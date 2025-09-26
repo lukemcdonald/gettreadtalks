@@ -61,13 +61,19 @@ export function validateClientEnv() {
 }
 
 export function getEnvironmentStatus() {
-  const requiredVars = ["NEXT_PUBLIC_CONVEX_URL", "BETTER_AUTH_SECRET", "NEXT_PUBLIC_SITE_URL"];
+  const requiredVars = [
+    "NEXT_PUBLIC_CONVEX_URL",
+    "NEXT_PUBLIC_CONVEX_SITE_URL",
+    "SITE_URL",
+    "BETTER_AUTH_SECRET",
+  ];
 
   const optional = [
     "NEXT_PUBLIC_SENTRY_DSN",
     "NEXT_PUBLIC_BOT_PROTECTION_TOKEN",
     "BETTER_AUTH_EMAIL_FROM",
     "RESEND_API_KEY",
+    "NEXT_PUBLIC_APP_ENV",
   ];
 
   const missing = requiredVars.filter((key) => !process.env[key]);
