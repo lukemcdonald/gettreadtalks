@@ -1,0 +1,9 @@
+{
+  "functions": "convex/",
+  "generateCommonJSApi": false,
+  "node": {
+    "externalPackages": [
+      "better-auth"
+    ]
+  }
+}
