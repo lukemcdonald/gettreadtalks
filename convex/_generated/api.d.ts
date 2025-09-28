@@ -9,8 +9,14 @@
  */
 
 import type * as auth from "../auth.js";
+import type * as clips from "../clips.js";
+import type * as collections from "../collections.js";
+import type * as favorites from "../favorites.js";
 import type * as http from "../http.js";
+import type * as speakers from "../speakers.js";
 import type * as talks from "../talks.js";
+import type * as topics from "../topics.js";
+import type * as utils from "../utils.js";
 
 import type {
   ApiFromModules,
@@ -28,8 +34,14 @@ import type {
  */
 declare const fullApi: ApiFromModules<{
   auth: typeof auth;
+  clips: typeof clips;
+  collections: typeof collections;
+  favorites: typeof favorites;
   http: typeof http;
+  speakers: typeof speakers;
   talks: typeof talks;
+  topics: typeof topics;
+  utils: typeof utils;
 }>;
 declare const fullApiWithMounts: typeof fullApi;
 

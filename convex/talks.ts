@@ -1,8 +1,9 @@
-import { query } from "./_generated/server";
+import { query, mutation } from "./_generated/server";
 import { v } from "convex/values";
+import { authComponent } from "./auth";
+import { normalizeSlug } from "./utils";
 
-// Get published talks with pagination
-export const getPublishedTalks = query({
+export const getPublished = query({
   args: {
     limit: v.optional(v.number()),
   },
@@ -31,8 +32,7 @@ export const getPublishedTalks = query({
   },
 });
 
-// Get talk by slug
-export const getTalkBySlug = query({
+export const getBySlug = query({
   args: {
     slug: v.string(),
   },
@@ -47,10 +47,8 @@ export const getTalkBySlug = query({
       return null;
     }
 
-    // Fetch speaker information
     const speaker = await ctx.db.get(talk.speakerId);
 
-    // Fetch collection if exists
     let collection = null;
     if (talk.collectionId) {
       collection = await ctx.db.get(talk.collectionId);
@@ -61,5 +59,127 @@ export const getTalkBySlug = query({
       collection,
       speaker,
     };
+  },
+});
+
+export const getBySpeaker = query({
+  args: {
+    speakerId: v.id("speakers"),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const limit = args.limit || 20;
+
+    return await ctx.db
+      .query("talks")
+      .withIndex("by_speaker_id", (q) => q.eq("speakerId", args.speakerId))
+      .filter((q) => q.eq(q.field("status"), "published"))
+      .order("desc")
+      .take(limit);
+  },
+});
+
+export const getByCollection = query({
+  args: {
+    collectionId: v.id("collections"),
+  },
+  handler: async (ctx, args) => {
+    const talks = await ctx.db
+      .query("talks")
+      .withIndex("by_collection_id_and_order", (q) => q.eq("collectionId", args.collectionId))
+      .filter((q) => q.eq(q.field("status"), "published"))
+      .collect();
+
+    // Sort by collectionOrder
+    return talks.sort((a, b) => (a.collectionOrder || 0) - (b.collectionOrder || 0));
+  },
+});
+
+export const create = mutation({
+  args: {
+    mediaUrl: v.string(),
+    speakerId: v.id("speakers"),
+    title: v.string(),
+    collectionId: v.optional(v.id("collections")),
+    collectionOrder: v.optional(v.number()),
+    scripture: v.optional(v.string()),
+    status: v.optional(
+      v.union(
+        v.literal("backlog"),
+        v.literal("approved"),
+        v.literal("published"),
+        v.literal("archived")
+      )
+    ),
+  },
+  handler: async (ctx, args) => {
+    const user = await authComponent.getAuthUser(ctx);
+
+    if (!user) {
+      throw new Error("Authentication required");
+    }
+
+    const slug = normalizeSlug(args.title);
+
+    const existing = await ctx.db
+      .query("talks")
+      .withIndex("by_slug", (q) => q.eq("slug", slug))
+      .first();
+
+    if (existing) {
+      throw new Error("Talk with this title already exists");
+    }
+
+    const status = args.status || "backlog";
+    const publishedAt = status === "published" ? Date.now() : undefined;
+
+    return await ctx.db.insert("talks", {
+      ...args,
+      createdAt: Date.now(),
+      publishedAt,
+      slug,
+      status,
+    });
+  },
+});
+
+export const updateStatus = mutation({
+  args: {
+    id: v.id("talks"),
+    status: v.union(
+      v.literal("backlog"),
+      v.literal("approved"),
+      v.literal("published"),
+      v.literal("archived")
+    ),
+  },
+  handler: async (ctx, args) => {
+    const user = await authComponent.getAuthUser(ctx);
+
+    if (!user) {
+      throw new Error("Authentication required");
+    }
+
+    const talk = await ctx.db.get(args.id);
+
+    if (!talk) {
+      throw new Error("Talk not found");
+    }
+
+    const updates: any = {
+      status: args.status,
+    };
+
+    if (args.status === "published" && !talk.publishedAt) {
+      updates.publishedAt = Date.now();
+    } else if (args.status !== "published") {
+      updates.publishedAt = undefined;
+    }
+
+    updates.updatedAt = Date.now();
+
+    await ctx.db.patch(args.id, updates);
+
+    return args.id;
   },
 });
