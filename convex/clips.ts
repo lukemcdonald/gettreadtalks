@@ -4,6 +4,7 @@ import { authComponent } from "./auth";
 import { normalizeSlug } from "./utils";
 
 export const getPublished = query({
+  args: {},
   handler: async (ctx) => {
     return await ctx.db
       .query("clips")

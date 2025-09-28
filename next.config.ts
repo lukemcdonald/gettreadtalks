@@ -1,6 +1,21 @@
 import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
 
+const cspHeader = `
+  base-uri 'self';
+  connect-src 'self' https://*.convex.cloud wss://*.convex.cloud;
+  default-src 'self';
+  font-src 'self' data:;
+  form-action 'self';
+  frame-ancestors 'none';
+  frame-src 'self';
+  img-src 'self' blob: data: https:;
+  object-src 'none';
+  script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live;
+  style-src 'self' 'unsafe-inline';
+  upgrade-insecure-requests;
+`;
+
 const nextConfig: NextConfig = {
   experimental: {
     instrumentationHook: true,
@@ -8,14 +23,13 @@ const nextConfig: NextConfig = {
   headers: async () => {
     return [
       {
+        source: "/(.*)",
         headers: [
           {
             key: "Content-Security-Policy",
-            value:
-              "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://*.convex.cloud wss://*.convex.cloud; frame-src 'self';",
+            value: cspHeader.replace(/\n/g, ""),
           },
         ],
-        source: "/(.*)",
       },
     ];
   },

@@ -14,10 +14,6 @@ export default function AuthStatus() {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
-
   const checkAuth = async () => {
     try {
       const session = await authClient.getSession();
@@ -42,10 +38,14 @@ export default function AuthStatus() {
     }
   };
 
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
   if (isLoading) {
     return (
-      <div className="inline-flex items-center px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-full">
-        <span className="animate-spin text-blue-500 mr-2">⚪</span>
+      <div className="inline-flex gap-2 items-center px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-full">
+        <span>⚪</span>
         <span className="text-gray-600 dark:text-gray-300">Checking auth...</span>
       </div>
     );
@@ -55,8 +55,8 @@ export default function AuthStatus() {
     return (
       <div className="inline-flex items-center space-x-4">
         <div className="inline-flex items-center px-4 py-2 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full">
-          <span className="text-green-500 mr-2">✅</span>
-          <span className="font-medium">Logged in as {user.name}</span>
+          <span>✅</span>
+          <span>Logged in as {user.name}</span>
         </div>
         <div className="space-x-2">
           <Link
@@ -80,7 +80,7 @@ export default function AuthStatus() {
   return (
     <div className="inline-flex items-center space-x-4">
       <div className="inline-flex items-center px-4 py-2 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-full">
-        <span className="text-yellow-500 mr-2">🔐</span>
+        <span>🔐</span>
         <span>Not logged in</span>
       </div>
       <div className="space-x-2">

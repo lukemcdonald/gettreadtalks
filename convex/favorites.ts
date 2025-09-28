@@ -3,6 +3,7 @@ import { v } from "convex/values";
 import { authComponent } from "./auth";
 
 export const getUserFavorites = query({
+  args: {},
   handler: async (ctx) => {
     const user = await authComponent.getAuthUser(ctx);
 

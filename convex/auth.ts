@@ -7,8 +7,10 @@ import { betterAuth } from "better-auth";
 
 const siteUrl = process.env.BETTER_AUTH_BASE_URL || process.env.SITE_URL || "http://localhost:3000";
 
-// The component client has methods needed for integrating Convex with Better Auth,
-// as well as helper methods for general use.
+/**
+ * The component client has methods needed for integrating Convex with
+ * Better Auth, as well as helper methods for general use.
+ */
 export const authComponent = createClient<DataModel>(components.betterAuth);
 
 export const createAuth = (
@@ -16,29 +18,24 @@ export const createAuth = (
   { optionsOnly } = { optionsOnly: false }
 ) => {
   return betterAuth({
-    // disable logging when createAuth is called just to generate options.
-    // this is not required, but there's a lot of noise in logs without it.
-    logger: {
-      disabled: optionsOnly,
-    },
+    plugins: [convex()],
+    database: authComponent.adapter(ctx),
     baseURL: siteUrl,
     secret: process.env.BETTER_AUTH_SECRET!,
-    database: authComponent.adapter(ctx),
     trustedOrigins: ["http://localhost:3000", "https://academic-reindeer-888.convex.site"],
     // Configure simple, non-verified email/password to get started
     emailAndPassword: {
       enabled: true,
       requireEmailVerification: false,
     },
-    plugins: [
-      // The Convex plugin is required for Convex compatibility
-      convex(),
-    ],
+    // disable logging when createAuth is called just to generate options.
+    // this is not required, but there's a lot of noise in logs without it.
+    logger: {
+      disabled: optionsOnly,
+    },
   });
 };
 
-// Example function for getting the current user
-// Feel free to edit, omit, etc.
 export const getCurrentUser = query({
   args: {},
   handler: async (ctx) => {

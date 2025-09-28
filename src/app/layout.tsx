@@ -16,6 +16,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   description: "TREADTalks - Faith-based talks and content platform",
   title: "TREADTalks",
+  icons: {
+    // icon: '/favicon.svg', // place in public folder. Add apple icon too.
+  },
 };
 
 export default function RootLayout({

@@ -3,6 +3,7 @@ import { v } from "convex/values";
 import { normalizeSlug } from "./utils";
 
 export const getAll = query({
+  args: {},
   handler: async (ctx) => {
     return await ctx.db.query("collections").collect();
   },
