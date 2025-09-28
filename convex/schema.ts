@@ -18,13 +18,8 @@ export const AffiliateType = v.union(
 );
 
 export default defineSchema({
-  // Users table for Better Auth integration
-  users: defineTable({
-    createdAt: v.optional(v.number()),
-    displayName: v.optional(v.string()),
-    email: v.string(),
-    updatedAt: v.optional(v.number()),
-  }).index("by_email", ["email"]),
+  // Note: Better Auth component automatically manages auth-related tables
+  // Remove manual users table definition to avoid conflicts
 
   // Speakers table
   speakers: defineTable({
@@ -120,11 +115,11 @@ export default defineSchema({
     .index("by_clip_id", ["clipId"])
     .index("by_topic_id", ["topicId"]),
 
-  // User favorites: talks
+  // User favorites: talks (userId will reference Better Auth managed users)
   userFavoriteTalks: defineTable({
     createdAt: v.optional(v.number()),
     talkId: v.id("talks"),
-    userId: v.id("users"),
+    userId: v.string(), // Better Auth user ID (string)
   })
     .index("by_user_and_talk", ["userId", "talkId"])
     .index("by_talk_id", ["talkId"]),
@@ -133,7 +128,7 @@ export default defineSchema({
   userFavoriteClips: defineTable({
     clipId: v.id("clips"),
     createdAt: v.optional(v.number()),
-    userId: v.id("users"),
+    userId: v.string(), // Better Auth user ID (string)
   })
     .index("by_user_and_clip", ["userId", "clipId"])
     .index("by_clip_id", ["clipId"]),
@@ -142,7 +137,7 @@ export default defineSchema({
   userFavoriteSpeakers: defineTable({
     createdAt: v.optional(v.number()),
     speakerId: v.id("speakers"),
-    userId: v.id("users"),
+    userId: v.string(), // Better Auth user ID (string)
   })
     .index("by_user_and_speaker", ["userId", "speakerId"])
     .index("by_speaker_id", ["speakerId"]),
@@ -151,7 +146,7 @@ export default defineSchema({
   userBookmarkedTalks: defineTable({
     createdAt: v.optional(v.number()),
     talkId: v.id("talks"),
-    userId: v.id("users"),
+    userId: v.string(), // Better Auth user ID (string)
   })
     .index("by_user_and_talk", ["userId", "talkId"])
     .index("by_talk_id", ["talkId"]),
@@ -160,7 +155,7 @@ export default defineSchema({
   userBookmarkedClips: defineTable({
     clipId: v.id("clips"),
     createdAt: v.optional(v.number()),
-    userId: v.id("users"),
+    userId: v.string(), // Better Auth user ID (string)
   })
     .index("by_user_and_clip", ["userId", "clipId"])
     .index("by_clip_id", ["clipId"]),

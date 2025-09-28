@@ -49,11 +49,11 @@ export default function LoginPage() {
       if (result.data) {
         window.location.href = "/account";
       } else {
-        setError("Registration failed. Please try again.");
+        setError(`Registration failed: ${result.error?.message || "Please try again."}`);
       }
-    } catch (err) {
-      setError("Registration failed. Please try again.");
+    } catch (err: any) {
       console.error("Registration error:", err);
+      setError(`Registration failed: ${err.message || "Please try again."}`);
     } finally {
       setIsLoading(false);
     }

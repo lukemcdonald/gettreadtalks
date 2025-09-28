@@ -1,3 +1,4 @@
+import AuthStatus from "@/components/auth-status";
 import EnvStatus from "@/components/env-status";
 import Link from "next/link";
 
@@ -12,9 +13,14 @@ export default function Home() {
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">
             Faith-based talks and content platform
           </p>
-          <div className="inline-flex items-center px-4 py-2 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full">
-            <span className="text-green-500 mr-2">✅</span>
-            Next.js + Convex + Better Auth Setup Complete
+          <div className="space-y-4">
+            <div className="inline-flex items-center px-4 py-2 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full">
+              <span className="text-green-500 mr-2">✅</span>
+              Next.js + Convex + Better Auth Setup Complete
+            </div>
+            <div>
+              <AuthStatus />
+            </div>
           </div>
         </header>
 
@@ -27,20 +33,27 @@ export default function Home() {
                 🔒 Authentication
               </h3>
               <p className="text-gray-600 dark:text-gray-300 mb-4">
-                Better Auth is configured for email/password authentication.
+                Better Auth is working perfectly! Create an account or login to access personalized
+                features.
               </p>
+              <div className="space-y-2 text-sm text-gray-500 dark:text-gray-400 mb-4">
+                <div>• Email/password authentication</div>
+                <div>• Secure session management</div>
+                <div>• Account dashboard</div>
+                <div>• User preferences & favorites</div>
+              </div>
               <div className="space-x-4">
                 <Link
                   className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
                   href="/login"
                 >
-                  Login
+                  Login / Register
                 </Link>
                 <Link
                   className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                   href="/account"
                 >
-                  Account
+                  Account Dashboard
                 </Link>
               </div>
             </div>
