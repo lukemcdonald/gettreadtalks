@@ -4,6 +4,7 @@ import { components } from "./_generated/api";
 import { DataModel } from "./_generated/dataModel";
 import { query } from "./_generated/server";
 import { betterAuth } from "better-auth";
+import { nextCookies } from "better-auth/next-js";
 
 const siteUrl = process.env.BETTER_AUTH_BASE_URL || process.env.SITE_URL || "http://localhost:3000";
 
@@ -18,7 +19,10 @@ export const createAuth = (
   { optionsOnly } = { optionsOnly: false }
 ) => {
   return betterAuth({
-    plugins: [convex()],
+    plugins: [
+      convex(),
+      nextCookies(), // Add nextCookies as the last plugin for automatic cookie handling
+    ],
     database: authComponent.adapter(ctx),
     baseURL: siteUrl,
     secret: process.env.BETTER_AUTH_SECRET!,
@@ -28,6 +32,12 @@ export const createAuth = (
       enabled: true,
       requireEmailVerification: false,
     },
+    // socialProviders: {
+    //   google: {
+    //     clientId: process.env.GOOGLE_CLIENT_ID!,
+    //     clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    //   },
+    // },
     // disable logging when createAuth is called just to generate options.
     // this is not required, but there's a lot of noise in logs without it.
     logger: {
