@@ -16,6 +16,7 @@ import type * as http from "../http.js";
 import type * as speakers from "../speakers.js";
 import type * as talks from "../talks.js";
 import type * as topics from "../topics.js";
+import type * as users from "../users.js";
 import type * as utils from "../utils.js";
 
 import type {
@@ -41,6 +42,7 @@ declare const fullApi: ApiFromModules<{
   speakers: typeof speakers;
   talks: typeof talks;
   topics: typeof topics;
+  users: typeof users;
   utils: typeof utils;
 }>;
 declare const fullApiWithMounts: typeof fullApi;
