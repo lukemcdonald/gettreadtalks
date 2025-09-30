@@ -1,0 +1,85 @@
+---
+description: Feature-based architecture with dot notation file naming conventions for Next.js projects
+globs: **/*.ts,**/*.tsx
+---
+
+# Feature-Based Architecture Rules
+
+## Directory Structure
+
+Organize code by features in the `src/features/` directory structure.
+
+```
+src/features/
+├── auth/
+│   ├── auth.types.ts   ← TypeScript interfaces/types
+│   ├── auth.server.ts  ← Server-side utilities
+│   ├── auth.client.ts  ← Client-side utilities
+│   └── auth.actions.ts ← Server Actions
+└── [feature]/
+    ├── [feature].types.ts
+    ├── [feature].server.ts
+    ├── [feature].client.ts
+    └── [feature].actions.ts
+```
+
+## File Naming Conventions
+
+### Dot Notation Pattern
+
+Use dot notation to indicate file purpose within each feature:
+
+- `[feature].types.ts` - TypeScript interfaces, types, and type definitions
+- `[feature].server.ts` - Server-side utilities and functions
+- `[feature].client.ts` - Client-side utilities and functions
+- `[feature].actions.ts` - Server Actions (Next.js App Router)
+- `[feature].utils.ts` - Shared utilities that work in both environments
+
+### When to Use Suffixes
+
+Use dot notation suffixes to indicate file purpose and environment. Always use suffixes for feature files to maintain consistency.
+
+## Feature Organization Principles
+
+### 1. Feature Cohesion
+
+- All code related to a specific domain should be in the same feature directory
+- Keep related functionality together (auth, users, talks, etc.)
+- Each feature should be self-contained with minimal cross-feature dependencies
+
+### 2. Clear Separation of Concerns
+
+- **Server code** (`*.server.ts`) - Runs only on the server
+- **Client code** (`*.client.ts`) - Runs only in the browser
+- **Actions** (`*.actions.ts`) - Server Actions that can be called from client components
+- **Types** (`*.types.ts`) - TypeScript definitions and interfaces
+- **Utils** (`*.utils.ts`) - Shared utilities that work in both environments
+
+### 3. Import Paths
+
+Use feature-based import paths:
+
+```typescript
+// ✅ Good - Feature-based imports
+import { authClient } from "@/features/auth/auth.client";
+import { getAuthToken } from "@/features/auth/auth.server";
+import { updatePassword } from "@/features/users/users.actions";
+
+// ❌ Bad - Generic lib imports
+import { authClient } from "@/lib/auth-client";
+import { getAuthToken } from "@/lib/auth-server";
+```
+
+## Implementation Guidelines
+
+### Server Actions vs Server Utilities
+
+- **`*.actions.ts`** - Server Actions with `"use server"` directive. Can be called from client components.
+- **`*.server.ts`** - Server utilities without directive. Cannot be called from client components.
+- Server Actions can import and use Server Utilities for reusable server logic.
+
+### Type Definitions
+
+- Define types in `*.types.ts` files within each feature
+- Export types that are used across features
+- Keep feature-specific types local to their feature directory

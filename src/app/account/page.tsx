@@ -1,6 +1,7 @@
 "use client";
 
-import { authClient } from "@/lib/auth-client";
+import MainLayout from "@/components/layouts/main";
+import { authClient } from "@/features/auth/auth.client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -47,14 +48,14 @@ export default function AccountPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600"></div>
       </div>
     );
   }
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <MainLayout>
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Access Denied</h1>
           <p className="text-gray-600 mb-4">You need to be logged in to view this page.</p>
@@ -65,116 +66,73 @@ export default function AccountPage() {
             Go to Login
           </Link>
         </div>
-      </div>
+      </MainLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <Link className="text-blue-600 hover:text-blue-700 font-medium" href="/">
-            ← Back to Home
-          </Link>
+    <MainLayout>
+      <div className="bg-white dark:bg-gray-800 shadow-xl rounded-lg">
+        <div className="px-6 py-8 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                Account Dashboard
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400 mt-2">Welcome back, {user.name}!</p>
+            </div>
+            <button
+              className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md transition-colors"
+              onClick={handleLogout}
+              type="button"
+            >
+              Logout
+            </button>
+          </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 shadow-xl rounded-lg">
-          <div className="px-6 py-8 border-b border-gray-200 dark:border-gray-700">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-                  Account Dashboard
-                </h1>
-                <p className="text-gray-600 dark:text-gray-400 mt-2">Welcome back, {user.name}!</p>
+        <div className="px-6 py-8">
+          <div className="grid md:grid-cols-2 gap-8">
+            <div>
+              <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+                Profile Information
+              </h2>
+              <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Email
+                    </label>
+                    <p className="text-gray-900 dark:text-white">{user.email}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Name
+                    </label>
+                    <p className="text-gray-900 dark:text-white">{user.name}</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      User ID
+                    </label>
+                    <p className="text-gray-500 dark:text-gray-400 font-mono text-sm">{user.id}</p>
+                  </div>
+                </div>
               </div>
-              <button
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md transition-colors"
-                onClick={handleLogout}
-                type="button"
-              >
-                Logout
-              </button>
             </div>
-          </div>
 
-          <div className="px-6 py-8">
-            <div className="grid md:grid-cols-2 gap-8">
-              <div>
-                <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
-                  Profile Information
-                </h2>
-                <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
-                  <div className="space-y-3">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Email
-                      </label>
-                      <p className="text-gray-900 dark:text-white">{user.email}</p>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Name
-                      </label>
-                      <p className="text-gray-900 dark:text-white">{user.name}</p>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        User ID
-                      </label>
-                      <p className="text-gray-500 dark:text-gray-400 font-mono text-sm">
-                        {user.id}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
-                  Account Status
-                </h2>
-                <div className="bg-green-50 dark:bg-green-900 p-4 rounded-lg">
-                  <div className="flex items-center">
-                    <span className="text-green-500 text-xl mr-2">✅</span>
-                    <div>
-                      <p className="text-green-800 dark:text-green-200 font-medium">
-                        Account Active
-                      </p>
-                      <p className="text-green-600 dark:text-green-400 text-sm">
-                        Your authentication is working correctly
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-6">
-                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">
-                    Available Features
-                  </h3>
-                  <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                    <li className="flex items-center">
-                      <span className="text-blue-500 mr-2">•</span>
-                      Browse talks and clips
-                    </li>
-                    <li className="flex items-center">
-                      <span className="text-blue-500 mr-2">•</span>
-                      Save favorites and bookmarks
-                    </li>
-                    <li className="flex items-center">
-                      <span className="text-blue-500 mr-2">•</span>
-                      Follow speakers
-                    </li>
-                    <li className="flex items-center">
-                      <span className="text-gray-400 mr-2">•</span>
-                      <span className="text-gray-400">More features coming soon...</span>
-                    </li>
-                  </ul>
-                </div>
+            <div>
+              <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+                Account Status
+              </h2>
+              <div className="bg-green-50 dark:bg-green-900 p-4 rounded-lg">
+                <p className="font-semibold">Account Active</p>
+                <p>Your authentication is working correctly</p>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </MainLayout>
   );
 }

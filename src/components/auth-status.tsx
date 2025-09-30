@@ -1,6 +1,6 @@
 "use client";
 
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/features/auth/auth.client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -18,7 +18,7 @@ export default function AuthStatus() {
     try {
       const session = await authClient.getSession();
       if (session.data?.user) {
-        setUser(session.data.user as User);
+        setUser(session.data.user);
       }
     } catch (error) {
       console.error("Auth check failed:", error);
@@ -55,8 +55,7 @@ export default function AuthStatus() {
     return (
       <div className="inline-flex items-center space-x-4">
         <div className="inline-flex items-center px-4 py-2 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full">
-          <span>✅</span>
-          <span>Logged in as {user.name}</span>
+          {user.name}
         </div>
         <div className="space-x-2">
           <Link
@@ -80,8 +79,7 @@ export default function AuthStatus() {
   return (
     <div className="inline-flex items-center space-x-4">
       <div className="inline-flex items-center px-4 py-2 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-full">
-        <span>🔐</span>
-        <span>Not logged in</span>
+        Not logged in
       </div>
       <div className="space-x-2">
         <Link
