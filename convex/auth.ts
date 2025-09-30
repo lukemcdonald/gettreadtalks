@@ -2,11 +2,11 @@ import { createClient, type GenericCtx } from "@convex-dev/better-auth";
 import { convex } from "@convex-dev/better-auth/plugins";
 import { components } from "./_generated/api";
 import { DataModel } from "./_generated/dataModel";
-import { query } from "./_generated/server";
+import { query, QueryCtx } from "./_generated/server";
 import { betterAuth } from "better-auth";
 import { nextCookies } from "better-auth/next-js";
 
-const siteUrl = process.env.BETTER_AUTH_BASE_URL || process.env.SITE_URL || "http://localhost:3000";
+const siteUrl = process.env.SITE_URL;
 
 /**
  * The component client has methods needed for integrating Convex with
@@ -46,9 +46,22 @@ export const createAuth = (
   });
 };
 
+/**
+ * Get the current user.
+ * @param ctx - The query context.
+ * @returns
+ */
+export const safeGetUser = async (ctx: QueryCtx) => {
+  return authComponent.safeGetAuthUser(ctx);
+};
+
+export const getUser = async (ctx: QueryCtx) => {
+  return authComponent.getAuthUser(ctx);
+};
+
 export const getCurrentUser = query({
   args: {},
   handler: async (ctx) => {
-    return authComponent.getAuthUser(ctx);
+    return safeGetUser(ctx);
   },
 });
