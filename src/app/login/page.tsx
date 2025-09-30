@@ -2,7 +2,6 @@
 
 import MainLayout from "@/components/layouts/main";
 import { authClient } from "@/features/auth/auth.client";
-import Link from "next/link";
 import { useState } from "react";
 
 export default function LoginPage() {
