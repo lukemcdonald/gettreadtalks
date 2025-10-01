@@ -1,8 +1,9 @@
-"use client";
+'use client';
 
-import { Authenticated, Unauthenticated, AuthLoading } from "convex/react";
-import AuthenticatedContent from "./authenticated-content";
-import UnauthenticatedContent from "./unauthenticated-content";
+import { Authenticated, AuthLoading, Unauthenticated } from 'convex/react';
+
+import AuthenticatedContent from './authenticated-content';
+import UnauthenticatedContent from './unauthenticated-content';
 
 function AuthStatus() {
   return (

@@ -1,10 +1,11 @@
-"use client";
+'use client';
 
-import { Authenticated, Unauthenticated } from "convex/react";
-import { useQuery } from "convex/react";
-import MainLayout from "@/components/layout/main-layout/main-layout";
-import Link from "next/link";
-import { api } from "@convex/_generated/api";
+import { api } from '@convex/_generated/api';
+import { Authenticated, Unauthenticated } from 'convex/react';
+import { useQuery } from 'convex/react';
+import Link from 'next/link';
+
+import MainLayout from '@/components/layout/main-layout/main-layout';
 
 export default function Home() {
   return (
@@ -26,7 +27,7 @@ const AuthenticatedHomeContent = () => {
   return (
     <div className="space-y-8">
       <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome back, {user?.name || "User"}!</h1>
+        <h1 className="text-4xl font-bold mb-4">Welcome back, {user?.name || 'User'}!</h1>
         <p className="text-lg text-gray-600 dark:text-gray-400">
           Discover inspiring talks and clips from TREAD Talks
         </p>

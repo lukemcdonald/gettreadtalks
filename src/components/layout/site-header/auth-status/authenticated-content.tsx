@@ -1,9 +1,10 @@
-"use client";
+'use client';
 
-import { useQuery } from "convex/react";
-import { signOut } from "@/features/auth/auth.client";
-import Link from "next/link";
-import { api } from "@convex/_generated/api";
+import { api } from '@convex/_generated/api';
+import { useQuery } from 'convex/react';
+import Link from 'next/link';
+
+import { signOut } from '@/features/auth/auth.client';
 
 function AuthenticatedContent() {
   const user = useQuery(api.auth.getCurrentUser);
@@ -13,14 +14,14 @@ function AuthenticatedContent() {
       await signOut();
       window.location.reload();
     } catch (error) {
-      console.error("Logout failed:", error);
+      console.error('Logout failed:', error);
     }
   };
 
   return (
     <div className="inline-flex items-center space-x-4">
       <div className="inline-flex items-center px-4 py-2 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full">
-        {user?.name || "User"}
+        {user?.name || 'User'}
       </div>
       <div className="space-x-2">
         <Link

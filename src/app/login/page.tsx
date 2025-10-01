@@ -1,31 +1,32 @@
-"use client";
+'use client';
 
-import MainLayout from "@/components/layout/main-layout/main-layout";
-import { signIn, signUp } from "@/features/auth/auth.client";
-import { AUTH_ERRORS } from "@/features/auth/auth.constants";
-import { useState } from "react";
+import { useState } from 'react';
+
+import MainLayout from '@/components/layout/main-layout/main-layout';
+import { signIn, signUp } from '@/features/auth/auth.client';
+import { AUTH_ERRORS } from '@/features/auth/auth.constants';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [error, setError] = useState("");
+  const [email, setEmail] = useState('');
+  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [password, setPassword] = useState("");
+  const [password, setPassword] = useState('');
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
+    setError('');
     setIsLoading(true);
 
     try {
       const result = await signIn({ email, password });
 
       if (result.data) {
-        window.location.href = "/account";
+        window.location.href = '/account';
       } else {
         setError(result.error?.message || AUTH_ERRORS.INVALID_CREDENTIALS);
       }
     } catch (err) {
-      console.error("Login error:", err);
+      console.error('Login error:', err);
       setError(AUTH_ERRORS.NETWORK_ERROR);
     } finally {
       setIsLoading(false);
@@ -34,19 +35,19 @@ export default function LoginPage() {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
+    setError('');
     setIsLoading(true);
 
     try {
       const result = await signUp({ email, password });
 
       if (result.data) {
-        window.location.href = "/account";
+        window.location.href = '/account';
       } else {
         setError(result.error?.message || AUTH_ERRORS.REGISTRATION_FAILED);
       }
     } catch (err) {
-      console.error("Registration error:", err);
+      console.error('Registration error:', err);
       setError(AUTH_ERRORS.NETWORK_ERROR);
     } finally {
       setIsLoading(false);
@@ -119,7 +120,7 @@ export default function LoginPage() {
               onClick={handleLogin}
               type="button"
             >
-              {isLoading ? "Signing in..." : "Sign In"}
+              {isLoading ? 'Signing in...' : 'Sign In'}
             </button>
             <button
               className="group relative w-full flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -127,7 +128,7 @@ export default function LoginPage() {
               onClick={handleRegister}
               type="button"
             >
-              {isLoading ? "Creating account..." : "Create Account"}
+              {isLoading ? 'Creating account...' : 'Create Account'}
             </button>
           </div>
         </form>

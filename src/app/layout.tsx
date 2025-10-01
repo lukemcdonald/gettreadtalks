@@ -1,20 +1,23 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import AuthProvider from "@/components/providers/auth-provider";
-import "./globals.css";
-import SiteHeader from "@/components/layout/site-header";
+import type { Metadata } from 'next';
+
+import { Inter } from 'next/font/google';
+
+import SiteHeader from '@/components/layout/site-header';
+
+import './globals.css';
+import AuthProvider from '@/components/providers/auth-provider';
 
 const inter = Inter({
-  variable: "--font-inter-sans",
-  subsets: ["latin"],
+  subsets: ['latin'],
+  variable: '--font-inter-sans',
 });
 
 export const metadata: Metadata = {
-  description: "TREADTalks - Faith-based talks and content platform",
-  title: "TREADTalks",
+  description: 'TREADTalks - Faith-based talks and content platform',
   icons: {
     // icon: '/favicon.svg', // place in public folder. Add apple icon too.
   },
+  title: 'TREADTalks',
 };
 
 export default function RootLayout({

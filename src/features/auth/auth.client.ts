@@ -1,6 +1,7 @@
-import { createAuthClient } from "better-auth/react";
-import { convexClient } from "@convex-dev/better-auth/client/plugins";
-import type { SignInParams, SignUpParams } from "./auth.types";
+import { convexClient } from '@convex-dev/better-auth/client/plugins';
+import { createAuthClient } from 'better-auth/react';
+
+import type { SignInParams, SignUpParams } from './auth.types';
 
 export const authClient = createAuthClient({
   plugins: [convexClient()],
@@ -9,7 +10,7 @@ export const authClient = createAuthClient({
 export async function signUp({ email, name, password }: SignUpParams) {
   return await authClient.signUp.email({
     email,
-    name: name || email.split("@")[0],
+    name: name || email.split('@')[0],
     password,
   });
 }

@@ -1,11 +1,12 @@
-"use client";
+'use client';
 
-import { Authenticated, Unauthenticated, AuthLoading } from "convex/react";
-import { useQuery } from "convex/react";
-import MainLayout from "@/components/layout/main-layout/main-layout";
-import { signOut } from "@/features/auth/auth.client";
-import Link from "next/link";
-import { api } from "@convex/_generated/api";
+import { api } from '@convex/_generated/api';
+import { Authenticated, AuthLoading, Unauthenticated } from 'convex/react';
+import { useQuery } from 'convex/react';
+import Link from 'next/link';
+
+import MainLayout from '@/components/layout/main-layout/main-layout';
+import { signOut } from '@/features/auth/auth.client';
 
 export default function AccountPage() {
   return (
@@ -32,9 +33,9 @@ const AccountContent = () => {
   const handleLogout = async () => {
     try {
       await signOut();
-      window.location.href = "/";
+      window.location.href = '/';
     } catch (error) {
-      console.error("Logout failed:", error);
+      console.error('Logout failed:', error);
     }
   };
 
@@ -45,7 +46,7 @@ const AccountContent = () => {
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Account Dashboard</h1>
             <p className="text-gray-600 dark:text-gray-400 mt-2">
-              Welcome back, {user?.name || "User"}!
+              Welcome back, {user?.name || 'User'}!
             </p>
           </div>
           <button
@@ -70,20 +71,20 @@ const AccountContent = () => {
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Email
                   </label>
-                  <p className="text-gray-900 dark:text-white">{user?.email || "Loading..."}</p>
+                  <p className="text-gray-900 dark:text-white">{user?.email || 'Loading...'}</p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Name
                   </label>
-                  <p className="text-gray-900 dark:text-white">{user?.name || "Loading..."}</p>
+                  <p className="text-gray-900 dark:text-white">{user?.name || 'Loading...'}</p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     User ID
                   </label>
                   <p className="text-gray-500 dark:text-gray-400 font-mono text-sm">
-                    {user?._id || user?.userId || "Loading..."}
+                    {user?._id || user?.userId || 'Loading...'}
                   </p>
                 </div>
               </div>

@@ -1,5 +1,6 @@
-import AuthStatus from "@/components/layout/site-header/auth-status";
-import Link from "next/link";
+import Link from 'next/link';
+
+import AuthStatus from '@/components/layout/site-header/auth-status';
 
 function SiteHeader() {
   return (
