@@ -1,6 +1,7 @@
 import Link from 'next/link';
 
 import AuthStatus from '@/components/layout/site-header/auth-status';
+import ThemeToggle from '@/components/theme-toggle';
 
 function SiteHeader() {
   return (
@@ -11,7 +12,10 @@ function SiteHeader() {
           <span className="text-black font-medium">Talks</span>
         </Link>
       </h1>
-      <AuthStatus />
+      <div className="flex items-center gap-4">
+        <ThemeToggle />
+        <AuthStatus />
+      </div>
     </header>
   );
 }
