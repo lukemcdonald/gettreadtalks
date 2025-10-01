@@ -1,0 +1,55 @@
+---
+description: Component organization patterns for Next.js projects with folder-based structure and barrel exports
+globs: **/*.tsx,**/*.ts
+---
+
+# Component Architecture Rules
+
+## Core Principles
+
+- **One component per file** - Split complex components, use composition
+- **Folder-based structure** - Each component gets its own folder with barrel export
+- **Kebab-case naming** - `auth-status/`, `user-profile.tsx`
+- **Co-located files** - Types, tests, utils in same folder
+
+## Folder Structure
+
+```
+src/components/
+├── component-name/
+│   ├── index.ts                    ← Barrel export
+│   ├── component-name.tsx          ← Main component
+│   ├── component-name.types.ts     ← Component types
+│   ├── component-name.test.tsx     ← Tests
+│   └── sub-component/              ← Nested components (same pattern)
+```
+
+## Component Placement
+
+- **Shared components**: `src/components/` (reusable across app)
+- **Page-specific**: `src/app/page-name/` (one-off components)
+- **Feature-specific**: `src/features/feature/components/` (complex domains)
+
+## Import Patterns
+
+```typescript
+// ✅ Barrel imports
+import ComponentName from "@/components/component-name";
+
+// ❌ Direct file imports
+import ComponentName from "@/components/component-name/component-name";
+```
+
+## Barrel Export Pattern
+
+```typescript
+// component-name/index.ts
+export { default } from "./component-name";
+export type { ComponentNameProps } from "./component-name.types";
+```
+
+## File Naming
+
+- Folders: `kebab-case` (`auth-status/`)
+- Files: `kebab-case` with purpose suffix (`auth-status.types.ts`)
+- Suffixes: `.types.ts`, `.test.tsx`, `.utils.ts`, `.hooks.ts`

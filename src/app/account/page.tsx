@@ -2,10 +2,10 @@
 
 import { Authenticated, Unauthenticated, AuthLoading } from "convex/react";
 import { useQuery } from "convex/react";
-import MainLayout from "@/components/layouts/main";
+import MainLayout from "@/components/layout/main-layout/main-layout";
 import { authClient } from "@/features/auth/auth.client";
 import Link from "next/link";
-import { api } from "../../../convex/_generated/api";
+import { api } from "@convex/_generated/api";
 
 export default function AccountPage() {
   return (

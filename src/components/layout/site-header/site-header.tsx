@@ -1,4 +1,4 @@
-import AuthStatus from "@/components/auth-status";
+import AuthStatus from "@/components/layout/site-header/auth-status";
 import Link from "next/link";
 
 function SiteHeader() {

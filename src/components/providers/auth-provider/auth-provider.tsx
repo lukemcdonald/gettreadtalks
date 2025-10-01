@@ -10,10 +10,12 @@ const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!, {
   expectAuth: true,
 });
 
-export default function Providers({ children }: { children: ReactNode }) {
+function AuthProvider({ children }: { children: ReactNode }) {
   return (
     <ConvexBetterAuthProvider client={convex} authClient={authClient}>
       {children}
     </ConvexBetterAuthProvider>
   );
 }
+
+export default AuthProvider;

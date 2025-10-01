@@ -2,9 +2,9 @@
 
 import { Authenticated, Unauthenticated } from "convex/react";
 import { useQuery } from "convex/react";
-import MainLayout from "@/components/layouts/main";
+import MainLayout from "@/components/layout/main-layout/main-layout";
 import Link from "next/link";
-import { api } from "../../convex/_generated/api";
+import { api } from "@convex/_generated/api";
 
 export default function Home() {
   return (

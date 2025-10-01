@@ -1,6 +1,6 @@
 "use client";
 
-import MainLayout from "@/components/layouts/main";
+import MainLayout from "@/components/layout/main-layout/main-layout";
 import { authClient } from "@/features/auth/auth.client";
 import { useState } from "react";
 

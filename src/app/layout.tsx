@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import Providers from "@/components/providers";
+import AuthProvider from "@/components/providers/auth-provider";
 import "./globals.css";
-import SiteHeader from "@/components/site-header";
+import SiteHeader from "@/components/layout/site-header";
 
 const inter = Inter({
   variable: "--font-inter-sans",
@@ -25,10 +25,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Providers>
+        <AuthProvider>
           <SiteHeader />
           {children}
-        </Providers>
+        </AuthProvider>
       </body>
     </html>
   );
