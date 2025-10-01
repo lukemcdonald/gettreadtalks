@@ -12,15 +12,18 @@ Organize code by features in the `src/features/` directory structure.
 ```
 src/features/
 ├── auth/
-│   ├── auth.types.ts   ← TypeScript interfaces/types
-│   ├── auth.server.ts  ← Server-side utilities
+│   ├── auth.actions.ts ← Server Actions
 │   ├── auth.client.ts  ← Client-side utilities
-│   └── auth.actions.ts ← Server Actions
+│   ├── auth.queries.ts ← Client-side queries
+│   ├── auth.server.ts  ← Server-side utilities
+│   ├── auth.types.ts   ← TypeScript interfaces/types
+│   └── auth.utils.ts   ← Shared utilities for both environements
 └── [feature]/
-    ├── [feature].types.ts
-    ├── [feature].server.ts
+    ├── [feature].actions.ts
     ├── [feature].client.ts
-    └── [feature].actions.ts
+    ├── [feature].queries.ts
+    ├── [feature].server.ts
+    └── [feature].types.ts
 ```
 
 ## File Naming Conventions
@@ -29,10 +32,10 @@ src/features/
 
 Use dot notation to indicate file purpose within each feature:
 
-- `[feature].types.ts` - TypeScript interfaces, types, and type definitions
-- `[feature].server.ts` - Server-side utilities and functions
-- `[feature].client.ts` - Client-side utilities and functions
 - `[feature].actions.ts` - Server Actions (Next.js App Router)
+- `[feature].client.ts` - Client-side utilities and functions
+- `[feature].server.ts` - Server-side utilities and functions
+- `[feature].types.ts` - TypeScript interfaces, types, and type definitions
 - `[feature].utils.ts` - Shared utilities that work in both environments
 
 ### When to Use Suffixes
@@ -49,9 +52,9 @@ Use dot notation suffixes to indicate file purpose and environment. Always use s
 
 ### 2. Clear Separation of Concerns
 
-- **Server code** (`*.server.ts`) - Runs only on the server
-- **Client code** (`*.client.ts`) - Runs only in the browser
 - **Actions** (`*.actions.ts`) - Server Actions that can be called from client components
+- **Client code** (`*.client.ts`) - Runs only in the browser
+- **Server code** (`*.server.ts`) - Runs only on the server
 - **Types** (`*.types.ts`) - TypeScript definitions and interfaces
 - **Utils** (`*.utils.ts`) - Shared utilities that work in both environments
 

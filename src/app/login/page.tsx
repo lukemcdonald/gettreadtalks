@@ -1,7 +1,8 @@
 "use client";
 
 import MainLayout from "@/components/layout/main-layout/main-layout";
-import { authClient } from "@/features/auth/auth.client";
+import { signIn, signUp } from "@/features/auth/auth.client";
+import { AUTH_ERRORS } from "@/features/auth/auth.constants";
 import { useState } from "react";
 
 export default function LoginPage() {
@@ -16,19 +17,16 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const result = await authClient.signIn.email({
-        email,
-        password,
-      });
+      const result = await signIn({ email, password });
 
       if (result.data) {
         window.location.href = "/account";
       } else {
-        setError("Invalid email or password");
+        setError(result.error?.message || AUTH_ERRORS.INVALID_CREDENTIALS);
       }
     } catch (err) {
-      setError("Login failed. Please try again.");
       console.error("Login error:", err);
+      setError(AUTH_ERRORS.NETWORK_ERROR);
     } finally {
       setIsLoading(false);
     }
@@ -40,20 +38,16 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const result = await authClient.signUp.email({
-        email,
-        name: email.split("@")[0], // Use email prefix as default name
-        password,
-      });
+      const result = await signUp({ email, password });
 
       if (result.data) {
         window.location.href = "/account";
       } else {
-        setError(`Registration failed: ${result.error?.message || "Please try again."}`);
+        setError(result.error?.message || AUTH_ERRORS.REGISTRATION_FAILED);
       }
-    } catch (err: any) {
+    } catch (err) {
       console.error("Registration error:", err);
-      setError(`Registration failed: ${err.message || "Please try again."}`);
+      setError(AUTH_ERRORS.NETWORK_ERROR);
     } finally {
       setIsLoading(false);
     }

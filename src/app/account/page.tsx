@@ -3,7 +3,7 @@
 import { Authenticated, Unauthenticated, AuthLoading } from "convex/react";
 import { useQuery } from "convex/react";
 import MainLayout from "@/components/layout/main-layout/main-layout";
-import { authClient } from "@/features/auth/auth.client";
+import { signOut } from "@/features/auth/auth.client";
 import Link from "next/link";
 import { api } from "@convex/_generated/api";
 
@@ -31,7 +31,7 @@ const AccountContent = () => {
 
   const handleLogout = async () => {
     try {
-      await authClient.signOut();
+      await signOut();
       window.location.href = "/";
     } catch (error) {
       console.error("Logout failed:", error);

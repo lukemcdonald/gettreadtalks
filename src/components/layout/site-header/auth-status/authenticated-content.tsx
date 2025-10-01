@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "convex/react";
-import { authClient } from "@/features/auth/auth.client";
+import { signOut } from "@/features/auth/auth.client";
 import Link from "next/link";
 import { api } from "@convex/_generated/api";
 
@@ -10,7 +10,7 @@ function AuthenticatedContent() {
 
   const handleLogout = async () => {
     try {
-      await authClient.signOut();
+      await signOut();
       window.location.reload();
     } catch (error) {
       console.error("Logout failed:", error);
