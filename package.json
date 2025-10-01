@@ -9,7 +9,7 @@
     "dev:backend": "convex dev",
     "dev:frontend": "next dev --turbopack",
     "lint": "next lint",
-    "predev": "convex dev --until-success && convex dashboard",
+    "predev": "convex dev --until-success && convex dashboard && sleep 2 && open http://localhost:3000",
     "start": "next start",
     "type-check": "tsc --noEmit"
   },
