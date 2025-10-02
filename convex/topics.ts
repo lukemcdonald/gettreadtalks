@@ -1,5 +1,6 @@
 import { v } from 'convex/values';
 
+import { Doc } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
 import { normalizeSlug } from './utils';
 
@@ -100,7 +101,8 @@ export const update = mutation({
     title: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const { id, ...updates } = args;
+    const { id, ...rest } = args;
+    const updates: Partial<Doc<'topics'>> = rest;
     const topic = await ctx.db.get(id);
 
     if (!topic) {
@@ -120,11 +122,11 @@ export const update = mutation({
           throw new Error('Topic with this title already exists');
         }
 
-        (updates as any).slug = newSlug;
+        updates.slug = newSlug;
       }
     }
 
-    (updates as any).updatedAt = Date.now();
+    updates.updatedAt = Date.now();
 
     await ctx.db.patch(id, updates);
 

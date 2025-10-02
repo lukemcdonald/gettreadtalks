@@ -1,5 +1,6 @@
 import { v } from 'convex/values';
 
+import { Doc } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
 import { authComponent } from './auth';
 import { normalizeSlug } from './utils';
@@ -167,7 +168,7 @@ export const updateStatus = mutation({
       throw new Error('Talk not found');
     }
 
-    const updates: any = {
+    const updates: Partial<Doc<'talks'>> = {
       status: args.status,
     };
 
