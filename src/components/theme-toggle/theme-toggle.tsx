@@ -1,9 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+
 import { useTheme } from 'next-themes';
-import { THEMES, THEME_CYCLE, THEME_ICONS } from './theme-toggle.constants';
+
 import type { Theme } from './theme-toggle.types';
+
+import { THEME_CYCLE, THEME_ICONS, THEMES } from './theme-toggle.constants';
 
 const getNextTheme = (theme: string | undefined): Theme => {
   return THEME_CYCLE[theme as Theme] ?? THEMES.SYSTEM;
@@ -15,7 +18,7 @@ const getThemeIcon = (theme: string | undefined): string => {
 
 export default function ThemeToggle() {
   const [mounted, setMounted] = useState(false);
-  const { theme, setTheme, systemTheme } = useTheme();
+  const { setTheme, theme } = useTheme();
 
   useEffect(() => {
     setMounted(true);

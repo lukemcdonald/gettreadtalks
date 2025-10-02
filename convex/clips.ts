@@ -1,16 +1,16 @@
-import { query, mutation } from "./_generated/server";
-import { v } from "convex/values";
-import { authComponent } from "./auth";
-import { normalizeSlug } from "./utils";
+import { query, mutation } from './_generated/server';
+import { v } from 'convex/values';
+import { authComponent } from './auth';
+import { normalizeSlug } from './utils';
 
 export const getPublished = query({
   args: {},
   handler: async (ctx) => {
     return await ctx.db
-      .query("clips")
-      .withIndex("by_published_at")
-      .filter((q) => q.eq(q.field("status"), "published"))
-      .order("desc")
+      .query('clips')
+      .withIndex('by_published_at')
+      .filter((q) => q.eq(q.field('status'), 'published'))
+      .order('desc')
       .collect();
   },
 });
@@ -22,10 +22,10 @@ export const getLatest = query({
   handler: async (ctx, args) => {
     const limit = args.limit || 10;
     return await ctx.db
-      .query("clips")
-      .withIndex("by_published_at")
-      .filter((q) => q.eq(q.field("status"), "published"))
-      .order("desc")
+      .query('clips')
+      .withIndex('by_published_at')
+      .filter((q) => q.eq(q.field('status'), 'published'))
+      .order('desc')
       .take(limit);
   },
 });
@@ -36,11 +36,11 @@ export const getBySlug = query({
   },
   handler: async (ctx, args) => {
     const clip = await ctx.db
-      .query("clips")
-      .withIndex("by_slug", (q) => q.eq("slug", args.slug))
+      .query('clips')
+      .withIndex('by_slug', (q) => q.eq('slug', args.slug))
       .unique();
 
-    if (!clip || clip.status !== "published") {
+    if (!clip || clip.status !== 'published') {
       return null;
     }
 
@@ -58,8 +58,8 @@ export const getBySlug = query({
 
     // Get topics
     const clipTopics = await ctx.db
-      .query("clipsOnTopics")
-      .withIndex("by_clip_id", (q) => q.eq("clipId", clip._id))
+      .query('clipsOnTopics')
+      .withIndex('by_clip_id', (q) => q.eq('clipId', clip._id))
       .collect();
 
     const topics = [];
@@ -76,38 +76,38 @@ export const create = mutation({
   args: {
     title: v.string(),
     mediaUrl: v.string(),
-    speakerId: v.optional(v.id("speakers")),
-    talkId: v.optional(v.id("talks")),
+    speakerId: v.optional(v.id('speakers')),
+    talkId: v.optional(v.id('talks')),
     status: v.optional(
       v.union(
-        v.literal("backlog"),
-        v.literal("approved"),
-        v.literal("published"),
-        v.literal("archived")
-      )
+        v.literal('backlog'),
+        v.literal('approved'),
+        v.literal('published'),
+        v.literal('archived'),
+      ),
     ),
   },
   handler: async (ctx, args) => {
     const user = await authComponent.getAuthUser(ctx);
     if (!user) {
-      throw new Error("Authentication required");
+      throw new Error('Authentication required');
     }
 
     const slug = normalizeSlug(args.title);
 
     const existing = await ctx.db
-      .query("clips")
-      .withIndex("by_slug", (q) => q.eq("slug", slug))
+      .query('clips')
+      .withIndex('by_slug', (q) => q.eq('slug', slug))
       .first();
 
     if (existing) {
-      throw new Error("Clip with this title already exists");
+      throw new Error('Clip with this title already exists');
     }
 
-    const status = args.status || "backlog";
-    const publishedAt = status === "published" ? Date.now() : undefined;
+    const status = args.status || 'backlog';
+    const publishedAt = status === 'published' ? Date.now() : undefined;
 
-    return await ctx.db.insert("clips", {
+    return await ctx.db.insert('clips', {
       ...args,
       slug,
       status,
@@ -119,32 +119,32 @@ export const create = mutation({
 
 export const updateStatus = mutation({
   args: {
-    id: v.id("clips"),
+    id: v.id('clips'),
     status: v.union(
-      v.literal("backlog"),
-      v.literal("approved"),
-      v.literal("published"),
-      v.literal("archived")
+      v.literal('backlog'),
+      v.literal('approved'),
+      v.literal('published'),
+      v.literal('archived'),
     ),
   },
   handler: async (ctx, args) => {
     const user = await authComponent.getAuthUser(ctx);
 
     if (!user) {
-      throw new Error("Authentication required");
+      throw new Error('Authentication required');
     }
 
     const clip = await ctx.db.get(args.id);
 
     if (!clip) {
-      throw new Error("Clip not found");
+      throw new Error('Clip not found');
     }
 
     const updates: any = { status: args.status };
 
-    if (args.status === "published" && !clip.publishedAt) {
+    if (args.status === 'published' && !clip.publishedAt) {
       updates.publishedAt = Date.now();
-    } else if (args.status !== "published") {
+    } else if (args.status !== 'published') {
       updates.publishedAt = undefined;
     }
 

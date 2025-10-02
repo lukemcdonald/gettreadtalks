@@ -1,11 +1,11 @@
-import { query, mutation } from "./_generated/server";
-import { v } from "convex/values";
-import { normalizeSlug } from "./utils";
+import { query, mutation } from './_generated/server';
+import { v } from 'convex/values';
+import { normalizeSlug } from './utils';
 
 export const getAll = query({
   args: {},
   handler: async (ctx) => {
-    return await ctx.db.query("collections").collect();
+    return await ctx.db.query('collections').collect();
   },
 });
 
@@ -15,8 +15,8 @@ export const getBySlug = query({
   },
   handler: async (ctx, args) => {
     return await ctx.db
-      .query("collections")
-      .withIndex("by_slug", (q) => q.eq("slug", args.slug))
+      .query('collections')
+      .withIndex('by_slug', (q) => q.eq('slug', args.slug))
       .unique();
   },
 });
@@ -27,8 +27,8 @@ export const getWithTalks = query({
   },
   handler: async (ctx, args) => {
     const collection = await ctx.db
-      .query("collections")
-      .withIndex("by_slug", (q) => q.eq("slug", args.slug))
+      .query('collections')
+      .withIndex('by_slug', (q) => q.eq('slug', args.slug))
       .unique();
 
     if (!collection) {
@@ -36,9 +36,9 @@ export const getWithTalks = query({
     }
 
     const talks = await ctx.db
-      .query("talks")
-      .withIndex("by_collection_id_and_order", (q) => q.eq("collectionId", collection._id))
-      .filter((q) => q.eq(q.field("status"), "published"))
+      .query('talks')
+      .withIndex('by_collection_id_and_order', (q) => q.eq('collectionId', collection._id))
+      .filter((q) => q.eq(q.field('status'), 'published'))
       .collect();
 
     // Sort by collectionOrder
@@ -61,15 +61,15 @@ export const create = mutation({
     const slug = normalizeSlug(args.title);
 
     const existing = await ctx.db
-      .query("collections")
-      .withIndex("by_slug", (q) => q.eq("slug", slug))
+      .query('collections')
+      .withIndex('by_slug', (q) => q.eq('slug', slug))
       .first();
 
     if (existing) {
-      throw new Error("Collection with this title already exists");
+      throw new Error('Collection with this title already exists');
     }
 
-    return await ctx.db.insert("collections", {
+    return await ctx.db.insert('collections', {
       ...args,
       slug,
       createdAt: Date.now(),
@@ -80,7 +80,7 @@ export const create = mutation({
 export const update = mutation({
   args: {
     description: v.optional(v.string()),
-    id: v.id("collections"),
+    id: v.id('collections'),
     title: v.optional(v.string()),
     url: v.optional(v.string()),
   },
@@ -89,7 +89,7 @@ export const update = mutation({
     const collection = await ctx.db.get(id);
 
     if (!collection) {
-      throw new Error("Collection not found");
+      throw new Error('Collection not found');
     }
 
     if (updates.title) {
@@ -97,12 +97,12 @@ export const update = mutation({
 
       if (newSlug !== collection.slug) {
         const existing = await ctx.db
-          .query("collections")
-          .withIndex("by_slug", (q) => q.eq("slug", newSlug))
+          .query('collections')
+          .withIndex('by_slug', (q) => q.eq('slug', newSlug))
           .first();
 
         if (existing && existing._id !== id) {
-          throw new Error("Collection with this title already exists");
+          throw new Error('Collection with this title already exists');
         }
 
         (updates as any).slug = newSlug;

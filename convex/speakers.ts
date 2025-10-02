@@ -1,11 +1,11 @@
-import { query, mutation } from "./_generated/server";
-import { v } from "convex/values";
-import { normalizeSlug } from "./utils";
+import { query, mutation } from './_generated/server';
+import { v } from 'convex/values';
+import { normalizeSlug } from './utils';
 
 export const getAll = query({
   args: {},
   handler: async (ctx) => {
-    return await ctx.db.query("speakers").collect();
+    return await ctx.db.query('speakers').collect();
   },
 });
 
@@ -15,8 +15,8 @@ export const getBySlug = query({
   },
   handler: async (ctx, args) => {
     return await ctx.db
-      .query("speakers")
-      .withIndex("by_slug", (q) => q.eq("slug", args.slug))
+      .query('speakers')
+      .withIndex('by_slug', (q) => q.eq('slug', args.slug))
       .unique();
   },
 });
@@ -35,15 +35,15 @@ export const create = mutation({
     const slug = normalizeSlug(`${args.firstName} ${args.lastName}`);
 
     const existing = await ctx.db
-      .query("speakers")
-      .withIndex("by_slug", (q) => q.eq("slug", slug))
+      .query('speakers')
+      .withIndex('by_slug', (q) => q.eq('slug', slug))
       .first();
 
     if (existing) {
-      throw new Error("Speaker with this name already exists");
+      throw new Error('Speaker with this name already exists');
     }
 
-    return await ctx.db.insert("speakers", {
+    return await ctx.db.insert('speakers', {
       ...args,
       slug,
       createdAt: Date.now(),
@@ -55,7 +55,7 @@ export const update = mutation({
   args: {
     description: v.optional(v.string()),
     firstName: v.optional(v.string()),
-    id: v.id("speakers"),
+    id: v.id('speakers'),
     imageUrl: v.optional(v.string()),
     lastName: v.optional(v.string()),
     ministry: v.optional(v.string()),
@@ -68,7 +68,7 @@ export const update = mutation({
     const speaker = await ctx.db.get(id);
 
     if (!speaker) {
-      throw new Error("Speaker not found");
+      throw new Error('Speaker not found');
     }
 
     // If name changed, update slug
@@ -79,12 +79,12 @@ export const update = mutation({
 
       if (newSlug !== speaker.slug) {
         const existing = await ctx.db
-          .query("speakers")
-          .withIndex("by_slug", (q) => q.eq("slug", newSlug))
+          .query('speakers')
+          .withIndex('by_slug', (q) => q.eq('slug', newSlug))
           .first();
 
         if (existing && existing._id !== id) {
-          throw new Error("Speaker with this name already exists");
+          throw new Error('Speaker with this name already exists');
         }
 
         (updates as any).slug = newSlug;

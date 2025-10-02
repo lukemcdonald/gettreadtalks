@@ -3,8 +3,8 @@ import { fileURLToPath } from "url";
 import { FlatCompat } from "@eslint/eslintrc";
 import perfectionistPlugin from "eslint-plugin-perfectionist";
 
-const __dirname = dirname(__filename);
 const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const compat = new FlatCompat({
   baseDirectory: __dirname,
@@ -24,7 +24,7 @@ const eslintConfig = [
       ".turbo/**",
       ".vercel/**",
       "build/**",
-      "convex/**",
+      "convex/_generated/**",
       "coverage/**",
       "dist/**",
       "next-env.d.ts",

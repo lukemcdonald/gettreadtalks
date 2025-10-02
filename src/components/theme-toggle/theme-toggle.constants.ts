@@ -1,17 +1,17 @@
 export const THEMES = {
-  LIGHT: 'light',
   DARK: 'dark',
+  LIGHT: 'light',
   SYSTEM: 'system',
 } as const;
 
 export const THEME_CYCLE = {
-  [THEMES.LIGHT]: THEMES.DARK,
   [THEMES.DARK]: THEMES.SYSTEM,
+  [THEMES.LIGHT]: THEMES.DARK,
   [THEMES.SYSTEM]: THEMES.LIGHT,
 } as const;
 
 export const THEME_ICONS = {
-  [THEMES.LIGHT]: '☀️',
   [THEMES.DARK]: '🌙',
+  [THEMES.LIGHT]: '☀️',
   [THEMES.SYSTEM]: '💻',
 } as const;

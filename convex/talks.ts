@@ -1,7 +1,7 @@
-import { query, mutation } from "./_generated/server";
-import { v } from "convex/values";
-import { authComponent } from "./auth";
-import { normalizeSlug } from "./utils";
+import { query, mutation } from './_generated/server';
+import { v } from 'convex/values';
+import { authComponent } from './auth';
+import { normalizeSlug } from './utils';
 
 export const getPublished = query({
   args: {
@@ -11,10 +11,10 @@ export const getPublished = query({
     const limit = args.limit ?? 20;
 
     const talks = await ctx.db
-      .query("talks")
-      .withIndex("by_published_at")
-      .filter((q) => q.eq(q.field("status"), "published"))
-      .order("desc")
+      .query('talks')
+      .withIndex('by_published_at')
+      .filter((q) => q.eq(q.field('status'), 'published'))
+      .order('desc')
       .take(limit);
 
     // Fetch speaker information for each talk
@@ -25,7 +25,7 @@ export const getPublished = query({
           ...talk,
           speaker,
         };
-      })
+      }),
     );
 
     return talksWithSpeakers;
@@ -38,9 +38,9 @@ export const getBySlug = query({
   },
   handler: async (ctx, args) => {
     const talk = await ctx.db
-      .query("talks")
-      .withIndex("by_slug")
-      .filter((q) => q.eq(q.field("slug"), args.slug))
+      .query('talks')
+      .withIndex('by_slug')
+      .filter((q) => q.eq(q.field('slug'), args.slug))
       .unique();
 
     if (!talk) {
@@ -64,30 +64,30 @@ export const getBySlug = query({
 
 export const getBySpeaker = query({
   args: {
-    speakerId: v.id("speakers"),
+    speakerId: v.id('speakers'),
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     const limit = args.limit || 20;
 
     return await ctx.db
-      .query("talks")
-      .withIndex("by_speaker_id", (q) => q.eq("speakerId", args.speakerId))
-      .filter((q) => q.eq(q.field("status"), "published"))
-      .order("desc")
+      .query('talks')
+      .withIndex('by_speaker_id', (q) => q.eq('speakerId', args.speakerId))
+      .filter((q) => q.eq(q.field('status'), 'published'))
+      .order('desc')
       .take(limit);
   },
 });
 
 export const getByCollection = query({
   args: {
-    collectionId: v.id("collections"),
+    collectionId: v.id('collections'),
   },
   handler: async (ctx, args) => {
     const talks = await ctx.db
-      .query("talks")
-      .withIndex("by_collection_id_and_order", (q) => q.eq("collectionId", args.collectionId))
-      .filter((q) => q.eq(q.field("status"), "published"))
+      .query('talks')
+      .withIndex('by_collection_id_and_order', (q) => q.eq('collectionId', args.collectionId))
+      .filter((q) => q.eq(q.field('status'), 'published'))
       .collect();
 
     // Sort by collectionOrder
@@ -98,42 +98,42 @@ export const getByCollection = query({
 export const create = mutation({
   args: {
     mediaUrl: v.string(),
-    speakerId: v.id("speakers"),
+    speakerId: v.id('speakers'),
     title: v.string(),
-    collectionId: v.optional(v.id("collections")),
+    collectionId: v.optional(v.id('collections')),
     collectionOrder: v.optional(v.number()),
     scripture: v.optional(v.string()),
     status: v.optional(
       v.union(
-        v.literal("backlog"),
-        v.literal("approved"),
-        v.literal("published"),
-        v.literal("archived")
-      )
+        v.literal('backlog'),
+        v.literal('approved'),
+        v.literal('published'),
+        v.literal('archived'),
+      ),
     ),
   },
   handler: async (ctx, args) => {
     const user = await authComponent.getAuthUser(ctx);
 
     if (!user) {
-      throw new Error("Authentication required");
+      throw new Error('Authentication required');
     }
 
     const slug = normalizeSlug(args.title);
 
     const existing = await ctx.db
-      .query("talks")
-      .withIndex("by_slug", (q) => q.eq("slug", slug))
+      .query('talks')
+      .withIndex('by_slug', (q) => q.eq('slug', slug))
       .first();
 
     if (existing) {
-      throw new Error("Talk with this title already exists");
+      throw new Error('Talk with this title already exists');
     }
 
-    const status = args.status || "backlog";
-    const publishedAt = status === "published" ? Date.now() : undefined;
+    const status = args.status || 'backlog';
+    const publishedAt = status === 'published' ? Date.now() : undefined;
 
-    return await ctx.db.insert("talks", {
+    return await ctx.db.insert('talks', {
       ...args,
       createdAt: Date.now(),
       publishedAt,
@@ -145,34 +145,34 @@ export const create = mutation({
 
 export const updateStatus = mutation({
   args: {
-    id: v.id("talks"),
+    id: v.id('talks'),
     status: v.union(
-      v.literal("backlog"),
-      v.literal("approved"),
-      v.literal("published"),
-      v.literal("archived")
+      v.literal('backlog'),
+      v.literal('approved'),
+      v.literal('published'),
+      v.literal('archived'),
     ),
   },
   handler: async (ctx, args) => {
     const user = await authComponent.getAuthUser(ctx);
 
     if (!user) {
-      throw new Error("Authentication required");
+      throw new Error('Authentication required');
     }
 
     const talk = await ctx.db.get(args.id);
 
     if (!talk) {
-      throw new Error("Talk not found");
+      throw new Error('Talk not found');
     }
 
     const updates: any = {
       status: args.status,
     };
 
-    if (args.status === "published" && !talk.publishedAt) {
+    if (args.status === 'published' && !talk.publishedAt) {
       updates.publishedAt = Date.now();
-    } else if (args.status !== "published") {
+    } else if (args.status !== 'published') {
       updates.publishedAt = undefined;
     }
 
