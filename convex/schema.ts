@@ -12,8 +12,8 @@ const statusType = v.union(
 // Common timestamp fields for audit trail
 const timestampFields = {
   createdAt: v.optional(v.number()),
-  updatedAt: v.optional(v.number()),
   deletedAt: v.optional(v.number()),
+  updatedAt: v.optional(v.number()),
 };
 
 // Better Auth user ID (string)

@@ -1,7 +1,7 @@
-import { dirname } from "path";
-import { fileURLToPath } from "url";
 import { FlatCompat } from "@eslint/eslintrc";
 import perfectionistPlugin from "eslint-plugin-perfectionist";
+import { dirname } from "path";
+import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -11,27 +11,18 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
     ignores: [
       "**/*.d.ts",
-      "*.config.",
-      "*.log",
+      "*.config.*",
       "*.tsbuildinfo",
-      ".DS_Store",
-      ".env*",
       ".next/**",
-      ".turbo/**",
-      ".vercel/**",
-      "build/**",
       "convex/_generated/**",
-      "coverage/**",
-      "dist/**",
       "next-env.d.ts",
       "node_modules/**",
-      "out/**",
     ],
   },
+  ...compat.extends("next/core-web-vitals", "next/typescript"),
   {
     plugins: {
       perfectionist: perfectionistPlugin,
@@ -44,29 +35,6 @@ const eslintConfig = [
       "sort-keys": 'off',
 
       // Perfectionist rules
-      "perfectionist/sort-objects": [
-        "error",
-        {
-          order: "asc",
-          type: "alphabetical",
-          partitionByComment: true,
-          partitionByNewLine: true,
-        },
-      ],
-      "perfectionist/sort-interfaces": [
-        "error",
-        {
-          order: "asc",
-          type: "alphabetical",
-        },
-      ],
-      "perfectionist/sort-object-types": [
-        "error",
-        {
-          order: "asc",
-          type: "alphabetical",
-        },
-      ],
       "perfectionist/sort-imports": [
         "error",
         {
@@ -92,7 +60,29 @@ const eslintConfig = [
           type: "alphabetical",
         },
       ],
-      // Sort named imports alphabetically
+      "perfectionist/sort-interfaces": [
+        "error",
+        {
+          order: "asc",
+          type: "alphabetical",
+        },
+      ],
+      "perfectionist/sort-object-types": [
+        "error",
+        {
+          order: "asc",
+          type: "alphabetical",
+        },
+      ],
+      "perfectionist/sort-objects": [
+        "error",
+        {
+          order: "asc",
+          partitionByComment: true,
+          partitionByNewLine: true,
+          type: "alphabetical",
+        },
+      ],
       "perfectionist/sort-named-imports": [
         "error",
         {
@@ -108,7 +98,7 @@ const eslintConfig = [
         type: "natural",
       },
     },
-  },
+  }
 ];
 
 export default eslintConfig;

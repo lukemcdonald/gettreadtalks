@@ -1,5 +1,6 @@
-import { query, mutation } from './_generated/server';
 import { v } from 'convex/values';
+
+import { mutation, query } from './_generated/server';
 import { authComponent } from './auth';
 import { normalizeSlug } from './utils';
 
@@ -64,8 +65,8 @@ export const getBySlug = query({
 
 export const getBySpeaker = query({
   args: {
-    speakerId: v.id('speakers'),
     limit: v.optional(v.number()),
+    speakerId: v.id('speakers'),
   },
   handler: async (ctx, args) => {
     const limit = args.limit || 20;
@@ -97,12 +98,11 @@ export const getByCollection = query({
 
 export const create = mutation({
   args: {
-    mediaUrl: v.string(),
-    speakerId: v.id('speakers'),
-    title: v.string(),
     collectionId: v.optional(v.id('collections')),
     collectionOrder: v.optional(v.number()),
+    mediaUrl: v.string(),
     scripture: v.optional(v.string()),
+    speakerId: v.id('speakers'),
     status: v.optional(
       v.union(
         v.literal('backlog'),
@@ -111,6 +111,7 @@ export const create = mutation({
         v.literal('archived'),
       ),
     ),
+    title: v.string(),
   },
   handler: async (ctx, args) => {
     const user = await authComponent.getAuthUser(ctx);

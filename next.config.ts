@@ -1,5 +1,6 @@
-import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
+
+import { withSentryConfig } from "@sentry/nextjs";
 
 const cspHeader = `
   base-uri 'self';
@@ -23,13 +24,13 @@ const nextConfig: NextConfig = {
   headers: async () => {
     return [
       {
-        source: "/(.*)",
         headers: [
           {
             key: "Content-Security-Policy",
             value: cspHeader.replace(/\n/g, ""),
           },
         ],
+        source: "/(.*)",
       },
     ];
   },

@@ -1,5 +1,6 @@
-import { query, mutation } from './_generated/server';
 import { v } from 'convex/values';
+
+import { mutation, query } from './_generated/server';
 import { normalizeSlug } from './utils';
 
 export const getAll = query({
@@ -71,8 +72,8 @@ export const create = mutation({
 
     return await ctx.db.insert('collections', {
       ...args,
-      slug,
       createdAt: Date.now(),
+      slug,
     });
   },
 });

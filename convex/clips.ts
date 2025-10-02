@@ -1,5 +1,6 @@
-import { query, mutation } from './_generated/server';
 import { v } from 'convex/values';
+
+import { mutation, query } from './_generated/server';
 import { authComponent } from './auth';
 import { normalizeSlug } from './utils';
 
@@ -74,10 +75,8 @@ export const getBySlug = query({
 
 export const create = mutation({
   args: {
-    title: v.string(),
     mediaUrl: v.string(),
     speakerId: v.optional(v.id('speakers')),
-    talkId: v.optional(v.id('talks')),
     status: v.optional(
       v.union(
         v.literal('backlog'),
@@ -86,6 +85,8 @@ export const create = mutation({
         v.literal('archived'),
       ),
     ),
+    talkId: v.optional(v.id('talks')),
+    title: v.string(),
   },
   handler: async (ctx, args) => {
     const user = await authComponent.getAuthUser(ctx);
@@ -109,10 +110,10 @@ export const create = mutation({
 
     return await ctx.db.insert('clips', {
       ...args,
+      createdAt: Date.now(),
+      publishedAt,
       slug,
       status,
-      publishedAt,
-      createdAt: Date.now(),
     });
   },
 });
