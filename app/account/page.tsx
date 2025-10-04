@@ -1,12 +1,12 @@
 'use client';
 
-import { api } from '@/convex/_generated/api';
 import { Authenticated, AuthLoading, Unauthenticated } from 'convex/react';
-import { useQuery } from 'convex/react';
 import Link from 'next/link';
 
-import MainLayout from '../../components/layout/main-layout/main-layout';
-import { signOut } from '../../lib/services/auth/client';
+import MainLayout from '@/components/layout/main-layout/main-layout';
+import { useUserFavorites } from '@/lib/features/favorites/hooks';
+import { useCurrentUser } from '@/lib/features/users/hooks';
+import { signOut } from '@/lib/services/auth/client';
 
 export default function AccountPage() {
   return (
@@ -27,8 +27,8 @@ export default function AccountPage() {
 }
 
 const AccountContent = () => {
-  const user = useQuery(api.auth.getCurrentUser);
-  const favorites = useQuery(api.favorites.getUserFavorites);
+  const user = useCurrentUser();
+  const favorites = useUserFavorites();
   const hasFavorites = favorites && !Array.isArray(favorites);
 
   const handleLogout = async () => {

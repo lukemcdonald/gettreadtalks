@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 import AuthStatus from './auth-status';
-import ThemeToggle from '../../theme-toggle';
+import ThemeToggle from '@/components/theme-toggle';
 
 function SiteHeader() {
   return (

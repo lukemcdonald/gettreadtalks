@@ -1,3 +1,5 @@
+'use server';
+
 import { getToken } from '@convex-dev/better-auth/nextjs';
 import { createAuth } from '@/convex/auth';
 

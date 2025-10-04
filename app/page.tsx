@@ -1,11 +1,10 @@
 'use client';
 
-import { api } from '@/convex/_generated/api';
 import { Authenticated, Unauthenticated } from 'convex/react';
-import { useQuery } from 'convex/react';
 import Link from 'next/link';
 
-import MainLayout from '../components/layout/main-layout/main-layout';
+import MainLayout from '@/components/layout/main-layout/main-layout';
+import { useCurrentUser } from '@/lib/features/users/hooks';
 
 export default function Home() {
   return (
@@ -22,7 +21,7 @@ export default function Home() {
 }
 
 const AuthenticatedHomeContent = () => {
-  const user = useQuery(api.auth.getCurrentUser);
+  const user = useCurrentUser();
 
   return (
     <div className="space-y-8">

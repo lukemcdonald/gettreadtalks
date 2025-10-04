@@ -3,7 +3,7 @@
 import { api } from '@/convex/_generated/api';
 import { fetchMutation } from 'convex/nextjs';
 
-import { getAuthToken } from '../../services/auth/server';
+import { getAuthToken } from '@/lib/services/auth/server';
 
 // Authenticated mutation via server function
 export async function updatePassword({
