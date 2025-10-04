@@ -14,25 +14,25 @@ globs: **/*.tsx,**/*.ts
 
 ## Folder Structure
 
-```
+```sh
 components/
-├── component-name/
-│   ├── index.ts                    ← Barrel export
-│   ├── component-name.tsx          ← Main component
-│   ├── component-name.types.ts     ← Component types
-│   ├── component-name.test.tsx     ← Tests
-│   └── sub-component/              ← Nested components (same pattern)
+├─ component-name/
+│  ├─ component-name.test.tsx  # Tests
+│  ├─ component-name.tsx       # Main component
+│  ├─ component-name.types.ts  # Component types
+│  ├─ index.ts                 # Barrel export
+│  └─ sub-component/           # Nested components (same pattern)
 ```
 
 ## Component Placement
 
 - **Shared components**: `components/` (reusable across app)
 - **Page-specific**: `app/page-name/` (one-off components)
-- **Feature-specific**: `features/feature/components/` (complex domains)
+- **Feature-specific**: `components/feature/components/` (complex domains)
 
 ## Import Patterns
 
-```typescript
+```ts
 // ✅ Barrel imports
 import ComponentName from '@/components/component-name';
 
@@ -42,7 +42,7 @@ import ComponentName from '@/components/component-name/component-name';
 
 ## Barrel Export Pattern
 
-```typescript
+```ts
 // component-name/index.ts
 export { default } from './component-name';
 export type { ComponentNameProps } from './component-name.types';
@@ -50,6 +50,6 @@ export type { ComponentNameProps } from './component-name.types';
 
 ## File Naming
 
-- Folders: `kebab-case` (`auth-status/`)
-- Files: `kebab-case` with purpose suffix (`auth-status.types.ts`)
+- Folders: `kebab-case` (`component-name/`)
+- Files: `kebab-case` with purpose suffix (`component-name.types.ts`)
 - Suffixes: `.types.ts`, `.test.tsx`, `.utils.ts`, `.hooks.ts`

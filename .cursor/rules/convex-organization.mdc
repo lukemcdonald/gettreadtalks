@@ -7,17 +7,17 @@ globs: convex/**/*.ts
 
 ## File Structure
 
-```
+```sh
 convex/
-├── schema.ts                 # Database schema
-├── items.ts                  # Item queries & mutations
-├── categories.ts             # Category queries & mutations
-├── users.ts                  # User queries
-├── http.ts                   # HTTP endpoints (webhooks)
-├── lib/
-│   ├── permissions.ts        # Authorization helpers
-│   └── validation.ts         # Server-side validation
-└── _generated/               # Auto-generated
+├─ categories.ts       # Category queries & mutations
+├─ http.ts             # HTTP endpoints (webhooks)
+├─ items.ts            # Item queries & mutations
+├─ schema.ts           # Database schema
+├─ users.ts            # User queries
+├─ lib/
+│  ├─ permissions.ts   # Authorization helpers
+│  └─ validation.ts    # Server-side validation
+└─ _generated/         # Auto-generated
 ```
 
 ## Naming Conventions
@@ -26,44 +26,44 @@ convex/
 
 Describe the data operation:
 
-```typescript
-export const list = query(...)           // Get collection
-export const get = query(...)            // Get single by ID
-export const getBySlug = query(...)      // Get by other field
-export const search = query(...)         // Filtered list
+```ts
+export const get = query(...)         // Get single by ID
+export const getBySlug = query(...)   // Get by other field
+export const list = query(...)        // Get collection
+export const search = query(...)      // Filtered list
 ```
 
 ### Mutation Functions (writes)
 
 Use action verbs:
 
-```typescript
-export const create = mutation(...)      // Create new
-export const update = mutation(...)      // Update existing
-export const remove = mutation(...)      // Delete (avoid "delete" keyword)
-export const toggle = mutation(...)      // Toggle state
-export const publish = mutation(...)     // Specific action
-export const archive = mutation(...)     // Specific action
+```ts
+export const archive = mutation(...)  // Specific action
+export const create = mutation(...)   // Create new
+export const publish = mutation(...)  // Specific action
+export const remove = mutation(...)   // Delete (avoid "delete" keyword)
+export const toggle = mutation(...)   // Toggle state
+export const update = mutation(...)   // Update existing
 ```
 
 ### Function Naming Examples
 
-```typescript
+```ts
+// ✅ Clear
+export const getBySlug = query(...)
+export const list = query(...)
+
 // ❌ Vague
 export const data = query(...)
 export const stuff = query(...)
 
-// ✅ Clear
-export const list = query(...)
-export const getBySlug = query(...)
+// ✅ Concise
+export const get = query(...)            // api.items.get
+export const list = query(...)           // api.items.list
 
 // ❌ Redundant (file provides context)
-export const getBookmark = query(...)    // in bookmarks.ts
-export const listBookmarks = query(...)  // in bookmarks.ts
-
-// ✅ Concise
-export const get = query(...)            // api.bookmarks.get
-export const list = query(...)           // api.bookmarks.list
+export const getItem = query(...)        // in items.ts
+export const listItems = query(...)      // in items.ts
 ```
 
 ## Database Schema Conventions
@@ -72,11 +72,11 @@ export const list = query(...)           // api.bookmarks.list
 
 Name fields by what they reference:
 
-```typescript
+```ts
 items: defineTable({
-  userId: v.id('user'), // or ownerId, authorId
   categoryId: v.id('categories'),
   statusId: v.id('statuses'),
+  userId: v.id('user'), // or authorId, be consistent
 });
 ```
 
@@ -84,10 +84,10 @@ items: defineTable({
 
 Name indexes by what you're querying:
 
-```typescript
-.index('by_user', ['userId'])
+```ts
 .index('by_category', ['categoryId'])
 .index('by_status', ['statusId'])
+.index('by_user', ['userId'])
 .index('by_user_and_category', ['userId', 'categoryId'])
 ```
 
@@ -104,27 +104,30 @@ Stay consistent within each table:
 
 One file per domain/entity:
 
-```typescript
+```ts
 // convex/items.ts
-export const list = query(...)
-export const get = query(...)
 export const create = mutation(...)
-export const update = mutation(...)
-export const remove = mutation(...)
-
-// convex/categories.ts
+export const get = query(...)
 export const list = query(...)
+export const remove = mutation(...)
+export const update = mutation(...)
+
+// convex/topics.ts
 export const get = query(...)
 export const getBySlug = query(...)
+export const list = query(...)
 ```
 
 ### Shared Helpers in lib/
 
-```typescript
+```ts
 // convex/lib/permissions.ts
 export async function getCurrentUser(ctx: QueryCtx | MutationCtx) {
   const identity = await ctx.auth.getUserIdentity();
-  if (!identity) return null;
+ 
+ if (!identity) {
+    return null
+  };
 
   const user = await ctx.db
     .query('user')
@@ -139,12 +142,14 @@ export async function getCurrentUser(ctx: QueryCtx | MutationCtx) {
 
 Always check auth in mutations:
 
-```typescript
+```ts
 // ✅ Always verify user and ownership
 export const update = mutation({
   handler: async (ctx, args) => {
     const user = await getCurrentUser(ctx);
-    if (!user) throw new Error('Unauthorized');
+    if (!user) {
+      throw new Error('Unauthorized')
+    };
 
     const resource = await ctx.db.get(args.id);
     if (resource.userId !== user._id) {
@@ -160,7 +165,7 @@ export const update = mutation({
 
 Enrich data with relationships in queries:
 
-```typescript
+```ts
 export const list = query({
   handler: async (ctx) => {
     const items = await ctx.db.query('items').collect();
@@ -183,31 +188,9 @@ export const list = query({
 
 ## Best Practices
 
-### Concise Function Names
-
-File provides context, so keep names short:
-
-```typescript
-// In convex/items.ts
-export const list = query(...) // Called as api.items.list
-export const get = query(...) // Called as api.items.get
-```
-
-### Use Internal Functions
-
-Keep helper functions private:
-
-```typescript
-// Use internalQuery, internalMutation for private functions
-export const internalHelper = internalMutation({...});
-
-// Only expose what's needed publicly
-export const create = mutation({...});
-```
-
 ### Avoid Redundant Indexes
 
-```typescript
+```ts
 // ❌ Redundant - only need the second one
 .index('by_user', ['userId'])
 .index('by_user_and_category', ['userId', 'categoryId'])

@@ -9,18 +9,18 @@ globs: **/*.tsx,**/*.ts
 
 ### Use Server Component (default) when:
 
-- ✅ No interactivity needed
-- ✅ No React hooks (`useState`, `useEffect`)
-- ✅ No browser APIs (`localStorage`, `window`)
-- ✅ Want fast initial load with no loading states
-- ✅ SEO important
+- No interactivity needed
+- No React hooks (`useState`, `useEffect`)
+- No browser APIs (`localStorage`, `window`)
+- Want fast initial load with no loading states
+- SEO important
 
 ### Use Client Component when:
 
-- ✅ Need interactivity (forms, buttons with `onClick`)
-- ✅ Need React hooks (`useState`, `useEffect`, `useContext`)
-- ✅ Need browser APIs (`localStorage`, `window`, `document`)
-- ✅ Need real-time updates (Convex subscriptions)
+- Need interactivity (forms, buttons with `onClick`)
+- Need React hooks (`useState`, `useEffect`, `useContext`)
+- Need browser APIs (`localStorage`, `window`, `document`)
+- Need real-time updates (Convex subscriptions)
 
 ## Common Data Flow Patterns
 
@@ -28,10 +28,10 @@ globs: **/*.tsx,**/*.ts
 
 Fast initial render, no loading state, SEO-friendly.
 
-```typescript
+```ts
 // app/items/page.tsx (Server Component)
-import { getItems } from '@/lib/features/items/queries';
 import { ItemList } from '@/components/items/item-list';
+import { getItems } from '@/lib/features/items/queries';
 
 export default async function ItemsPage() {
   const items = await getItems();
@@ -43,7 +43,7 @@ export default async function ItemsPage() {
 
 Subscribe to Convex for real-time updates.
 
-```typescript
+```ts
 // app/dashboard/page.tsx (Client Component)
 'use client';
 import { useMyItems } from '@/lib/features/items/hooks';
@@ -51,7 +51,9 @@ import { useMyItems } from '@/lib/features/items/hooks';
 export default function DashboardPage() {
   const items = useMyItems();
 
-  if (!items) return <div>Loading...</div>;
+  if (!items) {
+    return <div>Loading...</div>
+  };
 
   return <ItemList items={items} />;
 }
@@ -61,7 +63,7 @@ export default function DashboardPage() {
 
 Server renders initial data, client subscribes for updates.
 
-```typescript
+```ts
 // app/items/page.tsx (Server Component)
 import { getItems } from '@/lib/features/items/queries';
 import { ItemsClient } from './items-client';
@@ -85,7 +87,7 @@ export function ItemsClient({ initialData }) {
 
 Handle form submissions with Server Actions.
 
-```typescript
+```ts
 // app/items/new/page.tsx (Client Component)
 'use client';
 import { useRouter } from 'next/navigation';
@@ -107,7 +109,7 @@ export default function NewItemPage() {
 
 Quick interactions use client-side mutations.
 
-```typescript
+```ts
 // components/items/favorite-button.tsx (Client Component)
 'use client';
 import { useFavoriteToggle } from '@/lib/features/favorites/hooks';
@@ -127,7 +129,7 @@ export function FavoriteButton({ itemId }) {
 
 ### Server Component Protection
 
-```typescript
+```ts
 import { getServerSession } from "@/lib/services/auth/server";
 import { redirect } from "next/navigation";
 
@@ -144,14 +146,16 @@ export default async function ProtectedPage() {
 
 ### Client Component Session
 
-```typescript
+```ts
 "use client";
 import { useSession } from "@/lib/services/auth/client";
 
 export function UserProfile() {
   const session = useSession();
 
-  if (!session) return <div>Please log in</div>;
+  if (!session) {
+    return <div>Please log in</div>
+  };
 
   return <div>Welcome {session.user.name}</div>;
 }
@@ -161,7 +165,7 @@ export function UserProfile() {
 
 ### Start with Server Components
 
-```typescript
+```ts
 // ✅ Default to Server Component
 export default async function Page() {
   const data = await getData();
@@ -173,18 +177,18 @@ Only go client when you need interactivity, hooks, browser APIs, or real-time up
 
 ### Keep Routes Thin
 
-```typescript
+```ts
+// ✅ Business logic in hooks/utils
+export default function ItemsPage() {
+  const items = usePublicItems();
+  return <ItemList items={items} />;
+}
+
 // ❌ Business logic in routes
 export default function ItemsPage() {
   const items = useQuery(api.items.list);
   const filtered = items?.filter((i) => i.isPublic && !i.archived);
   const sorted = filtered?.sort((a, b) => b.createdAt - a.createdAt);
   // ...
-}
-
-// ✅ Business logic in hooks/utils
-export default function ItemsPage() {
-  const items = usePublicItems();
-  return <ItemList items={items} />;
 }
 ```

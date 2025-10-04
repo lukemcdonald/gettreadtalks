@@ -1,5 +1,6 @@
 *.log
 *.tsbuildinfo
+.cursor/
 .DS_Store
 .env*
 .idea/

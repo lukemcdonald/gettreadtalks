@@ -11,7 +11,7 @@ globs: **/*.ts,**/*.tsx
 
 - ALWAYS use the new function syntax for Convex functions. For example:
 
-```typescript
+```ts
 import { query } from './_generated/server';
 import { v } from 'convex/values';
 export const f = query({
@@ -27,7 +27,7 @@ export const f = query({
 
 - HTTP endpoints are defined in `convex/http.ts` and require an `httpAction` decorator. For example:
 
-```typescript
+```ts
 import { httpRouter } from 'convex/server';
 import { httpAction } from './_generated/server';
 const http = httpRouter();
@@ -48,7 +48,7 @@ http.route({
 
 - Below is an example of an array validator:
 
-```typescript
+```ts
 import { mutation } from './_generated/server';
 import { v } from 'convex/values';
 
@@ -64,7 +64,7 @@ export default mutation({
 
 - Below is an example of a schema with validators that codify a discriminated union type:
 
-```typescript
+```ts
 import { defineSchema, defineTable } from 'convex/server';
 import { v } from 'convex/values';
 
@@ -87,7 +87,7 @@ export default defineSchema({
 - Always use the `v.null()` validator when returning a null value. Below is an example query that
   returns a null value:
 
-```typescript
+```ts
 import { query } from './_generated/server';
 import { v } from 'convex/values';
 
@@ -155,7 +155,7 @@ export const exampleQuery = query({
   file, specify a type annotation on the return value to work around TypeScript circularity
   limitations. For example,
 
-```
+```ts
 export const f = query({
   args: { name: v.string() },
   returns: v.string(),
@@ -240,8 +240,6 @@ Note: `paginationOpts` is an object with the following properties:
 - System fields are automatically added to all documents and are prefixed with an underscore. The
   two system fields that are automatically added to all documents are `_creationTime` which has the
   validator `v.number()` and `_id` which has the validator `v.id(tableName)`.
-- Always include all index fields in the index name. For example, if an index is defined as
-  `["field1", "field2"]`, the index name should be "by_field1_and_field2".
 - Index fields must be queried in the same order they are defined. If you want to be able to query
   by "field1" then "field2" and by "field2" then "field1", you must create separate indexes.
 
@@ -383,7 +381,7 @@ export default crons;
 
                     Instead, query the `_storage` system table. For example, you can use `ctx.db.system.get` to get an `Id<"_storage">`.
 
-```
+```ts
 import { query } from "./_generated/server";
 import { Id } from "./_generated/dataModel";
 
@@ -428,12 +426,6 @@ export const exampleQuery = query({
   `ctx.db.query("messages").filter((q) => q.eq(q.field("author"), "Tom")).collect()` with
   `ctx.db.query("messages").withIndex("by_author", (q) => q.eq("author", "Tom")).collect()`
 
-### Index Management
-
-- Check for redundant indexes (e.g., `by_foo` and `by_foo_and_bar` are redundant - only need the
-  latter)
-- Use the more specific index for all queries, even when you don't need all fields
-- Reducing indexes saves database storage and reduces write overhead
 
 ### Security & Access Control
 

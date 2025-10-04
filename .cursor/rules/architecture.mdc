@@ -12,11 +12,11 @@ server, and shared code.
 
 ## Directory Structure
 
-```
+```sh
 lib/
-├── features/              # Business domains (domain entities like users, posts, etc.)
-├── services/              # Infrastructure (auth, email, analytics)
-└── utils/                 # Generic utilities (date, array, string helpers)
+├─ features/  # Business domains (domain entities like users, posts, etc.)
+├─ services/  # Infrastructure (auth, email, analytics)
+└─ utils/     # Generic utilities (date, array, string helpers)
 ```
 
 ## Decision Tree: Where Should This Code Live?
@@ -29,69 +29,69 @@ lib/
 
 ## Features Directory
 
-Business domains and entities (e.g., users, posts, products).
+Business domains and entities (e.g., items, posts, users).
 
 ### Feature Structure
 
-```
+```sh
 lib/features/items/
-├── hooks.ts          # Client: React hooks (useItems, useCreateItem)
-├── queries.ts        # Server: Read operations (getItems, getItem)
-├── actions.ts        # Server: Write operations (createItem, updateItem)
-├── types.ts          # Shared: TypeScript types
-├── validation.ts     # Shared: Zod schemas
-└── utils.ts          # Shared: Pure functions
+├─ actions.ts      # Server: Write operations (createItem, updateItem)
+├─ hooks.ts        # Client: React hooks (useItems, useCreateItem)
+├─ queries.ts      # Server: Read operations (getItems, getItem)
+├─ types.ts        # Shared: TypeScript types
+├─ utils.ts        # Shared: Pure functions
+└─ validation.ts   # Shared: Zod schemas
 ```
 
 ### Which File Within a Feature?
 
+- **`actions.ts`** - Server-side writes? Uses `fetchMutation`? Has `"use server"`?
 - **`hooks.ts`** - React hooks? Client-side state? Uses `useQuery`/`useMutation`?
 - **`queries.ts`** - Server-side reads? Uses `fetchQuery`? Called from Server Components?
-- **`actions.ts`** - Server-side writes? Uses `fetchMutation`? Has `"use server"`?
 - **`types.ts`** - TypeScript types? No runtime code?
-- **`validation.ts`** - Zod schemas? Used by both client and server?
 - **`utils.ts`** - Pure functions? No side effects?
+- **`validation.ts`** - Zod schemas? Used by both client and server?
 
 ### Import Examples
 
-```typescript
+```ts
 // ✅ Good - Feature-based imports
-import { useItems } from '@/lib/features/items/hooks';
-import { getItems } from '@/lib/features/items/queries';
 import { createItem } from '@/lib/features/items/actions';
+import { getItems } from '@/lib/features/items/queries';
+import { useItems } from '@/lib/features/items/hooks';
 import type { Item } from '@/lib/features/items/types';
 
 // ❌ Bad - Generic/unclear paths
-import { useItems } from '@/hooks/items';
 import { getItems } from '@/lib/queries';
+import { useItems } from '@/hooks/items';
 ```
 
 ## Services Directory
 
-Infrastructure and cross-cutting concerns (e.g., auth, email, analytics).
+Infrastructure and cross-cutting concerns (e.g., analytics, auth, email).
 
 ### Service Structure
 
-```
+```sh
+lib/services/analytics/
+├─ client.ts   # Client: trackEvent
+└─ server.ts   # Server: server-side tracking
+
 lib/services/auth/
-├── client.ts         # Client: signIn, signUp, useSession
-├── server.ts         # Server: getSession, requireAuth
-└── config.ts         # Shared: Configuration
+├─ client.ts   # Client: signIn, signUp, useSession
+├─ config.ts   # Shared: Configuration
+└─ server.ts   # Server: getSession, requireAuth
 
 lib/services/email/
-└── server.ts         # Server: sendEmail
-
-lib/services/analytics/
-├── client.ts         # Client: trackEvent
-└── server.ts         # Server: server-side tracking
+└─ server.ts   # Server: sendEmail
 ```
 
 ### Import Examples
 
-```typescript
+```ts
 // ✅ Good - Service imports
-import { useSession } from '@/lib/services/auth/client';
 import { getServerSession } from '@/lib/services/auth/server';
+import { useSession } from '@/lib/services/auth/client';
 
 // ❌ Bad
 import { useSession } from '@/lib/auth';
@@ -103,20 +103,20 @@ Generic, reusable utilities that don't belong to a specific domain.
 
 ### Utils Structure
 
-```
+```sh
 lib/utils/
-├── cn.ts             # className utility
-├── array.ts          # Array helpers
-├── string.ts         # String helpers
-└── date.ts           # Date formatting
+├─ array.ts    # Array helpers
+├─ cn.ts       # className utility
+├─ date.ts     # Date formatting
+└─ string.ts   # String helpers
 ```
 
 ### Import Examples
 
-```typescript
+```ts
 // ✅ Good - Utility imports
-import { formatDate } from '@/lib/utils/date';
 import { cn } from '@/lib/utils/cn';
+import { formatDate } from '@/lib/utils/date';
 
 // ❌ Bad
 import { formatDate } from '@/utils';
@@ -146,15 +146,15 @@ import { formatDate } from '@/utils';
 
 ### Always Wrap Convex Calls
 
-```typescript
-// ❌ Don't call Convex directly in components
-function ItemsPage() {
-  const items = useQuery(api.items.list);
-}
-
+```ts
 // ✅ Wrap in custom hooks
 function ItemsPage() {
   const items = useItems();
+}
+
+// ❌ Don't call Convex directly in components
+function ItemsPage() {
+  const items = useQuery(api.items.list);
 }
 ```
 
@@ -162,14 +162,14 @@ Benefits: Single source of truth, easier refactoring, better naming
 
 ### Co-locate Related Code
 
-```typescript
+```ts
 // ✅ Feature contains all its code
 lib/features/items/
-├── hooks.ts
-├── queries.ts
-├── actions.ts
-├── types.ts
-└── validation.ts
+├─ actions.ts
+├─ hooks.ts
+├─ queries.ts
+├─ types.ts
+└─ validation.ts
 ```
 
 Easy to find, easy to delete/move the feature

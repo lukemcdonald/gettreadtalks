@@ -9,28 +9,28 @@ globs: **/*.ts,**/*.tsx
 
 Use descriptive, use-case focused names:
 
-```typescript
+```ts
 // List query with options/filters
 export function useItems(options?: {
-  userId?: string;
   categoryId?: string;
-  status?: string;
   search?: string;
+  status?: string;
+  userId?: string;
 });
 
 // Usage examples:
-// useItems()                              → all items
-// useItems({ userId: 'user_123' })        → items for specific user
-// useItems({ categoryId: 'cat_456' })     → items in category
+// useItems()                                  → all items
+// useItems({ categoryId: 'cat_456' })         → items in category
 // useItems({ userId: 'me', status: 'draft' }) → filtered by user and status
+// useItems({ userId: 'user_123' })            → items for specific user
 
 // Single item
 export function useItem(id: string);
 
 // Mutations
 export function useCreateItem();
-export function useUpdateItem();
 export function useDeleteItem();
+export function useUpdateItem();
 ```
 
 **Note:** Define options/filter types in `types.ts` for reuse across hooks and queries.
@@ -39,60 +39,36 @@ export function useDeleteItem();
 
 Mirror Convex naming with `get` prefix:
 
-```typescript
+```ts
 // queries.ts - Server reads
-export async function getItems();
 export async function getItem(id);
-export async function getMyItems();
-export async function getItemsByCategory(categoryId);
+export async function getItems({ categoryId });
 ```
 
 ## Feature Actions (Server)
 
 Mirror Convex naming with verb prefix:
 
-```typescript
+```ts
 // actions.ts - Server writes
+export async function archiveItem(id);
 export async function createItem(data);
-export async function updateItem(id, data);
 export async function deleteItem(id);
 export async function publishItem(id);
-export async function archiveItem(id);
+export async function updateItem(id, data);
 ```
 
-## Convex Functions
-
-### Query Functions
-
-```typescript
-// Describe the data operation
-export const list = query(...)
-export const get = query(...)
-export const getBySlug = query(...)
-export const search = query(...)
-```
-
-### Mutation Functions
-
-```typescript
-// Use action verbs
-export const create = mutation(...)
-export const update = mutation(...)
-export const remove = mutation(...)    // Use "remove" instead of "delete"
-export const toggle = mutation(...)
-export const publish = mutation(...)
-export const archive = mutation(...)
-```
+**Note:** For Convex function naming, see `convex-organization.mdc`.
 
 ## Service Functions
 
 ### Auth Service
 
-```typescript
+```ts
 // client.ts
-export function useSession();
 export function signIn(credentials);
 export function signOut();
+export function useSession();
 
 // server.ts
 export async function getServerSession();
@@ -101,16 +77,16 @@ export async function requireAuth();
 
 ### Email Service
 
-```typescript
+```ts
 // server.ts
 export async function sendEmail(to, subject, body);
-export async function sendWelcomeEmail(user);
 export async function sendResetPasswordEmail(user);
+export async function sendWelcomeEmail(user);
 ```
 
 ### Analytics Service
 
-```typescript
+```ts
 // client.ts
 export function trackEvent(name, properties);
 export function trackPageView(path);
@@ -123,7 +99,7 @@ export async function trackServerEvent(name, properties);
 
 Use clear, descriptive names:
 
-```typescript
+```ts
 // date.ts
 export function formatDate(date);
 export function formatRelativeTime(date);
@@ -139,37 +115,36 @@ export function unique<T>(arr);
 
 ## Type Naming
 
-```typescript
+```ts
 // types.ts
+export type CreateItemInput = {...}
 export type Item = {...}
 export type ItemWithRelations = {...}
-export type CreateItemInput = {...}
 export type UpdateItemInput = {...}
 
-// Avoid generic names
-// ❌ Bad
+// ✅ Good
+export type ItemCardProps = {...}
+export type ItemData = {...}
+
+// ❌ Bad. Avoid generic names
 export type Data = {...}
 export type Props = {...}
-
-// ✅ Good
-export type ItemData = {...}
-export type ItemCardProps = {...}
 ```
 
 ## Constants
 
-Use UPPER_SNAKE_CASE for true constants:
+Use `UPPER_SNAKE_CASE` for true constants:
 
-```typescript
+```ts
 // constants.ts
-export const MAX_ITEMS_PER_USER = 100;
-export const DEFAULT_PAGE_SIZE = 20;
 export const API_BASE_URL = 'https://api.example.com';
+export const DEFAULT_PAGE_SIZE = 20;
+export const MAX_ITEMS_PER_USER = 100;
 ```
 
-Use camelCase for configuration objects:
+Use `camelCase` for configuration objects:
 
-```typescript
+```ts
 // config.ts
 export const authConfig = {
   providers: [...],
@@ -179,69 +154,38 @@ export const authConfig = {
 
 ## File Naming
 
-Use consistent patterns:
-
-```typescript
-// Features
-lib / features / items / hooks.ts;
-lib / features / items / queries.ts;
-lib / features / items / actions.ts;
-lib / features / items / types.ts;
-lib / features / items / validation.ts;
-lib / features / items / utils.ts;
-
-// Services
-lib / services / auth / client.ts;
-lib / services / auth / server.ts;
-lib / services / auth / config.ts;
-
-// Utils
-lib / utils / date.ts;
-lib / utils / string.ts;
-lib / utils / array.ts;
-```
+**Note:** For complete file structure patterns, see `architecture.mdc` and `architecture-component.mdc`.
 
 ## Best Practices
 
 ### Avoid Abbreviations
 
-```typescript
-// ❌ Unclear
-export function getItms();
-export function useItm();
-
+```ts
 // ✅ Clear
 export function getItems();
 export function useItem();
+
+// ❌ Unclear
+export function getItms();
+export function useItm();
 ```
 
 ### Be Consistent
 
 Within a feature, use consistent naming patterns:
 
-```typescript
+```ts
 // ✅ Consistent
-export function useItems(); // List
-export function useItem(id); // Single
 export function useCreateItem(); // Mutation
+export function useItem({ id }); // Single
+export function useItems();      // List
 
 // ❌ Inconsistent
-export function useItems();
-export function getItem(id);
 export function createNewItem();
+export function getItem({ id });
+export function useItems();
 ```
 
 ### Context Matters
 
-File provides context, avoid redundancy:
-
-```typescript
-// In items/hooks.ts
-// ❌ Redundant
-export function useItemsList();
-export function useItemsGet();
-
-// ✅ Concise
-export function useItems();
-export function useItem();
-```
+File provides context, avoid redundancy in naming (e.g., in `items/hooks.ts` use `useItem()` not `useItemsItem()`).
