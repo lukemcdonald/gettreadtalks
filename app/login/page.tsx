@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-import MainLayout from '@/components/layout/main-layout/main-layout';
+import MainLayout from '@/components/layout/main-layout';
 import { signIn, signUp } from '@/lib/services/auth/client';
 import { AUTH_ERRORS } from '@/lib/services/auth/config';
 

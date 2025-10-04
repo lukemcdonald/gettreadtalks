@@ -3,7 +3,7 @@
 import { Authenticated, AuthLoading, Unauthenticated } from 'convex/react';
 import Link from 'next/link';
 
-import MainLayout from '@/components/layout/main-layout/main-layout';
+import MainLayout from '@/components/layout/main-layout';
 import { useUserFavorites } from '@/lib/features/favorites/hooks';
 import { useCurrentUser } from '@/lib/features/users/hooks';
 import { signOut } from '@/lib/services/auth/client';

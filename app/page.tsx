@@ -3,7 +3,7 @@
 import { Authenticated, Unauthenticated } from 'convex/react';
 import Link from 'next/link';
 
-import MainLayout from '@/components/layout/main-layout/main-layout';
+import MainLayout from '@/components/layout/main-layout';
 import { useCurrentUser } from '@/lib/features/users/hooks';
 
 export default function Home() {
