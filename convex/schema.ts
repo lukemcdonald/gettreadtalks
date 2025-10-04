@@ -2,7 +2,8 @@ import { defineSchema, defineTable } from 'convex/server';
 import { v } from 'convex/values';
 
 // Common status type for content items
-const statusType = v.union(
+// Export for reuse in mutations and queries to maintain consistency
+export const statusType = v.union(
   v.literal('backlog'),
   v.literal('approved'),
   v.literal('published'),
@@ -10,14 +11,14 @@ const statusType = v.union(
 );
 
 // Common timestamp fields for audit trail
-const timestampFields = {
+export const timestampFields = {
   createdAt: v.optional(v.number()),
   deletedAt: v.optional(v.number()),
   updatedAt: v.optional(v.number()),
 };
 
 // Better Auth user ID (string)
-const userIdType = v.string();
+export const userIdType = v.string();
 
 const applicationTables = {
   affiliateLinks: defineTable({
@@ -50,10 +51,8 @@ const applicationTables = {
     talkId: v.optional(v.id('talks')),
     title: v.string(),
   })
-    .index('by_published_at', ['publishedAt'])
     .index('by_slug', ['slug'])
     .index('by_speaker_id', ['speakerId'])
-    .index('by_status', ['status'])
     .index('by_status_and_published_at', ['status', 'publishedAt'])
     .index('by_talk_id', ['talkId']),
 
@@ -101,11 +100,8 @@ const applicationTables = {
   })
     .index('by_collection_id_and_order', ['collectionId', 'collectionOrder'])
     .index('by_collection_id_and_status', ['collectionId', 'status'])
-    .index('by_published_at', ['publishedAt'])
     .index('by_slug', ['slug'])
-    .index('by_speaker_id', ['speakerId'])
     .index('by_speaker_id_and_status', ['speakerId', 'status'])
-    .index('by_status', ['status'])
     .index('by_status_and_published_at', ['status', 'publishedAt']),
 
   talksOnTopics: defineTable({

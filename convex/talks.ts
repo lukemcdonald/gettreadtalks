@@ -3,6 +3,7 @@ import { v } from 'convex/values';
 import { Doc } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
 import { authComponent } from './auth';
+import { statusType } from './schema';
 import { normalizeSlug } from './utils';
 
 export const getPublished = query({
@@ -108,14 +109,7 @@ export const create = mutation({
     mediaUrl: v.string(),
     scripture: v.optional(v.string()),
     speakerId: v.id('speakers'),
-    status: v.optional(
-      v.union(
-        v.literal('backlog'),
-        v.literal('approved'),
-        v.literal('published'),
-        v.literal('archived'),
-      ),
-    ),
+    status: v.optional(statusType),
     title: v.string(),
   },
   returns: v.id('talks'),
@@ -153,12 +147,7 @@ export const create = mutation({
 export const updateStatus = mutation({
   args: {
     id: v.id('talks'),
-    status: v.union(
-      v.literal('backlog'),
-      v.literal('approved'),
-      v.literal('published'),
-      v.literal('archived'),
-    ),
+    status: statusType,
   },
   returns: v.id('talks'),
   handler: async (ctx, args) => {
