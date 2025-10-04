@@ -1,13 +1,12 @@
 'use client';
 
-import { api } from '@/convex/_generated/api';
-import { useQuery } from 'convex/react';
 import Link from 'next/link';
 
-import { signOut } from '../../../../lib/services/auth/client';
+import { signOut } from '@/lib/services/auth/client';
+import { useCurrentUser } from '@/lib/features/users/hooks';
 
 function AuthenticatedContent() {
-  const user = useQuery(api.auth.getCurrentUser);
+  const user = useCurrentUser();
 
   const handleLogout = async () => {
     try {
