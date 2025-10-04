@@ -30,7 +30,7 @@ export const createAuth = (
     // TODO: Is trustedOrigins needed? Use env variables instead?
     emailAndPassword: {
       enabled: true,
-      requireEmailVerification: true,
+      requireEmailVerification: false,
     },
     trustedOrigins: ['http://localhost:3000', 'https://academic-reindeer-888.convex.site'],
     // disable logging when createAuth is called just to generate options.
