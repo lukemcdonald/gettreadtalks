@@ -1,0 +1,181 @@
+---
+description: Feature-based architecture with domain-driven organization for Next.js projects
+globs: **/*.ts,**/*.tsx
+---
+
+# Feature-Based Architecture Rules
+
+## Core Philosophy
+
+**Organize by domain/feature, not by technical layer.** Each feature contains all its client,
+server, and shared code.
+
+## Directory Structure
+
+```
+src/lib/
+├── features/              # Business domains (domain entities like users, posts, etc.)
+├── services/              # Infrastructure (auth, email, analytics)
+└── utils/                 # Generic utilities (date, array, string helpers)
+```
+
+## Decision Tree: Where Should This Code Live?
+
+1. **Interacts with database?** → `convex/{domain}.ts`
+2. **Business domain/entity?** → `lib/features/{domain}/`
+3. **Infrastructure/cross-cutting?** → `lib/services/{service}/`
+4. **Generic/reusable utility?** → `lib/utils/`
+5. **Otherwise** → Inline in component or create if reused 3+ times
+
+## Features Directory
+
+Business domains and entities (e.g., users, posts, products).
+
+### Feature Structure
+
+```
+lib/features/items/
+├── hooks.ts          # Client: React hooks (useItems, useCreateItem)
+├── queries.ts        # Server: Read operations (getItems, getItem)
+├── actions.ts        # Server: Write operations (createItem, updateItem)
+├── types.ts          # Shared: TypeScript types
+├── validation.ts     # Shared: Zod schemas
+└── utils.ts          # Shared: Pure functions
+```
+
+### Which File Within a Feature?
+
+- **`hooks.ts`** - React hooks? Client-side state? Uses `useQuery`/`useMutation`?
+- **`queries.ts`** - Server-side reads? Uses `fetchQuery`? Called from Server Components?
+- **`actions.ts`** - Server-side writes? Uses `fetchMutation`? Has `"use server"`?
+- **`types.ts`** - TypeScript types? No runtime code?
+- **`validation.ts`** - Zod schemas? Used by both client and server?
+- **`utils.ts`** - Pure functions? No side effects?
+
+### Import Examples
+
+```typescript
+// ✅ Good - Feature-based imports
+import { useItems } from '@/lib/features/items/hooks';
+import { getItems } from '@/lib/features/items/queries';
+import { createItem } from '@/lib/features/items/actions';
+import type { Item } from '@/lib/features/items/types';
+
+// ❌ Bad - Generic/unclear paths
+import { useItems } from '@/hooks/items';
+import { getItems } from '@/lib/queries';
+```
+
+## Services Directory
+
+Infrastructure and cross-cutting concerns (e.g., auth, email, analytics).
+
+### Service Structure
+
+```
+lib/services/auth/
+├── client.ts         # Client: signIn, signUp, useSession
+├── server.ts         # Server: getSession, requireAuth
+└── config.ts         # Shared: Configuration
+
+lib/services/email/
+└── server.ts         # Server: sendEmail
+
+lib/services/analytics/
+├── client.ts         # Client: trackEvent
+└── server.ts         # Server: server-side tracking
+```
+
+### Import Examples
+
+```typescript
+// ✅ Good - Service imports
+import { useSession } from '@/lib/services/auth/client';
+import { getServerSession } from '@/lib/services/auth/server';
+
+// ❌ Bad
+import { useSession } from '@/lib/auth';
+```
+
+## Utils Directory
+
+Generic, reusable utilities that don't belong to a specific domain.
+
+### Utils Structure
+
+```
+lib/utils/
+├── cn.ts             # className utility
+├── array.ts          # Array helpers
+├── string.ts         # String helpers
+└── date.ts           # Date formatting
+```
+
+### Import Examples
+
+```typescript
+// ✅ Good - Utility imports
+import { formatDate } from '@/lib/utils/date';
+import { cn } from '@/lib/utils/cn';
+
+// ❌ Bad
+import { formatDate } from '@/utils';
+```
+
+## File Purpose Guidelines
+
+### Client Files (`hooks.ts`, `client.ts`)
+
+- Must include `"use client"` directive
+- Uses: `useQuery`, `useMutation`, `useState`, `useEffect`, browser APIs
+- Example: React hooks, client-side state management
+
+### Server Files (`queries.ts`, `actions.ts`, `server.ts`)
+
+- **Queries** - Uses `fetchQuery`, no `"use server"` needed, called from Server Components
+- **Actions** - Must include `"use server"` directive, uses `fetchMutation`
+- Uses: `fetchQuery`, `fetchMutation`, `cookies`, `headers`, secrets
+
+### Shared Files (`types.ts`, `validation.ts`, `utils.ts`)
+
+- No directive needed
+- Pure functions, types, constants, Zod schemas
+- Works in both client and server environments
+
+## Best Practices
+
+### Always Wrap Convex Calls
+
+```typescript
+// ❌ Don't call Convex directly in components
+function ItemsPage() {
+  const items = useQuery(api.items.list);
+}
+
+// ✅ Wrap in custom hooks
+function ItemsPage() {
+  const items = useItems();
+}
+```
+
+Benefits: Single source of truth, easier refactoring, better naming
+
+### Co-locate Related Code
+
+```typescript
+// ✅ Feature contains all its code
+lib/features/items/
+├── hooks.ts
+├── queries.ts
+├── actions.ts
+├── types.ts
+└── validation.ts
+```
+
+Easy to find, easy to delete/move the feature
+
+### Minimal Cross-Feature Dependencies
+
+- Features should be self-contained
+- Shared logic goes in `lib/services/` or `lib/utils/`
+- Avoid importing from other features when possible

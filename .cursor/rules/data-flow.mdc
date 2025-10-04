@@ -1,0 +1,190 @@
+---
+description: Data flow patterns for Server Components, Client Components, and Convex integration
+globs: **/*.tsx,**/*.ts
+---
+
+# Data Flow Patterns
+
+## Server Component vs Client Component
+
+### Use Server Component (default) when:
+
+- ✅ No interactivity needed
+- ✅ No React hooks (`useState`, `useEffect`)
+- ✅ No browser APIs (`localStorage`, `window`)
+- ✅ Want fast initial load with no loading states
+- ✅ SEO important
+
+### Use Client Component when:
+
+- ✅ Need interactivity (forms, buttons with `onClick`)
+- ✅ Need React hooks (`useState`, `useEffect`, `useContext`)
+- ✅ Need browser APIs (`localStorage`, `window`, `document`)
+- ✅ Need real-time updates (Convex subscriptions)
+
+## Common Data Flow Patterns
+
+### Server Component → Display Data
+
+Fast initial render, no loading state, SEO-friendly.
+
+```typescript
+// app/items/page.tsx (Server Component)
+import { getItems } from '@/lib/features/items/queries';
+import { ItemList } from '@/components/items/item-list';
+
+export default async function ItemsPage() {
+  const items = await getItems();
+  return <ItemList items={items} />;
+}
+```
+
+### Client Component → Real-time Updates
+
+Subscribe to Convex for real-time updates.
+
+```typescript
+// app/dashboard/page.tsx (Client Component)
+'use client';
+import { useMyItems } from '@/lib/features/items/hooks';
+
+export default function DashboardPage() {
+  const items = useMyItems();
+
+  if (!items) return <div>Loading...</div>;
+
+  return <ItemList items={items} />;
+}
+```
+
+### Hybrid Pattern → Best of Both
+
+Server renders initial data, client subscribes for updates.
+
+```typescript
+// app/items/page.tsx (Server Component)
+import { getItems } from '@/lib/features/items/queries';
+import { ItemsClient } from './items-client';
+
+export default async function ItemsPage() {
+  const initialItems = await getItems();
+  return <ItemsClient initialData={initialItems} />;
+}
+
+// app/items/items-client.tsx (Client Component)
+'use client';
+import { useItems } from '@/lib/features/items/hooks';
+
+export function ItemsClient({ initialData }) {
+  const items = useItems() ?? initialData;
+  return <ItemList items={items} />;
+}
+```
+
+### Form Submission → Server Action
+
+Handle form submissions with Server Actions.
+
+```typescript
+// app/items/new/page.tsx (Client Component)
+'use client';
+import { useRouter } from 'next/navigation';
+import { createItem } from '@/lib/features/items/actions';
+
+export default function NewItemPage() {
+  const router = useRouter();
+
+  const handleSubmit = async (data) => {
+    await createItem(data);
+    router.push('/items');
+  };
+
+  return <ItemForm onSubmit={handleSubmit} />;
+}
+```
+
+### Button Click → Client Mutation
+
+Quick interactions use client-side mutations.
+
+```typescript
+// components/items/favorite-button.tsx (Client Component)
+'use client';
+import { useFavoriteToggle } from '@/lib/features/favorites/hooks';
+
+export function FavoriteButton({ itemId }) {
+  const toggleFavorite = useFavoriteToggle();
+
+  const handleClick = async () => {
+    await toggleFavorite({ itemId });
+  };
+
+  return <button onClick={handleClick}>Favorite</button>;
+}
+```
+
+## Authentication Patterns
+
+### Server Component Protection
+
+```typescript
+import { getServerSession } from "@/lib/services/auth/server";
+import { redirect } from "next/navigation";
+
+export default async function ProtectedPage() {
+  const session = await getServerSession();
+
+  if (!session) {
+    redirect("/auth/login");
+  }
+
+  return <div>Protected content</div>;
+}
+```
+
+### Client Component Session
+
+```typescript
+"use client";
+import { useSession } from "@/lib/services/auth/client";
+
+export function UserProfile() {
+  const session = useSession();
+
+  if (!session) return <div>Please log in</div>;
+
+  return <div>Welcome {session.user.name}</div>;
+}
+```
+
+## Best Practices
+
+### Start with Server Components
+
+```typescript
+// ✅ Default to Server Component
+export default async function Page() {
+  const data = await getData();
+  return <Display data={data} />;
+}
+```
+
+Only go client when you need interactivity, hooks, browser APIs, or real-time updates.
+
+### Keep Routes Thin
+
+```typescript
+// ❌ Business logic in routes
+export default function ItemsPage() {
+  const items = useQuery(api.items.list);
+  const filtered = items?.filter((i) => i.isPublic && !i.archived);
+  const sorted = filtered?.sort((a, b) => b.createdAt - a.createdAt);
+  // ...
+}
+
+// ✅ Business logic in hooks/utils
+export default function ItemsPage() {
+  const items = usePublicItems();
+  return <ItemList items={items} />;
+}
+```

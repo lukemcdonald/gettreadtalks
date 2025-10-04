@@ -1,0 +1,220 @@
+---
+description: Convex function organization and naming conventions
+globs: convex/**/*.ts
+---
+
+# Convex Organization
+
+## File Structure
+
+```
+convex/
+├── schema.ts                 # Database schema
+├── items.ts                  # Item queries & mutations
+├── categories.ts             # Category queries & mutations
+├── users.ts                  # User queries
+├── http.ts                   # HTTP endpoints (webhooks)
+├── lib/
+│   ├── permissions.ts        # Authorization helpers
+│   └── validation.ts         # Server-side validation
+└── _generated/               # Auto-generated
+```
+
+## Naming Conventions
+
+### Query Functions (reads)
+
+Describe the data operation:
+
+```typescript
+export const list = query(...)           // Get collection
+export const get = query(...)            // Get single by ID
+export const getBySlug = query(...)      // Get by other field
+export const search = query(...)         // Filtered list
+```
+
+### Mutation Functions (writes)
+
+Use action verbs:
+
+```typescript
+export const create = mutation(...)      // Create new
+export const update = mutation(...)      // Update existing
+export const remove = mutation(...)      // Delete (avoid "delete" keyword)
+export const toggle = mutation(...)      // Toggle state
+export const publish = mutation(...)     // Specific action
+export const archive = mutation(...)     // Specific action
+```
+
+### Function Naming Examples
+
+```typescript
+// ❌ Vague
+export const data = query(...)
+export const stuff = query(...)
+
+// ✅ Clear
+export const list = query(...)
+export const getBySlug = query(...)
+
+// ❌ Redundant (file provides context)
+export const getBookmark = query(...)    // in bookmarks.ts
+export const listBookmarks = query(...)  // in bookmarks.ts
+
+// ✅ Concise
+export const get = query(...)            // api.bookmarks.get
+export const list = query(...)           // api.bookmarks.list
+```
+
+## Database Schema Conventions
+
+### Field Naming
+
+Name fields by what they reference:
+
+```typescript
+items: defineTable({
+  userId: v.id('user'), // or ownerId, authorId
+  categoryId: v.id('categories'),
+  statusId: v.id('statuses'),
+});
+```
+
+### Index Naming
+
+Name indexes by what you're querying:
+
+```typescript
+.index('by_user', ['userId'])
+.index('by_category', ['categoryId'])
+.index('by_status', ['statusId'])
+.index('by_user_and_category', ['userId', 'categoryId'])
+```
+
+### Consistency
+
+Stay consistent within each table:
+
+- `userId` + `by_user` OR `authorId` + `by_author`
+- Don't mix naming styles
+
+## Function Organization
+
+### Group by Domain
+
+One file per domain/entity:
+
+```typescript
+// convex/items.ts
+export const list = query(...)
+export const get = query(...)
+export const create = mutation(...)
+export const update = mutation(...)
+export const remove = mutation(...)
+
+// convex/categories.ts
+export const list = query(...)
+export const get = query(...)
+export const getBySlug = query(...)
+```
+
+### Shared Helpers in lib/
+
+```typescript
+// convex/lib/permissions.ts
+export async function getCurrentUser(ctx: QueryCtx | MutationCtx) {
+  const identity = await ctx.auth.getUserIdentity();
+  if (!identity) return null;
+
+  const user = await ctx.db
+    .query('user')
+    .withIndex('by_email', (q) => q.eq('email', identity.email!))
+    .first();
+
+  return user;
+}
+```
+
+## Authorization Pattern
+
+Always check auth in mutations:
+
+```typescript
+// ✅ Always verify user and ownership
+export const update = mutation({
+  handler: async (ctx, args) => {
+    const user = await getCurrentUser(ctx);
+    if (!user) throw new Error('Unauthorized');
+
+    const resource = await ctx.db.get(args.id);
+    if (resource.userId !== user._id) {
+      throw new Error('Not authorized');
+    }
+
+    // Now safe to update
+  },
+});
+```
+
+## Data Enrichment Pattern
+
+Enrich data with relationships in queries:
+
+```typescript
+export const list = query({
+  handler: async (ctx) => {
+    const items = await ctx.db.query('items').collect();
+
+    return Promise.all(
+      items.map(async (item) => {
+        const category = await ctx.db.get(item.categoryId);
+        const owner = await ctx.db.get(item.userId);
+
+        return {
+          ...item,
+          category,
+          owner: { name: owner?.name, image: owner?.image },
+        };
+      }),
+    );
+  },
+});
+```
+
+## Best Practices
+
+### Concise Function Names
+
+File provides context, so keep names short:
+
+```typescript
+// In convex/items.ts
+export const list = query(...) // Called as api.items.list
+export const get = query(...) // Called as api.items.get
+```
+
+### Use Internal Functions
+
+Keep helper functions private:
+
+```typescript
+// Use internalQuery, internalMutation for private functions
+export const internalHelper = internalMutation({...});
+
+// Only expose what's needed publicly
+export const create = mutation({...});
+```
+
+### Avoid Redundant Indexes
+
+```typescript
+// ❌ Redundant - only need the second one
+.index('by_user', ['userId'])
+.index('by_user_and_category', ['userId', 'categoryId'])
+
+// ✅ Only define what you need
+.index('by_user_and_category', ['userId', 'categoryId'])
+.index('by_category', ['categoryId'])
+```
+
+Use the more specific index for all queries, even when you don't need all fields.

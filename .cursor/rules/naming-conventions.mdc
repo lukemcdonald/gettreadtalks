@@ -1,0 +1,247 @@
+---
+description: Naming conventions for features, services, hooks, and functions
+globs: **/*.ts,**/*.tsx
+---
+
+# Naming Conventions
+
+## Feature Hooks (Client)
+
+Use descriptive, use-case focused names:
+
+```typescript
+// List query with options/filters
+export function useItems(options?: {
+  userId?: string;
+  categoryId?: string;
+  status?: string;
+  search?: string;
+});
+
+// Usage examples:
+// useItems()                              → all items
+// useItems({ userId: 'user_123' })        → items for specific user
+// useItems({ categoryId: 'cat_456' })     → items in category
+// useItems({ userId: 'me', status: 'draft' }) → filtered by user and status
+
+// Single item
+export function useItem(id: string);
+
+// Mutations
+export function useCreateItem();
+export function useUpdateItem();
+export function useDeleteItem();
+```
+
+**Note:** Define options/filter types in `types.ts` for reuse across hooks and queries.
+
+## Feature Queries (Server)
+
+Mirror Convex naming with `get` prefix:
+
+```typescript
+// queries.ts - Server reads
+export async function getItems();
+export async function getItem(id);
+export async function getMyItems();
+export async function getItemsByCategory(categoryId);
+```
+
+## Feature Actions (Server)
+
+Mirror Convex naming with verb prefix:
+
+```typescript
+// actions.ts - Server writes
+export async function createItem(data);
+export async function updateItem(id, data);
+export async function deleteItem(id);
+export async function publishItem(id);
+export async function archiveItem(id);
+```
+
+## Convex Functions
+
+### Query Functions
+
+```typescript
+// Describe the data operation
+export const list = query(...)
+export const get = query(...)
+export const getBySlug = query(...)
+export const search = query(...)
+```
+
+### Mutation Functions
+
+```typescript
+// Use action verbs
+export const create = mutation(...)
+export const update = mutation(...)
+export const remove = mutation(...)    // Use "remove" instead of "delete"
+export const toggle = mutation(...)
+export const publish = mutation(...)
+export const archive = mutation(...)
+```
+
+## Service Functions
+
+### Auth Service
+
+```typescript
+// client.ts
+export function useSession();
+export function signIn(credentials);
+export function signOut();
+
+// server.ts
+export async function getServerSession();
+export async function requireAuth();
+```
+
+### Email Service
+
+```typescript
+// server.ts
+export async function sendEmail(to, subject, body);
+export async function sendWelcomeEmail(user);
+export async function sendResetPasswordEmail(user);
+```
+
+### Analytics Service
+
+```typescript
+// client.ts
+export function trackEvent(name, properties);
+export function trackPageView(path);
+
+// server.ts
+export async function trackServerEvent(name, properties);
+```
+
+## Utility Functions
+
+Use clear, descriptive names:
+
+```typescript
+// date.ts
+export function formatDate(date);
+export function formatRelativeTime(date);
+
+// string.ts
+export function capitalize(str);
+export function slugify(str);
+
+// array.ts
+export function groupBy<T>(arr, key);
+export function unique<T>(arr);
+```
+
+## Type Naming
+
+```typescript
+// types.ts
+export type Item = {...}
+export type ItemWithRelations = {...}
+export type CreateItemInput = {...}
+export type UpdateItemInput = {...}
+
+// Avoid generic names
+// ❌ Bad
+export type Data = {...}
+export type Props = {...}
+
+// ✅ Good
+export type ItemData = {...}
+export type ItemCardProps = {...}
+```
+
+## Constants
+
+Use UPPER_SNAKE_CASE for true constants:
+
+```typescript
+// constants.ts
+export const MAX_ITEMS_PER_USER = 100;
+export const DEFAULT_PAGE_SIZE = 20;
+export const API_BASE_URL = 'https://api.example.com';
+```
+
+Use camelCase for configuration objects:
+
+```typescript
+// config.ts
+export const authConfig = {
+  providers: [...],
+  session: {...},
+};
+```
+
+## File Naming
+
+Use consistent patterns:
+
+```typescript
+// Features
+lib / features / items / hooks.ts;
+lib / features / items / queries.ts;
+lib / features / items / actions.ts;
+lib / features / items / types.ts;
+lib / features / items / validation.ts;
+lib / features / items / utils.ts;
+
+// Services
+lib / services / auth / client.ts;
+lib / services / auth / server.ts;
+lib / services / auth / config.ts;
+
+// Utils
+lib / utils / date.ts;
+lib / utils / string.ts;
+lib / utils / array.ts;
+```
+
+## Best Practices
+
+### Avoid Abbreviations
+
+```typescript
+// ❌ Unclear
+export function getItms();
+export function useItm();
+
+// ✅ Clear
+export function getItems();
+export function useItem();
+```
+
+### Be Consistent
+
+Within a feature, use consistent naming patterns:
+
+```typescript
+// ✅ Consistent
+export function useItems(); // List
+export function useItem(id); // Single
+export function useCreateItem(); // Mutation
+
+// ❌ Inconsistent
+export function useItems();
+export function getItem(id);
+export function createNewItem();
+```
+
+### Context Matters
+
+File provides context, avoid redundancy:
+
+```typescript
+// In items/hooks.ts
+// ❌ Redundant
+export function useItemsList();
+export function useItemsGet();
+
+// ✅ Concise
+export function useItems();
+export function useItem();
+```
