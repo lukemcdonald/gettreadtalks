@@ -3,14 +3,20 @@ import { v } from 'convex/values';
 import { Doc } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
 import { authComponent } from './auth';
-import { statusType } from './schema';
+import { collectionFields, speakerFields, statusType, talkFields } from './schema';
 import { normalizeSlug } from './utils';
 
+// Public query - returns published talks with speaker data
 export const getPublished = query({
   args: {
     limit: v.optional(v.number()),
   },
-  returns: v.array(v.any()),
+  returns: v.array(
+    v.object({
+      ...talkFields,
+      speaker: v.union(v.object(speakerFields), v.null()),
+    }),
+  ),
   handler: async (ctx, args) => {
     const limit = args.limit ?? 20;
 
@@ -35,11 +41,19 @@ export const getPublished = query({
   },
 });
 
+// Public query - returns published talk with related data
 export const getBySlug = query({
   args: {
     slug: v.string(),
   },
-  returns: v.union(v.any(), v.null()),
+  returns: v.union(
+    v.object({
+      ...talkFields,
+      collection: v.union(v.object(collectionFields), v.null()),
+      speaker: v.union(v.object(speakerFields), v.null()),
+    }),
+    v.null(),
+  ),
   handler: async (ctx, args) => {
     const talk = await ctx.db
       .query('talks')
@@ -65,12 +79,13 @@ export const getBySlug = query({
   },
 });
 
+// Public query - returns published talks by speaker
 export const getBySpeaker = query({
   args: {
     limit: v.optional(v.number()),
     speakerId: v.id('speakers'),
   },
-  returns: v.array(v.any()),
+  returns: v.array(v.object(talkFields)),
   handler: async (ctx, args) => {
     const limit = args.limit || 20;
 
@@ -84,11 +99,12 @@ export const getBySpeaker = query({
   },
 });
 
+// Public query - returns published talks in a collection
 export const getByCollection = query({
   args: {
     collectionId: v.id('collections'),
   },
-  returns: v.array(v.any()),
+  returns: v.array(v.object(talkFields)),
   handler: async (ctx, args) => {
     const talks = await ctx.db
       .query('talks')

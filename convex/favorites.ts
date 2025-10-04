@@ -2,22 +2,30 @@ import { v } from 'convex/values';
 
 import { mutation, query } from './_generated/server';
 import { authComponent } from './auth';
+import {
+  userFavoriteClipFields,
+  userFavoriteSpeakerFields,
+  userFavoriteTalkFields,
+} from './schema';
 
+// Returns user's favorite clips, speakers, and talks (join table records)
+// Always returns consistent object shape, with empty arrays when not authenticated
 export const getUserFavorites = query({
   args: {},
-  returns: v.union(
-    v.object({
-      clips: v.array(v.any()),
-      speakers: v.array(v.any()),
-      talks: v.array(v.any()),
-    }),
-    v.array(v.any()),
-  ),
+  returns: v.object({
+    clips: v.array(v.object(userFavoriteClipFields)),
+    speakers: v.array(v.object(userFavoriteSpeakerFields)),
+    talks: v.array(v.object(userFavoriteTalkFields)),
+  }),
   handler: async (ctx) => {
     const user = await authComponent.getAuthUser(ctx);
 
     if (!user) {
-      return [];
+      return {
+        clips: [],
+        speakers: [],
+        talks: [],
+      };
     }
 
     const userId = user.userId || user._id;

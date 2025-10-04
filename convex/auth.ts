@@ -50,9 +50,10 @@ export const getUser = async (ctx: QueryCtx) => {
   return authComponent.getAuthUser(ctx);
 };
 
+// Returns the currently authenticated user (Better Auth user object)
 export const getCurrentUser = query({
   args: {},
-  returns: v.union(v.any(), v.null()),
+  returns: v.union(v.any(), v.null()), // BetterAuthUser | null
   handler: async (ctx) => {
     return safeGetUser(ctx);
   },

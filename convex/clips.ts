@@ -3,12 +3,13 @@ import { v } from 'convex/values';
 import { Doc } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
 import { authComponent } from './auth';
-import { statusType } from './schema';
+import { clipFields, speakerFields, statusType, talkFields, topicFields } from './schema';
 import { normalizeSlug } from './utils';
 
+// Public query - returns only published clips (no auth required)
 export const getPublished = query({
   args: {},
-  returns: v.array(v.any()),
+  returns: v.array(v.object(clipFields)),
   handler: async (ctx) => {
     return await ctx.db
       .query('clips')
@@ -18,11 +19,12 @@ export const getPublished = query({
   },
 });
 
+// Public query - returns latest published clips (no auth required)
 export const getLatest = query({
   args: {
     limit: v.optional(v.number()),
   },
-  returns: v.array(v.any()),
+  returns: v.array(v.object(clipFields)),
   handler: async (ctx, args) => {
     const limit = args.limit || 10;
     return await ctx.db
@@ -33,16 +35,17 @@ export const getLatest = query({
   },
 });
 
+// Public query - returns published clip with related data (no auth required)
 export const getBySlug = query({
   args: {
     slug: v.string(),
   },
   returns: v.union(
     v.object({
-      clip: v.any(),
-      speaker: v.union(v.any(), v.null()),
-      talk: v.union(v.any(), v.null()),
-      topics: v.array(v.any()),
+      clip: v.object(clipFields),
+      speaker: v.union(v.object(speakerFields), v.null()),
+      talk: v.union(v.object(talkFields), v.null()),
+      topics: v.array(v.object(topicFields)),
     }),
     v.null(),
   ),
@@ -86,6 +89,7 @@ export const getBySlug = query({
 
 export const create = mutation({
   args: {
+    description: v.optional(v.string()),
     mediaUrl: v.string(),
     speakerId: v.optional(v.id('speakers')),
     status: v.optional(statusType),

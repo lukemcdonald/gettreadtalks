@@ -2,22 +2,25 @@ import { v } from 'convex/values';
 
 import { Doc } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
+import { collectionFields, talkFields } from './schema';
 import { requireAuth } from './lib/permissions';
 import { normalizeSlug } from './utils';
 
+// Public query - returns all collections
 export const getAll = query({
   args: {},
-  returns: v.array(v.any()),
+  returns: v.array(v.object(collectionFields)),
   handler: async (ctx) => {
     return await ctx.db.query('collections').collect();
   },
 });
 
+// Public query - returns collection by slug
 export const getBySlug = query({
   args: {
     slug: v.string(),
   },
-  returns: v.union(v.any(), v.null()),
+  returns: v.union(v.object(collectionFields), v.null()),
   handler: async (ctx, args) => {
     return await ctx.db
       .query('collections')
@@ -26,14 +29,15 @@ export const getBySlug = query({
   },
 });
 
+// Public query - returns collection with its talks
 export const getWithTalks = query({
   args: {
     slug: v.string(),
   },
   returns: v.union(
     v.object({
-      collection: v.any(),
-      talks: v.array(v.any()),
+      collection: v.object(collectionFields),
+      talks: v.array(v.object(talkFields)),
     }),
     v.null(),
   ),

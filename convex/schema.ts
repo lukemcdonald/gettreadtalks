@@ -20,6 +20,76 @@ export const timestampFields = {
 // Better Auth user ID (string)
 export const userIdType = v.string();
 
+// Define field objects for reuse in both schema and validators
+// This keeps schema and return types in sync automatically
+export const clipFields = {
+  ...timestampFields,
+  description: v.optional(v.string()),
+  mediaUrl: v.string(),
+  publishedAt: v.optional(v.number()),
+  slug: v.string(),
+  speakerId: v.optional(v.id('speakers')),
+  status: statusType,
+  talkId: v.optional(v.id('talks')),
+  title: v.string(),
+};
+
+export const speakerFields = {
+  ...timestampFields,
+  description: v.optional(v.string()),
+  firstName: v.string(),
+  imageUrl: v.optional(v.string()),
+  lastName: v.string(),
+  ministry: v.optional(v.string()),
+  role: v.optional(v.string()),
+  slug: v.string(),
+  websiteUrl: v.optional(v.string()),
+};
+
+export const topicFields = {
+  ...timestampFields,
+  slug: v.string(),
+  title: v.string(),
+};
+
+export const talkFields = {
+  ...timestampFields,
+  collectionId: v.optional(v.id('collections')),
+  collectionOrder: v.optional(v.number()),
+  description: v.optional(v.string()),
+  mediaUrl: v.string(),
+  publishedAt: v.optional(v.number()),
+  scripture: v.optional(v.string()),
+  slug: v.string(),
+  speakerId: v.id('speakers'),
+  status: statusType,
+  title: v.string(),
+};
+
+export const collectionFields = {
+  ...timestampFields,
+  description: v.optional(v.string()),
+  slug: v.string(),
+  title: v.string(),
+  url: v.optional(v.string()),
+};
+
+// Join table field objects
+export const userFavoriteClipFields = {
+  clipId: v.id('clips'),
+  userId: userIdType,
+};
+
+export const userFavoriteSpeakerFields = {
+  speakerId: v.id('speakers'),
+  userId: userIdType,
+};
+
+export const userFavoriteTalkFields = {
+  talkId: v.id('talks'),
+  userId: userIdType,
+};
+
 const applicationTables = {
   affiliateLinks: defineTable({
     ...timestampFields,
@@ -40,17 +110,7 @@ const applicationTables = {
     .index('by_featured', ['featured'])
     .index('by_slug', ['slug']),
 
-  clips: defineTable({
-    ...timestampFields,
-    description: v.optional(v.string()),
-    mediaUrl: v.string(),
-    publishedAt: v.optional(v.number()),
-    slug: v.string(),
-    speakerId: v.optional(v.id('speakers')),
-    status: statusType,
-    talkId: v.optional(v.id('talks')),
-    title: v.string(),
-  })
+  clips: defineTable(clipFields)
     .index('by_slug', ['slug'])
     .index('by_speaker_id', ['speakerId'])
     .index('by_status_and_published_at', ['status', 'publishedAt'])
@@ -63,41 +123,13 @@ const applicationTables = {
     .index('by_clip_id', ['clipId'])
     .index('by_topic_id', ['topicId']),
 
-  collections: defineTable({
-    ...timestampFields,
-    description: v.optional(v.string()),
-    slug: v.string(),
-    title: v.string(),
-    url: v.optional(v.string()),
-  }).index('by_slug', ['slug']),
+  collections: defineTable(collectionFields).index('by_slug', ['slug']),
 
-  speakers: defineTable({
-    ...timestampFields,
-    description: v.optional(v.string()),
-    firstName: v.string(),
-    imageUrl: v.optional(v.string()),
-    lastName: v.string(),
-    ministry: v.optional(v.string()),
-    role: v.optional(v.string()),
-    slug: v.string(),
-    websiteUrl: v.optional(v.string()),
-  })
+  speakers: defineTable(speakerFields)
     .index('by_last_name', ['lastName'])
     .index('by_slug', ['slug']),
 
-  talks: defineTable({
-    ...timestampFields,
-    collectionId: v.optional(v.id('collections')),
-    collectionOrder: v.optional(v.number()),
-    description: v.optional(v.string()),
-    mediaUrl: v.string(),
-    publishedAt: v.optional(v.number()),
-    scripture: v.optional(v.string()),
-    slug: v.string(),
-    speakerId: v.id('speakers'),
-    status: statusType,
-    title: v.string(),
-  })
+  talks: defineTable(talkFields)
     .index('by_collection_id_and_order', ['collectionId', 'collectionOrder'])
     .index('by_collection_id_and_status', ['collectionId', 'status'])
     .index('by_slug', ['slug'])
@@ -111,13 +143,7 @@ const applicationTables = {
     .index('by_talk_id', ['talkId'])
     .index('by_topic_id', ['topicId']),
 
-  topics: defineTable({
-    ...timestampFields,
-    slug: v.string(),
-    title: v.string(),
-  })
-    .index('by_slug', ['slug'])
-    .index('by_title', ['title']),
+  topics: defineTable(topicFields).index('by_slug', ['slug']).index('by_title', ['title']),
 
   userBookmarkedClips: defineTable({
     clipId: v.id('clips'),
@@ -129,20 +155,20 @@ const applicationTables = {
     userId: userIdType,
   }).index('by_user_and_talk', ['userId', 'talkId']),
 
-  userFavoriteClips: defineTable({
-    clipId: v.id('clips'),
-    userId: userIdType,
-  }).index('by_user_and_clip', ['userId', 'clipId']),
+  userFavoriteClips: defineTable(userFavoriteClipFields).index('by_user_and_clip', [
+    'userId',
+    'clipId',
+  ]),
 
-  userFavoriteSpeakers: defineTable({
-    speakerId: v.id('speakers'),
-    userId: userIdType,
-  }).index('by_user_and_speaker', ['userId', 'speakerId']),
+  userFavoriteSpeakers: defineTable(userFavoriteSpeakerFields).index('by_user_and_speaker', [
+    'userId',
+    'speakerId',
+  ]),
 
-  userFavoriteTalks: defineTable({
-    talkId: v.id('talks'),
-    userId: userIdType,
-  }).index('by_user_and_talk', ['userId', 'talkId']),
+  userFavoriteTalks: defineTable(userFavoriteTalkFields).index('by_user_and_talk', [
+    'userId',
+    'talkId',
+  ]),
 };
 
 export default defineSchema(applicationTables);

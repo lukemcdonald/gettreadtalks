@@ -3,21 +3,24 @@ import { v } from 'convex/values';
 import { Doc } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
 import { requireAuth } from './lib/permissions';
+import { speakerFields } from './schema';
 import { normalizeSlug } from './utils';
 
+// Public query - returns all speakers
 export const list = query({
   args: {},
-  returns: v.array(v.any()),
+  returns: v.array(v.object(speakerFields)),
   handler: async (ctx) => {
     return await ctx.db.query('speakers').collect();
   },
 });
 
+// Public query - returns speaker by slug
 export const getBySlug = query({
   args: {
     slug: v.string(),
   },
-  returns: v.union(v.any(), v.null()),
+  returns: v.union(v.object(speakerFields), v.null()),
   handler: async (ctx, args) => {
     return await ctx.db
       .query('speakers')

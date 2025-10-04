@@ -3,21 +3,24 @@ import { v } from 'convex/values';
 import { Doc } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
 import { requireAuth } from './lib/permissions';
+import { clipFields, talkFields, topicFields } from './schema';
 import { normalizeSlug } from './utils';
 
+// Public query - returns all topics
 export const list = query({
   args: {},
-  returns: v.array(v.any()),
+  returns: v.array(v.object(topicFields)),
   handler: async (ctx) => {
     return await ctx.db.query('topics').withIndex('by_title').collect();
   },
 });
 
+// Public query - returns topic by slug
 export const getBySlug = query({
   args: {
     slug: v.string(),
   },
-  returns: v.union(v.any(), v.null()),
+  returns: v.union(v.object(topicFields), v.null()),
   handler: async (ctx, args) => {
     return await ctx.db
       .query('topics')
@@ -26,15 +29,16 @@ export const getBySlug = query({
   },
 });
 
+// Public query - returns topic with related talks and clips
 export const getWithContent = query({
   args: {
     slug: v.string(),
   },
   returns: v.union(
     v.object({
-      clips: v.array(v.any()),
-      talks: v.array(v.any()),
-      topic: v.any(),
+      clips: v.array(v.object(clipFields)),
+      talks: v.array(v.object(talkFields)),
+      topic: v.object(topicFields),
     }),
     v.null(),
   ),
