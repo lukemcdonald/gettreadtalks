@@ -7,6 +7,7 @@ import { normalizeSlug } from './utils';
 
 export const getPublished = query({
   args: {},
+  returns: v.array(v.any()),
   handler: async (ctx) => {
     return await ctx.db
       .query('clips')
@@ -20,6 +21,7 @@ export const getLatest = query({
   args: {
     limit: v.optional(v.number()),
   },
+  returns: v.array(v.any()),
   handler: async (ctx, args) => {
     const limit = args.limit || 10;
     return await ctx.db
@@ -34,6 +36,15 @@ export const getBySlug = query({
   args: {
     slug: v.string(),
   },
+  returns: v.union(
+    v.object({
+      clip: v.any(),
+      speaker: v.union(v.any(), v.null()),
+      talk: v.union(v.any(), v.null()),
+      topics: v.array(v.any()),
+    }),
+    v.null(),
+  ),
   handler: async (ctx, args) => {
     const clip = await ctx.db
       .query('clips')
@@ -87,6 +98,7 @@ export const create = mutation({
     talkId: v.optional(v.id('talks')),
     title: v.string(),
   },
+  returns: v.id('clips'),
   handler: async (ctx, args) => {
     const user = await authComponent.getAuthUser(ctx);
     if (!user) {
@@ -127,6 +139,7 @@ export const updateStatus = mutation({
       v.literal('archived'),
     ),
   },
+  returns: v.id('clips'),
   handler: async (ctx, args) => {
     const user = await authComponent.getAuthUser(ctx);
 

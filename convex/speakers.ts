@@ -2,10 +2,12 @@ import { v } from 'convex/values';
 
 import { Doc } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
+import { requireAuth } from './lib/permissions';
 import { normalizeSlug } from './utils';
 
-export const getAll = query({
+export const list = query({
   args: {},
+  returns: v.array(v.any()),
   handler: async (ctx) => {
     return await ctx.db.query('speakers').collect();
   },
@@ -15,6 +17,7 @@ export const getBySlug = query({
   args: {
     slug: v.string(),
   },
+  returns: v.union(v.any(), v.null()),
   handler: async (ctx, args) => {
     return await ctx.db
       .query('speakers')
@@ -33,7 +36,10 @@ export const create = mutation({
     role: v.optional(v.string()),
     websiteUrl: v.optional(v.string()),
   },
+  returns: v.id('speakers'),
   handler: async (ctx, args) => {
+    await requireAuth(ctx);
+
     const slug = normalizeSlug(`${args.firstName} ${args.lastName}`);
 
     const existing = await ctx.db
@@ -64,7 +70,10 @@ export const update = mutation({
     role: v.optional(v.string()),
     websiteUrl: v.optional(v.string()),
   },
+  returns: v.id('speakers'),
   handler: async (ctx, args) => {
+    await requireAuth(ctx);
+
     const { id, ...rest } = args;
     const updates: Partial<Doc<'speakers'>> = rest;
 

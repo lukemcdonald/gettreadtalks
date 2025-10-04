@@ -7,6 +7,7 @@ import { normalizeSlug } from './utils';
 
 export const getAll = query({
   args: {},
+  returns: v.array(v.any()),
   handler: async (ctx) => {
     return await ctx.db.query('collections').collect();
   },
@@ -16,6 +17,7 @@ export const getBySlug = query({
   args: {
     slug: v.string(),
   },
+  returns: v.union(v.any(), v.null()),
   handler: async (ctx, args) => {
     return await ctx.db
       .query('collections')
@@ -28,6 +30,13 @@ export const getWithTalks = query({
   args: {
     slug: v.string(),
   },
+  returns: v.union(
+    v.object({
+      collection: v.any(),
+      talks: v.array(v.any()),
+    }),
+    v.null(),
+  ),
   handler: async (ctx, args) => {
     const collection = await ctx.db
       .query('collections')
@@ -61,6 +70,7 @@ export const create = mutation({
     title: v.string(),
     url: v.optional(v.string()),
   },
+  returns: v.id('collections'),
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
@@ -90,6 +100,7 @@ export const update = mutation({
     title: v.optional(v.string()),
     url: v.optional(v.string()),
   },
+  returns: v.id('collections'),
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 

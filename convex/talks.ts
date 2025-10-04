@@ -9,6 +9,7 @@ export const getPublished = query({
   args: {
     limit: v.optional(v.number()),
   },
+  returns: v.array(v.any()),
   handler: async (ctx, args) => {
     const limit = args.limit ?? 20;
 
@@ -37,6 +38,7 @@ export const getBySlug = query({
   args: {
     slug: v.string(),
   },
+  returns: v.union(v.any(), v.null()),
   handler: async (ctx, args) => {
     const talk = await ctx.db
       .query('talks')
@@ -67,6 +69,7 @@ export const getBySpeaker = query({
     limit: v.optional(v.number()),
     speakerId: v.id('speakers'),
   },
+  returns: v.array(v.any()),
   handler: async (ctx, args) => {
     const limit = args.limit || 20;
 
@@ -84,6 +87,7 @@ export const getByCollection = query({
   args: {
     collectionId: v.id('collections'),
   },
+  returns: v.array(v.any()),
   handler: async (ctx, args) => {
     const talks = await ctx.db
       .query('talks')
@@ -114,6 +118,7 @@ export const create = mutation({
     ),
     title: v.string(),
   },
+  returns: v.id('talks'),
   handler: async (ctx, args) => {
     const user = await authComponent.getAuthUser(ctx);
 
@@ -155,6 +160,7 @@ export const updateStatus = mutation({
       v.literal('archived'),
     ),
   },
+  returns: v.id('talks'),
   handler: async (ctx, args) => {
     const user = await authComponent.getAuthUser(ctx);
 

@@ -5,6 +5,14 @@ import { authComponent } from './auth';
 
 export const getUserFavorites = query({
   args: {},
+  returns: v.union(
+    v.object({
+      clips: v.array(v.any()),
+      speakers: v.array(v.any()),
+      talks: v.array(v.any()),
+    }),
+    v.array(v.any()),
+  ),
   handler: async (ctx) => {
     const user = await authComponent.getAuthUser(ctx);
 
@@ -41,6 +49,7 @@ export const addFavoriteTalk = mutation({
   args: {
     talkId: v.id('talks'),
   },
+  returns: v.id('userFavoriteTalks'),
   handler: async (ctx, args) => {
     const user = await authComponent.getAuthUser(ctx);
 
@@ -71,6 +80,7 @@ export const removeFavoriteTalk = mutation({
   args: {
     talkId: v.id('talks'),
   },
+  returns: v.null(),
   handler: async (ctx, args) => {
     const user = await authComponent.getAuthUser(ctx);
 
@@ -99,6 +109,7 @@ export const addFavoriteClip = mutation({
   args: {
     clipId: v.id('clips'),
   },
+  returns: v.id('userFavoriteClips'),
   handler: async (ctx, args) => {
     const user = await authComponent.getAuthUser(ctx);
 
@@ -129,6 +140,7 @@ export const removeFavoriteClip = mutation({
   args: {
     clipId: v.id('clips'),
   },
+  returns: v.null(),
   handler: async (ctx, args) => {
     const user = await authComponent.getAuthUser(ctx);
 
@@ -157,6 +169,7 @@ export const addFavoriteSpeaker = mutation({
   args: {
     speakerId: v.id('speakers'),
   },
+  returns: v.id('userFavoriteSpeakers'),
   handler: async (ctx, args) => {
     const user = await authComponent.getAuthUser(ctx);
 
@@ -189,6 +202,7 @@ export const removeFavoriteSpeaker = mutation({
   args: {
     speakerId: v.id('speakers'),
   },
+  returns: v.null(),
   handler: async (ctx, args) => {
     const user = await authComponent.getAuthUser(ctx);
 

@@ -2,6 +2,7 @@ import { createClient, type GenericCtx } from '@convex-dev/better-auth';
 import { convex } from '@convex-dev/better-auth/plugins';
 import { betterAuth } from 'better-auth';
 import { nextCookies } from 'better-auth/next-js';
+import { v } from 'convex/values';
 
 import { components } from './_generated/api';
 import { DataModel } from './_generated/dataModel';
@@ -51,6 +52,7 @@ export const getUser = async (ctx: QueryCtx) => {
 
 export const getCurrentUser = query({
   args: {},
+  returns: v.union(v.any(), v.null()),
   handler: async (ctx) => {
     return safeGetUser(ctx);
   },
