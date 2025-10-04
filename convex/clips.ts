@@ -10,8 +10,7 @@ export const getPublished = query({
   handler: async (ctx) => {
     return await ctx.db
       .query('clips')
-      .withIndex('by_published_at')
-      .filter((q) => q.eq(q.field('status'), 'published'))
+      .withIndex('by_status_and_published_at', (q) => q.eq('status', 'published'))
       .order('desc')
       .collect();
   },
@@ -25,8 +24,7 @@ export const getLatest = query({
     const limit = args.limit || 10;
     return await ctx.db
       .query('clips')
-      .withIndex('by_published_at')
-      .filter((q) => q.eq(q.field('status'), 'published'))
+      .withIndex('by_status_and_published_at', (q) => q.eq('status', 'published'))
       .order('desc')
       .take(limit);
   },

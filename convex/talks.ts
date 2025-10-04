@@ -14,8 +14,7 @@ export const getPublished = query({
 
     const talks = await ctx.db
       .query('talks')
-      .withIndex('by_published_at')
-      .filter((q) => q.eq(q.field('status'), 'published'))
+      .withIndex('by_status_and_published_at', (q) => q.eq('status', 'published'))
       .order('desc')
       .take(limit);
 
@@ -41,8 +40,7 @@ export const getBySlug = query({
   handler: async (ctx, args) => {
     const talk = await ctx.db
       .query('talks')
-      .withIndex('by_slug')
-      .filter((q) => q.eq(q.field('slug'), args.slug))
+      .withIndex('by_slug', (q) => q.eq('slug', args.slug))
       .unique();
 
     if (!talk) {
@@ -74,8 +72,9 @@ export const getBySpeaker = query({
 
     return await ctx.db
       .query('talks')
-      .withIndex('by_speaker_id', (q) => q.eq('speakerId', args.speakerId))
-      .filter((q) => q.eq(q.field('status'), 'published'))
+      .withIndex('by_speaker_id_and_status', (q) =>
+        q.eq('speakerId', args.speakerId).eq('status', 'published'),
+      )
       .order('desc')
       .take(limit);
   },
@@ -88,8 +87,9 @@ export const getByCollection = query({
   handler: async (ctx, args) => {
     const talks = await ctx.db
       .query('talks')
-      .withIndex('by_collection_id_and_order', (q) => q.eq('collectionId', args.collectionId))
-      .filter((q) => q.eq(q.field('status'), 'published'))
+      .withIndex('by_collection_id_and_status', (q) =>
+        q.eq('collectionId', args.collectionId).eq('status', 'published'),
+      )
       .collect();
 
     // Sort by collectionOrder

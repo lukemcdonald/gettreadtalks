@@ -54,6 +54,7 @@ const applicationTables = {
     .index('by_slug', ['slug'])
     .index('by_speaker_id', ['speakerId'])
     .index('by_status', ['status'])
+    .index('by_status_and_published_at', ['status', 'publishedAt'])
     .index('by_talk_id', ['talkId']),
 
   clipsOnTopics: defineTable({
@@ -99,10 +100,13 @@ const applicationTables = {
     title: v.string(),
   })
     .index('by_collection_id_and_order', ['collectionId', 'collectionOrder'])
+    .index('by_collection_id_and_status', ['collectionId', 'status'])
     .index('by_published_at', ['publishedAt'])
     .index('by_slug', ['slug'])
     .index('by_speaker_id', ['speakerId'])
-    .index('by_status', ['status']),
+    .index('by_speaker_id_and_status', ['speakerId', 'status'])
+    .index('by_status', ['status'])
+    .index('by_status_and_published_at', ['status', 'publishedAt']),
 
   talksOnTopics: defineTable({
     talkId: v.id('talks'),

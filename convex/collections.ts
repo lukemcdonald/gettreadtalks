@@ -2,6 +2,7 @@ import { v } from 'convex/values';
 
 import { Doc } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
+import { requireAuth } from './lib/permissions';
 import { normalizeSlug } from './utils';
 
 export const getAll = query({
@@ -39,8 +40,9 @@ export const getWithTalks = query({
 
     const talks = await ctx.db
       .query('talks')
-      .withIndex('by_collection_id_and_order', (q) => q.eq('collectionId', collection._id))
-      .filter((q) => q.eq(q.field('status'), 'published'))
+      .withIndex('by_collection_id_and_status', (q) =>
+        q.eq('collectionId', collection._id).eq('status', 'published'),
+      )
       .collect();
 
     // Sort by collectionOrder
@@ -60,6 +62,8 @@ export const create = mutation({
     url: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    await requireAuth(ctx);
+
     const slug = normalizeSlug(args.title);
 
     const existing = await ctx.db
@@ -87,6 +91,8 @@ export const update = mutation({
     url: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    await requireAuth(ctx);
+
     const { id, ...rest } = args;
     const updates: Partial<Doc<'collections'>> = rest;
     const collection = await ctx.db.get(id);

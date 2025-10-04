@@ -13,6 +13,7 @@ import type * as clips from "../clips.js";
 import type * as collections from "../collections.js";
 import type * as favorites from "../favorites.js";
 import type * as http from "../http.js";
+import type * as lib_permissions from "../lib/permissions.js";
 import type * as speakers from "../speakers.js";
 import type * as talks from "../talks.js";
 import type * as topics from "../topics.js";
@@ -39,6 +40,7 @@ declare const fullApi: ApiFromModules<{
   collections: typeof collections;
   favorites: typeof favorites;
   http: typeof http;
+  "lib/permissions": typeof lib_permissions;
   speakers: typeof speakers;
   talks: typeof talks;
   topics: typeof topics;
