@@ -15,7 +15,7 @@ globs: **/*.tsx,**/*.ts
 ## Folder Structure
 
 ```
-src/components/
+components/
 ├── component-name/
 │   ├── index.ts                    ← Barrel export
 │   ├── component-name.tsx          ← Main component
@@ -26,26 +26,26 @@ src/components/
 
 ## Component Placement
 
-- **Shared components**: `src/components/` (reusable across app)
-- **Page-specific**: `src/app/page-name/` (one-off components)
-- **Feature-specific**: `src/features/feature/components/` (complex domains)
+- **Shared components**: `components/` (reusable across app)
+- **Page-specific**: `app/page-name/` (one-off components)
+- **Feature-specific**: `features/feature/components/` (complex domains)
 
 ## Import Patterns
 
 ```typescript
 // ✅ Barrel imports
-import ComponentName from "@/components/component-name";
+import ComponentName from '@/components/component-name';
 
 // ❌ Direct file imports
-import ComponentName from "@/components/component-name/component-name";
+import ComponentName from '@/components/component-name/component-name';
 ```
 
 ## Barrel Export Pattern
 
 ```typescript
 // component-name/index.ts
-export { default } from "./component-name";
-export type { ComponentNameProps } from "./component-name.types";
+export { default } from './component-name';
+export type { ComponentNameProps } from './component-name.types';
 ```
 
 ## File Naming

@@ -1,9 +1,9 @@
 'use server';
 
-import { api } from '@convex/_generated/api';
+import { api } from '@/convex/_generated/api';
 import { fetchMutation } from 'convex/nextjs';
 
-import { getAuthToken } from '@/lib/services/auth/server';
+import { getAuthToken } from '../../services/auth/server';
 
 // Authenticated mutation via server function
 export async function updatePassword({

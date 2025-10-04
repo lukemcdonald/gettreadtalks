@@ -13,7 +13,7 @@ server, and shared code.
 ## Directory Structure
 
 ```
-src/lib/
+lib/
 ├── features/              # Business domains (domain entities like users, posts, etc.)
 ├── services/              # Infrastructure (auth, email, analytics)
 └── utils/                 # Generic utilities (date, array, string helpers)

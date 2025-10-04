@@ -1,12 +1,12 @@
 'use client';
 
-import { api } from '@convex/_generated/api';
+import { api } from '@/convex/_generated/api';
 import { Authenticated, AuthLoading, Unauthenticated } from 'convex/react';
 import { useQuery } from 'convex/react';
 import Link from 'next/link';
 
-import MainLayout from '@/components/layout/main-layout/main-layout';
-import { signOut } from '@/lib/services/auth/client';
+import MainLayout from '../../components/layout/main-layout/main-layout';
+import { signOut } from '../../lib/services/auth/client';
 
 export default function AccountPage() {
   return (
