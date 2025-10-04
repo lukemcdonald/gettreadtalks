@@ -61,7 +61,6 @@ export const addFavoriteTalk = mutation({
     }
 
     return await ctx.db.insert('userFavoriteTalks', {
-      createdAt: Date.now(),
       talkId: args.talkId,
       userId: userId,
     });
@@ -121,7 +120,6 @@ export const addFavoriteClip = mutation({
 
     return await ctx.db.insert('userFavoriteClips', {
       clipId: args.clipId,
-      createdAt: Date.now(),
       userId: userId,
     });
   },
@@ -181,7 +179,6 @@ export const addFavoriteSpeaker = mutation({
     }
 
     return await ctx.db.insert('userFavoriteSpeakers', {
-      createdAt: Date.now(),
       speakerId: args.speakerId,
       userId: userId,
     });

@@ -29,6 +29,7 @@ export default function AccountPage() {
 const AccountContent = () => {
   const user = useQuery(api.auth.getCurrentUser);
   const favorites = useQuery(api.favorites.getUserFavorites);
+  const hasFavorites = favorites && !Array.isArray(favorites);
 
   const handleLogout = async () => {
     try {
@@ -104,7 +105,7 @@ const AccountContent = () => {
       </div>
 
       <div className="px-6 py-8">
-        {favorites && (
+        {hasFavorites && (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
             <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">
               Your Favorites
