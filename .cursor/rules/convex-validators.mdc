@@ -1,0 +1,125 @@
+---
+description: Reusable validator patterns for Convex schemas and best practices for index management
+globs: convex/**/*.ts
+---
+
+# Convex Validator Patterns
+
+## Reusable Validators
+
+Per [Convex Stack: Keep validators from going stale](https://stack.convex.dev/types-cookbook#keep-validators-from-going-stale), export field objects from `schema.ts` to maintain consistency:
+
+### Export Field Objects
+
+```ts
+// convex/schema.ts
+export const statusType = v.union(
+  v.literal('approved'),
+  v.literal('archived'),
+  v.literal('backlog'),
+  v.literal('published'),
+);
+
+export const timestampFields = {
+  createdAt: v.optional(v.number()),
+  deletedAt: v.optional(v.number()),
+  updatedAt: v.optional(v.number()),
+};
+
+// Export field objects (without system fields)
+export const itemFields = {
+  ...timestampFields,
+  description: v.optional(v.string()),
+  status: statusType,
+  title: v.string(),
+};
+
+// Use in schema
+export default defineSchema({
+  items: defineTable(itemFields).index('by_status', ['status']),
+});
+```
+
+### Use for Return Validators
+
+Wrap field objects with `v.object()` for return validators:
+
+```ts
+// convex/items.ts
+import { itemFields } from './schema';
+
+export const list = query({
+  args: {},
+  returns: v.array(v.object(itemFields)), // ✅ Reuses schema fields
+  handler: async (ctx) => {
+    return await ctx.db.query('items').collect();
+  },
+});
+
+// ❌ Don't use v.any() for simple queries
+returns: v.array(v.any())
+```
+
+### Mutation Args: Use Subsets
+
+For mutations, define args separately (often a subset of fields):
+
+```ts
+export const create = mutation({
+  args: {
+    // Only user-provided fields (no auto-generated timestamps/slugs)
+    description: v.optional(v.string()),
+    status: v.optional(statusType), // ✅ Reuse common validators
+    title: v.string(),
+  },
+  // ...
+});
+```
+
+### Composite Return Types
+
+For queries that join multiple tables, use `v.any()` with TypeScript comments:
+
+```ts
+returns: v.union(
+  v.object({
+    item: v.any(), // Doc<"items">
+    owner: v.union(v.any(), v.null()), // Doc<"users"> | null
+  }),
+  v.null(),
+)
+```
+
+**Why:** Field objects keep schema and validators in sync. Changes propagate automatically.
+
+## Index Optimization
+
+### Redundant Indexes
+
+Compound indexes can be used for prefix queries - remove redundant single-field indexes:
+
+```ts
+// ✅ Optimal
+.index('by_user_and_category', ['userId', 'categoryId'])
+
+// ❌ Redundant (already covered by compound index above)
+.index('by_user', ['userId'])
+```
+
+Use compound index for both queries:
+```ts
+// Query by prefix only
+.withIndex('by_user_and_category', (q) => q.eq('userId', id))
+
+// Query by full compound
+.withIndex('by_user_and_category', (q) => q.eq('userId', id).eq('categoryId', catId))
+```
+
+**Exception:** Keep both only if you need different sort orders.
+
+### Schema Audit Checklist
+
+1. Remove indexes that are prefixes of compound indexes
+2. Remove unused indexes
+3. Add indexes for filtered fields with large result sets (1000+)
+4. Use pagination/`.take()` instead of `.collect()` for large queries
