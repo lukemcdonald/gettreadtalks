@@ -4,7 +4,7 @@ import { api } from '@convex/_generated/api';
 import { useQuery } from 'convex/react';
 import Link from 'next/link';
 
-import { signOut } from '@/features/auth/auth.client';
+import { signOut } from '@/lib/services/auth/client';
 
 function AuthenticatedContent() {
   const user = useQuery(api.auth.getCurrentUser);

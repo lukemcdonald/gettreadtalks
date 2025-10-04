@@ -6,7 +6,7 @@ import { useQuery } from 'convex/react';
 import Link from 'next/link';
 
 import MainLayout from '@/components/layout/main-layout/main-layout';
-import { signOut } from '@/features/auth/auth.client';
+import { signOut } from '@/lib/services/auth/client';
 
 export default function AccountPage() {
   return (
