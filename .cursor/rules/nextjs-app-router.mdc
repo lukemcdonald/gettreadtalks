@@ -1,0 +1,355 @@
+---
+description: Next.js App Router organization patterns and best practices
+globs: app/**/*.tsx,app/**/*.ts
+---
+
+# Next.js App Router Organization
+
+## Core Principle
+
+**Group routes by layout/purpose, not by authentication level.** Handle authentication at the page level, not through folder structure.
+
+## Route Grouping Strategy
+
+### ✅ Good: Group by Layout/Purpose
+
+```sh
+app/
+├─ (marketing)/              # Marketing layout (different header/footer)
+│  ├─ layout.tsx             # Marketing-specific layout
+│  ├─ page.tsx               # Homepage
+│  ├─ about/
+│  │  └─ page.tsx
+│  └─ pricing/
+│     └─ page.tsx
+├─ (app)/                    # Main app layout (navigation, user menu)
+│  ├─ layout.tsx             # App-specific layout
+│  ├─ dashboard/
+│  │  └─ page.tsx            # Protected via page-level check
+│  ├─ items/
+│  │  ├─ page.tsx            # List page
+│  │  ├─ [id]/
+│  │  │  └─ page.tsx         # Detail page
+│  │  └─ new/
+│  │     └─ page.tsx         # Create page (protected)
+│  └─ account/
+│     └─ page.tsx            # Protected via page-level check
+└─ auth/                     # Auth layout (centered, minimal)
+   ├─ layout.tsx             # Auth-specific layout
+   ├─ login/
+   │  └─ page.tsx
+   └─ signup/
+      └─ page.tsx
+```
+
+**Why this works:**
+- Clear visual/UX separation (marketing vs app vs auth)
+- Easy to find routes by feature
+- Layouts match user experience
+- Auth requirements can change without moving files
+
+### ❌ Bad: Group by Auth Level
+
+```sh
+app/
+├─ (public)/       # ❌ Breaks down quickly
+│  ├─ page.tsx
+│  ├─ about/
+│  └─ items/       # What if this needs auth later?
+├─ (protected)/    # ❌ Routes move frequently
+│  ├─ account/
+│  └─ dashboard/   # Auth requirements change
+└─ (auth)/
+   ├─ login/
+   └─ signup/
+```
+
+**Why this fails:**
+- Auth requirements change frequently
+- Moving files is tedious and error-prone
+- Mixed concerns (layout + protection)
+- Harder to reason about
+
+## Route Groups Explained
+
+Route groups use `(folder)` syntax and **don't affect URL structure**:
+
+```sh
+app/
+├─ (marketing)/
+│  └─ about/
+│     └─ page.tsx   # URL: /about (not /marketing/about)
+└─ (app)/
+   └─ dashboard/
+      └─ page.tsx   # URL: /dashboard (not /app/dashboard)
+```
+
+**Use route groups when:**
+- Different sections need different layouts
+- You want to organize files without affecting URLs
+- You have distinct visual/UX sections (marketing, app, admin)
+
+**Don't use route groups when:**
+- You only want to group by auth (use page-level checks instead)
+- You want the folder name in the URL (just use regular folders)
+
+## Page-Level Protection
+
+Handle authentication at the page level:
+
+### Server Component (Redirect Pattern)
+
+```tsx
+// app/(app)/dashboard/page.tsx
+import { getServerSession } from '@/lib/services/auth/server';
+import { redirect } from 'next/navigation';
+
+export default async function DashboardPage() {
+  const session = await getServerSession();
+  
+  if (!session) {
+    redirect('/auth/login');
+  }
+
+  return <div>Protected content</div>;
+}
+```
+
+### Client Component (Conditional Render Pattern)
+
+```tsx
+// app/(app)/account/page.tsx
+'use client';
+import { Authenticated, Unauthenticated } from 'convex/react';
+
+export default function AccountPage() {
+  return (
+    <>
+      <Authenticated>
+        <AccountContent />
+      </Authenticated>
+      <Unauthenticated>
+        <LoginPrompt />
+      </Unauthenticated>
+    </>
+  );
+}
+```
+
+## File Conventions
+
+### Page Files
+
+```sh
+error.tsx       # Error UI (Error boundary)
+layout.tsx      # Shared layout (wraps all child routes)
+loading.tsx     # Loading UI (Suspense boundary)
+not-found.tsx   # 404 UI
+page.tsx        # Required for route to be accessible
+```
+
+### Dynamic Routes
+
+```sh
+app/
+├─ items/
+│  ├─ page.tsx         # /items
+│  ├─ [slug]/
+│  │  └─ page.tsx      # /items/some-item-slug
+│  └─ [id]/
+│     └─ edit/
+│        └─ page.tsx   # /items/123/edit
+```
+
+### API Routes
+
+```sh
+app/
+└─ api/
+   ├─ auth/
+   │  └─ [...all]/
+   │     └─ route.ts   # Catch-all: /api/auth/*
+   └─ webhooks/
+      └─ stripe/
+         └─ route.ts   # /api/webhooks/stripe
+```
+
+## Layout Hierarchy
+
+Layouts nest from root to leaf:
+
+```tsx
+// app/layout.tsx (Root Layout - Required)
+export default function RootLayout({ children }) {
+  return (
+    <html>
+      <body>
+        <Providers>
+          {children}
+        </Providers>
+      </body>
+    </html>
+  );
+}
+
+// app/(app)/layout.tsx (App Layout)
+export default function AppLayout({ children }) {
+  return (
+    <>
+      <AppHeader />
+      <Sidebar />
+      <main>{children}</main>
+    </>
+  );
+}
+
+// app/(marketing)/layout.tsx (Marketing Layout)
+export default function MarketingLayout({ children }) {
+  return (
+    <>
+      <MarketingHeader />
+      <main>{children}</main>
+      <Footer />
+    </>
+  );
+}
+```
+
+**Rendering hierarchy:**
+
+```sh
+Root Layout
+  ├─ App Layout
+  │  └─ Dashboard Page
+  └─ Marketing Layout
+     └─ About Page
+```
+
+## Best Practices
+
+### 1. Keep Pages Simple
+
+```tsx
+// ✅ Page delegates to components
+export default function ItemsPage() {
+  return <ItemList />;
+}
+
+// ❌ Page has too much logic
+export default function ItemsPage() {
+  const [filter, setFilter] = useState('all');
+  const items = useItems();
+  const filtered = items?.filter(...);
+  // 50 more lines...
+}
+```
+
+### 2. Co-locate Page-Specific Components
+
+Use `_components/` or `_lib/` prefix - Next.js ignores folders starting with `_`.
+
+```sh
+app/
+└─ items/
+   ├─ page.tsx              # Main page
+   ├─ _components/          # Page-specific components
+   │  ├─ item-filters.tsx
+   │  └─ item-stats.tsx
+   └─ [id]/
+      └─ page.tsx
+```
+
+### 3. Use Metadata API
+
+```tsx
+// app/(marketing)/about/page.tsx
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'About Us',
+  description: 'Learn more about our mission',
+};
+
+export default function AboutPage() {
+  return <div>About content</div>;
+}
+```
+
+### 4. Group Related Routes
+
+```sh
+# ✅ Good: Related features together
+app/(app)/
+└─ items/
+   ├─ page.tsx         # List
+   ├─ [id]/
+   │  ├─ page.tsx      # View
+   │  └─ edit/
+   │     └─ page.tsx   # Edit
+   └─ new/
+      └─ page.tsx      # Create
+
+# ❌ Bad: Scattered
+app/(app)/
+├─ items-list/
+├─ items-detail/
+├─ edit-item/
+└─ new-item/
+```
+
+## Common Patterns
+
+### Loading States
+
+```tsx
+// app/(app)/items/loading.tsx
+export default function Loading() {
+  return <ItemsListSkeleton />;
+}
+
+// Automatically wraps page.tsx in Suspense
+```
+
+### Error Boundaries
+
+```tsx
+// app/(app)/items/error.tsx
+'use client';
+export default function Error({ error, reset }) {
+  return (
+    <div>
+      <h2>Something went wrong!</h2>
+      <button onClick={reset}>Try again</button>
+    </div>
+  );
+}
+```
+
+### Parallel Routes (Advanced)
+
+```sh
+app/
+└─ dashboard/
+   ├─ page.tsx
+   ├─ @analytics/
+   │  └─ page.tsx          # Renders in parallel
+   └─ layout.tsx           # Receives analytics as prop
+```
+
+## Decision Tree
+
+**Should I use a route group?**
+- ✅ Different layouts needed? → Use `(group)`
+- ✅ Organize without URL impact? → Use `(group)`
+- ❌ Only for auth? → No, use page-level checks
+- ❌ Want folder in URL? → No, use regular folder
+
+**Where should protection happen?**
+- ✅ Individual page needs auth? → Page-level check
+- ✅ Whole section needs auth? → Layout-level check
+- ❌ Folder-based protection? → No, use page/layout checks
+
+**Should this be a page or component?**
+- ✅ Needs a URL? → `page.tsx`
+- ✅ Shared across pages? → Component in `components/`
+- ✅ Page-specific? → Component in `app/route/_components/`

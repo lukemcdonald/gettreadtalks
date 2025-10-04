@@ -5,6 +5,7 @@
 .env*
 .idea/
 .next/
+.notes/
 .vscode/
 build/
 convex/_generated/
