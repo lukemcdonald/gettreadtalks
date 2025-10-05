@@ -152,7 +152,6 @@ export const create = mutation({
 
     return await ctx.db.insert('talks', {
       ...args,
-      createdAt: Date.now(),
       publishedAt,
       slug,
       status,

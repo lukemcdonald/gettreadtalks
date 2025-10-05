@@ -188,7 +188,7 @@ export default function ItemsPage() {
 export default function ItemsPage() {
   const items = useQuery(api.items.list);
   const filtered = items?.filter((i) => i.isPublic && !i.archived);
-  const sorted = filtered?.sort((a, b) => b.createdAt - a.createdAt);
+  const sorted = filtered?.sort((a, b) => b._creationTime - a._creationTime);
   // ...
 }
 ```

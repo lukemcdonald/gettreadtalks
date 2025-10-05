@@ -91,7 +91,6 @@ export const create = mutation({
 
     return await ctx.db.insert('collections', {
       ...args,
-      createdAt: Date.now(),
       slug,
     });
   },

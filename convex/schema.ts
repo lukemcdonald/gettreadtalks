@@ -12,16 +12,28 @@ export const statusType = v.union(
 
 // Common timestamp fields for audit trail
 export const timestampFields = {
-  createdAt: v.optional(v.number()),
+  // Note: Convex provides a `_creationTime` field automatically
   deletedAt: v.optional(v.number()),
   updatedAt: v.optional(v.number()),
 };
 
-// Better Auth user ID (string)
-export const userIdType = v.string();
+export const affiliateLinkFields = {
+  ...timestampFields,
+  affiliate: v.optional(v.string()),
+  description: v.optional(v.string()),
+  featured: v.optional(v.boolean()),
+  slug: v.string(),
+  title: v.string(),
+  type: v.union(
+    v.literal('app'),
+    v.literal('book'),
+    v.literal('movie'),
+    v.literal('music'),
+    v.literal('podcast'),
+  ),
+  url: v.string(),
+};
 
-// Define field objects for reuse in both schema and validators
-// This keeps schema and return types in sync automatically
 export const clipFields = {
   ...timestampFields,
   description: v.optional(v.string()),
@@ -77,36 +89,21 @@ export const collectionFields = {
 // Join table field objects
 export const userFavoriteClipFields = {
   clipId: v.id('clips'),
-  userId: userIdType,
+  userId: v.string(),
 };
 
 export const userFavoriteSpeakerFields = {
   speakerId: v.id('speakers'),
-  userId: userIdType,
+  userId: v.string(),
 };
 
 export const userFavoriteTalkFields = {
   talkId: v.id('talks'),
-  userId: userIdType,
+  userId: v.string(),
 };
 
-const applicationTables = {
-  affiliateLinks: defineTable({
-    ...timestampFields,
-    affiliate: v.optional(v.string()),
-    description: v.optional(v.string()),
-    featured: v.optional(v.boolean()),
-    slug: v.string(),
-    title: v.string(),
-    type: v.union(
-      v.literal('app'),
-      v.literal('book'),
-      v.literal('movie'),
-      v.literal('music'),
-      v.literal('podcast'),
-    ),
-    url: v.string(),
-  })
+export default defineSchema({
+  affiliateLinks: defineTable(affiliateLinkFields)
     .index('by_featured', ['featured'])
     .index('by_slug', ['slug']),
 
@@ -145,16 +142,6 @@ const applicationTables = {
 
   topics: defineTable(topicFields).index('by_slug', ['slug']).index('by_title', ['title']),
 
-  userBookmarkedClips: defineTable({
-    clipId: v.id('clips'),
-    userId: userIdType,
-  }).index('by_user_and_clip', ['userId', 'clipId']),
-
-  userBookmarkedTalks: defineTable({
-    talkId: v.id('talks'),
-    userId: userIdType,
-  }).index('by_user_and_talk', ['userId', 'talkId']),
-
   userFavoriteClips: defineTable(userFavoriteClipFields).index('by_user_and_clip', [
     'userId',
     'clipId',
@@ -169,6 +156,4 @@ const applicationTables = {
     'userId',
     'talkId',
   ]),
-};
-
-export default defineSchema(applicationTables);
+});

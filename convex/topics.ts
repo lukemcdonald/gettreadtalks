@@ -107,7 +107,6 @@ export const create = mutation({
 
     return await ctx.db.insert('topics', {
       ...args,
-      createdAt: Date.now(),
       slug,
     });
   },

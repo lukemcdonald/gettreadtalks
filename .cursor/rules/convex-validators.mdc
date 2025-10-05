@@ -21,7 +21,7 @@ export const statusType = v.union(
 );
 
 export const timestampFields = {
-  createdAt: v.optional(v.number()),
+  // Convex provides a `_creationTime` field automatically
   deletedAt: v.optional(v.number()),
   updatedAt: v.optional(v.number()),
 };
