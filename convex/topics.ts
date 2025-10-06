@@ -2,7 +2,7 @@ import { v } from 'convex/values';
 
 import { Doc } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
-import { requireAuth } from './model';
+import { requireAuth } from './model/auth';
 import { clipFields, talkFields, topicFields } from './schema';
 import { normalizeSlug } from './utils';
 import { getBySlug as getTopicBySlug, getWithContent as getTopicWithContent } from './model/topics';
@@ -26,7 +26,7 @@ export const getBySlug = query({
   },
   returns: v.union(v.object(topicFields), v.null()),
   handler: async (ctx, args) => {
-    return await getTopicBySlug(ctx.db, args.slug);
+    return await getTopicBySlug(ctx, args.slug);
   },
 });
 
@@ -46,7 +46,7 @@ export const getWithContent = query({
   ),
   handler: async (ctx, args) => {
     const limit = args.limit || 50; // Default limit to prevent unbounded results
-    return await getTopicWithContent(ctx.db, args.slug, limit);
+    return await getTopicWithContent(ctx, args.slug, limit);
   },
 });
 

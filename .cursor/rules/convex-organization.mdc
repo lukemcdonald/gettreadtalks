@@ -205,14 +205,14 @@ import { getBySlug, getClipTopics } from './model';
 
 export const getBySlug = query({
   handler: async (ctx, args) => {
-    const clip = await getBySlug(ctx.db, 'clips', args.slug, 'published');
+    const clip = await getBySlug(ctx, 'clips', args.slug, 'published');
     if (!clip) return null;
 
     // Use helper functions for related data
     const [speaker, talk, topics] = await Promise.all([
       clip.speakerId ? ctx.db.get(clip.speakerId) : null,
       clip.talkId ? ctx.db.get(clip.talkId) : null,
-      getClipTopics(ctx.db, clip._id, 20),
+      getClipTopics(ctx, clip._id, 20),
     ]);
 
     return { clip, speaker, talk, topics };
@@ -254,7 +254,7 @@ import { normalizeSlug } from './utils';
 export const getPublished = query({
   handler: async (ctx, args) => {
     const limit = args.limit || 20;
-    return await getPublishedWithSpeakers(ctx.db, limit);
+    return await getPublishedWithSpeakers(ctx, limit);
   },
 });
 ```
@@ -286,7 +286,7 @@ import { getDefaultLimit } from './utils';
 export const getPublished = query({
   handler: async (ctx, args) => {
     const limit = args.limit || getDefaultLimit('content');
-    return await getPublishedWithSpeakers(ctx.db, limit);
+    return await getPublishedWithSpeakers(ctx, limit);
   },
 });
 

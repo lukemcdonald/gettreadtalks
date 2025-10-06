@@ -2,7 +2,7 @@ import { v } from 'convex/values';
 
 import { Doc } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
-import { requireAuth } from './model';
+import { requireAuth } from './model/auth';
 import { speakerFields } from './schema';
 import { normalizeSlug } from './utils';
 import { getBySlug as getSpeakerBySlug } from './model/speakers';
@@ -26,7 +26,7 @@ export const getBySlug = query({
   },
   returns: v.union(v.object(speakerFields), v.null()),
   handler: async (ctx, args) => {
-    return await getSpeakerBySlug(ctx.db, args.slug);
+    return await getSpeakerBySlug(ctx, args.slug);
   },
 });
 

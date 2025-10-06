@@ -16,7 +16,6 @@ import type * as http from "../http.js";
 import type * as model_auth from "../model/auth.js";
 import type * as model_clips from "../model/clips.js";
 import type * as model_collections from "../model/collections.js";
-import type * as model_index from "../model/index.js";
 import type * as model_speakers from "../model/speakers.js";
 import type * as model_talks from "../model/talks.js";
 import type * as model_topics from "../model/topics.js";
@@ -50,7 +49,6 @@ declare const fullApi: ApiFromModules<{
   "model/auth": typeof model_auth;
   "model/clips": typeof model_clips;
   "model/collections": typeof model_collections;
-  "model/index": typeof model_index;
   "model/speakers": typeof model_speakers;
   "model/talks": typeof model_talks;
   "model/topics": typeof model_topics;

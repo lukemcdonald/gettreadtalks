@@ -1,4 +1,4 @@
-import type { DatabaseReader } from '../_generated/server';
+import type { QueryCtx, MutationCtx } from '../_generated/server';
 import type { Id } from '../_generated/dataModel';
 import type { Doc } from '../_generated/dataModel';
 
@@ -9,10 +9,10 @@ import type { Doc } from '../_generated/dataModel';
  * @returns Array of talks with speaker information
  */
 export async function getPublishedWithSpeakers(
-  ctx: DatabaseReader,
+  ctx: QueryCtx,
   limit: number,
 ): Promise<Array<Doc<'talks'> & { speaker: Doc<'speakers'> | null }>> {
-  const talks = await ctx
+  const talks = await ctx.db
     .query('talks')
     .withIndex('by_status_and_published_at', (q) => q.eq('status', 'published'))
     .order('desc')
@@ -39,14 +39,14 @@ export async function getPublishedWithSpeakers(
  * @returns Talk with speaker and collection data
  */
 export async function getBySlugWithRelations(
-  ctx: DatabaseReader,
+  ctx: QueryCtx,
   slug: string,
 ): Promise<{
   talk: Doc<'talks'>;
   speaker: Doc<'speakers'> | null;
   collection: Doc<'collections'> | null;
 } | null> {
-  const talk = await ctx
+  const talk = await ctx.db
     .query('talks')
     .withIndex('by_slug', (q) => q.eq('slug', slug))
     .unique();
@@ -76,12 +76,12 @@ export async function getBySlugWithRelations(
  * @returns Array of talks
  */
 export async function getBySpeaker(
-  ctx: DatabaseReader,
+  ctx: QueryCtx,
   speakerId: Id<'speakers'>,
-  status: string,
+  status: 'backlog' | 'approved' | 'published' | 'archived',
   limit: number,
 ): Promise<Doc<'talks'>[]> {
-  return await ctx
+  return await ctx.db
     .query('talks')
     .withIndex('by_speaker_id_and_status', (q) => q.eq('speakerId', speakerId).eq('status', status))
     .order('desc')
@@ -97,12 +97,12 @@ export async function getBySpeaker(
  * @returns Array of talks sorted by collection order
  */
 export async function getByCollection(
-  ctx: DatabaseReader,
+  ctx: QueryCtx,
   collectionId: Id<'collections'>,
-  status: string,
+  status: 'backlog' | 'approved' | 'published' | 'archived',
   limit: number,
 ): Promise<Doc<'talks'>[]> {
-  const talks = await ctx
+  const talks = await ctx.db
     .query('talks')
     .withIndex('by_collection_id_and_status', (q) =>
       q.eq('collectionId', collectionId).eq('status', status),

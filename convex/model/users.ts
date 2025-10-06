@@ -1,4 +1,4 @@
-import type { DatabaseReader } from '../_generated/server';
+import type { QueryCtx, MutationCtx } from '../_generated/server';
 import type { Doc } from '../_generated/dataModel';
 
 /**
@@ -10,33 +10,33 @@ import type { Doc } from '../_generated/dataModel';
  * @returns Array of favorite records
  */
 export async function getUserFavoriteClips(
-  ctx: DatabaseReader,
+  ctx: QueryCtx,
   userId: string,
   limit: number,
 ): Promise<Doc<'userFavoriteClips'>[]> {
-  return await ctx
+  return await ctx.db
     .query('userFavoriteClips')
     .withIndex('by_user_and_clip', (q) => q.eq('userId', userId))
     .take(limit);
 }
 
 export async function getUserFavoriteSpeakers(
-  ctx: DatabaseReader,
+  ctx: QueryCtx,
   userId: string,
   limit: number,
 ): Promise<Doc<'userFavoriteSpeakers'>[]> {
-  return await ctx
+  return await ctx.db
     .query('userFavoriteSpeakers')
     .withIndex('by_user_and_speaker', (q) => q.eq('userId', userId))
     .take(limit);
 }
 
 export async function getUserFavoriteTalks(
-  ctx: DatabaseReader,
+  ctx: QueryCtx,
   userId: string,
   limit: number,
 ): Promise<Doc<'userFavoriteTalks'>[]> {
-  return await ctx
+  return await ctx.db
     .query('userFavoriteTalks')
     .withIndex('by_user_and_talk', (q) => q.eq('userId', userId))
     .take(limit);
@@ -50,7 +50,7 @@ export async function getUserFavoriteTalks(
  * @returns Object with clips, speakers, and talks favorites
  */
 export async function getAllUserFavorites(
-  ctx: DatabaseReader,
+  ctx: QueryCtx,
   userId: string,
   limit: number,
 ): Promise<{

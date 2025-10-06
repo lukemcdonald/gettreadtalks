@@ -3,7 +3,7 @@ import { v } from 'convex/values';
 import { Doc } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
 import { collectionFields, talkFields } from './schema';
-import { requireAuth } from './model';
+import { requireAuth } from './model/auth';
 import { normalizeSlug } from './utils';
 import {
   getBySlug as getCollectionBySlug,
@@ -29,7 +29,7 @@ export const getBySlug = query({
   },
   returns: v.union(v.object(collectionFields), v.null()),
   handler: async (ctx, args) => {
-    return await getCollectionBySlug(ctx.db, args.slug);
+    return await getCollectionBySlug(ctx, args.slug);
   },
 });
 
@@ -48,7 +48,7 @@ export const getWithTalks = query({
   ),
   handler: async (ctx, args) => {
     const limit = args.limit || 100; // Default limit to prevent unbounded results
-    return await getCollectionWithTalks(ctx.db, args.slug, limit);
+    return await getCollectionWithTalks(ctx, args.slug, limit);
   },
 });
 

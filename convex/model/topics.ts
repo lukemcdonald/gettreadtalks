@@ -1,4 +1,4 @@
-import type { DatabaseReader } from '../_generated/server';
+import type { QueryCtx, MutationCtx } from '../_generated/server';
 import type { Id } from '../_generated/dataModel';
 import type { Doc } from '../_generated/dataModel';
 
@@ -8,8 +8,8 @@ import type { Doc } from '../_generated/dataModel';
  * @param slug - Topic slug
  * @returns Topic or null if not found
  */
-export async function getBySlug(ctx: DatabaseReader, slug: string): Promise<Doc<'topics'> | null> {
-  return await ctx
+export async function getBySlug(ctx: QueryCtx, slug: string): Promise<Doc<'topics'> | null> {
+  return await ctx.db
     .query('topics')
     .withIndex('by_slug', (q) => q.eq('slug', slug))
     .unique();
@@ -23,7 +23,7 @@ export async function getBySlug(ctx: DatabaseReader, slug: string): Promise<Doc<
  * @returns Topic with related talks and clips
  */
 export async function getWithContent(
-  ctx: DatabaseReader,
+  ctx: QueryCtx,
   slug: string,
   limit: number = 50,
 ): Promise<{
@@ -39,33 +39,35 @@ export async function getWithContent(
 
   // Get related talks and clips in parallel
   const [talkTopics, clipTopics] = await Promise.all([
-    ctx
+    ctx.db
       .query('talksOnTopics')
       .withIndex('by_topic_id', (q) => q.eq('topicId', topic._id))
       .take(limit),
-    ctx
+    ctx.db
       .query('clipsOnTopics')
       .withIndex('by_topic_id', (q) => q.eq('topicId', topic._id))
       .take(limit),
   ]);
 
-  // Get talks
-  const talks = [];
-  for (const talkTopic of talkTopics) {
-    const talk = await ctx.db.get(talkTopic.talkId);
-    if (talk && talk.status === 'published') {
-      talks.push(talk);
-    }
-  }
+  // Get talks and clips in parallel
+  const [talkResults, clipResults] = await Promise.all([
+    Promise.all(
+      talkTopics.map(async (talkTopic) => {
+        const talk = await ctx.db.get(talkTopic.talkId);
+        return talk && talk.status === 'published' ? talk : null;
+      }),
+    ),
+    Promise.all(
+      clipTopics.map(async (clipTopic) => {
+        const clip = await ctx.db.get(clipTopic.clipId);
+        return clip && clip.status === 'published' ? clip : null;
+      }),
+    ),
+  ]);
 
-  // Get clips
-  const clips = [];
-  for (const clipTopic of clipTopics) {
-    const clip = await ctx.db.get(clipTopic.clipId);
-    if (clip && clip.status === 'published') {
-      clips.push(clip);
-    }
-  }
+  // Filter out null results
+  const talks = talkResults.filter((talk): talk is Doc<'talks'> => talk !== null);
+  const clips = clipResults.filter((clip): clip is Doc<'clips'> => clip !== null);
 
   return {
     topic,

@@ -15,7 +15,7 @@ export const getPublished = query({
   returns: v.array(v.object(clipFields)),
   handler: async (ctx, args) => {
     const limit = args.limit || 50; // Default limit to prevent unbounded results
-    return await getPublishedClips(ctx.db, limit);
+    return await getPublishedClips(ctx, limit);
   },
 });
 
@@ -27,7 +27,7 @@ export const getLatest = query({
   returns: v.array(v.object(clipFields)),
   handler: async (ctx, args) => {
     const limit = args.limit || 10;
-    return await getPublishedClips(ctx.db, limit);
+    return await getPublishedClips(ctx, limit);
   },
 });
 
@@ -48,7 +48,7 @@ export const getBySlug = query({
   ),
   handler: async (ctx, args) => {
     const limit = args.limit || 20; // Default limit to prevent unbounded results
-    return await getBySlugWithRelations(ctx.db, args.slug, limit);
+    return await getBySlugWithRelations(ctx, args.slug, limit);
   },
 });
 

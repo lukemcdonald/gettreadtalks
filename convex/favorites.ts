@@ -1,7 +1,7 @@
 import { v } from 'convex/values';
 
 import { mutation, query } from './_generated/server';
-import { getCurrentUser, getUserId } from './model';
+import { getCurrentUser, getUserId } from './model/auth';
 import { getAllUserFavorites } from './model/users';
 import { getDefaultLimit } from './utils';
 import {
@@ -39,7 +39,7 @@ export const getUserFavorites = query({
       clips: favoriteClips,
       speakers: favoriteSpeakers,
       talks: favoriteTalks,
-    } = await getAllUserFavorites(ctx.db, userId, limit);
+    } = await getAllUserFavorites(ctx, userId, limit);
 
     return {
       clips: favoriteClips,

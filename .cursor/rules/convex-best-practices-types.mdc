@@ -1,0 +1,414 @@
+---
+description: TypeScript best practices for Convex backend development. Covers type safety patterns, generated types usage, context types for helpers, validator reuse, and end-to-end type safety between backend and frontend.
+globs: convex/**/*.ts
+---
+
+# Convex TypeScript Best Practices
+
+## Requirements
+
+- TypeScript version 5.0.3 or newer
+- Use `.ts` extension for Convex functions
+- Schema defined for best type support
+
+## Writing Convex Functions
+
+### Use argument validators for automatic type inference
+
+When using argument validation, Convex automatically infers argument types:
+
+```typescript
+import { mutation } from "./_generated/server";
+import { v } from "convex/values";
+
+export default mutation({
+  args: {
+    body: v.string(),
+    author: v.string(),
+  },
+  // ✅ Convex automatically infers: {body: string, author: string}
+  handler: async (ctx, args) => {
+    const { body, author } = args;
+    await ctx.db.insert("messages", { body, author });
+  },
+});
+```
+
+### Manual type annotations for internal functions
+
+For internal functions with complex types, annotate manually:
+
+```typescript
+import { internalMutation } from "./_generated/server";
+
+export default internalMutation({
+  // ✅ Explicitly type arguments for internal functions
+  handler: async (ctx, args: { body: string; author: string }) => {
+    const { body, author } = args;
+    await ctx.db.insert("messages", { body, author });
+  },
+});
+```
+
+## Schema Integration
+
+### Define a schema for full type support
+
+Once you define a schema, database methods are fully typed:
+
+```typescript
+import { query } from "./_generated/server";
+
+export const list = query({
+  args: {},
+  // ✅ Return type is automatically inferred as Promise<Doc<"messages">[]>
+  handler: (ctx) => {
+    return ctx.db.query("messages").collect();
+  },
+});
+```
+
+### Use generated types
+
+Import types from `_generated/dataModel`:
+
+```typescript
+import { Doc, Id } from "./_generated/dataModel";
+
+// Use Doc for document types
+const message: Doc<"messages"> = {
+  _id: /* ... */,
+  _creationTime: /* ... */,
+  body: "Hello",
+  author: "Alice",
+};
+
+// Use Id for document IDs
+const channelId: Id<"channels"> = /* ... */;
+```
+
+## Server-Side Helpers
+
+### Use generated context types
+
+Import context types from `_generated/server`:
+
+```typescript
+// Types based on your schema and functions
+import {
+  QueryCtx,
+  MutationCtx,
+  ActionCtx,
+  DatabaseReader,
+  DatabaseWriter,
+} from "./_generated/server";
+
+// Types that don't depend on schema
+import {
+  Auth,
+  StorageReader,
+  StorageWriter,
+  StorageActionWriter,
+} from "convex/server";
+
+// ✅ Type your helper functions with appropriate context
+export function myReadHelper(ctx: QueryCtx, id: Id<"channels">) {
+  // Can use ctx.db for queries
+}
+
+export function myWriteHelper(ctx: MutationCtx, id: Id<"channels">) {
+  // Can use ctx.db for reads and writes
+}
+
+export function myActionHelper(ctx: ActionCtx, doc: Doc<"messages">) {
+  // Can use ctx.runQuery, ctx.runMutation, fetch, etc.
+}
+```
+
+**Note:** `MutationCtx` satisfies the `QueryCtx` interface, so mutation helpers can accept `QueryCtx`.
+
+## Validators and Type Inference
+
+### Reuse validators across schema and arguments
+
+Use `Infer` to get TypeScript types from validators:
+
+```typescript
+import { Infer, v } from "convex/values";
+
+// ✅ Define validator once
+export const courseValidator = v.union(
+  v.literal("appetizer"),
+  v.literal("main"),
+  v.literal("dessert"),
+);
+
+// ✅ Infer TypeScript type from validator
+export type Course = Infer<typeof courseValidator>;
+// Type is: 'appetizer' | 'main' | 'dessert'
+
+// Use in schema
+export default defineSchema({
+  meals: defineTable({
+    name: v.string(),
+    course: courseValidator, // Use validator
+  }),
+});
+
+// Use in function arguments
+export const createMeal = mutation({
+  args: {
+    name: v.string(),
+    course: courseValidator, // Use validator
+  },
+  handler: async (ctx, args) => {
+    // ...
+  },
+});
+
+// Use type in helpers
+export function categorizeMeal(course: Course) {
+  // ...
+}
+```
+
+## Document Types Without System Fields
+
+### Use `WithoutSystemFields` for inserts and updates
+
+When creating or updating documents, remove system fields:
+
+```typescript
+import { MutationCtx } from "./_generated/server";
+import { WithoutSystemFields } from "convex/server";
+import { Doc } from "./_generated/dataModel";
+
+// ✅ Use WithoutSystemFields for insert helpers
+export async function insertMessageHelper(
+  ctx: MutationCtx,
+  values: WithoutSystemFields<Doc<"messages">>,
+) {
+  // values doesn't include _id or _creationTime
+  await ctx.db.insert("messages", values);
+}
+
+// ✅ Use WithoutSystemFields for update helpers
+export async function updateMessageHelper(
+  ctx: MutationCtx,
+  id: Id<"messages">,
+  updates: Partial<WithoutSystemFields<Doc<"messages">>>,
+) {
+  await ctx.db.patch(id, updates);
+}
+```
+
+## Frontend TypeScript
+
+### Use generated types in React components
+
+Import and use `Doc` and `Id` types in your frontend:
+
+```typescript
+import { Doc, Id } from "../convex/_generated/dataModel";
+
+// ✅ Type component props with Doc and Id
+function Channel(props: { channelId: Id<"channels"> }) {
+  // ...
+}
+
+function MessagesView(props: { message: Doc<"messages"> }) {
+  // ...
+}
+
+function MessagesList(props: { messages: Doc<"messages">[] }) {
+  // ...
+}
+```
+
+### End-to-end type safety with React hooks
+
+Convex React hooks are fully typed:
+
+```typescript
+import { useQuery, useMutation } from "convex/react";
+import { api } from "../convex/_generated/api";
+
+function MyComponent() {
+  // ✅ Type-safe: messages is Doc<"messages">[] | undefined
+  const messages = useQuery(api.messages.list);
+  
+  // ✅ Type-safe: TypeScript ensures correct argument types
+  const sendMessage = useMutation(api.messages.send);
+  
+  const handleSend = () => {
+    // TypeScript will error if arguments don't match
+    sendMessage({ body: "Hello", author: "Alice" });
+  };
+  
+  return /* ... */;
+}
+```
+
+## Inferring Function Return Types
+
+### Use `FunctionReturnType` for query/mutation returns
+
+Infer return types from function references instead of manually declaring:
+
+```typescript
+import { FunctionReturnType } from "convex/server";
+import { api } from "../convex/_generated/api";
+
+// ✅ Automatically infer return type from backend function
+export function MyHelperComponent(props: {
+  data: FunctionReturnType<typeof api.myFunctions.getSomething>;
+}) {
+  // props.data is typed based on what getSomething returns
+}
+
+// Example with optional data
+export function MyComponent(props: {
+  data: FunctionReturnType<typeof api.messages.list> | undefined;
+}) {
+  if (!data) return <div>Loading...</div>;
+  // data is now Doc<"messages">[]
+}
+```
+
+### Use `UsePaginatedQueryReturnType` for paginated queries
+
+```typescript
+import { UsePaginatedQueryReturnType } from "convex/react";
+import { api } from "../convex/_generated/api";
+
+// ✅ Type for paginated query results
+export function MyPaginationHelperComponent(props: {
+  paginatedData: UsePaginatedQueryReturnType<
+    typeof api.myFunctions.getSomethingPaginated
+  >;
+}) {
+  const { results, status, loadMore } = props.paginatedData;
+  // All properties are properly typed
+}
+```
+
+## Document IDs and Strings
+
+### Converting strings to document IDs
+
+When receiving IDs as strings (e.g., from URL params), validate and convert:
+
+```typescript
+import { Id } from "./_generated/dataModel";
+
+// The string must be a valid Convex ID format
+const messageId = "k17dxp3ks9s6f7n7p5k5m5g5r5k5m5g5" as Id<"messages">;
+
+// ✅ Better: Validate ID format first
+function isValidConvexId(id: string): boolean {
+  // Check if it matches Convex ID format
+  return /^[a-z0-9]{32}$/.test(id);
+}
+
+// In your function
+export const getMessage = query({
+  args: { id: v.string() },
+  handler: async (ctx, { id }) => {
+    if (!isValidConvexId(id)) {
+      throw new Error("Invalid ID format");
+    }
+    return await ctx.db.get(id as Id<"messages">);
+  },
+});
+```
+
+**Note:** Better to use `v.id("tableName")` validator when possible to avoid string conversion.
+
+## Common Type Patterns
+
+### Sharing custom types between backend and frontend
+
+```typescript
+// convex/types.ts
+import { Doc, Id } from "./_generated/dataModel";
+
+// ✅ Define shared types in backend
+export type MessageWithAuthor = {
+  message: Doc<"messages">;
+  author: Doc<"users">;
+};
+
+export type ChannelSummary = {
+  channelId: Id<"channels">;
+  name: string;
+  memberCount: number;
+};
+
+// convex/messages.ts
+import { query } from "./_generated/server";
+import { MessageWithAuthor } from "./types";
+
+export const getMessagesWithAuthors = query({
+  handler: async (ctx): Promise<MessageWithAuthor[]> => {
+    // ...
+  },
+});
+
+// app/components/Messages.tsx
+import { MessageWithAuthor } from "../convex/types";
+
+function MessageItem({ data }: { data: MessageWithAuthor }) {
+  // ✅ Type is shared and consistent
+}
+```
+
+### Optional and partial types
+
+```typescript
+import { Doc } from "./_generated/dataModel";
+import { WithoutSystemFields } from "convex/server";
+
+// ✅ Optional fields for updates
+type MessageUpdate = Partial<WithoutSystemFields<Doc<"messages">>>;
+
+// ✅ Required fields for creation
+type NewMessage = WithoutSystemFields<Doc<"messages">>;
+
+// ✅ Pick specific fields
+type MessagePreview = Pick<Doc<"messages">, "_id" | "body" | "author">;
+
+// ✅ Omit specific fields
+type PublicMessage = Omit<Doc<"messages">, "deletedAt" | "editHistory">;
+```
+
+## Quick Reference
+
+### Essential imports for server-side code
+
+```typescript
+// Generated types
+import { Doc, Id } from "./_generated/dataModel";
+import { QueryCtx, MutationCtx, ActionCtx } from "./_generated/server";
+import { api, internal } from "./_generated/api";
+
+// Validators and type inference
+import { v, Infer } from "convex/values";
+
+// Utility types
+import { WithoutSystemFields } from "convex/server";
+```
+
+### Essential imports for client-side code
+
+```typescript
+// React hooks
+import { useQuery, useMutation, useAction } from "convex/react";
+
+// Generated types and API
+import { Doc, Id } from "../convex/_generated/dataModel";
+import { api } from "../convex/_generated/api";
+
+// Type utilities
+import { FunctionReturnType } from "convex/server";
+import { UsePaginatedQueryReturnType } from "convex/react";
+```

@@ -1,4 +1,4 @@
-import type { DatabaseReader } from '../_generated/server';
+import type { QueryCtx, MutationCtx } from '../_generated/server';
 import type { Id } from '../_generated/dataModel';
 import type { Doc } from '../_generated/dataModel';
 
@@ -8,11 +8,8 @@ import type { Doc } from '../_generated/dataModel';
  * @param slug - Collection slug
  * @returns Collection or null if not found
  */
-export async function getBySlug(
-  ctx: DatabaseReader,
-  slug: string,
-): Promise<Doc<'collections'> | null> {
-  return await ctx
+export async function getBySlug(ctx: QueryCtx, slug: string): Promise<Doc<'collections'> | null> {
+  return await ctx.db
     .query('collections')
     .withIndex('by_slug', (q) => q.eq('slug', slug))
     .unique();
@@ -26,7 +23,7 @@ export async function getBySlug(
  * @returns Collection with its talks
  */
 export async function getWithTalks(
-  ctx: DatabaseReader,
+  ctx: QueryCtx,
   slug: string,
   limit: number = 100,
 ): Promise<{
@@ -39,7 +36,7 @@ export async function getWithTalks(
     return null;
   }
 
-  const talks = await ctx
+  const talks = await ctx.db
     .query('talks')
     .withIndex('by_collection_id_and_status', (q) =>
       q.eq('collectionId', collection._id).eq('status', 'published'),

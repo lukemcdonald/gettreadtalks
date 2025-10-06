@@ -3,7 +3,7 @@ import { v } from 'convex/values';
 import { Doc } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
 import { authComponent } from './auth';
-import { collectionFields, speakerFields, statusType, talkFields } from './schema';
+import { speakerFields, statusType, talkFields } from './schema';
 import { normalizeSlug } from './utils';
 import {
   getPublishedWithSpeakers,
@@ -25,7 +25,7 @@ export const getPublished = query({
   ),
   handler: async (ctx, args) => {
     const limit = args.limit ?? 20;
-    return await getPublishedWithSpeakers(ctx.db, limit);
+    return await getPublishedWithSpeakers(ctx, limit);
   },
 });
 
@@ -43,7 +43,7 @@ export const getBySlug = query({
     v.null(),
   ),
   handler: async (ctx, args) => {
-    return await getBySlugWithRelations(ctx.db, args.slug);
+    return await getBySlugWithRelations(ctx, args.slug);
   },
 });
 
@@ -56,7 +56,7 @@ export const getBySpeaker = query({
   returns: v.array(v.object(talkFields)),
   handler: async (ctx, args) => {
     const limit = args.limit || 20;
-    return await getTalksBySpeaker(ctx.db, args.speakerId, 'published', limit);
+    return await getTalksBySpeaker(ctx, args.speakerId, 'published', limit);
   },
 });
 
@@ -69,7 +69,7 @@ export const getByCollection = query({
   returns: v.array(v.object(talkFields)),
   handler: async (ctx, args) => {
     const limit = args.limit || 100; // Default limit to prevent unbounded results
-    return await getTalksByCollection(ctx.db, args.collectionId, 'published', limit);
+    return await getTalksByCollection(ctx, args.collectionId, 'published', limit);
   },
 });
 

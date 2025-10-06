@@ -1,6 +1,5 @@
-import type { DatabaseReader } from '../_generated/server';
-import type { Id } from '../_generated/dataModel';
-import type { Doc } from '../_generated/dataModel';
+import type { QueryCtx, MutationCtx } from '../_generated/server';
+import type { Doc, Id } from '../_generated/dataModel';
 
 /**
  * Get published clips
@@ -8,8 +7,8 @@ import type { Doc } from '../_generated/dataModel';
  * @param limit - Maximum number of results
  * @returns Array of published clips
  */
-export async function getPublished(ctx: DatabaseReader, limit: number): Promise<Doc<'clips'>[]> {
-  return await ctx
+export async function getPublished(ctx: QueryCtx, limit: number): Promise<Doc<'clips'>[]> {
+  return await ctx.db
     .query('clips')
     .withIndex('by_status_and_published_at', (q) => q.eq('status', 'published'))
     .order('desc')
@@ -24,7 +23,7 @@ export async function getPublished(ctx: DatabaseReader, limit: number): Promise<
  * @returns Clip with speaker, talk, and topics data
  */
 export async function getBySlugWithRelations(
-  ctx: DatabaseReader,
+  ctx: QueryCtx,
   slug: string,
   topicLimit: number = 20,
 ): Promise<{
@@ -33,7 +32,7 @@ export async function getBySlugWithRelations(
   talk: Doc<'talks'> | null;
   topics: Doc<'topics'>[];
 } | null> {
-  const clip = await ctx
+  const clip = await ctx.db
     .query('clips')
     .withIndex('by_slug', (q) => q.eq('slug', slug))
     .unique();
@@ -46,18 +45,22 @@ export async function getBySlugWithRelations(
   const [speaker, talk, clipTopics] = await Promise.all([
     clip.speakerId ? ctx.db.get(clip.speakerId) : null,
     clip.talkId ? ctx.db.get(clip.talkId) : null,
-    ctx
+    ctx.db
       .query('clipsOnTopics')
       .withIndex('by_clip_id', (q) => q.eq('clipId', clip._id))
       .take(topicLimit),
   ]);
 
-  // Get topics
-  const topics = [];
-  for (const clipTopic of clipTopics) {
-    const topic = await ctx.db.get(clipTopic.topicId);
-    if (topic) topics.push(topic);
-  }
+  // Get topics in parallel
+  const topics = await Promise.all(
+    clipTopics.map(async (clipTopic) => {
+      const topic = await ctx.db.get(clipTopic.topicId);
+      return topic;
+    }),
+  );
 
-  return { clip, speaker, talk, topics };
+  // Filter out null topics
+  const validTopics = topics.filter((topic): topic is Doc<'topics'> => topic !== null);
+
+  return { clip, speaker, talk, topics: validTopics };
 }
