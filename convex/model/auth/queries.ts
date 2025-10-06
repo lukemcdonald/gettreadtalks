@@ -1,5 +1,15 @@
-import type { MutationCtx, QueryCtx } from '../_generated/server';
-import { authComponent } from '../auth';
+import type { MutationCtx, QueryCtx } from '../../_generated/server';
+import { authComponent } from '../../auth';
+
+/**
+ * Get the current authenticated user.
+ *
+ * @param ctx - Query context
+ * @returns User object or null if not authenticated
+ */
+export const getUser = async (ctx: QueryCtx) => {
+  return authComponent.safeGetAuthUser(ctx);
+};
 
 /**
  * Get the current authenticated user.
@@ -8,7 +18,7 @@ import { authComponent } from '../auth';
  * @returns User object or null if not authenticated
  */
 export async function getCurrentUser(ctx: QueryCtx | MutationCtx) {
-  const user = await authComponent.getAuthUser(ctx);
+  const user = await getUser(ctx);
 
   if (!user) {
     return null;

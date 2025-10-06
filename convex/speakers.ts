@@ -2,7 +2,7 @@ import { v } from 'convex/values';
 
 import { Doc } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
-import { requireAuth } from './model/auth';
+import { requireAuth } from './model/auth/queries';
 import { speakerFields } from './schema';
 import { normalizeSlug } from './utils';
 import { getBySlug as getSpeakerBySlug } from './model/speakers';

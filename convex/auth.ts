@@ -6,7 +6,8 @@ import { v } from 'convex/values';
 
 import { components } from './_generated/api';
 import { DataModel } from './_generated/dataModel';
-import { query, QueryCtx } from './_generated/server';
+import { query } from './_generated/server';
+import { getCurrentUser as getUser } from './model/auth/queries';
 
 const siteUrl = process.env.SITE_URL;
 
@@ -42,12 +43,6 @@ export const createAuth = (
   });
 };
 
-export const getUser = async (ctx: QueryCtx) => {
-  return authComponent.safeGetAuthUser(ctx);
-};
-
-// Returns the currently authenticated user (Better Auth user object)
-// Type-safe user data for client consumption
 export const getCurrentUser = query({
   args: {},
   returns: v.union(v.any(), v.null()),

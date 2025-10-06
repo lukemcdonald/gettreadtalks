@@ -13,7 +13,7 @@ import type * as clips from "../clips.js";
 import type * as collections from "../collections.js";
 import type * as favorites from "../favorites.js";
 import type * as http from "../http.js";
-import type * as model_auth from "../model/auth.js";
+import type * as model_auth from "../model/auth/queries.js";
 import type * as model_clips from "../model/clips.js";
 import type * as model_collections from "../model/collections.js";
 import type * as model_speakers from "../model/speakers.js";

@@ -11,7 +11,6 @@ export const statusType = v.union(
 );
 export type StatusType = Infer<typeof statusType>;
 
-// Common timestamp fields for audit trail
 export const timestampFields = {
   // Note: Convex provides a `_creationTime` field automatically
   deletedAt: v.optional(v.number()),

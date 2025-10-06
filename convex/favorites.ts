@@ -1,7 +1,7 @@
 import { v } from 'convex/values';
 
 import { mutation, query } from './_generated/server';
-import { getCurrentUser, getUserId } from './model/auth';
+import { getCurrentUser, getUserId } from './model/auth/queries';
 import { getAllUserFavorites } from './model/users';
 import { getDefaultLimit } from './utils';
 import {
