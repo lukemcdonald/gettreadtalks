@@ -28,11 +28,11 @@ export const createAuth = (
       nextCookies(), // Add nextCookies as the last plugin for automatic cookie handling
     ],
     secret: process.env.BETTER_AUTH_SECRET!,
-    // TODO: Is trustedOrigins needed? Use env variables instead?
     emailAndPassword: {
       enabled: true,
       requireEmailVerification: false,
     },
+    // TODO: Is trustedOrigins needed? Use env variables instead?
     trustedOrigins: ['http://localhost:3000', 'https://academic-reindeer-888.convex.site'],
     // disable logging when createAuth is called just to generate options.
     // this is not required, but there's a lot of noise in logs without it.
@@ -42,19 +42,16 @@ export const createAuth = (
   });
 };
 
-export const safeGetUser = async (ctx: QueryCtx) => {
+export const getUser = async (ctx: QueryCtx) => {
   return authComponent.safeGetAuthUser(ctx);
 };
 
-export const getUser = async (ctx: QueryCtx) => {
-  return authComponent.getAuthUser(ctx);
-};
-
 // Returns the currently authenticated user (Better Auth user object)
+// Type-safe user data for client consumption
 export const getCurrentUser = query({
   args: {},
-  returns: v.union(v.any(), v.null()), // BetterAuthUser | null
+  returns: v.union(v.any(), v.null()),
   handler: async (ctx) => {
-    return safeGetUser(ctx);
+    return await getUser(ctx);
   },
 });

@@ -28,7 +28,7 @@ export const getUserFavorites = query({
       };
     }
 
-    const userId = user.userId || user._id;
+    const userId = user._id;
 
     const favoriteClips = await ctx.db
       .query('userFavoriteClips')
@@ -65,7 +65,7 @@ export const addFavoriteTalk = mutation({
       throw new Error('Authentication required');
     }
 
-    const userId = user.userId || user._id;
+    const userId = user._id;
 
     // Check if already favorited
     const existing = await ctx.db
@@ -96,7 +96,7 @@ export const removeFavoriteTalk = mutation({
       throw new Error('Authentication required');
     }
 
-    const userId = user.userId || user._id;
+    const userId = user._id;
 
     const favorite = await ctx.db
       .query('userFavoriteTalks')
@@ -125,7 +125,7 @@ export const addFavoriteClip = mutation({
       throw new Error('Authentication required');
     }
 
-    const userId = user.userId || user._id;
+    const userId = user._id;
 
     // Check if already favorited
     const existing = await ctx.db
@@ -156,7 +156,7 @@ export const removeFavoriteClip = mutation({
       throw new Error('Authentication required');
     }
 
-    const userId = user.userId || user._id;
+    const userId = user._id;
 
     const favorite = await ctx.db
       .query('userFavoriteClips')
@@ -185,7 +185,7 @@ export const addFavoriteSpeaker = mutation({
       throw new Error('Authentication required');
     }
 
-    const userId = user.userId || user._id;
+    const userId = user._id;
 
     // Check if already favorited
     const existing = await ctx.db
@@ -218,7 +218,7 @@ export const removeFavoriteSpeaker = mutation({
       throw new Error('Authentication required');
     }
 
-    const userId = user.userId || user._id;
+    const userId = user._id;
 
     const favorite = await ctx.db
       .query('userFavoriteSpeakers')

@@ -84,7 +84,7 @@ const AccountContent = () => {
                     User ID
                   </label>
                   <p className="text-gray-500 dark:text-gray-400 font-mono text-sm">
-                    {user?._id || user?.userId || 'Loading...'}
+                    {user?._id || 'Loading...'}
                   </p>
                 </div>
               </div>
