@@ -1,7 +1,9 @@
 import { v } from 'convex/values';
 
 import { mutation, query } from './_generated/server';
-import { authComponent } from './auth';
+import { getCurrentUser, getUserId } from './model';
+import { getAllUserFavorites } from './model/users';
+import { getDefaultLimit } from './utils';
 import {
   userFavoriteClipFields,
   userFavoriteSpeakerFields,
@@ -20,7 +22,7 @@ export const getUserFavorites = query({
     talks: v.array(v.object(userFavoriteTalkFields)),
   }),
   handler: async (ctx, args) => {
-    const user = await authComponent.getAuthUser(ctx);
+    const user = await getCurrentUser(ctx);
 
     if (!user) {
       return {
@@ -31,22 +33,13 @@ export const getUserFavorites = query({
     }
 
     const userId = user._id;
-    const limit = args.limit || 100; // Default limit to prevent unbounded results
+    const limit = args.limit || getDefaultLimit('main');
 
-    const favoriteClips = await ctx.db
-      .query('userFavoriteClips')
-      .withIndex('by_user_and_clip', (q) => q.eq('userId', userId))
-      .take(limit);
-
-    const favoriteSpeakers = await ctx.db
-      .query('userFavoriteSpeakers')
-      .withIndex('by_user_and_speaker', (q) => q.eq('userId', userId))
-      .take(limit);
-
-    const favoriteTalks = await ctx.db
-      .query('userFavoriteTalks')
-      .withIndex('by_user_and_talk', (q) => q.eq('userId', userId))
-      .take(limit);
+    const {
+      clips: favoriteClips,
+      speakers: favoriteSpeakers,
+      talks: favoriteTalks,
+    } = await getAllUserFavorites(ctx.db, userId, limit);
 
     return {
       clips: favoriteClips,
@@ -62,13 +55,7 @@ export const addFavoriteTalk = mutation({
   },
   returns: v.id('userFavoriteTalks'),
   handler: async (ctx, args) => {
-    const user = await authComponent.getAuthUser(ctx);
-
-    if (!user) {
-      throw new Error('Authentication required');
-    }
-
-    const userId = user._id;
+    const userId = await getUserId(ctx);
 
     // Check if already favorited
     const existing = await ctx.db
@@ -93,13 +80,7 @@ export const removeFavoriteTalk = mutation({
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    const user = await authComponent.getAuthUser(ctx);
-
-    if (!user) {
-      throw new Error('Authentication required');
-    }
-
-    const userId = user._id;
+    const userId = await getUserId(ctx);
 
     const favorite = await ctx.db
       .query('userFavoriteTalks')
@@ -122,13 +103,7 @@ export const addFavoriteClip = mutation({
   },
   returns: v.id('userFavoriteClips'),
   handler: async (ctx, args) => {
-    const user = await authComponent.getAuthUser(ctx);
-
-    if (!user) {
-      throw new Error('Authentication required');
-    }
-
-    const userId = user._id;
+    const userId = await getUserId(ctx);
 
     // Check if already favorited
     const existing = await ctx.db
@@ -153,13 +128,7 @@ export const removeFavoriteClip = mutation({
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    const user = await authComponent.getAuthUser(ctx);
-
-    if (!user) {
-      throw new Error('Authentication required');
-    }
-
-    const userId = user._id;
+    const userId = await getUserId(ctx);
 
     const favorite = await ctx.db
       .query('userFavoriteClips')
@@ -182,13 +151,7 @@ export const addFavoriteSpeaker = mutation({
   },
   returns: v.id('userFavoriteSpeakers'),
   handler: async (ctx, args) => {
-    const user = await authComponent.getAuthUser(ctx);
-
-    if (!user) {
-      throw new Error('Authentication required');
-    }
-
-    const userId = user._id;
+    const userId = await getUserId(ctx);
 
     // Check if already favorited
     const existing = await ctx.db
@@ -215,13 +178,7 @@ export const removeFavoriteSpeaker = mutation({
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    const user = await authComponent.getAuthUser(ctx);
-
-    if (!user) {
-      throw new Error('Authentication required');
-    }
-
-    const userId = user._id;
+    const userId = await getUserId(ctx);
 
     const favorite = await ctx.db
       .query('userFavoriteSpeakers')

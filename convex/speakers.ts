@@ -2,9 +2,10 @@ import { v } from 'convex/values';
 
 import { Doc } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
-import { requireAuth } from './lib/permissions';
+import { requireAuth } from './model';
 import { speakerFields } from './schema';
 import { normalizeSlug } from './utils';
+import { getBySlug as getSpeakerBySlug } from './model/speakers';
 
 // Public query - returns all speakers
 export const list = query({
@@ -25,10 +26,7 @@ export const getBySlug = query({
   },
   returns: v.union(v.object(speakerFields), v.null()),
   handler: async (ctx, args) => {
-    return await ctx.db
-      .query('speakers')
-      .withIndex('by_slug', (q) => q.eq('slug', args.slug))
-      .unique();
+    return await getSpeakerBySlug(ctx.db, args.slug);
   },
 });
 

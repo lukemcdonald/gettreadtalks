@@ -9,14 +9,20 @@ globs: convex/**/*.ts
 
 ```sh
 convex/
-├─ categories.ts       # Category queries & mutations
+├─ auth.config.ts      # Auth configuration
+├─ auth.ts             # Authentication setup
+├─ convex.config.ts    # Convex configuration
+├─ convex.json         # Convex project config
 ├─ http.ts             # HTTP endpoints (webhooks)
-├─ items.ts            # Item queries & mutations
+├─ items.ts            # User favorites queries & mutations
 ├─ schema.ts           # Database schema
-├─ users.ts            # User queries
-├─ lib/
-│  ├─ permissions.ts   # Authorization helpers
-│  └─ validation.ts    # Server-side validation
+├─ users.ts            # User queries & mutations
+├─ utils.ts            # General utility functions
+├─ model/              # Entity-specific helper functions for queries, mutstaions and utils
+│  ├─ index.ts         # Barrel exports
+│  ├─ auth.ts          # Authentication helpers
+│  ├─ items.ts         # Entity type specific helpers (example)
+│  └─ users.ts         # User-specific helpers
 └─ _generated/         # Auto-generated
 ```
 
@@ -118,41 +124,70 @@ export const getBySlug = query(...)
 export const list = query(...)
 ```
 
-### Shared Helpers in lib/
+### Entity-Specific Helpers in model/
+
+Organize entity-specific logic in the `model/` directory:
 
 ```ts
-// convex/lib/permissions.ts
+// convex/model/auth.ts - Cross-cutting authentication
 export async function getCurrentUser(ctx: QueryCtx | MutationCtx) {
-  const identity = await ctx.auth.getUserIdentity();
- 
- if (!identity) {
-    return null
-  };
+  const user = await authComponent.getAuthUser(ctx);
+  return user || null;
+}
 
-  const user = await ctx.db
-    .query('user')
-    .withIndex('by_email', (q) => q.eq('email', identity.email!))
-    .first();
+// convex/model/talks.ts - Talk-specific helpers
+export async function getPublishedWithSpeakers(
+  ctx: DatabaseReader,
+  limit: number,
+): Promise<Array<Doc<'talks'> & { speaker: Doc<'speakers'> | null }>> {
+  const talks = await ctx
+    .query('talks')
+    .withIndex('by_status_and_published_at', (q) => q.eq('status', 'published'))
+    .order('desc')
+    .take(limit);
 
-  return user;
+  return Promise.all(
+    talks.map(async (talk) => {
+      const speaker = await ctx.db.get(talk.speakerId);
+      return { ...talk, speaker };
+    }),
+  );
+}
+
+// convex/model/clips.ts - Clip-specific helpers
+export async function getBySlugWithRelations(
+  ctx: DatabaseReader,
+  slug: string,
+  topicLimit: number = 20,
+): Promise<{
+  clip: Doc<'clips'>;
+  speaker: Doc<'speakers'> | null;
+  talk: Doc<'talks'> | null;
+  topics: Doc<'topics'>[];
+} | null> {
+  // Implementation for clip with relations
+}
+
+// convex/utils.ts - General utilities (not entity-specific)
+export function normalizeSlug(text: string): string {
+  return text.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-');
 }
 ```
 
 ## Authorization Pattern
 
-Always check auth in mutations:
+Always check auth in mutations using model helpers:
 
 ```ts
-// ✅ Always verify user and ownership
+// ✅ Use model helpers for consistent auth
+import { requireAuth, getUserId } from './model';
+
 export const update = mutation({
   handler: async (ctx, args) => {
-    const user = await getCurrentUser(ctx);
-    if (!user) {
-      throw new Error('Unauthorized')
-    };
-
+    const userId = await getUserId(ctx); // Throws if not authenticated
+    
     const resource = await ctx.db.get(args.id);
-    if (resource.userId !== user._id) {
+    if (resource.userId !== userId) {
       throw new Error('Not authorized');
     }
 
@@ -163,25 +198,63 @@ export const update = mutation({
 
 ## Data Enrichment Pattern
 
-Enrich data with relationships in queries:
+Enrich data with relationships using model helpers:
 
 ```ts
-export const list = query({
-  handler: async (ctx) => {
-    const items = await ctx.db.query('items').collect();
+import { getBySlug, getClipTopics } from './model';
 
-    return Promise.all(
-      items.map(async (item) => {
-        const category = await ctx.db.get(item.categoryId);
-        const owner = await ctx.db.get(item.userId);
+export const getBySlug = query({
+  handler: async (ctx, args) => {
+    const clip = await getBySlug(ctx.db, 'clips', args.slug, 'published');
+    if (!clip) return null;
 
-        return {
-          ...item,
-          category,
-          owner: { name: owner?.name, image: owner?.image },
-        };
-      }),
-    );
+    // Use helper functions for related data
+    const [speaker, talk, topics] = await Promise.all([
+      clip.speakerId ? ctx.db.get(clip.speakerId) : null,
+      clip.talkId ? ctx.db.get(clip.talkId) : null,
+      getClipTopics(ctx.db, clip._id, 20),
+    ]);
+
+    return { clip, speaker, talk, topics };
+  },
+});
+```
+
+## Model Directory Structure
+
+The `model/` directory contains **entity-specific helper functions** organized by domain:
+
+### Authentication (`model/auth.ts`) - Cross-cutting
+- `getCurrentUser()` - Get authenticated user or null
+- `requireAuth()` - Require authentication, throw if not authenticated  
+- `getUserId()` - Get user ID, throw if not authenticated
+
+### Entity-Specific Helpers
+- **`model/talks.ts`** - Talk-specific queries and operations
+- **`model/clips.ts`** - Clip-specific queries and operations
+- **`model/topics.ts`** - Topic-specific queries and operations
+- **`model/collections.ts`** - Collection-specific queries and operations
+- **`model/speakers.ts`** - Speaker-specific queries and operations
+- **`model/users.ts`** - User-specific queries and operations
+
+### General Utilities (`utils.ts`) - Root level
+- `normalizeSlug()` - URL-friendly slug generation
+- `slugExists()` - Check if slug exists in table
+- `getDefaultLimit()` - Get appropriate default limits by content type
+
+### Usage Pattern
+```ts
+// Import entity-specific helpers from model
+import { getPublishedWithSpeakers } from './model/talks';
+import { getBySlugWithRelations } from './model/clips';
+import { getCurrentUser } from './model';
+import { normalizeSlug } from './utils';
+
+// Use in functions
+export const getPublished = query({
+  handler: async (ctx, args) => {
+    const limit = args.limit || 20;
+    return await getPublishedWithSpeakers(ctx.db, limit);
   },
 });
 ```
@@ -201,3 +274,37 @@ export const list = query({
 ```
 
 Use the more specific index for all queries, even when you don't need all fields.
+
+### Use Entity-Specific Model Helpers
+
+```ts
+// ✅ Use entity-specific model helpers
+import { getPublishedWithSpeakers } from './model/talks';
+import { getBySlugWithRelations } from './model/clips';
+import { getDefaultLimit } from './utils';
+
+export const getPublished = query({
+  handler: async (ctx, args) => {
+    const limit = args.limit || getDefaultLimit('content');
+    return await getPublishedWithSpeakers(ctx.db, limit);
+  },
+});
+
+// ❌ Don't duplicate entity-specific logic
+export const getPublished = query({
+  handler: async (ctx, args) => {
+    const limit = args.limit || 50; // Duplicated default
+    const talks = await ctx.db
+      .query('talks')
+      .withIndex('by_status_and_published_at', (q) => q.eq('status', 'published'))
+      .order('desc')
+      .take(limit); // Duplicated query pattern
+    
+    // Duplicated speaker fetching logic
+    return Promise.all(talks.map(async (talk) => {
+      const speaker = await ctx.db.get(talk.speakerId);
+      return { ...talk, speaker };
+    }));
+  },
+});
+```

@@ -3,8 +3,12 @@ import { v } from 'convex/values';
 import { Doc } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
 import { collectionFields, talkFields } from './schema';
-import { requireAuth } from './lib/permissions';
+import { requireAuth } from './model';
 import { normalizeSlug } from './utils';
+import {
+  getBySlug as getCollectionBySlug,
+  getWithTalks as getCollectionWithTalks,
+} from './model/collections';
 
 // Public query - returns all collections
 export const getAll = query({
@@ -25,10 +29,7 @@ export const getBySlug = query({
   },
   returns: v.union(v.object(collectionFields), v.null()),
   handler: async (ctx, args) => {
-    return await ctx.db
-      .query('collections')
-      .withIndex('by_slug', (q) => q.eq('slug', args.slug))
-      .unique();
+    return await getCollectionBySlug(ctx.db, args.slug);
   },
 });
 
@@ -46,30 +47,8 @@ export const getWithTalks = query({
     v.null(),
   ),
   handler: async (ctx, args) => {
-    const collection = await ctx.db
-      .query('collections')
-      .withIndex('by_slug', (q) => q.eq('slug', args.slug))
-      .unique();
-
-    if (!collection) {
-      return null;
-    }
-
     const limit = args.limit || 100; // Default limit to prevent unbounded results
-    const talks = await ctx.db
-      .query('talks')
-      .withIndex('by_collection_id_and_status', (q) =>
-        q.eq('collectionId', collection._id).eq('status', 'published'),
-      )
-      .take(limit);
-
-    // Sort by collectionOrder
-    talks.sort((a, b) => (a.collectionOrder || 0) - (b.collectionOrder || 0));
-
-    return {
-      collection,
-      talks,
-    };
+    return await getCollectionWithTalks(ctx.db, args.slug, limit);
   },
 });
 

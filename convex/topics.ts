@@ -2,9 +2,10 @@ import { v } from 'convex/values';
 
 import { Doc } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
-import { requireAuth } from './lib/permissions';
+import { requireAuth } from './model';
 import { clipFields, talkFields, topicFields } from './schema';
 import { normalizeSlug } from './utils';
+import { getBySlug as getTopicBySlug, getWithContent as getTopicWithContent } from './model/topics';
 
 // Public query - returns all topics
 export const list = query({
@@ -25,10 +26,7 @@ export const getBySlug = query({
   },
   returns: v.union(v.object(topicFields), v.null()),
   handler: async (ctx, args) => {
-    return await ctx.db
-      .query('topics')
-      .withIndex('by_slug', (q) => q.eq('slug', args.slug))
-      .unique();
+    return await getTopicBySlug(ctx.db, args.slug);
   },
 });
 
@@ -47,48 +45,8 @@ export const getWithContent = query({
     v.null(),
   ),
   handler: async (ctx, args) => {
-    const topic = await ctx.db
-      .query('topics')
-      .withIndex('by_slug', (q) => q.eq('slug', args.slug))
-      .unique();
-
-    if (!topic) {
-      return null;
-    }
-
     const limit = args.limit || 50; // Default limit to prevent unbounded results
-
-    const talkTopics = await ctx.db
-      .query('talksOnTopics')
-      .withIndex('by_topic_id', (q) => q.eq('topicId', topic._id))
-      .take(limit);
-
-    const talks = [];
-    for (const talkTopic of talkTopics) {
-      const talk = await ctx.db.get(talkTopic.talkId);
-      if (talk && talk.status === 'published') {
-        talks.push(talk);
-      }
-    }
-
-    const clipTopics = await ctx.db
-      .query('clipsOnTopics')
-      .withIndex('by_topic_id', (q) => q.eq('topicId', topic._id))
-      .take(limit);
-
-    const clips = [];
-    for (const clipTopic of clipTopics) {
-      const clip = await ctx.db.get(clipTopic.clipId);
-      if (clip && clip.status === 'published') {
-        clips.push(clip);
-      }
-    }
-
-    return {
-      clips,
-      talks,
-      topic,
-    };
+    return await getTopicWithContent(ctx.db, args.slug, limit);
   },
 });
 

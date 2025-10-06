@@ -5,6 +5,7 @@ import { mutation, query } from './_generated/server';
 import { authComponent } from './auth';
 import { clipFields, speakerFields, statusType, talkFields, topicFields } from './schema';
 import { normalizeSlug } from './utils';
+import { getPublished as getPublishedClips, getBySlugWithRelations } from './model/clips';
 
 // Public query - returns only published clips (no auth required)
 export const getPublished = query({
@@ -14,11 +15,7 @@ export const getPublished = query({
   returns: v.array(v.object(clipFields)),
   handler: async (ctx, args) => {
     const limit = args.limit || 50; // Default limit to prevent unbounded results
-    return await ctx.db
-      .query('clips')
-      .withIndex('by_status_and_published_at', (q) => q.eq('status', 'published'))
-      .order('desc')
-      .take(limit);
+    return await getPublishedClips(ctx.db, limit);
   },
 });
 
@@ -30,11 +27,7 @@ export const getLatest = query({
   returns: v.array(v.object(clipFields)),
   handler: async (ctx, args) => {
     const limit = args.limit || 10;
-    return await ctx.db
-      .query('clips')
-      .withIndex('by_status_and_published_at', (q) => q.eq('status', 'published'))
-      .order('desc')
-      .take(limit);
+    return await getPublishedClips(ctx.db, limit);
   },
 });
 
@@ -54,41 +47,8 @@ export const getBySlug = query({
     v.null(),
   ),
   handler: async (ctx, args) => {
-    const clip = await ctx.db
-      .query('clips')
-      .withIndex('by_slug', (q) => q.eq('slug', args.slug))
-      .unique();
-
-    if (!clip || clip.status !== 'published') {
-      return null;
-    }
-
-    // Get speaker if exists
-    let speaker = null;
-    if (clip.speakerId) {
-      speaker = await ctx.db.get(clip.speakerId);
-    }
-
-    // Get talk if exists
-    let talk = null;
-    if (clip.talkId) {
-      talk = await ctx.db.get(clip.talkId);
-    }
-
-    // Get topics
     const limit = args.limit || 20; // Default limit to prevent unbounded results
-    const clipTopics = await ctx.db
-      .query('clipsOnTopics')
-      .withIndex('by_clip_id', (q) => q.eq('clipId', clip._id))
-      .take(limit);
-
-    const topics = [];
-    for (const clipTopic of clipTopics) {
-      const topic = await ctx.db.get(clipTopic.topicId);
-      if (topic) topics.push(topic);
-    }
-
-    return { clip, speaker, talk, topics };
+    return await getBySlugWithRelations(ctx.db, args.slug, limit);
   },
 });
 

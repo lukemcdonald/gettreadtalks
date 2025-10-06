@@ -5,6 +5,12 @@ import { mutation, query } from './_generated/server';
 import { authComponent } from './auth';
 import { collectionFields, speakerFields, statusType, talkFields } from './schema';
 import { normalizeSlug } from './utils';
+import {
+  getPublishedWithSpeakers,
+  getBySlugWithRelations,
+  getBySpeaker as getTalksBySpeaker,
+  getByCollection as getTalksByCollection,
+} from './model/talks';
 
 // Public query - returns published talks with speaker data
 export const getPublished = query({
@@ -19,25 +25,7 @@ export const getPublished = query({
   ),
   handler: async (ctx, args) => {
     const limit = args.limit ?? 20;
-
-    const talks = await ctx.db
-      .query('talks')
-      .withIndex('by_status_and_published_at', (q) => q.eq('status', 'published'))
-      .order('desc')
-      .take(limit);
-
-    // Fetch speaker information for each talk
-    const talksWithSpeakers = await Promise.all(
-      talks.map(async (talk) => {
-        const speaker = await ctx.db.get(talk.speakerId);
-        return {
-          ...talk,
-          speaker,
-        };
-      }),
-    );
-
-    return talksWithSpeakers;
+    return await getPublishedWithSpeakers(ctx.db, limit);
   },
 });
 
@@ -48,34 +36,14 @@ export const getBySlug = query({
   },
   returns: v.union(
     v.object({
-      ...talkFields,
-      collection: v.union(v.object(collectionFields), v.null()),
-      speaker: v.union(v.object(speakerFields), v.null()),
+      talk: v.any(), // Doc<"talks">
+      collection: v.union(v.any(), v.null()), // Doc<"collections"> | null
+      speaker: v.union(v.any(), v.null()), // Doc<"speakers"> | null
     }),
     v.null(),
   ),
   handler: async (ctx, args) => {
-    const talk = await ctx.db
-      .query('talks')
-      .withIndex('by_slug', (q) => q.eq('slug', args.slug))
-      .unique();
-
-    if (!talk) {
-      return null;
-    }
-
-    const speaker = await ctx.db.get(talk.speakerId);
-
-    let collection = null;
-    if (talk.collectionId) {
-      collection = await ctx.db.get(talk.collectionId);
-    }
-
-    return {
-      ...talk,
-      collection,
-      speaker,
-    };
+    return await getBySlugWithRelations(ctx.db, args.slug);
   },
 });
 
@@ -88,14 +56,7 @@ export const getBySpeaker = query({
   returns: v.array(v.object(talkFields)),
   handler: async (ctx, args) => {
     const limit = args.limit || 20;
-
-    return await ctx.db
-      .query('talks')
-      .withIndex('by_speaker_id_and_status', (q) =>
-        q.eq('speakerId', args.speakerId).eq('status', 'published'),
-      )
-      .order('desc')
-      .take(limit);
+    return await getTalksBySpeaker(ctx.db, args.speakerId, 'published', limit);
   },
 });
 
@@ -108,15 +69,7 @@ export const getByCollection = query({
   returns: v.array(v.object(talkFields)),
   handler: async (ctx, args) => {
     const limit = args.limit || 100; // Default limit to prevent unbounded results
-    const talks = await ctx.db
-      .query('talks')
-      .withIndex('by_collection_id_and_status', (q) =>
-        q.eq('collectionId', args.collectionId).eq('status', 'published'),
-      )
-      .take(limit);
-
-    // Sort by collectionOrder
-    return talks.sort((a, b) => (a.collectionOrder || 0) - (b.collectionOrder || 0));
+    return await getTalksByCollection(ctx.db, args.collectionId, 'published', limit);
   },
 });
 
