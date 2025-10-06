@@ -1,14 +1,14 @@
-import type { QueryCtx, MutationCtx } from '../_generated/server';
-import type { Id } from '../_generated/dataModel';
-import type { Doc } from '../_generated/dataModel';
+import type { Doc, Id } from '../_generated/dataModel';
+import type { QueryCtx } from '../_generated/server';
 
 /**
- * Get topic by slug
+ * Get topic by slug.
+ *
  * @param ctx - Database context
  * @param slug - Topic slug
  * @returns Topic or null if not found
  */
-export async function getBySlug(ctx: QueryCtx, slug: string): Promise<Doc<'topics'> | null> {
+export async function getBySlug(ctx: QueryCtx, slug: string) {
   return await ctx.db
     .query('topics')
     .withIndex('by_slug', (q) => q.eq('slug', slug))
@@ -16,62 +16,57 @@ export async function getBySlug(ctx: QueryCtx, slug: string): Promise<Doc<'topic
 }
 
 /**
- * Get topic with related talks and clips
+ * Get topic with related talks and clips.
+ *
  * @param ctx - Database context
  * @param slug - Topic slug
  * @param limit - Maximum number of talks/clips to fetch
  * @returns Topic with related talks and clips
  */
-export async function getWithContent(
-  ctx: QueryCtx,
-  slug: string,
-  limit: number = 50,
-): Promise<{
-  topic: Doc<'topics'>;
-  talks: Doc<'talks'>[];
-  clips: Doc<'clips'>[];
-} | null> {
+export async function getWithContent(ctx: QueryCtx, slug: string, limit: number = 50) {
   const topic = await getBySlug(ctx, slug);
 
   if (!topic) {
     return null;
   }
 
-  // Get related talks and clips in parallel
-  const [talkTopics, clipTopics] = await Promise.all([
-    ctx.db
-      .query('talksOnTopics')
-      .withIndex('by_topic_id', (q) => q.eq('topicId', topic._id))
-      .take(limit),
-    ctx.db
+  const queries = {
+    clipTopics: ctx.db
       .query('clipsOnTopics')
       .withIndex('by_topic_id', (q) => q.eq('topicId', topic._id))
       .take(limit),
-  ]);
+    talkTopics: ctx.db
+      .query('talksOnTopics')
+      .withIndex('by_topic_id', (q) => q.eq('topicId', topic._id))
+      .take(limit),
+  };
 
-  // Get talks and clips in parallel
-  const [talkResults, clipResults] = await Promise.all([
-    Promise.all(
-      talkTopics.map(async (talkTopic) => {
-        const talk = await ctx.db.get(talkTopic.talkId);
-        return talk && talk.status === 'published' ? talk : null;
-      }),
-    ),
+  // Get related talks and clips in parallel
+  const [clipTopics, talkTopics] = await Promise.all([queries.clipTopics, queries.talkTopics]);
+
+  // Get talks and clips in parallel.
+  const [clipResults, talkResults] = await Promise.all([
     Promise.all(
       clipTopics.map(async (clipTopic) => {
         const clip = await ctx.db.get(clipTopic.clipId);
         return clip && clip.status === 'published' ? clip : null;
       }),
     ),
+    Promise.all(
+      talkTopics.map(async (talkTopic) => {
+        const talk = await ctx.db.get(talkTopic.talkId);
+        return talk && talk.status === 'published' ? talk : null;
+      }),
+    ),
   ]);
 
-  // Filter out null results
-  const talks = talkResults.filter((talk): talk is Doc<'talks'> => talk !== null);
-  const clips = clipResults.filter((clip): clip is Doc<'clips'> => clip !== null);
+  // Filter out null results with proper type guards.
+  const talks = talkResults.filter((talk): talk is Doc<'talks'> => Boolean(talk));
+  const clips = clipResults.filter((clip): clip is Doc<'clips'> => Boolean(clip));
 
   return {
-    topic,
-    talks,
     clips,
+    talks,
+    topic,
   };
 }

@@ -1,5 +1,4 @@
-import type { QueryCtx, MutationCtx } from '../_generated/server';
-import type { Doc } from '../_generated/dataModel';
+import type { QueryCtx } from '../_generated/server';
 
 /**
  * Get speaker by slug
@@ -7,7 +6,7 @@ import type { Doc } from '../_generated/dataModel';
  * @param slug - Speaker slug
  * @returns Speaker or null if not found
  */
-export async function getBySlug(ctx: QueryCtx, slug: string): Promise<Doc<'speakers'> | null> {
+export async function getBySlug(ctx: QueryCtx, slug: string) {
   return await ctx.db
     .query('speakers')
     .withIndex('by_slug', (q) => q.eq('slug', slug))

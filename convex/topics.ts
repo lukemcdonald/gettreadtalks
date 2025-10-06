@@ -7,19 +7,17 @@ import { clipFields, talkFields, topicFields } from './schema';
 import { normalizeSlug } from './utils';
 import { getBySlug as getTopicBySlug, getWithContent as getTopicWithContent } from './model/topics';
 
-// Public query - returns all topics
 export const list = query({
   args: {
     limit: v.optional(v.number()),
   },
   returns: v.array(v.object(topicFields)),
   handler: async (ctx, args) => {
-    const limit = args.limit || 100; // Default limit to prevent unbounded results
+    const { limit = 100 } = args;
     return await ctx.db.query('topics').withIndex('by_title').take(limit);
   },
 });
 
-// Public query - returns topic by slug
 export const getBySlug = query({
   args: {
     slug: v.string(),
@@ -30,7 +28,6 @@ export const getBySlug = query({
   },
 });
 
-// Public query - returns topic with related talks and clips
 export const getWithContent = query({
   args: {
     limit: v.optional(v.number()),
@@ -45,8 +42,8 @@ export const getWithContent = query({
     v.null(),
   ),
   handler: async (ctx, args) => {
-    const limit = args.limit || 50; // Default limit to prevent unbounded results
-    return await getTopicWithContent(ctx, args.slug, limit);
+    const { limit = 50, slug } = args;
+    return await getTopicWithContent(ctx, slug, limit);
   },
 });
 

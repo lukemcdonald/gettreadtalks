@@ -1,31 +1,26 @@
-import type { QueryCtx, MutationCtx } from '../_generated/server';
+import type { QueryCtx } from '../_generated/server';
 import type { Id } from '../_generated/dataModel';
-import type { Doc } from '../_generated/dataModel';
+import type { StatusType } from '../schema';
 
 /**
- * Get published talks with speaker data
+ * Get published talks with speaker data.
+ *
  * @param ctx - Database context
  * @param limit - Maximum number of results
  * @returns Array of talks with speaker information
  */
-export async function getPublishedWithSpeakers(
-  ctx: QueryCtx,
-  limit: number,
-): Promise<Array<Doc<'talks'> & { speaker: Doc<'speakers'> | null }>> {
-  const talks = await ctx.db
+export async function getPublishedWithSpeakers(ctx: QueryCtx, limit: number) {
+  const publishedTalks = await ctx.db
     .query('talks')
     .withIndex('by_status_and_published_at', (q) => q.eq('status', 'published'))
     .order('desc')
     .take(limit);
 
-  // Fetch speaker information for each talk
   const talksWithSpeakers = await Promise.all(
-    talks.map(async (talk) => {
+    publishedTalks.map(async (talk) => {
       const speaker = await ctx.db.get(talk.speakerId);
-      return {
-        ...talk,
-        speaker,
-      };
+
+      return { ...talk, speaker };
     }),
   );
 
@@ -33,19 +28,13 @@ export async function getPublishedWithSpeakers(
 }
 
 /**
- * Get talk by slug with related data
+ * Get talk by slug with related data.
+ *
  * @param ctx - Database context
  * @param slug - Talk slug
  * @returns Talk with speaker and collection data
  */
-export async function getBySlugWithRelations(
-  ctx: QueryCtx,
-  slug: string,
-): Promise<{
-  talk: Doc<'talks'>;
-  speaker: Doc<'speakers'> | null;
-  collection: Doc<'collections'> | null;
-} | null> {
+export async function getBySlugWithRelations(ctx: QueryCtx, slug: string) {
   const talk = await ctx.db
     .query('talks')
     .withIndex('by_slug', (q) => q.eq('slug', slug))
@@ -55,15 +44,17 @@ export async function getBySlugWithRelations(
     return null;
   }
 
-  const [speaker, collection] = await Promise.all([
-    ctx.db.get(talk.speakerId),
-    talk.collectionId ? ctx.db.get(talk.collectionId) : null,
-  ]);
+  const queries = {
+    collection: talk.collectionId ? ctx.db.get(talk.collectionId) : null,
+    speaker: talk.speakerId ? ctx.db.get(talk.speakerId) : null,
+  };
+
+  const [collection, speaker] = await Promise.all([queries.collection, queries.speaker]);
 
   return {
-    talk,
-    speaker,
     collection,
+    speaker,
+    talk,
   };
 }
 
@@ -78,9 +69,9 @@ export async function getBySlugWithRelations(
 export async function getBySpeaker(
   ctx: QueryCtx,
   speakerId: Id<'speakers'>,
-  status: 'backlog' | 'approved' | 'published' | 'archived',
+  status: StatusType,
   limit: number,
-): Promise<Doc<'talks'>[]> {
+) {
   return await ctx.db
     .query('talks')
     .withIndex('by_speaker_id_and_status', (q) => q.eq('speakerId', speakerId).eq('status', status))
@@ -89,7 +80,8 @@ export async function getBySpeaker(
 }
 
 /**
- * Get talks by collection with status filter
+ * Get talks by collection with status filter.
+ *
  * @param ctx - Database context
  * @param collectionId - Collection ID
  * @param status - Status filter
@@ -99,9 +91,9 @@ export async function getBySpeaker(
 export async function getByCollection(
   ctx: QueryCtx,
   collectionId: Id<'collections'>,
-  status: 'backlog' | 'approved' | 'published' | 'archived',
+  status: StatusType,
   limit: number,
-): Promise<Doc<'talks'>[]> {
+) {
   const talks = await ctx.db
     .query('talks')
     .withIndex('by_collection_id_and_status', (q) =>
@@ -109,6 +101,8 @@ export async function getByCollection(
     )
     .take(limit);
 
-  // Sort by collectionOrder
-  return talks.sort((a, b) => (a.collectionOrder || 0) - (b.collectionOrder || 0));
+  // Sort by collection order.
+  const sortedTalks = talks.sort((a, b) => (a.collectionOrder || 0) - (b.collectionOrder || 0));
+
+  return sortedTalks;
 }

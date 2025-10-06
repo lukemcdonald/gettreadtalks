@@ -15,7 +15,7 @@
     "predev": "convex dev --until-success && convex dashboard && sleep 2 && open http://localhost:3000",
     "start": "next start",
     "style": "npm run lint:fix && npm run format:fix",
-    "type-check": "tsc --noEmit"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@convex-dev/better-auth": "^0.8.6",

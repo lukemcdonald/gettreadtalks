@@ -1,5 +1,5 @@
 import { defineSchema, defineTable } from 'convex/server';
-import { v } from 'convex/values';
+import { Infer, v } from 'convex/values';
 
 // Common status type for content items
 // Export for reuse in mutations and queries to maintain consistency
@@ -9,6 +9,7 @@ export const statusType = v.union(
   v.literal('published'),
   v.literal('archived'),
 );
+export type StatusType = Infer<typeof statusType>;
 
 // Common timestamp fields for audit trail
 export const timestampFields = {

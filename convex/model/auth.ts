@@ -2,7 +2,8 @@ import type { MutationCtx, QueryCtx } from '../_generated/server';
 import { authComponent } from '../auth';
 
 /**
- * Get the current authenticated user
+ * Get the current authenticated user.
+ *
  * @param ctx - Query or Mutation context
  * @returns User object or null if not authenticated
  */
@@ -17,7 +18,8 @@ export async function getCurrentUser(ctx: QueryCtx | MutationCtx) {
 }
 
 /**
- * Require authentication and return the current user
+ * Require authentication and return the current user.
+ *
  * @param ctx - Query or Mutation context
  * @returns User object
  * @throws Error if not authenticated
@@ -33,12 +35,13 @@ export async function requireAuth(ctx: QueryCtx | MutationCtx) {
 }
 
 /**
- * Get user ID from authenticated user
+ * Get user ID from authenticated user.
+ *
  * @param ctx - Query or Mutation context
  * @returns User ID string
  * @throws Error if not authenticated
  */
-export async function getUserId(ctx: QueryCtx | MutationCtx): Promise<string> {
+export async function getUserId(ctx: QueryCtx | MutationCtx) {
   const user = await requireAuth(ctx);
   return user._id;
 }
