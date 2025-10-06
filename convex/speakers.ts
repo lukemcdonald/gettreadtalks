@@ -8,10 +8,13 @@ import { normalizeSlug } from './utils';
 
 // Public query - returns all speakers
 export const list = query({
-  args: {},
+  args: {
+    limit: v.optional(v.number()),
+  },
   returns: v.array(v.object(speakerFields)),
-  handler: async (ctx) => {
-    return await ctx.db.query('speakers').collect();
+  handler: async (ctx, args) => {
+    const limit = args.limit || 100; // Default limit to prevent unbounded results
+    return await ctx.db.query('speakers').take(limit);
   },
 });
 

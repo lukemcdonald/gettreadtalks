@@ -8,10 +8,13 @@ import { normalizeSlug } from './utils';
 
 // Public query - returns all collections
 export const getAll = query({
-  args: {},
+  args: {
+    limit: v.optional(v.number()),
+  },
   returns: v.array(v.object(collectionFields)),
-  handler: async (ctx) => {
-    return await ctx.db.query('collections').collect();
+  handler: async (ctx, args) => {
+    const limit = args.limit || 100; // Default limit to prevent unbounded results
+    return await ctx.db.query('collections').take(limit);
   },
 });
 
@@ -32,6 +35,7 @@ export const getBySlug = query({
 // Public query - returns collection with its talks
 export const getWithTalks = query({
   args: {
+    limit: v.optional(v.number()),
     slug: v.string(),
   },
   returns: v.union(
@@ -51,12 +55,13 @@ export const getWithTalks = query({
       return null;
     }
 
+    const limit = args.limit || 100; // Default limit to prevent unbounded results
     const talks = await ctx.db
       .query('talks')
       .withIndex('by_collection_id_and_status', (q) =>
         q.eq('collectionId', collection._id).eq('status', 'published'),
       )
-      .collect();
+      .take(limit);
 
     // Sort by collectionOrder
     talks.sort((a, b) => (a.collectionOrder || 0) - (b.collectionOrder || 0));

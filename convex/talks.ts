@@ -103,15 +103,17 @@ export const getBySpeaker = query({
 export const getByCollection = query({
   args: {
     collectionId: v.id('collections'),
+    limit: v.optional(v.number()),
   },
   returns: v.array(v.object(talkFields)),
   handler: async (ctx, args) => {
+    const limit = args.limit || 100; // Default limit to prevent unbounded results
     const talks = await ctx.db
       .query('talks')
       .withIndex('by_collection_id_and_status', (q) =>
         q.eq('collectionId', args.collectionId).eq('status', 'published'),
       )
-      .collect();
+      .take(limit);
 
     // Sort by collectionOrder
     return talks.sort((a, b) => (a.collectionOrder || 0) - (b.collectionOrder || 0));

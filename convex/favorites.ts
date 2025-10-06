@@ -11,13 +11,15 @@ import {
 // Returns user's favorite clips, speakers, and talks (join table records)
 // Always returns consistent object shape, with empty arrays when not authenticated
 export const getUserFavorites = query({
-  args: {},
+  args: {
+    limit: v.optional(v.number()),
+  },
   returns: v.object({
     clips: v.array(v.object(userFavoriteClipFields)),
     speakers: v.array(v.object(userFavoriteSpeakerFields)),
     talks: v.array(v.object(userFavoriteTalkFields)),
   }),
-  handler: async (ctx) => {
+  handler: async (ctx, args) => {
     const user = await authComponent.getAuthUser(ctx);
 
     if (!user) {
@@ -29,21 +31,22 @@ export const getUserFavorites = query({
     }
 
     const userId = user._id;
+    const limit = args.limit || 100; // Default limit to prevent unbounded results
 
     const favoriteClips = await ctx.db
       .query('userFavoriteClips')
       .withIndex('by_user_and_clip', (q) => q.eq('userId', userId))
-      .collect();
+      .take(limit);
 
     const favoriteSpeakers = await ctx.db
       .query('userFavoriteSpeakers')
       .withIndex('by_user_and_speaker', (q) => q.eq('userId', userId))
-      .collect();
+      .take(limit);
 
     const favoriteTalks = await ctx.db
       .query('userFavoriteTalks')
       .withIndex('by_user_and_talk', (q) => q.eq('userId', userId))
-      .collect();
+      .take(limit);
 
     return {
       clips: favoriteClips,

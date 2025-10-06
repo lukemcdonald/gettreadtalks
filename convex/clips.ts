@@ -8,14 +8,17 @@ import { normalizeSlug } from './utils';
 
 // Public query - returns only published clips (no auth required)
 export const getPublished = query({
-  args: {},
+  args: {
+    limit: v.optional(v.number()),
+  },
   returns: v.array(v.object(clipFields)),
-  handler: async (ctx) => {
+  handler: async (ctx, args) => {
+    const limit = args.limit || 50; // Default limit to prevent unbounded results
     return await ctx.db
       .query('clips')
       .withIndex('by_status_and_published_at', (q) => q.eq('status', 'published'))
       .order('desc')
-      .collect();
+      .take(limit);
   },
 });
 
@@ -38,6 +41,7 @@ export const getLatest = query({
 // Public query - returns published clip with related data (no auth required)
 export const getBySlug = query({
   args: {
+    limit: v.optional(v.number()),
     slug: v.string(),
   },
   returns: v.union(
@@ -72,10 +76,11 @@ export const getBySlug = query({
     }
 
     // Get topics
+    const limit = args.limit || 20; // Default limit to prevent unbounded results
     const clipTopics = await ctx.db
       .query('clipsOnTopics')
       .withIndex('by_clip_id', (q) => q.eq('clipId', clip._id))
-      .collect();
+      .take(limit);
 
     const topics = [];
     for (const clipTopic of clipTopics) {

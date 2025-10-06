@@ -8,10 +8,13 @@ import { normalizeSlug } from './utils';
 
 // Public query - returns all topics
 export const list = query({
-  args: {},
+  args: {
+    limit: v.optional(v.number()),
+  },
   returns: v.array(v.object(topicFields)),
-  handler: async (ctx) => {
-    return await ctx.db.query('topics').withIndex('by_title').collect();
+  handler: async (ctx, args) => {
+    const limit = args.limit || 100; // Default limit to prevent unbounded results
+    return await ctx.db.query('topics').withIndex('by_title').take(limit);
   },
 });
 
@@ -32,6 +35,7 @@ export const getBySlug = query({
 // Public query - returns topic with related talks and clips
 export const getWithContent = query({
   args: {
+    limit: v.optional(v.number()),
     slug: v.string(),
   },
   returns: v.union(
@@ -52,10 +56,12 @@ export const getWithContent = query({
       return null;
     }
 
+    const limit = args.limit || 50; // Default limit to prevent unbounded results
+
     const talkTopics = await ctx.db
       .query('talksOnTopics')
       .withIndex('by_topic_id', (q) => q.eq('topicId', topic._id))
-      .collect();
+      .take(limit);
 
     const talks = [];
     for (const talkTopic of talkTopics) {
@@ -68,7 +74,7 @@ export const getWithContent = query({
     const clipTopics = await ctx.db
       .query('clipsOnTopics')
       .withIndex('by_topic_id', (q) => q.eq('topicId', topic._id))
-      .collect();
+      .take(limit);
 
     const clips = [];
     for (const clipTopic of clipTopics) {
