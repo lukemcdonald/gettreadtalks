@@ -1,12 +1,13 @@
-import type { QueryCtx } from '../_generated/server';
+import type { QueryCtx } from '../../_generated/server';
 
 /**
- * Get published clips
+ * Get published clips.
+ *
  * @param ctx - Database context
  * @param limit - Maximum number of results
  * @returns Array of published clips
  */
-export async function getPublished(ctx: QueryCtx, limit: number) {
+export async function getPublishedClips(ctx: QueryCtx, limit: number) {
   return await ctx.db
     .query('clips')
     .withIndex('by_status_and_published_at', (q) => q.eq('status', 'published'))

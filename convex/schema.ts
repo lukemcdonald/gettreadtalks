@@ -1,6 +1,8 @@
 import { defineSchema, defineTable } from 'convex/server';
 import { Infer, v } from 'convex/values';
 
+import { clipTables } from './model/clips/schema';
+
 // Common status type for content items
 // Export for reuse in mutations and queries to maintain consistency
 export const statusType = v.union(
@@ -32,18 +34,6 @@ export const affiliateLinkFields = {
     v.literal('podcast'),
   ),
   url: v.string(),
-};
-
-export const clipFields = {
-  ...timestampFields,
-  description: v.optional(v.string()),
-  mediaUrl: v.string(),
-  publishedAt: v.optional(v.number()),
-  slug: v.string(),
-  speakerId: v.optional(v.id('speakers')),
-  status: statusType,
-  talkId: v.optional(v.id('talks')),
-  title: v.string(),
 };
 
 export const speakerFields = {
@@ -103,15 +93,11 @@ export const userFavoriteTalkFields = {
 };
 
 export default defineSchema({
+  ...clipTables,
+
   affiliateLinks: defineTable(affiliateLinkFields)
     .index('by_featured', ['featured'])
     .index('by_slug', ['slug']),
-
-  clips: defineTable(clipFields)
-    .index('by_slug', ['slug'])
-    .index('by_speaker_id', ['speakerId'])
-    .index('by_status_and_published_at', ['status', 'publishedAt'])
-    .index('by_talk_id', ['talkId']),
 
   clipsOnTopics: defineTable({
     clipId: v.id('clips'),

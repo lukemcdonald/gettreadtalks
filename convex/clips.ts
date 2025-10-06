@@ -1,37 +1,22 @@
 import { v } from 'convex/values';
 
-import { Doc } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
-import { authComponent } from './auth';
-import { clipFields, speakerFields, statusType, talkFields, topicFields } from './schema';
-import { normalizeSlug } from './utils';
-import { getPublished as getPublishedClips, getBySlugWithRelations } from './model/clips';
+import { speakerFields, statusType, talkFields, topicFields } from './schema';
+import { getPublishedClips, getBySlugWithRelations } from './model/clips/queries';
+import { createClip, updateClipStatus } from './model/clips/mutations';
+import { clipFields } from './model/clips/schema';
 
-// Public query - returns only published clips (no auth required)
 export const getPublished = query({
   args: {
     limit: v.optional(v.number()),
   },
   returns: v.array(v.object(clipFields)),
   handler: async (ctx, args) => {
-    const limit = args.limit || 50; // Default limit to prevent unbounded results
+    const limit = args.limit ?? 50;
     return await getPublishedClips(ctx, limit);
   },
 });
 
-// Public query - returns latest published clips (no auth required)
-export const getLatest = query({
-  args: {
-    limit: v.optional(v.number()),
-  },
-  returns: v.array(v.object(clipFields)),
-  handler: async (ctx, args) => {
-    const limit = args.limit || 10;
-    return await getPublishedClips(ctx, limit);
-  },
-});
-
-// Public query - returns published clip with related data (no auth required)
 export const getBySlug = query({
   args: {
     limit: v.optional(v.number()),
@@ -47,8 +32,8 @@ export const getBySlug = query({
     v.null(),
   ),
   handler: async (ctx, args) => {
-    const limit = args.limit || 20; // Default limit to prevent unbounded results
-    return await getBySlugWithRelations(ctx, args.slug, limit);
+    const { limit = 20, slug } = args;
+    return await getBySlugWithRelations(ctx, slug, limit);
   },
 });
 
@@ -63,31 +48,7 @@ export const create = mutation({
   },
   returns: v.id('clips'),
   handler: async (ctx, args) => {
-    const user = await authComponent.getAuthUser(ctx);
-    if (!user) {
-      throw new Error('Authentication required');
-    }
-
-    const slug = normalizeSlug(args.title);
-
-    const existing = await ctx.db
-      .query('clips')
-      .withIndex('by_slug', (q) => q.eq('slug', slug))
-      .first();
-
-    if (existing) {
-      throw new Error('Clip with this title already exists');
-    }
-
-    const status = args.status || 'backlog';
-    const publishedAt = status === 'published' ? Date.now() : undefined;
-
-    return await ctx.db.insert('clips', {
-      ...args,
-      publishedAt,
-      slug,
-      status,
-    });
+    return await createClip(ctx, args);
   },
 });
 
@@ -98,30 +59,6 @@ export const updateStatus = mutation({
   },
   returns: v.id('clips'),
   handler: async (ctx, args) => {
-    const user = await authComponent.getAuthUser(ctx);
-
-    if (!user) {
-      throw new Error('Authentication required');
-    }
-
-    const clip = await ctx.db.get(args.id);
-
-    if (!clip) {
-      throw new Error('Clip not found');
-    }
-
-    const updates: Partial<Doc<'clips'>> = {
-      status: args.status,
-    };
-
-    if (args.status === 'published' && !clip.publishedAt) {
-      updates.publishedAt = Date.now();
-    } else if (args.status !== 'published') {
-      updates.publishedAt = undefined;
-    }
-
-    updates.updatedAt = Date.now();
-    await ctx.db.patch(args.id, updates);
-    return args.id;
+    return await updateClipStatus(ctx, args);
   },
 });
