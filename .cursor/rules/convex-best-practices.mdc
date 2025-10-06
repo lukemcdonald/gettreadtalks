@@ -1,0 +1,345 @@
+---
+description: List of best practices and common anti-patterns around using Convex.
+globs: convex/**/*.ts
+---
+
+# Convex Best Practices
+
+## Async/Await
+
+- Always await all promises in Convex functions
+- Never let promises float (e.g., `await ctx.scheduler.runAfter`, `await ctx.db.patch`)
+- Use TypeScript ESLint `no-floating-promises` rule
+
+## Database Queries
+
+### Avoid `.filter()` on queries
+
+- Replace `.filter()` with `.withIndex()` or `.withSearchIndex()` for better performance
+- If not using indexes, filter in TypeScript code instead
+- Exception: Paginated queries (`.paginate()`) benefit from `.filter()`
+
+```typescript
+// ❌ Bad
+const tomsMessages = ctx.db
+  .query("messages")
+  .filter((q) => q.eq(q.field("author"), "Tom"))
+  .collect();
+
+// ✅ Good - Use index
+const tomsMessages = await ctx.db
+  .query("messages")
+  .withIndex("by_author", (q) => q.eq("author", "Tom"))
+  .collect();
+
+// ✅ Good - Filter in code
+const allMessages = await ctx.db.query("messages").collect();
+const tomsMessages = allMessages.filter((m) => m.author === "Tom");
+```
+
+### Limit `.collect()` usage
+
+- Only use `.collect()` when returning small result sets (< 1000 documents)
+- For large datasets, use indexes, pagination, limits, or denormalization
+- All results count toward database bandwidth, even filtered ones
+
+```typescript
+// ❌ Bad - potentially unbounded
+const allMovies = await ctx.db.query("movies").collect();
+
+// ✅ Good - use index to filter first
+const moviesByDirector = await ctx.db
+  .query("movies")
+  .withIndex("by_director", (q) => q.eq("director", "Steven Spielberg"))
+  .collect();
+
+// ✅ Good - use pagination
+const watchedMovies = await ctx.db
+  .query("watchedMovies")
+  .withIndex("by_user", (q) => q.eq("user", userId))
+  .paginate(paginationOptions);
+
+// ✅ Good - use limit with UI fallback
+const watchedMovies = await ctx.db
+  .query("watchedMovies")
+  .withIndex("by_user", (q) => q.eq("user", userId))
+  .take(100);
+const count = watchedMovies.length === 100 ? "99+" : watchedMovies.length.toString();
+```
+
+## Indexes
+
+### Remove redundant indexes
+
+- `by_foo` and `by_foo_and_bar` are usually redundant (keep `by_foo_and_bar`)
+- An index on `["foo"]` is actually `["foo", "_creationTime"]`
+- Exception: If you need to sort by `foo` and `_creationTime`, keep both
+
+```typescript
+// ❌ Bad - redundant indexes
+schema.defineTable("teamMembers")
+  .index("by_team", ["team"])
+  .index("by_team_and_user", ["team", "user"]);
+
+// ✅ Good - single compound index
+schema.defineTable("teamMembers")
+  .index("by_team_and_user", ["team", "user"]);
+```
+
+## Security
+
+### Always use argument validators
+
+- Use validators on all `query`, `mutation`, and `action` functions
+- Consider return value validators too
+- For `httpAction`, use zod or similar for validation
+
+```typescript
+// ❌ Bad - no validation
+export const updateMessage = mutation({
+  handler: async (ctx, { id, update }) => {
+    await ctx.db.patch(id, update);
+  },
+});
+
+// ✅ Good - validated arguments
+export const updateMessage = mutation({
+  args: {
+    id: v.id("messages"),
+    update: v.object({
+      body: v.optional(v.string()),
+      author: v.optional(v.string()),
+    }),
+  },
+  handler: async (ctx, { id, update }) => {
+    await ctx.db.patch(id, update);
+  },
+});
+```
+
+### Implement access control
+
+- Check `ctx.auth.getUserIdentity()` for authenticated-only functions
+- Use unguessable identifiers (UUID, Convex ID) for access control
+- Never use spoofable values (email) for authentication
+- Prefer granular functions (`setTeamOwner`) over generic ones (`updateTeam`)
+
+```typescript
+// ❌ Bad - no access control
+export const updateTeam = mutation({
+  args: { id: v.id("teams"), update: v.object({...}) },
+  handler: async (ctx, { id, update }) => {
+    await ctx.db.patch(id, update);
+  },
+});
+
+// ✅ Good - checks auth
+export const updateTeam = mutation({
+  args: { id: v.id("teams"), update: v.object({...}) },
+  handler: async (ctx, { id, update }) => {
+    const user = await ctx.auth.getUserIdentity();
+    if (user === null) throw new Error("Unauthorized");
+    
+    const isTeamMember = /* check membership */;
+    if (!isTeamMember) throw new Error("Unauthorized");
+    
+    await ctx.db.patch(id, update);
+  },
+});
+```
+
+## Internal Functions
+
+### Use `internal` for scheduled/called functions
+
+- Functions called by `ctx.scheduler`, `ctx.run*`, or crons should be `internal`
+- Never schedule or run public `api` functions
+- Public functions need careful security auditing; internal functions don't
+- Share code via helper functions, not by calling public functions
+
+```typescript
+// ❌ Bad - using api
+crons.daily(
+  "send daily reminder",
+  { hourUTC: 17, minuteUTC: 30 },
+  api.messages.sendMessage,
+  { author: "System", body: "Share your daily update!" }
+);
+
+// ✅ Good - using internal
+async function sendMessageHelper(
+  ctx: MutationCtx,
+  args: { body: string; author: string }
+) {
+  // shared implementation
+}
+
+export const sendMessage = mutation({
+  args: { body: v.string() },
+  handler: async (ctx, { body }) => {
+    const user = await ctx.auth.getUserIdentity();
+    if (!user) throw new Error("Unauthorized");
+    await sendMessageHelper(ctx, { body, author: user.name ?? "Anonymous" });
+  },
+});
+
+export const sendInternalMessage = internalMutation({
+  args: { body: v.string(), author: v.string() },
+  handler: async (ctx, args) => {
+    await sendMessageHelper(ctx, args);
+  },
+});
+```
+
+## Code Organization
+
+### Use helper functions for shared logic
+
+- Write most logic as plain TypeScript functions
+- Keep `query`, `mutation`, `action` wrappers thin
+- Organize shared code in `convex/model/` directory
+- Use TypeScript types: `QueryCtx`, `MutationCtx`, `ActionCtx`
+
+```typescript
+// ✅ Good structure
+// convex/model/users.ts
+import { QueryCtx } from '../_generated/server';
+
+export async function getCurrentUser(ctx: QueryCtx) {
+  const userIdentity = await ctx.auth.getUserIdentity();
+  if (!userIdentity) throw new Error("Unauthorized");
+  const user = await ctx.db.query("users")
+    .withIndex("by_token", (q) => q.eq("token", userIdentity.tokenIdentifier))
+    .unique();
+  return user;
+}
+
+// convex/users.ts
+import * as Users from './model/users';
+
+export const getCurrentUser = query({
+  args: {},
+  handler: async (ctx) => {
+    return Users.getCurrentUser(ctx);
+  },
+});
+```
+
+### Avoid `ctx.runAction` unless switching runtimes
+
+- Replace `ctx.runAction` with plain TypeScript functions
+- Only use `ctx.runAction` when calling Node.js code from Convex runtime
+- Each `runAction` call has overhead (separate function, memory, CPU)
+
+```typescript
+// ❌ Bad - unnecessary runAction
+export const scrapeWebsite = action({
+  handler: async (ctx, { siteMapUrl }) => {
+    const pages = /* parse sitemap */;
+    await Promise.all(
+      pages.map((page) =>
+        ctx.runAction(internal.scrape.scrapeSinglePage, { url: page })
+      )
+    );
+  },
+});
+
+// ✅ Good - plain TypeScript function
+export async function scrapeSinglePage(
+  ctx: ActionCtx,
+  { url }: { url: string }
+) {
+  const page = await fetch(url);
+  const text = /* parse page */;
+  await ctx.runMutation(internal.scrape.addPage, { url, text });
+}
+
+export const scrapeWebsite = action({
+  handler: async (ctx, { siteMapUrl }) => {
+    const pages = /* parse sitemap */;
+    await Promise.all(
+      pages.map((page) => Scrape.scrapeSinglePage(ctx, { url: page }))
+    );
+  },
+});
+```
+
+## Actions
+
+### Minimize sequential `ctx.runQuery`/`ctx.runMutation` calls
+
+- Each runs in separate transaction - may have inconsistent data
+- Combine multiple calls into single query/mutation when possible
+- Exception: Processing large datasets or side effects between calls
+
+```typescript
+// ❌ Bad - sequential queries (could be inconsistent)
+const team = await ctx.runQuery(internal.teams.getTeam, { teamId });
+const teamOwner = await ctx.runQuery(internal.teams.getTeamOwner, { teamId });
+
+// ✅ Good - single query (guaranteed consistent)
+const teamAndOwner = await ctx.runQuery(internal.teams.getTeamAndOwner, {
+  teamId,
+});
+
+// ❌ Bad - loop with separate mutations
+for (const member of teamMembers) {
+  await ctx.runMutation(internal.teams.insertUser, member);
+}
+
+// ✅ Good - single mutation
+await ctx.runMutation(internal.teams.insertUsers, teamMembers);
+```
+
+### Use `ctx.run*` sparingly in queries/mutations
+
+- Prefer plain TypeScript functions over `ctx.runQuery`/`ctx.runMutation`
+- Extra overhead compared to helper functions
+- Exceptions:
+  - Using components (require `ctx.run*`)
+  - Need partial rollback on error
+
+```typescript
+// ❌ Bad - unnecessary ctx.runQuery
+export const listMessages = query({
+  handler: async (ctx, { conversationId }) => {
+    const user = await ctx.runQuery(api.users.getCurrentUser);
+    // ... rest of logic
+  },
+});
+
+// ✅ Good - helper function
+export const listMessages = query({
+  handler: async (ctx, { conversationId }) => {
+    const user = await Users.getCurrentUser(ctx);
+    // ... rest of logic
+  },
+});
+
+// ✅ Exception - partial rollback
+export const trySendMessage = mutation({
+  handler: async (ctx, { body, author }) => {
+    try {
+      await ctx.runMutation(internal.messages.sendMessage, { body, author });
+    } catch (e) {
+      // Records failure, but rollback sendMessage writes
+      await ctx.db.insert("failures", { kind: "MessageFailed", error: `${e}` });
+    }
+  },
+});
+```
+
+## Quick Reference Checklist
+
+Before production:
+- [ ] All promises are awaited
+- [ ] No `.filter()` on queries (use indexes or code filters)
+- [ ] `.collect()` only used with small result sets
+- [ ] No redundant indexes
+- [ ] All public functions have argument validators
+- [ ] All public functions have access control checks
+- [ ] Only `internal` functions are scheduled or called via `ctx.run*`
+- [ ] Code organized with helper functions in `convex/model/`
+- [ ] Minimal use of `ctx.runAction` (only for runtime switches)
+- [ ] No sequential `ctx.runQuery`/`ctx.runMutation` in actions
+- [ ] Limited `ctx.run*` in queries/mutations (prefer helpers)
