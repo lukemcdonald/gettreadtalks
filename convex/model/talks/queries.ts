@@ -1,6 +1,6 @@
-import type { QueryCtx } from '../_generated/server';
-import type { Id } from '../_generated/dataModel';
-import type { StatusType } from '../schema';
+import type { QueryCtx } from '../../_generated/server';
+import type { Id } from '../../_generated/dataModel';
+import type { StatusType } from '../../schema';
 
 /**
  * Get published talks with speaker data.

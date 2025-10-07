@@ -1,7 +1,7 @@
 import { v } from 'convex/values';
 
 import { mutation, query } from './_generated/server';
-import { talkFields } from './schema';
+import { talkFields } from './model/talks/schema';
 import {
   getBySlug as getCollectionBySlug,
   getWithTalks as getCollectionWithTalks,

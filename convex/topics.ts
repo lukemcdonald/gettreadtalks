@@ -3,10 +3,11 @@ import { v } from 'convex/values';
 import { Doc } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
 import { requireAuth } from './model/auth/queries';
-import { talkFields, topicFields } from './schema';
+import { topicFields } from './schema';
 import { normalizeSlug } from './utils';
 import { getBySlug as getTopicBySlug, getWithContent as getTopicWithContent } from './model/topics';
 import { clipFields } from './model/clips/schema';
+import { talkFields } from './model/talks/schema';
 
 export const list = query({
   args: {

@@ -1,19 +1,17 @@
 import { v } from 'convex/values';
 
-import { Doc } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
-import { authComponent } from './auth';
-import { statusType, talkFields } from './schema';
-import { normalizeSlug } from './utils';
+import { statusType } from './schema';
 import {
   getPublishedWithSpeakers,
   getBySlugWithRelations,
   getBySpeaker as getTalksBySpeaker,
   getByCollection as getTalksByCollection,
-} from './model/talks';
+} from './model/talks/queries';
 import { speakerFields } from './model/speakers/schema';
+import { createTalk, updateTalkStatus } from './model/talks/mutations.js';
+import { talkFields } from './model/talks/schema';
 
-// Public query - returns published talks with speaker data
 export const getPublished = query({
   args: {
     limit: v.optional(v.number()),
@@ -25,21 +23,20 @@ export const getPublished = query({
     }),
   ),
   handler: async (ctx, args) => {
-    const limit = args.limit ?? 20;
+    const { limit = 20 } = args;
     return await getPublishedWithSpeakers(ctx, limit);
   },
 });
 
-// Public query - returns published talk with related data
 export const getBySlug = query({
   args: {
     slug: v.string(),
   },
   returns: v.union(
     v.object({
-      talk: v.any(), // Doc<"talks">
-      collection: v.union(v.any(), v.null()), // Doc<"collections"> | null
-      speaker: v.union(v.any(), v.null()), // Doc<"speakers"> | null
+      talk: v.any(),
+      collection: v.union(v.any(), v.null()),
+      speaker: v.union(v.any(), v.null()),
     }),
     v.null(),
   ),
@@ -48,7 +45,6 @@ export const getBySlug = query({
   },
 });
 
-// Public query - returns published talks by speaker
 export const getBySpeaker = query({
   args: {
     limit: v.optional(v.number()),
@@ -56,12 +52,11 @@ export const getBySpeaker = query({
   },
   returns: v.array(v.object(talkFields)),
   handler: async (ctx, args) => {
-    const limit = args.limit || 20;
-    return await getTalksBySpeaker(ctx, args.speakerId, 'published', limit);
+    const { limit = 20, speakerId } = args;
+    return await getTalksBySpeaker(ctx, speakerId, 'published', limit);
   },
 });
 
-// Public query - returns published talks in a collection
 export const getByCollection = query({
   args: {
     collectionId: v.id('collections'),
@@ -69,8 +64,8 @@ export const getByCollection = query({
   },
   returns: v.array(v.object(talkFields)),
   handler: async (ctx, args) => {
-    const limit = args.limit || 100; // Default limit to prevent unbounded results
-    return await getTalksByCollection(ctx, args.collectionId, 'published', limit);
+    const { collectionId, limit = 100 } = args;
+    return await getTalksByCollection(ctx, collectionId, 'published', limit);
   },
 });
 
@@ -86,32 +81,7 @@ export const create = mutation({
   },
   returns: v.id('talks'),
   handler: async (ctx, args) => {
-    const user = await authComponent.getAuthUser(ctx);
-
-    if (!user) {
-      throw new Error('Authentication required');
-    }
-
-    const slug = normalizeSlug(args.title);
-
-    const existing = await ctx.db
-      .query('talks')
-      .withIndex('by_slug', (q) => q.eq('slug', slug))
-      .first();
-
-    if (existing) {
-      throw new Error('Talk with this title already exists');
-    }
-
-    const status = args.status || 'backlog';
-    const publishedAt = status === 'published' ? Date.now() : undefined;
-
-    return await ctx.db.insert('talks', {
-      ...args,
-      publishedAt,
-      slug,
-      status,
-    });
+    return await createTalk(ctx, args);
   },
 });
 
@@ -122,32 +92,6 @@ export const updateStatus = mutation({
   },
   returns: v.id('talks'),
   handler: async (ctx, args) => {
-    const user = await authComponent.getAuthUser(ctx);
-
-    if (!user) {
-      throw new Error('Authentication required');
-    }
-
-    const talk = await ctx.db.get(args.id);
-
-    if (!talk) {
-      throw new Error('Talk not found');
-    }
-
-    const updates: Partial<Doc<'talks'>> = {
-      status: args.status,
-    };
-
-    if (args.status === 'published' && !talk.publishedAt) {
-      updates.publishedAt = Date.now();
-    } else if (args.status !== 'published') {
-      updates.publishedAt = undefined;
-    }
-
-    updates.updatedAt = Date.now();
-
-    await ctx.db.patch(args.id, updates);
-
-    return args.id;
+    return await updateTalkStatus(ctx, args);
   },
 });
