@@ -16,7 +16,7 @@ import type * as http from "../http.js";
 import type * as model_auth from "../model/auth/queries.js";
 import type * as model_clips from "../model/clips.js";
 import type * as model_collections from "../model/collections.js";
-import type * as model_speakers from "../model/speakers.js";
+import type * as model_speakers from "../model/speakers/queries.js";
 import type * as model_talks from "../model/talks.js";
 import type * as model_topics from "../model/topics.js";
 import type * as model_users from "../model/users.js";

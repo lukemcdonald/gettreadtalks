@@ -1,35 +1,33 @@
 import { v } from 'convex/values';
 
-import { Doc } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
-import { requireAuth } from './model/auth/queries';
-import { speakerFields } from './schema';
-import { normalizeSlug } from './utils';
-import { getBySlug as getSpeakerBySlug } from './model/speakers';
+import { speakerFields } from './model/speakers/schema';
+import { getBySlug as getSpeakerBySlug } from './model/speakers/queries';
+import { createSpeaker, updateSpeaker } from './model/speakers/mutations';
 
-// Public query - returns all speakers
 export const list = query({
   args: {
     limit: v.optional(v.number()),
   },
   returns: v.array(v.object(speakerFields)),
   handler: async (ctx, args) => {
-    const limit = args.limit || 100; // Default limit to prevent unbounded results
+    const { limit = 100 } = args;
     return await ctx.db.query('speakers').take(limit);
   },
 });
 
-// Public query - returns speaker by slug
 export const getBySlug = query({
   args: {
     slug: v.string(),
   },
   returns: v.union(v.object(speakerFields), v.null()),
   handler: async (ctx, args) => {
-    return await getSpeakerBySlug(ctx, args.slug);
+    const { slug } = args;
+    return await getSpeakerBySlug(ctx, slug);
   },
 });
 
+// TODO: Figure out how to share arg validators
 export const create = mutation({
   args: {
     description: v.optional(v.string()),
@@ -42,26 +40,11 @@ export const create = mutation({
   },
   returns: v.id('speakers'),
   handler: async (ctx, args) => {
-    await requireAuth(ctx);
-
-    const slug = normalizeSlug(`${args.firstName} ${args.lastName}`);
-
-    const existing = await ctx.db
-      .query('speakers')
-      .withIndex('by_slug', (q) => q.eq('slug', slug))
-      .first();
-
-    if (existing) {
-      throw new Error('Speaker with this name already exists');
-    }
-
-    return await ctx.db.insert('speakers', {
-      ...args,
-      slug,
-    });
+    return await createSpeaker(ctx, args);
   },
 });
 
+// TODO: Figure out how to share arg validators
 export const update = mutation({
   args: {
     description: v.optional(v.string()),
@@ -75,41 +58,6 @@ export const update = mutation({
   },
   returns: v.id('speakers'),
   handler: async (ctx, args) => {
-    await requireAuth(ctx);
-
-    const { id, ...rest } = args;
-    const updates: Partial<Doc<'speakers'>> = rest;
-
-    const speaker = await ctx.db.get(id);
-
-    if (!speaker) {
-      throw new Error('Speaker not found');
-    }
-
-    // If name changed, update slug
-    if (updates.firstName || updates.lastName) {
-      const firstName = updates.firstName || speaker.firstName;
-      const lastName = updates.lastName || speaker.lastName;
-      const newSlug = normalizeSlug(`${firstName} ${lastName}`);
-
-      if (newSlug !== speaker.slug) {
-        const existing = await ctx.db
-          .query('speakers')
-          .withIndex('by_slug', (q) => q.eq('slug', newSlug))
-          .first();
-
-        if (existing && existing._id !== id) {
-          throw new Error('Speaker with this name already exists');
-        }
-
-        updates.slug = newSlug;
-      }
-    }
-
-    updates.updatedAt = Date.now();
-
-    await ctx.db.patch(id, updates);
-
-    return id;
+    return await updateSpeaker(ctx, args);
   },
 });

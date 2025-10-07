@@ -1,10 +1,11 @@
 import { v } from 'convex/values';
 
 import { mutation, query } from './_generated/server';
-import { speakerFields, statusType, talkFields, topicFields } from './schema';
+import { statusType, talkFields, topicFields } from './schema';
 import { getPublishedClips, getBySlugWithRelations } from './model/clips/queries';
 import { createClip, updateClipStatus } from './model/clips/mutations';
 import { clipFields } from './model/clips/schema';
+import { speakerFields } from './model/speakers/schema';
 
 export const getPublished = query({
   args: {

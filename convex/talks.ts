@@ -3,7 +3,7 @@ import { v } from 'convex/values';
 import { Doc } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
 import { authComponent } from './auth';
-import { speakerFields, statusType, talkFields } from './schema';
+import { statusType, talkFields } from './schema';
 import { normalizeSlug } from './utils';
 import {
   getPublishedWithSpeakers,
@@ -11,6 +11,7 @@ import {
   getBySpeaker as getTalksBySpeaker,
   getByCollection as getTalksByCollection,
 } from './model/talks';
+import { speakerFields } from './model/speakers/schema';
 
 // Public query - returns published talks with speaker data
 export const getPublished = query({
