@@ -12,22 +12,24 @@ export function normalizeSlug(text: string): string {
     .trim();
 }
 
+import type { QueryCtx, MutationCtx } from '../_generated/server';
+
 /**
  * Check if a slug already exists in a table
- * @param ctx - Database context
+ * @param ctx - Database context (QueryCtx or MutationCtx)
  * @param table - Table name
  * @param slug - Slug to check
  * @param excludeId - Optional ID to exclude from check (for updates)
  * @returns True if slug exists, false otherwise
  */
 export async function slugExists(
-  ctx: any,
+  ctx: QueryCtx | MutationCtx,
   table: string,
   slug: string,
   excludeId?: string,
 ): Promise<boolean> {
-  const existing = await ctx
-    .query(table)
+  const existing = await ctx.db
+    .query(table as any)
     .withIndex('by_slug', (q: any) => q.eq('slug', slug))
     .first();
 

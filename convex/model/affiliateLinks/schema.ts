@@ -1,6 +1,7 @@
-import { Infer, v } from 'convex/values';
-import { timestampFields } from '../../lib/validators';
 import { defineTable } from 'convex/server';
+import { Infer, v } from 'convex/values';
+
+import { timestampFields } from '../../lib/validators';
 
 const affiliateLinkTypes = v.union(
   v.literal('app'),

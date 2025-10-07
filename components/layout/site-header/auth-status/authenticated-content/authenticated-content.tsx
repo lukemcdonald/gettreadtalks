@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 
-import { signOut } from '@/lib/services/auth/client';
 import { useCurrentUser } from '@/lib/features/users/hooks';
+import { signOut } from '@/lib/services/auth/client';
 
 function AuthenticatedContent() {
   const user = useCurrentUser();

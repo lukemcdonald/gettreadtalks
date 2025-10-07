@@ -24,15 +24,15 @@ export const createAuth = (
   return betterAuth({
     baseURL: siteUrl,
     database: authComponent.adapter(ctx),
+    emailAndPassword: {
+      enabled: true,
+      requireEmailVerification: false,
+    },
     plugins: [
       convex(),
       nextCookies(), // Add nextCookies as the last plugin for automatic cookie handling
     ],
     secret: process.env.BETTER_AUTH_SECRET!,
-    emailAndPassword: {
-      enabled: true,
-      requireEmailVerification: false,
-    },
     // TODO: Is trustedOrigins needed? Use env variables instead?
     trustedOrigins: ['http://localhost:3000', 'https://academic-reindeer-888.convex.site'],
     // disable logging when createAuth is called just to generate options.
@@ -45,8 +45,8 @@ export const createAuth = (
 
 export const getCurrentUser = query({
   args: {},
-  returns: v.union(v.any(), v.null()),
   handler: async (ctx) => {
     return await getUser(ctx);
   },
+  returns: v.union(v.any(), v.null()),
 });

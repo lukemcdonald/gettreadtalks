@@ -1,6 +1,7 @@
-import { v } from 'convex/values';
-import { timestampFields } from '../../lib/validators';
 import { defineTable } from 'convex/server';
+import { v } from 'convex/values';
+
+import { timestampFields } from '../../lib/validators';
 
 export const collectionFields = {
   ...timestampFields,

@@ -34,12 +34,12 @@ export async function getBySlugWithRelations(ctx: QueryCtx, slug: string, topicL
   }
 
   const queries = {
-    speaker: clip.speakerId ? ctx.db.get(clip.speakerId) : null,
-    talk: clip.talkId ? ctx.db.get(clip.talkId) : null,
     clipTopics: ctx.db
       .query('clipsOnTopics')
       .withIndex('by_clip_id', (q) => q.eq('clipId', clip._id))
       .take(topicLimit),
+    speaker: clip.speakerId ? ctx.db.get(clip.speakerId) : null,
+    talk: clip.talkId ? ctx.db.get(clip.talkId) : null,
   };
 
   const [speaker, talk, clipTopics] = await Promise.all([

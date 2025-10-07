@@ -1,13 +1,13 @@
 import { defineSchema, defineTable } from 'convex/server';
 import { Infer, v } from 'convex/values';
 
+import { statusType } from './lib/validators';
+import { affiliateLinkTables } from './model/affiliateLinks/schema';
 import { clipTables } from './model/clips/schema';
 import { collectionTables } from './model/collections/schema';
 import { speakerTables } from './model/speakers/schema';
-import { affiliateLinkTables } from './model/affiliateLinks/schema';
 import { talkTables } from './model/talks/schema';
 import { topicTables } from './model/topics/schema';
-import { statusType } from './lib/validators';
 
 export type StatusType = Infer<typeof statusType>;
 

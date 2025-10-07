@@ -1,7 +1,7 @@
 import { v } from 'convex/values';
 
 import { mutation, query } from './_generated/server';
-import { affiliateLinkFields } from './model/affiliateLinks/schema';
+import { createAffiliateLink, updateAffiliateLink } from './model/affiliateLinks/mutations';
 import {
   getAffiliateLinkBySlug,
   getAffiliateLinks,
@@ -9,7 +9,7 @@ import {
   getAffiliateLinksByType,
   getFeaturedAffiliateLinks,
 } from './model/affiliateLinks/queries';
-import { createAffiliateLink, updateAffiliateLink } from './model/affiliateLinks/mutations';
+import { affiliateLinkFields } from './model/affiliateLinks/schema';
 
 // Query Functions
 
@@ -17,22 +17,22 @@ export const getFeatured = query({
   args: {
     limit: v.optional(v.number()),
   },
-  returns: v.array(v.object(affiliateLinkFields)),
   handler: async (ctx, args) => {
     const limit = args.limit ?? 10;
     return await getFeaturedAffiliateLinks(ctx, limit);
   },
+  returns: v.array(v.object(affiliateLinkFields)),
 });
 
 export const getBySlug = query({
   args: {
     slug: v.string(),
   },
-  returns: v.union(v.object(affiliateLinkFields), v.null()),
   handler: async (ctx, args) => {
     const { slug } = args;
     return await getAffiliateLinkBySlug(ctx, slug);
   },
+  returns: v.union(v.object(affiliateLinkFields), v.null()),
 });
 
 export const getByType = query({
@@ -46,11 +46,11 @@ export const getByType = query({
       v.literal('podcast'),
     ),
   },
-  returns: v.array(v.object(affiliateLinkFields)),
   handler: async (ctx, args) => {
     const { limit = 20, type } = args;
     return await getAffiliateLinksByType(ctx, type, limit);
   },
+  returns: v.array(v.object(affiliateLinkFields)),
 });
 
 export const getByAffiliate = query({
@@ -58,11 +58,11 @@ export const getByAffiliate = query({
     affiliate: v.string(),
     limit: v.optional(v.number()),
   },
-  returns: v.array(v.object(affiliateLinkFields)),
   handler: async (ctx, args) => {
     const { affiliate, limit = 20 } = args;
     return await getAffiliateLinksByAffiliate(ctx, affiliate, limit);
   },
+  returns: v.array(v.object(affiliateLinkFields)),
 });
 
 export const list = query({
@@ -80,10 +80,10 @@ export const list = query({
       ),
     ),
   },
-  returns: v.array(v.object(affiliateLinkFields)),
   handler: async (ctx, args) => {
     return await getAffiliateLinks(ctx, args);
   },
+  returns: v.array(v.object(affiliateLinkFields)),
 });
 
 // Mutation Functions
@@ -103,10 +103,10 @@ export const create = mutation({
     ),
     url: v.string(),
   },
-  returns: v.id('affiliateLinks'),
   handler: async (ctx, args) => {
     return await createAffiliateLink(ctx, args);
   },
+  returns: v.id('affiliateLinks'),
 });
 
 export const update = mutation({
@@ -127,8 +127,8 @@ export const update = mutation({
     ),
     url: v.optional(v.string()),
   },
-  returns: v.id('affiliateLinks'),
   handler: async (ctx, args) => {
     return await updateAffiliateLink(ctx, args);
   },
+  returns: v.id('affiliateLinks'),
 });

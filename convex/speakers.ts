@@ -1,30 +1,30 @@
 import { v } from 'convex/values';
 
 import { mutation, query } from './_generated/server';
-import { speakerFields } from './model/speakers/schema';
-import { getBySlug as getSpeakerBySlug } from './model/speakers/queries';
 import { createSpeaker, updateSpeaker } from './model/speakers/mutations';
+import { getBySlug as getSpeakerBySlug } from './model/speakers/queries';
+import { speakerFields } from './model/speakers/schema';
 
 export const list = query({
   args: {
     limit: v.optional(v.number()),
   },
-  returns: v.array(v.object(speakerFields)),
   handler: async (ctx, args) => {
     const { limit = 100 } = args;
     return await ctx.db.query('speakers').take(limit);
   },
+  returns: v.array(v.object(speakerFields)),
 });
 
 export const getBySlug = query({
   args: {
     slug: v.string(),
   },
-  returns: v.union(v.object(speakerFields), v.null()),
   handler: async (ctx, args) => {
     const { slug } = args;
     return await getSpeakerBySlug(ctx, slug);
   },
+  returns: v.union(v.object(speakerFields), v.null()),
 });
 
 // TODO: Figure out how to share arg validators
@@ -38,10 +38,10 @@ export const create = mutation({
     role: v.optional(v.string()),
     websiteUrl: v.optional(v.string()),
   },
-  returns: v.id('speakers'),
   handler: async (ctx, args) => {
     return await createSpeaker(ctx, args);
   },
+  returns: v.id('speakers'),
 });
 
 // TODO: Figure out how to share arg validators
@@ -56,8 +56,8 @@ export const update = mutation({
     role: v.optional(v.string()),
     websiteUrl: v.optional(v.string()),
   },
-  returns: v.id('speakers'),
   handler: async (ctx, args) => {
     return await updateSpeaker(ctx, args);
   },
+  returns: v.id('speakers'),
 });

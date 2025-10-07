@@ -8,7 +8,6 @@ export const updatePassword = mutation({
     currentPassword: v.string(),
     newPassword: v.string(),
   },
-  returns: v.null(),
   handler: async (ctx, args) => {
     await createAuth(ctx).api.changePassword({
       body: {
@@ -20,4 +19,5 @@ export const updatePassword = mutation({
 
     return null;
   },
+  returns: v.null(),
 });

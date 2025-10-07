@@ -1,5 +1,6 @@
-import { Id } from '../../_generated/dataModel';
 import type { MutationCtx } from '../../_generated/server';
+
+import { Id } from '../../_generated/dataModel';
 import { getUserId } from '../auth/queries';
 
 /**
