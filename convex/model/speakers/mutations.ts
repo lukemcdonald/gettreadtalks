@@ -1,6 +1,7 @@
-import { Doc, Id } from '../../_generated/dataModel';
 import type { MutationCtx } from '../../_generated/server';
-import { normalizeSlug } from '../../lib/utils';
+
+import { Doc, Id } from '../../_generated/dataModel';
+import { normalizeSlug, slugExists } from '../../lib/utils';
 import { requireAuth } from '../auth/queries';
 
 /**
@@ -26,12 +27,7 @@ export async function createSpeaker(
 
   const slug = normalizeSlug(`${args.firstName} ${args.lastName}`);
 
-  const existing = await ctx.db
-    .query('speakers')
-    .withIndex('by_slug', (q) => q.eq('slug', slug))
-    .first();
-
-  if (existing) {
+  if (await slugExists(ctx, 'speakers', slug)) {
     throw new Error('Speaker with this name already exists');
   }
 
@@ -79,12 +75,7 @@ export async function updateSpeaker(
     const newSlug = normalizeSlug(`${firstName} ${lastName}`);
 
     if (newSlug !== speaker.slug) {
-      const existing = await ctx.db
-        .query('speakers')
-        .withIndex('by_slug', (q) => q.eq('slug', newSlug))
-        .first();
-
-      if (existing && existing._id !== id) {
+      if (await slugExists(ctx, 'speakers', newSlug, id)) {
         throw new Error('Speaker with this name already exists');
       }
 

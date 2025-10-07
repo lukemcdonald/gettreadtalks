@@ -1,7 +1,8 @@
-import { Doc, Id } from '../../_generated/dataModel';
 import type { MutationCtx } from '../../_generated/server';
+
+import { Doc, Id } from '../../_generated/dataModel';
+import { normalizeSlug, slugExists } from '../../lib/utils';
 import { StatusType } from '../../lib/validators';
-import { normalizeSlug } from '../../lib/utils';
 import { requireAuth } from '../auth/queries';
 
 /**
@@ -27,12 +28,7 @@ export async function createTalk(
 
   const slug = normalizeSlug(args.title);
 
-  const existing = await ctx.db
-    .query('talks')
-    .withIndex('by_slug', (q) => q.eq('slug', slug))
-    .first();
-
-  if (existing) {
+  if (await slugExists(ctx, 'talks', slug)) {
     throw new Error('Talk with this title already exists');
   }
 

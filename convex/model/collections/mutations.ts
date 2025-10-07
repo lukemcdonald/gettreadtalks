@@ -1,6 +1,7 @@
-import { Doc, Id } from '../../_generated/dataModel';
 import type { MutationCtx } from '../../_generated/server';
-import { normalizeSlug } from '../../lib/utils';
+
+import { Doc, Id } from '../../_generated/dataModel';
+import { normalizeSlug, slugExists } from '../../lib/utils';
 import { requireAuth } from '../auth/queries';
 
 /**
@@ -22,12 +23,7 @@ export async function createCollection(
 
   const slug = normalizeSlug(args.title);
 
-  const existing = await ctx.db
-    .query('collections')
-    .withIndex('by_slug', (q) => q.eq('slug', slug))
-    .first();
-
-  if (existing) {
+  if (await slugExists(ctx, 'collections', slug)) {
     throw new Error('Collection with this title already exists');
   }
 
@@ -67,12 +63,7 @@ export async function updateCollection(
     const newSlug = normalizeSlug(updates.title);
 
     if (newSlug !== collection.slug) {
-      const existing = await ctx.db
-        .query('collections')
-        .withIndex('by_slug', (q) => q.eq('slug', newSlug))
-        .first();
-
-      if (existing && existing._id !== id) {
+      if (await slugExists(ctx, 'collections', newSlug, id)) {
         throw new Error('Collection with this title already exists');
       }
 

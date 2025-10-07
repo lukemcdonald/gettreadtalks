@@ -1,6 +1,7 @@
-import { Doc, Id } from '../../_generated/dataModel';
 import type { MutationCtx } from '../../_generated/server';
-import { normalizeSlug } from '../../lib/utils';
+
+import { Doc, Id } from '../../_generated/dataModel';
+import { normalizeSlug, slugExists } from '../../lib/utils';
 import { requireAuth } from '../auth/queries';
 import { AffiliateLinkType } from './schema';
 
@@ -26,12 +27,7 @@ export async function createAffiliateLink(
 
   const slug = normalizeSlug(args.title);
 
-  const existing = await ctx.db
-    .query('affiliateLinks')
-    .withIndex('by_slug', (q) => q.eq('slug', slug))
-    .first();
-
-  if (existing) {
+  if (await slugExists(ctx, 'affiliateLinks', slug)) {
     throw new Error('Affiliate link with this title already exists');
   }
 

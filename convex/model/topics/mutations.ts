@@ -1,6 +1,7 @@
-import { Doc, Id } from '../../_generated/dataModel';
 import type { MutationCtx } from '../../_generated/server';
-import { normalizeSlug } from '../../lib/utils';
+
+import { Doc, Id } from '../../_generated/dataModel';
+import { normalizeSlug, slugExists } from '../../lib/utils';
 import { requireAuth } from '../auth/queries';
 
 /**
@@ -20,12 +21,7 @@ export async function createTopic(
 
   const slug = normalizeSlug(args.title);
 
-  const existing = await ctx.db
-    .query('topics')
-    .withIndex('by_slug', (q) => q.eq('slug', slug))
-    .first();
-
-  if (existing) {
+  if (await slugExists(ctx, 'topics', slug)) {
     throw new Error('Topic with this title already exists');
   }
 
@@ -64,12 +60,7 @@ export async function updateTopic(
     const newSlug = normalizeSlug(updates.title);
 
     if (newSlug !== topic.slug) {
-      const existing = await ctx.db
-        .query('topics')
-        .withIndex('by_slug', (q) => q.eq('slug', newSlug))
-        .first();
-
-      if (existing && existing._id !== id) {
+      if (await slugExists(ctx, 'topics', newSlug, id)) {
         throw new Error('Topic with this title already exists');
       }
 

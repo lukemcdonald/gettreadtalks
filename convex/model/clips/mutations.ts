@@ -1,8 +1,9 @@
-import { Doc, Id } from '../../_generated/dataModel';
 import type { MutationCtx } from '../../_generated/server';
-import { normalizeSlug } from '../../lib/utils';
-import { requireAuth } from '../auth/queries';
+
+import { Doc, Id } from '../../_generated/dataModel';
+import { normalizeSlug, slugExists } from '../../lib/utils';
 import { StatusType } from '../../lib/validators';
+import { requireAuth } from '../auth/queries';
 
 /**
  * Create a new clip.
@@ -26,12 +27,7 @@ export async function createClip(
 
   const slug = normalizeSlug(args.title);
 
-  const existing = await ctx.db
-    .query('clips')
-    .withIndex('by_slug', (q) => q.eq('slug', slug))
-    .first();
-
-  if (existing) {
+  if (await slugExists(ctx, 'clips', slug)) {
     throw new Error('Clip with this title already exists');
   }
 
