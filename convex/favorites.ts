@@ -1,7 +1,6 @@
 import { v } from 'convex/values';
 
 import { mutation, query } from './_generated/server';
-import { getDefaultLimit } from './lib/utils';
 import { getCurrentUser } from './model/auth/queries';
 import {
   addFavoriteClip as addFavoriteClipHelper,
@@ -29,7 +28,7 @@ export const getUserFavorites = query({
     }
 
     const userId = user._id;
-    const limit = args.limit || getDefaultLimit('main');
+    const limit = args.limit ?? 100;
 
     const {
       clips: favoriteClips,

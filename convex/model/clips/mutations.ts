@@ -56,7 +56,8 @@ export async function updateClipStatus(
     status: 'approved' | 'archived' | 'backlog' | 'published';
   },
 ) {
-  const user = await requireAuth(ctx);
+  await requireAuth(ctx);
+
   const clip: Doc<'clips'> | null = await ctx.db.get(args.id);
 
   if (!clip) {

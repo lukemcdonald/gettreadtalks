@@ -18,6 +18,7 @@ const eslintConfig = [
       "*.tsbuildinfo",
       ".next/**",
       "convex/_generated/**",
+      "convex/convex.json",
       "next-env.d.ts",
       "node_modules/**",
     ],

@@ -12,25 +12,28 @@ export function normalizeSlug(text: string): string {
     .trim();
 }
 
-import type { QueryCtx, MutationCtx } from '../_generated/server';
+import type { MutationCtx, QueryCtx } from '../_generated/server';
+
+// Tables that have a 'by_slug' index
+type SlugTable = 'clips' | 'talks' | 'topics' | 'speakers' | 'collections';
 
 /**
  * Check if a slug already exists in a table
  * @param ctx - Database context (QueryCtx or MutationCtx)
- * @param table - Table name
+ * @param table - Table name (must have a 'by_slug' index)
  * @param slug - Slug to check
  * @param excludeId - Optional ID to exclude from check (for updates)
  * @returns True if slug exists, false otherwise
  */
 export async function slugExists(
   ctx: QueryCtx | MutationCtx,
-  table: string,
+  table: SlugTable,
   slug: string,
   excludeId?: string,
 ): Promise<boolean> {
   const existing = await ctx.db
-    .query(table as any)
-    .withIndex('by_slug', (q: any) => q.eq('slug', slug))
+    .query(table)
+    .withIndex('by_slug', (q) => q.eq('slug', slug))
     .first();
 
   if (!existing) {
@@ -43,22 +46,4 @@ export async function slugExists(
   }
 
   return true;
-}
-
-/**
- * Get default limit based on content type
- * @param contentType - Type of content
- * @returns Default limit number
- */
-export function getDefaultLimit(contentType: 'main' | 'content' | 'related'): number {
-  switch (contentType) {
-    case 'main':
-      return 100; // For main entity lists
-    case 'content':
-      return 50; // For content-heavy queries
-    case 'related':
-      return 20; // For related data
-    default:
-      return 50;
-  }
 }
