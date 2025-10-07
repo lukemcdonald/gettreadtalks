@@ -1,5 +1,5 @@
-import type { Doc, Id } from '../_generated/dataModel';
-import type { QueryCtx } from '../_generated/server';
+import type { Doc, Id } from '../../_generated/dataModel';
+import type { QueryCtx } from '../../_generated/server';
 
 /**
  * Get topic by slug.

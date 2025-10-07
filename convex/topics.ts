@@ -1,13 +1,14 @@
 import { v } from 'convex/values';
 
-import { Doc } from './_generated/dataModel';
 import { mutation, query } from './_generated/server';
-import { requireAuth } from './model/auth/queries';
-import { topicFields } from './schema';
-import { normalizeSlug } from './utils';
-import { getBySlug as getTopicBySlug, getWithContent as getTopicWithContent } from './model/topics';
+import { topicFields } from './model/topics/schema';
+import {
+  getBySlug as getTopicBySlug,
+  getWithContent as getTopicWithContent,
+} from './model/topics/queries';
 import { clipFields } from './model/clips/schema';
 import { talkFields } from './model/talks/schema';
+import { createTopic, updateTopic } from './model/topics/mutations.js';
 
 export const list = query({
   args: {
@@ -55,23 +56,7 @@ export const create = mutation({
   },
   returns: v.id('topics'),
   handler: async (ctx, args) => {
-    await requireAuth(ctx);
-
-    const slug = normalizeSlug(args.title);
-
-    const existing = await ctx.db
-      .query('topics')
-      .withIndex('by_slug', (q) => q.eq('slug', slug))
-      .first();
-
-    if (existing) {
-      throw new Error('Topic with this title already exists');
-    }
-
-    return await ctx.db.insert('topics', {
-      ...args,
-      slug,
-    });
+    return await createTopic(ctx, args);
   },
 });
 
@@ -82,37 +67,6 @@ export const update = mutation({
   },
   returns: v.id('topics'),
   handler: async (ctx, args) => {
-    await requireAuth(ctx);
-
-    const { id, ...rest } = args;
-    const updates: Partial<Doc<'topics'>> = rest;
-    const topic = await ctx.db.get(id);
-
-    if (!topic) {
-      throw new Error('Topic not found');
-    }
-
-    if (updates.title) {
-      const newSlug = normalizeSlug(updates.title);
-
-      if (newSlug !== topic.slug) {
-        const existing = await ctx.db
-          .query('topics')
-          .withIndex('by_slug', (q) => q.eq('slug', newSlug))
-          .first();
-
-        if (existing && existing._id !== id) {
-          throw new Error('Topic with this title already exists');
-        }
-
-        updates.slug = newSlug;
-      }
-    }
-
-    updates.updatedAt = Date.now();
-
-    await ctx.db.patch(id, updates);
-
-    return id;
+    return await updateTopic(ctx, args);
   },
 });
