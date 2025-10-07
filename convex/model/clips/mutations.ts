@@ -1,8 +1,8 @@
 import { Doc, Id } from '../../_generated/dataModel';
 import type { MutationCtx } from '../../_generated/server';
-import { normalizeSlug } from '../../utils';
+import { normalizeSlug } from '../../lib/utils';
 import { requireAuth } from '../auth/queries';
-import { StatusType } from '../../schema';
+import { StatusType } from '../../lib/validators';
 
 /**
  * Create a new clip.

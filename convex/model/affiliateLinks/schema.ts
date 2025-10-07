@@ -1,5 +1,5 @@
 import { Infer, v } from 'convex/values';
-import { timestampFields } from '../../schema';
+import { timestampFields } from '../../lib/validators';
 import { defineTable } from 'convex/server';
 
 const affiliateLinkTypes = v.union(

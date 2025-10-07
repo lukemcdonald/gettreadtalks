@@ -11,7 +11,7 @@ import {
   removeFavoriteSpeaker as removeFavoriteSpeakerHelper,
   removeFavoriteTalk as removeFavoriteTalkHelper,
 } from './model/users/mutations.js';
-import { getDefaultLimit } from './utils';
+import { getDefaultLimit } from './lib/utils';
 
 export const getUserFavorites = query({
   args: {

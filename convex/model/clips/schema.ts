@@ -1,5 +1,5 @@
 import { v } from 'convex/values';
-import { statusType, timestampFields } from '../../schema';
+import { statusType, timestampFields } from '../../lib/validators';
 import { defineTable } from 'convex/server';
 
 export const clipFields = {

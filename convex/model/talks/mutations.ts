@@ -1,7 +1,7 @@
 import { Doc, Id } from '../../_generated/dataModel';
 import type { MutationCtx } from '../../_generated/server';
-import { StatusType } from '../../schema';
-import { normalizeSlug } from '../../utils';
+import { StatusType } from '../../lib/validators';
+import { normalizeSlug } from '../../lib/utils';
 import { requireAuth } from '../auth/queries';
 
 /**

@@ -7,22 +7,9 @@ import { speakerTables } from './model/speakers/schema';
 import { affiliateLinkTables } from './model/affiliateLinks/schema';
 import { talkTables } from './model/talks/schema';
 import { topicTables } from './model/topics/schema';
+import { statusType } from './lib/validators';
 
-// Common status type for content items
-// Export for reuse in mutations and queries to maintain consistency
-export const statusType = v.union(
-  v.literal('backlog'),
-  v.literal('approved'),
-  v.literal('published'),
-  v.literal('archived'),
-);
 export type StatusType = Infer<typeof statusType>;
-
-export const timestampFields = {
-  // Note: Convex provides a `_creationTime` field automatically
-  deletedAt: v.optional(v.number()),
-  updatedAt: v.optional(v.number()),
-};
 
 export default defineSchema({
   ...affiliateLinkTables,

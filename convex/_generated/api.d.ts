@@ -8,23 +8,32 @@
  * @module
  */
 
+import type * as affiliateLinks from "../affiliateLinks.js";
 import type * as auth from "../auth.js";
-import type * as clips from "../clips.js";
 import type * as collections from "../collections.js";
 import type * as favorites from "../favorites.js";
 import type * as http from "../http.js";
-import type * as model_auth from "../model/auth/queries.js";
-import type * as model_clips from "../model/clips.js";
-import type * as model_collections from "../model/collections.js";
-import type * as model_speakers from "../model/speakers/queries.js";
-import type * as model_talks from "../model/talks/queries.js";
-import type * as model_topics from "../model/topics/queries.js";
-import type * as model_users from "../model/users/queries.js";
+import type * as lib_utils from "../lib/utils.js";
+import type * as lib_validators from "../lib/validators.js";
+import type * as model_affiliateLinks_mutations from "../model/affiliateLinks/mutations.js";
+import type * as model_affiliateLinks_queries from "../model/affiliateLinks/queries.js";
+import type * as model_auth_queries from "../model/auth/queries.js";
+import type * as model_clips_mutations from "../model/clips/mutations.js";
+import type * as model_clips_queries from "../model/clips/queries.js";
+import type * as model_collections_mutations from "../model/collections/mutations.js";
+import type * as model_collections_queries from "../model/collections/queries.js";
+import type * as model_speakers_mutations from "../model/speakers/mutations.js";
+import type * as model_speakers_queries from "../model/speakers/queries.js";
+import type * as model_talks_mutations from "../model/talks/mutations.js";
+import type * as model_talks_queries from "../model/talks/queries.js";
+import type * as model_topics_mutations from "../model/topics/mutations.js";
+import type * as model_topics_queries from "../model/topics/queries.js";
+import type * as model_users_mutations from "../model/users/mutations.js";
+import type * as model_users_queries from "../model/users/queries.js";
 import type * as speakers from "../speakers.js";
 import type * as talks from "../talks.js";
 import type * as topics from "../topics.js";
 import type * as users from "../users.js";
-import type * as utils from "../utils.js";
 
 import type {
   ApiFromModules,
@@ -41,23 +50,32 @@ import type {
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  affiliateLinks: typeof affiliateLinks;
   auth: typeof auth;
-  clips: typeof clips;
   collections: typeof collections;
   favorites: typeof favorites;
   http: typeof http;
-  "model/auth": typeof model_auth;
-  "model/clips": typeof model_clips;
-  "model/collections": typeof model_collections;
-  "model/speakers": typeof model_speakers;
-  "model/talks": typeof model_talks;
-  "model/topics": typeof model_topics;
-  "model/users": typeof model_users;
+  "lib/utils": typeof lib_utils;
+  "lib/validators": typeof lib_validators;
+  "model/affiliateLinks/mutations": typeof model_affiliateLinks_mutations;
+  "model/affiliateLinks/queries": typeof model_affiliateLinks_queries;
+  "model/auth/queries": typeof model_auth_queries;
+  "model/clips/mutations": typeof model_clips_mutations;
+  "model/clips/queries": typeof model_clips_queries;
+  "model/collections/mutations": typeof model_collections_mutations;
+  "model/collections/queries": typeof model_collections_queries;
+  "model/speakers/mutations": typeof model_speakers_mutations;
+  "model/speakers/queries": typeof model_speakers_queries;
+  "model/talks/mutations": typeof model_talks_mutations;
+  "model/talks/queries": typeof model_talks_queries;
+  "model/topics/mutations": typeof model_topics_mutations;
+  "model/topics/queries": typeof model_topics_queries;
+  "model/users/mutations": typeof model_users_mutations;
+  "model/users/queries": typeof model_users_queries;
   speakers: typeof speakers;
   talks: typeof talks;
   topics: typeof topics;
   users: typeof users;
-  utils: typeof utils;
 }>;
 declare const fullApiWithMounts: typeof fullApi;
 
