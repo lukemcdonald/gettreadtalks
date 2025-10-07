@@ -4,6 +4,7 @@ import { Infer, v } from 'convex/values';
 import { clipTables } from './model/clips/schema';
 import { collectionTables } from './model/collections/schema';
 import { speakerTables } from './model/speakers/schema';
+import { affiliateLinkTables } from './model/affiliateLinks/schema';
 
 // Common status type for content items
 // Export for reuse in mutations and queries to maintain consistency
@@ -19,23 +20,6 @@ export const timestampFields = {
   // Note: Convex provides a `_creationTime` field automatically
   deletedAt: v.optional(v.number()),
   updatedAt: v.optional(v.number()),
-};
-
-export const affiliateLinkFields = {
-  ...timestampFields,
-  affiliate: v.optional(v.string()),
-  description: v.optional(v.string()),
-  featured: v.optional(v.boolean()),
-  slug: v.string(),
-  title: v.string(),
-  type: v.union(
-    v.literal('app'),
-    v.literal('book'),
-    v.literal('movie'),
-    v.literal('music'),
-    v.literal('podcast'),
-  ),
-  url: v.string(),
 };
 
 export const topicFields = {
@@ -75,13 +59,10 @@ export const userFavoriteTalkFields = {
 };
 
 export default defineSchema({
+  ...affiliateLinkTables,
   ...clipTables,
   ...collectionTables,
   ...speakerTables,
-
-  affiliateLinks: defineTable(affiliateLinkFields)
-    .index('by_featured', ['featured'])
-    .index('by_slug', ['slug']),
 
   clipsOnTopics: defineTable({
     clipId: v.id('clips'),
