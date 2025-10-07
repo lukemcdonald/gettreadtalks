@@ -24,21 +24,6 @@ export const timestampFields = {
   updatedAt: v.optional(v.number()),
 };
 
-export const userFavoriteClipFields = {
-  clipId: v.id('clips'),
-  userId: v.string(),
-};
-
-export const userFavoriteSpeakerFields = {
-  speakerId: v.id('speakers'),
-  userId: v.string(),
-};
-
-export const userFavoriteTalkFields = {
-  talkId: v.id('talks'),
-  userId: v.string(),
-};
-
 export default defineSchema({
   ...affiliateLinkTables,
   ...clipTables,
@@ -47,6 +32,7 @@ export default defineSchema({
   ...talkTables,
   ...topicTables,
 
+  // Join tables
   clipsOnTopics: defineTable({
     clipId: v.id('clips'),
     topicId: v.id('topics'),
@@ -61,18 +47,18 @@ export default defineSchema({
     .index('by_talk_id', ['talkId'])
     .index('by_topic_id', ['topicId']),
 
-  userFavoriteClips: defineTable(userFavoriteClipFields).index('by_user_and_clip', [
-    'userId',
-    'clipId',
-  ]),
+  userFavoriteClips: defineTable({
+    clipId: v.id('clips'),
+    userId: v.string(),
+  }).index('by_user_and_clip', ['userId', 'clipId']),
 
-  userFavoriteSpeakers: defineTable(userFavoriteSpeakerFields).index('by_user_and_speaker', [
-    'userId',
-    'speakerId',
-  ]),
+  userFavoriteSpeakers: defineTable({
+    speakerId: v.id('speakers'),
+    userId: v.string(),
+  }).index('by_user_and_speaker', ['userId', 'speakerId']),
 
-  userFavoriteTalks: defineTable(userFavoriteTalkFields).index('by_user_and_talk', [
-    'userId',
-    'talkId',
-  ]),
+  userFavoriteTalks: defineTable({
+    talkId: v.id('talks'),
+    userId: v.string(),
+  }).index('by_user_and_talk', ['userId', 'talkId']),
 });

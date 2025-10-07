@@ -1,10 +1,10 @@
-import type { QueryCtx } from '../_generated/server';
+import type { QueryCtx } from '../../_generated/server';
 
 /**
- * Get user favorites by type.
+ * Get user favorites by clip.
+ *
  * @param ctx - Database context
  * @param userId - User ID
- * @param favoriteType - Type of favorite ('clips', 'speakers', 'talks')
  * @param limit - Maximum number of favorites
  * @returns Array of favorite records
  */
