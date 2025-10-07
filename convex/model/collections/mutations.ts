@@ -1,0 +1,88 @@
+import { Doc, Id } from '../../_generated/dataModel';
+import type { MutationCtx } from '../../_generated/server';
+import { normalizeSlug } from '../../utils';
+import { requireAuth } from '../auth/queries';
+
+/**
+ * Create a new collection.
+ *
+ * @param ctx - Database context
+ * @param args - Collection creation arguments
+ * @returns The ID of the created collection
+ */
+export async function createCollection(
+  ctx: MutationCtx,
+  args: {
+    description?: string;
+    title: string;
+    url?: string;
+  },
+) {
+  await requireAuth(ctx);
+
+  const slug = normalizeSlug(args.title);
+
+  const existing = await ctx.db
+    .query('collections')
+    .withIndex('by_slug', (q) => q.eq('slug', slug))
+    .first();
+
+  if (existing) {
+    throw new Error('Collection with this title already exists');
+  }
+
+  return await ctx.db.insert('collections', {
+    ...args,
+    slug,
+  });
+}
+
+/**
+ * Update an existing collection.
+ *
+ * @param ctx - Database context
+ * @param args - Update arguments
+ * @returns The ID of the updated collection
+ */
+export async function updateCollection(
+  ctx: MutationCtx,
+  args: {
+    description?: string;
+    id: Id<'collections'>;
+    title?: string;
+    url?: string;
+  },
+) {
+  await requireAuth(ctx);
+
+  const { id, ...rest } = args;
+  const updates: Partial<Doc<'collections'>> = rest;
+  const collection: Doc<'collections'> | null = await ctx.db.get(id);
+
+  if (!collection) {
+    throw new Error('Collection not found');
+  }
+
+  if (updates.title) {
+    const newSlug = normalizeSlug(updates.title);
+
+    if (newSlug !== collection.slug) {
+      const existing = await ctx.db
+        .query('collections')
+        .withIndex('by_slug', (q) => q.eq('slug', newSlug))
+        .first();
+
+      if (existing && existing._id !== id) {
+        throw new Error('Collection with this title already exists');
+      }
+
+      updates.slug = newSlug;
+    }
+  }
+
+  updates.updatedAt = Date.now();
+
+  await ctx.db.patch(id, updates);
+
+  return id;
+}

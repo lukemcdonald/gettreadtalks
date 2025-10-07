@@ -2,6 +2,7 @@ import { defineSchema, defineTable } from 'convex/server';
 import { Infer, v } from 'convex/values';
 
 import { clipTables } from './model/clips/schema';
+import { collectionTables } from './model/collections/schema';
 
 // Common status type for content items
 // Export for reuse in mutations and queries to maintain consistency
@@ -68,14 +69,6 @@ export const talkFields = {
   title: v.string(),
 };
 
-export const collectionFields = {
-  ...timestampFields,
-  description: v.optional(v.string()),
-  slug: v.string(),
-  title: v.string(),
-  url: v.optional(v.string()),
-};
-
 // Join table field objects
 export const userFavoriteClipFields = {
   clipId: v.id('clips'),
@@ -94,6 +87,7 @@ export const userFavoriteTalkFields = {
 
 export default defineSchema({
   ...clipTables,
+  ...collectionTables,
 
   affiliateLinks: defineTable(affiliateLinkFields)
     .index('by_featured', ['featured'])
@@ -105,8 +99,6 @@ export default defineSchema({
   })
     .index('by_clip_id', ['clipId'])
     .index('by_topic_id', ['topicId']),
-
-  collections: defineTable(collectionFields).index('by_slug', ['slug']),
 
   speakers: defineTable(speakerFields)
     .index('by_last_name', ['lastName'])

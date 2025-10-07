@@ -1,4 +1,4 @@
-import type { QueryCtx } from '../_generated/server';
+import type { QueryCtx } from '../../_generated/server';
 
 /**
  * Get collection by slug.
