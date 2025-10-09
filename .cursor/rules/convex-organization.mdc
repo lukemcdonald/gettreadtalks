@@ -42,9 +42,9 @@ export const getWithRelations = query(...) // Get with joined data
 **`list*` queries** - Return array of documents:
 ```ts
 export const list = query(...)                // Basic array query
-export const listBySpeaker = query(...)       // Filtered by relation
+export const listByAuthor = query(...)        // Filtered by relation
 export const listByType = query(...)          // Filtered by field
-export const listWithSpeakers = query(...)    // With joined data
+export const listWithAuthors = query(...)     // With joined data
 ```
 
 ### Mutation Functions (writes)
@@ -64,10 +64,10 @@ export const update = mutation(...)   // Update existing
 
 ```ts
 // ✅ Clear - Return type obvious from name
-export const get = query(...)              // Returns: Doc<"talks"> | null
-export const getBySlug = query(...)        // Returns: Doc<"talks"> | null
-export const list = query(...)             // Returns: Doc<"talks">[]
-export const listBySpeaker = query(...)    // Returns: Doc<"talks">[]
+export const get = query(...)              // Returns: Doc<"items"> | null
+export const getBySlug = query(...)        // Returns: Doc<"items"> | null
+export const list = query(...)             // Returns: Doc<"items">[]
+export const listByAuthor = query(...)     // Returns: Doc<"items">[]
 
 // ❌ Vague
 export const data = query(...)
@@ -75,16 +75,100 @@ export const stuff = query(...)
 
 // ❌ Confusing - Doesn't indicate return type
 export const getByCollection = query(...) // Returns array but starts with "get"
-export const getTalks = query(...)        // Redundant with file name
+export const getItems = query(...)        // Redundant with file name
 
 // ✅ Concise (file provides context)
-export const get = query(...)            // api.talks.get
-export const list = query(...)           // api.talks.list
+export const get = query(...)            // api.items.get
+export const list = query(...)           // api.items.list
 
 // ❌ Redundant
-export const getTalk = query(...)        // in talks.ts
-export const listTalks = query(...)      // in talks.ts
+export const getItem = query(...)        // in items.ts
+export const listItems = query(...)      // in items.ts
 ```
+
+### Query Design Decision Tree
+
+When deciding whether to create a new query function, follow this tree:
+
+**For Single Items:**
+1. **By ID?** → Use/reuse `get(id)`
+2. **By unique field (slug, email)?** → Add `getBySlug(slug)`
+3. **Need common relations included?** → Include in `getBySlug` by default
+
+**For Arrays:**
+1. **Just different filter values?** → Add optional params to existing `list({ status?, authorId?, limit? })`
+2. **Special filtering logic or ordering?** → Add `listByX` (e.g., `listByAuthor` with published-only filter)
+3. **Needs joined data?** → Add `listWithX` (e.g., `listWithAuthors`)
+
+**Examples:**
+
+```ts
+// ✅ Good: Smart base query with optional filters
+export const list = query({
+  args: {
+    authorId: v.optional(v.id('users')),
+    categoryId: v.optional(v.id('categories')),
+    limit: v.optional(v.number()),
+    status: v.optional(statusType),
+  },
+  handler: async (ctx, args) => {
+    // Can handle multiple filter combinations
+  }
+});
+
+// ✅ Good: Specific query when special logic needed
+export const listByAuthor = query({
+  args: { authorId: v.id('users'), limit: v.optional(v.number()) },
+  handler: async (ctx, args) => {
+    // Special ordering: published only, sorted by date desc
+    return await ctx.db
+      .query('items')
+      .withIndex('by_author_id_and_status', q => 
+        q.eq('authorId', args.authorId).eq('status', 'published')
+      )
+      .order('desc')
+      .take(args.limit ?? 20);
+  }
+});
+
+// ✅ Good: Separate function for joined data (type safety)
+export const listWithAuthors = query({
+  args: { limit: v.optional(v.number()) },
+  returns: v.array(v.object({
+    ...itemFields,
+    author: v.union(v.object(userFields), v.null()),
+  })),
+  handler: async (ctx, args) => {
+    // Returns items with author data
+  }
+});
+```
+
+**Why Not Parameterized?**
+```ts
+// ❌ Bad: Loses type safety
+export const list = query({
+  args: { 
+    with: v.optional(v.array(v.string())), // 'authors'? 'categories'?
+  },
+  returns: v.array(v.any()), // Can't know return type at compile time
+});
+
+// ❌ Bad: Not discoverable
+// Developer has to remember what options exist
+api.items.list({ with: ['authors'] }) // What other options?
+
+// vs
+
+// ✅ Good: Autocomplete shows all options
+api.items.listWithAuthors()
+api.items.listWithCategories()
+api.items.listWithTags()
+```
+
+**Typical Query Count per Entity:** 5-8 queries is manageable and clear:
+- 2-3 single-item: `get`, `getBySlug`, maybe `getWithRelations`
+- 3-5 arrays: `list`, 1-2 `listBy*`, 1-2 `listWith*`
 
 ## Database Schema Conventions
 
@@ -132,7 +216,7 @@ export const list = query(...)
 export const remove = mutation(...)
 export const update = mutation(...)
 
-// convex/topics.ts
+// convex/categories.ts
 export const get = query(...)
 export const getBySlug = query(...)
 export const list = query(...)
@@ -149,37 +233,37 @@ export async function getCurrentUser(ctx: QueryCtx | MutationCtx) {
   return user || null;
 }
 
-// convex/model/talks.ts - Talk-specific helpers
-export async function getPublishedWithSpeakers(
+// convex/model/items.ts - Item-specific helpers
+export async function getPublishedWithAuthors(
   ctx: DatabaseReader,
   limit: number,
-): Promise<Array<Doc<'talks'> & { speaker: Doc<'speakers'> | null }>> {
-  const talks = await ctx
-    .query('talks')
+): Promise<Array<Doc<'items'> & { author: Doc<'users'> | null }>> {
+  const items = await ctx
+    .query('items')
     .withIndex('by_status_and_published_at', (q) => q.eq('status', 'published'))
     .order('desc')
     .take(limit);
 
   return Promise.all(
-    talks.map(async (talk) => {
-      const speaker = await ctx.db.get(talk.speakerId);
-      return { ...talk, speaker };
+    items.map(async (item) => {
+      const author = await ctx.db.get(item.authorId);
+      return { ...item, author };
     }),
   );
 }
 
-// convex/model/clips.ts - Clip-specific helpers
+// convex/model/posts.ts - Post-specific helpers
 export async function getBySlugWithRelations(
   ctx: DatabaseReader,
   slug: string,
-  topicLimit: number = 20,
+  tagLimit: number = 20,
 ): Promise<{
-  clip: Doc<'clips'>;
-  speaker: Doc<'speakers'> | null;
-  talk: Doc<'talks'> | null;
-  topics: Doc<'topics'>[];
+  post: Doc<'posts'>;
+  author: Doc<'users'> | null;
+  category: Doc<'categories'> | null;
+  tags: Doc<'tags'>[];
 } | null> {
-  // Implementation for clip with relations
+  // Implementation for post with relations
 }
 
 // convex/utils.ts - General utilities (not entity-specific)
@@ -215,21 +299,21 @@ export const update = mutation({
 Enrich data with relationships using model helpers:
 
 ```ts
-import { getBySlug, getClipTopics } from './model';
+import { getBySlug, getItemTags } from './model';
 
 export const getBySlug = query({
   handler: async (ctx, args) => {
-    const clip = await getBySlug(ctx, 'clips', args.slug, 'published');
-    if (!clip) return null;
+    const item = await getBySlug(ctx, 'items', args.slug, 'published');
+    if (!item) return null;
 
     // Use helper functions for related data
-    const [speaker, talk, topics] = await Promise.all([
-      clip.speakerId ? ctx.db.get(clip.speakerId) : null,
-      clip.talkId ? ctx.db.get(clip.talkId) : null,
-      getClipTopics(ctx, clip._id, 20),
+    const [author, category, tags] = await Promise.all([
+      item.authorId ? ctx.db.get(item.authorId) : null,
+      item.categoryId ? ctx.db.get(item.categoryId) : null,
+      getItemTags(ctx, item._id, 20),
     ]);
 
-    return { clip, speaker, talk, topics };
+    return { item, author, category, tags };
   },
 });
 ```
@@ -244,11 +328,11 @@ The `model/` directory contains **entity-specific helper functions** organized b
 - `getUserId()` - Get user ID, throw if not authenticated
 
 ### Entity-Specific Helpers
-- **`model/talks.ts`** - Talk-specific queries and operations
-- **`model/clips.ts`** - Clip-specific queries and operations
-- **`model/topics.ts`** - Topic-specific queries and operations
-- **`model/collections.ts`** - Collection-specific queries and operations
-- **`model/speakers.ts`** - Speaker-specific queries and operations
+- **`model/items.ts`** - Item-specific queries and operations
+- **`model/posts.ts`** - Post-specific queries and operations
+- **`model/categories.ts`** - Category-specific queries and operations
+- **`model/tags.ts`** - Tag-specific queries and operations
+- **`model/comments.ts`** - Comment-specific queries and operations
 - **`model/users.ts`** - User-specific queries and operations
 
 ### General Utilities (`utils.ts`) - Root level
@@ -259,8 +343,8 @@ The `model/` directory contains **entity-specific helper functions** organized b
 ### Usage Pattern
 ```ts
 // Import entity-specific helpers from model
-import { getPublishedWithSpeakers } from './model/talks';
-import { getBySlugWithRelations } from './model/clips';
+import { getPublishedWithAuthors } from './model/items';
+import { getBySlugWithRelations } from './model/posts';
 import { getCurrentUser } from './model';
 import { normalizeSlug } from './utils';
 
@@ -268,7 +352,7 @@ import { normalizeSlug } from './utils';
 export const getPublished = query({
   handler: async (ctx, args) => {
     const limit = args.limit || 20;
-    return await getPublishedWithSpeakers(ctx, limit);
+    return await getPublishedWithAuthors(ctx, limit);
   },
 });
 ```
@@ -293,14 +377,14 @@ Use the more specific index for all queries, even when you don't need all fields
 
 ```ts
 // ✅ Use entity-specific model helpers
-import { getPublishedWithSpeakers } from './model/talks';
-import { getBySlugWithRelations } from './model/clips';
+import { getPublishedWithAuthors } from './model/items';
+import { getBySlugWithRelations } from './model/posts';
 import { getDefaultLimit } from './utils';
 
 export const getPublished = query({
   handler: async (ctx, args) => {
     const limit = args.limit || getDefaultLimit('content');
-    return await getPublishedWithSpeakers(ctx, limit);
+    return await getPublishedWithAuthors(ctx, limit);
   },
 });
 
@@ -308,16 +392,16 @@ export const getPublished = query({
 export const getPublished = query({
   handler: async (ctx, args) => {
     const limit = args.limit || 50; // Duplicated default
-    const talks = await ctx.db
-      .query('talks')
+    const items = await ctx.db
+      .query('items')
       .withIndex('by_status_and_published_at', (q) => q.eq('status', 'published'))
       .order('desc')
       .take(limit); // Duplicated query pattern
     
-    // Duplicated speaker fetching logic
-    return Promise.all(talks.map(async (talk) => {
-      const speaker = await ctx.db.get(talk.speakerId);
-      return { ...talk, speaker };
+    // Duplicated author fetching logic
+    return Promise.all(items.map(async (item) => {
+      const author = await ctx.db.get(item.authorId);
+      return { ...item, author };
     }));
   },
 });
