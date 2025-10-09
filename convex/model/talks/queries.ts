@@ -79,7 +79,7 @@ export async function getTalksWithSpeakers(ctx: QueryCtx, args: ListTalksArgs) {
  *
  * @param ctx - Database context
  * @param args - Query arguments
- * @returns Talk with speaker and collection data
+ * @returns Talk with speaker, collection, and topics data
  */
 export async function getTalkBySlugWithRelations(ctx: QueryCtx, args: GetTalkBySlugArgs) {
   const talk = await getTalkBySlug(ctx, args);
@@ -91,14 +91,33 @@ export async function getTalkBySlugWithRelations(ctx: QueryCtx, args: GetTalkByS
   const queries = {
     collection: talk.collectionId ? ctx.db.get(talk.collectionId) : null,
     speaker: talk.speakerId ? ctx.db.get(talk.speakerId) : null,
+    talkTopics: ctx.db
+      .query('talksOnTopics')
+      .withIndex('by_talk_id', (q) => q.eq('talkId', talk._id))
+      .collect(),
   };
 
-  const [collection, speaker] = await Promise.all([queries.collection, queries.speaker]);
+  const [collection, speaker, talkTopics] = await Promise.all([
+    queries.collection,
+    queries.speaker,
+    queries.talkTopics,
+  ]);
+
+  // Fetch all topics in parallel
+  const topics = await Promise.all(
+    talkTopics.map(async (talkTopic) => {
+      return await ctx.db.get(talkTopic.topicId);
+    }),
+  );
+
+  // Filter out any null topics
+  const validTopics = topics.filter((topic) => topic !== null);
 
   return {
     collection,
     speaker,
     talk,
+    topics: validTopics,
   };
 }
 

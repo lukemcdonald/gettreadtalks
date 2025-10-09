@@ -16,7 +16,6 @@ export const createClipReturns = v.id('clips');
 
 export const getClipBySlugWithRelationsArgs = {
   slug: v.string(),
-  topicLimit: v.optional(v.number()),
 };
 
 export const getClipBySlugWithRelationsReturns = v.union(

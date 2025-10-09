@@ -28,6 +28,7 @@ export const getTalkBySlugReturns = v.union(
     collection: v.union(v.any(), v.null()),
     speaker: v.union(v.any(), v.null()),
     talk: v.any(),
+    topics: v.array(v.any()),
   }),
   v.null(),
 );

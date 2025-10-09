@@ -21,15 +21,13 @@ export async function getPublishedClips(ctx: QueryCtx, args: GetPublishedClipsAr
  * Get clip by slug with related data.
  *
  * @param ctx - Database context
- * @param args - Query arguments with defaults
+ * @param args - Query arguments
  * @returns Clip with speaker, talk, and topics data
  */
 export async function getBySlugWithRelations(ctx: QueryCtx, args: GetClipBySlugWithRelationsArgs) {
-  const { slug, topicLimit = 20 } = args;
-
   const clip = await ctx.db
     .query('clips')
-    .withIndex('by_slug', (q) => q.eq('slug', slug))
+    .withIndex('by_slug', (q) => q.eq('slug', args.slug))
     .unique();
 
   if (!clip || clip.status !== 'published') {
@@ -40,7 +38,7 @@ export async function getBySlugWithRelations(ctx: QueryCtx, args: GetClipBySlugW
     clipTopics: ctx.db
       .query('clipsOnTopics')
       .withIndex('by_clip_id', (q) => q.eq('clipId', clip._id))
-      .take(topicLimit),
+      .collect(),
     speaker: clip.speakerId ? ctx.db.get(clip.speakerId) : null,
     talk: clip.talkId ? ctx.db.get(clip.talkId) : null,
   };
