@@ -1,8 +1,5 @@
-import { v } from 'convex/values';
-
 import { mutation, query } from './_generated/server';
-import { collectionFields, mutations, queries, validators } from './model/collections';
-import { talkFields } from './model/talks/schema';
+import { mutations, queries, validators } from './model/collections';
 
 // ============================================
 // QUERIES
@@ -13,7 +10,7 @@ export const get = query({
   handler: async (ctx, args) => {
     return await queries.getCollection(ctx, args);
   },
-  returns: v.union(v.object(collectionFields), v.null()),
+  returns: validators.getCollectionReturns,
 });
 
 export const getBySlug = query({
@@ -21,7 +18,7 @@ export const getBySlug = query({
   handler: async (ctx, args) => {
     return await queries.getCollectionBySlug(ctx, args);
   },
-  returns: v.union(v.object(collectionFields), v.null()),
+  returns: validators.getCollectionBySlugReturns,
 });
 
 export const getWithTalks = query({
@@ -29,13 +26,7 @@ export const getWithTalks = query({
   handler: async (ctx, args) => {
     return await queries.getCollectionWithTalks(ctx, args);
   },
-  returns: v.union(
-    v.object({
-      collection: v.object(collectionFields),
-      talks: v.array(v.object(talkFields)),
-    }),
-    v.null(),
-  ),
+  returns: validators.getCollectionWithTalksReturns,
 });
 
 export const list = query({
@@ -43,7 +34,7 @@ export const list = query({
   handler: async (ctx, args) => {
     return await queries.getCollections(ctx, args);
   },
-  returns: v.array(v.object(collectionFields)),
+  returns: validators.listCollectionsReturns,
 });
 
 // ============================================
@@ -55,7 +46,7 @@ export const create = mutation({
   handler: async (ctx, args) => {
     return await mutations.createCollection(ctx, args);
   },
-  returns: v.id('collections'),
+  returns: validators.createCollectionReturns,
 });
 
 export const update = mutation({
@@ -63,5 +54,5 @@ export const update = mutation({
   handler: async (ctx, args) => {
     return await mutations.updateCollection(ctx, args);
   },
-  returns: v.id('collections'),
+  returns: validators.updateCollectionReturns,
 });

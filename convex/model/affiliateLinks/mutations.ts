@@ -1,11 +1,10 @@
 import type { MutationCtx } from '../../_generated/server';
-import type { ObjectType } from 'convex/values';
 
-import { Doc, Id } from '../../_generated/dataModel';
+import { Doc } from '../../_generated/dataModel';
 import { normalizeSlug, slugExists } from '../../lib/utils';
 import { requireAuth } from '../auth/queries';
 import { AffiliateLinkType } from './schema';
-import { createAffiliateLinkArgs, updateAffiliateLinkArgs } from './validators';
+import type { CreateAffiliateLinkArgs, UpdateAffiliateLinkArgs } from './types';
 
 /**
  * Create a new affiliate link.
@@ -14,10 +13,7 @@ import { createAffiliateLinkArgs, updateAffiliateLinkArgs } from './validators';
  * @param args - Affiliate link creation arguments
  * @returns The ID of the created affiliate link
  */
-export async function createAffiliateLink(
-  ctx: MutationCtx,
-  args: ObjectType<typeof createAffiliateLinkArgs>,
-) {
+export async function createAffiliateLink(ctx: MutationCtx, args: CreateAffiliateLinkArgs) {
   await requireAuth(ctx);
 
   const slug = normalizeSlug(args.title);
@@ -39,10 +35,7 @@ export async function createAffiliateLink(
  * @param args - Update arguments
  * @returns The ID of the updated affiliate link
  */
-export async function updateAffiliateLink(
-  ctx: MutationCtx,
-  args: ObjectType<typeof updateAffiliateLinkArgs>,
-) {
+export async function updateAffiliateLink(ctx: MutationCtx, args: UpdateAffiliateLinkArgs) {
   await requireAuth(ctx);
 
   const { id, ...rest } = args;

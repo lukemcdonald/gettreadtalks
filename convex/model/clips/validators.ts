@@ -1,6 +1,7 @@
 import { v } from 'convex/values';
 
 import { statusType } from '../../lib/validators';
+import { clipFields } from './schema';
 
 export const createClipArgs = {
   description: v.optional(v.string()),
@@ -11,14 +12,28 @@ export const createClipArgs = {
   title: v.string(),
 };
 
+export const createClipReturns = v.id('clips');
+
 export const getClipBySlugWithRelationsArgs = {
   slug: v.string(),
   topicLimit: v.optional(v.number()),
 };
 
+export const getClipBySlugWithRelationsReturns = v.union(
+  v.object({
+    clip: v.any(),
+    speaker: v.union(v.any(), v.null()),
+    talk: v.union(v.any(), v.null()),
+    topics: v.array(v.any()),
+  }),
+  v.null(),
+);
+
 export const getPublishedClipsArgs = {
   limit: v.number(),
 };
+
+export const getPublishedClipsReturns = v.array(v.object(clipFields));
 
 export const updateClipStatusArgs = {
   id: v.id('clips'),
@@ -29,3 +44,5 @@ export const updateClipStatusArgs = {
     v.literal('published'),
   ),
 };
+
+export const updateClipStatusReturns = v.id('clips');

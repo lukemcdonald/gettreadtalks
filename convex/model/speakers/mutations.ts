@@ -1,10 +1,9 @@
 import type { MutationCtx } from '../../_generated/server';
-import type { ObjectType } from 'convex/values';
 
-import { Doc, Id } from '../../_generated/dataModel';
+import { Doc } from '../../_generated/dataModel';
 import { normalizeSlug, slugExists } from '../../lib/utils';
 import { requireAuth } from '../auth/queries';
-import { createSpeakerArgs, updateSpeakerArgs } from './validators';
+import type { CreateSpeakerArgs, UpdateSpeakerArgs } from './types';
 
 /**
  * Create a new speaker.
@@ -13,7 +12,7 @@ import { createSpeakerArgs, updateSpeakerArgs } from './validators';
  * @param args - Speaker creation arguments
  * @returns The ID of the created speaker
  */
-export async function createSpeaker(ctx: MutationCtx, args: ObjectType<typeof createSpeakerArgs>) {
+export async function createSpeaker(ctx: MutationCtx, args: CreateSpeakerArgs) {
   await requireAuth(ctx);
 
   const slug = normalizeSlug(`${args.firstName} ${args.lastName}`);
@@ -35,7 +34,7 @@ export async function createSpeaker(ctx: MutationCtx, args: ObjectType<typeof cr
  * @param args - Update arguments
  * @returns The ID of the updated speaker
  */
-export async function updateSpeaker(ctx: MutationCtx, args: ObjectType<typeof updateSpeakerArgs>) {
+export async function updateSpeaker(ctx: MutationCtx, args: UpdateSpeakerArgs) {
   await requireAuth(ctx);
 
   const { id, ...rest } = args;

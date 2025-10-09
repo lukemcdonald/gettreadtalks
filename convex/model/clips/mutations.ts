@@ -1,11 +1,10 @@
 import type { MutationCtx } from '../../_generated/server';
-import type { ObjectType } from 'convex/values';
 
-import { Doc, Id } from '../../_generated/dataModel';
+import { Doc } from '../../_generated/dataModel';
 import { normalizeSlug, slugExists } from '../../lib/utils';
 import { StatusType } from '../../lib/validators';
 import { requireAuth } from '../auth/queries';
-import { createClipArgs, updateClipStatusArgs } from './validators';
+import type { CreateClipArgs, UpdateClipStatusArgs } from './types';
 
 /**
  * Create a new clip.
@@ -14,7 +13,7 @@ import { createClipArgs, updateClipStatusArgs } from './validators';
  * @param args - Clip creation arguments
  * @returns The ID of the created clip
  */
-export async function createClip(ctx: MutationCtx, args: ObjectType<typeof createClipArgs>) {
+export async function createClip(ctx: MutationCtx, args: CreateClipArgs) {
   await requireAuth(ctx);
 
   const slug = normalizeSlug(args.title);
@@ -41,10 +40,7 @@ export async function createClip(ctx: MutationCtx, args: ObjectType<typeof creat
  * @param args - Update arguments
  * @returns The ID of the updated clip
  */
-export async function updateClipStatus(
-  ctx: MutationCtx,
-  args: ObjectType<typeof updateClipStatusArgs>,
-) {
+export async function updateClipStatus(ctx: MutationCtx, args: UpdateClipStatusArgs) {
   await requireAuth(ctx);
 
   const clip: Doc<'clips'> | null = await ctx.db.get(args.id);

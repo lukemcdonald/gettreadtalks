@@ -1,5 +1,3 @@
-import { v } from 'convex/values';
-
 import { mutation } from './_generated/server';
 import { authComponent, createAuth } from './auth';
 import { validators } from './model/users';
@@ -21,5 +19,5 @@ export const updatePassword = mutation({
 
     return null;
   },
-  returns: v.null(),
+  returns: validators.updatePasswordReturns,
 });

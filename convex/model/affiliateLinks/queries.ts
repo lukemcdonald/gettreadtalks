@@ -1,15 +1,13 @@
-import type { Id } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
-import type { ObjectType } from 'convex/values';
 
 import { AffiliateLinkType } from './schema';
-import {
-  getAffiliateLinkArgs,
-  getAffiliateLinkBySlugArgs,
-  getAffiliateLinksByAffiliateArgs,
-  getAffiliateLinksByTypeArgs,
-  listAffiliateLinksArgs,
-} from './validators';
+import type {
+  GetAffiliateLinkArgs,
+  GetAffiliateLinkBySlugArgs,
+  GetAffiliateLinksByAffiliateArgs,
+  GetAffiliateLinksByTypeArgs,
+  ListAffiliateLinksArgs,
+} from './types';
 
 /**
  * Get affiliate link by ID.
@@ -18,10 +16,7 @@ import {
  * @param args - Query arguments
  * @returns Affiliate link or null if not found
  */
-export async function getAffiliateLink(
-  ctx: QueryCtx,
-  args: ObjectType<typeof getAffiliateLinkArgs>,
-) {
+export async function getAffiliateLink(ctx: QueryCtx, args: GetAffiliateLinkArgs) {
   return await ctx.db.get(args.id);
 }
 
@@ -32,10 +27,7 @@ export async function getAffiliateLink(
  * @param args - Query arguments
  * @returns Affiliate link or null if not found
  */
-export async function getAffiliateLinkBySlug(
-  ctx: QueryCtx,
-  args: ObjectType<typeof getAffiliateLinkBySlugArgs>,
-) {
+export async function getAffiliateLinkBySlug(ctx: QueryCtx, args: GetAffiliateLinkBySlugArgs) {
   return await ctx.db
     .query('affiliateLinks')
     .withIndex('by_slug', (q) => q.eq('slug', args.slug))
@@ -49,10 +41,7 @@ export async function getAffiliateLinkBySlug(
  * @param args - Query arguments with defaults
  * @returns Array of affiliate links of the specified type
  */
-export async function getAffiliateLinksByType(
-  ctx: QueryCtx,
-  args: ObjectType<typeof getAffiliateLinksByTypeArgs>,
-) {
+export async function getAffiliateLinksByType(ctx: QueryCtx, args: GetAffiliateLinksByTypeArgs) {
   const { limit = 20, type } = args;
 
   const allLinks = await ctx.db.query('affiliateLinks').collect();
@@ -75,7 +64,7 @@ export async function getAffiliateLinksByType(
  */
 export async function getAffiliateLinksByAffiliate(
   ctx: QueryCtx,
-  args: ObjectType<typeof getAffiliateLinksByAffiliateArgs>,
+  args: GetAffiliateLinksByAffiliateArgs,
 ) {
   const { affiliate, limit = 20 } = args;
 
@@ -97,10 +86,7 @@ export async function getAffiliateLinksByAffiliate(
  * @param args - Query arguments with defaults
  * @returns Array of affiliate links
  */
-export async function getAffiliateLinks(
-  ctx: QueryCtx,
-  args: ObjectType<typeof listAffiliateLinksArgs>,
-) {
+export async function getAffiliateLinks(ctx: QueryCtx, args: ListAffiliateLinksArgs) {
   const { affiliate, featured, limit = 50, type } = args;
 
   // Use index if filtering by featured, otherwise get all links

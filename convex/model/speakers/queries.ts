@@ -1,8 +1,6 @@
-import type { Id } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
-import type { ObjectType } from 'convex/values';
 
-import { getSpeakerArgs, getSpeakerBySlugArgs, listSpeakersArgs } from './validators';
+import type { GetSpeakerArgs, GetSpeakerBySlugArgs, ListSpeakersArgs } from './types';
 
 /**
  * Get speaker by ID.
@@ -11,7 +9,7 @@ import { getSpeakerArgs, getSpeakerBySlugArgs, listSpeakersArgs } from './valida
  * @param args - Query arguments
  * @returns Speaker or null if not found
  */
-export async function getSpeaker(ctx: QueryCtx, args: ObjectType<typeof getSpeakerArgs>) {
+export async function getSpeaker(ctx: QueryCtx, args: GetSpeakerArgs) {
   return await ctx.db.get(args.id);
 }
 
@@ -22,10 +20,7 @@ export async function getSpeaker(ctx: QueryCtx, args: ObjectType<typeof getSpeak
  * @param args - Query arguments
  * @returns Speaker or null if not found
  */
-export async function getSpeakerBySlug(
-  ctx: QueryCtx,
-  args: ObjectType<typeof getSpeakerBySlugArgs>,
-) {
+export async function getSpeakerBySlug(ctx: QueryCtx, args: GetSpeakerBySlugArgs) {
   return await ctx.db
     .query('speakers')
     .withIndex('by_slug', (q) => q.eq('slug', args.slug))
@@ -39,7 +34,7 @@ export async function getSpeakerBySlug(
  * @param args - Query arguments with defaults
  * @returns Array of speakers
  */
-export async function getSpeakers(ctx: QueryCtx, args: ObjectType<typeof listSpeakersArgs>) {
+export async function getSpeakers(ctx: QueryCtx, args: ListSpeakersArgs) {
   const { limit = 100 } = args;
 
   return await ctx.db.query('speakers').take(limit);

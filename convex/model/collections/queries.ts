@@ -1,13 +1,11 @@
-import type { Id } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
-import type { ObjectType } from 'convex/values';
 
-import {
-  getCollectionArgs,
-  getCollectionBySlugArgs,
-  getCollectionWithTalksArgs,
-  listCollectionsArgs,
-} from './validators';
+import type {
+  GetCollectionArgs,
+  GetCollectionBySlugArgs,
+  GetCollectionWithTalksArgs,
+  ListCollectionsArgs,
+} from './types';
 
 /**
  * Get collection by ID.
@@ -16,7 +14,7 @@ import {
  * @param args - Query arguments
  * @returns Collection or null if not found
  */
-export async function getCollection(ctx: QueryCtx, args: ObjectType<typeof getCollectionArgs>) {
+export async function getCollection(ctx: QueryCtx, args: GetCollectionArgs) {
   return await ctx.db.get(args.id);
 }
 
@@ -27,10 +25,7 @@ export async function getCollection(ctx: QueryCtx, args: ObjectType<typeof getCo
  * @param args - Query arguments
  * @returns Collection or null if not found
  */
-export async function getCollectionBySlug(
-  ctx: QueryCtx,
-  args: ObjectType<typeof getCollectionBySlugArgs>,
-) {
+export async function getCollectionBySlug(ctx: QueryCtx, args: GetCollectionBySlugArgs) {
   return await ctx.db
     .query('collections')
     .withIndex('by_slug', (q) => q.eq('slug', args.slug))
@@ -44,7 +39,7 @@ export async function getCollectionBySlug(
  * @param args - Query arguments with defaults
  * @returns Array of collections
  */
-export async function getCollections(ctx: QueryCtx, args: ObjectType<typeof listCollectionsArgs>) {
+export async function getCollections(ctx: QueryCtx, args: ListCollectionsArgs) {
   const { limit = 100 } = args;
 
   return await ctx.db.query('collections').take(limit);
@@ -57,10 +52,7 @@ export async function getCollections(ctx: QueryCtx, args: ObjectType<typeof list
  * @param args - Query arguments with defaults
  * @returns Collection with its talks
  */
-export async function getCollectionWithTalks(
-  ctx: QueryCtx,
-  args: ObjectType<typeof getCollectionWithTalksArgs>,
-) {
+export async function getCollectionWithTalks(ctx: QueryCtx, args: GetCollectionWithTalksArgs) {
   const { limit = 100, slug } = args;
 
   const collection = await getCollectionBySlug(ctx, { slug });

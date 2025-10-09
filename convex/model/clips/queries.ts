@@ -1,7 +1,6 @@
 import type { QueryCtx } from '../../_generated/server';
-import type { ObjectType } from 'convex/values';
 
-import { getClipBySlugWithRelationsArgs, getPublishedClipsArgs } from './validators';
+import type { GetClipBySlugWithRelationsArgs, GetPublishedClipsArgs } from './types';
 
 /**
  * Get published clips.
@@ -10,10 +9,7 @@ import { getClipBySlugWithRelationsArgs, getPublishedClipsArgs } from './validat
  * @param args - Query arguments
  * @returns Array of published clips
  */
-export async function getPublishedClips(
-  ctx: QueryCtx,
-  args: ObjectType<typeof getPublishedClipsArgs>,
-) {
+export async function getPublishedClips(ctx: QueryCtx, args: GetPublishedClipsArgs) {
   return await ctx.db
     .query('clips')
     .withIndex('by_status_and_published_at', (q) => q.eq('status', 'published'))
@@ -28,10 +24,7 @@ export async function getPublishedClips(
  * @param args - Query arguments with defaults
  * @returns Clip with speaker, talk, and topics data
  */
-export async function getBySlugWithRelations(
-  ctx: QueryCtx,
-  args: ObjectType<typeof getClipBySlugWithRelationsArgs>,
-) {
+export async function getBySlugWithRelations(ctx: QueryCtx, args: GetClipBySlugWithRelationsArgs) {
   const { slug, topicLimit = 20 } = args;
 
   const clip = await ctx.db

@@ -1,8 +1,5 @@
-import { v } from 'convex/values';
-
 import { mutation, query } from './_generated/server';
-import { mutations, queries, talkFields, validators } from './model/talks';
-import { speakerFields } from './model/speakers/schema';
+import { mutations, queries, validators } from './model/talks';
 
 // ============================================
 // QUERIES
@@ -13,7 +10,7 @@ export const get = query({
   handler: async (ctx, args) => {
     return await queries.getTalk(ctx, args);
   },
-  returns: v.union(v.object(talkFields), v.null()),
+  returns: validators.getTalkReturns,
 });
 
 export const getByCollection = query({
@@ -21,7 +18,7 @@ export const getByCollection = query({
   handler: async (ctx, args) => {
     return await queries.getTalksByCollection(ctx, args);
   },
-  returns: v.array(v.object(talkFields)),
+  returns: validators.getTalksByCollectionReturns,
 });
 
 export const getBySlug = query({
@@ -29,14 +26,7 @@ export const getBySlug = query({
   handler: async (ctx, args) => {
     return await queries.getTalkBySlugWithRelations(ctx, args);
   },
-  returns: v.union(
-    v.object({
-      collection: v.union(v.any(), v.null()),
-      speaker: v.union(v.any(), v.null()),
-      talk: v.any(),
-    }),
-    v.null(),
-  ),
+  returns: validators.getTalkBySlugReturns,
 });
 
 export const getBySpeaker = query({
@@ -44,7 +34,7 @@ export const getBySpeaker = query({
   handler: async (ctx, args) => {
     return await queries.getTalksBySpeaker(ctx, args);
   },
-  returns: v.array(v.object(talkFields)),
+  returns: validators.getTalksBySpeakerReturns,
 });
 
 export const list = query({
@@ -52,12 +42,7 @@ export const list = query({
   handler: async (ctx, args) => {
     return await queries.getTalksWithSpeakers(ctx, args);
   },
-  returns: v.array(
-    v.object({
-      ...talkFields,
-      speaker: v.union(v.object(speakerFields), v.null()),
-    }),
-  ),
+  returns: validators.listTalksReturns,
 });
 
 // ============================================
@@ -69,7 +54,7 @@ export const create = mutation({
   handler: async (ctx, args) => {
     return await mutations.createTalk(ctx, args);
   },
-  returns: v.id('talks'),
+  returns: validators.createTalkReturns,
 });
 
 export const updateStatus = mutation({
@@ -77,5 +62,5 @@ export const updateStatus = mutation({
   handler: async (ctx, args) => {
     return await mutations.updateTalkStatus(ctx, args);
   },
-  returns: v.id('talks'),
+  returns: validators.updateTalkStatusReturns,
 });

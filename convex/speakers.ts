@@ -1,7 +1,5 @@
-import { v } from 'convex/values';
-
 import { mutation, query } from './_generated/server';
-import { mutations, queries, speakerFields, validators } from './model/speakers';
+import { mutations, queries, validators } from './model/speakers';
 
 // ============================================
 // QUERIES
@@ -12,7 +10,7 @@ export const get = query({
   handler: async (ctx, args) => {
     return await queries.getSpeaker(ctx, args);
   },
-  returns: v.union(v.object(speakerFields), v.null()),
+  returns: validators.getSpeakerReturns,
 });
 
 export const getBySlug = query({
@@ -20,7 +18,7 @@ export const getBySlug = query({
   handler: async (ctx, args) => {
     return await queries.getSpeakerBySlug(ctx, args);
   },
-  returns: v.union(v.object(speakerFields), v.null()),
+  returns: validators.getSpeakerBySlugReturns,
 });
 
 export const list = query({
@@ -28,7 +26,7 @@ export const list = query({
   handler: async (ctx, args) => {
     return await queries.getSpeakers(ctx, args);
   },
-  returns: v.array(v.object(speakerFields)),
+  returns: validators.listSpeakersReturns,
 });
 
 // ============================================
@@ -40,7 +38,7 @@ export const create = mutation({
   handler: async (ctx, args) => {
     return await mutations.createSpeaker(ctx, args);
   },
-  returns: v.id('speakers'),
+  returns: validators.createSpeakerReturns,
 });
 
 export const update = mutation({
@@ -48,5 +46,5 @@ export const update = mutation({
   handler: async (ctx, args) => {
     return await mutations.updateSpeaker(ctx, args);
   },
-  returns: v.id('speakers'),
+  returns: validators.updateSpeakerReturns,
 });

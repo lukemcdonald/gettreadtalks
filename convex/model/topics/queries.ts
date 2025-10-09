@@ -1,13 +1,12 @@
-import type { Doc, Id } from '../../_generated/dataModel';
+import type { Doc } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
-import type { ObjectType } from 'convex/values';
 
-import {
-  getTopicArgs,
-  getTopicBySlugArgs,
-  getTopicWithContentArgs,
-  listTopicsArgs,
-} from './validators';
+import type {
+  GetTopicArgs,
+  GetTopicBySlugArgs,
+  GetTopicWithContentArgs,
+  ListTopicsArgs,
+} from './types';
 
 /**
  * Get topic by ID.
@@ -16,7 +15,7 @@ import {
  * @param args - Query arguments
  * @returns Topic or null if not found
  */
-export async function getTopic(ctx: QueryCtx, args: ObjectType<typeof getTopicArgs>) {
+export async function getTopic(ctx: QueryCtx, args: GetTopicArgs) {
   return await ctx.db.get(args.id);
 }
 
@@ -27,7 +26,7 @@ export async function getTopic(ctx: QueryCtx, args: ObjectType<typeof getTopicAr
  * @param args - Query arguments
  * @returns Topic or null if not found
  */
-export async function getTopicBySlug(ctx: QueryCtx, args: ObjectType<typeof getTopicBySlugArgs>) {
+export async function getTopicBySlug(ctx: QueryCtx, args: GetTopicBySlugArgs) {
   return await ctx.db
     .query('topics')
     .withIndex('by_slug', (q) => q.eq('slug', args.slug))
@@ -41,7 +40,7 @@ export async function getTopicBySlug(ctx: QueryCtx, args: ObjectType<typeof getT
  * @param args - Query arguments with defaults
  * @returns Array of topics
  */
-export async function getTopics(ctx: QueryCtx, args: ObjectType<typeof listTopicsArgs>) {
+export async function getTopics(ctx: QueryCtx, args: ListTopicsArgs) {
   const { limit = 100 } = args;
 
   return await ctx.db.query('topics').withIndex('by_title').take(limit);
@@ -54,10 +53,7 @@ export async function getTopics(ctx: QueryCtx, args: ObjectType<typeof listTopic
  * @param args - Query arguments with defaults
  * @returns Topic with related talks and clips
  */
-export async function getTopicWithContent(
-  ctx: QueryCtx,
-  args: ObjectType<typeof getTopicWithContentArgs>,
-) {
+export async function getTopicWithContent(ctx: QueryCtx, args: GetTopicWithContentArgs) {
   const { limit = 50, slug } = args;
 
   const topic = await getTopicBySlug(ctx, { slug });

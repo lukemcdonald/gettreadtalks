@@ -1,7 +1,5 @@
-import { v } from 'convex/values';
-
 import { mutation, query } from './_generated/server';
-import { affiliateLinkFields, mutations, queries, validators } from './model/affiliateLinks';
+import { mutations, queries, validators } from './model/affiliateLinks';
 
 // ============================================
 // QUERIES
@@ -12,7 +10,7 @@ export const get = query({
   handler: async (ctx, args) => {
     return await queries.getAffiliateLink(ctx, args);
   },
-  returns: v.union(v.object(affiliateLinkFields), v.null()),
+  returns: validators.getAffiliateLinkReturns,
 });
 
 export const getByAffiliate = query({
@@ -20,7 +18,7 @@ export const getByAffiliate = query({
   handler: async (ctx, args) => {
     return await queries.getAffiliateLinksByAffiliate(ctx, args);
   },
-  returns: v.array(v.object(affiliateLinkFields)),
+  returns: validators.getAffiliateLinksByAffiliateReturns,
 });
 
 export const getBySlug = query({
@@ -28,7 +26,7 @@ export const getBySlug = query({
   handler: async (ctx, args) => {
     return await queries.getAffiliateLinkBySlug(ctx, args);
   },
-  returns: v.union(v.object(affiliateLinkFields), v.null()),
+  returns: validators.getAffiliateLinkBySlugReturns,
 });
 
 export const getByType = query({
@@ -36,7 +34,7 @@ export const getByType = query({
   handler: async (ctx, args) => {
     return await queries.getAffiliateLinksByType(ctx, args);
   },
-  returns: v.array(v.object(affiliateLinkFields)),
+  returns: validators.getAffiliateLinksByTypeReturns,
 });
 
 export const list = query({
@@ -44,7 +42,7 @@ export const list = query({
   handler: async (ctx, args) => {
     return await queries.getAffiliateLinks(ctx, args);
   },
-  returns: v.array(v.object(affiliateLinkFields)),
+  returns: validators.listAffiliateLinksReturns,
 });
 
 // ============================================
@@ -56,7 +54,7 @@ export const create = mutation({
   handler: async (ctx, args) => {
     return await mutations.createAffiliateLink(ctx, args);
   },
-  returns: v.id('affiliateLinks'),
+  returns: validators.createAffiliateLinkReturns,
 });
 
 export const update = mutation({
@@ -64,5 +62,5 @@ export const update = mutation({
   handler: async (ctx, args) => {
     return await mutations.updateAffiliateLink(ctx, args);
   },
-  returns: v.id('affiliateLinks'),
+  returns: validators.updateAffiliateLinkReturns,
 });

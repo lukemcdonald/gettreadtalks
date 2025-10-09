@@ -1,10 +1,9 @@
 import type { MutationCtx } from '../../_generated/server';
-import type { ObjectType } from 'convex/values';
 
-import { Doc, Id } from '../../_generated/dataModel';
+import { Doc } from '../../_generated/dataModel';
 import { normalizeSlug, slugExists } from '../../lib/utils';
 import { requireAuth } from '../auth/queries';
-import { createCollectionArgs, updateCollectionArgs } from './validators';
+import type { CreateCollectionArgs, UpdateCollectionArgs } from './types';
 
 /**
  * Create a new collection.
@@ -13,10 +12,7 @@ import { createCollectionArgs, updateCollectionArgs } from './validators';
  * @param args - Collection creation arguments
  * @returns The ID of the created collection
  */
-export async function createCollection(
-  ctx: MutationCtx,
-  args: ObjectType<typeof createCollectionArgs>,
-) {
+export async function createCollection(ctx: MutationCtx, args: CreateCollectionArgs) {
   await requireAuth(ctx);
 
   const slug = normalizeSlug(args.title);
@@ -38,10 +34,7 @@ export async function createCollection(
  * @param args - Update arguments
  * @returns The ID of the updated collection
  */
-export async function updateCollection(
-  ctx: MutationCtx,
-  args: ObjectType<typeof updateCollectionArgs>,
-) {
+export async function updateCollection(ctx: MutationCtx, args: UpdateCollectionArgs) {
   await requireAuth(ctx);
 
   const { id, ...rest } = args;

@@ -1,9 +1,5 @@
-import { v } from 'convex/values';
-
 import { mutation, query } from './_generated/server';
-import { clipFields } from './model/clips/schema';
-import { talkFields } from './model/talks/schema';
-import { mutations, queries, topicFields, validators } from './model/topics';
+import { mutations, queries, validators } from './model/topics';
 
 // ============================================
 // QUERIES
@@ -14,7 +10,7 @@ export const get = query({
   handler: async (ctx, args) => {
     return await queries.getTopic(ctx, args);
   },
-  returns: v.union(v.object(topicFields), v.null()),
+  returns: validators.getTopicReturns,
 });
 
 export const getBySlug = query({
@@ -22,7 +18,7 @@ export const getBySlug = query({
   handler: async (ctx, args) => {
     return await queries.getTopicBySlug(ctx, args);
   },
-  returns: v.union(v.object(topicFields), v.null()),
+  returns: validators.getTopicBySlugReturns,
 });
 
 export const getWithContent = query({
@@ -30,14 +26,7 @@ export const getWithContent = query({
   handler: async (ctx, args) => {
     return await queries.getTopicWithContent(ctx, args);
   },
-  returns: v.union(
-    v.object({
-      clips: v.array(v.object(clipFields)),
-      talks: v.array(v.object(talkFields)),
-      topic: v.object(topicFields),
-    }),
-    v.null(),
-  ),
+  returns: validators.getTopicWithContentReturns,
 });
 
 export const list = query({
@@ -45,7 +34,7 @@ export const list = query({
   handler: async (ctx, args) => {
     return await queries.getTopics(ctx, args);
   },
-  returns: v.array(v.object(topicFields)),
+  returns: validators.listTopicsReturns,
 });
 
 // ============================================
@@ -57,7 +46,7 @@ export const create = mutation({
   handler: async (ctx, args) => {
     return await mutations.createTopic(ctx, args);
   },
-  returns: v.id('topics'),
+  returns: validators.createTopicReturns,
 });
 
 export const update = mutation({
@@ -65,5 +54,5 @@ export const update = mutation({
   handler: async (ctx, args) => {
     return await mutations.updateTopic(ctx, args);
   },
-  returns: v.id('topics'),
+  returns: validators.updateTopicReturns,
 });

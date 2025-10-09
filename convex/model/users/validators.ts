@@ -4,3 +4,5 @@ export const updatePasswordArgs = {
   currentPassword: v.string(),
   newPassword: v.string(),
 };
+
+export const updatePasswordReturns = v.null();
