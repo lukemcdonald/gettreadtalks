@@ -1,0 +1,103 @@
+---
+description: File organization patterns for Convex projects with consistent structure and alphabetical ordering
+globs: convex/**/*.ts
+---
+
+# Convex File Organization
+
+## Overview
+
+All Convex files follow a consistent organization pattern with clear visual sections and alphabetical ordering within logical groups.
+
+## Domain Files (convex/{domain}.ts)
+
+### Structure
+
+```ts
+// All imports 
+
+// ============================================
+// QUERIES
+// ============================================
+
+// All queries (alphabetical)
+
+// ============================================
+// MUTATIONS
+// ============================================
+
+// All mutations (alphabetical)
+```
+
+### Query Organization
+
+Queries grouped alphabetical within each group:
+
+```ts
+// ✅ Good - Alphabetical
+export const get = query({...});
+export const getByCategory = query({...});
+export const getBySlug = query({...});
+export const getWithRelations = query({...});
+export const list = query({...});
+```
+
+### Mutation Organization
+
+All mutations alphabetical:
+
+```ts
+// ✅ Good - Alphabetical
+export const create = mutation({...});
+export const remove = mutation({...});
+export const update = mutation({...});
+```
+
+### Comment Separators
+
+Use consistent comment separators for visual structure:
+
+```ts
+// ============================================
+// SECTION NAME
+// ============================================
+```
+
+Use for:
+- ACTIONS section 
+- QUERIES section  
+- MUTATIONS section
+
+## Helper Files (convex/model/{domain}/)
+
+### Pure Alphabetical Ordering
+
+Helper functions are ordered alphabetically by name:
+
+```ts
+// ✅ Good - Alphabetical
+export async function getItem(...)
+export async function getItemBySlug(...)
+export async function getItems(...)
+export async function getItemsByCategory(...)
+export async function getItemsByUser(...)
+```
+
+Since all functions start with the entity name, they naturally group together.
+
+### JSDoc Comments
+
+Keep JSDoc comments with their functions:
+
+```ts
+/**
+ * Get item by ID.
+ *
+ * @param ctx - Database context
+ * @param id - Item ID
+ * @returns Item or null if not found
+ */
+export async function getItem(ctx: QueryCtx, id: Id<'items'>) {
+  return await ctx.db.get(id);
+}
+```

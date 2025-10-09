@@ -1,9 +1,11 @@
 import type { MutationCtx } from '../../_generated/server';
+import type { ObjectType } from 'convex/values';
 
 import { Doc, Id } from '../../_generated/dataModel';
 import { normalizeSlug, slugExists } from '../../lib/utils';
 import { StatusType } from '../../lib/validators';
 import { requireAuth } from '../auth/queries';
+import { createClipArgs, updateClipStatusArgs } from './validators';
 
 /**
  * Create a new clip.
@@ -12,17 +14,7 @@ import { requireAuth } from '../auth/queries';
  * @param args - Clip creation arguments
  * @returns The ID of the created clip
  */
-export async function createClip(
-  ctx: MutationCtx,
-  args: {
-    description?: string;
-    mediaUrl: string;
-    speakerId?: Id<'speakers'>;
-    status?: StatusType;
-    talkId?: Id<'talks'>;
-    title: string;
-  },
-) {
+export async function createClip(ctx: MutationCtx, args: ObjectType<typeof createClipArgs>) {
   await requireAuth(ctx);
 
   const slug = normalizeSlug(args.title);
@@ -51,10 +43,7 @@ export async function createClip(
  */
 export async function updateClipStatus(
   ctx: MutationCtx,
-  args: {
-    id: Id<'clips'>;
-    status: 'approved' | 'archived' | 'backlog' | 'published';
-  },
+  args: ObjectType<typeof updateClipStatusArgs>,
 ) {
   await requireAuth(ctx);
 

@@ -15,7 +15,7 @@ export function normalizeSlug(text: string): string {
 import type { MutationCtx, QueryCtx } from '../_generated/server';
 
 // Tables that have a 'by_slug' index
-type SlugTable = 'clips' | 'talks' | 'topics' | 'speakers' | 'collections';
+type SlugTable = 'affiliateLinks' | 'clips' | 'collections' | 'speakers' | 'talks' | 'topics';
 
 /**
  * Check if a slug already exists in a table

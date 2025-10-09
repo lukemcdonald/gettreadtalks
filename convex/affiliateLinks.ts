@@ -10,6 +10,14 @@ import {
   getAffiliateLinksByType,
 } from './model/affiliateLinks/queries';
 import { affiliateLinkFields } from './model/affiliateLinks/schema';
+import {
+  createAffiliateLinkArgs,
+  updateAffiliateLinkArgs,
+} from './model/affiliateLinks/validators';
+
+// ============================================
+// QUERIES
+// ============================================
 
 export const get = query({
   args: {
@@ -19,6 +27,18 @@ export const get = query({
     return await getAffiliateLink(ctx, args.id);
   },
   returns: v.union(v.object(affiliateLinkFields), v.null()),
+});
+
+export const getByAffiliate = query({
+  args: {
+    affiliate: v.string(),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const { affiliate, limit = 20 } = args;
+    return await getAffiliateLinksByAffiliate(ctx, affiliate, limit);
+  },
+  returns: v.array(v.object(affiliateLinkFields)),
 });
 
 export const getBySlug = query({
@@ -49,18 +69,6 @@ export const getByType = query({
   returns: v.array(v.object(affiliateLinkFields)),
 });
 
-export const getByAffiliate = query({
-  args: {
-    affiliate: v.string(),
-    limit: v.optional(v.number()),
-  },
-  handler: async (ctx, args) => {
-    const { affiliate, limit = 20 } = args;
-    return await getAffiliateLinksByAffiliate(ctx, affiliate, limit);
-  },
-  returns: v.array(v.object(affiliateLinkFields)),
-});
-
 export const list = query({
   args: {
     affiliate: v.optional(v.string()),
@@ -82,23 +90,12 @@ export const list = query({
   returns: v.array(v.object(affiliateLinkFields)),
 });
 
-// Mutation Functions
+// ============================================
+// MUTATIONS
+// ============================================
 
 export const create = mutation({
-  args: {
-    affiliate: v.optional(v.string()),
-    description: v.optional(v.string()),
-    featured: v.optional(v.boolean()),
-    title: v.string(),
-    type: v.union(
-      v.literal('app'),
-      v.literal('book'),
-      v.literal('movie'),
-      v.literal('music'),
-      v.literal('podcast'),
-    ),
-    url: v.string(),
-  },
+  args: createAffiliateLinkArgs,
   handler: async (ctx, args) => {
     return await createAffiliateLink(ctx, args);
   },
@@ -106,23 +103,7 @@ export const create = mutation({
 });
 
 export const update = mutation({
-  args: {
-    affiliate: v.optional(v.string()),
-    description: v.optional(v.string()),
-    featured: v.optional(v.boolean()),
-    id: v.id('affiliateLinks'),
-    title: v.optional(v.string()),
-    type: v.optional(
-      v.union(
-        v.literal('app'),
-        v.literal('book'),
-        v.literal('movie'),
-        v.literal('music'),
-        v.literal('podcast'),
-      ),
-    ),
-    url: v.optional(v.string()),
-  },
+  args: updateAffiliateLinkArgs,
   handler: async (ctx, args) => {
     return await updateAffiliateLink(ctx, args);
   },

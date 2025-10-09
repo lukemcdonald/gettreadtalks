@@ -1,35 +1,33 @@
 import { v } from 'convex/values';
 
 import { mutation, query } from './_generated/server';
-import { statusType } from './lib/validators';
+import { mutations, queries, talkFields, validators } from './model/talks';
 import { speakerFields } from './model/speakers/schema';
-import { createTalk, updateTalkStatus } from './model/talks/mutations.js';
-import {
-  getTalk,
-  getTalkBySlug,
-  getTalkBySlugWithRelations,
-  getTalksByCollection,
-  getTalksBySpeaker,
-  getTalksWithSpeakers,
-} from './model/talks/queries';
-import { talkFields } from './model/talks/schema';
+
+// ============================================
+// QUERIES
+// ============================================
 
 export const get = query({
-  args: {
-    id: v.id('talks'),
-  },
+  args: validators.getTalkArgs,
   handler: async (ctx, args) => {
-    return await getTalk(ctx, args.id);
+    return await queries.getTalk(ctx, args);
   },
   returns: v.union(v.object(talkFields), v.null()),
 });
 
-export const getBySlug = query({
-  args: {
-    slug: v.string(),
-  },
+export const getByCollection = query({
+  args: validators.getTalksByCollectionArgs,
   handler: async (ctx, args) => {
-    return await getTalkBySlugWithRelations(ctx, args.slug);
+    return await queries.getTalksByCollection(ctx, args);
+  },
+  returns: v.array(v.object(talkFields)),
+});
+
+export const getBySlug = query({
+  args: validators.getTalkBySlugArgs,
+  handler: async (ctx, args) => {
+    return await queries.getTalkBySlugWithRelations(ctx, args);
   },
   returns: v.union(
     v.object({
@@ -42,37 +40,17 @@ export const getBySlug = query({
 });
 
 export const getBySpeaker = query({
-  args: {
-    limit: v.optional(v.number()),
-    speakerId: v.id('speakers'),
-  },
+  args: validators.getTalksBySpeakerArgs,
   handler: async (ctx, args) => {
-    const { limit = 20, speakerId } = args;
-    return await getTalksBySpeaker(ctx, speakerId, 'published', limit);
-  },
-  returns: v.array(v.object(talkFields)),
-});
-
-export const getByCollection = query({
-  args: {
-    collectionId: v.id('collections'),
-    limit: v.optional(v.number()),
-  },
-  handler: async (ctx, args) => {
-    const { collectionId, limit = 100 } = args;
-    return await getTalksByCollection(ctx, collectionId, 'published', limit);
+    return await queries.getTalksBySpeaker(ctx, args);
   },
   returns: v.array(v.object(talkFields)),
 });
 
 export const list = query({
-  args: {
-    limit: v.optional(v.number()),
-    status: v.optional(statusType),
-  },
+  args: validators.listTalksArgs,
   handler: async (ctx, args) => {
-    const { limit = 20, status = 'published' } = args;
-    return await getTalksWithSpeakers(ctx, { limit, status });
+    return await queries.getTalksWithSpeakers(ctx, args);
   },
   returns: v.array(
     v.object({
@@ -82,29 +60,22 @@ export const list = query({
   ),
 });
 
+// ============================================
+// MUTATIONS
+// ============================================
+
 export const create = mutation({
-  args: {
-    collectionId: v.optional(v.id('collections')),
-    collectionOrder: v.optional(v.number()),
-    mediaUrl: v.string(),
-    scripture: v.optional(v.string()),
-    speakerId: v.id('speakers'),
-    status: v.optional(statusType),
-    title: v.string(),
-  },
+  args: validators.createTalkArgs,
   handler: async (ctx, args) => {
-    return await createTalk(ctx, args);
+    return await mutations.createTalk(ctx, args);
   },
   returns: v.id('talks'),
 });
 
 export const updateStatus = mutation({
-  args: {
-    id: v.id('talks'),
-    status: statusType,
-  },
+  args: validators.updateTalkStatusArgs,
   handler: async (ctx, args) => {
-    return await updateTalkStatus(ctx, args);
+    return await mutations.updateTalkStatus(ctx, args);
   },
   returns: v.id('talks'),
 });

@@ -12,6 +12,10 @@ import {
 } from './model/users/mutations.js';
 import { getUserFavorites } from './model/users/queries';
 
+// ============================================
+// QUERIES
+// ============================================
+
 export const list = query({
   args: {
     limit: v.optional(v.number()),
@@ -60,25 +64,9 @@ export const list = query({
   }),
 });
 
-export const addFavoriteTalk = mutation({
-  args: {
-    talkId: v.id('talks'),
-  },
-  handler: async (ctx, args) => {
-    return await addUserFavoriteTalk(ctx, args);
-  },
-  returns: v.id('userFavoriteTalks'),
-});
-
-export const removeFavoriteTalk = mutation({
-  args: {
-    talkId: v.id('talks'),
-  },
-  handler: async (ctx, args) => {
-    return await removeUserFavoriteTalk(ctx, args);
-  },
-  returns: v.null(),
-});
+// ============================================
+// MUTATIONS
+// ============================================
 
 export const addFavoriteClip = mutation({
   args: {
@@ -88,16 +76,6 @@ export const addFavoriteClip = mutation({
     return await addUserFavoriteClip(ctx, args);
   },
   returns: v.id('userFavoriteClips'),
-});
-
-export const removeFavoriteClip = mutation({
-  args: {
-    clipId: v.id('clips'),
-  },
-  handler: async (ctx, args) => {
-    return await removeUserFavoriteClip(ctx, args);
-  },
-  returns: v.null(),
 });
 
 export const addFavoriteSpeaker = mutation({
@@ -110,12 +88,42 @@ export const addFavoriteSpeaker = mutation({
   returns: v.id('userFavoriteSpeakers'),
 });
 
+export const addFavoriteTalk = mutation({
+  args: {
+    talkId: v.id('talks'),
+  },
+  handler: async (ctx, args) => {
+    return await addUserFavoriteTalk(ctx, args);
+  },
+  returns: v.id('userFavoriteTalks'),
+});
+
+export const removeFavoriteClip = mutation({
+  args: {
+    clipId: v.id('clips'),
+  },
+  handler: async (ctx, args) => {
+    return await removeUserFavoriteClip(ctx, args);
+  },
+  returns: v.null(),
+});
+
 export const removeFavoriteSpeaker = mutation({
   args: {
     speakerId: v.id('speakers'),
   },
   handler: async (ctx, args) => {
     return await removeUserFavoriteSpeaker(ctx, args);
+  },
+  returns: v.null(),
+});
+
+export const removeFavoriteTalk = mutation({
+  args: {
+    talkId: v.id('talks'),
+  },
+  handler: async (ctx, args) => {
+    return await removeUserFavoriteTalk(ctx, args);
   },
   returns: v.null(),
 });

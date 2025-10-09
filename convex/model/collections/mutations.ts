@@ -1,8 +1,10 @@
 import type { MutationCtx } from '../../_generated/server';
+import type { ObjectType } from 'convex/values';
 
 import { Doc, Id } from '../../_generated/dataModel';
 import { normalizeSlug, slugExists } from '../../lib/utils';
 import { requireAuth } from '../auth/queries';
+import { createCollectionArgs, updateCollectionArgs } from './validators';
 
 /**
  * Create a new collection.
@@ -13,11 +15,7 @@ import { requireAuth } from '../auth/queries';
  */
 export async function createCollection(
   ctx: MutationCtx,
-  args: {
-    description?: string;
-    title: string;
-    url?: string;
-  },
+  args: ObjectType<typeof createCollectionArgs>,
 ) {
   await requireAuth(ctx);
 
@@ -42,12 +40,7 @@ export async function createCollection(
  */
 export async function updateCollection(
   ctx: MutationCtx,
-  args: {
-    description?: string;
-    id: Id<'collections'>;
-    title?: string;
-    url?: string;
-  },
+  args: ObjectType<typeof updateCollectionArgs>,
 ) {
   await requireAuth(ctx);
 

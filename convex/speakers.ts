@@ -4,6 +4,11 @@ import { mutation, query } from './_generated/server';
 import { createSpeaker, updateSpeaker } from './model/speakers/mutations';
 import { getSpeaker, getSpeakerBySlug, getSpeakers } from './model/speakers/queries';
 import { speakerFields } from './model/speakers/schema';
+import { createSpeakerArgs, updateSpeakerArgs } from './model/speakers/validators';
+
+// ============================================
+// QUERIES
+// ============================================
 
 export const get = query({
   args: {
@@ -36,35 +41,20 @@ export const list = query({
   returns: v.array(v.object(speakerFields)),
 });
 
-// TODO: Figure out how to share arg validators
+// ============================================
+// MUTATIONS
+// ============================================
+
 export const create = mutation({
-  args: {
-    description: v.optional(v.string()),
-    firstName: v.string(),
-    imageUrl: v.optional(v.string()),
-    lastName: v.string(),
-    ministry: v.optional(v.string()),
-    role: v.optional(v.string()),
-    websiteUrl: v.optional(v.string()),
-  },
+  args: createSpeakerArgs,
   handler: async (ctx, args) => {
     return await createSpeaker(ctx, args);
   },
   returns: v.id('speakers'),
 });
 
-// TODO: Figure out how to share arg validators
 export const update = mutation({
-  args: {
-    description: v.optional(v.string()),
-    firstName: v.optional(v.string()),
-    id: v.id('speakers'),
-    imageUrl: v.optional(v.string()),
-    lastName: v.optional(v.string()),
-    ministry: v.optional(v.string()),
-    role: v.optional(v.string()),
-    websiteUrl: v.optional(v.string()),
-  },
+  args: updateSpeakerArgs,
   handler: async (ctx, args) => {
     return await updateSpeaker(ctx, args);
   },

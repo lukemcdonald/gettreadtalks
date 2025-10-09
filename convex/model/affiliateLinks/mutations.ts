@@ -1,9 +1,11 @@
 import type { MutationCtx } from '../../_generated/server';
+import type { ObjectType } from 'convex/values';
 
 import { Doc, Id } from '../../_generated/dataModel';
 import { normalizeSlug, slugExists } from '../../lib/utils';
 import { requireAuth } from '../auth/queries';
 import { AffiliateLinkType } from './schema';
+import { createAffiliateLinkArgs, updateAffiliateLinkArgs } from './validators';
 
 /**
  * Create a new affiliate link.
@@ -14,14 +16,7 @@ import { AffiliateLinkType } from './schema';
  */
 export async function createAffiliateLink(
   ctx: MutationCtx,
-  args: {
-    affiliate?: string;
-    description?: string;
-    featured?: boolean;
-    title: string;
-    type: AffiliateLinkType;
-    url: string;
-  },
+  args: ObjectType<typeof createAffiliateLinkArgs>,
 ) {
   await requireAuth(ctx);
 
@@ -46,15 +41,7 @@ export async function createAffiliateLink(
  */
 export async function updateAffiliateLink(
   ctx: MutationCtx,
-  args: {
-    affiliate?: string;
-    description?: string;
-    featured?: boolean;
-    id: Id<'affiliateLinks'>;
-    title?: string;
-    type?: AffiliateLinkType;
-    url?: string;
-  },
+  args: ObjectType<typeof updateAffiliateLinkArgs>,
 ) {
   await requireAuth(ctx);
 

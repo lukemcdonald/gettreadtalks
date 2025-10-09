@@ -10,6 +10,11 @@ import {
 } from './model/collections/queries';
 import { collectionFields } from './model/collections/schema';
 import { talkFields } from './model/talks/schema';
+import { createCollectionArgs, updateCollectionArgs } from './model/collections/validators';
+
+// ============================================
+// QUERIES
+// ============================================
 
 export const get = query({
   args: {
@@ -60,12 +65,12 @@ export const list = query({
   returns: v.array(v.object(collectionFields)),
 });
 
+// ============================================
+// MUTATIONS
+// ============================================
+
 export const create = mutation({
-  args: {
-    description: v.optional(v.string()),
-    title: v.string(),
-    url: v.optional(v.string()),
-  },
+  args: createCollectionArgs,
   handler: async (ctx, args) => {
     return await createCollection(ctx, args);
   },
@@ -73,12 +78,7 @@ export const create = mutation({
 });
 
 export const update = mutation({
-  args: {
-    description: v.optional(v.string()),
-    id: v.id('collections'),
-    title: v.optional(v.string()),
-    url: v.optional(v.string()),
-  },
+  args: updateCollectionArgs,
   handler: async (ctx, args) => {
     return await updateCollection(ctx, args);
   },

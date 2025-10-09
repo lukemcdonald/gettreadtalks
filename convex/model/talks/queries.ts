@@ -1,29 +1,38 @@
 import type { Id } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
+import type { ObjectType } from 'convex/values';
+
 import type { StatusType } from '../../lib/validators';
+import {
+  getTalkArgs,
+  getTalkBySlugArgs,
+  getTalksByCollectionArgs,
+  getTalksBySpeakerArgs,
+  listTalksArgs,
+} from './validators';
 
 /**
  * Get talk by ID.
  *
  * @param ctx - Database context
- * @param id - Talk ID
+ * @param args - Query arguments
  * @returns Talk or null if not found
  */
-export async function getTalk(ctx: QueryCtx, id: Id<'talks'>) {
-  return await ctx.db.get(id);
+export async function getTalk(ctx: QueryCtx, args: ObjectType<typeof getTalkArgs>) {
+  return await ctx.db.get(args.id);
 }
 
 /**
  * Get talk by slug.
  *
  * @param ctx - Database context
- * @param slug - Talk slug
+ * @param args - Query arguments
  * @returns Talk or null if not found
  */
-export async function getTalkBySlug(ctx: QueryCtx, slug: string) {
+export async function getTalkBySlug(ctx: QueryCtx, args: ObjectType<typeof getTalkBySlugArgs>) {
   return await ctx.db
     .query('talks')
-    .withIndex('by_slug', (q) => q.eq('slug', slug))
+    .withIndex('by_slug', (q) => q.eq('slug', args.slug))
     .unique();
 }
 
@@ -31,17 +40,11 @@ export async function getTalkBySlug(ctx: QueryCtx, slug: string) {
  * Get talks with optional filters.
  *
  * @param ctx - Database context
- * @param options - Filter options
+ * @param args - Query arguments with defaults
  * @returns Array of talks
  */
-export async function getTalks(
-  ctx: QueryCtx,
-  options: {
-    limit?: number;
-    status?: StatusType;
-  } = {},
-) {
-  const { limit = 20, status } = options;
+export async function getTalks(ctx: QueryCtx, args: ObjectType<typeof listTalksArgs>) {
+  const { limit = 20, status } = args;
 
   if (status) {
     return await ctx.db
@@ -58,17 +61,11 @@ export async function getTalks(
  * Get talks with speaker data.
  *
  * @param ctx - Database context
- * @param options - Filter options
+ * @param args - Query arguments with defaults
  * @returns Array of talks with speaker information
  */
-export async function getTalksWithSpeakers(
-  ctx: QueryCtx,
-  options: {
-    limit?: number;
-    status?: StatusType;
-  } = {},
-) {
-  const talks = await getTalks(ctx, options);
+export async function getTalksWithSpeakers(ctx: QueryCtx, args: ObjectType<typeof listTalksArgs>) {
+  const talks = await getTalks(ctx, args);
 
   const talksWithSpeakers = await Promise.all(
     talks.map(async (talk) => {
@@ -84,11 +81,14 @@ export async function getTalksWithSpeakers(
  * Get talk by slug with related data.
  *
  * @param ctx - Database context
- * @param slug - Talk slug
+ * @param args - Query arguments
  * @returns Talk with speaker and collection data
  */
-export async function getTalkBySlugWithRelations(ctx: QueryCtx, slug: string) {
-  const talk = await getTalkBySlug(ctx, slug);
+export async function getTalkBySlugWithRelations(
+  ctx: QueryCtx,
+  args: ObjectType<typeof getTalkBySlugArgs>,
+) {
+  const talk = await getTalkBySlug(ctx, args);
 
   if (!talk) {
     return null;
@@ -112,20 +112,20 @@ export async function getTalkBySlugWithRelations(ctx: QueryCtx, slug: string) {
  * Get talks by speaker with status filter.
  *
  * @param ctx - Database context
- * @param speakerId - Speaker ID
- * @param status - Status filter
- * @param limit - Maximum number of results
+ * @param args - Query arguments with defaults
  * @returns Array of talks
  */
 export async function getTalksBySpeaker(
   ctx: QueryCtx,
-  speakerId: Id<'speakers'>,
-  status: StatusType,
-  limit: number,
+  args: ObjectType<typeof getTalksBySpeakerArgs>,
 ) {
+  const { limit = 20, speakerId } = args;
+
   return await ctx.db
     .query('talks')
-    .withIndex('by_speaker_id_and_status', (q) => q.eq('speakerId', speakerId).eq('status', status))
+    .withIndex('by_speaker_id_and_status', (q) =>
+      q.eq('speakerId', speakerId).eq('status', 'published'),
+    )
     .order('desc')
     .take(limit);
 }
@@ -134,21 +134,19 @@ export async function getTalksBySpeaker(
  * Get talks by collection with status filter.
  *
  * @param ctx - Database context
- * @param collectionId - Collection ID
- * @param status - Status filter
- * @param limit - Maximum number of results
+ * @param args - Query arguments with defaults
  * @returns Array of talks sorted by collection order
  */
 export async function getTalksByCollection(
   ctx: QueryCtx,
-  collectionId: Id<'collections'>,
-  status: StatusType,
-  limit: number,
+  args: ObjectType<typeof getTalksByCollectionArgs>,
 ) {
+  const { collectionId, limit = 100 } = args;
+
   const talks = await ctx.db
     .query('talks')
     .withIndex('by_collection_id_and_status', (q) =>
-      q.eq('collectionId', collectionId).eq('status', status),
+      q.eq('collectionId', collectionId).eq('status', 'published'),
     )
     .take(limit);
 

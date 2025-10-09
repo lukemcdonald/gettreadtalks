@@ -6,6 +6,11 @@ import { talkFields } from './model/talks/schema';
 import { createTopic, updateTopic } from './model/topics/mutations.js';
 import { getTopic, getTopicBySlug, getTopics, getTopicWithContent } from './model/topics/queries';
 import { topicFields } from './model/topics/schema';
+import { createTopicArgs, updateTopicArgs } from './model/topics/validators';
+
+// ============================================
+// QUERIES
+// ============================================
 
 export const get = query({
   args: {
@@ -57,10 +62,12 @@ export const list = query({
   returns: v.array(v.object(topicFields)),
 });
 
+// ============================================
+// MUTATIONS
+// ============================================
+
 export const create = mutation({
-  args: {
-    title: v.string(),
-  },
+  args: createTopicArgs,
   handler: async (ctx, args) => {
     return await createTopic(ctx, args);
   },
@@ -68,10 +75,7 @@ export const create = mutation({
 });
 
 export const update = mutation({
-  args: {
-    id: v.id('topics'),
-    title: v.optional(v.string()),
-  },
+  args: updateTopicArgs,
   handler: async (ctx, args) => {
     return await updateTopic(ctx, args);
   },

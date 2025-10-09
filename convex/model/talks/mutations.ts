@@ -1,9 +1,10 @@
 import type { MutationCtx } from '../../_generated/server';
+import type { ObjectType } from 'convex/values';
 
 import { Doc, Id } from '../../_generated/dataModel';
 import { normalizeSlug, slugExists } from '../../lib/utils';
-import { StatusType } from '../../lib/validators';
 import { requireAuth } from '../auth/queries';
+import { createTalkArgs, updateTalkStatusArgs } from './validators';
 
 /**
  * Create a new talk.
@@ -12,18 +13,7 @@ import { requireAuth } from '../auth/queries';
  * @param args - Talk creation arguments
  * @returns The ID of the created talk
  */
-export async function createTalk(
-  ctx: MutationCtx,
-  args: {
-    collectionId?: Id<'collections'>;
-    collectionOrder?: number;
-    mediaUrl: string;
-    scripture?: string;
-    speakerId: Id<'speakers'>;
-    status?: StatusType;
-    title: string;
-  },
-) {
+export async function createTalk(ctx: MutationCtx, args: ObjectType<typeof createTalkArgs>) {
   await requireAuth(ctx);
 
   const slug = normalizeSlug(args.title);
@@ -52,10 +42,7 @@ export async function createTalk(
  */
 export async function updateTalkStatus(
   ctx: MutationCtx,
-  args: {
-    id: Id<'talks'>;
-    status: StatusType;
-  },
+  args: ObjectType<typeof updateTalkStatusArgs>,
 ) {
   await requireAuth(ctx);
 

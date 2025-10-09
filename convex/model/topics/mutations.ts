@@ -1,8 +1,10 @@
 import type { MutationCtx } from '../../_generated/server';
+import type { ObjectType } from 'convex/values';
 
 import { Doc, Id } from '../../_generated/dataModel';
 import { normalizeSlug, slugExists } from '../../lib/utils';
 import { requireAuth } from '../auth/queries';
+import { createTopicArgs, updateTopicArgs } from './validators';
 
 /**
  * Create a new topic.
@@ -11,12 +13,7 @@ import { requireAuth } from '../auth/queries';
  * @param args - Topic creation arguments
  * @returns The ID of the created topic
  */
-export async function createTopic(
-  ctx: MutationCtx,
-  args: {
-    title: string;
-  },
-) {
+export async function createTopic(ctx: MutationCtx, args: ObjectType<typeof createTopicArgs>) {
   await requireAuth(ctx);
 
   const slug = normalizeSlug(args.title);
@@ -38,13 +35,7 @@ export async function createTopic(
  * @param args - Update arguments
  * @returns The ID of the updated topic
  */
-export async function updateTopic(
-  ctx: MutationCtx,
-  args: {
-    id: Id<'topics'>;
-    title?: string;
-  },
-) {
+export async function updateTopic(ctx: MutationCtx, args: ObjectType<typeof updateTopicArgs>) {
   await requireAuth(ctx);
 
   const { id, ...rest } = args;
