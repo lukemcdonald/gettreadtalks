@@ -3,25 +3,22 @@ import { v } from 'convex/values';
 import { mutation, query } from './_generated/server';
 import { createAffiliateLink, updateAffiliateLink } from './model/affiliateLinks/mutations';
 import {
+  getAffiliateLink,
   getAffiliateLinkBySlug,
   getAffiliateLinks,
   getAffiliateLinksByAffiliate,
   getAffiliateLinksByType,
-  getFeaturedAffiliateLinks,
 } from './model/affiliateLinks/queries';
 import { affiliateLinkFields } from './model/affiliateLinks/schema';
 
-// Query Functions
-
-export const getFeatured = query({
+export const get = query({
   args: {
-    limit: v.optional(v.number()),
+    id: v.id('affiliateLinks'),
   },
   handler: async (ctx, args) => {
-    const limit = args.limit ?? 10;
-    return await getFeaturedAffiliateLinks(ctx, limit);
+    return await getAffiliateLink(ctx, args.id);
   },
-  returns: v.array(v.object(affiliateLinkFields)),
+  returns: v.union(v.object(affiliateLinkFields), v.null()),
 });
 
 export const getBySlug = query({
@@ -29,8 +26,7 @@ export const getBySlug = query({
     slug: v.string(),
   },
   handler: async (ctx, args) => {
-    const { slug } = args;
-    return await getAffiliateLinkBySlug(ctx, slug);
+    return await getAffiliateLinkBySlug(ctx, args.slug);
   },
   returns: v.union(v.object(affiliateLinkFields), v.null()),
 });

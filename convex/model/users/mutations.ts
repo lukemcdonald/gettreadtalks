@@ -10,7 +10,7 @@ import { getUserId } from '../auth/queries';
  * @param args - Arguments containing talkId
  * @returns The ID of the created favorite record
  */
-export async function addFavoriteTalk(
+export async function addUserFavoriteTalk(
   ctx: MutationCtx,
   args: {
     talkId: Id<'talks'>;
@@ -40,7 +40,7 @@ export async function addFavoriteTalk(
  * @param args - Arguments containing talkId
  * @returns null
  */
-export async function removeFavoriteTalk(
+export async function removeUserFavoriteTalk(
   ctx: MutationCtx,
   args: {
     talkId: Id<'talks'>;
@@ -69,7 +69,7 @@ export async function removeFavoriteTalk(
  * @param args - Arguments containing clipId
  * @returns The ID of the created favorite record
  */
-export async function addFavoriteClip(
+export async function addUserFavoriteClip(
   ctx: MutationCtx,
   args: {
     clipId: Id<'clips'>;
@@ -99,7 +99,7 @@ export async function addFavoriteClip(
  * @param args - Arguments containing clipId
  * @returns null
  */
-export async function removeFavoriteClip(
+export async function removeUserFavoriteClip(
   ctx: MutationCtx,
   args: {
     clipId: Id<'clips'>;
@@ -128,7 +128,7 @@ export async function removeFavoriteClip(
  * @param args - Arguments containing speakerId
  * @returns The ID of the created favorite record
  */
-export async function addFavoriteSpeaker(
+export async function addUserFavoriteSpeaker(
   ctx: MutationCtx,
   args: {
     speakerId: Id<'speakers'>;
@@ -158,7 +158,7 @@ export async function addFavoriteSpeaker(
  * @param args - Arguments containing speakerId
  * @returns null
  */
-export async function removeFavoriteSpeaker(
+export async function removeUserFavoriteSpeaker(
   ctx: MutationCtx,
   args: {
     speakerId: Id<'speakers'>;

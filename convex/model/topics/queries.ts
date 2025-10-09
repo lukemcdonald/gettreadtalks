@@ -1,5 +1,16 @@
-import type { Doc } from '../../_generated/dataModel';
+import type { Doc, Id } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
+
+/**
+ * Get topic by ID.
+ *
+ * @param ctx - Database context
+ * @param id - Topic ID
+ * @returns Topic or null if not found
+ */
+export async function getTopic(ctx: QueryCtx, id: Id<'topics'>) {
+  return await ctx.db.get(id);
+}
 
 /**
  * Get topic by slug.
@@ -8,11 +19,22 @@ import type { QueryCtx } from '../../_generated/server';
  * @param slug - Topic slug
  * @returns Topic or null if not found
  */
-export async function getBySlug(ctx: QueryCtx, slug: string) {
+export async function getTopicBySlug(ctx: QueryCtx, slug: string) {
   return await ctx.db
     .query('topics')
     .withIndex('by_slug', (q) => q.eq('slug', slug))
     .unique();
+}
+
+/**
+ * Get topics.
+ *
+ * @param ctx - Database context
+ * @param limit - Maximum number of results
+ * @returns Array of topics
+ */
+export async function getTopics(ctx: QueryCtx, limit: number = 100) {
+  return await ctx.db.query('topics').withIndex('by_title').take(limit);
 }
 
 /**
@@ -23,8 +45,8 @@ export async function getBySlug(ctx: QueryCtx, slug: string) {
  * @param limit - Maximum number of talks/clips to fetch
  * @returns Topic with related talks and clips
  */
-export async function getWithContent(ctx: QueryCtx, slug: string, limit: number = 50) {
-  const topic = await getBySlug(ctx, slug);
+export async function getTopicWithContent(ctx: QueryCtx, slug: string, limit: number = 50) {
+  const topic = await getTopicBySlug(ctx, slug);
 
   if (!topic) {
     return null;

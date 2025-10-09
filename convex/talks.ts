@@ -5,27 +5,23 @@ import { statusType } from './lib/validators';
 import { speakerFields } from './model/speakers/schema';
 import { createTalk, updateTalkStatus } from './model/talks/mutations.js';
 import {
-  getBySlugWithRelations,
-  getPublishedWithSpeakers,
-  getByCollection as getTalksByCollection,
-  getBySpeaker as getTalksBySpeaker,
+  getTalk,
+  getTalkBySlug,
+  getTalkBySlugWithRelations,
+  getTalksByCollection,
+  getTalksBySpeaker,
+  getTalksWithSpeakers,
 } from './model/talks/queries';
 import { talkFields } from './model/talks/schema';
 
-export const getPublished = query({
+export const get = query({
   args: {
-    limit: v.optional(v.number()),
+    id: v.id('talks'),
   },
   handler: async (ctx, args) => {
-    const { limit = 20 } = args;
-    return await getPublishedWithSpeakers(ctx, limit);
+    return await getTalk(ctx, args.id);
   },
-  returns: v.array(
-    v.object({
-      ...talkFields,
-      speaker: v.union(v.object(speakerFields), v.null()),
-    }),
-  ),
+  returns: v.union(v.object(talkFields), v.null()),
 });
 
 export const getBySlug = query({
@@ -33,7 +29,7 @@ export const getBySlug = query({
     slug: v.string(),
   },
   handler: async (ctx, args) => {
-    return await getBySlugWithRelations(ctx, args.slug);
+    return await getTalkBySlugWithRelations(ctx, args.slug);
   },
   returns: v.union(
     v.object({
@@ -67,6 +63,23 @@ export const getByCollection = query({
     return await getTalksByCollection(ctx, collectionId, 'published', limit);
   },
   returns: v.array(v.object(talkFields)),
+});
+
+export const list = query({
+  args: {
+    limit: v.optional(v.number()),
+    status: v.optional(statusType),
+  },
+  handler: async (ctx, args) => {
+    const { limit = 20, status = 'published' } = args;
+    return await getTalksWithSpeakers(ctx, { limit, status });
+  },
+  returns: v.array(
+    v.object({
+      ...talkFields,
+      speaker: v.union(v.object(speakerFields), v.null()),
+    }),
+  ),
 });
 
 export const create = mutation({

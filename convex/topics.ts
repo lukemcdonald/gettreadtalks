@@ -4,21 +4,17 @@ import { mutation, query } from './_generated/server';
 import { clipFields } from './model/clips/schema';
 import { talkFields } from './model/talks/schema';
 import { createTopic, updateTopic } from './model/topics/mutations.js';
-import {
-  getBySlug as getTopicBySlug,
-  getWithContent as getTopicWithContent,
-} from './model/topics/queries';
+import { getTopic, getTopicBySlug, getTopics, getTopicWithContent } from './model/topics/queries';
 import { topicFields } from './model/topics/schema';
 
-export const list = query({
+export const get = query({
   args: {
-    limit: v.optional(v.number()),
+    id: v.id('topics'),
   },
   handler: async (ctx, args) => {
-    const { limit = 100 } = args;
-    return await ctx.db.query('topics').withIndex('by_title').take(limit);
+    return await getTopic(ctx, args.id);
   },
-  returns: v.array(v.object(topicFields)),
+  returns: v.union(v.object(topicFields), v.null()),
 });
 
 export const getBySlug = query({
@@ -48,6 +44,17 @@ export const getWithContent = query({
     }),
     v.null(),
   ),
+});
+
+export const list = query({
+  args: {
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const { limit = 100 } = args;
+    return await getTopics(ctx, limit);
+  },
+  returns: v.array(v.object(topicFields)),
 });
 
 export const create = mutation({

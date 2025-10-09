@@ -1,20 +1,17 @@
+import type { Id } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
 
 import { AffiliateLinkType } from './schema';
 
 /**
- * Get featured affiliate links.
+ * Get affiliate link by ID.
  *
  * @param ctx - Database context
- * @param limit - Maximum number of results
- * @returns Array of featured affiliate links
+ * @param id - Affiliate link ID
+ * @returns Affiliate link or null if not found
  */
-export async function getFeaturedAffiliateLinks(ctx: QueryCtx, limit: number = 10) {
-  return await ctx.db
-    .query('affiliateLinks')
-    .withIndex('by_featured', (q) => q.eq('featured', true))
-    .order('desc')
-    .take(limit);
+export async function getAffiliateLink(ctx: QueryCtx, id: Id<'affiliateLinks'>) {
+  return await ctx.db.get(id);
 }
 
 /**

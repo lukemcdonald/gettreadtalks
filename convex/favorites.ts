@@ -3,16 +3,16 @@ import { v } from 'convex/values';
 import { mutation, query } from './_generated/server';
 import { getCurrentUser } from './model/auth/queries';
 import {
-  addFavoriteClip as addFavoriteClipHelper,
-  addFavoriteSpeaker as addFavoriteSpeakerHelper,
-  addFavoriteTalk as addFavoriteTalkHelper,
-  removeFavoriteClip as removeFavoriteClipHelper,
-  removeFavoriteSpeaker as removeFavoriteSpeakerHelper,
-  removeFavoriteTalk as removeFavoriteTalkHelper,
+  addUserFavoriteClip,
+  addUserFavoriteSpeaker,
+  addUserFavoriteTalk,
+  removeUserFavoriteClip,
+  removeUserFavoriteSpeaker,
+  removeUserFavoriteTalk,
 } from './model/users/mutations.js';
-import { getAllUserFavorites } from './model/users/queries';
+import { getUserFavorites } from './model/users/queries';
 
-export const getUserFavorites = query({
+export const list = query({
   args: {
     limit: v.optional(v.number()),
   },
@@ -30,16 +30,12 @@ export const getUserFavorites = query({
     const userId = user._id;
     const limit = args.limit ?? 100;
 
-    const {
-      clips: favoriteClips,
-      speakers: favoriteSpeakers,
-      talks: favoriteTalks,
-    } = await getAllUserFavorites(ctx, userId, limit);
+    const { clips, speakers, talks } = await getUserFavorites(ctx, userId, limit);
 
     return {
-      clips: favoriteClips,
-      speakers: favoriteSpeakers,
-      talks: favoriteTalks,
+      clips,
+      speakers,
+      talks,
     };
   },
   returns: v.object({
@@ -69,7 +65,7 @@ export const addFavoriteTalk = mutation({
     talkId: v.id('talks'),
   },
   handler: async (ctx, args) => {
-    return await addFavoriteTalkHelper(ctx, args);
+    return await addUserFavoriteTalk(ctx, args);
   },
   returns: v.id('userFavoriteTalks'),
 });
@@ -79,7 +75,7 @@ export const removeFavoriteTalk = mutation({
     talkId: v.id('talks'),
   },
   handler: async (ctx, args) => {
-    return await removeFavoriteTalkHelper(ctx, args);
+    return await removeUserFavoriteTalk(ctx, args);
   },
   returns: v.null(),
 });
@@ -89,7 +85,7 @@ export const addFavoriteClip = mutation({
     clipId: v.id('clips'),
   },
   handler: async (ctx, args) => {
-    return await addFavoriteClipHelper(ctx, args);
+    return await addUserFavoriteClip(ctx, args);
   },
   returns: v.id('userFavoriteClips'),
 });
@@ -99,7 +95,7 @@ export const removeFavoriteClip = mutation({
     clipId: v.id('clips'),
   },
   handler: async (ctx, args) => {
-    return await removeFavoriteClipHelper(ctx, args);
+    return await removeUserFavoriteClip(ctx, args);
   },
   returns: v.null(),
 });
@@ -109,7 +105,7 @@ export const addFavoriteSpeaker = mutation({
     speakerId: v.id('speakers'),
   },
   handler: async (ctx, args) => {
-    return await addFavoriteSpeakerHelper(ctx, args);
+    return await addUserFavoriteSpeaker(ctx, args);
   },
   returns: v.id('userFavoriteSpeakers'),
 });
@@ -119,7 +115,7 @@ export const removeFavoriteSpeaker = mutation({
     speakerId: v.id('speakers'),
   },
   handler: async (ctx, args) => {
-    return await removeFavoriteSpeakerHelper(ctx, args);
+    return await removeUserFavoriteSpeaker(ctx, args);
   },
   returns: v.null(),
 });

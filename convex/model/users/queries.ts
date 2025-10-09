@@ -53,7 +53,7 @@ export async function getUserFavoriteTalks(ctx: QueryCtx, userId: string, limit:
  * @param limit - Maximum number of favorites per type
  * @returns Object with clips, speakers, and talks favorites
  */
-export async function getAllUserFavorites(ctx: QueryCtx, userId: string, limit: number) {
+export async function getUserFavorites(ctx: QueryCtx, userId: string, limit: number) {
   const [clips, speakers, talks] = await Promise.all([
     getUserFavoriteClips(ctx, userId, limit),
     getUserFavoriteSpeakers(ctx, userId, limit),
