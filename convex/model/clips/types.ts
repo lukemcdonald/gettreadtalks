@@ -10,7 +10,9 @@ export type GetClipBySlugWithRelationsArgs = ObjectType<
 export type GetClipBySlugWithRelationsReturns = Infer<
   typeof validators.getClipBySlugWithRelationsReturns
 >;
-export type GetPublishedClipsArgs = ObjectType<typeof validators.getPublishedClipsArgs>;
-export type GetPublishedClipsReturns = Infer<typeof validators.getPublishedClipsReturns>;
+export type ListClipsArgs = ObjectType<typeof validators.listClipsArgs>;
+export type ListClipsReturns = Infer<typeof validators.listClipsReturns>;
+export type ListPublishedClipsArgs = ObjectType<typeof validators.listPublishedClipsArgs>;
+export type ListPublishedClipsReturns = Infer<typeof validators.listPublishedClipsReturns>;
 export type UpdateClipStatusArgs = ObjectType<typeof validators.updateClipStatusArgs>;
 export type UpdateClipStatusReturns = Infer<typeof validators.updateClipStatusReturns>;

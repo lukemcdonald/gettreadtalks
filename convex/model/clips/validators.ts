@@ -1,6 +1,9 @@
 import { v } from 'convex/values';
 
 import { statusType } from '../../lib/validators';
+import { speakerFields } from '../speakers/schema';
+import { talkFields } from '../talks/schema';
+import { topicFields } from '../topics/schema';
 import { clipFields } from './schema';
 
 export const createClipArgs = {
@@ -20,19 +23,26 @@ export const getClipBySlugWithRelationsArgs = {
 
 export const getClipBySlugWithRelationsReturns = v.union(
   v.object({
-    clip: v.any(),
-    speaker: v.union(v.any(), v.null()),
-    talk: v.union(v.any(), v.null()),
-    topics: v.array(v.any()),
+    clip: v.object(clipFields),
+    speaker: v.union(v.object(speakerFields), v.null()),
+    talk: v.union(v.object(talkFields), v.null()),
+    topics: v.array(v.object(topicFields)),
   }),
   v.null(),
 );
 
-export const getPublishedClipsArgs = {
+export const listClipsArgs = {
+  limit: v.optional(v.number()),
+  status: v.optional(statusType),
+};
+
+export const listClipsReturns = v.array(v.object(clipFields));
+
+export const listPublishedClipsArgs = {
   limit: v.number(),
 };
 
-export const getPublishedClipsReturns = v.array(v.object(clipFields));
+export const listPublishedClipsReturns = v.array(v.object(clipFields));
 
 export const updateClipStatusArgs = {
   id: v.id('clips'),

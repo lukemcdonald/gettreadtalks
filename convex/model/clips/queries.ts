@@ -1,6 +1,31 @@
 import type { QueryCtx } from '../../_generated/server';
 
-import type { GetClipBySlugWithRelationsArgs, GetPublishedClipsArgs } from './types';
+import type {
+  GetClipBySlugWithRelationsArgs,
+  ListClipsArgs,
+  ListPublishedClipsArgs,
+} from './types';
+
+/**
+ * Get clips with optional filters.
+ *
+ * @param ctx - Database context
+ * @param args - Query arguments with defaults
+ * @returns Array of clips
+ */
+export async function getClips(ctx: QueryCtx, args: ListClipsArgs) {
+  const { limit = 20, status } = args;
+
+  if (status) {
+    return await ctx.db
+      .query('clips')
+      .withIndex('by_status_and_published_at', (q) => q.eq('status', status))
+      .order('desc')
+      .take(limit);
+  }
+
+  return await ctx.db.query('clips').take(limit);
+}
 
 /**
  * Get published clips.
@@ -9,7 +34,7 @@ import type { GetClipBySlugWithRelationsArgs, GetPublishedClipsArgs } from './ty
  * @param args - Query arguments
  * @returns Array of published clips
  */
-export async function getPublishedClips(ctx: QueryCtx, args: GetPublishedClipsArgs) {
+export async function getPublishedClips(ctx: QueryCtx, args: ListPublishedClipsArgs) {
   return await ctx.db
     .query('clips')
     .withIndex('by_status_and_published_at', (q) => q.eq('status', 'published'))

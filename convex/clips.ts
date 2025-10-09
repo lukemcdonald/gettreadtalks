@@ -1,0 +1,50 @@
+import { mutation, query } from './_generated/server';
+import { mutations, queries, validators } from './model/clips';
+
+// ============================================
+// QUERIES
+// ============================================
+
+export const getBySlug = query({
+  args: validators.getClipBySlugWithRelationsArgs,
+  handler: async (ctx, args) => {
+    return await queries.getBySlugWithRelations(ctx, args);
+  },
+  returns: validators.getClipBySlugWithRelationsReturns,
+});
+
+export const list = query({
+  args: validators.listClipsArgs,
+  handler: async (ctx, args) => {
+    return await queries.getClips(ctx, args);
+  },
+  returns: validators.listClipsReturns,
+});
+
+export const listPublished = query({
+  args: validators.listPublishedClipsArgs,
+  handler: async (ctx, args) => {
+    return await queries.getPublishedClips(ctx, args);
+  },
+  returns: validators.listPublishedClipsReturns,
+});
+
+// ============================================
+// MUTATIONS
+// ============================================
+
+export const create = mutation({
+  args: validators.createClipArgs,
+  handler: async (ctx, args) => {
+    return await mutations.createClip(ctx, args);
+  },
+  returns: validators.createClipReturns,
+});
+
+export const updateStatus = mutation({
+  args: validators.updateClipStatusArgs,
+  handler: async (ctx, args) => {
+    return await mutations.updateClipStatus(ctx, args);
+  },
+  returns: validators.updateClipStatusReturns,
+});

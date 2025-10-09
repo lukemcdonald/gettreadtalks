@@ -79,7 +79,7 @@ export async function getTalksWithSpeakers(ctx: QueryCtx, args: ListTalksArgs) {
  *
  * @param ctx - Database context
  * @param args - Query arguments
- * @returns Talk with speaker, collection, and topics data
+ * @returns Talk with speaker, collection, clips, and topics data
  */
 export async function getTalkBySlugWithRelations(ctx: QueryCtx, args: GetTalkBySlugArgs) {
   const talk = await getTalkBySlug(ctx, args);
@@ -89,6 +89,11 @@ export async function getTalkBySlugWithRelations(ctx: QueryCtx, args: GetTalkByS
   }
 
   const queries = {
+    clips: ctx.db
+      .query('clips')
+      .withIndex('by_talk_id', (q) => q.eq('talkId', talk._id))
+      .filter((q) => q.eq(q.field('status'), 'published'))
+      .collect(),
     collection: talk.collectionId ? ctx.db.get(talk.collectionId) : null,
     speaker: talk.speakerId ? ctx.db.get(talk.speakerId) : null,
     talkTopics: ctx.db
@@ -97,7 +102,8 @@ export async function getTalkBySlugWithRelations(ctx: QueryCtx, args: GetTalkByS
       .collect(),
   };
 
-  const [collection, speaker, talkTopics] = await Promise.all([
+  const [clips, collection, speaker, talkTopics] = await Promise.all([
+    queries.clips,
     queries.collection,
     queries.speaker,
     queries.talkTopics,
@@ -114,6 +120,7 @@ export async function getTalkBySlugWithRelations(ctx: QueryCtx, args: GetTalkByS
   const validTopics = topics.filter((topic) => topic !== null);
 
   return {
+    clips,
     collection,
     speaker,
     talk,

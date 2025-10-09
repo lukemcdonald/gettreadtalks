@@ -1,7 +1,10 @@
 import { v } from 'convex/values';
 
 import { statusType } from '../../lib/validators';
+import { clipFields } from '../clips/schema';
+import { collectionFields } from '../collections/schema';
 import { speakerFields } from '../speakers/schema';
+import { topicFields } from '../topics/schema';
 import { talkFields } from './schema';
 
 export const createTalkArgs = {
@@ -25,10 +28,11 @@ export const getTalkBySlugArgs = {
 };
 export const getTalkBySlugReturns = v.union(
   v.object({
-    collection: v.union(v.any(), v.null()),
-    speaker: v.union(v.any(), v.null()),
-    talk: v.any(),
-    topics: v.array(v.any()),
+    clips: v.array(v.object(clipFields)),
+    collection: v.union(v.object(collectionFields), v.null()),
+    speaker: v.union(v.object(speakerFields), v.null()),
+    talk: v.object(talkFields),
+    topics: v.array(v.object(topicFields)),
   }),
   v.null(),
 );
