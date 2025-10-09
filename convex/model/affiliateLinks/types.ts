@@ -8,17 +8,19 @@ export type GetAffiliateLinkArgs = ObjectType<typeof validators.getAffiliateLink
 export type GetAffiliateLinkBySlugArgs = ObjectType<typeof validators.getAffiliateLinkBySlugArgs>;
 export type GetAffiliateLinkBySlugReturns = Infer<typeof validators.getAffiliateLinkBySlugReturns>;
 export type GetAffiliateLinkReturns = Infer<typeof validators.getAffiliateLinkReturns>;
-export type GetAffiliateLinksByAffiliateArgs = ObjectType<
-  typeof validators.getAffiliateLinksByAffiliateArgs
->;
-export type GetAffiliateLinksByAffiliateReturns = Infer<
-  typeof validators.getAffiliateLinksByAffiliateReturns
->;
-export type GetAffiliateLinksByTypeArgs = ObjectType<typeof validators.getAffiliateLinksByTypeArgs>;
-export type GetAffiliateLinksByTypeReturns = Infer<
-  typeof validators.getAffiliateLinksByTypeReturns
->;
 export type ListAffiliateLinksArgs = ObjectType<typeof validators.listAffiliateLinksArgs>;
+export type ListAffiliateLinksByAffiliateArgs = ObjectType<
+  typeof validators.listAffiliateLinksByAffiliateArgs
+>;
+export type ListAffiliateLinksByAffiliateReturns = Infer<
+  typeof validators.listAffiliateLinksByAffiliateReturns
+>;
+export type ListAffiliateLinksByTypeArgs = ObjectType<
+  typeof validators.listAffiliateLinksByTypeArgs
+>;
+export type ListAffiliateLinksByTypeReturns = Infer<
+  typeof validators.listAffiliateLinksByTypeReturns
+>;
 export type ListAffiliateLinksReturns = Infer<typeof validators.listAffiliateLinksReturns>;
 export type UpdateAffiliateLinkArgs = ObjectType<typeof validators.updateAffiliateLinkArgs>;
 export type UpdateAffiliateLinkReturns = Infer<typeof validators.updateAffiliateLinkReturns>;

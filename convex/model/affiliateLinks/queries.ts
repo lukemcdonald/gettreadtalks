@@ -4,9 +4,9 @@ import { AffiliateLinkType } from './schema';
 import type {
   GetAffiliateLinkArgs,
   GetAffiliateLinkBySlugArgs,
-  GetAffiliateLinksByAffiliateArgs,
-  GetAffiliateLinksByTypeArgs,
   ListAffiliateLinksArgs,
+  ListAffiliateLinksByAffiliateArgs,
+  ListAffiliateLinksByTypeArgs,
 } from './types';
 
 /**
@@ -41,7 +41,7 @@ export async function getAffiliateLinkBySlug(ctx: QueryCtx, args: GetAffiliateLi
  * @param args - Query arguments with defaults
  * @returns Array of affiliate links of the specified type
  */
-export async function getAffiliateLinksByType(ctx: QueryCtx, args: GetAffiliateLinksByTypeArgs) {
+export async function getAffiliateLinksByType(ctx: QueryCtx, args: ListAffiliateLinksByTypeArgs) {
   const { limit = 20, type } = args;
 
   const allLinks = await ctx.db.query('affiliateLinks').collect();
@@ -64,7 +64,7 @@ export async function getAffiliateLinksByType(ctx: QueryCtx, args: GetAffiliateL
  */
 export async function getAffiliateLinksByAffiliate(
   ctx: QueryCtx,
-  args: GetAffiliateLinksByAffiliateArgs,
+  args: ListAffiliateLinksByAffiliateArgs,
 ) {
   const { affiliate, limit = 20 } = args;
 

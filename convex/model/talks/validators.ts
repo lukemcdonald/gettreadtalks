@@ -32,23 +32,29 @@ export const getTalkBySlugReturns = v.union(
   v.null(),
 );
 
-export const getTalksByCollectionArgs = {
-  collectionId: v.id('collections'),
-  limit: v.optional(v.number()),
-};
-export const getTalksByCollectionReturns = v.array(v.object(talkFields));
-
-export const getTalksBySpeakerArgs = {
-  limit: v.optional(v.number()),
-  speakerId: v.id('speakers'),
-};
-export const getTalksBySpeakerReturns = v.array(v.object(talkFields));
-
 export const listTalksArgs = {
   limit: v.optional(v.number()),
   status: v.optional(statusType),
 };
-export const listTalksReturns = v.array(
+export const listTalksReturns = v.array(v.object(talkFields));
+
+export const listTalksByCollectionArgs = {
+  collectionId: v.id('collections'),
+  limit: v.optional(v.number()),
+};
+export const listTalksByCollectionReturns = v.array(v.object(talkFields));
+
+export const listTalksBySpeakerArgs = {
+  limit: v.optional(v.number()),
+  speakerId: v.id('speakers'),
+};
+export const listTalksBySpeakerReturns = v.array(v.object(talkFields));
+
+export const listTalksWithSpeakersArgs = {
+  limit: v.optional(v.number()),
+  status: v.optional(statusType),
+};
+export const listTalksWithSpeakersReturns = v.array(
   v.object({
     ...talkFields,
     speaker: v.union(v.object(speakerFields), v.null()),

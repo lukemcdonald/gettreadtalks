@@ -30,13 +30,21 @@ convex/
 
 ### Query Functions (reads)
 
-Describe the data operation:
+Follow the `get` vs `list` pattern:
 
+**`get*` queries** - Return single document or null:
 ```ts
-export const get = query(...)         // Get single by ID
-export const getBySlug = query(...)   // Get by other field
-export const list = query(...)        // Get collection
-export const search = query(...)      // Filtered list
+export const get = query(...)              // Get by ID
+export const getBySlug = query(...)        // Get by unique field
+export const getWithRelations = query(...) // Get with joined data
+```
+
+**`list*` queries** - Return array of documents:
+```ts
+export const list = query(...)                // Basic array query
+export const listBySpeaker = query(...)       // Filtered by relation
+export const listByType = query(...)          // Filtered by field
+export const listWithSpeakers = query(...)    // With joined data
 ```
 
 ### Mutation Functions (writes)
@@ -55,21 +63,27 @@ export const update = mutation(...)   // Update existing
 ### Function Naming Examples
 
 ```ts
-// ✅ Clear
-export const getBySlug = query(...)
-export const list = query(...)
+// ✅ Clear - Return type obvious from name
+export const get = query(...)              // Returns: Doc<"talks"> | null
+export const getBySlug = query(...)        // Returns: Doc<"talks"> | null
+export const list = query(...)             // Returns: Doc<"talks">[]
+export const listBySpeaker = query(...)    // Returns: Doc<"talks">[]
 
 // ❌ Vague
 export const data = query(...)
 export const stuff = query(...)
 
-// ✅ Concise
-export const get = query(...)            // api.items.get
-export const list = query(...)           // api.items.list
+// ❌ Confusing - Doesn't indicate return type
+export const getByCollection = query(...) // Returns array but starts with "get"
+export const getTalks = query(...)        // Redundant with file name
 
-// ❌ Redundant (file provides context)
-export const getItem = query(...)        // in items.ts
-export const listItems = query(...)      // in items.ts
+// ✅ Concise (file provides context)
+export const get = query(...)            // api.talks.get
+export const list = query(...)           // api.talks.list
+
+// ❌ Redundant
+export const getTalk = query(...)        // in talks.ts
+export const listTalks = query(...)      // in talks.ts
 ```
 
 ## Database Schema Conventions

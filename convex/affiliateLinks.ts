@@ -13,14 +13,6 @@ export const get = query({
   returns: validators.getAffiliateLinkReturns,
 });
 
-export const getByAffiliate = query({
-  args: validators.getAffiliateLinksByAffiliateArgs,
-  handler: async (ctx, args) => {
-    return await queries.getAffiliateLinksByAffiliate(ctx, args);
-  },
-  returns: validators.getAffiliateLinksByAffiliateReturns,
-});
-
 export const getBySlug = query({
   args: validators.getAffiliateLinkBySlugArgs,
   handler: async (ctx, args) => {
@@ -29,20 +21,28 @@ export const getBySlug = query({
   returns: validators.getAffiliateLinkBySlugReturns,
 });
 
-export const getByType = query({
-  args: validators.getAffiliateLinksByTypeArgs,
-  handler: async (ctx, args) => {
-    return await queries.getAffiliateLinksByType(ctx, args);
-  },
-  returns: validators.getAffiliateLinksByTypeReturns,
-});
-
 export const list = query({
   args: validators.listAffiliateLinksArgs,
   handler: async (ctx, args) => {
     return await queries.getAffiliateLinks(ctx, args);
   },
   returns: validators.listAffiliateLinksReturns,
+});
+
+export const listByAffiliate = query({
+  args: validators.listAffiliateLinksByAffiliateArgs,
+  handler: async (ctx, args) => {
+    return await queries.getAffiliateLinksByAffiliate(ctx, args);
+  },
+  returns: validators.listAffiliateLinksByAffiliateReturns,
+});
+
+export const listByType = query({
+  args: validators.listAffiliateLinksByTypeArgs,
+  handler: async (ctx, args) => {
+    return await queries.getAffiliateLinksByType(ctx, args);
+  },
+  returns: validators.listAffiliateLinksByTypeReturns,
 });
 
 // ============================================

@@ -33,20 +33,6 @@ export const getAffiliateLinkBySlugArgs = {
 
 export const getAffiliateLinkBySlugReturns = v.union(v.object(affiliateLinkFields), v.null());
 
-export const getAffiliateLinksByAffiliateArgs = {
-  affiliate: v.string(),
-  limit: v.optional(v.number()),
-};
-
-export const getAffiliateLinksByAffiliateReturns = v.array(v.object(affiliateLinkFields));
-
-export const getAffiliateLinksByTypeArgs = {
-  limit: v.optional(v.number()),
-  type: affiliateLinkTypes,
-};
-
-export const getAffiliateLinksByTypeReturns = v.array(v.object(affiliateLinkFields));
-
 export const listAffiliateLinksArgs = {
   affiliate: v.optional(v.string()),
   featured: v.optional(v.boolean()),
@@ -55,6 +41,20 @@ export const listAffiliateLinksArgs = {
 };
 
 export const listAffiliateLinksReturns = v.array(v.object(affiliateLinkFields));
+
+export const listAffiliateLinksByAffiliateArgs = {
+  affiliate: v.string(),
+  limit: v.optional(v.number()),
+};
+
+export const listAffiliateLinksByAffiliateReturns = v.array(v.object(affiliateLinkFields));
+
+export const listAffiliateLinksByTypeArgs = {
+  limit: v.optional(v.number()),
+  type: affiliateLinkTypes,
+};
+
+export const listAffiliateLinksByTypeReturns = v.array(v.object(affiliateLinkFields));
 
 export const updateAffiliateLinkArgs = {
   affiliate: v.optional(v.string()),

@@ -31,16 +31,23 @@ All Convex files follow a consistent organization pattern with clear visual sect
 
 ### Query Organization
 
-Queries grouped alphabetical within each group:
+Queries ordered alphabetically following the `get`/`list` pattern:
 
 ```ts
 // ✅ Good - Alphabetical
 export const get = query({...});
-export const getByCategory = query({...});
 export const getBySlug = query({...});
 export const getWithRelations = query({...});
 export const list = query({...});
+export const listByCategory = query({...});
+export const listBySpeaker = query({...});
+export const listWithSpeakers = query({...});
 ```
+
+**Pattern:**
+- `get*` queries return single document or `null`
+- `list*` queries return arrays
+- Alphabetical within each prefix group
 
 ### Mutation Organization
 

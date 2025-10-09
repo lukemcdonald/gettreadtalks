@@ -37,13 +37,52 @@ export function useUpdateItem();
 
 ## Feature Queries (Server)
 
-Mirror Convex naming with `get` prefix:
+Mirror Convex naming with `get`/`list` pattern:
 
 ```ts
 // queries.ts - Server reads
+
+// Single items (return one or null)
 export async function getItem(id);
-export async function getItems({ categoryId });
+export async function getItemBySlug(slug);
+
+// Arrays (return array)
+export async function getItems({ filters });
+export async function getItemsByCategory(categoryId);
 ```
+
+### Convex Query Naming
+
+For Convex backend queries, follow the `get`/`list` pattern:
+
+**Single Items (Public API):**
+```ts
+// convex/items.ts
+export const get = query({...})           // getItem(id)
+export const getBySlug = query({...})     // getItemBySlug(slug)
+export const getWithDetails = query({...}) // getItemWithDetails(id)
+```
+
+**Arrays (Public API):**
+```ts
+// convex/items.ts
+export const list = query({...})                // getItems()
+export const listByCategory = query({...})      // getItemsByCategory(categoryId)
+export const listByUser = query({...})          // getItemsByUser(userId)
+export const listWithAuthors = query({...})     // getItemsWithAuthors()
+```
+
+**Implementation Layer:**
+The implementation functions in `convex/model/*/queries.ts` use verbose, descriptive names:
+```ts
+// convex/model/items/queries.ts
+export async function getItem(ctx, args) {...}
+export async function getItemBySlug(ctx, args) {...}
+export async function getItems(ctx, args) {...}
+export async function getItemsByCategory(ctx, args) {...}
+```
+
+See `convex-organization.mdc` for complete details.
 
 ## Feature Actions (Server)
 

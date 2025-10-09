@@ -3,9 +3,9 @@ import type { QueryCtx } from '../../_generated/server';
 import type {
   GetTalkArgs,
   GetTalkBySlugArgs,
-  GetTalksByCollectionArgs,
-  GetTalksBySpeakerArgs,
   ListTalksArgs,
+  ListTalksByCollectionArgs,
+  ListTalksBySpeakerArgs,
 } from './types';
 
 /**
@@ -109,7 +109,7 @@ export async function getTalkBySlugWithRelations(ctx: QueryCtx, args: GetTalkByS
  * @param args - Query arguments with defaults
  * @returns Array of talks
  */
-export async function getTalksBySpeaker(ctx: QueryCtx, args: GetTalksBySpeakerArgs) {
+export async function getTalksBySpeaker(ctx: QueryCtx, args: ListTalksBySpeakerArgs) {
   const { limit = 20, speakerId } = args;
 
   return await ctx.db
@@ -128,7 +128,7 @@ export async function getTalksBySpeaker(ctx: QueryCtx, args: GetTalksBySpeakerAr
  * @param args - Query arguments with defaults
  * @returns Array of talks sorted by collection order
  */
-export async function getTalksByCollection(ctx: QueryCtx, args: GetTalksByCollectionArgs) {
+export async function getTalksByCollection(ctx: QueryCtx, args: ListTalksByCollectionArgs) {
   const { collectionId, limit = 100 } = args;
 
   const talks = await ctx.db

@@ -13,14 +13,6 @@ export const get = query({
   returns: validators.getTalkReturns,
 });
 
-export const getByCollection = query({
-  args: validators.getTalksByCollectionArgs,
-  handler: async (ctx, args) => {
-    return await queries.getTalksByCollection(ctx, args);
-  },
-  returns: validators.getTalksByCollectionReturns,
-});
-
 export const getBySlug = query({
   args: validators.getTalkBySlugArgs,
   handler: async (ctx, args) => {
@@ -29,20 +21,36 @@ export const getBySlug = query({
   returns: validators.getTalkBySlugReturns,
 });
 
-export const getBySpeaker = query({
-  args: validators.getTalksBySpeakerArgs,
-  handler: async (ctx, args) => {
-    return await queries.getTalksBySpeaker(ctx, args);
-  },
-  returns: validators.getTalksBySpeakerReturns,
-});
-
 export const list = query({
   args: validators.listTalksArgs,
   handler: async (ctx, args) => {
-    return await queries.getTalksWithSpeakers(ctx, args);
+    return await queries.getTalks(ctx, args);
   },
   returns: validators.listTalksReturns,
+});
+
+export const listByCollection = query({
+  args: validators.listTalksByCollectionArgs,
+  handler: async (ctx, args) => {
+    return await queries.getTalksByCollection(ctx, args);
+  },
+  returns: validators.listTalksByCollectionReturns,
+});
+
+export const listBySpeaker = query({
+  args: validators.listTalksBySpeakerArgs,
+  handler: async (ctx, args) => {
+    return await queries.getTalksBySpeaker(ctx, args);
+  },
+  returns: validators.listTalksBySpeakerReturns,
+});
+
+export const listWithSpeakers = query({
+  args: validators.listTalksWithSpeakersArgs,
+  handler: async (ctx, args) => {
+    return await queries.getTalksWithSpeakers(ctx, args);
+  },
+  returns: validators.listTalksWithSpeakersReturns,
 });
 
 // ============================================
