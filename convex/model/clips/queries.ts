@@ -1,29 +1,39 @@
 import type { QueryCtx } from '../../_generated/server';
+import type { ObjectType } from 'convex/values';
+
+import { getClipBySlugWithRelationsArgs, getPublishedClipsArgs } from './validators';
 
 /**
  * Get published clips.
  *
  * @param ctx - Database context
- * @param limit - Maximum number of results
+ * @param args - Query arguments
  * @returns Array of published clips
  */
-export async function getPublishedClips(ctx: QueryCtx, limit: number) {
+export async function getPublishedClips(
+  ctx: QueryCtx,
+  args: ObjectType<typeof getPublishedClipsArgs>,
+) {
   return await ctx.db
     .query('clips')
     .withIndex('by_status_and_published_at', (q) => q.eq('status', 'published'))
     .order('desc')
-    .take(limit);
+    .take(args.limit);
 }
 
 /**
  * Get clip by slug with related data.
  *
  * @param ctx - Database context
- * @param slug - Clip slug
- * @param topicLimit - Maximum number of topics to fetch
+ * @param args - Query arguments with defaults
  * @returns Clip with speaker, talk, and topics data
  */
-export async function getBySlugWithRelations(ctx: QueryCtx, slug: string, topicLimit: number = 20) {
+export async function getBySlugWithRelations(
+  ctx: QueryCtx,
+  args: ObjectType<typeof getClipBySlugWithRelationsArgs>,
+) {
+  const { slug, topicLimit = 20 } = args;
+
   const clip = await ctx.db
     .query('clips')
     .withIndex('by_slug', (q) => q.eq('slug', slug))

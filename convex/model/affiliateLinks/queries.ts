@@ -1,30 +1,44 @@
 import type { Id } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
+import type { ObjectType } from 'convex/values';
 
 import { AffiliateLinkType } from './schema';
+import {
+  getAffiliateLinkArgs,
+  getAffiliateLinkBySlugArgs,
+  getAffiliateLinksByAffiliateArgs,
+  getAffiliateLinksByTypeArgs,
+  listAffiliateLinksArgs,
+} from './validators';
 
 /**
  * Get affiliate link by ID.
  *
  * @param ctx - Database context
- * @param id - Affiliate link ID
+ * @param args - Query arguments
  * @returns Affiliate link or null if not found
  */
-export async function getAffiliateLink(ctx: QueryCtx, id: Id<'affiliateLinks'>) {
-  return await ctx.db.get(id);
+export async function getAffiliateLink(
+  ctx: QueryCtx,
+  args: ObjectType<typeof getAffiliateLinkArgs>,
+) {
+  return await ctx.db.get(args.id);
 }
 
 /**
  * Get affiliate link by slug.
  *
  * @param ctx - Database context
- * @param slug - Affiliate link slug
+ * @param args - Query arguments
  * @returns Affiliate link or null if not found
  */
-export async function getAffiliateLinkBySlug(ctx: QueryCtx, slug: string) {
+export async function getAffiliateLinkBySlug(
+  ctx: QueryCtx,
+  args: ObjectType<typeof getAffiliateLinkBySlugArgs>,
+) {
   return await ctx.db
     .query('affiliateLinks')
-    .withIndex('by_slug', (q) => q.eq('slug', slug))
+    .withIndex('by_slug', (q) => q.eq('slug', args.slug))
     .unique();
 }
 
@@ -32,15 +46,15 @@ export async function getAffiliateLinkBySlug(ctx: QueryCtx, slug: string) {
  * Get affiliate links by type.
  *
  * @param ctx - Database context
- * @param type - Type of affiliate link (app, book, movie, music, podcast)
- * @param limit - Maximum number of results
+ * @param args - Query arguments with defaults
  * @returns Array of affiliate links of the specified type
  */
 export async function getAffiliateLinksByType(
   ctx: QueryCtx,
-  type: AffiliateLinkType,
-  limit: number = 20,
+  args: ObjectType<typeof getAffiliateLinksByTypeArgs>,
 ) {
+  const { limit = 20, type } = args;
+
   const allLinks = await ctx.db.query('affiliateLinks').collect();
 
   // Filter by type since there's no index for type
@@ -56,15 +70,15 @@ export async function getAffiliateLinksByType(
  * Get affiliate links by affiliate.
  *
  * @param ctx - Database context
- * @param affiliate - Affiliate name
- * @param limit - Maximum number of results
+ * @param args - Query arguments with defaults
  * @returns Array of affiliate links from the specified affiliate
  */
 export async function getAffiliateLinksByAffiliate(
   ctx: QueryCtx,
-  affiliate: string,
-  limit: number = 20,
+  args: ObjectType<typeof getAffiliateLinksByAffiliateArgs>,
 ) {
+  const { affiliate, limit = 20 } = args;
+
   const allLinks = await ctx.db.query('affiliateLinks').collect();
 
   // Filter by affiliate since there's no index for affiliate
@@ -80,19 +94,14 @@ export async function getAffiliateLinksByAffiliate(
  * Get all affiliate links with optional filters.
  *
  * @param ctx - Database context
- * @param options - Query options
+ * @param args - Query arguments with defaults
  * @returns Array of affiliate links
  */
 export async function getAffiliateLinks(
   ctx: QueryCtx,
-  options: {
-    affiliate?: string;
-    featured?: boolean;
-    limit?: number;
-    type?: AffiliateLinkType;
-  } = {},
+  args: ObjectType<typeof listAffiliateLinksArgs>,
 ) {
-  const { affiliate, featured, limit = 50, type } = options;
+  const { affiliate, featured, limit = 50, type } = args;
 
   // Use index if filtering by featured, otherwise get all links
   const allLinks =

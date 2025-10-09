@@ -1,28 +1,39 @@
 import type { Id } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
+import type { ObjectType } from 'convex/values';
+
+import {
+  getCollectionArgs,
+  getCollectionBySlugArgs,
+  getCollectionWithTalksArgs,
+  listCollectionsArgs,
+} from './validators';
 
 /**
  * Get collection by ID.
  *
  * @param ctx - Database context
- * @param id - Collection ID
+ * @param args - Query arguments
  * @returns Collection or null if not found
  */
-export async function getCollection(ctx: QueryCtx, id: Id<'collections'>) {
-  return await ctx.db.get(id);
+export async function getCollection(ctx: QueryCtx, args: ObjectType<typeof getCollectionArgs>) {
+  return await ctx.db.get(args.id);
 }
 
 /**
  * Get collection by slug.
  *
  * @param ctx - Database context
- * @param slug - Collection slug
+ * @param args - Query arguments
  * @returns Collection or null if not found
  */
-export async function getCollectionBySlug(ctx: QueryCtx, slug: string) {
+export async function getCollectionBySlug(
+  ctx: QueryCtx,
+  args: ObjectType<typeof getCollectionBySlugArgs>,
+) {
   return await ctx.db
     .query('collections')
-    .withIndex('by_slug', (q) => q.eq('slug', slug))
+    .withIndex('by_slug', (q) => q.eq('slug', args.slug))
     .unique();
 }
 
@@ -30,10 +41,12 @@ export async function getCollectionBySlug(ctx: QueryCtx, slug: string) {
  * Get collections.
  *
  * @param ctx - Database context
- * @param limit - Maximum number of results
+ * @param args - Query arguments with defaults
  * @returns Array of collections
  */
-export async function getCollections(ctx: QueryCtx, limit: number = 100) {
+export async function getCollections(ctx: QueryCtx, args: ObjectType<typeof listCollectionsArgs>) {
+  const { limit = 100 } = args;
+
   return await ctx.db.query('collections').take(limit);
 }
 
@@ -41,12 +54,16 @@ export async function getCollections(ctx: QueryCtx, limit: number = 100) {
  * Get collection with its talks.
  *
  * @param ctx - Database context
- * @param slug - Collection slug
- * @param limit - Maximum number of talks to fetch
+ * @param args - Query arguments with defaults
  * @returns Collection with its talks
  */
-export async function getCollectionWithTalks(ctx: QueryCtx, slug: string, limit: number = 100) {
-  const collection = await getCollectionBySlug(ctx, slug);
+export async function getCollectionWithTalks(
+  ctx: QueryCtx,
+  args: ObjectType<typeof getCollectionWithTalksArgs>,
+) {
+  const { limit = 100, slug } = args;
+
+  const collection = await getCollectionBySlug(ctx, { slug });
 
   if (!collection) {
     return null;

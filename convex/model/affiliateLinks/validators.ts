@@ -17,6 +17,31 @@ export const createAffiliateLinkArgs = {
   url: v.string(),
 };
 
+export const getAffiliateLinkArgs = {
+  id: v.id('affiliateLinks'),
+};
+
+export const getAffiliateLinkBySlugArgs = {
+  slug: v.string(),
+};
+
+export const getAffiliateLinksByAffiliateArgs = {
+  affiliate: v.string(),
+  limit: v.optional(v.number()),
+};
+
+export const getAffiliateLinksByTypeArgs = {
+  limit: v.optional(v.number()),
+  type: affiliateLinkTypes,
+};
+
+export const listAffiliateLinksArgs = {
+  affiliate: v.optional(v.string()),
+  featured: v.optional(v.boolean()),
+  limit: v.optional(v.number()),
+  type: v.optional(affiliateLinkTypes),
+};
+
 export const updateAffiliateLinkArgs = {
   affiliate: v.optional(v.string()),
   description: v.optional(v.string()),

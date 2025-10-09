@@ -10,6 +10,18 @@ export const createSpeakerArgs = {
   websiteUrl: v.optional(v.string()),
 };
 
+export const getSpeakerArgs = {
+  id: v.id('speakers'),
+};
+
+export const getSpeakerBySlugArgs = {
+  slug: v.string(),
+};
+
+export const listSpeakersArgs = {
+  limit: v.optional(v.number()),
+};
+
 export const updateSpeakerArgs = {
   description: v.optional(v.string()),
   firstName: v.optional(v.string()),

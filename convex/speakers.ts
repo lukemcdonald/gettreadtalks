@@ -1,42 +1,32 @@
 import { v } from 'convex/values';
 
 import { mutation, query } from './_generated/server';
-import { createSpeaker, updateSpeaker } from './model/speakers/mutations';
-import { getSpeaker, getSpeakerBySlug, getSpeakers } from './model/speakers/queries';
-import { speakerFields } from './model/speakers/schema';
-import { createSpeakerArgs, updateSpeakerArgs } from './model/speakers/validators';
+import { mutations, queries, speakerFields, validators } from './model/speakers';
 
 // ============================================
 // QUERIES
 // ============================================
 
 export const get = query({
-  args: {
-    id: v.id('speakers'),
-  },
+  args: validators.getSpeakerArgs,
   handler: async (ctx, args) => {
-    return await getSpeaker(ctx, args.id);
+    return await queries.getSpeaker(ctx, args);
   },
   returns: v.union(v.object(speakerFields), v.null()),
 });
 
 export const getBySlug = query({
-  args: {
-    slug: v.string(),
-  },
+  args: validators.getSpeakerBySlugArgs,
   handler: async (ctx, args) => {
-    return await getSpeakerBySlug(ctx, args.slug);
+    return await queries.getSpeakerBySlug(ctx, args);
   },
   returns: v.union(v.object(speakerFields), v.null()),
 });
 
 export const list = query({
-  args: {
-    limit: v.optional(v.number()),
-  },
+  args: validators.listSpeakersArgs,
   handler: async (ctx, args) => {
-    const { limit = 100 } = args;
-    return await getSpeakers(ctx, limit);
+    return await queries.getSpeakers(ctx, args);
   },
   returns: v.array(v.object(speakerFields)),
 });
@@ -46,17 +36,17 @@ export const list = query({
 // ============================================
 
 export const create = mutation({
-  args: createSpeakerArgs,
+  args: validators.createSpeakerArgs,
   handler: async (ctx, args) => {
-    return await createSpeaker(ctx, args);
+    return await mutations.createSpeaker(ctx, args);
   },
   returns: v.id('speakers'),
 });
 
 export const update = mutation({
-  args: updateSpeakerArgs,
+  args: validators.updateSpeakerArgs,
   handler: async (ctx, args) => {
-    return await updateSpeaker(ctx, args);
+    return await mutations.updateSpeaker(ctx, args);
   },
   returns: v.id('speakers'),
 });

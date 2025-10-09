@@ -11,6 +11,15 @@ export const createClipArgs = {
   title: v.string(),
 };
 
+export const getClipBySlugWithRelationsArgs = {
+  slug: v.string(),
+  topicLimit: v.optional(v.number()),
+};
+
+export const getPublishedClipsArgs = {
+  limit: v.number(),
+};
+
 export const updateClipStatusArgs = {
   id: v.id('clips'),
   status: v.union(

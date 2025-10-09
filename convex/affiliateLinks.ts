@@ -1,91 +1,48 @@
 import { v } from 'convex/values';
 
 import { mutation, query } from './_generated/server';
-import { createAffiliateLink, updateAffiliateLink } from './model/affiliateLinks/mutations';
-import {
-  getAffiliateLink,
-  getAffiliateLinkBySlug,
-  getAffiliateLinks,
-  getAffiliateLinksByAffiliate,
-  getAffiliateLinksByType,
-} from './model/affiliateLinks/queries';
-import { affiliateLinkFields } from './model/affiliateLinks/schema';
-import {
-  createAffiliateLinkArgs,
-  updateAffiliateLinkArgs,
-} from './model/affiliateLinks/validators';
+import { affiliateLinkFields, mutations, queries, validators } from './model/affiliateLinks';
 
 // ============================================
 // QUERIES
 // ============================================
 
 export const get = query({
-  args: {
-    id: v.id('affiliateLinks'),
-  },
+  args: validators.getAffiliateLinkArgs,
   handler: async (ctx, args) => {
-    return await getAffiliateLink(ctx, args.id);
+    return await queries.getAffiliateLink(ctx, args);
   },
   returns: v.union(v.object(affiliateLinkFields), v.null()),
 });
 
 export const getByAffiliate = query({
-  args: {
-    affiliate: v.string(),
-    limit: v.optional(v.number()),
-  },
+  args: validators.getAffiliateLinksByAffiliateArgs,
   handler: async (ctx, args) => {
-    const { affiliate, limit = 20 } = args;
-    return await getAffiliateLinksByAffiliate(ctx, affiliate, limit);
+    return await queries.getAffiliateLinksByAffiliate(ctx, args);
   },
   returns: v.array(v.object(affiliateLinkFields)),
 });
 
 export const getBySlug = query({
-  args: {
-    slug: v.string(),
-  },
+  args: validators.getAffiliateLinkBySlugArgs,
   handler: async (ctx, args) => {
-    return await getAffiliateLinkBySlug(ctx, args.slug);
+    return await queries.getAffiliateLinkBySlug(ctx, args);
   },
   returns: v.union(v.object(affiliateLinkFields), v.null()),
 });
 
 export const getByType = query({
-  args: {
-    limit: v.optional(v.number()),
-    type: v.union(
-      v.literal('app'),
-      v.literal('book'),
-      v.literal('movie'),
-      v.literal('music'),
-      v.literal('podcast'),
-    ),
-  },
+  args: validators.getAffiliateLinksByTypeArgs,
   handler: async (ctx, args) => {
-    const { limit = 20, type } = args;
-    return await getAffiliateLinksByType(ctx, type, limit);
+    return await queries.getAffiliateLinksByType(ctx, args);
   },
   returns: v.array(v.object(affiliateLinkFields)),
 });
 
 export const list = query({
-  args: {
-    affiliate: v.optional(v.string()),
-    featured: v.optional(v.boolean()),
-    limit: v.optional(v.number()),
-    type: v.optional(
-      v.union(
-        v.literal('app'),
-        v.literal('book'),
-        v.literal('movie'),
-        v.literal('music'),
-        v.literal('podcast'),
-      ),
-    ),
-  },
+  args: validators.listAffiliateLinksArgs,
   handler: async (ctx, args) => {
-    return await getAffiliateLinks(ctx, args);
+    return await queries.getAffiliateLinks(ctx, args);
   },
   returns: v.array(v.object(affiliateLinkFields)),
 });
@@ -95,17 +52,17 @@ export const list = query({
 // ============================================
 
 export const create = mutation({
-  args: createAffiliateLinkArgs,
+  args: validators.createAffiliateLinkArgs,
   handler: async (ctx, args) => {
-    return await createAffiliateLink(ctx, args);
+    return await mutations.createAffiliateLink(ctx, args);
   },
   returns: v.id('affiliateLinks'),
 });
 
 export const update = mutation({
-  args: updateAffiliateLinkArgs,
+  args: validators.updateAffiliateLinkArgs,
   handler: async (ctx, args) => {
-    return await updateAffiliateLink(ctx, args);
+    return await mutations.updateAffiliateLink(ctx, args);
   },
   returns: v.id('affiliateLinks'),
 });

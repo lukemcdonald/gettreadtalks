@@ -6,6 +6,23 @@ export const createCollectionArgs = {
   url: v.optional(v.string()),
 };
 
+export const getCollectionArgs = {
+  id: v.id('collections'),
+};
+
+export const getCollectionBySlugArgs = {
+  slug: v.string(),
+};
+
+export const getCollectionWithTalksArgs = {
+  limit: v.optional(v.number()),
+  slug: v.string(),
+};
+
+export const listCollectionsArgs = {
+  limit: v.optional(v.number()),
+};
+
 export const updateCollectionArgs = {
   description: v.optional(v.string()),
   id: v.id('collections'),

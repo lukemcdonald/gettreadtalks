@@ -1,7 +1,6 @@
 import * as mutations from './mutations';
 import * as queries from './queries';
 import * as validators from './validators';
-import { talkFields, talkTables } from './schema';
 
-export { mutations, queries, talkFields, talkTables, validators };
+export { mutations, queries, validators };
 export * from './types';

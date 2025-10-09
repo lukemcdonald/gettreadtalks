@@ -3,43 +3,32 @@ import { v } from 'convex/values';
 import { mutation, query } from './_generated/server';
 import { clipFields } from './model/clips/schema';
 import { talkFields } from './model/talks/schema';
-import { createTopic, updateTopic } from './model/topics/mutations.js';
-import { getTopic, getTopicBySlug, getTopics, getTopicWithContent } from './model/topics/queries';
-import { topicFields } from './model/topics/schema';
-import { createTopicArgs, updateTopicArgs } from './model/topics/validators';
+import { mutations, queries, topicFields, validators } from './model/topics';
 
 // ============================================
 // QUERIES
 // ============================================
 
 export const get = query({
-  args: {
-    id: v.id('topics'),
-  },
+  args: validators.getTopicArgs,
   handler: async (ctx, args) => {
-    return await getTopic(ctx, args.id);
+    return await queries.getTopic(ctx, args);
   },
   returns: v.union(v.object(topicFields), v.null()),
 });
 
 export const getBySlug = query({
-  args: {
-    slug: v.string(),
-  },
+  args: validators.getTopicBySlugArgs,
   handler: async (ctx, args) => {
-    return await getTopicBySlug(ctx, args.slug);
+    return await queries.getTopicBySlug(ctx, args);
   },
   returns: v.union(v.object(topicFields), v.null()),
 });
 
 export const getWithContent = query({
-  args: {
-    limit: v.optional(v.number()),
-    slug: v.string(),
-  },
+  args: validators.getTopicWithContentArgs,
   handler: async (ctx, args) => {
-    const { limit = 50, slug } = args;
-    return await getTopicWithContent(ctx, slug, limit);
+    return await queries.getTopicWithContent(ctx, args);
   },
   returns: v.union(
     v.object({
@@ -52,12 +41,9 @@ export const getWithContent = query({
 });
 
 export const list = query({
-  args: {
-    limit: v.optional(v.number()),
-  },
+  args: validators.listTopicsArgs,
   handler: async (ctx, args) => {
-    const { limit = 100 } = args;
-    return await getTopics(ctx, limit);
+    return await queries.getTopics(ctx, args);
   },
   returns: v.array(v.object(topicFields)),
 });
@@ -67,17 +53,17 @@ export const list = query({
 // ============================================
 
 export const create = mutation({
-  args: createTopicArgs,
+  args: validators.createTopicArgs,
   handler: async (ctx, args) => {
-    return await createTopic(ctx, args);
+    return await mutations.createTopic(ctx, args);
   },
   returns: v.id('topics'),
 });
 
 export const update = mutation({
-  args: updateTopicArgs,
+  args: validators.updateTopicArgs,
   handler: async (ctx, args) => {
-    return await updateTopic(ctx, args);
+    return await mutations.updateTopic(ctx, args);
   },
   returns: v.id('topics'),
 });

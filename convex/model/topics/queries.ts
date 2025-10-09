@@ -1,28 +1,36 @@
 import type { Doc, Id } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
+import type { ObjectType } from 'convex/values';
+
+import {
+  getTopicArgs,
+  getTopicBySlugArgs,
+  getTopicWithContentArgs,
+  listTopicsArgs,
+} from './validators';
 
 /**
  * Get topic by ID.
  *
  * @param ctx - Database context
- * @param id - Topic ID
+ * @param args - Query arguments
  * @returns Topic or null if not found
  */
-export async function getTopic(ctx: QueryCtx, id: Id<'topics'>) {
-  return await ctx.db.get(id);
+export async function getTopic(ctx: QueryCtx, args: ObjectType<typeof getTopicArgs>) {
+  return await ctx.db.get(args.id);
 }
 
 /**
  * Get topic by slug.
  *
  * @param ctx - Database context
- * @param slug - Topic slug
+ * @param args - Query arguments
  * @returns Topic or null if not found
  */
-export async function getTopicBySlug(ctx: QueryCtx, slug: string) {
+export async function getTopicBySlug(ctx: QueryCtx, args: ObjectType<typeof getTopicBySlugArgs>) {
   return await ctx.db
     .query('topics')
-    .withIndex('by_slug', (q) => q.eq('slug', slug))
+    .withIndex('by_slug', (q) => q.eq('slug', args.slug))
     .unique();
 }
 
@@ -30,10 +38,12 @@ export async function getTopicBySlug(ctx: QueryCtx, slug: string) {
  * Get topics.
  *
  * @param ctx - Database context
- * @param limit - Maximum number of results
+ * @param args - Query arguments with defaults
  * @returns Array of topics
  */
-export async function getTopics(ctx: QueryCtx, limit: number = 100) {
+export async function getTopics(ctx: QueryCtx, args: ObjectType<typeof listTopicsArgs>) {
+  const { limit = 100 } = args;
+
   return await ctx.db.query('topics').withIndex('by_title').take(limit);
 }
 
@@ -41,12 +51,16 @@ export async function getTopics(ctx: QueryCtx, limit: number = 100) {
  * Get topic with related talks and clips.
  *
  * @param ctx - Database context
- * @param slug - Topic slug
- * @param limit - Maximum number of talks/clips to fetch
+ * @param args - Query arguments with defaults
  * @returns Topic with related talks and clips
  */
-export async function getTopicWithContent(ctx: QueryCtx, slug: string, limit: number = 50) {
-  const topic = await getTopicBySlug(ctx, slug);
+export async function getTopicWithContent(
+  ctx: QueryCtx,
+  args: ObjectType<typeof getTopicWithContentArgs>,
+) {
+  const { limit = 50, slug } = args;
+
+  const topic = await getTopicBySlug(ctx, { slug });
 
   if (!topic) {
     return null;
