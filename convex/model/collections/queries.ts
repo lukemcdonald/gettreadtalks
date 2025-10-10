@@ -114,3 +114,33 @@ export async function getCollectionWithSpeakers(ctx: QueryCtx, args: { slug: str
     speakers: validSpeakers,
   };
 }
+
+/**
+ * Get collections by speaker.
+ *
+ * @param ctx - Database context
+ * @param args - Query arguments
+ * @returns Array of collections that contain talks by the speaker
+ */
+export async function getCollectionsBySpeaker(ctx: QueryCtx, args: { speakerId: string }) {
+  // Get all published talks by speaker
+  const talks = await ctx.db
+    .query('talks')
+    .withIndex('by_speaker_id_and_status', (q) =>
+      q.eq('speakerId', args.speakerId).eq('status', 'published'),
+    )
+    .collect();
+
+  // Get unique collection IDs (filter out talks without collections)
+  const collectionIds = [
+    ...new Set(talks.filter((talk) => talk.collectionId).map((talk) => talk.collectionId!)),
+  ];
+
+  // Fetch all collections in parallel
+  const collections = await Promise.all(collectionIds.map((id) => ctx.db.get(id)));
+
+  // Filter out null collections
+  const validCollections = collections.filter((collection) => collection !== null);
+
+  return validCollections;
+}

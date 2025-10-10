@@ -31,6 +31,12 @@ export const getCollectionBySlugArgs = {
 
 export const getCollectionBySlugReturns = v.union(v.object(collectionFields), v.null());
 
+export const getCollectionsBySpeakerArgs = {
+  speakerId: v.id('speakers'),
+};
+
+export const getCollectionsBySpeakerReturns = v.array(v.object(collectionFields));
+
 export const getCollectionWithSpeakersArgs = {
   slug: v.string(),
 };

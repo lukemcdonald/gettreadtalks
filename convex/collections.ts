@@ -13,6 +13,14 @@ export const get = query({
   returns: validators.getCollectionReturns,
 });
 
+export const getBySpeaker = query({
+  args: validators.getCollectionsBySpeakerArgs,
+  handler: async (ctx, args) => {
+    return await queries.getCollectionsBySpeaker(ctx, args);
+  },
+  returns: validators.getCollectionsBySpeakerReturns,
+});
+
 export const getBySlug = query({
   args: validators.getCollectionBySlugArgs,
   handler: async (ctx, args) => {
