@@ -221,3 +221,52 @@ export async function getRandomTalksBySpeaker(
 
   return shuffled.slice(0, limit);
 }
+
+/**
+ * Get total count of published talks.
+ *
+ * @param ctx - Database context
+ * @returns Count of published talks
+ */
+export async function getTalksCount(ctx: QueryCtx) {
+  const talks = await ctx.db
+    .query('talks')
+    .withIndex('by_status_and_published_at', (q) => q.eq('status', 'published'))
+    .collect();
+
+  return talks.length;
+}
+
+/**
+ * Get count of talks by topic.
+ *
+ * @param ctx - Database context
+ * @param args - Query arguments
+ * @returns Count of talks for topic
+ */
+export async function getTalksCountByTopic(ctx: QueryCtx, args: { topicId: string }) {
+  const talkTopics = await ctx.db
+    .query('talksOnTopics')
+    .withIndex('by_topic_id', (q) => q.eq('topicId', args.topicId))
+    .collect();
+
+  return talkTopics.length;
+}
+
+/**
+ * Get count of talks by collection.
+ *
+ * @param ctx - Database context
+ * @param args - Query arguments
+ * @returns Count of talks in collection
+ */
+export async function getTalksCountByCollection(ctx: QueryCtx, args: { collectionId: string }) {
+  const talks = await ctx.db
+    .query('talks')
+    .withIndex('by_collection_id_and_status', (q) =>
+      q.eq('collectionId', args.collectionId).eq('status', 'published'),
+    )
+    .collect();
+
+  return talks.length;
+}

@@ -63,6 +63,18 @@ export async function getFeaturedSpeakers(ctx: QueryCtx, args: { limit?: number 
 
   // Shuffle and return limited number
   const shuffled = speakers.sort(() => Math.random() - 0.5);
-
+  
   return shuffled.slice(0, limit);
+}
+
+/**
+ * Get total count of speakers.
+ *
+ * @param ctx - Database context
+ * @returns Count of speakers
+ */
+export async function getSpeakersCount(ctx: QueryCtx) {
+  const speakers = await ctx.db.query('speakers').collect();
+
+  return speakers.length;
 }

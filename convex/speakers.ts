@@ -29,6 +29,14 @@ export const getFeatured = query({
   returns: validators.getFeaturedSpeakersReturns,
 });
 
+export const getSpeakersCount = query({
+  args: validators.getSpeakersCountArgs,
+  handler: async (ctx, args) => {
+    return await queries.getSpeakersCount(ctx);
+  },
+  returns: validators.getSpeakersCountReturns,
+});
+
 export const list = query({
   args: validators.listSpeakersArgs,
   handler: async (ctx, args) => {

@@ -11,6 +11,16 @@ export type GetFeaturedTalksReturns = Infer<typeof validators.getFeaturedTalksRe
 export type GetRandomTalksBySpeakerArgs = ObjectType<typeof validators.getRandomTalksBySpeakerArgs>;
 export type GetRandomTalksBySpeakerReturns = Infer<typeof validators.getRandomTalksBySpeakerReturns>;
 export type GetTalkArgs = ObjectType<typeof validators.getTalkArgs>;
+export type GetTalksCountArgs = ObjectType<typeof validators.getTalksCountArgs>;
+export type GetTalksCountByCollectionArgs = ObjectType<
+  typeof validators.getTalksCountByCollectionArgs
+>;
+export type GetTalksCountByCollectionReturns = Infer<
+  typeof validators.getTalksCountByCollectionReturns
+>;
+export type GetTalksCountByTopicArgs = ObjectType<typeof validators.getTalksCountByTopicArgs>;
+export type GetTalksCountByTopicReturns = Infer<typeof validators.getTalksCountByTopicReturns>;
+export type GetTalksCountReturns = Infer<typeof validators.getTalksCountReturns>;
 export type GetTalkBySlugArgs = ObjectType<typeof validators.getTalkBySlugArgs>;
 export type GetTalkBySlugReturns = Infer<typeof validators.getTalkBySlugReturns>;
 export type GetTalkReturns = Infer<typeof validators.getTalkReturns>;

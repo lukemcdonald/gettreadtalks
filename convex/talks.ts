@@ -37,6 +37,30 @@ export const getRandomBySpeaker = query({
   returns: validators.getRandomTalksBySpeakerReturns,
 });
 
+export const getTalksCount = query({
+  args: validators.getTalksCountArgs,
+  handler: async (ctx, args) => {
+    return await queries.getTalksCount(ctx);
+  },
+  returns: validators.getTalksCountReturns,
+});
+
+export const getTalksCountByCollection = query({
+  args: validators.getTalksCountByCollectionArgs,
+  handler: async (ctx, args) => {
+    return await queries.getTalksCountByCollection(ctx, args);
+  },
+  returns: validators.getTalksCountByCollectionReturns,
+});
+
+export const getTalksCountByTopic = query({
+  args: validators.getTalksCountByTopicArgs,
+  handler: async (ctx, args) => {
+    return await queries.getTalksCountByTopic(ctx, args);
+  },
+  returns: validators.getTalksCountByTopicReturns,
+});
+
 export const list = query({
   args: validators.listTalksArgs,
   handler: async (ctx, args) => {
