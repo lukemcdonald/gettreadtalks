@@ -78,9 +78,19 @@ export const create = mutation({
 
 ### Composite Return Types
 
-For queries that join multiple tables, use `v.any()` with TypeScript comments:
+For queries that join multiple tables, prefer specific validators when possible:
 
 ```ts
+// ✅ Best - Use specific field objects
+returns: v.union(
+  v.object({
+    item: v.object(itemFields),
+    owner: v.union(v.object(userFields), v.null()),
+  }),
+  v.null(),
+)
+
+// ⚠️ Only if structure is too complex
 returns: v.union(
   v.object({
     item: v.any(), // Doc<"items">
@@ -91,6 +101,45 @@ returns: v.union(
 ```
 
 **Why:** Field objects keep schema and validators in sync. Changes propagate automatically.
+
+## Type Safety
+
+### Avoid `v.any()`
+
+Use specific validators instead of `v.any()` to maintain type safety:
+
+```ts
+// ❌ Bad - loses all type safety
+export const getUser = query({
+  args: { id: v.id('users') },
+  returns: v.any(),
+  handler: async (ctx, { id }) => {
+    return await ctx.db.get(id);
+  },
+});
+
+// ✅ Good - maintains type safety
+export const getUser = query({
+  args: { id: v.id('users') },
+  returns: v.union(v.object(userFields), v.null()),
+  handler: async (ctx, { id }) => {
+    return await ctx.db.get(id);
+  },
+});
+```
+
+**When `v.any()` is acceptable:**
+- Complex joined types where exact structure can't be defined
+- Always add TypeScript comment to document expected type
+- Use `v.object()` with specific fields when possible
+
+```ts
+// ✅ Acceptable with comment
+returns: v.object({
+  post: v.any(), // Doc<"posts">
+  author: v.union(v.any(), v.null()), // Doc<"users"> | null
+})
+```
 
 ## Index Optimization
 
@@ -123,3 +172,5 @@ Use compound index for both queries:
 2. Remove unused indexes
 3. Add indexes for filtered fields with large result sets (1000+)
 4. Use pagination/`.take()` instead of `.collect()` for large queries
+5. Replace `v.any()` with specific validators where possible
+6. Add TypeScript comments for any remaining `v.any()` usage
