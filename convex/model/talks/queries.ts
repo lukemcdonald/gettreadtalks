@@ -169,3 +169,58 @@ export async function getTalksByCollection(ctx: QueryCtx, args: ListTalksByColle
 
   return sortedTalks;
 }
+
+/**
+ * Get featured talks (random selection).
+ *
+ * @param ctx - Database context
+ * @param args - Query arguments with defaults
+ * @returns Array of random featured talks
+ */
+export async function getFeaturedTalks(
+  ctx: QueryCtx,
+  args: { limit?: number } = {},
+) {
+  const { limit = 5 } = args;
+
+  const talks = await ctx.db
+    .query('talks')
+    .withIndex('by_featured_and_status', (q) => q.eq('featured', true).eq('status', 'published'))
+    .collect();
+
+  // Shuffle and return limited number
+  const shuffled = talks.sort(() => Math.random() - 0.5);
+  
+  return shuffled.slice(0, limit);
+}
+
+/**
+ * Get random talks by speaker (excluding a specific talk).
+ *
+ * @param ctx - Database context
+ * @param args - Query arguments
+ * @returns Array of random talks by speaker
+ */
+export async function getRandomTalksBySpeaker(
+  ctx: QueryCtx,
+  args: { excludeTalkId?: string; limit?: number; speakerId: string },
+) {
+  const { excludeTalkId, limit = 5, speakerId } = args;
+
+  const talks = await ctx.db
+    .query('talks')
+    .withIndex('by_speaker_id_and_status', (q) =>
+      q.eq('speakerId', speakerId).eq('status', 'published'),
+    )
+    .collect();
+
+  // Filter out excluded talk if provided
+  const filteredTalks = excludeTalkId
+    ? talks.filter((talk) => talk._id !== excludeTalkId)
+    : talks;
+
+  // Shuffle and return limited number
+  const shuffled = filteredTalks.sort(() => Math.random() - 0.5);
+  
+  return shuffled.slice(0, limit);
+}

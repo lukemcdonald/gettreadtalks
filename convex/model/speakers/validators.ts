@@ -20,6 +20,12 @@ export const deleteSpeakerArgs = {
 
 export const deleteSpeakerReturns = v.null();
 
+export const getFeaturedSpeakersArgs = {
+  limit: v.optional(v.number()),
+};
+
+export const getFeaturedSpeakersReturns = v.array(v.object(speakerFields));
+
 export const getSpeakerArgs = {
   id: v.id('speakers'),
 };

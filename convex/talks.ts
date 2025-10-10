@@ -21,6 +21,22 @@ export const getBySlug = query({
   returns: validators.getTalkBySlugReturns,
 });
 
+export const getFeatured = query({
+  args: validators.getFeaturedTalksArgs,
+  handler: async (ctx, args) => {
+    return await queries.getFeaturedTalks(ctx, args);
+  },
+  returns: validators.getFeaturedTalksReturns,
+});
+
+export const getRandomBySpeaker = query({
+  args: validators.getRandomTalksBySpeakerArgs,
+  handler: async (ctx, args) => {
+    return await queries.getRandomTalksBySpeaker(ctx, args);
+  },
+  returns: validators.getRandomTalksBySpeakerReturns,
+});
+
 export const list = query({
   args: validators.listTalksArgs,
   handler: async (ctx, args) => {

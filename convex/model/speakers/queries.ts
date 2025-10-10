@@ -39,3 +39,27 @@ export async function getSpeakers(ctx: QueryCtx, args: ListSpeakersArgs) {
 
   return await ctx.db.query('speakers').take(limit);
 }
+
+/**
+ * Get featured speakers (random selection).
+ *
+ * @param ctx - Database context
+ * @param args - Query arguments with defaults
+ * @returns Array of random featured speakers
+ */
+export async function getFeaturedSpeakers(
+  ctx: QueryCtx,
+  args: { limit?: number } = {},
+) {
+  const { limit = 6 } = args;
+
+  const speakers = await ctx.db
+    .query('speakers')
+    .withIndex('by_featured', (q) => q.eq('featured', true))
+    .collect();
+
+  // Shuffle and return limited number
+  const shuffled = speakers.sort(() => Math.random() - 0.5);
+  
+  return shuffled.slice(0, limit);
+}

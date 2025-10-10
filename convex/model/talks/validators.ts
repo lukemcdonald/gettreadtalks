@@ -23,6 +23,18 @@ export const deleteTalkArgs = {
 };
 export const deleteTalkReturns = v.null();
 
+export const getFeaturedTalksArgs = {
+  limit: v.optional(v.number()),
+};
+export const getFeaturedTalksReturns = v.array(v.object(talkFields));
+
+export const getRandomTalksBySpeakerArgs = {
+  excludeTalkId: v.optional(v.id('talks')),
+  limit: v.optional(v.number()),
+  speakerId: v.id('speakers'),
+};
+export const getRandomTalksBySpeakerReturns = v.array(v.object(talkFields));
+
 export const getTalkArgs = {
   id: v.id('talks'),
 };
