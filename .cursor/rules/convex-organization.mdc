@@ -49,18 +49,39 @@ export const listWithAuthors = query(...)     // With joined data
 
 ### Mutation Functions (writes)
 
-Use single-word action verbs (avoid multi-word names):
+Use single-word action verbs with clear semantic meaning:
 
 ```ts
-export const archive = mutation(...)  // Specific action
-export const create = mutation(...)   // Create new
-export const publish = mutation(...)  // Specific action
-export const remove = mutation(...)   // Delete entity (ALWAYS use "remove", never "delete")
-export const toggle = mutation(...)   // Toggle state
-export const update = mutation(...)   // Update existing
+export const archive = mutation(...)  // Soft delete (set status to 'archived')
+export const create = mutation(...)   // Create new entity
+export const destroy = mutation(...)  // Hard delete (remove from database permanently)
+export const publish = mutation(...)  // Specific status action
+export const remove = mutation(...)   // Remove from association/list (non-destructive)
+export const toggle = mutation(...)   // Toggle boolean state
+export const update = mutation(...)   // Update existing entity
 ```
 
-**Important:** Always use `remove` for deletion operations (not `delete`, `destroy`, or multi-word variants like `deleteTalk`). This maintains consistency with other single-word mutations and avoids the `delete` reserved keyword.
+**Deletion Semantics:**
+
+Use the appropriate verb based on what actually happens:
+
+- **`remove`** - Remove from association or list (e.g., `removeFavoriteTalk`, `removeClipFromTopic`)
+  - Non-destructive operation
+  - Removes relationship/reference, not the entity itself
+  - Entity remains in database
+
+- **`archive`** - Soft delete via status change (e.g., `archiveTalk`, `archiveClip`)
+  - Sets status to 'archived'
+  - Entity remains in database
+  - Reversible by changing status back
+
+- **`destroy`** - Permanently delete from database (e.g., `destroySpeaker`, `destroyTopic`)
+  - Hard delete with `ctx.db.delete()`
+  - Entity completely removed from database
+  - Should include reference checks before deletion
+  - Irreversible operation
+
+**Never use** `delete` (reserved keyword) or multi-word variants like `deleteTalk`, `removeItem`, `destroyEntity`.
 
 ### Function Naming Examples
 

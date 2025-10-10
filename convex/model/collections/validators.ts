@@ -13,11 +13,11 @@ export const createCollectionArgs = {
 
 export const createCollectionReturns = v.id('collections');
 
-export const removeCollectionArgs = {
+export const destroyCollectionArgs = {
   id: v.id('collections'),
 };
 
-export const removeCollectionReturns = v.null();
+export const destroyCollectionReturns = v.null();
 
 export const getCollectionArgs = {
   id: v.id('collections'),

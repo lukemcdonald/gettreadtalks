@@ -4,7 +4,7 @@ import { Doc } from '../../_generated/dataModel';
 import { normalizeSlug, slugExists } from '../../lib/utils';
 import { requireAuth } from '../auth/queries';
 import { AffiliateLinkType } from './schema';
-import type { CreateAffiliateLinkArgs, RemoveAffiliateLinkArgs, UpdateAffiliateLinkArgs } from './types';
+import type { CreateAffiliateLinkArgs, DestroyAffiliateLinkArgs, UpdateAffiliateLinkArgs } from './types';
 
 /**
  * Create a new affiliate link.
@@ -73,13 +73,13 @@ export async function updateAffiliateLink(ctx: MutationCtx, args: UpdateAffiliat
 }
 
 /**
- * Remove an affiliate link (hard delete).
+ * Destroy an affiliate link (permanently delete from database).
  *
  * @param ctx - Database context
- * @param args - Remove arguments
+ * @param args - Destroy arguments
  * @returns null
  */
-export async function removeAffiliateLink(ctx: MutationCtx, args: RemoveAffiliateLinkArgs) {
+export async function destroyAffiliateLink(ctx: MutationCtx, args: DestroyAffiliateLinkArgs) {
   await requireAuth(ctx);
 
   const affiliateLink = await ctx.db.get(args.id);

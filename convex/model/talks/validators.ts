@@ -19,10 +19,10 @@ export const createTalkArgs = {
 };
 export const createTalkReturns = v.id('talks');
 
-export const removeTalkArgs = {
+export const archiveTalkArgs = {
   id: v.id('talks'),
 };
-export const removeTalkReturns = v.null();
+export const archiveTalkReturns = v.null();
 
 export const getFeaturedTalksArgs = {
   limit: v.optional(v.number()),

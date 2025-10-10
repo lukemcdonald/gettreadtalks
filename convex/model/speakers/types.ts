@@ -4,8 +4,8 @@ import * as validators from './validators';
 
 export type CreateSpeakerArgs = ObjectType<typeof validators.createSpeakerArgs>;
 export type CreateSpeakerReturns = Infer<typeof validators.createSpeakerReturns>;
-export type RemoveSpeakerArgs = ObjectType<typeof validators.removeSpeakerArgs>;
-export type RemoveSpeakerReturns = Infer<typeof validators.removeSpeakerReturns>;
+export type DestroySpeakerArgs = ObjectType<typeof validators.destroySpeakerArgs>;
+export type DestroySpeakerReturns = Infer<typeof validators.destroySpeakerReturns>;
 export type GetFeaturedSpeakersArgs = ObjectType<typeof validators.getFeaturedSpeakersArgs>;
 export type GetFeaturedSpeakersReturns = Infer<typeof validators.getFeaturedSpeakersReturns>;
 export type GetSpeakerArgs = ObjectType<typeof validators.getSpeakerArgs>;

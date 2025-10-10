@@ -3,7 +3,7 @@ import type { MutationCtx } from '../../_generated/server';
 import { Doc } from '../../_generated/dataModel';
 import { normalizeSlug, slugExists } from '../../lib/utils';
 import { requireAuth } from '../auth/queries';
-import type { CreateTalkArgs, RemoveTalkArgs, UpdateTalkArgs, UpdateTalkStatusArgs } from './types';
+import type { ArchiveTalkArgs, CreateTalkArgs, UpdateTalkArgs, UpdateTalkStatusArgs } from './types';
 
 /**
  * Create a new talk.
@@ -113,13 +113,13 @@ export async function updateTalkStatus(ctx: MutationCtx, args: UpdateTalkStatusA
 }
 
 /**
- * Remove a talk (soft delete by archiving).
+ * Archive a talk (soft delete by setting status to archived).
  *
  * @param ctx - Database context
- * @param args - Remove arguments
+ * @param args - Archive arguments
  * @returns null
  */
-export async function removeTalk(ctx: MutationCtx, args: RemoveTalkArgs) {
+export async function archiveTalk(ctx: MutationCtx, args: ArchiveTalkArgs) {
   await requireAuth(ctx);
 
   const talk = await ctx.db.get(args.id);

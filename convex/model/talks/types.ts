@@ -4,8 +4,8 @@ import * as validators from './validators';
 
 export type CreateTalkArgs = ObjectType<typeof validators.createTalkArgs>;
 export type CreateTalkReturns = Infer<typeof validators.createTalkReturns>;
-export type RemoveTalkArgs = ObjectType<typeof validators.removeTalkArgs>;
-export type RemoveTalkReturns = Infer<typeof validators.removeTalkReturns>;
+export type ArchiveTalkArgs = ObjectType<typeof validators.archiveTalkArgs>;
+export type ArchiveTalkReturns = Infer<typeof validators.archiveTalkReturns>;
 export type GetFeaturedTalksArgs = ObjectType<typeof validators.getFeaturedTalksArgs>;
 export type GetFeaturedTalksReturns = Infer<typeof validators.getFeaturedTalksReturns>;
 export type GetRandomTalksBySpeakerArgs = ObjectType<typeof validators.getRandomTalksBySpeakerArgs>;

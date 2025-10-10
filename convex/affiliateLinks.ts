@@ -57,12 +57,12 @@ export const create = mutation({
   returns: validators.createAffiliateLinkReturns,
 });
 
-export const remove = mutation({
-  args: validators.removeAffiliateLinkArgs,
+export const destroy = mutation({
+  args: validators.destroyAffiliateLinkArgs,
   handler: async (ctx, args) => {
-    return await mutations.removeAffiliateLink(ctx, args);
+    return await mutations.destroyAffiliateLink(ctx, args);
   },
-  returns: validators.removeAffiliateLinkReturns,
+  returns: validators.destroyAffiliateLinkReturns,
 });
 
 export const update = mutation({

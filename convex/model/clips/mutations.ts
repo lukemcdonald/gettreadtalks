@@ -4,7 +4,7 @@ import { Doc } from '../../_generated/dataModel';
 import { normalizeSlug, slugExists } from '../../lib/utils';
 import { StatusType } from '../../lib/validators';
 import { requireAuth } from '../auth/queries';
-import type { CreateClipArgs, RemoveClipArgs, UpdateClipArgs, UpdateClipStatusArgs } from './types';
+import type { ArchiveClipArgs, CreateClipArgs, UpdateClipArgs, UpdateClipStatusArgs } from './types';
 
 /**
  * Create a new clip.
@@ -114,13 +114,13 @@ export async function updateClipStatus(ctx: MutationCtx, args: UpdateClipStatusA
 }
 
 /**
- * Remove a clip (soft delete by archiving).
+ * Archive a clip (soft delete by setting status to archived).
  *
  * @param ctx - Database context
- * @param args - Remove arguments
+ * @param args - Archive arguments
  * @returns null
  */
-export async function removeClip(ctx: MutationCtx, args: RemoveClipArgs) {
+export async function archiveClip(ctx: MutationCtx, args: ArchiveClipArgs) {
   await requireAuth(ctx);
 
   const clip = await ctx.db.get(args.id);

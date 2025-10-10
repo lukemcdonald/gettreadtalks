@@ -4,8 +4,8 @@ import * as validators from './validators';
 
 export type CreateCollectionArgs = ObjectType<typeof validators.createCollectionArgs>;
 export type CreateCollectionReturns = Infer<typeof validators.createCollectionReturns>;
-export type RemoveCollectionArgs = ObjectType<typeof validators.removeCollectionArgs>;
-export type RemoveCollectionReturns = Infer<typeof validators.removeCollectionReturns>;
+export type DestroyCollectionArgs = ObjectType<typeof validators.destroyCollectionArgs>;
+export type DestroyCollectionReturns = Infer<typeof validators.destroyCollectionReturns>;
 export type GetCollectionArgs = ObjectType<typeof validators.getCollectionArgs>;
 export type GetCollectionBySlugArgs = ObjectType<typeof validators.getCollectionBySlugArgs>;
 export type GetCollectionBySlugReturns = Infer<typeof validators.getCollectionBySlugReturns>;

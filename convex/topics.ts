@@ -73,12 +73,12 @@ export const create = mutation({
   returns: validators.createTopicReturns,
 });
 
-export const remove = mutation({
-  args: validators.removeTopicArgs,
+export const destroy = mutation({
+  args: validators.destroyTopicArgs,
   handler: async (ctx, args) => {
-    return await mutations.removeTopic(ctx, args);
+    return await mutations.destroyTopic(ctx, args);
   },
-  returns: validators.removeTopicReturns,
+  returns: validators.destroyTopicReturns,
 });
 
 export const removeClipFromTopic = mutation({

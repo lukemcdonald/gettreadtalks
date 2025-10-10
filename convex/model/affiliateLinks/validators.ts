@@ -21,11 +21,11 @@ export const createAffiliateLinkArgs = {
 
 export const createAffiliateLinkReturns = v.id('affiliateLinks');
 
-export const removeAffiliateLinkArgs = {
+export const destroyAffiliateLinkArgs = {
   id: v.id('affiliateLinks'),
 };
 
-export const removeAffiliateLinkReturns = v.null();
+export const destroyAffiliateLinkReturns = v.null();
 
 export const getAffiliateLinkArgs = {
   id: v.id('affiliateLinks'),

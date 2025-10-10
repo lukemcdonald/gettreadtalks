@@ -73,12 +73,12 @@ export const create = mutation({
   returns: validators.createCollectionReturns,
 });
 
-export const remove = mutation({
-  args: validators.removeCollectionArgs,
+export const destroy = mutation({
+  args: validators.destroyCollectionArgs,
   handler: async (ctx, args) => {
-    return await mutations.removeCollection(ctx, args);
+    return await mutations.destroyCollection(ctx, args);
   },
-  returns: validators.removeCollectionReturns,
+  returns: validators.destroyCollectionReturns,
 });
 
 export const update = mutation({

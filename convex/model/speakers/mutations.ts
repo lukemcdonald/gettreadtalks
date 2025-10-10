@@ -3,7 +3,7 @@ import type { MutationCtx } from '../../_generated/server';
 import { Doc } from '../../_generated/dataModel';
 import { normalizeSlug, slugExists } from '../../lib/utils';
 import { requireAuth } from '../auth/queries';
-import type { CreateSpeakerArgs, RemoveSpeakerArgs, UpdateSpeakerArgs } from './types';
+import type { CreateSpeakerArgs, DestroySpeakerArgs, UpdateSpeakerArgs } from './types';
 
 /**
  * Create a new speaker.
@@ -69,13 +69,13 @@ export async function updateSpeaker(ctx: MutationCtx, args: UpdateSpeakerArgs) {
 }
 
 /**
- * Remove a speaker (hard delete with reference checks).
+ * Destroy a speaker (permanently delete from database with reference checks).
  *
  * @param ctx - Database context
- * @param args - Remove arguments
+ * @param args - Destroy arguments
  * @returns null
  */
-export async function removeSpeaker(ctx: MutationCtx, args: RemoveSpeakerArgs) {
+export async function destroySpeaker(ctx: MutationCtx, args: DestroySpeakerArgs) {
   await requireAuth(ctx);
 
   const speaker = await ctx.db.get(args.id);

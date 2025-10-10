@@ -27,10 +27,12 @@ export function useItems(options?: {
 // Single item
 export function useItem(id: string);
 
-// Mutations
-export function useCreateItem();
-export function useRemoveItem();  // ALWAYS use "remove", never "delete"
-export function useUpdateItem();
+// Mutations - Use appropriate semantic verb
+export function useArchiveItem();   // Soft delete (set status to 'archived')
+export function useCreateItem();    // Create new
+export function useDestroyItem();   // Hard delete (permanent removal from DB)
+export function useRemoveItem();    // Remove from association/list (non-destructive)
+export function useUpdateItem();    // Update existing
 ```
 
 **Note:** Define options/filter types in `types.ts` for reuse across hooks and queries.
@@ -90,11 +92,12 @@ Mirror Convex naming with verb prefix:
 
 ```ts
 // actions.ts - Server writes
-export async function archiveItem(id);
-export async function createItem(data);
-export async function removeItem(id);  // ALWAYS use "remove", never "delete"
-export async function publishItem(id);
-export async function updateItem(id, data);
+export async function archiveItem(id);    // Soft delete (set status to 'archived')
+export async function createItem(data);   // Create new
+export async function destroyItem(id);    // Hard delete (permanent removal from DB)
+export async function publishItem(id);    // Specific status action
+export async function removeItem(id);     // Remove from association/list (non-destructive)
+export async function updateItem(id, data); // Update existing
 ```
 
 **Note:** For Convex function naming, see `convex-organization.mdc`.
