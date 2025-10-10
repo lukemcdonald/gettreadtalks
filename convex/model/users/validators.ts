@@ -81,7 +81,6 @@ export const listUserFinishedTalksArgs = {
 
 export const listUserFinishedTalksReturns = v.array(
   v.object({
-    finishedAt: v.number(),
     talkId: v.id('talks'),
     userId: v.string(),
   }),

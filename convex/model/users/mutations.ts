@@ -205,7 +205,6 @@ export async function addUserFinishedTalk(
   }
 
   return await ctx.db.insert('userFinishedTalks', {
-    finishedAt: Date.now(),
     talkId: args.talkId,
     userId: userId,
   });

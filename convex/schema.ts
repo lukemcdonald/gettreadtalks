@@ -50,7 +50,6 @@ export default defineSchema({
   }).index('by_user_and_talk', ['userId', 'talkId']),
 
   userFinishedTalks: defineTable({
-    finishedAt: v.number(),
     talkId: v.id('talks'),
     userId: v.string(),
   })
