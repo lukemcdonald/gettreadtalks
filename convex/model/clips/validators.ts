@@ -52,12 +52,6 @@ export const listClipsArgs = {
 
 export const listClipsReturns = v.any(); // PaginationResult<Clip>
 
-export const listPublishedClipsArgs = {
-  limit: v.number(),
-};
-
-export const listPublishedClipsReturns = v.array(v.object(clipFields));
-
 export const updateClipArgs = {
   description: v.optional(v.string()),
   id: v.id('clips'),

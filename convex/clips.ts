@@ -29,14 +29,6 @@ export const list = query({
   returns: validators.listClipsReturns,
 });
 
-export const listPublished = query({
-  args: validators.listPublishedClipsArgs,
-  handler: async (ctx, args) => {
-    return await queries.getPublishedClips(ctx, args);
-  },
-  returns: validators.listPublishedClipsReturns,
-});
-
 // ============================================
 // MUTATIONS
 // ============================================

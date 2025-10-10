@@ -1,11 +1,7 @@
 import type { PaginationOptions } from 'convex/server';
 import type { QueryCtx } from '../../_generated/server';
 
-import type {
-  GetClipBySlugWithRelationsArgs,
-  ListClipsArgs,
-  ListPublishedClipsArgs,
-} from './types';
+import type { GetClipBySlugWithRelationsArgs, ListClipsArgs } from './types';
 
 /**
  * Get clips with optional filters and pagination.
@@ -27,21 +23,6 @@ export async function getClips(
   }
 
   return await ctx.db.query('clips').order('desc').paginate(args.paginationOpts);
-}
-
-/**
- * Get published clips.
- *
- * @param ctx - Database context
- * @param args - Query arguments
- * @returns Array of published clips
- */
-export async function getPublishedClips(ctx: QueryCtx, args: ListPublishedClipsArgs) {
-  return await ctx.db
-    .query('clips')
-    .withIndex('by_status_and_published_at', (q) => q.eq('status', 'published'))
-    .order('desc')
-    .take(args.limit);
 }
 
 /**
