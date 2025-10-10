@@ -21,6 +21,14 @@ export const getBySlug = query({
   returns: validators.getCollectionBySlugReturns,
 });
 
+export const getWithSpeakers = query({
+  args: validators.getCollectionWithSpeakersArgs,
+  handler: async (ctx, args) => {
+    return await queries.getCollectionWithSpeakers(ctx, args);
+  },
+  returns: validators.getCollectionWithSpeakersReturns,
+});
+
 export const getWithTalks = query({
   args: validators.getCollectionWithTalksArgs,
   handler: async (ctx, args) => {

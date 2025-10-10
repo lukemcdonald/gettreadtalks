@@ -10,6 +10,12 @@ export type GetCollectionArgs = ObjectType<typeof validators.getCollectionArgs>;
 export type GetCollectionBySlugArgs = ObjectType<typeof validators.getCollectionBySlugArgs>;
 export type GetCollectionBySlugReturns = Infer<typeof validators.getCollectionBySlugReturns>;
 export type GetCollectionReturns = Infer<typeof validators.getCollectionReturns>;
+export type GetCollectionWithSpeakersArgs = ObjectType<
+  typeof validators.getCollectionWithSpeakersArgs
+>;
+export type GetCollectionWithSpeakersReturns = Infer<
+  typeof validators.getCollectionWithSpeakersReturns
+>;
 export type GetCollectionWithTalksArgs = ObjectType<typeof validators.getCollectionWithTalksArgs>;
 export type GetCollectionWithTalksReturns = Infer<typeof validators.getCollectionWithTalksReturns>;
 export type ListCollectionsArgs = ObjectType<typeof validators.listCollectionsArgs>;

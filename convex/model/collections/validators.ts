@@ -1,6 +1,7 @@
 import { paginationOptsValidator } from 'convex/server';
 import { v } from 'convex/values';
 
+import { speakerFields } from '../speakers/schema';
 import { talkFields } from '../talks/schema';
 import { collectionFields } from './schema';
 
@@ -29,6 +30,18 @@ export const getCollectionBySlugArgs = {
 };
 
 export const getCollectionBySlugReturns = v.union(v.object(collectionFields), v.null());
+
+export const getCollectionWithSpeakersArgs = {
+  slug: v.string(),
+};
+
+export const getCollectionWithSpeakersReturns = v.union(
+  v.object({
+    collection: v.object(collectionFields),
+    speakers: v.array(v.object(speakerFields)),
+  }),
+  v.null(),
+);
 
 export const getCollectionWithTalksArgs = {
   limit: v.optional(v.number()),

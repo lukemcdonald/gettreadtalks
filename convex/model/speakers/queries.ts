@@ -35,10 +35,7 @@ export async function getSpeakerBySlug(ctx: QueryCtx, args: GetSpeakerBySlugArgs
  * @param args - Query arguments with pagination options
  * @returns Paginated speakers
  */
-export async function getSpeakers(
-  ctx: QueryCtx,
-  args: { paginationOpts: PaginationOptions },
-) {
+export async function getSpeakers(ctx: QueryCtx, args: { paginationOpts: PaginationOptions }) {
   return await ctx.db
     .query('speakers')
     .withIndex('by_last_name')
@@ -63,7 +60,7 @@ export async function getFeaturedSpeakers(ctx: QueryCtx, args: { limit?: number 
 
   // Shuffle and return limited number
   const shuffled = speakers.sort(() => Math.random() - 0.5);
-  
+
   return shuffled.slice(0, limit);
 }
 

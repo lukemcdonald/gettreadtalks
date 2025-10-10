@@ -78,3 +78,39 @@ export async function getCollectionWithTalks(ctx: QueryCtx, args: GetCollectionW
     talks,
   };
 }
+
+/**
+ * Get collection with unique speakers from its talks.
+ *
+ * @param ctx - Database context
+ * @param args - Query arguments
+ * @returns Collection with array of unique speakers
+ */
+export async function getCollectionWithSpeakers(ctx: QueryCtx, args: { slug: string }) {
+  const collection = await getCollectionBySlug(ctx, { slug: args.slug });
+
+  if (!collection) {
+    return null;
+  }
+
+  const talks = await ctx.db
+    .query('talks')
+    .withIndex('by_collection_id_and_status', (q) =>
+      q.eq('collectionId', collection._id).eq('status', 'published'),
+    )
+    .collect();
+
+  // Get unique speaker IDs
+  const speakerIds = [...new Set(talks.map((talk) => talk.speakerId))];
+
+  // Fetch all speakers in parallel
+  const speakers = await Promise.all(speakerIds.map((id) => ctx.db.get(id)));
+
+  // Filter out null speakers
+  const validSpeakers = speakers.filter((speaker) => speaker !== null);
+
+  return {
+    collection,
+    speakers: validSpeakers,
+  };
+}
