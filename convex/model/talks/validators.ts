@@ -19,10 +19,10 @@ export const createTalkArgs = {
 };
 export const createTalkReturns = v.id('talks');
 
-export const deleteTalkArgs = {
+export const removeTalkArgs = {
   id: v.id('talks'),
 };
-export const deleteTalkReturns = v.null();
+export const removeTalkReturns = v.null();
 
 export const getFeaturedTalksArgs = {
   limit: v.optional(v.number()),
@@ -87,15 +87,10 @@ export const listTalksBySpeakerArgs = {
 export const listTalksBySpeakerReturns = v.array(v.object(talkFields));
 
 export const listTalksWithSpeakersArgs = {
-  limit: v.optional(v.number()),
+  paginationOpts: paginationOptsValidator,
   status: v.optional(statusType),
 };
-export const listTalksWithSpeakersReturns = v.array(
-  v.object({
-    ...talkFields,
-    speaker: v.union(v.object(speakerFields), v.null()),
-  }),
-);
+export const listTalksWithSpeakersReturns = v.any(); // PaginationResult with enriched page
 
 export const updateTalkArgs = {
   collectionId: v.optional(v.id('collections')),

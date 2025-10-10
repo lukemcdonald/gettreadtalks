@@ -18,11 +18,11 @@ export const createClipArgs = {
 
 export const createClipReturns = v.id('clips');
 
-export const deleteClipArgs = {
+export const removeClipArgs = {
   id: v.id('clips'),
 };
 
-export const deleteClipReturns = v.null();
+export const removeClipReturns = v.null();
 
 export const getClipBySlugWithRelationsArgs = {
   slug: v.string(),

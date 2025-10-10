@@ -7,9 +7,9 @@ import type {
   AddClipToTopicArgs,
   AddTalkToTopicArgs,
   CreateTopicArgs,
-  DeleteTopicArgs,
   RemoveClipFromTopicArgs,
   RemoveTalkFromTopicArgs,
+  RemoveTopicArgs,
   UpdateTopicArgs,
 } from './types';
 
@@ -74,13 +74,13 @@ export async function updateTopic(ctx: MutationCtx, args: UpdateTopicArgs) {
 }
 
 /**
- * Delete a topic (hard delete with reference checks).
+ * Remove a topic (hard delete with reference checks).
  *
  * @param ctx - Database context
- * @param args - Delete arguments
+ * @param args - Remove arguments
  * @returns null
  */
-export async function deleteTopic(ctx: MutationCtx, args: DeleteTopicArgs) {
+export async function removeTopic(ctx: MutationCtx, args: RemoveTopicArgs) {
   await requireAuth(ctx);
 
   const topic = await ctx.db.get(args.id);

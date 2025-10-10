@@ -3,7 +3,7 @@ import type { MutationCtx } from '../../_generated/server';
 import { Doc } from '../../_generated/dataModel';
 import { normalizeSlug, slugExists } from '../../lib/utils';
 import { requireAuth } from '../auth/queries';
-import type { CreateCollectionArgs, DeleteCollectionArgs, UpdateCollectionArgs } from './types';
+import type { CreateCollectionArgs, RemoveCollectionArgs, UpdateCollectionArgs } from './types';
 
 /**
  * Create a new collection.
@@ -65,13 +65,13 @@ export async function updateCollection(ctx: MutationCtx, args: UpdateCollectionA
 }
 
 /**
- * Delete a collection (hard delete with reference checks).
+ * Remove a collection (hard delete with reference checks).
  *
  * @param ctx - Database context
- * @param args - Delete arguments
+ * @param args - Remove arguments
  * @returns null
  */
-export async function deleteCollection(ctx: MutationCtx, args: DeleteCollectionArgs) {
+export async function removeCollection(ctx: MutationCtx, args: RemoveCollectionArgs) {
   await requireAuth(ctx);
 
   const collection = await ctx.db.get(args.id);

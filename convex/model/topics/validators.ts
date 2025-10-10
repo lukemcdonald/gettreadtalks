@@ -24,11 +24,11 @@ export const createTopicArgs = {
 
 export const createTopicReturns = v.id('topics');
 
-export const deleteTopicArgs = {
+export const removeTopicArgs = {
   id: v.id('topics'),
 };
 
-export const deleteTopicReturns = v.null();
+export const removeTopicReturns = v.null();
 
 export const getTopicArgs = {
   id: v.id('topics'),

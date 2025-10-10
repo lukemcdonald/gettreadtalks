@@ -105,12 +105,12 @@ export const create = mutation({
   returns: validators.createTalkReturns,
 });
 
-export const deleteTalk = mutation({
-  args: validators.deleteTalkArgs,
+export const remove = mutation({
+  args: validators.removeTalkArgs,
   handler: async (ctx, args) => {
-    return await mutations.deleteTalk(ctx, args);
+    return await mutations.removeTalk(ctx, args);
   },
-  returns: validators.deleteTalkReturns,
+  returns: validators.removeTalkReturns,
 });
 
 export const update = mutation({

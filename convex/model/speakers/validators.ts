@@ -15,11 +15,11 @@ export const createSpeakerArgs = {
 
 export const createSpeakerReturns = v.id('speakers');
 
-export const deleteSpeakerArgs = {
+export const removeSpeakerArgs = {
   id: v.id('speakers'),
 };
 
-export const deleteSpeakerReturns = v.null();
+export const removeSpeakerReturns = v.null();
 
 export const getFeaturedSpeakersArgs = {
   limit: v.optional(v.number()),

@@ -4,8 +4,8 @@ import * as validators from './validators';
 
 export type CreateClipArgs = ObjectType<typeof validators.createClipArgs>;
 export type CreateClipReturns = Infer<typeof validators.createClipReturns>;
-export type DeleteClipArgs = ObjectType<typeof validators.deleteClipArgs>;
-export type DeleteClipReturns = Infer<typeof validators.deleteClipReturns>;
+export type RemoveClipArgs = ObjectType<typeof validators.removeClipArgs>;
+export type RemoveClipReturns = Infer<typeof validators.removeClipReturns>;
 export type GetClipBySlugWithRelationsArgs = ObjectType<
   typeof validators.getClipBySlugWithRelationsArgs
 >;

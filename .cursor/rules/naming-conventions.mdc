@@ -29,7 +29,7 @@ export function useItem(id: string);
 
 // Mutations
 export function useCreateItem();
-export function useDeleteItem();
+export function useRemoveItem();  // ALWAYS use "remove", never "delete"
 export function useUpdateItem();
 ```
 
@@ -92,7 +92,7 @@ Mirror Convex naming with verb prefix:
 // actions.ts - Server writes
 export async function archiveItem(id);
 export async function createItem(data);
-export async function deleteItem(id);
+export async function removeItem(id);  // ALWAYS use "remove", never "delete"
 export async function publishItem(id);
 export async function updateItem(id, data);
 ```

@@ -57,23 +57,29 @@ export async function getTalks(
 }
 
 /**
- * Get talks with speaker data.
+ * Get talks with speaker data (paginated).
  *
  * @param ctx - Database context
- * @param args - Query arguments with defaults
- * @returns Array of talks with speaker information
+ * @param args - Query arguments with pagination options
+ * @returns Paginated talks with speaker information
  */
-export async function getTalksWithSpeakers(ctx: QueryCtx, args: ListTalksArgs) {
-  const talks = await getTalks(ctx, args);
+export async function getTalksWithSpeakers(
+  ctx: QueryCtx,
+  args: { paginationOpts: PaginationOptions; status?: string },
+) {
+  const result = await getTalks(ctx, args);
 
-  const talksWithSpeakers = await Promise.all(
-    talks.map(async (talk) => {
+  const enrichedPage = await Promise.all(
+    result.page.map(async (talk) => {
       const speaker = await ctx.db.get(talk.speakerId);
       return { ...talk, speaker };
     }),
   );
 
-  return talksWithSpeakers;
+  return {
+    ...result,
+    page: enrichedPage,
+  };
 }
 
 /**

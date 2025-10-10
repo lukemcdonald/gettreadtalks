@@ -49,16 +49,18 @@ export const listWithAuthors = query(...)     // With joined data
 
 ### Mutation Functions (writes)
 
-Use action verbs:
+Use single-word action verbs (avoid multi-word names):
 
 ```ts
 export const archive = mutation(...)  // Specific action
 export const create = mutation(...)   // Create new
 export const publish = mutation(...)  // Specific action
-export const remove = mutation(...)   // Delete (avoid "delete" keyword)
+export const remove = mutation(...)   // Delete entity (ALWAYS use "remove", never "delete")
 export const toggle = mutation(...)   // Toggle state
 export const update = mutation(...)   // Update existing
 ```
+
+**Important:** Always use `remove` for deletion operations (not `delete`, `destroy`, or multi-word variants like `deleteTalk`). This maintains consistency with other single-word mutations and avoids the `delete` reserved keyword.
 
 ### Function Naming Examples
 

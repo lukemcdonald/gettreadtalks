@@ -41,12 +41,12 @@ export const create = mutation({
   returns: validators.createClipReturns,
 });
 
-export const deleteClip = mutation({
-  args: validators.deleteClipArgs,
+export const remove = mutation({
+  args: validators.removeClipArgs,
   handler: async (ctx, args) => {
-    return await mutations.deleteClip(ctx, args);
+    return await mutations.removeClip(ctx, args);
   },
-  returns: validators.deleteClipReturns,
+  returns: validators.removeClipReturns,
 });
 
 export const update = mutation({
