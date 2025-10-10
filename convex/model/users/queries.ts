@@ -1,5 +1,32 @@
 import type { QueryCtx } from '../../_generated/server';
 
+import { getCurrentUser } from '../auth/queries';
+import type { ListUserFavoritesArgs } from './types';
+
+/**
+ * List all user favorites.
+ *
+ * @param ctx - Database context
+ * @param args - Query arguments with defaults
+ * @returns Object with clips, speakers, and talks favorites
+ */
+export async function listUserFavorites(ctx: QueryCtx, args: ListUserFavoritesArgs) {
+  const user = await getCurrentUser(ctx);
+
+  if (!user) {
+    return {
+      clips: [],
+      speakers: [],
+      talks: [],
+    };
+  }
+
+  const userId = user._id;
+  const limit = args.limit ?? 100;
+
+  return await getUserFavorites(ctx, userId, limit);
+}
+
 /**
  * Get user favorites by clip.
  *

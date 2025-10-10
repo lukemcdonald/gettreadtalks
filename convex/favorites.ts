@@ -1,67 +1,16 @@
-import { v } from 'convex/values';
-
 import { mutation, query } from './_generated/server';
-import { getCurrentUser } from './model/auth/queries';
-import {
-  addUserFavoriteClip,
-  addUserFavoriteSpeaker,
-  addUserFavoriteTalk,
-  removeUserFavoriteClip,
-  removeUserFavoriteSpeaker,
-  removeUserFavoriteTalk,
-} from './model/users/mutations.js';
-import { getUserFavorites } from './model/users/queries';
+import { mutations, queries, validators } from './model/users';
 
 // ============================================
 // QUERIES
 // ============================================
 
 export const list = query({
-  args: {
-    limit: v.optional(v.number()),
-  },
+  args: validators.listUserFavoritesArgs,
   handler: async (ctx, args) => {
-    const user = await getCurrentUser(ctx);
-
-    if (!user) {
-      return {
-        clips: [],
-        speakers: [],
-        talks: [],
-      };
-    }
-
-    const userId = user._id;
-    const limit = args.limit ?? 100;
-
-    const { clips, speakers, talks } = await getUserFavorites(ctx, userId, limit);
-
-    return {
-      clips,
-      speakers,
-      talks,
-    };
+    return await queries.listUserFavorites(ctx, args);
   },
-  returns: v.object({
-    clips: v.array(
-      v.object({
-        clipId: v.id('clips'),
-        userId: v.string(),
-      }),
-    ),
-    speakers: v.array(
-      v.object({
-        speakerId: v.id('speakers'),
-        userId: v.string(),
-      }),
-    ),
-    talks: v.array(
-      v.object({
-        talkId: v.id('talks'),
-        userId: v.string(),
-      }),
-    ),
-  }),
+  returns: validators.listUserFavoritesReturns,
 });
 
 // ============================================
@@ -69,61 +18,49 @@ export const list = query({
 // ============================================
 
 export const addFavoriteClip = mutation({
-  args: {
-    clipId: v.id('clips'),
-  },
+  args: validators.addFavoriteClipArgs,
   handler: async (ctx, args) => {
-    return await addUserFavoriteClip(ctx, args);
+    return await mutations.addUserFavoriteClip(ctx, args);
   },
-  returns: v.id('userFavoriteClips'),
+  returns: validators.addFavoriteClipReturns,
 });
 
 export const addFavoriteSpeaker = mutation({
-  args: {
-    speakerId: v.id('speakers'),
-  },
+  args: validators.addFavoriteSpeakerArgs,
   handler: async (ctx, args) => {
-    return await addUserFavoriteSpeaker(ctx, args);
+    return await mutations.addUserFavoriteSpeaker(ctx, args);
   },
-  returns: v.id('userFavoriteSpeakers'),
+  returns: validators.addFavoriteSpeakerReturns,
 });
 
 export const addFavoriteTalk = mutation({
-  args: {
-    talkId: v.id('talks'),
-  },
+  args: validators.addFavoriteTalkArgs,
   handler: async (ctx, args) => {
-    return await addUserFavoriteTalk(ctx, args);
+    return await mutations.addUserFavoriteTalk(ctx, args);
   },
-  returns: v.id('userFavoriteTalks'),
+  returns: validators.addFavoriteTalkReturns,
 });
 
 export const removeFavoriteClip = mutation({
-  args: {
-    clipId: v.id('clips'),
-  },
+  args: validators.removeFavoriteClipArgs,
   handler: async (ctx, args) => {
-    return await removeUserFavoriteClip(ctx, args);
+    return await mutations.removeUserFavoriteClip(ctx, args);
   },
-  returns: v.null(),
+  returns: validators.removeFavoriteClipReturns,
 });
 
 export const removeFavoriteSpeaker = mutation({
-  args: {
-    speakerId: v.id('speakers'),
-  },
+  args: validators.removeFavoriteSpeakerArgs,
   handler: async (ctx, args) => {
-    return await removeUserFavoriteSpeaker(ctx, args);
+    return await mutations.removeUserFavoriteSpeaker(ctx, args);
   },
-  returns: v.null(),
+  returns: validators.removeFavoriteSpeakerReturns,
 });
 
 export const removeFavoriteTalk = mutation({
-  args: {
-    talkId: v.id('talks'),
-  },
+  args: validators.removeFavoriteTalkArgs,
   handler: async (ctx, args) => {
-    return await removeUserFavoriteTalk(ctx, args);
+    return await mutations.removeUserFavoriteTalk(ctx, args);
   },
-  returns: v.null(),
+  returns: validators.removeFavoriteTalkReturns,
 });
