@@ -6,6 +6,7 @@ import { timestampFields } from '../../lib/validators';
 export const speakerFields = {
   ...timestampFields,
   description: v.optional(v.string()),
+  featured: v.optional(v.boolean()),
   firstName: v.string(),
   imageUrl: v.optional(v.string()),
   lastName: v.string(),
@@ -17,6 +18,7 @@ export const speakerFields = {
 
 export const speakerTables = {
   speakers: defineTable(speakerFields)
+    .index('by_featured', ['featured'])
     .index('by_last_name', ['lastName'])
     .index('by_slug', ['slug']),
 };
