@@ -162,7 +162,7 @@ Benefits: Single source of truth, easier refactoring, better naming
 
 ### Co-locate Related Code
 
-```ts
+```sh
 // ✅ Feature contains all its code
 lib/features/items/
 ├─ actions.ts

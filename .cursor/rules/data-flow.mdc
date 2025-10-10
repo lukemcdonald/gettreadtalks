@@ -76,6 +76,7 @@ export default async function ItemsPage() {
 // app/items/items-client.tsx (Client Component)
 'use client';
 import { useItems } from '@/lib/features/items/hooks';
+import { ItemList } from '@/components/items/item-list';
 
 export function ItemsClient({ initialData }) {
   const items = useItems() ?? initialData;
@@ -130,14 +131,14 @@ export function FavoriteButton({ itemId }) {
 ### Server Component Protection
 
 ```ts
-import { getServerSession } from "@/lib/services/auth/server";
-import { redirect } from "next/navigation";
+import { getServerSession } from '@/lib/services/auth/server';
+import { redirect } from 'next/navigation';
 
 export default async function ProtectedPage() {
   const session = await getServerSession();
 
   if (!session) {
-    redirect("/auth/login");
+    redirect('/auth/login');
   }
 
   return <div>Protected content</div>;
@@ -147,15 +148,15 @@ export default async function ProtectedPage() {
 ### Client Component Session
 
 ```ts
-"use client";
-import { useSession } from "@/lib/services/auth/client";
+'use client';
+import { useSession } from '@/lib/services/auth/client';
 
 export function UserProfile() {
   const session = useSession();
 
   if (!session) {
-    return <div>Please log in</div>
-  };
+    return <div>Please log in</div>;
+  }
 
   return <div>Welcome {session.user.name}</div>;
 }

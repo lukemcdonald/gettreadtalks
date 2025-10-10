@@ -14,11 +14,11 @@ convex/
 ├─ convex.config.ts    # Convex configuration
 ├─ convex.json         # Convex project config
 ├─ http.ts             # HTTP endpoints (webhooks)
-├─ items.ts            # User favorites queries & mutations
+├─ items.ts            # Item queries & mutations
 ├─ schema.ts           # Database schema
 ├─ users.ts            # User queries & mutations
 ├─ utils.ts            # General utility functions
-├─ model/              # Entity-specific helper functions for queries, mutstaions and utils
+├─ model/              # Entity-specific helper functions for queries, mutations and utils
 │  ├─ index.ts         # Barrel exports
 │  ├─ auth.ts          # Authentication helpers
 │  ├─ items.ts         # Entity type specific helpers (example)
@@ -52,13 +52,13 @@ export const listWithAuthors = query(...)     // With joined data
 Use single-word action verbs with clear semantic meaning:
 
 ```ts
-export const archive = mutation(...)  // Soft delete (set status to 'archived')
-export const create = mutation(...)   // Create new entity
-export const destroy = mutation(...)  // Hard delete (remove from database permanently)
-export const publish = mutation(...)  // Specific status action
-export const remove = mutation(...)   // Remove from association/list (non-destructive)
-export const toggle = mutation(...)   // Toggle boolean state
-export const update = mutation(...)   // Update existing entity
+export const archive = mutation(...) // Soft delete (set status to 'archived')
+export const create = mutation(...)  // Create new entity
+export const destroy = mutation(...) // Hard delete (delete from database permanently)
+export const publish = mutation(...) // Specific status action
+export const remove = mutation(...)  // Remove from association/list (non-destructive)
+export const toggle = mutation(...)  // Toggle boolean state
+export const update = mutation(...)  // Update existing entity
 ```
 
 **Deletion Semantics:**
@@ -87,10 +87,10 @@ Use the appropriate verb based on what actually happens:
 
 ```ts
 // ✅ Clear - Return type obvious from name
-export const get = query(...)              // Returns: Doc<"items"> | null
-export const getBySlug = query(...)        // Returns: Doc<"items"> | null
-export const list = query(...)             // Returns: Doc<"items">[]
-export const listByAuthor = query(...)     // Returns: Doc<"items">[]
+export const get = query(...)             // Returns: Doc<"items"> | null
+export const getBySlug = query(...)       // Returns: Doc<"items"> | null
+export const list = query(...)            // Returns: Doc<"items">[]
+export const listByAuthor = query(...)    // Returns: Doc<"items">[]
 
 // ❌ Vague
 export const data = query(...)
