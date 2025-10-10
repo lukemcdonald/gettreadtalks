@@ -37,6 +37,12 @@ export const getCollectionsBySpeakerArgs = {
 
 export const getCollectionsBySpeakerReturns = v.array(v.object(collectionFields));
 
+export const getCollectionsWithStatsArgs = {
+  paginationOpts: paginationOptsValidator,
+};
+
+export const getCollectionsWithStatsReturns = v.any(); // PaginationResult with enriched page
+
 export const getCollectionWithSpeakersArgs = {
   slug: v.string(),
 };

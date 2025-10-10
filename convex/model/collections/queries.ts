@@ -48,6 +48,50 @@ export async function getCollections(
 }
 
 /**
+ * Get collections with stats (talk counts and speakers).
+ *
+ * @param ctx - Database context
+ * @param args - Query arguments with pagination options
+ * @returns Paginated collections with talk counts and speakers
+ */
+export async function getCollectionsWithStats(
+  ctx: QueryCtx,
+  args: { paginationOpts: PaginationOptions },
+) {
+  const result = await ctx.db.query('collections').order('desc').paginate(args.paginationOpts);
+
+  // Enrich each collection with stats
+  const enrichedPage = await Promise.all(
+    result.page.map(async (collection) => {
+      const talks = await ctx.db
+        .query('talks')
+        .withIndex('by_collection_id_and_status', (q) =>
+          q.eq('collectionId', collection._id).eq('status', 'published'),
+        )
+        .collect();
+
+      // Get unique speaker IDs
+      const speakerIds = [...new Set(talks.map((talk) => talk.speakerId))];
+
+      // Fetch speakers in parallel
+      const speakers = await Promise.all(speakerIds.map((id) => ctx.db.get(id)));
+      const validSpeakers = speakers.filter((speaker) => speaker !== null);
+
+      return {
+        collection,
+        speakers: validSpeakers,
+        talkCount: talks.length,
+      };
+    }),
+  );
+
+  return {
+    ...result,
+    page: enrichedPage,
+  };
+}
+
+/**
  * Get collection with its talks.
  *
  * @param ctx - Database context

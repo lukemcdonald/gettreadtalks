@@ -37,6 +37,14 @@ export const getWithSpeakers = query({
   returns: validators.getCollectionWithSpeakersReturns,
 });
 
+export const getWithStats = query({
+  args: validators.getCollectionsWithStatsArgs,
+  handler: async (ctx, args) => {
+    return await queries.getCollectionsWithStats(ctx, args);
+  },
+  returns: validators.getCollectionsWithStatsReturns,
+});
+
 export const getWithTalks = query({
   args: validators.getCollectionWithTalksArgs,
   handler: async (ctx, args) => {

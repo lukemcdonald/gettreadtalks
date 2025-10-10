@@ -12,6 +12,8 @@ export type GetCollectionBySlugReturns = Infer<typeof validators.getCollectionBy
 export type GetCollectionReturns = Infer<typeof validators.getCollectionReturns>;
 export type GetCollectionsBySpeakerArgs = ObjectType<typeof validators.getCollectionsBySpeakerArgs>;
 export type GetCollectionsBySpeakerReturns = Infer<typeof validators.getCollectionsBySpeakerReturns>;
+export type GetCollectionsWithStatsArgs = ObjectType<typeof validators.getCollectionsWithStatsArgs>;
+export type GetCollectionsWithStatsReturns = Infer<typeof validators.getCollectionsWithStatsReturns>;
 export type GetCollectionWithSpeakersArgs = ObjectType<
   typeof validators.getCollectionWithSpeakersArgs
 >;
