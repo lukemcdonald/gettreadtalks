@@ -1,5 +1,6 @@
 import type { PaginationOptions } from 'convex/server';
 import type { QueryCtx } from '../../_generated/server';
+import type { Id } from '../../_generated/dataModel';
 
 import type {
   GetCollectionArgs,
@@ -40,10 +41,7 @@ export async function getCollectionBySlug(ctx: QueryCtx, args: GetCollectionBySl
  * @param args - Query arguments with pagination options
  * @returns Paginated collections
  */
-export async function getCollections(
-  ctx: QueryCtx,
-  args: { paginationOpts: PaginationOptions },
-) {
+export async function getCollections(ctx: QueryCtx, args: { paginationOpts: PaginationOptions }) {
   return await ctx.db.query('collections').order('desc').paginate(args.paginationOpts);
 }
 
@@ -166,7 +164,7 @@ export async function getCollectionWithSpeakers(ctx: QueryCtx, args: { slug: str
  * @param args - Query arguments
  * @returns Array of collections that contain talks by the speaker
  */
-export async function getCollectionsBySpeaker(ctx: QueryCtx, args: { speakerId: string }) {
+export async function getCollectionsBySpeaker(ctx: QueryCtx, args: { speakerId: Id<'speakers'> }) {
   // Get all published talks by speaker
   const talks = await ctx.db
     .query('talks')

@@ -1,4 +1,5 @@
 import type { QueryCtx } from '../../_generated/server';
+import type { Id } from '../../_generated/dataModel';
 
 import { getCurrentUser } from '../auth/queries';
 import type { ListUserFavoritesArgs } from './types';
@@ -136,7 +137,7 @@ export async function listUserFinishedTalks(ctx: QueryCtx, args: { limit?: numbe
  * @param args - Query arguments
  * @returns True if favorited, false otherwise
  */
-export async function isTalkFavorited(ctx: QueryCtx, args: { talkId: string }) {
+export async function isTalkFavorited(ctx: QueryCtx, args: { talkId: Id<'talks'> }) {
   const user = await getCurrentUser(ctx);
 
   if (!user) {
@@ -158,7 +159,7 @@ export async function isTalkFavorited(ctx: QueryCtx, args: { talkId: string }) {
  * @param args - Query arguments
  * @returns True if favorited, false otherwise
  */
-export async function isClipFavorited(ctx: QueryCtx, args: { clipId: string }) {
+export async function isClipFavorited(ctx: QueryCtx, args: { clipId: Id<'clips'> }) {
   const user = await getCurrentUser(ctx);
 
   if (!user) {
@@ -180,7 +181,7 @@ export async function isClipFavorited(ctx: QueryCtx, args: { clipId: string }) {
  * @param args - Query arguments
  * @returns True if favorited, false otherwise
  */
-export async function isSpeakerFavorited(ctx: QueryCtx, args: { speakerId: string }) {
+export async function isSpeakerFavorited(ctx: QueryCtx, args: { speakerId: Id<'speakers'> }) {
   const user = await getCurrentUser(ctx);
 
   if (!user) {
@@ -189,7 +190,9 @@ export async function isSpeakerFavorited(ctx: QueryCtx, args: { speakerId: strin
 
   const favorite = await ctx.db
     .query('userFavoriteSpeakers')
-    .withIndex('by_user_and_speaker', (q) => q.eq('userId', user._id).eq('speakerId', args.speakerId))
+    .withIndex('by_user_and_speaker', (q) =>
+      q.eq('userId', user._id).eq('speakerId', args.speakerId),
+    )
     .first();
 
   return favorite !== null;
@@ -202,7 +205,7 @@ export async function isSpeakerFavorited(ctx: QueryCtx, args: { speakerId: strin
  * @param args - Query arguments
  * @returns True if finished, false otherwise
  */
-export async function isTalkFinished(ctx: QueryCtx, args: { talkId: string }) {
+export async function isTalkFinished(ctx: QueryCtx, args: { talkId: Id<'talks'> }) {
   const user = await getCurrentUser(ctx);
 
   if (!user) {

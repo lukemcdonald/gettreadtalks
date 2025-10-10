@@ -1,7 +1,9 @@
 import type { PaginationOptions } from 'convex/server';
 import type { QueryCtx } from '../../_generated/server';
+import type { Id } from '../../_generated/dataModel';
 
-import type { GetClipBySlugWithRelationsArgs, ListClipsArgs } from './types';
+import type { StatusType } from '../../schema';
+import type { GetClipBySlugWithRelationsArgs } from './types';
 
 /**
  * Get clips with optional filters and pagination.
@@ -12,17 +14,19 @@ import type { GetClipBySlugWithRelationsArgs, ListClipsArgs } from './types';
  */
 export async function getClips(
   ctx: QueryCtx,
-  args: { paginationOpts: PaginationOptions; status?: string },
+  args: { paginationOpts: PaginationOptions; status?: StatusType },
 ) {
-  if (args.status) {
+  const { paginationOpts, status } = args;
+
+  if (status) {
     return await ctx.db
       .query('clips')
-      .withIndex('by_status_and_published_at', (q) => q.eq('status', args.status))
+      .withIndex('by_status_and_published_at', (q) => q.eq('status', status))
       .order('desc')
-      .paginate(args.paginationOpts);
+      .paginate(paginationOpts);
   }
 
-  return await ctx.db.query('clips').order('desc').paginate(args.paginationOpts);
+  return await ctx.db.query('clips').order('desc').paginate(paginationOpts);
 }
 
 /**
@@ -34,7 +38,7 @@ export async function getClips(
  */
 export async function getClipsBySpeaker(
   ctx: QueryCtx,
-  args: { limit?: number; speakerId: string },
+  args: { limit?: number; speakerId: Id<'speakers'> },
 ) {
   const { limit = 20, speakerId } = args;
 

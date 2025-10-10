@@ -107,7 +107,7 @@ export async function destroySpeaker(ctx: MutationCtx, args: DestroySpeakerArgs)
   // Delete user favorites for this speaker
   const favorites = await ctx.db
     .query('userFavoriteSpeakers')
-    .withIndex('by_user_and_speaker', (q) => q.eq('speakerId', args.id))
+    .withIndex('by_speaker_id', (q) => q.eq('speakerId', args.id))
     .collect();
 
   for (const favorite of favorites) {

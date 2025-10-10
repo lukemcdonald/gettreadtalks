@@ -42,7 +42,9 @@ export default defineSchema({
   userFavoriteSpeakers: defineTable({
     speakerId: v.id('speakers'),
     userId: v.string(),
-  }).index('by_user_and_speaker', ['userId', 'speakerId']),
+  })
+    .index('by_speaker_id', ['speakerId'])
+    .index('by_user_and_speaker', ['userId', 'speakerId']),
 
   userFavoriteTalks: defineTable({
     talkId: v.id('talks'),

@@ -1,6 +1,8 @@
 import type { PaginationOptions } from 'convex/server';
 import type { QueryCtx } from '../../_generated/server';
+import type { Id } from '../../_generated/dataModel';
 
+import type { StatusType } from '../../schema';
 import type {
   GetTalkArgs,
   GetTalkBySlugArgs,
@@ -43,17 +45,19 @@ export async function getTalkBySlug(ctx: QueryCtx, args: GetTalkBySlugArgs) {
  */
 export async function getTalks(
   ctx: QueryCtx,
-  args: { paginationOpts: PaginationOptions; status?: string },
+  args: { paginationOpts: PaginationOptions; status?: StatusType },
 ) {
-  if (args.status) {
+  const { paginationOpts, status } = args;
+
+  if (status) {
     return await ctx.db
       .query('talks')
-      .withIndex('by_status_and_published_at', (q) => q.eq('status', args.status))
+      .withIndex('by_status_and_published_at', (q) => q.eq('status', status))
       .order('desc')
-      .paginate(args.paginationOpts);
+      .paginate(paginationOpts);
   }
 
-  return await ctx.db.query('talks').order('desc').paginate(args.paginationOpts);
+  return await ctx.db.query('talks').order('desc').paginate(paginationOpts);
 }
 
 /**
@@ -65,7 +69,7 @@ export async function getTalks(
  */
 export async function getTalksWithSpeakers(
   ctx: QueryCtx,
-  args: { paginationOpts: PaginationOptions; status?: string },
+  args: { paginationOpts: PaginationOptions; status?: StatusType },
 ) {
   const result = await getTalks(ctx, args);
 
@@ -149,7 +153,7 @@ export async function getTalksBySpeaker(ctx: QueryCtx, args: ListTalksBySpeakerA
   return await ctx.db
     .query('talks')
     .withIndex('by_speaker_id_and_status', (q) =>
-      q.eq('speakerId', speakerId).eq('status', 'published'),
+      q.eq('speakerId', speakerId as Id<'speakers'>).eq('status', 'published'),
     )
     .order('desc')
     .take(limit);
@@ -208,7 +212,7 @@ export async function getFeaturedTalks(ctx: QueryCtx, args: { limit?: number } =
  */
 export async function getRandomTalksBySpeaker(
   ctx: QueryCtx,
-  args: { excludeTalkId?: string; limit?: number; speakerId: string },
+  args: { excludeTalkId?: string; limit?: number; speakerId: Id<'speakers'> },
 ) {
   const { excludeTalkId, limit = 5, speakerId } = args;
 
@@ -250,7 +254,7 @@ export async function getTalksCount(ctx: QueryCtx) {
  * @param args - Query arguments
  * @returns Count of talks for topic
  */
-export async function getTalksCountByTopic(ctx: QueryCtx, args: { topicId: string }) {
+export async function getTalksCountByTopic(ctx: QueryCtx, args: { topicId: Id<'topics'> }) {
   const talkTopics = await ctx.db
     .query('talksOnTopics')
     .withIndex('by_topic_id', (q) => q.eq('topicId', args.topicId))
@@ -266,7 +270,10 @@ export async function getTalksCountByTopic(ctx: QueryCtx, args: { topicId: strin
  * @param args - Query arguments
  * @returns Count of talks in collection
  */
-export async function getTalksCountByCollection(ctx: QueryCtx, args: { collectionId: string }) {
+export async function getTalksCountByCollection(
+  ctx: QueryCtx,
+  args: { collectionId: Id<'collections'> },
+) {
   const talks = await ctx.db
     .query('talks')
     .withIndex('by_collection_id_and_status', (q) =>
