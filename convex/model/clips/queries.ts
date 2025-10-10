@@ -45,6 +45,27 @@ export async function getPublishedClips(ctx: QueryCtx, args: ListPublishedClipsA
 }
 
 /**
+ * Get clips by speaker.
+ *
+ * @param ctx - Database context
+ * @param args - Query arguments
+ * @returns Array of clips by speaker
+ */
+export async function getClipsBySpeaker(
+  ctx: QueryCtx,
+  args: { limit?: number; speakerId: string },
+) {
+  const { limit = 20, speakerId } = args;
+
+  return await ctx.db
+    .query('clips')
+    .withIndex('by_speaker_id', (q) => q.eq('speakerId', speakerId))
+    .filter((q) => q.eq(q.field('status'), 'published'))
+    .order('desc')
+    .take(limit);
+}
+
+/**
  * Get clip by slug with related data.
  *
  * @param ctx - Database context

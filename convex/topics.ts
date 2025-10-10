@@ -29,6 +29,14 @@ export const getWithContent = query({
   returns: validators.getTopicWithContentReturns,
 });
 
+export const getWithCount = query({
+  args: validators.getTopicsWithCountArgs,
+  handler: async (ctx, args) => {
+    return await queries.getTopicsWithCount(ctx, args);
+  },
+  returns: validators.getTopicsWithCountReturns,
+});
+
 export const list = query({
   args: validators.listTopicsArgs,
   handler: async (ctx, args) => {

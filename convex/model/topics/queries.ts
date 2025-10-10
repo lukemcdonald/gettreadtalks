@@ -47,6 +47,37 @@ export async function getTopics(ctx: QueryCtx, args: ListTopicsArgs) {
 }
 
 /**
+ * Get topics with talk counts.
+ *
+ * @param ctx - Database context
+ * @param args - Query arguments with defaults
+ * @returns Array of topics with talk counts
+ */
+export async function getTopicsWithCount(ctx: QueryCtx, args: { limit?: number }) {
+  const { limit = 100 } = args;
+
+  const topics = await ctx.db.query('topics').withIndex('by_title').take(limit);
+
+  // Get talk counts for each topic in parallel
+  const topicsWithCounts = await Promise.all(
+    topics.map(async (topic) => {
+      const talkTopics = await ctx.db
+        .query('talksOnTopics')
+        .withIndex('by_topic_id', (q) => q.eq('topicId', topic._id))
+        .collect();
+
+      return {
+        count: talkTopics.length,
+        topic,
+      };
+    }),
+  );
+
+  // Sort by count descending
+  return topicsWithCounts.sort((a, b) => b.count - a.count);
+}
+
+/**
  * Get topic with related talks and clips.
  *
  * @param ctx - Database context

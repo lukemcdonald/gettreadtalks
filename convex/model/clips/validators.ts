@@ -38,6 +38,13 @@ export const getClipBySlugWithRelationsReturns = v.union(
   v.null(),
 );
 
+export const getClipsBySpeakerArgs = {
+  limit: v.optional(v.number()),
+  speakerId: v.id('speakers'),
+};
+
+export const getClipsBySpeakerReturns = v.array(v.object(clipFields));
+
 export const listClipsArgs = {
   paginationOpts: paginationOptsValidator,
   status: v.optional(statusType),

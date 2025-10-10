@@ -13,6 +13,14 @@ export const getBySlug = query({
   returns: validators.getClipBySlugWithRelationsReturns,
 });
 
+export const getBySpeaker = query({
+  args: validators.getClipsBySpeakerArgs,
+  handler: async (ctx, args) => {
+    return await queries.getClipsBySpeaker(ctx, args);
+  },
+  returns: validators.getClipsBySpeakerReturns,
+});
+
 export const list = query({
   args: validators.listClipsArgs,
   handler: async (ctx, args) => {

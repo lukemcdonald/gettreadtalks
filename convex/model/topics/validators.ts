@@ -28,6 +28,17 @@ export const getTopicBySlugArgs = {
 
 export const getTopicBySlugReturns = v.union(v.object(topicFields), v.null());
 
+export const getTopicsWithCountArgs = {
+  limit: v.optional(v.number()),
+};
+
+export const getTopicsWithCountReturns = v.array(
+  v.object({
+    count: v.number(),
+    topic: v.object(topicFields),
+  }),
+);
+
 export const getTopicWithContentArgs = {
   limit: v.optional(v.number()),
   slug: v.string(),
