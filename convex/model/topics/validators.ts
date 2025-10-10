@@ -10,6 +10,12 @@ export const createTopicArgs = {
 
 export const createTopicReturns = v.id('topics');
 
+export const deleteTopicArgs = {
+  id: v.id('topics'),
+};
+
+export const deleteTopicReturns = v.null();
+
 export const getTopicArgs = {
   id: v.id('topics'),
 };

@@ -17,6 +17,12 @@ export const createClipArgs = {
 
 export const createClipReturns = v.id('clips');
 
+export const deleteClipArgs = {
+  id: v.id('clips'),
+};
+
+export const deleteClipReturns = v.null();
+
 export const getClipBySlugWithRelationsArgs = {
   slug: v.string(),
 };
@@ -43,6 +49,18 @@ export const listPublishedClipsArgs = {
 };
 
 export const listPublishedClipsReturns = v.array(v.object(clipFields));
+
+export const updateClipArgs = {
+  description: v.optional(v.string()),
+  id: v.id('clips'),
+  mediaUrl: v.optional(v.string()),
+  speakerId: v.optional(v.id('speakers')),
+  status: v.optional(statusType),
+  talkId: v.optional(v.id('talks')),
+  title: v.optional(v.string()),
+};
+
+export const updateClipReturns = v.id('clips');
 
 export const updateClipStatusArgs = {
   id: v.id('clips'),

@@ -3,7 +3,7 @@ import type { MutationCtx } from '../../_generated/server';
 import { Doc } from '../../_generated/dataModel';
 import { normalizeSlug, slugExists } from '../../lib/utils';
 import { requireAuth } from '../auth/queries';
-import type { CreateTopicArgs, UpdateTopicArgs } from './types';
+import type { CreateTopicArgs, DeleteTopicArgs, UpdateTopicArgs } from './types';
 
 /**
  * Create a new topic.
@@ -63,4 +63,46 @@ export async function updateTopic(ctx: MutationCtx, args: UpdateTopicArgs) {
   await ctx.db.patch(id, updates);
 
   return id;
+}
+
+/**
+ * Delete a topic (hard delete with reference checks).
+ *
+ * @param ctx - Database context
+ * @param args - Delete arguments
+ * @returns null
+ */
+export async function deleteTopic(ctx: MutationCtx, args: DeleteTopicArgs) {
+  await requireAuth(ctx);
+
+  const topic = await ctx.db.get(args.id);
+
+  if (!topic) {
+    throw new Error('Topic not found');
+  }
+
+  // Check if topic is referenced by any talks
+  const talksWithTopic = await ctx.db
+    .query('talksOnTopics')
+    .withIndex('by_topic_id', (q) => q.eq('topicId', args.id))
+    .first();
+
+  if (talksWithTopic) {
+    throw new Error('Cannot delete topic: topic has associated talks');
+  }
+
+  // Check if topic is referenced by any clips
+  const clipsWithTopic = await ctx.db
+    .query('clipsOnTopics')
+    .withIndex('by_topic_id', (q) => q.eq('topicId', args.id))
+    .first();
+
+  if (clipsWithTopic) {
+    throw new Error('Cannot delete topic: topic has associated clips');
+  }
+
+  // Hard delete the topic
+  await ctx.db.delete(args.id);
+
+  return null;
 }

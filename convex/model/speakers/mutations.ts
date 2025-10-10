@@ -3,7 +3,7 @@ import type { MutationCtx } from '../../_generated/server';
 import { Doc } from '../../_generated/dataModel';
 import { normalizeSlug, slugExists } from '../../lib/utils';
 import { requireAuth } from '../auth/queries';
-import type { CreateSpeakerArgs, UpdateSpeakerArgs } from './types';
+import type { CreateSpeakerArgs, DeleteSpeakerArgs, UpdateSpeakerArgs } from './types';
 
 /**
  * Create a new speaker.
@@ -66,4 +66,56 @@ export async function updateSpeaker(ctx: MutationCtx, args: UpdateSpeakerArgs) {
   await ctx.db.patch(id, updates);
 
   return id;
+}
+
+/**
+ * Delete a speaker (hard delete with reference checks).
+ *
+ * @param ctx - Database context
+ * @param args - Delete arguments
+ * @returns null
+ */
+export async function deleteSpeaker(ctx: MutationCtx, args: DeleteSpeakerArgs) {
+  await requireAuth(ctx);
+
+  const speaker = await ctx.db.get(args.id);
+
+  if (!speaker) {
+    throw new Error('Speaker not found');
+  }
+
+  // Check if speaker is referenced by any talks
+  const talksWithSpeaker = await ctx.db
+    .query('talks')
+    .withIndex('by_speaker_id_and_status', (q) => q.eq('speakerId', args.id))
+    .first();
+
+  if (talksWithSpeaker) {
+    throw new Error('Cannot delete speaker: speaker has associated talks');
+  }
+
+  // Check if speaker is referenced by any clips
+  const clipsWithSpeaker = await ctx.db
+    .query('clips')
+    .withIndex('by_speaker_id', (q) => q.eq('speakerId', args.id))
+    .first();
+
+  if (clipsWithSpeaker) {
+    throw new Error('Cannot delete speaker: speaker has associated clips');
+  }
+
+  // Delete user favorites for this speaker
+  const favorites = await ctx.db
+    .query('userFavoriteSpeakers')
+    .withIndex('by_user_and_speaker', (q) => q.eq('speakerId', args.id))
+    .collect();
+
+  for (const favorite of favorites) {
+    await ctx.db.delete(favorite._id);
+  }
+
+  // Hard delete the speaker
+  await ctx.db.delete(args.id);
+
+  return null;
 }

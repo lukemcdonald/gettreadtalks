@@ -49,6 +49,14 @@ export const create = mutation({
   returns: validators.createCollectionReturns,
 });
 
+export const deleteCollection = mutation({
+  args: validators.deleteCollectionArgs,
+  handler: async (ctx, args) => {
+    return await mutations.deleteCollection(ctx, args);
+  },
+  returns: validators.deleteCollectionReturns,
+});
+
 export const update = mutation({
   args: validators.updateCollectionArgs,
   handler: async (ctx, args) => {

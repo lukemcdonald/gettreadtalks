@@ -41,6 +41,14 @@ export const create = mutation({
   returns: validators.createSpeakerReturns,
 });
 
+export const deleteSpeaker = mutation({
+  args: validators.deleteSpeakerArgs,
+  handler: async (ctx, args) => {
+    return await mutations.deleteSpeaker(ctx, args);
+  },
+  returns: validators.deleteSpeakerReturns,
+});
+
 export const update = mutation({
   args: validators.updateSpeakerArgs,
   handler: async (ctx, args) => {

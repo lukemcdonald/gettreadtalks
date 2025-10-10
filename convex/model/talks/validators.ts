@@ -18,6 +18,11 @@ export const createTalkArgs = {
 };
 export const createTalkReturns = v.id('talks');
 
+export const deleteTalkArgs = {
+  id: v.id('talks'),
+};
+export const deleteTalkReturns = v.null();
+
 export const getTalkArgs = {
   id: v.id('talks'),
 };
@@ -65,6 +70,20 @@ export const listTalksWithSpeakersReturns = v.array(
     speaker: v.union(v.object(speakerFields), v.null()),
   }),
 );
+
+export const updateTalkArgs = {
+  collectionId: v.optional(v.id('collections')),
+  collectionOrder: v.optional(v.number()),
+  description: v.optional(v.string()),
+  featured: v.optional(v.boolean()),
+  id: v.id('talks'),
+  mediaUrl: v.optional(v.string()),
+  scripture: v.optional(v.string()),
+  speakerId: v.optional(v.id('speakers')),
+  status: v.optional(statusType),
+  title: v.optional(v.string()),
+};
+export const updateTalkReturns = v.id('talks');
 
 export const updateTalkStatusArgs = {
   id: v.id('talks'),

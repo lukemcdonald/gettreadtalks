@@ -4,6 +4,8 @@ import * as validators from './validators';
 
 export type CreateTopicArgs = ObjectType<typeof validators.createTopicArgs>;
 export type CreateTopicReturns = Infer<typeof validators.createTopicReturns>;
+export type DeleteTopicArgs = ObjectType<typeof validators.deleteTopicArgs>;
+export type DeleteTopicReturns = Infer<typeof validators.deleteTopicReturns>;
 export type GetTopicArgs = ObjectType<typeof validators.getTopicArgs>;
 export type GetTopicBySlugArgs = ObjectType<typeof validators.getTopicBySlugArgs>;
 export type GetTopicBySlugReturns = Infer<typeof validators.getTopicBySlugReturns>;

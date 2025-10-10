@@ -65,6 +65,22 @@ export const create = mutation({
   returns: validators.createTalkReturns,
 });
 
+export const deleteTalk = mutation({
+  args: validators.deleteTalkArgs,
+  handler: async (ctx, args) => {
+    return await mutations.deleteTalk(ctx, args);
+  },
+  returns: validators.deleteTalkReturns,
+});
+
+export const update = mutation({
+  args: validators.updateTalkArgs,
+  handler: async (ctx, args) => {
+    return await mutations.updateTalk(ctx, args);
+  },
+  returns: validators.updateTalkReturns,
+});
+
 export const updateStatus = mutation({
   args: validators.updateTalkStatusArgs,
   handler: async (ctx, args) => {

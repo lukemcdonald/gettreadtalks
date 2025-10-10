@@ -14,6 +14,12 @@ export const createSpeakerArgs = {
 
 export const createSpeakerReturns = v.id('speakers');
 
+export const deleteSpeakerArgs = {
+  id: v.id('speakers'),
+};
+
+export const deleteSpeakerReturns = v.null();
+
 export const getSpeakerArgs = {
   id: v.id('speakers'),
 };

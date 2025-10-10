@@ -3,7 +3,7 @@ import type { MutationCtx } from '../../_generated/server';
 import { Doc } from '../../_generated/dataModel';
 import { normalizeSlug, slugExists } from '../../lib/utils';
 import { requireAuth } from '../auth/queries';
-import type { CreateCollectionArgs, UpdateCollectionArgs } from './types';
+import type { CreateCollectionArgs, DeleteCollectionArgs, UpdateCollectionArgs } from './types';
 
 /**
  * Create a new collection.
@@ -62,4 +62,36 @@ export async function updateCollection(ctx: MutationCtx, args: UpdateCollectionA
   await ctx.db.patch(id, updates);
 
   return id;
+}
+
+/**
+ * Delete a collection (hard delete with reference checks).
+ *
+ * @param ctx - Database context
+ * @param args - Delete arguments
+ * @returns null
+ */
+export async function deleteCollection(ctx: MutationCtx, args: DeleteCollectionArgs) {
+  await requireAuth(ctx);
+
+  const collection = await ctx.db.get(args.id);
+
+  if (!collection) {
+    throw new Error('Collection not found');
+  }
+
+  // Check if collection is referenced by any talks
+  const talksWithCollection = await ctx.db
+    .query('talks')
+    .withIndex('by_collection_id_and_status', (q) => q.eq('collectionId', args.id))
+    .first();
+
+  if (talksWithCollection) {
+    throw new Error('Cannot delete collection: collection has associated talks');
+  }
+
+  // Hard delete the collection
+  await ctx.db.delete(args.id);
+
+  return null;
 }

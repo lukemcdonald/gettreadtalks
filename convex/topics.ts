@@ -49,6 +49,14 @@ export const create = mutation({
   returns: validators.createTopicReturns,
 });
 
+export const deleteTopic = mutation({
+  args: validators.deleteTopicArgs,
+  handler: async (ctx, args) => {
+    return await mutations.deleteTopic(ctx, args);
+  },
+  returns: validators.deleteTopicReturns,
+});
+
 export const update = mutation({
   args: validators.updateTopicArgs,
   handler: async (ctx, args) => {

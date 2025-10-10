@@ -4,6 +4,8 @@ import * as validators from './validators';
 
 export type CreateAffiliateLinkArgs = ObjectType<typeof validators.createAffiliateLinkArgs>;
 export type CreateAffiliateLinkReturns = Infer<typeof validators.createAffiliateLinkReturns>;
+export type DeleteAffiliateLinkArgs = ObjectType<typeof validators.deleteAffiliateLinkArgs>;
+export type DeleteAffiliateLinkReturns = Infer<typeof validators.deleteAffiliateLinkReturns>;
 export type GetAffiliateLinkArgs = ObjectType<typeof validators.getAffiliateLinkArgs>;
 export type GetAffiliateLinkBySlugArgs = ObjectType<typeof validators.getAffiliateLinkBySlugArgs>;
 export type GetAffiliateLinkBySlugReturns = Infer<typeof validators.getAffiliateLinkBySlugReturns>;
