@@ -1,9 +1,17 @@
 import type { MutationCtx } from '../../_generated/server';
 
-import { Doc } from '../../_generated/dataModel';
+import { Doc, Id } from '../../_generated/dataModel';
 import { normalizeSlug, slugExists } from '../../lib/utils';
 import { requireAuth } from '../auth/queries';
-import type { CreateTopicArgs, DeleteTopicArgs, UpdateTopicArgs } from './types';
+import type {
+  AddClipToTopicArgs,
+  AddTalkToTopicArgs,
+  CreateTopicArgs,
+  DeleteTopicArgs,
+  RemoveClipFromTopicArgs,
+  RemoveTalkFromTopicArgs,
+  UpdateTopicArgs,
+} from './types';
 
 /**
  * Create a new topic.
@@ -103,6 +111,152 @@ export async function deleteTopic(ctx: MutationCtx, args: DeleteTopicArgs) {
 
   // Hard delete the topic
   await ctx.db.delete(args.id);
+
+  return null;
+}
+
+/**
+ * Add a talk to a topic.
+ *
+ * @param ctx - Database context
+ * @param args - Arguments containing talkId and topicId
+ * @returns The ID of the created association
+ */
+export async function addTalkToTopic(
+  ctx: MutationCtx,
+  args: {
+    talkId: Id<'talks'>;
+    topicId: Id<'topics'>;
+  },
+) {
+  await requireAuth(ctx);
+
+  const talk = await ctx.db.get(args.talkId);
+  if (!talk) {
+    throw new Error('Talk not found');
+  }
+
+  const topic = await ctx.db.get(args.topicId);
+  if (!topic) {
+    throw new Error('Topic not found');
+  }
+
+  const existing = await ctx.db
+    .query('talksOnTopics')
+    .withIndex('by_talk_id', (q) => q.eq('talkId', args.talkId))
+    .filter((q) => q.eq(q.field('topicId'), args.topicId))
+    .first();
+
+  if (existing) {
+    throw new Error('Talk is already associated with this topic');
+  }
+
+  return await ctx.db.insert('talksOnTopics', {
+    talkId: args.talkId,
+    topicId: args.topicId,
+  });
+}
+
+/**
+ * Remove a talk from a topic.
+ *
+ * @param ctx - Database context
+ * @param args - Arguments containing talkId and topicId
+ * @returns null
+ */
+export async function removeTalkFromTopic(
+  ctx: MutationCtx,
+  args: {
+    talkId: Id<'talks'>;
+    topicId: Id<'topics'>;
+  },
+) {
+  await requireAuth(ctx);
+
+  const association = await ctx.db
+    .query('talksOnTopics')
+    .withIndex('by_talk_id', (q) => q.eq('talkId', args.talkId))
+    .filter((q) => q.eq(q.field('topicId'), args.topicId))
+    .first();
+
+  if (!association) {
+    throw new Error('Association not found');
+  }
+
+  await ctx.db.delete(association._id);
+
+  return null;
+}
+
+/**
+ * Add a clip to a topic.
+ *
+ * @param ctx - Database context
+ * @param args - Arguments containing clipId and topicId
+ * @returns The ID of the created association
+ */
+export async function addClipToTopic(
+  ctx: MutationCtx,
+  args: {
+    clipId: Id<'clips'>;
+    topicId: Id<'topics'>;
+  },
+) {
+  await requireAuth(ctx);
+
+  const clip = await ctx.db.get(args.clipId);
+  if (!clip) {
+    throw new Error('Clip not found');
+  }
+
+  const topic = await ctx.db.get(args.topicId);
+  if (!topic) {
+    throw new Error('Topic not found');
+  }
+
+  const existing = await ctx.db
+    .query('clipsOnTopics')
+    .withIndex('by_clip_id', (q) => q.eq('clipId', args.clipId))
+    .filter((q) => q.eq(q.field('topicId'), args.topicId))
+    .first();
+
+  if (existing) {
+    throw new Error('Clip is already associated with this topic');
+  }
+
+  return await ctx.db.insert('clipsOnTopics', {
+    clipId: args.clipId,
+    topicId: args.topicId,
+  });
+}
+
+/**
+ * Remove a clip from a topic.
+ *
+ * @param ctx - Database context
+ * @param args - Arguments containing clipId and topicId
+ * @returns null
+ */
+export async function removeClipFromTopic(
+  ctx: MutationCtx,
+  args: {
+    clipId: Id<'clips'>;
+    topicId: Id<'topics'>;
+  },
+) {
+  await requireAuth(ctx);
+
+  const association = await ctx.db
+    .query('clipsOnTopics')
+    .withIndex('by_clip_id', (q) => q.eq('clipId', args.clipId))
+    .filter((q) => q.eq(q.field('topicId'), args.topicId))
+    .first();
+
+  if (!association) {
+    throw new Error('Association not found');
+  }
+
+  await ctx.db.delete(association._id);
 
   return null;
 }

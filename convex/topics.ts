@@ -49,6 +49,22 @@ export const list = query({
 // MUTATIONS
 // ============================================
 
+export const addClipToTopic = mutation({
+  args: validators.addClipToTopicArgs,
+  handler: async (ctx, args) => {
+    return await mutations.addClipToTopic(ctx, args);
+  },
+  returns: validators.addClipToTopicReturns,
+});
+
+export const addTalkToTopic = mutation({
+  args: validators.addTalkToTopicArgs,
+  handler: async (ctx, args) => {
+    return await mutations.addTalkToTopic(ctx, args);
+  },
+  returns: validators.addTalkToTopicReturns,
+});
+
 export const create = mutation({
   args: validators.createTopicArgs,
   handler: async (ctx, args) => {
@@ -63,6 +79,22 @@ export const deleteTopic = mutation({
     return await mutations.deleteTopic(ctx, args);
   },
   returns: validators.deleteTopicReturns,
+});
+
+export const removeClipFromTopic = mutation({
+  args: validators.removeClipFromTopicArgs,
+  handler: async (ctx, args) => {
+    return await mutations.removeClipFromTopic(ctx, args);
+  },
+  returns: validators.removeClipFromTopicReturns,
+});
+
+export const removeTalkFromTopic = mutation({
+  args: validators.removeTalkFromTopicArgs,
+  handler: async (ctx, args) => {
+    return await mutations.removeTalkFromTopic(ctx, args);
+  },
+  returns: validators.removeTalkFromTopicReturns,
 });
 
 export const update = mutation({
