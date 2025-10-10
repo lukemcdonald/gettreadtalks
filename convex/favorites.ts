@@ -5,6 +5,38 @@ import { mutations, queries, validators } from './model/users';
 // QUERIES
 // ============================================
 
+export const isClipFavorited = query({
+  args: validators.isClipFavoritedArgs,
+  handler: async (ctx, args) => {
+    return await queries.isClipFavorited(ctx, args);
+  },
+  returns: validators.isClipFavoritedReturns,
+});
+
+export const isSpeakerFavorited = query({
+  args: validators.isSpeakerFavoritedArgs,
+  handler: async (ctx, args) => {
+    return await queries.isSpeakerFavorited(ctx, args);
+  },
+  returns: validators.isSpeakerFavoritedReturns,
+});
+
+export const isTalkFavorited = query({
+  args: validators.isTalkFavoritedArgs,
+  handler: async (ctx, args) => {
+    return await queries.isTalkFavorited(ctx, args);
+  },
+  returns: validators.isTalkFavoritedReturns,
+});
+
+export const isTalkFinished = query({
+  args: validators.isTalkFinishedArgs,
+  handler: async (ctx, args) => {
+    return await queries.isTalkFinished(ctx, args);
+  },
+  returns: validators.isTalkFinishedReturns,
+});
+
 export const list = query({
   args: validators.listUserFavoritesArgs,
   handler: async (ctx, args) => {

@@ -66,6 +66,34 @@ export const removeFavoriteTalkArgs = {
 export const removeFavoriteTalkReturns = v.null();
 
 // ============================================
+// STATUS CHECKS
+// ============================================
+
+export const isClipFavoritedArgs = {
+  clipId: v.id('clips'),
+};
+
+export const isClipFavoritedReturns = v.boolean();
+
+export const isSpeakerFavoritedArgs = {
+  speakerId: v.id('speakers'),
+};
+
+export const isSpeakerFavoritedReturns = v.boolean();
+
+export const isTalkFavoritedArgs = {
+  talkId: v.id('talks'),
+};
+
+export const isTalkFavoritedReturns = v.boolean();
+
+export const isTalkFinishedArgs = {
+  talkId: v.id('talks'),
+};
+
+export const isTalkFinishedReturns = v.boolean();
+
+// ============================================
 // FINISHED TALKS
 // ============================================
 

@@ -128,3 +128,91 @@ export async function listUserFinishedTalks(ctx: QueryCtx, args: { limit?: numbe
 
   return await getUserFinishedTalks(ctx, user._id, limit);
 }
+
+/**
+ * Check if user has favorited a talk.
+ *
+ * @param ctx - Database context
+ * @param args - Query arguments
+ * @returns True if favorited, false otherwise
+ */
+export async function isTalkFavorited(ctx: QueryCtx, args: { talkId: string }) {
+  const user = await getCurrentUser(ctx);
+
+  if (!user) {
+    return false;
+  }
+
+  const favorite = await ctx.db
+    .query('userFavoriteTalks')
+    .withIndex('by_user_and_talk', (q) => q.eq('userId', user._id).eq('talkId', args.talkId))
+    .first();
+
+  return favorite !== null;
+}
+
+/**
+ * Check if user has favorited a clip.
+ *
+ * @param ctx - Database context
+ * @param args - Query arguments
+ * @returns True if favorited, false otherwise
+ */
+export async function isClipFavorited(ctx: QueryCtx, args: { clipId: string }) {
+  const user = await getCurrentUser(ctx);
+
+  if (!user) {
+    return false;
+  }
+
+  const favorite = await ctx.db
+    .query('userFavoriteClips')
+    .withIndex('by_user_and_clip', (q) => q.eq('userId', user._id).eq('clipId', args.clipId))
+    .first();
+
+  return favorite !== null;
+}
+
+/**
+ * Check if user has favorited a speaker.
+ *
+ * @param ctx - Database context
+ * @param args - Query arguments
+ * @returns True if favorited, false otherwise
+ */
+export async function isSpeakerFavorited(ctx: QueryCtx, args: { speakerId: string }) {
+  const user = await getCurrentUser(ctx);
+
+  if (!user) {
+    return false;
+  }
+
+  const favorite = await ctx.db
+    .query('userFavoriteSpeakers')
+    .withIndex('by_user_and_speaker', (q) => q.eq('userId', user._id).eq('speakerId', args.speakerId))
+    .first();
+
+  return favorite !== null;
+}
+
+/**
+ * Check if user has finished a talk.
+ *
+ * @param ctx - Database context
+ * @param args - Query arguments
+ * @returns True if finished, false otherwise
+ */
+export async function isTalkFinished(ctx: QueryCtx, args: { talkId: string }) {
+  const user = await getCurrentUser(ctx);
+
+  if (!user) {
+    return false;
+  }
+
+  const finished = await ctx.db
+    .query('userFinishedTalks')
+    .withIndex('by_user_and_talk', (q) => q.eq('userId', user._id).eq('talkId', args.talkId))
+    .first();
+
+  return finished !== null;
+}
