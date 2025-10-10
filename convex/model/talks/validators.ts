@@ -1,3 +1,4 @@
+import { paginationOptsValidator } from 'convex/server';
 import { v } from 'convex/values';
 
 import { statusType } from '../../lib/validators';
@@ -55,10 +56,10 @@ export const getTalkBySlugReturns = v.union(
 );
 
 export const listTalksArgs = {
-  limit: v.optional(v.number()),
+  paginationOpts: paginationOptsValidator,
   status: v.optional(statusType),
 };
-export const listTalksReturns = v.array(v.object(talkFields));
+export const listTalksReturns = v.any(); // PaginationResult<Talk>
 
 export const listTalksByCollectionArgs = {
   collectionId: v.id('collections'),

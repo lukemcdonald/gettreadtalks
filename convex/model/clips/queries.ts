@@ -1,3 +1,4 @@
+import type { PaginationOptions } from 'convex/server';
 import type { QueryCtx } from '../../_generated/server';
 
 import type {
@@ -7,24 +8,25 @@ import type {
 } from './types';
 
 /**
- * Get clips with optional filters.
+ * Get clips with optional filters and pagination.
  *
  * @param ctx - Database context
- * @param args - Query arguments with defaults
- * @returns Array of clips
+ * @param args - Query arguments with pagination options
+ * @returns Paginated clips
  */
-export async function getClips(ctx: QueryCtx, args: ListClipsArgs) {
-  const { limit = 20, status } = args;
-
-  if (status) {
+export async function getClips(
+  ctx: QueryCtx,
+  args: { paginationOpts: PaginationOptions; status?: string },
+) {
+  if (args.status) {
     return await ctx.db
       .query('clips')
-      .withIndex('by_status_and_published_at', (q) => q.eq('status', status))
+      .withIndex('by_status_and_published_at', (q) => q.eq('status', args.status))
       .order('desc')
-      .take(limit);
+      .paginate(args.paginationOpts);
   }
 
-  return await ctx.db.query('clips').take(limit);
+  return await ctx.db.query('clips').order('desc').paginate(args.paginationOpts);
 }
 
 /**

@@ -1,3 +1,4 @@
+import { paginationOptsValidator } from 'convex/server';
 import { v } from 'convex/values';
 
 import { speakerFields } from './schema';
@@ -39,10 +40,10 @@ export const getSpeakerBySlugArgs = {
 export const getSpeakerBySlugReturns = v.union(v.object(speakerFields), v.null());
 
 export const listSpeakersArgs = {
-  limit: v.optional(v.number()),
+  paginationOpts: paginationOptsValidator,
 };
 
-export const listSpeakersReturns = v.array(v.object(speakerFields));
+export const listSpeakersReturns = v.any(); // PaginationResult<Speaker>
 
 export const updateSpeakerArgs = {
   description: v.optional(v.string()),

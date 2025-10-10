@@ -1,3 +1,4 @@
+import { paginationOptsValidator } from 'convex/server';
 import { v } from 'convex/values';
 
 import { statusType } from '../../lib/validators';
@@ -38,11 +39,11 @@ export const getClipBySlugWithRelationsReturns = v.union(
 );
 
 export const listClipsArgs = {
-  limit: v.optional(v.number()),
+  paginationOpts: paginationOptsValidator,
   status: v.optional(statusType),
 };
 
-export const listClipsReturns = v.array(v.object(clipFields));
+export const listClipsReturns = v.any(); // PaginationResult<Clip>
 
 export const listPublishedClipsArgs = {
   limit: v.number(),

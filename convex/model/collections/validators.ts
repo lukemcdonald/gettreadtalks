@@ -1,3 +1,4 @@
+import { paginationOptsValidator } from 'convex/server';
 import { v } from 'convex/values';
 
 import { talkFields } from '../talks/schema';
@@ -43,10 +44,10 @@ export const getCollectionWithTalksReturns = v.union(
 );
 
 export const listCollectionsArgs = {
-  limit: v.optional(v.number()),
+  paginationOpts: paginationOptsValidator,
 };
 
-export const listCollectionsReturns = v.array(v.object(collectionFields));
+export const listCollectionsReturns = v.any(); // PaginationResult<Collection>
 
 export const updateCollectionArgs = {
   description: v.optional(v.string()),

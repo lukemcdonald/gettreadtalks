@@ -1,3 +1,4 @@
+import type { PaginationOptions } from 'convex/server';
 import type { QueryCtx } from '../../_generated/server';
 
 import type {
@@ -33,16 +34,17 @@ export async function getCollectionBySlug(ctx: QueryCtx, args: GetCollectionBySl
 }
 
 /**
- * Get collections.
+ * Get collections with pagination.
  *
  * @param ctx - Database context
- * @param args - Query arguments with defaults
- * @returns Array of collections
+ * @param args - Query arguments with pagination options
+ * @returns Paginated collections
  */
-export async function getCollections(ctx: QueryCtx, args: ListCollectionsArgs) {
-  const { limit = 100 } = args;
-
-  return await ctx.db.query('collections').take(limit);
+export async function getCollections(
+  ctx: QueryCtx,
+  args: { paginationOpts: PaginationOptions },
+) {
+  return await ctx.db.query('collections').order('desc').paginate(args.paginationOpts);
 }
 
 /**

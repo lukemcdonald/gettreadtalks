@@ -1,3 +1,4 @@
+import type { PaginationOptions } from 'convex/server';
 import type { QueryCtx } from '../../_generated/server';
 
 import type {
@@ -34,24 +35,25 @@ export async function getTalkBySlug(ctx: QueryCtx, args: GetTalkBySlugArgs) {
 }
 
 /**
- * Get talks with optional filters.
+ * Get talks with optional filters and pagination.
  *
  * @param ctx - Database context
- * @param args - Query arguments with defaults
- * @returns Array of talks
+ * @param args - Query arguments with pagination options
+ * @returns Paginated talks
  */
-export async function getTalks(ctx: QueryCtx, args: ListTalksArgs) {
-  const { limit = 20, status } = args;
-
-  if (status) {
+export async function getTalks(
+  ctx: QueryCtx,
+  args: { paginationOpts: PaginationOptions; status?: string },
+) {
+  if (args.status) {
     return await ctx.db
       .query('talks')
-      .withIndex('by_status_and_published_at', (q) => q.eq('status', status))
+      .withIndex('by_status_and_published_at', (q) => q.eq('status', args.status))
       .order('desc')
-      .take(limit);
+      .paginate(args.paginationOpts);
   }
 
-  return await ctx.db.query('talks').take(limit);
+  return await ctx.db.query('talks').order('desc').paginate(args.paginationOpts);
 }
 
 /**
@@ -177,10 +179,7 @@ export async function getTalksByCollection(ctx: QueryCtx, args: ListTalksByColle
  * @param args - Query arguments with defaults
  * @returns Array of random featured talks
  */
-export async function getFeaturedTalks(
-  ctx: QueryCtx,
-  args: { limit?: number } = {},
-) {
+export async function getFeaturedTalks(ctx: QueryCtx, args: { limit?: number } = {}) {
   const { limit = 5 } = args;
 
   const talks = await ctx.db
@@ -190,7 +189,7 @@ export async function getFeaturedTalks(
 
   // Shuffle and return limited number
   const shuffled = talks.sort(() => Math.random() - 0.5);
-  
+
   return shuffled.slice(0, limit);
 }
 
@@ -215,12 +214,10 @@ export async function getRandomTalksBySpeaker(
     .collect();
 
   // Filter out excluded talk if provided
-  const filteredTalks = excludeTalkId
-    ? talks.filter((talk) => talk._id !== excludeTalkId)
-    : talks;
+  const filteredTalks = excludeTalkId ? talks.filter((talk) => talk._id !== excludeTalkId) : talks;
 
   // Shuffle and return limited number
   const shuffled = filteredTalks.sort(() => Math.random() - 0.5);
-  
+
   return shuffled.slice(0, limit);
 }

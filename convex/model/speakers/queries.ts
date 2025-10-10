@@ -1,3 +1,4 @@
+import type { PaginationOptions } from 'convex/server';
 import type { QueryCtx } from '../../_generated/server';
 
 import type { GetSpeakerArgs, GetSpeakerBySlugArgs, ListSpeakersArgs } from './types';
@@ -28,16 +29,21 @@ export async function getSpeakerBySlug(ctx: QueryCtx, args: GetSpeakerBySlugArgs
 }
 
 /**
- * Get speakers.
+ * Get speakers with pagination.
  *
  * @param ctx - Database context
- * @param args - Query arguments with defaults
- * @returns Array of speakers
+ * @param args - Query arguments with pagination options
+ * @returns Paginated speakers
  */
-export async function getSpeakers(ctx: QueryCtx, args: ListSpeakersArgs) {
-  const { limit = 100 } = args;
-
-  return await ctx.db.query('speakers').take(limit);
+export async function getSpeakers(
+  ctx: QueryCtx,
+  args: { paginationOpts: PaginationOptions },
+) {
+  return await ctx.db
+    .query('speakers')
+    .withIndex('by_last_name')
+    .order('asc')
+    .paginate(args.paginationOpts);
 }
 
 /**
@@ -47,10 +53,7 @@ export async function getSpeakers(ctx: QueryCtx, args: ListSpeakersArgs) {
  * @param args - Query arguments with defaults
  * @returns Array of random featured speakers
  */
-export async function getFeaturedSpeakers(
-  ctx: QueryCtx,
-  args: { limit?: number } = {},
-) {
+export async function getFeaturedSpeakers(ctx: QueryCtx, args: { limit?: number } = {}) {
   const { limit = 6 } = args;
 
   const speakers = await ctx.db
@@ -60,6 +63,6 @@ export async function getFeaturedSpeakers(
 
   // Shuffle and return limited number
   const shuffled = speakers.sort(() => Math.random() - 0.5);
-  
+
   return shuffled.slice(0, limit);
 }
