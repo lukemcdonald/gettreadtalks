@@ -26,6 +26,8 @@ export const affiliateLinkFields = {
 
 export const affiliateLinkTables = {
   affiliateLinks: defineTable(affiliateLinkFields)
+    .index('by_affiliate', ['affiliate'])
     .index('by_featured', ['featured'])
-    .index('by_slug', ['slug']),
+    .index('by_slug', ['slug'])
+    .index('by_type', ['type']),
 };

@@ -44,15 +44,11 @@ export async function getAffiliateLinkBySlug(ctx: QueryCtx, args: GetAffiliateLi
 export async function getAffiliateLinksByType(ctx: QueryCtx, args: ListAffiliateLinksByTypeArgs) {
   const { limit = 20, type } = args;
 
-  const allLinks = await ctx.db.query('affiliateLinks').collect();
-
-  // Filter by type since there's no index for type
-  const filteredLinks = allLinks
-    .filter((link) => link.type === type)
-    .sort((a, b) => (b._creationTime || 0) - (a._creationTime || 0))
-    .slice(0, limit);
-
-  return filteredLinks;
+  return await ctx.db
+    .query('affiliateLinks')
+    .withIndex('by_type', (q) => q.eq('type', type))
+    .order('desc')
+    .take(limit);
 }
 
 /**
@@ -68,15 +64,11 @@ export async function getAffiliateLinksByAffiliate(
 ) {
   const { affiliate, limit = 20 } = args;
 
-  const allLinks = await ctx.db.query('affiliateLinks').collect();
-
-  // Filter by affiliate since there's no index for affiliate
-  const filteredLinks = allLinks
-    .filter((link) => link.affiliate === affiliate)
-    .sort((a, b) => (b._creationTime || 0) - (a._creationTime || 0))
-    .slice(0, limit);
-
-  return filteredLinks;
+  return await ctx.db
+    .query('affiliateLinks')
+    .withIndex('by_affiliate', (q) => q.eq('affiliate', affiliate))
+    .order('desc')
+    .take(limit);
 }
 
 /**
