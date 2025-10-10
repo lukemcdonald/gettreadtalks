@@ -66,6 +66,34 @@ export const removeFavoriteTalkArgs = {
 export const removeFavoriteTalkReturns = v.null();
 
 // ============================================
+// FINISHED TALKS
+// ============================================
+
+export const addFinishedTalkArgs = {
+  talkId: v.id('talks'),
+};
+
+export const addFinishedTalkReturns = v.id('userFinishedTalks');
+
+export const listUserFinishedTalksArgs = {
+  limit: v.optional(v.number()),
+};
+
+export const listUserFinishedTalksReturns = v.array(
+  v.object({
+    finishedAt: v.number(),
+    talkId: v.id('talks'),
+    userId: v.string(),
+  }),
+);
+
+export const removeFinishedTalkArgs = {
+  talkId: v.id('talks'),
+};
+
+export const removeFinishedTalkReturns = v.null();
+
+// ============================================
 // PASSWORD
 // ============================================
 

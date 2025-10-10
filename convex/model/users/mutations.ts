@@ -179,3 +179,63 @@ export async function removeUserFavoriteSpeaker(
 
   return null;
 }
+
+/**
+ * Mark a talk as finished for the user.
+ *
+ * @param ctx - Database context
+ * @param args - Arguments containing talkId
+ * @returns The ID of the created finished record
+ */
+export async function addUserFinishedTalk(
+  ctx: MutationCtx,
+  args: {
+    talkId: Id<'talks'>;
+  },
+) {
+  const userId = await getUserId(ctx);
+
+  const existing = await ctx.db
+    .query('userFinishedTalks')
+    .withIndex('by_user_and_talk', (q) => q.eq('userId', userId).eq('talkId', args.talkId))
+    .first();
+
+  if (existing) {
+    throw new Error('Talk already marked as finished');
+  }
+
+  return await ctx.db.insert('userFinishedTalks', {
+    finishedAt: Date.now(),
+    talkId: args.talkId,
+    userId: userId,
+  });
+}
+
+/**
+ * Unmark a talk as finished for the user.
+ *
+ * @param ctx - Database context
+ * @param args - Arguments containing talkId
+ * @returns null
+ */
+export async function removeUserFinishedTalk(
+  ctx: MutationCtx,
+  args: {
+    talkId: Id<'talks'>;
+  },
+) {
+  const userId = await getUserId(ctx);
+
+  const finished = await ctx.db
+    .query('userFinishedTalks')
+    .withIndex('by_user_and_talk', (q) => q.eq('userId', userId).eq('talkId', args.talkId))
+    .first();
+
+  if (!finished) {
+    throw new Error('Finished talk not found');
+  }
+
+  await ctx.db.delete(finished._id);
+
+  return null;
+}

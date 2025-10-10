@@ -13,6 +13,14 @@ export const list = query({
   returns: validators.listUserFavoritesReturns,
 });
 
+export const listFinished = query({
+  args: validators.listUserFinishedTalksArgs,
+  handler: async (ctx, args) => {
+    return await queries.listUserFinishedTalks(ctx, args);
+  },
+  returns: validators.listUserFinishedTalksReturns,
+});
+
 // ============================================
 // MUTATIONS
 // ============================================
@@ -63,4 +71,20 @@ export const removeFavoriteTalk = mutation({
     return await mutations.removeUserFavoriteTalk(ctx, args);
   },
   returns: validators.removeFavoriteTalkReturns,
+});
+
+export const addFinishedTalk = mutation({
+  args: validators.addFinishedTalkArgs,
+  handler: async (ctx, args) => {
+    return await mutations.addUserFinishedTalk(ctx, args);
+  },
+  returns: validators.addFinishedTalkReturns,
+});
+
+export const removeFinishedTalk = mutation({
+  args: validators.removeFinishedTalkArgs,
+  handler: async (ctx, args) => {
+    return await mutations.removeUserFinishedTalk(ctx, args);
+  },
+  returns: validators.removeFinishedTalkReturns,
 });

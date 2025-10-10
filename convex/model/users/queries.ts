@@ -93,3 +93,38 @@ export async function getUserFavorites(ctx: QueryCtx, userId: string, limit: num
     talks,
   };
 }
+
+/**
+ * Get user finished talks.
+ *
+ * @param ctx - Database context
+ * @param userId - User ID
+ * @param limit - Maximum number of finished talks
+ * @returns Array of finished talk records
+ */
+export async function getUserFinishedTalks(ctx: QueryCtx, userId: string, limit: number) {
+  return await ctx.db
+    .query('userFinishedTalks')
+    .withIndex('by_user', (q) => q.eq('userId', userId))
+    .order('desc')
+    .take(limit);
+}
+
+/**
+ * List all user finished talks.
+ *
+ * @param ctx - Database context
+ * @param args - Query arguments with defaults
+ * @returns Array of finished talk records
+ */
+export async function listUserFinishedTalks(ctx: QueryCtx, args: { limit?: number }) {
+  const user = await getCurrentUser(ctx);
+
+  if (!user) {
+    return [];
+  }
+
+  const limit = args.limit ?? 100;
+
+  return await getUserFinishedTalks(ctx, user._id, limit);
+}
