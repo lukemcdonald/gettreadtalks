@@ -159,6 +159,16 @@ export async function getItems(ctx, args) {...}
 
 **Why:** Domain exports are accessed via `api.items.*` so the context is clear. Helper functions are imported directly and need the noun to be self-documenting: `import { getItem } from './model/items/queries'`.
 
+### Helper Function Naming Pattern
+
+Domain files use simple names (file provides context), helpers use descriptive names (clarity when imported):
+
+```ts
+// Domain file: convex/talks.ts
+export const getBySlug = query({...})  
+  → queries.getTalkBySlugWithRelations()  // Descriptive helper name
+```
+
 ### Query Design Decision Tree
 
 When deciding whether to create a new query function, follow this tree:

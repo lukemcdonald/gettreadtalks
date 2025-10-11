@@ -41,18 +41,8 @@ export const getTalkArgs = {
 };
 export const getTalkReturns = v.union(v.object(talkFields), v.null());
 
-export const getTalksCountArgs = {};
-export const getTalksCountReturns = v.number();
-
-export const getTalksCountByCollectionArgs = {
-  collectionId: v.id('collections'),
-};
-export const getTalksCountByCollectionReturns = v.number();
-
-export const getTalksCountByTopicArgs = {
-  topicId: v.id('topics'),
-};
-export const getTalksCountByTopicReturns = v.number();
+export const getCountArgs = {};
+export const getCountReturns = v.number();
 
 export const getTalkBySlugArgs = {
   slug: v.string(),

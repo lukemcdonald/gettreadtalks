@@ -12,8 +12,8 @@ export type GetClipBySlugWithRelationsArgs = ObjectType<
 export type GetClipBySlugWithRelationsReturns = Infer<
   typeof validators.getClipBySlugWithRelationsReturns
 >;
-export type GetClipsBySpeakerArgs = ObjectType<typeof validators.getClipsBySpeakerArgs>;
-export type GetClipsBySpeakerReturns = Infer<typeof validators.getClipsBySpeakerReturns>;
+export type ListBySpeakerArgs = ObjectType<typeof validators.listBySpeakerArgs>;
+export type ListBySpeakerReturns = Infer<typeof validators.listBySpeakerReturns>;
 export type ListClipsArgs = ObjectType<typeof validators.listClipsArgs>;
 export type ListClipsReturns = Infer<typeof validators.listClipsReturns>;
 export type UpdateClipArgs = ObjectType<typeof validators.updateClipArgs>;

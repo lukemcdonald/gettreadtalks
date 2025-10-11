@@ -21,6 +21,14 @@ export const getBySlug = query({
   returns: validators.getTalkBySlugReturns,
 });
 
+export const getCount = query({
+  args: validators.getCountArgs,
+  handler: async (ctx) => {
+    return await queries.getTalksCount(ctx);
+  },
+  returns: validators.getCountReturns,
+});
+
 export const getFeatured = query({
   args: validators.getFeaturedTalksArgs,
   handler: async (ctx, args) => {
@@ -35,30 +43,6 @@ export const getRandomBySpeaker = query({
     return await queries.getRandomTalksBySpeaker(ctx, args);
   },
   returns: validators.getRandomTalksBySpeakerReturns,
-});
-
-export const getTalksCount = query({
-  args: validators.getTalksCountArgs,
-  handler: async (ctx, args) => {
-    return await queries.getTalksCount(ctx);
-  },
-  returns: validators.getTalksCountReturns,
-});
-
-export const getTalksCountByCollection = query({
-  args: validators.getTalksCountByCollectionArgs,
-  handler: async (ctx, args) => {
-    return await queries.getTalksCountByCollection(ctx, args);
-  },
-  returns: validators.getTalksCountByCollectionReturns,
-});
-
-export const getTalksCountByTopic = query({
-  args: validators.getTalksCountByTopicArgs,
-  handler: async (ctx, args) => {
-    return await queries.getTalksCountByTopic(ctx, args);
-  },
-  returns: validators.getTalksCountByTopicReturns,
 });
 
 export const list = query({
@@ -97,20 +81,20 @@ export const listWithSpeakers = query({
 // MUTATIONS
 // ============================================
 
-export const create = mutation({
-  args: validators.createTalkArgs,
-  handler: async (ctx, args) => {
-    return await mutations.createTalk(ctx, args);
-  },
-  returns: validators.createTalkReturns,
-});
-
 export const archive = mutation({
   args: validators.archiveTalkArgs,
   handler: async (ctx, args) => {
     return await mutations.archiveTalk(ctx, args);
   },
   returns: validators.archiveTalkReturns,
+});
+
+export const create = mutation({
+  args: validators.createTalkArgs,
+  handler: async (ctx, args) => {
+    return await mutations.createTalk(ctx, args);
+  },
+  returns: validators.createTalkReturns,
 });
 
 export const update = mutation({

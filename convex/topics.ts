@@ -29,20 +29,20 @@ export const getWithContent = query({
   returns: validators.getTopicWithContentReturns,
 });
 
-export const getWithCount = query({
-  args: validators.getTopicsWithCountArgs,
-  handler: async (ctx, args) => {
-    return await queries.getTopicsWithCount(ctx, args);
-  },
-  returns: validators.getTopicsWithCountReturns,
-});
-
 export const list = query({
   args: validators.listTopicsArgs,
   handler: async (ctx, args) => {
     return await queries.getTopics(ctx, args);
   },
   returns: validators.listTopicsReturns,
+});
+
+export const listWithCount = query({
+  args: validators.listWithCountArgs,
+  handler: async (ctx, args) => {
+    return await queries.getTopicsWithCount(ctx, args);
+  },
+  returns: validators.listWithCountReturns,
 });
 
 // ============================================

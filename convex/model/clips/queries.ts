@@ -58,7 +58,10 @@ export async function getClipsBySpeaker(
  * @param args - Query arguments
  * @returns Clip with speaker, talk, and topics data
  */
-export async function getClipBySlugWithRelations(ctx: QueryCtx, args: GetClipBySlugWithRelationsArgs) {
+export async function getClipBySlugWithRelations(
+  ctx: QueryCtx,
+  args: GetClipBySlugWithRelationsArgs,
+) {
   const clip = await ctx.db
     .query('clips')
     .withIndex('by_slug', (q) => q.eq('slug', args.slug))

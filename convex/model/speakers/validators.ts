@@ -39,9 +39,9 @@ export const getSpeakerBySlugArgs = {
 
 export const getSpeakerBySlugReturns = v.union(v.object(speakerFields), v.null());
 
-export const getSpeakersCountArgs = {};
+export const getCountArgs = {};
 
-export const getSpeakersCountReturns = v.number();
+export const getCountReturns = v.number();
 
 export const listSpeakersArgs = {
   paginationOpts: paginationOptsValidator,

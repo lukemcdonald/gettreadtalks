@@ -13,14 +13,6 @@ export const getBySlug = query({
   returns: validators.getClipBySlugWithRelationsReturns,
 });
 
-export const getBySpeaker = query({
-  args: validators.getClipsBySpeakerArgs,
-  handler: async (ctx, args) => {
-    return await queries.getClipsBySpeaker(ctx, args);
-  },
-  returns: validators.getClipsBySpeakerReturns,
-});
-
 export const list = query({
   args: validators.listClipsArgs,
   handler: async (ctx, args) => {
@@ -29,17 +21,17 @@ export const list = query({
   returns: validators.listClipsReturns,
 });
 
+export const listBySpeaker = query({
+  args: validators.listBySpeakerArgs,
+  handler: async (ctx, args) => {
+    return await queries.getClipsBySpeaker(ctx, args);
+  },
+  returns: validators.listBySpeakerReturns,
+});
+
 // ============================================
 // MUTATIONS
 // ============================================
-
-export const create = mutation({
-  args: validators.createClipArgs,
-  handler: async (ctx, args) => {
-    return await mutations.createClip(ctx, args);
-  },
-  returns: validators.createClipReturns,
-});
 
 export const archive = mutation({
   args: validators.archiveClipArgs,
@@ -47,6 +39,14 @@ export const archive = mutation({
     return await mutations.archiveClip(ctx, args);
   },
   returns: validators.archiveClipReturns,
+});
+
+export const create = mutation({
+  args: validators.createClipArgs,
+  handler: async (ctx, args) => {
+    return await mutations.createClip(ctx, args);
+  },
+  returns: validators.createClipReturns,
 });
 
 export const update = mutation({

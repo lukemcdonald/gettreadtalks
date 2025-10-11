@@ -21,20 +21,20 @@ export const getBySlug = query({
   returns: validators.getSpeakerBySlugReturns,
 });
 
+export const getCount = query({
+  args: validators.getCountArgs,
+  handler: async (ctx) => {
+    return await queries.getSpeakersCount(ctx);
+  },
+  returns: validators.getCountReturns,
+});
+
 export const getFeatured = query({
   args: validators.getFeaturedSpeakersArgs,
   handler: async (ctx, args) => {
     return await queries.getFeaturedSpeakers(ctx, args);
   },
   returns: validators.getFeaturedSpeakersReturns,
-});
-
-export const getSpeakersCount = query({
-  args: validators.getSpeakersCountArgs,
-  handler: async (ctx, args) => {
-    return await queries.getSpeakersCount(ctx);
-  },
-  returns: validators.getSpeakersCountReturns,
 });
 
 export const list = query({

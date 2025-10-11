@@ -31,13 +31,13 @@ export const getCollectionBySlugArgs = {
 
 export const getCollectionBySlugReturns = v.union(v.object(collectionFields), v.null());
 
-export const getCollectionsBySpeakerArgs = {
+export const listBySpeakerArgs = {
   speakerId: v.id('speakers'),
 };
 
-export const getCollectionsBySpeakerReturns = v.array(v.object(collectionFields));
+export const listBySpeakerReturns = v.array(v.object(collectionFields));
 
-export const getCollectionsWithStatsArgs = {
+export const listWithStatsArgs = {
   paginationOpts: paginationOptsValidator,
 };
 
@@ -48,7 +48,7 @@ export const getCollectionsWithStatsArgs = {
  * Returns: PaginationResult with enriched page
  * Structure: { page: Array<Doc<'collections'> & stats>, continueCursor: string, isDone: boolean }
  */
-export const getCollectionsWithStatsReturns = v.any();
+export const listWithStatsReturns = v.any();
 
 export const getCollectionWithSpeakersArgs = {
   slug: v.string(),
