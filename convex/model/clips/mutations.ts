@@ -1,10 +1,14 @@
 import type { MutationCtx } from '../../_generated/server';
+import type {
+  ArchiveClipArgs,
+  CreateClipArgs,
+  UpdateClipArgs,
+  UpdateClipStatusArgs,
+} from './types';
 
 import { Doc } from '../../_generated/dataModel';
 import { normalizeSlug, slugExists } from '../../lib/utils';
-import { StatusType } from '../../lib/validators';
 import { requireAuth } from '../auth/queries';
-import type { ArchiveClipArgs, CreateClipArgs, UpdateClipArgs, UpdateClipStatusArgs } from './types';
 
 /**
  * Create a new clip.

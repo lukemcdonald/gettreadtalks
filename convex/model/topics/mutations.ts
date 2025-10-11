@@ -1,17 +1,9 @@
 import type { MutationCtx } from '../../_generated/server';
+import type { CreateTopicArgs, DestroyTopicArgs, UpdateTopicArgs } from './types';
 
 import { Doc, Id } from '../../_generated/dataModel';
 import { normalizeSlug, slugExists } from '../../lib/utils';
 import { requireAuth } from '../auth/queries';
-import type {
-  AddClipToTopicArgs,
-  AddTalkToTopicArgs,
-  CreateTopicArgs,
-  DestroyTopicArgs,
-  RemoveClipFromTopicArgs,
-  RemoveTalkFromTopicArgs,
-  UpdateTopicArgs,
-} from './types';
 
 /**
  * Create a new topic.

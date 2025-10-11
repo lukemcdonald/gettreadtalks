@@ -1,10 +1,13 @@
 import type { MutationCtx } from '../../_generated/server';
+import type {
+  CreateAffiliateLinkArgs,
+  DestroyAffiliateLinkArgs,
+  UpdateAffiliateLinkArgs,
+} from './types';
 
 import { Doc } from '../../_generated/dataModel';
 import { normalizeSlug, slugExists } from '../../lib/utils';
 import { requireAuth } from '../auth/queries';
-import { AffiliateLinkType } from './schema';
-import type { CreateAffiliateLinkArgs, DestroyAffiliateLinkArgs, UpdateAffiliateLinkArgs } from './types';
 
 /**
  * Create a new affiliate link.

@@ -1,12 +1,11 @@
 import type { PaginationOptions } from 'convex/server';
-import type { QueryCtx } from '../../_generated/server';
-import type { Id } from '../../_generated/dataModel';
 
+import type { Id } from '../../_generated/dataModel';
+import type { QueryCtx } from '../../_generated/server';
 import type { StatusType } from '../../schema';
 import type {
   GetTalkArgs,
   GetTalkBySlugArgs,
-  ListTalksArgs,
   ListTalksByCollectionArgs,
   ListTalksBySpeakerArgs,
 } from './types';
@@ -103,9 +102,7 @@ export async function getTalkBySlugWithRelations(ctx: QueryCtx, args: GetTalkByS
   const queries = {
     clips: ctx.db
       .query('clips')
-      .withIndex('by_talk_id_and_status', (q) =>
-        q.eq('talkId', talk._id).eq('status', 'published'),
-      )
+      .withIndex('by_talk_id_and_status', (q) => q.eq('talkId', talk._id).eq('status', 'published'))
       .collect(),
     collection: talk.collectionId ? ctx.db.get(talk.collectionId) : null,
     speaker: talk.speakerId ? ctx.db.get(talk.speakerId) : null,

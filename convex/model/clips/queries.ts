@@ -1,7 +1,7 @@
 import type { PaginationOptions } from 'convex/server';
-import type { QueryCtx } from '../../_generated/server';
-import type { Id } from '../../_generated/dataModel';
 
+import type { Id } from '../../_generated/dataModel';
+import type { QueryCtx } from '../../_generated/server';
 import type { StatusType } from '../../schema';
 import type { GetClipBySlugWithRelationsArgs } from './types';
 

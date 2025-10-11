@@ -1,9 +1,9 @@
 import type { MutationCtx } from '../../_generated/server';
+import type { CreateCollectionArgs, DestroyCollectionArgs, UpdateCollectionArgs } from './types';
 
 import { Doc } from '../../_generated/dataModel';
 import { normalizeSlug, slugExists } from '../../lib/utils';
 import { requireAuth } from '../auth/queries';
-import type { CreateCollectionArgs, DestroyCollectionArgs, UpdateCollectionArgs } from './types';
 
 /**
  * Create a new collection.

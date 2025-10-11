@@ -1,9 +1,14 @@
 import type { MutationCtx } from '../../_generated/server';
+import type {
+  ArchiveTalkArgs,
+  CreateTalkArgs,
+  UpdateTalkArgs,
+  UpdateTalkStatusArgs,
+} from './types';
 
 import { Doc } from '../../_generated/dataModel';
 import { normalizeSlug, slugExists } from '../../lib/utils';
 import { requireAuth } from '../auth/queries';
-import type { ArchiveTalkArgs, CreateTalkArgs, UpdateTalkArgs, UpdateTalkStatusArgs } from './types';
 
 /**
  * Create a new talk.

@@ -1,9 +1,9 @@
 import type { MutationCtx } from '../../_generated/server';
+import type { CreateSpeakerArgs, DestroySpeakerArgs, UpdateSpeakerArgs } from './types';
 
 import { Doc } from '../../_generated/dataModel';
 import { normalizeSlug, slugExists } from '../../lib/utils';
 import { requireAuth } from '../auth/queries';
-import type { CreateSpeakerArgs, DestroySpeakerArgs, UpdateSpeakerArgs } from './types';
 
 /**
  * Create a new speaker.

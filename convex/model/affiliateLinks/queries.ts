@@ -1,6 +1,4 @@
 import type { QueryCtx } from '../../_generated/server';
-
-import { AffiliateLinkType } from './schema';
 import type {
   GetAffiliateLinkArgs,
   GetAffiliateLinkBySlugArgs,

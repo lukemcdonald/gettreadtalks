@@ -1,8 +1,8 @@
-import type { QueryCtx } from '../../_generated/server';
 import type { Id } from '../../_generated/dataModel';
+import type { QueryCtx } from '../../_generated/server';
+import type { ListUserFavoritesArgs } from './types';
 
 import { getCurrentUser } from '../auth/queries';
-import type { ListUserFavoritesArgs } from './types';
 
 /**
  * List all user favorites.
