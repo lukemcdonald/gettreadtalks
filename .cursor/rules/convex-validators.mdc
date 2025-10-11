@@ -130,6 +130,7 @@ export const getUser = query({
 
 **When `v.any()` is acceptable:**
 - Complex joined types where exact structure can't be defined
+- Pagination return types (see below)
 - Always add TypeScript comment to document expected type
 - Use `v.object()` with specific fields when possible
 
@@ -140,6 +141,42 @@ returns: v.object({
   author: v.union(v.any(), v.null()), // Doc<"users"> | null
 })
 ```
+
+## Pagination Return Types
+
+Convex pagination uses `v.any()` as the standard pattern per official documentation. Convex does not provide a built-in pagination result validator.
+
+Always document pagination returns with a JSDoc comment:
+
+```ts
+/**
+ * Pagination return type uses v.any() per Convex standard pattern.
+ * See: https://docs.convex.dev/database/pagination
+ *
+ * Returns: PaginationResult<Doc<'tableName'>>
+ * Structure: { page: Doc<'tableName'>[], continueCursor: string, isDone: boolean }
+ */
+export const listItemsReturns = v.any();
+```
+
+**For enriched pagination results:**
+
+```ts
+/**
+ * Pagination return type uses v.any() per Convex standard pattern.
+ * See: https://docs.convex.dev/database/pagination
+ *
+ * Returns: PaginationResult with enriched page
+ * Structure: { page: Array<Doc<'items'> & { owner: Doc<'users'> | null }>, continueCursor: string, isDone: boolean }
+ */
+export const listItemsWithOwnersReturns = v.any();
+```
+
+**Why this is the standard pattern:**
+- Convex doesn't provide a `v.paginationResult()` validator
+- The `page` array can be transformed (mapped/filtered), making static typing impractical
+- Official docs show no examples of typing pagination returns
+- Reference: https://docs.convex.dev/database/pagination
 
 ## Index Optimization
 
