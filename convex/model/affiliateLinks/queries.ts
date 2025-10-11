@@ -82,13 +82,14 @@ export async function getAffiliateLinks(ctx: QueryCtx, args: ListAffiliateLinksA
   const { affiliate, featured, limit = 50, type } = args;
 
   // Use index if filtering by featured, otherwise get all links
+  // Limited to 100 to prevent memory issues in admin UI
   const allLinks =
     featured !== undefined
       ? await ctx.db
           .query('affiliateLinks')
           .withIndex('by_featured', (q) => q.eq('featured', featured))
-          .collect()
-      : await ctx.db.query('affiliateLinks').collect();
+          .take(100)
+      : await ctx.db.query('affiliateLinks').take(100);
 
   // Apply additional filters
   let filteredLinks = allLinks;

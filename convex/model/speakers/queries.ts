@@ -53,10 +53,12 @@ export async function getSpeakers(ctx: QueryCtx, args: { paginationOpts: Paginat
 export async function getFeaturedSpeakers(ctx: QueryCtx, args: { limit?: number } = {}) {
   const { limit = 6 } = args;
 
+  // Intentionally unbounded: Need all featured speakers for random selection
+  // Limited to 50 to prevent memory issues if featured speakers grow
   const speakers = await ctx.db
     .query('speakers')
     .withIndex('by_featured', (q) => q.eq('featured', true))
-    .collect();
+    .take(50);
 
   // Shuffle and return limited number
   const shuffled = speakers.sort(() => Math.random() - 0.5);
@@ -71,6 +73,8 @@ export async function getFeaturedSpeakers(ctx: QueryCtx, args: { limit?: number 
  * @returns Count of speakers
  */
 export async function getSpeakersCount(ctx: QueryCtx) {
+  // Intentionally unbounded: Used only for counting total speakers
+  // TODO: Replace with ctx.db.query('speakers').count() when available
   const speakers = await ctx.db.query('speakers').collect();
 
   return speakers.length;

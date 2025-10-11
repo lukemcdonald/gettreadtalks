@@ -193,10 +193,12 @@ export async function getTalksByCollection(ctx: QueryCtx, args: ListTalksByColle
 export async function getFeaturedTalks(ctx: QueryCtx, args: { limit?: number } = {}) {
   const { limit = 5 } = args;
 
+  // Intentionally unbounded: Need all featured talks for random selection
+  // Limited to 50 to prevent memory issues if featured talks grow
   const talks = await ctx.db
     .query('talks')
     .withIndex('by_featured_and_status', (q) => q.eq('featured', true).eq('status', 'published'))
-    .collect();
+    .take(50);
 
   // Shuffle and return limited number
   const shuffled = talks.sort(() => Math.random() - 0.5);
@@ -240,6 +242,8 @@ export async function getRandomTalksBySpeaker(
  * @returns Count of published talks
  */
 export async function getTalksCount(ctx: QueryCtx) {
+  // Intentionally unbounded: Used only for counting total talks
+  // TODO: Replace with ctx.db.query('talks').withIndex(...).count() when available
   const talks = await ctx.db
     .query('talks')
     .withIndex('by_status_and_published_at', (q) => q.eq('status', 'published'))
@@ -256,6 +260,8 @@ export async function getTalksCount(ctx: QueryCtx) {
  * @returns Count of talks for topic
  */
 export async function getTalksCountByTopic(ctx: QueryCtx, args: { topicId: Id<'topics'> }) {
+  // Intentionally unbounded: Used only for counting talks in topic
+  // TODO: Replace with ctx.db.query(...).count() when available
   const talkTopics = await ctx.db
     .query('talksOnTopics')
     .withIndex('by_topic_id', (q) => q.eq('topicId', args.topicId))
