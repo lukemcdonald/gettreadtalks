@@ -1,16 +1,23 @@
-*.log
-*.tsbuildinfo
-.cursor/
-.DS_Store
-.env*
-.idea/
-.next/
-.notes/
-.vscode/
-build/
-convex/_generated/
-convex/convex.json
-dist/
-next-env.d.ts
-node_modules/
-out/
+# Dependencies
+node_modules
+pnpm-lock.yaml
+
+# Build outputs
+.next
+dist
+build
+
+# Generated files
+.convex/_generated
+convex/_generated
+
+# Config files
+*.config.js
+*.config.ts
+*.config.mjs
+
+# Git
+.git
+
+# Deployment
+.vercel
