@@ -83,6 +83,22 @@ Use the appropriate verb based on what actually happens:
 
 **Never use** `delete` (reserved keyword) or multi-word variants like `deleteTalk`, `removeItem`, `destroyEntity`.
 
+**Naming Pattern Summary:**
+
+**Domain files (`convex/items.ts`)** - Use single-word verbs (file provides context):
+```ts
+export const archive = mutation(...)     // api.items.archive
+export const create = mutation(...)      // api.items.create
+export const update = mutation(...)      // api.items.update
+```
+
+**Helper files (`convex/model/items/mutations.ts`)** - Include noun (clarity when imported):
+```ts
+export async function archiveItem(ctx, id) {...}
+export async function createItem(ctx, data) {...}
+export async function updateItem(ctx, id, data) {...}
+```
+
 **Exception: Join Table Operations**
 
 For many-to-many relationships, use descriptive compound verbs for clarity:
@@ -124,6 +140,24 @@ export const list = query(...)           // api.items.list
 export const getItem = query(...)        // in items.ts
 export const listItems = query(...)      // in items.ts
 ```
+
+**Naming Pattern Summary:**
+
+**Domain files (`convex/items.ts`)** - Omit noun (file provides context):
+```ts
+export const get = query(...)             // api.items.get
+export const getBySlug = query(...)       // api.items.getBySlug
+export const list = query(...)            // api.items.list
+```
+
+**Helper files (`convex/model/items/queries.ts`)** - Include noun (clarity when imported):
+```ts
+export async function getItem(ctx, id) {...}
+export async function getItemBySlug(ctx, slug) {...}
+export async function getItems(ctx, args) {...}
+```
+
+**Why:** Domain exports are accessed via `api.items.*` so the context is clear. Helper functions are imported directly and need the noun to be self-documenting: `import { getItem } from './model/items/queries'`.
 
 ### Query Design Decision Tree
 
