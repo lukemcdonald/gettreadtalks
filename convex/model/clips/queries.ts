@@ -44,8 +44,9 @@ export async function getClipsBySpeaker(
 
   return await ctx.db
     .query('clips')
-    .withIndex('by_speaker_id', (q) => q.eq('speakerId', speakerId))
-    .filter((q) => q.eq(q.field('status'), 'published'))
+    .withIndex('by_speaker_id_and_status', (q) =>
+      q.eq('speakerId', speakerId).eq('status', 'published'),
+    )
     .order('desc')
     .take(limit);
 }

@@ -143,9 +143,10 @@ export async function addTalkToTopic(
 
   const existing = await ctx.db
     .query('talksOnTopics')
-    .withIndex('by_talk_id', (q) => q.eq('talkId', args.talkId))
-    .filter((q) => q.eq(q.field('topicId'), args.topicId))
-    .first();
+    .withIndex('by_talk_id_and_topic_id', (q) =>
+      q.eq('talkId', args.talkId).eq('topicId', args.topicId),
+    )
+    .unique();
 
   if (existing) {
     throw new Error('Talk is already associated with this topic');
@@ -175,8 +176,9 @@ export async function removeTalkFromTopic(
 
   const association = await ctx.db
     .query('talksOnTopics')
-    .withIndex('by_talk_id', (q) => q.eq('talkId', args.talkId))
-    .filter((q) => q.eq(q.field('topicId'), args.topicId))
+    .withIndex('by_talk_id_and_topic_id', (q) =>
+      q.eq('talkId', args.talkId).eq('topicId', args.topicId),
+    )
     .first();
 
   if (!association) {
@@ -216,9 +218,10 @@ export async function addClipToTopic(
 
   const existing = await ctx.db
     .query('clipsOnTopics')
-    .withIndex('by_clip_id', (q) => q.eq('clipId', args.clipId))
-    .filter((q) => q.eq(q.field('topicId'), args.topicId))
-    .first();
+    .withIndex('by_clip_id_and_topic_id', (q) =>
+      q.eq('clipId', args.clipId).eq('topicId', args.topicId),
+    )
+    .unique();
 
   if (existing) {
     throw new Error('Clip is already associated with this topic');
@@ -248,8 +251,9 @@ export async function removeClipFromTopic(
 
   const association = await ctx.db
     .query('clipsOnTopics')
-    .withIndex('by_clip_id', (q) => q.eq('clipId', args.clipId))
-    .filter((q) => q.eq(q.field('topicId'), args.topicId))
+    .withIndex('by_clip_id_and_topic_id', (q) =>
+      q.eq('clipId', args.clipId).eq('topicId', args.topicId),
+    )
     .first();
 
   if (!association) {
