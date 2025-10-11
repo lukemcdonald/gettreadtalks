@@ -83,6 +83,22 @@ Use the appropriate verb based on what actually happens:
 
 **Never use** `delete` (reserved keyword) or multi-word variants like `deleteTalk`, `removeItem`, `destroyEntity`.
 
+**Exception: Join Table Operations**
+
+For many-to-many relationships, use descriptive compound verbs for clarity:
+
+```ts
+// ✅ Join operations - compound names acceptable
+export const addClipToTopic = mutation(...)     // Add to join table
+export const removeClipFromTopic = mutation(...) // Remove from join table
+export const addFavoriteClip = mutation(...)     // Add to user favorites
+export const removeFavoriteClip = mutation(...)  // Remove from user favorites
+export const addFinishedTalk = mutation(...)     // Mark talk as finished
+export const removeFinishedTalk = mutation(...)  // Unmark talk as finished
+```
+
+**Rationale:** Join operations are semantically different from CRUD. Explicit naming improves clarity when multiple join tables exist (e.g., `userFavoriteClips`, `userFavoriteSpeakers`, `clipsOnTopics`, `talksOnTopics`).
+
 ### Function Naming Examples
 
 ```ts
