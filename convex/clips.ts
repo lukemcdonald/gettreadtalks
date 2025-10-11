@@ -8,7 +8,7 @@ import { mutations, queries, validators } from './model/clips';
 export const getBySlug = query({
   args: validators.getClipBySlugWithRelationsArgs,
   handler: async (ctx, args) => {
-    return await queries.getBySlugWithRelations(ctx, args);
+    return await queries.getClipBySlugWithRelations(ctx, args);
   },
   returns: validators.getClipBySlugWithRelationsReturns,
 });
