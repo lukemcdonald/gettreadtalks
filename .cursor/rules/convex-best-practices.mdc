@@ -13,29 +13,55 @@ globs: convex/**/*.ts
 
 ## Database Queries
 
-### Avoid `.filter()` on queries
+### Understand Convex `.filter()` vs JavaScript `.filter()`
 
-- Replace `.filter()` with `.withIndex()` or `.withSearchIndex()` for better performance
-- If not using indexes, filter in TypeScript code instead
-- Exception: Paginated queries (`.paginate()`) benefit from `.filter()`
+**Convex `.filter()`** (database operation):
+- Scans every document returned by the index
+- Doesn't use indexes for filtering
+- Poor performance for large result sets
+- Should be replaced with compound indexes
+
+**JavaScript `.filter()`** (in-memory operation):
+- Standard Array method after `.collect()` or `.take()`
+- Acceptable for complex logic not suitable for indexes
+- Keep result sets small before filtering
 
 ```typescript
-// ❌ Bad
-const tomsMessages = ctx.db
-  .query("messages")
-  .filter((q) => q.eq(q.field("author"), "Tom"))
+// ❌ Bad - Convex .filter() after index (scans all results)
+const publishedClips = await ctx.db
+  .query("clips")
+  .withIndex("by_talk_id", (q) => q.eq("talkId", talkId))
+  .filter((q) => q.eq(q.field("status"), "published")) // Database scan
   .collect();
 
-// ✅ Good - Use index
-const tomsMessages = await ctx.db
-  .query("messages")
-  .withIndex("by_author", (q) => q.eq("author", "Tom"))
+// ✅ Good - Use compound index for filtering
+const publishedClips = await ctx.db
+  .query("clips")
+  .withIndex("by_talk_id_and_status", (q) => 
+    q.eq("talkId", talkId).eq("status", "published")
+  )
   .collect();
 
-// ✅ Good - Filter in code
-const allMessages = await ctx.db.query("messages").collect();
-const tomsMessages = allMessages.filter((m) => m.author === "Tom");
+// ✅ Good - JavaScript .filter() for complex logic (after fetching)
+const items = await ctx.db
+  .query("items")
+  .withIndex("by_user", (q) => q.eq("userId", userId))
+  .take(50); // Keep dataset small
+const filtered = items.filter(item => 
+  complexBusinessLogic(item) // Logic not suitable for index
+);
+
+// ⚠️ Avoid - JavaScript .filter() on large datasets
+const allItems = await ctx.db.query("items").collect(); // Could be 10,000+
+const filtered = allItems.filter(item => item.status === "active"); // Use index instead
 ```
+
+**When to use each**:
+- **Compound indexes**: For field equality/range checks (status, dates, IDs)
+- **JavaScript `.filter()`**: For complex logic, calculations, or regex (after limiting dataset)
+- **Never use Convex `.filter()`**: Except in rare pagination edge cases
+
+**Exception**: Paginated queries (`.paginate()`) may benefit from Convex `.filter()` for fields not in index, but prefer compound indexes when possible.
 
 ### Limit `.collect()` usage
 
