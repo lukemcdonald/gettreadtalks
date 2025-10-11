@@ -25,6 +25,7 @@ export default defineSchema({
     topicId: v.id('topics'),
   })
     .index('by_clip_id', ['clipId'])
+    .index('by_clip_id_and_topic_id', ['clipId', 'topicId'])
     .index('by_topic_id', ['topicId']),
 
   talksOnTopics: defineTable({
@@ -32,6 +33,7 @@ export default defineSchema({
     topicId: v.id('topics'),
   })
     .index('by_talk_id', ['talkId'])
+    .index('by_talk_id_and_topic_id', ['talkId', 'topicId'])
     .index('by_topic_id', ['topicId']),
 
   userFavoriteClips: defineTable({

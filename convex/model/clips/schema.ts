@@ -19,6 +19,8 @@ export const clipTables = {
   clips: defineTable(clipFields)
     .index('by_slug', ['slug'])
     .index('by_speaker_id', ['speakerId'])
+    .index('by_speaker_id_and_status', ['speakerId', 'status'])
     .index('by_status_and_published_at', ['status', 'publishedAt'])
-    .index('by_talk_id', ['talkId']),
+    .index('by_talk_id', ['talkId'])
+    .index('by_talk_id_and_status', ['talkId', 'status']),
 };
