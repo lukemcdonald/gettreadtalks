@@ -41,7 +41,14 @@ export const getCollectionsWithStatsArgs = {
   paginationOpts: paginationOptsValidator,
 };
 
-export const getCollectionsWithStatsReturns = v.any(); // PaginationResult with enriched page
+/**
+ * Pagination return type uses v.any() per Convex standard pattern.
+ * See: https://docs.convex.dev/database/pagination
+ *
+ * Returns: PaginationResult with enriched page
+ * Structure: { page: Array<Doc<'collections'> & stats>, continueCursor: string, isDone: boolean }
+ */
+export const getCollectionsWithStatsReturns = v.any();
 
 export const getCollectionWithSpeakersArgs = {
   slug: v.string(),
@@ -72,7 +79,14 @@ export const listCollectionsArgs = {
   paginationOpts: paginationOptsValidator,
 };
 
-export const listCollectionsReturns = v.any(); // PaginationResult<Collection>
+/**
+ * Pagination return type uses v.any() per Convex standard pattern.
+ * See: https://docs.convex.dev/database/pagination
+ *
+ * Returns: PaginationResult<Doc<'collections'>>
+ * Structure: { page: Doc<'collections'>[], continueCursor: string, isDone: boolean }
+ */
+export const listCollectionsReturns = v.any();
 
 export const updateCollectionArgs = {
   description: v.optional(v.string()),

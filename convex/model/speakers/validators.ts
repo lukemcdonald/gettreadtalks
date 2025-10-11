@@ -47,7 +47,14 @@ export const listSpeakersArgs = {
   paginationOpts: paginationOptsValidator,
 };
 
-export const listSpeakersReturns = v.any(); // PaginationResult<Speaker>
+/**
+ * Pagination return type uses v.any() per Convex standard pattern.
+ * See: https://docs.convex.dev/database/pagination
+ *
+ * Returns: PaginationResult<Doc<'speakers'>>
+ * Structure: { page: Doc<'speakers'>[], continueCursor: string, isDone: boolean }
+ */
+export const listSpeakersReturns = v.any();
 
 export const updateSpeakerArgs = {
   description: v.optional(v.string()),

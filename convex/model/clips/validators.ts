@@ -50,7 +50,14 @@ export const listClipsArgs = {
   status: v.optional(statusType),
 };
 
-export const listClipsReturns = v.any(); // PaginationResult<Clip>
+/**
+ * Pagination return type uses v.any() per Convex standard pattern.
+ * See: https://docs.convex.dev/database/pagination
+ *
+ * Returns: PaginationResult<Doc<'clips'>>
+ * Structure: { page: Doc<'clips'>[], continueCursor: string, isDone: boolean }
+ */
+export const listClipsReturns = v.any();
 
 export const updateClipArgs = {
   description: v.optional(v.string()),

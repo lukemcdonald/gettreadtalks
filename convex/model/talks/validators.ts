@@ -72,7 +72,15 @@ export const listTalksArgs = {
   paginationOpts: paginationOptsValidator,
   status: v.optional(statusType),
 };
-export const listTalksReturns = v.any(); // PaginationResult<Talk>
+
+/**
+ * Pagination return type uses v.any() per Convex standard pattern.
+ * See: https://docs.convex.dev/database/pagination
+ *
+ * Returns: PaginationResult<Doc<'talks'>>
+ * Structure: { page: Doc<'talks'>[], continueCursor: string, isDone: boolean }
+ */
+export const listTalksReturns = v.any();
 
 export const listTalksByCollectionArgs = {
   collectionId: v.id('collections'),
@@ -90,7 +98,15 @@ export const listTalksWithSpeakersArgs = {
   paginationOpts: paginationOptsValidator,
   status: v.optional(statusType),
 };
-export const listTalksWithSpeakersReturns = v.any(); // PaginationResult with enriched page
+
+/**
+ * Pagination return type uses v.any() per Convex standard pattern.
+ * See: https://docs.convex.dev/database/pagination
+ *
+ * Returns: PaginationResult with enriched page
+ * Structure: { page: Array<Doc<'talks'> & { speaker: Doc<'speakers'> | null }>, continueCursor: string, isDone: boolean }
+ */
+export const listTalksWithSpeakersReturns = v.any();
 
 export const updateTalkArgs = {
   collectionId: v.optional(v.id('collections')),
