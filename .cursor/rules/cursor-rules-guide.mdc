@@ -8,6 +8,7 @@ globs: .cursor/rules/**/*.mdc
 This guide provides templates and patterns for creating effective cursor rules - whether you're creating a new rule file or adding new sections to existing files.
 
 **Use this guide when:**
+
 - Creating a new `.mdc` rule file from scratch
 - Adding new patterns or sections to existing rule files
 - Updating or refactoring existing rules for clarity
@@ -20,7 +21,7 @@ Every rule file should start with YAML frontmatter:
 ```yaml
 ---
 description: Brief description of what this rule covers
-globs: **/*.ts,**/*.tsx
+globs: **/*.js,**/*.jsx
 ---
 ```
 
@@ -29,8 +30,8 @@ globs: **/*.ts,**/*.tsx
 ```yaml
 # ✅ Good - Specific and actionable
 description: Naming conventions for functions, hooks, and components
-description: TypeScript best practices for type safety and maintainability
-description: Database query patterns and performance optimization
+description: Code organization and best practices
+description: Data fetching patterns and performance optimization
 
 # ❌ Bad - Too vague
 description: General rules
@@ -43,16 +44,16 @@ Target specific file types where rules apply:
 
 ```yaml
 # Single pattern
-globs: **/*.ts
+globs: **/*.js
 
 # Multiple patterns (comma-separated)
-globs: **/*.ts,**/*.tsx
+globs: **/*.js,**/*.jsx
 
 # Specific directory
-globs: src/features/**/*.ts
+globs: src/features/**/*.js
 
 # Multiple directories
-globs: src/**/*.ts,app/**/*.tsx
+globs: src/**/*.js,app/**/*.jsx
 ```
 
 ## Document Structure
@@ -84,19 +85,20 @@ globs: src/**/*.ts,app/**/*.tsx
 
 Show good vs bad patterns side-by-side:
 
-```typescript
+```javascript
 // ✅ Good - Clear and descriptive
-export function getUserById(id: string) {
-  return db.query('users').filter(q => q.eq('id', id));
+export function getItemById(id) {
+  return items.find(item => item.id === id);
 }
 
 // ❌ Bad - Unclear naming
-export function get(id: string) {
-  return db.query('users').filter(q => q.eq('id', id));
+export function get(id) {
+  return items.find(item => item.id === id);
 }
 ```
 
 **Pattern:**
+
 1. Use `// ✅ Good` for recommended approach
 2. Use `// ❌ Bad` for anti-patterns
 3. Add brief explanation after dashes
@@ -110,11 +112,13 @@ Help users choose the right approach:
 ## When to Use X vs Y
 
 **Use X when:**
+
 - Condition A is true
 - Need feature B
 - Working with context C
 
 **Use Y when:**
+
 - Condition D is true
 - Need different outcome E
 - Performance is critical
@@ -133,43 +137,48 @@ Help users choose the right approach:
 Use ASCII trees for directory structures:
 
 ```sh
-src/
-├─ features/        # Business logic
-│  ├─ users/
-│  │  ├─ hooks.ts   # React hooks
-│  │  └─ types.ts   # TypeScript types
-│  └─ posts/
-├─ components/      # UI components
-└─ utils/           # Utilities
+src/                       # Comment 1
+├─ components/
+│  ├─ ComponentName/
+│  │  ├─ ComponentName.js  # Comment 2
+│  │  └─ index.js
+│  └─ SomeComponent/
+├─ hooks/
+└─ utils/
+   ├─ helpers.js
+   └─ validators.js
 ```
 
 **Format rules:**
+
 - Use `├─` for items with siblings
 - Use `└─` for last item in group
 - Use `│` for vertical continuation
 - Add `# comments` for clarity
+- Indent consistently to show nesting levels
 
 ### Import Examples
 
 Show how to use the patterns:
 
-```typescript
+```javascript
 // Recommended imports
-import { useUser } from '@/features/users/hooks';
-import { createPost } from '@/features/posts/actions';
+import { useData } from '@/hooks/useData';
+import { processItem } from '@/utils/helpers';
 
 // Usage in component
-export function UserProfile() {
-  const user = useUser();
-  return <div>{user.name}</div>;
+export function ComponentName() {
+  const data = useData();
+  return <div>{data.value}</div>;
 }
 ```
 
 **Note:** Examples use `@/` as the path alias, which is common but not universal. When copying to a new project:
-- Check `tsconfig.json` or `jsconfig.json` for the actual path alias
+
+- Check `jsconfig.json` or `tsconfig.json` for the actual path alias
 - Common aliases: `@/`, `~/`, `@app/`, `#client/`
 - Update examples to match your project's configuration
-- Or use relative paths: `'../../features/users/hooks'`
+- Or use relative paths: `'../hooks/useData'`
 
 ### Checklists
 
@@ -179,21 +188,66 @@ Provide quick reference lists:
 ## Pre-commit Checklist
 
 - [ ] All functions have descriptive names
-- [ ] Types are defined for public APIs
+- [ ] Function parameters and return values are documented
 - [ ] No unused imports
 - [ ] Comments explain "why" not "what"
 ```
 
 ### Cross-references
 
-Link related concepts between files:
+**Avoid cross-references between rule files.** Each rule should be self-contained.
 
 ```markdown
-For complete naming patterns, see `naming-conventions.mdc`.
+# ❌ Bad - Creates dependency
+For complete Convex naming conventions, see `convex-organization.mdc`.
 
-**Related rules:**
-- File organization → `architecture.mdc`
-- Type safety → `typescript-patterns.mdc`
+# ✅ Good - Self-contained with brief summary
+For Convex backend queries, use the `get`/`list` pattern:
+- **`get*`** - Returns single document or null
+- **`list*`** - Returns arrays
+```
+
+**Why avoid ALL cross-references:**
+- Cursor's AI already finds related rules through semantic search
+- Creates fragile dependencies that break when files are renamed
+- Reduces portability when copying rules to other projects
+- Adds maintenance burden
+
+**Handling related content:**
+- Include a brief summary if needed for context
+- Accept minimal duplication to maintain independence
+- Trust the AI to surface related rules when relevant
+
+## Avoiding Duplication
+
+Keep the rules system lean and focused. Multiple rules saying similar things create confusion for both humans and AI agents.
+
+**Consolidate into one rule when:**
+
+- Rules share 70%+ of their guidance
+- Same examples would apply to both
+- Developers would naturally look in one place
+- Rules are always referenced together
+
+**Keep separate when:**
+
+- Different audiences (backend vs. frontend)
+- Different contexts (development vs. production)
+- One is high-level philosophy, other is detailed implementation
+- Cross-referencing is more helpful than combining
+
+**Example:**
+
+```markdown
+# ✅ Good - Clear differentiation
+naming-conventions.mdc → How to name things
+architecture.mdc → Where to put things
+
+# ❌ Bad - Unnecessary splits
+component-structure.mdc
+component-organization.mdc  
+component-file-layout.mdc
+These should be one file with clear sections
 ```
 
 ## Writing Guidelines
@@ -201,6 +255,7 @@ For complete naming patterns, see `naming-conventions.mdc`.
 ### Tone and Voice
 
 **Characteristics:**
+
 - **Concise** - Get to the point quickly
 - **Actionable** - Tell them what to do
 - **Direct** - Use imperative mood
@@ -218,25 +273,34 @@ function is intended to accomplish.
 
 ### Explain "Why" Not Just "What"
 
+Always include rationale, but integrate it naturally into the statement:
+
 ```markdown
 # ❌ Only "what"
-Use async/await in all functions.
+Use folder-based structure for components.
 
-# ✅ Includes "why"
+# ✅ "Why" integrated naturally
+Use folder-based structure to keep related files together and make components easy to move/delete as a unit.
+
+# ✅ Alternative: Multiple reasons as bullets (when listing several benefits)
 Use async/await in all functions to:
 - Improve error handling with try/catch
 - Make code more readable than Promise chains
 - Enable sequential async operations
 ```
 
+**Prefer integrating "why" naturally into the statement** for single-reason guidelines. Use bullet lists when explaining multiple distinct benefits or when the reasons need more detail.
+
 ### Balance Detail vs Scannability
 
 **Use bullets for quick scanning:**
+
 - One concept per bullet
 - Keep bullets short (1-2 lines)
 - Group related items
 
 **Use paragraphs sparingly:**
+
 - Only when context needs explanation
 - Keep under 3-4 sentences
 - Follow with examples
@@ -246,13 +310,14 @@ Use async/await in all functions to:
 Always note when rules don't apply:
 
 ```markdown
-## Use TypeScript strict mode
+## Use ESLint for code quality
 
-Enable strict mode in `tsconfig.json`.
+Enable ESLint in your project with a standard configuration.
 
 **Exceptions:**
+
 - Legacy codebases being gradually migrated
-- Third-party types that conflict with strict mode
+- Build tools or frameworks that provide their own linting
 - Generated code that can't be modified
 ```
 
@@ -263,53 +328,61 @@ Enable strict mode in `tsconfig.json`.
 **1. Always specify language:**
 
 ````markdown
-```typescript  ✅
-```ts          ✅
+```javascript  ✅
+```js          ✅
 ```            ❌
 ````
 
 **2. Keep examples focused:**
 
-```typescript
+```javascript
 // ✅ Minimal - shows only the pattern
-export function getUser(id: string) {
-  return db.get(id);
+export function getItem(id) {
+  return items.find(item => item.id === id);
 }
 
 // ❌ Too much context
-import { db } from './database';
-import { User } from './types';
-import { cache } from './cache';
+import { validateId } from './validators';
+import { logEvent } from './logger';
 
-export function getUser(id: string): Promise<User> {
-  const cached = cache.get(id);
-  if (cached) return cached;
-  const user = await db.get(id);
-  cache.set(id, user);
-  return user;
+export function getItem(id) {
+  console.log(`Starting getItem for ${id}`);
+  
+  if (!id) {
+    throw new Error('ID is required');
+  }
+  
+  const validId = validateId(id);
+  logEvent('item_accessed', { id: validId });
+  
+  const item = items.find(item => item.id === validId);
+  
+  console.log(`Found item: ${item ? 'yes' : 'no'}`);
+  return item;
 }
 ```
 
 **3. Use comments to highlight:**
 
-```typescript
-export function processItems(items: Item[]) {
+```javascript
+export function processItems(items) {
   return items
     .filter(item => item.active) // Only active items
     .map(transform)              // Apply transformation
-    .sort(byDate);               // Sort by date
+    .slice(0, 100);              // Limit results
 }
 ```
 
 **4. Alphabetize for consistency:**
 
 **Alphabetize:**
+
 - Import statements (groups by type, then alpha within group)
 - Object properties in examples
 - Component props in JSX examples
-- Type/interface properties
 
 **Don't alphabetize when:**
+
 - Logical grouping is more important (e.g., related config)
 - Specific order matters for functionality
 - Highlighting a specific pattern where order aids understanding
@@ -326,7 +399,7 @@ Use these consistently across all rules:
 
 ### Spacing and Readability
 
-```markdown
+````markdown
 ## Section Title
 
 Brief intro paragraph.
@@ -335,9 +408,9 @@ Brief intro paragraph.
 
 Code example with breathing room:
 
-\`\`\`typescript
+```javascript
 // Code here
-\`\`\`
+```
 
 Another paragraph after space.
 
@@ -345,9 +418,10 @@ Another paragraph after space.
 - More items
 
 Next section after clear break.
-```
+````
 
 **Rules:**
+
 - Blank line before/after headings
 - Blank line before/after code blocks
 - Blank line between list groups
@@ -355,9 +429,9 @@ Next section after clear break.
 
 ### Comment Placement
 
-```typescript
+```javascript
 // ✅ Good - Comment explains "why"
-export function retry<T>(fn: () => T, times = 3) {
+export function retry(fn, times = 3) {
   // Retry failed operations for transient errors
 }
 
@@ -365,9 +439,9 @@ export function retry<T>(fn: () => T, times = 3) {
 return items.slice(0, 100); // Limit to prevent memory issues
 
 // ❌ Bad - Comment states the obvious
-// Get user by ID
-export function getUserById(id: string) {
-  return db.get(id); // Return user from database
+// Get item by ID
+export function getItemById(id) {
+  return items.find(item => item.id === id); // Return item from array
 }
 ```
 
@@ -379,30 +453,33 @@ When creating examples, use these patterns:
 
 Use universally understood concepts:
 
-```typescript
-// ✅ Generic entities anyone understands
-users, posts, comments, items, products, orders
+```javascript
+// ✅ Generic entities that are clearly examples
+items, data, values, examples, records, entries
 categories, tags, files, messages, tasks
 
 // ❌ Project-specific domains
 treadTalks, speakers, affiliateLinks, clips
+
+// ⚠️ Avoid unless truly generic to your domain
+users, posts, comments, pages, articles
 ```
 
 ### Minimal Code Snippets
 
 Show only what's necessary:
 
-```typescript
+```javascript
 // ✅ Minimal - clear pattern
-export function getItem(id: string) {
-  return db.get(id);
+export function getItem(id) {
+  return items.find(item => item.id === id);
 }
 
 // ❌ Unnecessary detail
-export function getItem(id: string) {
+export function getItem(id) {
   console.log(`Fetching item ${id}`);
   const startTime = Date.now();
-  const item = db.get(id);
+  const item = items.find(item => item.id === id);
   console.log(`Took ${Date.now() - startTime}ms`);
   return item;
 }
@@ -412,22 +489,22 @@ export function getItem(id: string) {
 
 Copy-paste ready structure:
 
-```markdown
+````markdown
 ## [Pattern Name]
 
 [Brief description of pattern and when to use it]
 
 ### Structure
 
-\`\`\`typescript
+```javascript
 // Template code here
-\`\`\`
+```
 
 ### Example
 
-\`\`\`typescript
+```javascript
 // Real usage example
-\`\`\`
+```
 
 ### When to Use
 
@@ -439,7 +516,7 @@ Copy-paste ready structure:
 
 - Opposite scenario X
 - Edge case Y
-```
+````
 
 ## Maintenance Checklist
 
@@ -452,41 +529,11 @@ Update rules when:
 - [ ] Rules cause confusion or questions
 - [ ] You find yourself repeating same code review comments
 
-### Keeping Rules in Sync
-
-**Regular review cycle:**
-1. **Monthly** - Quick scan for outdated patterns
-2. **Quarterly** - Deep review with team
-3. **After major updates** - Review affected rules
-
-**Sync indicators:**
-- Code reviews reveal inconsistencies
-- Multiple violations of same rule
-- Team members ask for clarification
-
-### Version Control
-
-```markdown
-## Changelog
-
-### 2024-01-15
-- Added section on async patterns
-- Updated import examples for new structure
-
-### 2023-12-01
-- Initial version
-```
-
-**Best practices:**
-- Track changes in rule file or separate changelog
-- Link to relevant PRs or discussions
-- Note who requested the change
-
 ## Quick Start Template
 
 Copy this template for new rule files:
 
-```markdown
+````markdown
 ---
 description: [Brief description]
 globs: [file patterns]
@@ -502,13 +549,13 @@ globs: [file patterns]
 
 ### [Pattern Name]
 
-\`\`\`typescript
+```javascript
 // ✅ Good
 // Code example
 
 // ❌ Bad
 // Anti-pattern
-\`\`\`
+```
 
 ## Best Practices
 
@@ -520,11 +567,7 @@ globs: [file patterns]
 
 - Mistake 1 → How to fix
 - Mistake 2 → How to fix
-
-## Related Rules
-
-- [Related rule] → `filename.mdc`
-```
+````
 
 ## Final Checklist
 
@@ -534,9 +577,10 @@ Before publishing a new rule file:
 - [ ] Examples use generic domain names
 - [ ] Code snippets are minimal and focused
 - [ ] ✅/❌ patterns used consistently
-- [ ] Includes "why" not just "what"
+- [ ] Includes "why" integrated naturally into statements
 - [ ] Has decision tree or when-to-use guidance
-- [ ] Cross-references related rules
+- [ ] No cross-references to other rule files
 - [ ] Exceptions and edge cases noted
 - [ ] Easy to scan with clear hierarchy
 - [ ] No project-specific examples
+- [ ] Self-contained and portable to other projects

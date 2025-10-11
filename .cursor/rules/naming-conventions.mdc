@@ -39,7 +39,7 @@ export function useUpdateItem();    // Update existing
 
 ## Feature Queries (Server)
 
-Mirror Convex naming with `get`/`list` pattern:
+Use the `get`/`list` pattern to indicate return type:
 
 ```ts
 // queries.ts - Server reads
@@ -53,42 +53,13 @@ export async function getItems({ filters });
 export async function getItemsByCategory(categoryId);
 ```
 
-### Convex Query Naming
-
-For Convex backend queries, follow the `get`/`list` pattern:
-
-**Single Items (Public API):**
-```ts
-// convex/items.ts
-export const get = query({...})           // getItem(id)
-export const getBySlug = query({...})     // getItemBySlug(slug)
-export const getWithDetails = query({...}) // getItemWithDetails(id)
-```
-
-**Arrays (Public API):**
-```ts
-// convex/items.ts
-export const list = query({...})                // getItems()
-export const listByCategory = query({...})      // getItemsByCategory(categoryId)
-export const listByUser = query({...})          // getItemsByUser(userId)
-export const listWithAuthors = query({...})     // getItemsWithAuthors()
-```
-
-**Implementation Layer:**
-The implementation functions in `convex/model/*/queries.ts` use verbose, descriptive names:
-```ts
-// convex/model/items/queries.ts
-export async function getItem(ctx, args) {...}
-export async function getItemBySlug(ctx, args) {...}
-export async function getItems(ctx, args) {...}
-export async function getItemsByCategory(ctx, args) {...}
-```
-
-See `convex-organization.mdc` for complete details.
+**Pattern:**
+- **`get*`** - Returns single item or null
+- **`list*`** - Returns arrays
 
 ## Feature Actions (Server)
 
-Mirror Convex naming with verb prefix:
+Use clear verb prefixes to indicate the operation:
 
 ```ts
 // actions.ts - Server writes
@@ -99,8 +70,6 @@ export async function publishItem(id);    // Specific status action
 export async function removeItem(id);     // Remove from association/list (non-destructive)
 export async function updateItem(id, data); // Update existing
 ```
-
-**Note:** For Convex function naming, see `convex-organization.mdc`.
 
 ## Service Functions
 

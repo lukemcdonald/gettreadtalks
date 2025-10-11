@@ -280,7 +280,7 @@ export type PostWithAuthor = {
   post: Doc<"posts">;
 };
 
-// app/components/Post.tsx
+// components/Post.tsx
 import { PostWithAuthor } from "../convex/types";
 
 function PostItem({ data }: { data: PostWithAuthor }) {

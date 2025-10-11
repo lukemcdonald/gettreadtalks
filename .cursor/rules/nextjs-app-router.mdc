@@ -351,5 +351,5 @@ app/
 
 **Should this be a page or component?**
 - ✅ Needs a URL? → `page.tsx`
-- ✅ Shared across pages? → Component in `components/`
-- ✅ Page-specific? → Component in `app/route/_components/`
+- ✅ Reusable across pages? → `components/` (shared)
+- ✅ Used only on this page? → `app/page-name/_components/` (page-specific)
