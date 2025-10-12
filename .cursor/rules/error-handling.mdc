@@ -5,44 +5,55 @@ globs: **/*.tsx,**/*.ts,app/**/*.tsx,components/**/*.tsx
 
 # Error Handling Patterns
 
-## Decision Tree: Which Pattern to Use?
+## When to Use Each Pattern
 
-### For React Components
+**Use `useMutation` hook when:**
 
-**Query errors (useQuery hooks):**
+- Writing Convex mutation calls
+- Want automatic error handling and Sentry reporting
+- Need loading/error/success state management
+- **Note:** Never import `useMutation` from `convex/react` (lint rule enforced)
 
-- Wrap component in `<ErrorBoundary>` - errors automatically caught
-- Already have app-level boundary in `app/layout.tsx`
-- Add feature-level boundaries for isolation
+**Use `<ErrorBoundary>` when:**
 
-**Mutation errors (form submissions, button clicks):**
+- Component error should crash the UI
+- Handling query errors (useQuery)
+- Want to isolate feature failures
+- Need fallback UI for entire section
 
-- Simple mutations → Use `useMutationWithErrorHandling` hook
-- Complex error logic → Use try/catch with manual handling
-- Need custom UI feedback → try/catch with state management
+**Use try/catch when:**
 
-**Unexpected errors during render:**
+- Need custom error handling logic
+- Checking for specific error codes
+- Want to prevent error propagation
+- Need multiple different error handling paths
 
-- Already caught by app-level ErrorBoundary
-- Add nested boundaries for feature isolation
+## Quick Reference
 
-### For Error Reporting
+### For Convex Mutations (Recommended Pattern)
 
-**Automatic (preferred):**
+```typescript
+import { useMutation } from '@/lib/hooks';
+import { api } from '@/convex/_generated/api';
 
-- ErrorBoundary catches query/render errors → auto-reports to Sentry
-- `useMutationWithErrorHandling` catches mutation errors → auto-reports to Sentry
+function MyComponent() {
+  const { mutate, isLoading, error } = useMutation(api.talks.create, {
+    onSuccess: () => toast.success('Created!'),
+    onError: (error) => toast.error(getErrorMessage(error)),
+  });
 
-**Manual (when needed):**
+  return (
+    <button onClick={() => mutate({ title: 'New Talk' })} disabled={isLoading}>
+      {isLoading ? 'Creating...' : 'Create'}
+    </button>
+  );
+}
+```
 
-- Caught errors you want to track → Use `captureException(error, context)`
-- Add context breadcrumbs → Use `addBreadcrumb()`
+**Important:** Always use `useMutation` from `@/lib/hooks`, not from `convex/react`. A lint rule
+enforces this pattern.
 
-## ErrorBoundary Usage
-
-### Basic Usage
-
-Wrap components that use queries or might throw errors:
+### For ErrorBoundary
 
 ```tsx
 import { ErrorBoundary } from '@/components/error-boundary';
@@ -67,290 +78,63 @@ function ProfileContent() {
 }
 ```
 
-### Custom Fallback UI
+### For Manual Error Handling
 
-```tsx
-import { ErrorBoundary } from '@/components/error-boundary';
-import { CustomErrorUI } from './custom-error-ui';
-
-// ✅ Custom fallback for specific feature
-<ErrorBoundary fallback={CustomErrorUI}>
-  <FeatureComponent />
-</ErrorBoundary>;
-```
-
-### When to Add ErrorBoundary
-
-- **App-level** - Already added in `app/layout.tsx` (catches all)
-- **Feature-level** - Wrap complex features to isolate failures
-- **Page-level** - Wrap individual pages that might fail independently
-
-```tsx
-// ✅ Feature isolation
-<ErrorBoundary>
-  <ComplexDataGrid />
-</ErrorBoundary>
-
-// ❌ Don't wrap everything individually
-<ErrorBoundary>
-  <SimpleButton />
-</ErrorBoundary>
-```
-
-## Mutation Error Handling
-
-### Using useMutationWithErrorHandling
-
-Best for simple mutations with standard error handling:
-
-```tsx
-import { useMutationWithErrorHandling, getErrorMessage } from '@/lib/services/errors';
-import { api } from '@/convex/_generated/api';
-
-function CreateForm() {
-  const { mutate, isLoading, error } = useMutationWithErrorHandling(api.items.create, {
-    onSuccess: () => router.push('/items'),
-  });
-
-  const handleSubmit = async (data) => {
-    await mutate(data); // Automatically reports errors to Sentry
-  };
-
-  return (
-    <form onSubmit={handleSubmit}>
-      {error && <div className="error">{getErrorMessage(error)}</div>}
-      <button disabled={isLoading}>Create</button>
-    </form>
-  );
-}
-```
-
-### Using try/catch
-
-For complex error handling or custom logic:
-
-```tsx
-import { getErrorMessage, isErrorCode, ErrorCode, captureException } from '@/lib/services/errors';
-
-function CreateForm() {
-  const [error, setError] = useState<string | null>(null);
-  const create = useMutation(api.items.create);
-
-  const handleSubmit = async (data) => {
-    try {
-      await create(data);
-      router.push('/items');
-    } catch (error) {
-      // Check specific error codes
-      if (isErrorCode(error, ErrorCode.DUPLICATE_SLUG)) {
-        setError('title', { message: 'Already exists' });
-        return;
-      }
-
-      // Manual Sentry reporting if needed
-      captureException(error, {
-        context: { operation: 'createItem', data },
-        tags: { feature: 'items' },
-      });
-
-      setError(getErrorMessage(error));
-    }
-  };
-
-  return <form onSubmit={handleSubmit}>...</form>;
-}
-```
-
-## Reading Error Information
-
-### Get User-Friendly Message
-
-```ts
-import { getErrorMessage } from '@/lib/services/errors';
-
-const message = getErrorMessage(error);
-// Returns: User-friendly string for any error type
-```
-
-### Check Specific Error Code
-
-```ts
-import { isErrorCode, ErrorCode } from '@/lib/services/errors';
-
-if (isErrorCode(error, ErrorCode.DUPLICATE_SLUG)) {
-  // Handle duplicate specifically
-}
-
-if (isErrorCode(error, ErrorCode.AUTH_REQUIRED)) {
-  redirect('/login');
-}
-```
-
-### Get Error Code Directly
-
-```ts
-import { getErrorCode, ErrorCode } from '@/lib/services/errors';
-
-const code = getErrorCode(error);
-// Returns: ErrorCode enum value or UNKNOWN_ERROR
-```
-
-## Manual Error Reporting
-
-### Report Caught Errors
-
-```ts
-import { captureException } from '@/lib/services/errors';
+```typescript
+import { captureException, getErrorMessage, isErrorCode, ErrorCode } from '@/lib/services/errors';
 
 try {
   await riskyOperation();
 } catch (error) {
+  // Check specific error codes
+  if (isErrorCode(error, ErrorCode.DUPLICATE_SLUG)) {
+    // Handle specific error
+  }
+
+  // Report to Sentry with context
   captureException(error, {
-    context: {
-      operation: 'riskyOperation',
-      userId: user._id,
-    },
-    level: 'warning',
-    tags: {
-      feature: 'items',
-    },
+    context: { operation: 'riskyOperation' },
+    level: 'error',
+    tags: { feature: 'items' },
   });
+
+  // Show user-friendly message
+  toast.error(getErrorMessage(error));
 }
 ```
 
-### Add Breadcrumbs for Context
+## Available Utilities
 
-```ts
-import { addBreadcrumb } from '@/lib/services/errors';
+### Error Reading
 
-// Add breadcrumb before operation
-addBreadcrumb({
-  message: 'User clicked submit button',
-  category: 'user-action',
-  level: 'info',
-});
+- `getErrorMessage(error)` - Get user-friendly message
+- `getErrorCode(error)` - Get error code (ErrorCode enum)
+- `isErrorCode(error, code)` - Check specific error code
+- `isConvexError(error)` - Check if ConvexError
 
-// Errors after this point will include the breadcrumb
-```
+### Error Reporting
 
-### Set User Context
+- `captureException(error, options)` - Report to Sentry
+- `addBreadcrumb(breadcrumb)` - Add debugging context
+- `setUserContext(user)` - Set user info
+- `clearUserContext()` - Clear user info
 
-```ts
-import { setUserContext, clearUserContext } from '@/lib/services/errors';
+### Error Codes
 
-// On login
-setUserContext({
-  id: user._id,
-  email: user.email,
-  username: user.name,
-});
-
-// On logout
-clearUserContext();
-```
-
-## Available Error Codes
-
-```ts
-import { ErrorCode } from '@/lib/services/errors';
-
-// Authentication & Authorization
-ErrorCode.AUTH_REQUIRED; // Not authenticated
-ErrorCode.FORBIDDEN; // No permission
+```typescript
+ErrorCode.AUTH_REQUIRED;
+ErrorCode.FORBIDDEN;
 ErrorCode.INVALID_CREDENTIALS;
-ErrorCode.SESSION_EXPIRED;
-
-// Validation
-ErrorCode.DUPLICATE_SLUG; // Unique field conflict
-ErrorCode.VALIDATION_FAILED; // Input validation failed
-ErrorCode.INVALID_INPUT;
-ErrorCode.MISSING_FIELD;
-
-// Resource
-ErrorCode.NOT_FOUND; // Resource doesn't exist
-
-// System
-ErrorCode.DATABASE_ERROR;
-ErrorCode.NETWORK_ERROR;
+ErrorCode.DUPLICATE_SLUG;
+ErrorCode.VALIDATION_FAILED;
+ErrorCode.NOT_FOUND;
 ErrorCode.SERVER_ERROR;
-ErrorCode.UNKNOWN_ERROR;
 ```
 
 ## Best Practices
 
-### When to Use Each Pattern
-
-**ErrorBoundary:**
-
-- Query errors (always)
-- React rendering errors
-- Isolate complex features
-- Display fallback UI automatically
-
-**useMutationWithErrorHandling:**
-
-- Simple mutations
-- Want automatic Sentry reporting
-- Standard error UI handling
-- No complex error logic
-
-**try/catch:**
-
-- Need to check specific error codes
-- Custom error handling logic
-- Want to prevent error propagation
-- Multiple different error paths
-
-### Don't Report Expected Errors
-
-```ts
-// ✅ Expected case - don't report
-const user = await getUser(userId);
-if (!user) {
-  return null; // Normal "not found" case
-}
-
-// ✅ Unexpected error - do report
-try {
-  await complexOperation();
-} catch (error) {
-  captureException(error); // Something went wrong
-  throw error;
-}
-```
-
-### Error Messages
-
-- **Backend** - Throw structured errors with codes (see convex-errors.mdc)
-- **Frontend** - Use `getErrorMessage()` for display
-- **UI** - Show clear, actionable messages to users
-
-## Quick Reference
-
-```tsx
-// Query errors - use ErrorBoundary
-<ErrorBoundary>
-  <ComponentWithQueries />
-</ErrorBoundary>;
-
-// Simple mutations - use hook
-const { mutate, error } = useMutationWithErrorHandling(api.items.create, {
-  onSuccess: () => {},
-});
-
-// Complex mutations - use try/catch
-try {
-  await mutation(data);
-} catch (error) {
-  if (isErrorCode(error, ErrorCode.DUPLICATE_SLUG)) {
-    // Handle specific error
-  }
-  captureException(error);
-}
-
-// Get user-friendly message
-const message = getErrorMessage(error);
-
-// Add debugging context
-addBreadcrumb({ message: 'User action', category: 'ui' });
-```
+1. **Mutations**: Use `useMutation` from `@/lib/hooks` (enforced by lint)
+2. **Queries**: Wrap with `<ErrorBoundary>`
+3. **Manual errors**: Use `captureException()` for Sentry
+4. **Display**: Use `getErrorMessage()` for user-facing messages
+5. **Checking**: Use `isErrorCode()` for specific error types

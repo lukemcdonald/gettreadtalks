@@ -20,6 +20,9 @@ importers:
       convex:
         specifier: ^1.27.4
         version: 1.27.4(react@19.2.0)
+      convex-helpers:
+        specifier: ^0.1.104
+        version: 0.1.104(convex@1.27.4(react@19.2.0))(react@19.2.0)(typescript@5.9.3)(zod@4.1.12)
       next:
         specifier: 15.5.4
         version: 15.5.4(@babel/core@7.28.4)(@opentelemetry/api@1.9.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -5082,6 +5085,14 @@ snapshots:
       react: 19.2.0
       typescript: 5.9.3
       zod: 3.25.76
+
+  convex-helpers@0.1.104(convex@1.27.4(react@19.2.0))(react@19.2.0)(typescript@5.9.3)(zod@4.1.12):
+    dependencies:
+      convex: 1.27.4(react@19.2.0)
+    optionalDependencies:
+      react: 19.2.0
+      typescript: 5.9.3
+      zod: 4.1.12
 
   convex@1.27.4(react@19.2.0):
     dependencies:

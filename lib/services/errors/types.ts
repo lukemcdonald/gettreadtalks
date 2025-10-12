@@ -5,6 +5,12 @@
 export type SeverityLevel = 'fatal' | 'error' | 'warning' | 'log' | 'info' | 'debug';
 
 /**
+ * Mutation status enum, similar to React Query/TanStack Query pattern.
+ * Single source of truth for mutation state.
+ */
+export type MutationStatus = 'idle' | 'loading' | 'success' | 'error';
+
+/**
  * Common error codes used throughout the application.
  * These should be used with ConvexError for consistent error handling.
  */
@@ -44,14 +50,29 @@ export interface ErrorContext {
 }
 
 /**
- * State returned from mutation hooks with error handling.
+ * Internal state for mutation hooks with error handling.
  */
 export interface MutationState<TData = unknown> {
   data: TData | null;
   error: Error | null;
+  status: MutationStatus;
+}
+
+/**
+ * Result returned from useConvexMutation hook.
+ * Includes status enum and derived boolean flags for convenience.
+ */
+export interface MutationResult<TData = unknown> {
+  data: TData | null;
+  error: Error | null;
   isError: boolean;
+  isIdle: boolean;
   isLoading: boolean;
   isSuccess: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Convex mutation args are dynamic
+  mutate: (...args: any[]) => Promise<TData>;
+  reset: () => void;
+  status: MutationStatus;
 }
 
 /**

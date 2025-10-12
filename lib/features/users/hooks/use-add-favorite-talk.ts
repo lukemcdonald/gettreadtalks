@@ -1,8 +1,7 @@
 'use client';
 
-import { useMutation } from 'convex/react';
-
 import { api } from '@/convex/_generated/api';
+import { useMutation } from '@/lib/hooks';
 
 export function useAddFavoriteTalk() {
   return useMutation(api.users.addFavoriteTalk);

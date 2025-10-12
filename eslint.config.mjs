@@ -91,6 +91,22 @@ const eslintConfig = [
           type: "alphabetical",
         },
       ],
+
+      // Restrict importing useMutation from convex/react
+      // Always use our wrapper from @/lib/hooks instead
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: 'convex/react',
+              importNames: ['useMutation'],
+              message:
+                'Use useMutation from @/lib/hooks instead. It provides error handling and Sentry reporting.',
+            },
+          ],
+        },
+      ],
     },
     settings: {
       perfectionist: {
@@ -99,7 +115,14 @@ const eslintConfig = [
         type: "natural",
       },
     },
-  }
+  },
+  // Allow useMutation import in our wrapper hook (override must come last)
+  {
+    files: ["lib/hooks/use-mutation.ts"],
+    rules: {
+      'no-restricted-imports': 'off',
+    },
+  },
 ];
 
 export default eslintConfig;

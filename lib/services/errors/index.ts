@@ -11,9 +11,13 @@ export {
   isErrorCode,
 } from './convex';
 
-// Hooks
-export { useMutationWithErrorHandling } from './hooks';
-
 // Types
 export { ErrorCode } from './types';
-export type { ErrorContext, ErrorReportOptions, MutationState, SeverityLevel } from './types';
+export type {
+  ErrorContext,
+  ErrorReportOptions,
+  MutationResult,
+  MutationState,
+  MutationStatus,
+  SeverityLevel,
+} from './types';
