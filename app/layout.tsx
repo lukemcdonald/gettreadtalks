@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 
 import { Inter } from 'next/font/google';
 
+import { ErrorBoundary } from '@/components/error-boundary';
 import SiteHeader from '@/components/layout/site-header';
 
 import './globals.css';
@@ -29,12 +30,14 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <ThemeProvider>
-          <AuthProvider>
-            <SiteHeader />
-            {children}
-          </AuthProvider>
-        </ThemeProvider>
+        <ErrorBoundary>
+          <ThemeProvider>
+            <AuthProvider>
+              <SiteHeader />
+              {children}
+            </AuthProvider>
+          </ThemeProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );

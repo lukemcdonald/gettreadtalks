@@ -2,6 +2,7 @@ import type { MutationCtx } from '../../_generated/server';
 import type { CreateSpeakerArgs, DestroySpeakerArgs, UpdateSpeakerArgs } from './types';
 
 import { Doc } from '../../_generated/dataModel';
+import { throwDuplicateSlug, throwNotFound, throwValidationError } from '../../lib/errors';
 import { normalizeSlug, slugExists } from '../../lib/utils';
 import { requireAuth } from '../auth/queries';
 
@@ -18,7 +19,7 @@ export async function createSpeaker(ctx: MutationCtx, args: CreateSpeakerArgs) {
   const slug = normalizeSlug(`${args.firstName} ${args.lastName}`);
 
   if (await slugExists(ctx, 'speakers', slug)) {
-    throw new Error('Speaker with this name already exists');
+    throwDuplicateSlug('Speaker with this name already exists', 'firstName');
   }
 
   return await ctx.db.insert('speakers', {
@@ -43,7 +44,7 @@ export async function updateSpeaker(ctx: MutationCtx, args: UpdateSpeakerArgs) {
   const speaker = await ctx.db.get(id);
 
   if (!speaker) {
-    throw new Error('Speaker not found');
+    throwNotFound('Speaker not found', { resource: 'speaker', resourceId: id });
   }
 
   // If name changed, update slug
@@ -54,7 +55,7 @@ export async function updateSpeaker(ctx: MutationCtx, args: UpdateSpeakerArgs) {
 
     if (newSlug !== speaker.slug) {
       if (await slugExists(ctx, 'speakers', newSlug, id)) {
-        throw new Error('Speaker with this name already exists');
+        throwDuplicateSlug('Speaker with this name already exists', 'firstName');
       }
 
       updates.slug = newSlug;
@@ -81,7 +82,7 @@ export async function destroySpeaker(ctx: MutationCtx, args: DestroySpeakerArgs)
   const speaker = await ctx.db.get(args.id);
 
   if (!speaker) {
-    throw new Error('Speaker not found');
+    throwNotFound('Speaker not found', { resource: 'speaker', resourceId: args.id });
   }
 
   // Check if speaker is referenced by any talks
@@ -91,7 +92,7 @@ export async function destroySpeaker(ctx: MutationCtx, args: DestroySpeakerArgs)
     .first();
 
   if (talksWithSpeaker) {
-    throw new Error('Cannot delete speaker: speaker has associated talks');
+    throwValidationError('Cannot delete speaker: speaker has associated talks');
   }
 
   // Check if speaker is referenced by any clips
@@ -101,7 +102,7 @@ export async function destroySpeaker(ctx: MutationCtx, args: DestroySpeakerArgs)
     .first();
 
   if (clipsWithSpeaker) {
-    throw new Error('Cannot delete speaker: speaker has associated clips');
+    throwValidationError('Cannot delete speaker: speaker has associated clips');
   }
 
   // Delete user favorites for this speaker

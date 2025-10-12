@@ -2,6 +2,7 @@ import type { MutationCtx } from '../../_generated/server';
 import type { CreateTopicArgs, DestroyTopicArgs, UpdateTopicArgs } from './types';
 
 import { Doc, Id } from '../../_generated/dataModel';
+import { throwDuplicateSlug, throwNotFound, throwValidationError } from '../../lib/errors';
 import { normalizeSlug, slugExists } from '../../lib/utils';
 import { requireAuth } from '../auth/queries';
 
@@ -18,7 +19,7 @@ export async function createTopic(ctx: MutationCtx, args: CreateTopicArgs) {
   const slug = normalizeSlug(args.title);
 
   if (await slugExists(ctx, 'topics', slug)) {
-    throw new Error('Topic with this title already exists');
+    throwDuplicateSlug('Topic with this title already exists', 'title');
   }
 
   return await ctx.db.insert('topics', {
@@ -43,7 +44,7 @@ export async function updateTopic(ctx: MutationCtx, args: UpdateTopicArgs) {
   const topic = await ctx.db.get(id);
 
   if (!topic) {
-    throw new Error('Topic not found');
+    throwNotFound('Topic not found', { resource: 'topic', resourceId: id });
   }
 
   if (updates.title) {
@@ -51,7 +52,7 @@ export async function updateTopic(ctx: MutationCtx, args: UpdateTopicArgs) {
 
     if (newSlug !== topic.slug) {
       if (await slugExists(ctx, 'topics', newSlug, id)) {
-        throw new Error('Topic with this title already exists');
+        throwDuplicateSlug('Topic with this title already exists', 'title');
       }
 
       updates.slug = newSlug;
@@ -78,7 +79,7 @@ export async function destroyTopic(ctx: MutationCtx, args: DestroyTopicArgs) {
   const topic = await ctx.db.get(args.id);
 
   if (!topic) {
-    throw new Error('Topic not found');
+    throwNotFound('Topic not found', { resource: 'topic', resourceId: args.id });
   }
 
   // Check if topic is referenced by any talks
@@ -88,7 +89,7 @@ export async function destroyTopic(ctx: MutationCtx, args: DestroyTopicArgs) {
     .first();
 
   if (talksWithTopic) {
-    throw new Error('Cannot delete topic: topic has associated talks');
+    throwValidationError('Cannot delete topic: topic has associated talks');
   }
 
   // Check if topic is referenced by any clips
@@ -98,7 +99,7 @@ export async function destroyTopic(ctx: MutationCtx, args: DestroyTopicArgs) {
     .first();
 
   if (clipsWithTopic) {
-    throw new Error('Cannot delete topic: topic has associated clips');
+    throwValidationError('Cannot delete topic: topic has associated clips');
   }
 
   // Hard delete the topic
@@ -125,12 +126,12 @@ export async function addTalkToTopic(
 
   const talk = await ctx.db.get(args.talkId);
   if (!talk) {
-    throw new Error('Talk not found');
+    throwNotFound('Talk not found', { resource: 'talk', resourceId: args.talkId });
   }
 
   const topic = await ctx.db.get(args.topicId);
   if (!topic) {
-    throw new Error('Topic not found');
+    throwNotFound('Topic not found', { resource: 'topic', resourceId: args.topicId });
   }
 
   const existing = await ctx.db
@@ -141,7 +142,7 @@ export async function addTalkToTopic(
     .unique();
 
   if (existing) {
-    throw new Error('Talk is already associated with this topic');
+    throwValidationError('Talk is already associated with this topic');
   }
 
   return await ctx.db.insert('talksOnTopics', {
@@ -174,7 +175,7 @@ export async function removeTalkFromTopic(
     .first();
 
   if (!association) {
-    throw new Error('Association not found');
+    throwNotFound('Association not found', { resource: 'talksOnTopics' });
   }
 
   await ctx.db.delete(association._id);
@@ -200,12 +201,12 @@ export async function addClipToTopic(
 
   const clip = await ctx.db.get(args.clipId);
   if (!clip) {
-    throw new Error('Clip not found');
+    throwNotFound('Clip not found', { resource: 'clip', resourceId: args.clipId });
   }
 
   const topic = await ctx.db.get(args.topicId);
   if (!topic) {
-    throw new Error('Topic not found');
+    throwNotFound('Topic not found', { resource: 'topic', resourceId: args.topicId });
   }
 
   const existing = await ctx.db
@@ -216,7 +217,7 @@ export async function addClipToTopic(
     .unique();
 
   if (existing) {
-    throw new Error('Clip is already associated with this topic');
+    throwValidationError('Clip is already associated with this topic');
   }
 
   return await ctx.db.insert('clipsOnTopics', {
@@ -249,7 +250,7 @@ export async function removeClipFromTopic(
     .first();
 
   if (!association) {
-    throw new Error('Association not found');
+    throwNotFound('Association not found', { resource: 'clipsOnTopics' });
   }
 
   await ctx.db.delete(association._id);

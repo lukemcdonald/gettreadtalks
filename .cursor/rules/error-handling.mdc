@@ -1,0 +1,356 @@
+---
+description: Frontend error handling patterns with ErrorBoundary, mutations, and Sentry
+globs: **/*.tsx,**/*.ts,app/**/*.tsx,components/**/*.tsx
+---
+
+# Error Handling Patterns
+
+## Decision Tree: Which Pattern to Use?
+
+### For React Components
+
+**Query errors (useQuery hooks):**
+
+- Wrap component in `<ErrorBoundary>` - errors automatically caught
+- Already have app-level boundary in `app/layout.tsx`
+- Add feature-level boundaries for isolation
+
+**Mutation errors (form submissions, button clicks):**
+
+- Simple mutations → Use `useMutationWithErrorHandling` hook
+- Complex error logic → Use try/catch with manual handling
+- Need custom UI feedback → try/catch with state management
+
+**Unexpected errors during render:**
+
+- Already caught by app-level ErrorBoundary
+- Add nested boundaries for feature isolation
+
+### For Error Reporting
+
+**Automatic (preferred):**
+
+- ErrorBoundary catches query/render errors → auto-reports to Sentry
+- `useMutationWithErrorHandling` catches mutation errors → auto-reports to Sentry
+
+**Manual (when needed):**
+
+- Caught errors you want to track → Use `captureException(error, context)`
+- Add context breadcrumbs → Use `addBreadcrumb()`
+
+## ErrorBoundary Usage
+
+### Basic Usage
+
+Wrap components that use queries or might throw errors:
+
+```tsx
+import { ErrorBoundary } from '@/components/error-boundary';
+
+// ✅ Wrap component with queries
+function ProfilePage() {
+  return (
+    <ErrorBoundary>
+      <ProfileContent />
+    </ErrorBoundary>
+  );
+}
+
+function ProfileContent() {
+  const user = useCurrentUser(); // If query throws, ErrorBoundary catches it
+
+  if (!user) {
+    return <div>Not found</div>;
+  }
+
+  return <div>{user.name}</div>;
+}
+```
+
+### Custom Fallback UI
+
+```tsx
+import { ErrorBoundary } from '@/components/error-boundary';
+import { CustomErrorUI } from './custom-error-ui';
+
+// ✅ Custom fallback for specific feature
+<ErrorBoundary fallback={CustomErrorUI}>
+  <FeatureComponent />
+</ErrorBoundary>;
+```
+
+### When to Add ErrorBoundary
+
+- **App-level** - Already added in `app/layout.tsx` (catches all)
+- **Feature-level** - Wrap complex features to isolate failures
+- **Page-level** - Wrap individual pages that might fail independently
+
+```tsx
+// ✅ Feature isolation
+<ErrorBoundary>
+  <ComplexDataGrid />
+</ErrorBoundary>
+
+// ❌ Don't wrap everything individually
+<ErrorBoundary>
+  <SimpleButton />
+</ErrorBoundary>
+```
+
+## Mutation Error Handling
+
+### Using useMutationWithErrorHandling
+
+Best for simple mutations with standard error handling:
+
+```tsx
+import { useMutationWithErrorHandling, getErrorMessage } from '@/lib/services/errors';
+import { api } from '@/convex/_generated/api';
+
+function CreateForm() {
+  const { mutate, isLoading, error } = useMutationWithErrorHandling(api.items.create, {
+    onSuccess: () => router.push('/items'),
+  });
+
+  const handleSubmit = async (data) => {
+    await mutate(data); // Automatically reports errors to Sentry
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      {error && <div className="error">{getErrorMessage(error)}</div>}
+      <button disabled={isLoading}>Create</button>
+    </form>
+  );
+}
+```
+
+### Using try/catch
+
+For complex error handling or custom logic:
+
+```tsx
+import { getErrorMessage, isErrorCode, ErrorCode, captureException } from '@/lib/services/errors';
+
+function CreateForm() {
+  const [error, setError] = useState<string | null>(null);
+  const create = useMutation(api.items.create);
+
+  const handleSubmit = async (data) => {
+    try {
+      await create(data);
+      router.push('/items');
+    } catch (error) {
+      // Check specific error codes
+      if (isErrorCode(error, ErrorCode.DUPLICATE_SLUG)) {
+        setError('title', { message: 'Already exists' });
+        return;
+      }
+
+      // Manual Sentry reporting if needed
+      captureException(error, {
+        context: { operation: 'createItem', data },
+        tags: { feature: 'items' },
+      });
+
+      setError(getErrorMessage(error));
+    }
+  };
+
+  return <form onSubmit={handleSubmit}>...</form>;
+}
+```
+
+## Reading Error Information
+
+### Get User-Friendly Message
+
+```ts
+import { getErrorMessage } from '@/lib/services/errors';
+
+const message = getErrorMessage(error);
+// Returns: User-friendly string for any error type
+```
+
+### Check Specific Error Code
+
+```ts
+import { isErrorCode, ErrorCode } from '@/lib/services/errors';
+
+if (isErrorCode(error, ErrorCode.DUPLICATE_SLUG)) {
+  // Handle duplicate specifically
+}
+
+if (isErrorCode(error, ErrorCode.AUTH_REQUIRED)) {
+  redirect('/login');
+}
+```
+
+### Get Error Code Directly
+
+```ts
+import { getErrorCode, ErrorCode } from '@/lib/services/errors';
+
+const code = getErrorCode(error);
+// Returns: ErrorCode enum value or UNKNOWN_ERROR
+```
+
+## Manual Error Reporting
+
+### Report Caught Errors
+
+```ts
+import { captureException } from '@/lib/services/errors';
+
+try {
+  await riskyOperation();
+} catch (error) {
+  captureException(error, {
+    context: {
+      operation: 'riskyOperation',
+      userId: user._id,
+    },
+    level: 'warning',
+    tags: {
+      feature: 'items',
+    },
+  });
+}
+```
+
+### Add Breadcrumbs for Context
+
+```ts
+import { addBreadcrumb } from '@/lib/services/errors';
+
+// Add breadcrumb before operation
+addBreadcrumb({
+  message: 'User clicked submit button',
+  category: 'user-action',
+  level: 'info',
+});
+
+// Errors after this point will include the breadcrumb
+```
+
+### Set User Context
+
+```ts
+import { setUserContext, clearUserContext } from '@/lib/services/errors';
+
+// On login
+setUserContext({
+  id: user._id,
+  email: user.email,
+  username: user.name,
+});
+
+// On logout
+clearUserContext();
+```
+
+## Available Error Codes
+
+```ts
+import { ErrorCode } from '@/lib/services/errors';
+
+// Authentication & Authorization
+ErrorCode.AUTH_REQUIRED; // Not authenticated
+ErrorCode.FORBIDDEN; // No permission
+ErrorCode.INVALID_CREDENTIALS;
+ErrorCode.SESSION_EXPIRED;
+
+// Validation
+ErrorCode.DUPLICATE_SLUG; // Unique field conflict
+ErrorCode.VALIDATION_FAILED; // Input validation failed
+ErrorCode.INVALID_INPUT;
+ErrorCode.MISSING_FIELD;
+
+// Resource
+ErrorCode.NOT_FOUND; // Resource doesn't exist
+
+// System
+ErrorCode.DATABASE_ERROR;
+ErrorCode.NETWORK_ERROR;
+ErrorCode.SERVER_ERROR;
+ErrorCode.UNKNOWN_ERROR;
+```
+
+## Best Practices
+
+### When to Use Each Pattern
+
+**ErrorBoundary:**
+
+- Query errors (always)
+- React rendering errors
+- Isolate complex features
+- Display fallback UI automatically
+
+**useMutationWithErrorHandling:**
+
+- Simple mutations
+- Want automatic Sentry reporting
+- Standard error UI handling
+- No complex error logic
+
+**try/catch:**
+
+- Need to check specific error codes
+- Custom error handling logic
+- Want to prevent error propagation
+- Multiple different error paths
+
+### Don't Report Expected Errors
+
+```ts
+// ✅ Expected case - don't report
+const user = await getUser(userId);
+if (!user) {
+  return null; // Normal "not found" case
+}
+
+// ✅ Unexpected error - do report
+try {
+  await complexOperation();
+} catch (error) {
+  captureException(error); // Something went wrong
+  throw error;
+}
+```
+
+### Error Messages
+
+- **Backend** - Throw structured errors with codes (see convex-errors.mdc)
+- **Frontend** - Use `getErrorMessage()` for display
+- **UI** - Show clear, actionable messages to users
+
+## Quick Reference
+
+```tsx
+// Query errors - use ErrorBoundary
+<ErrorBoundary>
+  <ComponentWithQueries />
+</ErrorBoundary>;
+
+// Simple mutations - use hook
+const { mutate, error } = useMutationWithErrorHandling(api.items.create, {
+  onSuccess: () => {},
+});
+
+// Complex mutations - use try/catch
+try {
+  await mutation(data);
+} catch (error) {
+  if (isErrorCode(error, ErrorCode.DUPLICATE_SLUG)) {
+    // Handle specific error
+  }
+  captureException(error);
+}
+
+// Get user-friendly message
+const message = getErrorMessage(error);
+
+// Add debugging context
+addBreadcrumb({ message: 'User action', category: 'ui' });
+```

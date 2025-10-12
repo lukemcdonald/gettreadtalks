@@ -1,0 +1,454 @@
+---
+description: Backend error handling patterns for Convex mutations with structured errors
+globs: convex/**/*.ts
+---
+
+# Convex Error Handling
+
+## Decision Tree: Which Throw Function?
+
+### Authentication & Authorization
+
+**User not authenticated:**
+
+```ts
+if (!userId) {
+  throwAuthRequired(); // Default message
+}
+```
+
+**User authenticated but lacks permission:**
+
+```ts
+if (resource.ownerId !== userId) {
+  throwForbidden('You do not have permission to edit this resource');
+}
+```
+
+### Resource Operations
+
+**Resource doesn't exist:**
+
+```ts
+const item = await ctx.db.get(itemId);
+if (!item) {
+  throwNotFound('Item not found', { resource: 'item', resourceId: itemId });
+}
+```
+
+**Unique field conflict (slug, email, etc.):**
+
+```ts
+if (await slugExists(ctx, 'items', slug)) {
+  throwDuplicateSlug('Item with this title already exists', 'title');
+}
+```
+
+### Validation
+
+**Input validation failed:**
+
+```ts
+if (!isValidEmail(email)) {
+  throwValidationError('Invalid email address', 'email');
+}
+```
+
+**General validation failure:**
+
+```ts
+if (items.length > MAX_ITEMS) {
+  throwValidationError('Too many items');
+}
+```
+
+### Custom Errors
+
+**Need custom error code or data:**
+
+```ts
+throw createConvexError('Custom error message', {
+  code: ErrorCode.VALIDATION_FAILED,
+  field: 'customField',
+  additionalData: 'context',
+});
+```
+
+## Available Throw Functions
+
+### throwAuthRequired(message?)
+
+Use when user must be authenticated but isn't:
+
+```ts
+import { throwAuthRequired } from '../lib/errors';
+
+export async function updateItem(ctx: MutationCtx, args: UpdateItemArgs) {
+  const userId = await getUserId(ctx);
+
+  // ✅ Check authentication
+  if (!userId) {
+    throwAuthRequired(); // Uses default: "Authentication required"
+  }
+
+  // ✅ Custom message
+  if (!userId) {
+    throwAuthRequired('Please log in to update items');
+  }
+}
+```
+
+### throwForbidden(message?)
+
+Use when user is authenticated but lacks permission:
+
+```ts
+import { throwForbidden } from '../lib/errors';
+
+export async function deleteItem(ctx: MutationCtx, args: { id: Id<'items'> }) {
+  const userId = await getUserId(ctx);
+  const item = await ctx.db.get(args.id);
+
+  // ✅ Check ownership
+  if (item.ownerId !== userId) {
+    throwForbidden('You can only delete your own items');
+  }
+}
+```
+
+### throwNotFound(message?, data?)
+
+Use when requested resource doesn't exist:
+
+```ts
+import { throwNotFound } from '../lib/errors';
+
+export async function getItem(ctx: QueryCtx, args: { id: Id<'items'> }) {
+  const item = await ctx.db.get(args.id);
+
+  // ✅ With context
+  if (!item) {
+    throwNotFound('Item not found', {
+      resource: 'item',
+      resourceId: args.id,
+    });
+  }
+
+  // ✅ Simple message
+  if (!item) {
+    throwNotFound('Item not found');
+  }
+}
+```
+
+### throwDuplicateSlug(message?, field?)
+
+Use when unique field already exists:
+
+```ts
+import { throwDuplicateSlug } from '../lib/errors';
+import { slugExists } from '../lib/utils';
+
+export async function createItem(ctx: MutationCtx, args: CreateItemArgs) {
+  const slug = normalizeSlug(args.title);
+
+  // ✅ Check uniqueness
+  if (await slugExists(ctx, 'items', slug)) {
+    throwDuplicateSlug('Item with this title already exists', 'title');
+  }
+}
+```
+
+### throwValidationError(message, field?)
+
+Use when input validation fails:
+
+```ts
+import { throwValidationError } from '../lib/errors';
+
+export async function createItem(ctx: MutationCtx, args: CreateItemArgs) {
+  // ✅ Validate email
+  if (!isValidEmail(args.email)) {
+    throwValidationError('Invalid email address', 'email');
+  }
+
+  // ✅ Validate length
+  if (args.title.length > 100) {
+    throwValidationError('Title too long', 'title');
+  }
+
+  // ✅ General validation
+  if (args.items.length === 0) {
+    throwValidationError('At least one item is required');
+  }
+}
+```
+
+### createConvexError(message, data?)
+
+Use for custom errors with specific codes:
+
+```ts
+import { createConvexError, ErrorCode } from '../lib/errors';
+
+export async function processItems(ctx: MutationCtx, args: ProcessItemsArgs) {
+  // ✅ Custom error with data
+  if (args.items.length > 100) {
+    throw createConvexError('Batch size exceeded', {
+      code: ErrorCode.VALIDATION_FAILED,
+      field: 'items',
+      limit: 100,
+      received: args.items.length,
+    });
+  }
+}
+```
+
+## Complete Example
+
+```ts
+import { MutationCtx } from '../_generated/server';
+import { Id } from '../_generated/dataModel';
+import {
+  throwAuthRequired,
+  throwForbidden,
+  throwNotFound,
+  throwDuplicateSlug,
+} from '../lib/errors';
+import { requireAuth } from './auth/queries';
+import { normalizeSlug, slugExists } from '../lib/utils';
+
+export async function createItem(ctx: MutationCtx, args: { title: string; description: string }) {
+  // 1. Check authentication
+  await requireAuth(ctx); // Throws if not authenticated
+  const userId = await getUserId(ctx);
+
+  // 2. Check for duplicates
+  const slug = normalizeSlug(args.title);
+  if (await slugExists(ctx, 'items', slug)) {
+    throwDuplicateSlug('Item with this title already exists', 'title');
+  }
+
+  // 3. Create item
+  return await ctx.db.insert('items', {
+    ...args,
+    slug,
+    ownerId: userId,
+  });
+}
+
+export async function updateItem(ctx: MutationCtx, args: { id: Id<'items'>; title: string }) {
+  // 1. Get authenticated user
+  const userId = await getUserId(ctx);
+  if (!userId) {
+    throwAuthRequired();
+  }
+
+  // 2. Get item
+  const item = await ctx.db.get(args.id);
+  if (!item) {
+    throwNotFound('Item not found', { resource: 'item', resourceId: args.id });
+  }
+
+  // 3. Check ownership
+  if (item.ownerId !== userId) {
+    throwForbidden('You can only edit your own items');
+  }
+
+  // 4. Check for slug conflict if title changed
+  if (args.title !== item.title) {
+    const newSlug = normalizeSlug(args.title);
+    if (await slugExists(ctx, 'items', newSlug, args.id)) {
+      throwDuplicateSlug('Item with this title already exists', 'title');
+    }
+  }
+
+  // 5. Update item
+  await ctx.db.patch(args.id, { title: args.title });
+
+  return args.id;
+}
+```
+
+## Available Error Codes
+
+```ts
+import { ErrorCode } from '../lib/errors';
+
+// Authentication & Authorization
+ErrorCode.AUTH_REQUIRED; // throwAuthRequired()
+ErrorCode.FORBIDDEN; // throwForbidden()
+ErrorCode.INVALID_CREDENTIALS;
+ErrorCode.SESSION_EXPIRED;
+
+// Validation
+ErrorCode.DUPLICATE_SLUG; // throwDuplicateSlug()
+ErrorCode.VALIDATION_FAILED; // throwValidationError()
+ErrorCode.INVALID_INPUT;
+ErrorCode.MISSING_FIELD;
+
+// Resource
+ErrorCode.NOT_FOUND; // throwNotFound()
+ErrorCode.RESOURCE_DELETED;
+
+// System
+ErrorCode.DATABASE_ERROR;
+ErrorCode.NETWORK_ERROR;
+ErrorCode.SERVER_ERROR;
+ErrorCode.UNKNOWN_ERROR;
+```
+
+## Best Practices
+
+### Always Use Structured Errors
+
+```ts
+// ✅ Good - structured error with code
+if (!item) {
+  throwNotFound('Item not found', { resource: 'item', resourceId: id });
+}
+
+// ❌ Bad - generic Error
+if (!item) {
+  throw new Error('Item not found');
+}
+```
+
+### Provide Context with Errors
+
+```ts
+// ✅ Good - includes resource context
+throwNotFound('Topic not found', {
+  resource: 'topic',
+  resourceId: topicId,
+});
+
+// ✅ Good - includes field context
+throwDuplicateSlug('Topic with this title already exists', 'title');
+
+// ⚠️ Okay but less helpful
+throwNotFound('Topic not found');
+```
+
+### Use Specific Functions Over Generic
+
+```ts
+// ✅ Best - specific function
+throwDuplicateSlug('Title already exists', 'title');
+
+// ⚠️ Okay - but less clear
+throw createConvexError('Title already exists', {
+  code: ErrorCode.DUPLICATE_SLUG,
+  field: 'title',
+});
+
+// ❌ Bad - generic error
+throw new Error('Title already exists');
+```
+
+### Check Authentication First
+
+```ts
+// ✅ Good order
+export async function updateItem(ctx: MutationCtx, args: UpdateItemArgs) {
+  // 1. Auth check first
+  const userId = await getUserId(ctx);
+  if (!userId) {
+    throwAuthRequired();
+  }
+
+  // 2. Then resource check
+  const item = await ctx.db.get(args.id);
+  if (!item) {
+    throwNotFound('Item not found');
+  }
+
+  // 3. Then permission check
+  if (item.ownerId !== userId) {
+    throwForbidden('You can only edit your own items');
+  }
+
+  // 4. Then business logic
+}
+```
+
+## Common Patterns
+
+### Check Before Delete
+
+```ts
+export async function deleteItem(ctx: MutationCtx, args: { id: Id<'items'> }) {
+  await requireAuth(ctx);
+
+  const item = await ctx.db.get(args.id);
+  if (!item) {
+    throwNotFound('Item not found', { resource: 'item', resourceId: args.id });
+  }
+
+  // Check for references before deleting
+  const hasReferences = await ctx.db
+    .query('references')
+    .withIndex('by_item_id', (q) => q.eq('itemId', args.id))
+    .first();
+
+  if (hasReferences) {
+    throwValidationError('Cannot delete item: it has associated references');
+  }
+
+  await ctx.db.delete(args.id);
+
+  return null;
+}
+```
+
+### Validate Unique Fields
+
+```ts
+export async function createItem(ctx: MutationCtx, args: CreateItemArgs) {
+  await requireAuth(ctx);
+
+  // Check email uniqueness
+  const existingEmail = await ctx.db
+    .query('items')
+    .withIndex('by_email', (q) => q.eq('email', args.email))
+    .first();
+
+  if (existingEmail) {
+    throwDuplicateSlug('Email already in use', 'email');
+  }
+
+  // Check slug uniqueness
+  const slug = normalizeSlug(args.title);
+  if (await slugExists(ctx, 'items', slug)) {
+    throwDuplicateSlug('Item with this title already exists', 'title');
+  }
+
+  return await ctx.db.insert('items', { ...args, slug });
+}
+```
+
+## Quick Reference
+
+```ts
+// Authentication
+throwAuthRequired();
+throwAuthRequired('Custom message');
+
+// Authorization
+throwForbidden('Cannot edit this resource');
+
+// Resource not found
+throwNotFound('Item not found', { resource: 'item', resourceId: id });
+
+// Duplicate unique field
+throwDuplicateSlug('Title already exists', 'title');
+
+// Validation
+throwValidationError('Invalid email', 'email');
+
+// Custom error
+throw createConvexError('Custom message', {
+  code: ErrorCode.VALIDATION_FAILED,
+  field: 'fieldName',
+});
+```
