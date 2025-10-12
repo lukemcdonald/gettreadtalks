@@ -8,9 +8,12 @@ globs: **/*.tsx,**/*.ts
 ## Core Principles
 
 - **One component per file** - Split complex components, use composition
-- **Folder-based structure** - Each component gets its own folder with barrel export to keep related files together and make components easy to move/delete as a unit
-- **Kebab-case naming** - `auth-status/`, `user-profile.tsx` for consistency with URL conventions and to avoid case-sensitivity issues across systems
-- **Co-located files** - Types, tests, utils in same folder so everything related to a component is in one place
+- **Folder-based structure** - Each component gets its own folder with barrel export to keep related
+  files together and make components easy to move/delete as a unit
+- **Kebab-case naming** - `auth-status/`, `user-profile.tsx` for consistency with URL conventions
+  and to avoid case-sensitivity issues across systems
+- **Co-located files** - Types, tests, utils in same folder so everything related to a component is
+  in one place
 
 ## Folder Structure
 
@@ -37,11 +40,9 @@ components/
 - **Shared components**: `components/` (reusable across app)
   - Examples: buttons, cards, modals, layouts
   - Test: "Would another page/feature benefit from this?"
-  
 - **Page-specific**: `app/page-name/_components/` (one-off components)
   - Examples: page headers, specific forms, unique sections
   - Test: "Is this only used on this one page?"
-  
 - **Feature-specific**: `lib/features/feature-name/components/` (complex domains)
   - Examples: feature dashboards, feature-specific widgets
   - Test: "Does this belong to a specific business domain?"
@@ -58,7 +59,8 @@ import ComponentName from '@/components/component-name/component-name';
 
 ## Barrel Export Pattern
 
-Barrel exports provide a clean public API for each component, enabling cleaner imports and easier refactoring without breaking external dependencies.
+Barrel exports provide a clean public API for each component, enabling cleaner imports and easier
+refactoring without breaking external dependencies.
 
 ```ts
 // component-name/index.ts
@@ -67,7 +69,9 @@ export type { ComponentNameProps } from './component-name.types';
 ```
 
 **Benefits:**
-- Cleaner imports: `from '@/components/component-name'` vs `from '@/components/component-name/component-name'`
+
+- Cleaner imports: `from '@/components/component-name'` vs
+  `from '@/components/component-name/component-name'`
 - Easy refactoring: Change internal file structure without breaking imports
 - Clear public API: Only export what should be used externally
 
@@ -76,3 +80,71 @@ export type { ComponentNameProps } from './component-name.types';
 - Folders: `kebab-case` (`component-name/`)
 - Files: `kebab-case` with purpose suffix (`component-name.types.ts`)
 - Suffixes: `.types.ts`, `.test.tsx`, `.utils.ts`, `.hooks.ts`
+
+## Hooks Organization
+
+### Pattern: One Hook Per File
+
+For features with multiple hooks (8+ or complex logic), use individual files in a `hooks/`
+directory:
+
+```sh
+lib/features/feature-name/
+├─ hooks/
+│  ├─ use-item.ts              # Single item query
+│  ├─ use-items.ts             # List query
+│  ├─ use-item-by-slug.ts      # Alternative query
+│  ├─ use-is-item-favorited.ts # Boolean check
+│  ├─ use-create-item.ts       # Mutation
+│  ├─ use-update-item.ts       # Mutation
+│  ├─ use-item-detail-page.ts  # Composite hook
+│  └─ index.ts                 # Barrel export
+├─ actions.ts
+└─ index.ts
+```
+
+### When to Split Hooks
+
+**Use individual files when:**
+
+- Feature has 8+ hooks
+- Working in a team (avoids merge conflicts)
+- Hooks have complex logic (easier to test)
+- Building for growth and scale
+
+**Use single `hooks.ts` file when:**
+
+- Feature has ≤3 simple hooks
+- Solo project that will stay small
+- Hooks are truly trivial pass-throughs
+
+### Barrel Export for Hooks
+
+```ts
+// hooks/index.ts
+export { useItem } from './use-item';
+export { useItems } from './use-items';
+export { useItemBySlug } from './use-item-by-slug';
+export { useIsItemFavorited } from './use-is-item-favorited';
+export { useCreateItem } from './use-create-item';
+export { useUpdateItem } from './use-update-item';
+export { useItemDetailPage } from './use-item-detail-page';
+```
+
+**Benefits:**
+
+- **Testing isolation** - Each hook has its own test file
+- **Clear dependencies** - Imports show exact hook relationships
+- **Parallel development** - Multiple developers, no conflicts
+- **Better navigation** - File search jumps directly to hook
+- **Easier maintenance** - Small, focused files
+
+### Import Pattern
+
+```ts
+// ✅ Clean imports work the same
+import { useItem, useItems, useCreateItem } from '@/lib/features/items/hooks';
+
+// ✅ Or import specific hook directly
+import { useItem } from '@/lib/features/items/hooks/use-item';
+```

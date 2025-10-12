@@ -5,37 +5,195 @@ globs: **/*.ts,**/*.tsx
 
 # Naming Conventions
 
-## Feature Hooks (Client)
+## React Hooks (Client)
 
-Use descriptive, use-case focused names:
+### Hook Naming Patterns
+
+**Queries (reads)** - Mirror backend API names:
+
+- Single items: `useItem(id)`, `useItemBySlug(slug)`
+- Lists: `useItems(options?)`, `useItemsByCategory(categoryId)`
+- Lists with relations: `useItemsWithAuthors()`
+- Boolean checks: `useIsItemFavorited(itemId)`
+- Special queries: `useFeaturedItems()`, `useItemsCount()`
+
+**Mutations (writes)** - Use verb prefix + entity:
 
 ```ts
-// List query with options/filters
-export function useItems(options?: {
-  categoryId?: string;
-  search?: string;
-  status?: string;
-  userId?: string;
-});
-
-// Usage examples:
-// useItems()                                  → all items
-// useItems({ categoryId: 'cat_456' })         → items in category
-// useItems({ userId: 'me', status: 'draft' }) → filtered by user and status
-// useItems({ userId: 'user_123' })            → items for specific user
-
-// Single item
-export function useItem(id: string);
-
 // Mutations - Use appropriate semantic verb
-export function useArchiveItem();   // Soft delete (set status to 'archived')
-export function useCreateItem();    // Create new
-export function useDestroyItem();   // Hard delete (permanent removal from DB)
-export function useRemoveItem();    // Remove from association/list (non-destructive)
-export function useUpdateItem();    // Update existing
+export function useArchiveItem(); // Soft delete (set status to 'archived')
+export function useCreateItem(); // Create new
+export function useDestroyItem(); // Hard delete (permanent removal from DB)
+export function useRemoveItem(); // Remove from association/list (non-destructive)
+export function useUpdateItem(); // Update existing
+export function useUpdateItemStatus(); // Update specific status field
+export function useAddFavoriteItem(); // Add to favorites (join table operation)
+export function useRemoveFavoriteItem(); // Remove from favorites (join table operation)
 ```
 
-**Note:** Define options/filter types in `types.ts` for reuse across hooks and queries.
+### Naming Principles
+
+- Drop redundant prefixes when file/feature provides context
+- Use singular for single items, plural for arrays
+- Mirror backend API conventions for consistency
+- Use `useCurrent*` pattern for authenticated/context-based data
+
+### Query Hook Return Pattern
+
+All query hooks return a consistent object shape for familiarity and destructuring:
+
+```ts
+// Single item hook
+export function useItem(id: string) {
+  const data = useQuery(api.items.get, { id });
+
+  return {
+    data,
+    isLoading: data === undefined,
+    notFound: data === null,
+  };
+}
+
+// Usage - familiar destructuring pattern
+const { data: item, isLoading, notFound } = useItem(id);
+if (isLoading) return <Loading />;
+if (notFound) return <NotFound />;
+return <div>{item.title}</div>;
+```
+
+**Benefits:**
+
+- Familiar to React Query users
+- Consistent shape across all hooks
+- Easy to destructure with renaming
+- Explicit `isLoading` and `notFound` states
+
+**Pattern for different return types:**
+
+```ts
+// Returns single item or null
+export function useItem(id: string) {
+  const data = useQuery(api.items.get, { id });
+  return {
+    data,
+    isLoading: data === undefined,
+    notFound: data === null,
+  };
+}
+
+// Returns array (never null)
+export function useItems(limit?: number) {
+  const data = useQuery(api.items.list, { limit });
+  return {
+    data: data ?? [],
+    isLoading: data === undefined,
+  };
+}
+
+// Returns boolean
+export function useIsItemFavorited(itemId: string) {
+  const data = useQuery(api.users.isItemFavorited, { itemId });
+  return {
+    data: data ?? false,
+    isLoading: data === undefined,
+  };
+}
+
+// Returns number
+export function useItemsCount() {
+  const data = useQuery(api.items.getCount);
+  return {
+    data: data ?? 0,
+    isLoading: data === undefined,
+  };
+}
+```
+
+### Mutation Hook Patterns
+
+**Simple mutations** - Direct pass-through when no error handling needed:
+
+```ts
+export function useCreateItem() {
+  return useMutation(api.items.create);
+}
+
+// Usage
+const createItem = useCreateItem();
+await createItem({ title: 'New Item' });
+```
+
+**With error handling** - Use `useMutationWithErrorHandling` for automatic error reporting:
+
+```ts
+import { useMutationWithErrorHandling } from '@/lib/services/errors';
+
+// In component
+const { mutate, isLoading, error } = useMutationWithErrorHandling(api.items.create, {
+  onSuccess: () => router.push('/items'),
+});
+```
+
+Reference: See `error-handling.mdc` for complete mutation error handling patterns.
+
+### Composite Hooks
+
+Combine multiple queries for page-level patterns to reduce boilerplate:
+
+```ts
+// Composite hook for item detail pages
+export function useItemDetailPage(id: string) {
+  const { data: item, isLoading } = useItem(id);
+  const { data: relatedItems } = useItems(
+    item ? { categoryId: item.categoryId, limit: 3 } : 'skip',
+  );
+
+  return {
+    data: item,
+    isLoading,
+    notFound: item === null,
+    relatedItems,
+  };
+}
+
+// Usage - all data in one call
+const { data, isLoading, notFound, relatedItems } = useItemDetailPage(id);
+```
+
+**When to combine:**
+
+- Specific page/component always needs queries together
+- Want unified loading state across related queries
+- Have dependent queries (one feeds into another)
+
+**When to keep separate:**
+
+- Queries used in different combinations across app
+- Need maximum flexibility and reusability
+- Want optimal React performance (granular re-renders)
+
+### Loading States
+
+Per Convex best practices, check for `undefined` internally to determine loading state. Hooks wrap
+this check into an explicit `isLoading` property to provide a familiar React Query-style API.
+
+```ts
+// Hook implementation
+export function useItem(id: string) {
+  const data = useQuery(api.items.get, { id });
+  return {
+    data,
+    isLoading: data === undefined, // undefined = still loading
+    notFound: data === null, // null = not found
+  };
+}
+
+// Component usage
+const { data, isLoading, notFound } = useItem(id);
+```
+
+Reference:
+[Convex UI Patterns](https://docs.convex.dev/understanding/best-practices/other-recommendations#ui-patterns)
 
 ## Feature Queries (Server)
 
@@ -54,6 +212,7 @@ export async function getItemsByCategory(categoryId);
 ```
 
 **Pattern:**
+
 - **`get*`** - Returns single item or null
 - **`list*`** - Returns arrays
 
@@ -63,11 +222,11 @@ Use clear verb prefixes to indicate the operation:
 
 ```ts
 // actions.ts - Server writes
-export async function archiveItem(id);    // Soft delete (set status to 'archived')
-export async function createItem(data);   // Create new
-export async function destroyItem(id);    // Hard delete (permanent removal from DB)
-export async function publishItem(id);    // Specific status action
-export async function removeItem(id);     // Remove from association/list (non-destructive)
+export async function archiveItem(id); // Soft delete (set status to 'archived')
+export async function createItem(data); // Create new
+export async function destroyItem(id); // Hard delete (permanent removal from DB)
+export async function publishItem(id); // Specific status action
+export async function removeItem(id); // Remove from association/list (non-destructive)
 export async function updateItem(id, data); // Update existing
 ```
 
@@ -165,7 +324,8 @@ export const authConfig = {
 
 ## File Naming
 
-**Note:** For complete file structure patterns, see `architecture.mdc` and `architecture-component.mdc`.
+**Note:** For complete file structure patterns, see `architecture.mdc` and
+`architecture-component.mdc`.
 
 ## Best Practices
 
@@ -189,7 +349,7 @@ Within a feature, use consistent naming patterns:
 // ✅ Consistent
 export function useCreateItem(); // Mutation
 export function useItem({ id }); // Single
-export function useItems();      // List
+export function useItems(); // List
 
 // ❌ Inconsistent
 export function createNewItem();
@@ -199,4 +359,5 @@ export function useItems();
 
 ### Context Matters
 
-File provides context, avoid redundancy in naming (e.g., in `items/hooks.ts` use `useItem()` not `useItemsItem()`).
+File provides context, avoid redundancy in naming (e.g., in `items/hooks.ts` use `useItem()` not
+`useItemsItem()`).
