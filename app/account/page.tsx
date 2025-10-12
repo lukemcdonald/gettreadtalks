@@ -4,7 +4,7 @@ import { Authenticated, AuthLoading, Unauthenticated } from 'convex/react';
 import Link from 'next/link';
 
 import MainLayout from '@/components/layout/main-layout';
-import { useCurrentUser, useUserFavorites } from '@/lib/features/users/hooks';
+import { useCurrentUser, useFavorites } from '@/lib/features/users/hooks';
 import { signOut } from '@/lib/services/auth/client';
 
 export default function AccountPage() {
@@ -27,7 +27,7 @@ export default function AccountPage() {
 
 const AccountContent = () => {
   const user = useCurrentUser();
-  const favorites = useUserFavorites();
+  const { data: favorites, isLoading: favoritesLoading } = useFavorites();
 
   const handleLogout = async () => {
     try {
@@ -103,7 +103,11 @@ const AccountContent = () => {
       </div>
 
       <div className="px-6 py-8">
-        {favorites && (
+        {favoritesLoading ? (
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+            <p className="text-gray-500 dark:text-gray-400">Loading favorites...</p>
+          </div>
+        ) : (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
             <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">
               Your Favorites

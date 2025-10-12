@@ -8,7 +8,7 @@ export function useFavorites(limit?: number) {
   const data = useQuery(api.users.listFavorites, { limit });
 
   return {
-    data: data ?? [],
+    data: data,
     isLoading: data === undefined,
   };
 }

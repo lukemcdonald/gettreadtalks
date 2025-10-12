@@ -1,8 +1,8 @@
 import * as Sentry from '@sentry/nextjs';
 
 Sentry.init({
-  // Only enable debug mode in development
-  debug: process.env.NODE_ENV === 'development',
+  // Debug mode for troubleshooting Sentry itself (set NEXT_PUBLIC_SENTRY_DEBUG=true)
+  debug: process.env.NEXT_PUBLIC_SENTRY_DEBUG === 'true',
 
   // Data Source Name - unique identifier for your Sentry project
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
