@@ -46,7 +46,7 @@ export const listFavorites = query({
   returns: validators.listUserFavoritesReturns,
 });
 
-export const listFinished = query({
+export const listFinishedTalks = query({
   args: validators.listUserFinishedTalksArgs,
   handler: async (ctx, args) => {
     return await queries.listUserFinishedTalks(ctx, args);

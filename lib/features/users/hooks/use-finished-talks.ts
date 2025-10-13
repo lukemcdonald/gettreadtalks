@@ -5,7 +5,7 @@ import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 
 export function useFinishedTalks(limit?: number) {
-  const data = useQuery(api.users.listFinished, { limit });
+  const data = useQuery(api.users.listFinishedTalks, { limit });
 
   return {
     data: data ?? [],
