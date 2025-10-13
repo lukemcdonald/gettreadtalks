@@ -2,22 +2,22 @@ import type { Infer, ObjectType } from 'convex/values';
 
 import * as validators from './validators';
 
-export type CreateTalkArgs = ObjectType<typeof validators.createTalkArgs>;
-export type CreateTalkReturns = Infer<typeof validators.createTalkReturns>;
 export type ArchiveTalkArgs = ObjectType<typeof validators.archiveTalkArgs>;
 export type ArchiveTalkReturns = Infer<typeof validators.archiveTalkReturns>;
-export type GetFeaturedTalksArgs = ObjectType<typeof validators.getFeaturedTalksArgs>;
-export type GetFeaturedTalksReturns = Infer<typeof validators.getFeaturedTalksReturns>;
+export type CreateTalkArgs = ObjectType<typeof validators.createTalkArgs>;
+export type CreateTalkReturns = Infer<typeof validators.createTalkReturns>;
+export type GetCountArgs = ObjectType<typeof validators.getCountArgs>;
+export type GetCountReturns = Infer<typeof validators.getCountReturns>;
 export type GetRandomTalksBySpeakerArgs = ObjectType<typeof validators.getRandomTalksBySpeakerArgs>;
 export type GetRandomTalksBySpeakerReturns = Infer<
   typeof validators.getRandomTalksBySpeakerReturns
 >;
 export type GetTalkArgs = ObjectType<typeof validators.getTalkArgs>;
-export type GetCountArgs = ObjectType<typeof validators.getCountArgs>;
-export type GetCountReturns = Infer<typeof validators.getCountReturns>;
 export type GetTalkBySlugArgs = ObjectType<typeof validators.getTalkBySlugArgs>;
 export type GetTalkBySlugReturns = Infer<typeof validators.getTalkBySlugReturns>;
 export type GetTalkReturns = Infer<typeof validators.getTalkReturns>;
+export type ListFeaturedTalksArgs = ObjectType<typeof validators.listFeaturedTalksArgs>;
+export type ListFeaturedTalksReturns = Infer<typeof validators.listFeaturedTalksReturns>;
 export type ListTalksArgs = ObjectType<typeof validators.listTalksArgs>;
 export type ListTalksReturns = Infer<typeof validators.listTalksReturns>;
 export type ListTalksByCollectionArgs = ObjectType<typeof validators.listTalksByCollectionArgs>;

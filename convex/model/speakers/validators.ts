@@ -21,17 +21,13 @@ export const destroySpeakerArgs = {
 
 export const destroySpeakerReturns = v.null();
 
-export const getFeaturedSpeakersArgs = {
-  limit: v.optional(v.number()),
-};
+export const getCountArgs = {};
 
-export const getFeaturedSpeakersReturns = v.array(v.object(speakerFields));
+export const getCountReturns = v.number();
 
 export const getSpeakerArgs = {
   id: v.id('speakers'),
 };
-
-export const getSpeakerReturns = v.union(v.object(speakerFields), v.null());
 
 export const getSpeakerBySlugArgs = {
   slug: v.string(),
@@ -39,9 +35,13 @@ export const getSpeakerBySlugArgs = {
 
 export const getSpeakerBySlugReturns = v.union(v.object(speakerFields), v.null());
 
-export const getCountArgs = {};
+export const getSpeakerReturns = v.union(v.object(speakerFields), v.null());
 
-export const getCountReturns = v.number();
+export const listFeaturedSpeakersArgs = {
+  limit: v.optional(v.number()),
+};
+
+export const listFeaturedSpeakersReturns = v.array(v.object(speakerFields));
 
 export const listSpeakersArgs = {
   paginationOpts: paginationOptsValidator,

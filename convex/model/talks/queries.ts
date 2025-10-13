@@ -187,7 +187,7 @@ export async function getTalksByCollection(ctx: QueryCtx, args: ListTalksByColle
  * @param args - Query arguments with defaults
  * @returns Array of random featured talks
  */
-export async function getFeaturedTalks(ctx: QueryCtx, args: { limit?: number } = {}) {
+export async function listFeaturedTalks(ctx: QueryCtx, args: { limit?: number } = {}) {
   const { limit = 5 } = args;
 
   // Intentionally unbounded: Need all featured talks for random selection

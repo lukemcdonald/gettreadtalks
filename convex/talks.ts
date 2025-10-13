@@ -29,14 +29,6 @@ export const getCount = query({
   returns: validators.getCountReturns,
 });
 
-export const getFeatured = query({
-  args: validators.getFeaturedTalksArgs,
-  handler: async (ctx, args) => {
-    return await queries.getFeaturedTalks(ctx, args);
-  },
-  returns: validators.getFeaturedTalksReturns,
-});
-
 export const getRandomBySpeaker = query({
   args: validators.getRandomTalksBySpeakerArgs,
   handler: async (ctx, args) => {
@@ -67,6 +59,14 @@ export const listBySpeaker = query({
     return await queries.getTalksBySpeaker(ctx, args);
   },
   returns: validators.listTalksBySpeakerReturns,
+});
+
+export const listFeatured = query({
+  args: validators.listFeaturedTalksArgs,
+  handler: async (ctx, args) => {
+    return await queries.listFeaturedTalks(ctx, args);
+  },
+  returns: validators.listFeaturedTalksReturns,
 });
 
 export const listWithSpeakers = query({

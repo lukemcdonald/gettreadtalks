@@ -50,7 +50,7 @@ export async function getSpeakers(ctx: QueryCtx, args: { paginationOpts: Paginat
  * @param args - Query arguments with defaults
  * @returns Array of random featured speakers
  */
-export async function getFeaturedSpeakers(ctx: QueryCtx, args: { limit?: number } = {}) {
+export async function listFeaturedSpeakers(ctx: QueryCtx, args: { limit?: number } = {}) {
   const { limit = 6 } = args;
 
   // Intentionally unbounded: Need all featured speakers for random selection

@@ -29,20 +29,20 @@ export const getCount = query({
   returns: validators.getCountReturns,
 });
 
-export const getFeatured = query({
-  args: validators.getFeaturedSpeakersArgs,
-  handler: async (ctx, args) => {
-    return await queries.getFeaturedSpeakers(ctx, args);
-  },
-  returns: validators.getFeaturedSpeakersReturns,
-});
-
 export const list = query({
   args: validators.listSpeakersArgs,
   handler: async (ctx, args) => {
     return await queries.getSpeakers(ctx, args);
   },
   returns: validators.listSpeakersReturns,
+});
+
+export const listFeatured = query({
+  args: validators.listFeaturedSpeakersArgs,
+  handler: async (ctx, args) => {
+    return await queries.listFeaturedSpeakers(ctx, args);
+  },
+  returns: validators.listFeaturedSpeakersReturns,
 });
 
 // ============================================

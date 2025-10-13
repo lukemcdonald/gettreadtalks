@@ -8,6 +8,11 @@ import { speakerFields } from '../speakers/schema';
 import { topicFields } from '../topics/schema';
 import { talkFields } from './schema';
 
+export const archiveTalkArgs = {
+  id: v.id('talks'),
+};
+export const archiveTalkReturns = v.null();
+
 export const createTalkArgs = {
   collectionId: v.optional(v.id('collections')),
   collectionOrder: v.optional(v.number()),
@@ -19,15 +24,8 @@ export const createTalkArgs = {
 };
 export const createTalkReturns = v.id('talks');
 
-export const archiveTalkArgs = {
-  id: v.id('talks'),
-};
-export const archiveTalkReturns = v.null();
-
-export const getFeaturedTalksArgs = {
-  limit: v.optional(v.number()),
-};
-export const getFeaturedTalksReturns = v.array(v.object(talkFields));
+export const getCountArgs = {};
+export const getCountReturns = v.number();
 
 export const getRandomTalksBySpeakerArgs = {
   excludeTalkId: v.optional(v.id('talks')),
@@ -40,9 +38,6 @@ export const getTalkArgs = {
   id: v.id('talks'),
 };
 export const getTalkReturns = v.union(v.object(talkFields), v.null());
-
-export const getCountArgs = {};
-export const getCountReturns = v.number();
 
 export const getTalkBySlugArgs = {
   slug: v.string(),
@@ -57,6 +52,11 @@ export const getTalkBySlugReturns = v.union(
   }),
   v.null(),
 );
+
+export const listFeaturedTalksArgs = {
+  limit: v.optional(v.number()),
+};
+export const listFeaturedTalksReturns = v.array(v.object(talkFields));
 
 export const listTalksArgs = {
   paginationOpts: paginationOptsValidator,
