@@ -4,7 +4,6 @@
   "private": true,
   "scripts": {
     "build": "next build",
-    "deploy": "convex deploy --cmd \"npm run build\"",
     "dev": "npm-run-all --parallel dev:frontend dev:backend dev:open",
     "dev:backend": "convex dev",
     "dev:frontend": "next dev --turbopack",
@@ -13,6 +12,10 @@
     "format:fix": "prettier ./app ./components ./convex ./lib --write --ignore-unknown",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
+    "push": "convex deploy --yes",
+    "push:prod": "convex deploy --cmd \"npm run build\"",
+    "seed": "convex run seed:seed",
+    "seed:force": "convex run seed:seed '{\"force\": true}'",
     "start": "next start",
     "style": "npm run lint:fix && npm run format:fix",
     "typecheck": "tsc --noEmit"
@@ -32,6 +35,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
+    "@faker-js/faker": "^10.0.0",
     "@tailwindcss/postcss": "^4.1.14",
     "@types/node": "^24.7.0",
     "@types/react": "^19.2.1",

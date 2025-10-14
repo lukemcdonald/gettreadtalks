@@ -26,7 +26,7 @@ export default function AccountPage() {
 }
 
 const AccountContent = () => {
-  const user = useCurrentUser();
+  const { data: user } = useCurrentUser();
   const { data: favorites, isLoading: favoritesLoading } = useFavorites();
 
   const handleLogout = async () => {
@@ -112,45 +112,47 @@ const AccountContent = () => {
             <h2 className="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">
               Your Favorites
             </h2>
-            <div className="grid gap-4">
-              {favorites.talks.length > 0 && (
-                <div>
-                  <h3 className="text-lg font-medium mb-2 text-gray-700 dark:text-gray-300">
-                    Favorite Talks ({favorites.talks.length})
-                  </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    You have {favorites.talks.length} favorite talks saved.
-                  </p>
-                </div>
-              )}
-              {favorites.clips.length > 0 && (
-                <div>
-                  <h3 className="text-lg font-medium mb-2 text-gray-700 dark:text-gray-300">
-                    Favorite Clips ({favorites.clips.length})
-                  </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    You have {favorites.clips.length} favorite clips saved.
-                  </p>
-                </div>
-              )}
-              {favorites.speakers.length > 0 && (
-                <div>
-                  <h3 className="text-lg font-medium mb-2 text-gray-700 dark:text-gray-300">
-                    Favorite Speakers ({favorites.speakers.length})
-                  </h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    You have {favorites.speakers.length} favorite speakers saved.
-                  </p>
-                </div>
-              )}
-              {favorites.talks.length === 0 &&
-                favorites.clips.length === 0 &&
-                favorites.speakers.length === 0 && (
-                  <p className="text-gray-500 dark:text-gray-400">
-                    No favorites yet. Start exploring talks and clips to build your collection!
-                  </p>
+            {favorites && (
+              <div className="grid gap-4">
+                {favorites.talks.length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-medium mb-2 text-gray-700 dark:text-gray-300">
+                      Favorite Talks ({favorites.talks.length})
+                    </h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      You have {favorites.talks.length} favorite talks saved.
+                    </p>
+                  </div>
                 )}
-            </div>
+                {favorites.clips.length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-medium mb-2 text-gray-700 dark:text-gray-300">
+                      Favorite Clips ({favorites.clips.length})
+                    </h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      You have {favorites.clips.length} favorite clips saved.
+                    </p>
+                  </div>
+                )}
+                {favorites.speakers.length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-medium mb-2 text-gray-700 dark:text-gray-300">
+                      Favorite Speakers ({favorites.speakers.length})
+                    </h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      You have {favorites.speakers.length} favorite speakers saved.
+                    </p>
+                  </div>
+                )}
+                {favorites.talks.length === 0 &&
+                  favorites.clips.length === 0 &&
+                  favorites.speakers.length === 0 && (
+                    <p className="text-gray-500 dark:text-gray-400">
+                      No favorites yet. Start exploring talks and clips to build your collection!
+                    </p>
+                  )}
+              </div>
+            )}
           </div>
         )}
       </div>

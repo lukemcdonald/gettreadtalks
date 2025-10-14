@@ -21,7 +21,7 @@ export default function Home() {
 }
 
 const AuthenticatedHomeContent = () => {
-  const user = useCurrentUser();
+  const { data: user } = useCurrentUser();
 
   return (
     <div className="space-y-8">

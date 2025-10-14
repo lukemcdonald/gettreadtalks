@@ -6,7 +6,7 @@ import { useCurrentUser } from '@/lib/features/users/hooks';
 import { signOut } from '@/lib/services/auth/client';
 
 function AuthenticatedContent() {
-  const user = useCurrentUser();
+  const { data: user } = useCurrentUser();
 
   const handleLogout = async () => {
     try {
