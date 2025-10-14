@@ -44,7 +44,10 @@ export async function getTalkBySlug(ctx: QueryCtx, args: GetTalkBySlugArgs) {
  */
 export async function getTalks(
   ctx: QueryCtx,
-  args: { paginationOpts: PaginationOptions; status?: StatusType },
+  args: {
+    paginationOpts: PaginationOptions;
+    status?: StatusType;
+  },
 ) {
   const { paginationOpts, status } = args;
 
@@ -68,7 +71,10 @@ export async function getTalks(
  */
 export async function getTalksWithSpeakers(
   ctx: QueryCtx,
-  args: { paginationOpts: PaginationOptions; status?: StatusType },
+  args: {
+    paginationOpts: PaginationOptions;
+    status?: StatusType;
+  },
 ) {
   const result = await getTalks(ctx, args);
 

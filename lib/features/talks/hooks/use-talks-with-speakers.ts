@@ -1,14 +1,35 @@
 'use client';
 
-import { useQuery } from 'convex/react';
+import { usePaginatedQuery } from 'convex/react';
 
 import { api } from '@/convex/_generated/api';
 
-export function useTalksWithSpeakers(limit?: number) {
-  const data = useQuery(api.talks.listWithSpeakers, { limit });
+type Options = {
+  pageSize?: number;
+};
+
+export function useTalksWithSpeakers(options: Options = {}) {
+  const { pageSize = 12 } = options;
+
+  const { results, status, loadMore } = usePaginatedQuery(
+    api.talks.listWithSpeakers,
+    {},
+    { initialNumItems: pageSize },
+  );
+
+  const canLoadMore = status === 'CanLoadMore';
+  const isLoading = status === 'LoadingFirstPage';
+  const isLoadingMore = status === 'LoadingMore';
+  const isExhausted = status === 'Exhausted';
 
   return {
-    data: data ?? [],
-    isLoading: data === undefined,
+    canLoadMore,
+    data: results ?? [],
+    isExhausted,
+    isLoading,
+    isLoadingMore,
+    loadMore,
+    pageSize,
+    status,
   };
 }
