@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { Authenticated, Unauthenticated } from 'convex/react';
 import Link from 'next/link';
 
@@ -23,7 +24,26 @@ export default function Home() {
 
 const AuthenticatedHomeContent = () => {
   const { data: user } = useCurrentUser();
-  const { data: talks, canLoadMore, isLoading, loadMore, pageSize } = useTalks({ pageSize: 10 });
+  const {
+    canLoadMore,
+    data: talks,
+    isLoading,
+    isLoadingMore,
+    loadMore,
+    pageSize,
+  } = useTalks({
+    pageSize: 12,
+  });
+
+  const [loadMoreMarkers, setLoadMoreMarkers] = useState<number[]>([]);
+  const [previousCount, setPreviousCount] = useState(0);
+
+  const handleLoadMore = () => {
+    // Mark current position before loading
+    setLoadMoreMarkers((prev) => [...prev, talks.length]);
+    setPreviousCount(talks.length);
+    loadMore(pageSize);
+  };
 
   return (
     <div className="space-y-8">
@@ -51,23 +71,53 @@ const AuthenticatedHomeContent = () => {
         ) : (
           <>
             <ul className="flex flex-col gap-4">
-              {talks.map((talk) => (
-                <li key={talk._id} className="border rounded-lg p-4">
-                  <a href={`/talks/${talk.slug}`}>
-                    <h3 className="font-semibold">{talk.title}</h3>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{talk.description}</p>
-                  </a>
+              {talks.map((talk, index) => (
+                <li key={talk._id}>
+                  {/* Show divider at load points */}
+                  {loadMoreMarkers.includes(index) && (
+                    <div className="flex items-center gap-4 my-6">
+                      <div className="flex-1 h-px bg-gray-300 dark:bg-gray-700" />
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                        Loaded {pageSize} more
+                      </span>
+                      <div className="flex-1 h-px bg-gray-300 dark:bg-gray-700" />
+                    </div>
+                  )}
+
+                  {/* Animate newly loaded items */}
+                  <div
+                    className={`
+                      border rounded-lg p-4 transition-all duration-500
+                      ${
+                        index >= previousCount && previousCount > 0
+                          ? 'animate-fade-in-up bg-blue-50 dark:bg-blue-900/20'
+                          : ''
+                      }
+                    `}
+                  >
+                    <a href={`/talks/${talk.slug}`}>
+                      <h3 className="font-semibold">{talk.title}</h3>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">{talk.description}</p>
+                    </a>
+                  </div>
                 </li>
               ))}
             </ul>
 
-            {canLoadMore && (
+            {/* Show loading state while fetching more */}
+            {isLoadingMore && (
+              <div className="text-center py-4 text-gray-500 dark:text-gray-400">
+                Loading more talks...
+              </div>
+            )}
+
+            {canLoadMore && !isLoadingMore && (
               <div className="text-center mt-6">
                 <button
-                  className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition-colors"
-                  onClick={() => loadMore(pageSize)}
+                  className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={handleLoadMore}
                 >
-                  Load More
+                  Load {pageSize} More
                 </button>
               </div>
             )}
