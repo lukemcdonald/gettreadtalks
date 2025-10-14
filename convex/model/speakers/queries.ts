@@ -72,8 +72,6 @@ export async function listFeaturedSpeakers(ctx: QueryCtx, args: { limit?: number
  * @returns Count of speakers
  */
 export async function getSpeakersCount(ctx: QueryCtx) {
-  // Intentionally unbounded: Used only for counting total speakers
-  // TODO: Replace with ctx.db.query('speakers').count() when available
   const speakers = await ctx.db.query('speakers').collect();
 
   return speakers.length;

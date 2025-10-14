@@ -233,8 +233,6 @@ export async function getRandomTalksBySpeaker(
  * @returns Count of published talks
  */
 export async function getTalksCount(ctx: QueryCtx) {
-  // Intentionally unbounded: Used only for counting total talks
-  // TODO: Replace with ctx.db.query('talks').withIndex(...).count() when available
   const talks = await getManyFrom(
     ctx.db,
     'talks',

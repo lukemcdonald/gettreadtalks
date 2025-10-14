@@ -59,8 +59,6 @@ export async function getTopicsWithCount(ctx: QueryCtx, args: { limit?: number }
 
   // Get talk counts for each topic in parallel
   const topicsWithCounts = await asyncMap(topics, async (topic) => {
-    // Intentionally unbounded: Used only for counting talks per topic
-    // TODO: Replace with .count() when available
     const talkTopics = await getManyFrom(ctx.db, 'talksOnTopics', 'by_topicId', topic._id);
 
     return {

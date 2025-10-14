@@ -68,49 +68,34 @@ const AuthenticatedHomeContent = () => {
         <h2 className="text-2xl font-bold mb-4">Latest Talks</h2>
 
         {isLoading ? (
-          <div className="text-center py-8">Loading talks...</div>
+          <div>Loading talks...</div>
         ) : (
           <>
-            <ul className="flex flex-col gap-4">
+            <ul>
               {talks.map((talk, index) => (
                 <li key={talk._id}>
                   {/* Show divider at load points */}
                   {loadMoreMarkers.includes(index) && (
-                    <div className="flex items-center gap-4 my-6">
-                      <div className="flex-1 h-px bg-gray-300 dark:bg-gray-700" />
-                      <span className="text-sm text-gray-500 dark:text-gray-400">
-                        Loaded {pageSize} more
-                      </span>
-                      <div className="flex-1 h-px bg-gray-300 dark:bg-gray-700" />
+                    <div className="my-6">
+                      <span className="text-sm">Loaded {pageSize} more</span>
                     </div>
                   )}
 
                   {/* Animate newly loaded items */}
                   <div
                     className={`
-                      border rounded-lg p-4 transition-all duration-500
-                      ${
-                        index >= previousCount && previousCount > 0
-                          ? 'animate-fade-in-up bg-blue-50 dark:bg-blue-900/20'
-                          : ''
-                      }
+                      transition-all duration-500
+                      ${index >= previousCount && previousCount > 0 ? 'animate-fade-in-up' : ''}
                     `}
                   >
-                    <a href={`/talks/${talk.slug}`}>
-                      <h3 className="font-semibold">{talk.title}</h3>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">{talk.description}</p>
-                    </a>
+                    <a href={`/talks/${talk.slug}`}>{talk.title}</a>
                   </div>
                 </li>
               ))}
             </ul>
 
             {/* Show loading state while fetching more */}
-            {isLoadingMore && (
-              <div className="text-center py-4 text-gray-500 dark:text-gray-400">
-                Loading more talks...
-              </div>
-            )}
+            {isLoadingMore && <p>Loading more talks...</p>}
 
             {canLoadMore && !isLoadingMore && (
               <div className="text-center mt-6">
