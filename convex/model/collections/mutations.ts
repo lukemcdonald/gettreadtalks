@@ -1,4 +1,5 @@
 import type { MutationCtx } from '../../_generated/server';
+import { getOneFrom } from 'convex-helpers/server/relationships';
 import type { CreateCollectionArgs, DestroyCollectionArgs, UpdateCollectionArgs } from './types';
 
 import { Doc } from '../../_generated/dataModel';
@@ -81,10 +82,13 @@ export async function destroyCollection(ctx: MutationCtx, args: DestroyCollectio
   }
 
   // Check if collection is referenced by any talks
-  const talksWithCollection = await ctx.db
-    .query('talks')
-    .withIndex('by_collection_id_and_status', (q) => q.eq('collectionId', args.id))
-    .first();
+  const talksWithCollection = await getOneFrom(
+    ctx.db,
+    'talks',
+    'by_collection_id_and_status',
+    args.id,
+    'collectionId',
+  );
 
   if (talksWithCollection) {
     throw new Error('Cannot delete collection: collection has associated talks');

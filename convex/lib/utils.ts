@@ -1,3 +1,7 @@
+import { getOneFrom } from 'convex-helpers/server/relationships';
+
+import type { MutationCtx, QueryCtx } from '../_generated/server';
+
 /**
  * Normalizes text into a URL-friendly slug
  * @param text - The text to normalize
@@ -11,8 +15,6 @@ export function normalizeSlug(text: string): string {
     .replace(/-+/g, '-')
     .trim();
 }
-
-import type { MutationCtx, QueryCtx } from '../_generated/server';
 
 // Tables that have a 'by_slug' index
 type SlugTable = 'affiliateLinks' | 'clips' | 'collections' | 'speakers' | 'talks' | 'topics';
@@ -31,10 +33,7 @@ export async function slugExists(
   slug: string,
   excludeId?: string,
 ): Promise<boolean> {
-  const existing = await ctx.db
-    .query(table)
-    .withIndex('by_slug', (q) => q.eq('slug', slug))
-    .first();
+  const existing = await getOneFrom(ctx.db, table, 'by_slug', slug);
 
   if (!existing) {
     return false;

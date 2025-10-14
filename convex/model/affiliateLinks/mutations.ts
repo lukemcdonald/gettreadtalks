@@ -55,12 +55,7 @@ export async function updateAffiliateLink(ctx: MutationCtx, args: UpdateAffiliat
     const newSlug = normalizeSlug(updates.title);
 
     if (newSlug !== affiliateLink.slug) {
-      const existing = await ctx.db
-        .query('affiliateLinks')
-        .withIndex('by_slug', (q) => q.eq('slug', newSlug))
-        .first();
-
-      if (existing && existing._id !== id) {
+      if (await slugExists(ctx, 'affiliateLinks', newSlug, id)) {
         throw new Error('Affiliate link with this title already exists');
       }
 

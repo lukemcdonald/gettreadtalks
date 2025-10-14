@@ -1,6 +1,8 @@
 import type { PaginationOptions } from 'convex/server';
+import { asyncMap } from 'convex-helpers';
+import { getAll, getOneFrom } from 'convex-helpers/server/relationships';
 
-import type { Id } from '../../_generated/dataModel';
+import type { Doc, Id } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
 import type {
   GetCollectionArgs,
@@ -27,10 +29,7 @@ export async function getCollection(ctx: QueryCtx, args: GetCollectionArgs) {
  * @returns Collection or null if not found
  */
 export async function getCollectionBySlug(ctx: QueryCtx, args: GetCollectionBySlugArgs) {
-  return await ctx.db
-    .query('collections')
-    .withIndex('by_slug', (q) => q.eq('slug', args.slug))
-    .unique();
+  return await getOneFrom(ctx.db, 'collections', 'by_slug', args.slug);
 }
 
 /**
@@ -58,29 +57,27 @@ export async function getCollectionsWithStats(
   const result = await ctx.db.query('collections').order('desc').paginate(args.paginationOpts);
 
   // Enrich each collection with stats
-  const enrichedPage = await Promise.all(
-    result.page.map(async (collection) => {
-      const talks = await ctx.db
-        .query('talks')
-        .withIndex('by_collection_id_and_status', (q) =>
-          q.eq('collectionId', collection._id).eq('status', 'published'),
-        )
-        .collect();
+  const enrichedPage = await asyncMap(result.page, async (collection: Doc<'collections'>) => {
+    const talks = await ctx.db
+      .query('talks')
+      .withIndex('by_collection_id_and_status', (q) =>
+        q.eq('collectionId', collection._id).eq('status', 'published'),
+      )
+      .collect();
 
-      // Get unique speaker IDs
-      const speakerIds = [...new Set(talks.map((talk) => talk.speakerId))];
+    // Get unique speaker IDs
+    const speakerIds = [...new Set(talks.map((talk) => talk.speakerId))];
 
-      // Fetch speakers in parallel
-      const speakers = await Promise.all(speakerIds.map((id) => ctx.db.get(id)));
-      const validSpeakers = speakers.filter((speaker) => speaker !== null);
+    // Fetch speakers in parallel
+    const speakers = await getAll(ctx.db, speakerIds);
+    const validSpeakers = speakers.filter((speaker) => speaker !== null);
 
-      return {
-        collection,
-        speakers: validSpeakers,
-        talkCount: talks.length,
-      };
-    }),
-  );
+    return {
+      collection,
+      speakers: validSpeakers,
+      talkCount: talks.length,
+    };
+  });
 
   return {
     ...result,
@@ -145,7 +142,7 @@ export async function getCollectionWithSpeakers(ctx: QueryCtx, args: { slug: str
   const speakerIds = [...new Set(talks.map((talk) => talk.speakerId))];
 
   // Fetch all speakers in parallel
-  const speakers = await Promise.all(speakerIds.map((id) => ctx.db.get(id)));
+  const speakers = await getAll(ctx.db, speakerIds);
 
   // Filter out null speakers
   const validSpeakers = speakers.filter((speaker) => speaker !== null);
@@ -178,7 +175,7 @@ export async function getCollectionsBySpeaker(ctx: QueryCtx, args: { speakerId: 
   ];
 
   // Fetch all collections in parallel
-  const collections = await Promise.all(collectionIds.map((id) => ctx.db.get(id)));
+  const collections = await getAll(ctx.db, collectionIds);
 
   // Filter out null collections
   const validCollections = collections.filter((collection) => collection !== null);

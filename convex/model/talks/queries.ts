@@ -1,6 +1,8 @@
 import type { PaginationOptions } from 'convex/server';
+import { asyncMap } from 'convex-helpers';
+import { getManyFrom, getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
 
-import type { Id } from '../../_generated/dataModel';
+import type { Doc, Id } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
 import type { StatusType } from '../../schema';
 import type {
@@ -29,10 +31,7 @@ export async function getTalk(ctx: QueryCtx, args: GetTalkArgs) {
  * @returns Talk or null if not found
  */
 export async function getTalkBySlug(ctx: QueryCtx, args: GetTalkBySlugArgs) {
-  return await ctx.db
-    .query('talks')
-    .withIndex('by_slug', (q) => q.eq('slug', args.slug))
-    .unique();
+  return await getOneFrom(ctx.db, 'talks', 'by_slug', args.slug);
 }
 
 /**
@@ -78,12 +77,10 @@ export async function getTalksWithSpeakers(
 ) {
   const result = await getTalks(ctx, args);
 
-  const enrichedPage = await Promise.all(
-    result.page.map(async (talk) => {
-      const speaker = await ctx.db.get(talk.speakerId);
-      return { ...talk, speaker };
-    }),
-  );
+  const enrichedPage = await asyncMap(result.page, async (talk: Doc<'talks'>) => {
+    const speaker = await ctx.db.get(talk.speakerId);
+    return { ...talk, speaker };
+  });
 
   return {
     ...result,
@@ -112,25 +109,15 @@ export async function getTalkBySlugWithRelations(ctx: QueryCtx, args: GetTalkByS
       .collect(),
     collection: talk.collectionId ? ctx.db.get(talk.collectionId) : null,
     speaker: talk.speakerId ? ctx.db.get(talk.speakerId) : null,
-    talkTopics: ctx.db
-      .query('talksOnTopics')
-      .withIndex('by_talk_id', (q) => q.eq('talkId', talk._id))
-      .collect(),
+    topics: getManyVia(ctx.db, 'talksOnTopics', 'topicId', 'by_talk_id', talk._id, 'talkId'),
   };
 
-  const [clips, collection, speaker, talkTopics] = await Promise.all([
+  const [clips, collection, speaker, topics] = await Promise.all([
     queries.clips,
     queries.collection,
     queries.speaker,
-    queries.talkTopics,
+    queries.topics,
   ]);
-
-  // Fetch all topics in parallel
-  const topics = await Promise.all(
-    talkTopics.map(async (talkTopic) => {
-      return await ctx.db.get(talkTopic.topicId);
-    }),
-  );
 
   // Filter out any null topics
   const validTopics = topics.filter((topic) => topic !== null);
@@ -247,10 +234,13 @@ export async function getRandomTalksBySpeaker(
 export async function getTalksCount(ctx: QueryCtx) {
   // Intentionally unbounded: Used only for counting total talks
   // TODO: Replace with ctx.db.query('talks').withIndex(...).count() when available
-  const talks = await ctx.db
-    .query('talks')
-    .withIndex('by_status_and_published_at', (q) => q.eq('status', 'published'))
-    .collect();
+  const talks = await getManyFrom(
+    ctx.db,
+    'talks',
+    'by_status_and_published_at',
+    'published',
+    'status',
+  );
 
   return talks.length;
 }

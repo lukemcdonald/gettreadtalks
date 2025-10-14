@@ -1,4 +1,5 @@
 import type { MutationCtx } from '../../_generated/server';
+import { getOneFrom } from 'convex-helpers/server/relationships';
 import type { CreateTopicArgs, DestroyTopicArgs, UpdateTopicArgs } from './types';
 
 import { Doc, Id } from '../../_generated/dataModel';
@@ -83,20 +84,26 @@ export async function destroyTopic(ctx: MutationCtx, args: DestroyTopicArgs) {
   }
 
   // Check if topic is referenced by any talks
-  const talksWithTopic = await ctx.db
-    .query('talksOnTopics')
-    .withIndex('by_topic_id', (q) => q.eq('topicId', args.id))
-    .first();
+  const talksWithTopic = await getOneFrom(
+    ctx.db,
+    'talksOnTopics',
+    'by_topic_id',
+    args.id,
+    'topicId',
+  );
 
   if (talksWithTopic) {
     throwValidationError('Cannot delete topic: topic has associated talks');
   }
 
   // Check if topic is referenced by any clips
-  const clipsWithTopic = await ctx.db
-    .query('clipsOnTopics')
-    .withIndex('by_topic_id', (q) => q.eq('topicId', args.id))
-    .first();
+  const clipsWithTopic = await getOneFrom(
+    ctx.db,
+    'clipsOnTopics',
+    'by_topic_id',
+    args.id,
+    'topicId',
+  );
 
   if (clipsWithTopic) {
     throwValidationError('Cannot delete topic: topic has associated clips');

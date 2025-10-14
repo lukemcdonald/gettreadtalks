@@ -1,3 +1,5 @@
+import { getOneFrom } from 'convex-helpers/server/relationships';
+
 import type { QueryCtx } from '../../_generated/server';
 import type {
   GetAffiliateLinkArgs,
@@ -26,10 +28,7 @@ export async function getAffiliateLink(ctx: QueryCtx, args: GetAffiliateLinkArgs
  * @returns Affiliate link or null if not found
  */
 export async function getAffiliateLinkBySlug(ctx: QueryCtx, args: GetAffiliateLinkBySlugArgs) {
-  return await ctx.db
-    .query('affiliateLinks')
-    .withIndex('by_slug', (q) => q.eq('slug', args.slug))
-    .unique();
+  return await getOneFrom(ctx.db, 'affiliateLinks', 'by_slug', args.slug);
 }
 
 /**

@@ -1,4 +1,5 @@
 import type { PaginationOptions } from 'convex/server';
+import { getAll, getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
 
 import type { Id } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
@@ -62,35 +63,23 @@ export async function getClipBySlugWithRelations(
   ctx: QueryCtx,
   args: GetClipBySlugWithRelationsArgs,
 ) {
-  const clip = await ctx.db
-    .query('clips')
-    .withIndex('by_slug', (q) => q.eq('slug', args.slug))
-    .unique();
+  const clip = await getOneFrom(ctx.db, 'clips', 'by_slug', args.slug);
 
   if (!clip || clip.status !== 'published') {
     return null;
   }
 
   const queries = {
-    clipTopics: ctx.db
-      .query('clipsOnTopics')
-      .withIndex('by_clip_id', (q) => q.eq('clipId', clip._id))
-      .collect(),
     speaker: clip.speakerId ? ctx.db.get(clip.speakerId) : null,
     talk: clip.talkId ? ctx.db.get(clip.talkId) : null,
+    topics: getManyVia(ctx.db, 'clipsOnTopics', 'topicId', 'by_clip_id', clip._id, 'clipId'),
   };
 
-  const [speaker, talk, clipTopics] = await Promise.all([
+  const [speaker, talk, topics] = await Promise.all([
     queries.speaker,
     queries.talk,
-    queries.clipTopics,
+    queries.topics,
   ]);
-
-  const topics = await Promise.all(
-    clipTopics.map(async (clipTopic) => {
-      return await ctx.db.get(clipTopic.topicId);
-    }),
-  );
 
   const validTopics = topics.filter((topic) => topic !== null);
 

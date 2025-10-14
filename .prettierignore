@@ -21,3 +21,6 @@ convex/_generated
 
 # Deployment
 .vercel
+
+# Internal
+.notes

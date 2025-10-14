@@ -1,3 +1,6 @@
+import { asyncMap } from 'convex-helpers';
+import { getManyFrom, getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
+
 import type { Doc } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
 import type {
@@ -26,10 +29,7 @@ export async function getTopic(ctx: QueryCtx, args: GetTopicArgs) {
  * @returns Topic or null if not found
  */
 export async function getTopicBySlug(ctx: QueryCtx, args: GetTopicBySlugArgs) {
-  return await ctx.db
-    .query('topics')
-    .withIndex('by_slug', (q) => q.eq('slug', args.slug))
-    .unique();
+  return await getOneFrom(ctx.db, 'topics', 'by_slug', args.slug);
 }
 
 /**
@@ -58,21 +58,22 @@ export async function getTopicsWithCount(ctx: QueryCtx, args: { limit?: number }
   const topics = await ctx.db.query('topics').withIndex('by_title').take(limit);
 
   // Get talk counts for each topic in parallel
-  const topicsWithCounts = await Promise.all(
-    topics.map(async (topic) => {
-      // Intentionally unbounded: Used only for counting talks per topic
-      // TODO: Replace with .count() when available
-      const talkTopics = await ctx.db
-        .query('talksOnTopics')
-        .withIndex('by_topic_id', (q) => q.eq('topicId', topic._id))
-        .collect();
+  const topicsWithCounts = await asyncMap(topics, async (topic) => {
+    // Intentionally unbounded: Used only for counting talks per topic
+    // TODO: Replace with .count() when available
+    const talkTopics = await getManyFrom(
+      ctx.db,
+      'talksOnTopics',
+      'by_topic_id',
+      topic._id,
+      'topicId',
+    );
 
-      return {
-        count: talkTopics.length,
-        topic,
-      };
-    }),
-  );
+    return {
+      count: talkTopics.length,
+      topic,
+    };
+  });
 
   // Sort by count descending
   return topicsWithCounts.sort((a, b) => b.count - a.count);
@@ -94,39 +95,20 @@ export async function getTopicWithContent(ctx: QueryCtx, args: GetTopicWithConte
     return null;
   }
 
-  const queries = {
-    clipTopics: ctx.db
-      .query('clipsOnTopics')
-      .withIndex('by_topic_id', (q) => q.eq('topicId', topic._id))
-      .take(limit),
-    talkTopics: ctx.db
-      .query('talksOnTopics')
-      .withIndex('by_topic_id', (q) => q.eq('topicId', topic._id))
-      .take(limit),
-  };
-
-  // Get related talks and clips in parallel
-  const [clipTopics, talkTopics] = await Promise.all([queries.clipTopics, queries.talkTopics]);
-
-  // Get talks and clips in parallel.
-  const [clipResults, talkResults] = await Promise.all([
-    Promise.all(
-      clipTopics.map(async (clipTopic) => {
-        const clip = await ctx.db.get(clipTopic.clipId);
-        return clip && clip.status === 'published' ? clip : null;
-      }),
-    ),
-    Promise.all(
-      talkTopics.map(async (talkTopic) => {
-        const talk = await ctx.db.get(talkTopic.talkId);
-        return talk && talk.status === 'published' ? talk : null;
-      }),
-    ),
+  // Get related talks and clips via join tables
+  const [allClips, allTalks] = await Promise.all([
+    getManyVia(ctx.db, 'clipsOnTopics', 'clipId', 'by_topic_id', topic._id, 'topicId'),
+    getManyVia(ctx.db, 'talksOnTopics', 'talkId', 'by_topic_id', topic._id, 'topicId'),
   ]);
 
-  // Filter out null results with proper type guards.
-  const talks = talkResults.filter((talk): talk is Doc<'talks'> => Boolean(talk));
-  const clips = clipResults.filter((clip): clip is Doc<'clips'> => Boolean(clip));
+  // Filter for published content only and apply limits
+  const clips = allClips
+    .filter((clip): clip is Doc<'clips'> => clip !== null && clip.status === 'published')
+    .slice(0, limit);
+
+  const talks = allTalks
+    .filter((talk): talk is Doc<'talks'> => talk !== null && talk.status === 'published')
+    .slice(0, limit);
 
   return {
     clips,
