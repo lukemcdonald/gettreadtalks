@@ -59,4 +59,3 @@ export const speakers: Array<{
   { firstName: 'James', lastName: 'White', slug: 'james-white' },
   { firstName: 'Ravi', lastName: 'Zacharias', slug: 'ravi-zacharias' },
 ];
-

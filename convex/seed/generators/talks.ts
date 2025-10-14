@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+
 import type { Id } from '../../_generated/dataModel';
 
 import { scriptureReferences } from '../data/scripture_refs';

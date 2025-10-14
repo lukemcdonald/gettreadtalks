@@ -20,10 +20,10 @@ export const talkFields = {
 
 export const talkTables = {
   talks: defineTable(talkFields)
-    .index('by_collection_id_and_order', ['collectionId', 'collectionOrder'])
-    .index('by_collection_id_and_status', ['collectionId', 'status'])
+    .index('by_collectionId_and_collectionOrder', ['collectionId', 'collectionOrder'])
+    .index('by_collectionId_and_status', ['collectionId', 'status'])
     .index('by_featured_and_status', ['featured', 'status'])
     .index('by_slug', ['slug'])
-    .index('by_speaker_id_and_status', ['speakerId', 'status'])
-    .index('by_status_and_published_at', ['status', 'publishedAt']),
+    .index('by_speakerId_and_status', ['speakerId', 'status'])
+    .index('by_status_and_publishedAt', ['status', 'publishedAt']),
 };

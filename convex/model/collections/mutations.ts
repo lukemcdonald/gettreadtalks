@@ -1,5 +1,6 @@
-import type { MutationCtx } from '../../_generated/server';
 import { getOneFrom } from 'convex-helpers/server/relationships';
+
+import type { MutationCtx } from '../../_generated/server';
 import type { CreateCollectionArgs, DestroyCollectionArgs, UpdateCollectionArgs } from './types';
 
 import { Doc } from '../../_generated/dataModel';
@@ -85,7 +86,7 @@ export async function destroyCollection(ctx: MutationCtx, args: DestroyCollectio
   const talksWithCollection = await getOneFrom(
     ctx.db,
     'talks',
-    'by_collection_id_and_status',
+    'by_collectionId_and_status',
     args.id,
     'collectionId',
   );

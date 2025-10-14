@@ -39,7 +39,7 @@ export async function listUserFavorites(ctx: QueryCtx, args: ListUserFavoritesAr
 export async function getUserFavoriteClips(ctx: QueryCtx, userId: string, limit: number) {
   return await ctx.db
     .query('userFavoriteClips')
-    .withIndex('by_user_and_clip', (q) => q.eq('userId', userId))
+    .withIndex('by_userId_and_clipId', (q) => q.eq('userId', userId))
     .take(limit);
 }
 
@@ -54,7 +54,7 @@ export async function getUserFavoriteClips(ctx: QueryCtx, userId: string, limit:
 export async function getUserFavoriteSpeakers(ctx: QueryCtx, userId: string, limit: number) {
   return await ctx.db
     .query('userFavoriteSpeakers')
-    .withIndex('by_user_and_speaker', (q) => q.eq('userId', userId))
+    .withIndex('by_userId_and_speakerId', (q) => q.eq('userId', userId))
     .take(limit);
 }
 
@@ -69,7 +69,7 @@ export async function getUserFavoriteSpeakers(ctx: QueryCtx, userId: string, lim
 export async function getUserFavoriteTalks(ctx: QueryCtx, userId: string, limit: number) {
   return await ctx.db
     .query('userFavoriteTalks')
-    .withIndex('by_user_and_talk', (q) => q.eq('userId', userId))
+    .withIndex('by_userId_and_talkId', (q) => q.eq('userId', userId))
     .take(limit);
 }
 
@@ -106,7 +106,7 @@ export async function getUserFavorites(ctx: QueryCtx, userId: string, limit: num
 export async function getUserFinishedTalks(ctx: QueryCtx, userId: string, limit: number) {
   return await ctx.db
     .query('userFinishedTalks')
-    .withIndex('by_user', (q) => q.eq('userId', userId))
+    .withIndex('by_userId', (q) => q.eq('userId', userId))
     .order('desc')
     .take(limit);
 }
@@ -146,7 +146,7 @@ export async function isTalkFavorited(ctx: QueryCtx, args: { talkId: Id<'talks'>
 
   const favorite = await ctx.db
     .query('userFavoriteTalks')
-    .withIndex('by_user_and_talk', (q) => q.eq('userId', user._id).eq('talkId', args.talkId))
+    .withIndex('by_userId_and_talkId', (q) => q.eq('userId', user._id).eq('talkId', args.talkId))
     .first();
 
   return favorite !== null;
@@ -168,7 +168,7 @@ export async function isClipFavorited(ctx: QueryCtx, args: { clipId: Id<'clips'>
 
   const favorite = await ctx.db
     .query('userFavoriteClips')
-    .withIndex('by_user_and_clip', (q) => q.eq('userId', user._id).eq('clipId', args.clipId))
+    .withIndex('by_userId_and_clipId', (q) => q.eq('userId', user._id).eq('clipId', args.clipId))
     .first();
 
   return favorite !== null;
@@ -190,7 +190,7 @@ export async function isSpeakerFavorited(ctx: QueryCtx, args: { speakerId: Id<'s
 
   const favorite = await ctx.db
     .query('userFavoriteSpeakers')
-    .withIndex('by_user_and_speaker', (q) =>
+    .withIndex('by_userId_and_speakerId', (q) =>
       q.eq('userId', user._id).eq('speakerId', args.speakerId),
     )
     .first();
@@ -214,7 +214,7 @@ export async function isTalkFinished(ctx: QueryCtx, args: { talkId: Id<'talks'> 
 
   const finished = await ctx.db
     .query('userFinishedTalks')
-    .withIndex('by_user_and_talk', (q) => q.eq('userId', user._id).eq('talkId', args.talkId))
+    .withIndex('by_userId_and_talkId', (q) => q.eq('userId', user._id).eq('talkId', args.talkId))
     .first();
 
   return finished !== null;

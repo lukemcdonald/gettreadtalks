@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+
 import type { Id } from '../../_generated/dataModel';
 
 import { talkTitles } from '../data/talk_titles';

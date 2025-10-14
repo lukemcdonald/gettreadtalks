@@ -1,5 +1,6 @@
+import { getManyFrom, getOneFrom } from 'convex-helpers/server/relationships';
+
 import type { MutationCtx } from '../../_generated/server';
-import { getOneFrom, getManyFrom } from 'convex-helpers/server/relationships';
 import type { CreateSpeakerArgs, DestroySpeakerArgs, UpdateSpeakerArgs } from './types';
 
 import { Doc } from '../../_generated/dataModel';
@@ -90,7 +91,7 @@ export async function destroySpeaker(ctx: MutationCtx, args: DestroySpeakerArgs)
   const talksWithSpeaker = await getOneFrom(
     ctx.db,
     'talks',
-    'by_speaker_id_and_status',
+    'by_speakerId_and_status',
     args.id,
     'speakerId',
   );
@@ -100,14 +101,14 @@ export async function destroySpeaker(ctx: MutationCtx, args: DestroySpeakerArgs)
   }
 
   // Check if speaker is referenced by any clips
-  const clipsWithSpeaker = await getOneFrom(ctx.db, 'clips', 'by_speaker_id', args.id);
+  const clipsWithSpeaker = await getOneFrom(ctx.db, 'clips', 'by_speakerId', args.id);
 
   if (clipsWithSpeaker) {
     throwValidationError('Cannot delete speaker: speaker has associated clips');
   }
 
   // Delete user favorites for this speaker
-  const favorites = await getManyFrom(ctx.db, 'userFavoriteSpeakers', 'by_speaker_id', args.id);
+  const favorites = await getManyFrom(ctx.db, 'userFavoriteSpeakers', 'by_speakerId', args.id);
 
   for (const favorite of favorites) {
     await ctx.db.delete(favorite._id);

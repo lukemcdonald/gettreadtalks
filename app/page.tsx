@@ -1,12 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+
 import { Authenticated, Unauthenticated } from 'convex/react';
 import Link from 'next/link';
 
 import MainLayout from '@/components/layout/main-layout';
-import { useCurrentUser } from '@/lib/features/users/hooks';
 import { useTalks } from '@/lib/features/talks';
+import { useCurrentUser } from '@/lib/features/users/hooks';
 
 export default function Home() {
   return (

@@ -1,4 +1,5 @@
 import type { PaginationOptions } from 'convex/server';
+
 import { getOneFrom } from 'convex-helpers/server/relationships';
 
 import type { QueryCtx } from '../../_generated/server';
@@ -36,7 +37,7 @@ export async function getSpeakerBySlug(ctx: QueryCtx, args: GetSpeakerBySlugArgs
 export async function getSpeakers(ctx: QueryCtx, args: { paginationOpts: PaginationOptions }) {
   return await ctx.db
     .query('speakers')
-    .withIndex('by_last_name')
+    .withIndex('by_lastName')
     .order('asc')
     .paginate(args.paginationOpts);
 }

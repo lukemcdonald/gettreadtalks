@@ -20,7 +20,7 @@ export async function favoriteClip(
 
   const existing = await ctx.db
     .query('userFavoriteClips')
-    .withIndex('by_user_and_clip', (q) => q.eq('userId', userId).eq('clipId', args.clipId))
+    .withIndex('by_userId_and_clipId', (q) => q.eq('userId', userId).eq('clipId', args.clipId))
     .first();
 
   if (existing) {
@@ -50,7 +50,9 @@ export async function favoriteSpeaker(
 
   const existing = await ctx.db
     .query('userFavoriteSpeakers')
-    .withIndex('by_user_and_speaker', (q) => q.eq('userId', userId).eq('speakerId', args.speakerId))
+    .withIndex('by_userId_and_speakerId', (q) =>
+      q.eq('userId', userId).eq('speakerId', args.speakerId),
+    )
     .first();
 
   if (existing) {
@@ -80,7 +82,7 @@ export async function favoriteTalk(
 
   const existing = await ctx.db
     .query('userFavoriteTalks')
-    .withIndex('by_user_and_talk', (q) => q.eq('userId', userId).eq('talkId', args.talkId))
+    .withIndex('by_userId_and_talkId', (q) => q.eq('userId', userId).eq('talkId', args.talkId))
     .first();
 
   if (existing) {
@@ -110,7 +112,7 @@ export async function finishTalk(
 
   const existing = await ctx.db
     .query('userFinishedTalks')
-    .withIndex('by_user_and_talk', (q) => q.eq('userId', userId).eq('talkId', args.talkId))
+    .withIndex('by_userId_and_talkId', (q) => q.eq('userId', userId).eq('talkId', args.talkId))
     .first();
 
   if (existing) {
@@ -140,7 +142,7 @@ export async function unfavoriteClip(
 
   const favorite = await ctx.db
     .query('userFavoriteClips')
-    .withIndex('by_user_and_clip', (q) => q.eq('userId', userId).eq('clipId', args.clipId))
+    .withIndex('by_userId_and_clipId', (q) => q.eq('userId', userId).eq('clipId', args.clipId))
     .first();
 
   if (!favorite) {
@@ -169,7 +171,9 @@ export async function unfavoriteSpeaker(
 
   const favorite = await ctx.db
     .query('userFavoriteSpeakers')
-    .withIndex('by_user_and_speaker', (q) => q.eq('userId', userId).eq('speakerId', args.speakerId))
+    .withIndex('by_userId_and_speakerId', (q) =>
+      q.eq('userId', userId).eq('speakerId', args.speakerId),
+    )
     .first();
 
   if (!favorite) {
@@ -198,7 +202,7 @@ export async function unfavoriteTalk(
 
   const favorite = await ctx.db
     .query('userFavoriteTalks')
-    .withIndex('by_user_and_talk', (q) => q.eq('userId', userId).eq('talkId', args.talkId))
+    .withIndex('by_userId_and_talkId', (q) => q.eq('userId', userId).eq('talkId', args.talkId))
     .first();
 
   if (!favorite) {
@@ -227,7 +231,7 @@ export async function unfinishTalk(
 
   const finished = await ctx.db
     .query('userFinishedTalks')
-    .withIndex('by_user_and_talk', (q) => q.eq('userId', userId).eq('talkId', args.talkId))
+    .withIndex('by_userId_and_talkId', (q) => q.eq('userId', userId).eq('talkId', args.talkId))
     .first();
 
   if (!finished) {

@@ -1,4 +1,5 @@
 import type { PaginationOptions } from 'convex/server';
+
 import { asyncMap } from 'convex-helpers';
 import { getAll, getOneFrom } from 'convex-helpers/server/relationships';
 
@@ -60,7 +61,7 @@ export async function getCollectionsWithStats(
   const enrichedPage = await asyncMap(result.page, async (collection: Doc<'collections'>) => {
     const talks = await ctx.db
       .query('talks')
-      .withIndex('by_collection_id_and_status', (q) =>
+      .withIndex('by_collectionId_and_status', (q) =>
         q.eq('collectionId', collection._id).eq('status', 'published'),
       )
       .collect();
@@ -103,7 +104,7 @@ export async function getCollectionWithTalks(ctx: QueryCtx, args: GetCollectionW
 
   const talks = await ctx.db
     .query('talks')
-    .withIndex('by_collection_id_and_status', (q) =>
+    .withIndex('by_collectionId_and_status', (q) =>
       q.eq('collectionId', collection._id).eq('status', 'published'),
     )
     .take(limit);
@@ -133,7 +134,7 @@ export async function getCollectionWithSpeakers(ctx: QueryCtx, args: { slug: str
 
   const talks = await ctx.db
     .query('talks')
-    .withIndex('by_collection_id_and_status', (q) =>
+    .withIndex('by_collectionId_and_status', (q) =>
       q.eq('collectionId', collection._id).eq('status', 'published'),
     )
     .collect();
@@ -164,7 +165,7 @@ export async function getCollectionsBySpeaker(ctx: QueryCtx, args: { speakerId: 
   // Get all published talks by speaker
   const talks = await ctx.db
     .query('talks')
-    .withIndex('by_speaker_id_and_status', (q) =>
+    .withIndex('by_speakerId_and_status', (q) =>
       q.eq('speakerId', args.speakerId).eq('status', 'published'),
     )
     .collect();

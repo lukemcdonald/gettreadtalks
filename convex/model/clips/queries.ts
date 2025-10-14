@@ -1,5 +1,6 @@
 import type { PaginationOptions } from 'convex/server';
-import { getAll, getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
+
+import { getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
 
 import type { Id } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
@@ -22,7 +23,7 @@ export async function getClips(
   if (status) {
     return await ctx.db
       .query('clips')
-      .withIndex('by_status_and_published_at', (q) => q.eq('status', status))
+      .withIndex('by_status_and_publishedAt', (q) => q.eq('status', status))
       .order('desc')
       .paginate(paginationOpts);
   }
@@ -45,7 +46,7 @@ export async function getClipsBySpeaker(
 
   return await ctx.db
     .query('clips')
-    .withIndex('by_speaker_id_and_status', (q) =>
+    .withIndex('by_speakerId_and_status', (q) =>
       q.eq('speakerId', speakerId).eq('status', 'published'),
     )
     .order('desc')
@@ -72,7 +73,7 @@ export async function getClipBySlugWithRelations(
   const queries = {
     speaker: clip.speakerId ? ctx.db.get(clip.speakerId) : null,
     talk: clip.talkId ? ctx.db.get(clip.talkId) : null,
-    topics: getManyVia(ctx.db, 'clipsOnTopics', 'topicId', 'by_clip_id', clip._id, 'clipId'),
+    topics: getManyVia(ctx.db, 'clipsOnTopics', 'topicId', 'by_clipId', clip._id, 'clipId'),
   };
 
   const [speaker, talk, topics] = await Promise.all([

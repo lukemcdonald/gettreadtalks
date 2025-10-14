@@ -1,5 +1,6 @@
-import type { MutationCtx } from '../../_generated/server';
 import { getOneFrom } from 'convex-helpers/server/relationships';
+
+import type { MutationCtx } from '../../_generated/server';
 import type { CreateTopicArgs, DestroyTopicArgs, UpdateTopicArgs } from './types';
 
 import { Doc, Id } from '../../_generated/dataModel';
@@ -84,26 +85,14 @@ export async function destroyTopic(ctx: MutationCtx, args: DestroyTopicArgs) {
   }
 
   // Check if topic is referenced by any talks
-  const talksWithTopic = await getOneFrom(
-    ctx.db,
-    'talksOnTopics',
-    'by_topic_id',
-    args.id,
-    'topicId',
-  );
+  const talksWithTopic = await getOneFrom(ctx.db, 'talksOnTopics', 'by_topicId', args.id);
 
   if (talksWithTopic) {
     throwValidationError('Cannot delete topic: topic has associated talks');
   }
 
   // Check if topic is referenced by any clips
-  const clipsWithTopic = await getOneFrom(
-    ctx.db,
-    'clipsOnTopics',
-    'by_topic_id',
-    args.id,
-    'topicId',
-  );
+  const clipsWithTopic = await getOneFrom(ctx.db, 'clipsOnTopics', 'by_topicId', args.id);
 
   if (clipsWithTopic) {
     throwValidationError('Cannot delete topic: topic has associated clips');
@@ -143,7 +132,7 @@ export async function addTalkToTopic(
 
   const existing = await ctx.db
     .query('talksOnTopics')
-    .withIndex('by_talk_id_and_topic_id', (q) =>
+    .withIndex('by_talkId_and_topicId', (q) =>
       q.eq('talkId', args.talkId).eq('topicId', args.topicId),
     )
     .unique();
@@ -176,7 +165,7 @@ export async function removeTalkFromTopic(
 
   const association = await ctx.db
     .query('talksOnTopics')
-    .withIndex('by_talk_id_and_topic_id', (q) =>
+    .withIndex('by_talkId_and_topicId', (q) =>
       q.eq('talkId', args.talkId).eq('topicId', args.topicId),
     )
     .first();
@@ -218,7 +207,7 @@ export async function addClipToTopic(
 
   const existing = await ctx.db
     .query('clipsOnTopics')
-    .withIndex('by_clip_id_and_topic_id', (q) =>
+    .withIndex('by_clipId_and_topicId', (q) =>
       q.eq('clipId', args.clipId).eq('topicId', args.topicId),
     )
     .unique();
@@ -251,7 +240,7 @@ export async function removeClipFromTopic(
 
   const association = await ctx.db
     .query('clipsOnTopics')
-    .withIndex('by_clip_id_and_topic_id', (q) =>
+    .withIndex('by_clipId_and_topicId', (q) =>
       q.eq('clipId', args.clipId).eq('topicId', args.topicId),
     )
     .first();

@@ -3,8 +3,8 @@ import { v } from 'convex/values';
 
 import type { Id } from './_generated/dataModel';
 import type { MutationCtx } from './_generated/server';
-import { internalMutation } from './_generated/server';
 
+import { internalMutation } from './_generated/server';
 import { generateClips } from './seed/generators/clips';
 import { generateCollections } from './seed/generators/collections';
 import { generateSpeakers } from './seed/generators/speakers';
@@ -29,7 +29,6 @@ export const seed = internalMutation({
   args: {
     force: v.optional(v.boolean()),
   },
-  returns: v.null(),
   handler: async (ctx, { force = false }) => {
     console.log('🌱 Starting seed process...');
 
@@ -84,6 +83,7 @@ export const seed = internalMutation({
 
     return null;
   },
+  returns: v.null(),
 });
 
 /**
@@ -105,6 +105,7 @@ async function clearAllTables(ctx: MutationCtx): Promise<void> {
   ];
 
   for (const table of tables) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const documents = await ctx.db.query(table as any).collect();
     await Promise.all(documents.map((doc) => ctx.db.delete(doc._id)));
   }

@@ -1,4 +1,5 @@
 import type { PaginationOptions } from 'convex/server';
+
 import { asyncMap } from 'convex-helpers';
 import { getManyFrom, getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
 
@@ -53,7 +54,7 @@ export async function getTalks(
   if (status) {
     return await ctx.db
       .query('talks')
-      .withIndex('by_status_and_published_at', (q) => q.eq('status', status))
+      .withIndex('by_status_and_publishedAt', (q) => q.eq('status', status))
       .order('desc')
       .paginate(paginationOpts);
   }
@@ -105,11 +106,11 @@ export async function getTalkBySlugWithRelations(ctx: QueryCtx, args: GetTalkByS
   const queries = {
     clips: ctx.db
       .query('clips')
-      .withIndex('by_talk_id_and_status', (q) => q.eq('talkId', talk._id).eq('status', 'published'))
+      .withIndex('by_talkId_and_status', (q) => q.eq('talkId', talk._id).eq('status', 'published'))
       .collect(),
     collection: talk.collectionId ? ctx.db.get(talk.collectionId) : null,
     speaker: talk.speakerId ? ctx.db.get(talk.speakerId) : null,
-    topics: getManyVia(ctx.db, 'talksOnTopics', 'topicId', 'by_talk_id', talk._id, 'talkId'),
+    topics: getManyVia(ctx.db, 'talksOnTopics', 'topicId', 'by_talkId', talk._id, 'talkId'),
   };
 
   const [clips, collection, speaker, topics] = await Promise.all([
@@ -143,7 +144,7 @@ export async function getTalksBySpeaker(ctx: QueryCtx, args: ListTalksBySpeakerA
 
   return await ctx.db
     .query('talks')
-    .withIndex('by_speaker_id_and_status', (q) =>
+    .withIndex('by_speakerId_and_status', (q) =>
       q.eq('speakerId', speakerId as Id<'speakers'>).eq('status', 'published'),
     )
     .order('desc')
@@ -162,7 +163,7 @@ export async function getTalksByCollection(ctx: QueryCtx, args: ListTalksByColle
 
   const talks = await ctx.db
     .query('talks')
-    .withIndex('by_collection_id_and_status', (q) =>
+    .withIndex('by_collectionId_and_status', (q) =>
       q.eq('collectionId', collectionId).eq('status', 'published'),
     )
     .take(limit);
@@ -211,7 +212,7 @@ export async function getRandomTalksBySpeaker(
 
   const talks = await ctx.db
     .query('talks')
-    .withIndex('by_speaker_id_and_status', (q) =>
+    .withIndex('by_speakerId_and_status', (q) =>
       q.eq('speakerId', speakerId).eq('status', 'published'),
     )
     .collect();
@@ -237,7 +238,7 @@ export async function getTalksCount(ctx: QueryCtx) {
   const talks = await getManyFrom(
     ctx.db,
     'talks',
-    'by_status_and_published_at',
+    'by_status_and_publishedAt',
     'published',
     'status',
   );

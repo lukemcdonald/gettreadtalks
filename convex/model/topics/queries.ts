@@ -61,13 +61,7 @@ export async function getTopicsWithCount(ctx: QueryCtx, args: { limit?: number }
   const topicsWithCounts = await asyncMap(topics, async (topic) => {
     // Intentionally unbounded: Used only for counting talks per topic
     // TODO: Replace with .count() when available
-    const talkTopics = await getManyFrom(
-      ctx.db,
-      'talksOnTopics',
-      'by_topic_id',
-      topic._id,
-      'topicId',
-    );
+    const talkTopics = await getManyFrom(ctx.db, 'talksOnTopics', 'by_topicId', topic._id);
 
     return {
       count: talkTopics.length,
@@ -97,8 +91,8 @@ export async function getTopicWithContent(ctx: QueryCtx, args: GetTopicWithConte
 
   // Get related talks and clips via join tables
   const [allClips, allTalks] = await Promise.all([
-    getManyVia(ctx.db, 'clipsOnTopics', 'clipId', 'by_topic_id', topic._id, 'topicId'),
-    getManyVia(ctx.db, 'talksOnTopics', 'talkId', 'by_topic_id', topic._id, 'topicId'),
+    getManyVia(ctx.db, 'clipsOnTopics', 'clipId', 'by_topicId', topic._id, 'topicId'),
+    getManyVia(ctx.db, 'talksOnTopics', 'talkId', 'by_topicId', topic._id, 'topicId'),
   ]);
 
   // Filter for published content only and apply limits

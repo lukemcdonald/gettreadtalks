@@ -24,39 +24,39 @@ export default defineSchema({
     clipId: v.id('clips'),
     topicId: v.id('topics'),
   })
-    .index('by_clip_id', ['clipId'])
-    .index('by_clip_id_and_topic_id', ['clipId', 'topicId'])
-    .index('by_topic_id', ['topicId']),
+    .index('by_clipId', ['clipId'])
+    .index('by_clipId_and_topicId', ['clipId', 'topicId'])
+    .index('by_topicId', ['topicId']),
 
   talksOnTopics: defineTable({
     talkId: v.id('talks'),
     topicId: v.id('topics'),
   })
-    .index('by_talk_id', ['talkId'])
-    .index('by_talk_id_and_topic_id', ['talkId', 'topicId'])
-    .index('by_topic_id', ['topicId']),
+    .index('by_talkId', ['talkId'])
+    .index('by_talkId_and_topicId', ['talkId', 'topicId'])
+    .index('by_topicId', ['topicId']),
 
   userFavoriteClips: defineTable({
     clipId: v.id('clips'),
     userId: v.string(),
-  }).index('by_user_and_clip', ['userId', 'clipId']),
+  }).index('by_userId_and_clipId', ['userId', 'clipId']),
 
   userFavoriteSpeakers: defineTable({
     speakerId: v.id('speakers'),
     userId: v.string(),
   })
-    .index('by_speaker_id', ['speakerId'])
-    .index('by_user_and_speaker', ['userId', 'speakerId']),
+    .index('by_speakerId', ['speakerId'])
+    .index('by_userId_and_speakerId', ['userId', 'speakerId']),
 
   userFavoriteTalks: defineTable({
     talkId: v.id('talks'),
     userId: v.string(),
-  }).index('by_user_and_talk', ['userId', 'talkId']),
+  }).index('by_userId_and_talkId', ['userId', 'talkId']),
 
   userFinishedTalks: defineTable({
     talkId: v.id('talks'),
     userId: v.string(),
   })
-    .index('by_user', ['userId'])
-    .index('by_user_and_talk', ['userId', 'talkId']),
+    .index('by_userId', ['userId'])
+    .index('by_userId_and_talkId', ['userId', 'talkId']),
 });

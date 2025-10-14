@@ -19,6 +19,6 @@ export const speakerFields = {
 export const speakerTables = {
   speakers: defineTable(speakerFields)
     .index('by_featured', ['featured'])
-    .index('by_last_name', ['lastName'])
+    .index('by_lastName', ['lastName'])
     .index('by_slug', ['slug']),
 };

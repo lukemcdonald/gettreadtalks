@@ -11,7 +11,7 @@ type Options = {
 export function useTalks(options: Options = {}) {
   const { pageSize = 12 } = options;
 
-  const { results, status, loadMore } = usePaginatedQuery(
+  const { loadMore, results, status } = usePaginatedQuery(
     api.talks.list,
     {},
     { initialNumItems: pageSize },
