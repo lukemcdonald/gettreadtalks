@@ -3,6 +3,6 @@
 import { api } from '@/convex/_generated/api';
 import { useMutation } from '@/lib/hooks';
 
-export function useRemoveFavoriteSpeaker() {
-  return useMutation(api.users.removeFavoriteSpeaker);
+export function useFavoriteSpeaker() {
+  return useMutation(api.users.favoriteSpeaker);
 }

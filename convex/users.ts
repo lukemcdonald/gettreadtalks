@@ -58,68 +58,68 @@ export const listFinishedTalks = query({
 // MUTATIONS
 // ============================================
 
-export const addFavoriteClip = mutation({
-  args: validators.addFavoriteClipArgs,
+export const favoriteClip = mutation({
+  args: validators.favoriteClipArgs,
   handler: async (ctx, args) => {
-    return await mutations.addUserFavoriteClip(ctx, args);
+    return await mutations.favoriteClip(ctx, args);
   },
-  returns: validators.addFavoriteClipReturns,
+  returns: validators.favoriteClipReturns,
 });
 
-export const addFavoriteSpeaker = mutation({
-  args: validators.addFavoriteSpeakerArgs,
+export const favoriteSpeaker = mutation({
+  args: validators.favoriteSpeakerArgs,
   handler: async (ctx, args) => {
-    return await mutations.addUserFavoriteSpeaker(ctx, args);
+    return await mutations.favoriteSpeaker(ctx, args);
   },
-  returns: validators.addFavoriteSpeakerReturns,
+  returns: validators.favoriteSpeakerReturns,
 });
 
-export const addFavoriteTalk = mutation({
-  args: validators.addFavoriteTalkArgs,
+export const favoriteTalk = mutation({
+  args: validators.favoriteTalkArgs,
   handler: async (ctx, args) => {
-    return await mutations.addUserFavoriteTalk(ctx, args);
+    return await mutations.favoriteTalk(ctx, args);
   },
-  returns: validators.addFavoriteTalkReturns,
+  returns: validators.favoriteTalkReturns,
 });
 
-export const addFinishedTalk = mutation({
-  args: validators.addFinishedTalkArgs,
+export const finishTalk = mutation({
+  args: validators.finishTalkArgs,
   handler: async (ctx, args) => {
-    return await mutations.addUserFinishedTalk(ctx, args);
+    return await mutations.finishTalk(ctx, args);
   },
-  returns: validators.addFinishedTalkReturns,
+  returns: validators.finishTalkReturns,
 });
 
-export const removeFavoriteClip = mutation({
-  args: validators.removeFavoriteClipArgs,
+export const unfavoriteClip = mutation({
+  args: validators.unfavoriteClipArgs,
   handler: async (ctx, args) => {
-    return await mutations.removeUserFavoriteClip(ctx, args);
+    return await mutations.unfavoriteClip(ctx, args);
   },
-  returns: validators.removeFavoriteClipReturns,
+  returns: validators.unfavoriteClipReturns,
 });
 
-export const removeFavoriteSpeaker = mutation({
-  args: validators.removeFavoriteSpeakerArgs,
+export const unfavoriteSpeaker = mutation({
+  args: validators.unfavoriteSpeakerArgs,
   handler: async (ctx, args) => {
-    return await mutations.removeUserFavoriteSpeaker(ctx, args);
+    return await mutations.unfavoriteSpeaker(ctx, args);
   },
-  returns: validators.removeFavoriteSpeakerReturns,
+  returns: validators.unfavoriteSpeakerReturns,
 });
 
-export const removeFavoriteTalk = mutation({
-  args: validators.removeFavoriteTalkArgs,
+export const unfavoriteTalk = mutation({
+  args: validators.unfavoriteTalkArgs,
   handler: async (ctx, args) => {
-    return await mutations.removeUserFavoriteTalk(ctx, args);
+    return await mutations.unfavoriteTalk(ctx, args);
   },
-  returns: validators.removeFavoriteTalkReturns,
+  returns: validators.unfavoriteTalkReturns,
 });
 
-export const removeFinishedTalk = mutation({
-  args: validators.removeFinishedTalkArgs,
+export const unfinishTalk = mutation({
+  args: validators.unfinishTalkArgs,
   handler: async (ctx, args) => {
-    return await mutations.removeUserFinishedTalk(ctx, args);
+    return await mutations.unfinishTalk(ctx, args);
   },
-  returns: validators.removeFinishedTalkReturns,
+  returns: validators.unfinishTalkReturns,
 });
 
 export const updatePassword = mutation({

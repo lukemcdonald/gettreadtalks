@@ -4,23 +4,23 @@ import { v } from 'convex/values';
 // FAVORITES
 // ============================================
 
-export const addFavoriteClipArgs = {
+export const favoriteClipArgs = {
   clipId: v.id('clips'),
 };
 
-export const addFavoriteClipReturns = v.id('userFavoriteClips');
+export const favoriteClipReturns = v.id('userFavoriteClips');
 
-export const addFavoriteSpeakerArgs = {
+export const favoriteSpeakerArgs = {
   speakerId: v.id('speakers'),
 };
 
-export const addFavoriteSpeakerReturns = v.id('userFavoriteSpeakers');
+export const favoriteSpeakerReturns = v.id('userFavoriteSpeakers');
 
-export const addFavoriteTalkArgs = {
+export const favoriteTalkArgs = {
   talkId: v.id('talks'),
 };
 
-export const addFavoriteTalkReturns = v.id('userFavoriteTalks');
+export const favoriteTalkReturns = v.id('userFavoriteTalks');
 
 export const listUserFavoritesArgs = {
   limit: v.optional(v.number()),
@@ -47,23 +47,50 @@ export const listUserFavoritesReturns = v.object({
   ),
 });
 
-export const removeFavoriteClipArgs = {
+export const unfavoriteClipArgs = {
   clipId: v.id('clips'),
 };
 
-export const removeFavoriteClipReturns = v.null();
+export const unfavoriteClipReturns = v.null();
 
-export const removeFavoriteSpeakerArgs = {
+export const unfavoriteSpeakerArgs = {
   speakerId: v.id('speakers'),
 };
 
-export const removeFavoriteSpeakerReturns = v.null();
+export const unfavoriteSpeakerReturns = v.null();
 
-export const removeFavoriteTalkArgs = {
+export const unfavoriteTalkArgs = {
   talkId: v.id('talks'),
 };
 
-export const removeFavoriteTalkReturns = v.null();
+export const unfavoriteTalkReturns = v.null();
+
+// ============================================
+// FINISHED TALKS
+// ============================================
+
+export const finishTalkArgs = {
+  talkId: v.id('talks'),
+};
+
+export const finishTalkReturns = v.id('userFinishedTalks');
+
+export const listUserFinishedTalksArgs = {
+  limit: v.optional(v.number()),
+};
+
+export const listUserFinishedTalksReturns = v.array(
+  v.object({
+    talkId: v.id('talks'),
+    userId: v.string(),
+  }),
+);
+
+export const unfinishTalkArgs = {
+  talkId: v.id('talks'),
+};
+
+export const unfinishTalkReturns = v.null();
 
 // ============================================
 // STATUS CHECKS
@@ -92,33 +119,6 @@ export const isTalkFinishedArgs = {
 };
 
 export const isTalkFinishedReturns = v.boolean();
-
-// ============================================
-// FINISHED TALKS
-// ============================================
-
-export const addFinishedTalkArgs = {
-  talkId: v.id('talks'),
-};
-
-export const addFinishedTalkReturns = v.id('userFinishedTalks');
-
-export const listUserFinishedTalksArgs = {
-  limit: v.optional(v.number()),
-};
-
-export const listUserFinishedTalksReturns = v.array(
-  v.object({
-    talkId: v.id('talks'),
-    userId: v.string(),
-  }),
-);
-
-export const removeFinishedTalkArgs = {
-  talkId: v.id('talks'),
-};
-
-export const removeFinishedTalkReturns = v.null();
 
 // ============================================
 // PASSWORD

@@ -17,18 +17,25 @@ globs: **/*.ts,**/*.tsx
 - Boolean checks: `useIsItemFavorited(itemId)`
 - Special queries: `useFeaturedItems()`, `useItemsCount()`
 
-**Mutations (writes)** - Use verb prefix + entity:
+**Mutations (writes)** - Use single action verb + entity:
 
 ```ts
-// Mutations - Use appropriate semantic verb
+// CRUD operations
 export function useArchiveItem(); // Soft delete (set status to 'archived')
 export function useCreateItem(); // Create new
 export function useDestroyItem(); // Hard delete (permanent removal from DB)
-export function useRemoveItem(); // Remove from association/list (non-destructive)
 export function useUpdateItem(); // Update existing
 export function useUpdateItemStatus(); // Update specific status field
-export function useAddFavoriteItem(); // Add to favorites (join table operation)
-export function useRemoveFavoriteItem(); // Remove from favorites (join table operation)
+
+// User actions (single natural verb)
+export function useFavoriteItem(); // User favorites something
+export function useUnfavoriteItem(); // User unfavorites something
+export function useFinishItem(); // User completes something
+export function useUnfinishItem(); // User uncompletes something
+
+// Structural relationships (no natural verb)
+export function useAddToCollection(); // Generic association
+export function useRemoveFromCollection(); // Generic disassociation
 ```
 
 ### Naming Principles
@@ -38,6 +45,32 @@ export function useRemoveFavoriteItem(); // Remove from favorites (join table op
 - Mirror backend API conventions for consistency
 - Use `useCurrent*` pattern for authenticated/context-based data
 
+### Deletion vs Removal: Critical Distinction
+
+**Deletion** - Removes the entity from the database:
+
+```ts
+// Hard delete - permanent removal from database
+export function useDestroyItem();
+
+// Soft delete - set status field (item still exists in DB)
+export function useArchiveItem();
+```
+
+**Removal** - Breaks a relationship, entity remains:
+
+```ts
+// ✅ Good - always specify "from X"
+export function useRemoveFromCollection();
+export function useRemoveItemFromCategory();
+
+// ❌ Bad - ambiguous, remove from what?
+export function useRemoveItem();
+```
+
+**Rule:** `remove` must always include "from X" to clarify you're breaking a relationship, not
+deleting the entity. Never use standalone `remove` without specifying the relationship being broken.
+
 ### Query Hook Return Pattern
 
 All query hooks return a consistent object shape for familiarity and destructuring:
@@ -45,7 +78,7 @@ All query hooks return a consistent object shape for familiarity and destructuri
 ```ts
 // Single item hook
 export function useItem(id: string) {
-  const data = useQuery(api.items.get, { id });
+  const data = useQuery(/* your backend query */, { id });
 
   return {
     data,
@@ -73,7 +106,7 @@ return <div>{item.title}</div>;
 ```ts
 // Returns single item or null
 export function useItem(id: string) {
-  const data = useQuery(api.items.get, { id });
+  const data = useQuery(/* your backend query */, { id });
   return {
     data,
     isLoading: data === undefined,
@@ -83,7 +116,7 @@ export function useItem(id: string) {
 
 // Returns array (never null)
 export function useItems(limit?: number) {
-  const data = useQuery(api.items.list, { limit });
+  const data = useQuery(/* your backend query */, { limit });
   return {
     data: data ?? [],
     isLoading: data === undefined,
@@ -92,7 +125,7 @@ export function useItems(limit?: number) {
 
 // Returns boolean
 export function useIsItemFavorited(itemId: string) {
-  const data = useQuery(api.users.isItemFavorited, { itemId });
+  const data = useQuery(/* your backend query */, { itemId });
   return {
     data: data ?? false,
     isLoading: data === undefined,
@@ -101,7 +134,7 @@ export function useIsItemFavorited(itemId: string) {
 
 // Returns number
 export function useItemsCount() {
-  const data = useQuery(api.items.getCount);
+  const data = useQuery(/* your backend query */);
   return {
     data: data ?? 0,
     isLoading: data === undefined,
@@ -115,7 +148,7 @@ export function useItemsCount() {
 
 ```ts
 export function useCreateItem() {
-  return useMutation(api.items.create);
+  return useMutation(/* your backend mutation */);
 }
 
 // Usage
@@ -123,18 +156,19 @@ const createItem = useCreateItem();
 await createItem({ title: 'New Item' });
 ```
 
-**With error handling** - Use `useMutationWithErrorHandling` for automatic error reporting:
+**With error handling** - Use custom error handling wrapper if needed:
 
 ```ts
 import { useMutationWithErrorHandling } from '@/lib/services/errors';
 
 // In component
-const { mutate, isLoading, error } = useMutationWithErrorHandling(api.items.create, {
-  onSuccess: () => router.push('/items'),
-});
+const { mutate, isLoading, error } = useMutationWithErrorHandling(
+  /* your backend mutation */,
+  {
+    onSuccess: () => router.push('/items'),
+  }
+);
 ```
-
-Reference: See `error-handling.mdc` for complete mutation error handling patterns.
 
 ### Composite Hooks
 
@@ -174,13 +208,13 @@ const { data, isLoading, notFound, relatedItems } = useItemDetailPage(id);
 
 ### Loading States
 
-Per Convex best practices, check for `undefined` internally to determine loading state. Hooks wrap
-this check into an explicit `isLoading` property to provide a familiar React Query-style API.
+Check for `undefined` to determine loading state. Hooks wrap this check into an explicit `isLoading`
+property to provide a familiar React Query-style API.
 
 ```ts
 // Hook implementation
 export function useItem(id: string) {
-  const data = useQuery(api.items.get, { id });
+  const data = useQuery(/* your backend query */, { id });
   return {
     data,
     isLoading: data === undefined, // undefined = still loading
@@ -191,9 +225,6 @@ export function useItem(id: string) {
 // Component usage
 const { data, isLoading, notFound } = useItem(id);
 ```
-
-Reference:
-[Convex UI Patterns](https://docs.convex.dev/understanding/best-practices/other-recommendations#ui-patterns)
 
 ## Feature Queries (Server)
 
@@ -222,12 +253,167 @@ Use clear verb prefixes to indicate the operation:
 
 ```ts
 // actions.ts - Server writes
+
+// CRUD operations
 export async function archiveItem(id); // Soft delete (set status to 'archived')
 export async function createItem(data); // Create new
 export async function destroyItem(id); // Hard delete (permanent removal from DB)
-export async function publishItem(id); // Specific status action
-export async function removeItem(id); // Remove from association/list (non-destructive)
 export async function updateItem(id, data); // Update existing
+
+// Status changes
+export async function publishItem(id); // Specific status action
+
+// Relationship management (always specify "from X")
+export async function removeItemFromCategory(itemId, categoryId);
+export async function removeFromCollection(itemId, collectionId);
+```
+
+**Note:** Never use standalone `removeItem()` - always specify what you're removing from to
+distinguish from deletion.
+
+## Mutation Naming: Single Verb Principle
+
+### Core Rule: Start with ONE Action Verb
+
+Mutation names should begin with **one verb** that describes the user action or system operation,
+not multiple verbs that reveal implementation details.
+
+**Pattern**: `verb + Entity`
+
+### Why This Matters
+
+```ts
+// ❌ Two verbs - reveals implementation, not intent
+export const addFavoriteItem = mutation(...)
+// "add" = implementation (adding to database table)
+// "favorite" = user intent (what user is actually doing)
+
+// ✅ One verb - expresses user intent directly
+export const favoriteItem = mutation(...)
+// "favorite" = the action user takes
+```
+
+**Benefits of single verb naming:**
+
+- Clear intent - one verb = one clear action
+- Better naming - matches how users think about the action
+- No implementation leak - hides database structure
+- Shorter names - `favoriteItem` vs `addFavoriteItem`
+
+### Natural Action Verbs (User Intent)
+
+Use the natural verb when users have a semantic action:
+
+```ts
+// User-initiated actions
+export const favorite = mutation(...)    // User favorites something
+export const unfavorite = mutation(...)  // User unfavorites something
+export const finish = mutation(...)      // User completes something
+export const unfinish = mutation(...)    // User uncompletes something
+export const follow = mutation(...)      // User follows someone
+export const unfollow = mutation(...)    // User unfollows someone
+export const subscribe = mutation(...)   // User subscribes
+export const unsubscribe = mutation(...) // User unsubscribes
+export const bookmark = mutation(...)    // User bookmarks content
+export const unbookmark = mutation(...)  // User removes bookmark
+```
+
+### Structural Relationships (No Semantic Meaning)
+
+Use `add`/`remove` for generic associations without user-facing meaning:
+
+```ts
+// Generic join table operations
+export const addToCollection = mutation(...)        // No natural verb
+export const removeFromCollection = mutation(...)   // Generic association
+export const addItemToCategory = mutation(...)      // Join table operation
+export const removeItemFromCategory = mutation(...) // No user-facing concept
+```
+
+### Decision Tree
+
+```
+Does the action have a natural user-facing verb?
+├─ Yes → Use that verb
+│   └─ Examples: favorite, follow, finish, subscribe
+└─ No → Use add/remove
+    └─ Examples: addToCollection, removeFromCollection
+
+Ask yourself: "How would a user describe this action?"
+├─ "I favorited this item" → favoriteItem ✓
+├─ "I finished this task" → finishTask ✓
+└─ "I added item to category" → addItemToCategory ✓ (no simpler verb)
+```
+
+### Examples by Context
+
+**Users Domain** - Rich with natural verbs:
+
+```ts
+// User-initiated actions with clear intent
+export const favoriteItem = mutation(...)
+export const unfavoriteItem = mutation(...)
+export const followUser = mutation(...)
+export const unfollowUser = mutation(...)
+export const finishTask = mutation(...)
+export const unfinishTask = mutation(...)
+export const bookmarkArticle = mutation(...)
+export const unbookmarkArticle = mutation(...)
+```
+
+**Other Domains** - Often structural:
+
+```ts
+// collections.ts - Structural relationships
+export const addItemToCollection = mutation(...)    // No natural verb
+export const removeItemFromCollection = mutation(...) // Structural
+
+// categories.ts - Join table operations
+export const addItemToCategory = mutation(...)    // Generic association
+export const removeItemFromCategory = mutation(...) // Join table
+```
+
+### Common Pitfalls
+
+```ts
+// ❌ Multiple verbs revealing implementation
+export const addFavorite = mutation(...)     // "add" + implicit "favorite"
+export const removeFavorite = mutation(...)  // "remove" + implicit "favorite"
+export const addFinished = mutation(...)     // "add" + implied "finished status"
+export const removeFinished = mutation(...) // "remove" + implied status
+
+// ✅ Single natural verb
+export const favorite = mutation(...)
+export const unfavorite = mutation(...)
+export const finish = mutation(...)
+export const unfinish = mutation(...)
+```
+
+### Complete Pattern
+
+**Backend**:
+
+```ts
+// Example mutation definition
+export const favoriteItem = mutation({
+  args: { itemId: v.id('items') },
+  handler: async (ctx, args) => {
+    // Implementation
+  },
+});
+```
+
+**Frontend (React)**:
+
+```ts
+// Hook wraps backend mutation
+export function useFavoriteItem() {
+  return useMutation(/* your backend mutation */);
+}
+
+// Component usage
+const favoriteItem = useFavoriteItem();
+await favoriteItem({ itemId: '123' });
 ```
 
 ## Service Functions
@@ -324,8 +510,13 @@ export const authConfig = {
 
 ## File Naming
 
-**Note:** For complete file structure patterns, see `architecture.mdc` and
-`architecture-component.mdc`.
+Use kebab-case for all files:
+
+```
+item-card.tsx
+use-items.ts
+item-service.ts
+```
 
 ## Best Practices
 
