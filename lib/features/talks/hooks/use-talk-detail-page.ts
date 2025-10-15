@@ -12,20 +12,22 @@ import { useTalksBySpeaker } from './use-talks-by-speaker';
  * Combines talk data, favorite status, and related talks with unified loading state.
  */
 export function useTalkDetailPage(slug: string) {
-  const { data: talk, isLoading: talkLoading } = useTalkBySlug(slug);
+  const { data: talkData, isLoading: talkLoading } = useTalkBySlug(slug);
 
-  const { data: isFavorited } = useIsTalkFavorited(talk?._id ? talk._id : ('skip' as Id<'talks'>));
+  const { data: isFavorited } = useIsTalkFavorited(
+    talkData?.talk?._id ? talkData.talk._id : ('skip' as Id<'talks'>),
+  );
 
   const { data: relatedTalks } = useTalksBySpeaker(
-    talk?.speakerId ? talk.speakerId : ('skip' as Id<'speakers'>),
+    talkData?.talk?.speakerId ? talkData.talk.speakerId : ('skip' as Id<'speakers'>),
     3,
   );
 
   return {
-    data: talk,
+    data: talkData,
     isFavorited,
     isLoading: talkLoading,
-    notFound: talk === null,
+    notFound: talkData === null,
     relatedTalks,
   };
 }
