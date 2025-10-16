@@ -8,8 +8,8 @@ type Options = {
   pageSize?: number;
 };
 
-export function useTalks(options: Options = {}) {
-  const { pageSize = 12 } = options;
+export function useTalks(options: Options) {
+  const { pageSize = 12 } = options ?? {};
 
   const { loadMore, results, status } = usePaginatedQuery(
     api.talks.list,

@@ -33,8 +33,12 @@ export const createAuth = (
       nextCookies(), // Add nextCookies as the last plugin for automatic cookie handling
     ],
     secret: process.env.BETTER_AUTH_SECRET!,
-    // TODO: Is trustedOrigins needed? Use env variables instead?
-    trustedOrigins: ['http://localhost:3000', 'https://academic-reindeer-888.convex.site'],
+    trustedOrigins: [
+      'http://localhost:3000',
+      'https://*.vercel.app',
+      'https://gettreadtalks.com',
+      'https://www.gettreadtalks.com',
+    ],
     // disable logging when createAuth is called just to generate options.
     // this is not required, but there's a lot of noise in logs without it.
     logger: {
