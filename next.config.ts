@@ -2,6 +2,8 @@ import type { NextConfig } from 'next';
 
 import { withSentryConfig } from '@sentry/nextjs';
 
+import { IS_SENTRY_ENABLED } from './lib/config/sentry';
+
 const cspHeader = `
   base-uri 'self';
   connect-src 'self' https://*.convex.cloud wss://*.convex.cloud;
@@ -33,8 +35,10 @@ const nextConfig: NextConfig = {
   },
 };
 
-// Wrap with Sentry configuration if Sentry DSN is provided
-const config = process.env.NEXT_PUBLIC_SENTRY_DSN
+
+
+// Wrap with Sentry configuration if Sentry is enabled
+const config = IS_SENTRY_ENABLED
   ? withSentryConfig(nextConfig, {
       // For all available options, see:
       // https://www.npmjs.com/package/@sentry/webpack-plugin#options

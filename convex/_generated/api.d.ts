@@ -14,6 +14,7 @@ import type * as clips from "../clips.js";
 import type * as collections from "../collections.js";
 import type * as http from "../http.js";
 import type * as lib_errors from "../lib/errors.js";
+import type * as lib_sentry from "../lib/sentry.js";
 import type * as lib_utils from "../lib/utils.js";
 import type * as lib_validators from "../lib/validators.js";
 import type * as model_affiliateLinks_index from "../model/affiliateLinks/index.js";
@@ -90,6 +91,7 @@ declare const fullApi: ApiFromModules<{
   collections: typeof collections;
   http: typeof http;
   "lib/errors": typeof lib_errors;
+  "lib/sentry": typeof lib_sentry;
   "lib/utils": typeof lib_utils;
   "lib/validators": typeof lib_validators;
   "model/affiliateLinks/index": typeof model_affiliateLinks_index;
