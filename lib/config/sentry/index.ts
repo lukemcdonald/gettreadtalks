@@ -1,4 +1,4 @@
-import { APP_ENV, IS_DEV } from '@/lib/constants';
+import { APP_ENV, IS_DEV } from '../../constants';
 
 /**
  * Sentry control
