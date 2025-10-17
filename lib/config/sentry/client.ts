@@ -1,7 +1,6 @@
 import * as Sentry from '@sentry/nextjs';
 
 import { IS_DEV } from '../../constants';
-
 import { baseSentryConfig } from './index';
 
 Sentry.init({
