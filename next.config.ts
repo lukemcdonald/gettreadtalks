@@ -36,10 +36,23 @@ const nextConfig: NextConfig = {
 // Wrap with Sentry configuration if Sentry DSN is provided
 const config = process.env.NEXT_PUBLIC_SENTRY_DSN
   ? withSentryConfig(nextConfig, {
+      // For all available options, see:
+      // https://www.npmjs.com/package/@sentry/webpack-plugin#options
       authToken: process.env.SENTRY_AUTH_TOKEN,
-      org: process.env.SENTRY_ORG,
-      project: process.env.SENTRY_PROJECT,
+      org: process.env.SENTRY_ORG || 'thelukemcdonald',
+      project: process.env.SENTRY_PROJECT || 'gettreadtalks',
+
+      // Only print logs for uploading source maps in CI
       silent: !process.env.CI,
+
+      // Upload a larger set of source maps for prettier stack traces (increases build time)
+      widenClientFileUpload: true,
+
+      // Automatically tree-shake Sentry logger statements to reduce bundle size
+      disableLogger: true,
+
+      // Enables automatic instrumentation of Vercel Cron Monitors
+      automaticVercelMonitors: true,
     })
   : nextConfig;
 

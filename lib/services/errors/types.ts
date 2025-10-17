@@ -1,12 +1,10 @@
 /**
  * Severity levels for errors and breadcrumbs, matching Sentry's severity levels.
- * Ordered from most to least severe.
  */
 export type SeverityLevel = 'fatal' | 'error' | 'warning' | 'log' | 'info' | 'debug';
 
 /**
  * Mutation status enum, similar to React Query/TanStack Query pattern.
- * Single source of truth for mutation state.
  */
 export type MutationStatus = 'idle' | 'loading' | 'success' | 'error';
 
@@ -79,9 +77,19 @@ export interface MutationResult<TData = unknown> {
  * Options for error reporting to Sentry.
  */
 export interface ErrorReportOptions {
+  /** Structured context data (appears in separate section in Sentry) */
   context?: ErrorContext;
+  /** Additional unstructured data (appears as Extra Data in Sentry) */
+  extras?: Record<string, unknown>;
+  /** Custom fingerprint for error grouping in Sentry */
+  fingerprint?: string[];
+  /** Severity level (fatal, error, warning, log, info, debug) */
   level?: SeverityLevel;
+  /** Tags for filtering and categorization */
   tags?: Record<string, string>;
+  /** Transaction name for better error organization */
+  transactionName?: string;
+  /** User information to associate with the error */
   user?: {
     email?: string;
     id?: string;
