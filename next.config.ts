@@ -6,7 +6,7 @@ import { IS_SENTRY_ENABLED } from './lib/config/sentry';
 
 const cspHeader = `
   base-uri 'self';
-  connect-src 'self' https://*.convex.cloud wss://*.convex.cloud;
+  connect-src 'self' https://*.convex.cloud wss://*.convex.cloud https://*.sentry.io https://*.ingest.us.sentry.io;
   default-src 'self';
   font-src 'self' data:;
   form-action 'self';
@@ -16,6 +16,7 @@ const cspHeader = `
   object-src 'none';
   script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live;
   style-src 'self' 'unsafe-inline';
+  worker-src 'self' blob:;
   upgrade-insecure-requests;
 `;
 
@@ -35,16 +36,14 @@ const nextConfig: NextConfig = {
   },
 };
 
-
-
 // Wrap with Sentry configuration if Sentry is enabled
 const config = IS_SENTRY_ENABLED
   ? withSentryConfig(nextConfig, {
       // For all available options, see:
       // https://www.npmjs.com/package/@sentry/webpack-plugin#options
       authToken: process.env.SENTRY_AUTH_TOKEN,
-      org: process.env.SENTRY_ORG || 'thelukemcdonald',
-      project: process.env.SENTRY_PROJECT || 'gettreadtalks',
+      org: process.env.SENTRY_ORG,
+      project: process.env.SENTRY_PROJECT,
 
       // Only print logs for uploading source maps in CI
       silent: !process.env.CI,

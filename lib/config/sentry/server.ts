@@ -1,11 +1,11 @@
 import * as Sentry from '@sentry/nextjs';
 
-import { IS_DEV } from '../../constants';
+import { IS_PROD } from '../../constants';
 import { baseSentryConfig } from './index';
 
 Sentry.init({
   ...baseSentryConfig,
 
   // Server-specific profiling
-  profilesSampleRate: IS_DEV ? 1.0 : 0.1,
+  profilesSampleRate: IS_PROD ? 0.1 : 1.0,
 });

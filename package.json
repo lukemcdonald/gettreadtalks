@@ -7,7 +7,7 @@
     "dev": "npm-run-all --parallel dev:frontend dev:backend dev:open",
     "dev:backend": "convex dev",
     "dev:frontend": "next dev --turbopack",
-    "dev:open": "wait-on http://localhost:3000 && convex dashboard && open http://localhost:3000",
+    "dev:open": "wait-on http://localhost:3000 && open http://localhost:3000",
     "format": "prettier ./app ./components ./convex ./lib",
     "format:fix": "prettier ./app ./components ./convex ./lib --write --ignore-unknown",
     "lint": "eslint .",
