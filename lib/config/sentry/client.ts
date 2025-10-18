@@ -5,6 +5,7 @@ import { baseSentryConfig } from './index';
 
 Sentry.init({
   ...baseSentryConfig,
+  attachStacktrace: true,
   integrations: [
     Sentry.browserTracingIntegration({
       enableInp: true,
@@ -15,5 +16,17 @@ Sentry.init({
     }),
   ],
   replaysOnErrorSampleRate: 1.0,
-  replaysSessionSampleRate: IS_PROD ? 0.5 : 0.1,
+  replaysSessionSampleRate: IS_PROD ? 0.1 : 1.0,
+
+  // Add useful debugging context
+  beforeSend(event) {
+    if (event.exception) {
+      event.extra = {
+        ...event.extra,
+        referrer: document.referrer || 'direct',
+        connectionType: (navigator as any).connection?.effectiveType || 'unknown',
+      };
+    }
+    return event;
+  },
 });

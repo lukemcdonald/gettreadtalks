@@ -23,6 +23,8 @@ export const IS_SENTRY_ENABLED = SENTRY_ENABLED && !!SENTRY_DSN;
 export const baseSentryConfig = {
   debug: SENTRY_DEBUG,
   dsn: SENTRY_DSN,
+  // Explicitly set environment to override any auto-detection by Vercel
+  // This ensures we use our standardized names: local, dev, preview, prod
   environment: APP_ENV,
   initialScope: {
     tags: {

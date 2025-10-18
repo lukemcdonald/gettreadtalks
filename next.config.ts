@@ -3,6 +3,7 @@ import type { NextConfig } from 'next';
 import { withSentryConfig } from '@sentry/nextjs';
 
 import { IS_SENTRY_ENABLED } from './lib/config/sentry';
+import { IS_PROD } from '@/lib/constants/env';
 
 const cspHeader = `
   base-uri 'self';
@@ -52,10 +53,19 @@ const config = IS_SENTRY_ENABLED
       widenClientFileUpload: true,
 
       // Automatically tree-shake Sentry logger statements to reduce bundle size
-      disableLogger: true,
+      disableLogger: IS_PROD,
 
       // Enables automatic instrumentation of Vercel Cron Monitors
       automaticVercelMonitors: true,
+
+      // Enhanced source map configuration for better debugging
+      // See: https://docs.sentry.io/platforms/javascript/guides/nextjs/sourcemaps/
+      sourcemaps: {
+        disable: false, // Source maps are enabled by default
+        assets: ["**/*.js", "**/*.js.map"], // Specify which files to upload
+        ignore: ["**/node_modules/**"], // Files to exclude
+        deleteSourcemapsAfterUpload: true, // Security: delete after upload
+      },
     })
   : nextConfig;
 
