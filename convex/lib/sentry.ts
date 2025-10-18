@@ -28,16 +28,16 @@ export interface ErrorContext {
   error_severity?: 'low' | 'medium' | 'high' | 'critical';
 
   // User context
-  user_role?: string;
   is_authenticated?: boolean;
+  user_role?: string;
 
   // Business context
-  entity_status?: string;
   batch_size?: number;
+  entity_status?: string;
 
   // Performance context
-  is_slow_query?: boolean;
   duration_ms?: number;
+  is_slow_query?: boolean;
 }
 
 /**
@@ -55,6 +55,7 @@ export function enhanceError(error: Error, context: ErrorContext): Error {
   // Store context as error properties (Convex will forward to Sentry)
   Object.entries(context).forEach(([key, value]) => {
     if (value !== undefined) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (error as any)[`tag_${key}`] = value;
     }
   });
