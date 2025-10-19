@@ -1,4 +1,5 @@
 import type { TableNames } from '../_generated/dataModel';
+import type { StatusType } from './types';
 
 import { v } from 'convex/values';
 import { doc as convexDoc } from 'convex-helpers/validators';
@@ -12,6 +13,9 @@ export const statusType = v.union(
   v.literal('published'),
   v.literal('archived'),
 );
+
+// Re-export for convenience
+export type { StatusType };
 
 export const timestampFields = {
   // Note: Convex provides a `_creationTime` field automatically

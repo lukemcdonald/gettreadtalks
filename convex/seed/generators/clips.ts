@@ -1,11 +1,10 @@
 import type { Id } from '../../_generated/dataModel';
+import type { StatusType } from '../../lib/types';
 
 import { faker } from '@faker-js/faker';
 
 import { talkTitles } from '../data/talk_titles';
 import { normalizeSlug, randomBoolean, randomInt, randomItem, weightedRandom } from '../utils';
-
-type StatusType = 'approved' | 'archived' | 'backlog' | 'published';
 
 /**
  * Generate clip data with realistic distribution

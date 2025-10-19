@@ -1,7 +1,5 @@
-import type { statusType } from './lib/validators';
-
 import { defineSchema, defineTable } from 'convex/server';
-import { type Infer, v } from 'convex/values';
+import { v } from 'convex/values';
 
 import { affiliateLinkTables } from './model/affiliateLinks/schema';
 import { clipTables } from './model/clips/schema';
@@ -9,8 +7,6 @@ import { collectionTables } from './model/collections/schema';
 import { speakerTables } from './model/speakers/schema';
 import { talkTables } from './model/talks/schema';
 import { topicTables } from './model/topics/schema';
-
-export type StatusType = Infer<typeof statusType>;
 
 export default defineSchema({
   ...affiliateLinkTables,

@@ -6,19 +6,16 @@ import { api } from '@/convex/_generated/api';
 import { getAuthToken } from '@/lib/services/auth/server';
 
 interface TalkPageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
 export default async function TalkPage({ params }: TalkPageProps) {
+  const { slug } = await params;
   const authToken = await getAuthToken();
 
-  const talkData = await fetchQuery(
-    api.talks.getBySlug,
-    { slug: params.slug },
-    { token: authToken },
-  );
+  const talkData = await fetchQuery(api.talks.getBySlug, { slug }, { token: authToken });
 
   if (!talkData) {
     notFound();

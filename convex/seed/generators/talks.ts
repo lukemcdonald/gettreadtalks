@@ -1,12 +1,11 @@
 import type { Id } from '../../_generated/dataModel';
+import type { StatusType } from '../../lib/types';
 
 import { faker } from '@faker-js/faker';
 
 import { scriptureReferences } from '../data/scripture_refs';
 import { talkTitles } from '../data/talk_titles';
 import { normalizeSlug, randomBoolean, randomInt, randomItem, weightedRandom } from '../utils';
-
-type StatusType = 'approved' | 'archived' | 'backlog' | 'published';
 
 /**
  * Generate talk data with realistic distribution
