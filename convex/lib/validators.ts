@@ -1,5 +1,4 @@
 import type { TableNames } from '../_generated/dataModel';
-import type { StatusType } from './types';
 
 import { v } from 'convex/values';
 import { doc as convexDoc } from 'convex-helpers/validators';
@@ -14,15 +13,11 @@ export const statusType = v.union(
   v.literal('archived'),
 );
 
-// Re-export for convenience
-export type { StatusType };
-
 export const timestampFields = {
   // Note: Convex provides a `_creationTime` field automatically
   deletedAt: v.optional(v.number()),
   updatedAt: v.optional(v.number()),
 };
-
 /**
  * Creates a document validator that includes system fields for the specified table.
  * @param tableName - The table name
