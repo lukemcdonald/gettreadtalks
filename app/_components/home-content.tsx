@@ -48,9 +48,7 @@ const AuthenticatedHomeContent = ({
   const { loadMore, results, status } = usePaginatedQuery(
     api.talks.list,
     {},
-    {
-      initialNumItems: 12,
-    },
+    { initialNumItems: 12 },
   );
 
   const canLoadMore = status === 'CanLoadMore';

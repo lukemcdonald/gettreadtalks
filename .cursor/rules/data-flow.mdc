@@ -126,6 +126,84 @@ export function FavoriteButton({ itemId }) {
 }
 ```
 
+## Convex Data Fetching Patterns
+
+### Decision Tree: When to Use Each Pattern
+
+**Use `preloadQuery` + `usePreloadedQuery` when:**
+- Critical above-the-fold content (homepage, landing pages)
+- SEO is important (public pages, content indexing)
+- Want zero loading states for initial render
+- Need both server rendering and client interactivity
+
+**Use `fetchQuery` (server-only) when:**
+- Static data that doesn't change during user session
+- No client-side interactivity needed
+- SEO critical but no real-time updates required
+
+**Use `useQuery` hooks when:**
+- User-specific data (favorites, profiles, dashboard content)
+- Need real-time updates during user session
+- Interactive features that respond to user actions
+- Not SEO critical (behind auth, user-specific)
+
+### Pattern Examples
+
+```ts
+// ✅ Hybrid: preloadQuery + usePreloadedQuery
+// app/page.tsx (Server Component)
+export default async function HomePage() {
+  const preloadedItems = await preloadQuery(
+    api.items.list,
+    { limit: 12 },
+    { token: authToken },
+  );
+  return <HomeContent preloadedItems={preloadedItems} />;
+}
+
+// app/_components/home-content.tsx (Client Component)
+'use client';
+export function HomeContent({ preloadedItems }) {
+  const initialItems = usePreloadedQuery(preloadedItems);
+  // Add interactivity: pagination, filtering, real-time updates
+}
+```
+
+```ts
+// ✅ Server-only: fetchQuery
+// app/items/[slug]/page.tsx (Server Component)
+export default async function ItemPage({ params }) {
+  const itemData = await fetchQuery(
+    api.items.getBySlug,
+    { slug: params.slug },
+    { token: authToken },
+  );
+  
+  if (!itemData) notFound();
+  
+  // Render directly - static content, SEO critical
+  return <ItemContent data={itemData} />;
+}
+```
+
+```ts
+// ✅ Client-only: useQuery hooks
+// lib/features/users/hooks/use-favorites.ts
+export function useFavorites(limit?: number) {
+  const data = useQuery(api.users.getFavorites, { limit });
+  return { data, isLoading: data === undefined };
+}
+```
+
+### Quick Decision Matrix
+
+| Scenario | Pattern | Rationale |
+|----------|---------|-----------|
+| **Homepage/data listing** | `preloadQuery` + `usePreloadedQuery` | Zero loading states and real-time updates |
+| **Public content** | `fetchQuery` only | SEO critical and static content |
+| **User dashboard/favorites** | `useQuery` hooks | User-specific data and real-time updates |
+| **Interactive lists** | Hybrid pattern | Best performance and user experience |
+
 ## Authentication Patterns
 
 ### Server Component Protection
