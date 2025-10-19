@@ -6,8 +6,8 @@ import { betterAuth } from 'better-auth';
 import { nextCookies } from 'better-auth/next-js';
 import { v } from 'convex/values';
 
-import { components } from './_generated/api';
-import { query } from './_generated/server';
+import { components, internal } from './_generated/api';
+import { type MutationCtx, query } from './_generated/server';
 import { getCurrentUser as getUser } from './model/auth/queries';
 
 const siteUrl = process.env.SITE_URL;
@@ -18,6 +18,10 @@ const siteUrl = process.env.SITE_URL;
  */
 export const authComponent = createClient<DataModel>(components.betterAuth);
 
+// Infer the exact user type from Better Auth's safeGetAuthUser method
+// This ensures type safety and stays in sync with the actual user schema
+type AuthUser = NonNullable<Awaited<ReturnType<typeof authComponent.safeGetAuthUser>>>;
+
 export const createAuth = (
   ctx: GenericCtx<DataModel>,
   { optionsOnly } = { optionsOnly: false },
@@ -27,7 +31,39 @@ export const createAuth = (
     database: authComponent.adapter(ctx),
     emailAndPassword: {
       enabled: true,
-      requireEmailVerification: false,
+      requireEmailVerification: true,
+      sendVerificationEmail: async ({
+        user,
+        url,
+        token,
+      }: {
+        user: AuthUser;
+        url: string;
+        token: string;
+      }) => {
+        // This will be handled by Convex email functions
+        await (ctx as MutationCtx).scheduler.runAfter(0, internal.emails.sendVerificationEmail, {
+          email: user.email,
+          verificationUrl: url,
+          token,
+        });
+      },
+      sendResetPasswordEmail: async ({
+        user,
+        url,
+        token,
+      }: {
+        user: AuthUser;
+        url: string;
+        token: string;
+      }) => {
+        // This will be handled by Convex email functions
+        await (ctx as MutationCtx).scheduler.runAfter(0, internal.emails.sendPasswordResetEmail, {
+          email: user.email,
+          resetUrl: url,
+          token,
+        });
+      },
     },
     plugins: [
       convex(),

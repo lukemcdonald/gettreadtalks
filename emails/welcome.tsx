@@ -1,0 +1,65 @@
+import type { WelcomeEmailProps } from '../lib/services/email/types';
+
+import { Button, Section, Text } from '@react-email/components';
+
+import { EmailLayout } from './_components/layout';
+
+export function WelcomeEmail({ name, email }: WelcomeEmailProps) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  email; // email parameter is part of the interface and could be used for personalization
+  return (
+    <EmailLayout preview={`Welcome to TreadTalks, ${name}!`}>
+      <Text style={paragraph}>Hi {name},</Text>
+      <Text style={paragraph}>
+        Welcome to TreadTalks! We're excited to have you join our community of believers seeking to
+        deepen their faith through inspiring talks and insights.
+      </Text>
+      <Text style={paragraph}>With your new account, you can:</Text>
+      <Text style={listItem}>• Access our growing library of Christian talks</Text>
+      <Text style={listItem}>• Save your favorite talks to personalized collections</Text>
+      <Text style={listItem}>• Get personalized recommendations based on your interests</Text>
+      <Text style={paragraph}>Get started by exploring some of our most popular talks:</Text>
+      <Section style={buttonContainer}>
+        <Button style={button} href={`${process.env.SITE_URL || 'http://localhost:3000'}`}>
+          Explore Talks
+        </Button>
+      </Section>
+      <Text style={paragraph}>
+        If you have any questions or need help getting started, don't hesitate to reach out to us.
+      </Text>
+      <Text style={paragraph}>Blessings,</Text>
+      <Text style={paragraph}>The TreadTalks Team</Text>
+    </EmailLayout>
+  );
+}
+
+const paragraph = {
+  color: '#333',
+  fontSize: '16px',
+  lineHeight: '26px',
+  margin: '0 0 16px',
+};
+
+const listItem = {
+  color: '#333',
+  fontSize: '16px',
+  lineHeight: '26px',
+  margin: '0 0 8px',
+  paddingLeft: '20px',
+};
+
+const buttonContainer = {
+  textAlign: 'center' as const,
+  margin: '32px 0',
+};
+
+const button = {
+  backgroundColor: '#2754C5',
+  borderRadius: '4px',
+  color: '#fff',
+  fontSize: '16px',
+  fontWeight: 'bold',
+  lineHeight: '50px',
+  textDecoration: 'none',
+  padding: '0 20px',
+};
