@@ -1,5 +1,3 @@
-import { getOneFrom } from 'convex-helpers/server/relationships';
-
 import type { QueryCtx } from '../../_generated/server';
 import type {
   GetAffiliateLinkArgs,
@@ -8,6 +6,8 @@ import type {
   ListAffiliateLinksByAffiliateArgs,
   ListAffiliateLinksByTypeArgs,
 } from './types';
+
+import { getOneFrom } from 'convex-helpers/server/relationships';
 
 /**
  * Get affiliate link by ID.

@@ -1,9 +1,9 @@
-import { getManyFrom, getOneFrom } from 'convex-helpers/server/relationships';
-
+import type { Doc } from '../../_generated/dataModel';
 import type { MutationCtx } from '../../_generated/server';
 import type { CreateSpeakerArgs, DestroySpeakerArgs, UpdateSpeakerArgs } from './types';
 
-import { Doc } from '../../_generated/dataModel';
+import { getManyFrom, getOneFrom } from 'convex-helpers/server/relationships';
+
 import { throwDuplicateSlug, throwNotFound, throwValidationError } from '../../lib/errors';
 import { normalizeSlug, slugExists } from '../../lib/utils';
 import { requireAuth } from '../auth/queries';

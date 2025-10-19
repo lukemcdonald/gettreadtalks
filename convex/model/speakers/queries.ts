@@ -1,9 +1,8 @@
 import type { PaginationOptions } from 'convex/server';
-
-import { getOneFrom } from 'convex-helpers/server/relationships';
-
 import type { QueryCtx } from '../../_generated/server';
 import type { GetSpeakerArgs, GetSpeakerBySlugArgs } from './types';
+
+import { getOneFrom } from 'convex-helpers/server/relationships';
 
 /**
  * Get speaker by ID.

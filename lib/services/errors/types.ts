@@ -67,8 +67,7 @@ export interface MutationResult<TData = unknown> {
   isIdle: boolean;
   isLoading: boolean;
   isSuccess: boolean;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Convex mutation args are dynamic
-  mutate: (...args: any[]) => Promise<TData>;
+  mutate: (...args: unknown[]) => Promise<TData>;
   reset: () => void;
   status: MutationStatus;
 }

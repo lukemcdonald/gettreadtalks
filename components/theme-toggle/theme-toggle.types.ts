@@ -1,4 +1,4 @@
-import { THEME_CYCLE, THEME_ICONS, THEMES } from './theme-toggle.constants';
+import type { THEMES, THEME_CYCLE, THEME_ICONS } from './theme-toggle.constants';
 
 export type Theme = (typeof THEMES)[keyof typeof THEMES];
 export type ThemeCycle = (typeof THEME_CYCLE)[keyof typeof THEME_CYCLE];

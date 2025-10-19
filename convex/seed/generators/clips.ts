@@ -1,6 +1,6 @@
-import { faker } from '@faker-js/faker';
-
 import type { Id } from '../../_generated/dataModel';
+
+import { faker } from '@faker-js/faker';
 
 import { talkTitles } from '../data/talk_titles';
 import { normalizeSlug, randomBoolean, randomInt, randomItem, weightedRandom } from '../utils';
@@ -89,7 +89,7 @@ export function generateClips(
       talkId?: Id<'talks'>;
       title: string;
     } = {
-      mediaUrl: faker.internet.url() + '/clip.mp4',
+      mediaUrl: `${faker.internet.url()}/clip.mp4`,
       publishedAt,
       slug: normalizeSlug(title),
       status,

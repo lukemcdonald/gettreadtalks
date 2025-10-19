@@ -1,9 +1,9 @@
 'use client';
 
-import { ReactNode } from 'react';
-import { FallbackProps, ErrorBoundary as ReactErrorBoundary } from 'react-error-boundary';
+import type { ReactNode } from 'react';
 
 import * as Sentry from '@sentry/nextjs';
+import { type FallbackProps, ErrorBoundary as ReactErrorBoundary } from 'react-error-boundary';
 
 import { ErrorFallback } from './error-fallback';
 

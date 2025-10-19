@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useId, useState } from 'react';
 
 import MainLayout from '@/components/layout/main-layout';
 import { signIn, signUp } from '@/lib/services/auth/client';
@@ -81,9 +81,9 @@ export default function LoginPage() {
                 Email address
               </label>
               <input
+                id={useId()}
                 autoComplete="email"
                 className="mt-1 appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 text-gray-900 dark:text-white bg-white dark:bg-gray-800 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10"
-                id="email"
                 name="email"
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
@@ -100,9 +100,9 @@ export default function LoginPage() {
                 Password
               </label>
               <input
+                id={useId()}
                 autoComplete="current-password"
                 className="mt-1 appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 text-gray-900 dark:text-white bg-white dark:bg-gray-800 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10"
-                id="password"
                 name="password"
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"

@@ -1,6 +1,6 @@
-import { ConvexError } from 'convex/values';
+import { ConvexError, type Value } from 'convex/values';
 
-import { ErrorCode, ErrorContext } from './types';
+import { ErrorCode, type ErrorContext } from './types';
 
 /**
  * Type guard to check if an error is a ConvexError.
@@ -14,8 +14,7 @@ import { ErrorCode, ErrorContext } from './types';
  *   }
  * }
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- ConvexError requires type parameter but data structure is dynamic
-export function isConvexError(error: unknown): error is ConvexError<any> {
+export function isConvexError(error: unknown): error is ConvexError<Value> {
   return error instanceof ConvexError;
 }
 

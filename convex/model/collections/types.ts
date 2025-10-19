@@ -1,6 +1,5 @@
 import type { Infer, ObjectType } from 'convex/values';
-
-import * as validators from './validators';
+import type * as validators from './validators';
 
 export type CreateCollectionArgs = ObjectType<typeof validators.createCollectionArgs>;
 export type CreateCollectionReturns = Infer<typeof validators.createCollectionReturns>;

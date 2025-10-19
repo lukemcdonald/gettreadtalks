@@ -1,6 +1,6 @@
-import * as Sentry from '@sentry/nextjs';
+import type { ErrorReportOptions, SeverityLevel } from './types';
 
-import { ErrorReportOptions, SeverityLevel } from './types';
+import * as Sentry from '@sentry/nextjs';
 
 /**
  * Captures an exception and reports it to Sentry with optional context.

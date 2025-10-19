@@ -100,6 +100,7 @@ const AuthenticatedHomeContent = () => {
             {canLoadMore && !isLoadingMore && (
               <div className="text-center mt-6">
                 <button
+                  type="button"
                   className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={handleLoadMore}
                 >

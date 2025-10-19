@@ -1,8 +1,8 @@
+import type { Id, TableNames } from './_generated/dataModel';
+import type { MutationCtx } from './_generated/server';
+
 import { faker } from '@faker-js/faker';
 import { v } from 'convex/values';
-
-import type { Id } from './_generated/dataModel';
-import type { MutationCtx } from './_generated/server';
 
 import { internalMutation } from './_generated/server';
 import { generateClips } from './seed/generators/clips';
@@ -105,8 +105,7 @@ async function clearAllTables(ctx: MutationCtx): Promise<void> {
   ];
 
   for (const table of tables) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const documents = await ctx.db.query(table as any).collect();
+    const documents = await ctx.db.query(table as TableNames).collect();
     await Promise.all(documents.map((doc) => ctx.db.delete(doc._id)));
   }
 }

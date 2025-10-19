@@ -1,4 +1,4 @@
-import { Infer, v } from 'convex/values';
+import { type Infer, v } from 'convex/values';
 
 // Common status type for content items
 export const statusType = v.union(

@@ -55,8 +55,7 @@ export function enhanceError(error: Error, context: ErrorContext): Error {
   // Store context as error properties (Convex will forward to Sentry)
   Object.entries(context).forEach(([key, value]) => {
     if (value !== undefined) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (error as any)[`tag_${key}`] = value;
+      (error as unknown as Record<string, unknown>)[`tag_${key}`] = value;
     }
   });
 

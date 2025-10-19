@@ -1,7 +1,8 @@
-import { defineSchema, defineTable } from 'convex/server';
-import { Infer, v } from 'convex/values';
+import type { statusType } from './lib/validators';
 
-import { statusType } from './lib/validators';
+import { defineSchema, defineTable } from 'convex/server';
+import { type Infer, v } from 'convex/values';
+
 import { affiliateLinkTables } from './model/affiliateLinks/schema';
 import { clipTables } from './model/clips/schema';
 import { collectionTables } from './model/collections/schema';

@@ -1,3 +1,4 @@
+import type { Doc } from '../../_generated/dataModel';
 import type { MutationCtx } from '../../_generated/server';
 import type {
   ArchiveClipArgs,
@@ -6,7 +7,6 @@ import type {
   UpdateClipStatusArgs,
 } from './types';
 
-import { Doc } from '../../_generated/dataModel';
 import { normalizeSlug, slugExists } from '../../lib/utils';
 import { requireAuth } from '../auth/queries';
 

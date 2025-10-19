@@ -1,6 +1,5 @@
 import type { Infer, ObjectType } from 'convex/values';
-
-import * as validators from './validators';
+import type * as validators from './validators';
 
 export type CreateAffiliateLinkArgs = ObjectType<typeof validators.createAffiliateLinkArgs>;
 export type CreateAffiliateLinkReturns = Infer<typeof validators.createAffiliateLinkReturns>;

@@ -23,8 +23,6 @@ Sentry.init({
     if (event.exception) {
       event.extra = {
         ...event.extra,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        connectionType: (navigator as any).connection?.effectiveType || 'unknown',
         referrer: document.referrer || 'direct',
       };
     }

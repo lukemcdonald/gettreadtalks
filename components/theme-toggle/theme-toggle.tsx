@@ -1,12 +1,12 @@
 'use client';
 
+import type { Theme } from './theme-toggle.types';
+
 import { useEffect, useState } from 'react';
 
 import { useTheme } from 'next-themes';
 
-import type { Theme } from './theme-toggle.types';
-
-import { THEME_CYCLE, THEME_ICONS, THEMES } from './theme-toggle.constants';
+import { THEMES, THEME_CYCLE, THEME_ICONS } from './theme-toggle.constants';
 
 const getNextTheme = (theme: string | undefined): Theme => {
   return THEME_CYCLE[theme as Theme] ?? THEMES.SYSTEM;
@@ -30,6 +30,7 @@ export default function ThemeToggle() {
 
   return (
     <button
+      type="button"
       onClick={() => setTheme(getNextTheme(theme))}
       className="inline-flex items-center justify-center w-10 h-10 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
       aria-label={`Current theme: ${theme}. Click to cycle themes.`}

@@ -4,4 +4,5 @@ import { speakerFields, speakerTables } from './schema';
 import * as validators from './validators';
 
 export { mutations, queries, speakerFields, speakerTables, validators };
+
 export * from './types';

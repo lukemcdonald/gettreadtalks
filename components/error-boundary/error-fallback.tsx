@@ -1,4 +1,4 @@
-import { FallbackProps } from 'react-error-boundary';
+import type { FallbackProps } from 'react-error-boundary';
 
 /**
  * Default fallback UI shown when an error is caught by ErrorBoundary.
@@ -43,7 +43,9 @@ export function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
           </button>
           <button
             className="rounded-md border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50"
-            onClick={() => (window.location.href = '/')}
+            onClick={() => {
+              window.location.href = '/';
+            }}
             type="button"
           >
             Go Home

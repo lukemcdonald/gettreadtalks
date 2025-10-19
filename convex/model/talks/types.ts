@@ -1,6 +1,5 @@
 import type { Infer, ObjectType } from 'convex/values';
-
-import * as validators from './validators';
+import type * as validators from './validators';
 
 export type ArchiveTalkArgs = ObjectType<typeof validators.archiveTalkArgs>;
 export type ArchiveTalkReturns = Infer<typeof validators.archiveTalkReturns>;

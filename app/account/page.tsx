@@ -1,6 +1,6 @@
 'use client';
 
-import { Authenticated, AuthLoading, Unauthenticated } from 'convex/react';
+import { AuthLoading, Authenticated, Unauthenticated } from 'convex/react';
 import Link from 'next/link';
 
 import MainLayout from '@/components/layout/main-layout';
@@ -67,19 +67,28 @@ const AccountContent = () => {
             <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
                     Email
                   </label>
                   <p className="text-gray-900 dark:text-white">{user?.email || 'Loading...'}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <label
+                    htmlFor="name"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
                     Name
                   </label>
                   <p className="text-gray-900 dark:text-white">{user?.name || 'Loading...'}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <label
+                    htmlFor="userId"
+                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
                     User ID
                   </label>
                   <p className="text-gray-500 dark:text-gray-400 font-mono text-sm">

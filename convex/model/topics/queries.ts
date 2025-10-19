@@ -1,6 +1,3 @@
-import { asyncMap } from 'convex-helpers';
-import { getManyFrom, getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
-
 import type { Doc } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
 import type {
@@ -9,6 +6,9 @@ import type {
   GetTopicWithContentArgs,
   ListTopicsArgs,
 } from './types';
+
+import { asyncMap } from 'convex-helpers';
+import { getManyFrom, getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
 
 /**
  * Get topic by ID.

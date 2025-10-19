@@ -82,6 +82,7 @@ export default function SentryTestPage() {
             Captures a simple error with tags and context
           </p>
           <button
+            type="button"
             onClick={testBasicError}
             className="rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700"
           >
@@ -95,6 +96,7 @@ export default function SentryTestPage() {
             Adds breadcrumbs before capturing error for better debugging
           </p>
           <button
+            type="button"
             onClick={testErrorWithContext}
             className="rounded bg-purple-600 px-4 py-2 text-white hover:bg-purple-700"
           >
@@ -108,6 +110,7 @@ export default function SentryTestPage() {
             Throws an uncaught error that Sentry automatically captures
           </p>
           <button
+            type="button"
             onClick={testUncaughtError}
             className="rounded bg-red-600 px-4 py-2 text-white hover:bg-red-700"
           >
@@ -119,6 +122,7 @@ export default function SentryTestPage() {
           <h3 className="mb-2 font-semibold">4. Promise Rejection</h3>
           <p className="mb-3 text-sm text-gray-600">Triggers an unhandled promise rejection</p>
           <button
+            type="button"
             onClick={testPromiseRejection}
             className="rounded bg-orange-600 px-4 py-2 text-white hover:bg-orange-700"
           >

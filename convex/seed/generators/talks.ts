@@ -1,6 +1,6 @@
-import { faker } from '@faker-js/faker';
-
 import type { Id } from '../../_generated/dataModel';
+
+import { faker } from '@faker-js/faker';
 
 import { scriptureReferences } from '../data/scripture_refs';
 import { talkTitles } from '../data/talk_titles';
@@ -84,7 +84,7 @@ export function generateTalks(
         status: StatusType;
         title: string;
       } = {
-        mediaUrl: faker.internet.url() + '/video.mp4',
+        mediaUrl: `${faker.internet.url()}/video.mp4`,
         publishedAt,
         slug: normalizeSlug(title),
         speakerId,

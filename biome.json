@@ -1,0 +1,89 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.2.6/schema.json",
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "style": {
+        "noNonNullAssertion": "off"
+      },
+      "suspicious": {
+        "noExplicitAny": "warn"
+      },
+      "correctness": {
+        "noUnusedImports": "error",
+        "noUnusedVariables": "error"
+      },
+      "a11y": {
+        "recommended": true
+      },
+      "complexity": {
+        "recommended": true
+      },
+      "nursery": {
+        "useSortedClasses": "off"
+      }
+    }
+  },
+  "formatter": {
+    "enabled": true,
+    "formatWithErrors": false,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100,
+    "lineEnding": "lf"
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "jsxQuoteStyle": "double",
+      "trailingCommas": "all",
+      "semicolons": "always",
+      "arrowParentheses": "always"
+    }
+  },
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": {
+          "level": "on",
+          "options": {
+            "groups": [
+              { "type": true },
+              ":BLANK_LINE:",
+              "react",
+              ":BLANK_LINE:",
+              ["builtin", ":PACKAGE:"],
+              ":BLANK_LINE:",
+              "@/**",
+              ":BLANK_LINE:",
+              "../**",
+              "./**"
+            ],
+            "identifierOrder": "lexicographic"
+          }
+        }
+      }
+    }
+  },
+  "files": {
+    "ignoreUnknown": false,
+    "includes": [
+      "**",
+      "!**/*.d.ts",
+      "!**/*.config.*",
+      "!**/*.tsbuildinfo",
+      "!**/.next",
+      "!**/convex/_generated",
+      "!**/convex/convex.json",
+      "!**/next-env.d.ts",
+      "!**/node_modules",
+      "!**/pnpm-lock.yaml",
+      "!**/dist",
+      "!**/build",
+      "!**/.git",
+      "!**/.vercel",
+      "!**/.notes"
+    ]
+  }
+}

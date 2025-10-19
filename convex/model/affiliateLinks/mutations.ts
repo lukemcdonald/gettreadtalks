@@ -1,3 +1,4 @@
+import type { Doc } from '../../_generated/dataModel';
 import type { MutationCtx } from '../../_generated/server';
 import type {
   CreateAffiliateLinkArgs,
@@ -5,7 +6,6 @@ import type {
   UpdateAffiliateLinkArgs,
 } from './types';
 
-import { Doc } from '../../_generated/dataModel';
 import { normalizeSlug, slugExists } from '../../lib/utils';
 import { requireAuth } from '../auth/queries';
 

@@ -1,9 +1,9 @@
-import { getOneFrom } from 'convex-helpers/server/relationships';
-
+import type { Doc } from '../../_generated/dataModel';
 import type { MutationCtx } from '../../_generated/server';
 import type { CreateCollectionArgs, DestroyCollectionArgs, UpdateCollectionArgs } from './types';
 
-import { Doc } from '../../_generated/dataModel';
+import { getOneFrom } from 'convex-helpers/server/relationships';
+
 import { normalizeSlug, slugExists } from '../../lib/utils';
 import { requireAuth } from '../auth/queries';
 

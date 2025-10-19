@@ -1,4 +1,4 @@
-import { ConvexError } from 'convex/values';
+import { ConvexError, type Value } from 'convex/values';
 
 /**
  * Common error codes for backend operations.
@@ -61,8 +61,7 @@ export interface ErrorData {
  *   field: 'title',
  * });
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- ConvexError requires type parameter but data structure is dynamic
-export function createConvexError(message: string, data?: ErrorData): ConvexError<any> {
+export function createConvexError(message: string, data?: ErrorData): ConvexError<Value> {
   return new ConvexError({
     message,
     ...data,
