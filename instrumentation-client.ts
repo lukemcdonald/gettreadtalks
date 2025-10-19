@@ -2,8 +2,15 @@
 // It runs before your application becomes interactive.
 // https://nextjs.org/docs/app/building-your-application/optimizing/instrumentation
 
+import * as Sentry from '@sentry/nextjs';
+
 import { IS_SENTRY_ENABLED } from './lib/config/sentry';
 
 if (IS_SENTRY_ENABLED) {
   import('./lib/config/sentry/client');
 }
+
+// Export the router transition hook for Sentry navigation instrumentation
+export const onRouterTransitionStart = IS_SENTRY_ENABLED
+  ? Sentry.captureRouterTransitionStart
+  : () => {};
