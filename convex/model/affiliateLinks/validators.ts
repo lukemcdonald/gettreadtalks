@@ -1,6 +1,6 @@
 import { v } from 'convex/values';
 
-import { affiliateLinkFields } from './schema';
+import { doc, docs } from '../../lib/validators';
 
 const affiliateLinkTypes = v.union(
   v.literal('app'),
@@ -31,13 +31,13 @@ export const getAffiliateLinkArgs = {
   id: v.id('affiliateLinks'),
 };
 
-export const getAffiliateLinkReturns = v.union(v.object(affiliateLinkFields), v.null());
+export const getAffiliateLinkReturns = doc('affiliateLinks', true);
 
 export const getAffiliateLinkBySlugArgs = {
   slug: v.string(),
 };
 
-export const getAffiliateLinkBySlugReturns = v.union(v.object(affiliateLinkFields), v.null());
+export const getAffiliateLinkBySlugReturns = doc('affiliateLinks', true);
 
 export const listAffiliateLinksArgs = {
   affiliate: v.optional(v.string()),
@@ -46,21 +46,21 @@ export const listAffiliateLinksArgs = {
   type: v.optional(affiliateLinkTypes),
 };
 
-export const listAffiliateLinksReturns = v.array(v.object(affiliateLinkFields));
+export const listAffiliateLinksReturns = docs('affiliateLinks');
 
 export const listAffiliateLinksByAffiliateArgs = {
   affiliate: v.string(),
   limit: v.optional(v.number()),
 };
 
-export const listAffiliateLinksByAffiliateReturns = v.array(v.object(affiliateLinkFields));
+export const listAffiliateLinksByAffiliateReturns = docs('affiliateLinks');
 
 export const listAffiliateLinksByTypeArgs = {
   limit: v.optional(v.number()),
   type: affiliateLinkTypes,
 };
 
-export const listAffiliateLinksByTypeReturns = v.array(v.object(affiliateLinkFields));
+export const listAffiliateLinksByTypeReturns = docs('affiliateLinks');
 
 export const updateAffiliateLinkArgs = {
   affiliate: v.optional(v.string()),

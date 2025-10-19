@@ -7,9 +7,11 @@ export type CreateTalkArgs = ObjectType<typeof validators.createTalkArgs>;
 export type CreateTalkReturns = Infer<typeof validators.createTalkReturns>;
 export type GetCountArgs = ObjectType<typeof validators.getCountArgs>;
 export type GetCountReturns = Infer<typeof validators.getCountReturns>;
-export type GetRandomTalksBySpeakerArgs = ObjectType<typeof validators.getRandomTalksBySpeakerArgs>;
-export type GetRandomTalksBySpeakerReturns = Infer<
-  typeof validators.getRandomTalksBySpeakerReturns
+export type ListRandomTalksBySpeakerArgs = ObjectType<
+  typeof validators.listRandomTalksBySpeakerArgs
+>;
+export type ListRandomTalksBySpeakerReturns = Infer<
+  typeof validators.listRandomTalksBySpeakerReturns
 >;
 export type GetTalkArgs = ObjectType<typeof validators.getTalkArgs>;
 export type GetTalkBySlugArgs = ObjectType<typeof validators.getTalkBySlugArgs>;

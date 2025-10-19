@@ -1,9 +1,7 @@
 import { paginationOptsValidator } from 'convex/server';
 import { v } from 'convex/values';
 
-import { speakerFields } from '../speakers/schema';
-import { talkFields } from '../talks/schema';
-import { collectionFields } from './schema';
+import { doc, docs } from '../../lib/validators';
 
 export const createCollectionArgs = {
   description: v.optional(v.string()),
@@ -23,19 +21,19 @@ export const getCollectionArgs = {
   id: v.id('collections'),
 };
 
-export const getCollectionReturns = v.union(v.object(collectionFields), v.null());
+export const getCollectionReturns = doc('collections', true);
 
 export const getCollectionBySlugArgs = {
   slug: v.string(),
 };
 
-export const getCollectionBySlugReturns = v.union(v.object(collectionFields), v.null());
+export const getCollectionBySlugReturns = doc('collections', true);
 
 export const listBySpeakerArgs = {
   speakerId: v.id('speakers'),
 };
 
-export const listBySpeakerReturns = v.array(v.object(collectionFields));
+export const listBySpeakerReturns = docs('collections');
 
 export const listWithStatsArgs = {
   paginationOpts: paginationOptsValidator,
@@ -56,8 +54,8 @@ export const getCollectionWithSpeakersArgs = {
 
 export const getCollectionWithSpeakersReturns = v.union(
   v.object({
-    collection: v.object(collectionFields),
-    speakers: v.array(v.object(speakerFields)),
+    collection: doc('collections'), // Guaranteed to exist (default: false)
+    speakers: docs('speakers'),
   }),
   v.null(),
 );
@@ -69,8 +67,8 @@ export const getCollectionWithTalksArgs = {
 
 export const getCollectionWithTalksReturns = v.union(
   v.object({
-    collection: v.object(collectionFields),
-    talks: v.array(v.object(talkFields)),
+    collection: doc('collections'), // Guaranteed to exist (default: false)
+    talks: docs('talks'),
   }),
   v.null(),
 );

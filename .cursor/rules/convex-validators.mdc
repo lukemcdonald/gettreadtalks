@@ -5,6 +5,29 @@ globs: convex/**/*.ts
 
 # Convex Validator Patterns
 
+## Document Validator Utilities
+
+Use the `doc` and `docs` utilities from `convex/lib/validators.ts` for consistent return validators that automatically include Convex system fields (`_id`, `_creationTime`):
+
+```ts
+import { doc, docs } from '../../lib/validators';
+
+// Single document (default: non-nullable)
+export const getItemReturns = doc('items'); // Guaranteed to exist
+
+// Single document (nullable)
+export const getItemReturns = doc('items', true); 
+
+// Array of documents
+export const listItemsReturns = docs('items');
+```
+
+**Benefits:**
+- Automatic system field inclusion
+- Consistent nullable/non-nullable patterns  
+- Type-safe with schema changes
+- Reduces boilerplate validator definitions
+
 ## Reusable Validators
 
 Per [Convex Stack: Keep validators from going stale](https://stack.convex.dev/types-cookbook#keep-validators-from-going-stale), export field objects from `schema.ts` to maintain consistency:
@@ -40,25 +63,38 @@ export default defineSchema({
 });
 ```
 
-### Use for Return Validators
+### Use `doc` and `docs` for Return Validators
 
-Wrap field objects with `v.object()` for return validators:
+Use the `doc` and `docs` utilities from `convex/lib/validators.ts` for consistent return validators that include system fields:
 
 ```ts
-// convex/items.ts
-import { itemFields } from './schema';
+// convex/model/items/validators.ts
+import { doc, docs } from '../../lib/validators';
 
-export const list = query({
-  args: {},
-  returns: v.array(v.object(itemFields)), // ✅ Reuses schema fields
-  handler: async (ctx) => {
-    return await ctx.db.query('items').collect();
-  },
-});
+// Single document (can be null)
+export const getItemReturns = doc('items', true); 
 
-// ❌ Don't use v.any() for simple queries
-returns: v.array(v.any())
+// Single document (guaranteed to exist in context)
+export const getItemWithRelationsReturns = v.union(
+  v.object({
+    item: doc('items'), // Guaranteed to exist (default: false)
+    author: doc('users', true), 
+    tags: docs('tags'), // Array of documents
+  }),
+  v.null(),
+);
+
+// Array of documents
+export const listItemsReturns = docs('items');
 ```
+
+**When to use `nullable: true`:**
+- Direct lookups that might not find the document
+- Optional relationships in composite returns
+
+**When to use default `nullable: false`:**
+- Documents guaranteed to exist in the current context
+- Main entity in composite returns where you've already checked existence
 
 ### Mutation Args: Use Subsets
 
@@ -78,14 +114,15 @@ export const create = mutation({
 
 ### Composite Return Types
 
-For queries that join multiple tables, prefer specific validators when possible:
+For queries that join multiple tables, use `doc` and `docs` utilities for consistent system field handling:
 
 ```ts
-// ✅ Best - Use specific field objects
+// ✅ Best - Use doc/docs utilities
 returns: v.union(
   v.object({
-    item: v.object(itemFields),
-    owner: v.union(v.object(userFields), v.null()),
+    item: doc('items'), // Guaranteed to exist (default: false)
+    owner: doc('users', true), 
+    tags: docs('tags'), // Array of documents
   }),
   v.null(),
 )
@@ -100,7 +137,7 @@ returns: v.union(
 )
 ```
 
-**Why:** Field objects keep schema and validators in sync. Changes propagate automatically.
+**Why:** The `doc` and `docs` utilities automatically include Convex system fields (`_id`, `_creationTime`) and stay in sync with schema changes.
 
 ## Type Safety
 
@@ -109,6 +146,8 @@ returns: v.union(
 Use specific validators instead of `v.any()` to maintain type safety:
 
 ```ts
+import { doc } from '../lib/validators';
+
 // ❌ Bad - loses all type safety
 export const getUser = query({
   args: { id: v.id('users') },
@@ -118,10 +157,10 @@ export const getUser = query({
   },
 });
 
-// ✅ Good - maintains type safety
+// ✅ Good - uses doc utility for type safety and system fields
 export const getUser = query({
   args: { id: v.id('users') },
-  returns: v.union(v.object(userFields), v.null()),
+  returns: doc('users', true), 
   handler: async (ctx, { id }) => {
     return await ctx.db.get(id);
   },

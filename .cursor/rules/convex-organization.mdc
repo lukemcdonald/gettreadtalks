@@ -186,6 +186,8 @@ When deciding whether to create a new query function, follow this tree:
 **Examples:**
 
 ```ts
+import { doc, docs } from '../lib/validators';
+
 // ✅ Good: Smart base query with optional filters
 export const list = query({
   args: {
@@ -215,11 +217,12 @@ export const listByAuthor = query({
 });
 
 // ✅ Good: Separate function for joined data (type safety)
+// Recommended approach: Separate fields for clarity (matches your codebase pattern)
 export const listWithAuthors = query({
   args: { limit: v.optional(v.number()) },
   returns: v.array(v.object({
-    ...itemFields,
-    author: v.union(v.object(userFields), v.null()),
+    item: doc('items'), // Main item with system fields
+    author: doc('users', true), 
   })),
   handler: async (ctx, args) => {
     // Returns items with author data

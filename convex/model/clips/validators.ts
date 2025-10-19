@@ -1,11 +1,7 @@
 import { paginationOptsValidator } from 'convex/server';
 import { v } from 'convex/values';
 
-import { statusType } from '../../lib/validators';
-import { speakerFields } from '../speakers/schema';
-import { talkFields } from '../talks/schema';
-import { topicFields } from '../topics/schema';
-import { clipFields } from './schema';
+import { doc, docs, statusType } from '../../lib/validators';
 
 export const createClipArgs = {
   description: v.optional(v.string()),
@@ -30,10 +26,10 @@ export const getClipBySlugWithRelationsArgs = {
 
 export const getClipBySlugWithRelationsReturns = v.union(
   v.object({
-    clip: v.object(clipFields),
-    speaker: v.union(v.object(speakerFields), v.null()),
-    talk: v.union(v.object(talkFields), v.null()),
-    topics: v.array(v.object(topicFields)),
+    clip: doc('clips'), // Guaranteed to exist (default: false)
+    speaker: doc('speakers', true),
+    talk: doc('talks', true),
+    topics: docs('topics'),
   }),
   v.null(),
 );
@@ -43,7 +39,7 @@ export const listBySpeakerArgs = {
   speakerId: v.id('speakers'),
 };
 
-export const listBySpeakerReturns = v.array(v.object(clipFields));
+export const listBySpeakerReturns = docs('clips');
 
 export const listClipsArgs = {
   paginationOpts: paginationOptsValidator,

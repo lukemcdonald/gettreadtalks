@@ -1,12 +1,7 @@
 import { paginationOptsValidator } from 'convex/server';
 import { v } from 'convex/values';
 
-import { statusType } from '../../lib/validators';
-import { clipFields } from '../clips/schema';
-import { collectionFields } from '../collections/schema';
-import { speakerFields } from '../speakers/schema';
-import { topicFields } from '../topics/schema';
-import { talkFields } from './schema';
+import { doc, docs, statusType } from '../../lib/validators';
 
 export const archiveTalkArgs = {
   id: v.id('talks'),
@@ -27,28 +22,28 @@ export const createTalkReturns = v.id('talks');
 export const getCountArgs = {};
 export const getCountReturns = v.number();
 
-export const getRandomTalksBySpeakerArgs = {
+export const listRandomTalksBySpeakerArgs = {
   excludeTalkId: v.optional(v.id('talks')),
   limit: v.optional(v.number()),
   speakerId: v.id('speakers'),
 };
-export const getRandomTalksBySpeakerReturns = v.array(v.object(talkFields));
+export const listRandomTalksBySpeakerReturns = docs('talks');
 
 export const getTalkArgs = {
   id: v.id('talks'),
 };
-export const getTalkReturns = v.union(v.object(talkFields), v.null());
+export const getTalkReturns = doc('talks', true);
 
 export const getTalkBySlugArgs = {
   slug: v.string(),
 };
 export const getTalkBySlugReturns = v.union(
   v.object({
-    clips: v.array(v.object(clipFields)),
-    collection: v.union(v.object(collectionFields), v.null()),
-    speaker: v.union(v.object(speakerFields), v.null()),
-    talk: v.object(talkFields),
-    topics: v.array(v.object(topicFields)),
+    clips: docs('clips'),
+    collection: doc('collections', true),
+    speaker: doc('speakers', true),
+    talk: doc('talks'),
+    topics: docs('topics'),
   }),
   v.null(),
 );
@@ -56,7 +51,7 @@ export const getTalkBySlugReturns = v.union(
 export const listFeaturedTalksArgs = {
   limit: v.optional(v.number()),
 };
-export const listFeaturedTalksReturns = v.array(v.object(talkFields));
+export const listFeaturedTalksReturns = docs('talks');
 
 export const listTalksArgs = {
   paginationOpts: paginationOptsValidator,
@@ -76,13 +71,13 @@ export const listTalksByCollectionArgs = {
   collectionId: v.id('collections'),
   limit: v.optional(v.number()),
 };
-export const listTalksByCollectionReturns = v.array(v.object(talkFields));
+export const listTalksByCollectionReturns = docs('talks');
 
 export const listTalksBySpeakerArgs = {
   limit: v.optional(v.number()),
   speakerId: v.id('speakers'),
 };
-export const listTalksBySpeakerReturns = v.array(v.object(talkFields));
+export const listTalksBySpeakerReturns = docs('talks');
 
 export const listTalksWithSpeakersArgs = {
   paginationOpts: paginationOptsValidator,

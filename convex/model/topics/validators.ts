@@ -1,8 +1,6 @@
 import { v } from 'convex/values';
 
-import { clipFields } from '../clips/schema';
-import { talkFields } from '../talks/schema';
-import { topicFields } from './schema';
+import { doc, docs } from '../../lib/validators';
 
 export const addClipToTopicArgs = {
   clipId: v.id('clips'),
@@ -34,13 +32,13 @@ export const getTopicArgs = {
   id: v.id('topics'),
 };
 
-export const getTopicReturns = v.union(v.object(topicFields), v.null());
+export const getTopicReturns = doc('topics', true);
 
 export const getTopicBySlugArgs = {
   slug: v.string(),
 };
 
-export const getTopicBySlugReturns = v.union(v.object(topicFields), v.null());
+export const getTopicBySlugReturns = doc('topics', true);
 
 export const listWithCountArgs = {
   limit: v.optional(v.number()),
@@ -49,7 +47,7 @@ export const listWithCountArgs = {
 export const listWithCountReturns = v.array(
   v.object({
     count: v.number(),
-    topic: v.object(topicFields),
+    topic: doc('topics'),
   }),
 );
 
@@ -60,9 +58,9 @@ export const getTopicWithContentArgs = {
 
 export const getTopicWithContentReturns = v.union(
   v.object({
-    clips: v.array(v.object(clipFields)),
-    talks: v.array(v.object(talkFields)),
-    topic: v.object(topicFields),
+    clips: docs('clips'),
+    talks: docs('talks'),
+    topic: doc('topics'),
   }),
   v.null(),
 );
@@ -71,7 +69,7 @@ export const listTopicsArgs = {
   limit: v.optional(v.number()),
 };
 
-export const listTopicsReturns = v.array(v.object(topicFields));
+export const listTopicsReturns = docs('topics');
 
 export const removeClipFromTopicArgs = {
   clipId: v.id('clips'),
@@ -86,7 +84,6 @@ export const removeTalkFromTopicArgs = {
 };
 
 export const removeTalkFromTopicReturns = v.null();
-
 export const updateTopicArgs = {
   id: v.id('topics'),
   title: v.optional(v.string()),

@@ -29,12 +29,12 @@ export const getCount = query({
   returns: validators.getCountReturns,
 });
 
-export const getRandomBySpeaker = query({
-  args: validators.getRandomTalksBySpeakerArgs,
+export const listRandomBySpeaker = query({
+  args: validators.listRandomTalksBySpeakerArgs,
   handler: async (ctx, args) => {
     return await queries.getRandomTalksBySpeaker(ctx, args);
   },
-  returns: validators.getRandomTalksBySpeakerReturns,
+  returns: validators.listRandomTalksBySpeakerReturns,
 });
 
 export const list = query({
