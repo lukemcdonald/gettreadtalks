@@ -1,6 +1,6 @@
 import { v } from 'convex/values';
 
-import { doc, docs } from '../../lib/validators';
+import { doc, docs } from '../../lib/validators/schema';
 
 const affiliateLinkTypes = v.union(
   v.literal('app'),

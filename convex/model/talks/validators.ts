@@ -1,7 +1,8 @@
 import { paginationOptsValidator } from 'convex/server';
 import { v } from 'convex/values';
 
-import { doc, docs, statusType } from '../../lib/validators';
+import { statusType } from '../../lib/validators';
+import { doc, docs } from '../../lib/validators/schema';
 
 export const archiveTalkArgs = {
   id: v.id('talks'),

@@ -1,7 +1,7 @@
 import { paginationOptsValidator } from 'convex/server';
 import { v } from 'convex/values';
 
-import { doc, docs } from '../../lib/validators';
+import { doc, docs } from '../../lib/validators/schema';
 
 export const createCollectionArgs = {
   description: v.optional(v.string()),

@@ -1,6 +1,6 @@
 import { v } from 'convex/values';
 
-import { doc, docs } from '../../lib/validators';
+import { doc, docs } from '../../lib/validators/schema';
 
 export const addClipToTopicArgs = {
   clipId: v.id('clips'),
