@@ -1,4 +1,6 @@
 import { FlatCompat } from "@eslint/eslintrc";
+import js from "@eslint/js";
+import { fixupConfigRules } from "@eslint/compat";
 import perfectionistPlugin from "eslint-plugin-perfectionist";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
@@ -8,7 +10,15 @@ const __dirname = dirname(__filename);
 
 const compat = new FlatCompat({
   baseDirectory: __dirname,
+  recommendedConfig: js.configs.recommended,
+  allConfig: js.configs.all,
 });
+
+// Fixup Next.js config rules for ESLint 9 compatibility
+const nextJsConfig = fixupConfigRules([
+  ...compat.extends("next/core-web-vitals"),
+  ...compat.extends("next/typescript"),
+]);
 
 const eslintConfig = [
   {
@@ -23,7 +33,8 @@ const eslintConfig = [
       "node_modules/**",
     ],
   },
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
+  // Next.js ESLint configuration with compatibility fixes
+  ...nextJsConfig,
   {
     plugins: {
       perfectionist: perfectionistPlugin,
