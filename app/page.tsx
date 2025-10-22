@@ -1,3 +1,5 @@
+import { Suspense } from 'react';
+
 import { preloadQuery } from 'convex/nextjs';
 import { cookies } from 'next/headers';
 
@@ -7,7 +9,7 @@ import { getAuthToken } from '@/lib/services/auth/server';
 
 import { HomeContent } from './_components/home-content';
 
-export default async function Home() {
+async function HomeData() {
   // Access cookies first to mark this as a dynamic route
   // This is required in Next.js 16 before using better-auth (which uses Math.random internally)
   await cookies();
@@ -20,9 +22,15 @@ export default async function Home() {
     { token: authToken },
   );
 
+  return <HomeContent preloadedTalks={preloadedTalks} />;
+}
+
+export default function Home() {
   return (
     <MainLayout>
-      <HomeContent preloadedTalks={preloadedTalks} />
+      <Suspense fallback={<div className="p-8">Loading...</div>}>
+        <HomeData />
+      </Suspense>
     </MainLayout>
   );
 }
