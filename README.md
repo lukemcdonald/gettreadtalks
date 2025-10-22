@@ -63,9 +63,31 @@ Set in Convex Dashboard → Settings → Environment Variables:
 
 **Email (Resend):**
 - `RESEND_API_KEY` - Get from Resend Dashboard
-- `RESEND_TEST_EMAIL` - Your email for testing (development only)
-- `RESEND_TEST_MODE` - Set to `false` for production
+- `RESEND_FROM_EMAIL` - Sender email address (defaults to `delivered@resend.dev`)
+- `RESEND_TEST_MODE` - Set to `false` to send real emails (defaults to true)
+- `RESEND_TO_EMAIL` - Recipient for `sendTestEmail()` function (development only)
 - `RESEND_WEBHOOK_SECRET` - Get from Resend Dashboard → Webhooks
+
+### Email Setup Flow
+
+**Development (Current Setup):**
+1. Set in Convex Dashboard → Development:
+   - `RESEND_API_KEY` - Your API key
+   - `RESEND_TEST_MODE=false` - To send real test emails
+   - `RESEND_TO_EMAIL=your-email@example.com` - Your email for testing
+2. Emails send from `delivered@resend.dev` (default, works without domain verification)
+3. Test using `sendTestEmail` function in Convex Dashboard
+
+**Production (When Ready to Launch):**
+1. Verify `gettreadtalks.com` domain in Resend Dashboard:
+   - Add domain
+   - Configure DNS records (SPF, DKIM, DMARC)
+   - Wait for verification
+2. Set in Convex Dashboard → Production:
+   - `RESEND_API_KEY` - Your API key
+   - `RESEND_FROM_EMAIL=noreply@gettreadtalks.com` - Your verified domain
+   - `RESEND_TEST_MODE=false` - To send real emails
+3. Emails will send from `noreply@gettreadtalks.com` with replies to `hello@gettreadtalks.com`
 
 ## 🔗 Resources
 

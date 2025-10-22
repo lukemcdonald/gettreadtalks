@@ -9,7 +9,8 @@ import { components, internal } from './_generated/api';
 import { internalMutation } from './_generated/server';
 
 // Email constants - same across all environments
-const FROM_EMAIL = 'noreply@gettreadtalks.com';
+const TEST_DOMAIN_EMAIL = 'delivered@resend.dev';
+const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || TEST_DOMAIN_EMAIL;
 const FROM_NAME = 'TREAD Talks';
 const REPLY_TO_EMAIL = 'hello@gettreadtalks.com';
 
@@ -104,7 +105,7 @@ export const sendTestEmail = internalMutation({
       html: '<p>This is a test email</p>',
       replyTo: [getReplyToAddress()],
       subject: 'Test email from TREAD Talks',
-      to: process.env.RESEND_TEST_EMAIL || 'delivered@resend.dev',
+      to: process.env.RESEND_TO_EMAIL || TEST_DOMAIN_EMAIL,
     });
   },
 });
@@ -177,11 +178,6 @@ export const sendWelcomeEmail = internalMutation({
 // ============================================
 
 function getFromAddress() {
-  // Always use Resend test domain if in test mode
-  if (process.env.RESEND_TEST_MODE !== 'false') {
-    return `${FROM_NAME} <delivered@resend.dev>`;
-  }
-
   return `${FROM_NAME} <${FROM_EMAIL}>`;
 }
 
