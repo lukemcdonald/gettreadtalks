@@ -22,6 +22,7 @@ const cspHeader = `
 `;
 
 const nextConfig: NextConfig = {
+  cacheComponents: true,
   headers: async () => {
     return [
       {

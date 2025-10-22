@@ -1,4 +1,5 @@
 import { fetchQuery } from 'convex/nextjs';
+import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
 
 import MainLayout from '@/components/layout/main-layout';
@@ -12,9 +13,12 @@ interface TalkPageProps {
 }
 
 export default async function TalkPage({ params }: TalkPageProps) {
+  // Access cookies first to mark this as a dynamic route
+  // This is required in Next.js 16 before using better-auth
+  await cookies();
+
   const { slug } = await params;
   const authToken = await getAuthToken();
-
   const talkData = await fetchQuery(api.talks.getBySlug, { slug }, { token: authToken });
 
   if (!talkData) {
