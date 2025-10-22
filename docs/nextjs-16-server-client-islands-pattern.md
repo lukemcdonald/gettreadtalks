@@ -82,6 +82,8 @@ Combine Server Components (for data fetching) with Client Component "islands" (f
 
 ```typescript
 // app/talks/[slug]/page.tsx (Server Component)
+import { Suspense } from 'react';
+
 import { fetchQuery } from 'convex/nextjs';
 import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
@@ -97,11 +99,13 @@ interface TalkPageProps {
   }>;
 }
 
-export default async function TalkPage({ params }: TalkPageProps) {
+async function TalkPageData({ params }: { params: Promise<{ slug: string }> }) {
   // IMPORTANT: Access cookies first for Next.js 16 + better-auth compatibility
   await cookies();
 
+  // Await params INSIDE Suspense boundary (Next.js 15+ requirement)
   const { slug } = await params;
+
   const authToken = await getAuthToken();
   const talkData = await fetchQuery(
     api.talks.getBySlug,
@@ -116,11 +120,21 @@ export default async function TalkPage({ params }: TalkPageProps) {
   // Pass data to Client Component
   return <TalkPageContent talkData={talkData} />;
 }
+
+export default async function TalkPage({ params }: TalkPageProps) {
+  return (
+    <Suspense fallback={<div className="p-8">Loading talk...</div>}>
+      <TalkPageData params={params} />
+    </Suspense>
+  );
+}
 ```
 
 **Key Points:**
 - ✅ No `'use client'` directive (Server Component by default)
 - ✅ Must call `await cookies()` before `getAuthToken()` (Next.js 16 requirement)
+- ✅ **Must await `params` inside Suspense boundary** (Next.js 15+ requirement)
+- ✅ Pass `params` as Promise to component inside Suspense, await there
 - ✅ Fetches data with `fetchQuery` (server-side)
 - ✅ Handles not found case
 - ✅ Minimal UI logic (just passes data)
@@ -350,9 +364,12 @@ app/talks/[slug]/
 ```typescript
 import { Suspense } from 'react';
 
-async function PageData({ slug }: { slug: string }) {
+async function PageData({ params }: { params: Promise<{ slug: string }> }) {
   // REQUIRED: Access cookies before better-auth
   await cookies();
+  
+  // Await params INSIDE Suspense boundary
+  const { slug } = await params;
   
   const authToken = await getAuthToken();
   const data = await fetchQuery(...);
@@ -363,17 +380,15 @@ async function PageData({ slug }: { slug: string }) {
 }
 
 export default async function Page({ params }: PageProps) {
-  const { slug } = await params;
-  
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <PageData slug={slug} />
+      <PageData params={params} />
     </Suspense>
   );
 }
 ```
 
-**Why Suspense:** Next.js 16 wants you to wrap dynamic data access (like `cookies()`) in Suspense boundaries so the page can stream progressively instead of blocking entirely.
+**Why Suspense:** Next.js 15+ requires wrapping dynamic data access (like `cookies()` and `await params`) in Suspense boundaries so the page can stream progressively instead of blocking entirely.
 
 **Why `await cookies()` first:** Next.js 16 requires accessing dynamic data sources (like `cookies()`) before any code that uses `Math.random()`. Since `better-auth` uses `Math.random()` internally, we must call `await cookies()` first.
 
@@ -435,17 +450,17 @@ interface TalkPageContentProps {
 
 ```typescript
 // Server Component page (with Suspense)
-async function ItemPageData({ slug }) {
+async function ItemPageData({ params }: { params: Promise<{ slug: string }> }) {
   await cookies();
+  const { slug } = await params; // Await inside Suspense
   const data = await fetchQuery(api.items.getBySlug, { slug });
   return <ItemPageContent data={data} />;
 }
 
 export default async function ItemPage({ params }) {
-  const { slug } = await params;
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <ItemPageData slug={slug} />
+      <ItemPageData params={params} />
     </Suspense>
   );
 }
@@ -591,9 +606,12 @@ interface EntityPageProps {
   }>;
 }
 
-async function EntityPageData({ slug }: { slug: string }) {
+async function EntityPageData({ params }: { params: Promise<{ slug: string }> }) {
   // Required for Next.js 16 + better-auth
   await cookies();
+
+  // Await params INSIDE Suspense boundary
+  const { slug } = await params;
 
   const authToken = await getAuthToken();
   const entityData = await fetchQuery(
@@ -610,11 +628,9 @@ async function EntityPageData({ slug }: { slug: string }) {
 }
 
 export default async function EntityPage({ params }: EntityPageProps) {
-  const { slug } = await params;
-
   return (
     <Suspense fallback={<div className="p-8">Loading...</div>}>
-      <EntityPageData slug={slug} />
+      <EntityPageData params={params} />
     </Suspense>
   );
 }
@@ -759,19 +775,19 @@ export default async function TalkPage({ params }) {
   // Warning: uncached data accessed outside of Suspense
 }
 
-// ✅ Best - with Suspense
-async function TalkPageData({ slug }) {
+// ✅ Best - with Suspense and params inside
+async function TalkPageData({ params }: { params: Promise<{ slug: string }> }) {
   await cookies(); // Access cookies first
+  const { slug } = await params; // Await params INSIDE Suspense
   const authToken = await getAuthToken();
   const data = await fetchQuery(...);
   return <TalkPageContent data={data} />;
 }
 
 export default async function TalkPage({ params }) {
-  const { slug } = await params;
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <TalkPageData slug={slug} />
+      <TalkPageData params={params} />
     </Suspense>
   );
 }

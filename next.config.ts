@@ -21,7 +21,7 @@ const cspHeader = `
   upgrade-insecure-requests;
 `;
 
-const nextConfig: NextConfig = {
+const nextConfig = {
   cacheComponents: true,
   headers: async () => {
     return [
@@ -36,7 +36,7 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-};
+} satisfies NextConfig;
 
 // Wrap with Sentry configuration if Sentry is enabled
 const config = IS_SENTRY_ENABLED
