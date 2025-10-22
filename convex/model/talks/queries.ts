@@ -144,7 +144,7 @@ export async function getTalksBySpeaker(ctx: QueryCtx, args: ListTalksBySpeakerA
   return await ctx.db
     .query('talks')
     .withIndex('by_speakerId_and_status', (q) =>
-      q.eq('speakerId', speakerId as Id<'speakers'>).eq('status', 'published'),
+      q.eq('speakerId', speakerId).eq('status', 'published'),
     )
     .order('desc')
     .take(limit);
