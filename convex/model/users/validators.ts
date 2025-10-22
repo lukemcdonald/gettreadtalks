@@ -1,5 +1,7 @@
 import { v } from 'convex/values';
 
+import { docs } from '../../lib/validators/schema';
+
 // ============================================
 // FAVORITES
 // ============================================
@@ -27,24 +29,9 @@ export const listUserFavoritesArgs = {
 };
 
 export const listUserFavoritesReturns = v.object({
-  clips: v.array(
-    v.object({
-      clipId: v.id('clips'),
-      userId: v.string(),
-    }),
-  ),
-  speakers: v.array(
-    v.object({
-      speakerId: v.id('speakers'),
-      userId: v.string(),
-    }),
-  ),
-  talks: v.array(
-    v.object({
-      talkId: v.id('talks'),
-      userId: v.string(),
-    }),
-  ),
+  clips: docs('userFavoriteClips'),
+  speakers: docs('userFavoriteSpeakers'),
+  talks: docs('userFavoriteTalks'),
 });
 
 export const unfavoriteClipArgs = {
@@ -79,12 +66,7 @@ export const listUserFinishedTalksArgs = {
   limit: v.optional(v.number()),
 };
 
-export const listUserFinishedTalksReturns = v.array(
-  v.object({
-    talkId: v.id('talks'),
-    userId: v.string(),
-  }),
-);
+export const listUserFinishedTalksReturns = docs('userFinishedTalks');
 
 export const unfinishTalkArgs = {
   talkId: v.id('talks'),
