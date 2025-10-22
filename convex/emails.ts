@@ -8,28 +8,26 @@ import { WelcomeEmail } from '../emails/welcome';
 import { components, internal } from './_generated/api';
 import { internalMutation } from './_generated/server';
 
+// Email constants - same across all environments
+const FROM_EMAIL = 'noreply@gettreadtalks.com';
+const FROM_NAME = 'TREAD Talks';
+const REPLY_TO_EMAIL = 'hello@gettreadtalks.com';
+
+// Initialize Resend client
+// Note: testMode true = simulate emails (nothing sent), false = actually send emails
 export const resend: Resend = new Resend(components.resend, {
-  testMode: process.env.NODE_ENV === 'development',
+  testMode: process.env.RESEND_TEST_MODE !== 'false',
   onEmailEvent: internal.emails.handleEmailEvent,
 });
 
-export const sendTestEmail = internalMutation({
-  handler: async (ctx) => {
-    await resend.sendEmail(ctx, {
-      from: getFromAddress(),
-      replyTo: [getReplyToAddress()],
-      to: 'delivered@resend.dev',
-      subject: 'Hi there',
-      html: 'This is a test email',
-    });
-  },
-});
+// ============================================
+// MUTATIONS
+// ============================================
 
-// Email event handler for webhook tracking following documentation pattern
 export const handleEmailEvent = internalMutation({
   args: {
-    id: vEmailId,
     event: vEmailEvent,
+    id: vEmailId,
   },
   handler: async (_ctx, args) => {
     console.log('Email event received:', {
@@ -66,85 +64,6 @@ export const handleEmailEvent = internalMutation({
   },
 });
 
-function getFromAddress() {
-  const fromEmail = process.env.RESEND_FROM_EMAIL || 'noreply@gettreadtalks.com';
-  const fromName = process.env.RESEND_FROM_NAME || 'TREAD Talks';
-
-  // Always use Resend test domain if in development mode
-  if (process.env.NODE_ENV === 'development') {
-    return 'TREAD Talks <delivered@resend.dev>';
-  }
-
-  return `${fromName} <${fromEmail}>`;
-}
-
-function getReplyToAddress() {
-  return process.env.RESEND_REPLY_TO_EMAIL || 'hello@gettreadtalks.com';
-}
-
-export const sendWelcomeEmail = internalMutation({
-  args: {
-    email: v.string(),
-    name: v.string(),
-    userId: v.string(),
-  },
-  returns: vEmailId,
-  handler: async (ctx, args) => {
-    try {
-      const html = await render(
-        WelcomeEmail({
-          name: args.name,
-          email: args.email,
-        }),
-      );
-
-      return await resend.sendEmail(ctx, {
-        subject: 'Welcome to TREAD Talks!',
-        to: args.email,
-        from: getFromAddress(),
-        replyTo: [getReplyToAddress()],
-        html,
-      });
-    } catch (error) {
-      console.error('Failed to send welcome email:', error);
-      throw new Error('Failed to send welcome email');
-    }
-  },
-});
-
-export const sendVerificationEmail = internalMutation({
-  args: {
-    email: v.string(),
-    token: v.string(),
-    verificationUrl: v.string(),
-  },
-  returns: vEmailId,
-  handler: async (ctx, args) => {
-    try {
-      const html = await render(
-        VerifyEmailTemplate({
-          email: args.email,
-          verificationUrl: args.verificationUrl,
-          token: args.token,
-        }),
-      );
-
-      const emailId = await resend.sendEmail(ctx, {
-        subject: 'Verify your email address',
-        from: getFromAddress(),
-        replyTo: [getReplyToAddress()],
-        to: args.email,
-        html,
-      });
-
-      return emailId;
-    } catch (error) {
-      console.error('Failed to send verification email:', error);
-      throw new Error('Failed to send verification email');
-    }
-  },
-});
-
 export const sendPasswordResetEmail = internalMutation({
   args: {
     email: v.string(),
@@ -163,11 +82,11 @@ export const sendPasswordResetEmail = internalMutation({
       );
 
       const emailId = await resend.sendEmail(ctx, {
+        from: getFromAddress(),
+        html,
+        replyTo: [getReplyToAddress()],
         subject: 'Reset your password',
         to: args.email,
-        from: getFromAddress(),
-        replyTo: [getReplyToAddress()],
-        html,
       });
 
       return emailId;
@@ -177,3 +96,95 @@ export const sendPasswordResetEmail = internalMutation({
     }
   },
 });
+
+export const sendTestEmail = internalMutation({
+  handler: async (ctx) => {
+    await resend.sendEmail(ctx, {
+      from: getFromAddress(),
+      html: '<p>This is a test email</p>',
+      replyTo: [getReplyToAddress()],
+      subject: 'Test email from TREAD Talks',
+      to: process.env.RESEND_TEST_EMAIL || 'delivered@resend.dev',
+    });
+  },
+});
+
+export const sendVerificationEmail = internalMutation({
+  args: {
+    email: v.string(),
+    token: v.string(),
+    verificationUrl: v.string(),
+  },
+  returns: vEmailId,
+  handler: async (ctx, args) => {
+    try {
+      const html = await render(
+        VerifyEmailTemplate({
+          email: args.email,
+          token: args.token,
+          verificationUrl: args.verificationUrl,
+        }),
+      );
+
+      const emailId = await resend.sendEmail(ctx, {
+        from: getFromAddress(),
+        html,
+        replyTo: [getReplyToAddress()],
+        subject: 'Verify your email address',
+        to: args.email,
+      });
+
+      return emailId;
+    } catch (error) {
+      console.error('Failed to send verification email:', error);
+      throw new Error('Failed to send verification email');
+    }
+  },
+});
+
+export const sendWelcomeEmail = internalMutation({
+  args: {
+    email: v.string(),
+    name: v.string(),
+    userId: v.string(),
+  },
+  returns: vEmailId,
+  handler: async (ctx, args) => {
+    try {
+      const html = await render(
+        WelcomeEmail({
+          email: args.email,
+          name: args.name,
+        }),
+      );
+
+      return await resend.sendEmail(ctx, {
+        from: getFromAddress(),
+        html,
+        replyTo: [getReplyToAddress()],
+        subject: 'Welcome to TREAD Talks!',
+        to: args.email,
+      });
+    } catch (error) {
+      console.error('Failed to send welcome email:', error);
+      throw new Error('Failed to send welcome email');
+    }
+  },
+});
+
+// ============================================
+// HELPERS
+// ============================================
+
+function getFromAddress() {
+  // Always use Resend test domain if in test mode
+  if (process.env.RESEND_TEST_MODE !== 'false') {
+    return `${FROM_NAME} <delivered@resend.dev>`;
+  }
+
+  return `${FROM_NAME} <${FROM_EMAIL}>`;
+}
+
+function getReplyToAddress() {
+  return REPLY_TO_EMAIL;
+}
