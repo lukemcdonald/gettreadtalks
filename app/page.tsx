@@ -1,4 +1,5 @@
 import { preloadQuery } from 'convex/nextjs';
+import { cookies } from 'next/headers';
 
 import MainLayout from '@/components/layout/main-layout';
 import { api } from '@/convex/_generated/api';
@@ -6,8 +7,8 @@ import { getAuthToken } from '@/lib/services/auth/server';
 
 import { HomeContent } from './_components/home-content';
 
-export default async function Home() {
-  // Preload talks data for server-side rendering
+async function HomeData() {
+  await cookies();
   const authToken = await getAuthToken();
   const preloadedTalks = await preloadQuery(
     api.talks.list,
@@ -15,9 +16,13 @@ export default async function Home() {
     { token: authToken },
   );
 
+  return <HomeContent preloadedTalks={preloadedTalks} />;
+}
+
+export default function Home() {
   return (
     <MainLayout>
-      <HomeContent preloadedTalks={preloadedTalks} />
+      <HomeData />
     </MainLayout>
   );
 }

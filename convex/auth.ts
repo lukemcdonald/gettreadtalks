@@ -27,6 +27,10 @@ export const createAuth = (
   { optionsOnly } = { optionsOnly: false },
 ) => {
   return betterAuth({
+    advanced: {
+      // Use secure cookies in production, non-secure in development
+      useSecureCookies: process.env.NODE_ENV === 'production',
+    },
     baseURL: siteUrl,
     database: authComponent.adapter(ctx),
     emailAndPassword: {

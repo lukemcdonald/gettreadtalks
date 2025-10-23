@@ -22,4 +22,3 @@ export function doc<T extends TableNames>(tableName: T, nullable: boolean = fals
 export function docs<T extends TableNames>(tableName: T) {
   return v.array(convexDoc(schema, tableName));
 }
-
