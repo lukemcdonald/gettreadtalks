@@ -67,6 +67,12 @@ const config = IS_SENTRY_ENABLED
         ignore: ["**/node_modules/**"], // Files to exclude
         deleteSourcemapsAfterUpload: true, // Security: delete after upload
       },
+
+      // Application key for third-party error filtering
+      // This marks your application code so it can be distinguished from third-party code
+      unstable_sentryWebpackPluginOptions: {
+        applicationKey: "gettreadtalks-app",
+      },
     })
   : nextConfig;
 
