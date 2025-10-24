@@ -1,8 +1,8 @@
-import type { PaginationOptions } from 'convex/server';
-import type { Id } from '../../_generated/dataModel';
-import type { QueryCtx } from '../../_generated/server';
-
+import { v } from 'convex/values';
 import { getOneFrom } from 'convex-helpers/server/relationships';
+
+import { query } from '../../_generated/server';
+import { doc, docs } from '../../lib/validators/schema';
 
 /**
  * Get speaker by ID.
@@ -11,9 +11,15 @@ import { getOneFrom } from 'convex-helpers/server/relationships';
  * @param args - Query arguments
  * @returns Speaker or null if not found
  */
-export async function getSpeaker(ctx: QueryCtx, args: { id: Id<'speakers'> }) {
-  return await ctx.db.get(args.id);
-}
+export const getSpeaker = query({
+  args: {
+    id: v.id('speakers'),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.id);
+  },
+  returns: doc('speakers', true),
+});
 
 /**
  * Get speaker by slug.
@@ -22,9 +28,15 @@ export async function getSpeaker(ctx: QueryCtx, args: { id: Id<'speakers'> }) {
  * @param args - Query arguments
  * @returns Speaker or null if not found
  */
-export async function getSpeakerBySlug(ctx: QueryCtx, args: { slug: string }) {
-  return await getOneFrom(ctx.db, 'speakers', 'by_slug', args.slug);
-}
+export const getSpeakerBySlug = query({
+  args: {
+    slug: v.string(),
+  },
+  handler: async (ctx, args) => {
+    return await getOneFrom(ctx.db, 'speakers', 'by_slug', args.slug);
+  },
+  returns: doc('speakers', true),
+});
 
 /**
  * Get speakers with pagination.
@@ -33,13 +45,19 @@ export async function getSpeakerBySlug(ctx: QueryCtx, args: { slug: string }) {
  * @param args - Query arguments with pagination options
  * @returns Paginated speakers
  */
-export async function getSpeakers(ctx: QueryCtx, args: { paginationOpts: PaginationOptions }) {
-  return await ctx.db
-    .query('speakers')
-    .withIndex('by_lastName')
-    .order('asc')
-    .paginate(args.paginationOpts);
-}
+export const getSpeakers = query({
+  args: {
+    paginationOpts: v.any(), // PaginationOptions
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query('speakers')
+      .withIndex('by_lastName')
+      .order('asc')
+      .paginate(args.paginationOpts);
+  },
+  returns: v.any(), // PaginationResult<Doc<'speakers'>>
+});
 
 /**
  * Get featured speakers (random selection).
@@ -48,21 +66,27 @@ export async function getSpeakers(ctx: QueryCtx, args: { paginationOpts: Paginat
  * @param args - Query arguments with defaults
  * @returns Array of random featured speakers
  */
-export async function listFeaturedSpeakers(ctx: QueryCtx, args: { limit?: number } = {}) {
-  const { limit = 6 } = args;
+export const listFeaturedSpeakers = query({
+  args: {
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const { limit = 6 } = args;
 
-  // Intentionally unbounded: Need all featured speakers for random selection
-  // Limited to 50 to prevent memory issues if featured speakers grow
-  const speakers = await ctx.db
-    .query('speakers')
-    .withIndex('by_featured', (q) => q.eq('featured', true))
-    .take(50);
+    // Intentionally unbounded: Need all featured speakers for random selection
+    // Limited to 50 to prevent memory issues if featured speakers grow
+    const speakers = await ctx.db
+      .query('speakers')
+      .withIndex('by_featured', (q) => q.eq('featured', true))
+      .take(50);
 
-  // Shuffle and return limited number
-  const shuffled = speakers.sort(() => Math.random() - 0.5);
+    // Shuffle and return limited number
+    const shuffled = speakers.sort(() => Math.random() - 0.5);
 
-  return shuffled.slice(0, limit);
-}
+    return shuffled.slice(0, limit);
+  },
+  returns: docs('speakers'),
+});
 
 /**
  * Get total count of speakers.
@@ -70,8 +94,12 @@ export async function listFeaturedSpeakers(ctx: QueryCtx, args: { limit?: number
  * @param ctx - Database context
  * @returns Count of speakers
  */
-export async function getSpeakersCount(ctx: QueryCtx) {
-  const speakers = await ctx.db.query('speakers').collect();
+export const getSpeakersCount = query({
+  args: {},
+  handler: async (ctx) => {
+    const speakers = await ctx.db.query('speakers').collect();
 
-  return speakers.length;
-}
+    return speakers.length;
+  },
+  returns: v.number(),
+});
