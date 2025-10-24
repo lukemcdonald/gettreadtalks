@@ -42,6 +42,7 @@ import type * as model_talks_validators from "../model/talks/validators.js";
 import type * as model_topics_index from "../model/topics/index.js";
 import type * as model_topics_mutations from "../model/topics/mutations.js";
 import type * as model_topics_queries from "../model/topics/queries.js";
+import type * as model_topics_validators from "../model/topics/validators.js";
 import type * as model_users_index from "../model/users/index.js";
 import type * as model_users_mutations from "../model/users/mutations.js";
 import type * as model_users_queries from "../model/users/queries.js";
@@ -111,6 +112,7 @@ declare const fullApi: ApiFromModules<{
   "model/topics/index": typeof model_topics_index;
   "model/topics/mutations": typeof model_topics_mutations;
   "model/topics/queries": typeof model_topics_queries;
+  "model/topics/validators": typeof model_topics_validators;
   "model/users/index": typeof model_users_index;
   "model/users/mutations": typeof model_users_mutations;
   "model/users/queries": typeof model_users_queries;
