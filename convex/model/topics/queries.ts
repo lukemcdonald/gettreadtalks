@@ -1,11 +1,5 @@
-import type { Doc } from '../../_generated/dataModel';
+import type { Doc, Id } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
-import type {
-  GetTopicArgs,
-  GetTopicBySlugArgs,
-  GetTopicWithContentArgs,
-  ListTopicsArgs,
-} from './types';
 
 import { asyncMap } from 'convex-helpers';
 import { getManyFrom, getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
@@ -17,7 +11,7 @@ import { getManyFrom, getManyVia, getOneFrom } from 'convex-helpers/server/relat
  * @param args - Query arguments
  * @returns Topic or null if not found
  */
-export async function getTopic(ctx: QueryCtx, args: GetTopicArgs) {
+export async function getTopic(ctx: QueryCtx, args: { id: Id<'topics'> }) {
   return await ctx.db.get(args.id);
 }
 
@@ -28,7 +22,7 @@ export async function getTopic(ctx: QueryCtx, args: GetTopicArgs) {
  * @param args - Query arguments
  * @returns Topic or null if not found
  */
-export async function getTopicBySlug(ctx: QueryCtx, args: GetTopicBySlugArgs) {
+export async function getTopicBySlug(ctx: QueryCtx, args: { slug: string }) {
   return await getOneFrom(ctx.db, 'topics', 'by_slug', args.slug);
 }
 
@@ -39,7 +33,7 @@ export async function getTopicBySlug(ctx: QueryCtx, args: GetTopicBySlugArgs) {
  * @param args - Query arguments with defaults
  * @returns Array of topics
  */
-export async function getTopics(ctx: QueryCtx, args: ListTopicsArgs) {
+export async function getTopics(ctx: QueryCtx, args: { limit?: number }) {
   const { limit = 100 } = args;
 
   return await ctx.db.query('topics').withIndex('by_title').take(limit);
@@ -78,7 +72,7 @@ export async function getTopicsWithCount(ctx: QueryCtx, args: { limit?: number }
  * @param args - Query arguments with defaults
  * @returns Topic with related talks and clips
  */
-export async function getTopicWithContent(ctx: QueryCtx, args: GetTopicWithContentArgs) {
+export async function getTopicWithContent(ctx: QueryCtx, args: { limit?: number; slug: string }) {
   const { limit = 50, slug } = args;
 
   const topic = await getTopicBySlug(ctx, { slug });

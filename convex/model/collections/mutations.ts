@@ -1,6 +1,5 @@
-import type { Doc } from '../../_generated/dataModel';
+import type { Doc, Id } from '../../_generated/dataModel';
 import type { MutationCtx } from '../../_generated/server';
-import type { CreateCollectionArgs, DestroyCollectionArgs, UpdateCollectionArgs } from './types';
 
 import { getOneFrom } from 'convex-helpers/server/relationships';
 
@@ -14,7 +13,14 @@ import { requireAuth } from '../auth/queries';
  * @param args - Collection creation arguments
  * @returns The ID of the created collection
  */
-export async function createCollection(ctx: MutationCtx, args: CreateCollectionArgs) {
+export async function createCollection(
+  ctx: MutationCtx,
+  args: {
+    description?: string;
+    title: string;
+    url?: string;
+  },
+) {
   await requireAuth(ctx);
 
   const slug = normalizeSlug(args.title);
@@ -36,7 +42,15 @@ export async function createCollection(ctx: MutationCtx, args: CreateCollectionA
  * @param args - Update arguments
  * @returns The ID of the updated collection
  */
-export async function updateCollection(ctx: MutationCtx, args: UpdateCollectionArgs) {
+export async function updateCollection(
+  ctx: MutationCtx,
+  args: {
+    description?: string;
+    id: Id<'collections'>;
+    title?: string;
+    url?: string;
+  },
+) {
   await requireAuth(ctx);
 
   const { id, ...rest } = args;
@@ -73,7 +87,12 @@ export async function updateCollection(ctx: MutationCtx, args: UpdateCollectionA
  * @param args - Destroy arguments
  * @returns null
  */
-export async function destroyCollection(ctx: MutationCtx, args: DestroyCollectionArgs) {
+export async function destroyCollection(
+  ctx: MutationCtx,
+  args: {
+    id: Id<'collections'>;
+  },
+) {
   await requireAuth(ctx);
 
   const collection = await ctx.db.get(args.id);

@@ -1,48 +1,73 @@
+import { v } from 'convex/values';
+
 import { mutation, query } from './_generated/server';
-import { mutations, queries, validators } from './model/topics';
+import { doc, docs } from './lib/validators/schema';
+import { mutations, queries } from './model/topics';
 
 // ============================================
 // QUERIES
 // ============================================
 
 export const get = query({
-  args: validators.getTopicArgs,
+  args: {
+    id: v.id('topics'),
+  },
   handler: async (ctx, args) => {
     return await queries.getTopic(ctx, args);
   },
-  returns: validators.getTopicReturns,
+  returns: doc('topics', true),
 });
 
 export const getBySlug = query({
-  args: validators.getTopicBySlugArgs,
+  args: {
+    slug: v.string(),
+  },
   handler: async (ctx, args) => {
     return await queries.getTopicBySlug(ctx, args);
   },
-  returns: validators.getTopicBySlugReturns,
+  returns: doc('topics', true),
 });
 
 export const getWithContent = query({
-  args: validators.getTopicWithContentArgs,
+  args: {
+    slug: v.string(),
+  },
   handler: async (ctx, args) => {
     return await queries.getTopicWithContent(ctx, args);
   },
-  returns: validators.getTopicWithContentReturns,
+  returns: v.union(
+    v.object({
+      clips: docs('clips'),
+      talks: docs('talks'),
+      topic: doc('topics'),
+    }),
+    v.null(),
+  ),
 });
 
 export const list = query({
-  args: validators.listTopicsArgs,
+  args: {
+    limit: v.optional(v.number()),
+  },
   handler: async (ctx, args) => {
     return await queries.getTopics(ctx, args);
   },
-  returns: validators.listTopicsReturns,
+  returns: docs('topics'),
 });
 
 export const listWithCount = query({
-  args: validators.listWithCountArgs,
+  args: {
+    limit: v.optional(v.number()),
+  },
   handler: async (ctx, args) => {
     return await queries.getTopicsWithCount(ctx, args);
   },
-  returns: validators.listWithCountReturns,
+  returns: v.array(
+    v.object({
+      count: v.number(),
+      topic: doc('topics'),
+    }),
+  ),
 });
 
 // ============================================
@@ -50,57 +75,76 @@ export const listWithCount = query({
 // ============================================
 
 export const addClipToTopic = mutation({
-  args: validators.addClipToTopicArgs,
+  args: {
+    clipId: v.id('clips'),
+    topicId: v.id('topics'),
+  },
   handler: async (ctx, args) => {
     return await mutations.addClipToTopic(ctx, args);
   },
-  returns: validators.addClipToTopicReturns,
+  returns: v.id('clipsOnTopics'),
 });
 
 export const addTalkToTopic = mutation({
-  args: validators.addTalkToTopicArgs,
+  args: {
+    talkId: v.id('talks'),
+    topicId: v.id('topics'),
+  },
   handler: async (ctx, args) => {
     return await mutations.addTalkToTopic(ctx, args);
   },
-  returns: validators.addTalkToTopicReturns,
+  returns: v.id('talksOnTopics'),
 });
 
 export const create = mutation({
-  args: validators.createTopicArgs,
+  args: {
+    title: v.string(),
+  },
   handler: async (ctx, args) => {
     return await mutations.createTopic(ctx, args);
   },
-  returns: validators.createTopicReturns,
+  returns: v.id('topics'),
 });
 
 export const destroy = mutation({
-  args: validators.destroyTopicArgs,
+  args: {
+    id: v.id('topics'),
+  },
   handler: async (ctx, args) => {
     return await mutations.destroyTopic(ctx, args);
   },
-  returns: validators.destroyTopicReturns,
+  returns: v.null(),
 });
 
 export const removeClipFromTopic = mutation({
-  args: validators.removeClipFromTopicArgs,
+  args: {
+    clipId: v.id('clips'),
+    topicId: v.id('topics'),
+  },
   handler: async (ctx, args) => {
     return await mutations.removeClipFromTopic(ctx, args);
   },
-  returns: validators.removeClipFromTopicReturns,
+  returns: v.null(),
 });
 
 export const removeTalkFromTopic = mutation({
-  args: validators.removeTalkFromTopicArgs,
+  args: {
+    talkId: v.id('talks'),
+    topicId: v.id('topics'),
+  },
   handler: async (ctx, args) => {
     return await mutations.removeTalkFromTopic(ctx, args);
   },
-  returns: validators.removeTalkFromTopicReturns,
+  returns: v.null(),
 });
 
 export const update = mutation({
-  args: validators.updateTopicArgs,
+  args: {
+    id: v.id('topics'),
+    title: v.optional(v.string()),
+  },
   handler: async (ctx, args) => {
     return await mutations.updateTopic(ctx, args);
   },
-  returns: validators.updateTopicReturns,
+  returns: v.id('topics'),
 });

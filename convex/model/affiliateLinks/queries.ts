@@ -1,11 +1,5 @@
+import type { Id } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
-import type {
-  GetAffiliateLinkArgs,
-  GetAffiliateLinkBySlugArgs,
-  ListAffiliateLinksArgs,
-  ListAffiliateLinksByAffiliateArgs,
-  ListAffiliateLinksByTypeArgs,
-} from './types';
 
 import { getOneFrom } from 'convex-helpers/server/relationships';
 
@@ -16,7 +10,7 @@ import { getOneFrom } from 'convex-helpers/server/relationships';
  * @param args - Query arguments
  * @returns Affiliate link or null if not found
  */
-export async function getAffiliateLink(ctx: QueryCtx, args: GetAffiliateLinkArgs) {
+export async function getAffiliateLink(ctx: QueryCtx, args: { id: Id<'affiliateLinks'> }) {
   return await ctx.db.get(args.id);
 }
 
@@ -27,7 +21,7 @@ export async function getAffiliateLink(ctx: QueryCtx, args: GetAffiliateLinkArgs
  * @param args - Query arguments
  * @returns Affiliate link or null if not found
  */
-export async function getAffiliateLinkBySlug(ctx: QueryCtx, args: GetAffiliateLinkBySlugArgs) {
+export async function getAffiliateLinkBySlug(ctx: QueryCtx, args: { slug: string }) {
   return await getOneFrom(ctx.db, 'affiliateLinks', 'by_slug', args.slug);
 }
 
@@ -38,7 +32,10 @@ export async function getAffiliateLinkBySlug(ctx: QueryCtx, args: GetAffiliateLi
  * @param args - Query arguments with defaults
  * @returns Array of affiliate links of the specified type
  */
-export async function getAffiliateLinksByType(ctx: QueryCtx, args: ListAffiliateLinksByTypeArgs) {
+export async function getAffiliateLinksByType(
+  ctx: QueryCtx,
+  args: { limit?: number; type: 'app' | 'book' | 'movie' | 'music' | 'podcast' },
+) {
   const { limit = 20, type } = args;
 
   return await ctx.db
@@ -57,7 +54,7 @@ export async function getAffiliateLinksByType(ctx: QueryCtx, args: ListAffiliate
  */
 export async function getAffiliateLinksByAffiliate(
   ctx: QueryCtx,
-  args: ListAffiliateLinksByAffiliateArgs,
+  args: { affiliate: string; limit?: number },
 ) {
   const { affiliate, limit = 20 } = args;
 
@@ -75,7 +72,15 @@ export async function getAffiliateLinksByAffiliate(
  * @param args - Query arguments with defaults
  * @returns Array of affiliate links
  */
-export async function getAffiliateLinks(ctx: QueryCtx, args: ListAffiliateLinksArgs) {
+export async function getAffiliateLinks(
+  ctx: QueryCtx,
+  args: {
+    affiliate?: string;
+    featured?: boolean;
+    limit?: number;
+    type?: 'app' | 'book' | 'movie' | 'music' | 'podcast';
+  },
+) {
   const { affiliate, featured, limit = 50, type } = args;
 
   // Use index if filtering by featured, otherwise get all links

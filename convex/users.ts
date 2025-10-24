@@ -1,57 +1,71 @@
+import { v } from 'convex/values';
+
 import { mutation, query } from './_generated/server';
 import { authComponent, createAuth } from './auth';
-import { mutations, queries, validators } from './model/users';
+import { mutations, queries } from './model/users';
 
 // ============================================
 // QUERIES
 // ============================================
 
 export const isClipFavorited = query({
-  args: validators.isClipFavoritedArgs,
+  args: {
+    clipId: v.id('clips'),
+  },
   handler: async (ctx, args) => {
     return await queries.isClipFavorited(ctx, args);
   },
-  returns: validators.isClipFavoritedReturns,
+  returns: v.boolean(),
 });
 
 export const isSpeakerFavorited = query({
-  args: validators.isSpeakerFavoritedArgs,
+  args: {
+    speakerId: v.id('speakers'),
+  },
   handler: async (ctx, args) => {
     return await queries.isSpeakerFavorited(ctx, args);
   },
-  returns: validators.isSpeakerFavoritedReturns,
+  returns: v.boolean(),
 });
 
 export const isTalkFavorited = query({
-  args: validators.isTalkFavoritedArgs,
+  args: {
+    talkId: v.id('talks'),
+  },
   handler: async (ctx, args) => {
     return await queries.isTalkFavorited(ctx, args);
   },
-  returns: validators.isTalkFavoritedReturns,
+  returns: v.boolean(),
 });
 
 export const isTalkFinished = query({
-  args: validators.isTalkFinishedArgs,
+  args: {
+    talkId: v.id('talks'),
+  },
   handler: async (ctx, args) => {
     return await queries.isTalkFinished(ctx, args);
   },
-  returns: validators.isTalkFinishedReturns,
+  returns: v.boolean(),
 });
 
 export const listFavorites = query({
-  args: validators.listUserFavoritesArgs,
+  args: {
+    limit: v.optional(v.number()),
+  },
   handler: async (ctx, args) => {
     return await queries.listUserFavorites(ctx, args);
   },
-  returns: validators.listUserFavoritesReturns,
+  returns: v.any(), // Complex return type with favorites
 });
 
 export const listFinishedTalks = query({
-  args: validators.listUserFinishedTalksArgs,
+  args: {
+    limit: v.optional(v.number()),
+  },
   handler: async (ctx, args) => {
     return await queries.listUserFinishedTalks(ctx, args);
   },
-  returns: validators.listUserFinishedTalksReturns,
+  returns: v.any(), // Complex return type with finished talks
 });
 
 // ============================================
@@ -59,71 +73,90 @@ export const listFinishedTalks = query({
 // ============================================
 
 export const favoriteClip = mutation({
-  args: validators.favoriteClipArgs,
+  args: {
+    clipId: v.id('clips'),
+  },
   handler: async (ctx, args) => {
     return await mutations.favoriteClip(ctx, args);
   },
-  returns: validators.favoriteClipReturns,
+  returns: v.id('userFavoriteClips'),
 });
 
 export const favoriteSpeaker = mutation({
-  args: validators.favoriteSpeakerArgs,
+  args: {
+    speakerId: v.id('speakers'),
+  },
   handler: async (ctx, args) => {
     return await mutations.favoriteSpeaker(ctx, args);
   },
-  returns: validators.favoriteSpeakerReturns,
+  returns: v.id('userFavoriteSpeakers'),
 });
 
 export const favoriteTalk = mutation({
-  args: validators.favoriteTalkArgs,
+  args: {
+    talkId: v.id('talks'),
+  },
   handler: async (ctx, args) => {
     return await mutations.favoriteTalk(ctx, args);
   },
-  returns: validators.favoriteTalkReturns,
+  returns: v.id('userFavoriteTalks'),
 });
 
 export const finishTalk = mutation({
-  args: validators.finishTalkArgs,
+  args: {
+    talkId: v.id('talks'),
+  },
   handler: async (ctx, args) => {
     return await mutations.finishTalk(ctx, args);
   },
-  returns: validators.finishTalkReturns,
+  returns: v.id('userFinishedTalks'),
 });
 
 export const unfavoriteClip = mutation({
-  args: validators.unfavoriteClipArgs,
+  args: {
+    clipId: v.id('clips'),
+  },
   handler: async (ctx, args) => {
     return await mutations.unfavoriteClip(ctx, args);
   },
-  returns: validators.unfavoriteClipReturns,
+  returns: v.null(),
 });
 
 export const unfavoriteSpeaker = mutation({
-  args: validators.unfavoriteSpeakerArgs,
+  args: {
+    speakerId: v.id('speakers'),
+  },
   handler: async (ctx, args) => {
     return await mutations.unfavoriteSpeaker(ctx, args);
   },
-  returns: validators.unfavoriteSpeakerReturns,
+  returns: v.null(),
 });
 
 export const unfavoriteTalk = mutation({
-  args: validators.unfavoriteTalkArgs,
+  args: {
+    talkId: v.id('talks'),
+  },
   handler: async (ctx, args) => {
     return await mutations.unfavoriteTalk(ctx, args);
   },
-  returns: validators.unfavoriteTalkReturns,
+  returns: v.null(),
 });
 
 export const unfinishTalk = mutation({
-  args: validators.unfinishTalkArgs,
+  args: {
+    talkId: v.id('talks'),
+  },
   handler: async (ctx, args) => {
     return await mutations.unfinishTalk(ctx, args);
   },
-  returns: validators.unfinishTalkReturns,
+  returns: v.null(),
 });
 
 export const updatePassword = mutation({
-  args: validators.updatePasswordArgs,
+  args: {
+    currentPassword: v.string(),
+    newPassword: v.string(),
+  },
   handler: async (ctx, args) => {
     await createAuth(ctx).api.changePassword({
       body: {
@@ -135,5 +168,5 @@ export const updatePassword = mutation({
 
     return null;
   },
-  returns: validators.updatePasswordReturns,
+  returns: v.null(),
 });

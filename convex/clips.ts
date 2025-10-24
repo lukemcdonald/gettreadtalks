@@ -1,32 +1,53 @@
+import { paginationOptsValidator } from 'convex/server';
+import { v } from 'convex/values';
+
 import { mutation, query } from './_generated/server';
-import { mutations, queries, validators } from './model/clips';
+import { statusType } from './lib/validators';
+import { doc, docs } from './lib/validators/schema';
+import { mutations, queries } from './model/clips';
 
 // ============================================
 // QUERIES
 // ============================================
 
 export const getBySlug = query({
-  args: validators.getClipBySlugWithRelationsArgs,
+  args: {
+    slug: v.string(),
+  },
   handler: async (ctx, args) => {
     return await queries.getClipBySlugWithRelations(ctx, args);
   },
-  returns: validators.getClipBySlugWithRelationsReturns,
+  returns: v.union(
+    v.object({
+      clip: doc('clips'),
+      speaker: doc('speakers', true),
+      talk: doc('talks', true),
+      topics: docs('topics'),
+    }),
+    v.null(),
+  ),
 });
 
 export const list = query({
-  args: validators.listClipsArgs,
+  args: {
+    paginationOpts: paginationOptsValidator,
+    status: v.optional(statusType),
+  },
   handler: async (ctx, args) => {
     return await queries.getClips(ctx, args);
   },
-  returns: validators.listClipsReturns,
+  returns: v.any(), // PaginationResult<Doc<'clips'>>
 });
 
 export const listBySpeaker = query({
-  args: validators.listBySpeakerArgs,
+  args: {
+    limit: v.optional(v.number()),
+    speakerId: v.id('speakers'),
+  },
   handler: async (ctx, args) => {
     return await queries.getClipsBySpeaker(ctx, args);
   },
-  returns: validators.listBySpeakerReturns,
+  returns: docs('clips'),
 });
 
 // ============================================
@@ -34,33 +55,53 @@ export const listBySpeaker = query({
 // ============================================
 
 export const archive = mutation({
-  args: validators.archiveClipArgs,
+  args: {
+    id: v.id('clips'),
+  },
   handler: async (ctx, args) => {
     return await mutations.archiveClip(ctx, args);
   },
-  returns: validators.archiveClipReturns,
+  returns: v.null(),
 });
 
 export const create = mutation({
-  args: validators.createClipArgs,
+  args: {
+    description: v.optional(v.string()),
+    mediaUrl: v.string(),
+    speakerId: v.optional(v.id('speakers')),
+    status: v.optional(statusType),
+    talkId: v.optional(v.id('talks')),
+    title: v.string(),
+  },
   handler: async (ctx, args) => {
     return await mutations.createClip(ctx, args);
   },
-  returns: validators.createClipReturns,
+  returns: v.id('clips'),
 });
 
 export const update = mutation({
-  args: validators.updateClipArgs,
+  args: {
+    description: v.optional(v.string()),
+    id: v.id('clips'),
+    mediaUrl: v.optional(v.string()),
+    speakerId: v.optional(v.id('speakers')),
+    status: v.optional(statusType),
+    talkId: v.optional(v.id('talks')),
+    title: v.optional(v.string()),
+  },
   handler: async (ctx, args) => {
     return await mutations.updateClip(ctx, args);
   },
-  returns: validators.updateClipReturns,
+  returns: v.id('clips'),
 });
 
 export const updateStatus = mutation({
-  args: validators.updateClipStatusArgs,
+  args: {
+    id: v.id('clips'),
+    status: statusType,
+  },
   handler: async (ctx, args) => {
     return await mutations.updateClipStatus(ctx, args);
   },
-  returns: validators.updateClipStatusReturns,
+  returns: v.id('clips'),
 });

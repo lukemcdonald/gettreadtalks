@@ -1,11 +1,5 @@
-import type { Doc } from '../../_generated/dataModel';
+import type { Doc, Id } from '../../_generated/dataModel';
 import type { MutationCtx } from '../../_generated/server';
-import type {
-  ArchiveTalkArgs,
-  CreateTalkArgs,
-  UpdateTalkArgs,
-  UpdateTalkStatusArgs,
-} from './types';
 
 import { normalizeSlug, slugExists } from '../../lib/utils';
 import { requireAuth } from '../auth/queries';
@@ -17,7 +11,18 @@ import { requireAuth } from '../auth/queries';
  * @param args - Talk creation arguments
  * @returns The ID of the created talk
  */
-export async function createTalk(ctx: MutationCtx, args: CreateTalkArgs) {
+export async function createTalk(
+  ctx: MutationCtx,
+  args: {
+    collectionId?: Id<'collections'>;
+    collectionOrder?: number;
+    mediaUrl: string;
+    scripture?: string;
+    speakerId: Id<'speakers'>;
+    status?: 'approved' | 'archived' | 'backlog' | 'published';
+    title: string;
+  },
+) {
   await requireAuth(ctx);
 
   const slug = normalizeSlug(args.title);
@@ -44,7 +49,21 @@ export async function createTalk(ctx: MutationCtx, args: CreateTalkArgs) {
  * @param args - Update arguments
  * @returns The ID of the updated talk
  */
-export async function updateTalk(ctx: MutationCtx, args: UpdateTalkArgs) {
+export async function updateTalk(
+  ctx: MutationCtx,
+  args: {
+    collectionId?: Id<'collections'>;
+    collectionOrder?: number;
+    description?: string;
+    featured?: boolean;
+    id: Id<'talks'>;
+    mediaUrl?: string;
+    scripture?: string;
+    speakerId?: Id<'speakers'>;
+    status?: 'approved' | 'archived' | 'backlog' | 'published';
+    title?: string;
+  },
+) {
   await requireAuth(ctx);
 
   const { id, ...rest } = args;
@@ -91,7 +110,13 @@ export async function updateTalk(ctx: MutationCtx, args: UpdateTalkArgs) {
  * @param args - Update arguments
  * @returns The ID of the updated talk
  */
-export async function updateTalkStatus(ctx: MutationCtx, args: UpdateTalkStatusArgs) {
+export async function updateTalkStatus(
+  ctx: MutationCtx,
+  args: {
+    id: Id<'talks'>;
+    status: 'approved' | 'archived' | 'backlog' | 'published';
+  },
+) {
   await requireAuth(ctx);
 
   const talk = await ctx.db.get(args.id);
@@ -124,7 +149,12 @@ export async function updateTalkStatus(ctx: MutationCtx, args: UpdateTalkStatusA
  * @param args - Archive arguments
  * @returns null
  */
-export async function archiveTalk(ctx: MutationCtx, args: ArchiveTalkArgs) {
+export async function archiveTalk(
+  ctx: MutationCtx,
+  args: {
+    id: Id<'talks'>;
+  },
+) {
   await requireAuth(ctx);
 
   const talk = await ctx.db.get(args.id);

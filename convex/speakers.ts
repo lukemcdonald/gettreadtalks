@@ -1,48 +1,60 @@
+import { paginationOptsValidator } from 'convex/server';
+import { v } from 'convex/values';
+
 import { mutation, query } from './_generated/server';
-import { mutations, queries, validators } from './model/speakers';
+import { doc, docs } from './lib/validators/schema';
+import { mutations, queries } from './model/speakers';
 
 // ============================================
 // QUERIES
 // ============================================
 
 export const get = query({
-  args: validators.getSpeakerArgs,
+  args: {
+    id: v.id('speakers'),
+  },
   handler: async (ctx, args) => {
     return await queries.getSpeaker(ctx, args);
   },
-  returns: validators.getSpeakerReturns,
+  returns: doc('speakers', true),
 });
 
 export const getBySlug = query({
-  args: validators.getSpeakerBySlugArgs,
+  args: {
+    slug: v.string(),
+  },
   handler: async (ctx, args) => {
     return await queries.getSpeakerBySlug(ctx, args);
   },
-  returns: validators.getSpeakerBySlugReturns,
+  returns: doc('speakers', true),
 });
 
 export const getCount = query({
-  args: validators.getCountArgs,
+  args: {},
   handler: async (ctx) => {
     return await queries.getSpeakersCount(ctx);
   },
-  returns: validators.getCountReturns,
+  returns: v.number(),
 });
 
 export const list = query({
-  args: validators.listSpeakersArgs,
+  args: {
+    paginationOpts: paginationOptsValidator,
+  },
   handler: async (ctx, args) => {
     return await queries.getSpeakers(ctx, args);
   },
-  returns: validators.listSpeakersReturns,
+  returns: v.any(), // PaginationResult<Doc<'speakers'>>
 });
 
 export const listFeatured = query({
-  args: validators.listFeaturedSpeakersArgs,
+  args: {
+    limit: v.optional(v.number()),
+  },
   handler: async (ctx, args) => {
     return await queries.listFeaturedSpeakers(ctx, args);
   },
-  returns: validators.listFeaturedSpeakersReturns,
+  returns: docs('speakers'),
 });
 
 // ============================================
@@ -50,25 +62,45 @@ export const listFeatured = query({
 // ============================================
 
 export const create = mutation({
-  args: validators.createSpeakerArgs,
+  args: {
+    description: v.optional(v.string()),
+    firstName: v.string(),
+    imageUrl: v.optional(v.string()),
+    lastName: v.string(),
+    ministry: v.optional(v.string()),
+    role: v.optional(v.string()),
+    websiteUrl: v.optional(v.string()),
+  },
   handler: async (ctx, args) => {
     return await mutations.createSpeaker(ctx, args);
   },
-  returns: validators.createSpeakerReturns,
+  returns: v.id('speakers'),
 });
 
 export const destroy = mutation({
-  args: validators.destroySpeakerArgs,
+  args: {
+    id: v.id('speakers'),
+  },
   handler: async (ctx, args) => {
     return await mutations.destroySpeaker(ctx, args);
   },
-  returns: validators.destroySpeakerReturns,
+  returns: v.null(),
 });
 
 export const update = mutation({
-  args: validators.updateSpeakerArgs,
+  args: {
+    description: v.optional(v.string()),
+    featured: v.optional(v.boolean()),
+    firstName: v.optional(v.string()),
+    id: v.id('speakers'),
+    imageUrl: v.optional(v.string()),
+    lastName: v.optional(v.string()),
+    ministry: v.optional(v.string()),
+    role: v.optional(v.string()),
+    websiteUrl: v.optional(v.string()),
+  },
   handler: async (ctx, args) => {
     return await mutations.updateSpeaker(ctx, args);
   },
-  returns: validators.updateSpeakerReturns,
+  returns: v.id('speakers'),
 });

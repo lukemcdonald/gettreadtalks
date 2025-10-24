@@ -1,6 +1,5 @@
 import type { Doc, Id } from '../../_generated/dataModel';
 import type { MutationCtx } from '../../_generated/server';
-import type { CreateTopicArgs, DestroyTopicArgs, UpdateTopicArgs } from './types';
 
 import { getOneFrom } from 'convex-helpers/server/relationships';
 
@@ -15,7 +14,12 @@ import { requireAuth } from '../auth/queries';
  * @param args - Topic creation arguments
  * @returns The ID of the created topic
  */
-export async function createTopic(ctx: MutationCtx, args: CreateTopicArgs) {
+export async function createTopic(
+  ctx: MutationCtx,
+  args: {
+    title: string;
+  },
+) {
   await requireAuth(ctx);
 
   const slug = normalizeSlug(args.title);
@@ -37,7 +41,13 @@ export async function createTopic(ctx: MutationCtx, args: CreateTopicArgs) {
  * @param args - Update arguments
  * @returns The ID of the updated topic
  */
-export async function updateTopic(ctx: MutationCtx, args: UpdateTopicArgs) {
+export async function updateTopic(
+  ctx: MutationCtx,
+  args: {
+    id: Id<'topics'>;
+    title?: string;
+  },
+) {
   await requireAuth(ctx);
 
   const { id, ...rest } = args;
@@ -75,7 +85,12 @@ export async function updateTopic(ctx: MutationCtx, args: UpdateTopicArgs) {
  * @param args - Destroy arguments
  * @returns null
  */
-export async function destroyTopic(ctx: MutationCtx, args: DestroyTopicArgs) {
+export async function destroyTopic(
+  ctx: MutationCtx,
+  args: {
+    id: Id<'topics'>;
+  },
+) {
   await requireAuth(ctx);
 
   const topic = await ctx.db.get(args.id);

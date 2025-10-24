@@ -2,12 +2,6 @@ import type { PaginationOptions } from 'convex/server';
 import type { Doc, Id } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
 import type { StatusType } from '../../lib/types';
-import type {
-  GetTalkArgs,
-  GetTalkBySlugArgs,
-  ListTalksByCollectionArgs,
-  ListTalksBySpeakerArgs,
-} from './types';
 
 import { asyncMap } from 'convex-helpers';
 import { getManyFrom, getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
@@ -19,7 +13,7 @@ import { getManyFrom, getManyVia, getOneFrom } from 'convex-helpers/server/relat
  * @param args - Query arguments
  * @returns Talk or null if not found
  */
-export async function getTalk(ctx: QueryCtx, args: GetTalkArgs) {
+export async function getTalk(ctx: QueryCtx, args: { id: Id<'talks'> }) {
   return await ctx.db.get(args.id);
 }
 
@@ -30,7 +24,7 @@ export async function getTalk(ctx: QueryCtx, args: GetTalkArgs) {
  * @param args - Query arguments
  * @returns Talk or null if not found
  */
-export async function getTalkBySlug(ctx: QueryCtx, args: GetTalkBySlugArgs) {
+export async function getTalkBySlug(ctx: QueryCtx, args: { slug: string }) {
   return await getOneFrom(ctx.db, 'talks', 'by_slug', args.slug);
 }
 
@@ -95,7 +89,7 @@ export async function getTalksWithSpeakers(
  * @param args - Query arguments
  * @returns Talk with speaker, collection, clips, and topics data
  */
-export async function getTalkBySlugWithRelations(ctx: QueryCtx, args: GetTalkBySlugArgs) {
+export async function getTalkBySlugWithRelations(ctx: QueryCtx, args: { slug: string }) {
   const talk = await getTalkBySlug(ctx, args);
 
   if (!talk) {
@@ -138,7 +132,10 @@ export async function getTalkBySlugWithRelations(ctx: QueryCtx, args: GetTalkByS
  * @param args - Query arguments with defaults
  * @returns Array of talks
  */
-export async function getTalksBySpeaker(ctx: QueryCtx, args: ListTalksBySpeakerArgs) {
+export async function getTalksBySpeaker(
+  ctx: QueryCtx,
+  args: { limit?: number; speakerId: Id<'speakers'> },
+) {
   const { limit = 20, speakerId } = args;
 
   return await ctx.db
@@ -157,7 +154,10 @@ export async function getTalksBySpeaker(ctx: QueryCtx, args: ListTalksBySpeakerA
  * @param args - Query arguments with defaults
  * @returns Array of talks sorted by collection order
  */
-export async function getTalksByCollection(ctx: QueryCtx, args: ListTalksByCollectionArgs) {
+export async function getTalksByCollection(
+  ctx: QueryCtx,
+  args: { collectionId: Id<'collections'>; limit?: number },
+) {
   const { collectionId, limit = 100 } = args;
 
   const talks = await ctx.db

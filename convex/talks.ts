@@ -1,80 +1,116 @@
+import { paginationOptsValidator } from 'convex/server';
+import { v } from 'convex/values';
+
 import { mutation, query } from './_generated/server';
-import { mutations, queries, validators } from './model/talks';
+import { statusType } from './lib/validators';
+import { doc, docs } from './lib/validators/schema';
+import { mutations, queries } from './model/talks';
 
 // ============================================
 // QUERIES
 // ============================================
 
 export const get = query({
-  args: validators.getTalkArgs,
+  args: {
+    id: v.id('talks'),
+  },
   handler: async (ctx, args) => {
     return await queries.getTalk(ctx, args);
   },
-  returns: validators.getTalkReturns,
+  returns: doc('talks', true),
 });
 
 export const getBySlug = query({
-  args: validators.getTalkBySlugArgs,
+  args: {
+    slug: v.string(),
+  },
   handler: async (ctx, args) => {
     return await queries.getTalkBySlugWithRelations(ctx, args);
   },
-  returns: validators.getTalkBySlugReturns,
+  returns: v.union(
+    v.object({
+      clips: docs('clips'),
+      collection: doc('collections', true),
+      speaker: doc('speakers', true),
+      talk: doc('talks'),
+      topics: docs('topics'),
+    }),
+    v.null(),
+  ),
 });
 
 export const getCount = query({
-  args: validators.getCountArgs,
+  args: {},
   handler: async (ctx) => {
     return await queries.getTalksCount(ctx);
   },
-  returns: validators.getCountReturns,
+  returns: v.number(),
 });
 
 export const listRandomBySpeaker = query({
-  args: validators.listRandomTalksBySpeakerArgs,
+  args: {
+    excludeTalkId: v.optional(v.id('talks')),
+    limit: v.optional(v.number()),
+    speakerId: v.id('speakers'),
+  },
   handler: async (ctx, args) => {
     return await queries.getRandomTalksBySpeaker(ctx, args);
   },
-  returns: validators.listRandomTalksBySpeakerReturns,
+  returns: docs('talks'),
 });
 
 export const list = query({
-  args: validators.listTalksArgs,
+  args: {
+    paginationOpts: paginationOptsValidator,
+    status: v.optional(statusType),
+  },
   handler: async (ctx, args) => {
     return await queries.getTalks(ctx, args);
   },
-  returns: validators.listTalksReturns,
+  returns: v.any(), // PaginationResult<Doc<'talks'>>
 });
 
 export const listByCollection = query({
-  args: validators.listTalksByCollectionArgs,
+  args: {
+    collectionId: v.id('collections'),
+    limit: v.optional(v.number()),
+  },
   handler: async (ctx, args) => {
     return await queries.getTalksByCollection(ctx, args);
   },
-  returns: validators.listTalksByCollectionReturns,
+  returns: docs('talks'),
 });
 
 export const listBySpeaker = query({
-  args: validators.listTalksBySpeakerArgs,
+  args: {
+    limit: v.optional(v.number()),
+    speakerId: v.id('speakers'),
+  },
   handler: async (ctx, args) => {
     return await queries.getTalksBySpeaker(ctx, args);
   },
-  returns: validators.listTalksBySpeakerReturns,
+  returns: docs('talks'),
 });
 
 export const listFeatured = query({
-  args: validators.listFeaturedTalksArgs,
+  args: {
+    limit: v.optional(v.number()),
+  },
   handler: async (ctx, args) => {
     return await queries.listFeaturedTalks(ctx, args);
   },
-  returns: validators.listFeaturedTalksReturns,
+  returns: docs('talks'),
 });
 
 export const listWithSpeakers = query({
-  args: validators.listTalksWithSpeakersArgs,
+  args: {
+    paginationOpts: paginationOptsValidator,
+    status: v.optional(statusType),
+  },
   handler: async (ctx, args) => {
     return await queries.getTalksWithSpeakers(ctx, args);
   },
-  returns: validators.listTalksWithSpeakersReturns,
+  returns: v.any(), // PaginationResult with enriched page
 });
 
 // ============================================
@@ -82,33 +118,57 @@ export const listWithSpeakers = query({
 // ============================================
 
 export const archive = mutation({
-  args: validators.archiveTalkArgs,
+  args: {
+    id: v.id('talks'),
+  },
   handler: async (ctx, args) => {
     return await mutations.archiveTalk(ctx, args);
   },
-  returns: validators.archiveTalkReturns,
+  returns: v.null(),
 });
 
 export const create = mutation({
-  args: validators.createTalkArgs,
+  args: {
+    collectionId: v.optional(v.id('collections')),
+    collectionOrder: v.optional(v.number()),
+    mediaUrl: v.string(),
+    scripture: v.optional(v.string()),
+    speakerId: v.id('speakers'),
+    status: v.optional(statusType),
+    title: v.string(),
+  },
   handler: async (ctx, args) => {
     return await mutations.createTalk(ctx, args);
   },
-  returns: validators.createTalkReturns,
+  returns: v.id('talks'),
 });
 
 export const update = mutation({
-  args: validators.updateTalkArgs,
+  args: {
+    collectionId: v.optional(v.id('collections')),
+    collectionOrder: v.optional(v.number()),
+    description: v.optional(v.string()),
+    featured: v.optional(v.boolean()),
+    id: v.id('talks'),
+    mediaUrl: v.optional(v.string()),
+    scripture: v.optional(v.string()),
+    speakerId: v.optional(v.id('speakers')),
+    status: v.optional(statusType),
+    title: v.optional(v.string()),
+  },
   handler: async (ctx, args) => {
     return await mutations.updateTalk(ctx, args);
   },
-  returns: validators.updateTalkReturns,
+  returns: v.id('talks'),
 });
 
 export const updateStatus = mutation({
-  args: validators.updateTalkStatusArgs,
+  args: {
+    id: v.id('talks'),
+    status: statusType,
+  },
   handler: async (ctx, args) => {
     return await mutations.updateTalkStatus(ctx, args);
   },
-  returns: validators.updateTalkStatusReturns,
+  returns: v.id('talks'),
 });

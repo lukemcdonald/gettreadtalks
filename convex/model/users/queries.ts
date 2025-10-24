@@ -1,6 +1,5 @@
 import type { Id } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
-import type { ListUserFavoritesArgs } from './types';
 
 import { getCurrentUser } from '../auth/queries';
 
@@ -11,7 +10,7 @@ import { getCurrentUser } from '../auth/queries';
  * @param args - Query arguments with defaults
  * @returns Object with clips, speakers, and talks favorites
  */
-export async function listUserFavorites(ctx: QueryCtx, args: ListUserFavoritesArgs) {
+export async function listUserFavorites(ctx: QueryCtx, args: { limit?: number }) {
   const user = await getCurrentUser(ctx);
 
   if (!user) {

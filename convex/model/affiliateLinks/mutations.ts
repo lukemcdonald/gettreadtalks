@@ -1,10 +1,5 @@
-import type { Doc } from '../../_generated/dataModel';
+import type { Doc, Id } from '../../_generated/dataModel';
 import type { MutationCtx } from '../../_generated/server';
-import type {
-  CreateAffiliateLinkArgs,
-  DestroyAffiliateLinkArgs,
-  UpdateAffiliateLinkArgs,
-} from './types';
 
 import { normalizeSlug, slugExists } from '../../lib/utils';
 import { requireAuth } from '../auth/queries';
@@ -16,7 +11,17 @@ import { requireAuth } from '../auth/queries';
  * @param args - Affiliate link creation arguments
  * @returns The ID of the created affiliate link
  */
-export async function createAffiliateLink(ctx: MutationCtx, args: CreateAffiliateLinkArgs) {
+export async function createAffiliateLink(
+  ctx: MutationCtx,
+  args: {
+    affiliate?: string;
+    description?: string;
+    featured?: boolean;
+    title: string;
+    type: 'app' | 'book' | 'movie' | 'music' | 'podcast';
+    url: string;
+  },
+) {
   await requireAuth(ctx);
 
   const slug = normalizeSlug(args.title);
@@ -38,7 +43,18 @@ export async function createAffiliateLink(ctx: MutationCtx, args: CreateAffiliat
  * @param args - Update arguments
  * @returns The ID of the updated affiliate link
  */
-export async function updateAffiliateLink(ctx: MutationCtx, args: UpdateAffiliateLinkArgs) {
+export async function updateAffiliateLink(
+  ctx: MutationCtx,
+  args: {
+    affiliate?: string;
+    description?: string;
+    featured?: boolean;
+    id: Id<'affiliateLinks'>;
+    title?: string;
+    type?: 'app' | 'book' | 'movie' | 'music' | 'podcast';
+    url?: string;
+  },
+) {
   await requireAuth(ctx);
 
   const { id, ...rest } = args;
@@ -77,7 +93,12 @@ export async function updateAffiliateLink(ctx: MutationCtx, args: UpdateAffiliat
  * @param args - Destroy arguments
  * @returns null
  */
-export async function destroyAffiliateLink(ctx: MutationCtx, args: DestroyAffiliateLinkArgs) {
+export async function destroyAffiliateLink(
+  ctx: MutationCtx,
+  args: {
+    id: Id<'affiliateLinks'>;
+  },
+) {
   await requireAuth(ctx);
 
   const affiliateLink = await ctx.db.get(args.id);

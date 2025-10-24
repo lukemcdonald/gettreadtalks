@@ -1,11 +1,6 @@
 import type { PaginationOptions } from 'convex/server';
 import type { Doc, Id } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
-import type {
-  GetCollectionArgs,
-  GetCollectionBySlugArgs,
-  GetCollectionWithTalksArgs,
-} from './types';
 
 import { asyncMap } from 'convex-helpers';
 import { getAll, getOneFrom } from 'convex-helpers/server/relationships';
@@ -17,7 +12,7 @@ import { getAll, getOneFrom } from 'convex-helpers/server/relationships';
  * @param args - Query arguments
  * @returns Collection or null if not found
  */
-export async function getCollection(ctx: QueryCtx, args: GetCollectionArgs) {
+export async function getCollection(ctx: QueryCtx, args: { id: Id<'collections'> }) {
   return await ctx.db.get(args.id);
 }
 
@@ -28,7 +23,7 @@ export async function getCollection(ctx: QueryCtx, args: GetCollectionArgs) {
  * @param args - Query arguments
  * @returns Collection or null if not found
  */
-export async function getCollectionBySlug(ctx: QueryCtx, args: GetCollectionBySlugArgs) {
+export async function getCollectionBySlug(ctx: QueryCtx, args: { slug: string }) {
   return await getOneFrom(ctx.db, 'collections', 'by_slug', args.slug);
 }
 
@@ -92,10 +87,13 @@ export async function getCollectionsWithStats(
  * @param args - Query arguments with defaults
  * @returns Collection with its talks
  */
-export async function getCollectionWithTalks(ctx: QueryCtx, args: GetCollectionWithTalksArgs) {
-  const { limit = 100, slug } = args;
+export async function getCollectionWithTalks(
+  ctx: QueryCtx,
+  args: { id: Id<'collections'>; limit?: number },
+) {
+  const { limit = 100, id } = args;
 
-  const collection = await getCollectionBySlug(ctx, { slug });
+  const collection = await ctx.db.get(id);
 
   if (!collection) {
     return null;

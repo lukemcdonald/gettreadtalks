@@ -2,7 +2,6 @@ import type { PaginationOptions } from 'convex/server';
 import type { Id } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
 import type { StatusType } from '../../lib/types';
-import type { GetClipBySlugWithRelationsArgs } from './types';
 
 import { getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
 
@@ -59,10 +58,7 @@ export async function getClipsBySpeaker(
  * @param args - Query arguments
  * @returns Clip with speaker, talk, and topics data
  */
-export async function getClipBySlugWithRelations(
-  ctx: QueryCtx,
-  args: GetClipBySlugWithRelationsArgs,
-) {
+export async function getClipBySlugWithRelations(ctx: QueryCtx, args: { slug: string }) {
   const clip = await getOneFrom(ctx.db, 'clips', 'by_slug', args.slug);
 
   if (!clip || clip.status !== 'published') {

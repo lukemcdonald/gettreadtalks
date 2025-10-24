@@ -1,64 +1,94 @@
+import { paginationOptsValidator } from 'convex/server';
+import { v } from 'convex/values';
+
 import { mutation, query } from './_generated/server';
-import { mutations, queries, validators } from './model/collections';
+import { doc, docs } from './lib/validators/schema';
+import { mutations, queries } from './model/collections';
 
 // ============================================
 // QUERIES
 // ============================================
 
 export const get = query({
-  args: validators.getCollectionArgs,
+  args: {
+    id: v.id('collections'),
+  },
   handler: async (ctx, args) => {
     return await queries.getCollection(ctx, args);
   },
-  returns: validators.getCollectionReturns,
+  returns: doc('collections', true),
 });
 
 export const getBySlug = query({
-  args: validators.getCollectionBySlugArgs,
+  args: {
+    slug: v.string(),
+  },
   handler: async (ctx, args) => {
     return await queries.getCollectionBySlug(ctx, args);
   },
-  returns: validators.getCollectionBySlugReturns,
+  returns: doc('collections', true),
 });
 
 export const getWithSpeakers = query({
-  args: validators.getCollectionWithSpeakersArgs,
+  args: {
+    slug: v.string(),
+  },
   handler: async (ctx, args) => {
     return await queries.getCollectionWithSpeakers(ctx, args);
   },
-  returns: validators.getCollectionWithSpeakersReturns,
+  returns: v.union(
+    v.object({
+      collection: doc('collections'),
+      speakers: docs('speakers'),
+    }),
+    v.null(),
+  ),
 });
 
 export const getWithTalks = query({
-  args: validators.getCollectionWithTalksArgs,
+  args: {
+    id: v.id('collections'),
+  },
   handler: async (ctx, args) => {
     return await queries.getCollectionWithTalks(ctx, args);
   },
-  returns: validators.getCollectionWithTalksReturns,
+  returns: v.union(
+    v.object({
+      collection: doc('collections'),
+      talks: docs('talks'),
+    }),
+    v.null(),
+  ),
 });
 
 export const list = query({
-  args: validators.listCollectionsArgs,
+  args: {
+    paginationOpts: paginationOptsValidator,
+  },
   handler: async (ctx, args) => {
     return await queries.getCollections(ctx, args);
   },
-  returns: validators.listCollectionsReturns,
+  returns: v.any(), // PaginationResult<Doc<'collections'>>
 });
 
 export const listBySpeaker = query({
-  args: validators.listBySpeakerArgs,
+  args: {
+    speakerId: v.id('speakers'),
+  },
   handler: async (ctx, args) => {
     return await queries.getCollectionsBySpeaker(ctx, args);
   },
-  returns: validators.listBySpeakerReturns,
+  returns: docs('collections'),
 });
 
 export const listWithStats = query({
-  args: validators.listWithStatsArgs,
+  args: {
+    paginationOpts: paginationOptsValidator,
+  },
   handler: async (ctx, args) => {
     return await queries.getCollectionsWithStats(ctx, args);
   },
-  returns: validators.listWithStatsReturns,
+  returns: v.any(), // PaginationResult with stats
 });
 
 // ============================================
@@ -66,25 +96,36 @@ export const listWithStats = query({
 // ============================================
 
 export const create = mutation({
-  args: validators.createCollectionArgs,
+  args: {
+    description: v.optional(v.string()),
+    title: v.string(),
+    url: v.optional(v.string()),
+  },
   handler: async (ctx, args) => {
     return await mutations.createCollection(ctx, args);
   },
-  returns: validators.createCollectionReturns,
+  returns: v.id('collections'),
 });
 
 export const destroy = mutation({
-  args: validators.destroyCollectionArgs,
+  args: {
+    id: v.id('collections'),
+  },
   handler: async (ctx, args) => {
     return await mutations.destroyCollection(ctx, args);
   },
-  returns: validators.destroyCollectionReturns,
+  returns: v.null(),
 });
 
 export const update = mutation({
-  args: validators.updateCollectionArgs,
+  args: {
+    description: v.optional(v.string()),
+    id: v.id('collections'),
+    title: v.optional(v.string()),
+    url: v.optional(v.string()),
+  },
   handler: async (ctx, args) => {
     return await mutations.updateCollection(ctx, args);
   },
-  returns: validators.updateCollectionReturns,
+  returns: v.id('collections'),
 });

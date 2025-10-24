@@ -1,6 +1,6 @@
 import type { PaginationOptions } from 'convex/server';
+import type { Id } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
-import type { GetSpeakerArgs, GetSpeakerBySlugArgs } from './types';
 
 import { getOneFrom } from 'convex-helpers/server/relationships';
 
@@ -11,7 +11,7 @@ import { getOneFrom } from 'convex-helpers/server/relationships';
  * @param args - Query arguments
  * @returns Speaker or null if not found
  */
-export async function getSpeaker(ctx: QueryCtx, args: GetSpeakerArgs) {
+export async function getSpeaker(ctx: QueryCtx, args: { id: Id<'speakers'> }) {
   return await ctx.db.get(args.id);
 }
 
@@ -22,7 +22,7 @@ export async function getSpeaker(ctx: QueryCtx, args: GetSpeakerArgs) {
  * @param args - Query arguments
  * @returns Speaker or null if not found
  */
-export async function getSpeakerBySlug(ctx: QueryCtx, args: GetSpeakerBySlugArgs) {
+export async function getSpeakerBySlug(ctx: QueryCtx, args: { slug: string }) {
   return await getOneFrom(ctx.db, 'speakers', 'by_slug', args.slug);
 }
 

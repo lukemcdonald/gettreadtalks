@@ -1,11 +1,5 @@
-import type { Doc } from '../../_generated/dataModel';
+import type { Doc, Id } from '../../_generated/dataModel';
 import type { MutationCtx } from '../../_generated/server';
-import type {
-  ArchiveClipArgs,
-  CreateClipArgs,
-  UpdateClipArgs,
-  UpdateClipStatusArgs,
-} from './types';
 
 import { normalizeSlug, slugExists } from '../../lib/utils';
 import { requireAuth } from '../auth/queries';
@@ -17,7 +11,17 @@ import { requireAuth } from '../auth/queries';
  * @param args - Clip creation arguments
  * @returns The ID of the created clip
  */
-export async function createClip(ctx: MutationCtx, args: CreateClipArgs) {
+export async function createClip(
+  ctx: MutationCtx,
+  args: {
+    description?: string;
+    mediaUrl: string;
+    speakerId?: Id<'speakers'>;
+    status?: 'approved' | 'archived' | 'backlog' | 'published';
+    talkId?: Id<'talks'>;
+    title: string;
+  },
+) {
   await requireAuth(ctx);
 
   const slug = normalizeSlug(args.title);
@@ -44,7 +48,18 @@ export async function createClip(ctx: MutationCtx, args: CreateClipArgs) {
  * @param args - Update arguments
  * @returns The ID of the updated clip
  */
-export async function updateClip(ctx: MutationCtx, args: UpdateClipArgs) {
+export async function updateClip(
+  ctx: MutationCtx,
+  args: {
+    description?: string;
+    id: Id<'clips'>;
+    mediaUrl?: string;
+    speakerId?: Id<'speakers'>;
+    status?: 'approved' | 'archived' | 'backlog' | 'published';
+    talkId?: Id<'talks'>;
+    title?: string;
+  },
+) {
   await requireAuth(ctx);
 
   const { id, ...rest } = args;
@@ -91,7 +106,13 @@ export async function updateClip(ctx: MutationCtx, args: UpdateClipArgs) {
  * @param args - Update arguments
  * @returns The ID of the updated clip
  */
-export async function updateClipStatus(ctx: MutationCtx, args: UpdateClipStatusArgs) {
+export async function updateClipStatus(
+  ctx: MutationCtx,
+  args: {
+    id: Id<'clips'>;
+    status: 'approved' | 'archived' | 'backlog' | 'published';
+  },
+) {
   await requireAuth(ctx);
 
   const clip: Doc<'clips'> | null = await ctx.db.get(args.id);
@@ -124,7 +145,12 @@ export async function updateClipStatus(ctx: MutationCtx, args: UpdateClipStatusA
  * @param args - Archive arguments
  * @returns null
  */
-export async function archiveClip(ctx: MutationCtx, args: ArchiveClipArgs) {
+export async function archiveClip(
+  ctx: MutationCtx,
+  args: {
+    id: Id<'clips'>;
+  },
+) {
   await requireAuth(ctx);
 
   const clip = await ctx.db.get(args.id);

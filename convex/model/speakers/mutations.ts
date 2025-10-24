@@ -1,6 +1,5 @@
-import type { Doc } from '../../_generated/dataModel';
+import type { Doc, Id } from '../../_generated/dataModel';
 import type { MutationCtx } from '../../_generated/server';
-import type { CreateSpeakerArgs, DestroySpeakerArgs, UpdateSpeakerArgs } from './types';
 
 import { getManyFrom, getOneFrom } from 'convex-helpers/server/relationships';
 
@@ -15,7 +14,18 @@ import { requireAuth } from '../auth/queries';
  * @param args - Speaker creation arguments
  * @returns The ID of the created speaker
  */
-export async function createSpeaker(ctx: MutationCtx, args: CreateSpeakerArgs) {
+export async function createSpeaker(
+  ctx: MutationCtx,
+  args: {
+    description?: string;
+    firstName: string;
+    imageUrl?: string;
+    lastName: string;
+    ministry?: string;
+    role?: string;
+    websiteUrl?: string;
+  },
+) {
   await requireAuth(ctx);
 
   const slug = normalizeSlug(`${args.firstName} ${args.lastName}`);
@@ -37,7 +47,20 @@ export async function createSpeaker(ctx: MutationCtx, args: CreateSpeakerArgs) {
  * @param args - Update arguments
  * @returns The ID of the updated speaker
  */
-export async function updateSpeaker(ctx: MutationCtx, args: UpdateSpeakerArgs) {
+export async function updateSpeaker(
+  ctx: MutationCtx,
+  args: {
+    description?: string;
+    featured?: boolean;
+    firstName?: string;
+    id: Id<'speakers'>;
+    imageUrl?: string;
+    lastName?: string;
+    ministry?: string;
+    role?: string;
+    websiteUrl?: string;
+  },
+) {
   await requireAuth(ctx);
 
   const { id, ...rest } = args;
@@ -78,7 +101,12 @@ export async function updateSpeaker(ctx: MutationCtx, args: UpdateSpeakerArgs) {
  * @param args - Destroy arguments
  * @returns null
  */
-export async function destroySpeaker(ctx: MutationCtx, args: DestroySpeakerArgs) {
+export async function destroySpeaker(
+  ctx: MutationCtx,
+  args: {
+    id: Id<'speakers'>;
+  },
+) {
   await requireAuth(ctx);
 
   const speaker = await ctx.db.get(args.id);
