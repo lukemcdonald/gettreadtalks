@@ -1,66 +1,9 @@
-import { mutation, query } from './_generated/server';
-import { mutations, queries, validators } from './model/clips';
+import { mutations, queries } from './model/clips';
 
-// ============================================
-// QUERIES
-// ============================================
-
-export const getBySlug = query({
-  args: validators.getClipBySlugWithRelationsArgs,
-  handler: async (ctx, args) => {
-    return await queries.getClipBySlugWithRelations(ctx, args);
-  },
-  returns: validators.getClipBySlugWithRelationsReturns,
-});
-
-export const list = query({
-  args: validators.listClipsArgs,
-  handler: async (ctx, args) => {
-    return await queries.getClips(ctx, args);
-  },
-  returns: validators.listClipsReturns,
-});
-
-export const listBySpeaker = query({
-  args: validators.listBySpeakerArgs,
-  handler: async (ctx, args) => {
-    return await queries.getClipsBySpeaker(ctx, args);
-  },
-  returns: validators.listBySpeakerReturns,
-});
-
-// ============================================
-// MUTATIONS
-// ============================================
-
-export const archive = mutation({
-  args: validators.archiveClipArgs,
-  handler: async (ctx, args) => {
-    return await mutations.archiveClip(ctx, args);
-  },
-  returns: validators.archiveClipReturns,
-});
-
-export const create = mutation({
-  args: validators.createClipArgs,
-  handler: async (ctx, args) => {
-    return await mutations.createClip(ctx, args);
-  },
-  returns: validators.createClipReturns,
-});
-
-export const update = mutation({
-  args: validators.updateClipArgs,
-  handler: async (ctx, args) => {
-    return await mutations.updateClip(ctx, args);
-  },
-  returns: validators.updateClipReturns,
-});
-
-export const updateStatus = mutation({
-  args: validators.updateClipStatusArgs,
-  handler: async (ctx, args) => {
-    return await mutations.updateClipStatus(ctx, args);
-  },
-  returns: validators.updateClipStatusReturns,
-});
+export const archive = mutations.archiveClip;
+export const create = mutations.createClip;
+export const getBySlug = queries.getClipBySlugWithRelations;
+export const list = queries.getClips;
+export const listBySpeaker = queries.getClipsBySpeaker;
+export const update = mutations.updateClip;
+export const updateStatus = mutations.updateClipStatus;

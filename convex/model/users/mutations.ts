@@ -1,6 +1,6 @@
-import type { Id } from '../../_generated/dataModel';
-import type { MutationCtx } from '../../_generated/server';
+import { v } from 'convex/values';
 
+import { mutation } from '../../_generated/server';
 import { getUserId } from '../auth/queries';
 
 /**
@@ -10,28 +10,29 @@ import { getUserId } from '../auth/queries';
  * @param args - Arguments containing clipId
  * @returns The ID of the created favorite record
  */
-export async function favoriteClip(
-  ctx: MutationCtx,
+export const favoriteClip = mutation({
   args: {
-    clipId: Id<'clips'>;
+    clipId: v.id('clips'),
   },
-) {
-  const userId = await getUserId(ctx);
+  handler: async (ctx, args) => {
+    const userId = await getUserId(ctx);
 
-  const existing = await ctx.db
-    .query('userFavoriteClips')
-    .withIndex('by_userId_and_clipId', (q) => q.eq('userId', userId).eq('clipId', args.clipId))
-    .first();
+    const existing = await ctx.db
+      .query('userFavoriteClips')
+      .withIndex('by_userId_and_clipId', (q) => q.eq('userId', userId).eq('clipId', args.clipId))
+      .first();
 
-  if (existing) {
-    throw new Error('Clip already favorited');
-  }
+    if (existing) {
+      throw new Error('Clip already favorited');
+    }
 
-  return await ctx.db.insert('userFavoriteClips', {
-    clipId: args.clipId,
-    userId: userId,
-  });
-}
+    return await ctx.db.insert('userFavoriteClips', {
+      clipId: args.clipId,
+      userId: userId,
+    });
+  },
+  returns: v.id('userFavoriteClips'),
+});
 
 /**
  * Add a speaker to user favorites.
@@ -40,30 +41,31 @@ export async function favoriteClip(
  * @param args - Arguments containing speakerId
  * @returns The ID of the created favorite record
  */
-export async function favoriteSpeaker(
-  ctx: MutationCtx,
+export const favoriteSpeaker = mutation({
   args: {
-    speakerId: Id<'speakers'>;
+    speakerId: v.id('speakers'),
   },
-) {
-  const userId = await getUserId(ctx);
+  handler: async (ctx, args) => {
+    const userId = await getUserId(ctx);
 
-  const existing = await ctx.db
-    .query('userFavoriteSpeakers')
-    .withIndex('by_userId_and_speakerId', (q) =>
-      q.eq('userId', userId).eq('speakerId', args.speakerId),
-    )
-    .first();
+    const existing = await ctx.db
+      .query('userFavoriteSpeakers')
+      .withIndex('by_userId_and_speakerId', (q) =>
+        q.eq('userId', userId).eq('speakerId', args.speakerId),
+      )
+      .first();
 
-  if (existing) {
-    throw new Error('Speaker already favorited');
-  }
+    if (existing) {
+      throw new Error('Speaker already favorited');
+    }
 
-  return await ctx.db.insert('userFavoriteSpeakers', {
-    speakerId: args.speakerId,
-    userId: userId,
-  });
-}
+    return await ctx.db.insert('userFavoriteSpeakers', {
+      speakerId: args.speakerId,
+      userId: userId,
+    });
+  },
+  returns: v.id('userFavoriteSpeakers'),
+});
 
 /**
  * Add a talk to user favorites.
@@ -72,28 +74,29 @@ export async function favoriteSpeaker(
  * @param args - Arguments containing talkId
  * @returns The ID of the created favorite record
  */
-export async function favoriteTalk(
-  ctx: MutationCtx,
+export const favoriteTalk = mutation({
   args: {
-    talkId: Id<'talks'>;
+    talkId: v.id('talks'),
   },
-) {
-  const userId = await getUserId(ctx);
+  handler: async (ctx, args) => {
+    const userId = await getUserId(ctx);
 
-  const existing = await ctx.db
-    .query('userFavoriteTalks')
-    .withIndex('by_userId_and_talkId', (q) => q.eq('userId', userId).eq('talkId', args.talkId))
-    .first();
+    const existing = await ctx.db
+      .query('userFavoriteTalks')
+      .withIndex('by_userId_and_talkId', (q) => q.eq('userId', userId).eq('talkId', args.talkId))
+      .first();
 
-  if (existing) {
-    throw new Error('Talk already favorited');
-  }
+    if (existing) {
+      throw new Error('Talk already favorited');
+    }
 
-  return await ctx.db.insert('userFavoriteTalks', {
-    talkId: args.talkId,
-    userId: userId,
-  });
-}
+    return await ctx.db.insert('userFavoriteTalks', {
+      talkId: args.talkId,
+      userId: userId,
+    });
+  },
+  returns: v.id('userFavoriteTalks'),
+});
 
 /**
  * Mark a talk as finished for the user.
@@ -102,28 +105,29 @@ export async function favoriteTalk(
  * @param args - Arguments containing talkId
  * @returns The ID of the created finished record
  */
-export async function finishTalk(
-  ctx: MutationCtx,
+export const finishTalk = mutation({
   args: {
-    talkId: Id<'talks'>;
+    talkId: v.id('talks'),
   },
-) {
-  const userId = await getUserId(ctx);
+  handler: async (ctx, args) => {
+    const userId = await getUserId(ctx);
 
-  const existing = await ctx.db
-    .query('userFinishedTalks')
-    .withIndex('by_userId_and_talkId', (q) => q.eq('userId', userId).eq('talkId', args.talkId))
-    .first();
+    const existing = await ctx.db
+      .query('userFinishedTalks')
+      .withIndex('by_userId_and_talkId', (q) => q.eq('userId', userId).eq('talkId', args.talkId))
+      .first();
 
-  if (existing) {
-    throw new Error('Talk already marked as finished');
-  }
+    if (existing) {
+      throw new Error('Talk already marked as finished');
+    }
 
-  return await ctx.db.insert('userFinishedTalks', {
-    talkId: args.talkId,
-    userId: userId,
-  });
-}
+    return await ctx.db.insert('userFinishedTalks', {
+      talkId: args.talkId,
+      userId: userId,
+    });
+  },
+  returns: v.id('userFinishedTalks'),
+});
 
 /**
  * Remove a clip from user favorites.
@@ -132,27 +136,28 @@ export async function finishTalk(
  * @param args - Arguments containing clipId
  * @returns null
  */
-export async function unfavoriteClip(
-  ctx: MutationCtx,
+export const unfavoriteClip = mutation({
   args: {
-    clipId: Id<'clips'>;
+    clipId: v.id('clips'),
   },
-) {
-  const userId = await getUserId(ctx);
+  handler: async (ctx, args) => {
+    const userId = await getUserId(ctx);
 
-  const favorite = await ctx.db
-    .query('userFavoriteClips')
-    .withIndex('by_userId_and_clipId', (q) => q.eq('userId', userId).eq('clipId', args.clipId))
-    .first();
+    const favorite = await ctx.db
+      .query('userFavoriteClips')
+      .withIndex('by_userId_and_clipId', (q) => q.eq('userId', userId).eq('clipId', args.clipId))
+      .first();
 
-  if (!favorite) {
-    throw new Error('Favorite not found');
-  }
+    if (!favorite) {
+      throw new Error('Favorite not found');
+    }
 
-  await ctx.db.delete(favorite._id);
+    await ctx.db.delete(favorite._id);
 
-  return null;
-}
+    return null;
+  },
+  returns: v.null(),
+});
 
 /**
  * Remove a speaker from user favorites.
@@ -161,29 +166,30 @@ export async function unfavoriteClip(
  * @param args - Arguments containing speakerId
  * @returns null
  */
-export async function unfavoriteSpeaker(
-  ctx: MutationCtx,
+export const unfavoriteSpeaker = mutation({
   args: {
-    speakerId: Id<'speakers'>;
+    speakerId: v.id('speakers'),
   },
-) {
-  const userId = await getUserId(ctx);
+  handler: async (ctx, args) => {
+    const userId = await getUserId(ctx);
 
-  const favorite = await ctx.db
-    .query('userFavoriteSpeakers')
-    .withIndex('by_userId_and_speakerId', (q) =>
-      q.eq('userId', userId).eq('speakerId', args.speakerId),
-    )
-    .first();
+    const favorite = await ctx.db
+      .query('userFavoriteSpeakers')
+      .withIndex('by_userId_and_speakerId', (q) =>
+        q.eq('userId', userId).eq('speakerId', args.speakerId),
+      )
+      .first();
 
-  if (!favorite) {
-    throw new Error('Favorite not found');
-  }
+    if (!favorite) {
+      throw new Error('Favorite not found');
+    }
 
-  await ctx.db.delete(favorite._id);
+    await ctx.db.delete(favorite._id);
 
-  return null;
-}
+    return null;
+  },
+  returns: v.null(),
+});
 
 /**
  * Remove a talk from user favorites.
@@ -192,27 +198,28 @@ export async function unfavoriteSpeaker(
  * @param args - Arguments containing talkId
  * @returns null
  */
-export async function unfavoriteTalk(
-  ctx: MutationCtx,
+export const unfavoriteTalk = mutation({
   args: {
-    talkId: Id<'talks'>;
+    talkId: v.id('talks'),
   },
-) {
-  const userId = await getUserId(ctx);
+  handler: async (ctx, args) => {
+    const userId = await getUserId(ctx);
 
-  const favorite = await ctx.db
-    .query('userFavoriteTalks')
-    .withIndex('by_userId_and_talkId', (q) => q.eq('userId', userId).eq('talkId', args.talkId))
-    .first();
+    const favorite = await ctx.db
+      .query('userFavoriteTalks')
+      .withIndex('by_userId_and_talkId', (q) => q.eq('userId', userId).eq('talkId', args.talkId))
+      .first();
 
-  if (!favorite) {
-    throw new Error('Favorite not found');
-  }
+    if (!favorite) {
+      throw new Error('Favorite not found');
+    }
 
-  await ctx.db.delete(favorite._id);
+    await ctx.db.delete(favorite._id);
 
-  return null;
-}
+    return null;
+  },
+  returns: v.null(),
+});
 
 /**
  * Unmark a talk as finished for the user.
@@ -221,24 +228,25 @@ export async function unfavoriteTalk(
  * @param args - Arguments containing talkId
  * @returns null
  */
-export async function unfinishTalk(
-  ctx: MutationCtx,
+export const unfinishTalk = mutation({
   args: {
-    talkId: Id<'talks'>;
+    talkId: v.id('talks'),
   },
-) {
-  const userId = await getUserId(ctx);
+  handler: async (ctx, args) => {
+    const userId = await getUserId(ctx);
 
-  const finished = await ctx.db
-    .query('userFinishedTalks')
-    .withIndex('by_userId_and_talkId', (q) => q.eq('userId', userId).eq('talkId', args.talkId))
-    .first();
+    const finished = await ctx.db
+      .query('userFinishedTalks')
+      .withIndex('by_userId_and_talkId', (q) => q.eq('userId', userId).eq('talkId', args.talkId))
+      .first();
 
-  if (!finished) {
-    throw new Error('Finished talk not found');
-  }
+    if (!finished) {
+      throw new Error('Finished talk not found');
+    }
 
-  await ctx.db.delete(finished._id);
+    await ctx.db.delete(finished._id);
 
-  return null;
-}
+    return null;
+  },
+  returns: v.null(),
+});

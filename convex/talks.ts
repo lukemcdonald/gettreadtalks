@@ -1,114 +1,18 @@
-import { mutation, query } from './_generated/server';
-import { mutations, queries, validators } from './model/talks';
+import { mutations, queries } from './model/talks';
 
-// ============================================
-// QUERIES
-// ============================================
-
-export const get = query({
-  args: validators.getTalkArgs,
-  handler: async (ctx, args) => {
-    return await queries.getTalk(ctx, args);
-  },
-  returns: validators.getTalkReturns,
-});
-
-export const getBySlug = query({
-  args: validators.getTalkBySlugArgs,
-  handler: async (ctx, args) => {
-    return await queries.getTalkBySlugWithRelations(ctx, args);
-  },
-  returns: validators.getTalkBySlugReturns,
-});
-
-export const getCount = query({
-  args: validators.getCountArgs,
-  handler: async (ctx) => {
-    return await queries.getTalksCount(ctx);
-  },
-  returns: validators.getCountReturns,
-});
-
-export const listRandomBySpeaker = query({
-  args: validators.listRandomTalksBySpeakerArgs,
-  handler: async (ctx, args) => {
-    return await queries.getRandomTalksBySpeaker(ctx, args);
-  },
-  returns: validators.listRandomTalksBySpeakerReturns,
-});
-
-export const list = query({
-  args: validators.listTalksArgs,
-  handler: async (ctx, args) => {
-    return await queries.getTalks(ctx, args);
-  },
-  returns: validators.listTalksReturns,
-});
-
-export const listByCollection = query({
-  args: validators.listTalksByCollectionArgs,
-  handler: async (ctx, args) => {
-    return await queries.getTalksByCollection(ctx, args);
-  },
-  returns: validators.listTalksByCollectionReturns,
-});
-
-export const listBySpeaker = query({
-  args: validators.listTalksBySpeakerArgs,
-  handler: async (ctx, args) => {
-    return await queries.getTalksBySpeaker(ctx, args);
-  },
-  returns: validators.listTalksBySpeakerReturns,
-});
-
-export const listFeatured = query({
-  args: validators.listFeaturedTalksArgs,
-  handler: async (ctx, args) => {
-    return await queries.listFeaturedTalks(ctx, args);
-  },
-  returns: validators.listFeaturedTalksReturns,
-});
-
-export const listWithSpeakers = query({
-  args: validators.listTalksWithSpeakersArgs,
-  handler: async (ctx, args) => {
-    return await queries.getTalksWithSpeakers(ctx, args);
-  },
-  returns: validators.listTalksWithSpeakersReturns,
-});
-
-// ============================================
-// MUTATIONS
-// ============================================
-
-export const archive = mutation({
-  args: validators.archiveTalkArgs,
-  handler: async (ctx, args) => {
-    return await mutations.archiveTalk(ctx, args);
-  },
-  returns: validators.archiveTalkReturns,
-});
-
-export const create = mutation({
-  args: validators.createTalkArgs,
-  handler: async (ctx, args) => {
-    return await mutations.createTalk(ctx, args);
-  },
-  returns: validators.createTalkReturns,
-});
-
-export const update = mutation({
-  args: validators.updateTalkArgs,
-  handler: async (ctx, args) => {
-    return await mutations.updateTalk(ctx, args);
-  },
-  returns: validators.updateTalkReturns,
-});
-
-export const updateStatus = mutation({
-  args: validators.updateTalkStatusArgs,
-  handler: async (ctx, args) => {
-    return await mutations.updateTalkStatus(ctx, args);
-  },
-  returns: validators.updateTalkStatusReturns,
-});
+export const archive = mutations.archiveTalk;
+export const create = mutations.createTalk;
+export const get = queries.getTalk;
+export const getBySlug = queries.getTalkBySlugWithRelations;
+export const getBySpeaker = queries.getTalksBySpeaker;
+export const getByCollection = queries.getTalksByCollection;
+export const getCount = queries.getTalksCount;
+export const getRandomBySpeaker = queries.getRandomTalksBySpeaker;
+export const list = queries.getTalks;
+export const listByCollection = queries.getTalksByCollection;
+export const listBySpeaker = queries.getTalksBySpeaker;
+export const listFeatured = queries.listFeaturedTalks;
+export const listRandomBySpeaker = queries.getRandomTalksBySpeaker;
+export const listWithSpeakers = queries.getTalksWithSpeakers;
+export const update = mutations.updateTalk;
+export const updateStatus = mutations.updateTalkStatus;

@@ -1,13 +1,9 @@
-import type { QueryCtx } from '../../_generated/server';
-import type {
-  GetAffiliateLinkArgs,
-  GetAffiliateLinkBySlugArgs,
-  ListAffiliateLinksArgs,
-  ListAffiliateLinksByAffiliateArgs,
-  ListAffiliateLinksByTypeArgs,
-} from './types';
-
+import { v } from 'convex/values';
 import { getOneFrom } from 'convex-helpers/server/relationships';
+
+import { query } from '../../_generated/server';
+import { doc, docs } from '../../lib/validators/schema';
+import { affiliateLinkTypes } from './validators';
 
 /**
  * Get affiliate link by ID.
@@ -16,9 +12,15 @@ import { getOneFrom } from 'convex-helpers/server/relationships';
  * @param args - Query arguments
  * @returns Affiliate link or null if not found
  */
-export async function getAffiliateLink(ctx: QueryCtx, args: GetAffiliateLinkArgs) {
-  return await ctx.db.get(args.id);
-}
+export const getAffiliateLink = query({
+  args: {
+    id: v.id('affiliateLinks'),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.id);
+  },
+  returns: doc('affiliateLinks', true),
+});
 
 /**
  * Get affiliate link by slug.
@@ -27,9 +29,15 @@ export async function getAffiliateLink(ctx: QueryCtx, args: GetAffiliateLinkArgs
  * @param args - Query arguments
  * @returns Affiliate link or null if not found
  */
-export async function getAffiliateLinkBySlug(ctx: QueryCtx, args: GetAffiliateLinkBySlugArgs) {
-  return await getOneFrom(ctx.db, 'affiliateLinks', 'by_slug', args.slug);
-}
+export const getAffiliateLinkBySlug = query({
+  args: {
+    slug: v.string(),
+  },
+  handler: async (ctx, args) => {
+    return await getOneFrom(ctx.db, 'affiliateLinks', 'by_slug', args.slug);
+  },
+  returns: doc('affiliateLinks', true),
+});
 
 /**
  * Get affiliate links by type.
@@ -38,15 +46,22 @@ export async function getAffiliateLinkBySlug(ctx: QueryCtx, args: GetAffiliateLi
  * @param args - Query arguments with defaults
  * @returns Array of affiliate links of the specified type
  */
-export async function getAffiliateLinksByType(ctx: QueryCtx, args: ListAffiliateLinksByTypeArgs) {
-  const { limit = 20, type } = args;
+export const getAffiliateLinksByType = query({
+  args: {
+    limit: v.optional(v.number()),
+    type: affiliateLinkTypes,
+  },
+  handler: async (ctx, args) => {
+    const { limit = 20, type } = args;
 
-  return await ctx.db
-    .query('affiliateLinks')
-    .withIndex('by_type', (q) => q.eq('type', type))
-    .order('desc')
-    .take(limit);
-}
+    return await ctx.db
+      .query('affiliateLinks')
+      .withIndex('by_type', (q) => q.eq('type', type))
+      .order('desc')
+      .take(limit);
+  },
+  returns: docs('affiliateLinks'),
+});
 
 /**
  * Get affiliate links by affiliate.
@@ -55,18 +70,22 @@ export async function getAffiliateLinksByType(ctx: QueryCtx, args: ListAffiliate
  * @param args - Query arguments with defaults
  * @returns Array of affiliate links from the specified affiliate
  */
-export async function getAffiliateLinksByAffiliate(
-  ctx: QueryCtx,
-  args: ListAffiliateLinksByAffiliateArgs,
-) {
-  const { affiliate, limit = 20 } = args;
+export const getAffiliateLinksByAffiliate = query({
+  args: {
+    affiliate: v.string(),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const { affiliate, limit = 20 } = args;
 
-  return await ctx.db
-    .query('affiliateLinks')
-    .withIndex('by_affiliate', (q) => q.eq('affiliate', affiliate))
-    .order('desc')
-    .take(limit);
-}
+    return await ctx.db
+      .query('affiliateLinks')
+      .withIndex('by_affiliate', (q) => q.eq('affiliate', affiliate))
+      .order('desc')
+      .take(limit);
+  },
+  returns: docs('affiliateLinks'),
+});
 
 /**
  * Get all affiliate links with optional filters.
@@ -75,32 +94,41 @@ export async function getAffiliateLinksByAffiliate(
  * @param args - Query arguments with defaults
  * @returns Array of affiliate links
  */
-export async function getAffiliateLinks(ctx: QueryCtx, args: ListAffiliateLinksArgs) {
-  const { affiliate, featured, limit = 50, type } = args;
+export const getAffiliateLinks = query({
+  args: {
+    affiliate: v.optional(v.string()),
+    featured: v.optional(v.boolean()),
+    limit: v.optional(v.number()),
+    type: v.optional(affiliateLinkTypes),
+  },
+  handler: async (ctx, args) => {
+    const { affiliate, featured, limit = 50, type } = args;
 
-  // Use index if filtering by featured, otherwise get all links
-  // Limited to 100 to prevent memory issues in admin UI
-  const allLinks =
-    featured !== undefined
-      ? await ctx.db
-          .query('affiliateLinks')
-          .withIndex('by_featured', (q) => q.eq('featured', featured))
-          .take(100)
-      : await ctx.db.query('affiliateLinks').take(100);
+    // Use index if filtering by featured, otherwise get all links
+    // Limited to 100 to prevent memory issues in admin UI
+    const allLinks =
+      featured !== undefined
+        ? await ctx.db
+            .query('affiliateLinks')
+            .withIndex('by_featured', (q) => q.eq('featured', featured))
+            .take(100)
+        : await ctx.db.query('affiliateLinks').take(100);
 
-  // Apply additional filters
-  let filteredLinks = allLinks;
+    // Apply additional filters
+    let filteredLinks = allLinks;
 
-  if (type) {
-    filteredLinks = filteredLinks.filter((link) => link.type === type);
-  }
+    if (type) {
+      filteredLinks = filteredLinks.filter((link) => link.type === type);
+    }
 
-  if (affiliate) {
-    filteredLinks = filteredLinks.filter((link) => link.affiliate === affiliate);
-  }
+    if (affiliate) {
+      filteredLinks = filteredLinks.filter((link) => link.affiliate === affiliate);
+    }
 
-  // Sort by creation time (newest first) and limit
-  return filteredLinks
-    .sort((a, b) => (b._creationTime || 0) - (a._creationTime || 0))
-    .slice(0, limit);
-}
+    // Sort by creation time (newest first) and limit
+    return filteredLinks
+      .sort((a, b) => (b._creationTime || 0) - (a._creationTime || 0))
+      .slice(0, limit);
+  },
+  returns: docs('affiliateLinks'),
+});

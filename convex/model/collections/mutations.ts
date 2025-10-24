@@ -1,9 +1,9 @@
 import type { Doc } from '../../_generated/dataModel';
-import type { MutationCtx } from '../../_generated/server';
-import type { CreateCollectionArgs, DestroyCollectionArgs, UpdateCollectionArgs } from './types';
 
+import { v } from 'convex/values';
 import { getOneFrom } from 'convex-helpers/server/relationships';
 
+import { mutation } from '../../_generated/server';
 import { normalizeSlug, slugExists } from '../../lib/utils';
 import { requireAuth } from '../auth/queries';
 
@@ -14,20 +14,28 @@ import { requireAuth } from '../auth/queries';
  * @param args - Collection creation arguments
  * @returns The ID of the created collection
  */
-export async function createCollection(ctx: MutationCtx, args: CreateCollectionArgs) {
-  await requireAuth(ctx);
+export const createCollection = mutation({
+  args: {
+    description: v.optional(v.string()),
+    title: v.string(),
+    url: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    await requireAuth(ctx);
 
-  const slug = normalizeSlug(args.title);
+    const slug = normalizeSlug(args.title);
 
-  if (await slugExists(ctx, 'collections', slug)) {
-    throw new Error('Collection with this title already exists');
-  }
+    if (await slugExists(ctx, 'collections', slug)) {
+      throw new Error('Collection with this title already exists');
+    }
 
-  return await ctx.db.insert('collections', {
-    ...args,
-    slug,
-  });
-}
+    return await ctx.db.insert('collections', {
+      ...args,
+      slug,
+    });
+  },
+  returns: v.id('collections'),
+});
 
 /**
  * Update an existing collection.
@@ -36,35 +44,44 @@ export async function createCollection(ctx: MutationCtx, args: CreateCollectionA
  * @param args - Update arguments
  * @returns The ID of the updated collection
  */
-export async function updateCollection(ctx: MutationCtx, args: UpdateCollectionArgs) {
-  await requireAuth(ctx);
+export const updateCollection = mutation({
+  args: {
+    description: v.optional(v.string()),
+    id: v.id('collections'),
+    title: v.optional(v.string()),
+    url: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    await requireAuth(ctx);
 
-  const { id, ...rest } = args;
-  const updates: Partial<Doc<'collections'>> = rest;
-  const collection: Doc<'collections'> | null = await ctx.db.get(id);
+    const { id, ...rest } = args;
+    const updates: Partial<Doc<'collections'>> = rest;
+    const collection: Doc<'collections'> | null = await ctx.db.get(id);
 
-  if (!collection) {
-    throw new Error('Collection not found');
-  }
-
-  if (updates.title) {
-    const newSlug = normalizeSlug(updates.title);
-
-    if (newSlug !== collection.slug) {
-      if (await slugExists(ctx, 'collections', newSlug, id)) {
-        throw new Error('Collection with this title already exists');
-      }
-
-      updates.slug = newSlug;
+    if (!collection) {
+      throw new Error('Collection not found');
     }
-  }
 
-  updates.updatedAt = Date.now();
+    if (updates.title) {
+      const newSlug = normalizeSlug(updates.title);
 
-  await ctx.db.patch(id, updates);
+      if (newSlug !== collection.slug) {
+        if (await slugExists(ctx, 'collections', newSlug, id)) {
+          throw new Error('Collection with this title already exists');
+        }
 
-  return id;
-}
+        updates.slug = newSlug;
+      }
+    }
+
+    updates.updatedAt = Date.now();
+
+    await ctx.db.patch(id, updates);
+
+    return id;
+  },
+  returns: v.id('collections'),
+});
 
 /**
  * Destroy a collection (permanently delete from database with reference checks).
@@ -73,30 +90,36 @@ export async function updateCollection(ctx: MutationCtx, args: UpdateCollectionA
  * @param args - Destroy arguments
  * @returns null
  */
-export async function destroyCollection(ctx: MutationCtx, args: DestroyCollectionArgs) {
-  await requireAuth(ctx);
+export const destroyCollection = mutation({
+  args: {
+    id: v.id('collections'),
+  },
+  handler: async (ctx, args) => {
+    await requireAuth(ctx);
 
-  const collection = await ctx.db.get(args.id);
+    const collection = await ctx.db.get(args.id);
 
-  if (!collection) {
-    throw new Error('Collection not found');
-  }
+    if (!collection) {
+      throw new Error('Collection not found');
+    }
 
-  // Check if collection is referenced by any talks
-  const talksWithCollection = await getOneFrom(
-    ctx.db,
-    'talks',
-    'by_collectionId_and_status',
-    args.id,
-    'collectionId',
-  );
+    // Check if collection is referenced by any talks
+    const talksWithCollection = await getOneFrom(
+      ctx.db,
+      'talks',
+      'by_collectionId_and_status',
+      args.id,
+      'collectionId',
+    );
 
-  if (talksWithCollection) {
-    throw new Error('Cannot delete collection: collection has associated talks');
-  }
+    if (talksWithCollection) {
+      throw new Error('Cannot delete collection: collection has associated talks');
+    }
 
-  // Hard delete the collection
-  await ctx.db.delete(args.id);
+    // Hard delete the collection
+    await ctx.db.delete(args.id);
 
-  return null;
-}
+    return null;
+  },
+  returns: v.null(),
+});
