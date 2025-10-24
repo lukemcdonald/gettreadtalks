@@ -1,6 +1,8 @@
-import type { Id } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
 
+import { v } from 'convex/values';
+
+import { query } from '../../_generated/server';
 import { getCurrentUser } from '../auth/queries';
 
 /**
@@ -10,22 +12,32 @@ import { getCurrentUser } from '../auth/queries';
  * @param args - Query arguments with defaults
  * @returns Object with clips, speakers, and talks favorites
  */
-export async function listUserFavorites(ctx: QueryCtx, args: { limit?: number }) {
-  const user = await getCurrentUser(ctx);
+export const listUserFavorites = query({
+  args: {
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const user = await getCurrentUser(ctx);
 
-  if (!user) {
-    return {
-      clips: [],
-      speakers: [],
-      talks: [],
-    };
-  }
+    if (!user) {
+      return {
+        clips: [],
+        speakers: [],
+        talks: [],
+      };
+    }
 
-  const userId = user._id;
-  const limit = args.limit ?? 100;
+    const userId = user._id;
+    const limit = args.limit ?? 100;
 
-  return await getUserFavorites(ctx, userId, limit);
-}
+    return await getUserFavorites(ctx, userId, limit);
+  },
+  returns: v.object({
+    clips: v.array(v.any()),
+    speakers: v.array(v.any()),
+    talks: v.array(v.any()),
+  }),
+});
 
 /**
  * Get user favorites by clip.
@@ -117,17 +129,23 @@ export async function getUserFinishedTalks(ctx: QueryCtx, userId: string, limit:
  * @param args - Query arguments with defaults
  * @returns Array of finished talk records
  */
-export async function listUserFinishedTalks(ctx: QueryCtx, args: { limit?: number }) {
-  const user = await getCurrentUser(ctx);
+export const listUserFinishedTalks = query({
+  args: {
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const user = await getCurrentUser(ctx);
 
-  if (!user) {
-    return [];
-  }
+    if (!user) {
+      return [];
+    }
 
-  const limit = args.limit ?? 100;
+    const limit = args.limit ?? 100;
 
-  return await getUserFinishedTalks(ctx, user._id, limit);
-}
+    return await getUserFinishedTalks(ctx, user._id, limit);
+  },
+  returns: v.array(v.any()),
+});
 
 /**
  * Check if user has favorited a talk.
@@ -136,20 +154,26 @@ export async function listUserFinishedTalks(ctx: QueryCtx, args: { limit?: numbe
  * @param args - Query arguments
  * @returns True if favorited, false otherwise
  */
-export async function isTalkFavorited(ctx: QueryCtx, args: { talkId: Id<'talks'> }) {
-  const user = await getCurrentUser(ctx);
+export const isTalkFavorited = query({
+  args: {
+    talkId: v.id('talks'),
+  },
+  handler: async (ctx, args) => {
+    const user = await getCurrentUser(ctx);
 
-  if (!user) {
-    return false;
-  }
+    if (!user) {
+      return false;
+    }
 
-  const favorite = await ctx.db
-    .query('userFavoriteTalks')
-    .withIndex('by_userId_and_talkId', (q) => q.eq('userId', user._id).eq('talkId', args.talkId))
-    .first();
+    const favorite = await ctx.db
+      .query('userFavoriteTalks')
+      .withIndex('by_userId_and_talkId', (q) => q.eq('userId', user._id).eq('talkId', args.talkId))
+      .first();
 
-  return favorite !== null;
-}
+    return favorite !== null;
+  },
+  returns: v.boolean(),
+});
 
 /**
  * Check if user has favorited a clip.
@@ -158,20 +182,26 @@ export async function isTalkFavorited(ctx: QueryCtx, args: { talkId: Id<'talks'>
  * @param args - Query arguments
  * @returns True if favorited, false otherwise
  */
-export async function isClipFavorited(ctx: QueryCtx, args: { clipId: Id<'clips'> }) {
-  const user = await getCurrentUser(ctx);
+export const isClipFavorited = query({
+  args: {
+    clipId: v.id('clips'),
+  },
+  handler: async (ctx, args) => {
+    const user = await getCurrentUser(ctx);
 
-  if (!user) {
-    return false;
-  }
+    if (!user) {
+      return false;
+    }
 
-  const favorite = await ctx.db
-    .query('userFavoriteClips')
-    .withIndex('by_userId_and_clipId', (q) => q.eq('userId', user._id).eq('clipId', args.clipId))
-    .first();
+    const favorite = await ctx.db
+      .query('userFavoriteClips')
+      .withIndex('by_userId_and_clipId', (q) => q.eq('userId', user._id).eq('clipId', args.clipId))
+      .first();
 
-  return favorite !== null;
-}
+    return favorite !== null;
+  },
+  returns: v.boolean(),
+});
 
 /**
  * Check if user has favorited a speaker.
@@ -180,22 +210,28 @@ export async function isClipFavorited(ctx: QueryCtx, args: { clipId: Id<'clips'>
  * @param args - Query arguments
  * @returns True if favorited, false otherwise
  */
-export async function isSpeakerFavorited(ctx: QueryCtx, args: { speakerId: Id<'speakers'> }) {
-  const user = await getCurrentUser(ctx);
+export const isSpeakerFavorited = query({
+  args: {
+    speakerId: v.id('speakers'),
+  },
+  handler: async (ctx, args) => {
+    const user = await getCurrentUser(ctx);
 
-  if (!user) {
-    return false;
-  }
+    if (!user) {
+      return false;
+    }
 
-  const favorite = await ctx.db
-    .query('userFavoriteSpeakers')
-    .withIndex('by_userId_and_speakerId', (q) =>
-      q.eq('userId', user._id).eq('speakerId', args.speakerId),
-    )
-    .first();
+    const favorite = await ctx.db
+      .query('userFavoriteSpeakers')
+      .withIndex('by_userId_and_speakerId', (q) =>
+        q.eq('userId', user._id).eq('speakerId', args.speakerId),
+      )
+      .first();
 
-  return favorite !== null;
-}
+    return favorite !== null;
+  },
+  returns: v.boolean(),
+});
 
 /**
  * Check if user has finished a talk.
@@ -204,17 +240,23 @@ export async function isSpeakerFavorited(ctx: QueryCtx, args: { speakerId: Id<'s
  * @param args - Query arguments
  * @returns True if finished, false otherwise
  */
-export async function isTalkFinished(ctx: QueryCtx, args: { talkId: Id<'talks'> }) {
-  const user = await getCurrentUser(ctx);
+export const isTalkFinished = query({
+  args: {
+    talkId: v.id('talks'),
+  },
+  handler: async (ctx, args) => {
+    const user = await getCurrentUser(ctx);
 
-  if (!user) {
-    return false;
-  }
+    if (!user) {
+      return false;
+    }
 
-  const finished = await ctx.db
-    .query('userFinishedTalks')
-    .withIndex('by_userId_and_talkId', (q) => q.eq('userId', user._id).eq('talkId', args.talkId))
-    .first();
+    const finished = await ctx.db
+      .query('userFinishedTalks')
+      .withIndex('by_userId_and_talkId', (q) => q.eq('userId', user._id).eq('talkId', args.talkId))
+      .first();
 
-  return finished !== null;
-}
+    return finished !== null;
+  },
+  returns: v.boolean(),
+});
