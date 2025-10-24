@@ -2,14 +2,7 @@ import { defineTable } from 'convex/server';
 import { type Infer, v } from 'convex/values';
 
 import { timestampFields } from '../../lib/validators';
-
-const affiliateLinkTypes = v.union(
-  v.literal('app'),
-  v.literal('book'),
-  v.literal('movie'),
-  v.literal('music'),
-  v.literal('podcast'),
-);
+import { affiliateLinkTypes } from './validators';
 
 export type AffiliateLinkType = Infer<typeof affiliateLinkTypes>;
 
