@@ -1,5 +1,4 @@
 import { fetchQuery } from 'convex/nextjs';
-import { cookies } from 'next/headers';
 import { notFound } from 'next/navigation';
 
 import { api } from '@/convex/_generated/api';
@@ -14,7 +13,6 @@ interface TalkPageProps {
 }
 
 async function TalkPageData({ params }: { params: Promise<{ slug: string }> }) {
-  await cookies();
   const { slug } = await params;
   const authToken = await getAuthToken();
   const talkData = await fetchQuery(api.talks.getBySlug, { slug }, { token: authToken });
