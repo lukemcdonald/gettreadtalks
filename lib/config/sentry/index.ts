@@ -1,4 +1,4 @@
-import { APP_ENV, IS_PROD } from '../../constants';
+import { DEPLOY_ENV, IS_PROD } from '../../constants';
 
 const SENTRY_DEBUG = process.env.NEXT_PUBLIC_SENTRY_DEBUG === 'true';
 const SENTRY_DSN = process.env.NEXT_PUBLIC_SENTRY_DSN;
@@ -9,7 +9,7 @@ export const IS_SENTRY_ENABLED = SENTRY_ENABLED && !!SENTRY_DSN;
 export const baseSentryConfig = {
   debug: SENTRY_DEBUG,
   dsn: SENTRY_DSN,
-  environment: APP_ENV,
+  environment: DEPLOY_ENV,
   initialScope: {
     tags: {
       platform: 'nextjs',
