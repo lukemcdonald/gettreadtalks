@@ -1,8 +1,11 @@
-import type { Doc, Id } from '../../_generated/dataModel';
-import type { MutationCtx } from '../../_generated/server';
+import type { Doc } from '../../_generated/dataModel';
 
+import { v } from 'convex/values';
+
+import { mutation } from '../../_generated/server';
 import { normalizeSlug, slugExists } from '../../lib/utils';
 import { requireAuth } from '../auth/queries';
+import { statusType } from './validators';
 
 /**
  * Create a new clip.
@@ -11,35 +14,36 @@ import { requireAuth } from '../auth/queries';
  * @param args - Clip creation arguments
  * @returns The ID of the created clip
  */
-export async function createClip(
-  ctx: MutationCtx,
+export const createClip = mutation({
   args: {
-    description?: string;
-    mediaUrl: string;
-    speakerId?: Id<'speakers'>;
-    status?: 'approved' | 'archived' | 'backlog' | 'published';
-    talkId?: Id<'talks'>;
-    title: string;
+    description: v.optional(v.string()),
+    mediaUrl: v.string(),
+    speakerId: v.optional(v.id('speakers')),
+    status: v.optional(statusType),
+    talkId: v.optional(v.id('talks')),
+    title: v.string(),
   },
-) {
-  await requireAuth(ctx);
+  handler: async (ctx, args) => {
+    await requireAuth(ctx);
 
-  const slug = normalizeSlug(args.title);
+    const slug = normalizeSlug(args.title);
 
-  if (await slugExists(ctx, 'clips', slug)) {
-    throw new Error('Clip with this title already exists');
-  }
+    if (await slugExists(ctx, 'clips', slug)) {
+      throw new Error('Clip with this title already exists');
+    }
 
-  const status = args.status ?? 'backlog';
-  const publishedAt = status === 'published' ? Date.now() : undefined;
+    const status = args.status ?? 'backlog';
+    const publishedAt = status === 'published' ? Date.now() : undefined;
 
-  return await ctx.db.insert('clips', {
-    ...args,
-    publishedAt,
-    slug,
-    status,
-  });
-}
+    return await ctx.db.insert('clips', {
+      ...args,
+      publishedAt,
+      slug,
+      status,
+    });
+  },
+  returns: v.id('clips'),
+});
 
 /**
  * Update an existing clip.
@@ -48,56 +52,57 @@ export async function createClip(
  * @param args - Update arguments
  * @returns The ID of the updated clip
  */
-export async function updateClip(
-  ctx: MutationCtx,
+export const updateClip = mutation({
   args: {
-    description?: string;
-    id: Id<'clips'>;
-    mediaUrl?: string;
-    speakerId?: Id<'speakers'>;
-    status?: 'approved' | 'archived' | 'backlog' | 'published';
-    talkId?: Id<'talks'>;
-    title?: string;
+    description: v.optional(v.string()),
+    id: v.id('clips'),
+    mediaUrl: v.optional(v.string()),
+    speakerId: v.optional(v.id('speakers')),
+    status: v.optional(statusType),
+    talkId: v.optional(v.id('talks')),
+    title: v.optional(v.string()),
   },
-) {
-  await requireAuth(ctx);
+  handler: async (ctx, args) => {
+    await requireAuth(ctx);
 
-  const { id, ...rest } = args;
-  const updates: Partial<Doc<'clips'>> = rest;
-  const clip = await ctx.db.get(id);
+    const { id, ...rest } = args;
+    const updates: Partial<Doc<'clips'>> = rest;
+    const clip = await ctx.db.get(id);
 
-  if (!clip) {
-    throw new Error('Clip not found');
-  }
+    if (!clip) {
+      throw new Error('Clip not found');
+    }
 
-  // If title changed, update slug
-  if (updates.title) {
-    const newSlug = normalizeSlug(updates.title);
+    // If title changed, update slug
+    if (updates.title) {
+      const newSlug = normalizeSlug(updates.title);
 
-    if (newSlug !== clip.slug) {
-      if (await slugExists(ctx, 'clips', newSlug, id)) {
-        throw new Error('Clip with this title already exists');
+      if (newSlug !== clip.slug) {
+        if (await slugExists(ctx, 'clips', newSlug, id)) {
+          throw new Error('Clip with this title already exists');
+        }
+
+        updates.slug = newSlug;
       }
-
-      updates.slug = newSlug;
     }
-  }
 
-  // Handle status changes
-  if (updates.status) {
-    if (updates.status === 'published' && !clip.publishedAt) {
-      updates.publishedAt = Date.now();
-    } else if (updates.status !== 'published') {
-      updates.publishedAt = undefined;
+    // Handle status changes
+    if (updates.status) {
+      if (updates.status === 'published' && !clip.publishedAt) {
+        updates.publishedAt = Date.now();
+      } else if (updates.status !== 'published') {
+        updates.publishedAt = undefined;
+      }
     }
-  }
 
-  updates.updatedAt = Date.now();
+    updates.updatedAt = Date.now();
 
-  await ctx.db.patch(id, updates);
+    await ctx.db.patch(id, updates);
 
-  return id;
-}
+    return id;
+  },
+  returns: v.id('clips'),
+});
 
 /**
  * Update clip status.
@@ -106,37 +111,38 @@ export async function updateClip(
  * @param args - Update arguments
  * @returns The ID of the updated clip
  */
-export async function updateClipStatus(
-  ctx: MutationCtx,
+export const updateClipStatus = mutation({
   args: {
-    id: Id<'clips'>;
-    status: 'approved' | 'archived' | 'backlog' | 'published';
+    id: v.id('clips'),
+    status: statusType,
   },
-) {
-  await requireAuth(ctx);
+  handler: async (ctx, args) => {
+    await requireAuth(ctx);
 
-  const clip: Doc<'clips'> | null = await ctx.db.get(args.id);
+    const clip: Doc<'clips'> | null = await ctx.db.get(args.id);
 
-  if (!clip) {
-    throw new Error('Clip not found');
-  }
+    if (!clip) {
+      throw new Error('Clip not found');
+    }
 
-  const updates: Partial<Doc<'clips'>> = {
-    status: args.status,
-  };
+    const updates: Partial<Doc<'clips'>> = {
+      status: args.status,
+    };
 
-  if (args.status === 'published' && !clip.publishedAt) {
-    updates.publishedAt = Date.now();
-  } else if (args.status !== 'published') {
-    updates.publishedAt = undefined;
-  }
+    if (args.status === 'published' && !clip.publishedAt) {
+      updates.publishedAt = Date.now();
+    } else if (args.status !== 'published') {
+      updates.publishedAt = undefined;
+    }
 
-  updates.updatedAt = Date.now();
+    updates.updatedAt = Date.now();
 
-  await ctx.db.patch(args.id, updates);
+    await ctx.db.patch(args.id, updates);
 
-  return args.id;
-}
+    return args.id;
+  },
+  returns: v.id('clips'),
+});
 
 /**
  * Archive a clip (soft delete by setting status to archived).
@@ -145,26 +151,27 @@ export async function updateClipStatus(
  * @param args - Archive arguments
  * @returns null
  */
-export async function archiveClip(
-  ctx: MutationCtx,
+export const archiveClip = mutation({
   args: {
-    id: Id<'clips'>;
+    id: v.id('clips'),
   },
-) {
-  await requireAuth(ctx);
+  handler: async (ctx, args) => {
+    await requireAuth(ctx);
 
-  const clip = await ctx.db.get(args.id);
+    const clip = await ctx.db.get(args.id);
 
-  if (!clip) {
-    throw new Error('Clip not found');
-  }
+    if (!clip) {
+      throw new Error('Clip not found');
+    }
 
-  // Soft delete by setting status to archived
-  await ctx.db.patch(args.id, {
-    publishedAt: undefined,
-    status: 'archived',
-    updatedAt: Date.now(),
-  });
+    // Soft delete by setting status to archived
+    await ctx.db.patch(args.id, {
+      publishedAt: undefined,
+      status: 'archived',
+      updatedAt: Date.now(),
+    });
 
-  return null;
-}
+    return null;
+  },
+  returns: v.null(),
+});

@@ -28,6 +28,7 @@ import type * as model_auth_queries from "../model/auth/queries.js";
 import type * as model_clips_index from "../model/clips/index.js";
 import type * as model_clips_mutations from "../model/clips/mutations.js";
 import type * as model_clips_queries from "../model/clips/queries.js";
+import type * as model_clips_validators from "../model/clips/validators.js";
 import type * as model_collections_index from "../model/collections/index.js";
 import type * as model_collections_mutations from "../model/collections/mutations.js";
 import type * as model_collections_queries from "../model/collections/queries.js";
@@ -95,6 +96,7 @@ declare const fullApi: ApiFromModules<{
   "model/clips/index": typeof model_clips_index;
   "model/clips/mutations": typeof model_clips_mutations;
   "model/clips/queries": typeof model_clips_queries;
+  "model/clips/validators": typeof model_clips_validators;
   "model/collections/index": typeof model_collections_index;
   "model/collections/mutations": typeof model_collections_mutations;
   "model/collections/queries": typeof model_collections_queries;
