@@ -1,11 +1,11 @@
 import type { Doc } from '../../_generated/dataModel';
 
 import { v } from 'convex/values';
+import { asyncMap } from 'convex-helpers';
+import { getManyFrom, getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
 
 import { query } from '../../_generated/server';
 import { doc, docs } from '../../lib/validators/schema';
-import { asyncMap } from 'convex-helpers';
-import { getManyFrom, getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
 
 /**
  * Get topic by ID.

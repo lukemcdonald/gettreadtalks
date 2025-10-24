@@ -1,5 +1,5 @@
+import type { PaginationResult } from 'convex/server';
 import type { Doc } from '../../_generated/dataModel';
-import type { QueryCtx } from '../../_generated/server';
 
 import { v } from 'convex/values';
 import { asyncMap } from 'convex-helpers';
@@ -86,7 +86,7 @@ export const getTalksWithSpeakers = query({
   handler: async (ctx, args) => {
     const { paginationOpts, status } = args;
 
-    let result;
+    let result: PaginationResult<Doc<'talks'>>;
     if (status) {
       result = await ctx.db
         .query('talks')
@@ -107,7 +107,11 @@ export const getTalksWithSpeakers = query({
       page: enrichedPage,
     };
   },
-  returns: v.any(), // PaginationResult with enriched data
+  returns: v.object({
+    page: docs('talks'),
+    continueCursor: v.string(),
+    isDone: v.boolean(),
+  }),
 });
 
 /**
