@@ -1,5 +1,7 @@
 'use server';
 
+import type { Route } from 'next';
+
 import { getToken } from '@convex-dev/better-auth/nextjs';
 import { fetchQuery } from 'convex/nextjs';
 import { cookies } from 'next/headers';
@@ -44,7 +46,7 @@ export const getAuthUser = async () => {
  * @param redirectTo - URL to redirect to if not authenticated (default: '/login')
  * @returns User object
  */
-export const requireAuthUser = async (redirectTo: string = '/login') => {
+export const requireAuthUser = async (redirectTo: Route<string> = '/login') => {
   const user = await getAuthUser();
 
   if (!user) {
