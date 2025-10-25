@@ -8,8 +8,7 @@ import { ConvexReactClient } from 'convex/react';
 import { authClient } from '@/lib/services/auth/client';
 
 const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!, {
-  // Optionally pause queries until the user is authenticated
-  expectAuth: true,
+  expectAuth: false, // Consider enabling for dashboard pages
 });
 
 function AuthProvider({ children }: { children: ReactNode }) {

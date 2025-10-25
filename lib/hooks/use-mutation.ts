@@ -10,55 +10,12 @@ import { useMutation as useConvexMutation } from 'convex/react';
 import { captureException } from '../services/errors/client';
 import { getErrorMessage } from '../services/errors/convex';
 
-/**
- * Options for useConvexMutation hook.
- */
 interface UseMutationOptions {
-  /**
-   * Callback when mutation succeeds.
-   */
-  onSuccess?: (data: unknown) => void;
-
-  /**
-   * Callback when mutation fails.
-   */
   onError?: (error: Error) => void;
-
-  /**
-   * Whether to automatically report errors to Sentry.
-   * @default true
-   */
+  onSuccess?: (data: unknown) => void;
   reportToSentry?: boolean;
 }
 
-/**
- * Enhanced mutation hook with automatic error handling and reporting.
- * Wraps Convex's useMutation with consistent error handling patterns and Sentry integration.
- *
- * Uses a single `status` field ('idle' | 'loading' | 'success' | 'error') as the source of truth,
- * while providing convenient derived boolean flags (isIdle, isLoading, isSuccess, isError).
- *
- * @example
- * // Using status enum
- * const { mutate, status, error } = useMutation(api.talks.create);
- * if (status === 'loading') return <Spinner />;
- *
- * @example
- * // Using derived booleans (convenient for simple checks)
- * const { mutate, isLoading, error } = useMutation(api.talks.create, {
- *   onSuccess: () => toast.success('Created!'),
- * });
- *
- * @example
- * // Switch pattern (cleanest for complex logic)
- * const { mutate, status, data, error } = useMutation(api.talks.create);
- * switch (status) {
- *   case 'idle': return <Form onSubmit={mutate} />;
- *   case 'loading': return <Spinner />;
- *   case 'error': return <Error error={error} />;
- *   case 'success': return <Success data={data} />;
- * }
- */
 export function useMutation<Mutation extends FunctionReference<'mutation'>>(
   mutation: Mutation,
   options: UseMutationOptions = {},
