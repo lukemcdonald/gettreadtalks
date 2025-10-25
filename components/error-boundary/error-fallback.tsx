@@ -4,6 +4,8 @@ import type { FallbackProps } from 'react-error-boundary';
 
 import { useRouter } from 'next/navigation';
 
+import { routes } from '@/lib/routes';
+
 /**
  * Default fallback UI shown when an error is caught by ErrorBoundary.
  * Displays a user-friendly error message with a retry button.
@@ -49,7 +51,7 @@ export function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
           </button>
           <button
             className="rounded-md border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50"
-            onClick={() => router.push('/')}
+            onClick={() => router.push(routes.home)}
             type="button"
           >
             Go Home
