@@ -39,24 +39,19 @@ export const getSpeakerBySlug = query({
 });
 
 /**
- * Get speakers with pagination.
+ * Get total count of speakers.
  *
  * @param ctx - Database context
- * @param args - Query arguments with pagination options
- * @returns Paginated speakers
+ * @returns Count of speakers
  */
-export const getSpeakers = query({
-  args: {
-    paginationOpts: v.any(), // PaginationOptions
+export const getSpeakersCount = query({
+  args: {},
+  handler: async (ctx) => {
+    const speakers = await ctx.db.query('speakers').collect();
+
+    return speakers.length;
   },
-  handler: async (ctx, args) => {
-    return await ctx.db
-      .query('speakers')
-      .withIndex('by_lastName')
-      .order('asc')
-      .paginate(args.paginationOpts);
-  },
-  returns: v.any(), // PaginationResult<Doc<'speakers'>>
+  returns: v.number(),
 });
 
 /**
@@ -89,17 +84,22 @@ export const listFeaturedSpeakers = query({
 });
 
 /**
- * Get total count of speakers.
+ * List speakers with pagination.
  *
  * @param ctx - Database context
- * @returns Count of speakers
+ * @param args - Query arguments with pagination options
+ * @returns Paginated speakers
  */
-export const getSpeakersCount = query({
-  args: {},
-  handler: async (ctx) => {
-    const speakers = await ctx.db.query('speakers').collect();
-
-    return speakers.length;
+export const listSpeakers = query({
+  args: {
+    paginationOpts: v.any(), // PaginationOptions
   },
-  returns: v.number(),
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query('speakers')
+      .withIndex('by_lastName')
+      .order('asc')
+      .paginate(args.paginationOpts);
+  },
+  returns: v.any(), // PaginationResult<Doc<'speakers'>>
 });

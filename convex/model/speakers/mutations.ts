@@ -43,61 +43,6 @@ export const createSpeaker = mutation({
 });
 
 /**
- * Update an existing speaker.
- *
- * @param ctx - Database context
- * @param args - Update arguments
- * @returns The ID of the updated speaker
- */
-export const updateSpeaker = mutation({
-  args: {
-    description: v.optional(v.string()),
-    featured: v.optional(v.boolean()),
-    firstName: v.optional(v.string()),
-    id: v.id('speakers'),
-    imageUrl: v.optional(v.string()),
-    lastName: v.optional(v.string()),
-    ministry: v.optional(v.string()),
-    role: v.optional(v.string()),
-    websiteUrl: v.optional(v.string()),
-  },
-  handler: async (ctx, args) => {
-    await requireAuth(ctx);
-
-    const { id, ...rest } = args;
-    const updates: Partial<Doc<'speakers'>> = rest;
-
-    const speaker = await ctx.db.get(id);
-
-    if (!speaker) {
-      throwNotFound('Speaker not found', { resource: 'speaker', resourceId: id });
-    }
-
-    // If name changed, update slug
-    if (updates.firstName || updates.lastName) {
-      const firstName = updates.firstName || speaker.firstName;
-      const lastName = updates.lastName || speaker.lastName;
-      const newSlug = normalizeSlug(`${firstName} ${lastName}`);
-
-      if (newSlug !== speaker.slug) {
-        if (await slugExists(ctx, 'speakers', newSlug, id)) {
-          throwDuplicateSlug('Speaker with this name already exists', 'firstName');
-        }
-
-        updates.slug = newSlug;
-      }
-    }
-
-    updates.updatedAt = Date.now();
-
-    await ctx.db.patch(id, updates);
-
-    return id;
-  },
-  returns: v.id('speakers'),
-});
-
-/**
  * Destroy a speaker (permanently delete from database with reference checks).
  *
  * @param ctx - Database context
@@ -150,4 +95,59 @@ export const destroySpeaker = mutation({
     return null;
   },
   returns: v.null(),
+});
+
+/**
+ * Update an existing speaker.
+ *
+ * @param ctx - Database context
+ * @param args - Update arguments
+ * @returns The ID of the updated speaker
+ */
+export const updateSpeaker = mutation({
+  args: {
+    description: v.optional(v.string()),
+    featured: v.optional(v.boolean()),
+    firstName: v.optional(v.string()),
+    id: v.id('speakers'),
+    imageUrl: v.optional(v.string()),
+    lastName: v.optional(v.string()),
+    ministry: v.optional(v.string()),
+    role: v.optional(v.string()),
+    websiteUrl: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    await requireAuth(ctx);
+
+    const { id, ...rest } = args;
+    const updates: Partial<Doc<'speakers'>> = rest;
+
+    const speaker = await ctx.db.get(id);
+
+    if (!speaker) {
+      throwNotFound('Speaker not found', { resource: 'speaker', resourceId: id });
+    }
+
+    // If name changed, update slug
+    if (updates.firstName || updates.lastName) {
+      const firstName = updates.firstName || speaker.firstName;
+      const lastName = updates.lastName || speaker.lastName;
+      const newSlug = normalizeSlug(`${firstName} ${lastName}`);
+
+      if (newSlug !== speaker.slug) {
+        if (await slugExists(ctx, 'speakers', newSlug, id)) {
+          throwDuplicateSlug('Speaker with this name already exists', 'firstName');
+        }
+
+        updates.slug = newSlug;
+      }
+    }
+
+    updates.updatedAt = Date.now();
+
+    await ctx.db.patch(id, updates);
+
+    return id;
+  },
+  returns: v.id('speakers'),
 });

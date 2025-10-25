@@ -2,8 +2,8 @@ import { mutations, queries } from './model/clips';
 
 // Queries
 export const getClipBySlug = queries.getClipBySlugWithRelations;
-export const listClips = queries.getClips;
-export const listClipsBySpeaker = queries.getClipsBySpeaker;
+export const listClips = queries.listClips;
+export const listClipsBySpeaker = queries.listClipsBySpeaker;
 
 // Mutations
 export const archiveClip = mutations.archiveClip;

@@ -44,77 +44,6 @@ export const getTalkBySlug = query({
 });
 
 /**
- * Get talks with optional filters and pagination.
- *
- * @param ctx - Database context
- * @param args - Query arguments with pagination options
- * @returns Paginated talks
- */
-export const getTalks = query({
-  args: {
-    paginationOpts: v.any(),
-    status: v.optional(statusType),
-  },
-  handler: async (ctx, args) => {
-    const { paginationOpts, status } = args;
-
-    if (status) {
-      return await ctx.db
-        .query('talks')
-        .withIndex('by_status_and_publishedAt', (q) => q.eq('status', status))
-        .order('desc')
-        .paginate(paginationOpts);
-    }
-
-    return await ctx.db.query('talks').order('desc').paginate(paginationOpts);
-  },
-  returns: v.any(), // PaginationResult<Doc<'talks'>>
-});
-
-/**
- * Get talks with speaker data (paginated).
- *
- * @param ctx - Database context
- * @param args - Query arguments with pagination options
- * @returns Paginated talks with speaker information
- */
-export const getTalksWithSpeakers = query({
-  args: {
-    paginationOpts: v.any(), // PaginationOptions
-    status: v.optional(statusType),
-  },
-  handler: async (ctx, args) => {
-    const { paginationOpts, status } = args;
-
-    let result: PaginationResult<Doc<'talks'>>;
-    if (status) {
-      result = await ctx.db
-        .query('talks')
-        .withIndex('by_status_and_publishedAt', (q) => q.eq('status', status))
-        .order('desc')
-        .paginate(paginationOpts);
-    } else {
-      result = await ctx.db.query('talks').order('desc').paginate(paginationOpts);
-    }
-
-    const enrichedPage = await asyncMap(result.page, async (talk: Doc<'talks'>) => {
-      const speaker = await ctx.db.get(talk.speakerId);
-      return { ...talk, speaker };
-    });
-
-    return {
-      ...result,
-      page: enrichedPage,
-    };
-  },
-  returns: v.object({
-    page: docs('talks'),
-    continueCursor: v.string(),
-    isDone: v.boolean(),
-  }),
-});
-
-/**
  * Get talk by slug with related data.
  *
  * @param ctx - Database context
@@ -175,59 +104,25 @@ export const getTalkBySlugWithRelations = query({
 });
 
 /**
- * Get talks by speaker with status filter.
+ * Get total count of published talks.
  *
  * @param ctx - Database context
- * @param args - Query arguments with defaults
- * @returns Array of talks
+ * @returns Count of published talks
  */
-export const getTalksBySpeaker = query({
-  args: {
-    limit: v.optional(v.number()),
-    speakerId: v.id('speakers'),
+export const getTalksCount = query({
+  args: {},
+  handler: async (ctx) => {
+    const talks = await getManyFrom(
+      ctx.db,
+      'talks',
+      'by_status_and_publishedAt',
+      'published',
+      'status',
+    );
+
+    return talks.length;
   },
-  handler: async (ctx, args) => {
-    const { limit = 20, speakerId } = args;
-
-    return await ctx.db
-      .query('talks')
-      .withIndex('by_speakerId_and_status', (q) =>
-        q.eq('speakerId', speakerId).eq('status', 'published'),
-      )
-      .order('desc')
-      .take(limit);
-  },
-  returns: docs('talks'),
-});
-
-/**
- * Get talks by collection with status filter.
- *
- * @param ctx - Database context
- * @param args - Query arguments with defaults
- * @returns Array of talks sorted by collection order
- */
-export const getTalksByCollection = query({
-  args: {
-    collectionId: v.id('collections'),
-    limit: v.optional(v.number()),
-  },
-  handler: async (ctx, args) => {
-    const { collectionId, limit = 100 } = args;
-
-    const talks = await ctx.db
-      .query('talks')
-      .withIndex('by_collectionId_and_status', (q) =>
-        q.eq('collectionId', collectionId).eq('status', 'published'),
-      )
-      .take(limit);
-
-    // Sort by collection order.
-    const sortedTalks = talks.sort((a, b) => (a.collectionOrder || 0) - (b.collectionOrder || 0));
-
-    return sortedTalks;
-  },
-  returns: docs('talks'),
+  returns: v.number(),
 });
 
 /**
@@ -266,7 +161,7 @@ export const listFeaturedTalks = query({
  * @param args - Query arguments
  * @returns Array of random talks by speaker
  */
-export const getRandomTalksBySpeaker = query({
+export const listRandomTalksBySpeaker = query({
   args: {
     excludeTalkId: v.optional(v.string()),
     limit: v.optional(v.number()),
@@ -296,23 +191,128 @@ export const getRandomTalksBySpeaker = query({
 });
 
 /**
- * Get total count of published talks.
+ * List talks with optional filters and pagination.
  *
  * @param ctx - Database context
- * @returns Count of published talks
+ * @param args - Query arguments with pagination options
+ * @returns Paginated talks
  */
-export const getTalksCount = query({
-  args: {},
-  handler: async (ctx) => {
-    const talks = await getManyFrom(
-      ctx.db,
-      'talks',
-      'by_status_and_publishedAt',
-      'published',
-      'status',
-    );
-
-    return talks.length;
+export const listTalks = query({
+  args: {
+    paginationOpts: v.any(),
+    status: v.optional(statusType),
   },
-  returns: v.number(),
+  handler: async (ctx, args) => {
+    const { paginationOpts, status } = args;
+
+    if (status) {
+      return await ctx.db
+        .query('talks')
+        .withIndex('by_status_and_publishedAt', (q) => q.eq('status', status))
+        .order('desc')
+        .paginate(paginationOpts);
+    }
+
+    return await ctx.db.query('talks').order('desc').paginate(paginationOpts);
+  },
+  returns: v.any(), // PaginationResult<Doc<'talks'>>
+});
+
+/**
+ * Get talks by collection with status filter.
+ *
+ * @param ctx - Database context
+ * @param args - Query arguments with defaults
+ * @returns Array of talks sorted by collection order
+ */
+export const listTalksByCollection = query({
+  args: {
+    collectionId: v.id('collections'),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const { collectionId, limit = 100 } = args;
+
+    const talks = await ctx.db
+      .query('talks')
+      .withIndex('by_collectionId_and_status', (q) =>
+        q.eq('collectionId', collectionId).eq('status', 'published'),
+      )
+      .take(limit);
+
+    // Sort by collection order.
+    const sortedTalks = talks.sort((a, b) => (a.collectionOrder || 0) - (b.collectionOrder || 0));
+
+    return sortedTalks;
+  },
+  returns: docs('talks'),
+});
+
+/**
+ * Get talks by speaker with status filter.
+ *
+ * @param ctx - Database context
+ * @param args - Query arguments with defaults
+ * @returns Array of talks
+ */
+export const listTalksBySpeaker = query({
+  args: {
+    limit: v.optional(v.number()),
+    speakerId: v.id('speakers'),
+  },
+  handler: async (ctx, args) => {
+    const { limit = 20, speakerId } = args;
+
+    return await ctx.db
+      .query('talks')
+      .withIndex('by_speakerId_and_status', (q) =>
+        q.eq('speakerId', speakerId).eq('status', 'published'),
+      )
+      .order('desc')
+      .take(limit);
+  },
+  returns: docs('talks'),
+});
+
+/**
+ * Get talks with speaker data (paginated).
+ *
+ * @param ctx - Database context
+ * @param args - Query arguments with pagination options
+ * @returns Paginated talks with speaker information
+ */
+export const listTalksWithSpeakers = query({
+  args: {
+    paginationOpts: v.any(), // PaginationOptions
+    status: v.optional(statusType),
+  },
+  handler: async (ctx, args) => {
+    const { paginationOpts, status } = args;
+
+    let result: PaginationResult<Doc<'talks'>>;
+    if (status) {
+      result = await ctx.db
+        .query('talks')
+        .withIndex('by_status_and_publishedAt', (q) => q.eq('status', status))
+        .order('desc')
+        .paginate(paginationOpts);
+    } else {
+      result = await ctx.db.query('talks').order('desc').paginate(paginationOpts);
+    }
+
+    const enrichedPage = await asyncMap(result.page, async (talk: Doc<'talks'>) => {
+      const speaker = await ctx.db.get(talk.speakerId);
+      return { ...talk, speaker };
+    });
+
+    return {
+      ...result,
+      page: enrichedPage,
+    };
+  },
+  returns: v.object({
+    page: docs('talks'),
+    continueCursor: v.string(),
+    isDone: v.boolean(),
+  }),
 });

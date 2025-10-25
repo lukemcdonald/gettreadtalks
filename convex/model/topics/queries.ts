@@ -42,62 +42,6 @@ export const getTopicBySlug = query({
 });
 
 /**
- * Get topics.
- *
- * @param ctx - Database context
- * @param args - Query arguments with defaults
- * @returns Array of topics
- */
-export const getTopics = query({
-  args: {
-    limit: v.optional(v.number()),
-  },
-  handler: async (ctx, args) => {
-    const { limit = 100 } = args;
-
-    return await ctx.db.query('topics').withIndex('by_title').take(limit);
-  },
-  returns: docs('topics'),
-});
-
-/**
- * Get topics with talk counts.
- *
- * @param ctx - Database context
- * @param args - Query arguments with defaults
- * @returns Array of topics with talk counts
- */
-export const getTopicsWithCount = query({
-  args: {
-    limit: v.optional(v.number()),
-  },
-  handler: async (ctx, args) => {
-    const { limit = 100 } = args;
-
-    const topics = await ctx.db.query('topics').withIndex('by_title').take(limit);
-
-    // Get talk counts for each topic in parallel
-    const topicsWithCounts = await asyncMap(topics, async (topic) => {
-      const talkTopics = await getManyFrom(ctx.db, 'talksOnTopics', 'by_topicId', topic._id);
-
-      return {
-        count: talkTopics.length,
-        topic,
-      };
-    });
-
-    // Sort by count descending
-    return topicsWithCounts.sort((a, b) => b.count - a.count);
-  },
-  returns: v.array(
-    v.object({
-      count: v.number(),
-      topic: doc('topics'),
-    }),
-  ),
-});
-
-/**
  * Get topic with related talks and clips.
  *
  * @param ctx - Database context
@@ -146,5 +90,61 @@ export const getTopicWithContent = query({
       topic: doc('topics'),
     }),
     v.null(),
+  ),
+});
+
+/**
+ * List topics.
+ *
+ * @param ctx - Database context
+ * @param args - Query arguments with defaults
+ * @returns Array of topics
+ */
+export const listTopics = query({
+  args: {
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const { limit = 100 } = args;
+
+    return await ctx.db.query('topics').withIndex('by_title').take(limit);
+  },
+  returns: docs('topics'),
+});
+
+/**
+ * List topics with talk counts.
+ *
+ * @param ctx - Database context
+ * @param args - Query arguments with defaults
+ * @returns Array of topics with talk counts
+ */
+export const listTopicsWithCount = query({
+  args: {
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const { limit = 100 } = args;
+
+    const topics = await ctx.db.query('topics').withIndex('by_title').take(limit);
+
+    // Get talk counts for each topic in parallel
+    const topicsWithCounts = await asyncMap(topics, async (topic) => {
+      const talkTopics = await getManyFrom(ctx.db, 'talksOnTopics', 'by_topicId', topic._id);
+
+      return {
+        count: talkTopics.length,
+        topic,
+      };
+    });
+
+    // Sort by count descending
+    return topicsWithCounts.sort((a, b) => b.count - a.count);
+  },
+  returns: v.array(
+    v.object({
+      count: v.number(),
+      topic: doc('topics'),
+    }),
   ),
 });

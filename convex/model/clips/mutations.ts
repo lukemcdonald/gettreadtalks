@@ -6,6 +6,37 @@ import { mutation } from '../../_generated/server';
 import { normalizeSlug, slugExists } from '../../lib/utils';
 import { requireAuth } from '../auth/queries';
 import { statusType } from './validators';
+/**
+ * Archive a clip (soft delete by setting status to archived).
+ *
+ * @param ctx - Database context
+ * @param args - Archive arguments
+ * @returns null
+ */
+export const archiveClip = mutation({
+  args: {
+    id: v.id('clips'),
+  },
+  handler: async (ctx, args) => {
+    await requireAuth(ctx);
+
+    const clip = await ctx.db.get(args.id);
+
+    if (!clip) {
+      throw new Error('Clip not found');
+    }
+
+    // Soft delete by setting status to archived
+    await ctx.db.patch(args.id, {
+      publishedAt: undefined,
+      status: 'archived',
+      updatedAt: Date.now(),
+    });
+
+    return null;
+  },
+  returns: v.null(),
+});
 
 /**
  * Create a new clip.
@@ -142,36 +173,4 @@ export const updateClipStatus = mutation({
     return args.id;
   },
   returns: v.id('clips'),
-});
-
-/**
- * Archive a clip (soft delete by setting status to archived).
- *
- * @param ctx - Database context
- * @param args - Archive arguments
- * @returns null
- */
-export const archiveClip = mutation({
-  args: {
-    id: v.id('clips'),
-  },
-  handler: async (ctx, args) => {
-    await requireAuth(ctx);
-
-    const clip = await ctx.db.get(args.id);
-
-    if (!clip) {
-      throw new Error('Clip not found');
-    }
-
-    // Soft delete by setting status to archived
-    await ctx.db.patch(args.id, {
-      publishedAt: undefined,
-      status: 'archived',
-      updatedAt: Date.now(),
-    });
-
-    return null;
-  },
-  returns: v.null(),
 });

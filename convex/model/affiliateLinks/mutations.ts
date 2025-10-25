@@ -7,6 +7,13 @@ import { normalizeSlug, slugExists } from '../../lib/utils';
 import { requireAuth } from '../auth/queries';
 import { affiliateLinkTypes } from './validators';
 
+/**
+ * Create a new affiliate link.
+ *
+ * @param ctx - Database context
+ * @param args - Affiliate link creation arguments
+ * @returns The ID of the created affiliate link
+ */
 export const createAffiliateLink = mutation({
   args: {
     affiliate: v.optional(v.string()),
@@ -29,6 +36,34 @@ export const createAffiliateLink = mutation({
     return await ctx.db.insert('affiliateLinks', { ...args, slug });
   },
   returns: v.id('affiliateLinks'),
+});
+
+/**
+ * Destroy an affiliate link (permanently delete from database).
+ *
+ * @param ctx - Database context
+ * @param args - Destroy arguments
+ * @returns null
+ */
+export const destroyAffiliateLink = mutation({
+  args: {
+    id: v.id('affiliateLinks'),
+  },
+  handler: async (ctx, args) => {
+    await requireAuth(ctx);
+
+    const affiliateLink = await ctx.db.get(args.id);
+
+    if (!affiliateLink) {
+      throw new Error('Affiliate link not found');
+    }
+
+    // Hard delete the affiliate link
+    await ctx.db.delete(args.id);
+
+    return null;
+  },
+  returns: v.null(),
 });
 
 /**
@@ -80,32 +115,4 @@ export const updateAffiliateLink = mutation({
     return id;
   },
   returns: v.id('affiliateLinks'),
-});
-
-/**
- * Destroy an affiliate link (permanently delete from database).
- *
- * @param ctx - Database context
- * @param args - Destroy arguments
- * @returns null
- */
-export const destroyAffiliateLink = mutation({
-  args: {
-    id: v.id('affiliateLinks'),
-  },
-  handler: async (ctx, args) => {
-    await requireAuth(ctx);
-
-    const affiliateLink = await ctx.db.get(args.id);
-
-    if (!affiliateLink) {
-      throw new Error('Affiliate link not found');
-    }
-
-    // Hard delete the affiliate link
-    await ctx.db.delete(args.id);
-
-    return null;
-  },
-  returns: v.null(),
 });

@@ -4,8 +4,8 @@ import { mutations, queries } from './model/topics';
 export const getTopic = queries.getTopic;
 export const getTopicBySlug = queries.getTopicBySlug;
 export const getTopicWithContent = queries.getTopicWithContent;
-export const listTopics = queries.getTopics;
-export const listTopicsWithCount = queries.getTopicsWithCount;
+export const listTopics = queries.listTopics;
+export const listTopicsWithCount = queries.listTopicsWithCount;
 
 // Mutations
 export const addClipToTopic = mutations.addClipToTopic;

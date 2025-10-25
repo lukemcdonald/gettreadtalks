@@ -6,60 +6,6 @@ import { doc, docs } from '../../lib/validators/schema';
 import { statusType } from './validators';
 
 /**
- * Get clips with optional filters and pagination.
- *
- * @param ctx - Database context
- * @param args - Query arguments with pagination options
- * @returns Paginated clips
- */
-export const getClips = query({
-  args: {
-    paginationOpts: v.any(), // PaginationOptions
-    status: v.optional(statusType),
-  },
-  handler: async (ctx, args) => {
-    const { paginationOpts, status } = args;
-
-    if (status) {
-      return await ctx.db
-        .query('clips')
-        .withIndex('by_status_and_publishedAt', (q) => q.eq('status', status))
-        .order('desc')
-        .paginate(paginationOpts);
-    }
-
-    return await ctx.db.query('clips').order('desc').paginate(paginationOpts);
-  },
-  returns: v.any(), // PaginationResult<Doc<'clips'>>
-});
-
-/**
- * Get clips by speaker.
- *
- * @param ctx - Database context
- * @param args - Query arguments
- * @returns Array of clips by speaker
- */
-export const getClipsBySpeaker = query({
-  args: {
-    limit: v.optional(v.number()),
-    speakerId: v.id('speakers'),
-  },
-  handler: async (ctx, args) => {
-    const { limit = 20, speakerId } = args;
-
-    return await ctx.db
-      .query('clips')
-      .withIndex('by_speakerId_and_status', (q) =>
-        q.eq('speakerId', speakerId).eq('status', 'published'),
-      )
-      .order('desc')
-      .take(limit);
-  },
-  returns: docs('clips'),
-});
-
-/**
  * Get clip by slug with related data.
  *
  * @param ctx - Database context
@@ -102,4 +48,58 @@ export const getClipBySlugWithRelations = query({
     }),
     v.null(),
   ),
+});
+
+/**
+ * List clips with optional filters and pagination.
+ *
+ * @param ctx - Database context
+ * @param args - Query arguments with pagination options
+ * @returns Paginated clips
+ */
+export const listClips = query({
+  args: {
+    paginationOpts: v.any(), // PaginationOptions
+    status: v.optional(statusType),
+  },
+  handler: async (ctx, args) => {
+    const { paginationOpts, status } = args;
+
+    if (status) {
+      return await ctx.db
+        .query('clips')
+        .withIndex('by_status_and_publishedAt', (q) => q.eq('status', status))
+        .order('desc')
+        .paginate(paginationOpts);
+    }
+
+    return await ctx.db.query('clips').order('desc').paginate(paginationOpts);
+  },
+  returns: v.any(), // PaginationResult<Doc<'clips'>>
+});
+
+/**
+ * List clips by speaker.
+ *
+ * @param ctx - Database context
+ * @param args - Query arguments
+ * @returns Array of clips by speaker
+ */
+export const listClipsBySpeaker = query({
+  args: {
+    limit: v.optional(v.number()),
+    speakerId: v.id('speakers'),
+  },
+  handler: async (ctx, args) => {
+    const { limit = 20, speakerId } = args;
+
+    return await ctx.db
+      .query('clips')
+      .withIndex('by_speakerId_and_status', (q) =>
+        q.eq('speakerId', speakerId).eq('status', 'published'),
+      )
+      .order('desc')
+      .take(limit);
+  },
+  returns: docs('clips'),
 });

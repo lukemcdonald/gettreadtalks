@@ -38,6 +38,47 @@ export const createCollection = mutation({
 });
 
 /**
+ * Destroy a collection (permanently delete from database with reference checks).
+ *
+ * @param ctx - Database context
+ * @param args - Destroy arguments
+ * @returns null
+ */
+export const destroyCollection = mutation({
+  args: {
+    id: v.id('collections'),
+  },
+  handler: async (ctx, args) => {
+    await requireAuth(ctx);
+
+    const collection = await ctx.db.get(args.id);
+
+    if (!collection) {
+      throw new Error('Collection not found');
+    }
+
+    // Check if collection is referenced by any talks
+    const talksWithCollection = await getOneFrom(
+      ctx.db,
+      'talks',
+      'by_collectionId_and_status',
+      args.id,
+      'collectionId',
+    );
+
+    if (talksWithCollection) {
+      throw new Error('Cannot delete collection: collection has associated talks');
+    }
+
+    // Hard delete the collection
+    await ctx.db.delete(args.id);
+
+    return null;
+  },
+  returns: v.null(),
+});
+
+/**
  * Update an existing collection.
  *
  * @param ctx - Database context
@@ -81,45 +122,4 @@ export const updateCollection = mutation({
     return id;
   },
   returns: v.id('collections'),
-});
-
-/**
- * Destroy a collection (permanently delete from database with reference checks).
- *
- * @param ctx - Database context
- * @param args - Destroy arguments
- * @returns null
- */
-export const destroyCollection = mutation({
-  args: {
-    id: v.id('collections'),
-  },
-  handler: async (ctx, args) => {
-    await requireAuth(ctx);
-
-    const collection = await ctx.db.get(args.id);
-
-    if (!collection) {
-      throw new Error('Collection not found');
-    }
-
-    // Check if collection is referenced by any talks
-    const talksWithCollection = await getOneFrom(
-      ctx.db,
-      'talks',
-      'by_collectionId_and_status',
-      args.id,
-      'collectionId',
-    );
-
-    if (talksWithCollection) {
-      throw new Error('Cannot delete collection: collection has associated talks');
-    }
-
-    // Hard delete the collection
-    await ctx.db.delete(args.id);
-
-    return null;
-  },
-  returns: v.null(),
 });

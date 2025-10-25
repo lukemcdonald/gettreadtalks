@@ -5,7 +5,7 @@ export const getSpeaker = queries.getSpeaker;
 export const getSpeakerBySlug = queries.getSpeakerBySlug;
 export const getSpeakersCount = queries.getSpeakersCount;
 export const listFeaturedSpeakers = queries.listFeaturedSpeakers;
-export const listSpeakers = queries.getSpeakers;
+export const listSpeakers = queries.listSpeakers;
 
 // Mutations
 export const createSpeaker = mutations.createSpeaker;

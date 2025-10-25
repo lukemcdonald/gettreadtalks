@@ -8,6 +8,38 @@ import { requireAuth } from '../auth/queries';
 import { statusType } from './validators';
 
 /**
+ * Archive a talk (soft delete by setting status to archived).
+ *
+ * @param ctx - Database context
+ * @param args - Archive arguments
+ * @returns null
+ */
+export const archiveTalk = mutation({
+  args: {
+    id: v.id('talks'),
+  },
+  handler: async (ctx, args) => {
+    await requireAuth(ctx);
+
+    const talk = await ctx.db.get(args.id);
+
+    if (!talk) {
+      throw new Error('Talk not found');
+    }
+
+    // Soft delete by setting status to archived
+    await ctx.db.patch(args.id, {
+      publishedAt: undefined,
+      status: 'archived',
+      updatedAt: Date.now(),
+    });
+
+    return null;
+  },
+  returns: v.null(),
+});
+
+/**
  * Create a new talk.
  *
  * @param ctx - Database context
@@ -146,36 +178,4 @@ export const updateTalkStatus = mutation({
     return args.id;
   },
   returns: v.id('talks'),
-});
-
-/**
- * Archive a talk (soft delete by setting status to archived).
- *
- * @param ctx - Database context
- * @param args - Archive arguments
- * @returns null
- */
-export const archiveTalk = mutation({
-  args: {
-    id: v.id('talks'),
-  },
-  handler: async (ctx, args) => {
-    await requireAuth(ctx);
-
-    const talk = await ctx.db.get(args.id);
-
-    if (!talk) {
-      throw new Error('Talk not found');
-    }
-
-    // Soft delete by setting status to archived
-    await ctx.db.patch(args.id, {
-      publishedAt: undefined,
-      status: 'archived',
-      updatedAt: Date.now(),
-    });
-
-    return null;
-  },
-  returns: v.null(),
 });

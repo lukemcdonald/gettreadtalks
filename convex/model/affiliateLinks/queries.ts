@@ -40,61 +40,13 @@ export const getAffiliateLinkBySlug = query({
 });
 
 /**
- * Get affiliate links by type.
- *
- * @param ctx - Database context
- * @param args - Query arguments with defaults
- * @returns Array of affiliate links of the specified type
- */
-export const getAffiliateLinksByType = query({
-  args: {
-    limit: v.optional(v.number()),
-    type: affiliateLinkTypes,
-  },
-  handler: async (ctx, args) => {
-    const { limit = 20, type } = args;
-
-    return await ctx.db
-      .query('affiliateLinks')
-      .withIndex('by_type', (q) => q.eq('type', type))
-      .order('desc')
-      .take(limit);
-  },
-  returns: docs('affiliateLinks'),
-});
-
-/**
- * Get affiliate links by affiliate.
- *
- * @param ctx - Database context
- * @param args - Query arguments with defaults
- * @returns Array of affiliate links from the specified affiliate
- */
-export const getAffiliateLinksByAffiliate = query({
-  args: {
-    affiliate: v.string(),
-    limit: v.optional(v.number()),
-  },
-  handler: async (ctx, args) => {
-    const { affiliate, limit = 20 } = args;
-
-    return await ctx.db
-      .query('affiliateLinks')
-      .withIndex('by_affiliate', (q) => q.eq('affiliate', affiliate))
-      .order('desc')
-      .take(limit);
-  },
-  returns: docs('affiliateLinks'),
-});
-
-/**
- * Get all affiliate links with optional filters.
+ * List all affiliate links with optional filters.
  *
  * @param ctx - Database context
  * @param args - Query arguments with defaults
  * @returns Array of affiliate links
  */
-export const getAffiliateLinks = query({
+export const listAffiliateLinks = query({
   args: {
     affiliate: v.optional(v.string()),
     featured: v.optional(v.boolean()),
@@ -129,6 +81,54 @@ export const getAffiliateLinks = query({
     return filteredLinks
       .sort((a, b) => (b._creationTime || 0) - (a._creationTime || 0))
       .slice(0, limit);
+  },
+  returns: docs('affiliateLinks'),
+});
+
+/**
+ * List affiliate links by affiliate.
+ *
+ * @param ctx - Database context
+ * @param args - Query arguments with defaults
+ * @returns Array of affiliate links from the specified affiliate
+ */
+export const listAffiliateLinksByAffiliate = query({
+  args: {
+    affiliate: v.string(),
+    limit: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const { affiliate, limit = 20 } = args;
+
+    return await ctx.db
+      .query('affiliateLinks')
+      .withIndex('by_affiliate', (q) => q.eq('affiliate', affiliate))
+      .order('desc')
+      .take(limit);
+  },
+  returns: docs('affiliateLinks'),
+});
+
+/**
+ * List affiliate links by type.
+ *
+ * @param ctx - Database context
+ * @param args - Query arguments with defaults
+ * @returns Array of affiliate links of the specified type
+ */
+export const listAffiliateLinksByType = query({
+  args: {
+    limit: v.optional(v.number()),
+    type: affiliateLinkTypes,
+  },
+  handler: async (ctx, args) => {
+    const { limit = 20, type } = args;
+
+    return await ctx.db
+      .query('affiliateLinks')
+      .withIndex('by_type', (q) => q.eq('type', type))
+      .order('desc')
+      .take(limit);
   },
   returns: docs('affiliateLinks'),
 });

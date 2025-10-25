@@ -52,10 +52,6 @@ export const createAuth = (
   });
 };
 
-// ============================================
-// QUERIES
-// ============================================
-
 export const getCurrentUser = query({
   args: {},
   handler: async (ctx) => {
