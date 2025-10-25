@@ -46,6 +46,7 @@ import type * as model_topics_validators from "../model/topics/validators.js";
 import type * as model_users_index from "../model/users/index.js";
 import type * as model_users_mutations from "../model/users/mutations.js";
 import type * as model_users_queries from "../model/users/queries.js";
+import type * as model_users_utils from "../model/users/utils.js";
 import type * as seed_data_ministries from "../seed/data/ministries.js";
 import type * as seed_data_scripture_refs from "../seed/data/scripture_refs.js";
 import type * as seed_data_speakers from "../seed/data/speakers.js";
@@ -116,6 +117,7 @@ declare const fullApi: ApiFromModules<{
   "model/users/index": typeof model_users_index;
   "model/users/mutations": typeof model_users_mutations;
   "model/users/queries": typeof model_users_queries;
+  "model/users/utils": typeof model_users_utils;
   "seed/data/ministries": typeof seed_data_ministries;
   "seed/data/scripture_refs": typeof seed_data_scripture_refs;
   "seed/data/speakers": typeof seed_data_speakers;

@@ -1,9 +1,8 @@
-import type { QueryCtx } from '../../_generated/server';
-
 import { v } from 'convex/values';
 
 import { query } from '../../_generated/server';
 import { getCurrentUser } from '../auth/utils';
+import { getUserFavoriteClips, getUserFavoriteSpeakers, getUserFavoriteTalks } from './utils';
 
 /**
  * Get the current authenticated user.
@@ -158,7 +157,19 @@ export const listUserFavorites = query({
     const userId = user._id;
     const limit = args.limit ?? 100;
 
-    return await getUserFavorites(ctx, userId, limit);
+    const [clips, speakers, talks] = await Promise.all([
+      getUserFavoriteClips(ctx, userId, limit),
+      getUserFavoriteSpeakers(ctx, userId, limit),
+      getUserFavoriteTalks(ctx, userId, limit),
+    ]);
+
+    return {
+      clips,
+      speakers,
+      talks,
+    };
+
+    // return await getUserFavorites(ctx, userId, limit);
   },
   returns: v.object({
     clips: v.array(v.any()),
@@ -187,90 +198,11 @@ export const listUserFinishedTalks = query({
 
     const limit = args.limit ?? 100;
 
-    return await getUserFinishedTalks(ctx, user._id, limit);
+    return await ctx.db
+      .query('userFinishedTalks')
+      .withIndex('by_userId', (q) => q.eq('userId', user._id))
+      .order('desc')
+      .take(limit);
   },
   returns: v.array(v.any()),
 });
-
-/**
- * Get user favorites by clip.
- *
- * @param ctx - Database context
- * @param userId - User ID
- * @param limit - Maximum number of favorites
- * @returns Array of favorite records
- */
-export async function getUserFavoriteClips(ctx: QueryCtx, userId: string, limit: number) {
-  return await ctx.db
-    .query('userFavoriteClips')
-    .withIndex('by_userId_and_clipId', (q) => q.eq('userId', userId))
-    .take(limit);
-}
-
-/**
- * Get user favorite speakers.
- *
- * @param ctx - Database context
- * @param userId - User ID
- * @param limit - Maximum number of favorites
- * @returns Array of favorite speakers
- */
-export async function getUserFavoriteSpeakers(ctx: QueryCtx, userId: string, limit: number) {
-  return await ctx.db
-    .query('userFavoriteSpeakers')
-    .withIndex('by_userId_and_speakerId', (q) => q.eq('userId', userId))
-    .take(limit);
-}
-
-/**
- * Get user favorite talks.
- *
- * @param ctx - Database context
- * @param userId - User ID
- * @param limit - Maximum number of favorites
- * @returns Array of favorite talks
- */
-export async function getUserFavoriteTalks(ctx: QueryCtx, userId: string, limit: number) {
-  return await ctx.db
-    .query('userFavoriteTalks')
-    .withIndex('by_userId_and_talkId', (q) => q.eq('userId', userId))
-    .take(limit);
-}
-
-/**
- * Get all user favorites.
- *
- * @param ctx - Database context
- * @param userId - User ID
- * @param limit - Maximum number of favorites per type
- * @returns Object with clips, speakers, and talks favorites
- */
-export async function getUserFavorites(ctx: QueryCtx, userId: string, limit: number) {
-  const [clips, speakers, talks] = await Promise.all([
-    getUserFavoriteClips(ctx, userId, limit),
-    getUserFavoriteSpeakers(ctx, userId, limit),
-    getUserFavoriteTalks(ctx, userId, limit),
-  ]);
-
-  return {
-    clips,
-    speakers,
-    talks,
-  };
-}
-
-/**
- * Get user finished talks.
- *
- * @param ctx - Database context
- * @param userId - User ID
- * @param limit - Maximum number of finished talks
- * @returns Array of finished talk records
- */
-export async function getUserFinishedTalks(ctx: QueryCtx, userId: string, limit: number) {
-  return await ctx.db
-    .query('userFinishedTalks')
-    .withIndex('by_userId', (q) => q.eq('userId', userId))
-    .order('desc')
-    .take(limit);
-}
