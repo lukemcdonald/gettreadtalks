@@ -1,13 +1,16 @@
 'use client';
 
+import type { AuthUser } from '@/lib/services/auth/types';
+
 import Link from 'next/link';
 
-import { useCurrentUser } from '@/lib/features/users/hooks';
 import { signOut } from '@/lib/services/auth/client';
 
-function AuthenticatedContent() {
-  const { data: user } = useCurrentUser();
+interface AuthenticatedContentProps {
+  user: AuthUser;
+}
 
+function AuthenticatedContent({ user }: AuthenticatedContentProps) {
   const handleLogout = async () => {
     try {
       await signOut();
@@ -20,7 +23,7 @@ function AuthenticatedContent() {
   return (
     <div className="inline-flex items-center space-x-4">
       <div className="inline-flex items-center px-4 py-2 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full">
-        {user?.name || 'User'}
+        {user.name || 'User'}
       </div>
       <div className="space-x-2">
         <Link

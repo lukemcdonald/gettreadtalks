@@ -181,7 +181,7 @@ components/component-name/
 
 **Better Auth** is used with Convex integration:
 - Client: `import { useSession } from '@/lib/services/auth/client'`
-- Server: `import { getServerSession } from '@/lib/services/auth/server'`
+- Server: `import { getAuthUser, requireAuthUser } from '@/lib/services/auth/server'`
 - Convex: `import { getCurrentUser } from '@/convex/model/auth'`
 
 ### Error Handling
