@@ -1,14 +1,17 @@
 import { mutations, queries } from './model/topics';
 
+// Queries
+export const getTopic = queries.getTopic;
+export const getTopicBySlug = queries.getTopicBySlug;
+export const getTopicWithContent = queries.getTopicWithContent;
+export const listTopics = queries.getTopics;
+export const listTopicsWithCount = queries.getTopicsWithCount;
+
+// Mutations
 export const addClipToTopic = mutations.addClipToTopic;
 export const addTalkToTopic = mutations.addTalkToTopic;
-export const create = mutations.createTopic;
-export const destroy = mutations.destroyTopic;
-export const get = queries.getTopic;
-export const getBySlug = queries.getTopicBySlug;
-export const getWithContent = queries.getTopicWithContent;
-export const list = queries.getTopics;
-export const listWithCount = queries.getTopicsWithCount;
+export const createTopic = mutations.createTopic;
+export const destroyTopic = mutations.destroyTopic;
 export const removeClipFromTopic = mutations.removeClipFromTopic;
 export const removeTalkFromTopic = mutations.removeTalkFromTopic;
-export const update = mutations.updateTopic;
+export const updateTopic = mutations.updateTopic;

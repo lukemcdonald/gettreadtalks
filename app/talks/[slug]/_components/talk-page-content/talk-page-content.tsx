@@ -8,7 +8,7 @@ import MainLayout from '@/components/layout/main-layout';
 import { FavoriteTalkButton } from '../favorite-talk-button';
 
 interface TalkPageContentProps {
-  talkData: NonNullable<FunctionReturnType<typeof api.talks.getBySlug>>;
+  talkData: NonNullable<FunctionReturnType<typeof api.talks.getTalkBySlug>>;
 }
 
 export function TalkPageContent({ talkData }: TalkPageContentProps) {

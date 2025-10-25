@@ -15,7 +15,7 @@ import { api } from '@/convex/_generated/api';
 import { useCurrentUser } from '@/lib/features/users/hooks';
 
 type HomeContentProps = {
-  preloadedTalks: Preloaded<typeof api.talks.list>;
+  preloadedTalks: Preloaded<typeof api.talks.listTalks>;
 };
 
 export function HomeContent({ preloadedTalks }: HomeContentProps) {
@@ -35,7 +35,7 @@ export function HomeContent({ preloadedTalks }: HomeContentProps) {
 const AuthenticatedHomeContent = ({
   preloadedTalks,
 }: {
-  preloadedTalks: Preloaded<typeof api.talks.list>;
+  preloadedTalks: Preloaded<typeof api.talks.listTalks>;
 }) => {
   const { data: user } = useCurrentUser();
 
@@ -46,7 +46,7 @@ const AuthenticatedHomeContent = ({
   // Use a separate paginated query for load more functionality
   // This will start fresh and we'll handle the transition
   const { loadMore, results, status } = usePaginatedQuery(
-    api.talks.list,
+    api.talks.listTalks,
     {},
     { initialNumItems: 12 },
   );

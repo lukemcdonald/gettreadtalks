@@ -12,7 +12,7 @@ export function useTalks(options: Options) {
   const { pageSize = 12 } = options ?? {};
 
   const { loadMore, results, status } = usePaginatedQuery(
-    api.talks.list,
+    api.talks.listTalks,
     {},
     { initialNumItems: pageSize },
   );

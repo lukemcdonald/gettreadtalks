@@ -1,6 +1,14 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(git checkout:*)",
+      "Bash(/dev/null -l)",
+      "Bash(find:*)",
+      "Bash(pnpm typecheck:*)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "next-devtools"
-  ],
-  "enableAllProjectMcpServers": true
+  ]
 }

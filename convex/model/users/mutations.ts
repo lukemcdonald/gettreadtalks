@@ -1,6 +1,7 @@
 import { v } from 'convex/values';
 
 import { mutation } from '../../_generated/server';
+import { authComponent, createAuth } from '../../auth';
 import { getUserId } from '../auth/queries';
 
 /**
@@ -245,6 +246,32 @@ export const unfinishTalk = mutation({
     }
 
     await ctx.db.delete(finished._id);
+
+    return null;
+  },
+  returns: v.null(),
+});
+
+/**
+ * Update the user's password.
+ *
+ * @param ctx - Database context
+ * @param args - Arguments containing current password and new password
+ * @returns null
+ */
+export const updatePassword = mutation({
+  args: {
+    currentPassword: v.string(),
+    newPassword: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await createAuth(ctx).api.changePassword({
+      body: {
+        currentPassword: args.currentPassword,
+        newPassword: args.newPassword,
+      },
+      headers: await authComponent.getHeaders(ctx),
+    });
 
     return null;
   },
