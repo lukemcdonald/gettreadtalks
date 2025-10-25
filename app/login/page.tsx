@@ -1,10 +1,10 @@
 'use client';
 
 import { useId, useState } from 'react';
+
 import { useRouter } from 'next/navigation';
 
 import MainLayout from '@/components/layout/main-layout';
-import { routes } from '@/lib/routes';
 import { signIn, signUp } from '@/lib/services/auth/client';
 import { AUTH_ERRORS } from '@/lib/services/auth/config';
 
@@ -24,7 +24,7 @@ export default function LoginPage() {
       const result = await signIn({ email, password });
 
       if (result.data) {
-        router.push(routes.account.root);
+        router.push('/account');
       } else {
         setError(result.error?.message || AUTH_ERRORS.INVALID_CREDENTIALS);
       }
@@ -45,7 +45,7 @@ export default function LoginPage() {
       const result = await signUp({ email, password });
 
       if (result.data) {
-        router.push(routes.account.root);
+        router.push('/account');
       } else {
         setError(result.error?.message || AUTH_ERRORS.REGISTRATION_FAILED);
       }

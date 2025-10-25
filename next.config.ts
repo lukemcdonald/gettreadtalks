@@ -23,6 +23,7 @@ const cspHeader = `
 
 const nextConfig = {
   cacheComponents: true,
+  typedRoutes: true,
   headers: async () => {
     return [
       {
