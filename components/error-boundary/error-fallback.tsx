@@ -1,4 +1,8 @@
+'use client';
+
 import type { FallbackProps } from 'react-error-boundary';
+
+import { useRouter } from 'next/navigation';
 
 /**
  * Default fallback UI shown when an error is caught by ErrorBoundary.
@@ -10,6 +14,8 @@ import type { FallbackProps } from 'react-error-boundary';
  * </ErrorBoundary>
  */
 export function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
+  const router = useRouter();
+
   return (
     <div className="flex min-h-[400px] flex-col items-center justify-center p-8">
       <div className="max-w-md space-y-4 text-center">
@@ -43,9 +49,7 @@ export function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
           </button>
           <button
             className="rounded-md border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50"
-            onClick={() => {
-              window.location.href = '/';
-            }}
+            onClick={() => router.push('/')}
             type="button"
           >
             Go Home

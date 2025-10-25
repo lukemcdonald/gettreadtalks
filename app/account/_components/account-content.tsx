@@ -1,17 +1,20 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
+
 import MainLayout from '@/components/layout/main-layout';
 import { useAuthUser, useFavorites } from '@/lib/features/users/hooks';
 import { signOut } from '@/lib/services/auth/client';
 
 export function AccountContent() {
+  const router = useRouter();
   const { data: user } = useAuthUser();
   const { data: favorites, isLoading: favoritesLoading } = useFavorites();
 
   const handleLogout = async () => {
     try {
       await signOut();
-      window.location.href = '/';
+      router.push('/');
     } catch (error) {
       console.error('Logout failed:', error);
     }

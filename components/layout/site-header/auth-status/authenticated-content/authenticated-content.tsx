@@ -3,6 +3,7 @@
 import type { AuthUser } from '@/lib/services/auth/types';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 import { signOut } from '@/lib/services/auth/client';
 
@@ -11,10 +12,12 @@ interface AuthenticatedContentProps {
 }
 
 function AuthenticatedContent({ user }: AuthenticatedContentProps) {
+  const router = useRouter();
+
   const handleLogout = async () => {
     try {
       await signOut();
-      window.location.reload();
+      router.refresh();
     } catch (error) {
       console.error('Logout failed:', error);
     }
