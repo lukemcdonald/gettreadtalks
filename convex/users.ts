@@ -1,7 +1,7 @@
 import { mutations, queries } from './model/users';
 
 // Queries
-export const getUser = queries.getUser;
+export const getAuthUser = queries.getUser;
 export const isClipFavorited = queries.isClipFavorited;
 export const isSpeakerFavorited = queries.isSpeakerFavorited;
 export const isTalkFavorited = queries.isTalkFavorited;

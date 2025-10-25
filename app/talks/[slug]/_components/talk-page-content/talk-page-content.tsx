@@ -3,6 +3,8 @@
 import type { FunctionReturnType } from 'convex/server';
 import type { api } from '@/convex/_generated/api';
 
+import { Authenticated } from 'convex/react';
+
 import MainLayout from '@/components/layout/main-layout';
 
 import { FavoriteTalkButton } from '../favorite-talk-button';
@@ -19,7 +21,9 @@ export function TalkPageContent({ talkData }: TalkPageContentProps) {
       <div>
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-bold">{talk.title}</h1>
-          <FavoriteTalkButton talkId={talk._id} />
+          <Authenticated>
+            <FavoriteTalkButton talkId={talk._id} />
+          </Authenticated>
         </div>
 
         {speaker && (

@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 
+import { Suspense } from 'react';
+
 import { Inter } from 'next/font/google';
 
 import { ErrorBoundary } from '@/components/error-boundary';
@@ -23,7 +25,7 @@ export const metadata: Metadata = {
   title: 'TREADTalks',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -34,7 +36,13 @@ export default function RootLayout({
         <ErrorBoundary>
           <ThemeProvider>
             <AuthProvider>
-              <SiteHeader />
+              <Suspense
+                fallback={
+                  <div className="h-16 bg-background border-b-2 border-slate-200 dark:border-slate-800" />
+                }
+              >
+                <SiteHeader />
+              </Suspense>
               {children}
             </AuthProvider>
           </ThemeProvider>

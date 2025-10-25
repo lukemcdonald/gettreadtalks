@@ -1,5 +1,4 @@
 import { preloadQuery } from 'convex/nextjs';
-import { cookies } from 'next/headers';
 
 import MainLayout from '@/components/layout/main-layout';
 import { api } from '@/convex/_generated/api';
@@ -8,7 +7,6 @@ import { getAuthToken } from '@/lib/services/auth/server';
 import { HomeContent } from './_components/home-content';
 
 async function HomeData() {
-  await cookies();
   const authToken = await getAuthToken();
   const preloadedTalks = await preloadQuery(
     api.talks.listTalks,

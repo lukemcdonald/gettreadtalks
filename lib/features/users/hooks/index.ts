@@ -1,4 +1,4 @@
-export { useCurrentUser } from './use-current-user';
+export { useAuthUser } from './use-auth-user';
 export { useFavoriteClip } from './use-favorite-clip';
 export { useFavoriteSpeaker } from './use-favorite-speaker';
 export { useFavoriteTalk } from './use-favorite-talk';

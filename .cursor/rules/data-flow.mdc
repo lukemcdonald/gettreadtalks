@@ -206,38 +206,99 @@ export function useFavorites(limit?: number) {
 
 ## Authentication Patterns
 
+### Server-Side Authentication
+
+Use server functions for initial data fetch and route protection:
+
+```ts
+// lib/services/auth/server.ts
+import { getAuthUser, requireAuthUser } from '@/lib/services/auth/server';
+
+// Get current user (returns null if not authenticated)
+const user = await getAuthUser();
+
+// Require authentication (redirects if not authenticated)
+const user = await requireAuthUser('/login?redirect=/account');
+```
+
 ### Server Component Protection
 
 ```ts
-import { getServerSession } from '@/lib/services/auth/server';
-import { redirect } from 'next/navigation';
+// app/account/page.tsx
+import { requireAuthUser } from '@/lib/services/auth/server';
 
-export default async function ProtectedPage() {
-  const session = await getServerSession();
-
-  if (!session) {
-    redirect('/auth/login');
-  }
-
-  return <div>Protected content</div>;
+export default async function AccountPage() {
+  const user = await requireAuthUser('/login?redirect=/account');
+  return <AccountContent initialUser={user} />;
 }
 ```
 
-### Client Component Session
+### Client-Side Authentication
+
+Use React hooks for client components with SSR hydration:
 
 ```ts
-'use client';
-import { useSession } from '@/lib/services/auth/client';
+// lib/features/users/hooks/use-auth-user.ts
+import { useAuthUser } from '@/lib/features/users/hooks';
 
-export function UserProfile() {
-  const session = useSession();
+// Basic usage (shows loading state)
+const { data: user, isLoading } = useAuthUser();
 
-  if (!session) {
-    return <div>Please log in</div>;
-  }
+// With SSR data (no loading state, prevents layout shift)
+const { data: user } = useAuthUser(initialUser);
+```
 
-  return <div>Welcome {session.user.name}</div>;
+### SSR Header (No Layout Shift)
+
+Always use server-side auth for headers to prevent layout shift:
+
+```ts
+// components/layout/site-header/site-header.tsx
+async function SiteHeader() {
+  const initialUser = await getAuthUser();
+  return <AuthStatus initialUser={initialUser} />;
 }
+```
+
+### Conditional Rendering
+
+Use Convex's built-in `Authenticated` component for auth-only UI elements on public pages:
+
+```ts
+// Use Convex's built-in components
+import { Authenticated, Unauthenticated, AuthLoading } from 'convex/react';
+
+// Simple usage - hide when logged out
+<Authenticated>
+  <FavoriteButton itemId={item._id} />
+</Authenticated>
+
+// Full auth flow - show different content for each state
+<Authenticated>
+  <UserDashboard />
+</Authenticated>
+<Unauthenticated>
+  <LoginPrompt />
+</Unauthenticated>
+<AuthLoading>
+  <Spinner />
+</AuthLoading>
+```
+
+### Type Safety
+
+User types are automatically inferred from Convex API:
+
+```ts
+// lib/services/auth/types.ts
+import type { FunctionReturnType } from 'convex/server';
+import type { api } from '@/convex/_generated/api';
+
+// Automatically stays in sync with the actual return type
+export type User = FunctionReturnType<typeof api.users.getAuthUser>;
+
+// For non-null user (when you know user exists)
+export type AuthUser = NonNullable<User>;
 ```
 
 ## Best Practices
@@ -271,3 +332,12 @@ export default function ItemsPage() {
   // ...
 }
 ```
+
+### Authentication Best Practices
+
+1. **Always use SSR for headers** - Prevents layout shift
+2. **Use Authenticated for public pages** - Don't render auth features for logged-out users
+3. **Pass initialUser to client components** - Enables seamless hydration
+4. **Use server-side redirects for protected pages** - Better UX than client-side checks
+5. **Use centralized user types** - Import `User` or `AuthUser` from `@/lib/services/auth/types`
+6. **Use consistent auth function naming** - `getAuthUser`/`useAuthUser` and `requireAuthUser` for auth operations

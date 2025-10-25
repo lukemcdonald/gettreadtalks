@@ -1,29 +1,24 @@
 'use client';
 
-import { AuthLoading, Authenticated, Unauthenticated } from 'convex/react';
+import type { User } from '@/lib/services/auth/types';
+
+import { useAuthUser } from '@/lib/features/users/hooks';
 
 import AuthenticatedContent from './authenticated-content';
 import UnauthenticatedContent from './unauthenticated-content';
 
-function AuthStatus() {
-  return (
-    <>
-      <AuthLoading>
-        <div className="inline-flex gap-2 items-center px-4 py-2 bg-gray-100 dark:bg-gray-800 rounded-full">
-          <span>⚪</span>
-          <span className="text-gray-600 dark:text-gray-300">Checking auth...</span>
-        </div>
-      </AuthLoading>
+interface AuthStatusProps {
+  initialUser?: User;
+}
 
-      <Authenticated>
-        <AuthenticatedContent />
-      </Authenticated>
+function AuthStatus({ initialUser }: AuthStatusProps) {
+  const { data: user } = useAuthUser(initialUser);
 
-      <Unauthenticated>
-        <UnauthenticatedContent />
-      </Unauthenticated>
-    </>
-  );
+  if (!user) {
+    return <UnauthenticatedContent />;
+  }
+
+  return <AuthenticatedContent user={user} />;
 }
 
 export default AuthStatus;

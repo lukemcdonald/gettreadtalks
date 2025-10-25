@@ -1,7 +1,7 @@
 import { v } from 'convex/values';
 
 import { query } from '../../_generated/server';
-import { getCurrentUser } from '../auth/utils';
+import { getAuthUser } from '../auth/utils';
 import { getUserFavoriteClips, getUserFavoriteSpeakers, getUserFavoriteTalks } from './utils';
 
 /**
@@ -13,7 +13,7 @@ import { getUserFavoriteClips, getUserFavoriteSpeakers, getUserFavoriteTalks } f
 export const getUser = query({
   args: {},
   handler: async (ctx) => {
-    return await getCurrentUser(ctx);
+    return await getAuthUser(ctx);
   },
   returns: v.union(v.any(), v.null()),
 });
@@ -30,7 +30,7 @@ export const isClipFavorited = query({
     clipId: v.id('clips'),
   },
   handler: async (ctx, args) => {
-    const user = await getCurrentUser(ctx);
+    const user = await getAuthUser(ctx);
 
     if (!user) {
       return false;
@@ -58,7 +58,7 @@ export const isSpeakerFavorited = query({
     speakerId: v.id('speakers'),
   },
   handler: async (ctx, args) => {
-    const user = await getCurrentUser(ctx);
+    const user = await getAuthUser(ctx);
 
     if (!user) {
       return false;
@@ -88,7 +88,7 @@ export const isTalkFavorited = query({
     talkId: v.id('talks'),
   },
   handler: async (ctx, args) => {
-    const user = await getCurrentUser(ctx);
+    const user = await getAuthUser(ctx);
 
     if (!user) {
       return false;
@@ -116,7 +116,7 @@ export const isTalkFinished = query({
     talkId: v.id('talks'),
   },
   handler: async (ctx, args) => {
-    const user = await getCurrentUser(ctx);
+    const user = await getAuthUser(ctx);
 
     if (!user) {
       return false;
@@ -144,7 +144,7 @@ export const listUserFavorites = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const user = await getCurrentUser(ctx);
+    const user = await getAuthUser(ctx);
 
     if (!user) {
       return {
@@ -190,7 +190,7 @@ export const listUserFinishedTalks = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const user = await getCurrentUser(ctx);
+    const user = await getAuthUser(ctx);
 
     if (!user) {
       return [];
