@@ -1,4 +1,4 @@
-import type { WelcomeEmailProps } from '../lib/services/email/types';
+import type { WelcomeEmailProps } from '../../lib/services/email/types';
 
 import { Button, Section, Text } from '@react-email/components';
 
