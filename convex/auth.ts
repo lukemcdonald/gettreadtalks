@@ -13,8 +13,7 @@ export const createAuth = (
 ) => {
   return betterAuth({
     advanced: {
-      // Use secure cookies in production, non-secure in development
-      useSecureCookies: process.env.NODE_ENV === 'production',
+      useSecureCookies: true // Set to true and use `next dev --experimental-https`
     },
     baseURL: process.env.SITE_URL,
     database: authComponent.adapter(ctx),
@@ -28,7 +27,7 @@ export const createAuth = (
     ],
     secret: process.env.BETTER_AUTH_SECRET!,
     trustedOrigins: [
-      'http://localhost:3000',
+      'https://localhost:3000',
       'https://*.vercel.app',
       'https://gettreadtalks.com',
       'https://www.gettreadtalks.com',

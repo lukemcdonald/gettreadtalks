@@ -20,8 +20,11 @@ export const getAuthToken = async () => {
   // This ensures dynamic rendering before Math.random() usage in betterAuth
   // Avoids the "used Math.random() before accessing Request data" error on page and builds.
   await cookies();
-
-  return await getToken(createAuth);
+  const token = await getToken(createAuth);
+  console.log(':: Token retrieved:', token ? 'present' : 'null');
+  console.log(':: NODE_ENV:', process.env.NODE_ENV);
+  console.log(':: useSecureCookies:', process.env.NODE_ENV === 'production');
+  return token;
 };
 
 /**
@@ -30,13 +33,13 @@ export const getAuthToken = async () => {
  * @returns User object or null if not authenticated
  */
 export const getAuthUser = async () => {
-  const authToken = await getAuthToken();
+  const token = await getAuthToken();
 
-  if (!authToken) {
+  if (!token) {
     return null;
   }
 
-  return await fetchQuery(api.users.getAuthUser, {}, { token: authToken });
+  return await fetchQuery(api.users.getAuthUser, {}, { token });
 };
 
 /**
