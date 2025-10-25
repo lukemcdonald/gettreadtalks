@@ -1,64 +1,82 @@
 ---
-description: Frontend error handling patterns with ErrorBoundary, mutations, and Sentry
-globs: **/*.tsx,**/*.ts,app/**/*.tsx,components/**/*.tsx
+description: Error handling patterns with Sentry integration, fingerprinting, and structured error reporting
+globs: **/*.ts,**/*.tsx,**/*.js,**/*.jsx
 ---
 
-# Error Handling Patterns
+# Error Handling Rules
 
-## When to Use Each Pattern
+Comprehensive error handling patterns for frontend and backend with Sentry integration, proper fingerprinting, and structured error reporting.
 
-**Use `useMutation` hook when:**
+## Core Principles
 
-- Writing Convex mutation calls
-- Want automatic error handling and Sentry reporting
-- Need loading/error/success state management
-- **Note:** Never import `useMutation` from `convex/react` (lint rule enforced)
+- **Always capture errors to Sentry** - Never use `console.error` alone
+- **Use structured error codes** - Leverage ErrorCode enum for consistent categorization
+- **Include meaningful fingerprints** - Group related errors together regardless of stack trace
+- **Provide user context** - Associate errors with users and operations when available
+- **Handle gracefully** - Show user-friendly messages while capturing technical details
 
-**Use `<ErrorBoundary>` when:**
+## Frontend Error Handling
 
-- Component error should crash the UI
-- Handling query errors (useQuery)
-- Want to isolate feature failures
-- Need fallback UI for entire section
+### Use Custom Hooks for Convex Mutations
 
-**Use try/catch when:**
-
-- Need custom error handling logic
-- Checking for specific error codes
-- Want to prevent error propagation
-- Need multiple different error handling paths
-
-## Quick Reference
-
-### For Convex Mutations (Recommended Pattern)
+Always wrap Convex mutations in custom hooks that handle errors automatically to ensure consistent error reporting and user feedback.
 
 ```typescript
+// ✅ Good - Custom hook with error handling
 import { useMutation } from '@/lib/hooks';
-import { api } from '@/convex/_generated/api';
 
-function MyComponent() {
-  const { mutate, isLoading, error } = useMutation(api.talks.create, {
-    onSuccess: () => toast.success('Created!'),
-    onError: (error) => toast.error(getErrorMessage(error)),
+const { mutate, isLoading, error } = useMutation(api.items.create, {
+  onSuccess: () => toast.success('Created!'),
+  onError: (error) => toast.error(getErrorMessage(error)),
+});
+
+// ❌ Bad - Direct Convex mutation without error handling
+import { useMutation } from 'convex/react';
+
+const createItem = useMutation(api.items.create);
+```
+
+### Manual Error Capture
+
+Use `captureException` for manual error reporting with proper context and fingerprinting to ensure errors are properly tracked and grouped in Sentry.
+
+```typescript
+// ✅ Good - Full context and fingerprinting
+import { captureException } from '@/lib/services/errors/client';
+
+try {
+  await riskyOperation();
+} catch (error) {
+  captureException(error, {
+    context: {
+      operation: 'riskyOperation',
+      userId: user?._id,
+    },
+    fingerprint: ['feature', 'operation', 'error-type'],
+    level: 'error',
+    tags: {
+      feature: 'items',
+      operation: 'create',
+    },
   });
+}
 
-  return (
-    <button onClick={() => mutate({ title: 'New Talk' })} disabled={isLoading}>
-      {isLoading ? 'Creating...' : 'Create'}
-    </button>
-  );
+// ❌ Bad - Only console logging
+try {
+  await riskyOperation();
+} catch (error) {
+  console.error('Operation failed:', error);
 }
 ```
 
-**Important:** Always use `useMutation` from `@/lib/hooks`, not from `convex/react`. A lint rule
-enforces this pattern.
+### Error Boundary Usage
 
-### For ErrorBoundary
+Wrap components with queries in ErrorBoundary to catch React errors and prevent app crashes while providing fallback UI.
 
-```tsx
+```typescript
+// ✅ Good - Error boundary for query components
 import { ErrorBoundary } from '@/components/error-boundary';
 
-// ✅ Wrap component with queries
 function ProfilePage() {
   return (
     <ErrorBoundary>
@@ -67,74 +85,270 @@ function ProfilePage() {
   );
 }
 
-function ProfileContent() {
-  const user = useCurrentUser(); // If query throws, ErrorBoundary catches it
-
-  if (!user) {
-    return <div>Not found</div>;
-  }
-
-  return <div>{user.name}</div>;
+// ❌ Bad - No error boundary for components with queries
+function ProfilePage() {
+  return <ProfileContent />; // If ProfileContent throws, app crashes
 }
 ```
 
-### For Manual Error Handling
+## Backend Error Handling (Convex)
+
+### Use Structured Convex Errors
+
+Always use `createConvexError` with proper error codes for backend functions to ensure structured error handling and consistent error categorization.
 
 ```typescript
-import { captureException, getErrorMessage, isErrorCode, ErrorCode } from '@/lib/services/errors';
+// ✅ Good - Structured error with code
+import { createConvexError, ErrorCode } from './lib/errors';
 
-try {
-  await riskyOperation();
-} catch (error) {
-  // Check specific error codes
-  if (isErrorCode(error, ErrorCode.DUPLICATE_SLUG)) {
-    // Handle specific error
-  }
+export const createItem = mutation({
+  handler: async (ctx, args) => {
+    try {
+      return await ctx.db.insert('items', args);
+    } catch {
+      throw createConvexError('Failed to create item', {
+        code: ErrorCode.SERVER_ERROR,
+        resource: 'item',
+        resourceId: args.id,
+      });
+    }
+  },
+});
 
-  // Report to Sentry with context
-  captureException(error, {
-    context: { operation: 'riskyOperation' },
-    level: 'error',
-    tags: { feature: 'items' },
+// ❌ Bad - Generic error without structure
+export const createItem = mutation({
+  handler: async (ctx, args) => {
+    try {
+      return await ctx.db.insert('items', args);
+    } catch (error) {
+      console.error('Failed to create item:', error);
+      throw new Error('Failed to create item');
+    }
+  },
+});
+```
+
+### Error Code Patterns
+
+Use specific error codes for different failure scenarios to enable precise error filtering and appropriate user feedback.
+
+```typescript
+// ✅ Good - Specific error codes
+if (!user) {
+  throw createConvexError('User not found', {
+    code: ErrorCode.NOT_FOUND,
+    resource: 'user',
+    resourceId: userId,
   });
+}
 
-  // Show user-friendly message
-  toast.error(getErrorMessage(error));
+if (!hasPermission) {
+  throw createConvexError('Insufficient permissions', {
+    code: ErrorCode.FORBIDDEN,
+    resource: 'item',
+    resourceId: itemId,
+  });
+}
+
+// ❌ Bad - Generic error codes
+if (!user) {
+  throw createConvexError('User not found', {
+    code: ErrorCode.SERVER_ERROR, // Too generic
+  });
 }
 ```
 
-## Available Utilities
+## Fingerprinting Strategy
 
-### Error Reading
+### Frontend Fingerprints
 
-- `getErrorMessage(error)` - Get user-friendly message
-- `getErrorCode(error)` - Get error code (ErrorCode enum)
-- `isErrorCode(error, code)` - Check specific error code
-- `isConvexError(error)` - Check if ConvexError
-
-### Error Reporting
-
-- `captureException(error, options)` - Report to Sentry
-- `addBreadcrumb(breadcrumb)` - Add debugging context
-- `setUserContext(user)` - Set user info
-- `clearUserContext()` - Clear user info
-
-### Error Codes
+Group errors by feature, operation, and error type for better organization and easier debugging in Sentry.
 
 ```typescript
-ErrorCode.AUTH_REQUIRED;
-ErrorCode.FORBIDDEN;
-ErrorCode.INVALID_CREDENTIALS;
-ErrorCode.DUPLICATE_SLUG;
-ErrorCode.VALIDATION_FAILED;
-ErrorCode.NOT_FOUND;
-ErrorCode.SERVER_ERROR;
+// ✅ Good - Meaningful fingerprinting
+captureException(error, {
+  fingerprint: ['auth', 'login', 'client-error'],
+  tags: { feature: 'auth', operation: 'login' },
+});
+
+captureException(error, {
+  fingerprint: ['mutation', 'validation-failed'],
+  tags: { errorType: 'mutation', errorCode: 'VALIDATION_FAILED' },
+});
+
+// ❌ Bad - No fingerprinting or poor grouping
+captureException(error); // Groups by stack trace only
+```
+
+### Backend Fingerprints
+
+Use error codes in fingerprints for consistent grouping across mutations and better error categorization.
+
+```typescript
+// ✅ Good - Error code in fingerprint
+const errorCode = getErrorCode(error);
+fingerprint: ['mutation', errorCode.toLowerCase().replace(/_/g, '-')]
+
+// Results in: ['mutation', 'validation-failed'], ['mutation', 'auth-required']
+```
+
+## Error Context Patterns
+
+### User Context
+
+Always include user information when available for better debugging and error correlation.
+
+```typescript
+// ✅ Good - User context included
+captureException(error, {
+  context: {
+    operation: 'logout',
+    userId: user?._id,
+    userEmail: user?.email,
+  },
+  user: {
+    id: user?._id,
+    email: user?.email,
+  },
+});
+
+// ❌ Bad - No user context
+captureException(error, {
+  context: { operation: 'logout' },
+});
+```
+
+### Operation Context
+
+Include operation details for better error tracking and debugging context.
+
+```typescript
+// ✅ Good - Detailed operation context
+captureException(error, {
+  context: {
+    operation: 'createItem',
+    itemTitle: data.title,
+    categoryId: data.categoryId,
+    attemptNumber: retryCount,
+  },
+});
+
+// ❌ Bad - Minimal context
+captureException(error, {
+  context: { operation: 'create' },
+});
+```
+
+## Error Level Guidelines
+
+Use appropriate severity levels based on error impact to prioritize critical issues in monitoring.
+
+```typescript
+// ✅ Good - Appropriate levels
+captureException(error, {
+  level: 'error',    // Unexpected failures
+  level: 'warning',  // Expected errors (validation, auth)
+  level: 'fatal',    // Critical system failures
+});
+
+// ❌ Bad - Always using 'error'
+captureException(error, { level: 'error' }); // Too generic
+```
+
+## Sentry Dashboard Queries
+
+With proper tagging and fingerprinting, create powerful filters:
+
+```bash
+# All auth-related errors
+tags.feature:auth
+
+# All validation errors across mutations  
+tags.errorCode:VALIDATION_FAILED
+
+# All login failures specifically
+fingerprint:"auth-login-client-error"
+
+# All mutation errors with specific error codes
+tags.errorType:mutation AND tags.errorCode:AUTH_REQUIRED
+```
+
+## Common Patterns
+
+### Authentication Errors
+
+```typescript
+// ✅ Good - Auth error pattern
+try {
+  await signOut();
+  router.push('/');
+} catch (error) {
+  captureException(error, {
+    context: { operation: 'logout', userId: user?._id },
+    fingerprint: ['auth', 'logout', 'client-error'],
+    level: 'error',
+    tags: { feature: 'auth', operation: 'logout' },
+  });
+}
+```
+
+### Form Validation Errors
+
+```typescript
+// ✅ Good - Validation error pattern
+try {
+  await createItem(data);
+} catch (error) {
+  if (isErrorCode(error, ErrorCode.VALIDATION_FAILED)) {
+    // Handle validation errors gracefully
+    setFieldErrors(getValidationErrors(error));
+  } else {
+    captureException(error, {
+      fingerprint: ['form', 'validation', 'server-error'],
+      tags: { feature: 'items', operation: 'create' },
+    });
+  }
+}
+```
+
+### Network/API Errors
+
+```typescript
+// ✅ Good - Network error pattern
+try {
+  const result = await fetchData();
+} catch (error) {
+  captureException(error, {
+    context: { endpoint: '/api/data', method: 'GET' },
+    fingerprint: ['network', 'api-error'],
+    level: 'warning',
+    tags: { errorType: 'network', endpoint: '/api/data' },
+  });
+}
 ```
 
 ## Best Practices
 
-1. **Mutations**: Use `useMutation` from `@/lib/hooks` (enforced by lint)
-2. **Queries**: Wrap with `<ErrorBoundary>`
-3. **Manual errors**: Use `captureException()` for Sentry
-4. **Display**: Use `getErrorMessage()` for user-facing messages
-5. **Checking**: Use `isErrorCode()` for specific error types
+- **Always use custom hooks** for Convex mutations instead of direct `useMutation`
+- **Include fingerprints** for better error grouping in Sentry
+- **Use structured error codes** for consistent error categorization
+- **Provide user context** when available for better debugging
+- **Set appropriate error levels** based on impact severity
+- **Wrap query components** in ErrorBoundary to prevent app crashes
+- **Use try/catch** for manual error handling with proper Sentry reporting
+
+**Exceptions:**
+
+- **Development-only errors** - Use `console.error` for temporary debugging
+- **Expected validation errors** - Don't report to Sentry if handled gracefully
+- **Third-party library errors** - Filter out noise from external dependencies
+
+## Common Mistakes
+
+- **Console.error only** → Use `captureException` with proper context
+- **No fingerprinting** → Add fingerprints for better error grouping
+- **Generic error codes** → Use specific ErrorCode values
+- **Missing user context** → Include user information when available
+- **No error boundaries** → Wrap components with queries in ErrorBoundary
+- **Direct Convex mutations** → Use custom hooks with error handling
+- **Poor error messages** → Use `getErrorMessage` for user-friendly messages

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { signOut } from '@/lib/services/auth/client';
+import { captureException } from '@/lib/services/errors/client';
 
 interface AuthenticatedContentProps {
   user: AuthUser;
@@ -19,7 +20,18 @@ function AuthenticatedContent({ user }: AuthenticatedContentProps) {
       await signOut();
       router.refresh();
     } catch (error) {
-      console.error('Logout failed:', error);
+      captureException(error, {
+        context: {
+          operation: 'logout',
+          userId: user._id,
+        },
+        fingerprint: ['auth', 'logout', 'client-error'],
+        level: 'error',
+        tags: {
+          feature: 'auth',
+          operation: 'logout',
+        },
+      });
     }
   };
 

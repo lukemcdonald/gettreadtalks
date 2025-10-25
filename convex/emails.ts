@@ -7,6 +7,7 @@ import { VerifyEmailTemplate } from '../emails/verify-email';
 import { WelcomeEmail } from '../emails/welcome';
 import { components, internal } from './_generated/api';
 import { internalMutation } from './_generated/server';
+import { ErrorCode, createConvexError } from './lib/errors';
 
 // Email constants - same across all environments
 const TEST_DOMAIN_EMAIL = 'delivered@resend.dev';
@@ -91,9 +92,12 @@ export const sendPasswordResetEmail = internalMutation({
       });
 
       return emailId;
-    } catch (error) {
-      console.error('Failed to send password reset email:', error);
-      throw new Error('Failed to send password reset email');
+    } catch {
+      throw createConvexError('Failed to send password reset email', {
+        code: ErrorCode.SERVER_ERROR,
+        resource: 'email',
+        resourceId: args.email,
+      });
     }
   },
 });
@@ -136,9 +140,12 @@ export const sendVerificationEmail = internalMutation({
       });
 
       return emailId;
-    } catch (error) {
-      console.error('Failed to send verification email:', error);
-      throw new Error('Failed to send verification email');
+    } catch {
+      throw createConvexError('Failed to send verification email', {
+        code: ErrorCode.SERVER_ERROR,
+        resource: 'email',
+        resourceId: args.email,
+      });
     }
   },
 });
@@ -166,9 +173,12 @@ export const sendWelcomeEmail = internalMutation({
         subject: 'Welcome to TREAD Talks!',
         to: args.email,
       });
-    } catch (error) {
-      console.error('Failed to send welcome email:', error);
-      throw new Error('Failed to send welcome email');
+    } catch {
+      throw createConvexError('Failed to send welcome email', {
+        code: ErrorCode.SERVER_ERROR,
+        resource: 'email',
+        resourceId: args.email,
+      });
     }
   },
 });

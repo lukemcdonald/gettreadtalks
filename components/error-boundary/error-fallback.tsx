@@ -6,14 +6,18 @@ import { useRouter } from 'next/navigation';
 
 /**
  * Default fallback UI shown when an error is caught by ErrorBoundary.
- * Displays a user-friendly error message with a retry button.
+ * Displays a user-friendly error message with a retry button and Sentry Event ID.
  *
  * @example
  * <ErrorBoundary FallbackComponent={ErrorFallback}>
  *   <YourComponent />
  * </ErrorBoundary>
  */
-export function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
+export function ErrorFallback({
+  error,
+  resetErrorBoundary,
+  eventId,
+}: FallbackProps & { eventId?: string }) {
   const router = useRouter();
 
   return (
@@ -24,6 +28,16 @@ export function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
           <p className="text-gray-600">
             We encountered an unexpected error. This has been reported to our team.
           </p>
+          {eventId && (
+            <div className="mt-3 rounded-md bg-gray-50 p-3">
+              <p className="text-sm text-gray-500">
+                Error ID: <span className="font-mono text-gray-700">{eventId}</span>
+              </p>
+              <p className="mt-1 text-xs text-gray-400">
+                Please include this ID when contacting support
+              </p>
+            </div>
+          )}
         </div>
 
         {process.env.NODE_ENV === 'development' && (

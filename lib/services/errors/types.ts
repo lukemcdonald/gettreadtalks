@@ -73,6 +73,13 @@ export interface MutationResult<TData = unknown> {
 }
 
 /**
+ * Error object with optional Sentry Event ID attached.
+ */
+export interface ErrorWithEventId extends Error {
+  __sentryEventId?: string;
+}
+
+/**
  * Options for error reporting to Sentry.
  */
 export interface ErrorReportOptions {

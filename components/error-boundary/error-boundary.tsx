@@ -1,6 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import type { ErrorWithEventId } from '@/lib/services/errors/types';
 
 import * as Sentry from '@sentry/nextjs';
 import { type FallbackProps, ErrorBoundary as ReactErrorBoundary } from 'react-error-boundary';
@@ -17,7 +18,7 @@ interface ErrorBoundaryProps {
    * Custom fallback component to render when an error occurs.
    * If not provided, uses the default ErrorFallback component.
    */
-  fallback?: React.ComponentType<FallbackProps>;
+  fallback?: React.ComponentType<FallbackProps & { eventId?: string }>;
 
   /**
    * Callback fired when an error is caught.
@@ -68,14 +69,22 @@ export function ErrorBoundary({
   onReset,
 }: ErrorBoundaryProps) {
   const handleError = (error: Error, info: React.ErrorInfo) => {
-    // Report to Sentry
-    Sentry.captureException(error, {
+    // Report to Sentry with fingerprinting and capture event ID
+    const eventId = Sentry.captureException(error, {
       contexts: {
         react: {
           componentStack: info.componentStack,
         },
       },
+      fingerprint: ['react-error-boundary', error.name.toLowerCase().replace(/error$/i, '')],
+      tags: {
+        errorType: 'react-error-boundary',
+        errorName: error.name,
+      },
     });
+
+    // Store event ID for the fallback component
+    (error as ErrorWithEventId).__sentryEventId = eventId;
 
     // Call custom error handler if provided
     onError?.(error, info);
@@ -83,7 +92,9 @@ export function ErrorBoundary({
 
   return (
     <ReactErrorBoundary
-      FallbackComponent={FallbackComponent}
+      FallbackComponent={(props) => (
+        <FallbackComponent {...props} eventId={(props.error as ErrorWithEventId).__sentryEventId} />
+      )}
       onError={handleError}
       onReset={onReset}
     >

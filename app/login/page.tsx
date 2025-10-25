@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import MainLayout from '@/components/layout/main-layout';
 import { signIn, signUp } from '@/lib/services/auth/client';
 import { AUTH_ERRORS } from '@/lib/services/auth/config';
+import { captureException } from '@/lib/services/errors/client';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -29,7 +30,18 @@ export default function LoginPage() {
         setError(result.error?.message || AUTH_ERRORS.INVALID_CREDENTIALS);
       }
     } catch (err) {
-      console.error('Login error:', err);
+      captureException(err, {
+        context: {
+          operation: 'login',
+          email,
+        },
+        fingerprint: ['auth', 'login', 'client-error'],
+        level: 'error',
+        tags: {
+          feature: 'auth',
+          operation: 'login',
+        },
+      });
       setError(AUTH_ERRORS.NETWORK_ERROR);
     } finally {
       setIsLoading(false);
@@ -50,7 +62,18 @@ export default function LoginPage() {
         setError(result.error?.message || AUTH_ERRORS.REGISTRATION_FAILED);
       }
     } catch (err) {
-      console.error('Registration error:', err);
+      captureException(err, {
+        context: {
+          operation: 'registration',
+          email,
+        },
+        fingerprint: ['auth', 'registration', 'client-error'],
+        level: 'error',
+        tags: {
+          feature: 'auth',
+          operation: 'registration',
+        },
+      });
       setError(AUTH_ERRORS.NETWORK_ERROR);
     } finally {
       setIsLoading(false);

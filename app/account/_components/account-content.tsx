@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import MainLayout from '@/components/layout/main-layout';
 import { useAuthUser, useFavorites } from '@/lib/features/users/hooks';
 import { signOut } from '@/lib/services/auth/client';
+import { captureException } from '@/lib/services/errors/client';
 
 export function AccountContent() {
   const router = useRouter();
@@ -16,7 +17,18 @@ export function AccountContent() {
       await signOut();
       router.push('/');
     } catch (error) {
-      console.error('Logout failed:', error);
+      captureException(error, {
+        context: {
+          operation: 'logout',
+          userId: user?._id,
+        },
+        fingerprint: ['auth', 'logout', 'client-error'],
+        level: 'error',
+        tags: {
+          feature: 'auth',
+          operation: 'logout',
+        },
+      });
     }
   };
 

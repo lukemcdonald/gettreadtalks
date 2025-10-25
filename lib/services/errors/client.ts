@@ -1,4 +1,4 @@
-import type { ErrorReportOptions, SeverityLevel } from './types';
+import type { ErrorReportOptions, ErrorWithEventId, SeverityLevel } from './types';
 
 import * as Sentry from '@sentry/nextjs';
 
@@ -7,13 +7,13 @@ import * as Sentry from '@sentry/nextjs';
  * Use this for manual error reporting outside of automatic captures.
  *
  * Supports fingerprinting for custom error grouping and transaction names
- * for better organization.
+ * for better organization. Returns the Sentry Event ID for tracking.
  *
  * @example
  * try {
  *   await riskyOperation();
  * } catch (error) {
- *   captureException(error, {
+ *   const eventId = captureException(error, {
  *     context: { operation: 'riskyOperation' },
  *     level: 'warning',
  *     tags: { feature: 'items' },
@@ -24,9 +24,13 @@ import * as Sentry from '@sentry/nextjs';
  *       attemptNumber: 3,
  *     },
  *   });
+ *   // Use eventId for user support or tracking
  * }
  */
-export function captureException(error: unknown, options: ErrorReportOptions = {}): void {
+export function captureException(
+  error: unknown,
+  options: ErrorReportOptions = {},
+): string | undefined {
   const { context, extras, fingerprint, level = 'error', tags, transactionName, user } = options;
 
   Sentry.withScope((scope) => {
@@ -69,11 +73,11 @@ export function captureException(error: unknown, options: ErrorReportOptions = {
       });
     }
 
-    // Capture the error
+    // Capture the error and return event ID
     if (error instanceof Error) {
-      Sentry.captureException(error);
+      return Sentry.captureException(error);
     } else {
-      Sentry.captureMessage(String(error));
+      return Sentry.captureMessage(String(error));
     }
   });
 }
@@ -88,8 +92,22 @@ export function captureException(error: unknown, options: ErrorReportOptions = {
  *   email: user.email,
  * });
  */
-export function setUserContext(user: { email?: string; id: string; username?: string }): void {
+export function setUserContext(user: { id: string; email?: string; username?: string }): void {
   Sentry.setUser(user);
+}
+
+/**
+ * Gets the Sentry Event ID from an error object if it was captured.
+ * Useful for displaying event IDs to users for support purposes.
+ *
+ * @example
+ * const eventId = getEventIdFromError(error);
+ * if (eventId) {
+ *   console.log('Error reported with ID:', eventId);
+ * }
+ */
+export function getEventIdFromError(error: unknown): string | undefined {
+  return (error as ErrorWithEventId).__sentryEventId;
 }
 
 /**
