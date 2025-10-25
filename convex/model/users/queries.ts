@@ -3,7 +3,21 @@ import type { QueryCtx } from '../../_generated/server';
 import { v } from 'convex/values';
 
 import { query } from '../../_generated/server';
-import { getCurrentUser } from '../auth/queries';
+import { getCurrentUser } from '../auth/utils';
+
+/**
+ * Get the current authenticated user.
+ *
+ * @param ctx - Query context
+ * @returns User object or null if not authenticated
+ */
+export const getUser = query({
+  args: {},
+  handler: async (ctx) => {
+    return await getCurrentUser(ctx);
+  },
+  returns: v.union(v.any(), v.null()),
+});
 
 /**
  * Check if user has favorited a clip.

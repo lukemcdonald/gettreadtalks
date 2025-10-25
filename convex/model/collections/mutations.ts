@@ -5,7 +5,7 @@ import { getOneFrom } from 'convex-helpers/server/relationships';
 
 import { mutation } from '../../_generated/server';
 import { normalizeSlug, slugExists } from '../../lib/utils';
-import { requireAuth } from '../auth/queries';
+import { requireAuth } from '../auth/utils';
 
 /**
  * Create a new collection.

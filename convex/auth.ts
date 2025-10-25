@@ -4,19 +4,8 @@ import { type GenericCtx, createClient } from '@convex-dev/better-auth';
 import { convex } from '@convex-dev/better-auth/plugins';
 import { betterAuth } from 'better-auth';
 import { nextCookies } from 'better-auth/next-js';
-import { v } from 'convex/values';
 
 import { components } from './_generated/api';
-import { query } from './_generated/server';
-import { getCurrentUser as getUser } from './model/auth/queries';
-
-const siteUrl = process.env.SITE_URL;
-
-/**
- * The component client has methods needed for integrating Convex with
- * Better Auth, as well as helper methods for general use.
- */
-export const authComponent = createClient<DataModel>(components.betterAuth);
 
 export const createAuth = (
   ctx: GenericCtx<DataModel>,
@@ -27,7 +16,7 @@ export const createAuth = (
       // Use secure cookies in production, non-secure in development
       useSecureCookies: process.env.NODE_ENV === 'production',
     },
-    baseURL: siteUrl,
+    baseURL: process.env.SITE_URL,
     database: authComponent.adapter(ctx),
     emailAndPassword: {
       enabled: true,
@@ -52,10 +41,8 @@ export const createAuth = (
   });
 };
 
-export const getCurrentUser = query({
-  args: {},
-  handler: async (ctx) => {
-    return await getUser(ctx);
-  },
-  returns: v.union(v.any(), v.null()),
-});
+/**
+ * The component client has methods needed for integrating Convex with
+ * Better Auth, as well as helper methods for general use.
+ */
+export const authComponent = createClient<DataModel>(components.betterAuth);

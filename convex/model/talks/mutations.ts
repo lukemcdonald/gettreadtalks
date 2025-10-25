@@ -4,7 +4,7 @@ import { v } from 'convex/values';
 
 import { mutation } from '../../_generated/server';
 import { normalizeSlug, slugExists } from '../../lib/utils';
-import { requireAuth } from '../auth/queries';
+import { requireAuth } from '../auth/utils';
 import { statusType } from './validators';
 
 /**

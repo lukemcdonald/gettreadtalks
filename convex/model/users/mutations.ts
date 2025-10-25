@@ -2,7 +2,7 @@ import { v } from 'convex/values';
 
 import { mutation } from '../../_generated/server';
 import { authComponent, createAuth } from '../../auth';
-import { getUserId } from '../auth/queries';
+import { getUserId } from '../auth/utils';
 
 /**
  * Add a clip to user favorites.

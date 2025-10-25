@@ -24,7 +24,7 @@ import type * as model_affiliateLinks_index from "../model/affiliateLinks/index.
 import type * as model_affiliateLinks_mutations from "../model/affiliateLinks/mutations.js";
 import type * as model_affiliateLinks_queries from "../model/affiliateLinks/queries.js";
 import type * as model_affiliateLinks_validators from "../model/affiliateLinks/validators.js";
-import type * as model_auth_queries from "../model/auth/queries.js";
+import type * as model_auth_utils from "../model/auth/utils.js";
 import type * as model_clips_index from "../model/clips/index.js";
 import type * as model_clips_mutations from "../model/clips/mutations.js";
 import type * as model_clips_queries from "../model/clips/queries.js";
@@ -94,7 +94,7 @@ declare const fullApi: ApiFromModules<{
   "model/affiliateLinks/mutations": typeof model_affiliateLinks_mutations;
   "model/affiliateLinks/queries": typeof model_affiliateLinks_queries;
   "model/affiliateLinks/validators": typeof model_affiliateLinks_validators;
-  "model/auth/queries": typeof model_auth_queries;
+  "model/auth/utils": typeof model_auth_utils;
   "model/clips/index": typeof model_clips_index;
   "model/clips/mutations": typeof model_clips_mutations;
   "model/clips/queries": typeof model_clips_queries;
