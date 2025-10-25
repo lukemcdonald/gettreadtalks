@@ -1,10 +1,13 @@
 import { mutations, queries } from './model/affiliateLinks';
 
-export const create = mutations.createAffiliateLink;
-export const destroy = mutations.destroyAffiliateLink;
-export const get = queries.getAffiliateLink;
-export const getBySlug = queries.getAffiliateLinkBySlug;
-export const list = queries.getAffiliateLinks;
-export const listByAffiliate = queries.getAffiliateLinksByAffiliate;
-export const listByType = queries.getAffiliateLinksByType;
-export const update = mutations.updateAffiliateLink;
+// Queries
+export const getAffiliateLink = queries.getAffiliateLink;
+export const getAffiliateLinkBySlug = queries.getAffiliateLinkBySlug;
+export const listAffiliateLinks = queries.getAffiliateLinks;
+export const listAffiliateLinksByAffiliate = queries.getAffiliateLinksByAffiliate;
+export const listAffiliateLinksByType = queries.getAffiliateLinksByType;
+
+// Mutations
+export const createAffiliateLink = mutations.createAffiliateLink;
+export const destroyAffiliateLink = mutations.destroyAffiliateLink;
+export const updateAffiliateLink = mutations.updateAffiliateLink;

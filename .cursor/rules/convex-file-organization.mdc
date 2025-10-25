@@ -14,66 +14,54 @@ All Convex files follow a consistent organization pattern with clear visual sect
 ### Structure
 
 ```ts
-// All imports 
+// All imports
+import { mutations, queries } from './model/{domain}';
 
-// ============================================
-// QUERIES
-// ============================================
+// Queries
+// All queries (alphabetical order)
 
-// All queries (alphabetical)
-
-// ============================================
-// MUTATIONS
-// ============================================
-
-// All mutations (alphabetical)
+// Mutations
+// All mutations (alphabetical order)
 ```
 
 ### Query Organization
 
-Queries ordered alphabetically following the `get`/`list` pattern:
+Queries use full descriptive names and are ordered alphabetically:
 
 ```ts
-// ✅ Good - Alphabetical
-export const get = query({...});
-export const getBySlug = query({...});
-export const getWithRelations = query({...});
-export const list = query({...});
-export const listByCategory = query({...});
-export const listBySpeaker = query({...});
-export const listWithSpeakers = query({...});
+// ✅ Good - Full names, alphabetical
+export const getTalk = queries.getTalk;
+export const getTalkBySlug = queries.getTalkBySlugWithRelations;
+export const getTalkWithRelations = queries.getTalkWithRelations;
+export const listFeaturedTalks = queries.listFeaturedTalks;        // Adjective before noun
+export const listTalks = queries.getTalks;
+export const listTalksByCategory = queries.getTalksByCategory;     // Filter by relationship
+export const listTalksBySpeaker = queries.getTalksBySpeaker;       // Filter by relationship
+export const listTalksWithSpeakers = queries.getTalksWithSpeakers; // With relations
 ```
 
 **Pattern:**
 - `get*` queries return single document or `null`
 - `list*` queries return arrays
-- Alphabetical within each prefix group
+- Alphabetical ordering
+- **Always include the noun** for clarity: `getItem` not `get`, `listItems` not `list`
+
+**Adjective placement:**
+- State/type descriptors go **before** the noun: `listFeaturedItems` (not `listItemsFeatured`)
+- Relationship filters go **after** with "By": `listItemsByAuthor`
+- Combined: `listFeaturedItemsByAuthor` (adjective first, then filter)
 
 ### Mutation Organization
 
-All mutations alphabetical:
+Mutations use full descriptive names and are ordered alphabetically:
 
 ```ts
-// ✅ Good - Alphabetical
-export const create = mutation({...});
-export const remove = mutation({...});
-export const update = mutation({...});
+// ✅ Good - Full names, alphabetical
+export const archiveTalk = mutations.archiveTalk;
+export const createTalk = mutations.createTalk;
+export const removeTalkFromTopic = mutations.removeTalkFromTopic;
+export const updateTalk = mutations.updateTalk;
 ```
-
-### Comment Separators
-
-Use consistent comment separators for visual structure:
-
-```ts
-// ============================================
-// SECTION NAME
-// ============================================
-```
-
-Use for:
-- ACTIONS section 
-- QUERIES section  
-- MUTATIONS section
 
 ## Helper Files (convex/model/{domain}/)
 

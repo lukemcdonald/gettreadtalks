@@ -11,7 +11,7 @@ async function HomeData() {
   await cookies();
   const authToken = await getAuthToken();
   const preloadedTalks = await preloadQuery(
-    api.talks.list,
+    api.talks.listTalks,
     { paginationOpts: { numItems: 12, cursor: null } },
     { token: authToken },
   );

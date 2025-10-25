@@ -105,32 +105,35 @@ return <TalksClient initialData={initialTalks} />;
 **Naming Conventions:**
 
 *Queries (reads):*
-- `get` - Returns single document or null (e.g., `get`, `getBySlug`)
-- `list` - Returns array of documents (e.g., `list`, `listByAuthor`)
+- `get*` - Returns single document or null (e.g., `getTalk`, `getTalkBySlug`)
+- `list*` - Returns array of documents (e.g., `listTalks`, `listTalksBySpeaker`)
+- `get*With*` - Returns single document with specific relations (e.g., `getCollectionWithSpeakers`)
+- `list*With*` - Returns array with relations (e.g., `listTalksWithSpeakers`)
 
 *Mutations (writes):*
-- `create` - Create new entity
-- `update` - Update existing entity
-- `archive` - Soft delete (set status to 'archived')
-- `destroy` - Hard delete (permanent removal)
-- `remove` - Remove from association/list (non-destructive)
-- For user actions with natural verbs: `favorite`, `unfavorite`, `finish`, `unfinish`
+- `create*` - Create new entity (e.g., `createTalk`)
+- `update*` - Update existing entity (e.g., `updateTalk`)
+- `archive*` - Soft delete (set status to 'archived')
+- `destroy*` - Hard delete (permanent removal)
+- `remove*From*` - Remove from association (e.g., `removeTalkFromTopic`)
+- `add*To*` - Add to association (e.g., `addTalkToTopic`)
+- For user actions with natural verbs: `favorite*`, `unfavorite*`, `finish*`, `unfinish*`
 
-**Domain files use simple names** (file provides context):
+**Domain files use full descriptive names** (clarity and discoverability):
 ```typescript
 // convex/talks.ts
-export const get = query(...)          // api.talks.get
-export const getBySlug = query(...)    // api.talks.getBySlug
-export const list = query(...)         // api.talks.list
-export const create = mutation(...)    // api.talks.create
+export const getTalk = queries.getTalk;           // api.talks.getTalk
+export const getTalkBySlug = queries.getTalkBySlugWithRelations;
+export const listTalks = queries.getTalks;        // api.talks.listTalks
+export const createTalk = mutations.createTalk;   // api.talks.createTalk
 ```
 
-**Helper files include noun** (clarity when imported):
+**Helper files mirror export names** (consistency):
 ```typescript
 // convex/model/talks/queries.ts
-export async function getTalk(ctx, id) {...}
-export async function getTalkBySlug(ctx, slug) {...}
-export async function getTalks(ctx, args) {...}
+export const getTalk = query({...});
+export const getTalkBySlug = query({...});
+export const getTalks = query({...});
 ```
 
 ### Feature Structure
@@ -269,4 +272,4 @@ The database uses Convex with the following domain tables:
 
 6. **Minimal cross-feature dependencies** - Features should be self-contained. Shared logic goes in `lib/services/` or `lib/utils/`
 
-7. **Consistent naming** - Follow the established patterns for queries (`get`/`list`), mutations (action verbs), and hooks (`use` + mirror backend names)
+7. **Consistent naming** - Follow the established patterns for queries (`get*`/`list*` with nouns), mutations (action verbs with nouns), and hooks (`use` + mirror backend names)

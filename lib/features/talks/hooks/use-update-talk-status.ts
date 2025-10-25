@@ -4,5 +4,5 @@ import { api } from '@/convex/_generated/api';
 import { useMutation } from '@/lib/hooks';
 
 export function useUpdateTalkStatus() {
-  return useMutation(api.talks.updateStatus);
+  return useMutation(api.talks.updateTalkStatus);
 }
