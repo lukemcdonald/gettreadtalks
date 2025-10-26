@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "convex deploy --cmd 'npm run build:next'",
+    "build": "convex deploy --yes --cmd 'npm run build:next'",
     "build:next": "next build",
     "build:webpack": "next build --webpack",
     "check": "biome check .",
