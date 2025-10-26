@@ -4,8 +4,8 @@ import { v } from 'convex/values';
 
 import { components, internal } from './_generated/api';
 import { internalMutation } from './_generated/server';
-import { ResetPasswordTemplate } from './emails/reset-password';
-import { VerifyEmailTemplate } from './emails/verify-email';
+import { ResetPasswordTemplate } from './emails/resetPassword';
+import { VerifyEmailTemplate } from './emails/verifyEmail';
 import { WelcomeEmail } from './emails/welcome';
 import { ErrorCode, createConvexError } from './lib/errors';
 

@@ -21,36 +21,44 @@ export interface EmailService {
 }
 
 export async function sendWelcomeEmail({
-  userId,
   email,
   name,
+  userId,
 }: {
-  userId: string;
   email: string;
   name: string;
+  userId: string;
 }) {
   // Note: Using type assertion because fetchMutation from convex/nextjs doesn't support internal mutations
   // and these email functions are internal mutations by design for security
   await fetchMutation(
     internal.emails.sendWelcomeEmail as unknown as FunctionReference<'mutation'>,
-    { userId, email, name },
+    {
+      email,
+      name,
+      userId,
+    },
   );
 }
 
 export async function sendVerificationEmail({
   email,
-  verificationUrl,
   token,
+  verificationUrl,
 }: {
   email: string;
-  verificationUrl: string;
   token: string;
+  verificationUrl: string;
 }) {
   // Note: Using type assertion because fetchMutation from convex/nextjs doesn't support internal mutations
   // and these email functions are internal mutations by design for security
   await fetchMutation(
     internal.emails.sendVerificationEmail as unknown as FunctionReference<'mutation'>,
-    { email, verificationUrl, token },
+    {
+      email,
+      token,
+      verificationUrl,
+    },
   );
 }
 
@@ -67,6 +75,10 @@ export async function sendPasswordResetEmail({
   // and these email functions are internal mutations by design for security
   await fetchMutation(
     internal.emails.sendPasswordResetEmail as unknown as FunctionReference<'mutation'>,
-    { email, resetUrl, token },
+    {
+      email,
+      resetUrl,
+      token,
+    },
   );
 }

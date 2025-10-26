@@ -2,8 +2,8 @@ import type { PasswordResetEmailProps, VerificationEmailProps, WelcomeEmailProps
 
 export const EMAIL_TEMPLATES = {
   WELCOME: 'welcome',
-  VERIFY_EMAIL: 'verify-email',
-  RESET_PASSWORD: 'reset-password',
+  VERIFY_EMAIL: 'verifyEmail',
+  RESET_PASSWORD: 'resetPassword',
 } as const;
 
 export type EmailTemplateName = (typeof EMAIL_TEMPLATES)[keyof typeof EMAIL_TEMPLATES];
