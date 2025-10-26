@@ -24,7 +24,6 @@ const cspHeader = `
 const nextConfig = {
   cacheComponents: true,
   typedRoutes: true,
-  proxy: './proxy.ts',
   headers: async () => {
     return [
       {
