@@ -27,10 +27,13 @@ import * as Sentry from '@sentry/nextjs';
  *   // Use eventId for user support or tracking
  * }
  */
-export function captureException(error: unknown, options: ErrorReportOptions = {}) {
+export function captureException(
+  error: unknown,
+  options: ErrorReportOptions = {},
+): string | undefined {
   const { context, extras, fingerprint, level = 'error', tags, transactionName, user } = options;
 
-  Sentry.withScope((scope) => {
+  return Sentry.withScope((scope) => {
     // Set error level
     scope.setLevel(level);
 
