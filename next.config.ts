@@ -64,8 +64,14 @@ const config = IS_SENTRY_ENABLED
       // See: https://docs.sentry.io/platforms/javascript/guides/nextjs/sourcemaps/
       sourcemaps: {
         disable: false, // Source maps are enabled by default
-        assets: ["**/*.js", "**/*.js.map"], // Specify which files to upload
-        ignore: ["**/node_modules/**"], // Files to exclude
+        assets: [
+          "**/*.js", 
+          "**/*.js.map",
+        ],
+        ignore: [
+          "**/node_modules/**",
+          "**/.next/static/chunks/**", // Exclude Next.js chunks
+        ],
         deleteSourcemapsAfterUpload: true, // Security: delete after upload
       },
 
