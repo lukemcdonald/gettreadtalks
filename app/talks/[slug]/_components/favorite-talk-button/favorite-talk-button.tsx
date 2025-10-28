@@ -2,13 +2,15 @@
 
 import type { Id } from '@/convex/_generated/dataModel';
 
+import { Authenticated } from 'convex/react';
+
 import { useFavoriteTalk, useIsTalkFavorited, useUnfavoriteTalk } from '@/lib/features/users/hooks';
 
 interface FavoriteTalkButtonProps {
   talkId: Id<'talks'>;
 }
 
-export function FavoriteTalkButton({ talkId }: FavoriteTalkButtonProps) {
+function FavoriteButton({ talkId }: FavoriteTalkButtonProps) {
   const { data: isFavorited, isLoading: isCheckingFavorite } = useIsTalkFavorited(talkId);
   const { mutate: favoriteTalk, isLoading: isFavoriting } = useFavoriteTalk();
   const { mutate: unfavoriteTalk, isLoading: isUnfavoriting } = useUnfavoriteTalk();
@@ -33,5 +35,13 @@ export function FavoriteTalkButton({ talkId }: FavoriteTalkButtonProps) {
       <span className="text-xl">{isFavorited ? '❤️' : '🤍'}</span>
       <span>{isProcessing ? 'Processing...' : isFavorited ? 'Favorited' : 'Favorite'}</span>
     </button>
+  );
+}
+
+export function FavoriteTalkButton({ talkId }: FavoriteTalkButtonProps) {
+  return (
+    <Authenticated>
+      <FavoriteButton talkId={talkId} />
+    </Authenticated>
   );
 }

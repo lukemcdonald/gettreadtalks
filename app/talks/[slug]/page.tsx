@@ -1,10 +1,14 @@
-import { fetchQuery } from 'convex/nextjs';
 import { notFound } from 'next/navigation';
 
-import { api } from '@/convex/_generated/api';
-import { getAuthToken } from '@/lib/services/auth/server';
+import MainLayout from '@/components/layout/main-layout';
+import { getTalkBySlug } from '@/lib/features/talks';
 
-import { TalkPageContent } from './_components/talk-page-content';
+import { ClipsList } from './_components/clips-list';
+import { CollectionInfo } from './_components/collection-info';
+import { FavoriteTalkButton } from './_components/favorite-talk-button';
+import { SpeakerInfo } from './_components/speaker-info';
+import { TalkDetails } from './_components/talk-details';
+import { TopicsList } from './_components/topics-list';
 
 interface TalkPageProps {
   params: Promise<{
@@ -12,18 +16,29 @@ interface TalkPageProps {
   }>;
 }
 
-async function TalkPageData({ params }: { params: Promise<{ slug: string }> }) {
+export default async function TalkPage({ params }: TalkPageProps) {
   const { slug } = await params;
-  const authToken = await getAuthToken();
-  const talkData = await fetchQuery(api.talks.getTalkBySlug, { slug }, { token: authToken });
+  const talkData = await getTalkBySlug(slug);
 
   if (!talkData) {
     notFound();
   }
 
-  return <TalkPageContent talkData={talkData} />;
-}
+  const { talk, speaker, collection, clips, topics } = talkData;
 
-export default function TalkPage({ params }: TalkPageProps) {
-  return <TalkPageData params={params} />;
+  return (
+    <MainLayout>
+      <header className="flex items-center justify-between mb-4">
+        <h1 className="text-2xl font-bold">{talk.title}</h1>
+        <FavoriteTalkButton talkId={talk._id} />
+      </header>
+
+      <TalkDetails talk={talk} />
+
+      {topics.length > 0 && <TopicsList topics={topics} />}
+      {speaker && <SpeakerInfo speaker={speaker} />}
+      {collection && <CollectionInfo collection={collection} />}
+      {clips.length > 0 && <ClipsList clips={clips} />}
+    </MainLayout>
+  );
 }

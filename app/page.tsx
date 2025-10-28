@@ -1,26 +1,14 @@
-import { preloadQuery } from 'convex/nextjs';
-
 import MainLayout from '@/components/layout/main-layout';
-import { api } from '@/convex/_generated/api';
-import { getAuthToken } from '@/lib/services/auth/server';
+import { preloadTalks } from '@/lib/features/talks';
 
-import { HomeContent } from './_components/home-content';
+import { TalksList } from './_components/talks-list';
 
-async function HomeData() {
-  const authToken = await getAuthToken();
-  const preloadedTalks = await preloadQuery(
-    api.talks.listTalks,
-    { paginationOpts: { numItems: 12, cursor: null } },
-    { token: authToken },
-  );
+export default async function HomePage() {
+  const preloadedTalks = await preloadTalks();
 
-  return <HomeContent preloadedTalks={preloadedTalks} />;
-}
-
-export default function Home() {
   return (
     <MainLayout>
-      <HomeData />
+      <TalksList preloadedTalks={preloadedTalks} />
     </MainLayout>
   );
 }
