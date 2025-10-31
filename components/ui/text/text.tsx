@@ -1,7 +1,5 @@
 import type { TextProps } from './text.types';
 
-import { forwardRef } from 'react';
-
 import { tv } from 'tailwind-variants';
 
 export const textVariants = tv({
@@ -38,16 +36,13 @@ export const textVariants = tv({
   },
 });
 
-export const Text = forwardRef<HTMLElement, TextProps>(
-  ({ as: Component = 'span', className, color, size, weight, ...props }, ref) => {
-    return (
-      <Component
-        ref={ref as any}
-        className={textVariants({ className, color, size, weight })}
-        {...props}
-      />
-    );
-  },
-);
-
-Text.displayName = 'Text';
+export function Text({
+  as: Component = 'span',
+  className,
+  color,
+  size,
+  weight,
+  ...props
+}: TextProps) {
+  return <Component className={textVariants({ className, color, size, weight })} {...props} />;
+}

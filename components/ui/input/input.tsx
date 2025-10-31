@@ -1,7 +1,5 @@
 import type { InputProps } from './input.types';
 
-import { forwardRef } from 'react';
-
 import { tv } from 'tailwind-variants';
 
 export const inputVariants = tv({
@@ -25,17 +23,6 @@ export const inputVariants = tv({
   },
 });
 
-export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ className, size, type, variant, ...props }, ref) => {
-    return (
-      <input
-        ref={ref}
-        className={inputVariants({ className, size, variant })}
-        type={type}
-        {...props}
-      />
-    );
-  },
-);
-
-Input.displayName = 'Input';
+export function Input({ className, size, type, variant, ...props }: InputProps) {
+  return <input className={inputVariants({ className, size, variant })} type={type} {...props} />;
+}

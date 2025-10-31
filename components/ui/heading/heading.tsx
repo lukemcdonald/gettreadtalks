@@ -1,7 +1,5 @@
 import type { HeadingProps } from './heading.types';
 
-import { forwardRef } from 'react';
-
 import { tv } from 'tailwind-variants';
 
 export const headingVariants = tv({
@@ -37,16 +35,13 @@ export const headingVariants = tv({
   },
 });
 
-export const Heading = forwardRef<HTMLHeadingElement, HeadingProps>(
-  ({ as: Component = 'h2', className, color, size, weight, ...props }, ref) => {
-    return (
-      <Component
-        ref={ref}
-        className={headingVariants({ className, color, size, weight })}
-        {...props}
-      />
-    );
-  },
-);
-
-Heading.displayName = 'Heading';
+export function Heading({
+  as: Component = 'h2',
+  className,
+  color,
+  size,
+  weight,
+  ...props
+}: HeadingProps) {
+  return <Component className={headingVariants({ className, color, size, weight })} {...props} />;
+}

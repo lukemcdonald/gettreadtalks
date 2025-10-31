@@ -1,5 +1,5 @@
 import MainLayout from '@/components/layout/main-layout';
-import { Badge, Card, CardContent, CardHeader, Heading, Text } from '@/components/ui';
+import { Badge, Card, CardHeader, Heading, Text } from '@/components/ui';
 import { getUserFavorites } from '@/lib/features/users/server';
 import { getAuthUser } from '@/lib/services/auth/server';
 
@@ -22,7 +22,7 @@ export default async function AccountPage() {
         </Card>
 
         <div className="grid gap-6 md:grid-cols-2">
-          <Card variant="bordered" padding="lg">
+          <Card variant="outlined" padding="lg">
             <div className="space-y-4">
               <Heading as="h2" size="2xl">
                 Profile Information
@@ -52,7 +52,7 @@ export default async function AccountPage() {
             </div>
           </Card>
 
-          <Card variant="bordered" padding="lg">
+          <Card variant="outlined" padding="lg">
             <div className="space-y-4">
               <Heading as="h2" size="2xl">
                 Account Status

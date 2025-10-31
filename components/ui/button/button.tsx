@@ -1,7 +1,5 @@
 import type { ButtonProps } from './button.types';
 
-import { forwardRef } from 'react';
-
 import { tv } from 'tailwind-variants';
 
 export const buttonVariants = tv({
@@ -28,10 +26,6 @@ export const buttonVariants = tv({
   },
 });
 
-export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, size, variant, ...props }, ref) => {
-    return <button ref={ref} className={buttonVariants({ className, size, variant })} {...props} />;
-  },
-);
-
-Button.displayName = 'Button';
+export function Button({ className, size, variant, ...delegated }: ButtonProps) {
+  return <button className={buttonVariants({ className, size, variant })} {...delegated} />;
+}

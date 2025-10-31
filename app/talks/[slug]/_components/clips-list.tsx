@@ -19,7 +19,7 @@ export function ClipsList({ clips }: ClipsListProps) {
       </Heading>
       <div className="space-y-3">
         {clips.map((clip) => (
-          <Card key={clip._id} variant="bordered" padding="md">
+          <Card key={clip._id} variant="outlined" padding="md">
             <CardContent className="space-y-2">
               <div className="flex items-start justify-between gap-2">
                 <Text weight="semibold">{clip.title}</Text>

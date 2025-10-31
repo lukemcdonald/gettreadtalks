@@ -1,7 +1,5 @@
 import type { BadgeProps } from './badge.types';
 
-import { forwardRef } from 'react';
-
 import { tv } from 'tailwind-variants';
 
 export const badgeVariants = tv({
@@ -29,10 +27,6 @@ export const badgeVariants = tv({
   },
 });
 
-export const Badge = forwardRef<HTMLDivElement, BadgeProps>(
-  ({ className, size, variant, ...props }, ref) => {
-    return <div ref={ref} className={badgeVariants({ className, size, variant })} {...props} />;
-  },
-);
-
-Badge.displayName = 'Badge';
+export function Badge({ className, size, variant, ...delegated }: BadgeProps) {
+  return <div className={badgeVariants({ className, size, variant })} {...delegated} />;
+}

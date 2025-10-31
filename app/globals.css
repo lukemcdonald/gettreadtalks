@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: oklch(0.985 0.002 247.839); /* Light grey background (gray-50) */
-  --foreground: oklch(0.21 0.034 264.665); /* Dark grey text (gray-900) - better contrast */
+  --background: var(--color-gray-50);
+  --foreground: var(--color-gray-900);
 }
 
 @theme inline {
@@ -66,32 +66,31 @@
 }
 
 .dark {
-  --background: oklch(0.13 0.028 261.692); /* Dark background (gray-950) */
-  --foreground: oklch(0.985 0.002 247.839); /* Light grey text (gray-50) */
+  --background: var(--color-gray-950);
+  --foreground: var(--color-gray-50);
 
-  /* Base colors - Using Tailwind gray scale for dark mode */
-  --color-base-100: var(--color-gray-950); /* Dark bg */
-  --color-base-200: var(--color-gray-900); /* Elevated */
-  --color-base-300: var(--color-gray-800); /* More elevated */
-  --color-base-content: var(--color-gray-50); /* Light text */
+  --color-base-100: var(--color-gray-950);
+  --color-base-200: var(--color-gray-900);
+  --color-base-300: var(--color-gray-800);
+  --color-base-content: var(--color-gray-50);
 
-  /* Brand colors - Lighter rose variants for dark mode */
-  --color-primary: var(--color-rose-400); /* Lighter rose */
-  --color-primary-content: var(--color-gray-950); /* Dark text */
-  --color-secondary: var(--color-rose-300); /* Even lighter rose */
-  --color-secondary-content: var(--color-gray-950); /* Dark text */
-  --color-accent: var(--color-rose-500); /* Mid rose */
-  --color-accent-content: var(--color-gray-950); /* Dark text */
+  /* Brand colors */
+  --color-primary: var(--color-rose-400);
+  --color-primary-content: var(--color-gray-950);
+  --color-secondary: var(--color-rose-300);
+  --color-secondary-content: var(--color-gray-950);
+  --color-accent: var(--color-rose-500);
+  --color-accent-content: var(--color-gray-950);
 
-  /* Neutral - Using Tailwind gray scale */
-  --color-neutral: var(--color-gray-600); /* Mid gray */
-  --color-neutral-content: var(--color-gray-950); /* Dark text */
+  /* Neutral */
+  --color-neutral: var(--color-gray-600);
+  --color-neutral-content: var(--color-gray-950);
 
-  /* Status colors - Adjusted for dark mode */
-  --color-info-content: oklch(15% 0 0);
-  --color-success-content: oklch(15% 0 0);
-  --color-warning-content: oklch(15% 0 0);
-  --color-error-content: oklch(98% 0 0); /* White on red */
+  /* Status colors */
+  --color-info-content: var(--color-blue-500);
+  --color-success-content: var(--color-green-500);
+  --color-warning-content: var(--color-yellow-500);
+  --color-error-content: var(--color-gray-50);
 }
 
 body {
