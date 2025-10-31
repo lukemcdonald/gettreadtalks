@@ -6,37 +6,40 @@ import { useEffect, useState } from 'react';
 
 import { useTheme } from 'next-themes';
 
+import { Button } from '@/components/ui';
+
 import { THEMES, THEME_CYCLE, THEME_ICONS } from './theme-toggle.constants';
 
 const getNextTheme = (theme: string | undefined): Theme => {
-  return THEME_CYCLE[theme as Theme] ?? THEMES.SYSTEM;
+	return THEME_CYCLE[theme as Theme] ?? THEMES.SYSTEM;
 };
 
 const getThemeIcon = (theme: string | undefined): string => {
-  return THEME_ICONS[theme as Theme] ?? THEME_ICONS[THEMES.SYSTEM];
+	return THEME_ICONS[theme as Theme] ?? THEME_ICONS[THEMES.SYSTEM];
 };
 
 export default function ThemeToggle() {
-  const [mounted, setMounted] = useState(false);
-  const { setTheme, theme } = useTheme();
+	const [mounted, setMounted] = useState(false);
+	const { setTheme, theme } = useTheme();
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+	useEffect(() => {
+		setMounted(true);
+	}, []);
 
-  if (!mounted) {
-    return <div className="w-10 h-10 bg-gray-200 rounded animate-pulse" />;
-  }
+	if (!mounted) {
+		return <div className="w-10 h-10 bg-base-200 rounded animate-pulse" />;
+	}
 
-  return (
-    <button
-      type="button"
-      onClick={() => setTheme(getNextTheme(theme))}
-      className="inline-flex items-center justify-center w-10 h-10 text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-      aria-label={`Current theme: ${theme}. Click to cycle themes.`}
-      title={theme}
-    >
-      <span className="text-lg">{getThemeIcon(theme)}</span>
-    </button>
-  );
+	return (
+		<Button
+			aria-label={`Current theme: ${theme}. Click to cycle themes.`}
+			className="w-10 h-10 p-0"
+			onClick={() => setTheme(getNextTheme(theme))}
+			title={theme}
+			type="button"
+			variant="ghost"
+		>
+			<span className="text-lg">{getThemeIcon(theme)}</span>
+		</Button>
+	);
 }
