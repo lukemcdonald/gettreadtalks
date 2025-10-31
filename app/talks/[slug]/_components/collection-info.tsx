@@ -1,16 +1,20 @@
+import { Heading, Text } from '@/components/ui';
+
 interface CollectionInfoProps {
   collection: {
-    title: string;
     description?: string;
+    title: string;
   };
 }
 
 export function CollectionInfo({ collection }: CollectionInfoProps) {
   return (
-    <section className="mb-4">
-      <h2 className="text-lg font-bold">Collection</h2>
-      <p>{collection.title}</p>
-      {collection.description && <p>{collection.description}</p>}
+    <section className="space-y-2">
+      <Heading as="h2" size="xl">
+        Collection
+      </Heading>
+      <Text weight="medium">{collection.title}</Text>
+      {collection.description && <Text color="neutral">{collection.description}</Text>}
     </section>
   );
 }

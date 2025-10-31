@@ -5,6 +5,7 @@ import type { AuthUser } from '@/lib/services/auth/types';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+import { Badge, Button } from '@/components/ui';
 import { signOut } from '@/lib/services/auth/client';
 import { captureException } from '@/lib/services/errors/client';
 
@@ -36,24 +37,17 @@ function AuthenticatedContent({ user }: AuthenticatedContentProps) {
   };
 
   return (
-    <div className="inline-flex items-center space-x-4">
-      <div className="inline-flex items-center px-4 py-2 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-full">
-        {user.name || 'User'}
-      </div>
-      <div className="space-x-2">
-        <Link
-          className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-          href="/account"
-        >
-          Account
+    <div className="inline-flex items-center gap-3">
+      <Badge variant="success">{user.name || 'User'}</Badge>
+      <div className="flex gap-2">
+        <Link href="/account">
+          <Button variant="primary" size="sm">
+            Account
+          </Button>
         </Link>
-        <button
-          className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
-          onClick={handleLogout}
-          type="button"
-        >
+        <Button variant="error" size="sm" onClick={handleLogout} type="button">
           Logout
-        </button>
+        </Button>
       </div>
     </div>
   );

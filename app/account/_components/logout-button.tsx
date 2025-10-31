@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 
+import { Button } from '@/components/ui';
 import { signOut } from '@/lib/services/auth/client';
 import { captureException } from '@/lib/services/errors/client';
 
@@ -20,13 +21,9 @@ function LogoutButton() {
   };
 
   return (
-    <button
-      className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md transition-colors"
-      onClick={handleLogout}
-      type="button"
-    >
+    <Button variant="error" onClick={handleLogout} type="button">
       Logout
-    </button>
+    </Button>
   );
 }
 

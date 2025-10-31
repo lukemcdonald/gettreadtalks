@@ -1,30 +1,40 @@
+import { Heading, Text } from '@/components/ui';
+
 interface SpeakerInfoProps {
   speaker: {
+    description?: string;
     firstName: string;
     lastName: string;
-    description?: string;
-    role?: string;
     ministry?: string;
+    role?: string;
   };
 }
 
 export function SpeakerInfo({ speaker }: SpeakerInfoProps) {
   return (
-    <section className="mb-4">
-      <h2 className="text-lg font-bold">Speaker</h2>
-      <p>
+    <section className="space-y-2">
+      <Heading as="h2" size="xl">
+        Speaker
+      </Heading>
+      <Text weight="medium">
         {speaker.firstName} {speaker.lastName}
-      </p>
-      {speaker.description && <p>{speaker.description}</p>}
+      </Text>
+      {speaker.description && <Text color="neutral">{speaker.description}</Text>}
       {speaker.role && (
-        <p>
-          <strong>Role:</strong> {speaker.role}
-        </p>
+        <Text size="sm">
+          <Text as="span" weight="semibold">
+            Role:
+          </Text>{' '}
+          {speaker.role}
+        </Text>
       )}
       {speaker.ministry && (
-        <p>
-          <strong>Ministry:</strong> {speaker.ministry}
-        </p>
+        <Text size="sm">
+          <Text as="span" weight="semibold">
+            Ministry:
+          </Text>{' '}
+          {speaker.ministry}
+        </Text>
       )}
     </section>
   );

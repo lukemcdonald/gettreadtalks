@@ -1,3 +1,5 @@
+import { Badge, Heading } from '@/components/ui';
+
 interface TopicsListProps {
   topics: Array<{
     _id: string;
@@ -7,13 +9,17 @@ interface TopicsListProps {
 
 export function TopicsList({ topics }: TopicsListProps) {
   return (
-    <section className="mb-4">
-      <h2 className="text-lg font-bold">Topics</h2>
-      <ul>
+    <section className="space-y-2">
+      <Heading as="h2" size="xl">
+        Topics
+      </Heading>
+      <div className="flex flex-wrap gap-2">
         {topics.map((topic) => (
-          <li key={topic._id}>{topic.title}</li>
+          <Badge key={topic._id} variant="neutral" size="sm">
+            {topic.title}
+          </Badge>
         ))}
-      </ul>
+      </div>
     </section>
   );
 }
