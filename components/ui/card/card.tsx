@@ -5,24 +5,24 @@ import { forwardRef } from 'react';
 import { tv } from 'tailwind-variants';
 
 export const cardVariants = tv({
-  base: 'rounded-lg bg-base-100 text-base-content',
-  variants: {
-    padding: {
-      lg: 'p-8',
-      md: 'p-6',
-      none: 'p-0',
-      sm: 'p-4',
-    },
-    variant: {
-      base: '',
-      bordered: 'border border-base-300',
-      elevated: 'shadow-lg',
-    },
-  },
-  defaultVariants: {
-    padding: 'md',
-    variant: 'base',
-  },
+	base: 'rounded-lg bg-base-100 text-base-content',
+	variants: {
+		padding: {
+			lg: 'p-8',
+			md: 'p-6',
+			none: 'p-0',
+			sm: 'p-4',
+		},
+		variant: {
+			base: '',
+			bordered: 'border border-base-300',
+			elevated: '', // Removed shadow
+		},
+	},
+	defaultVariants: {
+		padding: 'md',
+		variant: 'base',
+	},
 });
 
 export const cardHeaderVariants = tv({
