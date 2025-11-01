@@ -13,4 +13,3 @@ export const timestampFields = {
   deletedAt: v.optional(v.number()),
   updatedAt: v.optional(v.number()),
 };
-

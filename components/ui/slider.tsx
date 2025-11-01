@@ -1,9 +1,10 @@
-"use client"
+'use client';
 
-import * as React from "react"
-import { Slider as SliderPrimitive } from "@base-ui-components/react/slider"
+import * as React from 'react';
 
-import { cn } from "@/lib/utils"
+import { Slider as SliderPrimitive } from '@base-ui-components/react/slider';
+
+import { cn } from '@/lib/utils';
 
 function Slider({
   className,
@@ -16,13 +17,13 @@ function Slider({
 }: SliderPrimitive.Root.Props) {
   const _values = React.useMemo(() => {
     if (value !== undefined) {
-      return Array.isArray(value) ? value : [value]
+      return Array.isArray(value) ? value : [value];
     }
     if (defaultValue !== undefined) {
-      return Array.isArray(defaultValue) ? defaultValue : [defaultValue]
+      return Array.isArray(defaultValue) ? defaultValue : [defaultValue];
     }
-    return [min]
-  }, [value, defaultValue, min])
+    return [min];
+  }, [value, defaultValue, min]);
 
   return (
     <SliderPrimitive.Root
@@ -38,8 +39,8 @@ function Slider({
       <SliderPrimitive.Control
         data-slot="slider-control"
         className={cn(
-          "flex touch-none select-none data-disabled:opacity-64 data-[disabled]:pointer-events-none data-[orientation=horizontal]:w-full data-[orientation=horizontal]:min-w-44 data-[orientation=vertical]:h-full data-[orientation=vertical]:min-h-44 data-[orientation=vertical]:flex-col",
-          className
+          'flex touch-none select-none data-disabled:opacity-64 data-[disabled]:pointer-events-none data-[orientation=horizontal]:w-full data-[orientation=horizontal]:min-w-44 data-[orientation=vertical]:h-full data-[orientation=vertical]:min-h-44 data-[orientation=vertical]:flex-col',
+          className,
         )}
       >
         <SliderPrimitive.Track
@@ -60,17 +61,17 @@ function Slider({
         </SliderPrimitive.Track>
       </SliderPrimitive.Control>
     </SliderPrimitive.Root>
-  )
+  );
 }
 
 function SliderValue({ className, ...props }: SliderPrimitive.Value.Props) {
   return (
     <SliderPrimitive.Value
       data-slot="slider-value"
-      className={cn("flex justify-end text-sm", className)}
+      className={cn('flex justify-end text-sm', className)}
       {...props}
     />
-  )
+  );
 }
 
-export { Slider, SliderValue }
+export { Slider, SliderValue };
