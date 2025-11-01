@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-function UnauthenticatedContent() {
+export function UnauthenticatedContent() {
   return (
     <div className="inline-flex items-center space-x-4">
       <div className="inline-flex items-center px-4 py-2 bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 rounded-full">
@@ -17,5 +17,3 @@ function UnauthenticatedContent() {
     </div>
   );
 }
-
-export default UnauthenticatedContent;

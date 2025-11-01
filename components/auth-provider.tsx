@@ -11,12 +11,10 @@ const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!, {
   expectAuth: false, // Consider enabling for dashboard pages
 });
 
-function AuthProvider({ children }: { children: ReactNode }) {
+export function AuthProvider({ children }: { children: ReactNode }) {
   return (
     <ConvexBetterAuthProvider client={convex} authClient={authClient}>
       {children}
     </ConvexBetterAuthProvider>
   );
 }
-
-export default AuthProvider;

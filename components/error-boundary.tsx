@@ -6,7 +6,7 @@ import type { ErrorWithEventId } from '@/lib/services/errors/types';
 import * as Sentry from '@sentry/nextjs';
 import { type FallbackProps, ErrorBoundary as ReactErrorBoundary } from 'react-error-boundary';
 
-import { ErrorFallback } from './error-fallback';
+import { ErrorFallback } from '@/components/error-fallback';
 
 interface ErrorBoundaryProps {
   /**

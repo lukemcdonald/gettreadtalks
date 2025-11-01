@@ -3,7 +3,10 @@
 import type { Id } from '@/convex/_generated/dataModel';
 
 import { Authenticated } from 'convex/react';
+import { DynamicIcon } from 'lucide-react/dynamic';
 
+import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useFavoriteTalk, useIsTalkFavorited, useUnfavoriteTalk } from '@/lib/features/users/hooks';
 
 interface FavoriteTalkButtonProps {
@@ -26,15 +29,24 @@ function FavoriteButton({ talkId }: FavoriteTalkButtonProps) {
   };
 
   return (
-    <button
-      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-      disabled={isProcessing}
-      onClick={handleToggleFavorite}
-      type="button"
-    >
-      <span className="text-xl">{isFavorited ? '❤️' : '🤍'}</span>
-      <span>{isProcessing ? 'Processing...' : isFavorited ? 'Favorited' : 'Favorite'}</span>
-    </button>
+    <Tooltip>
+      <TooltipTrigger
+        render={() => (
+          <Button
+            disabled={isProcessing}
+            onClick={handleToggleFavorite}
+            type="button"
+            variant={isFavorited ? 'destructive' : 'default'}
+          >
+            <DynamicIcon name={isFavorited ? 'heart-minus' : 'heart-plus'} />
+          </Button>
+        )}
+      />
+
+      <TooltipContent>
+        <p>{isFavorited ? 'Remove from favorites' : 'Add to favorites'}</p>
+      </TooltipContent>
+    </Tooltip>
   );
 }
 

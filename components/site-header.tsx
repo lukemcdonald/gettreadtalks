@@ -1,11 +1,10 @@
 import Link from 'next/link';
 
-import ThemeToggle from '@/components/theme-toggle';
+import { AuthStatus } from '@/components/auth-status';
+import { ModeSwitcher } from '@/components/mode-switcher';
 import { getAuthUser } from '@/lib/services/auth/server';
 
-import AuthStatus from './auth-status';
-
-async function SiteHeader() {
+export async function SiteHeader() {
   const initialUser = await getAuthUser();
 
   return (
@@ -17,11 +16,9 @@ async function SiteHeader() {
         </Link>
       </h1>
       <div className="flex items-center gap-4">
-        <ThemeToggle />
         <AuthStatus initialUser={initialUser} />
+        <ModeSwitcher />
       </div>
     </header>
   );
 }
-
-export default SiteHeader;

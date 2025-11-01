@@ -12,7 +12,7 @@ interface AuthenticatedContentProps {
   user: AuthUser;
 }
 
-function AuthenticatedContent({ user }: AuthenticatedContentProps) {
+export function AuthenticatedContent({ user }: AuthenticatedContentProps) {
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -58,5 +58,3 @@ function AuthenticatedContent({ user }: AuthenticatedContentProps) {
     </div>
   );
 }
-
-export default AuthenticatedContent;

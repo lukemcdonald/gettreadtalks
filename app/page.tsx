@@ -1,4 +1,4 @@
-import MainLayout from '@/components/layout/main-layout';
+import { MainLayout } from '@/components/main-layout';
 import { preloadTalks } from '@/lib/features/talks';
 
 import { TalksList } from './_components/talks-list';
