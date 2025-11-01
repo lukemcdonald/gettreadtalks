@@ -4,13 +4,12 @@ import { Suspense } from 'react';
 
 import { Inter } from 'next/font/google';
 
+import { AuthProvider } from '@/components/auth-provider';
 import { ErrorBoundary } from '@/components/error-boundary';
-import SiteHeader from '@/components/layout/site-header';
+import { SiteHeader } from '@/components/site-header';
+import { ThemeProvider } from '@/components/theme-provider';
 
 import './globals.css';
-
-import AuthProvider from '@/components/providers/auth-provider';
-import ThemeProvider from '@/components/providers/theme-provider';
 
 const inter = Inter({
   subsets: ['latin'],

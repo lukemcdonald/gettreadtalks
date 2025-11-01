@@ -13,7 +13,7 @@ export const createAuth = (
 ) => {
   return betterAuth({
     advanced: {
-      useSecureCookies: true // Set to true and use `next dev --experimental-https`
+      useSecureCookies: true, // Set to true and use `next dev --experimental-https`
     },
     baseURL: process.env.SITE_URL,
     database: authComponent.adapter(ctx),

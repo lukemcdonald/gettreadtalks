@@ -1,6 +1,6 @@
 // app/account/page.tsx
 
-import MainLayout from '@/components/layout/main-layout';
+import { MainLayout } from '@/components/main-layout';
 import { getUserFavorites } from '@/lib/features/users/server';
 import { getAuthUser } from '@/lib/services/auth/server';
 

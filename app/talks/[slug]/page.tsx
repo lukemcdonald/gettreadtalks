@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 
-import MainLayout from '@/components/layout/main-layout';
+import { MainLayout } from '@/components/main-layout';
 import { getTalkBySlug } from '@/lib/features/talks';
 
 import { ClipsList } from './_components/clips-list';
