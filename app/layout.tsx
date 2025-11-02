@@ -9,7 +9,7 @@ import { ErrorBoundary } from '@/components/error-boundary';
 import { SiteHeader } from '@/components/site-header';
 import { ThemeProvider } from '@/components/theme-provider';
 
-import './globals.css';
+import './_assets/css/styles.css';
 
 const inter = Inter({
   subsets: ['latin'],
