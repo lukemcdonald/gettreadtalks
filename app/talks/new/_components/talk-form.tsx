@@ -43,6 +43,9 @@ export function TalkForm({ collections, initialData, speakers, talkId, talkSlug 
 
   const [isDeleting, setIsDeleting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [status, setStatus] = useState<'backlog' | 'published' | 'archived'>(
+    (initialData?.status as 'backlog' | 'published' | 'archived') || 'backlog',
+  );
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -50,7 +53,6 @@ export function TalkForm({ collections, initialData, speakers, talkId, talkSlug 
 
     const formData = new FormData(e.currentTarget);
 
-    // Extract form values
     const title = formData.get('title') as string;
     const speakerId = formData.get('speakerId') as Id<'speakers'>;
     const mediaUrl = formData.get('mediaUrl') as string;
@@ -61,7 +63,6 @@ export function TalkForm({ collections, initialData, speakers, talkId, talkSlug 
     const status = formData.get('status') as 'backlog' | 'published' | 'archived';
     const featured = formData.get('featured') === 'on';
 
-    // Build mutation data
     const data = {
       collectionId: collectionId ? (collectionId as Id<'collections'>) : undefined,
       collectionOrder: collectionOrder ? Number.parseInt(collectionOrder, 10) : undefined,
@@ -78,14 +79,12 @@ export function TalkForm({ collections, initialData, speakers, talkId, talkSlug 
       if (talkId) {
         await updateTalk.mutate({ ...data, id: talkId });
 
-        // For edit, use the updated title to generate slug (or existing slug if title unchanged)
         const newSlug = normalizeSlug(title);
         const slug = newSlug === normalizeSlug(initialData?.title ?? '') ? talkSlug : newSlug;
         router.push(`/talks/${slug || newSlug}`);
       } else {
         await createTalk.mutate(data);
 
-        // Generate slug from title for redirect
         const slug = normalizeSlug(title);
         router.push(`/talks/${slug}`);
       }
@@ -94,22 +93,37 @@ export function TalkForm({ collections, initialData, speakers, talkId, talkSlug 
     }
   };
 
-  const handleDelete = async () => {
+  const handleArchiveToggle = async () => {
     if (!talkId) {
       return;
     }
 
-    if (!confirm('Are you sure you want to archive this talk?')) {
+    const isArchived = status === 'archived';
+    const action = isArchived ? 'unarchive' : 'archive';
+    const confirmMessage = isArchived
+      ? 'Are you sure you want to unarchive this talk?'
+      : 'Are you sure you want to archive this talk?';
+
+    if (!confirm(confirmMessage)) {
       return;
     }
 
     setIsDeleting(true);
 
     try {
-      await archiveTalk.mutate({ id: talkId });
+      if (isArchived) {
+        await updateTalk.mutate({
+          id: talkId,
+          status: 'backlog',
+        });
+        setStatus('backlog');
+      } else {
+        await archiveTalk.mutate({ id: talkId });
+        setStatus('archived');
+      }
       router.push('/talks');
     } catch (error) {
-      console.error('Failed to archive talk:', error);
+      console.error(`Failed to ${action} talk:`, error);
       setIsDeleting(false);
     }
   };
@@ -188,6 +202,8 @@ export function TalkForm({ collections, initialData, speakers, talkId, talkSlug 
 
         <StatusSelectField
           defaultValue={(initialData?.status as 'backlog' | 'published' | 'archived') ?? 'backlog'}
+          onChange={setStatus}
+          value={status}
         />
 
         <div className="flex items-center gap-2">
@@ -204,11 +220,17 @@ export function TalkForm({ collections, initialData, speakers, talkId, talkSlug 
         {talkId && (
           <Button
             disabled={isDeleting || isLoading}
-            onClick={handleDelete}
+            onClick={handleArchiveToggle}
             type="button"
-            variant="destructive"
+            variant={status === 'archived' ? 'outline' : 'destructive'}
           >
-            {isDeleting ? 'Archiving...' : 'Archive Talk'}
+            {isDeleting
+              ? status === 'archived'
+                ? 'Unarchiving...'
+                : 'Archiving...'
+              : status === 'archived'
+                ? 'Unarchive Talk'
+                : 'Archive Talk'}
           </Button>
         )}
       </div>

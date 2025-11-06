@@ -3,9 +3,11 @@ import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/c
 
 interface StatusSelectFieldProps {
   defaultValue?: 'backlog' | 'published' | 'archived';
+  onChange?: (value: 'backlog' | 'published' | 'archived') => void;
+  value?: 'backlog' | 'published' | 'archived';
 }
 
-export function StatusSelectField({ defaultValue = 'backlog' }: StatusSelectFieldProps) {
+export function StatusSelectField({ defaultValue = 'backlog', onChange, value }: StatusSelectFieldProps) {
   const items = [
     { label: 'Backlog', value: 'backlog' },
     { label: 'Published', value: 'published' },
@@ -15,7 +17,14 @@ export function StatusSelectField({ defaultValue = 'backlog' }: StatusSelectFiel
   return (
     <div>
       <Label htmlFor="status">Status</Label>
-      <Select defaultValue={defaultValue} items={items} name="status" required>
+      <Select
+        defaultValue={defaultValue}
+        items={items}
+        name="status"
+        onValueChange={(val) => onChange?.(val as 'backlog' | 'published' | 'archived')}
+        required
+        value={value}
+      >
         <SelectTrigger id="status">
           <SelectValue />
         </SelectTrigger>
