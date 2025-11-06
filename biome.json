@@ -31,6 +31,8 @@
         "noNonNullAssertion": "off"
       },
       "suspicious": {
+        "noArrayIndexKey": "off",
+        "noEmptyBlock": "off",
         "noExplicitAny": "warn"
       }
     }

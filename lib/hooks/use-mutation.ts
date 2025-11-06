@@ -62,14 +62,11 @@ export function useMutation<Mutation extends FunctionReference<'mutation'>>(
         if (reportToSentry) {
           const errorCode = getErrorCode(error);
           const eventId = captureException(errorObj, {
-            context: {
-              mutation: mutation.toString(),
-            },
             fingerprint: ['mutation', errorCode.toLowerCase().replace(/_/g, '-')],
             level: 'error',
             tags: {
-              errorType: 'mutation',
               errorCode,
+              errorType: 'mutation',
             },
           });
 
@@ -82,7 +79,7 @@ export function useMutation<Mutation extends FunctionReference<'mutation'>>(
         throw errorObj;
       }
     },
-    [convexMutation, mutation, onSuccess, onError, reportToSentry],
+    [convexMutation, onSuccess, onError, reportToSentry],
   );
 
   const reset = useCallback(() => {

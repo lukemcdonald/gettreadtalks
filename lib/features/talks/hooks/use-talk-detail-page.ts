@@ -7,10 +7,6 @@ import { useIsTalkFavorited } from '@/lib/features/users/hooks';
 import { useTalkBySlug } from './use-talk-by-slug';
 import { useTalksBySpeaker } from './use-talks-by-speaker';
 
-/**
- * Composite hook for talk detail pages.
- * Combines talk data, favorite status, and related talks with unified loading state.
- */
 export function useTalkDetailPage(slug: string) {
   const { data: talkData, isLoading: talkLoading } = useTalkBySlug(slug);
 

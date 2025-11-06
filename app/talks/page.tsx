@@ -1,0 +1,88 @@
+import type { Id } from '@/convex/_generated/dataModel';
+import type { StatusType } from '@/convex/lib/validators/shared';
+
+import { Suspense } from 'react';
+
+import Link from 'next/link';
+
+import { MainLayout } from '@/components/main-layout';
+import { Button } from '@/components/ui/button';
+import { getAllSpeakersForFilter, getAllTopicsForFilter, getTalks } from '@/lib/features/talks';
+import { getAuthUser } from '@/lib/services/auth/server';
+
+import {
+  ActiveFilters,
+  Pagination,
+  TalksFilters,
+  TalksList,
+  TalksListSkeleton,
+} from './_components';
+
+interface TalksPageProps {
+  searchParams: Promise<{
+    cursor?: string;
+    featured?: string;
+    speaker?: string;
+    status?: string;
+    topic?: string;
+  }>;
+}
+
+async function TalksContent({ params }: { params: Awaited<TalksPageProps['searchParams']> }) {
+  const user = await getAuthUser();
+
+  const cursor = params.cursor || undefined;
+  const featured = params.featured === 'true' ? true : undefined;
+  const speakerId = params.speaker as Id<'speakers'> | undefined;
+  const topicId = params.topic as Id<'topics'> | undefined;
+  const statusParam = params.status as StatusType | undefined;
+
+  const status = user
+    ? statusParam
+    : statusParam || (featured === undefined && !speakerId && !topicId ? 'published' : undefined);
+
+  const result = await getTalks({ cursor, featured, speakerId, status, topicId });
+
+  return (
+    <>
+      <TalksList talks={result.talks} />
+      <Pagination
+        continueCursor={result.continueCursor}
+        hasNextPage={!result.isDone}
+        hasPrevPage={!!cursor}
+      />
+    </>
+  );
+}
+
+export default async function TalksPage({ searchParams }: TalksPageProps) {
+  const params = await searchParams;
+  const user = await getAuthUser();
+
+  // Fetch filter data (not affected by pagination)
+  const [speakers, topics] = await Promise.all([
+    getAllSpeakersForFilter(),
+    getAllTopicsForFilter(),
+  ]);
+
+  return (
+    <MainLayout>
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Talks</h1>
+        {user && <Button render={<Link href="/talks/new" />}>New Talk</Button>}
+      </div>
+
+      <div className="mb-4">
+        <TalksFilters isAuthenticated={!!user} speakers={speakers} topics={topics} />
+      </div>
+
+      <div className="mb-6">
+        <ActiveFilters speakers={speakers} topics={topics} />
+      </div>
+
+      <Suspense fallback={<TalksListSkeleton />}>
+        <TalksContent params={params} />
+      </Suspense>
+    </MainLayout>
+  );
+}
