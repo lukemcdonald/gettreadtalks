@@ -20,26 +20,60 @@ export async function preloadTalks(pageSize = 12) {
 }
 
 /**
- * Get talks with optional status filter.
+ * Get talks with optional filters.
  */
-export async function getTalks(
-  status?: 'published' | 'backlog' | 'archived',
-  pageSize = 100,
-) {
+export async function getTalks(filters?: {
+  featured?: boolean;
+  pageSize?: number;
+  speakerId?: string;
+  status?: 'published' | 'backlog' | 'archived';
+  topicId?: string;
+}) {
   const token = await getAuthToken();
 
   const paginationOpts = {
     cursor: null,
-    numItems: pageSize,
+    numItems: filters?.pageSize || 100,
   };
 
   const result = await fetchQuery(
     api.talks.listTalks,
-    { paginationOpts, status },
+    {
+      featured: filters?.featured,
+      paginationOpts,
+      speakerId: filters?.speakerId,
+      status: filters?.status,
+      topicId: filters?.topicId,
+    },
     { token },
   );
 
   return result.page;
+}
+
+/**
+ * Get all speakers for filter dropdowns.
+ */
+export async function getAllSpeakersForFilter() {
+  const token = await getAuthToken();
+
+  const paginationOpts = {
+    cursor: null,
+    numItems: 1000,
+  };
+
+  const result = await fetchQuery(api.speakers.listSpeakers, { paginationOpts }, { token });
+
+  return result.page;
+}
+
+/**
+ * Get all topics for filter dropdowns.
+ */
+export async function getAllTopicsForFilter() {
+  const token = await getAuthToken();
+
+  return await fetchQuery(api.topics.listTopics, { limit: 1000 }, { token });
 }
 
 /**

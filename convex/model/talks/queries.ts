@@ -199,16 +199,96 @@ export const listRandomTalksBySpeaker = query({
  */
 export const listTalks = query({
   args: {
+    featured: v.optional(v.boolean()),
     paginationOpts: v.any(),
+    speakerId: v.optional(v.id('speakers')),
     status: v.optional(statusType),
+    topicId: v.optional(v.id('topics')),
   },
   handler: async (ctx, args) => {
-    const { paginationOpts, status } = args;
+    const { featured, paginationOpts, speakerId, status, topicId } = args;
+
+    // If filtering by topic, get talks from talksOnTopics join table
+    if (topicId) {
+      const talksOnTopics = await ctx.db
+        .query('talksOnTopics')
+        .withIndex('by_topicId', (q) => q.eq('topicId', topicId))
+        .collect();
+
+      const talkIds = talksOnTopics.map((t) => t.talkId);
+      const talks = await Promise.all(talkIds.map((id) => ctx.db.get(id)));
+
+      // Filter out null results and apply additional filters
+      let filteredTalks = talks.filter((talk): talk is Doc<'talks'> => talk !== null);
+
+      if (status) {
+        filteredTalks = filteredTalks.filter((talk) => talk.status === status);
+      }
+      if (featured !== undefined) {
+        filteredTalks = filteredTalks.filter((talk) => talk.featured === featured);
+      }
+      if (speakerId) {
+        filteredTalks = filteredTalks.filter((talk) => talk.speakerId === speakerId);
+      }
+
+      // Sort by publishedAt or _creationTime
+      filteredTalks.sort((a, b) => (b.publishedAt || b._creationTime) - (a.publishedAt || a._creationTime));
+
+      // Manual pagination
+      const numItems = paginationOpts.numItems || 20;
+      const page = filteredTalks.slice(0, numItems);
+
+      return {
+        continueCursor: '',
+        isDone: true,
+        page,
+      };
+    }
+
+    // Use indexes when possible for better performance
+    if (featured !== undefined && status) {
+      return await ctx.db
+        .query('talks')
+        .withIndex('by_featured_and_status', (q) => q.eq('featured', featured).eq('status', status))
+        .order('desc')
+        .paginate(paginationOpts);
+    }
+
+    if (speakerId && status) {
+      return await ctx.db
+        .query('talks')
+        .withIndex('by_speakerId_and_status', (q) => q.eq('speakerId', speakerId).eq('status', status))
+        .order('desc')
+        .paginate(paginationOpts);
+    }
 
     if (status) {
       return await ctx.db
         .query('talks')
         .withIndex('by_status_and_publishedAt', (q) => q.eq('status', status))
+        .order('desc')
+        .paginate(paginationOpts);
+    }
+
+    if (speakerId) {
+      const result = await ctx.db
+        .query('talks')
+        .withIndex('by_speakerId_and_status', (q) => q.eq('speakerId', speakerId))
+        .order('desc')
+        .paginate(paginationOpts);
+
+      // Apply featured filter if needed
+      if (featured !== undefined) {
+        result.page = result.page.filter((talk) => talk.featured === featured);
+      }
+
+      return result;
+    }
+
+    if (featured !== undefined) {
+      return await ctx.db
+        .query('talks')
+        .withIndex('by_featured_and_status', (q) => q.eq('featured', featured))
         .order('desc')
         .paginate(paginationOpts);
     }
