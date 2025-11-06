@@ -20,6 +20,29 @@ export async function preloadTalks(pageSize = 12) {
 }
 
 /**
+ * Get talks with optional status filter.
+ */
+export async function getTalks(
+  status?: 'published' | 'backlog' | 'archived',
+  pageSize = 100,
+) {
+  const token = await getAuthToken();
+
+  const paginationOpts = {
+    cursor: null,
+    numItems: pageSize,
+  };
+
+  const result = await fetchQuery(
+    api.talks.listTalks,
+    { paginationOpts, status },
+    { token },
+  );
+
+  return result.page;
+}
+
+/**
  * Get talk by slug with all related data (speaker, collection, clips, topics).
  *
  * @param slug - Talk slug identifier
