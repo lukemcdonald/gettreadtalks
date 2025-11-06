@@ -1,7 +1,5 @@
 'use client';
 
-import * as React from 'react';
-
 import { Toast } from '@base-ui-components/react/toast';
 import {
   CircleAlertIcon,
