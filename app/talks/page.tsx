@@ -10,7 +10,7 @@ import {
 } from '@/lib/features/talks';
 import { getAuthUser } from '@/lib/services/auth/server';
 
-import { Pagination, TalksFilters, TalksList, TalksListSkeleton } from './_components';
+import { ActiveFilters, Pagination, TalksFilters, TalksList, TalksListSkeleton } from './_components';
 
 interface TalksPageProps {
   searchParams: Promise<{
@@ -74,8 +74,12 @@ export default async function TalksPage({ searchParams }: TalksPageProps) {
         )}
       </div>
 
-      <div className="mb-6">
+      <div className="mb-4">
         <TalksFilters isAuthenticated={!!user} speakers={speakers} topics={topics} />
+      </div>
+
+      <div className="mb-6">
+        <ActiveFilters speakers={speakers} topics={topics} />
       </div>
 
       <Suspense fallback={<TalksListSkeleton />}>
