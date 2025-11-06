@@ -9,7 +9,9 @@ import { ErrorBoundary } from '@/components/error-boundary';
 import { SiteHeader } from '@/components/site-header';
 import { ThemeProvider } from '@/components/theme-provider';
 
-import './globals.css';
+import './_assets/css/styles.css';
+
+import { cn } from '@/lib/utils';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -30,16 +32,12 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+    <html lang="en" suppressHydrationWarning className="h-full">
+      <body className={cn(inter.className, 'bg-cover h-full')}>
         <ErrorBoundary>
           <ThemeProvider>
             <AuthProvider>
-              <Suspense
-                fallback={
-                  <div className="h-16 bg-background border-b-2 border-slate-200 dark:border-slate-800" />
-                }
-              >
+              <Suspense>
                 <SiteHeader />
               </Suspense>
               {children}
