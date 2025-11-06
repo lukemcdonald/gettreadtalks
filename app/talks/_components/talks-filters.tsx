@@ -47,12 +47,12 @@ export function TalksFilters({
       params.set(key, String(value));
     }
 
-    // Reset pagination when filter changes
     params.delete('cursor');
 
     startTransition(() => {
       onLoadingChange?.(true);
-      router.push(`/talks${params.toString() ? `?${params.toString()}` : ''}`);
+      const query = params.toString();
+      router.push(query ? `/talks?${query}` : '/talks');
     });
   };
 

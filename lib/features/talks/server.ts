@@ -1,5 +1,8 @@
 'use server';
 
+import type { Id } from '@/convex/_generated/dataModel';
+import type { StatusType } from '@/convex/lib/validators/shared';
+
 import { fetchQuery, preloadQuery } from 'convex/nextjs';
 
 import { api } from '@/convex/_generated/api';
@@ -26,9 +29,9 @@ export async function getTalks(filters?: {
   cursor?: string | null;
   featured?: boolean;
   pageSize?: number;
-  speakerId?: string;
-  status?: 'published' | 'backlog' | 'archived';
-  topicId?: string;
+  speakerId?: Id<'speakers'>;
+  status?: StatusType;
+  topicId?: Id<'topics'>;
 }) {
   const token = await getAuthToken();
 

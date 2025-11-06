@@ -13,10 +13,7 @@ export default async function NewTalkPage() {
     redirect('/login?redirect=/talks/new');
   }
 
-  const [collections, speakers] = await Promise.all([
-    getAllCollections(),
-    getAllSpeakers(),
-  ]);
+  const [collections, speakers] = await Promise.all([getAllCollections(), getAllSpeakers()]);
 
   return (
     <MainLayout>

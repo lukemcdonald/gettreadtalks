@@ -1,16 +1,22 @@
-import Link from 'next/link';
+import type { Id } from '@/convex/_generated/dataModel';
+import type { StatusType } from '@/convex/lib/validators/shared';
+
 import { Suspense } from 'react';
+
+import Link from 'next/link';
 
 import { MainLayout } from '@/components/main-layout';
 import { Button } from '@/components/ui/button';
-import {
-  getAllSpeakersForFilter,
-  getAllTopicsForFilter,
-  getTalks,
-} from '@/lib/features/talks';
+import { getAllSpeakersForFilter, getAllTopicsForFilter, getTalks } from '@/lib/features/talks';
 import { getAuthUser } from '@/lib/services/auth/server';
 
-import { ActiveFilters, Pagination, TalksFilters, TalksList, TalksListSkeleton } from './_components';
+import {
+  ActiveFilters,
+  Pagination,
+  TalksFilters,
+  TalksList,
+  TalksListSkeleton,
+} from './_components';
 
 interface TalksPageProps {
   searchParams: Promise<{
@@ -25,20 +31,16 @@ interface TalksPageProps {
 async function TalksContent({ params }: { params: Awaited<TalksPageProps['searchParams']> }) {
   const user = await getAuthUser();
 
-  // Parse filters from URL params
   const cursor = params.cursor || undefined;
   const featured = params.featured === 'true' ? true : undefined;
-  const speakerId = params.speaker || undefined;
-  const topicId = params.topic || undefined;
-  const statusParam = params.status as 'published' | 'backlog' | 'archived' | undefined;
+  const speakerId = params.speaker as Id<'speakers'> | undefined;
+  const topicId = params.topic as Id<'topics'> | undefined;
+  const statusParam = params.status as StatusType | undefined;
 
-  // Non-authenticated users only see published talks (unless other filters are applied)
-  const status =
-    user
-      ? statusParam
-      : statusParam || (featured === undefined && !speakerId && !topicId ? 'published' : undefined);
+  const status = user
+    ? statusParam
+    : statusParam || (featured === undefined && !speakerId && !topicId ? 'published' : undefined);
 
-  // Fetch talks with pagination
   const result = await getTalks({ cursor, featured, speakerId, status, topicId });
 
   return (
@@ -67,11 +69,7 @@ export default async function TalksPage({ searchParams }: TalksPageProps) {
     <MainLayout>
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Talks</h1>
-        {user && (
-          <Button asChild>
-            <Link href="/talks/new">New Talk</Link>
-          </Button>
-        )}
+        {user && <Button render={<Link href="/talks/new" />}>New Talk</Button>}
       </div>
 
       <div className="mb-4">

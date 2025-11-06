@@ -1,7 +1,13 @@
 import type { Id } from '@/convex/_generated/dataModel';
 
 import { Label } from '@/components/ui/label';
-import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectItem,
+  SelectPopup,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface CollectionSelectFieldProps {
   collections: Array<{ _id: Id<'collections'>; title: string }>;

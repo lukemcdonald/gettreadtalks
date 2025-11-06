@@ -232,7 +232,9 @@ export const listTalks = query({
       }
 
       // Sort by publishedAt or _creationTime
-      filteredTalks.sort((a, b) => (b.publishedAt || b._creationTime) - (a.publishedAt || a._creationTime));
+      filteredTalks.sort(
+        (a, b) => (b.publishedAt || b._creationTime) - (a.publishedAt || a._creationTime),
+      );
 
       // Manual pagination
       const numItems = paginationOpts.numItems || 20;
@@ -257,7 +259,9 @@ export const listTalks = query({
     if (speakerId && status) {
       return await ctx.db
         .query('talks')
-        .withIndex('by_speakerId_and_status', (q) => q.eq('speakerId', speakerId).eq('status', status))
+        .withIndex('by_speakerId_and_status', (q) =>
+          q.eq('speakerId', speakerId).eq('status', status),
+        )
         .order('desc')
         .paginate(paginationOpts);
     }

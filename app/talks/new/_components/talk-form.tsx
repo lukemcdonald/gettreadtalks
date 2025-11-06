@@ -1,6 +1,7 @@
 'use client';
 
 import type { Id } from '@/convex/_generated/dataModel';
+import type { StatusType } from '@/convex/lib/validators/shared';
 
 import { useState } from 'react';
 
@@ -27,7 +28,7 @@ interface TalkFormProps {
     mediaUrl: string;
     scripture?: string | null;
     speakerId: Id<'speakers'>;
-    status?: 'backlog' | 'published' | 'archived' | null;
+    status?: StatusType | null;
     title: string;
   };
   speakers: Array<{ _id: Id<'speakers'>; firstName: string; lastName: string; slug: string }>;
@@ -43,9 +44,7 @@ export function TalkForm({ collections, initialData, speakers, talkId, talkSlug 
 
   const [isDeleting, setIsDeleting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [status, setStatus] = useState<'backlog' | 'published' | 'archived'>(
-    (initialData?.status as 'backlog' | 'published' | 'archived') || 'backlog',
-  );
+  const [status, setStatus] = useState<StatusType>(initialData?.status || 'backlog');
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -60,7 +59,7 @@ export function TalkForm({ collections, initialData, speakers, talkId, talkSlug 
     const collectionOrder = formData.get('collectionOrder') as string;
     const description = formData.get('description') as string;
     const scripture = formData.get('scripture') as string;
-    const status = formData.get('status') as 'backlog' | 'published' | 'archived';
+    const status = formData.get('status') as StatusType;
     const featured = formData.get('featured') === 'on';
 
     const data = {
@@ -201,7 +200,7 @@ export function TalkForm({ collections, initialData, speakers, talkId, talkSlug 
         </div>
 
         <StatusSelectField
-          defaultValue={(initialData?.status as 'backlog' | 'published' | 'archived') ?? 'backlog'}
+          defaultValue={initialData?.status ?? 'backlog'}
           onChange={setStatus}
           value={status}
         />

@@ -28,10 +28,7 @@ export default async function EditTalkPage({ params }: EditTalkPageProps) {
 
   const { talk } = talkData;
 
-  const [collections, speakers] = await Promise.all([
-    getAllCollections(),
-    getAllSpeakers(),
-  ]);
+  const [collections, speakers] = await Promise.all([getAllCollections(), getAllSpeakers()]);
 
   return (
     <MainLayout>

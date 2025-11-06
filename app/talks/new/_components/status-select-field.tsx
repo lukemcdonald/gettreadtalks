@@ -1,17 +1,30 @@
+import type { StatusType } from '@/convex/lib/validators/shared';
+
 import { Label } from '@/components/ui/label';
-import { Select, SelectItem, SelectPopup, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectItem,
+  SelectPopup,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface StatusSelectFieldProps {
-  defaultValue?: 'backlog' | 'published' | 'archived';
-  onChange?: (value: 'backlog' | 'published' | 'archived') => void;
-  value?: 'backlog' | 'published' | 'archived';
+  defaultValue?: StatusType;
+  onChange?: (value: StatusType) => void;
+  value?: StatusType;
 }
 
-export function StatusSelectField({ defaultValue = 'backlog', onChange, value }: StatusSelectFieldProps) {
+export function StatusSelectField({
+  defaultValue = 'backlog',
+  onChange,
+  value,
+}: StatusSelectFieldProps) {
   const items = [
+    { label: 'Approved', value: 'approved' },
+    { label: 'Archived', value: 'archived' },
     { label: 'Backlog', value: 'backlog' },
     { label: 'Published', value: 'published' },
-    { label: 'Archived', value: 'archived' },
   ];
 
   return (
@@ -21,7 +34,7 @@ export function StatusSelectField({ defaultValue = 'backlog', onChange, value }:
         defaultValue={defaultValue}
         items={items}
         name="status"
-        onValueChange={(val) => onChange?.(val as 'backlog' | 'published' | 'archived')}
+        onValueChange={(val) => onChange?.(val as StatusType)}
         required
         value={value}
       >
@@ -29,9 +42,10 @@ export function StatusSelectField({ defaultValue = 'backlog', onChange, value }:
           <SelectValue />
         </SelectTrigger>
         <SelectPopup>
+          <SelectItem value="approved">Approved</SelectItem>
+          <SelectItem value="archived">Archived</SelectItem>
           <SelectItem value="backlog">Backlog</SelectItem>
           <SelectItem value="published">Published</SelectItem>
-          <SelectItem value="archived">Archived</SelectItem>
         </SelectPopup>
       </Select>
     </div>

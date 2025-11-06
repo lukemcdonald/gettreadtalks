@@ -34,13 +34,9 @@ export function AccountMenu({ initialUser }: AccountMenuProps) {
   if (!user) {
     return (
       <Menu>
-        <MenuTrigger asChild>
-          <Button variant="outline">Account</Button>
-        </MenuTrigger>
+        <MenuTrigger render={<Button variant="outline" />}>Account</MenuTrigger>
         <MenuPopup>
-          <MenuItem asChild>
-            <Link href="/login">Login</Link>
-          </MenuItem>
+          <MenuItem render={<Link href="/login" />}>Login</MenuItem>
         </MenuPopup>
       </Menu>
     );
@@ -48,30 +44,22 @@ export function AccountMenu({ initialUser }: AccountMenuProps) {
 
   return (
     <Menu>
-      <MenuTrigger asChild>
-        <Button variant="outline">Account</Button>
-      </MenuTrigger>
+      <MenuTrigger render={<Button variant="outline" />}>Account</MenuTrigger>
       <MenuPopup>
         <div className="px-2 py-1.5 text-xs text-muted-foreground">Signed in as</div>
         <div className="px-2 pb-1.5 text-sm font-semibold">{user.email}</div>
         <MenuSeparator />
-        <MenuItem asChild>
-          <Link href="/account/favorites">
-            <Heart className="size-4" />
-            Favorites
-          </Link>
+        <MenuItem render={<Link href="/account/favorites" />}>
+          <Heart className="size-4" />
+          Favorites
         </MenuItem>
-        <MenuItem asChild>
-          <Link href="/account/finished">
-            <CheckCircle2 className="size-4" />
-            Finished
-          </Link>
+        <MenuItem render={<Link href="/account/finished" />}>
+          <CheckCircle2 className="size-4" />
+          Finished
         </MenuItem>
-        <MenuItem asChild>
-          <Link href="/account">
-            <Settings className="size-4" />
-            Settings
-          </Link>
+        <MenuItem render={<Link href="/account" />}>
+          <Settings className="size-4" />
+          Settings
         </MenuItem>
         <MenuSeparator />
         <MenuItem onClick={handleLogout}>

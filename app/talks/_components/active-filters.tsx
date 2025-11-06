@@ -26,8 +26,10 @@ export function ActiveFilters({ speakers, topics }: ActiveFiltersProps) {
   const removeFilter = (key: string) => {
     const params = new URLSearchParams(searchParams.toString());
     params.delete(key);
-    params.delete('cursor'); // Reset pagination when filter changes
-    router.push(`/talks${params.toString() ? `?${params.toString()}` : ''}`);
+    params.delete('cursor');
+
+    const query = params.toString();
+    router.push(query ? `/talks?${query}` : '/talks');
   };
 
   const clearAllFilters = () => {

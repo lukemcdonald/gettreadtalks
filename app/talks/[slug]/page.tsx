@@ -39,11 +39,7 @@ export default async function TalkPage({ params }: TalkPageProps) {
       <header className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold">{talk.title}</h1>
         <div className="flex items-center gap-2">
-          {user && (
-            <Button asChild variant="outline">
-              <Link href={`/talks/${slug}/edit`}>Edit</Link>
-            </Button>
-          )}
+          {user && <Button render={<Link href={`/talks/${slug}/edit`} />} variant="outline">Edit</Button>}
           <FavoriteTalkButton talkId={talk._id} />
         </div>
       </header>

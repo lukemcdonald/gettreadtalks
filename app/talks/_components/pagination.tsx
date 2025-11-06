@@ -23,7 +23,8 @@ export function Pagination({ continueCursor, hasNextPage, hasPrevPage }: Paginat
       params.delete('cursor');
     }
 
-    router.push(`/talks${params.toString() ? `?${params.toString()}` : ''}`);
+    const query = params.toString();
+    router.push(query ? `/talks?${query}` : '/talks');
   };
 
   if (!hasNextPage && !hasPrevPage) {
