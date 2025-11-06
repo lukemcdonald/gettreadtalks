@@ -20,9 +20,10 @@ export async function preloadTalks(pageSize = 12) {
 }
 
 /**
- * Get talks with optional filters.
+ * Get talks with optional filters and pagination.
  */
 export async function getTalks(filters?: {
+  cursor?: string | null;
   featured?: boolean;
   pageSize?: number;
   speakerId?: string;
@@ -32,8 +33,8 @@ export async function getTalks(filters?: {
   const token = await getAuthToken();
 
   const paginationOpts = {
-    cursor: null,
-    numItems: filters?.pageSize || 100,
+    cursor: filters?.cursor || null,
+    numItems: filters?.pageSize || 20,
   };
 
   const result = await fetchQuery(
@@ -48,7 +49,11 @@ export async function getTalks(filters?: {
     { token },
   );
 
-  return result.page;
+  return {
+    continueCursor: result.continueCursor,
+    isDone: result.isDone,
+    talks: result.page,
+  };
 }
 
 /**

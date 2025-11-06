@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Suspense } from 'react';
 
 import { MainLayout } from '@/components/main-layout';
 import { Button } from '@/components/ui/button';
@@ -9,10 +10,11 @@ import {
 } from '@/lib/features/talks';
 import { getAuthUser } from '@/lib/services/auth/server';
 
-import { TalksFilters, TalksList } from './_components';
+import { Pagination, TalksFilters, TalksList, TalksListSkeleton } from './_components';
 
 interface TalksPageProps {
   searchParams: Promise<{
+    cursor?: string;
     featured?: string;
     speaker?: string;
     status?: string;
@@ -20,22 +22,43 @@ interface TalksPageProps {
   }>;
 }
 
-export default async function TalksPage({ searchParams }: TalksPageProps) {
-  const params = await searchParams;
+async function TalksContent({ params }: { params: Awaited<TalksPageProps['searchParams']> }) {
   const user = await getAuthUser();
 
   // Parse filters from URL params
+  const cursor = params.cursor || undefined;
   const featured = params.featured === 'true' ? true : undefined;
   const speakerId = params.speaker || undefined;
   const topicId = params.topic || undefined;
   const statusParam = params.status as 'published' | 'backlog' | 'archived' | undefined;
 
   // Non-authenticated users only see published talks (unless other filters are applied)
-  const status = user ? statusParam : statusParam || (featured === undefined && !speakerId && !topicId ? 'published' : undefined);
+  const status =
+    user
+      ? statusParam
+      : statusParam || (featured === undefined && !speakerId && !topicId ? 'published' : undefined);
 
-  // Fetch data
-  const [talks, speakers, topics] = await Promise.all([
-    getTalks({ featured, speakerId, status, topicId }),
+  // Fetch talks with pagination
+  const result = await getTalks({ cursor, featured, speakerId, status, topicId });
+
+  return (
+    <>
+      <TalksList talks={result.talks} />
+      <Pagination
+        continueCursor={result.continueCursor}
+        hasNextPage={!result.isDone}
+        hasPrevPage={!!cursor}
+      />
+    </>
+  );
+}
+
+export default async function TalksPage({ searchParams }: TalksPageProps) {
+  const params = await searchParams;
+  const user = await getAuthUser();
+
+  // Fetch filter data (not affected by pagination)
+  const [speakers, topics] = await Promise.all([
     getAllSpeakersForFilter(),
     getAllTopicsForFilter(),
   ]);
@@ -55,7 +78,9 @@ export default async function TalksPage({ searchParams }: TalksPageProps) {
         <TalksFilters isAuthenticated={!!user} speakers={speakers} topics={topics} />
       </div>
 
-      <TalksList talks={talks} />
+      <Suspense fallback={<TalksListSkeleton />}>
+        <TalksContent params={params} />
+      </Suspense>
     </MainLayout>
   );
 }

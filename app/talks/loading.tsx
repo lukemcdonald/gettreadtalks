@@ -1,7 +1,11 @@
-export default function TalksLoading() {
+import { TalksListSkeleton } from './_components';
+
+export default function Loading() {
   return (
-    <div className="p-8">
-      <div className="text-lg">Loading talks...</div>
+    <div className="space-y-6">
+      <div className="h-8 w-32 animate-pulse rounded bg-muted" />
+      <div className="h-10 w-full animate-pulse rounded bg-muted" />
+      <TalksListSkeleton />
     </div>
   );
 }
