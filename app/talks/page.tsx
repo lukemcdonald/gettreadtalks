@@ -1,9 +1,22 @@
-import { MainLayout } from '@/components/main-layout';
+import Link from 'next/link';
 
-export default function TalksPage() {
+import { MainLayout } from '@/components/main-layout';
+import { Button } from '@/components/ui/button';
+import { getAuthUser } from '@/lib/services/auth/server';
+
+export default async function TalksPage() {
+  const user = await getAuthUser();
+
   return (
     <MainLayout>
-      <h1>Talks</h1>
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Talks</h1>
+        {user && (
+          <Button asChild>
+            <Link href="/talks/new">New Talk</Link>
+          </Button>
+        )}
+      </div>
     </MainLayout>
   );
 }

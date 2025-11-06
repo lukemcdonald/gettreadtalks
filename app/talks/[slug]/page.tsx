@@ -1,7 +1,10 @@
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { MainLayout } from '@/components/main-layout';
+import { Button } from '@/components/ui/button';
 import { getTalkBySlug } from '@/lib/features/talks';
+import { getAuthUser } from '@/lib/services/auth/server';
 
 import { ClipsList } from './_components/clips-list';
 import { CollectionInfo } from './_components/collection-info';
@@ -18,7 +21,7 @@ interface TalkPageProps {
 
 export default async function TalkPage({ params }: TalkPageProps) {
   const { slug } = await params;
-  const talkData = await getTalkBySlug(slug);
+  const [talkData, user] = await Promise.all([getTalkBySlug(slug), getAuthUser()]);
 
   if (!talkData) {
     notFound();
@@ -30,7 +33,14 @@ export default async function TalkPage({ params }: TalkPageProps) {
     <MainLayout>
       <header className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold">{talk.title}</h1>
-        <FavoriteTalkButton talkId={talk._id} />
+        <div className="flex items-center gap-2">
+          {user && (
+            <Button asChild variant="outline">
+              <Link href={`/talks/${slug}/edit`}>Edit</Link>
+            </Button>
+          )}
+          <FavoriteTalkButton talkId={talk._id} />
+        </div>
       </header>
 
       <TalkDetails talk={talk} />

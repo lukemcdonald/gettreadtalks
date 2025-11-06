@@ -61,9 +61,22 @@ export function useMutation<Mutation extends FunctionReference<'mutation'>>(
         // Report to Sentry if enabled
         if (reportToSentry) {
           const errorCode = getErrorCode(error);
+          // Try to get mutation name from the function reference
+          let mutationName = 'unknown-mutation';
+          try {
+            // FunctionReference might have a path or name property
+            if (typeof mutation === 'object' && mutation !== null) {
+              const ref = mutation as Record<string, unknown>;
+              mutationName = (ref.path as string) || (ref.name as string) || String(mutation);
+            } else {
+              mutationName = String(mutation);
+            }
+          } catch {
+            mutationName = 'unknown-mutation';
+          }
           const eventId = captureException(errorObj, {
             context: {
-              mutation: mutation.toString(),
+              mutation: mutationName,
             },
             fingerprint: ['mutation', errorCode.toLowerCase().replace(/_/g, '-')],
             level: 'error',
