@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 
 import { MainLayout } from '@/components/main-layout';
 import { Button } from '@/components/ui/button';
@@ -28,6 +28,11 @@ export default async function TalkPage({ params }: TalkPageProps) {
   }
 
   const { talk, speaker, collection, clips, topics } = talkData;
+
+  // Access control: non-published talks require authentication
+  if (talk.status !== 'published' && !user) {
+    redirect(`/login?redirect=/talks/${slug}`);
+  }
 
   return (
     <MainLayout>
