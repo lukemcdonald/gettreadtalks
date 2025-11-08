@@ -2,7 +2,12 @@
 
 import type { User } from '@/lib/services/auth/types';
 
-import { CheckCircle2, Heart, LogOut, Settings } from 'lucide-react';
+import {
+  Heart as FavoritesIcon,
+  CheckCircle2 as FinishedIcon,
+  Settings as SettingsIcon,
+  LogOut as SignOutIcon,
+} from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -46,24 +51,26 @@ export function AccountMenu({ initialUser }: AccountMenuProps) {
     <Menu>
       <MenuTrigger render={<Button variant="outline" />}>Account</MenuTrigger>
       <MenuPopup>
-        <div className="px-2 py-1.5 text-xs text-muted-foreground">Signed in as</div>
-        <div className="px-2 pb-1.5 text-sm font-semibold">{user.email}</div>
+        <div className="flex flex-col px-2 py-1.5">
+          <span className="text-muted-foreground text-xs">Signed in as</span>
+          <span className="font-semibold text-foreground text-sm">{user.email}</span>
+        </div>
         <MenuSeparator />
         <MenuItem render={<Link href="/account/favorites" />}>
-          <Heart className="size-4" />
+          <FavoritesIcon className="size-4" />
           Favorites
         </MenuItem>
         <MenuItem render={<Link href="/account/finished" />}>
-          <CheckCircle2 className="size-4" />
+          <FinishedIcon className="size-4" />
           Finished
         </MenuItem>
         <MenuItem render={<Link href="/account" />}>
-          <Settings className="size-4" />
+          <SettingsIcon className="size-4" />
           Settings
         </MenuItem>
         <MenuSeparator />
         <MenuItem onClick={handleLogout}>
-          <LogOut className="size-4" />
+          <SignOutIcon className="size-4" />
           <span>Sign out</span>
         </MenuItem>
       </MenuPopup>

@@ -6,7 +6,7 @@ import { Inter } from 'next/font/google';
 
 import { AuthProvider } from '@/components/auth-provider';
 import { ErrorBoundary } from '@/components/error-boundary';
-import { SiteHeader } from '@/components/site-header';
+import { SiteHeader } from '@/components/site-header/site-header';
 import { ThemeProvider } from '@/components/theme-provider';
 
 import './_assets/css/styles.css';
@@ -33,7 +33,7 @@ export default async function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className="h-full">
-      <body className={cn(inter.className, 'bg-cover h-full')}>
+      <body className={cn(inter.className, 'h-full bg-cover')}>
         <ErrorBoundary>
           <ThemeProvider>
             <AuthProvider>

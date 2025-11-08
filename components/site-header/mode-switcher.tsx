@@ -5,8 +5,7 @@ import { useCallback } from 'react';
 import { useTheme } from 'next-themes';
 
 import { Button } from '@/components/ui/button';
-
-import { cn } from '../lib/utils';
+import { cn } from '@/lib/utils';
 
 export function ModeSwitcher() {
   const { setTheme, resolvedTheme } = useTheme();
@@ -41,7 +40,7 @@ const ModeSwitcherIcon = ({
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"
-      className={cn('size-4 -rotate-45', className)}
+      className={cn('-rotate-45 size-4', className)}
     >
       <title id="svgTitle">Mode Switcher</title>
       <path

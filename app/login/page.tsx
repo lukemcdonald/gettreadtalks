@@ -83,16 +83,16 @@ export default function LoginPage() {
     <MainLayout>
       <div className="m-auto max-w-md w-full space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-foreground">
             Welcome Back
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+          <p className="mt-2 text-center text-sm text-muted-foreground">
             Sign in to your account or create a new one
           </p>
         </div>
         <form className="mt-8 space-y-6">
           {error && (
-            <div className="bg-red-50 dark:bg-red-900 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-200 px-4 py-3 rounded">
+            <div className="bg-destructive/8 border border-destructive/32 text-destructive-foreground px-4 py-3 rounded">
               {error}
             </div>
           )}
@@ -100,7 +100,7 @@ export default function LoginPage() {
           <div className="space-y-4">
             <div>
               <label
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="block text-sm font-medium text-foreground"
                 htmlFor="email"
               >
                 Email address
@@ -108,7 +108,7 @@ export default function LoginPage() {
               <input
                 id={useId()}
                 autoComplete="email"
-                className="mt-1 appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 text-gray-900 dark:text-white bg-white dark:bg-gray-800 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10"
+                className="mt-1 appearance-none rounded-md relative block w-full px-3 py-2 border border-input placeholder-muted-foreground text-foreground bg-background focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring focus:z-10"
                 name="email"
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
@@ -119,7 +119,7 @@ export default function LoginPage() {
             </div>
             <div>
               <label
-                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="block text-sm font-medium text-foreground"
                 htmlFor="password"
               >
                 Password
@@ -127,7 +127,7 @@ export default function LoginPage() {
               <input
                 id={useId()}
                 autoComplete="current-password"
-                className="mt-1 appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 text-gray-900 dark:text-white bg-white dark:bg-gray-800 focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10"
+                className="mt-1 appearance-none rounded-md relative block w-full px-3 py-2 border border-input placeholder-muted-foreground text-foreground bg-background focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring focus:z-10"
                 name="password"
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
@@ -140,7 +140,7 @@ export default function LoginPage() {
 
           <div className="flex space-x-4">
             <button
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={isLoading || !email || !password}
               onClick={handleLogin}
               type="button"
@@ -148,7 +148,7 @@ export default function LoginPage() {
               {isLoading ? 'Signing in...' : 'Sign In'}
             </button>
             <button
-              className="group relative w-full flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="group relative w-full flex justify-center py-2 px-4 border border-border text-sm font-medium rounded-md text-foreground bg-background hover:bg-accent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={isLoading || !email || !password}
               onClick={handleRegister}
               type="button"

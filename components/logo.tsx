@@ -10,7 +10,7 @@ interface Props {
 
 const defaultColors = {
   tread: 'text-primary',
-  talks: 'text-gray-950 dark:text-gray-50',
+  talks: 'text-foreground',
 };
 
 function Logo({ className, colors = defaultColors }: Props) {
