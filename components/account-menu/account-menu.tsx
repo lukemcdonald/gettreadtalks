@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import { Menu, MenuItem, MenuPopup, MenuSeparator, MenuTrigger } from '@/components/ui/menu';
-import { useAuthUser } from '@/lib/features/users/hooks';
+import { useCurrentUser } from '@/lib/features/users/hooks';
 import { signOut } from '@/lib/services/auth/client';
 import { captureException } from '@/lib/services/errors/client';
 
@@ -17,7 +17,7 @@ interface AccountMenuProps {
 }
 
 export function AccountMenu({ initialUser }: AccountMenuProps) {
-  const { data: user } = useAuthUser(initialUser);
+  const { data: user } = useCurrentUser(initialUser);
   const router = useRouter();
 
   const handleLogout = async () => {

@@ -3,9 +3,9 @@ import type { api } from '@/convex/_generated/api';
 
 /**
  * Infer the user type from the Convex API
- * This automatically stays in sync with the actual return type of api.users.getAuthUser
+ * This automatically stays in sync with the actual return type of api.users.getCurrentUser
  */
-export type User = FunctionReturnType<typeof api.users.getAuthUser>;
+export type User = FunctionReturnType<typeof api.users.getCurrentUser>;
 
 /**
  * Non-null user type for when you know the user is authenticated

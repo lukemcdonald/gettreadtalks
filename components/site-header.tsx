@@ -3,10 +3,10 @@ import Link from 'next/link';
 import { AccountMenu } from '@/components/account-menu';
 import { Logo } from '@/components/logo';
 import { ModeSwitcher } from '@/components/mode-switcher';
-import { getAuthUser } from '@/lib/services/auth/server';
+import { getCurrentUser } from '@/lib/services/auth/server';
 
 export async function SiteHeader() {
-  const initialUser = await getAuthUser();
+  const initialUser = await getCurrentUser();
 
   return (
     <header className="text-center mb-12 sticky top-0 z-10 bg-background p-4 border-b-2 border-slate-200 dark:border-slate-800 flex flex-row justify-between items-center">

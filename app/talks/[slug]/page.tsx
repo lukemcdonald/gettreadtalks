@@ -1,10 +1,10 @@
 import Link from 'next/link';
-import { notFound, redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
 
 import { MainLayout } from '@/components/main-layout';
 import { Button } from '@/components/ui/button';
 import { getTalkBySlug } from '@/lib/features/talks';
-import { getAuthUser } from '@/lib/services/auth/server';
+import { getCurrentUser } from '@/lib/services/auth/server';
 
 import { ClipsList } from './_components/clips-list';
 import { CollectionInfo } from './_components/collection-info';
@@ -21,18 +21,13 @@ interface TalkPageProps {
 
 export default async function TalkPage({ params }: TalkPageProps) {
   const { slug } = await params;
-  const [talkData, user] = await Promise.all([getTalkBySlug(slug), getAuthUser()]);
+  const [talkData, user] = await Promise.all([getTalkBySlug(slug), getCurrentUser()]);
 
   if (!talkData) {
     notFound();
   }
 
   const { talk, speaker, collection, clips, topics } = talkData;
-
-  // Access control: non-published talks require authentication
-  if (talk.status !== 'published' && !user) {
-    redirect(`/login?redirect=/talks/${slug}`);
-  }
 
   return (
     <MainLayout>

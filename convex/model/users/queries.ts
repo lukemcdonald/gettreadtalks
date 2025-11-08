@@ -10,7 +10,7 @@ import { getUserFavoriteClips, getUserFavoriteSpeakers, getUserFavoriteTalks } f
  * @param ctx - Query context
  * @returns User object or null if not authenticated
  */
-export const getUser = query({
+export const getCurrentUser = query({
   args: {},
   handler: async (ctx) => {
     return await getAuthUser(ctx);
