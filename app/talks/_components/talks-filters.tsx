@@ -165,7 +165,7 @@ export function TalksFilters({
 
       {/* Fixed height loading indicator to prevent layout shift */}
       <div className="mt-2 h-5">
-        {isPending && <span className="text-sm text-muted-foreground">Updating...</span>}
+        {isPending && <span className="text-muted-foreground text-sm">Updating...</span>}
       </div>
     </div>
   );

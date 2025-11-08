@@ -54,9 +54,9 @@ function SheetPopup({
           side === 'right' &&
             'inset-y-0 right-0 h-full w-[calc(100%-(--spacing(12)))] max-w-sm data-ending-style:translate-x-full data-starting-style:translate-x-full',
           side === 'left' &&
-            'inset-y-0 left-0 h-full w-[calc(100%-(--spacing(12)))] max-w-sm data-ending-style:-translate-x-full data-starting-style:-translate-x-full',
+            'data-ending-style:-translate-x-full data-starting-style:-translate-x-full inset-y-0 left-0 h-full w-[calc(100%-(--spacing(12)))] max-w-sm',
           side === 'top' &&
-            'inset-x-0 top-0 h-auto data-ending-style:-translate-y-full data-starting-style:-translate-y-full',
+            'data-ending-style:-translate-y-full data-starting-style:-translate-y-full inset-x-0 top-0 h-auto',
           side === 'bottom' &&
             'inset-x-0 bottom-0 h-auto data-ending-style:translate-y-full data-starting-style:translate-y-full',
           className,
@@ -65,7 +65,7 @@ function SheetPopup({
       >
         {children}
         {showCloseButton && (
-          <SheetPrimitive.Close className="absolute end-2 top-2 inline-flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-md border border-transparent opacity-72 transition-[color,background-color,box-shadow,opacity] outline-none hover:opacity-100 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background pointer-coarse:after:absolute pointer-coarse:after:size-full pointer-coarse:after:min-h-11 pointer-coarse:after:min-w-11 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4">
+          <SheetPrimitive.Close className="absolute end-2 top-2 inline-flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-md border border-transparent opacity-72 outline-none transition-[color,background-color,box-shadow,opacity] pointer-coarse:after:absolute pointer-coarse:after:size-full pointer-coarse:after:min-h-11 pointer-coarse:after:min-w-11 hover:opacity-100 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0">
             <XIcon />
             <span className="sr-only">Close</span>
           </SheetPrimitive.Close>
@@ -109,7 +109,7 @@ function SheetDescription({ className, ...props }: SheetPrimitive.Description.Pr
   return (
     <SheetPrimitive.Description
       data-slot="sheet-description"
-      className={cn('text-sm text-muted-foreground', className)}
+      className={cn('text-muted-foreground text-sm', className)}
       {...props}
     />
   );

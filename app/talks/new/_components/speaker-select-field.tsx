@@ -38,7 +38,7 @@ export function SpeakerSelectField({ defaultValue, error, speakers }: SpeakerSel
           ))}
         </SelectPopup>
       </Select>
-      {error && <p className="mt-1 text-sm text-destructive">{error}</p>}
+      {error && <p className="mt-1 text-destructive text-sm">{error}</p>}
     </div>
   );
 }

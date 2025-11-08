@@ -22,7 +22,7 @@ function MeterLabel({ className, ...props }: MeterPrimitive.Label.Props) {
   return (
     <MeterPrimitive.Label
       data-slot="meter-label"
-      className={cn('text-sm font-medium', className)}
+      className={cn('font-medium text-sm', className)}
       {...props}
     />
   );

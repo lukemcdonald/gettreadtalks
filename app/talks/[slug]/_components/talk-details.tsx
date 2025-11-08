@@ -12,7 +12,7 @@ interface TalkDetailsProps {
 export function TalkDetails({ talk }: TalkDetailsProps) {
   return (
     <section className="mb-4">
-      <h2 className="text-lg font-bold">Talk Details</h2>
+      <h2 className="font-bold text-lg">Talk Details</h2>
       <p>
         <strong>Status:</strong> {talk.status}
       </p>

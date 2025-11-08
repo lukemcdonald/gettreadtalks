@@ -24,16 +24,16 @@ export function ErrorFallback({
     <div className="flex min-h-[400px] flex-col items-center justify-center p-8">
       <div className="max-w-md space-y-4 text-center">
         <div className="space-y-2">
-          <h2 className="text-2xl font-bold text-destructive">Something went wrong</h2>
+          <h2 className="font-bold text-2xl text-destructive">Something went wrong</h2>
           <p className="text-muted-foreground">
             We encountered an unexpected error. This has been reported to our team.
           </p>
           {eventId && (
             <div className="mt-3 rounded-md bg-muted p-3">
-              <p className="text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm">
                 Error ID: <span className="font-mono text-foreground">{eventId}</span>
               </p>
-              <p className="mt-1 text-xs text-muted-foreground">
+              <p className="mt-1 text-muted-foreground text-xs">
                 Please include this ID when contacting support
               </p>
             </div>
@@ -45,7 +45,7 @@ export function ErrorFallback({
             <summary className="cursor-pointer font-medium text-foreground">
               Error Details (Development Only)
             </summary>
-            <pre className="mt-2 overflow-auto text-xs text-muted-foreground">
+            <pre className="mt-2 overflow-auto text-muted-foreground text-xs">
               {error.message}
               {'\n\n'}
               {error.stack}

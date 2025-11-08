@@ -10,28 +10,28 @@ export default async function AccountPage() {
 
   return (
     <MainLayout>
-      <div className="bg-card shadow-xl rounded-lg">
-        <div className="px-6 py-8 border-b border-border">
+      <div className="rounded-lg bg-card shadow-xl">
+        <div className="border-border border-b px-6 py-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-card-foreground">Account Dashboard</h1>
-              <p className="text-muted-foreground mt-2">Welcome back, {user?.name || 'User'}!</p>
+              <h1 className="font-bold text-3xl text-card-foreground">Account Dashboard</h1>
+              <p className="mt-2 text-muted-foreground">Welcome back, {user?.name || 'User'}!</p>
             </div>
           </div>
         </div>
 
         <div className="px-6 py-8">
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid gap-8 md:grid-cols-2">
             <div>
-              <h2 className="text-xl font-semibold mb-4 text-card-foreground">
+              <h2 className="mb-4 font-semibold text-card-foreground text-xl">
                 Profile Information
               </h2>
-              <div className="bg-muted p-4 rounded-lg">
+              <div className="rounded-lg bg-muted p-4">
                 <div className="space-y-3">
                   <div>
                     <label
                       htmlFor="email"
-                      className="block text-sm font-medium text-muted-foreground"
+                      className="block font-medium text-muted-foreground text-sm"
                     >
                       Email
                     </label>
@@ -40,7 +40,7 @@ export default async function AccountPage() {
                   <div>
                     <label
                       htmlFor="name"
-                      className="block text-sm font-medium text-muted-foreground"
+                      className="block font-medium text-muted-foreground text-sm"
                     >
                       Name
                     </label>
@@ -49,19 +49,19 @@ export default async function AccountPage() {
                   <div>
                     <label
                       htmlFor="userId"
-                      className="block text-sm font-medium text-muted-foreground"
+                      className="block font-medium text-muted-foreground text-sm"
                     >
                       User ID
                     </label>
-                    <p className="text-muted-foreground font-mono text-sm">{user?._id}</p>
+                    <p className="font-mono text-muted-foreground text-sm">{user?._id}</p>
                   </div>
                 </div>
               </div>
             </div>
 
             <div>
-              <h2 className="text-xl font-semibold mb-4 text-card-foreground">Account Status</h2>
-              <div className="bg-success/8 text-success-foreground p-4 rounded-lg">
+              <h2 className="mb-4 font-semibold text-card-foreground text-xl">Account Status</h2>
+              <div className="rounded-lg bg-success/8 p-4 text-success-foreground">
                 <p className="font-semibold">Account Active</p>
                 <p>Your authentication is working correctly</p>
               </div>
@@ -70,36 +70,36 @@ export default async function AccountPage() {
         </div>
 
         <div className="px-6 py-8">
-          <div className="bg-card rounded-lg shadow-lg p-6">
-            <h2 className="text-2xl font-semibold mb-4 text-card-foreground">Your Favorites</h2>
+          <div className="rounded-lg bg-card p-6 shadow-lg">
+            <h2 className="mb-4 font-semibold text-2xl text-card-foreground">Your Favorites</h2>
             {favorites && (
               <div className="grid gap-4">
                 {favorites.talks.length > 0 && (
                   <div>
-                    <h3 className="text-lg font-medium mb-2 text-card-foreground">
+                    <h3 className="mb-2 font-medium text-card-foreground text-lg">
                       Favorite Talks ({favorites.talks.length})
                     </h3>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-muted-foreground text-sm">
                       You have {favorites.talks.length} favorite talks saved.
                     </p>
                   </div>
                 )}
                 {favorites.clips.length > 0 && (
                   <div>
-                    <h3 className="text-lg font-medium mb-2 text-card-foreground">
+                    <h3 className="mb-2 font-medium text-card-foreground text-lg">
                       Favorite Clips ({favorites.clips.length})
                     </h3>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-muted-foreground text-sm">
                       You have {favorites.clips.length} favorite clips saved.
                     </p>
                   </div>
                 )}
                 {favorites.speakers.length > 0 && (
                   <div>
-                    <h3 className="text-lg font-medium mb-2 text-card-foreground">
+                    <h3 className="mb-2 font-medium text-card-foreground text-lg">
                       Favorite Speakers ({favorites.speakers.length})
                     </h3>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-muted-foreground text-sm">
                       You have {favorites.speakers.length} favorite speakers saved.
                     </p>
                   </div>

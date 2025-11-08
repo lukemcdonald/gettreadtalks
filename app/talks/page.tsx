@@ -68,7 +68,7 @@ export default async function TalksPage({ searchParams }: TalksPageProps) {
   return (
     <MainLayout>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Talks</h1>
+        <h1 className="font-bold text-2xl">Talks</h1>
         {user && <Button render={<Link href="/talks/new" />}>New Talk</Button>}
       </div>
 

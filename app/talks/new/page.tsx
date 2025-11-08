@@ -17,7 +17,7 @@ export default async function NewTalkPage() {
 
   return (
     <MainLayout>
-      <h1 className="mb-6 text-2xl font-bold">Create New Talk</h1>
+      <h1 className="mb-6 font-bold text-2xl">Create New Talk</h1>
       <TalkForm collections={collections} speakers={speakers} />
     </MainLayout>
   );

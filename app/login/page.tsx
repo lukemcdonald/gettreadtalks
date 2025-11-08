@@ -81,34 +81,29 @@ export default function LoginPage() {
 
   return (
     <MainLayout>
-      <div className="m-auto max-w-md w-full space-y-8">
+      <div className="m-auto w-full max-w-md space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-foreground">
-            Welcome Back
-          </h2>
-          <p className="mt-2 text-center text-sm text-muted-foreground">
+          <h2 className="mt-6 text-center font-extrabold text-3xl text-foreground">Welcome Back</h2>
+          <p className="mt-2 text-center text-muted-foreground text-sm">
             Sign in to your account or create a new one
           </p>
         </div>
         <form className="mt-8 space-y-6">
           {error && (
-            <div className="bg-destructive/8 border border-destructive/32 text-destructive-foreground px-4 py-3 rounded">
+            <div className="rounded border border-destructive/32 bg-destructive/8 px-4 py-3 text-destructive-foreground">
               {error}
             </div>
           )}
 
           <div className="space-y-4">
             <div>
-              <label
-                className="block text-sm font-medium text-foreground"
-                htmlFor="email"
-              >
+              <label className="block font-medium text-foreground text-sm" htmlFor="email">
                 Email address
               </label>
               <input
                 id={useId()}
                 autoComplete="email"
-                className="mt-1 appearance-none rounded-md relative block w-full px-3 py-2 border border-input placeholder-muted-foreground text-foreground bg-background focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring focus:z-10"
+                className="relative mt-1 block w-full appearance-none rounded-md border border-input bg-background px-3 py-2 text-foreground placeholder-muted-foreground focus:z-10 focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
                 name="email"
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
@@ -118,16 +113,13 @@ export default function LoginPage() {
               />
             </div>
             <div>
-              <label
-                className="block text-sm font-medium text-foreground"
-                htmlFor="password"
-              >
+              <label className="block font-medium text-foreground text-sm" htmlFor="password">
                 Password
               </label>
               <input
                 id={useId()}
                 autoComplete="current-password"
-                className="mt-1 appearance-none rounded-md relative block w-full px-3 py-2 border border-input placeholder-muted-foreground text-foreground bg-background focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring focus:z-10"
+                className="relative mt-1 block w-full appearance-none rounded-md border border-input bg-background px-3 py-2 text-foreground placeholder-muted-foreground focus:z-10 focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
                 name="password"
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
@@ -140,7 +132,7 @@ export default function LoginPage() {
 
           <div className="flex space-x-4">
             <button
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
+              className="group relative flex w-full justify-center rounded-md border border-transparent bg-primary px-4 py-2 font-medium text-primary-foreground text-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               disabled={isLoading || !email || !password}
               onClick={handleLogin}
               type="button"
@@ -148,7 +140,7 @@ export default function LoginPage() {
               {isLoading ? 'Signing in...' : 'Sign In'}
             </button>
             <button
-              className="group relative w-full flex justify-center py-2 px-4 border border-border text-sm font-medium rounded-md text-foreground bg-background hover:bg-accent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
+              className="group relative flex w-full justify-center rounded-md border border-border bg-background px-4 py-2 font-medium text-foreground text-sm hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               disabled={isLoading || !email || !password}
               onClick={handleRegister}
               type="button"
