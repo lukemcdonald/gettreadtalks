@@ -2,12 +2,12 @@ import { redirect } from 'next/navigation';
 
 import { MainLayout } from '@/components/main-layout';
 import { getAllCollections, getAllSpeakers } from '@/lib/features/talks';
-import { getAuthUser } from '@/lib/services/auth/server';
+import { getCurrentUser } from '@/lib/services/auth/server';
 
 import { TalkForm } from './_components';
 
 export default async function NewTalkPage() {
-  const user = await getAuthUser();
+  const user = await getCurrentUser();
 
   if (!user) {
     redirect('/login?redirect=/talks/new');

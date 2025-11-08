@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { MainLayout } from '@/components/main-layout';
 import { Button } from '@/components/ui/button';
 import { getAllSpeakersForFilter, getAllTopicsForFilter, getTalks } from '@/lib/features/talks';
-import { getAuthUser } from '@/lib/services/auth/server';
+import { getCurrentUser } from '@/lib/services/auth/server';
 
 import {
   ActiveFilters,
@@ -29,7 +29,7 @@ interface TalksPageProps {
 }
 
 async function TalksContent({ params }: { params: Awaited<TalksPageProps['searchParams']> }) {
-  const user = await getAuthUser();
+  const user = await getCurrentUser();
 
   const cursor = params.cursor || undefined;
   const featured = params.featured === 'true' ? true : undefined;
@@ -57,7 +57,7 @@ async function TalksContent({ params }: { params: Awaited<TalksPageProps['search
 
 export default async function TalksPage({ searchParams }: TalksPageProps) {
   const params = await searchParams;
-  const user = await getAuthUser();
+  const user = await getCurrentUser();
 
   // Fetch filter data (not affected by pagination)
   const [speakers, topics] = await Promise.all([

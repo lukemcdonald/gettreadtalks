@@ -2,10 +2,10 @@
 
 import { MainLayout } from '@/components/main-layout';
 import { getUserFavorites } from '@/lib/features/users/server';
-import { getAuthUser } from '@/lib/services/auth/server';
+import { getCurrentUser } from '@/lib/services/auth/server';
 
 export default async function AccountPage() {
-  const user = await getAuthUser();
+  const user = await getCurrentUser();
   const favorites = await getUserFavorites();
 
   return (

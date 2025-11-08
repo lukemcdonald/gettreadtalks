@@ -2,7 +2,7 @@ import { notFound, redirect } from 'next/navigation';
 
 import { MainLayout } from '@/components/main-layout';
 import { getAllCollections, getAllSpeakers, getTalkBySlug } from '@/lib/features/talks';
-import { getAuthUser } from '@/lib/services/auth/server';
+import { getCurrentUser } from '@/lib/services/auth/server';
 
 import { TalkForm } from '../../new/_components';
 
@@ -13,7 +13,7 @@ interface EditTalkPageProps {
 }
 
 export default async function EditTalkPage({ params }: EditTalkPageProps) {
-  const user = await getAuthUser();
+  const user = await getCurrentUser();
 
   if (!user) {
     redirect('/login?redirect=/talks/[slug]/edit');

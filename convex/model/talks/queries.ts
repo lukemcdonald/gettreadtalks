@@ -7,6 +7,7 @@ import { getManyFrom, getManyVia, getOneFrom } from 'convex-helpers/server/relat
 
 import { query } from '../../_generated/server';
 import { doc, docs } from '../../lib/validators/schema';
+import { getCurrentUser } from '../auth/utils';
 import { statusType } from './validators';
 
 /**
@@ -55,9 +56,15 @@ export const getTalkBySlugWithRelations = query({
     slug: v.string(),
   },
   handler: async (ctx, args) => {
+    const user = await getCurrentUser(ctx);
     const talk = await getOneFrom(ctx.db, 'talks', 'by_slug', args.slug);
 
     if (!talk) {
+      return null;
+    }
+
+    // Unauthenticated users can only view published talks
+    if (!user && talk.status !== 'published') {
       return null;
     }
 

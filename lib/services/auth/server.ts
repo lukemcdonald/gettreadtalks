@@ -28,14 +28,14 @@ export const getAuthToken = async () => {
  *
  * @returns User object or null if not authenticated
  */
-export const getAuthUser = async () => {
+export const getCurrentUser = async () => {
   const token = await getAuthToken();
 
   if (!token) {
     return null;
   }
 
-  return await fetchQuery(api.users.getAuthUser, {}, { token });
+  return await fetchQuery(api.users.getCurrentUser, {}, { token });
 };
 
 /**
@@ -45,8 +45,8 @@ export const getAuthUser = async () => {
  * @param redirectTo - URL to redirect to if not authenticated (default: '/login')
  * @returns User object
  */
-export const requireAuthUser = async (redirectTo: Route<string> = '/login') => {
-  const user = await getAuthUser();
+export const requireCurrentUser = async (redirectTo: Route<string> = '/login') => {
+  const user = await getCurrentUser();
 
   if (!user) {
     redirect(redirectTo);

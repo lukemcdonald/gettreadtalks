@@ -12,14 +12,13 @@ import { api } from '@/convex/_generated/api';
  * @param initialData - Optional SSR user data to prevent layout shift
  * @returns { data, isLoading }
  */
-export function useAuthUser(initialData?: User) {
-  const data = useQuery(api.users.getAuthUser);
+export function useCurrentUser(initialData?: User) {
+  const data = useQuery(api.users.getCurrentUser);
 
   const user = data ?? initialData;
   const isLoading = data === undefined && initialData === undefined;
 
   return {
-    // !Note: Maybe return user or currentUser or authUser?
     data: user,
     isLoading,
   };
