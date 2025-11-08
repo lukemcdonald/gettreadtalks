@@ -51,7 +51,7 @@ export function AccountMenu({ initialUser }: AccountMenuProps) {
     <Menu>
       <MenuTrigger render={<Button variant="outline" />}>Account</MenuTrigger>
       <MenuPopup>
-        <div className="flex flex-col px-2 py-1.5">
+        <div className="flex flex-col px-2 pt-1">
           <span className="text-muted-foreground text-xs">Signed in as</span>
           <span className="font-semibold text-foreground text-sm">{user.email}</span>
         </div>

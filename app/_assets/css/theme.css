@@ -1,5 +1,18 @@
 @custom-variant dark (&:is(.dark *));
 
+/**
+ * Preserve Tailwind V3 border color
+ * https://tailwindcss.com/docs/upgrade-guide#default-border-color
+ */
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop {
+    border-color: var(--color-border, currentColor);
+  }
+}
+
 @theme inline {
   /** Brand */
   --color-primary: var(--primary);
@@ -8,7 +21,11 @@
   --color-secondary-foreground: var(--secondary-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
 
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-info: var(--info);
@@ -19,11 +36,8 @@
   --color-warning-foreground: var(--warning-foreground);
 
   /** General */
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-border: var(--border);
   --color-ring: var(--ring);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
   --font-sans: var(--font-inter-sans);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -31,7 +45,6 @@
   --radius-xl: calc(var(--radius) + 4px);
 
   /** UI */
-  --color-border: var(--border);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-chart-1: var(--chart-1);
@@ -43,15 +56,13 @@
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
   --color-ring: var(--ring);
-
-  /** Component Colors */
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
   --color-sidebar-accent: var(--sidebar-accent);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
   --color-sidebar-ring: var(--sidebar-ring);
 
   /** Animations */
