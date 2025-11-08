@@ -15,13 +15,7 @@ export function ModeSwitcher() {
   }, [resolvedTheme, setTheme]);
 
   return (
-    <Button
-      variant="ghost"
-      size="icon"
-      className="relative size-8"
-      onClick={toggleTheme}
-      title="Toggle theme"
-    >
+    <Button variant="ghost" size="icon-lg" onClick={toggleTheme} title="Toggle theme">
       <ModeSwitcherIcon />
       <span className="sr-only">Toggle theme</span>
     </Button>
@@ -40,7 +34,7 @@ const ModeSwitcherIcon = ({
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"
-      className={cn('-rotate-45 size-4', className)}
+      className={cn('-rotate-45 size-6 transition-all', className)}
     >
       <title id="svgTitle">Mode Switcher</title>
       <path

@@ -3,6 +3,7 @@
 import type { User } from '@/lib/services/auth/types';
 
 import {
+  ArrowRight as ArrowRightIcon,
   Heart as FavoritesIcon,
   CheckCircle2 as FinishedIcon,
   Settings as SettingsIcon,
@@ -11,8 +12,10 @@ import {
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+import { AccountMenuAvatar } from '@/components/site-header/account-menu/account-menu-avatar';
+import { AccountMenuItem } from '@/components/site-header/account-menu/account-menu-item';
 import { Button } from '@/components/ui/button';
-import { Menu, MenuItem, MenuPopup, MenuSeparator, MenuTrigger } from '@/components/ui/menu';
+import { Menu, MenuPopup, MenuSeparator, MenuTrigger } from '@/components/ui/menu';
 import { useCurrentUser } from '@/lib/features/users/hooks';
 import { signOut } from '@/lib/services/auth/client';
 import { captureException } from '@/lib/services/errors/client';
@@ -38,41 +41,29 @@ export function AccountMenu({ initialUser }: AccountMenuProps) {
 
   if (!user) {
     return (
-      <Menu>
-        <MenuTrigger render={<Button variant="outline" />}>Account</MenuTrigger>
-        <MenuPopup>
-          <MenuItem render={<Link href="/login" />}>Login</MenuItem>
-        </MenuPopup>
-      </Menu>
+      <Link href="/login">
+        Sign In
+        <ArrowRightIcon className="size-4" />
+      </Link>
     );
   }
 
   return (
-    <Menu>
-      <MenuTrigger render={<Button variant="outline" />}>Account</MenuTrigger>
+    <Menu openOnHover>
+      <MenuTrigger render={<Button variant="ghost" size="icon-lg" />} className="p-0 outline-0">
+        <AccountMenuAvatar user={user} />
+      </MenuTrigger>
       <MenuPopup>
         <div className="flex flex-col px-2 pt-1">
           <span className="text-muted-foreground text-xs">Signed in as</span>
           <span className="font-semibold text-foreground text-sm">{user.email}</span>
         </div>
         <MenuSeparator />
-        <MenuItem render={<Link href="/account/favorites" />}>
-          <FavoritesIcon className="size-4" />
-          Favorites
-        </MenuItem>
-        <MenuItem render={<Link href="/account/finished" />}>
-          <FinishedIcon className="size-4" />
-          Finished
-        </MenuItem>
-        <MenuItem render={<Link href="/account" />}>
-          <SettingsIcon className="size-4" />
-          Settings
-        </MenuItem>
+        <AccountMenuItem href="/account/favorites" icon={FavoritesIcon} label="Favorites" />
+        <AccountMenuItem href="/account/finished" icon={FinishedIcon} label="Finished" />
+        <AccountMenuItem href="/account" icon={SettingsIcon} label="Settings" />
         <MenuSeparator />
-        <MenuItem onClick={handleLogout}>
-          <SignOutIcon className="size-4" />
-          <span>Sign out</span>
-        </MenuItem>
+        <AccountMenuItem onClick={handleLogout} icon={SignOutIcon} label="Sign out" />
       </MenuPopup>
     </Menu>
   );

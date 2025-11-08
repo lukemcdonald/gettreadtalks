@@ -4,7 +4,7 @@ import { SecondaryNav } from '@/components/site-header/secondary-nav';
 
 export function SiteHeader() {
   return (
-    <header className="mb-12 flex flex-row items-center justify-between gap-3 p-4 text-center">
+    <header className="mb-12 flex flex-row items-center justify-between gap-2 p-4 text-center">
       <SiteBranding />
       <PrimaryNav />
       <SecondaryNav />

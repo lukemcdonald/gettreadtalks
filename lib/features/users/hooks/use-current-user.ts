@@ -15,7 +15,9 @@ import { api } from '@/convex/_generated/api';
 export function useCurrentUser(initialData?: User) {
   const data = useQuery(api.users.getCurrentUser);
 
-  const user = data ?? initialData;
+  // Only use initialData when query hasn't loaded yet (undefined)
+  // Once query has loaded (null or user object), use that value
+  const user = data === undefined ? initialData : data;
   const isLoading = data === undefined && initialData === undefined;
 
   return {

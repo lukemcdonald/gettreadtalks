@@ -45,6 +45,9 @@ importers:
       convex-helpers:
         specifier: ^0.1.104
         version: 0.1.104(@standard-schema/spec@1.0.0)(convex@1.28.2(react@19.2.0))(react@19.2.0)(typescript@5.9.3)(zod@4.1.12)
+      js-sha256:
+        specifier: ^0.11.1
+        version: 0.11.1
       lucide-react:
         specifier: ^0.553.0
         version: 0.553.0(react@19.2.0)
@@ -2430,6 +2433,9 @@ packages:
 
   jose@6.1.0:
     resolution: {integrity: sha512-TTQJyoEoKcC1lscpVDCSsVgYzUDg/0Bt3WE//WiTPK6uOCQC2KZS4MpugbMWt/zyjkopgZoXhZuCi00gLudfUA==}
+
+  js-sha256@0.11.1:
+    resolution: {integrity: sha512-o6WSo/LUvY2uC4j7mO50a2ms7E/EAdbP0swigLV+nzHKTTaYnaLIWJ02VdXrsJX0vGedDESQnLsOekr94ryfjg==}
 
   js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
@@ -5921,6 +5927,8 @@ snapshots:
       '@standard-schema/spec': 1.0.0
 
   jose@6.1.0: {}
+
+  js-sha256@0.11.1: {}
 
   js-tokens@4.0.0: {}
 
