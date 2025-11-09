@@ -2,14 +2,21 @@
 
 import type { Id } from '@/convex/_generated/dataModel';
 
-import { X } from 'lucide-react';
+import { X as RemoveIcon } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 
 interface ActiveFiltersProps {
-  speakers: Array<{ _id: Id<'speakers'>; firstName: string; lastName: string }>;
-  topics: Array<{ _id: Id<'topics'>; title: string }>;
+  speakers: Array<{
+    _id: Id<'speakers'>;
+    firstName: string;
+    lastName: string;
+  }>;
+  topics: Array<{
+    _id: Id<'topics'>;
+    title: string;
+  }>;
 }
 
 export function ActiveFilters({ speakers, topics }: ActiveFiltersProps) {
@@ -54,7 +61,7 @@ export function ActiveFilters({ speakers, topics }: ActiveFiltersProps) {
           type="button"
         >
           Featured
-          <X className="size-3" />
+          <RemoveIcon className="size-3" />
         </button>
       )}
 
@@ -65,7 +72,7 @@ export function ActiveFilters({ speakers, topics }: ActiveFiltersProps) {
           type="button"
         >
           {speaker.firstName} {speaker.lastName}
-          <X className="size-3" />
+          <RemoveIcon className="size-3" />
         </button>
       )}
 
@@ -76,7 +83,7 @@ export function ActiveFilters({ speakers, topics }: ActiveFiltersProps) {
           type="button"
         >
           {topic.title}
-          <X className="size-3" />
+          <RemoveIcon className="size-3" />
         </button>
       )}
 
@@ -87,7 +94,7 @@ export function ActiveFilters({ speakers, topics }: ActiveFiltersProps) {
           type="button"
         >
           {status.charAt(0).toUpperCase() + status.slice(1)}
-          <X className="size-3" />
+          <RemoveIcon className="size-3" />
         </button>
       )}
 

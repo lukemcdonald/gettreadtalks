@@ -3,7 +3,6 @@
 import type { Id } from '@/convex/_generated/dataModel';
 
 import { useTransition } from 'react';
-
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { Checkbox } from '@/components/ui/checkbox';
@@ -81,66 +80,64 @@ export function TalksFilters({
 
   return (
     <div className="relative">
-      <div className="flex flex-wrap items-center gap-4">
-        <div className="flex items-center gap-2">
-          <Checkbox
-            checked={featured}
-            disabled={isPending}
-            id="featured"
-            onCheckedChange={(checked) => updateFilter('featured', checked === true)}
-          />
-          <Label className="cursor-pointer" htmlFor="featured">
-            Featured
-          </Label>
-        </div>
+      <div className="flex flex-wrap items-center gap-2">
+        {speakerItems.length > 1 && (
+          <div className="flex items-center gap-2">
+            <Label className="sr-only" htmlFor="speaker">
+              Speaker:
+            </Label>
+            <Select
+              defaultValue={speakerId}
+              disabled={isPending}
+              items={speakerItems}
+              onValueChange={(value) => updateFilter('speaker', value as string)}
+              value={speakerId}
+            >
+              <SelectTrigger className="w-48" id="speaker">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectPopup>
+                {speakerItems.map((item) => (
+                  <SelectItem key={item.value || 'all'} value={item.value}>
+                    {item.label}
+                  </SelectItem>
+                ))}
+              </SelectPopup>
+            </Select>
+          </div>
+        )}
 
-        <div className="flex items-center gap-2">
-          <Label htmlFor="speaker">Speaker:</Label>
-          <Select
-            defaultValue={speakerId}
-            disabled={isPending}
-            items={speakerItems}
-            onValueChange={(value) => updateFilter('speaker', value as string)}
-            value={speakerId}
-          >
-            <SelectTrigger className="w-48" id="speaker">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectPopup>
-              {speakerItems.map((item) => (
-                <SelectItem key={item.value || 'all'} value={item.value}>
-                  {item.label}
-                </SelectItem>
-              ))}
-            </SelectPopup>
-          </Select>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Label htmlFor="topic">Topic:</Label>
-          <Select
-            defaultValue={topicId}
-            disabled={isPending}
-            items={topicItems}
-            onValueChange={(value) => updateFilter('topic', value as string)}
-            value={topicId}
-          >
-            <SelectTrigger className="w-48" id="topic">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectPopup>
-              {topicItems.map((item) => (
-                <SelectItem key={item.value || 'all'} value={item.value}>
-                  {item.label}
-                </SelectItem>
-              ))}
-            </SelectPopup>
-          </Select>
-        </div>
+        {topicItems.length > 1 && (
+          <div className="flex items-center gap-2">
+            <Label className="sr-only" htmlFor="topic">
+              Topic:
+            </Label>
+            <Select
+              defaultValue={topicId}
+              disabled={isPending}
+              items={topicItems}
+              onValueChange={(value) => updateFilter('topic', value as string)}
+              value={topicId}
+            >
+              <SelectTrigger className="w-48" id="topic">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectPopup>
+                {topicItems.map((item) => (
+                  <SelectItem key={item.value || 'all'} value={item.value}>
+                    {item.label}
+                  </SelectItem>
+                ))}
+              </SelectPopup>
+            </Select>
+          </div>
+        )}
 
         {isAuthenticated && (
           <div className="flex items-center gap-2">
-            <Label htmlFor="status">Status:</Label>
+            <Label className="sr-only" htmlFor="status">
+              Status:
+            </Label>
             <Select
               defaultValue={status}
               disabled={isPending}
@@ -161,6 +158,18 @@ export function TalksFilters({
             </Select>
           </div>
         )}
+
+        <div className="flex items-center gap-2">
+          <Checkbox
+            checked={featured}
+            disabled={isPending}
+            id="featured"
+            onCheckedChange={(checked) => updateFilter('featured', checked === true)}
+          />
+          <Label className="cursor-pointer" htmlFor="featured">
+            Featured
+          </Label>
+        </div>
       </div>
 
       {/* Fixed height loading indicator to prevent layout shift */}
