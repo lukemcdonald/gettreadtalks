@@ -1,5 +1,6 @@
 'use client';
 
+import type { Route } from 'next';
 import type { User } from '@/lib/services/auth/types';
 
 import {
@@ -9,7 +10,6 @@ import {
   Settings as SettingsIcon,
   LogOut as SignOutIcon,
 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 
 import { AccountMenuAvatar } from '@/components/site-header/account-menu/account-menu-avatar';
 import { AccountMenuItem } from '@/components/site-header/account-menu/account-menu-item';
@@ -17,8 +17,6 @@ import { NavLink } from '@/components/site-header/nav-link';
 import { Button } from '@/components/ui/button';
 import { Menu, MenuPopup, MenuSeparator, MenuTrigger } from '@/components/ui/menu';
 import { useCurrentUser } from '@/lib/features/users/hooks';
-import { signOut } from '@/lib/services/auth/client';
-import { captureException } from '@/lib/services/errors/client';
 
 interface AccountMenuProps {
   initialUser?: User;
@@ -26,18 +24,6 @@ interface AccountMenuProps {
 
 export function AccountMenu({ initialUser }: AccountMenuProps) {
   const { data: user } = useCurrentUser(initialUser);
-  const router = useRouter();
-
-  const handleLogout = async () => {
-    try {
-      await signOut();
-      router.push('/');
-    } catch (error) {
-      captureException(error, {
-        fingerprint: ['auth', 'logout'],
-      });
-    }
-  };
 
   if (!user) {
     return (
@@ -50,7 +36,7 @@ export function AccountMenu({ initialUser }: AccountMenuProps) {
 
   return (
     <Menu openOnHover>
-      <MenuTrigger render={<Button variant="ghost" size="icon-lg" />} className="p-0 outline-0">
+      <MenuTrigger render={<Button variant="ghost" size="icon-lg" className="size-10" />}>
         <AccountMenuAvatar user={user} />
       </MenuTrigger>
       <MenuPopup>
@@ -63,7 +49,7 @@ export function AccountMenu({ initialUser }: AccountMenuProps) {
         <AccountMenuItem href="/account/finished" icon={FinishedIcon} label="Finished" />
         <AccountMenuItem href="/account" icon={SettingsIcon} label="Settings" />
         <MenuSeparator />
-        <AccountMenuItem onClick={handleLogout} icon={SignOutIcon} label="Sign out" />
+        <AccountMenuItem href={'/logout' as Route} icon={SignOutIcon} label="Sign out" />
       </MenuPopup>
     </Menu>
   );
