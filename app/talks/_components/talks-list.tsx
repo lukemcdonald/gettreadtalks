@@ -4,6 +4,8 @@ import type { Doc } from '@/convex/_generated/dataModel';
 
 import Link from 'next/link';
 
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+
 interface TalksListProps {
   talks: Doc<'talks'>[];
 }
@@ -20,21 +22,13 @@ export function TalksList({ talks }: TalksListProps) {
   return (
     <div className="space-y-4">
       {talks.map((talk) => (
-        <Link
-          className="block rounded-lg border p-4 transition-colors hover:bg-accent"
-          href={`/talks/${talk.slug}`}
-          key={talk._id}
-        >
+        <Card render={<Link href={`/talks/${talk.slug}`} />} key={talk._id}>
           <div className="flex items-start justify-between gap-4">
-            <div className="flex-1">
-              <h2 className="font-semibold">{talk.title}</h2>
-              {talk.description && (
-                <p className="mt-1 line-clamp-2 text-muted-foreground text-sm">
-                  {talk.description}
-                </p>
-              )}
-            </div>
-            <div className="flex items-center gap-2">
+            <CardHeader className="flex-1">
+              <CardTitle>{talk.title}</CardTitle>
+              {talk.description && <CardDescription>{talk.description}</CardDescription>}
+            </CardHeader>
+            <CardContent className="flex items-center gap-2">
               {talk.featured && (
                 <span className="rounded bg-primary/10 px-2 py-1 font-medium text-primary text-xs">
                   Featured
@@ -59,9 +53,9 @@ export function TalksList({ talks }: TalksListProps) {
               >
                 {talk.status}
               </span>
-            </div>
+            </CardContent>
           </div>
-        </Link>
+        </Card>
       ))}
     </div>
   );

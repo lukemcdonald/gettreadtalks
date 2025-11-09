@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 
 import { Suspense } from 'react';
-
 import { Inter } from 'next/font/google';
 
 import { AuthProvider } from '@/components/auth-provider';
@@ -33,7 +32,7 @@ export default async function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className="h-full">
-      <body className={cn(inter.className, 'h-full bg-cover')}>
+      <body className={cn(inter.className, 'h-full bg-cover bg-gray-100 dark:bg-gray-950')}>
         <ErrorBoundary>
           <ThemeProvider>
             <AuthProvider>

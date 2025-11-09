@@ -1,18 +1,26 @@
 import type * as React from 'react';
 
+import { mergeProps } from '@base-ui-components/react/merge-props';
+import { useRender } from '@base-ui-components/react/use-render';
+
 import { cn } from '@/lib/utils';
 
-function Card({ className, ...props }: React.ComponentProps<'div'>) {
-  return (
-    <div
-      data-slot="card"
-      className={cn(
-        'relative flex flex-col gap-6 rounded-2xl border bg-card bg-clip-padding py-6 text-card-foreground shadow-xs before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-2xl)-1px)] before:shadow-[0_1px_--theme(--color-black/4%)] dark:bg-clip-border dark:before:shadow-[0_-1px_--theme(--color-white/8%)]',
-        className,
-      )}
-      {...props}
-    />
-  );
+interface CardProps extends useRender.ComponentProps<'div'> {}
+
+function Card({ className, render, ...props }: CardProps) {
+  const defaultProps = {
+    'data-slot': 'card',
+    className: cn(
+      'relative flex flex-col gap-6 rounded-2xl border bg-card bg-clip-padding py-6 text-card-foreground shadow-xs before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-2xl)-1px)] before:shadow-[0_1px_--theme(--color-black/4%)] dark:bg-clip-border dark:before:shadow-[0_-1px_--theme(--color-white/8%)]',
+      className,
+    ),
+  };
+
+  return useRender({
+    defaultTagName: 'div',
+    render,
+    props: mergeProps<'div'>(defaultProps, props),
+  });
 }
 
 function CardHeader({ className, ...props }: React.ComponentProps<'div'>) {

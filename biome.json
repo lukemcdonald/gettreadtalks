@@ -65,11 +65,9 @@
               { "type": true },
               ":BLANK_LINE:",
               "react",
-              ":BLANK_LINE:",
               ["builtin", ":PACKAGE:"],
               ":BLANK_LINE:",
               "@/**",
-              ":BLANK_LINE:",
               "../**",
               "./**"
             ],
