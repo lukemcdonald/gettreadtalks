@@ -6,9 +6,9 @@ export async function SecondaryNav() {
   const initialUser = await getCurrentUser();
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center">
       <AccountMenu initialUser={initialUser} />
-      <ModeSwitcher />
+      <ModeSwitcher className="size-10" />
     </div>
   );
 }

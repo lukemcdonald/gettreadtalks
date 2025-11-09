@@ -9,11 +9,11 @@ import {
   Settings as SettingsIcon,
   LogOut as SignOutIcon,
 } from 'lucide-react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { AccountMenuAvatar } from '@/components/site-header/account-menu/account-menu-avatar';
 import { AccountMenuItem } from '@/components/site-header/account-menu/account-menu-item';
+import { NavLink } from '@/components/site-header/nav-link';
 import { Button } from '@/components/ui/button';
 import { Menu, MenuPopup, MenuSeparator, MenuTrigger } from '@/components/ui/menu';
 import { useCurrentUser } from '@/lib/features/users/hooks';
@@ -34,17 +34,17 @@ export function AccountMenu({ initialUser }: AccountMenuProps) {
       router.push('/');
     } catch (error) {
       captureException(error, {
-        fingerprint: ['auth', 'logout', 'client-error'],
+        fingerprint: ['auth', 'logout'],
       });
     }
   };
 
   if (!user) {
     return (
-      <Link href="/login">
-        Sign In
+      <NavLink href="/login" isActive={false}>
+        <span>Sign In</span>
         <ArrowRightIcon className="size-4" />
-      </Link>
+      </NavLink>
     );
   }
 

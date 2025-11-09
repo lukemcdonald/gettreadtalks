@@ -7,15 +7,21 @@ import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
-export function ModeSwitcher() {
-  const { setTheme, resolvedTheme } = useTheme();
+export function ModeSwitcher({ className }: { className?: string }) {
+  const { resolvedTheme, setTheme } = useTheme();
 
   const toggleTheme = useCallback(() => {
     setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
   }, [resolvedTheme, setTheme]);
 
   return (
-    <Button variant="ghost" size="icon-lg" onClick={toggleTheme} title="Toggle theme">
+    <Button
+      className={className}
+      onClick={toggleTheme}
+      size="icon-lg"
+      title="Toggle theme"
+      variant="ghost"
+    >
       <ModeSwitcherIcon />
       <span className="sr-only">Toggle theme</span>
     </Button>

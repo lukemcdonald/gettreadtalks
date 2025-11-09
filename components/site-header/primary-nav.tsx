@@ -1,4 +1,8 @@
-import { PrimaryNavLink } from '@/components/site-header/primary-nav-link';
+'use client';
+
+import { usePathname } from 'next/navigation';
+
+import { NavLink } from '@/components/site-header/nav-link';
 
 const NAVIGATION_LINKS = [
   { label: 'Talks', href: '/talks' },
@@ -8,12 +12,14 @@ const NAVIGATION_LINKS = [
 ] as const;
 
 export function PrimaryNav() {
+  const pathname = usePathname();
+
   return (
     <nav className="flex items-center">
       {NAVIGATION_LINKS.map((link) => (
-        <PrimaryNavLink key={link.href} href={link.href}>
+        <NavLink key={link.href} href={link.href} isActive={link.href === pathname}>
           {link.label}
-        </PrimaryNavLink>
+        </NavLink>
       ))}
     </nav>
   );
