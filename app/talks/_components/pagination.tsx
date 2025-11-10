@@ -27,7 +27,7 @@ export function Pagination({ continueCursor, hasNextPage, hasPrevPage }: Paginat
     router.push(query ? `/talks?${query}` : '/talks');
   };
 
-  if (!hasNextPage && !hasPrevPage) {
+  if (!(hasNextPage || hasPrevPage)) {
     return null;
   }
 

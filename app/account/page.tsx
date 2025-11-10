@@ -30,8 +30,8 @@ export default async function AccountPage() {
                 <div className="space-y-3">
                   <div>
                     <label
-                      htmlFor="email"
                       className="block font-medium text-muted-foreground text-sm"
+                      htmlFor="email"
                     >
                       Email
                     </label>
@@ -39,8 +39,8 @@ export default async function AccountPage() {
                   </div>
                   <div>
                     <label
-                      htmlFor="name"
                       className="block font-medium text-muted-foreground text-sm"
+                      htmlFor="name"
                     >
                       Name
                     </label>
@@ -48,8 +48,8 @@ export default async function AccountPage() {
                   </div>
                   <div>
                     <label
-                      htmlFor="userId"
                       className="block font-medium text-muted-foreground text-sm"
+                      htmlFor="userId"
                     >
                       User ID
                     </label>

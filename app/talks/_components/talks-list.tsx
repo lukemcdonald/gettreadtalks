@@ -22,7 +22,7 @@ export function TalksList({ talks }: TalksListProps) {
   return (
     <div className="space-y-4">
       {talks.map((talk) => (
-        <Card render={<Link href={`/talks/${talk.slug}`} />} key={talk._id}>
+        <Card key={talk._id} render={<Link href={`/talks/${talk.slug}`} />}>
           <div className="flex items-start justify-between gap-4">
             <CardHeader className="flex-1">
               <CardTitle>{talk.title}</CardTitle>

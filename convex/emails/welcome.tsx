@@ -20,7 +20,7 @@ export function WelcomeEmail({ name, email }: WelcomeEmailProps) {
       <Text style={listItem}>• Get personalized recommendations based on your interests</Text>
       <Text style={paragraph}>Get started by exploring some of our most popular talks:</Text>
       <Section style={buttonContainer}>
-        <Button style={button} href={`${process.env.SITE_URL}`}>
+        <Button href={`${process.env.SITE_URL}`} style={button}>
           Explore Talks
         </Button>
       </Section>

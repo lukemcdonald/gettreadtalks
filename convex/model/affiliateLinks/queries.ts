@@ -16,9 +16,7 @@ export const getAffiliateLink = query({
   args: {
     id: v.id('affiliateLinks'),
   },
-  handler: async (ctx, args) => {
-    return await ctx.db.get(args.id);
-  },
+  handler: async (ctx, args) => await ctx.db.get(args.id),
   returns: doc('affiliateLinks', true),
 });
 
@@ -33,9 +31,7 @@ export const getAffiliateLinkBySlug = query({
   args: {
     slug: v.string(),
   },
-  handler: async (ctx, args) => {
-    return await getOneFrom(ctx.db, 'affiliateLinks', 'by_slug', args.slug);
-  },
+  handler: async (ctx, args) => await getOneFrom(ctx.db, 'affiliateLinks', 'by_slug', args.slug),
   returns: doc('affiliateLinks', true),
 });
 

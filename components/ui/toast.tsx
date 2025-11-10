@@ -60,24 +60,14 @@ function ToastList({ position = 'bottom-right' }: { position: ToastPosition }) {
           'data-[position*=right]:right-(--toast-inset)',
           'data-[position*=center]:-translate-x-1/2 data-[position*=center]:left-1/2',
         )}
-        data-slot="toast-viewport"
         data-position={position}
+        data-slot="toast-viewport"
       >
         {toasts.map((toast) => {
           const Icon = toast.type ? TOAST_ICONS[toast.type as keyof typeof TOAST_ICONS] : null;
 
           return (
             <Toast.Root
-              key={toast.id}
-              toast={toast}
-              data-position={position}
-              swipeDirection={
-                position.includes('center')
-                  ? [isTop ? 'up' : 'down']
-                  : position.includes('left')
-                    ? ['left', isTop ? 'up' : 'down']
-                    : ['right', isTop ? 'up' : 'down']
-              }
               className={cn(
                 'absolute z-[calc(9999-var(--toast-index))] h-(--toast-calc-height) w-full select-none rounded-lg border bg-popover bg-clip-padding px-3.5 py-3 text-popover-foreground shadow-lg [transition:transform_.5s_cubic-bezier(.22,1,.36,1),opacity_.5s,height_.15s] before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-lg)-1px)] before:shadow-[0_1px_--theme(--color-black/4%)] dark:bg-clip-border dark:before:shadow-[0_-1px_--theme(--color-white/8%)]',
                 // Base positioning using data-position
@@ -119,6 +109,16 @@ function ToastList({ position = 'bottom-right' }: { position: ToastPosition }) {
                 'data-expanded:data-ending-style:data-[swipe-direction=up]:[transform:translateY(calc(var(--toast-swipe-movement-y)-100%-var(--toast-inset)))]',
                 'data-expanded:data-ending-style:data-[swipe-direction=down]:[transform:translateY(calc(var(--toast-swipe-movement-y)+100%+var(--toast-inset)))]',
               )}
+              data-position={position}
+              key={toast.id}
+              swipeDirection={
+                position.includes('center')
+                  ? [isTop ? 'up' : 'down']
+                  : position.includes('left')
+                    ? ['left', isTop ? 'up' : 'down']
+                    : ['right', isTop ? 'up' : 'down']
+              }
+              toast={toast}
             >
               <Toast.Content className="flex items-center justify-between gap-1.5 overflow-hidden text-sm transition-opacity duration-250 data-behind:pointer-events-none data-expanded:pointer-events-auto data-behind:opacity-0 data-expanded:opacity-100">
                 <div className="flex gap-2">

@@ -18,9 +18,7 @@ export const getTopic = query({
   args: {
     id: v.id('topics'),
   },
-  handler: async (ctx, args) => {
-    return await ctx.db.get(args.id);
-  },
+  handler: async (ctx, args) => await ctx.db.get(args.id),
   returns: doc('topics', true),
 });
 
@@ -35,9 +33,7 @@ export const getTopicBySlug = query({
   args: {
     slug: v.string(),
   },
-  handler: async (ctx, args) => {
-    return await getOneFrom(ctx.db, 'topics', 'by_slug', args.slug);
-  },
+  handler: async (ctx, args) => await getOneFrom(ctx.db, 'topics', 'by_slug', args.slug),
   returns: doc('topics', true),
 });
 

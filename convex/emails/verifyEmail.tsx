@@ -18,7 +18,7 @@ export function VerifyEmailTemplate({ verificationUrl, email, token }: Verificat
         below.
       </Text>
       <Section style={buttonContainer}>
-        <Button style={button} href={verificationUrl}>
+        <Button href={verificationUrl} style={button}>
           Verify Email Address
         </Button>
       </Section>

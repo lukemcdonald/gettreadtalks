@@ -63,6 +63,6 @@ export function randomInt(min: number, max: number): number {
 /**
  * Generate random boolean with given probability (0-1)
  */
-export function randomBoolean(probability: number = 0.5): boolean {
+export function randomBoolean(probability = 0.5): boolean {
   return Math.random() < probability;
 }

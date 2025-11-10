@@ -23,7 +23,7 @@ const collectionThemes: Array<string> = [
 /**
  * Generate collection data
  */
-export function generateCollections(count: number = 8): Array<{
+export function generateCollections(count = 8): Array<{
   description?: string;
   slug: string;
   title: string;

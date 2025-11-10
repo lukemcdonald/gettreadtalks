@@ -23,7 +23,7 @@ export function TalksList({ preloadedTalks }: TalksListProps) {
         ))}
       </ul>
       {canLoadMore && (
-        <button type="button" onClick={loadMore}>
+        <button onClick={loadMore} type="button">
           Load More
         </button>
       )}

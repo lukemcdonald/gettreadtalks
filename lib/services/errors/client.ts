@@ -76,9 +76,8 @@ export function captureException(
     // Capture the error and return event ID
     if (error instanceof Error) {
       return Sentry.captureException(error);
-    } else {
-      return Sentry.captureMessage(String(error));
     }
+    return Sentry.captureMessage(String(error));
   });
 }
 

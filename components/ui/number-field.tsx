@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-
 import { NumberField as NumberFieldPrimitive } from '@base-ui-components/react/number-field';
 import { MinusIcon, PlusIcon } from 'lucide-react';
 
@@ -26,10 +25,10 @@ function NumberField({
   return (
     <NumberFieldContext.Provider value={{ fieldId }}>
       <NumberFieldPrimitive.Root
-        id={fieldId}
         className={cn('flex w-full flex-col items-start gap-2', className)}
-        data-slot="number-field"
         data-size={size}
+        data-slot="number-field"
+        id={fieldId}
         {...props}
       />
     </NumberFieldContext.Provider>
@@ -113,7 +112,7 @@ function NumberFieldScrubArea({
       data-slot="number-field-scrub-area"
       {...props}
     >
-      <Label htmlFor={context.fieldId} className="cursor-ew-resize">
+      <Label className="cursor-ew-resize" htmlFor={context.fieldId}>
         {label}
       </Label>
       <NumberFieldPrimitive.ScrubAreaCursor className="drop-shadow-[0_1px_1px_#0008] filter">
@@ -126,11 +125,11 @@ function NumberFieldScrubArea({
 function CursorGrowIcon(props: React.ComponentProps<'svg'>) {
   return (
     <svg
-      width="26"
-      height="14"
-      viewBox="0 0 24 14"
       fill="black"
+      height="14"
       stroke="white"
+      viewBox="0 0 24 14"
+      width="26"
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >

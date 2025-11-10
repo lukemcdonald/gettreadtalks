@@ -13,7 +13,7 @@ const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!, {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   return (
-    <ConvexBetterAuthProvider client={convex} authClient={authClient}>
+    <ConvexBetterAuthProvider authClient={authClient} client={convex}>
       {children}
     </ConvexBetterAuthProvider>
   );

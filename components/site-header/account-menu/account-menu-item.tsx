@@ -22,7 +22,7 @@ export function AccountMenuItem({
 }: AccountMenuItemProps) {
   const isButton = !href && Boolean(onClick);
 
-  const ButtonComponent = isButton && <Button variant="ghost" size="xs" />;
+  const ButtonComponent = isButton && <Button size="xs" variant="ghost" />;
   const LinkComponent = href && <Link href={href} />;
 
   return (

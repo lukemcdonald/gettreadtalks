@@ -2,14 +2,12 @@ import type { Id } from '@/convex/_generated/dataModel';
 import type { StatusType } from '@/convex/lib/validators/shared';
 
 import { Suspense } from 'react';
-
 import Link from 'next/link';
 
 import { MainLayout } from '@/components/main-layout';
 import { Button } from '@/components/ui/button';
 import { getAllSpeakersForFilter, getAllTopicsForFilter, getTalks } from '@/lib/features/talks';
 import { getCurrentUser } from '@/lib/services/auth/server';
-
 import {
   ActiveFilters,
   Pagination,

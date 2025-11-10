@@ -12,9 +12,7 @@ import { getUserFavoriteClips, getUserFavoriteSpeakers, getUserFavoriteTalks } f
  */
 export const getCurrentUser = query({
   args: {},
-  handler: async (ctx) => {
-    return await getAuthUser(ctx);
-  },
+  handler: async (ctx) => await getAuthUser(ctx),
   returns: v.union(v.any(), v.null()),
 });
 

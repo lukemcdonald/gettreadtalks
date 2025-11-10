@@ -5,7 +5,6 @@ import { MainLayout } from '@/components/main-layout';
 import { Button } from '@/components/ui/button';
 import { getTalkBySlug } from '@/lib/features/talks';
 import { getCurrentUser } from '@/lib/services/auth/server';
-
 import { ClipsList } from './_components/clips-list';
 import { CollectionInfo } from './_components/collection-info';
 import { FavoriteTalkButton } from './_components/favorite-talk-button';

@@ -3,7 +3,6 @@
 import type { Id } from '@/convex/_generated/dataModel';
 
 import { useIsTalkFavorited } from '@/lib/features/users/hooks';
-
 import { useTalkBySlug } from './use-talk-by-slug';
 import { useTalksBySpeaker } from './use-talks-by-speaker';
 

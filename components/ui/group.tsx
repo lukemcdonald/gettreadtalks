@@ -16,11 +16,11 @@ function Group({
 }) {
   return (
     <div
-      data-slot="group"
       className={cn(
         'flex w-fit [--clip-end:-1rem] [--clip-start:-1rem] *:pointer-coarse:after:min-w-auto',
         className,
       )}
+      data-slot="group"
       {...props}
     >
       {children}
@@ -45,11 +45,11 @@ function GroupItem({ className, render, ...props }: useRender.ComponentProps<'di
 function GroupSeparator({ className, ...props }: { className?: string }) {
   return (
     <Separator
-      orientation="vertical"
       className={cn(
         '[[data-slot=input-control]:focus-within+&,[data-slot=field-control]:focus-within+&,[data-slot=select-trigger]:focus-visible+*+&]:-translate-x-px relative z-20 has-[+[data-slot=input-control]:focus-within,+[data-slot=field-control]:focus-within,+[data-slot=select-trigger]:focus-visible+*]:translate-x-px has-[+[data-slot=input-control]:focus-within,+[data-slot=field-control]:focus-within,+[data-slot=select-trigger]:focus-visible+*]:bg-ring [[data-slot=input-control]:focus-within+&,[data-slot=field-control]:focus-within+&,[data-slot=select-trigger]:focus-visible+*+&]:bg-ring',
         className,
       )}
+      orientation="vertical"
       {...props}
     />
   );

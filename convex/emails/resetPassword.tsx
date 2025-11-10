@@ -15,7 +15,7 @@ export function ResetPasswordTemplate({ resetUrl, email, token }: PasswordResetE
         made this request, click the button below to create a new password.
       </Text>
       <Section style={buttonContainer}>
-        <Button style={button} href={resetUrl}>
+        <Button href={resetUrl} style={button}>
           Reset Password
         </Button>
       </Section>

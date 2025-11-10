@@ -4,7 +4,6 @@ import type { FunctionReference } from 'convex/server';
 import type { ErrorWithEventId, MutationState, MutationStatus } from '../services/errors/types';
 
 import { useCallback, useState } from 'react';
-
 import { useMutation as useConvexMutation } from 'convex/react';
 
 import { captureException } from '../services/errors/client';

@@ -15,9 +15,7 @@ export const getSpeaker = query({
   args: {
     id: v.id('speakers'),
   },
-  handler: async (ctx, args) => {
-    return await ctx.db.get(args.id);
-  },
+  handler: async (ctx, args) => await ctx.db.get(args.id),
   returns: doc('speakers', true),
 });
 
@@ -32,9 +30,7 @@ export const getSpeakerBySlug = query({
   args: {
     slug: v.string(),
   },
-  handler: async (ctx, args) => {
-    return await getOneFrom(ctx.db, 'speakers', 'by_slug', args.slug);
-  },
+  handler: async (ctx, args) => await getOneFrom(ctx.db, 'speakers', 'by_slug', args.slug),
   returns: doc('speakers', true),
 });
 
@@ -94,12 +90,11 @@ export const listSpeakers = query({
   args: {
     paginationOpts: v.any(), // PaginationOptions
   },
-  handler: async (ctx, args) => {
-    return await ctx.db
+  handler: async (ctx, args) =>
+    await ctx.db
       .query('speakers')
       .withIndex('by_lastName')
       .order('asc')
-      .paginate(args.paginationOpts);
-  },
+      .paginate(args.paginationOpts),
   returns: v.any(), // PaginationResult<Doc<'speakers'>>
 });

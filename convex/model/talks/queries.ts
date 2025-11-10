@@ -21,9 +21,7 @@ export const getTalk = query({
   args: {
     id: v.id('talks'),
   },
-  handler: async (ctx, args) => {
-    return await ctx.db.get(args.id);
-  },
+  handler: async (ctx, args) => await ctx.db.get(args.id),
   returns: doc('talks', true),
 });
 
@@ -38,9 +36,7 @@ export const getTalkBySlug = query({
   args: {
     slug: v.string(),
   },
-  handler: async (ctx, args) => {
-    return await getOneFrom(ctx.db, 'talks', 'by_slug', args.slug);
-  },
+  handler: async (ctx, args) => await getOneFrom(ctx.db, 'talks', 'by_slug', args.slug),
   returns: doc('talks', true),
 });
 

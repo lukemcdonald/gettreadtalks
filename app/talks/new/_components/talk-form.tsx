@@ -4,7 +4,6 @@ import type { Id } from '@/convex/_generated/dataModel';
 import type { StatusType } from '@/convex/lib/validators/shared';
 
 import { useState } from 'react';
-
 import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
@@ -13,7 +12,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useArchiveTalk, useCreateTalk, useUpdateTalk } from '@/lib/features/talks';
-
 import { CollectionSelectField } from './collection-select-field';
 import { SpeakerSelectField } from './speaker-select-field';
 import { StatusSelectField } from './status-select-field';
@@ -127,14 +125,13 @@ export function TalkForm({ collections, initialData, speakers, talkId, talkSlug 
     }
   };
 
-  const normalizeSlug = (text: string) => {
-    return text
+  const normalizeSlug = (text: string) =>
+    text
       .toLowerCase()
       .replace(/[^a-z0-9\s-]/g, '')
       .replace(/\s+/g, '-')
       .replace(/-+/g, '-')
       .trim();
-  };
 
   const isLoading = createTalk.isLoading || updateTalk.isLoading;
 
