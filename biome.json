@@ -1,58 +1,17 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.3.4/schema.json",
+  "extends": ["ultracite/core", "ultracite/react", "ultracite/next"],
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "formatter": {
     "enabled": true,
     "formatWithErrors": true,
     "indentStyle": "space",
     "lineWidth": 100
   },
-  "linter": {
-    "enabled": true,
-    "domains": {
-      "react": "recommended",
-      "next": "recommended"
-    },
-    "rules": {
-      "recommended": true,
-      "a11y": {
-        "recommended": true
-      },
-      "complexity": {
-        "recommended": true
-      },
-      "correctness": {
-        "noUnusedImports": "error",
-        "noUnusedVariables": "error"
-      },
-      "nursery": {
-        "useSortedClasses": {
-          "fix": "safe",
-          "level": "error",
-          "options": {
-            "functions": ["clsx", "cva", "cn", "tw"]
-          }
-        }
-      },
-      "style": {
-        "noNonNullAssertion": "off"
-      },
-      "suspicious": {
-        "noArrayIndexKey": "off",
-        "noEmptyBlock": "off",
-        "noExplicitAny": "warn"
-      }
-    }
-  },
-  "css": {
-    "parser": {
-      "tailwindDirectives": true
-    }
-  },
   "javascript": {
     "formatter": {
-      "attributePosition": "auto",
       "quoteStyle": "single",
-      "jsxQuoteStyle": "double"
+      "jsxQuoteStyle": "double",
+      "trailingCommas": "all"
     }
   },
   "assist": {
@@ -80,21 +39,21 @@
   "files": {
     "ignoreUnknown": false,
     "includes": [
-      "**",
-      "!**/*.d.ts",
+      "**/*",
       "!**/*.config.*",
+      "!**/*.d.ts",
       "!**/*.tsbuildinfo",
+      "!**/.git",
       "!**/.next",
+      "!**/.notes",
+      "!**/.vercel",
+      "!**/build",
       "!**/convex/_generated",
       "!**/convex/convex.json",
+      "!**/dist",
       "!**/next-env.d.ts",
       "!**/node_modules",
-      "!**/pnpm-lock.yaml",
-      "!**/dist",
-      "!**/build",
-      "!**/.git",
-      "!**/.vercel",
-      "!**/.notes"
+      "!**/pnpm-lock.yaml"
     ]
   }
 }
