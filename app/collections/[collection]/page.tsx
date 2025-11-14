@@ -1,10 +1,10 @@
 import { MainLayout } from '@/components/main-layout';
 
-interface CollectionPageProps {
+type CollectionPageProps = {
   params: Promise<{
     collection: string;
   }>;
-}
+};
 
 export default async function CollectionPage({ params }: CollectionPageProps) {
   await params;

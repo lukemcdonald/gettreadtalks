@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/nextjs';
+import { captureRequestError } from '@sentry/nextjs';
 
 import { IS_SENTRY_ENABLED } from './lib/config/sentry';
 
@@ -16,4 +16,5 @@ export async function register() {
   }
 }
 
-export const onRequestError = IS_SENTRY_ENABLED ? Sentry.captureRequestError : () => {};
+// biome-ignore lint/suspicious: no-op function
+export const onRequestError = IS_SENTRY_ENABLED ? captureRequestError : () => {};

@@ -1,6 +1,6 @@
 import { ConvexError, type Value } from 'convex/values';
 
-import { ErrorCode, type ErrorContext } from './types';
+import { ErrorCode, type ErrorCodeType, type ErrorContext } from './types';
 
 /**
  * Type guard to check if an error is a ConvexError.
@@ -78,7 +78,7 @@ export function getErrorMessage(error: unknown): string {
  *   redirect('/login');
  * }
  */
-export function getErrorCode(error: unknown): ErrorCode {
+export function getErrorCode(error: unknown): ErrorCodeType {
   const data = getConvexErrorData(error);
 
   return data.code || ErrorCode.UNKNOWN_ERROR;
@@ -92,7 +92,7 @@ export function getErrorCode(error: unknown): ErrorCode {
  *   setError('title', { message: 'Title already exists' });
  * }
  */
-export function isErrorCode(error: unknown, code: ErrorCode): boolean {
+export function isErrorCode(error: unknown, code: ErrorCodeType): boolean {
   return getErrorCode(error) === code;
 }
 

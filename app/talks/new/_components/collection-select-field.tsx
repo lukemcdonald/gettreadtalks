@@ -9,10 +9,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-interface CollectionSelectFieldProps {
+type CollectionSelectFieldProps = {
   collections: Array<{ _id: Id<'collections'>; title: string }>;
   defaultValue?: Id<'collections'> | null;
-}
+};
 
 export function CollectionSelectField({ collections, defaultValue }: CollectionSelectFieldProps) {
   const items = [

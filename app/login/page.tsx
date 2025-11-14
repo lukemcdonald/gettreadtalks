@@ -101,9 +101,9 @@ export default function LoginPage() {
                 Email address
               </label>
               <input
-                id={useId()}
                 autoComplete="email"
                 className="relative mt-1 block w-full appearance-none rounded-md border border-input bg-background px-3 py-2 text-foreground placeholder-muted-foreground focus:z-10 focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
+                id={useId()}
                 name="email"
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
@@ -117,9 +117,9 @@ export default function LoginPage() {
                 Password
               </label>
               <input
-                id={useId()}
                 autoComplete="current-password"
                 className="relative mt-1 block w-full appearance-none rounded-md border border-input bg-background px-3 py-2 text-foreground placeholder-muted-foreground focus:z-10 focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring"
+                id={useId()}
                 name="password"
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"

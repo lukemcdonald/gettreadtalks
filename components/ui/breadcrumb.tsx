@@ -13,11 +13,11 @@ function Breadcrumb({ ...props }: React.ComponentProps<'nav'>) {
 function BreadcrumbList({ className, ...props }: React.ComponentProps<'ol'>) {
   return (
     <ol
-      data-slot="breadcrumb-list"
       className={cn(
         'flex flex-wrap items-center gap-1.5 break-words text-muted-foreground text-sm sm:gap-2.5',
         className,
       )}
+      data-slot="breadcrumb-list"
       {...props}
     />
   );
@@ -26,8 +26,8 @@ function BreadcrumbList({ className, ...props }: React.ComponentProps<'ol'>) {
 function BreadcrumbItem({ className, ...props }: React.ComponentProps<'li'>) {
   return (
     <li
-      data-slot="breadcrumb-item"
       className={cn('inline-flex items-center gap-1.5', className)}
+      data-slot="breadcrumb-item"
       {...props}
     />
   );
@@ -49,10 +49,10 @@ function BreadcrumbLink({ className, render, ...props }: useRender.ComponentProp
 function BreadcrumbPage({ className, ...props }: React.ComponentProps<'span'>) {
   return (
     <span
-      data-slot="breadcrumb-page"
-      aria-disabled="true"
       aria-current="page"
+      aria-disabled="true"
       className={cn('font-normal text-foreground', className)}
+      data-slot="breadcrumb-page"
       {...props}
     />
   );
@@ -61,10 +61,10 @@ function BreadcrumbPage({ className, ...props }: React.ComponentProps<'span'>) {
 function BreadcrumbSeparator({ children, className, ...props }: React.ComponentProps<'li'>) {
   return (
     <li
-      data-slot="breadcrumb-separator"
-      role="presentation"
       aria-hidden="true"
       className={cn('opacity-72 [&>svg]:size-4', className)}
+      data-slot="breadcrumb-separator"
+      role="presentation"
       {...props}
     >
       {children ?? <ChevronRight />}
@@ -75,10 +75,10 @@ function BreadcrumbSeparator({ children, className, ...props }: React.ComponentP
 function BreadcrumbEllipsis({ className, ...props }: React.ComponentProps<'span'>) {
   return (
     <span
-      data-slot="breadcrumb-ellipsis"
-      role="presentation"
       aria-hidden="true"
       className={className}
+      data-slot="breadcrumb-ellipsis"
+      role="presentation"
       {...props}
     >
       <MoreHorizontal className="size-4" />

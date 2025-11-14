@@ -1,8 +1,9 @@
 export function TalksListSkeleton() {
   return (
     <div className="space-y-4">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <div className="animate-pulse rounded-lg border p-4" key={i}>
+      {Array.from({ length: 5 }).map((_, idx) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: range
+        <div className="animate-pulse rounded-lg border p-4" key={idx}>
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1 space-y-2">
               <div className="h-5 w-3/4 rounded bg-muted" />

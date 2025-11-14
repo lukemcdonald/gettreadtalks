@@ -11,9 +11,7 @@ authComponent.registerRoutes(http, createAuth);
 http.route({
   path: '/resend-webhook',
   method: 'POST',
-  handler: httpAction(async (ctx, req) => {
-    return await resend.handleResendEventWebhook(ctx, req);
-  }),
+  handler: httpAction(async (ctx, req) => await resend.handleResendEventWebhook(ctx, req)),
 });
 
 export default http;

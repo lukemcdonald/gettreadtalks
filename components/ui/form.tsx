@@ -7,8 +7,8 @@ import { cn } from '@/lib/utils';
 function Form({ className, ...props }: FormPrimitive.Props) {
   return (
     <FormPrimitive
-      data-slot="form"
       className={cn('flex w-full flex-col gap-4', className)}
+      data-slot="form"
       {...props}
     />
   );

@@ -1,6 +1,12 @@
 import type { ErrorReportOptions, ErrorWithEventId, SeverityLevel } from './types';
 
-import * as Sentry from '@sentry/nextjs';
+import {
+  addBreadcrumb as sentryAddBreadcrumb,
+  captureException as sentryCaptureException,
+  captureMessage as sentryCaptureMessage,
+  setUser as sentrySetUser,
+  withScope as sentryWithScope,
+} from '@sentry/nextjs';
 
 /**
  * Captures an exception and reports it to Sentry with optional context.
@@ -33,7 +39,8 @@ export function captureException(
 ): string | undefined {
   const { context, extras, fingerprint, level = 'error', tags, transactionName, user } = options;
 
-  return Sentry.withScope((scope) => {
+  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: relative
+  return sentryWithScope((scope) => {
     // Set error level
     scope.setLevel(level);
 
@@ -51,9 +58,9 @@ export function captureException(
 
     // Add tags for filtering and categorization
     if (tags) {
-      Object.entries(tags).forEach(([key, value]) => {
+      for (const [key, value] of Object.entries(tags)) {
         scope.setTag(key, value);
-      });
+      }
     }
 
     // Set transaction name for better organization
@@ -68,17 +75,16 @@ export function captureException(
 
     // Add extra data (appears in Extra Data section in Sentry)
     if (extras) {
-      Object.entries(extras).forEach(([key, value]) => {
+      for (const [key, value] of Object.entries(extras)) {
         scope.setExtra(key, value);
-      });
+      }
     }
 
-    // Capture the error and return event ID
-    if (error instanceof Error) {
-      return Sentry.captureException(error);
-    } else {
-      return Sentry.captureMessage(String(error));
+    if (typeof error === 'string') {
+      return sentryCaptureMessage(error);
     }
+
+    return sentryCaptureException(error);
   });
 }
 
@@ -93,7 +99,7 @@ export function captureException(
  * });
  */
 export function setUserContext(user: { id: string; email?: string; username?: string }): void {
-  Sentry.setUser(user);
+  sentrySetUser(user);
 }
 
 /**
@@ -118,7 +124,7 @@ export function getEventIdFromError(error: unknown): string | undefined {
  * clearUserContext();
  */
 export function clearUserContext(): void {
-  Sentry.setUser(null);
+  sentrySetUser(null);
 }
 
 /**
@@ -138,5 +144,5 @@ export function addBreadcrumb(breadcrumb: {
   level?: SeverityLevel;
   message: string;
 }): void {
-  Sentry.addBreadcrumb(breadcrumb);
+  sentryAddBreadcrumb(breadcrumb);
 }

@@ -1,9 +1,9 @@
-interface TopicsListProps {
+type TopicsListProps = {
   topics: Array<{
     _id: string;
     title: string;
   }>;
-}
+};
 
 export function TopicsList({ topics }: TopicsListProps) {
   return (

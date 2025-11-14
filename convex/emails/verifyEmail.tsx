@@ -2,13 +2,9 @@ import type { VerificationEmailProps } from '../../lib/services/email/types';
 
 import { Button, Section, Text } from '@react-email/components';
 
-import { EmailLayout } from './_components/layout';
+import { EmailLayout } from './components/layout';
 
-export function VerifyEmailTemplate({ verificationUrl, email, token }: VerificationEmailProps) {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  token; // token parameter is part of the interface and could be used for additional verification
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  email; // email parameter is part of the interface and could be used for personalization
+export function VerifyEmailTemplate({ verificationUrl }: VerificationEmailProps) {
   return (
     <EmailLayout preview="Please verify your email address to complete your TreadTalks registration.">
       <Text style={paragraph}>Hi there,</Text>
@@ -18,7 +14,7 @@ export function VerifyEmailTemplate({ verificationUrl, email, token }: Verificat
         below.
       </Text>
       <Section style={buttonContainer}>
-        <Button style={button} href={verificationUrl}>
+        <Button href={verificationUrl} style={button}>
           Verify Email Address
         </Button>
       </Section>
@@ -45,8 +41,8 @@ const paragraph = {
 };
 
 const buttonContainer = {
-  textAlign: 'center' as const,
   margin: '32px 0',
+  textAlign: 'center' as const,
 };
 
 const button = {
@@ -56,8 +52,8 @@ const button = {
   fontSize: '16px',
   fontWeight: 'bold',
   lineHeight: '50px',
-  textDecoration: 'none',
   padding: '0 20px',
+  textDecoration: 'none',
 };
 
 const linkText = {

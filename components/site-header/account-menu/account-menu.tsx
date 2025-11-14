@@ -18,9 +18,9 @@ import { Button } from '@/components/ui/button';
 import { Menu, MenuPopup, MenuSeparator, MenuTrigger } from '@/components/ui/menu';
 import { useCurrentUser } from '@/lib/features/users/hooks';
 
-interface AccountMenuProps {
+type AccountMenuProps = {
   initialUser?: User;
-}
+};
 
 export function AccountMenu({ initialUser }: AccountMenuProps) {
   const { data: user } = useCurrentUser(initialUser);
@@ -36,7 +36,7 @@ export function AccountMenu({ initialUser }: AccountMenuProps) {
 
   return (
     <Menu openOnHover>
-      <MenuTrigger render={<Button variant="ghost" size="icon-lg" className="size-10" />}>
+      <MenuTrigger render={<Button className="size-10" size="icon-lg" variant="ghost" />}>
         <AccountMenuAvatar user={user} />
       </MenuTrigger>
       <MenuPopup>

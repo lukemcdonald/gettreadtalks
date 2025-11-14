@@ -18,9 +18,7 @@ export const getCollection = query({
   args: {
     id: v.id('collections'),
   },
-  handler: async (ctx, args) => {
-    return await ctx.db.get(args.id);
-  },
+  handler: async (ctx, args) => await ctx.db.get(args.id),
   returns: doc('collections', true),
 });
 
@@ -35,9 +33,7 @@ export const getCollectionBySlug = query({
   args: {
     slug: v.string(),
   },
-  handler: async (ctx, args) => {
-    return await getOneFrom(ctx.db, 'collections', 'by_slug', args.slug);
-  },
+  handler: async (ctx, args) => await getOneFrom(ctx.db, 'collections', 'by_slug', args.slug),
   returns: doc('collections', true),
 });
 
@@ -145,9 +141,8 @@ export const listCollections = query({
   args: {
     paginationOpts: v.any(), // PaginationOptions
   },
-  handler: async (ctx, args) => {
-    return await ctx.db.query('collections').order('desc').paginate(args.paginationOpts);
-  },
+  handler: async (ctx, args) =>
+    await ctx.db.query('collections').order('desc').paginate(args.paginationOpts),
   returns: v.any(), // PaginationResult<Doc<'collections'>>
 });
 
@@ -173,7 +168,7 @@ export const listCollectionsBySpeaker = query({
 
     // Get unique collection IDs (filter out talks without collections)
     const collectionIds = [
-      ...new Set(talks.filter((talk) => talk.collectionId).map((talk) => talk.collectionId!)),
+      ...new Set(talks.flatMap((talk) => (talk.collectionId ? [talk.collectionId] : []))),
     ];
 
     // Fetch all collections in parallel

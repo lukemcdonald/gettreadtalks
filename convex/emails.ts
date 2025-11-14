@@ -31,7 +31,7 @@ export const handleEmailEvent = internalMutation({
     event: vEmailEvent,
     id: vEmailId,
   },
-  handler: async (_ctx, args) => {
+  handler: (_ctx, args) => {
     console.log('Email event received:', {
       emailId: args.id,
       event: args.event.type,
@@ -61,6 +61,9 @@ export const handleEmailEvent = internalMutation({
       case 'email.complained':
         // Handle spam complaints
         console.log('Email marked as spam:', args.id);
+        break;
+      default:
+        console.log('Email event not handled:', args.event.type);
         break;
     }
   },

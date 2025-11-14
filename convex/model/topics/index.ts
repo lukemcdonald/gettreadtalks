@@ -1,5 +1,3 @@
-import * as mutations from './mutations';
-import * as queries from './queries';
-import { topicFields, topicTables } from './schema';
-
-export { mutations, queries, topicFields, topicTables };
+export * as mutations from './mutations';
+export * as queries from './queries';
+export { topicFields, topicTables } from './schema';

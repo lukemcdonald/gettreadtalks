@@ -1,12 +1,12 @@
 import { cn } from '@/lib/utils';
 
-interface Props {
+type Props = {
   className?: string;
   colors?: {
     tread?: string;
     talks?: string;
   };
-}
+};
 
 const defaultColors = {
   tread: 'text-primary',
@@ -16,10 +16,10 @@ const defaultColors = {
 function Logo({ className, colors = defaultColors }: Props) {
   return (
     <svg
-      xmlns="http://www.w3.org/2000/svg"
+      className={cn('fill-current', className)}
       overflow="visible"
       viewBox="0 0 398.3 53.7"
-      className={cn('fill-current', className)}
+      xmlns="http://www.w3.org/2000/svg"
     >
       <title>TREADTalks</title>
       <g className={cn('fill-current', colors.tread)}>

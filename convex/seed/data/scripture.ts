@@ -1,7 +1,7 @@
 /**
  * Common scripture reference examples
  */
-export const scriptureReferences: Array<string> = [
+export const scriptureReferences = [
   // Single verses
   'John 3:16',
   'Jeremiah 29:11',

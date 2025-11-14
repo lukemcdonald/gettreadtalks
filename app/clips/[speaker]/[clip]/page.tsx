@@ -1,11 +1,11 @@
 import { MainLayout } from '@/components/main-layout';
 
-interface ClipPageProps {
+type ClipPageProps = {
   params: Promise<{
     clip: string;
     speaker: string;
   }>;
-}
+};
 
 export default async function ClipPage({ params }: ClipPageProps) {
   await params;

@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect } from 'react';
-
 import NextError from 'next/error';
 
 import { captureException } from '@/lib/services/errors';

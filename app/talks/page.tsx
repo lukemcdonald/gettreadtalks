@@ -2,14 +2,12 @@ import type { Id } from '@/convex/_generated/dataModel';
 import type { StatusType } from '@/convex/lib/validators/shared';
 
 import { Suspense } from 'react';
-
 import Link from 'next/link';
 
 import { MainLayout } from '@/components/main-layout';
 import { Button } from '@/components/ui/button';
 import { getAllSpeakersForFilter, getAllTopicsForFilter, getTalks } from '@/lib/features/talks';
 import { getCurrentUser } from '@/lib/services/auth/server';
-
 import {
   ActiveFilters,
   Pagination,
@@ -18,7 +16,7 @@ import {
   TalksListSkeleton,
 } from './_components';
 
-interface TalksPageProps {
+type TalksPageProps = {
   searchParams: Promise<{
     cursor?: string;
     featured?: string;
@@ -26,7 +24,7 @@ interface TalksPageProps {
     status?: string;
     topic?: string;
   }>;
-}
+};
 
 async function TalksContent({ params }: { params: Awaited<TalksPageProps['searchParams']> }) {
   const user = await getCurrentUser();

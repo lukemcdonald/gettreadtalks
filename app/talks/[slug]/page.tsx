@@ -5,7 +5,6 @@ import { MainLayout } from '@/components/main-layout';
 import { Button } from '@/components/ui/button';
 import { getTalkBySlug } from '@/lib/features/talks';
 import { getCurrentUser } from '@/lib/services/auth/server';
-
 import { ClipsList } from './_components/clips-list';
 import { CollectionInfo } from './_components/collection-info';
 import { FavoriteTalkButton } from './_components/favorite-talk-button';
@@ -13,11 +12,9 @@ import { SpeakerInfo } from './_components/speaker-info';
 import { TalkDetails } from './_components/talk-details';
 import { TopicsList } from './_components/topics-list';
 
-interface TalkPageProps {
-  params: Promise<{
-    slug: string;
-  }>;
-}
+type TalkPageProps = {
+  params: Promise<{ slug: string }>;
+};
 
 export default async function TalkPage({ params }: TalkPageProps) {
   const { slug } = await params;

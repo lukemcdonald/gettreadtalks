@@ -26,7 +26,7 @@ function getImage(type: ImageType | undefined, user: User) {
     return getGravatarUrl({ email: user?.email, size: 64 }) ?? undefined;
   }
 
-  return undefined;
+  return;
 }
 
 export function AccountMenuAvatar({
@@ -55,13 +55,13 @@ export function AccountMenuAvatar({
       )}
     >
       <AvatarImage
+        alt={user.name ?? 'User'}
         className={cn(
           'grayscale transition-all duration-300',
           'group-hover:grayscale-0',
           "[button[aria-expanded='true']_&]:grayscale-0",
         )}
         src={imageUrl}
-        alt={user.name ?? 'User'}
       />
       <AvatarFallback className="bg-transparent">{fallback}</AvatarFallback>
     </Avatar>

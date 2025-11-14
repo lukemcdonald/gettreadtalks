@@ -16,16 +16,16 @@ export type AuthUser = NonNullable<User>;
 /**
  * Sign up parameters
  */
-export interface SignUpParams {
+export type SignUpParams = {
   email: string;
   name?: string;
   password: string;
-}
+};
 
 /**
  * Sign in parameters
  */
-export interface SignInParams {
+export type SignInParams = {
   email: string;
   password: string;
-}
+};

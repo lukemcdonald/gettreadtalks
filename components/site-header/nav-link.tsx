@@ -10,9 +10,9 @@ type NavLinkProps = {
 export function NavLink({ href, isActive, children }: NavLinkProps) {
   return (
     <Button
-      variant="ghost"
       className={cn('text-lg', isActive ? 'text-primary' : 'text-foreground')}
       render={<Link href={href} />}
+      variant="ghost"
     >
       {children}
     </Button>

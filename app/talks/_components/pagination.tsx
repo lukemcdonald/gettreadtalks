@@ -4,11 +4,11 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 
-interface PaginationProps {
+type PaginationProps = {
   continueCursor: string;
   hasNextPage: boolean;
   hasPrevPage: boolean;
-}
+};
 
 export function Pagination({ continueCursor, hasNextPage, hasPrevPage }: PaginationProps) {
   const router = useRouter();
@@ -27,7 +27,7 @@ export function Pagination({ continueCursor, hasNextPage, hasPrevPage }: Paginat
     router.push(query ? `/talks?${query}` : '/talks');
   };
 
-  if (!hasNextPage && !hasPrevPage) {
+  if (!(hasNextPage || hasPrevPage)) {
     return null;
   }
 

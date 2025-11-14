@@ -4,7 +4,6 @@ import type { Id } from '@/convex/_generated/dataModel';
 import type { StatusType } from '@/convex/lib/validators/shared';
 
 import { useState } from 'react';
-
 import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
@@ -13,12 +12,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useArchiveTalk, useCreateTalk, useUpdateTalk } from '@/lib/features/talks';
-
 import { CollectionSelectField } from './collection-select-field';
 import { SpeakerSelectField } from './speaker-select-field';
 import { StatusSelectField } from './status-select-field';
 
-interface TalkFormProps {
+type TalkFormProps = {
   collections: Array<{ _id: Id<'collections'>; slug: string; title: string }>;
   initialData?: {
     collectionId?: Id<'collections'> | null;
@@ -34,7 +32,7 @@ interface TalkFormProps {
   speakers: Array<{ _id: Id<'speakers'>; firstName: string; lastName: string; slug: string }>;
   talkId?: Id<'talks'>;
   talkSlug?: string;
-}
+};
 
 export function TalkForm({ collections, initialData, speakers, talkId, talkSlug }: TalkFormProps) {
   const router = useRouter();
@@ -59,7 +57,7 @@ export function TalkForm({ collections, initialData, speakers, talkId, talkSlug 
     const collectionOrder = formData.get('collectionOrder') as string;
     const description = formData.get('description') as string;
     const scripture = formData.get('scripture') as string;
-    const status = formData.get('status') as StatusType;
+    const formStatus = formData.get('status') as StatusType;
     const featured = formData.get('featured') === 'on';
 
     const data = {
@@ -70,7 +68,7 @@ export function TalkForm({ collections, initialData, speakers, talkId, talkSlug 
       mediaUrl: mediaUrl.trim(),
       scripture: scripture || undefined,
       speakerId,
-      status,
+      status: formStatus,
       title: title.trim(),
     };
 
@@ -103,7 +101,8 @@ export function TalkForm({ collections, initialData, speakers, talkId, talkSlug 
       ? 'Are you sure you want to unarchive this talk?'
       : 'Are you sure you want to archive this talk?';
 
-    if (!confirm(confirmMessage)) {
+    // biome-ignore lint/suspicious/noAlert: confirm dialog
+    if (!window.confirm(confirmMessage)) {
       return;
     }
 
@@ -127,16 +126,35 @@ export function TalkForm({ collections, initialData, speakers, talkId, talkSlug 
     }
   };
 
-  const normalizeSlug = (text: string) => {
-    return text
+  const normalizeSlug = (text: string) =>
+    text
       .toLowerCase()
       .replace(/[^a-z0-9\s-]/g, '')
       .replace(/\s+/g, '-')
       .replace(/-+/g, '-')
       .trim();
-  };
 
   const isLoading = createTalk.isLoading || updateTalk.isLoading;
+
+  const getSubmitButtonText = () => {
+    if (isLoading) {
+      return 'Saving...';
+    }
+
+    if (talkId) {
+      return 'Update Talk';
+    }
+
+    return 'Create Talk';
+  };
+
+  const getArchiveButtonText = () => {
+    if (isDeleting) {
+      return status === 'archived' ? 'Unarchiving...' : 'Archiving...';
+    }
+
+    return status === 'archived' ? 'Unarchive Talk' : 'Archive Talk';
+  };
 
   return (
     <form className="space-y-6" onSubmit={handleSubmit}>
@@ -213,7 +231,7 @@ export function TalkForm({ collections, initialData, speakers, talkId, talkSlug 
 
       <div className="flex items-center gap-4">
         <Button disabled={isLoading} type="submit">
-          {isLoading ? 'Saving...' : talkId ? 'Update Talk' : 'Create Talk'}
+          {getSubmitButtonText()}
         </Button>
 
         {talkId && (
@@ -223,13 +241,7 @@ export function TalkForm({ collections, initialData, speakers, talkId, talkSlug 
             type="button"
             variant={status === 'archived' ? 'outline' : 'destructive'}
           >
-            {isDeleting
-              ? status === 'archived'
-                ? 'Unarchiving...'
-                : 'Archiving...'
-              : status === 'archived'
-                ? 'Unarchive Talk'
-                : 'Archive Talk'}
+            {getArchiveButtonText()}
           </Button>
         )}
       </div>

@@ -2,11 +2,9 @@ import type { WelcomeEmailProps } from '../../lib/services/email/types';
 
 import { Button, Section, Text } from '@react-email/components';
 
-import { EmailLayout } from './_components/layout';
+import { EmailLayout } from './components/layout';
 
-export function WelcomeEmail({ name, email }: WelcomeEmailProps) {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  email; // email parameter is part of the interface and could be used for personalization
+export function WelcomeEmail({ name }: WelcomeEmailProps) {
   return (
     <EmailLayout preview={`Welcome to TreadTalks, ${name}!`}>
       <Text style={paragraph}>Hi {name},</Text>
@@ -20,7 +18,7 @@ export function WelcomeEmail({ name, email }: WelcomeEmailProps) {
       <Text style={listItem}>• Get personalized recommendations based on your interests</Text>
       <Text style={paragraph}>Get started by exploring some of our most popular talks:</Text>
       <Section style={buttonContainer}>
-        <Button style={button} href={`${process.env.SITE_URL}`}>
+        <Button href={`${process.env.SITE_URL}`} style={button}>
           Explore Talks
         </Button>
       </Section>
@@ -49,8 +47,8 @@ const listItem = {
 };
 
 const buttonContainer = {
-  textAlign: 'center' as const,
   margin: '32px 0',
+  textAlign: 'center' as const,
 };
 
 const button = {
@@ -60,6 +58,6 @@ const button = {
   fontSize: '16px',
   fontWeight: 'bold',
   lineHeight: '50px',
-  textDecoration: 'none',
   padding: '0 20px',
+  textDecoration: 'none',
 };

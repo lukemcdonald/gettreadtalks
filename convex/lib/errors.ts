@@ -33,14 +33,14 @@ export type ErrorCodeType = (typeof ErrorCode)[keyof typeof ErrorCode];
 /**
  * Context information that can be attached to errors.
  */
-export interface ErrorData {
+export type ErrorData = {
   [key: string]: unknown;
   code?: ErrorCodeType;
   field?: string;
   message?: string;
   resource?: string;
   resourceId?: string;
-}
+};
 
 /**
  * Creates a ConvexError with structured error data.

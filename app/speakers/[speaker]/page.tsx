@@ -1,10 +1,10 @@
 import { MainLayout } from '@/components/main-layout';
 
-interface SpeakerPageProps {
+type SpeakerPageProps = {
   params: Promise<{
     speaker: string;
   }>;
-}
+};
 
 export default async function SpeakerPage({ params }: SpeakerPageProps) {
   await params;

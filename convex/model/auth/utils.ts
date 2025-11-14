@@ -8,9 +8,7 @@ import { authComponent } from '../../auth';
  * @param ctx - Query context
  * @returns User identity object or null if not authenticated
  */
-export const getAuthUser = async (ctx: QueryCtx) => {
-  return authComponent.safeGetAuthUser(ctx);
-};
+export const getAuthUser = async (ctx: QueryCtx) => authComponent.safeGetAuthUser(ctx);
 
 /**
  * Get the current authenticated user.

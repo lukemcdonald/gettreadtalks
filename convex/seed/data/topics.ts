@@ -1,7 +1,7 @@
 /**
  * Real topic categories from the actual site
  */
-export const topics: Array<{ slug: string; title: string }> = [
+export const topics = [
   { slug: 'adoption', title: 'Adoption' },
   { slug: 'anxiety', title: 'Anxiety' },
   { slug: 'apologetics', title: 'Apologetics' },

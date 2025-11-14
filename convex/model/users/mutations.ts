@@ -29,7 +29,7 @@ export const favoriteClip = mutation({
 
     return await ctx.db.insert('userFavoriteClips', {
       clipId: args.clipId,
-      userId: userId,
+      userId,
     });
   },
   returns: v.id('userFavoriteClips'),
@@ -62,7 +62,7 @@ export const favoriteSpeaker = mutation({
 
     return await ctx.db.insert('userFavoriteSpeakers', {
       speakerId: args.speakerId,
-      userId: userId,
+      userId,
     });
   },
   returns: v.id('userFavoriteSpeakers'),
@@ -93,7 +93,7 @@ export const favoriteTalk = mutation({
 
     return await ctx.db.insert('userFavoriteTalks', {
       talkId: args.talkId,
-      userId: userId,
+      userId,
     });
   },
   returns: v.id('userFavoriteTalks'),
@@ -124,7 +124,7 @@ export const finishTalk = mutation({
 
     return await ctx.db.insert('userFinishedTalks', {
       talkId: args.talkId,
-      userId: userId,
+      userId,
     });
   },
   returns: v.id('userFinishedTalks'),

@@ -9,11 +9,11 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-interface SpeakerSelectFieldProps {
+type SpeakerSelectFieldProps = {
   defaultValue?: Id<'speakers'> | null;
   error?: string;
   speakers: Array<{ _id: Id<'speakers'>; firstName: string; lastName: string }>;
-}
+};
 
 export function SpeakerSelectField({ defaultValue, error, speakers }: SpeakerSelectFieldProps) {
   const items = speakers.map((speaker) => ({

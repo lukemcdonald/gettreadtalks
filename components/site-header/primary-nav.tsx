@@ -17,7 +17,7 @@ export function PrimaryNav() {
   return (
     <nav className="flex items-center">
       {NAVIGATION_LINKS.map((link) => (
-        <NavLink key={link.href} href={link.href} isActive={link.href === pathname}>
+        <NavLink href={link.href} isActive={link.href === pathname} key={link.href}>
           {link.label}
         </NavLink>
       ))}

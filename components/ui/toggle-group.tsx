@@ -3,15 +3,14 @@
 import type { Toggle as TogglePrimitive } from '@base-ui-components/react/toggle';
 import type { VariantProps } from 'class-variance-authority';
 
-import * as React from 'react';
-
+import { createContext, useContext } from 'react';
 import { ToggleGroup as ToggleGroupPrimitive } from '@base-ui-components/react/toggle-group';
 
 import { Separator } from '@/components/ui/separator';
 import { Toggle as ToggleComponent, type toggleVariants } from '@/components/ui/toggle';
 import { cn } from '@/lib/utils';
 
-const ToggleGroupContext = React.createContext<VariantProps<typeof toggleVariants>>({
+const ToggleGroupContext = createContext<VariantProps<typeof toggleVariants>>({
   size: 'default',
   variant: 'default',
 });
@@ -25,14 +24,14 @@ function ToggleGroup({
 }: ToggleGroupPrimitive.Props & VariantProps<typeof toggleVariants>) {
   return (
     <ToggleGroupPrimitive
-      data-slot="toggle-group"
-      data-variant={variant}
-      data-size={size}
       className={cn(
         'flex w-fit *:pointer-coarse:after:min-w-auto',
         variant === 'default' ? 'gap-0.5' : '[--clip-end:-1rem] [--clip-start:-1rem]',
         className,
       )}
+      data-size={size}
+      data-slot="toggle-group"
+      data-variant={variant}
       {...props}
     >
       <ToggleGroupContext.Provider value={{ variant, size }}>
@@ -49,22 +48,22 @@ function Toggle({
   size,
   ...props
 }: TogglePrimitive.Props & VariantProps<typeof toggleVariants>) {
-  const context = React.useContext(ToggleGroupContext);
+  const context = useContext(ToggleGroupContext);
 
   const resolvedVariant = context.variant || variant;
   const resolvedSize = context.size || size;
 
   return (
     <ToggleComponent
-      data-variant={resolvedVariant}
-      data-size={resolvedSize}
       className={cn(
         resolvedVariant === 'outline' &&
           'not-first:before:-start-0.5 not-last:before:-end-0.5 not-first:rounded-s-none not-last:rounded-e-none border-x-0 not-first:before:rounded-s-none not-last:before:rounded-e-none first:border-s last:border-e focus-visible:z-10 before:[clip-path:inset(-1rem_var(--clip-end)_-1rem_var(--clip-start))] not-first:before:[--clip-start:2px] not-last:before:[--clip-end:2px] not-last:has-[+[data-slot=separator]]:before:[--clip-end:1.5px] [[data-slot=separator]+&]:before:[--clip-start:1.5px]',
         className,
       )}
-      variant={resolvedVariant}
+      data-size={resolvedSize}
+      data-variant={resolvedVariant}
       size={resolvedSize}
+      variant={resolvedVariant}
       {...props}
     >
       {children}
@@ -73,7 +72,7 @@ function Toggle({
 }
 
 function ToggleGroupSeparator({ className, ...props }: { className?: string }) {
-  return <Separator orientation="vertical" className={className} {...props} />;
+  return <Separator className={className} orientation="vertical" {...props} />;
 }
 
 export { ToggleGroup, Toggle, Toggle as ToggleGroupItem, ToggleGroupSeparator };

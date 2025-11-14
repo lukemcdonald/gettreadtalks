@@ -10,7 +10,7 @@ import schema from '../../schema';
  * @param tableName - The table name
  * @param nullable - Whether the document can be null (default: false)
  */
-export function doc<T extends TableNames>(tableName: T, nullable: boolean = false) {
+export function doc<T extends TableNames>(tableName: T, nullable = false) {
   const docValidator = convexDoc(schema, tableName);
   return nullable ? v.union(docValidator, v.null()) : docValidator;
 }

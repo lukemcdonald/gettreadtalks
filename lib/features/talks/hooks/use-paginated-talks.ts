@@ -3,17 +3,16 @@
 import type { Preloaded } from 'convex/react';
 
 import { useState } from 'react';
-
 import { usePaginatedQuery, usePreloadedQuery } from 'convex/react';
 
 import { api } from '@/convex/_generated/api';
 
 const PAGE_SIZE = 12;
 
-interface UsePaginatedTalksOptions {
+type UsePaginatedTalksOptions = {
   pageSize?: number;
   preloadedTalks: Preloaded<typeof api.talks.listTalks>;
-}
+};
 
 export function usePaginatedTalks({
   pageSize = PAGE_SIZE,

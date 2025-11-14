@@ -7,7 +7,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 
-interface ActiveFiltersProps {
+type ActiveFiltersProps = {
   speakers: Array<{
     _id: Id<'speakers'>;
     firstName: string;
@@ -17,7 +17,7 @@ interface ActiveFiltersProps {
     _id: Id<'topics'>;
     title: string;
   }>;
-}
+};
 
 export function ActiveFilters({ speakers, topics }: ActiveFiltersProps) {
   const router = useRouter();

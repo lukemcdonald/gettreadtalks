@@ -1,5 +1,3 @@
-import * as mutations from './mutations';
-import * as queries from './queries';
-import { speakerFields, speakerTables } from './schema';
-
-export { mutations, queries, speakerFields, speakerTables };
+export * as mutations from './mutations';
+export * as queries from './queries';
+export { speakerFields, speakerTables } from './schema';

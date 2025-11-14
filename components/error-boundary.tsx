@@ -3,12 +3,15 @@
 import type { ReactNode } from 'react';
 import type { ErrorWithEventId } from '@/lib/services/errors/types';
 
-import * as Sentry from '@sentry/nextjs';
 import { type FallbackProps, ErrorBoundary as ReactErrorBoundary } from 'react-error-boundary';
 
 import { ErrorFallback } from '@/components/error-fallback';
+import { captureException } from '@/lib/services/errors/client';
 
-interface ErrorBoundaryProps {
+// Regex to remove "error" suffix from error names (case-insensitive)
+const ERROR_NAME_SUFFIX_REGEX = /error$/i;
+
+type ErrorBoundaryProps = {
   /**
    * The content to render within the error boundary.
    */
@@ -31,7 +34,7 @@ interface ErrorBoundaryProps {
    * Use this to reset application state if needed.
    */
   onReset?: () => void;
-}
+};
 
 /**
  * Error boundary component that catches React errors and reports them to Sentry.
@@ -70,13 +73,16 @@ export function ErrorBoundary({
 }: ErrorBoundaryProps) {
   const handleError = (error: Error, info: React.ErrorInfo) => {
     // Report to Sentry with fingerprinting and capture event ID
-    const eventId = Sentry.captureException(error, {
-      contexts: {
+    const eventId = captureException(error, {
+      context: {
         react: {
           componentStack: info.componentStack,
         },
       },
-      fingerprint: ['react-error-boundary', error.name.toLowerCase().replace(/error$/i, '')],
+      fingerprint: [
+        'react-error-boundary',
+        error.name.toLowerCase().replace(ERROR_NAME_SUFFIX_REGEX, ''),
+      ],
       tags: {
         errorType: 'react-error-boundary',
         errorName: error.name,

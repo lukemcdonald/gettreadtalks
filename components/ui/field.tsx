@@ -7,8 +7,8 @@ import { cn } from '@/lib/utils';
 function Field({ className, ...props }: FieldPrimitive.Root.Props) {
   return (
     <FieldPrimitive.Root
-      data-slot="field"
       className={cn('flex flex-col items-start gap-2', className)}
+      data-slot="field"
       {...props}
     />
   );
@@ -17,8 +17,8 @@ function Field({ className, ...props }: FieldPrimitive.Root.Props) {
 function FieldLabel({ className, ...props }: FieldPrimitive.Label.Props) {
   return (
     <FieldPrimitive.Label
-      data-slot="field-label"
       className={cn('inline-flex items-center gap-2 text-sm/4', className)}
+      data-slot="field-label"
       {...props}
     />
   );
@@ -37,14 +37,13 @@ function FieldControl({
 
   return (
     <span
-      data-slot="field-control"
       className={cn(
         'relative inline-flex w-full rounded-lg border border-input bg-transparent bg-clip-padding text-base/5 shadow-xs ring-ring/24 transition-shadow before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-lg)-1px)] has-focus-visible:has-aria-invalid:border-destructive/64 has-focus-visible:has-aria-invalid:ring-destructive/16 has-aria-invalid:border-destructive/36 has-focus-visible:border-ring has-disabled:opacity-64 has-focus-visible:ring-[3px] not-has-disabled:has-not-focus-visible:not-has-aria-invalid:before:shadow-[0_1px_--theme(--color-black/4%)] sm:text-sm dark:bg-input/32 dark:not-in-data-[slot=group]:bg-clip-border dark:has-aria-invalid:ring-destructive/24 dark:not-has-disabled:has-not-focus-visible:not-has-aria-invalid:before:shadow-[0_-1px_--theme(--color-white/8%)] [&:has(:disabled,:focus-visible,[aria-invalid])]:shadow-none',
         className,
       )}
+      data-slot="field-control"
     >
       <FieldPrimitive.Control
-        data-slot="field-control"
         className={cn(
           'w-full min-w-0 rounded-[inherit] px-[calc(--spacing(3)-1px)] py-[calc(--spacing(1.5)-1px)] outline-none placeholder:text-muted-foreground/64',
           size === 'sm' && 'px-[calc(--spacing(2.5)-1px)] py-[calc(--spacing(1)-1px)]',
@@ -54,6 +53,7 @@ function FieldControl({
           props.type === 'file' &&
             'text-muted-foreground file:me-3 file:bg-transparent file:font-medium file:text-foreground file:text-sm',
         )}
+        data-slot="field-control"
         {...props}
       />
     </span>
@@ -63,8 +63,8 @@ function FieldControl({
 function FieldDescription({ className, ...props }: FieldPrimitive.Description.Props) {
   return (
     <FieldPrimitive.Description
-      data-slot="field-description"
       className={cn('text-muted-foreground text-xs', className)}
+      data-slot="field-description"
       {...props}
     />
   );
@@ -73,8 +73,8 @@ function FieldDescription({ className, ...props }: FieldPrimitive.Description.Pr
 function FieldError({ className, ...props }: FieldPrimitive.Error.Props) {
   return (
     <FieldPrimitive.Error
-      data-slot="field-error"
       className={cn('text-destructive-foreground text-xs', className)}
+      data-slot="field-error"
       {...props}
     />
   );

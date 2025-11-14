@@ -1,10 +1,8 @@
 import { MainLayout } from '@/components/main-layout';
 
-interface TopicPageProps {
-  params: Promise<{
-    topic: string;
-  }>;
-}
+type TopicPageProps = {
+  params: Promise<{ topic: string }>;
+};
 
 export default async function TopicPage({ params }: TopicPageProps) {
   await params;

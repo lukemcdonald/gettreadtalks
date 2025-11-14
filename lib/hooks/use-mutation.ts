@@ -4,17 +4,16 @@ import type { FunctionReference } from 'convex/server';
 import type { ErrorWithEventId, MutationState, MutationStatus } from '../services/errors/types';
 
 import { useCallback, useState } from 'react';
-
 import { useMutation as useConvexMutation } from 'convex/react';
 
 import { captureException } from '../services/errors/client';
 import { getErrorCode, getErrorMessage } from '../services/errors/convex';
 
-interface UseMutationOptions {
+type UseMutationOptions = {
   onError?: (error: Error) => void;
   onSuccess?: (data: unknown) => void;
   reportToSentry?: boolean;
-}
+};
 
 export function useMutation<Mutation extends FunctionReference<'mutation'>>(
   mutation: Mutation,

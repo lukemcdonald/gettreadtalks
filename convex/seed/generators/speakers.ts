@@ -4,10 +4,7 @@ import { ministryOrganizations, ministryRoles } from '../data/ministries';
 import { speakers as realSpeakers } from '../data/speakers';
 import { randomBoolean, randomItem } from '../utils';
 
-/**
- * Generate speaker data using real speaker names with varied realistic details
- */
-export function generateSpeakers(): Array<{
+type Speaker = {
   description?: string;
   featured?: boolean;
   firstName: string;
@@ -17,18 +14,13 @@ export function generateSpeakers(): Array<{
   role?: string;
   slug: string;
   websiteUrl?: string;
-}> {
-  const speakers: Array<{
-    description?: string;
-    featured?: boolean;
-    firstName: string;
-    imageUrl?: string;
-    lastName: string;
-    ministry?: string;
-    role?: string;
-    slug: string;
-    websiteUrl?: string;
-  }> = [];
+};
+
+/**
+ * Generate speaker data using real speaker names with varied realistic details
+ */
+export function generateSpeakers() {
+  const speakers: Speaker[] = [];
 
   // Use real speaker names from the actual site
   for (const realSpeaker of realSpeakers) {

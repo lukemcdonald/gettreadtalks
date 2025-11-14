@@ -31,7 +31,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className="h-full">
+    <html className="h-full" lang="en" suppressHydrationWarning>
       <body className={cn(inter.className, 'h-full bg-cover bg-gray-100 dark:bg-gray-950')}>
         <ErrorBoundary>
           <ThemeProvider>

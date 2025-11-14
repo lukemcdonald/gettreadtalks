@@ -5,11 +5,11 @@ import { cn } from '@/lib/utils';
 function Empty({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
-      data-slot="empty"
       className={cn(
         'flex min-w-0 flex-1 flex-col items-center justify-center gap-6 text-balance rounded-xl border-dashed p-6 text-center md:p-12',
         className,
       )}
+      data-slot="empty"
       {...props}
     />
   );
@@ -18,8 +18,8 @@ function Empty({ className, ...props }: React.ComponentProps<'div'>) {
 function EmptyHeader({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
-      data-slot="empty-header"
       className={cn('flex max-w-sm flex-col items-center text-center', className)}
+      data-slot="empty-header"
       {...props}
     />
   );
@@ -47,26 +47,26 @@ function EmptyMedia({
 }: React.ComponentProps<'div'> & VariantProps<typeof emptyMediaVariants>) {
   return (
     <div
+      className={cn('relative mb-6', className)}
       data-slot="empty-media"
       data-variant={variant}
-      className={cn('relative mb-6', className)}
       {...props}
     >
       {variant === 'icon' && (
         <>
           <div
+            aria-hidden="true"
             className={cn(
               emptyMediaVariants({ variant, className }),
               '-translate-x-0.5 -rotate-10 pointer-events-none absolute bottom-px origin-bottom-left scale-84 shadow-none',
             )}
-            aria-hidden="true"
           />
           <div
+            aria-hidden="true"
             className={cn(
               emptyMediaVariants({ variant, className }),
               'pointer-events-none absolute bottom-px origin-bottom-right translate-x-0.5 rotate-10 scale-84 shadow-none',
             )}
-            aria-hidden="true"
           />
         </>
       )}
@@ -78,8 +78,8 @@ function EmptyMedia({
 function EmptyTitle({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
-      data-slot="empty-title"
       className={cn('font-heading text-xl leading-none', className)}
+      data-slot="empty-title"
       {...props}
     />
   );
@@ -88,11 +88,11 @@ function EmptyTitle({ className, ...props }: React.ComponentProps<'div'>) {
 function EmptyDescription({ className, ...props }: React.ComponentProps<'p'>) {
   return (
     <div
-      data-slot="empty-description"
       className={cn(
         'text-muted-foreground text-sm/relaxed [&>a:hover]:text-primary [&>a]:underline [&>a]:underline-offset-4 [[data-slot=empty-title]+&]:mt-1',
         className,
       )}
+      data-slot="empty-description"
       {...props}
     />
   );
@@ -101,11 +101,11 @@ function EmptyDescription({ className, ...props }: React.ComponentProps<'p'>) {
 function EmptyContent({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
-      data-slot="empty-content"
       className={cn(
         'flex w-full min-w-0 max-w-sm flex-col items-center gap-4 text-balance text-sm',
         className,
       )}
+      data-slot="empty-content"
       {...props}
     />
   );

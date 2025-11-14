@@ -21,8 +21,8 @@ function Meter({ className, children, ...props }: MeterPrimitive.Root.Props) {
 function MeterLabel({ className, ...props }: MeterPrimitive.Label.Props) {
   return (
     <MeterPrimitive.Label
-      data-slot="meter-label"
       className={cn('font-medium text-sm', className)}
+      data-slot="meter-label"
       {...props}
     />
   );
@@ -31,8 +31,8 @@ function MeterLabel({ className, ...props }: MeterPrimitive.Label.Props) {
 function MeterTrack({ className, ...props }: MeterPrimitive.Track.Props) {
   return (
     <MeterPrimitive.Track
-      data-slot="meter-track"
       className={cn('block h-2 w-full overflow-hidden bg-input', className)}
+      data-slot="meter-track"
       {...props}
     />
   );
@@ -41,8 +41,8 @@ function MeterTrack({ className, ...props }: MeterPrimitive.Track.Props) {
 function MeterIndicator({ className, ...props }: MeterPrimitive.Indicator.Props) {
   return (
     <MeterPrimitive.Indicator
-      data-slot="meter-indicator"
       className={cn('bg-primary transition-all duration-500', className)}
+      data-slot="meter-indicator"
       {...props}
     />
   );
@@ -51,8 +51,8 @@ function MeterIndicator({ className, ...props }: MeterPrimitive.Indicator.Props)
 function MeterValue({ className, ...props }: MeterPrimitive.Value.Props) {
   return (
     <MeterPrimitive.Value
-      data-slot="meter-value"
       className={cn('text-sm tabular-nums', className)}
+      data-slot="meter-value"
       {...props}
     />
   );

@@ -1,4 +1,4 @@
-interface SpeakerInfoProps {
+type SpeakerInfoProps = {
   speaker: {
     firstName: string;
     lastName: string;
@@ -6,7 +6,7 @@ interface SpeakerInfoProps {
     role?: string;
     ministry?: string;
   };
-}
+};
 
 export function SpeakerInfo({ speaker }: SpeakerInfoProps) {
   return (

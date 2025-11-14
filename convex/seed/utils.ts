@@ -17,14 +17,14 @@ export function normalizeSlug(text: string): string {
 /**
  * Pick a random item from an array
  */
-export function randomItem<T>(array: Array<T>): T {
+export function randomItem<T>(array: T[]): T {
   return array[Math.floor(Math.random() * array.length)];
 }
 
 /**
  * Pick N random unique items from an array
  */
-export function randomSubset<T>(array: Array<T>, count: number): Array<T> {
+export function randomSubset<T>(array: T[], count: number): T[] {
   const shuffled = [...array].sort(() => Math.random() - 0.5);
 
   return shuffled.slice(0, Math.min(count, array.length));
@@ -39,7 +39,7 @@ export function randomSubset<T>(array: Array<T>, count: number): Array<T> {
  * // 70% chance of 0, 20% chance of 1, 10% chance of 2
  * const index = weightedRandom([70, 20, 10]);
  */
-export function weightedRandom(weights: Array<number>): number {
+export function weightedRandom(weights: number[]): number {
   const random = Math.random() * 100;
   let sum = 0;
 
@@ -63,6 +63,6 @@ export function randomInt(min: number, max: number): number {
 /**
  * Generate random boolean with given probability (0-1)
  */
-export function randomBoolean(probability: number = 0.5): boolean {
+export function randomBoolean(probability = 0.5): boolean {
   return Math.random() < probability;
 }
