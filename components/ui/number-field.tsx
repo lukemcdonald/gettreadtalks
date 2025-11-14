@@ -1,13 +1,13 @@
 'use client';
 
-import * as React from 'react';
+import { createContext, useContext, useId } from 'react';
 import { NumberField as NumberFieldPrimitive } from '@base-ui-components/react/number-field';
 import { MinusIcon, PlusIcon } from 'lucide-react';
 
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 
-const NumberFieldContext = React.createContext<{
+const NumberFieldContext = createContext<{
   fieldId: string;
 } | null>(null);
 
@@ -19,7 +19,7 @@ function NumberField({
 }: NumberFieldPrimitive.Root.Props & {
   size?: 'sm' | 'default' | 'lg';
 }) {
-  const generatedId = React.useId();
+  const generatedId = useId();
   const fieldId = id ?? generatedId;
 
   return (
@@ -98,7 +98,7 @@ function NumberFieldScrubArea({
 }: NumberFieldPrimitive.ScrubArea.Props & {
   label: string;
 }) {
-  const context = React.useContext(NumberFieldContext);
+  const context = useContext(NumberFieldContext);
 
   if (!context) {
     throw new Error(

@@ -5,11 +5,11 @@ import { getAllCollections, getAllSpeakers, getTalkBySlug } from '@/lib/features
 import { getCurrentUser } from '@/lib/services/auth/server';
 import { TalkForm } from '../../new/_components';
 
-interface EditTalkPageProps {
+type EditTalkPageProps = {
   params: Promise<{
     slug: string;
   }>;
-}
+};
 
 export default async function EditTalkPage({ params }: EditTalkPageProps) {
   const user = await getCurrentUser();

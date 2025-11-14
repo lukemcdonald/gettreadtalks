@@ -1,7 +1,7 @@
 /**
  * Curated inspirational talk titles for religious/faith-based content
  */
-export const talkTitles: Array<string> = [
+export const talkTitles = [
   // Purpose & Calling
   "Finding Your Purpose in God's Plan",
   'The Power of Faithful Leadership',

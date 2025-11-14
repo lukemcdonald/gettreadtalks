@@ -2,11 +2,9 @@ import type { PasswordResetEmailProps } from '../../lib/services/email/types';
 
 import { Button, Section, Text } from '@react-email/components';
 
-import { EmailLayout } from './_components/layout';
+import { EmailLayout } from './components/layout';
 
-export function ResetPasswordTemplate({ resetUrl, email, token }: PasswordResetEmailProps) {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  token; // token parameter is part of the interface and could be used for additional security
+export function ResetPasswordTemplate({ email, resetUrl }: PasswordResetEmailProps) {
   return (
     <EmailLayout preview="Reset your TreadTalks password to regain access to your account.">
       <Text style={paragraph}>Hi there,</Text>
@@ -56,8 +54,8 @@ const listItem = {
 };
 
 const buttonContainer = {
-  textAlign: 'center' as const,
   margin: '32px 0',
+  textAlign: 'center' as const,
 };
 
 const button = {
@@ -67,8 +65,8 @@ const button = {
   fontSize: '16px',
   fontWeight: 'bold',
   lineHeight: '50px',
-  textDecoration: 'none',
   padding: '0 20px',
+  textDecoration: 'none',
 };
 
 const linkText = {

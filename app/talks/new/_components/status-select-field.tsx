@@ -9,11 +9,11 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-interface StatusSelectFieldProps {
+type StatusSelectFieldProps = {
   defaultValue?: StatusType;
   onChange?: (value: StatusType) => void;
   value?: StatusType;
-}
+};
 
 export function StatusSelectField({
   defaultValue = 'backlog',

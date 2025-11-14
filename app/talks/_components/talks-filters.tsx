@@ -15,12 +15,12 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-interface TalksFiltersProps {
+type TalksFiltersProps = {
   isAuthenticated: boolean;
   onLoadingChange?: (loading: boolean) => void;
   speakers: Array<{ _id: Id<'speakers'>; firstName: string; lastName: string }>;
   topics: Array<{ _id: Id<'topics'>; title: string }>;
-}
+};
 
 export function TalksFilters({
   isAuthenticated,

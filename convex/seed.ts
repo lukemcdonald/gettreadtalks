@@ -113,7 +113,7 @@ async function clearAllTables(ctx: MutationCtx): Promise<void> {
 /**
  * Seed topics from curated list
  */
-async function seedTopics(ctx: MutationCtx): Promise<Array<Id<'topics'>>> {
+async function seedTopics(ctx: MutationCtx): Promise<Id<'topics'>[]> {
   const topicsData = generateTopics();
 
   const topicIds = await Promise.all(
@@ -131,7 +131,7 @@ async function seedTopics(ctx: MutationCtx): Promise<Array<Id<'topics'>>> {
 /**
  * Seed speakers with varied data using real speaker names
  */
-async function seedSpeakers(ctx: MutationCtx): Promise<Array<Id<'speakers'>>> {
+async function seedSpeakers(ctx: MutationCtx): Promise<Id<'speakers'>[]> {
   const speakersData = generateSpeakers();
 
   const speakerIds = await Promise.all(
@@ -156,10 +156,7 @@ async function seedSpeakers(ctx: MutationCtx): Promise<Array<Id<'speakers'>>> {
 /**
  * Seed talks with realistic distribution
  */
-async function seedTalks(
-  ctx: MutationCtx,
-  speakerIds: Array<Id<'speakers'>>,
-): Promise<Array<Id<'talks'>>> {
+async function seedTalks(ctx: MutationCtx, speakerIds: Id<'speakers'>[]): Promise<Id<'talks'>[]> {
   const talksData = generateTalks(100, speakerIds);
 
   const talkIds = await Promise.all(
@@ -186,8 +183,8 @@ async function seedTalks(
  */
 async function seedCollections(
   ctx: MutationCtx,
-  talkIds: Array<Id<'talks'>>,
-): Promise<Array<Id<'collections'>>> {
+  talkIds: Id<'talks'>[],
+): Promise<Id<'collections'>[]> {
   const collectionsData = generateCollections(8);
 
   const collectionIds = await Promise.all(
@@ -225,9 +222,9 @@ async function seedCollections(
  */
 async function seedClips(
   ctx: MutationCtx,
-  talkIds: Array<Id<'talks'>>,
-  speakerIds: Array<Id<'speakers'>>,
-): Promise<Array<Id<'clips'>>> {
+  talkIds: Id<'talks'>[],
+  speakerIds: Id<'speakers'>[],
+): Promise<Id<'clips'>[]> {
   const clipsData = generateClips(200, talkIds, speakerIds);
 
   const clipIds = await Promise.all(
@@ -253,8 +250,8 @@ async function seedClips(
  */
 async function seedTalksOnTopics(
   ctx: MutationCtx,
-  talkIds: Array<Id<'talks'>>,
-  topicIds: Array<Id<'topics'>>,
+  talkIds: Id<'talks'>[],
+  topicIds: Id<'topics'>[],
 ): Promise<void> {
   // Each talk gets 2-4 topics
   const relationships: Array<{ talkId: Id<'talks'>; topicId: Id<'topics'> }> = [];
@@ -283,8 +280,8 @@ async function seedTalksOnTopics(
  */
 async function seedClipsOnTopics(
   ctx: MutationCtx,
-  clipIds: Array<Id<'clips'>>,
-  topicIds: Array<Id<'topics'>>,
+  clipIds: Id<'clips'>[],
+  topicIds: Id<'topics'>[],
 ): Promise<void> {
   // Each clip gets 1-3 topics
   const relationships: Array<{ clipId: Id<'clips'>; topicId: Id<'topics'> }> = [];

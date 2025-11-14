@@ -2,10 +2,17 @@ import { faker } from '@faker-js/faker';
 
 import { normalizeSlug, randomBoolean } from '../utils';
 
+type Collection = {
+  description?: string;
+  slug: string;
+  title: string;
+  url?: string;
+};
+
 /**
  * Collection themes for organizing talks
  */
-const collectionThemes: Array<string> = [
+const collectionThemes: string[] = [
   'Essential Teachings on Faith',
   'Leadership in Ministry',
   'Building Stronger Families',
@@ -41,12 +48,7 @@ export function generateCollections(count = 8): Array<{
   for (let i = 0; i < Math.min(count, collectionThemes.length); i++) {
     const title = shuffledThemes[i];
 
-    const collection: {
-      description?: string;
-      slug: string;
-      title: string;
-      url?: string;
-    } = {
+    const collection: Collection = {
       slug: normalizeSlug(title),
       title,
     };

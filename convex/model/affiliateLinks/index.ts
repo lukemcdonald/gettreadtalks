@@ -1,5 +1,3 @@
-import * as mutations from './mutations';
-import * as queries from './queries';
-import { affiliateLinkFields, affiliateLinkTables } from './schema';
-
-export { affiliateLinkFields, affiliateLinkTables, mutations, queries };
+export * as mutations from './mutations';
+export * as queries from './queries';
+export { affiliateLinkFields, affiliateLinkTables } from './schema';

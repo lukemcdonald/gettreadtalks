@@ -1,6 +1,6 @@
 'use client';
 
-import * as React from 'react';
+import { type RefObject, createContext, useContext, useRef } from 'react';
 import { Combobox as ComboboxPrimitive } from '@base-ui-components/react/combobox';
 import { ChevronsUpDownIcon, XIcon } from 'lucide-react';
 
@@ -8,8 +8,8 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 
-const ComboboxContext = React.createContext<{
-  chipsRef: React.RefObject<HTMLDivElement | null> | null;
+const ComboboxContext = createContext<{
+  chipsRef: RefObject<HTMLDivElement | null> | null;
   multiple: boolean;
 }>({
   chipsRef: null,
@@ -21,7 +21,7 @@ function Combobox<
   SelectedValue = ItemValue,
   Multiple extends boolean | undefined = false,
 >(props: ComboboxPrimitive.Root.Props<ItemValue, SelectedValue, Multiple>) {
-  const chipsRef = React.useRef<HTMLDivElement | null>(null);
+  const chipsRef = useRef<HTMLDivElement | null>(null);
   return (
     <ComboboxContext.Provider value={{ chipsRef, multiple: !!props.multiple }}>
       <ComboboxPrimitive.Root {...props} />
@@ -40,7 +40,7 @@ function ComboboxInput({
   showClear?: boolean;
   size?: 'sm' | 'default' | 'lg' | number;
 }) {
-  const { multiple } = React.useContext(ComboboxContext);
+  const { multiple } = useContext(ComboboxContext);
   const sizeValue = (size ?? 'default') as 'sm' | 'default' | 'lg' | number;
 
   // multiple mode
@@ -111,7 +111,7 @@ function ComboboxPopup({
 }: ComboboxPrimitive.Popup.Props & {
   sideOffset?: number;
 }) {
-  const { chipsRef } = React.useContext(ComboboxContext);
+  const { chipsRef } = useContext(ComboboxContext);
 
   return (
     <ComboboxPrimitive.Portal>
@@ -248,7 +248,7 @@ function ComboboxCollection(props: ComboboxPrimitive.Collection.Props) {
 }
 
 function ComboboxChips({ className, ...props }: ComboboxPrimitive.Chips.Props) {
-  const { chipsRef } = React.useContext(ComboboxContext);
+  const { chipsRef } = useContext(ComboboxContext);
 
   return (
     <ComboboxPrimitive.Chips

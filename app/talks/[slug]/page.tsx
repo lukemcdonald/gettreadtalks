@@ -12,11 +12,9 @@ import { SpeakerInfo } from './_components/speaker-info';
 import { TalkDetails } from './_components/talk-details';
 import { TopicsList } from './_components/topics-list';
 
-interface TalkPageProps {
-  params: Promise<{
-    slug: string;
-  }>;
-}
+type TalkPageProps = {
+  params: Promise<{ slug: string }>;
+};
 
 export default async function TalkPage({ params }: TalkPageProps) {
   const { slug } = await params;

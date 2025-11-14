@@ -2,7 +2,7 @@
  * Ministry organizations and roles
  */
 
-export const ministryOrganizations: Array<string> = [
+export const ministryOrganizations = [
   'Crossroads Church',
   'Grace Community Church',
   'New Life Fellowship',
@@ -30,7 +30,7 @@ export const ministryOrganizations: Array<string> = [
   'The Well Community',
 ];
 
-export const ministryRoles: Array<string> = [
+export const ministryRoles: string[] = [
   'Lead Pastor',
   'Senior Pastor',
   'Teaching Pastor',

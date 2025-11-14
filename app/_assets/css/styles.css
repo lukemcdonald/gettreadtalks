@@ -6,11 +6,11 @@
 @import "./theme.css";
 
 /** Base */
-@import "./base.css";
+/* @import "./base.css"; */
 
 /** Components */
-@import "./components.css";
+/* @import "./components.css"; */
 
 /** Utilities */
 @import "./animations.css";
-@import "./utilities.css";
+/* @import "./utilities.css"; */

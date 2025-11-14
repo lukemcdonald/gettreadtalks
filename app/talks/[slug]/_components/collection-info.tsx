@@ -1,9 +1,9 @@
-interface CollectionInfoProps {
+type CollectionInfoProps = {
   collection: {
     title: string;
     description?: string;
   };
-}
+};
 
 export function CollectionInfo({ collection }: CollectionInfoProps) {
   return (

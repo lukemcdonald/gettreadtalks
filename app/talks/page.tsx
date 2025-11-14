@@ -16,7 +16,7 @@ import {
   TalksListSkeleton,
 } from './_components';
 
-interface TalksPageProps {
+type TalksPageProps = {
   searchParams: Promise<{
     cursor?: string;
     featured?: string;
@@ -24,7 +24,7 @@ interface TalksPageProps {
     status?: string;
     topic?: string;
   }>;
-}
+};
 
 async function TalksContent({ params }: { params: Awaited<TalksPageProps['searchParams']> }) {
   const user = await getCurrentUser();

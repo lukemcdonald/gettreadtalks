@@ -6,9 +6,9 @@ import Link from 'next/link';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
-interface TalksListProps {
+type TalksListProps = {
   talks: Doc<'talks'>[];
-}
+};
 
 export function TalksList({ talks }: TalksListProps) {
   if (talks.length === 0) {
@@ -34,25 +34,6 @@ export function TalksList({ talks }: TalksListProps) {
                   Featured
                 </span>
               )}
-              <span
-                className="rounded px-2 py-1 font-medium text-xs"
-                style={{
-                  backgroundColor:
-                    talk.status === 'published'
-                      ? 'hsl(var(--success) / 0.1)'
-                      : talk.status === 'backlog'
-                        ? 'hsl(var(--warning) / 0.1)'
-                        : 'hsl(var(--muted) / 0.5)',
-                  color:
-                    talk.status === 'published'
-                      ? 'hsl(var(--success))'
-                      : talk.status === 'backlog'
-                        ? 'hsl(var(--warning))'
-                        : 'hsl(var(--muted-foreground))',
-                }}
-              >
-                {talk.status}
-              </span>
             </CardContent>
           </div>
         </Card>

@@ -1,11 +1,7 @@
 /**
  * Real speaker names from the actual site
  */
-export const speakers: Array<{
-  firstName: string;
-  lastName: string;
-  slug: string;
-}> = [
+export const speakers = [
   { firstName: 'Jay', lastName: 'Adams', slug: 'jay-adams' },
   { firstName: 'Eric', lastName: 'Alexander', slug: 'eric-alexander' },
   { firstName: 'Greg', lastName: 'Bahnsen', slug: 'greg-bahnsen' },

@@ -208,6 +208,7 @@ export const listTalks = query({
     status: v.optional(statusType),
     topicId: v.optional(v.id('topics')),
   },
+  // biome-ignore lint/complexity: query
   handler: async (ctx, args) => {
     const { featured, paginationOpts, speakerId, status, topicId } = args;
 

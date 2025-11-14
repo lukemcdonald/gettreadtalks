@@ -12,55 +12,60 @@ export type MutationStatus = 'idle' | 'loading' | 'success' | 'error';
  * Common error codes used throughout the application.
  * These should be used with ConvexError for consistent error handling.
  */
-export enum ErrorCode {
+export const ErrorCode = {
   // Authentication & Authorization
-  AUTH_REQUIRED = 'AUTH_REQUIRED',
-  FORBIDDEN = 'FORBIDDEN',
-  INVALID_CREDENTIALS = 'INVALID_CREDENTIALS',
-  SESSION_EXPIRED = 'SESSION_EXPIRED',
+  AUTH_REQUIRED: 'AUTH_REQUIRED',
+  FORBIDDEN: 'FORBIDDEN',
+  INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
+  SESSION_EXPIRED: 'SESSION_EXPIRED',
 
   // Validation
-  DUPLICATE_SLUG = 'DUPLICATE_SLUG',
-  INVALID_INPUT = 'INVALID_INPUT',
-  MISSING_FIELD = 'MISSING_FIELD',
-  VALIDATION_FAILED = 'VALIDATION_FAILED',
+  DUPLICATE_SLUG: 'DUPLICATE_SLUG',
+  INVALID_INPUT: 'INVALID_INPUT',
+  MISSING_FIELD: 'MISSING_FIELD',
+  VALIDATION_FAILED: 'VALIDATION_FAILED',
 
   // Resource
-  NOT_FOUND = 'NOT_FOUND',
-  RESOURCE_DELETED = 'RESOURCE_DELETED',
+  NOT_FOUND: 'NOT_FOUND',
+  RESOURCE_DELETED: 'RESOURCE_DELETED',
 
   // System
-  DATABASE_ERROR = 'DATABASE_ERROR',
-  NETWORK_ERROR = 'NETWORK_ERROR',
-  SERVER_ERROR = 'SERVER_ERROR',
-  UNKNOWN_ERROR = 'UNKNOWN_ERROR',
-}
+  DATABASE_ERROR: 'DATABASE_ERROR',
+  NETWORK_ERROR: 'NETWORK_ERROR',
+  SERVER_ERROR: 'SERVER_ERROR',
+  UNKNOWN_ERROR: 'UNKNOWN_ERROR',
+} as const;
+
+/**
+ * Type representing all possible error code values.
+ */
+export type ErrorCodeType = (typeof ErrorCode)[keyof typeof ErrorCode];
 
 /**
  * Context information that can be attached to errors for debugging.
  */
-export interface ErrorContext {
+export type ErrorContext = {
   [key: string]: unknown;
-  code?: ErrorCode;
+  code?: ErrorCodeType;
   field?: string;
   resource?: string;
   resourceId?: string;
-}
+};
 
 /**
  * Internal state for mutation hooks with error handling.
  */
-export interface MutationState<TData = unknown> {
+export type MutationState<TData = unknown> = {
   data: TData | null;
   error: Error | null;
   status: MutationStatus;
-}
+};
 
 /**
  * Result returned from useConvexMutation hook.
  * Includes status enum and derived boolean flags for convenience.
  */
-export interface MutationResult<TData = unknown> {
+export type MutationResult<TData = unknown> = {
   data: TData | null;
   error: Error | null;
   isError: boolean;
@@ -70,19 +75,19 @@ export interface MutationResult<TData = unknown> {
   mutate: (...args: unknown[]) => Promise<TData>;
   reset: () => void;
   status: MutationStatus;
-}
+};
 
 /**
  * Error object with optional Sentry Event ID attached.
  */
-export interface ErrorWithEventId extends Error {
+export type ErrorWithEventId = Error & {
   __sentryEventId?: string;
-}
+};
 
 /**
  * Options for error reporting to Sentry.
  */
-export interface ErrorReportOptions {
+export type ErrorReportOptions = {
   /** Structured context data (appears in separate section in Sentry) */
   context?: ErrorContext;
   /** Additional unstructured data (appears as Extra Data in Sentry) */
@@ -101,4 +106,4 @@ export interface ErrorReportOptions {
     id?: string;
     username?: string;
   };
-}
+};

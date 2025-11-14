@@ -1,28 +1,28 @@
-export interface EmailTemplateProps {
+export type EmailTemplateProps = {
+  email: string;
   firstName?: string;
   lastName?: string;
-  email: string;
-}
+};
 
-export interface WelcomeEmailProps extends EmailTemplateProps {
+export type WelcomeEmailProps = EmailTemplateProps & {
   name: string;
-}
+};
 
-export interface VerificationEmailProps extends EmailTemplateProps {
-  verificationUrl: string;
+export type VerificationEmailProps = EmailTemplateProps & {
   token: string;
-}
+  verificationUrl: string;
+};
 
-export interface PasswordResetEmailProps extends EmailTemplateProps {
+export type PasswordResetEmailProps = EmailTemplateProps & {
   resetUrl: string;
   token: string;
-}
+};
 
-export interface EmailSendOptions {
-  to: string[];
+export type EmailSendOptions = {
   from: string;
-  subject: string;
   html?: string;
-  text?: string;
   replyTo?: string;
-}
+  subject: string;
+  text?: string;
+  to: string[];
+};

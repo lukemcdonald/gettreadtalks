@@ -3,17 +3,10 @@ import type { StatusType } from '../../lib/types';
 
 import { faker } from '@faker-js/faker';
 
-import { talkTitles } from '../data/talk_titles';
+import { talkTitles } from '../data/talks';
 import { normalizeSlug, randomBoolean, randomInt, randomItem, weightedRandom } from '../utils';
 
-/**
- * Generate clip data with realistic distribution
- */
-export function generateClips(
-  count: number,
-  talkIds: Array<Id<'talks'>>,
-  speakerIds: Array<Id<'speakers'>>,
-): Array<{
+type Clip = {
   description?: string;
   mediaUrl: string;
   publishedAt?: number;
@@ -22,17 +15,13 @@ export function generateClips(
   status: StatusType;
   talkId?: Id<'talks'>;
   title: string;
-}> {
-  const clips: Array<{
-    description?: string;
-    mediaUrl: string;
-    publishedAt?: number;
-    slug: string;
-    speakerId?: Id<'speakers'>;
-    status: StatusType;
-    talkId?: Id<'talks'>;
-    title: string;
-  }> = [];
+};
+
+/**
+ * Generate clip data with realistic distribution
+ */
+export function generateClips(count: number, talkIds: Id<'talks'>[], speakerIds: Id<'speakers'>[]) {
+  const clips: Clip[] = [];
 
   // Generate clip titles by combining talk titles with descriptors
   const clipDescriptors = [
@@ -66,7 +55,7 @@ export function generateClips(
 
     // Status distribution: 70% published, 20% approved, 10% backlog/archived
     const statusIndex = weightedRandom([70, 20, 10]);
-    const statuses: Array<StatusType> = ['published', 'approved', 'backlog'];
+    const statuses: StatusType[] = ['published', 'approved', 'backlog'];
     const status = statuses[statusIndex];
 
     // Generate published date for published clips
@@ -78,16 +67,7 @@ export function generateClips(
       publishedAt = faker.date.between({ from: twoYearsAgo, to: now }).getTime();
     }
 
-    const clip: {
-      description?: string;
-      mediaUrl: string;
-      publishedAt?: number;
-      slug: string;
-      speakerId?: Id<'speakers'>;
-      status: StatusType;
-      talkId?: Id<'talks'>;
-      title: string;
-    } = {
+    const clip: Clip = {
       mediaUrl: `${faker.internet.url()}/clip.mp4`,
       publishedAt,
       slug: normalizeSlug(title),

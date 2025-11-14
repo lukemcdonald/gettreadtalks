@@ -1,4 +1,4 @@
-interface ClipsListProps {
+type ClipsListProps = {
   clips: Array<{
     _id: string;
     title: string;
@@ -7,7 +7,7 @@ interface ClipsListProps {
     status: string;
     publishedAt?: number;
   }>;
-}
+};
 
 export function ClipsList({ clips }: ClipsListProps) {
   return (

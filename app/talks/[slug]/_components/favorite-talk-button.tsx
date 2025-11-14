@@ -9,9 +9,9 @@ import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useFavoriteTalk, useIsTalkFavorited, useUnfavoriteTalk } from '@/lib/features/users/hooks';
 
-interface FavoriteTalkButtonProps {
+type FavoriteTalkButtonProps = {
   talkId: Id<'talks'>;
-}
+};
 
 function FavoriteButton({ talkId }: FavoriteTalkButtonProps) {
   const { data: isFavorited, isLoading: isCheckingFavorite } = useIsTalkFavorited(talkId);

@@ -6,9 +6,9 @@ import Link from 'next/link';
 
 import { usePaginatedTalks } from '@/lib/features/talks';
 
-interface TalksListProps {
+type TalksListProps = {
   preloadedTalks: PreloadedTalks;
-}
+};
 
 export function TalksList({ preloadedTalks }: TalksListProps) {
   const { canLoadMore, data: talks, loadMore } = usePaginatedTalks({ preloadedTalks });

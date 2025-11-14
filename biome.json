@@ -7,6 +7,14 @@
     "indentStyle": "space",
     "lineWidth": 100
   },
+  "linter": {
+    "rules": {
+      "performance": {
+        "noBarrelFile": "off",
+        "noNamespaceImport": "off"
+      }
+    }
+  },
   "javascript": {
     "formatter": {
       "quoteStyle": "single",
@@ -36,6 +44,18 @@
       }
     }
   },
+  "overrides": [
+    {
+      "includes": ["convex/**/*"],
+      "linter": {
+        "rules": {
+          "style": {
+            "useFilenamingConvention": "off"
+          }
+        }
+      }
+    }
+  ],
   "files": {
     "ignoreUnknown": false,
     "includes": [

@@ -168,7 +168,7 @@ export const listCollectionsBySpeaker = query({
 
     // Get unique collection IDs (filter out talks without collections)
     const collectionIds = [
-      ...new Set(talks.filter((talk) => talk.collectionId).map((talk) => talk.collectionId!)),
+      ...new Set(talks.flatMap((talk) => (talk.collectionId ? [talk.collectionId] : []))),
     ];
 
     // Fetch all collections in parallel

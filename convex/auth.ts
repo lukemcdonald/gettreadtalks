@@ -4,6 +4,7 @@ import { type GenericCtx, createClient } from '@convex-dev/better-auth';
 import { convex } from '@convex-dev/better-auth/plugins';
 import { betterAuth } from 'better-auth';
 import { nextCookies } from 'better-auth/next-js';
+import invariant from 'tiny-invariant';
 
 import { components } from './_generated/api';
 
@@ -11,6 +12,10 @@ export const createAuth = (
   ctx: GenericCtx<DataModel>,
   { optionsOnly } = { optionsOnly: false },
 ) => {
+  const secret = process.env.BETTER_AUTH_SECRET;
+
+  invariant(secret, 'Missing required environment variable: BETTER_AUTH_SECRET');
+
   return betterAuth({
     advanced: {
       useSecureCookies: true, // Set to true and use `next dev --experimental-https`
@@ -25,7 +30,7 @@ export const createAuth = (
       convex(),
       nextCookies(), // Add nextCookies as the last plugin for automatic cookie handling
     ],
-    secret: process.env.BETTER_AUTH_SECRET!,
+    secret,
     trustedOrigins: [
       'https://localhost:3000',
       'https://*.vercel.app',
