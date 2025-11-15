@@ -2,7 +2,7 @@ import type { NextConfig } from 'next';
 
 import { withSentryConfig } from '@sentry/nextjs';
 
-import { IS_SENTRY_ENABLED } from './lib/config/sentry';
+import { IS_SENTRY_ENABLED } from './src/lib/config/sentry';
 import { IS_PROD } from '@/lib/constants/env';
 
 const cspHeader = `
