@@ -6,5 +6,6 @@ export { HeroSection } from './hero-section';
 export { ListPageLayout } from './list-page-layout';
 export { PageLayout } from './page-layout';
 export { SectionContainer } from './section-container';
+export { SectionHeader } from './section-header';
 export { SidebarContent } from './sidebar-content';
 export { SidebarLayout } from './sidebar-layout';

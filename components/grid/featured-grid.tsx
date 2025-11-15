@@ -1,7 +1,4 @@
-import type { Route } from 'next';
-
-import Link from 'next/link';
-
+import { SectionHeader } from '@/components/layouts';
 import { cn } from '@/lib/utils';
 import { GridList } from './grid-list';
 
@@ -13,6 +10,7 @@ type FeaturedGridProps = {
   className?: string;
   description?: string;
   featuredHref?: string;
+  itemCount?: number;
   title?: string;
 };
 
@@ -22,29 +20,35 @@ export function FeaturedGrid({
   className,
   description,
   featuredHref,
+  itemCount,
   title,
 }: FeaturedGridProps) {
   const itemType = title?.replace(FEATURED_PREFIX_REGEX, '') || 'Items';
 
+  const actions: Array<{ href: string; label: string }> = [];
+  if (allHref) {
+    actions.push({
+      href: allHref,
+      label: featuredHref ? `All ${itemType}` : 'View All →',
+    });
+  }
+  if (featuredHref) {
+    actions.push({
+      href: featuredHref,
+      label: `Featured ${itemType}`,
+    });
+  }
+
+  const displayTitle = itemCount !== undefined ? `${title} (${itemCount})` : title;
+
   return (
     <section className={cn('space-y-6', className)}>
       {title && (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="font-bold text-2xl">{title}</h2>
-            {(allHref || featuredHref) && (
-              <div className="flex items-center gap-4">
-                {allHref && (
-                  <Link href={allHref as Route}>
-                    {featuredHref ? `All ${itemType}` : 'View All →'}
-                  </Link>
-                )}
-                {featuredHref && <Link href={featuredHref as Route}>Featured {itemType}</Link>}
-              </div>
-            )}
-          </div>
-          {description && <p className="text-muted-foreground text-sm">{description}</p>}
-        </div>
+        <SectionHeader
+          actions={actions.length > 0 ? actions : undefined}
+          description={description}
+          title={displayTitle || ''}
+        />
       )}
       <GridList columns={{ default: 1, sm: 2, md: 2, lg: 3, xl: 4 }}>{children}</GridList>
     </section>

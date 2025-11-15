@@ -1,6 +1,7 @@
 import { SpeakerCard, TalkCard } from '@/components/cards';
 import { FeaturedGrid } from '@/components/grid';
 import { HeroSection, PageLayout, SectionContainer } from '@/components/layouts';
+import { Separator } from '@/components/ui/separator';
 import { getFeaturedSpeakers } from '@/lib/features/speakers';
 import { getFeaturedTalks } from '@/lib/features/talks';
 
@@ -13,11 +14,13 @@ export default async function HomePage() {
   return (
     <PageLayout>
       <SectionContainer>
-        <div className="space-y-12">
+        <div className="space-y-20">
           <HeroSection
             description="Christ centered sermons to elevate your spiritual heartbeat."
             imageAlt="Billy Graham preaching"
             imageSrc="/billy-graham-preaching-header.jpg"
+            primaryAction={{ href: '/talks', label: 'Browse Talks' }}
+            secondaryAction={{ href: '/speakers', label: 'Explore Speakers' }}
             title="Workout your salvation."
           />
 
@@ -25,6 +28,7 @@ export default async function HomePage() {
             allHref="/talks"
             description="Don't know what to listen to? Try starting with one of these favorites."
             featuredHref="/talks?featured=true"
+            itemCount={featuredTalks.length}
             title="Featured Talks"
           >
             {featuredTalks.map((talk) => (
@@ -51,10 +55,13 @@ export default async function HomePage() {
             ))}
           </FeaturedGrid>
 
+          <Separator className="my-8" />
+
           <FeaturedGrid
             allHref="/speakers"
             description="Have you listened to one of these faithful ministers of the Gospel?"
             featuredHref="/speakers?sort=featured"
+            itemCount={featuredSpeakers.length}
             title="Featured Speakers"
           >
             {featuredSpeakers.map((speaker) => (
