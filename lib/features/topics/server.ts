@@ -10,6 +10,14 @@ export async function getTopicsWithCounts() {
   return await fetchQuery(api.topics.listTopicsWithCount, {}, { token });
 }
 
+/**
+ * Get all topics (for selector dropdown).
+ */
+export async function getAllTopics() {
+  const token = await getAuthToken();
+  return await fetchQuery(api.topics.listTopics, { limit: 1000 }, { token });
+}
+
 export async function getTopicBySlug(slug: string) {
   const token = await getAuthToken();
 
@@ -26,7 +34,7 @@ export async function getTopicBySlug(slug: string) {
   const talksWithSpeakers = await Promise.all(
     result.talks.map(async (talk) => {
       const speaker = talk.speakerId
-        ? await fetchQuery(api.speakers.getSpeakerById, { speakerId: talk.speakerId }, { token })
+        ? await fetchQuery(api.speakers.getSpeaker, { id: talk.speakerId }, { token })
         : null;
 
       return {

@@ -1,8 +1,20 @@
+import { Suspense } from 'react';
+
+import { FilterBar, SearchInput, SortSelect } from '@/components/filters';
 import { ListPageLayout, SectionContainer } from '@/components/layouts';
-import { TopicCard } from '@/components/cards';
-import { GridList } from '@/components/grid';
 import { PageHeader } from '@/components/page-header';
 import { getTopicsWithCounts } from '@/lib/features/topics';
+import { TopicsList } from './_components/topics-list';
+
+function TopicsListSkeleton() {
+  return (
+    <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {Array.from({ length: 8 }).map((_, i) => (
+        <div key={i} className="h-32 animate-pulse rounded-lg bg-muted" />
+      ))}
+    </div>
+  );
+}
 
 export default async function TopicsPage() {
   const topics = await getTopicsWithCounts();
@@ -15,11 +27,23 @@ export default async function TopicsPage() {
           title="Topics"
         />
 
-        <GridList>
-          {topics.map((item) => (
-            <TopicCard key={item.topic._id} talkCount={item.count} topic={item.topic} />
-          ))}
-        </GridList>
+        <div className="space-y-6">
+          <FilterBar>
+            <SearchInput label="Search" paramName="search" placeholder="Search topics..." />
+            <SortSelect
+              label="Sort by"
+              options={[
+                { label: 'Most Talks', value: 'most-talks' },
+                { label: 'Least Talks', value: 'least-talks' },
+                { label: 'Alphabetical', value: 'alphabetical' },
+              ]}
+            />
+          </FilterBar>
+
+          <Suspense fallback={<TopicsListSkeleton />}>
+            <TopicsList topics={topics} />
+          </Suspense>
+        </div>
       </SectionContainer>
     </ListPageLayout>
   );

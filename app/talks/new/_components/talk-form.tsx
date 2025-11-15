@@ -11,7 +11,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { useArchiveTalk, useCreateTalk, useUpdateTalk } from '@/lib/features/talks';
+import { useArchiveTalk, useCreateTalk, useUpdateTalk } from '@/lib/features/talks/hooks';
 import { CollectionSelectField } from './collection-select-field';
 import { SpeakerSelectField } from './speaker-select-field';
 import { StatusSelectField } from './status-select-field';

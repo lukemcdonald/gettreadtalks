@@ -1,1 +1,1 @@
-export { getTopicBySlug, getTopicsWithCounts } from './server';
+export { getAllTopics, getTopicBySlug, getTopicsWithCounts } from './server';

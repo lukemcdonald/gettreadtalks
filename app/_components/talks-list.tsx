@@ -4,7 +4,7 @@ import type { PreloadedTalks } from '@/lib/features/talks';
 
 import Link from 'next/link';
 
-import { usePaginatedTalks } from '@/lib/features/talks';
+import { usePaginatedTalks } from '@/lib/features/talks/hooks';
 
 type TalksListProps = {
   preloadedTalks: PreloadedTalks;

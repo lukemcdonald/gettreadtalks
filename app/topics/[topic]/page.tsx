@@ -1,10 +1,12 @@
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import { TalkCard } from '@/components/cards';
+import { TalkCard, ViewMoreCard } from '@/components/cards';
 import { HorizontalScrollGrid } from '@/components/grid';
 import { SidebarContent } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
-import { getTopicBySlug } from '@/lib/features/topics';
+import { TopicSelector } from '@/components/topic-selector';
+import { getAllTopics, getTopicBySlug } from '@/lib/features/topics';
 
 type TopicPageProps = {
   params: Promise<{
@@ -12,15 +14,19 @@ type TopicPageProps = {
   }>;
 };
 
+const DISPLAY_LIMIT = 12;
+
 export default async function TopicPage({ params }: TopicPageProps) {
   const { topic: slug } = await params;
-  const data = await getTopicBySlug(slug);
+  const [data, allTopics] = await Promise.all([getTopicBySlug(slug), getAllTopics()]);
 
   if (!data) {
     notFound();
   }
 
   const { talks, topic } = data;
+  const displayedTalks = talks.slice(0, DISPLAY_LIMIT);
+  const remainingCount = talks.length - DISPLAY_LIMIT;
 
   return (
     <HorizontalScrollGrid
@@ -35,6 +41,23 @@ export default async function TopicPage({ params }: TopicPageProps) {
             title={topic.title}
           />
 
+          <SidebarContent title="Browse Topics">
+            <TopicSelector
+              currentSlug={slug}
+              topics={allTopics.map((t) => ({
+                _id: t._id,
+                slug: t.slug,
+                title: t.title,
+              }))}
+            />
+            <Link
+              className="text-primary text-sm hover:underline"
+              href="/topics"
+            >
+              View all topics →
+            </Link>
+          </SidebarContent>
+
           <SidebarContent title="About">
             <div className="space-y-2 text-sm">
               <div>
@@ -46,7 +69,7 @@ export default async function TopicPage({ params }: TopicPageProps) {
         </>
       }
     >
-      {talks.map((talk) => (
+      {displayedTalks.map((talk) => (
         <div className="min-w-[300px] flex-shrink-0" key={talk._id}>
           <TalkCard
             featured={talk.featured}
@@ -69,6 +92,13 @@ export default async function TopicPage({ params }: TopicPageProps) {
           />
         </div>
       ))}
+      {remainingCount > 0 && (
+        <ViewMoreCard
+          count={remainingCount}
+          href={`/talks?topic=${topic._id}`}
+          label="View All Talks"
+        />
+      )}
     </HorizontalScrollGrid>
   );
 }

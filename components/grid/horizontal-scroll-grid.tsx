@@ -42,7 +42,12 @@ export function HorizontalScrollGrid({
             <div className="space-y-6">{sidebar}</div>
           </aside>
           <div className="min-w-0">
-            <div className="relative">
+            {/* Mobile: Vertical grid */}
+            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:hidden">
+              {children}
+            </div>
+            {/* Desktop: Horizontal scroll */}
+            <div className="relative hidden lg:block">
               <div className="scrollbar-hide flex gap-6 overflow-x-auto pb-4" ref={scrollRef}>
                 {children}
               </div>

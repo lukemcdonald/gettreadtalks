@@ -6,6 +6,20 @@ import { api } from '@/convex/_generated/api';
 import { getAuthToken } from '@/lib/services/auth/server';
 
 /**
+ * Get all collections with stats (talk counts and speakers) for list page.
+ */
+export async function getAllCollectionsWithStats() {
+  const token = await getAuthToken();
+
+  const paginationOpts = {
+    cursor: null,
+    numItems: 1000,
+  };
+
+  return await fetchQuery(api.collections.listCollectionsWithStats, { paginationOpts }, { token });
+}
+
+/**
  * Get collections with stats (talk counts and speakers) for list page.
  */
 export async function getCollectionsWithStats(pageSize = 12) {

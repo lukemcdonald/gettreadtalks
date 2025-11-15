@@ -15,9 +15,9 @@ export async function getFeaturedSpeakers(limit = 6) {
 }
 
 /**
- * Get all speakers grouped alphabetically by last name.
+ * Get all speakers (flat list, not grouped).
  */
-export async function getAllSpeakersGrouped() {
+export async function getAllSpeakers() {
   const token = await getAuthToken();
 
   const paginationOpts = {
@@ -26,7 +26,14 @@ export async function getAllSpeakersGrouped() {
   };
 
   const result = await fetchQuery(api.speakers.listSpeakers, { paginationOpts }, { token });
-  const speakers = result.page;
+  return result.page;
+}
+
+/**
+ * Get all speakers grouped alphabetically by last name.
+ */
+export async function getAllSpeakersGrouped() {
+  const speakers = await getAllSpeakers();
 
   // Group speakers by first letter of last name
   const grouped = new Map<string, typeof speakers>();
