@@ -29,7 +29,7 @@ export function CollectionCard({ collection, speakers = [], talkCount }: Collect
 
   return (
     <Card
-      className="group transition-all hover:shadow-md"
+      className="group min-w-0 transition-all hover:shadow-md"
       render={<Link href={`/collections/${collection.slug}`} />}
     >
       <CardHeader>

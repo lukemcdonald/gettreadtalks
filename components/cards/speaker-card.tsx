@@ -25,7 +25,7 @@ export function SpeakerCard({ favorited, speaker }: SpeakerCardProps) {
 
   return (
     <Card
-      className="group transition-all hover:shadow-md"
+      className="group min-w-0 transition-all hover:shadow-md"
       render={<Link href={`/speakers/${speaker.slug}`} />}
     >
       <CardHeader>

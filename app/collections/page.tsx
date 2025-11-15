@@ -15,7 +15,7 @@ export default async function CollectionsPage() {
           title="Series"
         />
 
-        <GridList columns={{ default: 1, sm: 2, md: 3, lg: 4 }}>
+        <GridList>
           {result.page.map((item) => (
             <CollectionCard
               collection={{

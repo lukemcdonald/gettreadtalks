@@ -30,7 +30,7 @@ export function TalkCard({ featured, favorited, finished, speaker, talk }: TalkC
 
   return (
     <Card
-      className="group transition-all hover:shadow-md"
+      className="group min-w-0 transition-all hover:shadow-md"
       render={<Link href={`/talks/${talk.slug}`} />}
     >
       <CardHeader>

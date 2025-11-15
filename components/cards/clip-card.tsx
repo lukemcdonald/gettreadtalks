@@ -28,7 +28,10 @@ export function ClipCard({ favorited, speaker, clip }: ClipCardProps) {
   const clipUrl = speaker ? `/clips/${speaker.slug}/${clip.slug}` : `/clips/${clip.slug}`;
 
   return (
-    <Card className="group transition-all hover:shadow-md" render={<Link href={clipUrl} />}>
+    <Card
+      className="group min-w-0 transition-all hover:shadow-md"
+      render={<Link href={clipUrl} />}
+    >
       <CardHeader>
         <div className="flex items-start justify-between gap-2">
           <CardTitle className="line-clamp-2 flex-1 group-hover:text-primary">

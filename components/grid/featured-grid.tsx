@@ -24,7 +24,7 @@ export function FeaturedGrid({ children, className, title, viewAllHref }: Featur
           )}
         </div>
       )}
-      <GridList columns={{ default: 1, sm: 2, md: 3, lg: 4, xl: 5 }}>{children}</GridList>
+      <GridList columns={{ default: 1, sm: 2, md: 2, lg: 3, xl: 4 }}>{children}</GridList>
     </section>
   );
 }
