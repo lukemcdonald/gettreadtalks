@@ -151,6 +151,7 @@ export async function getFeaturedTalks(limit = 5) {
   const talksWithSpeakers = await Promise.all(
     talks.map(async (talk) => {
       const speaker = await fetchQuery(api.speakers.getSpeaker, { id: talk.speakerId }, { token });
+
       return {
         ...talk,
         speaker,

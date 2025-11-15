@@ -47,8 +47,12 @@ export function HeroSection({
         </div>
         <div className="flex w-full flex-col justify-center space-y-6 lg:w-2/5">
           <div className="space-y-4">
-            <h1 className="font-bold text-5xl tracking-tighter lg:text-6xl">{title}</h1>
-            <p className="text-lg text-muted-foreground leading-relaxed">{description}</p>
+            <h1 className="font-bold text-4xl leading-tight tracking-tight sm:text-5xl lg:text-6xl xl:text-7xl">
+              {title}
+            </h1>
+            <p className="text-base text-muted-foreground leading-relaxed sm:text-lg lg:text-xl">
+              {description}
+            </p>
           </div>
           {(primaryAction || secondaryAction) && (
             <div className="flex flex-col gap-3 sm:flex-row">

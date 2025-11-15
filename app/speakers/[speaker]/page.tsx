@@ -64,7 +64,6 @@ export default async function SpeakerPage({ params }: SpeakerPageProps) {
                         slug: speaker.slug,
                       }}
                       talk={{
-                        _id: talk._id,
                         description: talk.description,
                         slug: talk.slug,
                         title: talk.title,

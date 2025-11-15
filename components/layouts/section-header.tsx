@@ -20,7 +20,6 @@ type SectionHeaderProps = {
 export function SectionHeader({ actions, className, description, title }: SectionHeaderProps) {
   return (
     <div className={cn('space-y-4', className)}>
-      {description && <p className="text-base text-muted-foreground">{description}</p>}
       <div className="flex items-center justify-between">
         <h2 className="font-bold text-3xl lg:text-4xl">{title}</h2>
         {actions && actions.length > 0 && (
@@ -38,6 +37,7 @@ export function SectionHeader({ actions, className, description, title }: Sectio
           </div>
         )}
       </div>
+      {description && <p className="text-base text-muted-foreground">{description}</p>}
     </div>
   );
 }

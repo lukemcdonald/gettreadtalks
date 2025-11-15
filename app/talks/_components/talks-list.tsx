@@ -38,7 +38,6 @@ export function TalksList({ talks }: TalksListProps) {
               : undefined
           }
           talk={{
-            _id: talk._id,
             description: talk.description,
             slug: talk.slug,
             title: talk.title,

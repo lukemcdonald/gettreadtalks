@@ -67,7 +67,6 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
                       : undefined
                   }
                   talk={{
-                    _id: talk._id,
                     description: talk.description,
                     slug: talk.slug,
                     title: talk.title,
