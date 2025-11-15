@@ -1,5 +1,7 @@
 'use client';
 
+import type { Doc } from '@/convex/_generated/dataModel';
+
 import Link from 'next/link';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -10,18 +12,8 @@ type TalkCardProps = {
   featured?: boolean;
   favorited?: boolean;
   finished?: boolean;
-  speaker?: {
-    firstName: string;
-    imageUrl?: string;
-    lastName: string;
-    slug: string;
-  };
-  talk: {
-    _id: string;
-    description?: string;
-    slug: string;
-    title: string;
-  };
+  speaker?: Pick<Doc<'speakers'>, 'firstName' | 'lastName' | 'imageUrl' | 'slug'>;
+  talk: Pick<Doc<'talks'>, 'description' | 'slug' | 'title'>;
 };
 
 export function TalkCard({ featured, favorited, finished, speaker, talk }: TalkCardProps) {
@@ -30,7 +22,7 @@ export function TalkCard({ featured, favorited, finished, speaker, talk }: TalkC
 
   return (
     <Card
-      className="group min-w-0 transition-all hover:shadow-md"
+      className="group min-w-0 transition-all duration-200 hover:scale-[1.02] hover:shadow-lg"
       render={<Link href={`/talks/${talk.slug}`} />}
     >
       <CardHeader>

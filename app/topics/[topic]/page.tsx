@@ -81,7 +81,6 @@ export default async function TopicPage({ params }: TopicPageProps) {
                 : undefined
             }
             talk={{
-              _id: talk._id,
               description: talk.description,
               slug: talk.slug,
               title: talk.title,
