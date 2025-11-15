@@ -1,6 +1,6 @@
 import { SpeakerCard, TalkCard } from '@/components/cards';
 import { FeaturedGrid } from '@/components/grid';
-import { PageLayout, SectionContainer } from '@/components/layouts';
+import { HeroSection, PageLayout, SectionContainer } from '@/components/layouts';
 import { getFeaturedSpeakers } from '@/lib/features/speakers';
 import { getFeaturedTalks } from '@/lib/features/talks';
 
@@ -14,14 +14,12 @@ export default async function HomePage() {
     <PageLayout>
       <SectionContainer>
         <div className="space-y-12">
-          <section className="space-y-6">
-            <div>
-              <h1 className="font-bold text-4xl tracking-tight">Workout your salvation.</h1>
-              <p className="mt-2 text-lg text-muted-foreground">
-                Christ centered sermons to elevate your spiritual heartbeat.
-              </p>
-            </div>
-          </section>
+          <HeroSection
+            description="Christ centered sermons to elevate your spiritual heartbeat."
+            imageAlt="Billy Graham preaching"
+            imageSrc="/billy-graham-preaching-header.jpg"
+            title="Workout your salvation."
+          />
 
           <FeaturedGrid
             allHref="/talks"
