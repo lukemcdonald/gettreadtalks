@@ -4,10 +4,10 @@
 
 import { captureRouterTransitionStart } from '@sentry/nextjs';
 
-import { IS_SENTRY_ENABLED } from './lib/config/sentry';
+import { IS_SENTRY_ENABLED } from './src/lib/config/sentry';
 
 if (IS_SENTRY_ENABLED) {
-  import('./lib/config/sentry/client');
+  import('./src/lib/config/sentry/client');
 }
 
 // Export the router transition hook for Sentry navigation instrumentation
