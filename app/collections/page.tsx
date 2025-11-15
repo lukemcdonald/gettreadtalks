@@ -9,26 +9,22 @@ import { CollectionsList } from './_components/collections-list';
 
 function CollectionsListSkeleton() {
   return (
-    <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {Array.from({ length: 8 }).map((_, i) => (
-        <div key={i} className="h-48 animate-pulse rounded-lg bg-muted" />
+        // biome-ignore lint/suspicious/noArrayIndexKey: Skeleton loader items are static and never reordered
+        <div className="h-48 animate-pulse rounded-lg bg-muted" key={i} />
       ))}
     </div>
   );
 }
 
 export default async function CollectionsPage() {
-  const [result, speakers] = await Promise.all([
-    getAllCollectionsWithStats(),
-    getAllSpeakers(),
-  ]);
+  const [result, _speakers] = await Promise.all([getAllCollectionsWithStats(), getAllSpeakers()]);
 
   // Get unique speakers who have collections
   const speakersWithCollections = Array.from(
     new Map(
-      result.page
-        .flatMap((item) => item.speakers)
-        .map((speaker) => [speaker.slug, speaker]),
+      result.page.flatMap((item) => item.speakers).map((speaker) => [speaker.slug, speaker]),
     ).values(),
   ).sort((a, b) => `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`));
 
@@ -54,11 +50,7 @@ export default async function CollectionsPage() {
         >
           <SidebarContent title="Filters">
             <div className="space-y-4">
-              <SearchInput
-                label="Search"
-                paramName="search"
-                placeholder="Search collections..."
-              />
+              <SearchInput label="Search" paramName="search" placeholder="Search collections..." />
               <SelectFilter
                 label="Speaker"
                 options={speakersWithCollections.map((speaker) => ({
@@ -82,7 +74,7 @@ export default async function CollectionsPage() {
       }
     >
       <Suspense fallback={<CollectionsListSkeleton />}>
-        <CollectionsList collections={result.page} speakers={speakersWithCollections} />
+        <CollectionsList collections={result.page} />
       </Suspense>
     </ArchiveLayout>
   );

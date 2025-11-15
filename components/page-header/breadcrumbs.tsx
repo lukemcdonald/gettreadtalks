@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 import { cn } from '@/lib/utils';
 
-type BreadcrumbItem = {
+export type BreadcrumbItem = {
   href: string;
   label: string;
 };
@@ -24,7 +24,7 @@ export function Breadcrumbs({ className, items }: BreadcrumbsProps) {
           const isLast = index === items.length - 1;
 
           return (
-            <li className="flex items-center gap-2" key={item.href}>
+            <li className="flex items-center gap-2" key={String(item.href)}>
               {index > 0 && (
                 <span aria-hidden="true" className="text-muted-foreground">
                   /

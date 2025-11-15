@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 
 import { TopicCard } from '@/components/cards';
 import { GridList } from '@/components/grid';
-import { Empty } from '@/components/ui/empty';
+import { Empty, EmptyDescription } from '@/components/ui/empty';
 
 type TopicWithCount = {
   count: number;
@@ -30,9 +30,7 @@ export function TopicsList({ topics }: TopicsListProps) {
 
     // Filter by search
     if (search) {
-      filtered = filtered.filter((item) =>
-        item.topic.title.toLowerCase().includes(search),
-      );
+      filtered = filtered.filter((item) => item.topic.title.toLowerCase().includes(search));
     }
 
     // Sort
@@ -53,7 +51,11 @@ export function TopicsList({ topics }: TopicsListProps) {
   }, [topics, search, sort]);
 
   if (filteredAndSorted.length === 0) {
-    return <Empty description="No topics found" />;
+    return (
+      <Empty>
+        <EmptyDescription>No topics found</EmptyDescription>
+      </Empty>
+    );
   }
 
   return (

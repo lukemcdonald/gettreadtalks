@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 
 import { CollectionCard } from '@/components/cards';
 import { GridList } from '@/components/grid';
-import { Empty } from '@/components/ui/empty';
+import { Empty, EmptyDescription } from '@/components/ui/empty';
 
 type CollectionWithStats = {
   collection: {
@@ -25,10 +25,9 @@ type CollectionWithStats = {
 
 type CollectionsListProps = {
   collections: CollectionWithStats[];
-  speakers: Array<{ firstName: string; lastName: string; slug: string }>;
 };
 
-export function CollectionsList({ collections, speakers }: CollectionsListProps) {
+export function CollectionsList({ collections }: CollectionsListProps) {
   const searchParams = useSearchParams();
   const search = searchParams.get('search')?.toLowerCase() || '';
   const speakerSlug = searchParams.get('speaker') || 'all';
@@ -39,17 +38,16 @@ export function CollectionsList({ collections, speakers }: CollectionsListProps)
 
     // Filter by search
     if (search) {
-      filtered = filtered.filter((item) =>
-        item.collection.title.toLowerCase().includes(search) ||
-        item.collection.description?.toLowerCase().includes(search),
+      filtered = filtered.filter(
+        (item) =>
+          item.collection.title.toLowerCase().includes(search) ||
+          item.collection.description?.toLowerCase().includes(search),
       );
     }
 
     // Filter by speaker
     if (speakerSlug !== 'all') {
-      filtered = filtered.filter((item) =>
-        item.speakers.some((s) => s.slug === speakerSlug),
-      );
+      filtered = filtered.filter((item) => item.speakers.some((s) => s.slug === speakerSlug));
     }
 
     // Sort
@@ -70,7 +68,11 @@ export function CollectionsList({ collections, speakers }: CollectionsListProps)
   }, [collections, search, speakerSlug, sort]);
 
   if (filteredAndSorted.length === 0) {
-    return <Empty description="No collections found" />;
+    return (
+      <Empty>
+        <EmptyDescription>No collections found</EmptyDescription>
+      </Empty>
+    );
   }
 
   return (

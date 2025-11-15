@@ -1,3 +1,5 @@
+import type { TalkWithSpeaker } from '@/lib/features/collections/types';
+
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
@@ -22,11 +24,15 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
   }
 
   const { collection, talks } = data;
+
   const uniqueSpeakers = Array.from(
     new Map(
       talks
-        .filter((talk) => talk.speaker)
-        .map((talk) => [talk.speaker!._id, talk.speaker!]),
+        .filter(
+          (talk): talk is TalkWithSpeaker & { speaker: NonNullable<TalkWithSpeaker['speaker']> } =>
+            talk.speaker !== null,
+        )
+        .map((talk) => [talk.speaker._id, talk.speaker] as const),
     ).values(),
   );
 
@@ -37,7 +43,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
           <PageHeader
             breadcrumbs={[
               { href: '/', label: 'Home' },
-              { href: '/collections/', label: 'Series' },
+              { href: '/collections', label: 'Series' },
               { href: `/collections/${slug}`, label: collection.title },
             ]}
             description={collection.description}
@@ -95,7 +101,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
                 {uniqueSpeakers.map((speaker) => (
                   <li key={speaker._id}>
                     <Link
-                      className="text-muted-foreground hover:text-foreground text-sm transition-colors"
+                      className="text-muted-foreground text-sm transition-colors hover:text-foreground"
                       href={`/speakers/${speaker.slug}`}
                     >
                       {speaker.firstName} {speaker.lastName}

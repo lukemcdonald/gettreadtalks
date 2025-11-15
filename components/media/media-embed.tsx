@@ -10,16 +10,22 @@ type MediaEmbedProps = {
   type?: 'audio' | 'video';
 };
 
+const YOUTUBE_PATTERNS = [
+  /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
+  /youtube\.com\/watch\?.*v=([^&\n?#]+)/,
+];
+
+const VIMEO_PATTERNS = [/(?:vimeo\.com\/|player\.vimeo\.com\/video\/)(\d+)/];
+
+const VIDEO_EXTENSION_PATTERN = /\.(mp4|webm|ogg|mov)(\?|$)/i;
+
+const AUDIO_EXTENSION_PATTERN = /\.(mp3|wav|ogg|m4a|aac)(\?|$)/i;
+
 /**
  * Parse YouTube URL and extract video ID
  */
 function parseYouTubeUrl(url: string): string | null {
-  const patterns = [
-    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
-    /youtube\.com\/watch\?.*v=([^&\n?#]+)/,
-  ];
-
-  for (const pattern of patterns) {
+  for (const pattern of YOUTUBE_PATTERNS) {
     const match = url.match(pattern);
     if (match?.[1]) {
       return match[1];
@@ -33,11 +39,7 @@ function parseYouTubeUrl(url: string): string | null {
  * Parse Vimeo URL and extract video ID
  */
 function parseVimeoUrl(url: string): string | null {
-  const patterns = [
-    /(?:vimeo\.com\/|player\.vimeo\.com\/video\/)(\d+)/,
-  ];
-
-  for (const pattern of patterns) {
+  for (const pattern of VIMEO_PATTERNS) {
     const match = url.match(pattern);
     if (match?.[1]) {
       return match[1];
@@ -57,10 +59,10 @@ function detectMediaType(url: string): 'youtube' | 'vimeo' | 'video' | 'audio' |
   if (parseVimeoUrl(url)) {
     return 'vimeo';
   }
-  if (/\.(mp4|webm|ogg|mov)(\?|$)/i.test(url)) {
+  if (VIDEO_EXTENSION_PATTERN.test(url)) {
     return 'video';
   }
-  if (/\.(mp3|wav|ogg|m4a|aac)(\?|$)/i.test(url)) {
+  if (AUDIO_EXTENSION_PATTERN.test(url)) {
     return 'audio';
   }
 
@@ -136,11 +138,8 @@ export function MediaEmbed({ className, mediaUrl, type }: MediaEmbedProps) {
   if (embedConfig.type === 'video') {
     return (
       <div className={cn('relative aspect-video w-full overflow-hidden rounded-lg', className)}>
-        <video
-          className="h-full w-full"
-          controls
-          src={embedConfig.embedUrl}
-        >
+        {/* biome-ignore lint/a11y/useMediaCaption: Caption files are not available for dynamically embedded media */}
+        <video className="h-full w-full" controls src={embedConfig.embedUrl}>
           Your browser does not support the video tag.
         </video>
       </div>
@@ -150,6 +149,7 @@ export function MediaEmbed({ className, mediaUrl, type }: MediaEmbedProps) {
   if (embedConfig.type === 'audio') {
     return (
       <div className={cn('rounded-lg border bg-muted p-6', className)}>
+        {/* biome-ignore lint/a11y/useMediaCaption: Caption files are not available for dynamically embedded media */}
         <audio className="w-full" controls src={embedConfig.embedUrl}>
           Your browser does not support the audio tag.
         </audio>

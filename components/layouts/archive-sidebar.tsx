@@ -27,8 +27,8 @@ export function ArchiveSidebar({
       {meta && meta.length > 0 && (
         <SidebarContent title="About">
           <div className="space-y-2 text-sm">
-            {meta.map((item, index) => (
-              <div key={index}>
+            {meta.map((item) => (
+              <div key={item.label}>
                 <span className="font-medium">{item.label}:</span>{' '}
                 <span className="text-muted-foreground">{item.value}</span>
               </div>

@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 
 import { SpeakerCard } from '@/components/cards';
 import { AlphabeticalGrid } from '@/components/grid';
-import { Empty } from '@/components/ui/empty';
+import { Empty, EmptyDescription } from '@/components/ui/empty';
 
 type Speaker = {
   _id: string;
@@ -51,8 +51,12 @@ export function SpeakersList({ speakers }: SpeakersListProps) {
         case 'alphabetical':
           return a.lastName.localeCompare(b.lastName);
         case 'featured':
-          if (a.featured && !b.featured) return -1;
-          if (!a.featured && b.featured) return 1;
+          if (a.featured && !b.featured) {
+            return -1;
+          }
+          if (!a.featured && b.featured) {
+            return 1;
+          }
           return a.lastName.localeCompare(b.lastName);
         default:
           return a.lastName.localeCompare(b.lastName);
@@ -91,7 +95,11 @@ export function SpeakersList({ speakers }: SpeakersListProps) {
   }, [filteredAndSorted]);
 
   if (filteredAndSorted.length === 0) {
-    return <Empty description="No speakers found" />;
+    return (
+      <Empty>
+        <EmptyDescription>No speakers found</EmptyDescription>
+      </Empty>
+    );
   }
 
   return (
@@ -99,7 +107,6 @@ export function SpeakersList({ speakers }: SpeakersListProps) {
       groups={grouped.map((group) => ({
         items: group.items.map((speaker) => (
           <SpeakerCard
-            featured={speaker.featured}
             key={speaker._id}
             speaker={{
               _id: speaker._id,

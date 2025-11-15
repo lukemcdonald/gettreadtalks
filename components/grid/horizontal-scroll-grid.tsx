@@ -2,8 +2,8 @@
 
 import { useRef } from 'react';
 
-import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 type HorizontalScrollGridProps = {
   children: React.ReactNode;
@@ -11,11 +11,7 @@ type HorizontalScrollGridProps = {
   sidebar: React.ReactNode;
 };
 
-export function HorizontalScrollGrid({
-  children,
-  className,
-  sidebar,
-}: HorizontalScrollGridProps) {
+export function HorizontalScrollGrid({ children, className, sidebar }: HorizontalScrollGridProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const scroll = (direction: 'left' | 'right') => {
@@ -43,17 +39,15 @@ export function HorizontalScrollGrid({
           </aside>
           <div className="min-w-0">
             {/* Mobile: Vertical grid */}
-            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:hidden">
-              {children}
-            </div>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:hidden">{children}</div>
             {/* Desktop: Horizontal scroll */}
             <div className="relative hidden lg:block">
               <div className="scrollbar-hide flex gap-6 overflow-x-auto pb-4" ref={scrollRef}>
                 {children}
               </div>
-              <div className="absolute right-0 top-0 flex gap-2">
+              <div className="absolute top-0 right-0 flex gap-2">
                 <Button
-                  className="h-8 rounded-full shadow-md w-8"
+                  className="h-8 w-8 rounded-full shadow-md"
                   onClick={() => scroll('left')}
                   size="icon"
                   variant="secondary"
@@ -61,7 +55,7 @@ export function HorizontalScrollGrid({
                   ←
                 </Button>
                 <Button
-                  className="h-8 rounded-full shadow-md w-8"
+                  className="h-8 w-8 rounded-full shadow-md"
                   onClick={() => scroll('right')}
                   size="icon"
                   variant="secondary"

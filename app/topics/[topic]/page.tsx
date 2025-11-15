@@ -35,7 +35,7 @@ export default async function TopicPage({ params }: TopicPageProps) {
           <PageHeader
             breadcrumbs={[
               { href: '/', label: 'Home' },
-              { href: '/topics/', label: 'Topics' },
+              { href: '/topics', label: 'Topics' },
               { href: `/topics/${slug}`, label: topic.title },
             ]}
             title={topic.title}
@@ -50,10 +50,7 @@ export default async function TopicPage({ params }: TopicPageProps) {
                 title: t.title,
               }))}
             />
-            <Link
-              className="text-primary text-sm hover:underline"
-              href="/topics"
-            >
+            <Link className="text-primary text-sm hover:underline" href="/topics">
               View all topics →
             </Link>
           </SidebarContent>

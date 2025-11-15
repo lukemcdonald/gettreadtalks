@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 
 import { ClipCard } from '@/components/cards';
 import { GridList } from '@/components/grid';
-import { Empty } from '@/components/ui/empty';
+import { Empty, EmptyDescription } from '@/components/ui/empty';
 
 type ClipWithSpeaker = {
   _id: string;
@@ -29,7 +29,7 @@ export function ClipsList({ clips }: ClipsListProps) {
   const searchParams = useSearchParams();
   const search = searchParams.get('search')?.toLowerCase() || '';
   const speakerSlug = searchParams.get('speaker') || 'all';
-  const topicSlug = searchParams.get('topic') || 'all';
+  const _topicSlug = searchParams.get('topic') || 'all';
   const sort = searchParams.get('sort') || 'recent';
 
   const filteredAndSorted = useMemo(() => {
@@ -67,10 +67,14 @@ export function ClipsList({ clips }: ClipsListProps) {
     });
 
     return sorted;
-  }, [clips, search, speakerSlug, topicSlug, sort]);
+  }, [clips, search, speakerSlug, sort]);
 
   if (filteredAndSorted.length === 0) {
-    return <Empty description="No clips found" />;
+    return (
+      <Empty>
+        <EmptyDescription>No clips found</EmptyDescription>
+      </Empty>
+    );
   }
 
   return (

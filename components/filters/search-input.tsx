@@ -1,7 +1,7 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useTransition } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -24,7 +24,7 @@ export function SearchInput({
 }: SearchInputProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [isPending, startTransition] = useTransition();
+  const [_isPending, startTransition] = useTransition();
 
   const handleChange = useCallback(
     (value: string) => {
@@ -44,7 +44,7 @@ export function SearchInput({
   );
 
   return (
-    <div className={cn('flex-1 min-w-[200px]', className)}>
+    <div className={cn('min-w-[200px] flex-1', className)}>
       {label && <Label htmlFor={paramName}>{label}</Label>}
       <Input
         defaultValue={defaultValue || searchParams.get(paramName) || ''}

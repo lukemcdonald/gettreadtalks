@@ -23,15 +23,12 @@ type ClipCardProps = {
 };
 
 export function ClipCard({ favorited, speaker, clip }: ClipCardProps) {
-  const speakerName = speaker ? `${speaker.firstName} ${speaker.lastName}` : null;
-  const speakerInitials = speaker ? `${speaker.firstName[0]}${speaker.lastName[0]}` : null;
-  const clipUrl = speaker ? `/clips/${speaker.slug}/${clip.slug}` : `/clips/${clip.slug}`;
+  const speakerName = speaker ? `${speaker.firstName} ${speaker.lastName}` : undefined;
+  const speakerInitials = speaker ? `${speaker.firstName[0]}${speaker.lastName[0]}` : undefined;
+  const clipUrl = `/clips/${clip.slug}`;
 
   return (
-    <Card
-      className="group min-w-0 transition-all hover:shadow-md"
-      render={<Link href={clipUrl} />}
-    >
+    <Card className="group min-w-0 transition-all hover:shadow-md" render={<Link href={clipUrl} />}>
       <CardHeader>
         <div className="flex items-start justify-between gap-2">
           <CardTitle className="line-clamp-2 flex-1 group-hover:text-primary">

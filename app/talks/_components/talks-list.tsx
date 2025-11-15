@@ -2,7 +2,7 @@ import type { Doc } from '@/convex/_generated/dataModel';
 
 import { TalkCard } from '@/components/cards';
 import { GridList } from '@/components/grid';
-import { Empty } from '@/components/ui/empty';
+import { Empty, EmptyDescription } from '@/components/ui/empty';
 
 type TalkWithSpeaker = Doc<'talks'> & {
   speaker: Doc<'speakers'> | null;
@@ -14,7 +14,11 @@ type TalksListProps = {
 
 export function TalksList({ talks }: TalksListProps) {
   if (talks.length === 0) {
-    return <Empty description="No talks found" />;
+    return (
+      <Empty>
+        <EmptyDescription>No talks found</EmptyDescription>
+      </Empty>
+    );
   }
 
   return (

@@ -33,7 +33,7 @@ export default async function SpeakerPage({ params }: SpeakerPageProps) {
           <PageHeader
             breadcrumbs={[
               { href: '/', label: 'Home' },
-              { href: '/speakers/', label: 'Speakers' },
+              { href: '/speakers', label: 'Speakers' },
               { href: `/speakers/${slug}`, label: speakerName },
             ]}
             title={speakerName}

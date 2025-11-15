@@ -25,8 +25,8 @@ type TalkCardProps = {
 };
 
 export function TalkCard({ featured, favorited, finished, speaker, talk }: TalkCardProps) {
-  const speakerName = speaker ? `${speaker.firstName} ${speaker.lastName}` : null;
-  const speakerInitials = speaker ? `${speaker.firstName[0]}${speaker.lastName[0]}` : null;
+  const speakerName = speaker ? `${speaker.firstName} ${speaker.lastName}` : undefined;
+  const speakerInitials = speaker ? `${speaker.firstName[0]}${speaker.lastName[0]}` : undefined;
 
   return (
     <Card

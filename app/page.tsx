@@ -23,10 +23,15 @@ export default async function HomePage() {
             </div>
           </section>
 
-          <FeaturedGrid title="Featured Talks" viewAllHref="/talks/featured/">
+          <FeaturedGrid
+            allHref="/talks"
+            description="Don't know what to listen to? Try starting with one of these favorites."
+            featuredHref="/talks?featured=true"
+            title="Featured Talks"
+          >
             {featuredTalks.map((talk) => (
               <TalkCard
-                featured={talk.featured}
+                // featured={talk.featured}
                 key={talk._id}
                 speaker={
                   talk.speaker
@@ -48,14 +53,18 @@ export default async function HomePage() {
             ))}
           </FeaturedGrid>
 
-          <FeaturedGrid title="Featured Speakers" viewAllHref="/speakers/featured/">
+          <FeaturedGrid
+            allHref="/speakers"
+            description="Have you listened to one of these faithful ministers of the Gospel?"
+            featuredHref="/speakers?sort=featured"
+            title="Featured Speakers"
+          >
             {featuredSpeakers.map((speaker) => (
               <SpeakerCard
-                featured={speaker.featured}
                 key={speaker._id}
                 speaker={{
                   _id: speaker._id,
-                  featured: speaker.featured,
+                  // featured: speaker.featured,
                   firstName: speaker.firstName,
                   imageUrl: speaker.imageUrl,
                   lastName: speaker.lastName,

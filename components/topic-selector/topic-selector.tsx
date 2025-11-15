@@ -1,7 +1,7 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
 import { useTransition } from 'react';
+import { useRouter } from 'next/navigation';
 
 import { Label } from '@/components/ui/label';
 import {
@@ -28,7 +28,7 @@ type TopicSelectorProps = {
 
 export function TopicSelector({ className, currentSlug, label, topics }: TopicSelectorProps) {
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const [_isPending, startTransition] = useTransition();
 
   const handleChange = (value: string) => {
     startTransition(() => {

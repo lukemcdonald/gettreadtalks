@@ -1,16 +1,14 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import { MediaEmbed } from '@/components/media';
 import { SidebarContent, SidebarLayout } from '@/components/layouts';
+import { MediaEmbed } from '@/components/media';
 import { PageHeader } from '@/components/page-header';
-import { Separator } from '@/components/ui/separator';
 import { getClipBySlug } from '@/lib/features/clips';
 
 type ClipPageProps = {
   params: Promise<{
     clip: string;
-    speaker: string;
   }>;
 };
 
@@ -32,7 +30,7 @@ export default async function ClipPage({ params }: ClipPageProps) {
           <PageHeader
             breadcrumbs={[
               { href: '/', label: 'Home' },
-              { href: '/clips/', label: 'Clips' },
+              { href: '/clips', label: 'Clips' },
               ...(speaker
                 ? [{ href: `/speakers/${speaker.slug}`, label: speakerName || 'Speaker' }]
                 : []),
@@ -66,7 +64,7 @@ export default async function ClipPage({ params }: ClipPageProps) {
                   <p className="text-muted-foreground text-sm">{speaker.ministry}</p>
                 )}
                 <Link
-                  className="text-primary hover:underline text-sm"
+                  className="text-primary text-sm hover:underline"
                   href={`/speakers/${speaker.slug}`}
                 >
                   View all talks →
@@ -82,10 +80,7 @@ export default async function ClipPage({ params }: ClipPageProps) {
                 {talk.description && (
                   <p className="line-clamp-2 text-muted-foreground text-sm">{talk.description}</p>
                 )}
-                <Link
-                  className="text-primary hover:underline text-sm"
-                  href={`/talks/${talk.slug}`}
-                >
+                <Link className="text-primary text-sm hover:underline" href={`/talks/${talk.slug}`}>
                   View talk →
                 </Link>
               </div>

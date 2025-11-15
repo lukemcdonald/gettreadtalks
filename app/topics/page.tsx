@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 
-import { FilterBar, SearchInput, SortSelect } from '@/components/filters';
+import { SearchInput, SortSelect } from '@/components/filters';
 import { ArchiveLayout, ArchiveSidebar, SidebarContent } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { getTopicsWithCounts } from '@/lib/features/topics';
@@ -8,9 +8,10 @@ import { TopicsList } from './_components/topics-list';
 
 function TopicsListSkeleton() {
   return (
-    <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {Array.from({ length: 8 }).map((_, i) => (
-        <div key={i} className="h-32 animate-pulse rounded-lg bg-muted" />
+        // biome-ignore lint/suspicious/noArrayIndexKey: Skeleton loader items are static and never reordered
+        <div className="h-32 animate-pulse rounded-lg bg-muted" key={i} />
       ))}
     </div>
   );
@@ -24,10 +25,7 @@ export default async function TopicsPage() {
   return (
     <ArchiveLayout
       header={
-        <PageHeader
-          description="Explore talks organized by topic and theme."
-          title="Topics"
-        />
+        <PageHeader description="Explore talks organized by topic and theme." title="Topics" />
       }
       sidebar={
         <ArchiveSidebar

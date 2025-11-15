@@ -52,9 +52,7 @@ export function CenteredLayout({
                 <div className="space-y-6">{leftSidebar}</div>
               </aside>
             )}
-            <main className={cn('min-w-0', maxWidthClasses[maxWidth], 'mx-auto')}>
-              {children}
-            </main>
+            <main className={cn('min-w-0', maxWidthClasses[maxWidth], 'mx-auto')}>{children}</main>
             {rightSidebar && (
               <aside className="lg:sticky lg:top-8 lg:h-fit">
                 <div className="space-y-6">{rightSidebar}</div>

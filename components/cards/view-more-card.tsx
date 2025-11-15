@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardHeader } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
 type ViewMoreCardProps = {
@@ -12,18 +12,10 @@ type ViewMoreCardProps = {
   label?: string;
 };
 
-export function ViewMoreCard({
-  className,
-  count,
-  href,
-  label = 'View More',
-}: ViewMoreCardProps) {
+export function ViewMoreCard({ className, count, href, label = 'View More' }: ViewMoreCardProps) {
   return (
     <Card
-      className={cn(
-        'group min-w-[300px] flex-shrink-0 transition-all hover:shadow-md',
-        className,
-      )}
+      className={cn('group min-w-[300px] flex-shrink-0 transition-all hover:shadow-md', className)}
       render={<Link href={href} />}
     >
       <CardHeader>
@@ -31,7 +23,7 @@ export function ViewMoreCard({
           <div className="text-center">
             <p className="font-semibold group-hover:text-primary">{label}</p>
             {count !== undefined && (
-              <p className="text-muted-foreground mt-1 text-sm">
+              <p className="mt-1 text-muted-foreground text-sm">
                 {count} {count === 1 ? 'more item' : 'more items'}
               </p>
             )}

@@ -32,7 +32,7 @@ const nextConfig = {
       },
     ],
   },
-  typedRoutes: true,
+  typedRoutes: false,
   headers: async () => {
     return [
       {

@@ -32,7 +32,7 @@ export default async function TalkPage({ params }: TalkPageProps) {
           <PageHeader
             breadcrumbs={[
               { href: '/', label: 'Home' },
-              { href: '/talks/', label: 'Talks' },
+              { href: '/talks', label: 'Talks' },
               { href: `/talks/${slug}`, label: talk.title },
             ]}
             title={talk.title}

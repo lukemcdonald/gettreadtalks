@@ -1,8 +1,8 @@
 'use client';
 
+import { useCallback, useEffect, useState, useTransition } from 'react';
 import { LoaderCircleIcon } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useCallback, useEffect, useState, useTransition } from 'react';
 
 import { Label } from '@/components/ui/label';
 import {
@@ -76,11 +76,8 @@ export function SortSelect({
     <div className={cn('min-w-[150px]', className)}>
       {label && <Label htmlFor={paramName}>{label}</Label>}
       <Select onValueChange={handleChange} value={displayValue}>
-        <SelectTrigger
-          className={cn(isPending && 'opacity-75')}
-          id={paramName}
-        >
-          <SelectValue placeholder="Sort by...">
+        <SelectTrigger className={cn(isPending && 'opacity-75')} id={paramName}>
+          <SelectValue>
             <span className="flex items-center gap-2">
               {isPending && <LoaderCircleIcon className="size-3 animate-spin" />}
               {displayLabel}

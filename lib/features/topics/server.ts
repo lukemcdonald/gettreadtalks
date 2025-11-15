@@ -21,11 +21,7 @@ export async function getAllTopics() {
 export async function getTopicBySlug(slug: string) {
   const token = await getAuthToken();
 
-  const result = await fetchQuery(
-    api.topics.getTopicWithContent,
-    { limit: 100, slug },
-    { token },
-  );
+  const result = await fetchQuery(api.topics.getTopicWithContent, { limit: 100, slug }, { token });
 
   if (!result) {
     return null;
