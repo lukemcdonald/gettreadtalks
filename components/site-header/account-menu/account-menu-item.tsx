@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { MenuItem } from '@/components/ui/menu';
 
 type AccountMenuItemProps = {
-  href?: React.ComponentProps<typeof Link>['href'];
+  href?: string;
   icon?: ComponentType<React.SVGProps<SVGSVGElement>>;
   label: string;
 } & Omit<React.ComponentProps<typeof MenuItem>, 'render' | 'children'>;
@@ -22,13 +22,17 @@ export function AccountMenuItem({
 }: AccountMenuItemProps) {
   const isButton = !href && Boolean(onClick);
 
-  const ButtonComponent = isButton && <Button size="xs" variant="ghost" />;
-  const LinkComponent = href && <Link href={href} />;
+  let renderComponent: React.ReactElement<Record<string, unknown>> | undefined;
+  if (isButton) {
+    renderComponent = <Button size="xs" variant="ghost" />;
+  } else if (href) {
+    renderComponent = <Link href={href} />;
+  }
 
   return (
     <MenuItem
       className="w-full items-center justify-start"
-      render={ButtonComponent || LinkComponent}
+      render={renderComponent}
       {...delegated}
       nativeButton={isButton}
       onClick={onClick}

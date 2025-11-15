@@ -4,8 +4,10 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 type NavLinkProps = {
+  href: string;
   isActive: boolean;
-} & React.ComponentProps<typeof Link>;
+  children: React.ReactNode;
+};
 
 export function NavLink({ href, isActive, children }: NavLinkProps) {
   return (

@@ -23,7 +23,16 @@ const cspHeader = `
 
 const nextConfig = {
   cacheComponents: true,
-  typedRoutes: true,
+  images: {
+    remotePatterns: [
+      {
+        hostname: 'cdn.jsdelivr.net',
+        pathname: '/gh/faker-js/**',
+        protocol: 'https',
+      },
+    ],
+  },
+  typedRoutes: false,
   headers: async () => {
     return [
       {
@@ -65,7 +74,7 @@ const config = IS_SENTRY_ENABLED
       sourcemaps: {
         disable: false, // Source maps are enabled by default
         assets: [
-          "**/*.js", 
+          "**/*.js",
           "**/*.js.map",
         ],
         ignore: [

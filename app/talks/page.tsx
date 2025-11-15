@@ -4,7 +4,8 @@ import type { StatusType } from '@/convex/lib/validators/shared';
 import { Suspense } from 'react';
 import Link from 'next/link';
 
-import { MainLayout } from '@/components/main-layout';
+import { ListPageLayout, SectionContainer } from '@/components/layouts';
+import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { getAllSpeakersForFilter, getAllTopicsForFilter, getTalks } from '@/lib/features/talks';
 import { getCurrentUser } from '@/lib/services/auth/server';
@@ -64,23 +65,23 @@ export default async function TalksPage({ searchParams }: TalksPageProps) {
   ]);
 
   return (
-    <MainLayout>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="font-bold text-2xl">Talks</h1>
-        {user && <Button render={<Link href="/talks/new" />}>New Talk</Button>}
-      </div>
+    <ListPageLayout>
+      <SectionContainer>
+        <PageHeader
+          actions={user ? <Button render={<Link href="/talks/new" />}>New Talk</Button> : undefined}
+          description="Elevate your spiritual heartbeat with Christ centered talks."
+          title="Talks"
+        />
 
-      <div className="mb-4">
-        <TalksFilters isAuthenticated={!!user} speakers={speakers} topics={topics} />
-      </div>
+        <div className="space-y-6">
+          <TalksFilters isAuthenticated={!!user} speakers={speakers} topics={topics} />
+          <ActiveFilters speakers={speakers} topics={topics} />
+        </div>
 
-      <div className="mb-6">
-        <ActiveFilters speakers={speakers} topics={topics} />
-      </div>
-
-      <Suspense fallback={<TalksListSkeleton />}>
-        <TalksContent params={params} />
-      </Suspense>
-    </MainLayout>
+        <Suspense fallback={<TalksListSkeleton />}>
+          <TalksContent params={params} />
+        </Suspense>
+      </SectionContainer>
+    </ListPageLayout>
   );
 }

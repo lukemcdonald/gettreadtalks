@@ -5,6 +5,7 @@ import { Inter } from 'next/font/google';
 
 import { AuthProvider } from '@/components/auth-provider';
 import { ErrorBoundary } from '@/components/error-boundary';
+import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header/site-header';
 import { ThemeProvider } from '@/components/theme-provider';
 
@@ -32,14 +33,20 @@ export default async function RootLayout({
 }>) {
   return (
     <html className="h-full" lang="en" suppressHydrationWarning>
-      <body className={cn(inter.className, 'h-full bg-cover bg-gray-100 dark:bg-gray-950')}>
+      <body
+        className={cn(
+          inter.className,
+          'flex min-h-full flex-col bg-cover bg-gray-100 dark:bg-gray-950',
+        )}
+      >
         <ErrorBoundary>
           <ThemeProvider>
             <AuthProvider>
               <Suspense>
                 <SiteHeader />
               </Suspense>
-              {children}
+              <main className="flex-1">{children}</main>
+              <SiteFooter />
             </AuthProvider>
           </ThemeProvider>
         </ErrorBoundary>

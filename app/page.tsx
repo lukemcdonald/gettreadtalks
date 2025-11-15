@@ -1,13 +1,81 @@
-import { MainLayout } from '@/components/main-layout';
-import { preloadTalks } from '@/lib/features/talks';
-import { TalksList } from './_components/talks-list';
+import { SpeakerCard, TalkCard } from '@/components/cards';
+import { FeaturedGrid } from '@/components/grid';
+import { PageLayout, SectionContainer } from '@/components/layouts';
+import { getFeaturedSpeakers } from '@/lib/features/speakers';
+import { getFeaturedTalks } from '@/lib/features/talks';
 
 export default async function HomePage() {
-  const preloadedTalks = await preloadTalks();
+  const [featuredTalks, featuredSpeakers] = await Promise.all([
+    getFeaturedTalks(5),
+    getFeaturedSpeakers(6),
+  ]);
 
   return (
-    <MainLayout>
-      <TalksList preloadedTalks={preloadedTalks} />
-    </MainLayout>
+    <PageLayout>
+      <SectionContainer>
+        <div className="space-y-12">
+          <section className="space-y-6">
+            <div>
+              <h1 className="font-bold text-4xl tracking-tight">Workout your salvation.</h1>
+              <p className="mt-2 text-lg text-muted-foreground">
+                Christ centered sermons to elevate your spiritual heartbeat.
+              </p>
+            </div>
+          </section>
+
+          <FeaturedGrid
+            allHref="/talks"
+            description="Don't know what to listen to? Try starting with one of these favorites."
+            featuredHref="/talks?featured=true"
+            title="Featured Talks"
+          >
+            {featuredTalks.map((talk) => (
+              <TalkCard
+                // featured={talk.featured}
+                key={talk._id}
+                speaker={
+                  talk.speaker
+                    ? {
+                        firstName: talk.speaker.firstName,
+                        imageUrl: talk.speaker.imageUrl,
+                        lastName: talk.speaker.lastName,
+                        slug: talk.speaker.slug,
+                      }
+                    : undefined
+                }
+                talk={{
+                  _id: talk._id,
+                  description: talk.description,
+                  slug: talk.slug,
+                  title: talk.title,
+                }}
+              />
+            ))}
+          </FeaturedGrid>
+
+          <FeaturedGrid
+            allHref="/speakers"
+            description="Have you listened to one of these faithful ministers of the Gospel?"
+            featuredHref="/speakers?sort=featured"
+            title="Featured Speakers"
+          >
+            {featuredSpeakers.map((speaker) => (
+              <SpeakerCard
+                key={speaker._id}
+                speaker={{
+                  _id: speaker._id,
+                  // featured: speaker.featured,
+                  firstName: speaker.firstName,
+                  imageUrl: speaker.imageUrl,
+                  lastName: speaker.lastName,
+                  role: speaker.role,
+                  slug: speaker.slug,
+                }}
+              />
+            ))}
+          </FeaturedGrid>
+        </div>
+      </SectionContainer>
+    </PageLayout>
   );
 }

@@ -1,15 +1,101 @@
-import { MainLayout } from '@/components/main-layout';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+
+import { TalkCard, ViewMoreCard } from '@/components/cards';
+import { HorizontalScrollGrid } from '@/components/grid';
+import { SidebarContent } from '@/components/layouts';
+import { PageHeader } from '@/components/page-header';
+import { TopicSelector } from '@/components/topic-selector';
+import { getAllTopics, getTopicBySlug } from '@/lib/features/topics';
 
 type TopicPageProps = {
-  params: Promise<{ topic: string }>;
+  params: Promise<{
+    topic: string;
+  }>;
 };
 
+const DISPLAY_LIMIT = 12;
+
 export default async function TopicPage({ params }: TopicPageProps) {
-  await params;
+  const { topic: slug } = await params;
+  const [data, allTopics] = await Promise.all([getTopicBySlug(slug), getAllTopics()]);
+
+  if (!data) {
+    notFound();
+  }
+
+  const { talks, topic } = data;
+  const displayedTalks = talks.slice(0, DISPLAY_LIMIT);
+  const remainingCount = talks.length - DISPLAY_LIMIT;
 
   return (
-    <MainLayout>
-      <h1>Topic</h1>
-    </MainLayout>
+    <HorizontalScrollGrid
+      sidebar={
+        <>
+          <PageHeader
+            breadcrumbs={[
+              { href: '/', label: 'Home' },
+              { href: '/topics', label: 'Topics' },
+              { href: `/topics/${slug}`, label: topic.title },
+            ]}
+            title={topic.title}
+          />
+
+          <SidebarContent title="Browse Topics">
+            <TopicSelector
+              currentSlug={slug}
+              topics={allTopics.map((t) => ({
+                _id: t._id,
+                slug: t.slug,
+                title: t.title,
+              }))}
+            />
+            <Link className="text-primary text-sm hover:underline" href="/topics">
+              View all topics →
+            </Link>
+          </SidebarContent>
+
+          <SidebarContent title="About">
+            <div className="space-y-2 text-sm">
+              <div>
+                <span className="font-medium">Talks:</span>{' '}
+                <span className="text-muted-foreground">{talks.length}</span>
+              </div>
+            </div>
+          </SidebarContent>
+        </>
+      }
+    >
+      {displayedTalks.map((talk) => (
+        <div className="min-w-[300px] flex-shrink-0" key={talk._id}>
+          <TalkCard
+            featured={talk.featured}
+            speaker={
+              talk.speaker
+                ? {
+                    firstName: talk.speaker.firstName,
+                    imageUrl: talk.speaker.imageUrl,
+                    lastName: talk.speaker.lastName,
+                    slug: talk.speaker.slug,
+                  }
+                : undefined
+            }
+            talk={{
+              _id: talk._id,
+              description: talk.description,
+              slug: talk.slug,
+              title: talk.title,
+            }}
+          />
+        </div>
+      ))}
+      {remainingCount > 0 && (
+        <ViewMoreCard
+          count={remainingCount}
+          href={`/talks?topic=${topic._id}`}
+          label="View All Talks"
+        />
+      )}
+    </HorizontalScrollGrid>
   );
 }
