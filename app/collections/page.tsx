@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 
-import { FilterBar, SearchInput, SelectFilter, SortSelect } from '@/components/filters';
-import { ListPageLayout, SectionContainer } from '@/components/layouts';
+import { SearchInput, SelectFilter, SortSelect } from '@/components/filters';
+import { ArchiveLayout, ArchiveSidebar, SidebarContent } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { getAllCollectionsWithStats } from '@/lib/features/collections';
 import { getAllSpeakers } from '@/lib/features/speakers';
@@ -32,45 +32,58 @@ export default async function CollectionsPage() {
     ).values(),
   ).sort((a, b) => `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`));
 
+  const totalCollections = result.page.length;
+  const totalTalks = result.page.reduce((sum, item) => sum + item.talkCount, 0);
+
   return (
-    <ListPageLayout>
-      <SectionContainer>
+    <ArchiveLayout
+      header={
         <PageHeader
           description="Each series includes talks given by one or more speakers on the same topic or book of the Bible."
           title="Series"
         />
-
-        <div className="space-y-6">
-          <FilterBar>
-            <SearchInput
-              label="Search"
-              paramName="search"
-              placeholder="Search collections..."
-            />
-            <SelectFilter
-              label="Speaker"
-              options={speakersWithCollections.map((speaker) => ({
-                label: `${speaker.firstName} ${speaker.lastName}`,
-                value: speaker.slug,
-              }))}
-              paramName="speaker"
-              placeholder="All Speakers"
-            />
-            <SortSelect
-              label="Sort by"
-              options={[
-                { label: 'Most Talks', value: 'most-talks' },
-                { label: 'Least Talks', value: 'least-talks' },
-                { label: 'Alphabetical', value: 'alphabetical' },
-              ]}
-            />
-          </FilterBar>
-
-          <Suspense fallback={<CollectionsListSkeleton />}>
-            <CollectionsList collections={result.page} speakers={speakersWithCollections} />
-          </Suspense>
-        </div>
-      </SectionContainer>
-    </ListPageLayout>
+      }
+      sidebar={
+        <ArchiveSidebar
+          description="Each series includes talks given by one or more speakers on the same topic or book of the Bible."
+          meta={[
+            { label: 'Series', value: totalCollections },
+            { label: 'Total Talks', value: totalTalks },
+          ]}
+          title="Series"
+        >
+          <SidebarContent title="Filters">
+            <div className="space-y-4">
+              <SearchInput
+                label="Search"
+                paramName="search"
+                placeholder="Search collections..."
+              />
+              <SelectFilter
+                label="Speaker"
+                options={speakersWithCollections.map((speaker) => ({
+                  label: `${speaker.firstName} ${speaker.lastName}`,
+                  value: speaker.slug,
+                }))}
+                paramName="speaker"
+                placeholder="All Speakers"
+              />
+              <SortSelect
+                label="Sort by"
+                options={[
+                  { label: 'Most Talks', value: 'most-talks' },
+                  { label: 'Least Talks', value: 'least-talks' },
+                  { label: 'Alphabetical', value: 'alphabetical' },
+                ]}
+              />
+            </div>
+          </SidebarContent>
+        </ArchiveSidebar>
+      }
+    >
+      <Suspense fallback={<CollectionsListSkeleton />}>
+        <CollectionsList collections={result.page} speakers={speakersWithCollections} />
+      </Suspense>
+    </ArchiveLayout>
   );
 }

@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 
-import { FilterBar, SearchInput, SelectFilter, SortSelect } from '@/components/filters';
-import { ListPageLayout, SectionContainer } from '@/components/layouts';
+import { SearchInput, SelectFilter, SortSelect } from '@/components/filters';
+import { ArchiveLayout, ArchiveSidebar, SidebarContent } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { getAllSpeakers } from '@/lib/features/speakers';
 import { SpeakersList } from './_components/speakers-list';
@@ -31,37 +31,50 @@ export default async function SpeakersPage() {
     new Set(speakers.map((s) => s.role).filter((r): r is string => !!r)),
   ).sort();
 
+  const totalSpeakers = speakers.length;
+  const featuredSpeakers = speakers.filter((s) => s.featured).length;
+
   return (
-    <ListPageLayout>
-      <SectionContainer>
+    <ArchiveLayout
+      header={
         <PageHeader
           description="Listen to faithful ambassadors of Christ and be blessed."
           title="All Speakers"
         />
-
-        <div className="space-y-6">
-          <FilterBar>
-            <SearchInput label="Search" paramName="search" placeholder="Search speakers..." />
-            <SelectFilter
-              label="Role"
-              options={roles.map((role) => ({ label: role, value: role }))}
-              paramName="role"
-              placeholder="All Roles"
-            />
-            <SortSelect
-              label="Sort by"
-              options={[
-                { label: 'Alphabetical', value: 'alphabetical' },
-                { label: 'Featured First', value: 'featured' },
-              ]}
-            />
-          </FilterBar>
-
-          <Suspense fallback={<SpeakersListSkeleton />}>
-            <SpeakersList speakers={speakers} />
-          </Suspense>
-        </div>
-      </SectionContainer>
-    </ListPageLayout>
+      }
+      sidebar={
+        <ArchiveSidebar
+          description="Listen to faithful ambassadors of Christ and be blessed."
+          meta={[
+            { label: 'Speakers', value: totalSpeakers },
+            { label: 'Featured', value: featuredSpeakers },
+          ]}
+          title="All Speakers"
+        >
+          <SidebarContent title="Filters">
+            <div className="space-y-4">
+              <SearchInput label="Search" paramName="search" placeholder="Search speakers..." />
+              <SelectFilter
+                label="Role"
+                options={roles.map((role) => ({ label: role, value: role }))}
+                paramName="role"
+                placeholder="All Roles"
+              />
+              <SortSelect
+                label="Sort by"
+                options={[
+                  { label: 'Alphabetical', value: 'alphabetical' },
+                  { label: 'Featured First', value: 'featured' },
+                ]}
+              />
+            </div>
+          </SidebarContent>
+        </ArchiveSidebar>
+      }
+    >
+      <Suspense fallback={<SpeakersListSkeleton />}>
+        <SpeakersList speakers={speakers} />
+      </Suspense>
+    </ArchiveLayout>
   );
 }
