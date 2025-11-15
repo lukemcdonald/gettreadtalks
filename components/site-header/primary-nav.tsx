@@ -3,20 +3,13 @@
 import { usePathname } from 'next/navigation';
 
 import { NavLink } from '@/components/site-header/nav-link';
-
-const NAVIGATION_LINKS = [
-  { label: 'Talks', href: '/talks' },
-  { label: 'Speakers', href: '/speakers' },
-  { label: 'Topics', href: '/topics' },
-  { label: 'Collections', href: '/collections' },
-  { label: 'Clips', href: '/clips' },
-] as const;
+import { NAVIGATION_LINKS } from '@/components/site-header/navigation-links';
 
 export function PrimaryNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex items-center">
+    <nav aria-label="Primary navigation" className="flex items-center">
       {NAVIGATION_LINKS.map((link) => (
         <NavLink href={link.href} isActive={link.href === pathname} key={link.href}>
           {link.label}

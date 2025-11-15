@@ -1,14 +1,17 @@
+import type { User } from '@/lib/services/auth/types';
+
 import { AccountMenu } from '@/components/site-header/account-menu/account-menu';
 import { ModeSwitcher } from '@/components/site-header/mode-switcher';
-import { getCurrentUser } from '@/lib/services/auth/server';
 
-export async function SecondaryNav() {
-  const initialUser = await getCurrentUser();
+type SecondaryNavProps = {
+  initialUser?: User;
+};
 
+export function SecondaryNav({ initialUser }: SecondaryNavProps) {
   return (
     <div className="flex items-center">
       <AccountMenu initialUser={initialUser} />
-      <ModeSwitcher className="size-10" />
+      <ModeSwitcher className="hidden size-10 lg:flex" />
     </div>
   );
 }

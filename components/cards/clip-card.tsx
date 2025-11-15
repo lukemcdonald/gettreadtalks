@@ -1,5 +1,7 @@
 'use client';
 
+import type { Route } from 'next';
+
 import Link from 'next/link';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -28,7 +30,10 @@ export function ClipCard({ favorited, speaker, clip }: ClipCardProps) {
   const clipUrl = `/clips/${clip.slug}`;
 
   return (
-    <Card className="group min-w-0 transition-all hover:shadow-md" render={<Link href={clipUrl} />}>
+    <Card
+      className="group min-w-0 transition-all hover:shadow-md"
+      render={<Link href={clipUrl as Route} />}
+    >
       <CardHeader>
         <div className="flex items-start justify-between gap-2">
           <CardTitle className="line-clamp-2 flex-1 group-hover:text-primary">

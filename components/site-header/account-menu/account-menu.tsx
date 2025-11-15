@@ -9,7 +9,10 @@ import {
   CheckCircle2 as FinishedIcon,
   Settings as SettingsIcon,
   LogOut as SignOutIcon,
+  CircleUser as UserIcon,
 } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 import { AccountMenuAvatar } from '@/components/site-header/account-menu/account-menu-avatar';
 import { AccountMenuItem } from '@/components/site-header/account-menu/account-menu-item';
@@ -24,13 +27,29 @@ type AccountMenuProps = {
 
 export function AccountMenu({ initialUser }: AccountMenuProps) {
   const { data: user } = useCurrentUser(initialUser);
+  const pathname = usePathname();
 
   if (!user) {
     return (
-      <NavLink href="/login" isActive={false}>
-        <span>Sign In</span>
-        <ArrowRightIcon className="size-4" />
-      </NavLink>
+      <>
+        <div className="lg:hidden">
+          <Button
+            className="lg:gap-2"
+            render={<Link href="/login" />}
+            size="icon-lg"
+            variant="ghost"
+          >
+            <UserIcon className="size-6" />
+            <span className="sr-only">Sign In</span>
+          </Button>
+        </div>
+        <div className="hidden lg:block">
+          <NavLink href="/login" isActive={pathname === '/login'}>
+            <span>Sign In</span>
+            <ArrowRightIcon className="size-4" />
+          </NavLink>
+        </div>
+      </>
     );
   }
 

@@ -1,3 +1,5 @@
+import type { Route } from 'next';
+
 import Link from 'next/link';
 
 import { cn } from '@/lib/utils';
@@ -37,7 +39,7 @@ export function Breadcrumbs({ className, items }: BreadcrumbsProps) {
               ) : (
                 <Link
                   className="text-muted-foreground transition-colors hover:text-foreground"
-                  href={item.href}
+                  href={item.href as Route}
                 >
                   {item.label}
                 </Link>
