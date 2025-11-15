@@ -1,5 +1,6 @@
 'use client';
 
+import type { Route } from 'next';
 import type { ComponentType } from 'react';
 
 import Link from 'next/link';
@@ -26,7 +27,7 @@ export function AccountMenuItem({
   if (isButton) {
     renderComponent = <Button size="xs" variant="ghost" />;
   } else if (href) {
-    renderComponent = <Link href={href} />;
+    renderComponent = <Link href={href as Route} />;
   }
 
   return (

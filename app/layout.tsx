@@ -45,7 +45,9 @@ export default async function RootLayout({
               <Suspense>
                 <SiteHeader />
               </Suspense>
-              <main className="flex-1">{children}</main>
+              <main className="flex-1" id="main-content">
+                {children}
+              </main>
               <SiteFooter />
             </AuthProvider>
           </ThemeProvider>

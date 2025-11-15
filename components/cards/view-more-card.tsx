@@ -1,5 +1,7 @@
 'use client';
 
+import type { Route } from 'next';
+
 import Link from 'next/link';
 
 import { Card, CardHeader } from '@/components/ui/card';
@@ -16,7 +18,7 @@ export function ViewMoreCard({ className, count, href, label = 'View More' }: Vi
   return (
     <Card
       className={cn('group min-w-[300px] flex-shrink-0 transition-all hover:shadow-md', className)}
-      render={<Link href={href} />}
+      render={<Link href={href as Route} />}
     >
       <CardHeader>
         <div className="flex h-full min-h-[120px] items-center justify-center">

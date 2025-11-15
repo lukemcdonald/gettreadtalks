@@ -1,5 +1,7 @@
 'use client';
 
+import type { Route } from 'next';
+
 import { Mail, Rss } from 'lucide-react';
 import Link from 'next/link';
 
@@ -16,7 +18,9 @@ function FooterColumn({ children, className, title }: FooterColumnProps) {
   return (
     <div className={cn('space-y-4', className)}>
       <h3 className="font-semibold text-foreground uppercase">{title}</h3>
-      <nav className="flex flex-col space-y-2">{children}</nav>
+      <nav aria-label={title} className="flex flex-col space-y-2">
+        {children}
+      </nav>
     </div>
   );
 }
@@ -28,7 +32,10 @@ type FooterLinkProps = {
 
 function FooterLink({ children, href }: FooterLinkProps) {
   return (
-    <Link className="text-muted-foreground transition-colors hover:text-foreground" href={href}>
+    <Link
+      className="text-muted-foreground transition-colors hover:text-foreground"
+      href={href as Route}
+    >
       {children}
     </Link>
   );
@@ -37,7 +44,7 @@ function FooterLink({ children, href }: FooterLinkProps) {
 export function SiteFooter() {
   return (
     <footer className="mt-auto border-t bg-background">
-      <div className="container mx-auto px-4 py-12 sm:px-6 lg:px-8">
+      <div className="container mx-auto px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
             <FooterColumn title="ENGAGE">
@@ -62,6 +69,7 @@ export function SiteFooter() {
             <FooterColumn title="GLORY TO THE HOLY ONE">
               <div className="relative">
                 <a
+                  aria-label="Glory To The Holy One book by Jeff Lippincott & R.C. Sproul (affiliate link)"
                   className="block"
                   href="https://www.ligonier.org/store/glory-to-the-holy-one-hardcover"
                   rel="noopener noreferrer"
@@ -104,16 +112,20 @@ export function SiteFooter() {
             </p>
             <div className="flex items-center gap-4">
               <a
+                aria-label="Send email to contact@gettreadtalks.com"
                 className="text-muted-foreground transition-colors hover:text-foreground"
                 href="mailto:contact@gettreadtalks.com"
               >
                 <Mail className="size-5" />
+                <span className="sr-only">Email</span>
               </a>
               <a
+                aria-label="RSS feed"
                 className="text-muted-foreground transition-colors hover:text-foreground"
                 href="/feed"
               >
                 <Rss className="size-5" />
+                <span className="sr-only">RSS feed</span>
               </a>
             </div>
           </div>

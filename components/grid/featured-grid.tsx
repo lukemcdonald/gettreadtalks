@@ -1,3 +1,5 @@
+import type { Route } from 'next';
+
 import Link from 'next/link';
 
 import { cn } from '@/lib/utils';
@@ -33,9 +35,11 @@ export function FeaturedGrid({
             {(allHref || featuredHref) && (
               <div className="flex items-center gap-4">
                 {allHref && (
-                  <Link href={allHref}>{featuredHref ? `All ${itemType}` : 'View All →'}</Link>
+                  <Link href={allHref as Route}>
+                    {featuredHref ? `All ${itemType}` : 'View All →'}
+                  </Link>
                 )}
-                {featuredHref && <Link href={featuredHref}>Featured {itemType}</Link>}
+                {featuredHref && <Link href={featuredHref as Route}>Featured {itemType}</Link>}
               </div>
             )}
           </div>
