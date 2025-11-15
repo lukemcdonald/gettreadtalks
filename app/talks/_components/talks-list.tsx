@@ -1,43 +1,46 @@
-'use client';
-
 import type { Doc } from '@/convex/_generated/dataModel';
 
-import Link from 'next/link';
+import { TalkCard } from '@/components/cards';
+import { GridList } from '@/components/grid';
+import { Empty } from '@/components/ui/empty';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+type TalkWithSpeaker = Doc<'talks'> & {
+  speaker: Doc<'speakers'> | null;
+};
 
 type TalksListProps = {
-  talks: Doc<'talks'>[];
+  talks: TalkWithSpeaker[];
 };
 
 export function TalksList({ talks }: TalksListProps) {
   if (talks.length === 0) {
-    return (
-      <div className="rounded-lg border border-dashed p-8 text-center">
-        <p className="text-muted-foreground">No talks found</p>
-      </div>
-    );
+    return <Empty description="No talks found" />;
   }
 
   return (
-    <div className="space-y-4">
+    <GridList columns={{ default: 1, sm: 2, md: 3, lg: 4 }}>
       {talks.map((talk) => (
-        <Card key={talk._id} render={<Link href={`/talks/${talk.slug}`} />}>
-          <div className="flex items-start justify-between gap-4">
-            <CardHeader className="flex-1">
-              <CardTitle>{talk.title}</CardTitle>
-              {talk.description && <CardDescription>{talk.description}</CardDescription>}
-            </CardHeader>
-            <CardContent className="flex items-center gap-2">
-              {talk.featured && (
-                <span className="rounded bg-primary/10 px-2 py-1 font-medium text-primary text-xs">
-                  Featured
-                </span>
-              )}
-            </CardContent>
-          </div>
-        </Card>
+        <TalkCard
+          featured={talk.featured}
+          key={talk._id}
+          speaker={
+            talk.speaker
+              ? {
+                  firstName: talk.speaker.firstName,
+                  imageUrl: talk.speaker.imageUrl,
+                  lastName: talk.speaker.lastName,
+                  slug: talk.speaker.slug,
+                }
+              : undefined
+          }
+          talk={{
+            _id: talk._id,
+            description: talk.description,
+            slug: talk.slug,
+            title: talk.title,
+          }}
+        />
       ))}
-    </div>
+    </GridList>
   );
 }

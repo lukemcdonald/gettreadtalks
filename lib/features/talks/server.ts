@@ -52,10 +52,21 @@ export async function getTalks(filters?: {
     { token },
   );
 
+  // Fetch speakers for each talk
+  const talksWithSpeakers = await Promise.all(
+    result.page.map(async (talk) => {
+      const speaker = await fetchQuery(api.speakers.getSpeaker, { id: talk.speakerId }, { token });
+      return {
+        ...talk,
+        speaker,
+      };
+    }),
+  );
+
   return {
     continueCursor: result.continueCursor,
     isDone: result.isDone,
-    talks: result.page,
+    talks: talksWithSpeakers,
   };
 }
 
@@ -126,4 +137,26 @@ export async function getAllCollections() {
   const result = await fetchQuery(api.collections.listCollections, { paginationOpts }, { token });
 
   return result.page;
+}
+
+/**
+ * Get featured talks for homepage.
+ */
+export async function getFeaturedTalks(limit = 5) {
+  const token = await getAuthToken();
+
+  const talks = await fetchQuery(api.talks.listFeaturedTalks, { limit }, { token });
+
+  // Fetch speakers for each talk
+  const talksWithSpeakers = await Promise.all(
+    talks.map(async (talk) => {
+      const speaker = await fetchQuery(api.speakers.getSpeaker, { id: talk.speakerId }, { token });
+      return {
+        ...talk,
+        speaker,
+      };
+    }),
+  );
+
+  return talksWithSpeakers;
 }
