@@ -1,16 +1,18 @@
-// Client-side utilities
-
 export type {
+  ErrorCode,
   ErrorContext,
   ErrorReportOptions,
-  MutationResult,
   MutationState,
   MutationStatus,
   SeverityLevel,
 } from './types';
 
-export { addBreadcrumb, captureException, clearUserContext, setUserContext } from './client';
-// Convex-specific utilities
+export {
+  addBreadcrumb,
+  captureException,
+  clearUserContext,
+  setUserContext,
+} from './client';
 export {
   formatErrorDetails,
   getConvexErrorData,
@@ -19,5 +21,3 @@ export {
   isConvexError,
   isErrorCode,
 } from './convex';
-// Types
-export { ErrorCode } from './types';

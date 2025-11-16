@@ -1,41 +1,23 @@
 import { ConvexError, type Value } from 'convex/values';
 
+import { ErrorCodes } from '../../lib/services/errors/constants';
+
 /**
- * Common error codes for backend operations.
- * Keep in sync with lib/services/errors/types.ts ErrorCode enum.
+ * Type representing all possible error code values.
  */
-export const ErrorCode = {
-  // Authentication & Authorization
-  AUTH_REQUIRED: 'AUTH_REQUIRED',
-  FORBIDDEN: 'FORBIDDEN',
-  INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
-  SESSION_EXPIRED: 'SESSION_EXPIRED',
+export type ErrorCode = (typeof ErrorCodes)[keyof typeof ErrorCodes];
 
-  // Validation
-  DUPLICATE_SLUG: 'DUPLICATE_SLUG',
-  INVALID_INPUT: 'INVALID_INPUT',
-  MISSING_FIELD: 'MISSING_FIELD',
-  VALIDATION_FAILED: 'VALIDATION_FAILED',
-
-  // Resource
-  NOT_FOUND: 'NOT_FOUND',
-  RESOURCE_DELETED: 'RESOURCE_DELETED',
-
-  // System
-  DATABASE_ERROR: 'DATABASE_ERROR',
-  NETWORK_ERROR: 'NETWORK_ERROR',
-  SERVER_ERROR: 'SERVER_ERROR',
-  UNKNOWN_ERROR: 'UNKNOWN_ERROR',
-} as const;
-
-export type ErrorCodeType = (typeof ErrorCode)[keyof typeof ErrorCode];
+/**
+ * Re-export ErrorCodes for convenience in Convex code.
+ */
+export { ErrorCodes } from '../../lib/services/errors/constants';
 
 /**
  * Context information that can be attached to errors.
  */
 export type ErrorData = {
   [key: string]: unknown;
-  code?: ErrorCodeType;
+  errorCode?: ErrorCode;
   field?: string;
   message?: string;
   resource?: string;
@@ -49,7 +31,7 @@ export type ErrorData = {
  * @example
  * // Simple error
  * throw createConvexError('User not found', {
- *   code: ErrorCode.NOT_FOUND,
+ *   errorCode: ErrorCodes.NOT_FOUND,
  *   resource: 'user',
  *   resourceId: userId,
  * });
@@ -57,15 +39,12 @@ export type ErrorData = {
  * @example
  * // Validation error
  * throw createConvexError('Title already exists', {
- *   code: ErrorCode.DUPLICATE_SLUG,
+ *   errorCode: ErrorCodes.DUPLICATE_SLUG,
  *   field: 'title',
  * });
  */
 export function createConvexError(message: string, data?: ErrorData): ConvexError<Value> {
-  return new ConvexError({
-    message,
-    ...data,
-  });
+  return new ConvexError({ message, ...data });
 }
 
 /**
@@ -79,7 +58,7 @@ export function createConvexError(message: string, data?: ErrorData): ConvexErro
  */
 export function throwAuthRequired(message = 'Authentication required'): never {
   throw createConvexError(message, {
-    code: ErrorCode.AUTH_REQUIRED,
+    errorCode: ErrorCodes.AUTH_REQUIRED,
   });
 }
 
@@ -94,7 +73,7 @@ export function throwAuthRequired(message = 'Authentication required'): never {
  */
 export function throwForbidden(message = 'Forbidden'): never {
   throw createConvexError(message, {
-    code: ErrorCode.FORBIDDEN,
+    errorCode: ErrorCodes.FORBIDDEN,
   });
 }
 
@@ -113,7 +92,7 @@ export function throwNotFound(
   data?: Pick<ErrorData, 'resource' | 'resourceId'>,
 ): never {
   throw createConvexError(message, {
-    code: ErrorCode.NOT_FOUND,
+    errorCode: ErrorCodes.NOT_FOUND,
     ...data,
   });
 }
@@ -129,7 +108,7 @@ export function throwNotFound(
  */
 export function throwDuplicateSlug(message = 'Resource already exists', field?: string): never {
   throw createConvexError(message, {
-    code: ErrorCode.DUPLICATE_SLUG,
+    errorCode: ErrorCodes.DUPLICATE_SLUG,
     field,
   });
 }
@@ -145,7 +124,7 @@ export function throwDuplicateSlug(message = 'Resource already exists', field?: 
  */
 export function throwValidationError(message: string, field?: string): never {
   throw createConvexError(message, {
-    code: ErrorCode.VALIDATION_FAILED,
+    errorCode: ErrorCodes.VALIDATION_FAILED,
     field,
   });
 }
