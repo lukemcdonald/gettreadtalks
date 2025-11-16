@@ -1,7 +1,8 @@
+import type { ErrorCode, ErrorContext } from './types';
+
 import { ConvexError, type Value } from 'convex/values';
 
 import { ErrorCodes } from './constants';
-import { type ErrorCode, type ErrorContext } from './types';
 
 /**
  * Type guard to check if an error is a ConvexError.

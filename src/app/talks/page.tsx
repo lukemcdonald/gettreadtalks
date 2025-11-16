@@ -21,6 +21,7 @@ type TalksPageProps = {
   searchParams: Promise<{
     cursor?: string;
     featured?: string;
+    search?: string;
     speaker?: string;
     status?: string;
     topic?: string;
@@ -32,15 +33,17 @@ async function TalksContent({ params }: { params: Awaited<TalksPageProps['search
 
   const cursor = params.cursor || undefined;
   const featured = params.featured === 'true' ? true : undefined;
+  const search = params.search || undefined;
   const speakerId = params.speaker as Id<'speakers'> | undefined;
   const topicId = params.topic as Id<'topics'> | undefined;
   const statusParam = params.status as StatusType | undefined;
 
   const status = user
     ? statusParam
-    : statusParam || (featured === undefined && !speakerId && !topicId ? 'published' : undefined);
+    : statusParam ||
+      (featured === undefined && !speakerId && !topicId && !search ? 'published' : undefined);
 
-  const result = await getTalks({ cursor, featured, speakerId, status, topicId });
+  const result = await getTalks({ cursor, featured, search, speakerId, status, topicId });
 
   return (
     <>
@@ -73,14 +76,19 @@ export default async function TalksPage({ searchParams }: TalksPageProps) {
           title="Talks"
         />
 
-        <div className="space-y-6">
+        {/* Sticky filter bar */}
+        <div className="-mx-4 sm:-mx-6 lg:-mx-8 sticky top-0 z-10 bg-background/95 px-4 py-4 backdrop-blur supports-[backdrop-filter]:bg-background/80 sm:px-6 lg:px-8">
           <TalksFilters isAuthenticated={!!user} speakers={speakers} topics={topics} />
-          <ActiveFilters speakers={speakers} topics={topics} />
         </div>
 
-        <Suspense fallback={<TalksListSkeleton />}>
-          <TalksContent params={params} />
-        </Suspense>
+        {/* Active filters and content */}
+        <div className="space-y-6">
+          <ActiveFilters speakers={speakers} topics={topics} />
+
+          <Suspense fallback={<TalksListSkeleton />}>
+            <TalksContent params={params} />
+          </Suspense>
+        </div>
       </SectionContainer>
     </ListPageLayout>
   );

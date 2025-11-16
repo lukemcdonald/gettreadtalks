@@ -27,10 +27,10 @@ export function TalkCard({ featured, favorited, finished, speaker, talk }: TalkC
     >
       <CardHeader>
         <div className="flex items-start justify-between gap-2">
-          <CardTitle className="line-clamp-2 flex-1 group-hover:text-primary">
+          <CardTitle className="line-clamp-3 flex-1 group-hover:text-primary">
             {talk.title}
           </CardTitle>
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-shrink-0 flex-col gap-1">
             {featured && (
               <Badge className="bg-primary/10 text-primary text-xs" variant="secondary">
                 Featured
@@ -54,9 +54,6 @@ export function TalkCard({ featured, favorited, finished, speaker, talk }: TalkC
             )}
           </div>
         </div>
-        {talk.description && (
-          <p className="line-clamp-2 text-muted-foreground text-sm">{talk.description}</p>
-        )}
       </CardHeader>
       {speaker && (
         <CardContent>

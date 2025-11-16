@@ -22,7 +22,7 @@ export function TalksList({ talks }: TalksListProps) {
   }
 
   return (
-    <GridList>
+    <GridList columns={{ default: 1, sm: 2, md: 2, lg: 3, xl: 3 }}>
       {talks.map((talk) => (
         <TalkCard
           featured={talk.featured}

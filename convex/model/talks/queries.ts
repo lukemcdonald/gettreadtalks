@@ -204,13 +204,14 @@ export const listTalks = query({
   args: {
     featured: v.optional(v.boolean()),
     paginationOpts: v.any(),
+    search: v.optional(v.string()),
     speakerId: v.optional(v.id('speakers')),
     status: v.optional(statusType),
     topicId: v.optional(v.id('topics')),
   },
   // biome-ignore lint/complexity: query
   handler: async (ctx, args) => {
-    const { featured, paginationOpts, speakerId, status, topicId } = args;
+    const { featured, paginationOpts, search, speakerId, status, topicId } = args;
 
     // If filtering by topic, get talks from talksOnTopics join table
     if (topicId) {
@@ -235,6 +236,14 @@ export const listTalks = query({
         filteredTalks = filteredTalks.filter((talk) => talk.speakerId === speakerId);
       }
 
+      // Apply search filter if provided
+      if (search) {
+        const searchLower = search.toLowerCase();
+        filteredTalks = filteredTalks.filter((talk) =>
+          talk.title.toLowerCase().includes(searchLower),
+        );
+      }
+
       // Sort by publishedAt or _creationTime
       filteredTalks.sort(
         (a, b) => (b.publishedAt || b._creationTime) - (a.publishedAt || a._creationTime),
@@ -251,31 +260,75 @@ export const listTalks = query({
       };
     }
 
+    // Helper function to apply search filter
+    const applySearchFilter = (talks: Doc<'talks'>[]): Doc<'talks'>[] => {
+      if (!search) {
+        return talks;
+      }
+      const searchLower = search.toLowerCase();
+      return talks.filter((talk) => talk.title.toLowerCase().includes(searchLower));
+    };
+
     // Use indexes when possible for better performance
     if (featured !== undefined && status) {
-      return await ctx.db
+      const result = await ctx.db
         .query('talks')
         .withIndex('by_featured_and_status', (q) => q.eq('featured', featured).eq('status', status))
         .order('desc')
         .paginate(paginationOpts);
+
+      // Apply search filter if provided
+      if (search) {
+        result.page = applySearchFilter(result.page);
+        // Reset pagination when search is applied (simplified approach)
+        return {
+          continueCursor: '',
+          isDone: true,
+          page: result.page,
+        };
+      }
+
+      return result;
     }
 
     if (speakerId && status) {
-      return await ctx.db
+      const result = await ctx.db
         .query('talks')
         .withIndex('by_speakerId_and_status', (q) =>
           q.eq('speakerId', speakerId).eq('status', status),
         )
         .order('desc')
         .paginate(paginationOpts);
+
+      if (search) {
+        result.page = applySearchFilter(result.page);
+        return {
+          continueCursor: '',
+          isDone: true,
+          page: result.page,
+        };
+      }
+
+      return result;
     }
 
     if (status) {
-      return await ctx.db
+      const result = await ctx.db
         .query('talks')
         .withIndex('by_status_and_publishedAt', (q) => q.eq('status', status))
         .order('desc')
         .paginate(paginationOpts);
+
+      if (search) {
+        result.page = applySearchFilter(result.page);
+        return {
+          continueCursor: '',
+          isDone: true,
+          page: result.page,
+        };
+      }
+
+      return result;
     }
 
     if (speakerId) {
@@ -290,15 +343,52 @@ export const listTalks = query({
         result.page = result.page.filter((talk) => talk.featured === featured);
       }
 
+      // Apply search filter if provided
+      if (search) {
+        result.page = applySearchFilter(result.page);
+        return {
+          continueCursor: '',
+          isDone: true,
+          page: result.page,
+        };
+      }
+
       return result;
     }
 
     if (featured !== undefined) {
-      return await ctx.db
+      const result = await ctx.db
         .query('talks')
         .withIndex('by_featured_and_status', (q) => q.eq('featured', featured))
         .order('desc')
         .paginate(paginationOpts);
+
+      if (search) {
+        result.page = applySearchFilter(result.page);
+        return {
+          continueCursor: '',
+          isDone: true,
+          page: result.page,
+        };
+      }
+
+      return result;
+    }
+
+    // Default query - apply search if provided
+    if (search) {
+      // For search without other filters, we need to fetch all and filter
+      // This is less efficient but necessary for search functionality
+      const allTalks = await ctx.db.query('talks').order('desc').collect();
+      const filtered = applySearchFilter(allTalks);
+      const numItems = paginationOpts.numItems || 20;
+      const page = filtered.slice(0, numItems);
+
+      return {
+        continueCursor: '',
+        isDone: filtered.length <= numItems,
+        page,
+      };
     }
 
     return await ctx.db.query('talks').order('desc').paginate(paginationOpts);
