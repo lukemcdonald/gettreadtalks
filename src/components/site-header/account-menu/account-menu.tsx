@@ -16,7 +16,7 @@ import { usePathname } from 'next/navigation';
 
 import { AccountMenuAvatar } from '@/components/site-header/account-menu/account-menu-avatar';
 import { AccountMenuItem } from '@/components/site-header/account-menu/account-menu-item';
-import { NavLink } from '@/components/site-header/nav-link';
+import { NavLink } from '@/components/site-header/navigation/nav-link';
 import { Button } from '@/components/ui/button';
 import { Menu, MenuPopup, MenuSeparator, MenuTrigger } from '@/components/ui/menu';
 import { useCurrentUser } from '@/lib/features/users/hooks';
@@ -34,13 +34,13 @@ export function AccountMenu({ initialUser }: AccountMenuProps) {
       <>
         <div className="lg:hidden">
           <Button
+            aria-label="Sign In"
             className="lg:gap-2"
             render={<Link href="/login" />}
             size="icon-lg"
             variant="ghost"
           >
             <UserIcon className="size-6" />
-            <span className="sr-only">Sign In</span>
           </Button>
         </div>
         <div className="hidden lg:block">

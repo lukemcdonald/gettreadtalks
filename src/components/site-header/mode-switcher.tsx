@@ -15,6 +15,7 @@ export function ModeSwitcher({ className }: { className?: string }) {
 
   return (
     <Button
+      aria-label="Toggle theme"
       className={className}
       onClick={toggleTheme}
       size="icon-lg"
@@ -22,7 +23,6 @@ export function ModeSwitcher({ className }: { className?: string }) {
       variant="ghost"
     >
       <ModeSwitcherIcon />
-      <span className="sr-only">Toggle theme</span>
     </Button>
   );
 }

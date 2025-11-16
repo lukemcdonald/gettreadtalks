@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 
-import { Suspense } from 'react';
 import { Inter } from 'next/font/google';
 
 import { AuthProvider } from '@/components/auth-provider';
@@ -9,8 +8,12 @@ import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header/site-header';
 import { ThemeProvider } from '@/components/theme-provider';
 
-import './_assets/css/styles.css';
+import '@/assets/styles.css';
 
+import { Suspense } from 'react';
+
+import { Main } from '@/components/main';
+import { SkipToMainLink } from '@/components/site-header/navigation/skip-to-main-link';
 import { cn } from '@/lib/utils';
 
 const inter = Inter({
@@ -19,11 +22,11 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  description: 'TREADTalks - Faith-based talks and content platform',
+  description: 'Faith-based talks and content platform',
   icons: {
     // icon: '/favicon.svg', // place in public folder. Add apple icon too.
   },
-  title: 'TREADTalks',
+  title: 'TREAD Talks',
 };
 
 export default async function RootLayout({
@@ -42,12 +45,11 @@ export default async function RootLayout({
         <ErrorBoundary>
           <ThemeProvider>
             <AuthProvider>
+              <SkipToMainLink />
               <Suspense>
                 <SiteHeader />
               </Suspense>
-              <main className="flex-1" id="main-content">
-                {children}
-              </main>
+              <Main>{children}</Main>
               <SiteFooter />
             </AuthProvider>
           </ThemeProvider>

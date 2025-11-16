@@ -117,7 +117,6 @@ export function SiteFooter() {
                 href="mailto:contact@gettreadtalks.com"
               >
                 <Mail className="size-5" />
-                <span className="sr-only">Email</span>
               </a>
               <a
                 aria-label="RSS feed"
@@ -125,7 +124,6 @@ export function SiteFooter() {
                 href="/feed"
               >
                 <Rss className="size-5" />
-                <span className="sr-only">RSS feed</span>
               </a>
             </div>
           </div>
