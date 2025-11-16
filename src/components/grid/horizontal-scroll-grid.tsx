@@ -2,6 +2,7 @@
 
 import { useRef } from 'react';
 
+import { Container } from '@/components/container';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -31,42 +32,40 @@ export function HorizontalScrollGrid({ children, className, sidebar }: Horizonta
   };
 
   return (
-    <div className={cn('container mx-auto px-4 py-12 sm:px-6 lg:px-8', className)}>
-      <div className="mx-auto max-w-7xl">
-        <div className="grid gap-8 lg:grid-cols-[300px_1fr]">
-          <aside className="lg:sticky lg:top-8 lg:h-fit">
-            <div className="space-y-6">{sidebar}</div>
-          </aside>
-          <div className="min-w-0">
-            {/* Mobile: Vertical grid */}
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:hidden">{children}</div>
-            {/* Desktop: Horizontal scroll */}
-            <div className="relative hidden lg:block">
-              <div className="scrollbar-hide flex gap-6 overflow-x-auto pb-4" ref={scrollRef}>
-                {children}
-              </div>
-              <div className="absolute top-0 right-0 flex gap-2">
-                <Button
-                  className="h-8 w-8 rounded-full shadow-md"
-                  onClick={() => scroll('left')}
-                  size="icon"
-                  variant="secondary"
-                >
-                  ←
-                </Button>
-                <Button
-                  className="h-8 w-8 rounded-full shadow-md"
-                  onClick={() => scroll('right')}
-                  size="icon"
-                  variant="secondary"
-                >
-                  →
-                </Button>
-              </div>
+    <Container className={cn('py-12', className)}>
+      <div className="grid gap-8 lg:grid-cols-[300px_1fr]">
+        <aside className="lg:sticky lg:top-8 lg:h-fit">
+          <div className="space-y-6">{sidebar}</div>
+        </aside>
+        <div className="min-w-0">
+          {/* Mobile: Vertical grid */}
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:hidden">{children}</div>
+          {/* Desktop: Horizontal scroll */}
+          <div className="relative hidden lg:block">
+            <div className="scrollbar-hide flex gap-6 overflow-x-auto pb-4" ref={scrollRef}>
+              {children}
+            </div>
+            <div className="absolute top-0 right-0 flex gap-2">
+              <Button
+                className="h-8 w-8 rounded-full shadow-md"
+                onClick={() => scroll('left')}
+                size="icon"
+                variant="secondary"
+              >
+                ←
+              </Button>
+              <Button
+                className="h-8 w-8 rounded-full shadow-md"
+                onClick={() => scroll('right')}
+                size="icon"
+                variant="secondary"
+              >
+                →
+              </Button>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </Container>
   );
 }

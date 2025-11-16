@@ -1,3 +1,4 @@
+import { Container } from '@/components/container';
 import { cn } from '@/lib/utils';
 
 type MaxWidth = 'sm' | 'md' | 'lg' | 'xl' | '2xl';
@@ -30,39 +31,39 @@ export function CenteredLayout({
   const hasSidebars = leftSidebar || rightSidebar;
 
   return (
-    <div className={cn('container mx-auto px-4 py-12 sm:px-6 lg:px-8', className)}>
-      <div className="mx-auto max-w-7xl">
-        {header && (
-          <div
-            className={cn(
-              'mb-8',
-              hasSidebars && 'lg:grid lg:grid-cols-[250px_1fr_250px] lg:gap-8',
-              !hasSidebars && 'mx-auto',
-              !hasSidebars && maxWidthClasses[maxWidth],
-            )}
-          >
-            {header}
-          </div>
-        )}
+    <Container className={cn('py-12', className)}>
+      {header && (
+        <div
+          className={cn(
+            'mb-8',
+            hasSidebars && 'lg:grid lg:grid-cols-[250px_1fr_250px] lg:gap-8',
+            !hasSidebars && 'mx-auto',
+            !hasSidebars && maxWidthClasses[maxWidth],
+          )}
+        >
+          {header}
+        </div>
+      )}
 
-        {hasSidebars ? (
-          <div className="grid gap-8 lg:grid-cols-[250px_1fr_250px]">
-            {leftSidebar && (
-              <aside className="lg:sticky lg:top-8 lg:h-fit">
-                <div className="space-y-6">{leftSidebar}</div>
-              </aside>
-            )}
-            <main className={cn('min-w-0', maxWidthClasses[maxWidth], 'mx-auto')}>{children}</main>
-            {rightSidebar && (
-              <aside className="lg:sticky lg:top-8 lg:h-fit">
-                <div className="space-y-6">{rightSidebar}</div>
-              </aside>
-            )}
-          </div>
-        ) : (
-          <main className={cn('mx-auto', maxWidthClasses[maxWidth])}>{children}</main>
-        )}
-      </div>
-    </div>
+      {hasSidebars ? (
+        <div className="grid gap-8 lg:grid-cols-[250px_1fr_250px]">
+          {leftSidebar && (
+            <aside className="lg:sticky lg:top-8 lg:h-fit">
+              <div className="space-y-6">{leftSidebar}</div>
+            </aside>
+          )}
+
+          <main className={cn('min-w-0', maxWidthClasses[maxWidth], 'mx-auto')}>{children}</main>
+
+          {rightSidebar && (
+            <aside className="lg:sticky lg:top-8 lg:h-fit">
+              <div className="space-y-6">{rightSidebar}</div>
+            </aside>
+          )}
+        </div>
+      ) : (
+        <main className={cn('mx-auto', maxWidthClasses[maxWidth])}>{children}</main>
+      )}
+    </Container>
   );
 }

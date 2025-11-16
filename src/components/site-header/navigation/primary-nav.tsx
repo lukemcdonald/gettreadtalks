@@ -2,8 +2,8 @@
 
 import { usePathname } from 'next/navigation';
 
-import { NavLink } from '@/components/site-header/nav-link';
-import { NAVIGATION_LINKS } from '@/components/site-header/navigation-links';
+import { NAVIGATION_LINKS } from '@/components/site-header/constants';
+import { NavLink } from '@/components/site-header/navigation/nav-link';
 
 export function PrimaryNav() {
   const pathname = usePathname();

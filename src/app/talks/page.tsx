@@ -10,7 +10,9 @@ import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { getAllSpeakersForFilter, getAllTopicsForFilter, getTalks } from '@/lib/features/talks';
 import { getCurrentUser } from '@/lib/services/auth/server';
-import { Pagination, TalksList, TalksListSkeleton } from './_components';
+import { Pagination } from './_components/pagination';
+import { TalksList } from './_components/talks-list';
+import { TalksListSkeleton } from './_components/talks-list-skeleton';
 
 type TalksPageProps = {
   searchParams: Promise<{

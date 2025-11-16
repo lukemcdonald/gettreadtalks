@@ -8,8 +8,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import { Logo } from '@/components/logo';
+import { NAVIGATION_LINKS } from '@/components/site-header/constants';
 import { ModeSwitcher } from '@/components/site-header/mode-switcher';
-import { NAVIGATION_LINKS } from '@/components/site-header/navigation-links';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetClose, SheetHeader, SheetPopup, SheetTrigger } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
@@ -30,7 +30,6 @@ export function MobileNav() {
             variant="ghost"
           >
             <MenuIcon className="size-6 transition-transform" />
-            <span className="sr-only">Open navigation menu</span>
           </Button>
         }
       />
@@ -38,7 +37,7 @@ export function MobileNav() {
         <SheetHeader className="flex flex-row items-center justify-between">
           <Link className="flex shrink-0 items-center" href="/">
             <Logo className="block h-6 w-auto" />
-            <span className="sr-only">TREADTalks</span>
+            <span className="sr-only">TREAD Talks</span>
           </Link>
           <div className="flex items-center gap-2">
             <ModeSwitcher className="size-10" />
@@ -46,12 +45,12 @@ export function MobileNav() {
               render={
                 <Button aria-label="Close navigation menu" size="icon-lg" variant="ghost">
                   <XIcon className="size-6" />
-                  <span className="sr-only">Close</span>
                 </Button>
               }
             />
           </div>
         </SheetHeader>
+
         <nav aria-label="Mobile navigation" className="flex flex-col gap-2 px-4">
           {NAVIGATION_LINKS.map((link) => (
             <SheetClose key={link.href}>

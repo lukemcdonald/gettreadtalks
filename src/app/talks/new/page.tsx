@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import { MainLayout } from '@/components/main-layout';
 import { getAllCollections, getAllSpeakers } from '@/lib/features/talks';
 import { getCurrentUser } from '@/lib/services/auth/server';
-import { TalkForm } from './_components';
+import { TalkForm } from './_components/talk-form';
 
 export default async function NewTalkPage() {
   const user = await getCurrentUser();

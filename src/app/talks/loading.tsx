@@ -1,4 +1,4 @@
-import { TalksListSkeleton } from './_components';
+import { TalksListSkeleton } from './_components/talks-list-skeleton';
 
 export default function Loading() {
   return (
