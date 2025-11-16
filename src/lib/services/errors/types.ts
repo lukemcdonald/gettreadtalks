@@ -1,81 +1,22 @@
-/**
- * Severity levels for errors and breadcrumbs, matching Sentry's severity levels.
- */
-export type SeverityLevel = 'fatal' | 'error' | 'warning' | 'log' | 'info' | 'debug';
+import type { Context as SentryContext, User as SentryUser, SeverityLevel } from '@sentry/nextjs';
 
-/**
- * Mutation status enum, similar to React Query/TanStack Query pattern.
- */
-export type MutationStatus = 'idle' | 'loading' | 'success' | 'error';
-
-/**
- * Common error codes used throughout the application.
- * These should be used with ConvexError for consistent error handling.
- */
-export const ErrorCode = {
-  // Authentication & Authorization
-  AUTH_REQUIRED: 'AUTH_REQUIRED',
-  FORBIDDEN: 'FORBIDDEN',
-  INVALID_CREDENTIALS: 'INVALID_CREDENTIALS',
-  SESSION_EXPIRED: 'SESSION_EXPIRED',
-
-  // Validation
-  DUPLICATE_SLUG: 'DUPLICATE_SLUG',
-  INVALID_INPUT: 'INVALID_INPUT',
-  MISSING_FIELD: 'MISSING_FIELD',
-  VALIDATION_FAILED: 'VALIDATION_FAILED',
-
-  // Resource
-  NOT_FOUND: 'NOT_FOUND',
-  RESOURCE_DELETED: 'RESOURCE_DELETED',
-
-  // System
-  DATABASE_ERROR: 'DATABASE_ERROR',
-  NETWORK_ERROR: 'NETWORK_ERROR',
-  SERVER_ERROR: 'SERVER_ERROR',
-  UNKNOWN_ERROR: 'UNKNOWN_ERROR',
-} as const;
+// biome-ignore lint/style/useImportType: ErrorCodes is needed as a value for typeof expression
+import { ErrorCodes } from './constants';
 
 /**
  * Type representing all possible error code values.
  */
-export type ErrorCodeType = (typeof ErrorCode)[keyof typeof ErrorCode];
+export type ErrorCode = (typeof ErrorCodes)[keyof typeof ErrorCodes];
 
 /**
  * Context information that can be attached to errors for debugging.
  */
 export type ErrorContext = {
-  [key: string]: unknown;
-  code?: ErrorCodeType;
+  errorCode?: ErrorCode;
   field?: string;
   resource?: string;
   resourceId?: string;
-};
-
-/**
- * Internal state for mutation hooks with error handling.
- */
-export type MutationState<TData = unknown> = {
-  data: TData | null;
-  error: Error | null;
-  status: MutationStatus;
-};
-
-/**
- * Result returned from useConvexMutation hook.
- * Includes status enum and derived boolean flags for convenience.
- */
-export type MutationResult<TData = unknown> = {
-  data: TData | null;
-  error: Error | null;
-  isError: boolean;
-  isIdle: boolean;
-  isLoading: boolean;
-  isSuccess: boolean;
-  mutate: (...args: unknown[]) => Promise<TData>;
-  reset: () => void;
-  status: MutationStatus;
-};
+} & SentryContext;
 
 /**
  * Error object with optional Sentry Event ID attached.
@@ -101,9 +42,21 @@ export type ErrorReportOptions = {
   /** Transaction name for better error organization */
   transactionName?: string;
   /** User information to associate with the error */
-  user?: {
-    email?: string;
-    id?: string;
-    username?: string;
-  };
+  user?: SentryUser;
 };
+
+/**
+ * Mutation status enum, similar to React Query/TanStack Query pattern.
+ */
+export type MutationStatus = 'idle' | 'loading' | 'success' | 'error';
+
+/**
+ * Internal state for mutation hooks with error handling.
+ */
+export type MutationState<TData = unknown> = {
+  data: TData | null;
+  error: Error | null;
+  status: MutationStatus;
+};
+
+export type { SeverityLevel } from '@sentry/nextjs';

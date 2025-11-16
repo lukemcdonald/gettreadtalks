@@ -5,17 +5,13 @@ import type { Id } from '@/convex/_generated/dataModel';
 import { useTransition } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
+import { SearchInput, SelectFilter } from '@/components/filters';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectItem,
-  SelectPopup,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { cn } from '@/lib/utils';
 
 type TalksFiltersProps = {
+  className?: string;
   isAuthenticated: boolean;
   onLoadingChange?: (loading: boolean) => void;
   speakers: Array<{ _id: Id<'speakers'>; firstName: string; lastName: string }>;
@@ -23,6 +19,7 @@ type TalksFiltersProps = {
 };
 
 export function TalksFilters({
+  className,
   isAuthenticated,
   onLoadingChange,
   speakers,
@@ -33,9 +30,6 @@ export function TalksFilters({
   const [isPending, startTransition] = useTransition();
 
   const featured = searchParams.get('featured') === 'true';
-  const speakerId = searchParams.get('speaker') || '';
-  const topicId = searchParams.get('topic') || '';
-  const status = searchParams.get('status') || '';
 
   const updateFilter = (key: string, value: string | boolean) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -55,125 +49,67 @@ export function TalksFilters({
     });
   };
 
-  const speakerItems = [
-    { label: 'All Speakers', value: '' },
-    ...speakers.map((speaker) => ({
-      label: `${speaker.firstName} ${speaker.lastName}`,
-      value: speaker._id,
-    })),
-  ];
+  const speakerOptions = speakers.map((speaker) => ({
+    label: `${speaker.firstName} ${speaker.lastName}`,
+    value: speaker._id,
+  }));
 
-  const topicItems = [
-    { label: 'All Topics', value: '' },
-    ...topics.map((topic) => ({
-      label: topic.title,
-      value: topic._id,
-    })),
-  ];
+  const topicOptions = topics.map((topic) => ({
+    label: topic.title,
+    value: topic._id,
+  }));
 
-  const statusItems = [
-    { label: 'All Statuses', value: '' },
+  const statusOptions = [
     { label: 'Published', value: 'published' },
     { label: 'Backlog', value: 'backlog' },
     { label: 'Archived', value: 'archived' },
   ];
 
   return (
-    <div className="relative">
-      <div className="flex flex-wrap items-center gap-2">
-        {speakerItems.length > 1 && (
-          <div className="flex items-center gap-2">
-            <Label className="sr-only" htmlFor="speaker">
-              Speaker:
-            </Label>
-            <Select
-              defaultValue={speakerId}
-              disabled={isPending}
-              items={speakerItems}
-              onValueChange={(value) => updateFilter('speaker', value as string)}
-              value={speakerId}
-            >
-              <SelectTrigger className="w-48" id="speaker">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectPopup>
-                {speakerItems.map((item) => (
-                  <SelectItem key={item.value || 'all'} value={item.value}>
-                    {item.label}
-                  </SelectItem>
-                ))}
-              </SelectPopup>
-            </Select>
-          </div>
-        )}
+    <div className={cn('space-y-4', className)}>
+      <SearchInput label="Search" paramName="search" placeholder="Search talks..." />
 
-        {topicItems.length > 1 && (
-          <div className="flex items-center gap-2">
-            <Label className="sr-only" htmlFor="topic">
-              Topic:
-            </Label>
-            <Select
-              defaultValue={topicId}
-              disabled={isPending}
-              items={topicItems}
-              onValueChange={(value) => updateFilter('topic', value as string)}
-              value={topicId}
-            >
-              <SelectTrigger className="w-48" id="topic">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectPopup>
-                {topicItems.map((item) => (
-                  <SelectItem key={item.value || 'all'} value={item.value}>
-                    {item.label}
-                  </SelectItem>
-                ))}
-              </SelectPopup>
-            </Select>
-          </div>
-        )}
+      {speakerOptions.length > 0 && (
+        <SelectFilter
+          label="Speaker"
+          options={speakerOptions}
+          paramName="speaker"
+          placeholder="All Speakers"
+        />
+      )}
 
-        {isAuthenticated && (
-          <div className="flex items-center gap-2">
-            <Label className="sr-only" htmlFor="status">
-              Status:
-            </Label>
-            <Select
-              defaultValue={status}
-              disabled={isPending}
-              items={statusItems}
-              onValueChange={(value) => updateFilter('status', value as string)}
-              value={status}
-            >
-              <SelectTrigger className="w-48" id="status">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectPopup>
-                {statusItems.map((item) => (
-                  <SelectItem key={item.value || 'all'} value={item.value}>
-                    {item.label}
-                  </SelectItem>
-                ))}
-              </SelectPopup>
-            </Select>
-          </div>
-        )}
+      {topicOptions.length > 0 && (
+        <SelectFilter
+          label="Topic"
+          options={topicOptions}
+          paramName="topic"
+          placeholder="All Topics"
+        />
+      )}
 
-        <div className="flex items-center gap-2">
-          <Checkbox
-            checked={featured}
-            disabled={isPending}
-            id="featured"
-            onCheckedChange={(checked) => updateFilter('featured', checked === true)}
-          />
-          <Label className="cursor-pointer" htmlFor="featured">
-            Featured
-          </Label>
-        </div>
+      {isAuthenticated && (
+        <SelectFilter
+          label="Status"
+          options={statusOptions}
+          paramName="status"
+          placeholder="All Statuses"
+        />
+      )}
+
+      <div className="flex items-center gap-2">
+        <Checkbox
+          checked={featured}
+          disabled={isPending}
+          id="featured"
+          onCheckedChange={(checked) => updateFilter('featured', checked === true)}
+        />
+        <Label className="cursor-pointer" htmlFor="featured">
+          Featured
+        </Label>
       </div>
 
       {/* Fixed height loading indicator to prevent layout shift */}
-      <div className="mt-2 h-5">
+      <div className="h-5">
         {isPending && <span className="text-muted-foreground text-sm">Updating...</span>}
       </div>
     </div>

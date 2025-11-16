@@ -24,11 +24,12 @@ export function ActiveFilters({ speakers, topics }: ActiveFiltersProps) {
   const searchParams = useSearchParams();
 
   const featured = searchParams.get('featured') === 'true';
+  const search = searchParams.get('search');
   const speakerId = searchParams.get('speaker');
   const topicId = searchParams.get('topic');
   const status = searchParams.get('status');
 
-  const hasFilters = featured || speakerId || topicId || status;
+  const hasFilters = featured || search || speakerId || topicId || status;
 
   const removeFilter = (key: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -53,6 +54,17 @@ export function ActiveFilters({ speakers, topics }: ActiveFiltersProps) {
   return (
     <div className="flex flex-wrap items-center gap-2">
       <span className="text-muted-foreground text-sm">Active filters:</span>
+
+      {search && (
+        <button
+          className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 font-medium text-primary text-sm transition-colors hover:bg-primary/20"
+          onClick={() => removeFilter('search')}
+          type="button"
+        >
+          Search: {search}
+          <RemoveIcon className="size-3" />
+        </button>
+      )}
 
       {featured && (
         <button

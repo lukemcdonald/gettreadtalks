@@ -7,7 +7,7 @@ import { internalMutation } from './_generated/server';
 import { ResetPasswordTemplate } from './emails/resetPassword';
 import { VerifyEmailTemplate } from './emails/verifyEmail';
 import { WelcomeEmail } from './emails/welcome';
-import { ErrorCode, createConvexError } from './lib/errors';
+import { ErrorCodes, createConvexError } from './lib/errors';
 
 // Email constants - same across all environments
 const TEST_DOMAIN_EMAIL = 'delivered@resend.dev';
@@ -16,10 +16,11 @@ const FROM_NAME = 'TREAD Talks';
 const REPLY_TO_EMAIL = 'hello@gettreadtalks.com';
 
 // Initialize Resend client
-// Note: testMode true = simulate emails (nothing sent), false = actually send emails
 export const resend: Resend = new Resend(components.resend, {
+  // Note: testMode true = simulate emails (nothing sent), false = actually send emails
   testMode: process.env.RESEND_TEST_MODE !== 'false',
-  onEmailEvent: internal.emails.handleEmailEvent,
+  // biome-ignore lint/suspicious/noExplicitAny: Type compatibility workaround for Convex 1.29.x
+  onEmailEvent: internal.emails.handleEmailEvent as any,
 });
 
 // ============================================
@@ -31,6 +32,7 @@ export const handleEmailEvent = internalMutation({
     event: vEmailEvent,
     id: vEmailId,
   },
+  returns: v.null(),
   handler: (_ctx, args) => {
     console.log('Email event received:', {
       emailId: args.id,
@@ -66,6 +68,8 @@ export const handleEmailEvent = internalMutation({
         console.log('Email event not handled:', args.event.type);
         break;
     }
+
+    return null;
   },
 });
 
@@ -97,7 +101,7 @@ export const sendPasswordResetEmail = internalMutation({
       return emailId;
     } catch {
       throw createConvexError('Failed to send password reset email', {
-        code: ErrorCode.SERVER_ERROR,
+        errorCode: ErrorCodes.SERVER_ERROR,
         resource: 'email',
         resourceId: args.email,
       });
@@ -145,7 +149,7 @@ export const sendVerificationEmail = internalMutation({
       return emailId;
     } catch {
       throw createConvexError('Failed to send verification email', {
-        code: ErrorCode.SERVER_ERROR,
+        errorCode: ErrorCodes.SERVER_ERROR,
         resource: 'email',
         resourceId: args.email,
       });
@@ -178,7 +182,7 @@ export const sendWelcomeEmail = internalMutation({
       });
     } catch {
       throw createConvexError('Failed to send welcome email', {
-        code: ErrorCode.SERVER_ERROR,
+        errorCode: ErrorCodes.SERVER_ERROR,
         resource: 'email',
         resourceId: args.email,
       });

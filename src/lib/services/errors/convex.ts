@@ -1,6 +1,8 @@
+import type { ErrorCode, ErrorContext } from './types';
+
 import { ConvexError, type Value } from 'convex/values';
 
-import { ErrorCode, type ErrorCodeType, type ErrorContext } from './types';
+import { ErrorCodes } from './constants';
 
 /**
  * Type guard to check if an error is a ConvexError.
@@ -23,7 +25,7 @@ export function isConvexError(error: unknown): error is ConvexError<Value> {
  *
  * @example
  * const errorData = getConvexErrorData(error);
- * console.log(errorData.code); // ErrorCode.VALIDATION_FAILED
+ * console.log(errorData.errorCode); // ErrorCodes.VALIDATION_FAILED
  */
 export function getConvexErrorData(error: unknown): ErrorContext {
   if (isConvexError(error)) {
@@ -74,25 +76,25 @@ export function getErrorMessage(error: unknown): string {
  *
  * @example
  * const code = getErrorCode(error);
- * if (code === ErrorCode.AUTH_REQUIRED) {
+ * if (code === ErrorCodes.AUTH_REQUIRED) {
  *   redirect('/login');
  * }
  */
-export function getErrorCode(error: unknown): ErrorCodeType {
+export function getErrorCode(error: unknown): ErrorCode {
   const data = getConvexErrorData(error);
 
-  return data.code || ErrorCode.UNKNOWN_ERROR;
+  return data.errorCode || ErrorCodes.UNKNOWN_ERROR;
 }
 
 /**
  * Checks if an error is a specific error code.
  *
  * @example
- * if (isErrorCode(error, ErrorCode.DUPLICATE_SLUG)) {
+ * if (isErrorCode(error, ErrorCodes.DUPLICATE_SLUG)) {
  *   setError('title', { message: 'Title already exists' });
  * }
  */
-export function isErrorCode(error: unknown, code: ErrorCodeType): boolean {
+export function isErrorCode(error: unknown, code: ErrorCode): boolean {
   return getErrorCode(error) === code;
 }
 
@@ -103,8 +105,8 @@ export function isErrorCode(error: unknown, code: ErrorCodeType): boolean {
  * console.error(formatErrorDetails(error));
  */
 export function formatErrorDetails(error: unknown): string {
-  const message = getErrorMessage(error);
   const data = getConvexErrorData(error);
+  const message = getErrorMessage(error);
 
   if (Object.keys(data).length === 0) {
     return message;

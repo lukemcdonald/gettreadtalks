@@ -29,6 +29,7 @@ export async function getTalks(filters?: {
   cursor?: string | null;
   featured?: boolean;
   pageSize?: number;
+  search?: string;
   speakerId?: Id<'speakers'>;
   status?: StatusType;
   topicId?: Id<'topics'>;
@@ -45,6 +46,7 @@ export async function getTalks(filters?: {
     {
       featured: filters?.featured,
       paginationOpts,
+      search: filters?.search,
       speakerId: filters?.speakerId,
       status: filters?.status,
       topicId: filters?.topicId,

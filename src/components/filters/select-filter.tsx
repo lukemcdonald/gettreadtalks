@@ -1,99 +1,85 @@
 'use client';
 
-import { useCallback, useEffect, useState, useTransition } from 'react';
-import { LoaderCircleIcon } from 'lucide-react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useTransition } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import { Label } from '@/components/ui/label';
 import {
   Select,
-  SelectPopup as SelectContent,
   SelectItem,
+  SelectPopup,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 
-type SelectFilterOption = {
+type FilterOption = {
   label: string;
   value: string;
 };
 
 type SelectFilterProps = {
   className?: string;
-  defaultValue?: string;
   label?: string;
-  options: SelectFilterOption[];
+  options: FilterOption[];
   paramName?: string;
   placeholder?: string;
 };
 
 export function SelectFilter({
   className,
-  defaultValue,
   label,
   options,
-  paramName = 'filter',
+  paramName,
   placeholder = 'All',
 }: SelectFilterProps) {
+  const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
-  const [optimisticValue, setOptimisticValue] = useState<string | null>(null);
 
-  const currentValue = searchParams.get(paramName) || defaultValue || 'all';
-  const displayValue = optimisticValue || currentValue;
+  if (!paramName) {
+    throw new Error('SelectFilter requires a paramName prop');
+  }
 
-  // Reset optimistic value when URL params catch up
-  useEffect(() => {
-    if (optimisticValue && optimisticValue === currentValue) {
-      setOptimisticValue(null);
+  const value = searchParams.get(paramName) ?? '';
+
+  const handleChange = (newValue: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (newValue && newValue !== 'all') {
+      params.set(paramName, newValue);
+    } else {
+      params.delete(paramName);
     }
-  }, [currentValue, optimisticValue]);
 
-  const handleChange = useCallback(
-    (value: string) => {
-      // Optimistically update the displayed value immediately
-      setOptimisticValue(value);
+    params.delete('cursor');
 
-      const params = new URLSearchParams(searchParams.toString());
+    startTransition(() => {
+      const query = params.toString();
+      router.push(query ? `${pathname}?${query}` : pathname);
+    });
+  };
 
-      if (value && value !== 'all') {
-        params.set(paramName, value);
-      } else {
-        params.delete(paramName);
-      }
-
-      startTransition(() => {
-        router.push(`?${params.toString()}`, { scroll: false });
-      });
-    },
-    [paramName, router, searchParams],
-  );
-
-  const selectedOption = options.find((option) => option.value === displayValue);
-  const displayLabel = displayValue === 'all' ? placeholder : selectedOption?.label || displayValue;
+  // Add "All" option if not present
+  const allOptions: FilterOption[] = options.some((opt) => opt.value === 'all')
+    ? options
+    : [{ label: placeholder, value: 'all' }, ...options];
 
   return (
-    <div className={cn('min-w-[150px]', className)}>
+    <div className={cn('space-y-2', className)}>
       {label && <Label htmlFor={paramName}>{label}</Label>}
-      <Select onValueChange={handleChange} value={displayValue}>
-        <SelectTrigger className={cn(isPending && 'opacity-75')} id={paramName}>
-          <SelectValue>
-            <span className="flex items-center gap-2">
-              {isPending && <LoaderCircleIcon className="size-3 animate-spin" />}
-              {displayLabel}
-            </span>
-          </SelectValue>
+      <Select disabled={isPending} onValueChange={handleChange} value={value || 'all'}>
+        <SelectTrigger id={paramName}>
+          <SelectValue />
         </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">{placeholder}</SelectItem>
-          {options.map((option) => (
+        <SelectPopup>
+          {allOptions.map((option) => (
             <SelectItem key={option.value} value={option.value}>
               {option.label}
             </SelectItem>
           ))}
-        </SelectContent>
+        </SelectPopup>
       </Select>
     </div>
   );

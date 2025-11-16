@@ -26,6 +26,10 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
+        hostname: 'avatars.githubusercontent.com',
+        protocol: 'https',
+      },
+      {
         hostname: 'cdn.jsdelivr.net',
         pathname: '/gh/faker-js/**',
         protocol: 'https',

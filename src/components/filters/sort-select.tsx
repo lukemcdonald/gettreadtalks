@@ -1,14 +1,13 @@
 'use client';
 
-import { useCallback, useEffect, useState, useTransition } from 'react';
-import { LoaderCircleIcon } from 'lucide-react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useTransition } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import { Label } from '@/components/ui/label';
 import {
   Select,
-  SelectPopup as SelectContent,
   SelectItem,
+  SelectPopup,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
@@ -21,76 +20,50 @@ type SortOption = {
 
 type SortSelectProps = {
   className?: string;
-  defaultValue?: string;
   label?: string;
   options: SortOption[];
   paramName?: string;
 };
 
-export function SortSelect({
-  className,
-  defaultValue = 'default',
-  label,
-  options,
-  paramName = 'sort',
-}: SortSelectProps) {
+export function SortSelect({ className, label, options, paramName = 'sort' }: SortSelectProps) {
+  const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
-  const [optimisticValue, setOptimisticValue] = useState<string | null>(null);
 
-  const currentValue = searchParams.get(paramName) || defaultValue;
-  const displayValue = optimisticValue || currentValue;
+  const value = searchParams.get(paramName) ?? options[0]?.value ?? '';
 
-  // Reset optimistic value when URL params catch up
-  useEffect(() => {
-    if (optimisticValue && optimisticValue === currentValue) {
-      setOptimisticValue(null);
+  const handleChange = (newValue: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (newValue && newValue !== options[0]?.value) {
+      params.set(paramName, newValue);
+    } else {
+      params.delete(paramName);
     }
-  }, [currentValue, optimisticValue]);
 
-  const handleChange = useCallback(
-    (value: string) => {
-      // Optimistically update the displayed value immediately
-      setOptimisticValue(value);
+    params.delete('cursor');
 
-      const params = new URLSearchParams(searchParams.toString());
-
-      if (value && value !== 'default') {
-        params.set(paramName, value);
-      } else {
-        params.delete(paramName);
-      }
-
-      startTransition(() => {
-        router.push(`?${params.toString()}`, { scroll: false });
-      });
-    },
-    [paramName, router, searchParams],
-  );
-
-  const selectedOption = options.find((option) => option.value === displayValue);
-  const displayLabel = selectedOption?.label || displayValue;
+    startTransition(() => {
+      const query = params.toString();
+      router.push(query ? `${pathname}?${query}` : pathname);
+    });
+  };
 
   return (
-    <div className={cn('min-w-[150px]', className)}>
+    <div className={cn('space-y-2', className)}>
       {label && <Label htmlFor={paramName}>{label}</Label>}
-      <Select onValueChange={handleChange} value={displayValue}>
-        <SelectTrigger className={cn(isPending && 'opacity-75')} id={paramName}>
-          <SelectValue>
-            <span className="flex items-center gap-2">
-              {isPending && <LoaderCircleIcon className="size-3 animate-spin" />}
-              {displayLabel}
-            </span>
-          </SelectValue>
+      <Select disabled={isPending} onValueChange={handleChange} value={value}>
+        <SelectTrigger id={paramName}>
+          <SelectValue />
         </SelectTrigger>
-        <SelectContent>
+        <SelectPopup>
           {options.map((option) => (
             <SelectItem key={option.value} value={option.value}>
               {option.label}
             </SelectItem>
           ))}
-        </SelectContent>
+        </SelectPopup>
       </Select>
     </div>
   );

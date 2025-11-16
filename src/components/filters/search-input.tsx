@@ -1,7 +1,7 @@
 'use client';
 
-import { useCallback, useTransition } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useTransition } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,7 +9,6 @@ import { cn } from '@/lib/utils';
 
 type SearchInputProps = {
   className?: string;
-  defaultValue?: string;
   label?: string;
   paramName?: string;
   placeholder?: string;
@@ -17,41 +16,43 @@ type SearchInputProps = {
 
 export function SearchInput({
   className,
-  defaultValue,
   label,
   paramName = 'search',
   placeholder = 'Search...',
 }: SearchInputProps) {
+  const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [_isPending, startTransition] = useTransition();
 
-  const handleChange = useCallback(
-    (value: string) => {
-      const params = new URLSearchParams(searchParams.toString());
+  const value = searchParams.get(paramName) ?? '';
 
-      if (value.trim()) {
-        params.set(paramName, value.trim());
-      } else {
-        params.delete(paramName);
-      }
+  const handleChange = (newValue: string) => {
+    const params = new URLSearchParams(searchParams.toString());
 
-      startTransition(() => {
-        router.push(`?${params.toString()}`, { scroll: false });
-      });
-    },
-    [paramName, router, searchParams],
-  );
+    if (newValue.trim()) {
+      params.set(paramName, newValue.trim());
+    } else {
+      params.delete(paramName);
+    }
+
+    params.delete('cursor');
+
+    startTransition(() => {
+      const query = params.toString();
+      router.push(query ? `${pathname}?${query}` : pathname);
+    });
+  };
 
   return (
-    <div className={cn('min-w-[200px] flex-1', className)}>
+    <div className={cn('space-y-2', className)}>
       {label && <Label htmlFor={paramName}>{label}</Label>}
       <Input
-        defaultValue={defaultValue || searchParams.get(paramName) || ''}
         id={paramName}
         onChange={(e) => handleChange(e.target.value)}
         placeholder={placeholder}
         type="search"
+        value={value}
       />
     </div>
   );
