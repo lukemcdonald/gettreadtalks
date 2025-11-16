@@ -64,7 +64,8 @@ export function GridList({ children, className, columns }: GridListProps) {
   return (
     <div
       className={cn(
-        'grid gap-6',
+        'grid',
+        defaultCols === 1 ? 'gap-4' : 'gap-6',
         gridColsClassMap[defaultCols],
         smCols && smGridColsClassMap[smCols],
         mdCols && mdGridColsClassMap[mdCols],

@@ -67,51 +67,45 @@ export function TalksFilters({
 
   return (
     <div className={cn('space-y-4', className)}>
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
-        <div className="flex-1">
-          <SearchInput label="Search" paramName="search" placeholder="Search talks..." />
-        </div>
+      <SearchInput label="Search" paramName="search" placeholder="Search talks..." />
 
-        <div className="flex flex-wrap items-end gap-3">
-          {speakerOptions.length > 0 && (
-            <SelectFilter
-              label="Speaker"
-              options={speakerOptions}
-              paramName="speaker"
-              placeholder="All Speakers"
-            />
-          )}
+      {speakerOptions.length > 0 && (
+        <SelectFilter
+          label="Speaker"
+          options={speakerOptions}
+          paramName="speaker"
+          placeholder="All Speakers"
+        />
+      )}
 
-          {topicOptions.length > 0 && (
-            <SelectFilter
-              label="Topic"
-              options={topicOptions}
-              paramName="topic"
-              placeholder="All Topics"
-            />
-          )}
+      {topicOptions.length > 0 && (
+        <SelectFilter
+          label="Topic"
+          options={topicOptions}
+          paramName="topic"
+          placeholder="All Topics"
+        />
+      )}
 
-          {isAuthenticated && (
-            <SelectFilter
-              label="Status"
-              options={statusOptions}
-              paramName="status"
-              placeholder="All Statuses"
-            />
-          )}
+      {isAuthenticated && (
+        <SelectFilter
+          label="Status"
+          options={statusOptions}
+          paramName="status"
+          placeholder="All Statuses"
+        />
+      )}
 
-          <div className="flex items-center gap-2">
-            <Checkbox
-              checked={featured}
-              disabled={isPending}
-              id="featured"
-              onCheckedChange={(checked) => updateFilter('featured', checked === true)}
-            />
-            <Label className="cursor-pointer whitespace-nowrap" htmlFor="featured">
-              Featured
-            </Label>
-          </div>
-        </div>
+      <div className="flex items-center gap-2">
+        <Checkbox
+          checked={featured}
+          disabled={isPending}
+          id="featured"
+          onCheckedChange={(checked) => updateFilter('featured', checked === true)}
+        />
+        <Label className="cursor-pointer" htmlFor="featured">
+          Featured
+        </Label>
       </div>
 
       {/* Fixed height loading indicator to prevent layout shift */}

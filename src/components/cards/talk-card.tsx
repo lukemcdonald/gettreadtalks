@@ -22,14 +22,16 @@ export function TalkCard({ featured, favorited, finished, speaker, talk }: TalkC
 
   return (
     <Card
-      className="group min-w-0 transition-all duration-200 hover:scale-[1.02] hover:shadow-lg"
+      className="group transition-all duration-200 hover:shadow-lg"
       render={<Link href={`/talks/${talk.slug}`} />}
     >
       <CardHeader>
-        <div className="flex items-start justify-between gap-2">
-          <CardTitle className="line-clamp-3 flex-1 group-hover:text-primary">
-            {talk.title}
-          </CardTitle>
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0 flex-1">
+            <CardTitle className="text-lg group-hover:text-primary sm:text-xl">
+              {talk.title}
+            </CardTitle>
+          </div>
           <div className="flex flex-shrink-0 flex-col gap-1">
             {featured && (
               <Badge className="bg-primary/10 text-primary text-xs" variant="secondary">
@@ -57,12 +59,12 @@ export function TalkCard({ featured, favorited, finished, speaker, talk }: TalkC
       </CardHeader>
       {speaker && (
         <CardContent>
-          <div className="flex items-center gap-2">
-            <Avatar className="size-8">
+          <div className="flex items-center gap-3">
+            <Avatar className="size-10">
               {speaker.imageUrl && <AvatarImage alt={speakerName} src={speaker.imageUrl} />}
               <AvatarFallback>{speakerInitials}</AvatarFallback>
             </Avatar>
-            <span className="text-muted-foreground text-sm">{speakerName}</span>
+            <span className="font-medium text-muted-foreground text-sm">{speakerName}</span>
           </div>
         </CardContent>
       )}

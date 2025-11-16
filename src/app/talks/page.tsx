@@ -4,7 +4,7 @@ import type { StatusType } from '@/convex/lib/validators/shared';
 import { Suspense } from 'react';
 import Link from 'next/link';
 
-import { ListPageLayout, SectionContainer } from '@/components/layouts';
+import { ArchiveLayout, ArchiveSidebar, SidebarContent } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { getAllSpeakersForFilter, getAllTopicsForFilter, getTalks } from '@/lib/features/talks';
@@ -68,28 +68,29 @@ export default async function TalksPage({ searchParams }: TalksPageProps) {
   ]);
 
   return (
-    <ListPageLayout>
-      <SectionContainer>
+    <ArchiveLayout
+      header={
         <PageHeader
           actions={user ? <Button render={<Link href="/talks/new" />}>New Talk</Button> : undefined}
           description="Elevate your spiritual heartbeat with Christ centered talks."
           title="Talks"
         />
+      }
+      sidebar={
+        <ArchiveSidebar>
+          <SidebarContent title="Filters">
+            <TalksFilters isAuthenticated={!!user} speakers={speakers} topics={topics} />
+          </SidebarContent>
+        </ArchiveSidebar>
+      }
+    >
+      <div className="space-y-6">
+        <ActiveFilters speakers={speakers} topics={topics} />
 
-        {/* Sticky filter bar */}
-        <div className="-mx-4 sm:-mx-6 lg:-mx-8 sticky top-0 z-10 bg-background/95 px-4 py-4 backdrop-blur supports-[backdrop-filter]:bg-background/80 sm:px-6 lg:px-8">
-          <TalksFilters isAuthenticated={!!user} speakers={speakers} topics={topics} />
-        </div>
-
-        {/* Active filters and content */}
-        <div className="space-y-6">
-          <ActiveFilters speakers={speakers} topics={topics} />
-
-          <Suspense fallback={<TalksListSkeleton />}>
-            <TalksContent params={params} />
-          </Suspense>
-        </div>
-      </SectionContainer>
-    </ListPageLayout>
+        <Suspense fallback={<TalksListSkeleton />}>
+          <TalksContent params={params} />
+        </Suspense>
+      </div>
+    </ArchiveLayout>
   );
 }
