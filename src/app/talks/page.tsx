@@ -4,15 +4,14 @@ import type { StatusType } from '@/convex/lib/validators/shared';
 import { Suspense } from 'react';
 import Link from 'next/link';
 
-import { ArchiveLayout, ArchiveSidebar, SidebarContent } from '@/components/layouts';
+import { ArchiveLayout } from '@/components/layouts';
+import { FilterUtilityBar } from '@/components/filters';
 import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { getAllSpeakersForFilter, getAllTopicsForFilter, getTalks } from '@/lib/features/talks';
 import { getCurrentUser } from '@/lib/services/auth/server';
 import {
-  ActiveFilters,
   Pagination,
-  TalksFilters,
   TalksList,
   TalksListSkeleton,
 } from './_components';
@@ -76,16 +75,13 @@ export default async function TalksPage({ searchParams }: TalksPageProps) {
           title="Talks"
         />
       }
-      sidebar={
-        <ArchiveSidebar>
-          <SidebarContent title="Filters">
-            <TalksFilters isAuthenticated={!!user} speakers={speakers} topics={topics} />
-          </SidebarContent>
-        </ArchiveSidebar>
-      }
     >
       <div className="space-y-6">
-        <ActiveFilters speakers={speakers} topics={topics} />
+        <FilterUtilityBar
+          isAuthenticated={!!user}
+          speakers={speakers}
+          topics={topics}
+        />
 
         <Suspense fallback={<TalksListSkeleton />}>
           <TalksContent params={params} />
