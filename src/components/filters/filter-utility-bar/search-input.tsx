@@ -26,11 +26,11 @@ export function SearchInput({
   const isLoading = isPending && pendingFilter === 'search' && value;
 
   return (
-    <GroupItem className={cn('relative flex-1 min-w-[200px] max-w-[300px]', className)}>
+    <GroupItem className={cn('relative min-w-[200px] max-w-[300px] flex-1', className)}>
       <div className="relative flex w-full items-center">
         {value && (
           <button
-            className="absolute left-3 z-10 flex size-6 items-center justify-center rounded-md hover:bg-muted transition-colors"
+            className="absolute left-3 z-10 flex size-6 items-center justify-center rounded-md transition-colors hover:bg-muted"
             onClick={() => onValueChange('')}
             type="button"
           >
@@ -41,7 +41,7 @@ export function SearchInput({
           <LoaderCircleIcon className="absolute left-10 z-10 size-4 animate-spin text-muted-foreground" />
         )}
         <Input
-          className="h-full w-full !rounded-none !border-0 pl-8 pr-3 !shadow-none before:!shadow-none ring-0 [&[data-slot=input-control]]:!border-0 [&[data-slot=input-control]]:bg-background"
+          className="!rounded-none !border-0 !shadow-none before:!shadow-none [&[data-slot=input-control]]:!border-0 h-full w-full pr-3 pl-8 ring-0 [&[data-slot=input-control]]:bg-background"
           onChange={(e) => onValueChange(e.target.value)}
           placeholder={placeholder}
           type="search"

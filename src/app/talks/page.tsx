@@ -4,17 +4,13 @@ import type { StatusType } from '@/convex/lib/validators/shared';
 import { Suspense } from 'react';
 import Link from 'next/link';
 
-import { ArchiveLayout } from '@/components/layouts';
 import { FilterUtilityBar } from '@/components/filters';
+import { ArchiveLayout, ArchiveSidebar } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { getAllSpeakersForFilter, getAllTopicsForFilter, getTalks } from '@/lib/features/talks';
 import { getCurrentUser } from '@/lib/services/auth/server';
-import {
-  Pagination,
-  TalksList,
-  TalksListSkeleton,
-} from './_components';
+import { Pagination, TalksList, TalksListSkeleton } from './_components';
 
 type TalksPageProps = {
   searchParams: Promise<{
@@ -75,13 +71,15 @@ export default async function TalksPage({ searchParams }: TalksPageProps) {
           title="Talks"
         />
       }
+      sidebar={
+        <ArchiveSidebar
+          description="Elevate your spiritual heartbeat with Christ centered talks."
+          title="Talks"
+        />
+      }
     >
       <div className="space-y-6">
-        <FilterUtilityBar
-          isAuthenticated={!!user}
-          speakers={speakers}
-          topics={topics}
-        />
+        <FilterUtilityBar isAuthenticated={!!user} speakers={speakers} topics={topics} />
 
         <Suspense fallback={<TalksListSkeleton />}>
           <TalksContent params={params} />

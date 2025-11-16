@@ -1,7 +1,7 @@
 'use client';
 
-import { LoaderCircleIcon, X as RemoveIcon } from 'lucide-react';
 import { useState } from 'react';
+import { LoaderCircleIcon, X as RemoveIcon } from 'lucide-react';
 
 import { GroupItem } from '@/components/ui/group';
 import {
@@ -51,7 +51,6 @@ export function FilterSelect({
     onValueChange(newValue);
   };
 
-
   const displayValue = value ?? 'all';
   const isActive = !!value;
   const isLoading = isPending && pendingFilter;
@@ -67,7 +66,7 @@ export function FilterSelect({
         render={
           <SelectTrigger
             className={cn(
-              'gap-2 min-w-0 w-fit [&_[data-slot=select-icon]]:hidden',
+              'w-fit min-w-0 gap-2 [&_[data-slot=select-icon]]:hidden',
               isActive && 'data-[pressed]:true',
             )}
             data-pressed={isActive ? true : undefined}
@@ -76,25 +75,35 @@ export function FilterSelect({
       >
         <SelectValue>
           <span className="flex min-w-0 items-center gap-2">
-            {isLoading ? (
-              <span className="flex size-6 shrink-0 items-center justify-center">
-                <LoaderCircleIcon className="size-4 animate-spin" />
-              </span>
-            ) : isActive ? (
-              <button
-                className="flex size-6 shrink-0 items-center justify-center rounded-md hover:bg-muted transition-colors"
-                onPointerDown={handleClear}
-                onClick={handleClear}
-                type="button"
-              >
-                <RemoveIcon className="size-4" />
-              </button>
-            ) : null}
+            {(() => {
+              if (isLoading) {
+                return (
+                  <span className="flex size-6 shrink-0 items-center justify-center">
+                    <LoaderCircleIcon className="size-4 animate-spin" />
+                  </span>
+                );
+              }
+
+              if (isActive) {
+                return (
+                  <button
+                    className="flex size-6 shrink-0 items-center justify-center rounded-md transition-colors hover:bg-muted"
+                    onClick={handleClear}
+                    onPointerDown={handleClear}
+                    type="button"
+                  >
+                    <RemoveIcon className="size-4" />
+                  </button>
+                );
+              }
+
+              return null;
+            })()}
             <span className="min-w-0 truncate">{selectedLabel}</span>
           </span>
         </SelectValue>
       </GroupItem>
-      <SelectPopup className="w-56 max-h-[min(var(--available-height),23rem)]">
+      <SelectPopup className="max-h-[min(var(--available-height),23rem)] w-56">
         {options.map((option) => (
           <SelectItem key={option.value} value={option.value}>
             {option.label}

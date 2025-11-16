@@ -2,14 +2,13 @@
 
 import type { Id } from '@/convex/_generated/dataModel';
 
+import { useCallback, useEffect, useState, useTransition } from 'react';
 import { LoaderCircleIcon, X as RemoveIcon } from 'lucide-react';
-import { useEffect, useState, useTransition } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import { Group, GroupItem, GroupSeparator } from '@/components/ui/group';
 import { cn } from '@/lib/utils';
-
 import { FilterSelect } from './filter-select';
 import { SearchInput } from './search-input';
 
@@ -26,6 +25,69 @@ type FilterUtilityBarProps = {
   topics: Array<{ _id: Id<'topics'>; title: string }>;
 };
 
+function clearOptimisticState(
+  key: string,
+  setOptimisticSpeaker: (value: string | null) => void,
+  setOptimisticTopic: (value: string | null) => void,
+  setOptimisticStatus: (value: string | null) => void,
+) {
+  if (key === 'speaker') {
+    setOptimisticSpeaker(null);
+  } else if (key === 'topic') {
+    setOptimisticTopic(null);
+  } else if (key === 'status') {
+    setOptimisticStatus(null);
+  }
+}
+
+function buildFilterOptions<T>(
+  items: T[],
+  allLabel: string,
+  getLabel: (item: T) => string,
+  getValue: (item: T) => string,
+): FilterOption[] {
+  return [
+    { label: allLabel, value: 'all' },
+    ...items.map((item) => ({
+      label: getLabel(item),
+      value: getValue(item),
+    })),
+  ];
+}
+
+function renderFeaturedFilterIcon(
+  isPending: boolean,
+  pendingFilter: string | null,
+  featured: boolean,
+  onClear: () => void,
+) {
+  if (isPending && pendingFilter === 'featured') {
+    return (
+      <span className="flex size-6 shrink-0 items-center justify-center">
+        <LoaderCircleIcon className="size-4 animate-spin" />
+      </span>
+    );
+  }
+
+  if (featured) {
+    return (
+      <button
+        className="flex size-6 shrink-0 items-center justify-center rounded-md transition-colors hover:bg-muted"
+        onClick={(e) => {
+          e.stopPropagation();
+          onClear();
+        }}
+        type="button"
+      >
+        <RemoveIcon className="size-4" />
+      </button>
+    );
+  }
+
+  return null;
+}
+
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Complex filter component with multiple handlers, already refactored with extracted helpers
 export function FilterUtilityBar({
   className,
   isAuthenticated,
@@ -37,12 +99,8 @@ export function FilterUtilityBar({
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
   const [pendingFilter, setPendingFilter] = useState<string | null>(null);
-  const [searchValue, setSearchValue] = useState(
-    () => searchParams.get('search') ?? '',
-  );
-  const [optimisticSpeaker, setOptimisticSpeaker] = useState<string | null>(
-    null,
-  );
+  const [searchValue, setSearchValue] = useState(() => searchParams.get('search') ?? '');
+  const [optimisticSpeaker, setOptimisticSpeaker] = useState<string | null>(null);
   const [optimisticTopic, setOptimisticTopic] = useState<string | null>(null);
   const [optimisticStatus, setOptimisticStatus] = useState<string | null>(null);
 
@@ -56,63 +114,51 @@ export function FilterUtilityBar({
     if (optimisticSpeaker && optimisticSpeaker === speakerId) {
       setOptimisticSpeaker(null);
     }
-  }, [optimisticSpeaker, speakerId]);
-
-  useEffect(() => {
     if (optimisticTopic && optimisticTopic === topicId) {
       setOptimisticTopic(null);
     }
-  }, [optimisticTopic, topicId]);
-
-  useEffect(() => {
     if (optimisticStatus && optimisticStatus === status) {
       setOptimisticStatus(null);
     }
-  }, [optimisticStatus, status]);
+  }, [optimisticSpeaker, speakerId, optimisticTopic, topicId, optimisticStatus, status]);
 
-  const updateFilter = (key: string, value: string | boolean | null) => {
-    const params = new URLSearchParams(searchParams.toString());
+  const updateFilter = useCallback(
+    (key: string, value: string | boolean | null) => {
+      const params = new URLSearchParams(searchParams.toString());
 
-    if (!value || value === '' || value === 'all' || value === null) {
-      params.delete(key);
-      // Clear optimistic state when clearing filter
-      if (key === 'speaker') {
-        setOptimisticSpeaker(null);
-      } else if (key === 'topic') {
-        setOptimisticTopic(null);
-      } else if (key === 'status') {
-        setOptimisticStatus(null);
+      if (!value || value === '' || value === 'all' || value === null) {
+        params.delete(key);
+        clearOptimisticState(key, setOptimisticSpeaker, setOptimisticTopic, setOptimisticStatus);
+      } else {
+        params.set(key, String(value));
       }
-    } else {
-      params.set(key, String(value));
-    }
 
-    params.delete('cursor');
+      params.delete('cursor');
 
-    setPendingFilter(key);
-    startTransition(() => {
-      onLoadingChange?.(true);
-      const query = params.toString();
-      router.push(query ? `/talks?${query}` : '/talks');
-      setPendingFilter(null);
-    });
-  };
+      setPendingFilter(key);
+      startTransition(() => {
+        onLoadingChange?.(true);
+        const query = params.toString();
+        router.push(query ? `/talks?${query}` : '/talks');
+        setPendingFilter(null);
+      });
+    },
+    [searchParams, router, onLoadingChange],
+  );
 
-  const speakerOptions: FilterOption[] = [
-    { label: 'All Speakers', value: 'all' },
-    ...speakers.map((speaker) => ({
-      label: `${speaker.firstName} ${speaker.lastName}`,
-      value: speaker._id,
-    })),
-  ];
+  const speakerOptions = buildFilterOptions(
+    speakers,
+    'All Speakers',
+    (s) => `${s.firstName} ${s.lastName}`,
+    (s) => s._id,
+  );
 
-  const topicOptions: FilterOption[] = [
-    { label: 'All Topics', value: 'all' },
-    ...topics.map((topic) => ({
-      label: topic.title,
-      value: topic._id,
-    })),
-  ];
+  const topicOptions = buildFilterOptions(
+    topics,
+    'All Topics',
+    (t) => t.title,
+    (t) => t._id,
+  );
 
   const statusOptions: FilterOption[] = [
     { label: 'All Statuses', value: 'all' },
@@ -128,14 +174,15 @@ export function FilterUtilityBar({
   const selectedSpeaker = displaySpeakerId
     ? speakers.find((s) => s._id === displaySpeakerId)
     : null;
-  const selectedTopic = displayTopicId
-    ? topics.find((t) => t._id === displayTopicId)
-    : null;
+  const selectedTopic = displayTopicId ? topics.find((t) => t._id === displayTopicId) : null;
   const selectedStatus = statusOptions.find((s) => s.value === displayStatus);
 
   const handleSearchChange = (value: string) => {
     setSearchValue(value);
+    updateSearchFilter(value);
+  };
 
+  const updateSearchFilter = (value: string) => {
     const params = new URLSearchParams(searchParams.toString());
 
     if (value.trim()) {
@@ -155,6 +202,30 @@ export function FilterUtilityBar({
     });
   };
 
+  const handleSpeakerChange = (value: string) => {
+    const newValue = value === 'all' ? null : value;
+    if (newValue) {
+      setOptimisticSpeaker(newValue);
+    }
+    updateFilter('speaker', newValue);
+  };
+
+  const handleTopicChange = (value: string) => {
+    const newValue = value === 'all' ? null : value;
+    if (newValue) {
+      setOptimisticTopic(newValue);
+    }
+    updateFilter('topic', newValue);
+  };
+
+  const handleStatusChange = (value: string) => {
+    const newValue = value === 'all' ? null : value;
+    if (newValue) {
+      setOptimisticStatus(newValue);
+    }
+    updateFilter('status', newValue);
+  };
+
   return (
     <div className={cn('flex w-full items-center gap-0', className)}>
       <Group aria-label="Filter controls" className="w-full">
@@ -164,13 +235,7 @@ export function FilterUtilityBar({
             <FilterSelect
               isPending={isPending}
               onClear={() => updateFilter('speaker', null)}
-              onValueChange={(value) => {
-                const newValue = value === 'all' ? null : value;
-                if (newValue) {
-                  setOptimisticSpeaker(newValue);
-                }
-                updateFilter('speaker', newValue);
-              }}
+              onValueChange={handleSpeakerChange}
               options={speakerOptions}
               pendingFilter={pendingFilter === 'speaker' ? 'speaker' : null}
               selectedLabel={
@@ -190,13 +255,7 @@ export function FilterUtilityBar({
             <FilterSelect
               isPending={isPending}
               onClear={() => updateFilter('topic', null)}
-              onValueChange={(value) => {
-                const newValue = value === 'all' ? null : value;
-                if (newValue) {
-                  setOptimisticTopic(newValue);
-                }
-                updateFilter('topic', newValue);
-              }}
+              onValueChange={handleTopicChange}
               options={topicOptions}
               pendingFilter={pendingFilter === 'topic' ? 'topic' : null}
               selectedLabel={selectedTopic ? selectedTopic.title : 'All Topics'}
@@ -212,13 +271,7 @@ export function FilterUtilityBar({
             <FilterSelect
               isPending={isPending}
               onClear={() => updateFilter('status', null)}
-              onValueChange={(value) => {
-                const newValue = value === 'all' ? null : value;
-                if (newValue) {
-                  setOptimisticStatus(newValue);
-                }
-                updateFilter('status', newValue);
-              }}
+              onValueChange={handleStatusChange}
               options={statusOptions}
               pendingFilter={pendingFilter === 'status' ? 'status' : null}
               selectedLabel={selectedStatus ? selectedStatus.label : 'All Statuses'}
@@ -232,29 +285,16 @@ export function FilterUtilityBar({
         <GroupItem
           render={
             <Button
-              className="gap-2 min-w-0 w-fit"
+              className="w-fit min-w-0 gap-2"
               data-pressed={featured ? true : undefined}
               onClick={() => updateFilter('featured', featured ? null : true)}
               variant="outline"
             />
           }
         >
-          {isPending && pendingFilter === 'featured' ? (
-            <span className="flex size-6 shrink-0 items-center justify-center">
-              <LoaderCircleIcon className="size-4 animate-spin" />
-            </span>
-          ) : featured ? (
-            <button
-              className="flex size-6 shrink-0 items-center justify-center rounded-md hover:bg-muted transition-colors"
-              onClick={(e) => {
-                e.stopPropagation();
-                updateFilter('featured', null);
-              }}
-              type="button"
-            >
-              <RemoveIcon className="size-4" />
-            </button>
-          ) : null}
+          {renderFeaturedFilterIcon(isPending, pendingFilter, featured, () =>
+            updateFilter('featured', null),
+          )}
           <span>Featured</span>
         </GroupItem>
 
