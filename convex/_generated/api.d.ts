@@ -12,11 +12,11 @@ import type * as affiliateLinks from "../affiliateLinks.js";
 import type * as auth from "../auth.js";
 import type * as clips from "../clips.js";
 import type * as collections from "../collections.js";
+import type * as emails from "../emails.js";
 import type * as emails_components_layout from "../emails/components/layout.js";
 import type * as emails_resetPassword from "../emails/resetPassword.js";
 import type * as emails_verifyEmail from "../emails/verifyEmail.js";
 import type * as emails_welcome from "../emails/welcome.js";
-import type * as emails from "../emails.js";
 import type * as http from "../http.js";
 import type * as lib_errors from "../lib/errors.js";
 import type * as lib_types from "../lib/types.js";
@@ -50,6 +50,7 @@ import type * as model_users_index from "../model/users/index.js";
 import type * as model_users_mutations from "../model/users/mutations.js";
 import type * as model_users_queries from "../model/users/queries.js";
 import type * as model_users_utils from "../model/users/utils.js";
+import type * as seed from "../seed.js";
 import type * as seed_data_ministries from "../seed/data/ministries.js";
 import type * as seed_data_scripture from "../seed/data/scripture.js";
 import type * as seed_data_speakers from "../seed/data/speakers.js";
@@ -61,7 +62,6 @@ import type * as seed_generators_speakers from "../seed/generators/speakers.js";
 import type * as seed_generators_talks from "../seed/generators/talks.js";
 import type * as seed_generators_topics from "../seed/generators/topics.js";
 import type * as seed_utils from "../seed/utils.js";
-import type * as seed from "../seed.js";
 import type * as speakers from "../speakers.js";
 import type * as talks from "../talks.js";
 import type * as topics from "../topics.js";
@@ -73,24 +73,16 @@ import type {
   FunctionReference,
 } from "convex/server";
 
-/**
- * A utility for referencing Convex functions in your app's API.
- *
- * Usage:
- * ```js
- * const myFunctionReference = api.myModule.myFunction;
- * ```
- */
 declare const fullApi: ApiFromModules<{
   affiliateLinks: typeof affiliateLinks;
   auth: typeof auth;
   clips: typeof clips;
   collections: typeof collections;
+  emails: typeof emails;
   "emails/components/layout": typeof emails_components_layout;
   "emails/resetPassword": typeof emails_resetPassword;
   "emails/verifyEmail": typeof emails_verifyEmail;
   "emails/welcome": typeof emails_welcome;
-  emails: typeof emails;
   http: typeof http;
   "lib/errors": typeof lib_errors;
   "lib/types": typeof lib_types;
@@ -124,6 +116,7 @@ declare const fullApi: ApiFromModules<{
   "model/users/mutations": typeof model_users_mutations;
   "model/users/queries": typeof model_users_queries;
   "model/users/utils": typeof model_users_utils;
+  seed: typeof seed;
   "seed/data/ministries": typeof seed_data_ministries;
   "seed/data/scripture": typeof seed_data_scripture;
   "seed/data/speakers": typeof seed_data_speakers;
@@ -135,20 +128,35 @@ declare const fullApi: ApiFromModules<{
   "seed/generators/talks": typeof seed_generators_talks;
   "seed/generators/topics": typeof seed_generators_topics;
   "seed/utils": typeof seed_utils;
-  seed: typeof seed;
   speakers: typeof speakers;
   talks: typeof talks;
   topics: typeof topics;
   users: typeof users;
 }>;
-declare const fullApiWithMounts: typeof fullApi;
 
+/**
+ * A utility for referencing Convex functions in your app's public API.
+ *
+ * Usage:
+ * ```js
+ * const myFunctionReference = api.myModule.myFunction;
+ * ```
+ */
 export declare const api: FilterApi<
-  typeof fullApiWithMounts,
+  typeof fullApi,
   FunctionReference<any, "public">
 >;
+
+/**
+ * A utility for referencing Convex functions in your app's internal API.
+ *
+ * Usage:
+ * ```js
+ * const myFunctionReference = internal.myModule.myFunction;
+ * ```
+ */
 export declare const internal: FilterApi<
-  typeof fullApiWithMounts,
+  typeof fullApi,
   FunctionReference<any, "internal">
 >;
 

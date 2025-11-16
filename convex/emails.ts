@@ -16,10 +16,11 @@ const FROM_NAME = 'TREAD Talks';
 const REPLY_TO_EMAIL = 'hello@gettreadtalks.com';
 
 // Initialize Resend client
-// Note: testMode true = simulate emails (nothing sent), false = actually send emails
 export const resend: Resend = new Resend(components.resend, {
+  // Note: testMode true = simulate emails (nothing sent), false = actually send emails
   testMode: process.env.RESEND_TEST_MODE !== 'false',
-  onEmailEvent: internal.emails.handleEmailEvent,
+  // biome-ignore lint/suspicious/noExplicitAny: Type compatibility workaround for Convex 1.29.x
+  onEmailEvent: internal.emails.handleEmailEvent as any,
 });
 
 // ============================================
@@ -31,6 +32,7 @@ export const handleEmailEvent = internalMutation({
     event: vEmailEvent,
     id: vEmailId,
   },
+  returns: v.null(),
   handler: (_ctx, args) => {
     console.log('Email event received:', {
       emailId: args.id,
@@ -66,6 +68,8 @@ export const handleEmailEvent = internalMutation({
         console.log('Email event not handled:', args.event.type);
         break;
     }
+
+    return null;
   },
 });
 
