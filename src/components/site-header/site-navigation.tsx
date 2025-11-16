@@ -12,12 +12,12 @@ type SiteNavigationProps = {
 export function SiteNavigation({ initialUser }: SiteNavigationProps) {
   return (
     <>
-      <div className="hidden items-center gap-2 lg:flex">
+      <div className="hidden items-center gap-2 md:flex">
         <PrimaryNav />
         <Separator orientation="vertical" />
         <SecondaryNav initialUser={initialUser} />
       </div>
-      <div className="flex items-center gap-2 lg:hidden">
+      <div className="flex items-center gap-2 md:hidden">
         <SecondaryNav initialUser={initialUser} />
         <MobileNav />
       </div>

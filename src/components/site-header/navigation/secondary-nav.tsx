@@ -11,7 +11,7 @@ export function SecondaryNav({ initialUser }: SecondaryNavProps) {
   return (
     <div className="flex items-center">
       <AccountMenu initialUser={initialUser} />
-      <ModeSwitcher className="hidden size-10 lg:flex" />
+      <ModeSwitcher className="hidden size-10 md:flex" />
     </div>
   );
 }
