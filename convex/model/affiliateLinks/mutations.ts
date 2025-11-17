@@ -3,7 +3,8 @@ import type { Doc } from '../../_generated/dataModel';
 import { v } from 'convex/values';
 
 import { mutation } from '../../_generated/server';
-import { normalizeSlug, slugExists } from '../../lib/utils';
+import { throwDuplicateSlug, throwValidationError } from '../../lib/errors';
+import { slugExists, slugify } from '../../lib/utils';
 import { requireAuth } from '../auth/utils';
 import { affiliateLinkTypes } from './validators';
 
@@ -27,10 +28,15 @@ export const createAffiliateLink = mutation({
     // return await mutations.createAffiliateLink(ctx, args);
     await requireAuth(ctx);
 
-    const slug = normalizeSlug(args.title);
+    // Validate input early
+    if (!args.title.trim()) {
+      throwValidationError('Title cannot be empty', 'title');
+    }
+
+    const slug = slugify(args.title);
 
     if (await slugExists(ctx, 'affiliateLinks', slug)) {
-      throw new Error('Affiliate link with this title already exists');
+      throwDuplicateSlug('Affiliate link with this title already exists', 'title');
     }
 
     return await ctx.db.insert('affiliateLinks', { ...args, slug });
@@ -96,12 +102,17 @@ export const updateAffiliateLink = mutation({
     }
 
     // If title changed, update slug
-    if (updates.title) {
-      const newSlug = normalizeSlug(updates.title);
+    if (updates.title !== undefined) {
+      // Validate input early
+      if (!updates.title.trim()) {
+        throwValidationError('Title cannot be empty', 'title');
+      }
+
+      const newSlug = slugify(updates.title);
 
       if (newSlug !== affiliateLink.slug) {
         if (await slugExists(ctx, 'affiliateLinks', newSlug, id)) {
-          throw new Error('Affiliate link with this title already exists');
+          throwDuplicateSlug('Affiliate link with this title already exists', 'title');
         }
 
         updates.slug = newSlug;

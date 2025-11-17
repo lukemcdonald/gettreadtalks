@@ -5,7 +5,7 @@ import { getManyFrom, getOneFrom } from 'convex-helpers/server/relationships';
 
 import { mutation } from '../../_generated/server';
 import { throwDuplicateSlug, throwNotFound, throwValidationError } from '../../lib/errors';
-import { normalizeSlug, slugExists } from '../../lib/utils';
+import { slugExists, slugify } from '../../lib/utils';
 import { requireAuth } from '../auth/utils';
 
 /**
@@ -28,7 +28,16 @@ export const createSpeaker = mutation({
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
-    const slug = normalizeSlug(`${args.firstName} ${args.lastName}`);
+    // Validate input early
+    if (!args.firstName.trim()) {
+      throwValidationError('First name cannot be empty', 'firstName');
+    }
+
+    if (!args.lastName.trim()) {
+      throwValidationError('Last name cannot be empty', 'lastName');
+    }
+
+    const slug = slugify(`${args.firstName} ${args.lastName}`);
 
     if (await slugExists(ctx, 'speakers', slug)) {
       throwDuplicateSlug('Speaker with this name already exists', 'firstName');
@@ -129,10 +138,20 @@ export const updateSpeaker = mutation({
     }
 
     // If name changed, update slug
-    if (updates.firstName || updates.lastName) {
-      const firstName = updates.firstName || speaker.firstName;
-      const lastName = updates.lastName || speaker.lastName;
-      const newSlug = normalizeSlug(`${firstName} ${lastName}`);
+    if (updates.firstName !== undefined || updates.lastName !== undefined) {
+      const firstName = updates.firstName ?? speaker.firstName;
+      const lastName = updates.lastName ?? speaker.lastName;
+
+      // Validate input early
+      if (!firstName.trim()) {
+        throwValidationError('First name cannot be empty', 'firstName');
+      }
+
+      if (!lastName.trim()) {
+        throwValidationError('Last name cannot be empty', 'lastName');
+      }
+
+      const newSlug = slugify(`${firstName} ${lastName}`);
 
       if (newSlug !== speaker.slug) {
         if (await slugExists(ctx, 'speakers', newSlug, id)) {

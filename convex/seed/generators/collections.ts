@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
 
-import { normalizeSlug, randomBoolean } from '../utils';
+import { slugify } from '../../lib/utils';
+import { randomBoolean } from '../utils';
 
 type Collection = {
   description?: string;
@@ -49,7 +50,7 @@ export function generateCollections(count = 8): Array<{
     const title = shuffledThemes[i];
 
     const collection: Collection = {
-      slug: normalizeSlug(title),
+      slug: slugify(title),
       title,
     };
 

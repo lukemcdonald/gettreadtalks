@@ -4,16 +4,20 @@ import { getOneFrom } from 'convex-helpers/server/relationships';
 
 /**
  * Normalizes text into a URL-friendly slug
- * @param text - The text to normalize
- * @returns A normalized slug string
+ * @param text - The text to normalize (can be undefined, null, or empty string)
+ * @returns A normalized slug string, or empty string if input is falsy
  */
-export function normalizeSlug(text: string): string {
+export function slugify(text: string | undefined | null): string {
+  if (!text) {
+    return '';
+  }
+
   return text
     .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .trim();
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_-]+/g, '-')
+    .replace(/^-+|-+$/g, '');
 }
 
 // Tables that have a 'by_slug' index

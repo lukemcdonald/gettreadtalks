@@ -3,18 +3,6 @@
  */
 
 /**
- * Generate URL-safe slug from text
- */
-export function normalizeSlug(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-|-$/g, '');
-}
-
-/**
  * Pick a random item from an array
  */
 export function randomItem<T>(array: T[]): T {
