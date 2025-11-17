@@ -109,7 +109,6 @@ export function SpeakersList({ speakers }: SpeakersListProps) {
           <SpeakerCard
             key={speaker._id}
             speaker={{
-              _id: speaker._id,
               featured: speaker.featured,
               firstName: speaker.firstName,
               imageUrl: speaker.imageUrl,

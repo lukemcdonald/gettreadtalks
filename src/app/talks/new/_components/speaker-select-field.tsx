@@ -1,4 +1,4 @@
-import type { Id } from '@/convex/_generated/dataModel';
+import type { Speaker, SpeakerId } from '@/lib/features/speakers/types';
 
 import { Label } from '@/components/ui/label';
 import {
@@ -10,9 +10,9 @@ import {
 } from '@/components/ui/select';
 
 type SpeakerSelectFieldProps = {
-  defaultValue?: Id<'speakers'> | null;
+  defaultValue?: SpeakerId | null;
   error?: string;
-  speakers: Array<{ _id: Id<'speakers'>; firstName: string; lastName: string }>;
+  speakers: Pick<Speaker, '_id' | 'firstName' | 'lastName'>[];
 };
 
 export function SpeakerSelectField({ defaultValue, error, speakers }: SpeakerSelectFieldProps) {

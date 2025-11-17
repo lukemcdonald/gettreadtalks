@@ -1,27 +1,22 @@
 'use client';
 
+import type { Speaker } from '@/lib/features/speakers/types';
+
 import Link from 'next/link';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
+import { getSpeakerInitials, getSpeakerName } from '@/lib/features/speakers';
 
 type SpeakerCardProps = {
   favorited?: boolean;
-  speaker: {
-    _id: string;
-    featured?: boolean;
-    firstName: string;
-    imageUrl?: string;
-    lastName: string;
-    role?: string;
-    slug: string;
-  };
+  speaker: Pick<Speaker, 'featured' | 'firstName' | 'lastName' | 'imageUrl' | 'role' | 'slug'>;
 };
 
 export function SpeakerCard({ favorited, speaker }: SpeakerCardProps) {
-  const speakerName = `${speaker.firstName} ${speaker.lastName}`;
-  const speakerInitials = `${speaker.firstName[0]}${speaker.lastName[0]}`;
+  const speakerName = getSpeakerName(speaker);
+  const speakerInitials = getSpeakerInitials(speaker);
 
   return (
     <Card

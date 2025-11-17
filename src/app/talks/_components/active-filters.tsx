@@ -1,6 +1,7 @@
 'use client';
 
-import type { Id } from '@/convex/_generated/dataModel';
+import type { Speaker } from '@/lib/features/speakers/types';
+import type { Topic } from '@/lib/features/topics/types';
 
 import { X as RemoveIcon } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -8,15 +9,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 
 type ActiveFiltersProps = {
-  speakers: Array<{
-    _id: Id<'speakers'>;
-    firstName: string;
-    lastName: string;
-  }>;
-  topics: Array<{
-    _id: Id<'topics'>;
-    title: string;
-  }>;
+  speakers: Pick<Speaker, '_id' | 'firstName' | 'lastName'>[];
+  topics: Pick<Topic, '_id' | 'title'>[];
 };
 
 export function ActiveFilters({ speakers, topics }: ActiveFiltersProps) {

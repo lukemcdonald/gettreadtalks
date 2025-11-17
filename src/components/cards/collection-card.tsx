@@ -1,25 +1,17 @@
 'use client';
 
+import type { Collection } from '@/lib/features/collections/types';
+import type { Speaker } from '@/lib/features/speakers/types';
+
 import Link from 'next/link';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-
-type SpeakerPreview = {
-  firstName: string;
-  imageUrl?: string;
-  lastName: string;
-  slug: string;
-};
+import { getSpeakerInitials, getSpeakerName } from '@/lib/features/speakers';
 
 type CollectionCardProps = {
-  collection: {
-    _id: string;
-    description?: string;
-    slug: string;
-    title: string;
-  };
-  speakers?: SpeakerPreview[];
+  collection: Pick<Collection, 'description' | 'slug' | 'title'>;
+  speakers?: Pick<Speaker, 'firstName' | 'lastName' | 'imageUrl' | 'slug'>[];
   talkCount?: number;
 };
 
@@ -43,13 +35,14 @@ export function CollectionCard({ collection, speakers = [], talkCount }: Collect
           </p>
         )}
       </CardHeader>
+
       {speakers.length > 0 && (
         <CardContent>
           <div className="flex items-center gap-2">
             <div className="-space-x-2 flex">
               {displaySpeakers.map((speaker) => {
-                const speakerName = `${speaker.firstName} ${speaker.lastName}`;
-                const speakerInitials = `${speaker.firstName[0]}${speaker.lastName[0]}`;
+                const speakerName = getSpeakerName(speaker);
+                const speakerInitials = getSpeakerInitials(speaker);
 
                 return (
                   <Avatar className="size-8 border-2 border-background" key={speaker.slug}>

@@ -1,7 +1,9 @@
 'use client';
 
-import type { Id } from '@/convex/_generated/dataModel';
 import type { StatusType } from '@/convex/lib/validators/shared';
+import type { Collection, CollectionId } from '@/lib/features/collections/types';
+import type { Speaker, SpeakerId } from '@/lib/features/speakers/types';
+import type { TalkId } from '@/lib/features/talks';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -11,26 +13,27 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { slugify } from '@/convex/lib/utils';
 import { useArchiveTalk, useCreateTalk, useUpdateTalk } from '@/lib/features/talks/hooks';
 import { CollectionSelectField } from './collection-select-field';
 import { SpeakerSelectField } from './speaker-select-field';
 import { StatusSelectField } from './status-select-field';
 
 type TalkFormProps = {
-  collections: Array<{ _id: Id<'collections'>; slug: string; title: string }>;
+  collections: Pick<Collection, '_id' | 'slug' | 'title'>[];
   initialData?: {
-    collectionId?: Id<'collections'> | null;
+    collectionId?: CollectionId | null;
     collectionOrder?: number | null;
     description?: string | null;
     featured?: boolean | null;
     mediaUrl: string;
     scripture?: string | null;
-    speakerId: Id<'speakers'>;
+    speakerId: SpeakerId;
     status?: StatusType | null;
     title: string;
   };
-  speakers: Array<{ _id: Id<'speakers'>; firstName: string; lastName: string; slug: string }>;
-  talkId?: Id<'talks'>;
+  speakers: Pick<Speaker, '_id' | 'firstName' | 'lastName' | 'slug'>[];
+  talkId?: TalkId;
   talkSlug?: string;
 };
 
@@ -51,7 +54,7 @@ export function TalkForm({ collections, initialData, speakers, talkId, talkSlug 
     const formData = new FormData(e.currentTarget);
 
     const title = formData.get('title') as string;
-    const speakerId = formData.get('speakerId') as Id<'speakers'>;
+    const speakerId = formData.get('speakerId') as SpeakerId;
     const mediaUrl = formData.get('mediaUrl') as string;
     const collectionId = formData.get('collectionId') as string;
     const collectionOrder = formData.get('collectionOrder') as string;
@@ -61,7 +64,7 @@ export function TalkForm({ collections, initialData, speakers, talkId, talkSlug 
     const featured = formData.get('featured') === 'on';
 
     const data = {
-      collectionId: collectionId ? (collectionId as Id<'collections'>) : undefined,
+      collectionId: collectionId ? (collectionId as CollectionId) : undefined,
       collectionOrder: collectionOrder ? Number.parseInt(collectionOrder, 10) : undefined,
       description: description || undefined,
       featured,
@@ -76,13 +79,13 @@ export function TalkForm({ collections, initialData, speakers, talkId, talkSlug 
       if (talkId) {
         await updateTalk.mutate({ ...data, id: talkId });
 
-        const newSlug = normalizeSlug(title);
-        const slug = newSlug === normalizeSlug(initialData?.title ?? '') ? talkSlug : newSlug;
-        router.push(`/talks/${slug || newSlug}`);
+        const newSlug = slugify(title);
+        const slug = newSlug === slugify(initialData?.title) ? (talkSlug ?? newSlug) : newSlug;
+        router.push(`/talks/${slug}`);
       } else {
         await createTalk.mutate(data);
 
-        const slug = normalizeSlug(title);
+        const slug = slugify(title);
         router.push(`/talks/${slug}`);
       }
     } catch (error) {
@@ -110,10 +113,7 @@ export function TalkForm({ collections, initialData, speakers, talkId, talkSlug 
 
     try {
       if (isArchived) {
-        await updateTalk.mutate({
-          id: talkId,
-          status: 'backlog',
-        });
+        await updateTalk.mutate({ id: talkId, status: 'backlog' });
         setStatus('backlog');
       } else {
         await archiveTalk.mutate({ id: talkId });
@@ -125,14 +125,6 @@ export function TalkForm({ collections, initialData, speakers, talkId, talkSlug 
       setIsDeleting(false);
     }
   };
-
-  const normalizeSlug = (text: string) =>
-    text
-      .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .trim();
 
   const isLoading = createTalk.isLoading || updateTalk.isLoading;
 

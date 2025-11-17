@@ -82,7 +82,6 @@ export function ClipsList({ clips }: ClipsListProps) {
       {filteredAndSorted.map((clip) => (
         <ClipCard
           clip={{
-            _id: clip._id,
             description: clip.description,
             slug: clip.slug,
             title: clip.title,

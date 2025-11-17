@@ -81,7 +81,6 @@ export default async function SpeakerPage({ params }: SpeakerPageProps) {
                   {collections.map((collection) => (
                     <CollectionCard
                       collection={{
-                        _id: collection._id,
                         description: collection.description,
                         slug: collection.slug,
                         title: collection.title,
@@ -104,7 +103,6 @@ export default async function SpeakerPage({ params }: SpeakerPageProps) {
                   {clips.map((clip) => (
                     <ClipCard
                       clip={{
-                        _id: clip._id,
                         description: clip.description,
                         slug: clip.slug,
                         title: clip.title,

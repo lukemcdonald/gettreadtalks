@@ -3,9 +3,10 @@ import type { StatusType } from '../../lib/types';
 
 import { faker } from '@faker-js/faker';
 
+import { slugify } from '../../lib/utils';
 import { scriptureReferences } from '../data/scripture';
 import { talkTitles } from '../data/talks';
-import { normalizeSlug, randomBoolean, randomInt, randomItem, weightedRandom } from '../utils';
+import { randomBoolean, randomInt, randomItem, weightedRandom } from '../utils';
 
 type Talk = {
   description?: string;
@@ -75,7 +76,7 @@ export function generateTalks(count: number, speakerIds: Id<'speakers'>[]) {
       } = {
         mediaUrl: `${faker.internet.url()}/video.mp4`,
         publishedAt,
-        slug: normalizeSlug(title),
+        slug: slugify(title),
         speakerId,
         status,
         title,

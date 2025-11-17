@@ -1,4 +1,4 @@
-import type { Id } from '@/convex/_generated/dataModel';
+import type { Collection, CollectionId } from '@/lib/features/collections/types';
 
 import { Label } from '@/components/ui/label';
 import {
@@ -10,8 +10,8 @@ import {
 } from '@/components/ui/select';
 
 type CollectionSelectFieldProps = {
-  collections: Array<{ _id: Id<'collections'>; title: string }>;
-  defaultValue?: Id<'collections'> | null;
+  collections: Pick<Collection, '_id' | 'title'>[];
+  defaultValue?: CollectionId | null;
 };
 
 export function CollectionSelectField({ collections, defaultValue }: CollectionSelectFieldProps) {

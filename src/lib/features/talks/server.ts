@@ -1,7 +1,8 @@
 'use server';
 
-import type { Id } from '@/convex/_generated/dataModel';
 import type { StatusType } from '@/convex/lib/validators/shared';
+import type { SpeakerId } from '@/lib/features/speakers/types';
+import type { TopicId } from '@/lib/features/topics/types';
 
 import { fetchQuery, preloadQuery } from 'convex/nextjs';
 
@@ -30,9 +31,9 @@ export async function getTalks(filters?: {
   featured?: boolean;
   pageSize?: number;
   search?: string;
-  speakerId?: Id<'speakers'>;
+  speakerId?: SpeakerId;
   status?: StatusType;
-  topicId?: Id<'topics'>;
+  topicId?: TopicId;
 }) {
   const token = await getAuthToken();
 
@@ -58,10 +59,7 @@ export async function getTalks(filters?: {
   const talksWithSpeakers = await Promise.all(
     result.page.map(async (talk) => {
       const speaker = await fetchQuery(api.speakers.getSpeaker, { id: talk.speakerId }, { token });
-      return {
-        ...talk,
-        speaker,
-      };
+      return { ...talk, speaker };
     }),
   );
 

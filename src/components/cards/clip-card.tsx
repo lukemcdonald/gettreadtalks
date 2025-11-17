@@ -1,38 +1,27 @@
 'use client';
 
-import type { Route } from 'next';
+import type { Clip } from '@/lib/features/clips/types';
+import type { Speaker } from '@/lib/features/speakers/types';
 
+import { StarIcon } from 'lucide-react';
 import Link from 'next/link';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { getSpeakerInitials, getSpeakerName } from '@/lib/features/speakers';
 
 type ClipCardProps = {
+  clip: Pick<Clip, 'description' | 'slug' | 'title'>;
   favorited?: boolean;
-  speaker?: {
-    firstName: string;
-    imageUrl?: string;
-    lastName: string;
-    slug: string;
-  };
-  clip: {
-    _id: string;
-    description?: string;
-    slug: string;
-    title: string;
-  };
+  speaker?: Pick<Speaker, 'firstName' | 'lastName' | 'imageUrl' | 'slug'>;
 };
 
-export function ClipCard({ favorited, speaker, clip }: ClipCardProps) {
-  const speakerName = speaker ? `${speaker.firstName} ${speaker.lastName}` : undefined;
-  const speakerInitials = speaker ? `${speaker.firstName[0]}${speaker.lastName[0]}` : undefined;
-  const clipUrl = `/clips/${clip.slug}`;
-
+export function ClipCard({ clip, favorited, speaker }: ClipCardProps) {
   return (
     <Card
       className="group min-w-0 transition-all hover:shadow-md"
-      render={<Link href={clipUrl as Route} />}
+      render={<Link href={`/clips/${clip.slug}`} />}
     >
       <CardHeader>
         <div className="flex items-start justify-between gap-2">
@@ -44,7 +33,7 @@ export function ClipCard({ favorited, speaker, clip }: ClipCardProps) {
               className="bg-yellow-500/10 text-xs text-yellow-600 dark:text-yellow-400"
               variant="secondary"
             >
-              ★
+              <StarIcon className="size-4" />
             </Badge>
           )}
         </div>
@@ -52,14 +41,17 @@ export function ClipCard({ favorited, speaker, clip }: ClipCardProps) {
           <p className="line-clamp-2 text-muted-foreground text-sm">{clip.description}</p>
         )}
       </CardHeader>
+
       {speaker && (
         <CardContent>
           <div className="flex items-center gap-2">
             <Avatar className="size-8">
-              {speaker.imageUrl && <AvatarImage alt={speakerName} src={speaker.imageUrl} />}
-              <AvatarFallback>{speakerInitials}</AvatarFallback>
+              {speaker.imageUrl && (
+                <AvatarImage alt={getSpeakerName(speaker)} src={speaker.imageUrl} />
+              )}
+              <AvatarFallback>{getSpeakerInitials(speaker)}</AvatarFallback>
             </Avatar>
-            <span className="text-muted-foreground text-sm">{speakerName}</span>
+            <span className="text-muted-foreground text-sm">{getSpeakerName(speaker)}</span>
           </div>
         </CardContent>
       )}

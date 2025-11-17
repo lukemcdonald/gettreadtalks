@@ -3,8 +3,9 @@ import type { StatusType } from '../../lib/types';
 
 import { faker } from '@faker-js/faker';
 
+import { slugify } from '../../lib/utils';
 import { talkTitles } from '../data/talks';
-import { normalizeSlug, randomBoolean, randomInt, randomItem, weightedRandom } from '../utils';
+import { randomBoolean, randomInt, randomItem, weightedRandom } from '../utils';
 
 type Clip = {
   description?: string;
@@ -70,7 +71,7 @@ export function generateClips(count: number, talkIds: Id<'talks'>[], speakerIds:
     const clip: Clip = {
       mediaUrl: `${faker.internet.url()}/clip.mp4`,
       publishedAt,
-      slug: normalizeSlug(title),
+      slug: slugify(title),
       status,
       talkId,
       title,

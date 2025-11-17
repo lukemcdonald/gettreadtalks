@@ -34,7 +34,7 @@ export function StatusSelectField({
         defaultValue={defaultValue}
         items={items}
         name="status"
-        onValueChange={(val) => onChange?.(val as StatusType)}
+        onValueChange={(v) => onChange?.(v as StatusType)}
         required
         value={value}
       >

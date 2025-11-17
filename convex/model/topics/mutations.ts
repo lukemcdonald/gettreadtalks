@@ -5,7 +5,7 @@ import { getOneFrom } from 'convex-helpers/server/relationships';
 
 import { mutation } from '../../_generated/server';
 import { throwDuplicateSlug, throwNotFound, throwValidationError } from '../../lib/errors';
-import { normalizeSlug, slugExists } from '../../lib/utils';
+import { slugExists, slugify } from '../../lib/utils';
 import { requireAuth } from '../auth/utils';
 import { topicStatus } from './validators';
 
@@ -111,7 +111,12 @@ export const createTopic = mutation({
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
-    const slug = normalizeSlug(args.title);
+    // Validate input early
+    if (!args.title.trim()) {
+      throwValidationError('Title cannot be empty', 'title');
+    }
+
+    const slug = slugify(args.title);
 
     if (await slugExists(ctx, 'topics', slug)) {
       throwDuplicateSlug('Topic with this title already exists', 'title');
@@ -259,8 +264,13 @@ export const updateTopic = mutation({
       throwNotFound('Topic not found', { resource: 'topic', resourceId: id });
     }
 
-    if (updates.title) {
-      const newSlug = normalizeSlug(updates.title);
+    if (updates.title !== undefined) {
+      // Validate input early
+      if (!updates.title.trim()) {
+        throwValidationError('Title cannot be empty', 'title');
+      }
+
+      const newSlug = slugify(updates.title);
 
       if (newSlug !== topic.slug) {
         if (await slugExists(ctx, 'topics', newSlug, id)) {

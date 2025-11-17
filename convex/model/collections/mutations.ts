@@ -4,7 +4,8 @@ import { v } from 'convex/values';
 import { getOneFrom } from 'convex-helpers/server/relationships';
 
 import { mutation } from '../../_generated/server';
-import { normalizeSlug, slugExists } from '../../lib/utils';
+import { throwDuplicateSlug, throwValidationError } from '../../lib/errors';
+import { slugExists, slugify } from '../../lib/utils';
 import { requireAuth } from '../auth/utils';
 
 /**
@@ -23,10 +24,15 @@ export const createCollection = mutation({
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
-    const slug = normalizeSlug(args.title);
+    // Validate input early
+    if (!args.title.trim()) {
+      throwValidationError('Title cannot be empty', 'title');
+    }
+
+    const slug = slugify(args.title);
 
     if (await slugExists(ctx, 'collections', slug)) {
-      throw new Error('Collection with this title already exists');
+      throwDuplicateSlug('Collection with this title already exists', 'title');
     }
 
     return await ctx.db.insert('collections', {
@@ -103,12 +109,17 @@ export const updateCollection = mutation({
       throw new Error('Collection not found');
     }
 
-    if (updates.title) {
-      const newSlug = normalizeSlug(updates.title);
+    if (updates.title !== undefined) {
+      // Validate input early
+      if (!updates.title.trim()) {
+        throwValidationError('Title cannot be empty', 'title');
+      }
+
+      const newSlug = slugify(updates.title);
 
       if (newSlug !== collection.slug) {
         if (await slugExists(ctx, 'collections', newSlug, id)) {
-          throw new Error('Collection with this title already exists');
+          throwDuplicateSlug('Collection with this title already exists', 'title');
         }
 
         updates.slug = newSlug;

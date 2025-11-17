@@ -1,6 +1,7 @@
 'use client';
 
-import type { Id } from '@/convex/_generated/dataModel';
+import type { Speaker } from '@/lib/features/speakers/types';
+import type { Topic } from '@/lib/features/topics/types';
 
 import { useTransition } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -14,8 +15,8 @@ type TalksFiltersProps = {
   className?: string;
   isAuthenticated: boolean;
   onLoadingChange?: (loading: boolean) => void;
-  speakers: Array<{ _id: Id<'speakers'>; firstName: string; lastName: string }>;
-  topics: Array<{ _id: Id<'topics'>; title: string }>;
+  speakers: Pick<Speaker, '_id' | 'firstName' | 'lastName'>[];
+  topics: Pick<Topic, '_id' | 'title'>[];
 };
 
 export function TalksFilters({

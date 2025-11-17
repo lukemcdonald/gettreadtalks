@@ -1,5 +1,8 @@
 'use client';
 
+import type { Collection } from '@/lib/features/collections/types';
+import type { Speaker } from '@/lib/features/speakers/types';
+
 import { useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 
@@ -8,18 +11,8 @@ import { GridList } from '@/components/grid';
 import { Empty, EmptyDescription } from '@/components/ui/empty';
 
 type CollectionWithStats = {
-  collection: {
-    _id: string;
-    description?: string;
-    slug: string;
-    title: string;
-  };
-  speakers: Array<{
-    firstName: string;
-    imageUrl?: string;
-    lastName: string;
-    slug: string;
-  }>;
+  collection: Collection;
+  speakers: Speaker[];
   talkCount: number;
 };
 
@@ -80,7 +73,6 @@ export function CollectionsList({ collections }: CollectionsListProps) {
       {filteredAndSorted.map((item) => (
         <CollectionCard
           collection={{
-            _id: item.collection._id,
             description: item.collection.description,
             slug: item.collection.slug,
             title: item.collection.title,

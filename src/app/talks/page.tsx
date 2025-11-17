@@ -1,5 +1,6 @@
-import type { Id } from '@/convex/_generated/dataModel';
 import type { StatusType } from '@/convex/lib/validators/shared';
+import type { SpeakerId } from '@/lib/features/speakers/types';
+import type { TopicId } from '@/lib/features/topics/types';
 
 import { Suspense } from 'react';
 import Link from 'next/link';
@@ -31,8 +32,8 @@ async function TalksContent({ params }: { params: Awaited<TalksPageProps['search
   const cursor = params.cursor || undefined;
   const featured = params.featured === 'true' ? true : undefined;
   const search = params.search || undefined;
-  const speakerId = params.speaker as Id<'speakers'> | undefined;
-  const topicId = params.topic as Id<'topics'> | undefined;
+  const speakerId = params.speaker as SpeakerId | undefined;
+  const topicId = params.topic as TopicId | undefined;
   const statusParam = params.status as StatusType | undefined;
 
   const status = user
