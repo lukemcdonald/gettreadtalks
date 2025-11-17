@@ -1,12 +1,12 @@
 'use client';
 
-import type { Id } from '@/convex/_generated/dataModel';
+import type { TalkId } from '@/lib/features/talks';
 
 import { useQuery } from 'convex/react';
 
 import { api } from '@/convex/_generated/api';
 
-export function useIsTalkFavorited(talkId: Id<'talks'>) {
+export function useIsTalkFavorited(talkId: TalkId) {
   const data = useQuery(api.users.isTalkFavorited, { talkId });
 
   return {

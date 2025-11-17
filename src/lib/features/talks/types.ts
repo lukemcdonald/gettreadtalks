@@ -1,8 +1,12 @@
 import type { Preloaded } from 'convex/react';
 import type { FunctionReturnType } from 'convex/server';
+import type { Doc, Id } from '@/convex/_generated/dataModel';
 
 // biome-ignore lint/style/useImportType: Convex API imports needed for typeof in type definitions
 import { api } from '@/convex/_generated/api';
+
+export type Talk = Doc<'talks'>;
+export type TalkId = Id<'talks'>;
 
 // Re-export commonly used Convex types for talks
 export type PreloadedTalks = Preloaded<typeof api.talks.listTalks>;

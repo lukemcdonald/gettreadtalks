@@ -93,8 +93,6 @@ export default async function HomePage() {
               <SpeakerCard
                 key={speaker._id}
                 speaker={{
-                  _id: speaker._id,
-                  // featured: speaker.featured,
                   firstName: speaker.firstName,
                   imageUrl: speaker.imageUrl,
                   lastName: speaker.lastName,

@@ -1,25 +1,25 @@
 'use client';
 
-import type { Doc } from '@/convex/_generated/dataModel';
+import type { Speaker } from '@/lib/features/speakers/types';
+import type { Talk } from '@/lib/features/talks/types';
 
+import { StarIcon } from 'lucide-react';
 import Link from 'next/link';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { getSpeakerInitials, getSpeakerName } from '@/lib/features/speakers';
 
 type TalkCardProps = {
   featured?: boolean;
   favorited?: boolean;
   finished?: boolean;
-  speaker?: Pick<Doc<'speakers'>, 'firstName' | 'lastName' | 'imageUrl' | 'slug'>;
-  talk: Pick<Doc<'talks'>, 'description' | 'slug' | 'title'>;
+  speaker?: Pick<Speaker, 'firstName' | 'lastName' | 'imageUrl' | 'slug'>;
+  talk: Pick<Talk, 'description' | 'slug' | 'title'>;
 };
 
 export function TalkCard({ featured, favorited, finished, speaker, talk }: TalkCardProps) {
-  const speakerName = speaker ? `${speaker.firstName} ${speaker.lastName}` : undefined;
-  const speakerInitials = speaker ? `${speaker.firstName[0]}${speaker.lastName[0]}` : undefined;
-
   return (
     <Card
       className="group transition-all duration-200 hover:shadow-lg"
@@ -43,7 +43,7 @@ export function TalkCard({ featured, favorited, finished, speaker, talk }: TalkC
                 className="bg-yellow-500/10 text-xs text-yellow-600 dark:text-yellow-400"
                 variant="secondary"
               >
-                ★
+                <StarIcon className="size-4" />
               </Badge>
             )}
             {finished && (
@@ -61,10 +61,14 @@ export function TalkCard({ featured, favorited, finished, speaker, talk }: TalkC
         <CardContent>
           <div className="flex items-center gap-3">
             <Avatar className="size-10">
-              {speaker.imageUrl && <AvatarImage alt={speakerName} src={speaker.imageUrl} />}
-              <AvatarFallback>{speakerInitials}</AvatarFallback>
+              {speaker.imageUrl && (
+                <AvatarImage alt={getSpeakerName(speaker)} src={speaker.imageUrl} />
+              )}
+              <AvatarFallback>{getSpeakerInitials(speaker)}</AvatarFallback>
             </Avatar>
-            <span className="font-medium text-muted-foreground text-sm">{speakerName}</span>
+            <span className="font-medium text-muted-foreground text-sm">
+              {getSpeakerName(speaker)}
+            </span>
           </div>
         </CardContent>
       )}

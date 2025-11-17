@@ -1,13 +1,11 @@
-import type { Doc } from '@/convex/_generated/dataModel';
+import type { Speaker } from '@/lib/features/speakers/types';
+import type { Talk } from '@/lib/features/talks';
 
 import { TalkCard } from '@/components/cards';
 import { GridList } from '@/components/grid';
 import { Empty, EmptyDescription } from '@/components/ui/empty';
 
-type TalkWithSpeaker = Doc<'talks'> & {
-  speaker: Doc<'speakers'> | null;
-};
-
+type TalkWithSpeaker = Talk & { speaker: Speaker | null };
 type TalksListProps = {
   talks: TalkWithSpeaker[];
 };

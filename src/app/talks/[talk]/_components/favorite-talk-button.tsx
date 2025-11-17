@@ -1,6 +1,6 @@
 'use client';
 
-import type { Id } from '@/convex/_generated/dataModel';
+import type { TalkId } from '@/lib/features/talks';
 
 import { Authenticated } from 'convex/react';
 import { DynamicIcon } from 'lucide-react/dynamic';
@@ -10,7 +10,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { useFavoriteTalk, useIsTalkFavorited, useUnfavoriteTalk } from '@/lib/features/users/hooks';
 
 type FavoriteTalkButtonProps = {
-  talkId: Id<'talks'>;
+  talkId: TalkId;
 };
 
 function FavoriteButton({ talkId }: FavoriteTalkButtonProps) {

@@ -1,6 +1,7 @@
 'use client';
 
-import type { Id } from '@/convex/_generated/dataModel';
+import type { Speaker } from '@/lib/features/speakers/types';
+import type { Topic } from '@/lib/features/topics/types';
 
 import { useCallback, useEffect, useState, useTransition } from 'react';
 import { LoaderCircleIcon, X as RemoveIcon } from 'lucide-react';
@@ -21,8 +22,8 @@ type FilterUtilityBarProps = {
   className?: string;
   isAuthenticated: boolean;
   onLoadingChange?: (loading: boolean) => void;
-  speakers: Array<{ _id: Id<'speakers'>; firstName: string; lastName: string }>;
-  topics: Array<{ _id: Id<'topics'>; title: string }>;
+  speakers: Pick<Speaker, '_id' | 'firstName' | 'lastName'>[];
+  topics: Pick<Topic, '_id' | 'title'>[];
 };
 
 function clearOptimisticState(
