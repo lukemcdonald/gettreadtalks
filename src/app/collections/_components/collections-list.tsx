@@ -32,9 +32,9 @@ export function CollectionsList({ collections }: CollectionsListProps) {
     // Filter by search
     if (search) {
       filtered = filtered.filter(
-        (item) =>
-          item.collection.title.toLowerCase().includes(search) ||
-          item.collection.description?.toLowerCase().includes(search),
+        ({ collection }) =>
+          collection.title.toLowerCase().includes(search) ||
+          collection.description?.toLowerCase().includes(search),
       );
     }
 

@@ -7,8 +7,7 @@ import { StarIcon } from 'lucide-react';
 import Link from 'next/link';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { getSpeakerInitials, getSpeakerName } from '@/lib/features/speakers';
 
 type TalkCardProps = {
@@ -20,58 +19,58 @@ type TalkCardProps = {
 };
 
 export function TalkCard({ featured, favorited, finished, speaker, talk }: TalkCardProps) {
+  const hasStatusIndicators = featured || favorited || finished;
+  const speakerName = speaker ? getSpeakerName(speaker) : '';
+  const accessibleLabel = speakerName ? `${talk.title} by ${speakerName}` : talk.title;
+
   return (
     <Card
-      className="group transition-all duration-200 hover:shadow-lg"
-      render={<Link href={`/talks/${talk.slug}`} />}
+      className="group transition-all duration-200 focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 hover:scale-[1.01] hover:shadow-lg"
+      render={<Link aria-label={accessibleLabel} href={`/talks/${talk.slug}`} />}
     >
-      <CardHeader>
-        <div className="flex items-start justify-between gap-4">
-          <div className="min-w-0 flex-1">
-            <CardTitle className="text-lg group-hover:text-primary sm:text-xl">
+      <CardContent className="flex items-start gap-4 p-6">
+        {speaker && (
+          <Avatar className="size-12 shrink-0">
+            {speaker.imageUrl && <AvatarImage alt={speakerName} src={speaker.imageUrl} />}
+            <AvatarFallback className="text-base">{getSpeakerInitials(speaker)}</AvatarFallback>
+          </Avatar>
+        )}
+        <div className="min-w-0 flex-1 space-y-1">
+          <div className="flex items-start justify-between gap-2">
+            <h3 className="font-semibold text-lg leading-tight group-hover:text-primary sm:text-xl">
               {talk.title}
-            </CardTitle>
-          </div>
-          <div className="flex flex-shrink-0 flex-col gap-1">
-            {featured && (
-              <Badge className="bg-primary/10 text-primary text-xs" variant="secondary">
-                Featured
-              </Badge>
-            )}
-            {favorited && (
-              <Badge
-                className="bg-yellow-500/10 text-xs text-yellow-600 dark:text-yellow-400"
-                variant="secondary"
+            </h3>
+            {hasStatusIndicators && (
+              <div
+                aria-hidden="true"
+                className="flex shrink-0 items-center gap-1.5 pt-0.5"
+                title={[featured && 'Featured', favorited && 'Favorited', finished && 'Finished']
+                  .filter(Boolean)
+                  .join(', ')}
               >
-                <StarIcon className="size-4" />
-              </Badge>
-            )}
-            {finished && (
-              <Badge
-                className="bg-green-500/10 text-green-600 text-xs dark:text-green-400"
-                variant="secondary"
-              >
-                ✓
-              </Badge>
+                {featured && (
+                  <span
+                    aria-hidden="true"
+                    className="size-2 rounded-full bg-primary"
+                    title="Featured"
+                  />
+                )}
+                {favorited && (
+                  <StarIcon aria-hidden="true" className="size-3 fill-yellow-500 text-yellow-500" />
+                )}
+                {finished && (
+                  <span
+                    aria-hidden="true"
+                    className="size-2 rounded-full bg-green-500"
+                    title="Finished"
+                  />
+                )}
+              </div>
             )}
           </div>
+          {speaker && <p className="font-medium text-muted-foreground text-sm">{speakerName}</p>}
         </div>
-      </CardHeader>
-      {speaker && (
-        <CardContent>
-          <div className="flex items-center gap-3">
-            <Avatar className="size-10">
-              {speaker.imageUrl && (
-                <AvatarImage alt={getSpeakerName(speaker)} src={speaker.imageUrl} />
-              )}
-              <AvatarFallback>{getSpeakerInitials(speaker)}</AvatarFallback>
-            </Avatar>
-            <span className="font-medium text-muted-foreground text-sm">
-              {getSpeakerName(speaker)}
-            </span>
-          </div>
-        </CardContent>
-      )}
+      </CardContent>
     </Card>
   );
 }
