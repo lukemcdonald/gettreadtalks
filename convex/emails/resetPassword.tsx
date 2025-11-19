@@ -1,4 +1,4 @@
-import type { PasswordResetEmailProps } from '../../src/lib/services/email/types';
+import type { PasswordResetEmailProps } from '../../src/services/email/types';
 
 import { Button, Section, Text } from '@react-email/components';
 

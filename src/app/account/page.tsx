@@ -1,8 +1,8 @@
 // app/account/page.tsx
 
 import { MainLayout } from '@/components/main-layout';
-import { getUserFavorites } from '@/lib/features/users/server';
-import { getCurrentUser } from '@/lib/services/auth/server';
+import { getUserFavorites } from '@/features/users/server';
+import { getCurrentUser } from '@/services/auth/server';
 
 export default async function AccountPage() {
   const user = await getCurrentUser();

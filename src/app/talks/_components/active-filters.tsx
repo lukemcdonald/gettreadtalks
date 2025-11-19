@@ -1,7 +1,7 @@
 'use client';
 
-import type { Speaker } from '@/lib/features/speakers/types';
-import type { Topic } from '@/lib/features/topics/types';
+import type { Speaker } from '@/features/speakers/types';
+import type { Topic } from '@/features/topics/types';
 
 import { X as RemoveIcon } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';

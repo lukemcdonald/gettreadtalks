@@ -1,12 +1,12 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import type { ErrorWithEventId } from '@/lib/services/errors/types';
+import type { ErrorWithEventId } from '@/services/errors/types';
 
 import { type FallbackProps, ErrorBoundary as ReactErrorBoundary } from 'react-error-boundary';
 
 import { ErrorFallback } from '@/components/error-fallback';
-import { captureException } from '@/lib/services/errors/client';
+import { captureException } from '@/services/errors/client';
 
 // Regex to remove "error" suffix from error names (case-insensitive)
 const ERROR_NAME_SUFFIX_REGEX = /error$/i;

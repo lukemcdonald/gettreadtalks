@@ -1,7 +1,7 @@
 import { mergeProps } from '@base-ui-components/react/merge-props';
 import { useRender } from '@base-ui-components/react/use-render';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils';
 
 interface ContainerProps extends useRender.ComponentProps<'div'> {}
 

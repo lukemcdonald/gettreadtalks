@@ -3,7 +3,7 @@
 import { Select as SelectPrimitive } from '@base-ui-components/react/select';
 import { ChevronDownIcon, ChevronUpIcon, ChevronsUpDownIcon } from 'lucide-react';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils';
 
 const Select = SelectPrimitive.Root;
 

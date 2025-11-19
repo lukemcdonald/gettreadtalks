@@ -7,8 +7,8 @@ import { MediaEmbed } from '@/components/media-embed';
 import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { getTalkBySlug } from '@/lib/features/talks';
-import { getCurrentUser } from '@/lib/services/auth/server';
+import { getTalkBySlug } from '@/features/talks';
+import { getCurrentUser } from '@/services/auth/server';
 import { ClipsList } from './_components/clips-list';
 import { FavoriteTalkButton } from './_components/favorite-talk-button';
 

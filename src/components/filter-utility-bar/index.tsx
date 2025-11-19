@@ -1,7 +1,7 @@
 'use client';
 
-import type { Speaker } from '@/lib/features/speakers/types';
-import type { Topic } from '@/lib/features/topics/types';
+import type { Speaker } from '@/features/speakers/types';
+import type { Topic } from '@/features/topics/types';
 
 import { useCallback, useEffect, useState, useTransition } from 'react';
 import { LoaderCircleIcon, X as RemoveIcon } from 'lucide-react';
@@ -9,7 +9,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import { Group, GroupItem, GroupSeparator } from '@/components/ui/group';
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils';
 import { FilterSelect } from './filter-select';
 import { SearchInput } from './search-input';
 

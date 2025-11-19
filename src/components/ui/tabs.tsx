@@ -2,7 +2,7 @@
 
 import { Tabs as TabsPrimitive } from '@base-ui-components/react/tabs';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils';
 
 type TabsVariant = 'default' | 'underline';
 

@@ -3,9 +3,9 @@
 import { useId, useState } from 'react';
 
 import { MainLayout } from '@/components/main-layout';
-import { signIn, signUp } from '@/lib/services/auth/client';
-import { AUTH_ERRORS } from '@/lib/services/auth/config';
-import { captureException } from '@/lib/services/errors/client';
+import { signIn, signUp } from '@/services/auth/client';
+import { AUTH_ERRORS } from '@/services/auth/config';
+import { captureException } from '@/services/errors/client';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');

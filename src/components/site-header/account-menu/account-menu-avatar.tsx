@@ -1,10 +1,10 @@
-import type { User } from '@/lib/services/auth/types';
+import type { User } from '@/services/auth/types';
 
 import { CircleUser as UserIcon } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { cn } from '@/lib/utils';
-import { getGravatarUrl } from '@/lib/utils/gravatar';
+import { cn } from '@/utils';
+import { getGravatarUrl } from '@/utils/gravatar';
 
 type FallbackType = 'initials' | 'icon';
 type ImageType = 'image' | 'gravatar';

@@ -14,7 +14,7 @@ import { Suspense } from 'react';
 
 import { Main } from '@/components/main';
 import { SkipToMainLink } from '@/components/site-header/navigation/skip-to-main-link';
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils';
 
 const inter = Inter({
   subsets: ['latin'],

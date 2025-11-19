@@ -7,9 +7,9 @@ import { PageHeader } from '@/components/page-header';
 import { SearchInput } from '@/components/search-input';
 import { SelectFilter } from '@/components/select-filter';
 import { SortSelect } from '@/components/sort-select';
-import { getAllClips } from '@/lib/features/clips';
-import { getAllSpeakers, sortSpeakersByName } from '@/lib/features/speakers';
-import { getTopicsWithCounts } from '@/lib/features/topics';
+import { getAllClips } from '@/features/clips';
+import { getAllSpeakers, sortSpeakersByName } from '@/features/speakers';
+import { getTopicsWithCounts } from '@/features/topics';
 import { ClipsList } from './_components/clips-list';
 
 function ClipsListSkeleton() {

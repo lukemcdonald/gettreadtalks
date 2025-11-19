@@ -1,7 +1,7 @@
 'use client';
 
 import type { Route } from 'next';
-import type { User } from '@/lib/services/auth/types';
+import type { User } from '@/services/auth/types';
 
 import {
   ArrowRight as ArrowRightIcon,
@@ -19,7 +19,7 @@ import { AccountMenuItem } from '@/components/site-header/account-menu/account-m
 import { NavLink } from '@/components/site-header/navigation/nav-link';
 import { Button } from '@/components/ui/button';
 import { Menu, MenuPopup, MenuSeparator, MenuTrigger } from '@/components/ui/menu';
-import { useCurrentUser } from '@/lib/features/users/hooks';
+import { useCurrentUser } from '@/features/users/hooks';
 
 type AccountMenuProps = {
   initialUser?: User;

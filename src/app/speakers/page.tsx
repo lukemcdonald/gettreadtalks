@@ -7,7 +7,7 @@ import { PageHeader } from '@/components/page-header';
 import { SearchInput } from '@/components/search-input';
 import { SelectFilter } from '@/components/select-filter';
 import { SortSelect } from '@/components/sort-select';
-import { getAllSpeakers } from '@/lib/features/speakers';
+import { getAllSpeakers } from '@/features/speakers';
 import { SpeakersList } from './_components/speakers-list';
 
 function SpeakersListSkeleton() {

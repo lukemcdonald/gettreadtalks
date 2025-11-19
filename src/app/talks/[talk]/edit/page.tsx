@@ -1,8 +1,8 @@
 import { notFound, redirect } from 'next/navigation';
 
 import { MainLayout } from '@/components/main-layout';
-import { getAllCollections, getAllSpeakers, getTalkBySlug } from '@/lib/features/talks';
-import { getCurrentUser } from '@/lib/services/auth/server';
+import { getAllCollections, getAllSpeakers, getTalkBySlug } from '@/features/talks';
+import { getCurrentUser } from '@/services/auth/server';
 import { TalkForm } from '../../new/_components/talk-form';
 
 type EditTalkPageProps = {

@@ -1,7 +1,7 @@
 import { Container } from '@/components/container';
 import { SiteBranding } from '@/components/site-header/site-branding';
 import { SiteNavigation } from '@/components/site-header/site-navigation';
-import { getCurrentUser } from '@/lib/services/auth/server';
+import { getCurrentUser } from '@/services/auth/server';
 
 export async function SiteHeader() {
   const initialUser = await getCurrentUser();

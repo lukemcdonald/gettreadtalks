@@ -1,7 +1,7 @@
 'use client';
 
-import type { Clip } from '@/lib/features/clips/types';
-import type { Speaker } from '@/lib/features/speakers/types';
+import type { Clip } from '@/features/clips/types';
+import type { Speaker } from '@/features/speakers/types';
 
 import { StarIcon } from 'lucide-react';
 import Link from 'next/link';
@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { getSpeakerInitials, getSpeakerName } from '@/lib/features/speakers';
+import { getSpeakerInitials, getSpeakerName } from '@/features/speakers';
 
 type ClipCardProps = {
   clip: Pick<Clip, 'description' | 'slug' | 'title'>;

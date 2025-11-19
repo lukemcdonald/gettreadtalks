@@ -1,9 +1,9 @@
 'use client';
 
 import type { StatusType } from '@/convex/lib/validators/shared';
-import type { Collection, CollectionId } from '@/lib/features/collections/types';
-import type { Speaker, SpeakerId } from '@/lib/features/speakers/types';
-import type { TalkId } from '@/lib/features/talks';
+import type { Collection, CollectionId } from '@/features/collections/types';
+import type { Speaker, SpeakerId } from '@/features/speakers/types';
+import type { TalkId } from '@/features/talks';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -14,7 +14,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { slugify } from '@/convex/lib/utils';
-import { useArchiveTalk, useCreateTalk, useUpdateTalk } from '@/lib/features/talks/hooks';
+import { useArchiveTalk, useCreateTalk, useUpdateTalk } from '@/features/talks/hooks';
 import { CollectionSelectField } from './collection-select-field';
 import { SpeakerSelectField } from './speaker-select-field';
 import { StatusSelectField } from './status-select-field';

@@ -5,7 +5,7 @@ import type * as React from 'react';
 import { Menu as MenuPrimitive } from '@base-ui-components/react/menu';
 import { CheckIcon, ChevronRightIcon } from 'lucide-react';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils';
 
 const Menu = MenuPrimitive.Root;
 

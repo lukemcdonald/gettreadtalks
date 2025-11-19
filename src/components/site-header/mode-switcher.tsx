@@ -4,7 +4,7 @@ import { useCallback } from 'react';
 import { useTheme } from 'next-themes';
 
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils';
 
 export function ModeSwitcher({ className }: { className?: string }) {
   const { resolvedTheme, setTheme } = useTheme();

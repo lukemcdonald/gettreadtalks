@@ -7,7 +7,7 @@ import { PageHeader } from '@/components/page-header';
 import { TalkCard } from '@/components/talk-card';
 import { TopicSelector } from '@/components/topic-selector';
 import { ViewMoreCard } from '@/components/view-more-card';
-import { getAllTopics, getTopicBySlug } from '@/lib/features/topics';
+import { getAllTopics, getTopicBySlug } from '@/features/topics';
 
 type TopicPageProps = {
   params: Promise<{

@@ -3,7 +3,7 @@
 import { useMemo } from 'react';
 import { Slider as SliderPrimitive } from '@base-ui-components/react/slider';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils';
 
 function Slider({
   className,

@@ -1,5 +1,5 @@
 import { SidebarSection } from '@/components/layouts/sidebar-section';
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils';
 import { GridList } from './grid-list';
 
 type GridColumns = {

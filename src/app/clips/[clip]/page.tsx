@@ -5,7 +5,7 @@ import { SidebarContent } from '@/components/layouts/sidebar-content';
 import { SidebarLayout } from '@/components/layouts/sidebar-layout';
 import { MediaEmbed } from '@/components/media-embed';
 import { PageHeader } from '@/components/page-header';
-import { getClipBySlug } from '@/lib/features/clips';
+import { getClipBySlug } from '@/features/clips';
 
 type ClipPageProps = {
   params: Promise<{

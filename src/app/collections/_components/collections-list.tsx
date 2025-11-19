@@ -1,7 +1,7 @@
 'use client';
 
-import type { Collection } from '@/lib/features/collections/types';
-import type { Speaker } from '@/lib/features/speakers/types';
+import type { Collection } from '@/features/collections/types';
+import type { Speaker } from '@/features/speakers/types';
 
 import { useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';

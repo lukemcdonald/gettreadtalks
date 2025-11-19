@@ -5,7 +5,7 @@ import type { Route } from 'next';
 import Link from 'next/link';
 
 import { Card, CardHeader } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils';
 
 type ViewMoreCardProps = {
   className?: string;

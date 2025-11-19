@@ -1,4 +1,4 @@
-import type { User } from '@/lib/services/auth/types';
+import type { User } from '@/services/auth/types';
 
 import { MobileNav } from '@/components/site-header/navigation/mobile-nav';
 import { PrimaryNav } from '@/components/site-header/navigation/primary-nav';

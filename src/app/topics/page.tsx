@@ -5,7 +5,7 @@ import { ArchiveSidebar } from '@/components/layouts/archive-sidebar';
 import { SidebarContent } from '@/components/layouts/sidebar-content';
 import { SearchInput } from '@/components/search-input';
 import { SortSelect } from '@/components/sort-select';
-import { getTopicsWithCounts } from '@/lib/features/topics';
+import { getTopicsWithCounts } from '@/features/topics';
 import { TopicsList } from './_components/topics-list';
 
 export default async function TopicsPage() {

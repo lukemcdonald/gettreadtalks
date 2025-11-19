@@ -5,8 +5,8 @@ import { SectionContainer } from '@/components/layouts/section-container';
 import { SpeakerCard } from '@/components/speaker-card';
 import { TalkCard } from '@/components/talk-card';
 import { Separator } from '@/components/ui/separator';
-import { getFeaturedSpeakers } from '@/lib/features/speakers';
-import { getFeaturedTalks } from '@/lib/features/talks';
+import { getFeaturedSpeakers } from '@/features/speakers';
+import { getFeaturedTalks } from '@/features/talks';
 
 export default async function HomePage() {
   const [featuredTalks, featuredSpeakers] = await Promise.all([

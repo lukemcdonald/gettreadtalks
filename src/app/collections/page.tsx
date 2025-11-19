@@ -6,8 +6,8 @@ import { SidebarContent } from '@/components/layouts/sidebar-content';
 import { SearchInput } from '@/components/search-input';
 import { SelectFilter } from '@/components/select-filter';
 import { SortSelect } from '@/components/sort-select';
-import { getAllCollectionsWithStats } from '@/lib/features/collections';
-import { getAllSpeakers, sortSpeakersByName } from '@/lib/features/speakers';
+import { getAllCollectionsWithStats } from '@/features/collections';
+import { getAllSpeakers, sortSpeakersByName } from '@/features/speakers';
 import { CollectionsList } from './_components/collections-list';
 
 export default async function CollectionsPage() {

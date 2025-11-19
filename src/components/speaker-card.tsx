@@ -1,13 +1,13 @@
 'use client';
 
-import type { Speaker } from '@/lib/features/speakers/types';
+import type { Speaker } from '@/features/speakers/types';
 
 import Link from 'next/link';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
-import { getSpeakerInitials, getSpeakerName } from '@/lib/features/speakers';
+import { getSpeakerInitials, getSpeakerName } from '@/features/speakers';
 
 type SpeakerCardProps = {
   favorited?: boolean;

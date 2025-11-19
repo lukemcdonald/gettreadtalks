@@ -10,7 +10,7 @@ import { SidebarLayout } from '@/components/layouts/sidebar-layout';
 import { PageHeader } from '@/components/page-header';
 import { TalkCard } from '@/components/talk-card';
 import { Separator } from '@/components/ui/separator';
-import { getSpeakerBySlug } from '@/lib/features/speakers';
+import { getSpeakerBySlug } from '@/features/speakers';
 
 type SpeakerPageProps = {
   params: Promise<{

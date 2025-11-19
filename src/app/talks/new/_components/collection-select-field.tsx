@@ -1,4 +1,4 @@
-import type { Collection, CollectionId } from '@/lib/features/collections/types';
+import type { Collection, CollectionId } from '@/features/collections/types';
 
 import { Label } from '@/components/ui/label';
 import {

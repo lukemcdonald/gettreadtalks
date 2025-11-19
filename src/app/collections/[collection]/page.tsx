@@ -6,7 +6,7 @@ import { SidebarContent } from '@/components/layouts/sidebar-content';
 import { SidebarLayout } from '@/components/layouts/sidebar-layout';
 import { PageHeader } from '@/components/page-header';
 import { TalkCard } from '@/components/talk-card';
-import { getCollectionBySlug } from '@/lib/features/collections';
+import { getCollectionBySlug } from '@/features/collections';
 
 type CollectionPageProps = {
   params: Promise<{ collection: string }>;

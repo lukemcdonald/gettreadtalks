@@ -1,5 +1,5 @@
-import type { Speaker } from '@/lib/features/speakers/types';
-import type { Talk } from '@/lib/features/talks';
+import type { Speaker } from '@/features/speakers/types';
+import type { Talk } from '@/features/talks';
 
 import { GridList } from '@/components/grid-list';
 import { TalkCard } from '@/components/talk-card';

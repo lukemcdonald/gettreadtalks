@@ -1,4 +1,4 @@
-import type { Speaker, SpeakerId } from '@/lib/features/speakers/types';
+import type { Speaker, SpeakerId } from '@/features/speakers/types';
 
 import { Label } from '@/components/ui/label';
 import {

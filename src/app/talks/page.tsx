@@ -1,14 +1,14 @@
 import type { StatusType } from '@/convex/lib/validators/shared';
-import type { SpeakerId } from '@/lib/features/speakers/types';
-import type { TopicId } from '@/lib/features/topics/types';
+import type { SpeakerId } from '@/features/speakers/types';
+import type { TopicId } from '@/features/topics/types';
 
 import { Suspense } from 'react';
 
 import { FilterUtilityBar } from '@/components/filter-utility-bar';
 import { ArchiveLayout } from '@/components/layouts/archive-layout';
 import { ArchiveSidebar } from '@/components/layouts/archive-sidebar';
-import { getAllSpeakersForFilter, getAllTopicsForFilter, getTalks } from '@/lib/features/talks';
-import { getCurrentUser } from '@/lib/services/auth/server';
+import { getAllSpeakersForFilter, getAllTopicsForFilter, getTalks } from '@/features/talks';
+import { getCurrentUser } from '@/services/auth/server';
 import { Pagination } from './_components/pagination';
 import { TalksList } from './_components/talks-list';
 import { TalksListSkeleton } from './_components/talks-list-skeleton';

@@ -1,5 +1,5 @@
 import { Container } from '@/components/container';
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils';
 
 type MaxWidth = 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 

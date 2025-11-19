@@ -4,7 +4,7 @@ import { LoaderCircleIcon, X as RemoveIcon } from 'lucide-react';
 
 import { GroupItem } from '@/components/ui/group';
 import { Input } from '@/components/ui/input';
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils';
 
 type SearchInputProps = {
   className?: string;

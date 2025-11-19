@@ -2,8 +2,8 @@ import type { NextConfig } from 'next';
 
 import { withSentryConfig } from '@sentry/nextjs';
 
-import { IS_SENTRY_ENABLED } from './src/lib/config/sentry';
-import { IS_PROD } from '@/lib/constants/env';
+import { IS_SENTRY_ENABLED } from './src/configs/sentry';
+import { IS_PROD } from '@/constants/env';
 
 const cspHeader = `
   base-uri 'self';

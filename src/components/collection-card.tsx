@@ -1,13 +1,13 @@
 'use client';
 
-import type { Collection } from '@/lib/features/collections/types';
-import type { Speaker } from '@/lib/features/speakers/types';
+import type { Collection } from '@/features/collections/types';
+import type { Speaker } from '@/features/speakers/types';
 
 import Link from 'next/link';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { getSpeakerInitials, getSpeakerName } from '@/lib/features/speakers';
+import { getSpeakerInitials, getSpeakerName } from '@/features/speakers';
 
 type CollectionCardProps = {
   collection: Pick<Collection, 'description' | 'slug' | 'title'>;
