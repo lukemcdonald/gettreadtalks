@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import { SidebarContent, SidebarLayout } from '@/components/layouts';
-import { MediaEmbed } from '@/components/media';
+import { SidebarContent } from '@/components/layouts/sidebar-content';
+import { SidebarLayout } from '@/components/layouts/sidebar-layout';
+import { MediaEmbed } from '@/components/media-embed';
 import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
@@ -29,14 +30,7 @@ export default async function TalkPage({ params }: TalkPageProps) {
     <SidebarLayout
       main={
         <>
-          <PageHeader
-            breadcrumbs={[
-              { href: '/', label: 'Home' },
-              { href: '/talks', label: 'Talks' },
-              { href: `/talks/${slug}`, label: talk.title },
-            ]}
-            title={talk.title}
-          />
+          <PageHeader title={talk.title} />
 
           {talk.mediaUrl && (
             <div className="space-y-4">
@@ -82,7 +76,7 @@ export default async function TalkPage({ params }: TalkPageProps) {
           {speaker && (
             <SidebarContent title="Speaker">
               <div className="space-y-2">
-                <p className="font-medium">
+                <p className="font-semibold">
                   {speaker.firstName} {speaker.lastName}
                 </p>
                 {speaker.role && <p className="text-muted-foreground text-sm">{speaker.role}</p>}
@@ -122,7 +116,7 @@ export default async function TalkPage({ params }: TalkPageProps) {
           {collection && (
             <SidebarContent title="Collection">
               <div className="space-y-2">
-                <p className="font-medium">{collection.title}</p>
+                <p className="font-semibold">{collection.title}</p>
                 {collection.description && (
                   <p className="text-muted-foreground text-sm">{collection.description}</p>
                 )}
@@ -139,12 +133,12 @@ export default async function TalkPage({ params }: TalkPageProps) {
           <SidebarContent title="Details">
             <div className="space-y-2 text-sm">
               <div>
-                <span className="font-medium">Status:</span>{' '}
+                <span className="font-semibold">Status:</span>{' '}
                 <span className="text-muted-foreground capitalize">{talk.status}</span>
               </div>
               {talk.publishedAt && (
                 <div>
-                  <span className="font-medium">Published:</span>{' '}
+                  <span className="font-semibold">Published:</span>{' '}
                   <span className="text-muted-foreground">
                     {new Date(talk.publishedAt).toLocaleDateString()}
                   </span>
@@ -152,7 +146,7 @@ export default async function TalkPage({ params }: TalkPageProps) {
               )}
               {talk.featured && (
                 <div>
-                  <span className="font-medium text-primary">Featured Talk</span>
+                  <span className="font-semibold text-primary">Featured Talk</span>
                 </div>
               )}
             </div>

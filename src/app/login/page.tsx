@@ -97,7 +97,7 @@ export default function LoginPage() {
 
           <div className="space-y-4">
             <div>
-              <label className="block font-medium text-foreground text-sm" htmlFor="email">
+              <label className="block font-semibold text-foreground text-sm" htmlFor="email">
                 Email address
               </label>
               <input
@@ -113,7 +113,7 @@ export default function LoginPage() {
               />
             </div>
             <div>
-              <label className="block font-medium text-foreground text-sm" htmlFor="password">
+              <label className="block font-semibold text-foreground text-sm" htmlFor="password">
                 Password
               </label>
               <input
@@ -132,7 +132,7 @@ export default function LoginPage() {
 
           <div className="flex space-x-4">
             <button
-              className="group relative flex w-full justify-center rounded-md border border-transparent bg-primary px-4 py-2 font-medium text-primary-foreground text-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              className="group relative flex w-full justify-center rounded-md border border-transparent bg-primary px-4 py-2 font-semibold text-primary-foreground text-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               disabled={isLoading || !email || !password}
               onClick={handleLogin}
               type="button"
@@ -140,7 +140,7 @@ export default function LoginPage() {
               {isLoading ? 'Signing in...' : 'Sign In'}
             </button>
             <button
-              className="group relative flex w-full justify-center rounded-md border border-border bg-background px-4 py-2 font-medium text-foreground text-sm hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              className="group relative flex w-full justify-center rounded-md border border-border bg-background px-4 py-2 font-semibold text-foreground text-sm hover:bg-accent focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               disabled={isLoading || !email || !password}
               onClick={handleRegister}
               type="button"

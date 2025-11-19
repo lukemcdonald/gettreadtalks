@@ -17,11 +17,11 @@ export function AffiliateLink() {
           </div>
           {/* Content */}
           <div className="relative flex h-full flex-col items-center justify-center p-4 text-center text-white">
-            <p className="mb-3 font-medium text-xs">JEFF LIPPINCOTT & R.C. SPROUL</p>
-            <p className="font-bold text-2xl italic leading-tight">Glory To The Holy One</p>
+            <p className="mb-3 font-semibold text-xs">JEFF LIPPINCOTT & R.C. SPROUL</p>
+            <p className="font-semibold text-2xl italic leading-tight">Glory To The Holy One</p>
           </div>
           {/* Affiliate badge */}
-          <div className="absolute right-2 bottom-2 rounded bg-foreground px-2 py-1 font-medium text-background text-xs">
+          <div className="absolute right-2 bottom-2 rounded bg-foreground px-2 py-1 font-semibold text-background text-xs">
             Affiliate
           </div>
         </div>

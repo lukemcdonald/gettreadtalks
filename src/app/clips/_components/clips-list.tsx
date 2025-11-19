@@ -3,8 +3,8 @@
 import { useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-import { ClipCard } from '@/components/cards';
-import { GridList } from '@/components/grid';
+import { ClipCard } from '@/components/clip-card';
+import { GridList } from '@/components/grid-list';
 import { Empty, EmptyDescription } from '@/components/ui/empty';
 
 type ClipWithSpeaker = {

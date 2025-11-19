@@ -35,9 +35,9 @@ export function TalkCard({ featured, favorited, finished, speaker, talk }: TalkC
             <AvatarFallback className="text-base">{getSpeakerInitials(speaker)}</AvatarFallback>
           </Avatar>
         )}
-        <div className="min-w-0 flex-1 space-y-1">
+        <div className="min-w-0 flex-1 space-y-1.5">
           <div className="flex items-start justify-between gap-2">
-            <h3 className="font-semibold text-lg leading-tight group-hover:text-primary sm:text-xl">
+            <h3 className="line-clamp-2 min-w-0 flex-1 font-semibold text-lg leading-tight group-hover:text-primary sm:text-xl">
               {talk.title}
             </h3>
             {hasStatusIndicators && (
@@ -68,7 +68,7 @@ export function TalkCard({ featured, favorited, finished, speaker, talk }: TalkC
               </div>
             )}
           </div>
-          {speaker && <p className="font-medium text-muted-foreground text-sm">{speakerName}</p>}
+          {speaker && <p className="font-semibold text-muted-foreground text-sm">{speakerName}</p>}
         </div>
       </CardContent>
     </Card>

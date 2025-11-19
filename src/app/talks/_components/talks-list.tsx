@@ -1,8 +1,8 @@
 import type { Speaker } from '@/lib/features/speakers/types';
 import type { Talk } from '@/lib/features/talks';
 
-import { TalkCard } from '@/components/cards';
-import { GridList } from '@/components/grid';
+import { GridList } from '@/components/grid-list';
+import { TalkCard } from '@/components/talk-card';
 import { Empty, EmptyDescription } from '@/components/ui/empty';
 
 type TalkWithSpeaker = Talk & { speaker: Speaker | null };

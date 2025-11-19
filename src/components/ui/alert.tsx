@@ -40,7 +40,7 @@ function Alert({
 function AlertTitle({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
-      className={cn('font-medium [svg~&]:col-start-2', className)}
+      className={cn('font-semibold [svg~&]:col-start-2', className)}
       data-slot="alert-title"
       {...props}
     />

@@ -69,6 +69,7 @@ export function SelectFilter({
   return (
     <div className={cn('space-y-2', className)}>
       {label && <Label htmlFor={paramName}>{label}</Label>}
+
       <Select disabled={isPending} onValueChange={handleChange} value={value || 'all'}>
         <SelectTrigger id={paramName}>
           <SelectValue />

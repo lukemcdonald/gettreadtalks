@@ -1,59 +1,37 @@
 import { Suspense } from 'react';
 
-import { SearchInput, SelectFilter, SortSelect } from '@/components/filters';
-import { ArchiveLayout, ArchiveSidebar, SidebarContent } from '@/components/layouts';
-import { PageHeader } from '@/components/page-header';
+import { ArchiveLayout } from '@/components/layouts/archive-layout';
+import { ArchiveSidebar } from '@/components/layouts/archive-sidebar';
+import { SidebarContent } from '@/components/layouts/sidebar-content';
+import { SearchInput } from '@/components/search-input';
+import { SelectFilter } from '@/components/select-filter';
+import { SortSelect } from '@/components/sort-select';
 import { getAllCollectionsWithStats } from '@/lib/features/collections';
-import { getAllSpeakers } from '@/lib/features/speakers';
+import { getAllSpeakers, sortSpeakersByName } from '@/lib/features/speakers';
 import { CollectionsList } from './_components/collections-list';
-
-function CollectionsListSkeleton() {
-  return (
-    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {Array.from({ length: 8 }).map((_, i) => (
-        // biome-ignore lint/suspicious/noArrayIndexKey: Skeleton loader items are static and never reordered
-        <div className="h-48 animate-pulse rounded-lg bg-muted" key={i} />
-      ))}
-    </div>
-  );
-}
 
 export default async function CollectionsPage() {
   const [result, _speakers] = await Promise.all([getAllCollectionsWithStats(), getAllSpeakers()]);
 
   // Get unique speakers who have collections
+  const allSpeakers = result.page.flatMap((item) => item.speakers);
   const speakersWithCollections = Array.from(
-    new Map(
-      result.page.flatMap((item) => item.speakers).map((speaker) => [speaker.slug, speaker]),
-    ).values(),
-  ).sort((a, b) => `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`));
-
-  const totalCollections = result.page.length;
-  const totalTalks = result.page.reduce((sum, item) => sum + item.talkCount, 0);
+    new Map(allSpeakers.map((speaker) => [speaker.slug, speaker])).values(),
+  );
+  const sortedSpeakersWithCollections = sortSpeakersByName(speakersWithCollections);
 
   return (
     <ArchiveLayout
-      header={
-        <PageHeader
-          description="Each series includes talks given by one or more speakers on the same topic or book of the Bible."
-          title="Series"
-        />
-      }
       sidebar={
         <ArchiveSidebar
           description="Each series includes talks given by one or more speakers on the same topic or book of the Bible."
-          meta={[
-            { label: 'Series', value: totalCollections },
-            { label: 'Total Talks', value: totalTalks },
-          ]}
-          title="Series"
+          title="Collections"
         >
-          <SidebarContent title="Filters">
-            <div className="space-y-4">
-              <SearchInput label="Search" paramName="search" placeholder="Search collections..." />
+          <SidebarContent>
+            <div className="space-y-2">
+              <SearchInput paramName="search" placeholder="Search collections..." />
               <SelectFilter
-                label="Speaker"
-                options={speakersWithCollections.map((speaker) => ({
+                options={sortedSpeakersWithCollections.map((speaker) => ({
                   label: `${speaker.firstName} ${speaker.lastName}`,
                   value: speaker.slug,
                 }))}
@@ -61,7 +39,6 @@ export default async function CollectionsPage() {
                 placeholder="All Speakers"
               />
               <SortSelect
-                label="Sort by"
                 options={[
                   { label: 'Most Talks', value: 'most-talks' },
                   { label: 'Least Talks', value: 'least-talks' },
@@ -73,7 +50,7 @@ export default async function CollectionsPage() {
         </ArchiveSidebar>
       }
     >
-      <Suspense fallback={<CollectionsListSkeleton />}>
+      <Suspense>
         <CollectionsList collections={result.page} />
       </Suspense>
     </ArchiveLayout>

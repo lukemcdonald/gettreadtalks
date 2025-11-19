@@ -31,7 +31,7 @@ export default async function EditTalkPage({ params }: EditTalkPageProps) {
 
   return (
     <MainLayout>
-      <h1 className="mb-6 font-bold text-2xl">Edit Talk</h1>
+      <h1 className="mb-6 font-semibold text-2xl">Edit Talk</h1>
       <TalkForm
         collections={collections}
         initialData={{

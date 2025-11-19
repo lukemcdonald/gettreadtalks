@@ -3,12 +3,10 @@ import type { SpeakerId } from '@/lib/features/speakers/types';
 import type { TopicId } from '@/lib/features/topics/types';
 
 import { Suspense } from 'react';
-import Link from 'next/link';
 
-import { FilterUtilityBar } from '@/components/filters';
-import { ArchiveLayout, ArchiveSidebar } from '@/components/layouts';
-import { PageHeader } from '@/components/page-header';
-import { Button } from '@/components/ui/button';
+import { FilterUtilityBar } from '@/components/filter-utility-bar';
+import { ArchiveLayout } from '@/components/layouts/archive-layout';
+import { ArchiveSidebar } from '@/components/layouts/archive-sidebar';
 import { getAllSpeakersForFilter, getAllTopicsForFilter, getTalks } from '@/lib/features/talks';
 import { getCurrentUser } from '@/lib/services/auth/server';
 import { Pagination } from './_components/pagination';
@@ -41,7 +39,14 @@ async function TalksContent({ params }: { params: Awaited<TalksPageProps['search
     : statusParam ||
       (featured === undefined && !speakerId && !topicId && !search ? 'published' : undefined);
 
-  const result = await getTalks({ cursor, featured, search, speakerId, status, topicId });
+  const result = await getTalks({
+    cursor,
+    featured,
+    search,
+    speakerId,
+    status,
+    topicId,
+  });
 
   return (
     <>
@@ -67,13 +72,6 @@ export default async function TalksPage({ searchParams }: TalksPageProps) {
 
   return (
     <ArchiveLayout
-      header={
-        <PageHeader
-          actions={user ? <Button render={<Link href="/talks/new" />}>New Talk</Button> : undefined}
-          description="Elevate your spiritual heartbeat with Christ centered talks."
-          title="Talks"
-        />
-      }
       sidebar={
         <ArchiveSidebar
           description="Elevate your spiritual heartbeat with Christ centered talks."

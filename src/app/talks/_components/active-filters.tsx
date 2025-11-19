@@ -51,7 +51,7 @@ export function ActiveFilters({ speakers, topics }: ActiveFiltersProps) {
 
       {search && (
         <button
-          className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 font-medium text-primary text-sm transition-colors hover:bg-primary/20"
+          className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 font-semibold text-primary text-sm transition-colors hover:bg-primary/20"
           onClick={() => removeFilter('search')}
           type="button"
         >
@@ -62,7 +62,7 @@ export function ActiveFilters({ speakers, topics }: ActiveFiltersProps) {
 
       {featured && (
         <button
-          className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 font-medium text-primary text-sm transition-colors hover:bg-primary/20"
+          className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 font-semibold text-primary text-sm transition-colors hover:bg-primary/20"
           onClick={() => removeFilter('featured')}
           type="button"
         >
@@ -73,7 +73,7 @@ export function ActiveFilters({ speakers, topics }: ActiveFiltersProps) {
 
       {speaker && (
         <button
-          className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 font-medium text-primary text-sm transition-colors hover:bg-primary/20"
+          className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 font-semibold text-primary text-sm transition-colors hover:bg-primary/20"
           onClick={() => removeFilter('speaker')}
           type="button"
         >
@@ -84,7 +84,7 @@ export function ActiveFilters({ speakers, topics }: ActiveFiltersProps) {
 
       {topic && (
         <button
-          className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 font-medium text-primary text-sm transition-colors hover:bg-primary/20"
+          className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 font-semibold text-primary text-sm transition-colors hover:bg-primary/20"
           onClick={() => removeFilter('topic')}
           type="button"
         >
@@ -95,7 +95,7 @@ export function ActiveFilters({ speakers, topics }: ActiveFiltersProps) {
 
       {status && (
         <button
-          className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 font-medium text-primary text-sm transition-colors hover:bg-primary/20"
+          className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 font-semibold text-primary text-sm transition-colors hover:bg-primary/20"
           onClick={() => removeFilter('status')}
           type="button"
         >

@@ -1,8 +1,12 @@
 import { Suspense } from 'react';
 
-import { SearchInput, SelectFilter, SortSelect } from '@/components/filters';
-import { ArchiveLayout, ArchiveSidebar, SidebarContent } from '@/components/layouts';
+import { ArchiveLayout } from '@/components/layouts/archive-layout';
+import { ArchiveSidebar } from '@/components/layouts/archive-sidebar';
+import { SidebarContent } from '@/components/layouts/sidebar-content';
 import { PageHeader } from '@/components/page-header';
+import { SearchInput } from '@/components/search-input';
+import { SelectFilter } from '@/components/select-filter';
+import { SortSelect } from '@/components/sort-select';
 import { getAllSpeakers } from '@/lib/features/speakers';
 import { SpeakersList } from './_components/speakers-list';
 
@@ -29,13 +33,10 @@ function SpeakersListSkeleton() {
 export default async function SpeakersPage() {
   const speakers = await getAllSpeakers();
 
-  // Get unique roles for filter
+  // Get unique roles for filter: (r): r is string => !!r)
   const roles = Array.from(
     new Set(speakers.map((s) => s.role).filter((r): r is string => !!r)),
   ).sort();
-
-  const totalSpeakers = speakers.length;
-  const featuredSpeakers = speakers.filter((s) => s.featured).length;
 
   return (
     <ArchiveLayout
@@ -48,10 +49,6 @@ export default async function SpeakersPage() {
       sidebar={
         <ArchiveSidebar
           description="Listen to faithful ambassadors of Christ and be blessed."
-          meta={[
-            { label: 'Speakers', value: totalSpeakers },
-            { label: 'Featured', value: featuredSpeakers },
-          ]}
           title="All Speakers"
         >
           <SidebarContent title="Filters">

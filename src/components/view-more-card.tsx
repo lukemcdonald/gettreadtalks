@@ -17,7 +17,7 @@ type ViewMoreCardProps = {
 export function ViewMoreCard({ className, count, href, label = 'View More' }: ViewMoreCardProps) {
   return (
     <Card
-      className={cn('group min-w-[300px] flex-shrink-0 transition-all hover:shadow-md', className)}
+      className={cn('group min-w-[300px] shrink-0 transition-all hover:shadow-md', className)}
       render={<Link href={href as Route} />}
     >
       <CardHeader>

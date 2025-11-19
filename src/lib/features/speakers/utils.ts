@@ -21,3 +21,15 @@ export function getSpeakerName(speaker: SpeakerNameFields): string {
 export function getSpeakerInitials(speaker: SpeakerNameFields): string {
   return `${speaker?.firstName?.[0]}${speaker?.lastName?.[0]}`;
 }
+
+/**
+ * Sort speakers by name.
+ *
+ * @param speakers - Array of speakers with firstName and lastName
+ * @returns Sorted array of speakers
+ */
+export function sortSpeakersByName(speakers: Speaker[]) {
+  return speakers.sort((a, b) =>
+    `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`),
+  );
+}

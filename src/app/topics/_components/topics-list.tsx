@@ -3,8 +3,8 @@
 import { useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-import { TopicCard } from '@/components/cards';
-import { GridList } from '@/components/grid';
+import { GridList } from '@/components/grid-list';
+import { TopicCard } from '@/components/topic-card';
 import { Empty, EmptyDescription } from '@/components/ui/empty';
 
 type TopicWithCount = {

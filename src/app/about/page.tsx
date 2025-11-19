@@ -1,4 +1,4 @@
-import { CenteredLayout } from '@/components/layouts';
+import { CenteredLayout } from '@/components/layouts/centered-layout';
 import { PageHeader } from '@/components/page-header';
 
 export default function AboutPage() {

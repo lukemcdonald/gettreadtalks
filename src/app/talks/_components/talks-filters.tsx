@@ -6,7 +6,8 @@ import type { Topic } from '@/lib/features/topics/types';
 import { useTransition } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-import { SearchInput, SelectFilter } from '@/components/filters';
+import { SearchInput } from '@/components/search-input';
+import { SelectFilter } from '@/components/select-filter';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';

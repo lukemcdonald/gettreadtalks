@@ -8,8 +8,12 @@ type SidebarContentProps = {
 
 export function SidebarContent({ children, className, title }: SidebarContentProps) {
   return (
-    <div className={cn('space-y-4', className)}>
-      {title && <h3 className="font-semibold text-lg">{title}</h3>}
+    <div className={cn('space-y-2', className)}>
+      {title && (
+        <h3 className="font-semibold text-muted-foreground text-xs uppercase tracking-wide">
+          {title}
+        </h3>
+      )}
       <div className="space-y-2">{children}</div>
     </div>
   );
