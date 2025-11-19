@@ -1,11 +1,15 @@
 import { Suspense } from 'react';
 
-import { SearchInput, SelectFilter, SortSelect } from '@/components/filters';
-import { ArchiveLayout, ArchiveSidebar, SidebarContent } from '@/components/layouts';
+import { ArchiveLayout } from '@/components/layouts/archive-layout';
+import { ArchiveSidebar } from '@/components/layouts/archive-sidebar';
+import { SidebarContent } from '@/components/layouts/sidebar-content';
 import { PageHeader } from '@/components/page-header';
-import { getAllClips } from '@/lib/features/clips';
-import { getAllSpeakers } from '@/lib/features/speakers';
-import { getTopicsWithCounts } from '@/lib/features/topics';
+import { SearchInput } from '@/components/search-input';
+import { SelectFilter } from '@/components/select-filter';
+import { SortSelect } from '@/components/sort-select';
+import { getAllClips } from '@/features/clips';
+import { getAllSpeakers, sortSpeakersByName } from '@/features/speakers';
+import { getTopicsWithCounts } from '@/features/topics';
 import { ClipsList } from './_components/clips-list';
 
 function ClipsListSkeleton() {
@@ -27,21 +31,11 @@ export default async function ClipsPage() {
   ]);
 
   // Get unique speakers who have clips
+  const allSpeakers = clips.map((clip) => clip.speaker).filter((speaker) => speaker !== null);
   const speakersWithClips = Array.from(
-    new Map(
-      clips
-        .filter((clip) => clip.speaker)
-        .map((clip) => {
-          const speaker = clip.speaker;
-          return speaker ? [speaker.slug, speaker] : null;
-        })
-        .filter(
-          (item): item is [string, NonNullable<(typeof clips)[0]['speaker']>] => item !== null,
-        ),
-    ).values(),
-  ).sort((a, b) => `${a.firstName} ${a.lastName}`.localeCompare(`${b.firstName} ${b.lastName}`));
-
-  const totalClips = clips.length;
+    new Map(allSpeakers.map((speaker) => [speaker.slug, speaker])).values(),
+  );
+  const sortedSpeakersWithClips = sortSpeakersByName(speakersWithClips);
 
   return (
     <ArchiveLayout
@@ -54,7 +48,6 @@ export default async function ClipsPage() {
       sidebar={
         <ArchiveSidebar
           description="Be encouraged by these short Christ centered clips."
-          meta={[{ label: 'Clips', value: totalClips }]}
           title="Clips"
         >
           <SidebarContent title="Filters">
@@ -62,7 +55,7 @@ export default async function ClipsPage() {
               <SearchInput label="Search" paramName="search" placeholder="Search clips..." />
               <SelectFilter
                 label="Speaker"
-                options={speakersWithClips.map((speaker) => ({
+                options={sortedSpeakersWithClips.map((speaker) => ({
                   label: `${speaker.firstName} ${speaker.lastName}`,
                   value: speaker.slug,
                 }))}

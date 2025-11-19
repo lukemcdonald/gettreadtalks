@@ -3,7 +3,7 @@
 import { Dialog as SheetPrimitive } from '@base-ui-components/react/dialog';
 import { XIcon } from 'lucide-react';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils';
 
 function Sheet(props: SheetPrimitive.Root.Props) {
   return <SheetPrimitive.Root data-slot="sheet" {...props} />;

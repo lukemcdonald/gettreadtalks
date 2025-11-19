@@ -1,4 +1,4 @@
-import type { User } from '@/lib/services/auth/types';
+import type { User } from '@/services/auth/types';
 
 import { AccountMenu } from '@/components/site-header/account-menu/account-menu';
 import { ModeSwitcher } from '@/components/site-header/mode-switcher';

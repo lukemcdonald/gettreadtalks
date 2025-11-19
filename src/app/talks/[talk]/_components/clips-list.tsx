@@ -12,7 +12,7 @@ type ClipsListProps = {
 export function ClipsList({ clips }: ClipsListProps) {
   return (
     <section className="mb-4">
-      <h2 className="font-bold text-lg">Clips ({clips.length})</h2>
+      <h2 className="font-semibold text-lg">Clips ({clips.length})</h2>
       <ul>
         {clips.map((clip) => (
           <li key={clip._id}>

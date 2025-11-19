@@ -1,10 +1,11 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import { SidebarContent, SidebarLayout } from '@/components/layouts';
-import { MediaEmbed } from '@/components/media';
+import { SidebarContent } from '@/components/layouts/sidebar-content';
+import { SidebarLayout } from '@/components/layouts/sidebar-layout';
+import { MediaEmbed } from '@/components/media-embed';
 import { PageHeader } from '@/components/page-header';
-import { getClipBySlug } from '@/lib/features/clips';
+import { getClipBySlug } from '@/features/clips';
 
 type ClipPageProps = {
   params: Promise<{
@@ -27,18 +28,6 @@ export default async function ClipPage({ params }: ClipPageProps) {
     <SidebarLayout
       main={
         <>
-          <PageHeader
-            breadcrumbs={[
-              { href: '/', label: 'Home' },
-              { href: '/clips', label: 'Clips' },
-              ...(speaker
-                ? [{ href: `/speakers/${speaker.slug}`, label: speakerName || 'Speaker' }]
-                : []),
-              { href: `/clips/${slug}`, label: clip.title },
-            ]}
-            title={clip.title}
-          />
-
           {clip.mediaUrl && (
             <div className="space-y-4">
               <MediaEmbed mediaUrl={clip.mediaUrl} />
@@ -55,10 +44,12 @@ export default async function ClipPage({ params }: ClipPageProps) {
       }
       sidebar={
         <>
+          <PageHeader title={clip.title} />
+
           {speaker && (
             <SidebarContent title="Speaker">
               <div className="space-y-2">
-                <p className="font-medium">{speakerName}</p>
+                <p className="font-semibold">{speakerName}</p>
                 {speaker.role && <p className="text-muted-foreground text-sm">{speaker.role}</p>}
                 {speaker.ministry && (
                   <p className="text-muted-foreground text-sm">{speaker.ministry}</p>
@@ -76,7 +67,7 @@ export default async function ClipPage({ params }: ClipPageProps) {
           {talk && (
             <SidebarContent title="Related Talk">
               <div className="space-y-2">
-                <p className="font-medium">{talk.title}</p>
+                <p className="font-semibold">{talk.title}</p>
                 {talk.description && (
                   <p className="line-clamp-2 text-muted-foreground text-sm">{talk.description}</p>
                 )}
@@ -86,23 +77,6 @@ export default async function ClipPage({ params }: ClipPageProps) {
               </div>
             </SidebarContent>
           )}
-
-          <SidebarContent title="Details">
-            <div className="space-y-2 text-sm">
-              <div>
-                <span className="font-medium">Status:</span>{' '}
-                <span className="text-muted-foreground capitalize">{clip.status}</span>
-              </div>
-              {clip.publishedAt && (
-                <div>
-                  <span className="font-medium">Published:</span>{' '}
-                  <span className="text-muted-foreground">
-                    {new Date(clip.publishedAt).toLocaleDateString()}
-                  </span>
-                </div>
-              )}
-            </div>
-          </SidebarContent>
         </>
       }
     />

@@ -2,7 +2,7 @@
 
 import { Field as FieldPrimitive } from '@base-ui-components/react/field';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils';
 
 function Field({ className, ...props }: FieldPrimitive.Root.Props) {
   return (
@@ -51,7 +51,7 @@ function FieldControl({
           props.type === 'search' &&
             '[&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none [&::-webkit-search-results-button]:appearance-none [&::-webkit-search-results-decoration]:appearance-none',
           props.type === 'file' &&
-            'text-muted-foreground file:me-3 file:bg-transparent file:font-medium file:text-foreground file:text-sm',
+            'text-muted-foreground file:me-3 file:bg-transparent file:font-semibold file:text-foreground file:text-sm',
         )}
         data-slot="field-control"
         {...props}

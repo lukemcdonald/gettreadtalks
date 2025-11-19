@@ -1,6 +1,6 @@
 import { ConvexError, type Value } from 'convex/values';
 
-import { ErrorCodes } from '../../src/lib/services/errors/constants';
+import { ErrorCodes } from '../../src/services/errors/constants';
 
 /**
  * Type representing all possible error code values.
@@ -10,7 +10,7 @@ export type ErrorCode = (typeof ErrorCodes)[keyof typeof ErrorCodes];
 /**
  * Re-export ErrorCodes for convenience in Convex code.
  */
-export { ErrorCodes } from '../../src/lib/services/errors/constants';
+export { ErrorCodes } from '../../src/services/errors/constants';
 
 /**
  * Context information that can be attached to errors.

@@ -6,7 +6,7 @@ import { ConvexBetterAuthProvider } from '@convex-dev/better-auth/react';
 import { ConvexReactClient } from 'convex/react';
 import invariant from 'tiny-invariant';
 
-import { authClient } from '@/lib/services/auth/client';
+import { authClient } from '@/services/auth/client';
 
 const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
 invariant(convexUrl, 'NEXT_PUBLIC_CONVEX_URL is not set');

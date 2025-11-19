@@ -11,7 +11,7 @@ type SpeakerInfoProps = {
 export function SpeakerInfo({ speaker }: SpeakerInfoProps) {
   return (
     <section className="mb-4">
-      <h2 className="font-bold text-lg">Speaker</h2>
+      <h2 className="font-semibold text-lg">Speaker</h2>
       <p>
         {speaker.firstName} {speaker.lastName}
       </p>

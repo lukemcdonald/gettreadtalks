@@ -1,8 +1,8 @@
 import { notFound, redirect } from 'next/navigation';
 
 import { MainLayout } from '@/components/main-layout';
-import { getAllCollections, getAllSpeakers, getTalkBySlug } from '@/lib/features/talks';
-import { getCurrentUser } from '@/lib/services/auth/server';
+import { getAllCollections, getAllSpeakers, getTalkBySlug } from '@/features/talks';
+import { getCurrentUser } from '@/services/auth/server';
 import { TalkForm } from '../../new/_components/talk-form';
 
 type EditTalkPageProps = {
@@ -31,7 +31,7 @@ export default async function EditTalkPage({ params }: EditTalkPageProps) {
 
   return (
     <MainLayout>
-      <h1 className="mb-6 font-bold text-2xl">Edit Talk</h1>
+      <h1 className="mb-6 font-semibold text-2xl">Edit Talk</h1>
       <TalkForm
         collections={collections}
         initialData={{

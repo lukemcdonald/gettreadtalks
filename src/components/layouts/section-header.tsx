@@ -3,7 +3,7 @@ import type { Route } from 'next';
 import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils';
 
 type SectionAction = {
   href: string;
@@ -21,7 +21,7 @@ export function SectionHeader({ actions, className, description, title }: Sectio
   return (
     <div className={cn('space-y-4', className)}>
       <div className="flex items-center justify-between">
-        <h2 className="font-bold text-3xl lg:text-4xl">{title}</h2>
+        <h2 className="font-semibold text-3xl lg:text-4xl">{title}</h2>
         {actions && actions.length > 0 && (
           <div className="flex items-center gap-3">
             {actions.map((action) => (

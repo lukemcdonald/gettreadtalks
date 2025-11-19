@@ -2,12 +2,15 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import { ClipCard, CollectionCard, TalkCard } from '@/components/cards';
-import { GridList } from '@/components/grid';
-import { SidebarContent, SidebarLayout } from '@/components/layouts';
+import { ClipCard } from '@/components/clip-card';
+import { CollectionCard } from '@/components/collection-card';
+import { GridList } from '@/components/grid-list';
+import { SidebarContent } from '@/components/layouts/sidebar-content';
+import { SidebarLayout } from '@/components/layouts/sidebar-layout';
 import { PageHeader } from '@/components/page-header';
+import { TalkCard } from '@/components/talk-card';
 import { Separator } from '@/components/ui/separator';
-import { getSpeakerBySlug } from '@/lib/features/speakers';
+import { getSpeakerBySlug } from '@/features/speakers';
 
 type SpeakerPageProps = {
   params: Promise<{
@@ -30,14 +33,7 @@ export default async function SpeakerPage({ params }: SpeakerPageProps) {
     <SidebarLayout
       main={
         <>
-          <PageHeader
-            breadcrumbs={[
-              { href: '/', label: 'Home' },
-              { href: '/speakers', label: 'Speakers' },
-              { href: `/speakers/${slug}`, label: speakerName },
-            ]}
-            title={speakerName}
-          />
+          <PageHeader title={speakerName} />
 
           {speaker.description && (
             <div className="space-y-4">
@@ -50,7 +46,7 @@ export default async function SpeakerPage({ params }: SpeakerPageProps) {
           <div className="space-y-12">
             {talks.length > 0 && (
               <section className="space-y-6">
-                <h2 className="font-bold text-2xl">Talks</h2>
+                <h2 className="font-semibold text-2xl">Talks</h2>
                 <p className="text-muted-foreground">Enjoy more talks by {speakerName}.</p>
                 <GridList>
                   {talks.map((talk) => (
@@ -76,7 +72,7 @@ export default async function SpeakerPage({ params }: SpeakerPageProps) {
 
             {collections.length > 0 && (
               <section className="space-y-6">
-                <h2 className="font-bold text-2xl">Collections</h2>
+                <h2 className="font-semibold text-2xl">Collections</h2>
                 <GridList>
                   {collections.map((collection) => (
                     <CollectionCard
@@ -94,7 +90,7 @@ export default async function SpeakerPage({ params }: SpeakerPageProps) {
 
             {clips.length > 0 && (
               <section className="space-y-6">
-                <h2 className="font-bold text-2xl">Clips</h2>
+                <h2 className="font-semibold text-2xl">Clips</h2>
                 <p className="text-muted-foreground">
                   Be encouraged by {clips.length === 1 ? 'this short' : 'these short'} Christ
                   centered {clips.length === 1 ? 'clip' : 'clips'}.
@@ -136,13 +132,13 @@ export default async function SpeakerPage({ params }: SpeakerPageProps) {
             <div className="space-y-2 text-sm">
               {speaker.role && (
                 <div>
-                  <span className="font-medium">Role:</span>{' '}
+                  <span className="font-semibold">Role:</span>{' '}
                   <span className="text-muted-foreground">{speaker.role}</span>
                 </div>
               )}
               {speaker.ministry && (
                 <div>
-                  <span className="font-medium">Ministry:</span>{' '}
+                  <span className="font-semibold">Ministry:</span>{' '}
                   <span className="text-muted-foreground">{speaker.ministry}</span>
                 </div>
               )}

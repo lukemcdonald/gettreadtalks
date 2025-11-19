@@ -6,7 +6,7 @@ import { ChevronsUpDownIcon, XIcon } from 'lucide-react';
 
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils';
 
 const ComboboxContext = createContext<{
   chipsRef: RefObject<HTMLDivElement | null> | null;
@@ -186,7 +186,7 @@ function ComboboxGroup({ className, ...props }: ComboboxPrimitive.Group.Props) {
 function ComboboxGroupLabel({ className, ...props }: ComboboxPrimitive.GroupLabel.Props) {
   return (
     <ComboboxPrimitive.GroupLabel
-      className={cn('px-2 py-1.5 font-medium text-muted-foreground text-xs', className)}
+      className={cn('px-2 py-1.5 font-semibold text-muted-foreground text-xs', className)}
       data-slot="combobox-group-label"
       {...props}
     />
@@ -234,7 +234,7 @@ function ComboboxStatus({ className, ...props }: ComboboxPrimitive.Status.Props)
   return (
     <ComboboxPrimitive.Status
       className={cn(
-        'px-3 py-2 font-medium text-muted-foreground text-xs empty:m-0 empty:p-0',
+        'px-3 py-2 font-semibold text-muted-foreground text-xs empty:m-0 empty:p-0',
         className,
       )}
       data-slot="combobox-status"
@@ -266,7 +266,7 @@ function ComboboxChips({ className, ...props }: ComboboxPrimitive.Chips.Props) {
 function ComboboxChip({ children, ...props }: ComboboxPrimitive.Chip.Props) {
   return (
     <ComboboxPrimitive.Chip
-      className="flex items-center rounded-md bg-accent ps-2 font-medium text-accent-foreground text-xs outline-none"
+      className="flex items-center rounded-md bg-accent ps-2 font-semibold text-accent-foreground text-xs outline-none"
       data-slot="combobox-chip"
       {...props}
     >

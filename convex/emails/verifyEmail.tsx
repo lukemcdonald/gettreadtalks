@@ -1,4 +1,4 @@
-import type { VerificationEmailProps } from '../../src/lib/services/email/types';
+import type { VerificationEmailProps } from '../../src/services/email/types';
 
 import { Button, Section, Text } from '@react-email/components';
 

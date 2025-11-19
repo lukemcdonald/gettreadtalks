@@ -1,8 +1,8 @@
-import type { Speaker } from '@/lib/features/speakers/types';
-import type { Talk } from '@/lib/features/talks';
+import type { Speaker } from '@/features/speakers/types';
+import type { Talk } from '@/features/talks';
 
-import { TalkCard } from '@/components/cards';
-import { GridList } from '@/components/grid';
+import { GridList } from '@/components/grid-list';
+import { TalkCard } from '@/components/talk-card';
 import { Empty, EmptyDescription } from '@/components/ui/empty';
 
 type TalkWithSpeaker = Talk & { speaker: Speaker | null };
@@ -20,7 +20,7 @@ export function TalksList({ talks }: TalksListProps) {
   }
 
   return (
-    <GridList columns={{ default: 1, sm: 1, md: 1, lg: 1, xl: 1 }}>
+    <GridList columns={{ default: 1, sm: 1, md: 2, lg: 2, xl: 3 }}>
       {talks.map((talk) => (
         <TalkCard
           featured={talk.featured}

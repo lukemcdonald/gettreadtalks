@@ -1,8 +1,8 @@
 // app/account/page.tsx
 
 import { MainLayout } from '@/components/main-layout';
-import { getUserFavorites } from '@/lib/features/users/server';
-import { getCurrentUser } from '@/lib/services/auth/server';
+import { getUserFavorites } from '@/features/users/server';
+import { getCurrentUser } from '@/services/auth/server';
 
 export default async function AccountPage() {
   const user = await getCurrentUser();
@@ -14,7 +14,7 @@ export default async function AccountPage() {
         <div className="border-border border-b px-6 py-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="font-bold text-3xl text-card-foreground">Account Dashboard</h1>
+              <h1 className="font-semibold text-3xl text-card-foreground">Account Dashboard</h1>
               <p className="mt-2 text-muted-foreground">Welcome back, {user?.name || 'User'}!</p>
             </div>
           </div>
@@ -30,7 +30,7 @@ export default async function AccountPage() {
                 <div className="space-y-3">
                   <div>
                     <label
-                      className="block font-medium text-muted-foreground text-sm"
+                      className="block font-semibold text-muted-foreground text-sm"
                       htmlFor="email"
                     >
                       Email
@@ -39,7 +39,7 @@ export default async function AccountPage() {
                   </div>
                   <div>
                     <label
-                      className="block font-medium text-muted-foreground text-sm"
+                      className="block font-semibold text-muted-foreground text-sm"
                       htmlFor="name"
                     >
                       Name
@@ -48,7 +48,7 @@ export default async function AccountPage() {
                   </div>
                   <div>
                     <label
-                      className="block font-medium text-muted-foreground text-sm"
+                      className="block font-semibold text-muted-foreground text-sm"
                       htmlFor="userId"
                     >
                       User ID
@@ -76,7 +76,7 @@ export default async function AccountPage() {
               <div className="grid gap-4">
                 {favorites.talks.length > 0 && (
                   <div>
-                    <h3 className="mb-2 font-medium text-card-foreground text-lg">
+                    <h3 className="mb-2 font-semibold text-card-foreground text-lg">
                       Favorite Talks ({favorites.talks.length})
                     </h3>
                     <p className="text-muted-foreground text-sm">
@@ -86,7 +86,7 @@ export default async function AccountPage() {
                 )}
                 {favorites.clips.length > 0 && (
                   <div>
-                    <h3 className="mb-2 font-medium text-card-foreground text-lg">
+                    <h3 className="mb-2 font-semibold text-card-foreground text-lg">
                       Favorite Clips ({favorites.clips.length})
                     </h3>
                     <p className="text-muted-foreground text-sm">
@@ -96,7 +96,7 @@ export default async function AccountPage() {
                 )}
                 {favorites.speakers.length > 0 && (
                   <div>
-                    <h3 className="mb-2 font-medium text-card-foreground text-lg">
+                    <h3 className="mb-2 font-semibold text-card-foreground text-lg">
                       Favorite Speakers ({favorites.speakers.length})
                     </h3>
                     <p className="text-muted-foreground text-sm">

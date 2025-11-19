@@ -3,7 +3,7 @@
 import { Select as SelectPrimitive } from '@base-ui-components/react/select';
 import { ChevronDownIcon, ChevronUpIcon, ChevronsUpDownIcon } from 'lucide-react';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils';
 
 const Select = SelectPrimitive.Root;
 
@@ -144,7 +144,7 @@ function SelectGroup(props: SelectPrimitive.Group.Props) {
 function SelectGroupLabel(props: SelectPrimitive.GroupLabel.Props) {
   return (
     <SelectPrimitive.GroupLabel
-      className="px-2 py-1.5 font-medium text-muted-foreground text-xs"
+      className="px-2 py-1.5 font-semibold text-muted-foreground text-xs"
       data-slot="select-group-label"
       {...props}
     />

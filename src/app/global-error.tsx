@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import NextError from 'next/error';
 
-import { captureException } from '@/lib/services/errors';
+import { captureException } from '@/services/errors';
 
 type GlobalErrorProps = {
   error: Error & {

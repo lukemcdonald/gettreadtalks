@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 
 import { buttonVariants } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils';
 
 const toastManager = Toast.createToastManager();
 
@@ -138,7 +138,7 @@ function ToastList({ position = 'bottom-right' }: { position: ToastPosition }) {
                   )}
 
                   <div className="flex flex-col gap-0.5">
-                    <Toast.Title className="font-medium" data-slot="toast-title" />
+                    <Toast.Title className="font-semibold" data-slot="toast-title" />
                     <Toast.Description
                       className="text-muted-foreground"
                       data-slot="toast-description"

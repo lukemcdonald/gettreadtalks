@@ -2,7 +2,7 @@
 
 import { Meter as MeterPrimitive } from '@base-ui-components/react/meter';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils';
 
 function Meter({ className, children, ...props }: MeterPrimitive.Root.Props) {
   return (
@@ -21,7 +21,7 @@ function Meter({ className, children, ...props }: MeterPrimitive.Root.Props) {
 function MeterLabel({ className, ...props }: MeterPrimitive.Label.Props) {
   return (
     <MeterPrimitive.Label
-      className={cn('font-medium text-sm', className)}
+      className={cn('font-semibold text-sm', className)}
       data-slot="meter-label"
       {...props}
     />

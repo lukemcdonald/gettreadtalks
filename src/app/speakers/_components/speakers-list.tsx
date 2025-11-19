@@ -3,8 +3,8 @@
 import { useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-import { SpeakerCard } from '@/components/cards';
-import { AlphabeticalGrid } from '@/components/grid';
+import { AlphabeticalGrid } from '@/components/alphabetical-grid';
+import { SpeakerCard } from '@/components/speaker-card';
 import { Empty, EmptyDescription } from '@/components/ui/empty';
 
 type Speaker = {

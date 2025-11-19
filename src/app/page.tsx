@@ -1,11 +1,12 @@
-import Link from 'next/link';
-
-import { SpeakerCard, TalkCard } from '@/components/cards';
-import { FeaturedGrid } from '@/components/grid';
-import { HeroSection, PageLayout, SectionContainer } from '@/components/layouts';
+import { FeaturedGrid } from '@/components/featured-grid';
+import { HeroSection } from '@/components/layouts/hero-section';
+import { PageLayout } from '@/components/layouts/page-layout';
+import { SectionContainer } from '@/components/layouts/section-container';
+import { SpeakerCard } from '@/components/speaker-card';
+import { TalkCard } from '@/components/talk-card';
 import { Separator } from '@/components/ui/separator';
-import { getFeaturedSpeakers } from '@/lib/features/speakers';
-import { getFeaturedTalks } from '@/lib/features/talks';
+import { getFeaturedSpeakers } from '@/features/speakers';
+import { getFeaturedTalks } from '@/features/talks';
 
 export default async function HomePage() {
   const [featuredTalks, featuredSpeakers] = await Promise.all([
@@ -27,31 +28,12 @@ export default async function HomePage() {
           />
 
           <FeaturedGrid
-            allHref="/talks"
             columns={{ default: 1, sm: 1, md: 2, lg: 2, xl: 2 }}
             description="Don't know what to listen to? Try starting with one of these favorites."
-            featuredHref="/talks?featured=true"
-            sidebar={
-              <div className="space-y-3">
-                <h3 className="font-semibold text-muted-foreground text-xs uppercase tracking-wide">
-                  Quick Links
-                </h3>
-                <nav className="flex flex-col gap-2">
-                  <Link
-                    className="text-muted-foreground text-sm transition-colors hover:text-foreground"
-                    href="/talks"
-                  >
-                    All Talks
-                  </Link>
-                  <Link
-                    className="text-muted-foreground text-sm transition-colors hover:text-foreground"
-                    href="/talks?featured=true"
-                  >
-                    Featured Talks
-                  </Link>
-                </nav>
-              </div>
-            }
+            quickLinks={[
+              { label: 'All Talks', href: '/talks' },
+              { label: 'Featured Talks', href: '/talks?featured=true' },
+            ]}
             title="Featured Talks"
           >
             {featuredTalks.map((talk) => (
@@ -62,31 +44,12 @@ export default async function HomePage() {
           <Separator className="my-8" />
 
           <FeaturedGrid
-            allHref="/speakers"
             columns={{ default: 1, sm: 2, md: 3, lg: 3, xl: 3 }}
             description="Have you listened to one of these faithful ministers of the Gospel?"
-            featuredHref="/speakers?sort=featured"
-            sidebar={
-              <div className="space-y-3">
-                <h3 className="font-semibold text-muted-foreground text-xs uppercase tracking-wide">
-                  Quick Links
-                </h3>
-                <nav className="flex flex-col gap-2">
-                  <Link
-                    className="text-muted-foreground text-sm transition-colors hover:text-foreground"
-                    href="/speakers"
-                  >
-                    All Speakers
-                  </Link>
-                  <Link
-                    className="text-muted-foreground text-sm transition-colors hover:text-foreground"
-                    href="/speakers?sort=featured"
-                  >
-                    Featured Speakers
-                  </Link>
-                </nav>
-              </div>
-            }
+            quickLinks={[
+              { label: 'All Speakers', href: '/speakers' },
+              { label: 'Featured Speakers', href: '/speakers?sort=featured' },
+            ]}
             title="Featured Speakers"
           >
             {featuredSpeakers.map((speaker) => (

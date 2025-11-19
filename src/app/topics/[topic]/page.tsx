@@ -1,12 +1,13 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import { TalkCard, ViewMoreCard } from '@/components/cards';
-import { HorizontalScrollGrid } from '@/components/grid';
-import { SidebarContent } from '@/components/layouts';
+import { HorizontalScrollGrid } from '@/components/horizontal-scroll-grid';
+import { SidebarContent } from '@/components/layouts/sidebar-content';
 import { PageHeader } from '@/components/page-header';
+import { TalkCard } from '@/components/talk-card';
 import { TopicSelector } from '@/components/topic-selector';
-import { getAllTopics, getTopicBySlug } from '@/lib/features/topics';
+import { ViewMoreCard } from '@/components/view-more-card';
+import { getAllTopics, getTopicBySlug } from '@/features/topics';
 
 type TopicPageProps = {
   params: Promise<{
@@ -32,14 +33,7 @@ export default async function TopicPage({ params }: TopicPageProps) {
     <HorizontalScrollGrid
       sidebar={
         <>
-          <PageHeader
-            breadcrumbs={[
-              { href: '/', label: 'Home' },
-              { href: '/topics', label: 'Topics' },
-              { href: `/topics/${slug}`, label: topic.title },
-            ]}
-            title={topic.title}
-          />
+          <PageHeader title={topic.title} />
 
           <SidebarContent title="Browse Topics">
             <TopicSelector
@@ -58,7 +52,7 @@ export default async function TopicPage({ params }: TopicPageProps) {
           <SidebarContent title="About">
             <div className="space-y-2 text-sm">
               <div>
-                <span className="font-medium">Talks:</span>{' '}
+                <span className="font-semibold">Talks:</span>{' '}
                 <span className="text-muted-foreground">{talks.length}</span>
               </div>
             </div>
@@ -67,7 +61,7 @@ export default async function TopicPage({ params }: TopicPageProps) {
       }
     >
       {displayedTalks.map((talk) => (
-        <div className="min-w-[300px] flex-shrink-0" key={talk._id}>
+        <div className="min-w-[300px] shrink-0" key={talk._id}>
           <TalkCard
             featured={talk.featured}
             speaker={

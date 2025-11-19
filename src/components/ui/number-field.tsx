@@ -5,7 +5,7 @@ import { NumberField as NumberFieldPrimitive } from '@base-ui-components/react/n
 import { MinusIcon, PlusIcon } from 'lucide-react';
 
 import { Label } from '@/components/ui/label';
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils';
 
 const NumberFieldContext = createContext<{
   fieldId: string;

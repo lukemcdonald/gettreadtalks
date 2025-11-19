@@ -5,8 +5,8 @@ import type { Route } from 'next';
 import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-import { signOut } from '@/lib/services/auth/client';
-import { captureException } from '@/lib/services/errors/client';
+import { signOut } from '@/services/auth/client';
+import { captureException } from '@/services/errors/client';
 
 export default function LogoutPage() {
   const router = useRouter();

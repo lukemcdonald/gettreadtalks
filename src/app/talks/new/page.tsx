@@ -1,8 +1,8 @@
 import { redirect } from 'next/navigation';
 
 import { MainLayout } from '@/components/main-layout';
-import { getAllCollections, getAllSpeakers } from '@/lib/features/talks';
-import { getCurrentUser } from '@/lib/services/auth/server';
+import { getAllCollections, getAllSpeakers } from '@/features/talks';
+import { getCurrentUser } from '@/services/auth/server';
 import { TalkForm } from './_components/talk-form';
 
 export default async function NewTalkPage() {
@@ -16,7 +16,7 @@ export default async function NewTalkPage() {
 
   return (
     <MainLayout>
-      <h1 className="mb-6 font-bold text-2xl">Create New Talk</h1>
+      <h1 className="mb-6 font-semibold text-2xl">Create New Talk</h1>
       <TalkForm collections={collections} speakers={speakers} />
     </MainLayout>
   );

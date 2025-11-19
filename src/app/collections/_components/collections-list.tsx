@@ -1,13 +1,13 @@
 'use client';
 
-import type { Collection } from '@/lib/features/collections/types';
-import type { Speaker } from '@/lib/features/speakers/types';
+import type { Collection } from '@/features/collections/types';
+import type { Speaker } from '@/features/speakers/types';
 
 import { useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-import { CollectionCard } from '@/components/cards';
-import { GridList } from '@/components/grid';
+import { CollectionCard } from '@/components/collection-card';
+import { GridList } from '@/components/grid-list';
 import { Empty, EmptyDescription } from '@/components/ui/empty';
 
 type CollectionWithStats = {
@@ -32,9 +32,9 @@ export function CollectionsList({ collections }: CollectionsListProps) {
     // Filter by search
     if (search) {
       filtered = filtered.filter(
-        (item) =>
-          item.collection.title.toLowerCase().includes(search) ||
-          item.collection.description?.toLowerCase().includes(search),
+        ({ collection }) =>
+          collection.title.toLowerCase().includes(search) ||
+          collection.description?.toLowerCase().includes(search),
       );
     }
 

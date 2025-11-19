@@ -1,6 +1,6 @@
 import type * as React from 'react';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@/utils';
 
 function Table({ className, ...props }: React.ComponentProps<'table'>) {
   return (
@@ -47,7 +47,7 @@ function TableFooter({ className, ...props }: React.ComponentProps<'tfoot'>) {
   return (
     <tfoot
       className={cn(
-        'border-t in-data-[slot=frame]:border-none bg-muted/72 in-data-[slot=frame]:bg-transparent font-medium [&>tr]:last:border-b-0 in-data-[slot=frame]:*:[tr]:hover:bg-transparent',
+        'border-t in-data-[slot=frame]:border-none bg-muted/72 in-data-[slot=frame]:bg-transparent font-semibold [&>tr]:last:border-b-0 in-data-[slot=frame]:*:[tr]:hover:bg-transparent',
         className,
       )}
       data-slot="table-footer"
@@ -73,7 +73,7 @@ function TableHead({ className, ...props }: React.ComponentProps<'th'>) {
   return (
     <th
       className={cn(
-        'h-10 whitespace-nowrap px-2 text-left align-middle font-medium text-foreground [&:has([role=checkbox])]:pe-0 [&>[role=checkbox]]:translate-y-[2px]',
+        'h-10 whitespace-nowrap px-2 text-left align-middle font-semibold text-foreground [&:has([role=checkbox])]:pe-0 [&>[role=checkbox]]:translate-y-[2px]',
         className,
       )}
       data-slot="table-head"
