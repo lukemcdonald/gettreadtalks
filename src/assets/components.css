@@ -1,0 +1,5 @@
+@layer components {
+  .section {
+    padding: --spacing(16) --spacing(5);
+  }
+}

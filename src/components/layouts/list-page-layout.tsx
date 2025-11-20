@@ -1,15 +1,16 @@
 import { Container } from '@/components/container';
-import { cn } from '@/utils';
+import { Section } from '@/components/section';
 
 type ListPageLayoutProps = {
   children: React.ReactNode;
-  className?: string;
 };
 
-export function ListPageLayout({ children, className }: ListPageLayoutProps) {
+export function ListPageLayout({ children }: ListPageLayoutProps) {
   return (
-    <Container className={cn('py-12', className)}>
-      <div className="space-y-12">{children}</div>
-    </Container>
+    <Section variant="xl">
+      <Container>
+        <div className="space-y-12">{children}</div>
+      </Container>
+    </Section>
   );
 }

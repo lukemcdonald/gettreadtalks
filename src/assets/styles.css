@@ -1,16 +1,11 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-/** Themes */
 @import "./variables.css";
 @import "./theme.css";
 
-/** Base */
-/* @import "./base.css"; */
+@import "./base.css";
+@import "./components.css";
+@import "./utilities.css";
 
-/** Components */
-/* @import "./components.css"; */
-
-/** Utilities */
 @import "./animations.css";
-/* @import "./utilities.css"; */
