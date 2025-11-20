@@ -1,4 +1,5 @@
 import { Container } from '@/components/container';
+import { Section } from '@/components/section';
 import { FooterInfo } from '@/components/site-footer/footer-info';
 import { FooterNav } from '@/components/site-footer/footer-nav';
 import { Separator } from '@/components/ui/separator';
@@ -6,15 +7,19 @@ import { Separator } from '@/components/ui/separator';
 export function SiteFooter() {
   return (
     <footer className="border-t bg-background">
-      <Container className="py-8 sm:py-12">
-        <FooterNav />
-      </Container>
+      <Section render={<div />} variant="xl">
+        <Container>
+          <FooterNav />
+        </Container>
+      </Section>
 
       <Separator />
 
-      <Container>
-        <FooterInfo />
-      </Container>
+      <Section render={<div />} variant="xl">
+        <Container>
+          <FooterInfo />
+        </Container>
+      </Section>
     </footer>
   );
 }

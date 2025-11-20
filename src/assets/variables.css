@@ -1,5 +1,6 @@
 :root {
-  --radius: 0.625rem;
+  --max-width-container: var(--breakpoint-xl);
+  --radius: 0.5rem;
 
   /** Branding */
 

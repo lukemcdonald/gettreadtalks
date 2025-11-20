@@ -5,12 +5,10 @@ import { cn } from '@/utils';
 
 interface ContainerProps extends useRender.ComponentProps<'div'> {}
 
-// TODO: Add variant to add py padding (often py-12). Maybe other variants, too?
-export function Container({ className, render, children, ...delegated }: ContainerProps) {
+export function Container({ className, render, ...delegated }: ContainerProps) {
   const defaultProps = {
     'data-slot': 'container',
-    children: <div className="mx-auto max-w-7xl">{children}</div>,
-    className: cn('p-4 sm:px-6', className),
+    className: cn('container', className),
   };
 
   return useRender({
