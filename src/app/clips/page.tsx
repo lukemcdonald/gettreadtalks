@@ -1,11 +1,11 @@
 import { Suspense } from 'react';
 
-import { ArchiveLayout } from '@/components/layouts/archive-layout';
 import { ArchiveSidebar } from '@/components/layouts/archive-sidebar';
-import { SidebarContent } from '@/components/layouts/sidebar-content';
+import { SidebarLayout } from '@/components/layouts/sidebar-layout';
 import { PageHeader } from '@/components/page-header';
 import { SearchInput } from '@/components/search-input';
 import { SelectFilter } from '@/components/select-filter';
+import { SidebarContent } from '@/components/sidebar-content';
 import { SortSelect } from '@/components/sort-select';
 import { getAllClips } from '@/features/clips';
 import { getAllSpeakers, sortSpeakersByName } from '@/features/speakers';
@@ -38,7 +38,7 @@ export default async function ClipsPage() {
   const sortedSpeakersWithClips = sortSpeakersByName(speakersWithClips);
 
   return (
-    <ArchiveLayout
+    <SidebarLayout
       header={
         <PageHeader
           description="Be encouraged by these short Christ centered clips."
@@ -87,6 +87,6 @@ export default async function ClipsPage() {
       <Suspense fallback={<ClipsListSkeleton />}>
         <ClipsList clips={clips} />
       </Suspense>
-    </ArchiveLayout>
+    </SidebarLayout>
   );
 }

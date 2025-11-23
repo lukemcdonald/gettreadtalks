@@ -1,15 +1,12 @@
 import { Container } from '@/components/container';
+import { Main } from '@/components/main';
 import { Section } from '@/components/section';
 
-type ListPageLayoutProps = {
-  children: React.ReactNode;
-};
-
-export function ListPageLayout({ children }: ListPageLayoutProps) {
+export function MainLayout({ children }: { children: React.ReactNode }) {
   return (
     <Section variant="xl">
       <Container>
-        <div className="space-y-12">{children}</div>
+        <Main className="mx-auto max-w-prose">{children}</Main>
       </Container>
     </Section>
   );

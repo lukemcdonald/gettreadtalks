@@ -6,8 +6,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/utils';
 import { getGravatarUrl } from '@/utils/gravatar';
 
-type FallbackType = 'initials' | 'icon';
-type ImageType = 'image' | 'gravatar';
+type FallbackType = 'icon' | 'initials';
+type ImageType = 'icon' | 'image' | 'gravatar';
 
 function getFallback(type: FallbackType, user: User) {
   if (user && type === 'initials') {
@@ -31,7 +31,7 @@ function getImage(type: ImageType | undefined, user: User) {
 
 export function AccountMenuAvatar({
   fallbackType = 'icon',
-  imageType,
+  imageType = 'icon',
   user,
 }: {
   fallbackType?: FallbackType;
@@ -48,7 +48,7 @@ export function AccountMenuAvatar({
   return (
     <Avatar
       className={cn(
-        'group size-6 transition-all',
+        'group size-6 bg-transparent transition-all',
         imageUrl ? 'border-0 border-transparent' : '',
         imageUrl ? "[button[aria-expanded='true']_&]:outline-2" : '',
         imageUrl ? 'size-[19px] outline-2' : '',

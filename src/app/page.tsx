@@ -1,5 +1,5 @@
 import { FeaturedGrid } from '@/components/featured-grid';
-import { HeroSection } from '@/components/layouts/hero-section';
+import { HeroSection } from '@/components/hero-section';
 import { Section } from '@/components/section';
 import { SpeakerCard } from '@/components/speaker-card';
 import { TalkCard } from '@/components/talk-card';
@@ -14,7 +14,7 @@ export default async function HomePage() {
   ]);
 
   return (
-    <Section>
+    <Section render={<main />}>
       <div className="space-y-20">
         <HeroSection
           description="Christ centered sermons to elevate your spiritual heartbeat."

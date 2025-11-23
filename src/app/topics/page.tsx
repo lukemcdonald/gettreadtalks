@@ -1,9 +1,9 @@
 import { Suspense } from 'react';
 
-import { ArchiveLayout } from '@/components/layouts/archive-layout';
 import { ArchiveSidebar } from '@/components/layouts/archive-sidebar';
-import { SidebarContent } from '@/components/layouts/sidebar-content';
+import { SidebarLayout } from '@/components/layouts/sidebar-layout';
 import { SearchInput } from '@/components/search-input';
+import { SidebarContent } from '@/components/sidebar-content';
 import { SortSelect } from '@/components/sort-select';
 import { getTopicsWithCounts } from '@/features/topics';
 import { TopicsList } from './_components/topics-list';
@@ -12,7 +12,7 @@ export default async function TopicsPage() {
   const topics = await getTopicsWithCounts();
 
   return (
-    <ArchiveLayout
+    <SidebarLayout
       sidebar={
         <ArchiveSidebar description="Explore talks organized by topic and theme." title="Topics">
           <SidebarContent title="Filters">
@@ -34,6 +34,6 @@ export default async function TopicsPage() {
       <Suspense>
         <TopicsList topics={topics} />
       </Suspense>
-    </ArchiveLayout>
+    </SidebarLayout>
   );
 }

@@ -1,7 +1,7 @@
 @custom-variant dark (&:is(.dark *));
 
 /**
- * Preserve Tailwind V3 border color
+ * Preserve Tailwind V3 border color (COSS UI relied on this)
  * https://tailwindcss.com/docs/upgrade-guide#default-border-color
  */
 @layer base {
@@ -11,6 +11,10 @@
   ::backdrop {
     border-color: var(--color-border, currentColor);
   }
+}
+
+@theme {
+  --max-width-prose: 70ch;
 }
 
 @theme inline {

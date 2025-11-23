@@ -1,10 +1,10 @@
 import { Suspense } from 'react';
 
-import { ArchiveLayout } from '@/components/layouts/archive-layout';
 import { ArchiveSidebar } from '@/components/layouts/archive-sidebar';
-import { SidebarContent } from '@/components/layouts/sidebar-content';
+import { SidebarLayout } from '@/components/layouts/sidebar-layout';
 import { SearchInput } from '@/components/search-input';
 import { SelectFilter } from '@/components/select-filter';
+import { SidebarContent } from '@/components/sidebar-content';
 import { SortSelect } from '@/components/sort-select';
 import { getAllCollectionsWithStats } from '@/features/collections';
 import { getAllSpeakers, sortSpeakersByName } from '@/features/speakers';
@@ -21,7 +21,7 @@ export default async function CollectionsPage() {
   const sortedSpeakersWithCollections = sortSpeakersByName(speakersWithCollections);
 
   return (
-    <ArchiveLayout
+    <SidebarLayout
       sidebar={
         <ArchiveSidebar
           description="Each series includes talks given by one or more speakers on the same topic or book of the Bible."
@@ -53,6 +53,6 @@ export default async function CollectionsPage() {
       <Suspense>
         <CollectionsList collections={result.page} />
       </Suspense>
-    </ArchiveLayout>
+    </SidebarLayout>
   );
 }

@@ -1,6 +1,5 @@
-// app/account/page.tsx
-
-import { MainLayout } from '@/components/main-layout';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import { getUserFavorites } from '@/features/users/server';
 import { getCurrentUser } from '@/services/auth/server';
 
@@ -9,113 +8,109 @@ export default async function AccountPage() {
   const favorites = await getUserFavorites();
 
   return (
-    <MainLayout>
-      <div className="rounded-lg bg-card shadow-xl">
-        <div className="border-border border-b px-6 py-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="font-semibold text-3xl text-card-foreground">Account Dashboard</h1>
-              <p className="mt-2 text-muted-foreground">Welcome back, {user?.name || 'User'}!</p>
-            </div>
-          </div>
+    <Card>
+      <CardHeader>
+        <div className="flex flex-col gap-2">
+          <h1 className="font-semibold text-3xl text-card-foreground">Account Settings</h1>
+          <p className="mt-2 text-muted-foreground">Welcome back, {user?.name || 'User'}!</p>
         </div>
+      </CardHeader>
 
-        <div className="px-6 py-8">
-          <div className="grid gap-8 md:grid-cols-2">
-            <div>
-              <h2 className="mb-4 font-semibold text-card-foreground text-xl">
-                Profile Information
-              </h2>
-              <div className="rounded-lg bg-muted p-4">
-                <div className="space-y-3">
-                  <div>
-                    <label
-                      className="block font-semibold text-muted-foreground text-sm"
-                      htmlFor="email"
-                    >
-                      Email
-                    </label>
-                    <p className="text-card-foreground">{user?.email}</p>
-                  </div>
-                  <div>
-                    <label
-                      className="block font-semibold text-muted-foreground text-sm"
-                      htmlFor="name"
-                    >
-                      Name
-                    </label>
-                    <p className="text-card-foreground">{user?.name}</p>
-                  </div>
-                  <div>
-                    <label
-                      className="block font-semibold text-muted-foreground text-sm"
-                      htmlFor="userId"
-                    >
-                      User ID
-                    </label>
-                    <p className="font-mono text-muted-foreground text-sm">{user?._id}</p>
-                  </div>
+      <Separator />
+
+      <CardContent className="px-6 py-8">
+        <div className="grid gap-8 md:grid-cols-2">
+          <div>
+            <h2 className="mb-4 font-semibold text-card-foreground text-xl">Profile Information</h2>
+            <div className="rounded-lg bg-muted p-4">
+              <div className="space-y-3">
+                <div>
+                  <label
+                    className="block font-semibold text-muted-foreground text-sm"
+                    htmlFor="email"
+                  >
+                    Email
+                  </label>
+                  <p className="text-card-foreground">{user?.email}</p>
+                </div>
+                <div>
+                  <label
+                    className="block font-semibold text-muted-foreground text-sm"
+                    htmlFor="name"
+                  >
+                    Name
+                  </label>
+                  <p className="text-card-foreground">{user?.name}</p>
+                </div>
+                <div>
+                  <label
+                    className="block font-semibold text-muted-foreground text-sm"
+                    htmlFor="userId"
+                  >
+                    User ID
+                  </label>
+                  <p className="font-mono text-muted-foreground text-sm">{user?._id}</p>
                 </div>
               </div>
             </div>
+          </div>
 
-            <div>
-              <h2 className="mb-4 font-semibold text-card-foreground text-xl">Account Status</h2>
-              <div className="rounded-lg bg-success/8 p-4 text-success-foreground">
-                <p className="font-semibold">Account Active</p>
-                <p>Your authentication is working correctly</p>
-              </div>
+          <div>
+            <h2 className="mb-4 font-semibold text-card-foreground text-xl">Account Status</h2>
+            <div className="rounded-lg bg-success/8 p-4 text-success-foreground">
+              <p className="font-semibold">Account Active</p>
+              <p>Your authentication is working correctly</p>
             </div>
           </div>
         </div>
+      </CardContent>
 
-        <div className="px-6 py-8">
-          <div className="rounded-lg bg-card p-6 shadow-lg">
-            <h2 className="mb-4 font-semibold text-2xl text-card-foreground">Your Favorites</h2>
-            {favorites && (
-              <div className="grid gap-4">
-                {favorites.talks.length > 0 && (
-                  <div>
-                    <h3 className="mb-2 font-semibold text-card-foreground text-lg">
-                      Favorite Talks ({favorites.talks.length})
-                    </h3>
-                    <p className="text-muted-foreground text-sm">
-                      You have {favorites.talks.length} favorite talks saved.
-                    </p>
-                  </div>
+      <div className="px-6 py-8">
+        <div className="rounded-lg bg-card p-6 shadow-lg">
+          <h2 className="mb-4 font-semibold text-2xl text-card-foreground">Your Favorites</h2>
+          {favorites && (
+            <div className="grid gap-4">
+              {favorites.talks.length > 0 && (
+                <div>
+                  <h3 className="mb-2 font-semibold text-card-foreground text-lg">
+                    Favorite Talks ({favorites.talks.length})
+                  </h3>
+                  <p className="text-muted-foreground text-sm">
+                    You have {favorites.talks.length} favorite talks saved.
+                  </p>
+                </div>
+              )}
+              {favorites.clips.length > 0 && (
+                <div>
+                  <h3 className="mb-2 font-semibold text-card-foreground text-lg">
+                    Favorite Clips ({favorites.clips.length})
+                  </h3>
+                  <p className="text-muted-foreground text-sm">
+                    You have {favorites.clips.length} favorite clips saved.
+                  </p>
+                </div>
+              )}
+              {favorites.speakers.length > 0 && (
+                <div>
+                  <h3 className="mb-2 font-semibold text-card-foreground text-lg">
+                    Favorite Speakers ({favorites.speakers.length})
+                  </h3>
+                  <p className="text-muted-foreground text-sm">
+                    You have {favorites.speakers.length} favorite speakers saved.
+                  </p>
+                </div>
+              )}
+              {favorites.talks.length === 0 &&
+                favorites.clips.length === 0 &&
+                favorites.speakers.length === 0 && (
+                  <p className="text-muted-foreground">
+                    No favorites yet. Start exploring talks and clips to build your collection!
+                  </p>
                 )}
-                {favorites.clips.length > 0 && (
-                  <div>
-                    <h3 className="mb-2 font-semibold text-card-foreground text-lg">
-                      Favorite Clips ({favorites.clips.length})
-                    </h3>
-                    <p className="text-muted-foreground text-sm">
-                      You have {favorites.clips.length} favorite clips saved.
-                    </p>
-                  </div>
-                )}
-                {favorites.speakers.length > 0 && (
-                  <div>
-                    <h3 className="mb-2 font-semibold text-card-foreground text-lg">
-                      Favorite Speakers ({favorites.speakers.length})
-                    </h3>
-                    <p className="text-muted-foreground text-sm">
-                      You have {favorites.speakers.length} favorite speakers saved.
-                    </p>
-                  </div>
-                )}
-                {favorites.talks.length === 0 &&
-                  favorites.clips.length === 0 &&
-                  favorites.speakers.length === 0 && (
-                    <p className="text-muted-foreground">
-                      No favorites yet. Start exploring talks and clips to build your collection!
-                    </p>
-                  )}
-              </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
-    </MainLayout>
+    </Card>
   );
 }
