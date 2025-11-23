@@ -14,7 +14,10 @@ type NavLinkProps = {
 export function NavLink({ href, isActive, children }: NavLinkProps) {
   return (
     <Button
-      className={cn('text-lg transition-colors', isActive ? 'text-primary' : 'text-foreground')}
+      className={cn(
+        'font-medium text-lg transition-colors',
+        isActive ? 'text-primary' : 'text-foreground',
+      )}
       render={<Link href={href as Route} />}
       variant="ghost"
     >

@@ -1,4 +1,5 @@
-import { SidebarSection } from '@/components/layouts/sidebar-section';
+import Link from 'next/link';
+
 import { cn } from '@/utils';
 import { GridList } from './grid-list';
 
@@ -48,7 +49,27 @@ export function FeaturedGrid({
                 </p>
               )}
             </header>
-            {quickLinks && <SidebarSection navItems={quickLinks} title="Quick Links" />}
+            {quickLinks && (
+              <div className={cn('space-y-3', className)}>
+                <h3 className="font-semibold text-muted-foreground text-xs uppercase tracking-wide">
+                  {title}
+                </h3>
+
+                {quickLinks.length > 0 && (
+                  <nav className="flex flex-col gap-2">
+                    {quickLinks.map((item) => (
+                      <Link
+                        className="text-muted-foreground text-sm transition-colors hover:text-foreground"
+                        href={item.href}
+                        key={item.href}
+                      >
+                        {item.label}
+                      </Link>
+                    ))}
+                  </nav>
+                )}
+              </div>
+            )}
           </div>
         </aside>
 

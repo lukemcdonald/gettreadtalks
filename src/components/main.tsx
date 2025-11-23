@@ -1,13 +1,10 @@
-import { cn } from '@/utils';
-
 type MainProps = {
   children: React.ReactNode;
-  className?: string;
-};
+} & React.ComponentPropsWithoutRef<'main'>;
 
-export function Main({ children, className, ...delegated }: MainProps) {
+export function Main({ children, ...delegated }: MainProps) {
   return (
-    <main className={cn('flex-1', className)} id="main-content" {...delegated}>
+    <main id="main" {...delegated}>
       {children}
     </main>
   );

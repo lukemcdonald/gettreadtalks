@@ -1,10 +1,10 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import { SidebarContent } from '@/components/layouts/sidebar-content';
 import { SidebarLayout } from '@/components/layouts/sidebar-layout';
 import { MediaEmbed } from '@/components/media-embed';
 import { PageHeader } from '@/components/page-header';
+import { SidebarContent } from '@/components/sidebar-content';
 import { getClipBySlug } from '@/features/clips';
 
 type ClipPageProps = {
@@ -26,22 +26,6 @@ export default async function ClipPage({ params }: ClipPageProps) {
 
   return (
     <SidebarLayout
-      main={
-        <>
-          {clip.mediaUrl && (
-            <div className="space-y-4">
-              <MediaEmbed mediaUrl={clip.mediaUrl} />
-            </div>
-          )}
-
-          {clip.description && (
-            <div className="space-y-2">
-              <h2 className="font-semibold text-lg">Description</h2>
-              <p className="text-muted-foreground">{clip.description}</p>
-            </div>
-          )}
-        </>
-      }
       sidebar={
         <>
           <PageHeader title={clip.title} />
@@ -79,6 +63,19 @@ export default async function ClipPage({ params }: ClipPageProps) {
           )}
         </>
       }
-    />
+    >
+      {clip.mediaUrl && (
+        <div className="space-y-4">
+          <MediaEmbed mediaUrl={clip.mediaUrl} />
+        </div>
+      )}
+
+      {clip.description && (
+        <div className="space-y-2">
+          <h2 className="font-semibold text-lg">Description</h2>
+          <p className="text-muted-foreground">{clip.description}</p>
+        </div>
+      )}
+    </SidebarLayout>
   );
 }

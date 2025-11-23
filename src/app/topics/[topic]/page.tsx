@@ -2,8 +2,8 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { HorizontalScrollGrid } from '@/components/horizontal-scroll-grid';
-import { SidebarContent } from '@/components/layouts/sidebar-content';
 import { PageHeader } from '@/components/page-header';
+import { SidebarContent } from '@/components/sidebar-content';
 import { TalkCard } from '@/components/talk-card';
 import { TopicSelector } from '@/components/topic-selector';
 import { ViewMoreCard } from '@/components/view-more-card';

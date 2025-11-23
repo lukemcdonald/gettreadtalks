@@ -6,7 +6,7 @@ import { Separator } from '@/components/ui/separator';
 
 export function SiteFooter() {
   return (
-    <footer className="border-t bg-background">
+    <footer className="border-t bg-background" id="footer">
       <Section render={<div />} variant="xl">
         <Container>
           <FooterNav />
@@ -15,7 +15,7 @@ export function SiteFooter() {
 
       <Separator />
 
-      <Section render={<div />} variant="xl">
+      <Section render={<div />} variant="lg">
         <Container>
           <FooterInfo />
         </Container>

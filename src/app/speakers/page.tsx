@@ -1,11 +1,10 @@
 import { Suspense } from 'react';
 
-import { ArchiveLayout } from '@/components/layouts/archive-layout';
 import { ArchiveSidebar } from '@/components/layouts/archive-sidebar';
-import { SidebarContent } from '@/components/layouts/sidebar-content';
-import { PageHeader } from '@/components/page-header';
+import { SidebarLayout } from '@/components/layouts/sidebar-layout';
 import { SearchInput } from '@/components/search-input';
 import { SelectFilter } from '@/components/select-filter';
+import { SidebarContent } from '@/components/sidebar-content';
 import { SortSelect } from '@/components/sort-select';
 import { getAllSpeakers } from '@/features/speakers';
 import { SpeakersList } from './_components/speakers-list';
@@ -39,13 +38,7 @@ export default async function SpeakersPage() {
   ).sort();
 
   return (
-    <ArchiveLayout
-      header={
-        <PageHeader
-          description="Listen to faithful ambassadors of Christ and be blessed."
-          title="All Speakers"
-        />
-      }
+    <SidebarLayout
       sidebar={
         <ArchiveSidebar
           description="Listen to faithful ambassadors of Christ and be blessed."
@@ -75,6 +68,6 @@ export default async function SpeakersPage() {
       <Suspense fallback={<SpeakersListSkeleton />}>
         <SpeakersList speakers={speakers} />
       </Suspense>
-    </ArchiveLayout>
+    </SidebarLayout>
   );
 }

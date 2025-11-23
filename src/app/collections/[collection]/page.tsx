@@ -2,9 +2,9 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { GridList } from '@/components/grid-list';
-import { SidebarContent } from '@/components/layouts/sidebar-content';
 import { SidebarLayout } from '@/components/layouts/sidebar-layout';
 import { PageHeader } from '@/components/page-header';
+import { SidebarContent } from '@/components/sidebar-content';
 import { TalkCard } from '@/components/talk-card';
 import { getCollectionBySlug } from '@/features/collections';
 
@@ -28,31 +28,6 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
 
   return (
     <SidebarLayout
-      main={
-        <GridList>
-          {talks.map((talk) => (
-            <TalkCard
-              featured={talk.featured}
-              key={talk._id}
-              speaker={
-                talk.speaker
-                  ? {
-                      firstName: talk.speaker.firstName,
-                      imageUrl: talk.speaker.imageUrl,
-                      lastName: talk.speaker.lastName,
-                      slug: talk.speaker.slug,
-                    }
-                  : undefined
-              }
-              talk={{
-                description: talk.description,
-                slug: talk.slug,
-                title: talk.title,
-              }}
-            />
-          ))}
-        </GridList>
-      }
       sidebar={
         <>
           <PageHeader description={collection.description} title={collection.title} />
@@ -75,6 +50,30 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
           )}
         </>
       }
-    />
+    >
+      <GridList>
+        {talks.map((talk) => (
+          <TalkCard
+            featured={talk.featured}
+            key={talk._id}
+            speaker={
+              talk.speaker
+                ? {
+                    firstName: talk.speaker.firstName,
+                    imageUrl: talk.speaker.imageUrl,
+                    lastName: talk.speaker.lastName,
+                    slug: talk.speaker.slug,
+                  }
+                : undefined
+            }
+            talk={{
+              description: talk.description,
+              slug: talk.slug,
+              title: talk.title,
+            }}
+          />
+        ))}
+      </GridList>
+    </SidebarLayout>
   );
 }

@@ -12,7 +12,6 @@ import '@/assets/styles.css';
 
 import { Suspense } from 'react';
 
-import { Main } from '@/components/main';
 import { SkipToMainLink } from '@/components/site-header/navigation/skip-to-main-link';
 import { cn } from '@/utils';
 
@@ -45,11 +44,13 @@ export default async function RootLayout({
         <ErrorBoundary>
           <ThemeProvider>
             <AuthProvider>
-              <SkipToMainLink />
+              <SkipToMainLink href="#content" />
               <Suspense>
                 <SiteHeader />
               </Suspense>
-              <Main>{children}</Main>
+              <div className="flex-1" id="content">
+                {children}
+              </div>
               <SiteFooter />
             </AuthProvider>
           </ThemeProvider>

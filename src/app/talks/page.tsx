@@ -5,8 +5,8 @@ import type { TopicId } from '@/features/topics/types';
 import { Suspense } from 'react';
 
 import { FilterUtilityBar } from '@/components/filter-utility-bar';
-import { ArchiveLayout } from '@/components/layouts/archive-layout';
 import { ArchiveSidebar } from '@/components/layouts/archive-sidebar';
+import { SidebarLayout } from '@/components/layouts/sidebar-layout';
 import { getAllSpeakersForFilter, getAllTopicsForFilter, getTalks } from '@/features/talks';
 import { getCurrentUser } from '@/services/auth/server';
 import { Pagination } from './_components/pagination';
@@ -71,7 +71,7 @@ export default async function TalksPage({ searchParams }: TalksPageProps) {
   ]);
 
   return (
-    <ArchiveLayout
+    <SidebarLayout
       sidebar={
         <ArchiveSidebar
           description="Elevate your spiritual heartbeat with Christ centered talks."
@@ -86,6 +86,6 @@ export default async function TalksPage({ searchParams }: TalksPageProps) {
           <TalksContent params={params} />
         </Suspense>
       </div>
-    </ArchiveLayout>
+    </SidebarLayout>
   );
 }

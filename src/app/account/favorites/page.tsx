@@ -1,9 +1,11 @@
-import { MainLayout } from '@/components/main-layout';
+import { Card, CardHeader } from '@/components/ui/card';
 
 export default function FavoritesPage() {
   return (
-    <MainLayout>
-      <h1>Favorites</h1>
-    </MainLayout>
+    <Card>
+      <CardHeader>
+        <h1>Favorites</h1>
+      </CardHeader>
+    </Card>
   );
 }

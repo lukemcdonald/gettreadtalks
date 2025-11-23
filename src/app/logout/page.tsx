@@ -19,7 +19,7 @@ export default function LogoutPage() {
         await signOut();
       } catch (error) {
         captureException(error, {
-          fingerprint: ['auth', 'logout'],
+          fingerprint: ['auth', 'signOut'],
         });
       } finally {
         router.push(redirectTo as Route);

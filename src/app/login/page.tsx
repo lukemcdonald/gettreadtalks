@@ -2,7 +2,7 @@
 
 import { useId, useState } from 'react';
 
-import { MainLayout } from '@/components/main-layout';
+import { MainLayout } from '@/components/layouts/main-layout';
 import { signIn, signUp } from '@/services/auth/client';
 import { AUTH_ERRORS } from '@/services/auth/config';
 import { captureException } from '@/services/errors/client';
@@ -29,16 +29,7 @@ export default function LoginPage() {
       }
     } catch (err) {
       captureException(err, {
-        context: {
-          operation: 'login',
-          email,
-        },
-        fingerprint: ['auth', 'login', 'client-error'],
-        level: 'error',
-        tags: {
-          feature: 'auth',
-          operation: 'login',
-        },
+        fingerprint: ['auth', 'signIn'],
       });
       setError(AUTH_ERRORS.NETWORK_ERROR);
     } finally {
@@ -62,16 +53,7 @@ export default function LoginPage() {
       }
     } catch (err) {
       captureException(err, {
-        context: {
-          operation: 'registration',
-          email,
-        },
-        fingerprint: ['auth', 'registration', 'client-error'],
-        level: 'error',
-        tags: {
-          feature: 'auth',
-          operation: 'registration',
-        },
+        fingerprint: ['auth', 'signUp'],
       });
       setError(AUTH_ERRORS.NETWORK_ERROR);
     } finally {
@@ -83,7 +65,7 @@ export default function LoginPage() {
     <MainLayout>
       <div className="m-auto w-full max-w-md space-y-8">
         <div>
-          <h2 className="mt-6 text-center font-extrabold text-3xl text-foreground">Welcome Back</h2>
+          <h2 className="mt-6 text-center font-bold text-3xl text-foreground">Welcome Back</h2>
           <p className="mt-2 text-center text-muted-foreground text-sm">
             Sign in to your account or create a new one
           </p>

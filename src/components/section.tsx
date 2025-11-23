@@ -26,7 +26,7 @@ const sectionVariants = cva('space-y-6 px-4 sm:px-6', {
 
 export function Section({ className, render, variant, ...delegated }: SectionProps) {
   const defaultProps = {
-    'data-slot': 'section',
+    // 'data-slot': 'section',
     className: cn(sectionVariants({ variant }), className),
   };
 

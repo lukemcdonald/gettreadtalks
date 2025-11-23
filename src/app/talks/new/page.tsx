@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 
-import { MainLayout } from '@/components/main-layout';
+import { MainLayout } from '@/components/layouts/main-layout';
 import { getAllCollections, getAllSpeakers } from '@/features/talks';
 import { getCurrentUser } from '@/services/auth/server';
 import { TalkForm } from './_components/talk-form';
