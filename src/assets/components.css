@@ -2,10 +2,10 @@
   main {
     & > section {
       &:first-child {
-        padding-top: --spacing(12);
+        padding-block-start: --spacing(24);
       }
       &:last-child {
-        padding-bottom: --spacing(12);
+        padding-block-end: --spacing(24);
       }
     }
   }

@@ -1,5 +1,4 @@
 import { Container } from '@/components/container';
-import { Main } from '@/components/main';
 import { Section } from '@/components/section';
 import { cn } from '@/utils';
 
@@ -54,7 +53,7 @@ export function CenteredLayout({
               </aside>
             )}
 
-            <Main className={cn('min-w-0', maxWidthClasses[maxWidth], 'mx-auto')}>{children}</Main>
+            <div className={cn('min-w-0', maxWidthClasses[maxWidth], 'mx-auto')}>{children}</div>
 
             {rightSidebar && (
               <aside className="lg:sticky lg:top-8 lg:h-fit">
