@@ -10,7 +10,7 @@ type SidebarLayoutProps = {
 
 export function SidebarLayout({ children, header, sidebar }: SidebarLayoutProps) {
   return (
-    <Section variant="xl">
+    <Section py="xl">
       <Container>
         {header && <div className="mb-8">{header}</div>}
 

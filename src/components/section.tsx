@@ -5,16 +5,12 @@ import { cva } from 'class-variance-authority';
 import { cn } from '@/utils';
 
 interface SectionProps extends useRender.ComponentProps<'section'> {
-  variant?: 'flush' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  py?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 }
 
 const sectionVariants = cva('space-y-6 px-4 sm:px-6', {
-  defaultVariants: {
-    variant: 'md',
-  },
   variants: {
-    variant: {
-      flush: 'p-0',
+    py: {
       xs: 'py-2',
       sm: 'py-3',
       md: 'py-4',
@@ -24,10 +20,10 @@ const sectionVariants = cva('space-y-6 px-4 sm:px-6', {
   },
 });
 
-export function Section({ className, render, variant, ...delegated }: SectionProps) {
+export function Section({ className, render, py, ...delegated }: SectionProps) {
   const defaultProps = {
     // 'data-slot': 'section',
-    className: cn(sectionVariants({ variant }), className),
+    className: cn(sectionVariants({ py }), className),
   };
 
   return useRender({

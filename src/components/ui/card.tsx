@@ -3,6 +3,7 @@ import type * as React from 'react';
 import { mergeProps } from '@base-ui-components/react/merge-props';
 import { useRender } from '@base-ui-components/react/use-render';
 import { cva } from 'class-variance-authority';
+import Link from 'next/link';
 
 import { cn } from '@/utils';
 
@@ -17,7 +18,7 @@ const cardVariants = cva(
       variant: {
         default: '',
         interactive:
-          'hover:before:-inset-0.25 ring-1 ring-transparent transition duration-300 hover:shadow-md/3 hover:ring-card',
+          'hover:before:-inset-0.25 isolate ring-1 ring-transparent transition duration-300 hover:shadow-md/3 hover:ring-card',
       },
     },
     defaultVariants: {
@@ -96,6 +97,15 @@ function CardFooter({ className, ...props }: React.ComponentProps<'div'>) {
   );
 }
 
+function CardLink({ children, ...delegated }: React.ComponentProps<typeof Link>) {
+  return (
+    <Link {...delegated}>
+      <span className="absolute inset-0 z-10" />
+      {children}
+    </Link>
+  );
+}
+
 export {
   Card,
   CardHeader,
@@ -105,4 +115,5 @@ export {
   CardDescription,
   CardPanel,
   CardPanel as CardContent,
+  CardLink,
 };

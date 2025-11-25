@@ -31,7 +31,7 @@ export function CenteredLayout({
   const hasSidebars = leftSidebar || rightSidebar;
 
   return (
-    <Section variant="xl">
+    <Section py="xl">
       <Container>
         {header && (
           <div

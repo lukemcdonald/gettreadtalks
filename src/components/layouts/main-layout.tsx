@@ -4,7 +4,7 @@ import { Section } from '@/components/section';
 
 export function MainLayout({ children }: { children: React.ReactNode }) {
   return (
-    <Section variant="xl">
+    <Section py="xl">
       <Container>
         <Main className="mx-auto max-w-prose">{children}</Main>
       </Container>

@@ -32,7 +32,7 @@ export function HorizontalScrollGrid({ children, sidebar }: HorizontalScrollGrid
   };
 
   return (
-    <Section variant="xl">
+    <Section py="xl">
       <Container>
         <div className="grid gap-8 lg:grid-cols-[300px_1fr]">
           <aside className="lg:sticky lg:top-8 lg:h-fit">
