@@ -142,7 +142,7 @@ export async function getAllCollections() {
 /**
  * Get featured talks for homepage.
  */
-export async function getFeaturedTalks(limit = 5) {
+export async function getFeaturedTalks(limit = 6) {
   const token = await getAuthToken();
 
   const talks = await fetchQuery(api.talks.listFeaturedTalks, { limit }, { token });
@@ -152,10 +152,7 @@ export async function getFeaturedTalks(limit = 5) {
     talks.map(async (talk) => {
       const speaker = await fetchQuery(api.speakers.getSpeaker, { id: talk.speakerId }, { token });
 
-      return {
-        ...talk,
-        speaker,
-      };
+      return { ...talk, speaker };
     }),
   );
 

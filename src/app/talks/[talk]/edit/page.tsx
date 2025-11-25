@@ -7,18 +7,18 @@ import { TalkForm } from '../../new/_components/talk-form';
 
 type EditTalkPageProps = {
   params: Promise<{
-    slug: string;
+    talk: string;
   }>;
 };
 
 export default async function EditTalkPage({ params }: EditTalkPageProps) {
+  const { talk: slug } = await params;
   const user = await getCurrentUser();
 
   if (!user) {
-    redirect('/login?redirect=/talks/[slug]/edit');
+    redirect(`/login?redirect=/talks/${slug}/edit`);
   }
 
-  const { slug } = await params;
   const talkData = await getTalkBySlug(slug);
 
   if (!talkData) {
@@ -26,21 +26,21 @@ export default async function EditTalkPage({ params }: EditTalkPageProps) {
   }
 
   const { talk } = talkData;
-
   const [collections, speakers] = await Promise.all([getAllCollections(), getAllSpeakers()]);
 
   return (
     <MainLayout>
       <h1 className="mb-6 font-semibold text-2xl">Edit Talk</h1>
+
       <TalkForm
         collections={collections}
         initialData={{
-          collectionId: talk.collectionId ?? null,
-          collectionOrder: talk.collectionOrder ?? null,
-          description: talk.description ?? null,
-          featured: talk.featured ?? null,
+          collectionId: talk.collectionId,
+          collectionOrder: talk.collectionOrder,
+          description: talk.description,
+          featured: talk.featured,
           mediaUrl: talk.mediaUrl,
-          scripture: talk.scripture ?? null,
+          scripture: talk.scripture,
           speakerId: talk.speakerId,
           status: talk.status,
           title: talk.title,

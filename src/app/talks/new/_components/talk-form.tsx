@@ -22,14 +22,14 @@ import { StatusSelectField } from './status-select-field';
 type TalkFormProps = {
   collections: Pick<Collection, '_id' | 'slug' | 'title'>[];
   initialData?: {
-    collectionId?: CollectionId | null;
-    collectionOrder?: number | null;
-    description?: string | null;
-    featured?: boolean | null;
+    collectionId?: CollectionId;
+    collectionOrder?: number;
+    description?: string;
+    featured?: boolean;
     mediaUrl: string;
-    scripture?: string | null;
+    scripture?: string;
     speakerId: SpeakerId;
-    status?: StatusType | null;
+    status?: StatusType;
     title: string;
   };
   speakers: Pick<Speaker, '_id' | 'firstName' | 'lastName' | 'slug'>[];
@@ -39,9 +39,10 @@ type TalkFormProps = {
 
 export function TalkForm({ collections, initialData, speakers, talkId, talkSlug }: TalkFormProps) {
   const router = useRouter();
+
+  const archiveTalk = useArchiveTalk();
   const createTalk = useCreateTalk();
   const updateTalk = useUpdateTalk();
-  const archiveTalk = useArchiveTalk();
 
   const [isDeleting, setIsDeleting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -53,15 +54,15 @@ export function TalkForm({ collections, initialData, speakers, talkId, talkSlug 
 
     const formData = new FormData(e.currentTarget);
 
-    const title = formData.get('title') as string;
-    const speakerId = formData.get('speakerId') as SpeakerId;
-    const mediaUrl = formData.get('mediaUrl') as string;
     const collectionId = formData.get('collectionId') as string;
     const collectionOrder = formData.get('collectionOrder') as string;
     const description = formData.get('description') as string;
-    const scripture = formData.get('scripture') as string;
-    const formStatus = formData.get('status') as StatusType;
     const featured = formData.get('featured') === 'on';
+    const formStatus = formData.get('status') as StatusType;
+    const mediaUrl = formData.get('mediaUrl') as string;
+    const scripture = formData.get('scripture') as string;
+    const speakerId = formData.get('speakerId') as SpeakerId;
+    const title = formData.get('title') as string;
 
     const data = {
       collectionId: collectionId ? (collectionId as CollectionId) : undefined,

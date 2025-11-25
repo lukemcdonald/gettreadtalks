@@ -82,7 +82,7 @@
 .dark {
   /** Branding */
 
-  --primary: oklch(50.5% 0.213 27.518);
+  --primary: oklch(57.7% 0.245 27.325);
   --primary-foreground: oklch(97.1% 0.013 17.38);
   --secondary: oklch(26.9% 0 0);
   --secondary-foreground: oklch(98.5% 0.001 106.423);

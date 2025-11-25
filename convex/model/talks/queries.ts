@@ -1,6 +1,7 @@
 import type { PaginationResult } from 'convex/server';
 import type { Doc } from '../../_generated/dataModel';
 
+import { paginationOptsValidator, paginationResultValidator } from 'convex/server';
 import { v } from 'convex/values';
 import { asyncMap } from 'convex-helpers';
 import { getManyFrom, getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
@@ -9,6 +10,8 @@ import { query } from '../../_generated/server';
 import { doc, docs } from '../../lib/validators/schema';
 import { getCurrentUser } from '../auth/utils';
 import { statusType } from './validators';
+
+const talkPageValidator = paginationResultValidator(doc('talks'));
 
 /**
  * Get talk by ID.
@@ -203,7 +206,7 @@ export const listRandomTalksBySpeaker = query({
 export const listTalks = query({
   args: {
     featured: v.optional(v.boolean()),
-    paginationOpts: v.any(),
+    paginationOpts: paginationOptsValidator,
     search: v.optional(v.string()),
     speakerId: v.optional(v.id('speakers')),
     status: v.optional(statusType),
@@ -393,7 +396,7 @@ export const listTalks = query({
 
     return await ctx.db.query('talks').order('desc').paginate(paginationOpts);
   },
-  returns: v.any(), // PaginationResult<Doc<'talks'>>
+  returns: talkPageValidator,
 });
 
 /**
@@ -461,7 +464,7 @@ export const listTalksBySpeaker = query({
  */
 export const listTalksWithSpeakers = query({
   args: {
-    paginationOpts: v.any(), // PaginationOptions
+    paginationOpts: paginationOptsValidator,
     status: v.optional(statusType),
   },
   handler: async (ctx, args) => {
@@ -488,9 +491,5 @@ export const listTalksWithSpeakers = query({
       page: enrichedPage,
     };
   },
-  returns: v.object({
-    page: docs('talks'),
-    continueCursor: v.string(),
-    isDone: v.boolean(),
-  }),
+  returns: talkPageValidator,
 });

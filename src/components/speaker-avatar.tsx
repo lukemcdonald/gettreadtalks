@@ -11,7 +11,7 @@ export function SpeakerAvatar({ speaker }: SpeakerAvatarProps) {
   const { imageUrl } = speaker;
 
   return (
-    <Avatar className="size-16 shrink-0">
+    <Avatar className="size-16 shrink-0" render={<figure />}>
       {imageUrl && <AvatarImage alt={getSpeakerName(speaker)} src={imageUrl} />}
       <AvatarFallback className="text-base">{getSpeakerInitials(speaker)}</AvatarFallback>
     </Avatar>

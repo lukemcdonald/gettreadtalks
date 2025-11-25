@@ -1,5 +1,4 @@
 import { Container } from '@/components/container';
-import { Main } from '@/components/main';
 import { Section } from '@/components/section';
 
 type SidebarLayoutProps = {
@@ -10,7 +9,7 @@ type SidebarLayoutProps = {
 
 export function SidebarLayout({ children, header, sidebar }: SidebarLayoutProps) {
   return (
-    <Section variant="xl">
+    <Section py="xl">
       <Container>
         {header && <div className="mb-8">{header}</div>}
 
@@ -18,7 +17,7 @@ export function SidebarLayout({ children, header, sidebar }: SidebarLayoutProps)
           <aside className="lg:sticky lg:top-8 lg:h-fit">
             <div className="space-y-6">{sidebar}</div>
           </aside>
-          <Main className="min-w-0 space-y-6">{children}</Main>
+          <div className="min-w-0 space-y-6">{children}</div>
         </div>
       </Container>
     </Section>
