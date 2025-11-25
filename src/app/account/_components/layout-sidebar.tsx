@@ -14,10 +14,10 @@ export function LayoutSidebar() {
         <figure>
           <Image
             alt={mockUser.name}
-            className="shrink-0 rounded-full"
-            height={100}
+            className="size-12 shrink-0 rounded-full"
+            height={96}
             src={mockUser.image}
-            width={48}
+            width={96}
           />
         </figure>
         <p className="flex flex-col truncate">

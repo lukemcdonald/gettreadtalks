@@ -9,7 +9,7 @@ export async function SiteHeader() {
 
   return (
     <Section
-      className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/80"
+      className="sticky top-0 z-50 bg-background"
       id="header"
       render={<header />}
       role="banner"
