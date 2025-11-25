@@ -2,18 +2,35 @@ import type * as React from 'react';
 
 import { mergeProps } from '@base-ui-components/react/merge-props';
 import { useRender } from '@base-ui-components/react/use-render';
+import { cva } from 'class-variance-authority';
+import Link from 'next/link';
 
 import { cn } from '@/utils';
 
-interface CardProps extends useRender.ComponentProps<'div'> {}
+interface CardProps extends useRender.ComponentProps<'div'> {
+  variant?: 'default' | 'interactive';
+}
 
-function Card({ className, render, ...props }: CardProps) {
+const cardVariants = cva(
+  'relative flex flex-col gap-6 rounded-lg bg-card bg-clip-padding text-card-foreground before:pointer-events-none before:absolute before:inset-0 before:rounded-lg before:border before:border-border-foreground',
+  {
+    variants: {
+      variant: {
+        default: '',
+        interactive:
+          'hover:before:-inset-0.25 isolate ring-1 ring-transparent transition duration-300 hover:shadow-md/3 hover:ring-card',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+    },
+  },
+);
+
+function Card({ className, render, variant, ...props }: CardProps) {
   const defaultProps = {
     'data-slot': 'card',
-    className: cn(
-      'relative flex flex-col gap-6 rounded-2xl border bg-card bg-clip-padding text-card-foreground shadow-xs before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-2xl)-1px)] before:shadow-[0_1px_--theme(--color-black/4%)] dark:bg-clip-border dark:before:shadow-[0_-1px_--theme(--color-white/8%)]',
-      className,
-    ),
+    className: cn(cardVariants({ variant }), className),
   };
 
   return useRender({
@@ -80,6 +97,15 @@ function CardFooter({ className, ...props }: React.ComponentProps<'div'>) {
   );
 }
 
+function CardLink({ children, ...delegated }: React.ComponentProps<typeof Link>) {
+  return (
+    <Link {...delegated}>
+      <span className="absolute inset-0 z-10" />
+      {children}
+    </Link>
+  );
+}
+
 export {
   Card,
   CardHeader,
@@ -89,4 +115,5 @@ export {
   CardDescription,
   CardPanel,
   CardPanel as CardContent,
+  CardLink,
 };

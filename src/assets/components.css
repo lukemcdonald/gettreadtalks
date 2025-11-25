@@ -1,5 +1,12 @@
 @layer components {
-  .section {
-    padding: --spacing(16) --spacing(5);
+  main {
+    & > section {
+      &:first-child {
+        padding-block-start: --spacing(24);
+      }
+      &:last-child {
+        padding-block-end: --spacing(24);
+      }
+    }
   }
 }
