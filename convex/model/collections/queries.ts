@@ -22,7 +22,7 @@ export const getCollection = query({
     id: v.id('collections'),
   },
   handler: async (ctx, args) => await ctx.db.get(args.id),
-  returns: doc('collections', true),
+  returns: doc('collections').nullable(),
 });
 
 /**
@@ -37,7 +37,7 @@ export const getCollectionBySlug = query({
     slug: v.string(),
   },
   handler: async (ctx, args) => await getOneFrom(ctx.db, 'collections', 'by_slug', args.slug),
-  returns: doc('collections', true),
+  returns: doc('collections').nullable(),
 });
 
 /**
