@@ -21,7 +21,7 @@ export function AlphabeticalGrid({ className, groups }: AlphabeticalGridProps) {
             <h2 className="font-semibold text-2xl">{group.letter}</h2>
             <span className="text-muted-foreground text-sm">{group.range}</span>
           </div>
-          <GridList columns={{ default: 1, sm: 2, md: 3, lg: 4, xl: 5 }}>{group.items}</GridList>
+          <GridList columns={{ default: 1, sm: 2, md: 3, lg: 3, xl: 3 }}>{group.items}</GridList>
         </section>
       ))}
     </div>

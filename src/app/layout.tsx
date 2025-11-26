@@ -43,7 +43,7 @@ export default async function RootLayout({
               <Suspense>
                 <SiteHeader />
               </Suspense>
-              <div className="flex-1 py-16" id="content">
+              <div className="flex-1 py-6 sm:py-8 md:py-10 lg:py-12" id="content">
                 {children}
               </div>
               <SiteFooter />

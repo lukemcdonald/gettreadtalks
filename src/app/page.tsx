@@ -10,7 +10,7 @@ import { getFeaturedTalks } from '@/features/talks';
 
 export default async function HomePage() {
   const [featuredTalks, featuredSpeakers] = await Promise.all([
-    getFeaturedTalks(5),
+    getFeaturedTalks(6),
     getFeaturedSpeakers(6),
   ]);
 
@@ -47,7 +47,7 @@ export default async function HomePage() {
         </Container>
       </Section>
 
-      <Section className="border-t" py="xl">
+      <Section py="xl">
         <Container>
           <FeaturedGrid
             columns={{ default: 1, sm: 2, md: 3, lg: 3, xl: 3 }}
