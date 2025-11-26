@@ -9,6 +9,12 @@ import { useMutation as useConvexMutation } from 'convex/react';
 import { captureException } from '@/services/errors/client';
 import { getErrorCode, getErrorMessage } from '@/services/errors/convex';
 
+const DEFAULT_STATE: MutationState = {
+  data: null,
+  error: null,
+  status: 'idle' as MutationStatus,
+};
+
 type UseMutationOptions = {
   onError?: (error: Error) => void;
   onSuccess?: (data: unknown) => void;
@@ -19,16 +25,12 @@ export function useMutation<Mutation extends FunctionReference<'mutation'>>(
   mutation: Mutation,
   options: UseMutationOptions = {},
 ) {
+  const convexMutation = useConvexMutation(mutation);
+  const [state, setState] = useState<MutationState>(DEFAULT_STATE);
+
   const { onError, onSuccess, reportToSentry = true } = options;
 
-  const convexMutation = useConvexMutation(mutation);
-  const [state, setState] = useState<MutationState>({
-    data: null,
-    error: null,
-    status: 'idle' as MutationStatus,
-  });
-
-  const mutate = useCallback(
+  const mutateAsync = useCallback(
     async (...args: Parameters<typeof convexMutation>) => {
       setState((prev) => ({
         ...prev,
@@ -81,12 +83,17 @@ export function useMutation<Mutation extends FunctionReference<'mutation'>>(
     [convexMutation, onSuccess, onError, reportToSentry],
   );
 
+  const mutate = useCallback(
+    (...args: Parameters<typeof convexMutation>) => {
+      mutateAsync(...args).catch(() => {
+        // Error already handled - stored in state and reported to Sentry
+      });
+    },
+    [mutateAsync],
+  );
+
   const reset = useCallback(() => {
-    setState({
-      data: null,
-      error: null,
-      status: 'idle',
-    });
+    setState(DEFAULT_STATE);
   }, []);
 
   // Return state with derived boolean flags for convenience
@@ -98,6 +105,7 @@ export function useMutation<Mutation extends FunctionReference<'mutation'>>(
     isLoading: state.status === 'loading',
     isSuccess: state.status === 'success',
     mutate,
+    mutateAsync,
     reset,
     status: state.status,
   };

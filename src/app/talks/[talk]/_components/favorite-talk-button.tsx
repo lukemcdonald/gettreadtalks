@@ -15,16 +15,16 @@ type FavoriteTalkButtonProps = {
 
 function FavoriteButton({ talkId }: FavoriteTalkButtonProps) {
   const { data: isFavorited, isLoading: isCheckingFavorite } = useIsTalkFavorited(talkId);
-  const { mutate: favoriteTalk, isLoading: isFavoriting } = useFavoriteTalk();
-  const { mutate: unfavoriteTalk, isLoading: isUnfavoriting } = useUnfavoriteTalk();
+  const favoriteTalk = useFavoriteTalk();
+  const unfavoriteTalk = useUnfavoriteTalk();
 
-  const isProcessing = isCheckingFavorite || isFavoriting || isUnfavoriting;
+  const isProcessing = isCheckingFavorite || favoriteTalk.isLoading || unfavoriteTalk.isLoading;
 
-  const handleToggleFavorite = async () => {
+  const handleToggleFavorite = () => {
     if (isFavorited) {
-      await unfavoriteTalk({ talkId });
+      unfavoriteTalk.mutate({ talkId });
     } else {
-      await favoriteTalk({ talkId });
+      favoriteTalk.mutate({ talkId });
     }
   };
 
