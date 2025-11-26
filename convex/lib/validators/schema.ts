@@ -8,11 +8,16 @@ import schema from '../../schema';
 /**
  * Creates a document validator that includes system fields for the specified table.
  * @param tableName - The table name
- * @param nullable - Whether the document can be null (default: false)
+ * @example
+ * doc('talks')
+ * doc('talks').nullable()
  */
-export function doc<T extends TableNames>(tableName: T, nullable = false) {
+export function doc<T extends TableNames>(tableName: T) {
   const docValidator = convexDoc(schema, tableName);
-  return nullable ? v.nullable(docValidator) : docValidator;
+
+  return Object.assign(docValidator, {
+    nullable: () => v.nullable(docValidator),
+  });
 }
 
 /**

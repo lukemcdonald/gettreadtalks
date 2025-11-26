@@ -25,7 +25,7 @@ export const getTalk = query({
     id: v.id('talks'),
   },
   handler: async (ctx, args) => await ctx.db.get(args.id),
-  returns: doc('talks', true),
+  returns: doc('talks').nullable(),
 });
 
 /**
@@ -40,7 +40,7 @@ export const getTalkBySlug = query({
     slug: v.string(),
   },
   handler: async (ctx, args) => await getOneFrom(ctx.db, 'talks', 'by_slug', args.slug),
-  returns: doc('talks', true),
+  returns: doc('talks').nullable(),
 });
 
 /**
@@ -100,8 +100,8 @@ export const getTalkBySlugWithRelations = query({
   returns: v.nullable(
     v.object({
       clips: docs('clips'),
-      collection: doc('collections', true),
-      speaker: doc('speakers', true),
+      collection: doc('collections').nullable(),
+      speaker: doc('speakers').nullable(),
       talk: doc('talks'),
       topics: docs('topics'),
     }),

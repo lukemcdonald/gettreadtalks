@@ -45,8 +45,8 @@ export const getClipBySlugWithRelations = query({
   returns: v.nullable(
     v.object({
       clip: doc('clips'),
-      speaker: doc('speakers', true),
-      talk: doc('talks', true),
+      speaker: doc('speakers').nullable(),
+      talk: doc('talks').nullable(),
       topics: docs('topics'),
     }),
   ),

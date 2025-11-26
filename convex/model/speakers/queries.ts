@@ -19,7 +19,7 @@ export const getSpeaker = query({
     id: v.id('speakers'),
   },
   handler: async (ctx, args) => await ctx.db.get(args.id),
-  returns: doc('speakers', true),
+  returns: doc('speakers').nullable(),
 });
 
 /**
@@ -34,7 +34,7 @@ export const getSpeakerBySlug = query({
     slug: v.string(),
   },
   handler: async (ctx, args) => await getOneFrom(ctx.db, 'speakers', 'by_slug', args.slug),
-  returns: doc('speakers', true),
+  returns: doc('speakers').nullable(),
 });
 
 /**
