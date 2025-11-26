@@ -79,13 +79,12 @@ export const getTopicWithContent = query({
       topic,
     };
   },
-  returns: v.union(
+  returns: v.nullable(
     v.object({
       clips: docs('clips'),
       talks: docs('talks'),
       topic: doc('topics'),
     }),
-    v.null(),
   ),
 });
 

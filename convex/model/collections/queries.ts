@@ -76,12 +76,11 @@ export const getCollectionWithTalks = query({
       talks,
     };
   },
-  returns: v.union(
+  returns: v.nullable(
     v.object({
       collection: doc('collections'),
       talks: docs('talks'),
     }),
-    v.null(),
   ),
 });
 
@@ -124,12 +123,11 @@ export const getCollectionWithSpeakers = query({
       speakers: validSpeakers,
     };
   },
-  returns: v.union(
+  returns: v.nullable(
     v.object({
       collection: doc('collections'),
       speakers: docs('speakers'),
     }),
-    v.null(),
   ),
 });
 
