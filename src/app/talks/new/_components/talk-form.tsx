@@ -78,13 +78,13 @@ export function TalkForm({ collections, initialData, speakers, talkId, talkSlug 
 
     try {
       if (talkId) {
-        await updateTalk.mutate({ ...data, id: talkId });
+        await updateTalk.mutateAsync({ ...data, id: talkId });
 
         const newSlug = slugify(title);
         const slug = newSlug === slugify(initialData?.title) ? (talkSlug ?? newSlug) : newSlug;
         router.push(`/talks/${slug}`);
       } else {
-        await createTalk.mutate(data);
+        await createTalk.mutateAsync(data);
 
         const slug = slugify(title);
         router.push(`/talks/${slug}`);
@@ -114,10 +114,10 @@ export function TalkForm({ collections, initialData, speakers, talkId, talkSlug 
 
     try {
       if (isArchived) {
-        await updateTalk.mutate({ id: talkId, status: 'backlog' });
+        await updateTalk.mutateAsync({ id: talkId, status: 'backlog' });
         setStatus('backlog');
       } else {
-        await archiveTalk.mutate({ id: talkId });
+        await archiveTalk.mutateAsync({ id: talkId });
         setStatus('archived');
       }
       router.push('/talks');
