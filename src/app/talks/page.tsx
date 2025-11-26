@@ -4,9 +4,10 @@ import type { TopicId } from '@/features/topics/types';
 
 import { Suspense } from 'react';
 
+import { Container } from '@/components/container';
 import { FilterUtilityBar } from '@/components/filter-utility-bar';
-import { ArchiveSidebar } from '@/components/layouts/archive-sidebar';
-import { SidebarLayout } from '@/components/layouts/sidebar-layout';
+import { Layout } from '@/components/layout';
+import { Section } from '@/components/section';
 import { getAllSpeakersForFilter, getAllTopicsForFilter, getTalks } from '@/features/talks';
 import { getCurrentUser } from '@/services/auth/server';
 import { Pagination } from './_components/pagination';
@@ -71,21 +72,26 @@ export default async function TalksPage({ searchParams }: TalksPageProps) {
   ]);
 
   return (
-    <SidebarLayout
-      sidebar={
-        <ArchiveSidebar
-          description="Elevate your spiritual heartbeat with Christ centered talks."
-          title="Talks"
-        />
-      }
-    >
-      <div className="space-y-6">
-        <FilterUtilityBar isAuthenticated={!!user} speakers={speakers} topics={topics} />
+    <Section py="xl">
+      <Container>
+        <Layout>
+          <Layout.Sidebar>
+            <header className="space-y-2">
+              <h2 className="font-semibold text-2xl">Talks</h2>
+              <p className="text-muted-foreground text-sm">
+                Elevate your spiritual heartbeat with Christ centered talks.
+              </p>
+            </header>
+          </Layout.Sidebar>
+          <Layout.Content>
+            <FilterUtilityBar isAuthenticated={!!user} speakers={speakers} topics={topics} />
 
-        <Suspense fallback={<TalksListSkeleton />}>
-          <TalksContent params={params} />
-        </Suspense>
-      </div>
-    </SidebarLayout>
+            <Suspense fallback={<TalksListSkeleton />}>
+              <TalksContent params={params} />
+            </Suspense>
+          </Layout.Content>
+        </Layout>
+      </Container>
+    </Section>
   );
 }

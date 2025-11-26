@@ -1,8 +1,9 @@
 import { Suspense } from 'react';
 
-import { ArchiveSidebar } from '@/components/layouts/archive-sidebar';
-import { SidebarLayout } from '@/components/layouts/sidebar-layout';
+import { Container } from '@/components/container';
+import { Layout } from '@/components/layout';
 import { SearchInput } from '@/components/search-input';
+import { Section } from '@/components/section';
 import { SelectFilter } from '@/components/select-filter';
 import { SidebarContent } from '@/components/sidebar-content';
 import { SortSelect } from '@/components/sort-select';
@@ -21,38 +22,45 @@ export default async function CollectionsPage() {
   const sortedSpeakersWithCollections = sortSpeakersByName(speakersWithCollections);
 
   return (
-    <SidebarLayout
-      sidebar={
-        <ArchiveSidebar
-          description="Each series includes talks given by one or more speakers on the same topic or book of the Bible."
-          title="Collections"
-        >
-          <SidebarContent>
-            <div className="space-y-2">
-              <SearchInput paramName="search" placeholder="Search collections..." />
-              <SelectFilter
-                options={sortedSpeakersWithCollections.map((speaker) => ({
-                  label: `${speaker.firstName} ${speaker.lastName}`,
-                  value: speaker.slug,
-                }))}
-                paramName="speaker"
-                placeholder="All Speakers"
-              />
-              <SortSelect
-                options={[
-                  { label: 'Most Talks', value: 'most-talks' },
-                  { label: 'Least Talks', value: 'least-talks' },
-                  { label: 'Alphabetical', value: 'alphabetical' },
-                ]}
-              />
-            </div>
-          </SidebarContent>
-        </ArchiveSidebar>
-      }
-    >
-      <Suspense>
-        <CollectionsList collections={result.page} />
-      </Suspense>
-    </SidebarLayout>
+    <Section py="xl">
+      <Container>
+        <Layout>
+          <Layout.Sidebar>
+            <header className="space-y-2">
+              <h2 className="font-semibold text-2xl">Collections</h2>
+              <p className="text-muted-foreground text-sm">
+                Each series includes talks given by one or more speakers on the same topic or book
+                of the Bible.
+              </p>
+            </header>
+            <SidebarContent>
+              <div className="space-y-2">
+                <SearchInput paramName="search" placeholder="Search collections..." />
+                <SelectFilter
+                  options={sortedSpeakersWithCollections.map((speaker) => ({
+                    label: `${speaker.firstName} ${speaker.lastName}`,
+                    value: speaker.slug,
+                  }))}
+                  paramName="speaker"
+                  placeholder="All Speakers"
+                />
+                <SortSelect
+                  options={[
+                    { label: 'Most Talks', value: 'most-talks' },
+                    { label: 'Least Talks', value: 'least-talks' },
+                    { label: 'Alphabetical', value: 'alphabetical' },
+                  ]}
+                />
+              </div>
+            </SidebarContent>
+          </Layout.Sidebar>
+          <Layout.Content>
+            <Suspense>
+              <CollectionsList collections={result.page} />
+            </Suspense>
+          </Layout.Content>
+        </Layout>
+      </Container>
+    </Section>
   );
 }

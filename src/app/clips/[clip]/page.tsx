@@ -1,9 +1,11 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import { SidebarLayout } from '@/components/layouts/sidebar-layout';
+import { Container } from '@/components/container';
+import { Layout } from '@/components/layout';
 import { MediaEmbed } from '@/components/media-embed';
 import { PageHeader } from '@/components/page-header';
+import { Section } from '@/components/section';
 import { SidebarContent } from '@/components/sidebar-content';
 import { getClipBySlug } from '@/features/clips';
 
@@ -25,57 +27,63 @@ export default async function ClipPage({ params }: ClipPageProps) {
   const speakerName = speaker ? `${speaker.firstName} ${speaker.lastName}` : null;
 
   return (
-    <SidebarLayout
-      sidebar={
-        <>
-          <PageHeader title={clip.title} />
+    <Section py="xl">
+      <Container>
+        <Layout>
+          <Layout.Sidebar>
+            <PageHeader title={clip.title} />
 
-          {speaker && (
-            <SidebarContent title="Speaker">
-              <div className="space-y-2">
-                <p className="font-semibold">{speakerName}</p>
-                {speaker.role && <p className="text-muted-foreground text-sm">{speaker.role}</p>}
-                {speaker.ministry && (
-                  <p className="text-muted-foreground text-sm">{speaker.ministry}</p>
-                )}
-                <Link
-                  className="text-primary text-sm hover:underline"
-                  href={`/speakers/${speaker.slug}`}
-                >
-                  View all talks →
-                </Link>
+            {speaker && (
+              <SidebarContent title="Speaker">
+                <div className="space-y-2">
+                  <p className="font-semibold">{speakerName}</p>
+                  {speaker.role && <p className="text-muted-foreground text-sm">{speaker.role}</p>}
+                  {speaker.ministry && (
+                    <p className="text-muted-foreground text-sm">{speaker.ministry}</p>
+                  )}
+                  <Link
+                    className="text-primary text-sm hover:underline"
+                    href={`/speakers/${speaker.slug}`}
+                  >
+                    View all talks →
+                  </Link>
+                </div>
+              </SidebarContent>
+            )}
+
+            {talk && (
+              <SidebarContent title="Related Talk">
+                <div className="space-y-2">
+                  <p className="font-semibold">{talk.title}</p>
+                  {talk.description && (
+                    <p className="line-clamp-2 text-muted-foreground text-sm">{talk.description}</p>
+                  )}
+                  <Link
+                    className="text-primary text-sm hover:underline"
+                    href={`/talks/${talk.slug}`}
+                  >
+                    View talk →
+                  </Link>
+                </div>
+              </SidebarContent>
+            )}
+          </Layout.Sidebar>
+          <Layout.Content>
+            {clip.mediaUrl && (
+              <div className="space-y-4">
+                <MediaEmbed mediaUrl={clip.mediaUrl} />
               </div>
-            </SidebarContent>
-          )}
+            )}
 
-          {talk && (
-            <SidebarContent title="Related Talk">
+            {clip.description && (
               <div className="space-y-2">
-                <p className="font-semibold">{talk.title}</p>
-                {talk.description && (
-                  <p className="line-clamp-2 text-muted-foreground text-sm">{talk.description}</p>
-                )}
-                <Link className="text-primary text-sm hover:underline" href={`/talks/${talk.slug}`}>
-                  View talk →
-                </Link>
+                <h2 className="font-semibold text-lg">Description</h2>
+                <p className="text-muted-foreground">{clip.description}</p>
               </div>
-            </SidebarContent>
-          )}
-        </>
-      }
-    >
-      {clip.mediaUrl && (
-        <div className="space-y-4">
-          <MediaEmbed mediaUrl={clip.mediaUrl} />
-        </div>
-      )}
-
-      {clip.description && (
-        <div className="space-y-2">
-          <h2 className="font-semibold text-lg">Description</h2>
-          <p className="text-muted-foreground">{clip.description}</p>
-        </div>
-      )}
-    </SidebarLayout>
+            )}
+          </Layout.Content>
+        </Layout>
+      </Container>
+    </Section>
   );
 }
