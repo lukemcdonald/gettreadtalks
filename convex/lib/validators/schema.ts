@@ -12,7 +12,7 @@ import schema from '../../schema';
  */
 export function doc<T extends TableNames>(tableName: T, nullable = false) {
   const docValidator = convexDoc(schema, tableName);
-  return nullable ? v.union(docValidator, v.null()) : docValidator;
+  return nullable ? v.nullable(docValidator) : docValidator;
 }
 
 /**

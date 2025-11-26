@@ -97,7 +97,7 @@ export const getTalkBySlugWithRelations = query({
       topics: validTopics,
     };
   },
-  returns: v.union(
+  returns: v.nullable(
     v.object({
       clips: docs('clips'),
       collection: doc('collections', true),
@@ -105,7 +105,6 @@ export const getTalkBySlugWithRelations = query({
       talk: doc('talks'),
       topics: docs('topics'),
     }),
-    v.null(),
   ),
 });
 
