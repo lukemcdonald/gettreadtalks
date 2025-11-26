@@ -1,4 +1,7 @@
 {
+  "codegen": {
+    "fileType": "ts"
+  },
   "functions": "convex/",
   "generateCommonJSApi": false,
   "node": {
