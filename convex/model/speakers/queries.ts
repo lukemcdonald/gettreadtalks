@@ -1,8 +1,11 @@
+import { paginationOptsValidator, paginationResultValidator } from 'convex/server';
 import { v } from 'convex/values';
 import { getOneFrom } from 'convex-helpers/server/relationships';
 
 import { query } from '../../_generated/server';
 import { doc, docs } from '../../lib/validators/schema';
+
+const speakerPageValidator = paginationResultValidator(doc('speakers'));
 
 /**
  * Get speaker by ID.
@@ -88,7 +91,7 @@ export const listFeaturedSpeakers = query({
  */
 export const listSpeakers = query({
   args: {
-    paginationOpts: v.any(), // PaginationOptions
+    paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) =>
     await ctx.db
@@ -96,5 +99,5 @@ export const listSpeakers = query({
       .withIndex('by_lastName')
       .order('asc')
       .paginate(args.paginationOpts),
-  returns: v.any(), // PaginationResult<Doc<'speakers'>>
+  returns: speakerPageValidator,
 });

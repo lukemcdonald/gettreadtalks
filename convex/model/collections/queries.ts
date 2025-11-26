@@ -1,11 +1,14 @@
 import type { Doc } from '../../_generated/dataModel';
 
+import { paginationOptsValidator, paginationResultValidator } from 'convex/server';
 import { v } from 'convex/values';
 import { asyncMap } from 'convex-helpers';
 import { getAll, getOneFrom } from 'convex-helpers/server/relationships';
 
 import { query } from '../../_generated/server';
 import { doc, docs } from '../../lib/validators/schema';
+
+const collectionPageValidator = paginationResultValidator(doc('collections'));
 
 /**
  * Get collection by ID.
@@ -139,11 +142,11 @@ export const getCollectionWithSpeakers = query({
  */
 export const listCollections = query({
   args: {
-    paginationOpts: v.any(), // PaginationOptions
+    paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) =>
     await ctx.db.query('collections').order('desc').paginate(args.paginationOpts),
-  returns: v.any(), // PaginationResult<Doc<'collections'>>
+  returns: collectionPageValidator,
 });
 
 /**
@@ -191,7 +194,7 @@ export const listCollectionsBySpeaker = query({
  */
 export const listCollectionsWithStats = query({
   args: {
-    paginationOpts: v.any(), // PaginationOptions
+    paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
     const result = await ctx.db.query('collections').order('desc').paginate(args.paginationOpts);
@@ -224,5 +227,5 @@ export const listCollectionsWithStats = query({
       page: enrichedPage,
     };
   },
-  returns: v.any(), // PaginationResult with enriched data
+  returns: v.any(), // PaginationResult with enriched page: Array<{ collection, speakers, talkCount }>
 });
