@@ -4,9 +4,11 @@ import { notFound } from 'next/navigation';
 
 import { ClipCard } from '@/components/clip-card';
 import { CollectionCard } from '@/components/collection-card';
+import { Container } from '@/components/container';
 import { GridList } from '@/components/grid-list';
-import { SidebarLayout } from '@/components/layouts/sidebar-layout';
+import { Layout } from '@/components/layout';
 import { PageHeader } from '@/components/page-header';
+import { Section } from '@/components/section';
 import { SidebarContent } from '@/components/sidebar-content';
 import { TalkCard } from '@/components/talk-card';
 import { Separator } from '@/components/ui/separator';
@@ -30,146 +32,154 @@ export default async function SpeakerPage({ params }: SpeakerPageProps) {
   const speakerName = `${speaker.firstName} ${speaker.lastName}`;
 
   return (
-    <SidebarLayout
-      sidebar={
-        <>
-          {speaker.imageUrl && (
-            <SidebarContent>
-              <div className="relative aspect-square overflow-hidden rounded-lg">
-                <Image alt={speakerName} className="object-cover" fill src={speaker.imageUrl} />
+    <Section py="xl">
+      <Container>
+        <Layout>
+          <Layout.Sidebar>
+            {speaker.imageUrl && (
+              <SidebarContent>
+                <div className="relative aspect-square overflow-hidden rounded-lg">
+                  <Image alt={speakerName} className="object-cover" fill src={speaker.imageUrl} />
+                </div>
+              </SidebarContent>
+            )}
+
+            <SidebarContent title="About">
+              <div className="space-y-2 text-sm">
+                {speaker.role && (
+                  <div>
+                    <span className="font-semibold">Role:</span>{' '}
+                    <span className="text-muted-foreground">{speaker.role}</span>
+                  </div>
+                )}
+                {speaker.ministry && (
+                  <div>
+                    <span className="font-semibold">Ministry:</span>{' '}
+                    <span className="text-muted-foreground">{speaker.ministry}</span>
+                  </div>
+                )}
               </div>
             </SidebarContent>
-          )}
 
-          <SidebarContent title="About">
-            <div className="space-y-2 text-sm">
-              {speaker.role && (
+            <SidebarContent title="Content">
+              <div className="space-y-2 text-sm">
                 <div>
-                  <span className="font-semibold">Role:</span>{' '}
-                  <span className="text-muted-foreground">{speaker.role}</span>
+                  <Link className="text-primary hover:underline" href={`/speakers/${slug}#talks`}>
+                    {talks.length} {talks.length === 1 ? 'Talk' : 'Talks'} →
+                  </Link>
                 </div>
-              )}
-              {speaker.ministry && (
-                <div>
-                  <span className="font-semibold">Ministry:</span>{' '}
-                  <span className="text-muted-foreground">{speaker.ministry}</span>
-                </div>
-              )}
-            </div>
-          </SidebarContent>
-
-          <SidebarContent title="Content">
-            <div className="space-y-2 text-sm">
-              <div>
-                <Link className="text-primary hover:underline" href={`/speakers/${slug}#talks`}>
-                  {talks.length} {talks.length === 1 ? 'Talk' : 'Talks'} →
-                </Link>
+                {collections.length > 0 && (
+                  <div>
+                    <Link
+                      className="text-primary hover:underline"
+                      href={`/speakers/${slug}#collections`}
+                    >
+                      {collections.length} {collections.length === 1 ? 'Collection' : 'Collections'}{' '}
+                      →
+                    </Link>
+                  </div>
+                )}
+                {clips.length > 0 && (
+                  <div>
+                    <Link className="text-primary hover:underline" href={`/speakers/${slug}#clips`}>
+                      {clips.length} {clips.length === 1 ? 'Clip' : 'Clips'} →
+                    </Link>
+                  </div>
+                )}
               </div>
-              {collections.length > 0 && (
-                <div>
-                  <Link
-                    className="text-primary hover:underline"
-                    href={`/speakers/${slug}#collections`}
-                  >
-                    {collections.length} {collections.length === 1 ? 'Collection' : 'Collections'} →
-                  </Link>
-                </div>
+            </SidebarContent>
+          </Layout.Sidebar>
+          <Layout.Content>
+            <PageHeader title={speakerName} />
+
+            {speaker.description && (
+              <div className="space-y-4">
+                <p className="text-muted-foreground">{speaker.description}</p>
+              </div>
+            )}
+
+            <Separator />
+
+            <div className="space-y-12">
+              {talks.length > 0 && (
+                <section className="space-y-6">
+                  <h2 className="font-semibold text-2xl">Talks</h2>
+                  <p className="text-muted-foreground">Enjoy more talks by {speakerName}.</p>
+                  <GridList>
+                    {talks.map((talk) => (
+                      <TalkCard
+                        featured={talk.featured}
+                        key={talk._id}
+                        speaker={{
+                          firstName: speaker.firstName,
+                          imageUrl: speaker.imageUrl,
+                          lastName: speaker.lastName,
+                          slug: speaker.slug,
+                        }}
+                        talk={{
+                          description: talk.description,
+                          slug: talk.slug,
+                          title: talk.title,
+                        }}
+                      />
+                    ))}
+                  </GridList>
+                </section>
               )}
+
+              {collections.length > 0 && (
+                <section className="space-y-6">
+                  <h2 className="font-semibold text-2xl">Collections</h2>
+                  <GridList>
+                    {collections.map((collection) => (
+                      <CollectionCard
+                        collection={{
+                          description: collection.description,
+                          slug: collection.slug,
+                          title: collection.title,
+                        }}
+                        key={collection._id}
+                      />
+                    ))}
+                  </GridList>
+                </section>
+              )}
+
               {clips.length > 0 && (
-                <div>
-                  <Link className="text-primary hover:underline" href={`/speakers/${slug}#clips`}>
-                    {clips.length} {clips.length === 1 ? 'Clip' : 'Clips'} →
-                  </Link>
-                </div>
+                <section className="space-y-6">
+                  <h2 className="font-semibold text-2xl">Clips</h2>
+                  <p className="text-muted-foreground">
+                    Be encouraged by {clips.length === 1 ? 'this short' : 'these short'} Christ
+                    centered {clips.length === 1 ? 'clip' : 'clips'}.
+                  </p>
+                  <GridList>
+                    {clips.map((clip) => (
+                      <ClipCard
+                        clip={{
+                          description: clip.description,
+                          slug: clip.slug,
+                          title: clip.title,
+                        }}
+                        key={clip._id}
+                        speaker={{
+                          firstName: speaker.firstName,
+                          imageUrl: speaker.imageUrl,
+                          lastName: speaker.lastName,
+                          slug: speaker.slug,
+                        }}
+                      />
+                    ))}
+                  </GridList>
+                </section>
               )}
             </div>
-          </SidebarContent>
-        </>
-      }
-    >
-      <PageHeader title={speakerName} />
+          </Layout.Content>
 
-      {speaker.description && (
-        <div className="space-y-4">
-          <p className="text-muted-foreground">{speaker.description}</p>
-        </div>
-      )}
-
-      <Separator />
-
-      <div className="space-y-12">
-        {talks.length > 0 && (
-          <section className="space-y-6">
-            <h2 className="font-semibold text-2xl">Talks</h2>
-            <p className="text-muted-foreground">Enjoy more talks by {speakerName}.</p>
-            <GridList>
-              {talks.map((talk) => (
-                <TalkCard
-                  featured={talk.featured}
-                  key={talk._id}
-                  speaker={{
-                    firstName: speaker.firstName,
-                    imageUrl: speaker.imageUrl,
-                    lastName: speaker.lastName,
-                    slug: speaker.slug,
-                  }}
-                  talk={{
-                    description: talk.description,
-                    slug: talk.slug,
-                    title: talk.title,
-                  }}
-                />
-              ))}
-            </GridList>
-          </section>
-        )}
-
-        {collections.length > 0 && (
-          <section className="space-y-6">
-            <h2 className="font-semibold text-2xl">Collections</h2>
-            <GridList>
-              {collections.map((collection) => (
-                <CollectionCard
-                  collection={{
-                    description: collection.description,
-                    slug: collection.slug,
-                    title: collection.title,
-                  }}
-                  key={collection._id}
-                />
-              ))}
-            </GridList>
-          </section>
-        )}
-
-        {clips.length > 0 && (
-          <section className="space-y-6">
-            <h2 className="font-semibold text-2xl">Clips</h2>
-            <p className="text-muted-foreground">
-              Be encouraged by {clips.length === 1 ? 'this short' : 'these short'} Christ centered{' '}
-              {clips.length === 1 ? 'clip' : 'clips'}.
-            </p>
-            <GridList>
-              {clips.map((clip) => (
-                <ClipCard
-                  clip={{
-                    description: clip.description,
-                    slug: clip.slug,
-                    title: clip.title,
-                  }}
-                  key={clip._id}
-                  speaker={{
-                    firstName: speaker.firstName,
-                    imageUrl: speaker.imageUrl,
-                    lastName: speaker.lastName,
-                    slug: speaker.slug,
-                  }}
-                />
-              ))}
-            </GridList>
-          </section>
-        )}
-      </div>
-    </SidebarLayout>
+          <Layout.Sidebar>
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
+          </Layout.Sidebar>
+        </Layout>
+      </Container>
+    </Section>
   );
 }
