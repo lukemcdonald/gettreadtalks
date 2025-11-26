@@ -10,7 +10,6 @@ import { Empty, EmptyDescription } from '@/components/ui/empty';
 type TopicWithCount = {
   count: number;
   topic: {
-    _id: string;
     slug: string;
     title: string;
   };
@@ -61,7 +60,7 @@ export function TopicsList({ topics }: TopicsListProps) {
   return (
     <GridList>
       {filteredAndSorted.map((item) => (
-        <TopicCard key={item.topic._id} talkCount={item.count} topic={item.topic} />
+        <TopicCard key={item.topic.slug} talkCount={item.count} topic={item.topic} />
       ))}
     </GridList>
   );

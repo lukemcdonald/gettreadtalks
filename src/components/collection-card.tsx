@@ -3,10 +3,15 @@
 import type { Collection } from '@/features/collections/types';
 import type { Speaker } from '@/features/speakers/types';
 
-import Link from 'next/link';
-
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardLink,
+  CardTitle,
+} from '@/components/ui/card';
 import { getSpeakerInitials, getSpeakerName } from '@/features/speakers';
 
 type CollectionCardProps = {
@@ -20,19 +25,17 @@ export function CollectionCard({ collection, speakers = [], talkCount }: Collect
   const remainingCount = speakers.length > 3 ? speakers.length - 3 : 0;
 
   return (
-    <Card
-      className="group min-w-0 transition-all hover:shadow-md"
-      render={<Link href={`/collections/${collection.slug}`} />}
-    >
-      <CardHeader>
-        <CardTitle className="group-hover:text-primary">{collection.title}</CardTitle>
-        {collection.description && (
-          <p className="line-clamp-2 text-muted-foreground text-sm">{collection.description}</p>
-        )}
+    <Card variant="interactive">
+      <CardHeader className="grow content-start gap-4">
+        <CardTitle>
+          <CardLink href={`/collections/${collection.slug}`}>{collection.title}</CardLink>
+        </CardTitle>
+
+        {collection.description && <CardDescription>{collection.description}</CardDescription>}
         {talkCount !== undefined && (
-          <p className="mt-2 text-muted-foreground text-sm">
+          <CardDescription>
             {talkCount} {talkCount === 1 ? 'Talk' : 'Talks'}
-          </p>
+          </CardDescription>
         )}
       </CardHeader>
 

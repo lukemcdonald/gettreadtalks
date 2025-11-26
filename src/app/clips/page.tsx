@@ -2,7 +2,6 @@ import { Suspense } from 'react';
 
 import { ArchiveSidebar } from '@/components/layouts/archive-sidebar';
 import { SidebarLayout } from '@/components/layouts/sidebar-layout';
-import { PageHeader } from '@/components/page-header';
 import { SearchInput } from '@/components/search-input';
 import { SelectFilter } from '@/components/select-filter';
 import { SidebarContent } from '@/components/sidebar-content';
@@ -39,12 +38,6 @@ export default async function ClipsPage() {
 
   return (
     <SidebarLayout
-      header={
-        <PageHeader
-          description="Be encouraged by these short Christ centered clips."
-          title="Clips"
-        />
-      }
       sidebar={
         <ArchiveSidebar
           description="Be encouraged by these short Christ centered clips."

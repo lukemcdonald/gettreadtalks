@@ -2,31 +2,24 @@
 
 import Link from 'next/link';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardDescription, CardTitle } from '@/components/ui/card';
 
 type TopicCardProps = {
-  topic: {
-    _id: string;
-    slug: string;
-    title: string;
-  };
   talkCount: number;
+  topic: { slug: string; title: string };
 };
 
 export function TopicCard({ talkCount, topic }: TopicCardProps) {
   return (
     <Card
-      className="group min-w-0 transition-all hover:shadow-md"
+      className="relative flex-row items-center gap-4 p-4"
       render={<Link href={`/topics/${topic.slug}`} />}
+      variant="interactive"
     >
-      <CardHeader>
-        <CardTitle className="group-hover:text-primary">{topic.title}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <p className="text-muted-foreground text-sm">
-          {talkCount} {talkCount === 1 ? 'Talk' : 'Talks'}
-        </p>
-      </CardContent>
+      <CardTitle>{topic.title}</CardTitle>
+      <CardDescription>
+        {talkCount} {talkCount === 1 ? 'Talk' : 'Talks'}
+      </CardDescription>
     </Card>
   );
 }

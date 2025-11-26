@@ -29,7 +29,7 @@ export function TalkCard({ featured, favorited, finished, speaker, talk }: TalkC
       variant="interactive"
     >
       {speaker && <SpeakerAvatar speaker={speaker} />}
-      <div className="flex-1 space-y-1.5">
+      <div className="flex-1 space-y-1">
         <CardTitle>
           <CardLink aria-label={accessibleLabel} href={`/talks/${talk.slug}`}>
             {talk.title}
