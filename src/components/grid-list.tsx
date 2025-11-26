@@ -58,7 +58,7 @@ export function GridList({ children, className, columns }: GridListProps) {
     sm: smCols = 2,
     md: mdCols = 2,
     lg: lgCols = 3,
-    xl: xlCols = 4,
+    xl: xlCols = 3,
   } = columns || {};
 
   return (
