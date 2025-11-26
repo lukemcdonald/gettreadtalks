@@ -1,9 +1,12 @@
+import { paginationOptsValidator, paginationResultValidator } from 'convex/server';
 import { v } from 'convex/values';
 import { getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
 
 import { query } from '../../_generated/server';
 import { doc, docs } from '../../lib/validators/schema';
 import { statusType } from './validators';
+
+const clipPageValidator = paginationResultValidator(doc('clips'));
 
 /**
  * Get clip by slug with related data.
@@ -59,7 +62,7 @@ export const getClipBySlugWithRelations = query({
  */
 export const listClips = query({
   args: {
-    paginationOpts: v.any(), // PaginationOptions
+    paginationOpts: paginationOptsValidator,
     status: v.optional(statusType),
   },
   handler: async (ctx, args) => {
@@ -75,7 +78,7 @@ export const listClips = query({
 
     return await ctx.db.query('clips').order('desc').paginate(paginationOpts);
   },
-  returns: v.any(), // PaginationResult<Doc<'clips'>>
+  returns: clipPageValidator,
 });
 
 /**
