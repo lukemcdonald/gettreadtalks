@@ -8,8 +8,14 @@ interface LayoutSidebarProps extends useRender.ComponentProps<'aside'> {}
 export function LayoutSidebar({ className, render, ...delegated }: LayoutSidebarProps) {
   const defaultProps = {
     className: cn(
-      'space-y-6 md:nth-3:col-span-2 lg:sticky lg:top-8 lg:nth-3:col-span-1 lg:h-fit',
+      'col-span-full space-y-6',
+      'md:col-span-3',
+      // Sticky behavior
+      'md:sticky md:top-8 md:h-fit',
       className,
+      // Second sidebar: override to full width on md, back to 3 on lg
+      'md:[div[data-sidebar-count="2"]_&:nth-of-type(2)]:col-span-full',
+      'lg:[div[data-sidebar-count="2"]_&:nth-of-type(2)]:col-span-3',
     ),
   };
 

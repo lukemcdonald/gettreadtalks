@@ -7,7 +7,14 @@ interface LayoutContentProps extends useRender.ComponentProps<'main'> {}
 
 export function LayoutContent({ className, render, ...delegated }: LayoutContentProps) {
   const defaultProps = {
-    className: cn('min-w-0 space-y-6', className),
+    className: cn(
+      'col-span-full min-w-0 space-y-6',
+      // Default: 9 cols on md+
+      'md:col-span-9',
+      // Dual sidebar override: 6 cols on lg
+      'lg:[div[data-sidebar-count="2"]_&]:col-span-6',
+      className,
+    ),
   };
 
   return useRender({
