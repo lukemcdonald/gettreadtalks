@@ -62,7 +62,7 @@ export default function LoginPage() {
   };
 
   return (
-    <PageLayout containerClassName="mx-auto max-w-prose">
+    <PageLayout>
       <PageLayout.Content>
         <div className="m-auto w-full max-w-md space-y-8">
           <div>

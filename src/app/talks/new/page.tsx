@@ -15,7 +15,7 @@ export default async function NewTalkPage() {
   const [collections, speakers] = await Promise.all([getAllCollections(), getAllSpeakers()]);
 
   return (
-    <PageLayout containerClassName="mx-auto max-w-prose">
+    <PageLayout>
       <PageLayout.Content>
         <h1 className="mb-6 font-semibold text-2xl">Create New Talk</h1>
         <TalkForm collections={collections} speakers={speakers} />

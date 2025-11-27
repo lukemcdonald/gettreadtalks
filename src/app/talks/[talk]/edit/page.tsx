@@ -29,7 +29,7 @@ export default async function EditTalkPage({ params }: EditTalkPageProps) {
   const [collections, speakers] = await Promise.all([getAllCollections(), getAllSpeakers()]);
 
   return (
-    <PageLayout containerClassName="mx-auto max-w-prose">
+    <PageLayout>
       <PageLayout.Content>
         <h1 className="mb-6 font-semibold text-2xl">Edit Talk</h1>
 

@@ -8,11 +8,6 @@ import { LayoutFooter } from './layout-footer';
 import { LayoutHeader } from './layout-header';
 import { LayoutSidebar } from './layout-sidebar';
 
-const GRID_CLASSES: Record<number, string> = {
-  0: 'grid-cols-1',
-  1: 'md:grid-cols-12',
-};
-
 const ORDER_CLASSES: Record<number, string> = {
   1: 'order-[-10] md:order-none',
   2: 'order-[-20] md:order-none',
@@ -43,15 +38,14 @@ export function Layout({ children, className }: LayoutProps) {
       style?: React.CSSProperties;
     };
 
-    // Track sidebar position (primary/secondary)
+    // Count sidebars for layout detection
     if (child.type === LayoutSidebar) {
-      props['data-position'] = sidebarCount === 0 ? 'primary' : 'secondary';
       sidebarCount += 1;
     }
 
     // Calculate priority order for any child with priority prop
     if (childProps.priority) {
-      priorityIndex++;
+      priorityIndex += 1;
       const priorityLevel = childrenArray.length - priorityIndex + 1;
       const orderClass = ORDER_CLASSES[priorityLevel];
 
@@ -64,10 +58,12 @@ export function Layout({ children, className }: LayoutProps) {
     return Object.keys(props).length > 0 ? cloneElement(child, props) : child;
   });
 
-  const gridClass = GRID_CLASSES[sidebarCount] ?? GRID_CLASSES[1];
-
   return (
-    <div className={cn('grid gap-6', gridClass, className)} data-sidebar-count={sidebarCount}>
+    <div
+      className={cn('grid grid-cols-[var(--layout-grid-columns)] gap-6', className)}
+      data-sidebar-count={sidebarCount}
+      data-slot="layout"
+    >
       {enhancedChildren}
     </div>
   );

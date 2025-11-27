@@ -16,19 +16,8 @@ export function LayoutSidebar({
   ...delegated
 }: LayoutSidebarProps) {
   const defaultProps = {
+    className: cn('space-y-6', sticky && 'md:sticky md:top-20 md:h-fit', className),
     'data-slot': 'layout-sidebar',
-    className: cn(
-      'col-span-full space-y-6',
-      // All sidebars default to 3 cols on md+
-      'md:col-span-3',
-      // Sticky behavior (opt-in with sticky={true})
-      // top-20 = 5rem = 80px (accounts for site header + gap)
-      sticky && 'md:sticky md:top-20 md:h-fit',
-      // Secondary sidebar: full width on md, back to 3 on lg
-      'md:[&[data-position="secondary"]]:col-span-full',
-      'lg:[&[data-position="secondary"]]:col-span-3',
-      className,
-    ),
   };
 
   return useRender({

@@ -9,4 +9,73 @@
       }
     }
   }
+
+  /* Layout Component Styles */
+  [data-slot="layout"] {
+    /* Content & Sidebar: full width on mobile */
+    & > [data-slot="layout-content"],
+    & > [data-slot="layout-sidebar"] {
+      @apply col-span-full;
+    }
+
+    /* Header & Footer: full width on mobile */
+    & > [data-slot="layout-header"],
+    & > [data-slot="layout-footer"] {
+      @apply col-span-full;
+    }
+
+    @variant md {
+      /* Header & Footer: always full width on md+ */
+      & > [data-slot="layout-header"],
+      & > [data-slot="layout-footer"] {
+        @apply col-span-full;
+      }
+
+      /* Content: default 9 cols on md+ (with sidebars) */
+      & > [data-slot="layout-content"] {
+        @apply col-span-9;
+      }
+
+      /* Content: full width when no sidebars */
+      &[data-sidebar-count="0"] > [data-slot="layout-content"] {
+        @apply col-span-full;
+      }
+
+      /* Sidebar: 3 cols on md+ */
+      & > [data-slot="layout-sidebar"] {
+        @apply col-span-3;
+      }
+
+      /* Dual sidebar: second sidebar wraps full width on md */
+      &
+        > [data-slot="layout-sidebar"]
+        + [data-slot="layout-content"]
+        + [data-slot="layout-sidebar"],
+      &
+        > [data-slot="layout-content"]
+        + [data-slot="layout-sidebar"]
+        + [data-slot="layout-sidebar"] {
+        @apply col-span-full;
+      }
+    }
+
+    @variant lg {
+      /* Dual sidebar: second sidebar back to 3 cols on lg */
+      &
+        > [data-slot="layout-sidebar"]
+        + [data-slot="layout-content"]
+        + [data-slot="layout-sidebar"],
+      &
+        > [data-slot="layout-content"]
+        + [data-slot="layout-sidebar"]
+        + [data-slot="layout-sidebar"] {
+        @apply col-span-3;
+      }
+
+      /* Dual sidebar: content shrinks to 6 cols on lg */
+      &[data-sidebar-count="2"] > [data-slot="layout-content"] {
+        @apply col-span-6;
+      }
+    }
+  }
 }
