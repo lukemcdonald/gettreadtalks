@@ -7,7 +7,7 @@ export default async function AccountLayout({ children }: { children: React.Reac
 
   return (
     <PageLayout>
-      <PageLayout.Sidebar>
+      <PageLayout.Sidebar sticky>
         <LayoutSidebar />
       </PageLayout.Sidebar>
       <PageLayout.Content>{children}</PageLayout.Content>

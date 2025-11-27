@@ -12,7 +12,7 @@ export default async function TopicsPage() {
 
   return (
     <PageLayout>
-      <PageLayout.Sidebar>
+      <PageLayout.Sidebar sticky>
         <header className="space-y-2">
           <h2 className="font-semibold text-2xl">Topics</h2>
           <p className="text-muted-foreground text-sm">
