@@ -3,7 +3,7 @@ import { useRender } from '@base-ui-components/react/use-render';
 
 import { cn } from '@/utils';
 
-interface LayoutContentProps extends useRender.ComponentProps<'main'> {}
+interface LayoutContentProps extends useRender.ComponentProps<'div'> {}
 
 export function LayoutContent({ className, render, ...delegated }: LayoutContentProps) {
   const defaultProps = {
@@ -18,8 +18,8 @@ export function LayoutContent({ className, render, ...delegated }: LayoutContent
   };
 
   return useRender({
-    defaultTagName: 'main',
-    props: mergeProps<'main'>(defaultProps, delegated),
+    defaultTagName: 'div',
+    props: mergeProps<'div'>(defaultProps, delegated),
     render,
   });
 }

@@ -3,7 +3,7 @@ import { useRender } from '@base-ui-components/react/use-render';
 
 import { cn } from '@/utils';
 
-interface LayoutSidebarProps extends useRender.ComponentProps<'aside'> {}
+interface LayoutSidebarProps extends useRender.ComponentProps<'div'> {}
 
 export function LayoutSidebar({ className, render, ...delegated }: LayoutSidebarProps) {
   const defaultProps = {
@@ -19,8 +19,8 @@ export function LayoutSidebar({ className, render, ...delegated }: LayoutSidebar
   };
 
   return useRender({
-    defaultTagName: 'aside',
-    props: mergeProps<'aside'>(defaultProps, delegated),
+    defaultTagName: 'div',
+    props: mergeProps<'div'>(defaultProps, delegated),
     render,
   });
 }
