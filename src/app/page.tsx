@@ -16,7 +16,7 @@ export default async function HomePage() {
 
   return (
     <Main>
-      <Section py="xl">
+      <Section spacing="xl">
         <Container>
           <HeroSection
             description="Christ centered sermons to elevate your spiritual heartbeat."
@@ -29,7 +29,7 @@ export default async function HomePage() {
         </Container>
       </Section>
 
-      <Section py="xl">
+      <Section spacing="xl">
         <Container>
           <FeaturedGrid
             columns={{ default: 1, sm: 1, md: 2, lg: 2, xl: 2 }}
@@ -47,7 +47,7 @@ export default async function HomePage() {
         </Container>
       </Section>
 
-      <Section py="xl">
+      <Section spacing="xl">
         <Container>
           <FeaturedGrid
             columns={{ default: 1, sm: 2, md: 3, lg: 3, xl: 3 }}

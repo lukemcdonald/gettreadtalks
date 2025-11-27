@@ -6,13 +6,13 @@ import { FooterNav } from '@/components/site-footer/footer-nav';
 export function SiteFooter() {
   return (
     <footer className="bg-card" id="footer">
-      <Section py="xl" render={<div />}>
+      <Section render={<div />} spacing="xl">
         <Container>
           <FooterNav />
         </Container>
       </Section>
 
-      <Section py="lg" render={<div />}>
+      <Section render={<div />} spacing="lg">
         <Container>
           <FooterInfo />
         </Container>
