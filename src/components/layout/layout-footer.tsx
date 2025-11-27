@@ -3,11 +3,11 @@ import { useRender } from '@base-ui-components/react/use-render';
 
 import { cn } from '@/utils';
 
-interface LayoutHeaderProps extends useRender.ComponentProps<'div'> {}
+interface LayoutFooterProps extends useRender.ComponentProps<'div'> {}
 
-export function LayoutHeader({ className, render, ...delegated }: LayoutHeaderProps) {
+export function LayoutFooter({ className, render, ...delegated }: LayoutFooterProps) {
   const defaultProps = {
-    className: cn('order-first col-span-full', className),
+    className: cn('order-last col-span-full', className),
   };
 
   return useRender({

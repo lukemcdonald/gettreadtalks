@@ -22,5 +22,6 @@ export function PageLayout({ children, containerClassName, spacing = 'xl' }: Pag
 
 // Re-export Layout sub-components for convenience
 PageLayout.Content = Layout.Content;
+PageLayout.Footer = Layout.Footer;
 PageLayout.Header = Layout.Header;
 PageLayout.Sidebar = Layout.Sidebar;

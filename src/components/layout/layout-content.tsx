@@ -13,8 +13,6 @@ export function LayoutContent({ className, render, ...delegated }: LayoutContent
       'md:col-span-9',
       // Dual sidebar override: 6 cols on lg
       'lg:[div[data-sidebar-count="2"]_&]:col-span-6',
-      // Mobile order: priority sidebars (10) before content (20) before regular sidebars (30)
-      'order-20 md:order-none',
       className,
     ),
   };

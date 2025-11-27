@@ -4,12 +4,20 @@ import { Children, cloneElement, isValidElement } from 'react';
 
 import { cn } from '@/utils';
 import { LayoutContent } from './layout-content';
+import { LayoutFooter } from './layout-footer';
 import { LayoutHeader } from './layout-header';
 import { LayoutSidebar } from './layout-sidebar';
 
 const GRID_CLASSES: Record<number, string> = {
   0: 'grid-cols-1',
   1: 'md:grid-cols-12',
+};
+
+const ORDER_CLASSES: Record<number, string> = {
+  1: 'order-[-10] md:order-none',
+  2: 'order-[-20] md:order-none',
+  3: 'order-[-30] md:order-none',
+  4: 'order-[-40] md:order-none',
 };
 
 type LayoutProps = {
@@ -20,16 +28,40 @@ type LayoutProps = {
 export function Layout({ children, className }: LayoutProps) {
   const childrenArray = Children.toArray(children);
 
+  let priorityIndex = 0;
   let sidebarCount = 0;
+
   const enhancedChildren = childrenArray.map((child) => {
-    if (isValidElement(child) && child.type === LayoutSidebar) {
-      const position = sidebarCount === 0 ? 'primary' : 'secondary';
-      sidebarCount += 1;
-      return cloneElement(child, {
-        'data-position': position,
-      } as Record<string, 'primary' | 'secondary'>);
+    if (!isValidElement(child)) {
+      return child;
     }
-    return child;
+
+    const props: Record<string, unknown> = {};
+    const childProps = child.props as {
+      className?: string;
+      priority?: boolean;
+      style?: React.CSSProperties;
+    };
+
+    // Track sidebar position (primary/secondary)
+    if (child.type === LayoutSidebar) {
+      props['data-position'] = sidebarCount === 0 ? 'primary' : 'secondary';
+      sidebarCount += 1;
+    }
+
+    // Calculate priority order for any child with priority prop
+    if (childProps.priority) {
+      priorityIndex++;
+      const priorityLevel = childrenArray.length - priorityIndex + 1;
+      const orderClass = ORDER_CLASSES[priorityLevel];
+
+      if (orderClass) {
+        props.className = cn(childProps.className, orderClass);
+      }
+    }
+
+    // Only clone if we have props to inject
+    return Object.keys(props).length > 0 ? cloneElement(child, props) : child;
   });
 
   const gridClass = GRID_CLASSES[sidebarCount] ?? GRID_CLASSES[1];
@@ -42,5 +74,6 @@ export function Layout({ children, className }: LayoutProps) {
 }
 
 Layout.Content = LayoutContent;
+Layout.Footer = LayoutFooter;
 Layout.Header = LayoutHeader;
 Layout.Sidebar = LayoutSidebar;
