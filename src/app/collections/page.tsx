@@ -21,7 +21,7 @@ export default async function CollectionsPage() {
 
   return (
     <PageLayout>
-      <PageLayout.Sidebar>
+      <PageLayout.Sidebar sticky>
         <header className="space-y-2">
           <h2 className="font-semibold text-2xl">Collections</h2>
           <p className="text-muted-foreground text-sm">

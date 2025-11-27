@@ -71,7 +71,7 @@ export default async function TalksPage({ searchParams }: TalksPageProps) {
 
   return (
     <PageLayout>
-      <PageLayout.Sidebar>
+      <PageLayout.Sidebar sticky>
         <header className="space-y-2">
           <h2 className="font-semibold text-2xl">Talks</h2>
           <p className="text-muted-foreground text-sm">

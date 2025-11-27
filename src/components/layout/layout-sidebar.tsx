@@ -3,15 +3,19 @@ import { useRender } from '@base-ui-components/react/use-render';
 
 import { cn } from '@/utils';
 
-interface LayoutSidebarProps extends useRender.ComponentProps<'div'> {}
+interface LayoutSidebarProps extends useRender.ComponentProps<'div'> {
+  sticky?: boolean;
+}
 
-export function LayoutSidebar({ className, render, ...delegated }: LayoutSidebarProps) {
+export function LayoutSidebar({ className, render, sticky, ...delegated }: LayoutSidebarProps) {
   const defaultProps = {
     className: cn(
       'col-span-full space-y-6',
-      // All sidebars default to 3 cols on md+, sticky behavior
+      // All sidebars default to 3 cols on md+
+      'md:col-span-3',
+      // Sticky behavior (opt-in with sticky={true})
       // top-20 = 5rem = 80px (accounts for site header + gap)
-      'md:sticky md:top-20 md:col-span-3 md:h-fit',
+      sticky && 'md:sticky md:top-20 md:h-fit',
       // Secondary sidebar: full width on md, back to 3 on lg
       'md:[&[data-position="secondary"]]:col-span-full',
       'lg:[&[data-position="secondary"]]:col-span-3',
