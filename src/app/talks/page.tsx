@@ -4,10 +4,8 @@ import type { TopicId } from '@/features/topics/types';
 
 import { Suspense } from 'react';
 
-import { Container } from '@/components/container';
 import { FilterUtilityBar } from '@/components/filter-utility-bar';
-import { Layout } from '@/components/layout';
-import { Section } from '@/components/section';
+import { PageLayout } from '@/components/page-layout';
 import { getAllSpeakersForFilter, getAllTopicsForFilter, getTalks } from '@/features/talks';
 import { getCurrentUser } from '@/services/auth/server';
 import { Pagination } from './_components/pagination';
@@ -72,26 +70,22 @@ export default async function TalksPage({ searchParams }: TalksPageProps) {
   ]);
 
   return (
-    <Section py="xl">
-      <Container>
-        <Layout>
-          <Layout.Sidebar>
-            <header className="space-y-2">
-              <h2 className="font-semibold text-2xl">Talks</h2>
-              <p className="text-muted-foreground text-sm">
-                Elevate your spiritual heartbeat with Christ centered talks.
-              </p>
-            </header>
-          </Layout.Sidebar>
-          <Layout.Content>
-            <FilterUtilityBar isAuthenticated={!!user} speakers={speakers} topics={topics} />
+    <PageLayout>
+      <PageLayout.Sidebar>
+        <header className="space-y-2">
+          <h2 className="font-semibold text-2xl">Talks</h2>
+          <p className="text-muted-foreground text-sm">
+            Elevate your spiritual heartbeat with Christ centered talks.
+          </p>
+        </header>
+      </PageLayout.Sidebar>
+      <PageLayout.Content>
+        <FilterUtilityBar isAuthenticated={!!user} speakers={speakers} topics={topics} />
 
-            <Suspense fallback={<TalksListSkeleton />}>
-              <TalksContent params={params} />
-            </Suspense>
-          </Layout.Content>
-        </Layout>
-      </Container>
-    </Section>
+        <Suspense fallback={<TalksListSkeleton />}>
+          <TalksContent params={params} />
+        </Suspense>
+      </PageLayout.Content>
+    </PageLayout>
   );
 }

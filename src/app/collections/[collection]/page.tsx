@@ -1,11 +1,9 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import { Container } from '@/components/container';
 import { GridList } from '@/components/grid-list';
-import { Layout } from '@/components/layout';
 import { PageHeader } from '@/components/page-header';
-import { Section } from '@/components/section';
+import { PageLayout } from '@/components/page-layout';
 import { SidebarContent } from '@/components/sidebar-content';
 import { TalkCard } from '@/components/talk-card';
 import { getCollectionBySlug } from '@/features/collections';
@@ -29,56 +27,52 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
   );
 
   return (
-    <Section py="xl">
-      <Container>
-        <Layout>
-          <Layout.Sidebar>
-            <PageHeader description={collection.description} title={collection.title} />
+    <PageLayout>
+      <PageLayout.Sidebar>
+        <PageHeader description={collection.description} title={collection.title} />
 
-            {uniqueSpeakers.length > 0 && (
-              <SidebarContent title="Speakers">
-                <ul className="space-y-1">
-                  {uniqueSpeakers.map((speaker) => (
-                    <li key={speaker._id}>
-                      <Link
-                        className="text-muted-foreground text-sm transition-colors hover:text-foreground"
-                        href={`/speakers/${speaker.slug}`}
-                      >
-                        {speaker.firstName} {speaker.lastName}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </SidebarContent>
-            )}
-          </Layout.Sidebar>
-          <Layout.Content>
-            <GridList>
-              {talks.map((talk) => (
-                <TalkCard
-                  featured={talk.featured}
-                  key={talk._id}
-                  speaker={
-                    talk.speaker
-                      ? {
-                          firstName: talk.speaker.firstName,
-                          imageUrl: talk.speaker.imageUrl,
-                          lastName: talk.speaker.lastName,
-                          slug: talk.speaker.slug,
-                        }
-                      : undefined
-                  }
-                  talk={{
-                    description: talk.description,
-                    slug: talk.slug,
-                    title: talk.title,
-                  }}
-                />
+        {uniqueSpeakers.length > 0 && (
+          <SidebarContent title="Speakers">
+            <ul className="space-y-1">
+              {uniqueSpeakers.map((speaker) => (
+                <li key={speaker._id}>
+                  <Link
+                    className="text-muted-foreground text-sm transition-colors hover:text-foreground"
+                    href={`/speakers/${speaker.slug}`}
+                  >
+                    {speaker.firstName} {speaker.lastName}
+                  </Link>
+                </li>
               ))}
-            </GridList>
-          </Layout.Content>
-        </Layout>
-      </Container>
-    </Section>
+            </ul>
+          </SidebarContent>
+        )}
+      </PageLayout.Sidebar>
+      <PageLayout.Content>
+        <GridList>
+          {talks.map((talk) => (
+            <TalkCard
+              featured={talk.featured}
+              key={talk._id}
+              speaker={
+                talk.speaker
+                  ? {
+                      firstName: talk.speaker.firstName,
+                      imageUrl: talk.speaker.imageUrl,
+                      lastName: talk.speaker.lastName,
+                      slug: talk.speaker.slug,
+                    }
+                  : undefined
+              }
+              talk={{
+                description: talk.description,
+                slug: talk.slug,
+                title: talk.title,
+              }}
+            />
+          ))}
+        </GridList>
+      </PageLayout.Content>
+    </PageLayout>
   );
 }

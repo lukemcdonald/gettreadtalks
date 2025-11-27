@@ -1,9 +1,7 @@
 import { Suspense } from 'react';
 
-import { Container } from '@/components/container';
-import { Layout } from '@/components/layout';
+import { PageLayout } from '@/components/page-layout';
 import { SearchInput } from '@/components/search-input';
-import { Section } from '@/components/section';
 import { SelectFilter } from '@/components/select-filter';
 import { SidebarContent } from '@/components/sidebar-content';
 import { SortSelect } from '@/components/sort-select';
@@ -39,42 +37,38 @@ export default async function SpeakersPage() {
   ).sort();
 
   return (
-    <Section py="xl">
-      <Container>
-        <Layout>
-          <Layout.Sidebar>
-            <header className="space-y-2">
-              <h2 className="font-semibold text-2xl">All Speakers</h2>
-              <p className="text-muted-foreground text-sm">
-                Listen to faithful ambassadors of Christ and be blessed.
-              </p>
-            </header>
-            <SidebarContent title="Filters">
-              <div className="space-y-4">
-                <SearchInput label="Search" paramName="search" placeholder="Search speakers..." />
-                <SelectFilter
-                  label="Role"
-                  options={roles.map((role) => ({ label: role, value: role }))}
-                  paramName="role"
-                  placeholder="All Roles"
-                />
-                <SortSelect
-                  label="Sort by"
-                  options={[
-                    { label: 'Alphabetical', value: 'alphabetical' },
-                    { label: 'Featured First', value: 'featured' },
-                  ]}
-                />
-              </div>
-            </SidebarContent>
-          </Layout.Sidebar>
-          <Layout.Content>
-            <Suspense fallback={<SpeakersListSkeleton />}>
-              <SpeakersList speakers={speakers} />
-            </Suspense>
-          </Layout.Content>
-        </Layout>
-      </Container>
-    </Section>
+    <PageLayout>
+      <PageLayout.Sidebar>
+        <header className="space-y-2">
+          <h2 className="font-semibold text-2xl">All Speakers</h2>
+          <p className="text-muted-foreground text-sm">
+            Listen to faithful ambassadors of Christ and be blessed.
+          </p>
+        </header>
+        <SidebarContent title="Filters">
+          <div className="space-y-4">
+            <SearchInput label="Search" paramName="search" placeholder="Search speakers..." />
+            <SelectFilter
+              label="Role"
+              options={roles.map((role) => ({ label: role, value: role }))}
+              paramName="role"
+              placeholder="All Roles"
+            />
+            <SortSelect
+              label="Sort by"
+              options={[
+                { label: 'Alphabetical', value: 'alphabetical' },
+                { label: 'Featured First', value: 'featured' },
+              ]}
+            />
+          </div>
+        </SidebarContent>
+      </PageLayout.Sidebar>
+      <PageLayout.Content>
+        <Suspense fallback={<SpeakersListSkeleton />}>
+          <SpeakersList speakers={speakers} />
+        </Suspense>
+      </PageLayout.Content>
+    </PageLayout>
   );
 }
