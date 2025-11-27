@@ -3,10 +3,9 @@ import { PageLayout } from '@/components/page-layout';
 
 export default function AboutPage() {
   return (
-    <PageLayout containerClassName="mx-auto max-w-prose">
-      <PageLayout.Content>
-        <PageHeader title="About" />
-
+    <PageLayout>
+      <PageLayout.Header className="mx-auto max-w-prose" render={<PageHeader title="About" />} />
+      <PageLayout.Content className="mx-auto max-w-prose">
         <div className="mt-6 space-y-6">
           <p>
             TREAD Talks was initially created as a way to bookmark and track the many sermons I was

@@ -3,7 +3,7 @@ import { PageLayout } from '@/components/page-layout';
 
 function BeliefsPage() {
   return (
-    <PageLayout containerClassName="mx-auto max-w-prose">
+    <PageLayout>
       <PageLayout.Content>
         <PageHeader title="Beliefs" />
 
