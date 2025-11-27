@@ -8,6 +8,7 @@ interface LayoutFooterProps extends useRender.ComponentProps<'div'> {}
 export function LayoutFooter({ className, render, ...delegated }: LayoutFooterProps) {
   const defaultProps = {
     className: cn('order-last col-span-full', className),
+    'data-slot': 'layout-footer',
   };
 
   return useRender({

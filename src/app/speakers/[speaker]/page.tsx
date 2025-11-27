@@ -29,8 +29,11 @@ export default async function SpeakerPage({ params }: SpeakerPageProps) {
   const { clips, collections, speaker, talks } = data;
   const speakerName = `${speaker.firstName} ${speaker.lastName}`;
 
+  // Create custom speaker header that displays a larger image to left of speaker name with role and ministry below in larger font. Or consider showing meta in left sidebar and content states in right sidebar. Add talks, collections, and clips to content states, linking to filtered archive when more than 5.
   return (
     <PageLayout>
+      <PageLayout.Header render={<PageHeader title={speakerName} />} />
+
       <PageLayout.Sidebar>
         {speaker.imageUrl && (
           <SidebarContent>
@@ -41,52 +44,42 @@ export default async function SpeakerPage({ params }: SpeakerPageProps) {
         )}
 
         <SidebarContent title="About">
-          <div className="space-y-2 text-sm">
+          <dl>
             {speaker.role && (
-              <div>
-                <span className="font-semibold">Role:</span>{' '}
-                <span className="text-muted-foreground">{speaker.role}</span>
-              </div>
+              <>
+                <dt className="font-semibold">Role:</dt>
+                <dd>{speaker.role}</dd>
+              </>
             )}
             {speaker.ministry && (
-              <div>
-                <span className="font-semibold">Ministry:</span>{' '}
-                <span className="text-muted-foreground">{speaker.ministry}</span>
-              </div>
+              <>
+                <dt className="font-semibold">Ministry:</dt>
+                <dd>{speaker.ministry}</dd>
+              </>
             )}
-          </div>
+          </dl>
         </SidebarContent>
 
         <SidebarContent title="Content">
-          <div className="space-y-2 text-sm">
-            <div>
-              <Link className="text-primary hover:underline" href={`/speakers/${slug}#talks`}>
-                {talks.length} {talks.length === 1 ? 'Talk' : 'Talks'} →
-              </Link>
-            </div>
+          <nav className="flex flex-col gap-2">
+            <Link href={`/speakers/${slug}#talks`}>
+              {talks.length} {talks.length === 1 ? 'Talk' : 'Talks'} →
+            </Link>
             {collections.length > 0 && (
-              <div>
-                <Link
-                  className="text-primary hover:underline"
-                  href={`/speakers/${slug}#collections`}
-                >
-                  {collections.length} {collections.length === 1 ? 'Collection' : 'Collections'} →
-                </Link>
-              </div>
+              <Link href={`/speakers/${slug}#collections`}>
+                {collections.length} {collections.length === 1 ? 'Collection' : 'Collections'} →
+              </Link>
             )}
             {clips.length > 0 && (
-              <div>
-                <Link className="text-primary hover:underline" href={`/speakers/${slug}#clips`}>
-                  {clips.length} {clips.length === 1 ? 'Clip' : 'Clips'} →
-                </Link>
-              </div>
+              <Link href={`/speakers/${slug}#clips`}>
+                {clips.length} {clips.length === 1 ? 'Clip' : 'Clips'} →
+              </Link>
             )}
-          </div>
+          </nav>
         </SidebarContent>
       </PageLayout.Sidebar>
-      <PageLayout.Content>
-        <PageHeader title={speakerName} />
 
+      <PageLayout.Content>
         {speaker.description && (
           <div className="space-y-4">
             <p className="text-muted-foreground">{speaker.description}</p>

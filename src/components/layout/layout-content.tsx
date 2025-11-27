@@ -7,6 +7,7 @@ interface LayoutContentProps extends useRender.ComponentProps<'div'> {}
 
 export function LayoutContent({ className, render, ...delegated }: LayoutContentProps) {
   const defaultProps = {
+    'data-slot': 'layout-content',
     className: cn(
       'col-span-full min-w-0 space-y-6',
       // Default: 9 cols on md+
