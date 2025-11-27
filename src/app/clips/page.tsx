@@ -37,14 +37,13 @@ export default async function ClipsPage() {
   const sortedSpeakersWithClips = sortSpeakersByName(speakersWithClips);
 
   return (
-    <PageLayout
-      header={
+    <PageLayout>
+      <PageLayout.Header>
         <PageHeader
           description="Be encouraged by these short Christ centered clips."
           title="Clips"
         />
-      }
-    >
+      </PageLayout.Header>
       <PageLayout.Sidebar>
         <SidebarContent title="Filters">
           <div className="space-y-4">
