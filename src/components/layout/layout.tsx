@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import { Children, isValidElement } from 'react';
+import { Children, cloneElement, isValidElement } from 'react';
 
 import { cn } from '@/utils';
 import { LayoutContent } from './layout-content';
@@ -18,17 +18,24 @@ const GRID_CLASSES: Record<number, string> = {
 };
 
 function Layout({ children, className }: LayoutProps) {
-  // Count sidebars to determine grid layout
   const childrenArray = Children.toArray(children);
-  const sidebarCount = childrenArray.filter(
-    (child) => isValidElement(child) && child.type === LayoutSidebar,
-  ).length;
+
+  // Count sidebars and enhance them with data-position
+  let sidebarCount = 0;
+  const enhancedChildren = childrenArray.map((child) => {
+    if (isValidElement(child) && child.type === LayoutSidebar) {
+      const position = sidebarCount === 0 ? 'primary' : 'secondary';
+      sidebarCount++;
+      return cloneElement(child, { 'data-position': position } as any);
+    }
+    return child;
+  });
 
   const gridClass = GRID_CLASSES[sidebarCount] ?? GRID_CLASSES[2];
 
   return (
     <div className={cn('grid gap-6', gridClass, className)} data-sidebar-count={sidebarCount}>
-      {children}
+      {enhancedChildren}
     </div>
   );
 }

@@ -9,13 +9,12 @@ export function LayoutSidebar({ className, render, ...delegated }: LayoutSidebar
   const defaultProps = {
     className: cn(
       'col-span-full space-y-6',
-      'md:col-span-3',
-      // Sticky behavior
-      'md:sticky md:top-8 md:h-fit',
+      // All sidebars default to 3 cols on md+, sticky behavior
+      'md:sticky md:top-8 md:col-span-3 md:h-fit',
+      // Secondary sidebar: full width on md, back to 3 on lg
+      'md:[&[data-position="secondary"]]:col-span-full',
+      'lg:[&[data-position="secondary"]]:col-span-3',
       className,
-      // Second sidebar: override to full width on md, back to 3 on lg
-      'md:[div[data-sidebar-count="2"]_&:nth-of-type(2)]:col-span-full',
-      'lg:[div[data-sidebar-count="2"]_&:nth-of-type(2)]:col-span-3',
     ),
   };
 
