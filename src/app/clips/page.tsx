@@ -38,16 +38,12 @@ export default async function ClipsPage() {
 
   return (
     <PageLayout>
-      <PageLayout.Header
-        render={
-          <PageHeader
-            description="Be encouraged by these short Christ centered clips."
-            title="Clips"
-          />
-        }
-      />
+      <PageLayout.Header render={<PageHeader title="Clips" />} />
 
       <PageLayout.Sidebar sticky>
+        <p className="text-lg text-muted-foreground">
+          Be encouraged by these short Christ centered clips.
+        </p>
         <SidebarContent title="Filters">
           <div className="space-y-4">
             <SearchInput label="Search" paramName="search" placeholder="Search clips..." />

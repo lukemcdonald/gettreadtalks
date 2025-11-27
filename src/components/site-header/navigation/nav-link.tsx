@@ -16,7 +16,9 @@ export function NavLink({ href, isActive, children }: NavLinkProps) {
     <Button
       className={cn(
         'rounded-lg font-medium text-md transition-colors hover:bg-card',
-        isActive ? 'text-primary' : 'text-foreground',
+        isActive
+          ? 'text-primary dark:text-primary-foreground'
+          : 'text-foreground dark:text-muted-foreground',
       )}
       render={<Link href={href as Route} />}
       variant="ghost"
