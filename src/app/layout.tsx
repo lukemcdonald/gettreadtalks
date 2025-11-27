@@ -12,7 +12,7 @@ import '@/assets/styles.css';
 
 import { Suspense } from 'react';
 
-import { SkipToMainLink } from '@/components/site-header/navigation/skip-to-main-link';
+import { SkipNavLink } from '@/components/site-header/navigation/skip-nav-link';
 import { cn } from '@/utils';
 
 const inter = Inter({
@@ -39,7 +39,7 @@ export default async function RootLayout({
         <ErrorBoundary>
           <ThemeProvider>
             <AuthProvider>
-              <SkipToMainLink href="#content" />
+              <SkipNavLink href="#main" />
               <Suspense>
                 <SiteHeader />
               </Suspense>
