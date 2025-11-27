@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 
+import { PageHeader } from '@/components/page-header';
 import { PageLayout } from '@/components/page-layout';
 import { SearchInput } from '@/components/search-input';
 import { SelectFilter } from '@/components/select-filter';
@@ -36,14 +37,15 @@ export default async function ClipsPage() {
   const sortedSpeakersWithClips = sortSpeakersByName(speakersWithClips);
 
   return (
-    <PageLayout>
+    <PageLayout
+      header={
+        <PageHeader
+          description="Be encouraged by these short Christ centered clips."
+          title="Clips"
+        />
+      }
+    >
       <PageLayout.Sidebar>
-        <header className="space-y-2">
-          <h2 className="font-semibold text-2xl">Clips</h2>
-          <p className="text-muted-foreground text-sm">
-            Be encouraged by these short Christ centered clips.
-          </p>
-        </header>
         <SidebarContent title="Filters">
           <div className="space-y-4">
             <SearchInput label="Search" paramName="search" placeholder="Search clips..." />
