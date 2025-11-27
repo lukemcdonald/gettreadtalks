@@ -16,6 +16,7 @@ export function LayoutSidebar({
   ...delegated
 }: LayoutSidebarProps) {
   const defaultProps = {
+    'data-slot': 'layout-sidebar',
     className: cn(
       'col-span-full space-y-6',
       // All sidebars default to 3 cols on md+

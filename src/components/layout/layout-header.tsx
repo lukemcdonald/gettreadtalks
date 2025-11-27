@@ -8,6 +8,7 @@ interface LayoutHeaderProps extends useRender.ComponentProps<'div'> {}
 export function LayoutHeader({ className, render, ...delegated }: LayoutHeaderProps) {
   const defaultProps = {
     className: cn('order-first col-span-full', className),
+    'data-slot': 'layout-header',
   };
 
   return useRender({
