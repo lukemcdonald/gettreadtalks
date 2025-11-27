@@ -7,12 +7,12 @@ import { Section } from '@/components/section';
 type PageLayoutProps = {
   children: ReactNode;
   containerClassName?: string;
-  sectionPy?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  spacing?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 };
 
-export function PageLayout({ children, containerClassName, sectionPy = 'xl' }: PageLayoutProps) {
+export function PageLayout({ children, containerClassName, spacing = 'xl' }: PageLayoutProps) {
   return (
-    <Section py={sectionPy}>
+    <Section spacing={spacing}>
       <Container className={containerClassName}>
         <Layout>{children}</Layout>
       </Container>

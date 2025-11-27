@@ -11,9 +11,9 @@ export async function SiteHeader() {
     <Section
       className="sticky top-0 z-50 bg-background"
       id="header"
-      py="sm"
       render={<header />}
       role="banner"
+      spacing="sm"
     >
       <Container>
         <div className="flex flex-row items-center justify-between gap-2">

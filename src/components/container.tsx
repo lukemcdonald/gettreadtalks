@@ -5,12 +5,12 @@ import { cva } from 'class-variance-authority';
 import { cn } from '@/utils';
 
 interface ContainerProps extends useRender.ComponentProps<'div'> {
-  py?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  spacing?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 }
 
 const containerVariants = cva('container', {
   variants: {
-    py: {
+    spacing: {
       xs: 'py-2',
       sm: 'py-3',
       md: 'py-4',
@@ -20,10 +20,10 @@ const containerVariants = cva('container', {
   },
 });
 
-export function Container({ className, py, render, ...delegated }: ContainerProps) {
+export function Container({ className, spacing, render, ...delegated }: ContainerProps) {
   const defaultProps = {
     'data-slot': 'container',
-    className: cn(containerVariants({ py }), className),
+    className: cn(containerVariants({ spacing }), className),
   };
 
   return useRender({

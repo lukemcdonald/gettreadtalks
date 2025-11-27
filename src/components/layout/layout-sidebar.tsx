@@ -10,7 +10,8 @@ export function LayoutSidebar({ className, render, ...delegated }: LayoutSidebar
     className: cn(
       'col-span-full space-y-6',
       // All sidebars default to 3 cols on md+, sticky behavior
-      'md:sticky md:top-8 md:col-span-3 md:h-fit',
+      // top-20 = 5rem = 80px (accounts for site header + gap)
+      'md:sticky md:top-20 md:col-span-3 md:h-fit',
       // Secondary sidebar: full width on md, back to 3 on lg
       'md:[&[data-position="secondary"]]:col-span-full',
       'lg:[&[data-position="secondary"]]:col-span-3',
