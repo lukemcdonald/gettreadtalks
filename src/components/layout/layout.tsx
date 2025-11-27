@@ -41,6 +41,7 @@ function Layout({ children, className }: LayoutProps) {
 }
 
 Layout.Content = LayoutContent;
+Layout.Header = LayoutHeader;
 Layout.Sidebar = LayoutSidebar;
 
 export { Layout };
