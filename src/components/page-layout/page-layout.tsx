@@ -14,7 +14,7 @@ export function PageLayout({ children, containerClassName, spacing = 'xl' }: Pag
   return (
     <Section spacing={spacing}>
       <Container className={containerClassName}>
-        <Layout>{children}</Layout>
+        <Layout className="[&>header]:mb-10">{children}</Layout>
       </Container>
     </Section>
   );
