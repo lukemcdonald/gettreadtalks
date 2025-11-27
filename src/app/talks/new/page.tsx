@@ -1,8 +1,6 @@
 import { redirect } from 'next/navigation';
 
-import { Container } from '@/components/container';
-import { Layout } from '@/components/layout';
-import { Section } from '@/components/section';
+import { PageLayout } from '@/components/page-layout';
 import { getAllCollections, getAllSpeakers } from '@/features/talks';
 import { getCurrentUser } from '@/services/auth/server';
 import { TalkForm } from './_components/talk-form';
@@ -17,15 +15,11 @@ export default async function NewTalkPage() {
   const [collections, speakers] = await Promise.all([getAllCollections(), getAllSpeakers()]);
 
   return (
-    <Section py="xl">
-      <Container className="mx-auto max-w-prose">
-        <Layout>
-          <Layout.Content>
-            <h1 className="mb-6 font-semibold text-2xl">Create New Talk</h1>
-            <TalkForm collections={collections} speakers={speakers} />
-          </Layout.Content>
-        </Layout>
-      </Container>
-    </Section>
+    <PageLayout containerClassName="mx-auto max-w-prose">
+      <PageLayout.Content>
+        <h1 className="mb-6 font-semibold text-2xl">Create New Talk</h1>
+        <TalkForm collections={collections} speakers={speakers} />
+      </PageLayout.Content>
+    </PageLayout>
   );
 }
