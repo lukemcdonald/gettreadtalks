@@ -4,10 +4,17 @@ import { useRender } from '@base-ui-components/react/use-render';
 import { cn } from '@/utils';
 
 interface LayoutSidebarProps extends useRender.ComponentProps<'div'> {
+  priority?: boolean;
   sticky?: boolean;
 }
 
-export function LayoutSidebar({ className, render, sticky, ...delegated }: LayoutSidebarProps) {
+export function LayoutSidebar({
+  className,
+  priority,
+  render,
+  sticky,
+  ...delegated
+}: LayoutSidebarProps) {
   const defaultProps = {
     className: cn(
       'col-span-full space-y-6',
@@ -19,6 +26,8 @@ export function LayoutSidebar({ className, render, sticky, ...delegated }: Layou
       // Secondary sidebar: full width on md, back to 3 on lg
       'md:[&[data-position="secondary"]]:col-span-full',
       'lg:[&[data-position="secondary"]]:col-span-3',
+      // Mobile order: priority sidebars (10) before content (20) before regular sidebars (30)
+      priority ? 'order-10 md:order-none' : 'order-30 md:order-none',
       className,
     ),
   };
