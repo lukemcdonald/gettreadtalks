@@ -15,6 +15,7 @@
 
 @theme {
   --max-width-prose: 70ch;
+  --grid-layout-columns: repeat(12, minmax(0, 1fr));
 }
 
 @theme inline {
