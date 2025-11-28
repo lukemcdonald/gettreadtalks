@@ -1,23 +1,22 @@
 /**
- * Migration Runner Script
+ * Database Seed Script
  *
- * Reads exported Airtable JSON files and runs the Convex migration.
- * This can be used without needing Airtable API access.
+ * Seeds the Convex database from JSON files in convex/migration/data/.
  *
  * Usage:
- *   pnpm tsx scripts/run-migration.ts          # Development
- *   pnpm tsx scripts/run-migration.ts --prod   # Production
+ *   pnpm db:seed          # Development
+ *   pnpm db:seed:prod     # Production
  *
  * Prerequisites:
- *   1. Export Airtable data first: pnpm tsx scripts/airtable-export.ts
- *   2. Have CONVEX_URL in .env.local or environment
- *   3. For production: pnpm convex deploy first
+ *   - NEXT_PUBLIC_CONVEX_URL in .env.local
+ *   - For production: pnpm convex deploy first
  */
 
 import { ConvexHttpClient } from 'convex/browser';
 import { config } from 'dotenv';
 
 import { api } from '../convex/_generated/api';
+import { execSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -92,8 +91,8 @@ async function main() {
   const env = isProd ? '🔴 PRODUCTION' : '🟢 Development';
   const convexUrl = getConvexUrl();
 
-  console.log(`🗄️  Migration Runner (${env})\n`);
-  console.log('📂 Loading exported Airtable data...\n');
+  console.log(`🗄️  Database Seed (${env})\n`);
+  console.log('📂 Loading seed data...\n');
 
   // Load all JSON files
   const data = {
@@ -117,12 +116,12 @@ async function main() {
   const hasData = Object.values(data).some((arr) => arr.length > 0);
 
   if (!hasData) {
-    console.error('\n❌ No data found! Run the export script first:');
-    console.error('   pnpm tsx scripts/airtable-export.ts');
+    console.error('\n❌ No data found in convex/migration/data/');
+    console.error('   Ensure JSON files exist: speakers.json, talks.json, etc.');
     process.exit(1);
   }
 
-  console.log('\n🚀 Starting migration to Convex...');
+  console.log('\n🚀 Starting database seed...');
   console.log(`   Target: ${convexUrl}`);
 
   if (isProd) {
@@ -146,10 +145,10 @@ async function main() {
       topics: data.topics,
     });
 
-    console.log('\n✅ Migration complete!');
+    console.log('\n✅ Seed complete!');
     console.log('📊 Results:', result);
   } catch (error) {
-    console.error('\n❌ Migration failed:', error);
+    console.error('\n❌ Seed failed:', error);
     process.exit(1);
   }
 }
