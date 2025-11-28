@@ -5,11 +5,13 @@
  * This can be used without needing Airtable API access.
  *
  * Usage:
- *   pnpm tsx scripts/run-migration.ts
+ *   pnpm tsx scripts/run-migration.ts          # Development
+ *   pnpm tsx scripts/run-migration.ts --prod   # Production
  *
  * Prerequisites:
  *   1. Export Airtable data first: pnpm tsx scripts/airtable-export.ts
  *   2. Have CONVEX_URL in .env.local or environment
+ *   3. For production: pnpm convex deploy first
  */
 
 import { ConvexHttpClient } from 'convex/browser';
@@ -24,10 +26,13 @@ config({ path: '.env.local' });
 
 const DATA_DIR = 'convex/migration/data';
 
-interface AirtableRecord {
+// Check for --prod flag
+const isProd = process.argv.includes('--prod');
+
+type AirtableRecord = {
   fields: Record<string, unknown>;
   id: string;
-}
+};
 
 function loadJsonFile(fileName: string): AirtableRecord[] {
   const filePath = path.join(process.cwd(), DATA_DIR, fileName);
@@ -43,15 +48,51 @@ function loadJsonFile(fileName: string): AirtableRecord[] {
   return JSON.parse(content);
 }
 
-async function main() {
-  const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL || process.env.CONVEX_URL;
+function getConvexUrl(): string {
+  if (isProd) {
+    // Get production URL from Convex CLI
+    try {
+      const result = execSync('npx convex env get CONVEX_URL --prod', {
+        encoding: 'utf-8',
+        stdio: ['pipe', 'pipe', 'pipe'],
+      }).trim();
 
-  if (!convexUrl) {
-    console.error('Error: NEXT_PUBLIC_CONVEX_URL environment variable is required');
-    console.error('Add NEXT_PUBLIC_CONVEX_URL to .env.local');
+      if (result) {
+        return result;
+      }
+    } catch {
+      // Fall back to checking .env.production or environment
+    }
+
+    // Check for production URL in environment
+    const prodUrl = process.env.CONVEX_PROD_URL || process.env.CONVEX_DEPLOYMENT_URL;
+
+    if (prodUrl) {
+      return prodUrl;
+    }
+
+    console.error('❌ Could not determine production Convex URL.');
+    console.error('   Make sure you have deployed to production: pnpm convex deploy');
     process.exit(1);
   }
 
+  // Development URL
+  const devUrl = process.env.NEXT_PUBLIC_CONVEX_URL || process.env.CONVEX_URL;
+
+  if (!devUrl) {
+    console.error('❌ NEXT_PUBLIC_CONVEX_URL environment variable is required');
+    console.error('   Add NEXT_PUBLIC_CONVEX_URL to .env.local');
+    process.exit(1);
+  }
+
+  return devUrl;
+}
+
+async function main() {
+  const env = isProd ? '🔴 PRODUCTION' : '🟢 Development';
+  const convexUrl = getConvexUrl();
+
+  console.log(`🗄️  Migration Runner (${env})\n`);
   console.log('📂 Loading exported Airtable data...\n');
 
   // Load all JSON files
@@ -82,8 +123,15 @@ async function main() {
   }
 
   console.log('\n🚀 Starting migration to Convex...');
-  console.log(`   Using: ${convexUrl}\n`);
+  console.log(`   Target: ${convexUrl}`);
 
+  if (isProd) {
+    console.log('\n⚠️  WARNING: This will modify your PRODUCTION database!');
+    console.log('   Press Ctrl+C within 5 seconds to cancel...\n');
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+  }
+
+  console.log('');
   const client = new ConvexHttpClient(convexUrl);
 
   try {

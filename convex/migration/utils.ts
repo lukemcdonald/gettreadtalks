@@ -83,21 +83,6 @@ export function parseTimestamp(isoDate: string | undefined): number | undefined 
 }
 
 /**
- * Extract first attachment URL from Airtable attachment array.
- * @param attachments - Airtable attachment array
- * @returns First attachment URL or undefined
- */
-export function extractImageUrl(
-  attachments: Array<{ url?: string }> | undefined,
-): string | undefined {
-  if (!attachments || attachments.length === 0) {
-    return;
-  }
-
-  return attachments[0]?.url;
-}
-
-/**
  * Lookup Convex ID from Airtable record ID.
  * @param mapping - ID mapping
  * @param table - Table name

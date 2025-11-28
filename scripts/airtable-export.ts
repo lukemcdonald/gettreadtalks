@@ -34,12 +34,12 @@ const TABLES = [
 
 type TableName = (typeof TABLES)[number];
 
-interface ExportedRecord {
+type ExportedRecord = {
   fields: Record<string, unknown>;
   id: string;
-}
+};
 
-async function exportTable(base: Airtable.Base, tableName: TableName): Promise<ExportedRecord[]> {
+function exportTable(base: Airtable.Base, tableName: TableName): Promise<ExportedRecord[]> {
   const records: ExportedRecord[] = [];
 
   return new Promise((resolve, reject) => {
