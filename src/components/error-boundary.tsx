@@ -75,18 +75,10 @@ export function ErrorBoundary({
     // Report to Sentry with fingerprinting and capture event ID
     const eventId = captureException(error, {
       context: {
-        react: {
-          componentStack: info.componentStack,
-        },
+        details: { componentStack: info.componentStack },
       },
-      fingerprint: [
-        'react-error-boundary',
-        error.name.toLowerCase().replace(ERROR_NAME_SUFFIX_REGEX, ''),
-      ],
-      tags: {
-        errorType: 'react-error-boundary',
-        errorName: error.name,
-      },
+      fingerprint: ['error', error.name.toLowerCase().replace(ERROR_NAME_SUFFIX_REGEX, '')],
+      tags: { errorName: error.name },
     });
 
     // Store event ID for the fallback component

@@ -1,0 +1,50 @@
+import type { Speaker } from '@/features/speakers/types';
+import type { Talk } from '@/features/talks';
+
+import Link from 'next/link';
+
+import { SidebarContent } from '@/components/sidebar-content';
+import { getSpeakerName } from '@/features/speakers';
+
+type ClipSidebarProps = {
+  speaker: Speaker | null;
+  talk: Talk | null;
+};
+
+export function ClipSidebar({ speaker, talk }: ClipSidebarProps) {
+  return (
+    <>
+      {speaker && (
+        <SidebarContent title="Speaker">
+          <div className="space-y-2">
+            <p className="font-semibold">{getSpeakerName(speaker)}</p>
+            {speaker.role && <p className="text-muted-foreground text-sm">{speaker.role}</p>}
+            {speaker.ministry && (
+              <p className="text-muted-foreground text-sm">{speaker.ministry}</p>
+            )}
+            <Link
+              className="text-primary text-sm hover:underline"
+              href={`/speakers/${speaker.slug}`}
+            >
+              View all talks →
+            </Link>
+          </div>
+        </SidebarContent>
+      )}
+
+      {talk && (
+        <SidebarContent title="Related Talk">
+          <div className="space-y-2">
+            <p className="font-semibold">{talk.title}</p>
+            {talk.description && (
+              <p className="line-clamp-2 text-muted-foreground text-sm">{talk.description}</p>
+            )}
+            <Link className="text-primary text-sm hover:underline" href={`/talks/${talk.slug}`}>
+              View talk →
+            </Link>
+          </div>
+        </SidebarContent>
+      )}
+    </>
+  );
+}

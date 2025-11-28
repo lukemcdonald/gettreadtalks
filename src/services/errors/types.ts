@@ -25,6 +25,9 @@ export type ErrorWithEventId = Error & {
   __sentryEventId?: string;
 };
 
+type FingerprintKind = 'auth' | 'mutation' | 'validation' | 'network' | 'http' | 'error';
+type Fingerprint = [FingerprintKind, ...string[]];
+
 /**
  * Options for error reporting to Sentry.
  */
@@ -34,7 +37,7 @@ export type ErrorReportOptions = {
   /** Additional unstructured data (appears as Extra Data in Sentry) */
   extras?: Record<string, unknown>;
   /** Custom fingerprint for error grouping in Sentry */
-  fingerprint?: string[];
+  fingerprint?: Fingerprint;
   /** Severity level (fatal, error, warning, log, info, debug) */
   level?: SeverityLevel;
   /** Tags for filtering and categorization */

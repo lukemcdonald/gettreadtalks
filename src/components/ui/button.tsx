@@ -7,7 +7,7 @@ import { type VariantProps, cva } from 'class-variance-authority';
 import { cn } from '@/utils';
 
 const buttonVariants = cva(
-  "relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-lg border bg-clip-padding font-semibold text-sm outline-none transition-shadow before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-lg)-1px)] pointer-coarse:after:absolute pointer-coarse:after:size-full pointer-coarse:after:min-h-11 pointer-coarse:after:min-w-11 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-64 [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+  "relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 whitespace-nowrap rounded-lg border bg-clip-padding font-semibold text-sm outline-none transition-shadow before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-lg)-1px)] pointer-coarse:after:absolute pointer-coarse:after:size-full pointer-coarse:after:min-h-11 pointer-coarse:after:min-w-11 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-64 [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
   {
     variants: {
       variant: {
@@ -34,6 +34,9 @@ const buttonVariants = cva(
         'icon-sm': 'size-7',
         'icon-lg': 'size-9',
       },
+      fullWidth: {
+        true: 'flex-1',
+      },
     },
     defaultVariants: {
       variant: 'default',
@@ -43,18 +46,19 @@ const buttonVariants = cva(
 );
 
 interface ButtonProps extends useRender.ComponentProps<'button'> {
+  fullWidth?: boolean;
   variant?: VariantProps<typeof buttonVariants>['variant'];
   size?: VariantProps<typeof buttonVariants>['size'];
 }
 
-function Button({ className, variant, size, render, ...props }: ButtonProps) {
+function Button({ className, fullWidth, variant, size, render, ...props }: ButtonProps) {
   const typeValue: React.ButtonHTMLAttributes<HTMLButtonElement>['type'] = render
     ? undefined
     : 'button';
 
   const defaultProps = {
     'data-slot': 'button',
-    className: cn(buttonVariants({ variant, size, className })),
+    className: cn(buttonVariants({ fullWidth, variant, size, className })),
     type: typeValue,
   };
 

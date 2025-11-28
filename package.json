@@ -8,6 +8,7 @@
     "build:next": "next build",
     "build:webpack": "next build --webpack",
     "check": "biome check .",
+    "clean": "rm -rf node_modules",
     "dev": "npm-run-all --parallel dev:backend dev:frontend dev:open",
     "dev:backend": "convex dev",
     "dev:frontend": "next dev --experimental-https",

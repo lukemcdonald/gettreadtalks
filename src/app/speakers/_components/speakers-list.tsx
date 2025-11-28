@@ -1,21 +1,14 @@
 'use client';
 
+import type { Speaker } from '@/features/speakers/types';
+
 import { useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 
 import { AlphabeticalGrid } from '@/components/alphabetical-grid';
 import { SpeakerCard } from '@/components/speaker-card';
 import { Empty, EmptyDescription } from '@/components/ui/empty';
-
-type Speaker = {
-  _id: string;
-  featured?: boolean;
-  firstName: string;
-  imageUrl?: string;
-  lastName: string;
-  role?: string;
-  slug: string;
-};
+import { getSpeakerName } from '@/features/speakers';
 
 type SpeakersListProps = {
   speakers: Speaker[];
@@ -36,7 +29,7 @@ export function SpeakersList({ speakers }: SpeakersListProps) {
         (speaker) =>
           speaker.firstName.toLowerCase().includes(search) ||
           speaker.lastName.toLowerCase().includes(search) ||
-          `${speaker.firstName} ${speaker.lastName}`.toLowerCase().includes(search),
+          getSpeakerName(speaker).toLowerCase().includes(search),
       );
     }
 

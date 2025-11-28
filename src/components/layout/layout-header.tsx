@@ -1,10 +1,10 @@
 import { cn } from '@/utils';
 
-interface LayoutHeaderProps {
+type LayoutHeaderProps = {
   children?: React.ReactNode;
   className?: string;
   render?: React.ReactNode;
-}
+};
 
 export function LayoutHeader({ children, className, render }: LayoutHeaderProps) {
   return (

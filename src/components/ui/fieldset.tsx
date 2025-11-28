@@ -1,26 +1,34 @@
-'use client';
-
-import { Fieldset as FieldsetPrimitive } from '@base-ui-components/react/fieldset';
+import { mergeProps } from '@base-ui-components/react/merge-props';
+import { useRender } from '@base-ui-components/react/use-render';
+import { type VariantProps, cva } from 'class-variance-authority';
 
 import { cn } from '@/utils';
 
-function Fieldset({ className, ...props }: FieldsetPrimitive.Root.Props) {
-  return (
-    <FieldsetPrimitive.Root
-      className={cn('flex w-full max-w-64 flex-col gap-6', className)}
-      data-slot="fieldset"
-      {...props}
-    />
-  );
-}
-function FieldsetLegend({ className, ...props }: FieldsetPrimitive.Legend.Props) {
-  return (
-    <FieldsetPrimitive.Legend
-      className={cn('font-semibold', className)}
-      data-slot="fieldset-legend"
-      {...props}
-    />
-  );
+const fieldsetVariants = cva('flex flex-col gap-4', {
+  variants: {
+    size: {
+      sm: 'gap-2',
+      md: 'gap-6',
+      lg: 'gap-10',
+    },
+  },
+});
+
+interface FieldsetProps extends useRender.ComponentProps<'fieldset'> {
+  size?: VariantProps<typeof fieldsetVariants>['size'];
 }
 
-export { Fieldset, FieldsetLegend };
+function Fieldset({ className, render, size, ...props }: FieldsetProps) {
+  const defaultProps = {
+    'data-slot': 'fieldset',
+    className: cn(fieldsetVariants({ size }), className),
+  };
+
+  return useRender({
+    defaultTagName: 'fieldset',
+    render,
+    props: mergeProps<'fieldset'>(defaultProps, props),
+  });
+}
+
+export { Fieldset, fieldsetVariants };
