@@ -11,6 +11,7 @@ export const affiliateLinkFields = {
   affiliate: v.optional(v.string()),
   description: v.optional(v.string()),
   featured: v.optional(v.boolean()),
+  imageUrl: v.optional(v.string()),
   slug: v.string(),
   title: v.string(),
   type: affiliateLinkTypes,

@@ -49,6 +49,7 @@ export async function importAffiliateLinks(
       affiliate: fields.affiliate,
       description: fields.description,
       featured: fields.featured ?? false,
+      imageUrl: `/images/affiliate-links/${slug}.jpg`,
       slug,
       title: fields.title,
       type: (type as 'app' | 'book' | 'movie' | 'music' | 'podcast') || 'book',
