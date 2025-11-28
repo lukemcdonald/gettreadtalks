@@ -1,42 +1,32 @@
-# Airtable to Convex Migration
+# Data Migration
+
+Seeds the Convex database from JSON files exported from Airtable.
+
+## Commands
+
+| Command | Description |
+|---------|-------------|
+| `pnpm db:seed` | Seed development database |
+| `pnpm db:seed:prod` | Seed production database |
+| `pnpm db:clear` | Clear development database |
+| `pnpm db:clear:prod` | Clear production database |
 
 ## Quick Start
 
 ### Development
 
 ```bash
-pnpm tsx scripts/run-migration.ts
-pnpm tsx scripts/update-speaker-images.ts
+pnpm db:clear
+pnpm db:seed
 ```
 
 ### Production
 
 ```bash
 pnpm convex deploy
-pnpm tsx scripts/run-migration.ts --prod
-pnpm tsx scripts/update-speaker-images.ts --prod
+pnpm db:clear:prod
+pnpm db:seed:prod
 ```
-
-## Commands
-
-| Command | Description |
-|---------|-------------|
-| `pnpm tsx scripts/run-migration.ts` | Import all data to development |
-| `pnpm tsx scripts/run-migration.ts --prod` | Import all data to production |
-| `pnpm tsx scripts/update-speaker-images.ts` | Update speaker images (dev) |
-| `pnpm tsx scripts/update-speaker-images.ts --prod` | Update speaker images (prod) |
-| `pnpm convex run migration/runMigration:clearAllData` | Clear development database |
-| `pnpm convex run migration/runMigration:clearAllData --prod` | Clear production database |
-
-## Re-export from Airtable
-
-If you need fresh data from Airtable:
-
-```bash
-pnpm tsx scripts/airtable-export.ts
-```
-
-Requires `AIRTABLE_API_KEY` in `.env.local`.
 
 ## Data Files
 
@@ -51,10 +41,9 @@ Located in `convex/migration/data/`:
 | `clips.json` | 7 |
 | `affiliate-links.json` | 8 |
 
-## Verify Migration
+## Verify
 
 ```bash
-# Check counts
 npx convex data speakers
 npx convex data talks --prod
 ```
