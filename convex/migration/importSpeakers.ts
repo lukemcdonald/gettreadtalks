@@ -2,7 +2,7 @@ import type { Id } from '../_generated/dataModel';
 import type { MutationCtx } from '../_generated/server';
 import type { IdMapping } from './idMap';
 
-import { ensureUniqueSlug, extractImageUrl } from './utils';
+import { ensureUniqueSlug } from './utils';
 
 /**
  * Import speakers from Airtable records.
@@ -45,7 +45,7 @@ export async function importSpeakers(
       description: fields.description,
       featured: fields.favorite ?? false,
       firstName: fields.firstName,
-      imageUrl: extractImageUrl(fields.avatar),
+      imageUrl: `/images/speakers/${slug}.jpg`,
       lastName: fields.lastName,
       ministry: fields.ministry,
       role: fields.role,
