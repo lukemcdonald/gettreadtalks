@@ -5,6 +5,7 @@ import type { TopicId } from '@/features/topics/types';
 import { Suspense } from 'react';
 
 import { FilterUtilityBar } from '@/components/filter-utility-bar';
+import { PageHeader } from '@/components/page-header';
 import { PageLayout } from '@/components/page-layout';
 import { getAllSpeakersForFilter, getAllTopicsForFilter, getTalks } from '@/features/talks';
 import { getCurrentUser } from '@/services/auth/server';
@@ -72,12 +73,11 @@ export default async function TalksPage({ searchParams }: TalksPageProps) {
   return (
     <PageLayout>
       <PageLayout.Sidebar sticky>
-        <header className="space-y-2">
-          <h2 className="font-semibold text-2xl">Talks</h2>
-          <p className="text-muted-foreground text-sm">
-            Elevate your spiritual heartbeat with Christ centered talks.
-          </p>
-        </header>
+        <PageHeader
+          description="Elevate your spiritual heartbeat with Christ centered talks."
+          title="Talks"
+          // variant="lg"
+        />
       </PageLayout.Sidebar>
       <PageLayout.Content>
         <FilterUtilityBar isAuthenticated={!!user} speakers={speakers} topics={topics} />

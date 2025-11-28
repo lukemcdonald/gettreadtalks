@@ -8,6 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { getSpeakerName } from '@/features/speakers';
 
 type SpeakerSelectFieldProps = {
   defaultValue?: SpeakerId | null;
@@ -17,7 +18,7 @@ type SpeakerSelectFieldProps = {
 
 export function SpeakerSelectField({ defaultValue, error, speakers }: SpeakerSelectFieldProps) {
   const items = speakers.map((speaker) => ({
-    label: `${speaker.firstName} ${speaker.lastName}`,
+    label: getSpeakerName(speaker),
     value: speaker._id,
   }));
 

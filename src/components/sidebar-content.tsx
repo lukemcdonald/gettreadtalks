@@ -14,7 +14,7 @@ export function SidebarContent({ children, className, title }: SidebarContentPro
           {title}
         </h3>
       )}
-      <div className="space-y-2">{children}</div>
+      <div className="flex flex-col gap-4">{children}</div>
     </div>
   );
 }

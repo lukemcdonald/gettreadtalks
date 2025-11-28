@@ -10,6 +10,7 @@ import { SearchInput } from '@/components/search-input';
 import { SelectFilter } from '@/components/select-filter';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { getSpeakerName } from '@/features/speakers';
 import { cn } from '@/utils';
 
 type TalksFiltersProps = {
@@ -52,7 +53,7 @@ export function TalksFilters({
   };
 
   const speakerOptions = speakers.map((speaker) => ({
-    label: `${speaker.firstName} ${speaker.lastName}`,
+    label: getSpeakerName(speaker),
     value: speaker._id,
   }));
 

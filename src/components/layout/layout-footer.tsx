@@ -1,10 +1,10 @@
 import { cn } from '@/utils';
 
-interface LayoutFooterProps {
+type LayoutFooterProps = {
   children?: React.ReactNode;
   className?: string;
   render?: React.ReactNode;
-}
+};
 
 export function LayoutFooter({ children, className, render }: LayoutFooterProps) {
   return (
