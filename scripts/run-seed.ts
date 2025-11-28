@@ -135,7 +135,6 @@ async function main() {
 
   try {
     // Call the public migration mutation
-    // @ts-expect-error - API types may not be generated yet
     const result = await client.mutation(api.migration.runMigration.runMigration, {
       affiliateLinks: data.affiliateLinks,
       clips: data.clips,

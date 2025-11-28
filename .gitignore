@@ -48,3 +48,6 @@ certificates
 
 # Playwright
 .playwright-mcp
+
+# Seed data (keep locally, not in repo)
+convex/migration/data/
