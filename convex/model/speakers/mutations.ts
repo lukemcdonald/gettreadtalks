@@ -3,7 +3,7 @@ import type { Doc } from '../../_generated/dataModel';
 import { v } from 'convex/values';
 import { getManyFrom, getOneFrom } from 'convex-helpers/server/relationships';
 
-import { internalMutation, mutation } from '../../_generated/server';
+import { mutation } from '../../_generated/server';
 import { throwDuplicateSlug, throwNotFound, throwValidationError } from '../../lib/errors';
 import { slugExists, slugify } from '../../lib/utils';
 import { requireAuth } from '../auth/utils';
@@ -169,44 +169,4 @@ export const updateSpeaker = mutation({
     return id;
   },
   returns: v.id('speakers'),
-});
-
-/**
- * Internal batch update for speaker image URLs.
- * Used for admin tasks like migrating images.
- *
- * @param ctx - Database context
- * @param args - Array of updates
- * @returns Count of updated speakers
- */
-export const batchUpdateSpeakerImages = internalMutation({
-  args: {
-    updates: v.array(
-      v.object({
-        imageUrl: v.string(),
-        slug: v.string(),
-      }),
-    ),
-  },
-  handler: async (ctx, args) => {
-    let updated = 0;
-
-    for (const update of args.updates) {
-      const speaker = await ctx.db
-        .query('speakers')
-        .withIndex('by_slug', (q) => q.eq('slug', update.slug))
-        .first();
-
-      if (speaker) {
-        await ctx.db.patch(speaker._id, {
-          imageUrl: update.imageUrl,
-          updatedAt: Date.now(),
-        });
-        updated += 1;
-      }
-    }
-
-    return updated;
-  },
-  returns: v.number(),
 });

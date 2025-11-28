@@ -4,7 +4,7 @@ A modern, full-stack faith-based talks and content platform built with Next.js, 
 
 ## Tech Stack
 
-- **Frontend:** Next.js 15, React 19, Tailwind CSS v4
+- **Frontend:** Next.js 16, React 19, Tailwind CSS v4
 - **Backend:** Convex (database + backend functions)
 - **Authentication:** Better Auth
 - **Email:** Resend
