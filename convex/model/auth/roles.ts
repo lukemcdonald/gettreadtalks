@@ -12,7 +12,7 @@ export type UserRole = 'admin' | 'user';
  * @param user - User object that may have role field
  * @returns True if user is an admin, false otherwise
  */
-export function isAdmin(user: User | null | undefined): boolean {
+export function isAdmin(user: User): boolean {
   return user?.role === 'admin';
 }
 

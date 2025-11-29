@@ -5,9 +5,9 @@ import { convex as convexPlugin } from '@convex-dev/better-auth/plugins';
 import { betterAuth } from 'better-auth';
 import { nextCookies } from 'better-auth/next-js';
 import { admin as adminPlugin } from 'better-auth/plugins';
-import invariant from 'tiny-invariant';
 
 import { components } from './_generated/api';
+import authSchema from './betterAuth/schema';
 
 /**
  * Creates a new Better Auth component client.
@@ -18,7 +18,11 @@ import { components } from './_generated/api';
  * @param ctx - The Convex context.
  * @returns The Better Auth component client.
  */
-export const authComponent = createClient<DataModel>(components.betterAuth);
+export const authComponent = createClient<DataModel, typeof authSchema>(components.betterAuth, {
+  local: {
+    schema: authSchema,
+  },
+});
 
 /**
  * Creates a new Better Auth instance.
@@ -33,7 +37,7 @@ export const createAuth = (
 ) => {
   const secret = process.env.BETTER_AUTH_SECRET;
 
-  invariant(secret, 'Missing required environment variable: BETTER_AUTH_SECRET');
+  // invariant(secret, 'Missing required environment variable: BETTER_AUTH_SECRET');
 
   return betterAuth({
     advanced: {
