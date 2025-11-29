@@ -20,7 +20,7 @@ type FilterOption = {
 
 type FilterUtilityBarProps = {
   className?: string;
-  isAuthenticated: boolean;
+  isAdmin: boolean;
   onLoadingChange?: (loading: boolean) => void;
   speakers: Pick<Speaker, '_id' | 'firstName' | 'lastName'>[];
   topics: Pick<Topic, '_id' | 'title'>[];
@@ -91,7 +91,7 @@ function renderFeaturedFilterIcon(
 // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Complex filter component with multiple handlers, already refactored with extracted helpers
 export function FilterUtilityBar({
   className,
-  isAuthenticated,
+  isAdmin,
   onLoadingChange,
   speakers,
   topics,
@@ -267,7 +267,7 @@ export function FilterUtilityBar({
         )}
 
         {/* Status Filter (only if authenticated) */}
-        {isAuthenticated && (
+        {isAdmin && (
           <>
             <FilterSelect
               isPending={isPending}

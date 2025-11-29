@@ -14,6 +14,13 @@ export type User = FunctionReturnType<typeof api.users.getCurrentUser>;
 export type AuthUser = NonNullable<User>;
 
 /**
+ * Admin user type with guaranteed admin role.
+ */
+export type AdminUser = AuthUser & {
+  role: 'admin';
+};
+
+/**
  * Sign up parameters
  */
 export type SignUpParams = {

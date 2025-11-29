@@ -1,8 +1,8 @@
-import { notFound, redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
 
 import { PageLayout } from '@/components/page-layout';
 import { getAllCollections, getAllSpeakers, getTalkBySlug } from '@/features/talks';
-import { getCurrentUser } from '@/services/auth/server';
+import { requireAdminUser } from '@/services/auth/server';
 import { TalkForm } from '../../new/_components/talk-form';
 
 type EditTalkPageProps = {
@@ -13,11 +13,7 @@ type EditTalkPageProps = {
 
 export default async function EditTalkPage({ params }: EditTalkPageProps) {
   const { talk: slug } = await params;
-  const user = await getCurrentUser();
-
-  if (!user) {
-    redirect(`/login?redirect=/talks/${slug}/edit`);
-  }
+  await requireAdminUser(`/login?redirect=/talks/${slug}/edit`);
 
   const talkData = await getTalkBySlug(slug);
 

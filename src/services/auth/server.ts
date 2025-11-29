@@ -1,6 +1,7 @@
 'use server';
 
 import type { Route } from 'next';
+import type { AdminUser } from '@/services/auth/types';
 
 import { getToken } from '@convex-dev/better-auth/nextjs';
 import { fetchQuery } from 'convex/nextjs';
@@ -9,6 +10,7 @@ import { redirect } from 'next/navigation';
 
 import { api } from '@/convex/_generated/api';
 import { createAuth } from '@/convex/auth';
+import { isAdmin } from '@/services/auth/utils';
 
 /**
  * Get the authentication token for the current user.
@@ -53,4 +55,27 @@ export const requireCurrentUser = async (redirectTo: Route<string> = '/login') =
   }
 
   return user;
+};
+
+/**
+ * Require admin access and return the current user.
+ * Redirects to login if not authenticated, or home if not admin.
+ *
+ * @param redirectTo - URL to redirect to if not authenticated (default: '/login')
+ * @returns Admin user object
+ */
+export const requireAdminUser = async (
+  redirectTo: Route<string> = '/login',
+): Promise<AdminUser> => {
+  const user = await getCurrentUser();
+
+  if (!user) {
+    redirect(redirectTo);
+  }
+
+  if (!isAdmin(user)) {
+    redirect('/');
+  }
+
+  return user as AdminUser;
 };

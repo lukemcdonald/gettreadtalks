@@ -15,7 +15,7 @@ import { cn } from '@/utils';
 
 type TalksFiltersProps = {
   className?: string;
-  isAuthenticated: boolean;
+  isAdmin: boolean;
   onLoadingChange?: (loading: boolean) => void;
   speakers: Pick<Speaker, '_id' | 'firstName' | 'lastName'>[];
   topics: Pick<Topic, '_id' | 'title'>[];
@@ -23,7 +23,7 @@ type TalksFiltersProps = {
 
 export function TalksFilters({
   className,
-  isAuthenticated,
+  isAdmin,
   onLoadingChange,
   speakers,
   topics,
@@ -90,7 +90,7 @@ export function TalksFilters({
         />
       )}
 
-      {isAuthenticated && (
+      {isAdmin && (
         <SelectFilter
           label="Status"
           options={statusOptions}
