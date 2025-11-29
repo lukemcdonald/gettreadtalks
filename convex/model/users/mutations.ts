@@ -1,6 +1,6 @@
 import { v } from 'convex/values';
 
-import { mutation } from '../../_generated/server';
+import { internalMutation, mutation } from '../../_generated/server';
 import { authComponent, createAuth } from '../../auth';
 import { requireAdmin } from '../auth/roles';
 import { getUserId } from '../auth/utils';
@@ -281,11 +281,34 @@ export const updatePassword = mutation({
 });
 
 /**
- * Set a user's role (admin only).
+ * Set a user's role (internal - no auth required).
  *
- * @param ctx - Database context
- * @param args - Arguments containing userId and role
- * @returns The ID of the updated user
+ * Use this to set the first admin or manage roles programmatically.
+ * Can be called from Convex Dashboard or CLI:
+ * - Dashboard: Functions → internal.model.users.mutations.setUserRoleInternal
+ * - CLI: npx convex run internal.model.users.mutations.setUserRoleInternal '{"userId":"...","role":"admin"}'
+ */
+export const setUserRoleInternal = internalMutation({
+  args: {
+    role: userRole,
+    userId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await createAuth(ctx).api.setRole({
+      body: {
+        role: args.role,
+        userId: args.userId,
+      },
+      headers: {},
+    });
+
+    return args.userId;
+  },
+  returns: v.string(),
+});
+
+/**
+ * Set a user's role (admin only).
  */
 export const setUserRole = mutation({
   args: {
