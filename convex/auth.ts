@@ -4,6 +4,7 @@ import { type GenericCtx, createClient } from '@convex-dev/better-auth';
 import { convex as convexPlugin } from '@convex-dev/better-auth/plugins';
 import { betterAuth } from 'better-auth';
 import { nextCookies } from 'better-auth/next-js';
+import { admin as adminPlugin } from 'better-auth/plugins';
 import invariant from 'tiny-invariant';
 
 import { components } from './_generated/api';
@@ -45,6 +46,10 @@ export const createAuth = (
       requireEmailVerification: false,
     },
     plugins: [
+      adminPlugin({
+        adminRoles: ['admin'],
+        defaultRole: 'user',
+      }),
       convexPlugin(),
       nextCookies(), // Add nextCookies as the last plugin for automatic cookie handling
     ],

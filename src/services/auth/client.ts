@@ -3,10 +3,16 @@
 import type { SignInParams, SignUpParams } from './types';
 
 import { convexClient } from '@convex-dev/better-auth/client/plugins';
+import { adminClient } from 'better-auth/client/plugins';
 import { createAuthClient } from 'better-auth/react';
 
+/**
+ * Create a Better Auth client instance for interacting with Better Auth server from the client.
+ *
+ * @returns The Better Auth client instance.
+ */
 export const authClient = createAuthClient({
-  plugins: [convexClient()],
+  plugins: [convexClient(), adminClient()],
 });
 
 export async function signUp({ email, name, password }: SignUpParams) {

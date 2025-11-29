@@ -39,6 +39,9 @@ import type * as model_affiliateLinks_index from "../model/affiliateLinks/index.
 import type * as model_affiliateLinks_mutations from "../model/affiliateLinks/mutations.js";
 import type * as model_affiliateLinks_queries from "../model/affiliateLinks/queries.js";
 import type * as model_affiliateLinks_validators from "../model/affiliateLinks/validators.js";
+import type * as model_auth_index from "../model/auth/index.js";
+import type * as model_auth_roles from "../model/auth/roles.js";
+import type * as model_auth_types from "../model/auth/types.js";
 import type * as model_auth_utils from "../model/auth/utils.js";
 import type * as model_clips_index from "../model/clips/index.js";
 import type * as model_clips_mutations from "../model/clips/mutations.js";
@@ -62,6 +65,7 @@ import type * as model_users_index from "../model/users/index.js";
 import type * as model_users_mutations from "../model/users/mutations.js";
 import type * as model_users_queries from "../model/users/queries.js";
 import type * as model_users_utils from "../model/users/utils.js";
+import type * as model_users_validators from "../model/users/validators.js";
 import type * as speakers from "../speakers.js";
 import type * as talks from "../talks.js";
 import type * as topics from "../topics.js";
@@ -105,6 +109,9 @@ declare const fullApi: ApiFromModules<{
   "model/affiliateLinks/mutations": typeof model_affiliateLinks_mutations;
   "model/affiliateLinks/queries": typeof model_affiliateLinks_queries;
   "model/affiliateLinks/validators": typeof model_affiliateLinks_validators;
+  "model/auth/index": typeof model_auth_index;
+  "model/auth/roles": typeof model_auth_roles;
+  "model/auth/types": typeof model_auth_types;
   "model/auth/utils": typeof model_auth_utils;
   "model/clips/index": typeof model_clips_index;
   "model/clips/mutations": typeof model_clips_mutations;
@@ -128,6 +135,7 @@ declare const fullApi: ApiFromModules<{
   "model/users/mutations": typeof model_users_mutations;
   "model/users/queries": typeof model_users_queries;
   "model/users/utils": typeof model_users_utils;
+  "model/users/validators": typeof model_users_validators;
   speakers: typeof speakers;
   talks: typeof talks;
   topics: typeof topics;

@@ -2,7 +2,9 @@ import { v } from 'convex/values';
 
 import { mutation } from '../../_generated/server';
 import { authComponent, createAuth } from '../../auth';
+import { requireAdmin } from '../auth/roles';
 import { getUserId } from '../auth/utils';
+import { userRole } from './validators';
 
 /**
  * Add a clip to user favorites.
@@ -276,4 +278,32 @@ export const updatePassword = mutation({
     return null;
   },
   returns: v.null(),
+});
+
+/**
+ * Set a user's role (admin only).
+ *
+ * @param ctx - Database context
+ * @param args - Arguments containing userId and role
+ * @returns The ID of the updated user
+ */
+export const setUserRole = mutation({
+  args: {
+    role: userRole,
+    userId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+
+    await createAuth(ctx).api.setRole({
+      body: {
+        role: args.role,
+        userId: args.userId,
+      },
+      headers: await authComponent.getHeaders(ctx),
+    });
+
+    return args.userId;
+  },
+  returns: v.string(),
 });

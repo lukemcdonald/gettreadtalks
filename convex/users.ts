@@ -14,6 +14,7 @@ export const favoriteClip = mutations.favoriteClip;
 export const favoriteSpeaker = mutations.favoriteSpeaker;
 export const favoriteTalk = mutations.favoriteTalk;
 export const finishTalk = mutations.finishTalk;
+export const setUserRole = mutations.setUserRole;
 export const unfavoriteClip = mutations.unfavoriteClip;
 export const unfavoriteSpeaker = mutations.unfavoriteSpeaker;
 export const unfavoriteTalk = mutations.unfavoriteTalk;
