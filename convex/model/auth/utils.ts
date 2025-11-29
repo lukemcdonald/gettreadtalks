@@ -4,21 +4,13 @@ import type { User } from './types';
 import { authComponent } from '../../auth';
 
 /**
- * Get the current authenticated user identity.
- *
- * @param ctx - Query context
- * @returns User identity object or null if not authenticated
- */
-export const getAuthUser = async (ctx: QueryCtx) => authComponent.safeGetAuthUser(ctx);
-
-/**
  * Get the current authenticated user.
  *
  * @param ctx - Query or Mutation context
  * @returns User object or null if not authenticated
  */
 export async function getCurrentUser(ctx: QueryCtx | MutationCtx): Promise<User | null> {
-  const user = await getAuthUser(ctx);
+  const user = await authComponent.safeGetAuthUser(ctx);
 
   if (!user) {
     return null;

@@ -1,7 +1,7 @@
 import { v } from 'convex/values';
 
 import { query } from '../../_generated/server';
-import { getAuthUser } from '../auth/utils';
+import { getCurrentUser as getAuthUser } from '../auth/utils';
 import { getUserFavoriteClips, getUserFavoriteSpeakers, getUserFavoriteTalks } from './utils';
 
 /**
