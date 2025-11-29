@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { getTalkBySlug } from '@/features/talks';
 import { getCurrentUser } from '@/services/auth/server';
+import { isAdmin } from '@/services/auth/utils';
 import { ClipsList } from './_components/clips-list';
 import { FavoriteTalkButton } from './_components/favorite-talk-button';
 
@@ -19,6 +20,7 @@ type TalkPageProps = {
 export default async function TalkPage({ params }: TalkPageProps) {
   const { talk: slug } = await params;
   const [talkData, user] = await Promise.all([getTalkBySlug(slug), getCurrentUser()]);
+  const userIsAdmin = isAdmin(user);
 
   if (!talkData) {
     notFound();
@@ -31,7 +33,7 @@ export default async function TalkPage({ params }: TalkPageProps) {
       <PageLayout.Sidebar>
         <SidebarContent title="Actions">
           <div className="flex flex-col gap-2">
-            {user && (
+            {userIsAdmin && (
               <Button render={<Link href={`/talks/${slug}/edit`} />} variant="outline">
                 Edit
               </Button>
