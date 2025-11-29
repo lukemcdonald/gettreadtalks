@@ -1,13 +1,31 @@
 import type { DataModel } from './_generated/dataModel';
 
 import { type GenericCtx, createClient } from '@convex-dev/better-auth';
-import { convex } from '@convex-dev/better-auth/plugins';
+import { convex as convexPlugin } from '@convex-dev/better-auth/plugins';
 import { betterAuth } from 'better-auth';
 import { nextCookies } from 'better-auth/next-js';
 import invariant from 'tiny-invariant';
 
 import { components } from './_generated/api';
 
+/**
+ * Creates a new Better Auth component client.
+ *
+ * The component client has methods needed for integrating Convex with
+ * Better Auth, as well as helper methods for general use.
+
+ * @param ctx - The Convex context.
+ * @returns The Better Auth component client.
+ */
+export const authComponent = createClient<DataModel>(components.betterAuth);
+
+/**
+ * Creates a new Better Auth instance.
+ *
+ * @param ctx - The Convex context.
+ * @param options - The options for the Better Auth instance.
+ * @returns The Better Auth instance.
+ */
 export const createAuth = (
   ctx: GenericCtx<DataModel>,
   { optionsOnly } = { optionsOnly: false },
@@ -27,7 +45,7 @@ export const createAuth = (
       requireEmailVerification: false,
     },
     plugins: [
-      convex(),
+      convexPlugin(),
       nextCookies(), // Add nextCookies as the last plugin for automatic cookie handling
     ],
     secret,
@@ -44,9 +62,3 @@ export const createAuth = (
     },
   });
 };
-
-/**
- * The component client has methods needed for integrating Convex with
- * Better Auth, as well as helper methods for general use.
- */
-export const authComponent = createClient<DataModel>(components.betterAuth);
