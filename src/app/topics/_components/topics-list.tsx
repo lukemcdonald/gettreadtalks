@@ -1,5 +1,7 @@
 'use client';
 
+import type { Topic } from '@/features/topics/types';
+
 import { useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 
@@ -9,10 +11,7 @@ import { Empty, EmptyDescription } from '@/components/ui/empty';
 
 type TopicWithCount = {
   count: number;
-  topic: {
-    slug: string;
-    title: string;
-  };
+  topic: Pick<Topic, 'slug' | 'title'>;
 };
 
 type TopicsListProps = {
@@ -37,8 +36,6 @@ export function TopicsList({ topics }: TopicsListProps) {
       switch (sort) {
         case 'alphabetical':
           return a.topic.title.localeCompare(b.topic.title);
-        case 'most-talks':
-          return b.count - a.count;
         case 'least-talks':
           return a.count - b.count;
         default:
