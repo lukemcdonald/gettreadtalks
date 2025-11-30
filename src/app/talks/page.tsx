@@ -1,94 +1,36 @@
-import type { StatusType } from '@/convex/lib/validators/shared';
 import type { SpeakerId } from '@/features/speakers/types';
+import type { TalkStatus } from '@/features/talks/types';
 import type { TopicId } from '@/features/topics/types';
 
-import { Suspense } from 'react';
-
-import { FilterUtilityBar } from '@/components/filter-utility-bar';
+import { TalksContent } from '@/app/talks/_components/talks-content';
+import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
-import { PageLayout } from '@/components/page-layout';
-import { getAllSpeakersForFilter, getAllTopicsForFilter, getTalks } from '@/features/talks';
-import { getCurrentUser } from '@/services/auth/server';
-import { isAdmin } from '@/services/auth/utils';
-import { Pagination } from './_components/pagination';
-import { TalksList } from './_components/talks-list';
-import { TalksListSkeleton } from './_components/talks-list-skeleton';
 
-type TalksPageProps = {
-  searchParams: Promise<{
-    cursor?: string;
-    featured?: string;
-    search?: string;
-    speaker?: string;
-    status?: string;
-    topic?: string;
-  }>;
+export type TalksPageSearchParams = {
+  cursor?: string;
+  featured?: string;
+  search?: string;
+  speakerId?: SpeakerId;
+  status?: TalkStatus;
+  topicId?: TopicId;
 };
 
-async function TalksContent({ params }: { params: Awaited<TalksPageProps['searchParams']> }) {
-  const user = await getCurrentUser();
-  const userIsAdmin = isAdmin(user);
-
-  const cursor = params.cursor || undefined;
-  const featured = params.featured === 'true' ? true : undefined;
-  const search = params.search || undefined;
-  const speakerId = params.speaker as SpeakerId | undefined;
-  const topicId = params.topic as TopicId | undefined;
-  const statusParam = params.status as StatusType | undefined;
-
-  const status = userIsAdmin
-    ? statusParam
-    : statusParam ||
-      (featured === undefined && !speakerId && !topicId && !search ? 'published' : undefined);
-
-  const result = await getTalks({
-    cursor,
-    featured,
-    search,
-    speakerId,
-    status,
-    topicId,
-  });
-
-  return (
-    <>
-      <TalksList talks={result.talks} />
-      <Pagination
-        continueCursor={result.continueCursor}
-        hasNextPage={!result.isDone}
-        hasPrevPage={!!cursor}
-      />
-    </>
-  );
-}
+type TalksPageProps = {
+  searchParams: Promise<TalksPageSearchParams>;
+};
 
 export default async function TalksPage({ searchParams }: TalksPageProps) {
   const params = await searchParams;
-  const user = await getCurrentUser();
-  const userIsAdmin = isAdmin(user);
-
-  // Fetch filter data (not affected by pagination)
-  const [speakers, topics] = await Promise.all([
-    getAllSpeakersForFilter(),
-    getAllTopicsForFilter(),
-  ]);
 
   return (
-    <PageLayout>
-      <PageLayout.Sidebar sticky>
+    <SidebarLayout
+      content={<TalksContent searchParams={params} />}
+      sidebar={
         <PageHeader
           description="Elevate your spiritual heartbeat with Christ centered talks."
           title="Talks"
-          // variant="lg"
         />
-      </PageLayout.Sidebar>
-      <PageLayout.Content>
-        <FilterUtilityBar isAdmin={userIsAdmin} speakers={speakers} topics={topics} />
-
-        <Suspense fallback={<TalksListSkeleton />}>
-          <TalksContent params={params} />
-        </Suspense>
-      </PageLayout.Content>
-    </PageLayout>
+      }
+    />
   );
 }
