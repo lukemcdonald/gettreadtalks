@@ -12,7 +12,7 @@
   --color-neutral-950: oklch(14.7% 0.004 87.237);
 
   --max-width-container: var(--breakpoint-xl);
-  --radius: 0.25rem;
+  --radius: 0.5rem;
 
   /** Branding */
 
@@ -39,11 +39,8 @@
   /** General */
 
   --border: oklch(92.3% 0.003 48.717);
-  --border-foreground: color-mix(
-    in oklab,
-    var(--color-foreground) 2.5%,
-    transparent
-  );
+  --border-alt: color-mix(in oklab, var(--color-foreground) 2.5%, transparent);
+
   --input: oklch(92.3% 0.003 48.717);
   --ring: oklch(70.4% 0.191 22.216);
 

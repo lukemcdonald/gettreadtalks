@@ -33,7 +33,7 @@ export function FeaturedGrid({
   quickLinks,
   title,
 }: FeaturedGridProps) {
-  const defaultColumns: GridColumns = { default: 1, sm: 2, md: 2, lg: 3, xl: 4 };
+  const defaultColumns: GridColumns = { default: 1, sm: 2, md: 2, lg: 3, xl: 3 };
   const gridColumns = columns || defaultColumns;
 
   return (

@@ -3,8 +3,8 @@
 import type { Clip } from '@/features/clips/types';
 import type { Speaker } from '@/features/speakers/types';
 
+import { MediaCard } from '@/components/media-card';
 import { SpeakerAvatar } from '@/components/speaker-avatar';
-import { Card, CardDescription, CardLink, CardTitle } from '@/components/ui/card';
 import { getSpeakerName } from '@/features/speakers';
 
 type ClipCardProps = {
@@ -14,23 +14,20 @@ type ClipCardProps = {
 };
 
 export function ClipCard({ clip, favorited, speaker }: ClipCardProps) {
-  const speakerName = speaker ? getSpeakerName(speaker) : '';
+  const speakerName = getSpeakerName(speaker);
+  const accessibleLabel = speakerName ? `${clip.title} by ${speakerName}` : clip.title;
   const statusLabels = [favorited && 'Favorited'];
   const statusLabel = statusLabels.filter(Boolean).join(', ');
 
   return (
-    <Card
-      className="relative flex-row items-center gap-4 p-4"
+    <MediaCard
+      ariaLabel={accessibleLabel}
+      className="items-center"
       data-status={statusLabel}
-      variant="interactive"
-    >
-      {speaker && <SpeakerAvatar speaker={speaker} />}
-      <div className="flex-1 space-y-1">
-        <CardTitle>
-          <CardLink href={`/clips/${clip.slug}`}>{clip.title}</CardLink>
-        </CardTitle>
-        {speakerName && <CardDescription>{speakerName}</CardDescription>}
-      </div>
-    </Card>
+      href={`/clips/${clip.slug}`}
+      media={speaker ? <SpeakerAvatar speaker={speaker} /> : undefined}
+      subtitle={speakerName}
+      title={clip.title}
+    />
   );
 }

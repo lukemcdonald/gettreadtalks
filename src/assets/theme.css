@@ -42,7 +42,7 @@
 
   /** General */
   --color-border: var(--border);
-  --color-border-foreground: var(--border-foreground);
+  --color-border-alt: var(--border-alt);
   --color-ring: var(--ring);
   --font-sans: var(--font-inter);
   --radius-sm: calc(var(--radius) - 4px);
