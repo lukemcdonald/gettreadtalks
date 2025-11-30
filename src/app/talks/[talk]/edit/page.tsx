@@ -1,18 +1,18 @@
 import { notFound } from 'next/navigation';
 
-import { PageLayout } from '@/components/page-layout';
+import { CenteredLayout } from '@/components/layouts';
+import { PageHeader } from '@/components/page-header';
 import { getAllCollections, getAllSpeakers, getTalkBySlug } from '@/features/talks';
 import { requireAdminUser } from '@/services/auth/server';
 import { TalkForm } from '../../new/_components/talk-form';
 
 type EditTalkPageProps = {
-  params: Promise<{
-    talk: string;
-  }>;
+  params: Promise<{ talk: string }>;
 };
 
 export default async function EditTalkPage({ params }: EditTalkPageProps) {
   const { talk: slug } = await params;
+
   await requireAdminUser(`/login?redirect=/talks/${slug}/edit`);
 
   const talkData = await getTalkBySlug(slug);
@@ -25,10 +25,8 @@ export default async function EditTalkPage({ params }: EditTalkPageProps) {
   const [collections, speakers] = await Promise.all([getAllCollections(), getAllSpeakers()]);
 
   return (
-    <PageLayout>
-      <PageLayout.Content>
-        <h1 className="mb-6 font-semibold text-2xl">Edit Talk</h1>
-
+    <CenteredLayout
+      content={
         <TalkForm
           collections={collections}
           initialData={{
@@ -46,7 +44,8 @@ export default async function EditTalkPage({ params }: EditTalkPageProps) {
           talkId={talk._id}
           talkSlug={talk.slug}
         />
-      </PageLayout.Content>
-    </PageLayout>
+      }
+      header={<PageHeader title="Edit Talk" />}
+    />
   );
 }
