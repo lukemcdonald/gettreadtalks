@@ -12,7 +12,7 @@ interface CardProps extends useRender.ComponentProps<'div'> {
 }
 
 const cardVariants = cva(
-  'relative flex flex-col gap-6 rounded-lg bg-card bg-clip-padding text-card-foreground before:pointer-events-none before:absolute before:inset-0 before:rounded-lg before:border before:border-border-foreground',
+  'relative flex flex-col gap-6 rounded-lg bg-card bg-clip-padding text-card-foreground before:pointer-events-none before:absolute before:inset-0 before:rounded-lg before:border before:border-border-alt',
   {
     variants: {
       variant: {
@@ -55,7 +55,7 @@ function CardHeader({ className, ...props }: React.ComponentProps<'div'>) {
 
 function CardTitle({ className, ...props }: React.ComponentProps<'div'>) {
   return (
-    <div className={cn('font-semibold text-lg', className)} data-slot="card-title" {...props} />
+    <div className={cn('font-semibold text-md', className)} data-slot="card-title" {...props} />
   );
 }
 
@@ -96,7 +96,7 @@ function CardFooter({ className, ...props }: React.ComponentProps<'div'>) {
 function CardLink({ children, ...delegated }: React.ComponentProps<typeof Link>) {
   return (
     <Link {...delegated}>
-      <span className="absolute inset-0 z-10" />
+      <span className="absolute inset-0" />
       {children}
     </Link>
   );

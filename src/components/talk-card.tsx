@@ -3,40 +3,51 @@
 import type { Speaker } from '@/features/speakers/types';
 import type { Talk } from '@/features/talks/types';
 
+import Link from 'next/link';
+
+import { MediaCard } from '@/components/media-card';
 import { SpeakerAvatar } from '@/components/speaker-avatar';
-import { Card, CardDescription, CardLink, CardTitle } from '@/components/ui/card';
 import { getSpeakerName } from '@/features/speakers';
+
+type TalkCardSpeaker = {
+  firstName: Speaker['firstName'];
+  imageUrl?: Speaker['imageUrl'];
+  lastName: Speaker['lastName'];
+  slug?: Speaker['slug'];
+};
 
 type TalkCardProps = {
   featured?: boolean;
   favorited?: boolean;
   finished?: boolean;
-  speaker?: Pick<Speaker, 'firstName' | 'lastName' | 'imageUrl' | 'slug'>;
+  speaker?: TalkCardSpeaker;
   talk: Pick<Talk, 'description' | 'slug' | 'title'>;
 };
 
-export function TalkCard({ featured, favorited, finished, speaker, talk }: TalkCardProps) {
-  const speakerName = speaker ? getSpeakerName(speaker) : '';
-  const accessibleLabel = speakerName ? `${talk.title} by ${speakerName}` : talk.title;
+function SpeakerLink({ children, slug }: { children: React.ReactNode; slug: string }) {
+  return (
+    <Link className="relative z-10 hover:underline" href={`/speakers/${slug}`}>
+      {children}
+    </Link>
+  );
+}
 
+export function TalkCard({ featured, favorited, finished, speaker, talk }: TalkCardProps) {
+  const speakerName = getSpeakerName(speaker);
+  const accessibleLabel = speakerName ? `${talk.title} by ${speakerName}` : talk.title;
   const statusLabels = [featured && 'Featured', favorited && 'Favorited', finished && 'Finished'];
   const statusLabel = statusLabels.filter(Boolean).join(', ');
 
   return (
-    <Card
-      className="relative flex-row items-center gap-4 p-4"
+    <MediaCard
+      ariaLabel={accessibleLabel}
       data-status={statusLabel}
-      variant="interactive"
-    >
-      {speaker && <SpeakerAvatar speaker={speaker} />}
-      <div className="flex-1 space-y-1">
-        <CardTitle>
-          <CardLink aria-label={accessibleLabel} href={`/talks/${talk.slug}`}>
-            {talk.title}
-          </CardLink>
-        </CardTitle>
-        {speaker && <CardDescription>{speakerName}</CardDescription>}
-      </div>
-    </Card>
+      href={`/talks/${talk.slug}`}
+      media={speaker?.imageUrl ? <SpeakerAvatar speaker={speaker} /> : undefined}
+      subtitle={
+        speaker?.slug ? <SpeakerLink slug={speaker.slug}>{speakerName}</SpeakerLink> : speakerName
+      }
+      title={talk.title}
+    />
   );
 }
