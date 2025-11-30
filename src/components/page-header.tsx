@@ -3,7 +3,6 @@ import { cva } from 'class-variance-authority';
 import { cn } from '@/utils';
 
 type PageHeaderProps = {
-  children?: React.ReactNode;
   className?: string;
   description?: string;
   variant?: 'sm' | 'md' | 'lg';
@@ -33,20 +32,13 @@ const descriptionVariants = cva('text-muted-foreground', {
   },
 });
 
-export function PageHeader({
-  children,
-  className,
-  description,
-  title,
-  variant = 'md',
-}: PageHeaderProps) {
+export function PageHeader({ className, description, title, variant = 'md' }: PageHeaderProps) {
   return (
     <header className={cn('flex flex-col gap-4', className)}>
       <div className="max-w-prose space-y-2">
         <h1 className={titleVariants({ variant })}>{title}</h1>
         {description && <p className={descriptionVariants({ variant })}>{description}</p>}
       </div>
-      {children}
     </header>
   );
 }

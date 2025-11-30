@@ -14,7 +14,11 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetClose, SheetHeader, SheetPopup, SheetTrigger } from '@/components/ui/sheet';
 import { cn } from '@/utils';
 
-export function MobileNav() {
+type MobileNavProps = {
+  className?: string;
+};
+
+export function MobileNav({ className }: MobileNavProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -25,7 +29,7 @@ export function MobileNav() {
           <Button
             aria-expanded={open}
             aria-label="Open navigation menu"
-            className="lg:hidden"
+            className={className}
             size="icon-lg"
             variant="ghost"
           >
@@ -33,6 +37,7 @@ export function MobileNav() {
           </Button>
         }
       />
+
       <SheetPopup showCloseButton={false} side="right">
         <SheetHeader className="flex flex-row items-center justify-between">
           <Link className="flex shrink-0 items-center" href="/">
