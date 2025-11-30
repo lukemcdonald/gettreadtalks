@@ -54,14 +54,6 @@ export default async function AccountPage() {
               </div>
             </div>
           </div>
-
-          <div>
-            <h2 className="mb-4 font-semibold text-card-foreground text-xl">Account Status</h2>
-            <div className="rounded-lg bg-success/8 p-4 text-success-foreground">
-              <p className="font-semibold">Account Active</p>
-              <p>Your authentication is working correctly</p>
-            </div>
-          </div>
         </div>
       </CardContent>
 

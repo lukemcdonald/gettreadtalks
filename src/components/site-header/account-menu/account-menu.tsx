@@ -14,7 +14,6 @@ import {
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
-import { AccountMenuAvatar } from '@/components/site-header/account-menu/account-menu-avatar';
 import { AccountMenuItem } from '@/components/site-header/account-menu/account-menu-item';
 import { NavLink } from '@/components/site-header/navigation/nav-link';
 import { Button } from '@/components/ui/button';
@@ -56,7 +55,7 @@ export function AccountMenu({ initialUser }: AccountMenuProps) {
   return (
     <Menu openOnHover>
       <MenuTrigger render={<Button className="size-10" size="icon-lg" variant="ghost" />}>
-        <AccountMenuAvatar user={user} />
+        <UserIcon className="size-6" />
       </MenuTrigger>
       <MenuPopup>
         <div className="flex flex-col px-2 pt-1">

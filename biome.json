@@ -9,6 +9,10 @@
   },
   "linter": {
     "rules": {
+      "correctness": {
+        "noUnusedImports": "off",
+        "noUnusedVariables": "off"
+      },
       "performance": {
         "noBarrelFile": "off",
         "noNamespaceImport": "off"
