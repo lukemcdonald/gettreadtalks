@@ -21,7 +21,7 @@ type TopicsListProps = {
 export function TopicsList({ topics }: TopicsListProps) {
   const searchParams = useSearchParams();
   const search = searchParams.get('search')?.toLowerCase() || '';
-  const sort = searchParams.get('sort') || 'most-talks';
+  const sort = searchParams.get('sort') || 'alphabetical';
 
   const filteredAndSorted = useMemo(() => {
     let filtered = topics;
@@ -34,12 +34,12 @@ export function TopicsList({ topics }: TopicsListProps) {
     // Sort
     const sorted = [...filtered].sort((a, b) => {
       switch (sort) {
-        case 'alphabetical':
-          return a.topic.title.localeCompare(b.topic.title);
+        case 'most-talks':
+          return b.count - a.count;
         case 'least-talks':
           return a.count - b.count;
         default:
-          return b.count - a.count;
+          return a.topic.title.localeCompare(b.topic.title);
       }
     });
 

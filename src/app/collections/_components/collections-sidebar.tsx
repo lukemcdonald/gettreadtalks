@@ -1,5 +1,6 @@
 import type { Speaker } from '@/features/speakers/types';
 
+import { PageHeader } from '@/components/page-header';
 import { SearchInput } from '@/components/search-input';
 import { SelectFilter } from '@/components/select-filter';
 import { SidebarContent } from '@/components/sidebar-content';
@@ -13,13 +14,10 @@ type CollectionsSidebarProps = {
 export function CollectionsSidebar({ speakersWithCollections }: CollectionsSidebarProps) {
   return (
     <>
-      <header className="space-y-2">
-        <h2 className="font-semibold text-2xl">Collections</h2>
-        <p className="text-muted-foreground text-sm">
-          Each series includes talks given by one or more speakers on the same topic or book of the
-          Bible.
-        </p>
-      </header>
+      <PageHeader
+        description="Each series includes talks given by one or more speakers on the same topic or book of the Bible."
+        title="Collections"
+      />
       <SidebarContent>
         <div className="space-y-2">
           <SearchInput paramName="search" placeholder="Search collections..." />
@@ -33,9 +31,9 @@ export function CollectionsSidebar({ speakersWithCollections }: CollectionsSideb
           />
           <SortSelect
             options={[
+              { label: 'Alphabetical', value: 'alphabetical' },
               { label: 'Most Talks', value: 'most-talks' },
               { label: 'Least Talks', value: 'least-talks' },
-              { label: 'Alphabetical', value: 'alphabetical' },
             ]}
           />
         </div>

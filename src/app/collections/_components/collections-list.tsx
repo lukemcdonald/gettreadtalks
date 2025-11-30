@@ -24,7 +24,7 @@ export function CollectionsList({ collections }: CollectionsListProps) {
   const searchParams = useSearchParams();
   const search = searchParams.get('search')?.toLowerCase() || '';
   const speakerSlug = searchParams.get('speaker') || 'all';
-  const sort = searchParams.get('sort') || 'most-talks';
+  const sort = searchParams.get('sort') || 'alphabetical';
 
   const filteredAndSorted = useMemo(() => {
     let filtered = collections;
@@ -46,14 +46,12 @@ export function CollectionsList({ collections }: CollectionsListProps) {
     // Sort
     const sorted = [...filtered].sort((a, b) => {
       switch (sort) {
-        case 'alphabetical':
-          return a.collection.title.localeCompare(b.collection.title);
         case 'most-talks':
           return b.talkCount - a.talkCount;
         case 'least-talks':
           return a.talkCount - b.talkCount;
         default:
-          return b.talkCount - a.talkCount;
+          return a.collection.title.localeCompare(b.collection.title);
       }
     });
 
