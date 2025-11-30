@@ -32,9 +32,9 @@ function clearOptimisticState(
   setOptimisticTopic: (value: string | null) => void,
   setOptimisticStatus: (value: string | null) => void,
 ) {
-  if (key === 'speaker') {
+  if (key === 'speakerId') {
     setOptimisticSpeaker(null);
-  } else if (key === 'topic') {
+  } else if (key === 'topicId') {
     setOptimisticTopic(null);
   } else if (key === 'status') {
     setOptimisticStatus(null);
@@ -106,8 +106,8 @@ export function FilterUtilityBar({
   const [optimisticStatus, setOptimisticStatus] = useState<string | null>(null);
 
   const featured = searchParams.get('featured') === 'true';
-  const speakerId = searchParams.get('speaker');
-  const topicId = searchParams.get('topic');
+  const speakerId = searchParams.get('speakerId');
+  const topicId = searchParams.get('topicId');
   const status = searchParams.get('status');
 
   // Sync optimistic values with URL params
@@ -208,7 +208,7 @@ export function FilterUtilityBar({
     if (newValue) {
       setOptimisticSpeaker(newValue);
     }
-    updateFilter('speaker', newValue);
+    updateFilter('speakerId', newValue);
   };
 
   const handleTopicChange = (value: string) => {
@@ -216,7 +216,7 @@ export function FilterUtilityBar({
     if (newValue) {
       setOptimisticTopic(newValue);
     }
-    updateFilter('topic', newValue);
+    updateFilter('topicId', newValue);
   };
 
   const handleStatusChange = (value: string) => {
@@ -235,10 +235,10 @@ export function FilterUtilityBar({
           <>
             <FilterSelect
               isPending={isPending}
-              onClear={() => updateFilter('speaker', null)}
+              onClear={() => updateFilter('speakerId', null)}
               onValueChange={handleSpeakerChange}
               options={speakerOptions}
-              pendingFilter={pendingFilter === 'speaker' ? 'speaker' : null}
+              pendingFilter={pendingFilter === 'speakerId' ? 'speakerId' : null}
               selectedLabel={
                 selectedSpeaker
                   ? `${selectedSpeaker.firstName} ${selectedSpeaker.lastName}`
@@ -255,10 +255,10 @@ export function FilterUtilityBar({
           <>
             <FilterSelect
               isPending={isPending}
-              onClear={() => updateFilter('topic', null)}
+              onClear={() => updateFilter('topicId', null)}
               onValueChange={handleTopicChange}
               options={topicOptions}
-              pendingFilter={pendingFilter === 'topic' ? 'topic' : null}
+              pendingFilter={pendingFilter === 'topicId' ? 'topicId' : null}
               selectedLabel={selectedTopic ? selectedTopic.title : 'All Topics'}
               value={displayTopicId}
             />

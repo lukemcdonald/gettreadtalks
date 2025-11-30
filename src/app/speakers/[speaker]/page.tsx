@@ -8,9 +8,7 @@ import { PageHeader } from '@/components/page-header';
 import { getSpeakerBySlug, getSpeakerName } from '@/features/speakers';
 
 type SpeakerPageProps = {
-  params: Promise<{
-    speaker: string;
-  }>;
+  params: Promise<{ speaker: string }>;
 };
 
 export default async function SpeakerPage({ params }: SpeakerPageProps) {
