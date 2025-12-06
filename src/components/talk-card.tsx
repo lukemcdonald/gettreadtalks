@@ -43,7 +43,7 @@ export function TalkCard({ featured, favorited, finished, speaker, talk }: TalkC
       ariaLabel={accessibleLabel}
       data-status={statusLabel}
       href={`/talks/${talk.slug}`}
-      media={speaker?.imageUrl ? <SpeakerAvatar speaker={speaker} /> : undefined}
+      media={speaker ? <SpeakerAvatar speaker={speaker} /> : undefined}
       subtitle={
         speaker?.slug ? <SpeakerLink slug={speaker.slug}>{speakerName}</SpeakerLink> : speakerName
       }
