@@ -14,8 +14,10 @@ export type ErrorCode = (typeof ErrorCodes)[keyof typeof ErrorCodes];
 export type ErrorContext = {
   errorCode?: ErrorCode;
   field?: string;
+  level?: SeverityLevel;
   resource?: string;
   resourceId?: string;
+  statusCode?: number;
 } & SentryContext;
 
 /**
@@ -26,7 +28,7 @@ export type ErrorWithEventId = Error & {
 };
 
 type FingerprintKind = 'auth' | 'mutation' | 'validation' | 'network' | 'http' | 'error';
-type Fingerprint = [FingerprintKind, ...string[]];
+export type Fingerprint = [FingerprintKind, ...string[]];
 
 /**
  * Options for error reporting to Sentry.
@@ -63,3 +65,19 @@ export type MutationState<TData = unknown> = {
 };
 
 export type { SeverityLevel } from '@sentry/nextjs';
+
+/**
+ * Configuration for Sentry error reporting derived from Convex error data.
+ */
+export type SentryConfig = {
+  /** Whether the error should be logged to Sentry */
+  shouldLog: boolean;
+  /** Severity level for the error */
+  level: SeverityLevel;
+  /** Fingerprint pattern for error grouping (undefined = use Sentry defaults) */
+  fingerprint?: Fingerprint;
+  /** Context data to include in Sentry report */
+  context: Record<string, unknown>;
+  /** Tags for filtering and categorization */
+  tags: Record<string, string>;
+};

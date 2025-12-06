@@ -4,6 +4,7 @@ export type {
   ErrorReportOptions,
   MutationState,
   MutationStatus,
+  SentryConfig,
   SeverityLevel,
 } from './types';
 
@@ -18,6 +19,7 @@ export {
   getConvexErrorData,
   getErrorCode,
   getErrorMessage,
+  getSentryConfig,
   isConvexError,
   isErrorCode,
 } from './convex';
