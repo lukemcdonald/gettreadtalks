@@ -30,14 +30,14 @@ Queries use full descriptive names and are ordered alphabetically:
 
 ```ts
 // ✅ Good - Full names, alphabetical
-export const getTalk = queries.getTalk;
-export const getTalkBySlug = queries.getTalkBySlugWithRelations;
-export const getTalkWithRelations = queries.getTalkWithRelations;
-export const listFeaturedTalks = queries.listFeaturedTalks;        // Adjective before noun
-export const listTalks = queries.getTalks;
-export const listTalksByCategory = queries.getTalksByCategory;     // Filter by relationship
-export const listTalksBySpeaker = queries.getTalksBySpeaker;       // Filter by relationship
-export const listTalksWithSpeakers = queries.getTalksWithSpeakers; // With relations
+export const getItem = queries.getItem;
+export const getItemBySlug = queries.getItemBySlug;
+export const getItemBySlugWithRelations = queries.getItemBySlugWithRelations;
+export const listFeaturedItems = queries.listFeaturedItems;        // Adjective before noun
+export const listItems = queries.listItems;
+export const listItemsByCategory = queries.listItemsByCategory;     // Filter by relationship
+export const listItemsByAuthor = queries.listItemsByAuthor;       // Filter by relationship
+export const listItemsWithAuthors = queries.listItemsWithAuthors; // With relations
 ```
 
 **Pattern:**
@@ -45,6 +45,7 @@ export const listTalksWithSpeakers = queries.getTalksWithSpeakers; // With relat
 - `list*` queries return arrays
 - Alphabetical ordering
 - **Always include the noun** for clarity: `getItem` not `get`, `listItems` not `list`
+- Export names should match what they return (export both simple and with-relations versions when both exist)
 
 **Adjective placement:**
 - State/type descriptors go **before** the noun: `listFeaturedItems` (not `listItemsFeatured`)
@@ -57,10 +58,10 @@ Mutations use full descriptive names and are ordered alphabetically:
 
 ```ts
 // ✅ Good - Full names, alphabetical
-export const archiveTalk = mutations.archiveTalk;
-export const createTalk = mutations.createTalk;
-export const removeTalkFromTopic = mutations.removeTalkFromTopic;
-export const updateTalk = mutations.updateTalk;
+export const archiveItem = mutations.archiveItem;
+export const createItem = mutations.createItem;
+export const removeItemFromCategory = mutations.removeItemFromCategory;
+export const updateItem = mutations.updateItem;
 ```
 
 ## Helper Files (convex/model/{domain}/)

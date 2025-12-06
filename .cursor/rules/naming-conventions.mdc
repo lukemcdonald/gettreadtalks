@@ -73,35 +73,7 @@ deleting the entity. Never use standalone `remove` without specifying the relati
 
 ### Query Hook Return Pattern
 
-All query hooks return a consistent object shape for familiarity and destructuring:
-
-```ts
-// Single item hook
-export function useItem(id: string) {
-  const data = useQuery(/* your backend query */, { id });
-
-  return {
-    data,
-    isLoading: data === undefined,
-    notFound: data === null,
-  };
-}
-
-// Usage - familiar destructuring pattern
-const { data: item, isLoading, notFound } = useItem(id);
-if (isLoading) return <Loading />;
-if (notFound) return <NotFound />;
-return <div>{item.title}</div>;
-```
-
-**Benefits:**
-
-- Familiar to React Query users
-- Consistent shape across all hooks
-- Easy to destructure with renaming
-- Explicit `isLoading` and `notFound` states
-
-**Pattern for different return types:**
+All query hooks return a consistent object shape: `{ data, isLoading, notFound? }`
 
 ```ts
 // Returns single item or null
@@ -172,11 +144,11 @@ const { mutate, isLoading, error } = useMutationWithErrorHandling(
 
 ### Composite Hooks
 
-Combine multiple queries for page-level patterns to reduce boilerplate:
+Combine multiple queries for reusable patterns across components:
 
 ```ts
-// Composite hook for item detail pages
-export function useItemDetailPage(id: string) {
+// Composite hook for reusable component patterns
+export function useItemWithRelated(id: string) {
   const { data: item, isLoading } = useItem(id);
   const { data: relatedItems } = useItems(
     item ? { categoryId: item.categoryId, limit: 3 } : 'skip',
@@ -189,14 +161,11 @@ export function useItemDetailPage(id: string) {
     relatedItems,
   };
 }
-
-// Usage - all data in one call
-const { data, isLoading, notFound, relatedItems } = useItemDetailPage(id);
 ```
 
 **When to combine:**
 
-- Specific page/component always needs queries together
+- Queries used together in multiple components
 - Want unified loading state across related queries
 - Have dependent queries (one feeds into another)
 
@@ -206,53 +175,149 @@ const { data, isLoading, notFound, relatedItems } = useItemDetailPage(id);
 - Need maximum flexibility and reusability
 - Want optimal React performance (granular re-renders)
 
-### Loading States
-
-Check for `undefined` to determine loading state. Hooks wrap this check into an explicit `isLoading`
-property to provide a familiar React Query-style API.
-
-```ts
-// Hook implementation
-export function useItem(id: string) {
-  const data = useQuery(/* your backend query */, { id });
-  return {
-    data,
-    isLoading: data === undefined, // undefined = still loading
-    notFound: data === null, // null = not found
-  };
-}
-
-// Component usage
-const { data, isLoading, notFound } = useItem(id);
-```
+**Note:** Don't create `use{Domain}DetailPage` hooks - use Server Components for detail pages instead. Server Components provide better SEO, faster initial load, and eliminate loading states for detail pages.
 
 ## Feature Queries (Server)
 
-Use the `get`/`list` pattern to indicate return type:
+Use singular/plural nouns to indicate return type:
 
 ```ts
-// queries.ts - Server reads
+// server.ts - Server reads
 
 // Single items (return one or null)
 export async function getItem(id);
 export async function getItemBySlug(slug);
 
-// Arrays (return array)
-export async function getItems({ filters });
-export async function getItemsByCategory(categoryId);
+// Arrays with pagination (return pagination metadata)
+export async function getItems({ limit = 12 });
+export async function getItemsWithAuthors({ limit = 12, cursor, ...filters });
 ```
 
 **Pattern:**
 
-- **`get*`** - Returns single item or null
-- **`list*`** - Returns arrays
+- **`get*` (singular)** - Returns single item or null (e.g., `getItem`, `getItemBySlug`)
+- **`get*` (plural)** - Returns pagination metadata (e.g., `getItems({ limit = 12 })` → `{ items, continueCursor, isDone }`)
+
+**Pagination Standard:**
+
+All plural functions:
+- Accept options object: `{ limit?: number }` (no default - undefined means fetch all)
+- Return pagination metadata: `{ [pluralNoun], continueCursor, isDone }`
+- Use `limit` parameter (not `pageSize` or `numItems`)
+- When `limit` is undefined, fetch all items (uses 1000 internally)
+
+**Examples:**
+
+```ts
+// No limit - fetch all items
+getItems() → { items, continueCursor, isDone }
+
+// With limit - paginated
+getItems({ limit: 20 }) → { items, continueCursor, isDone }
+
+// With filters
+getItemsWithAuthors({ limit: 20, cursor, featured, search, ... }) → { items, continueCursor, isDone }
+```
+
+**Why singular/plural instead of `get*`/`list*`?**
+
+- Matches React hooks convention (`useItem`/`useItems`)
+- Simpler and less verbose
+- Singular/plural nouns already clearly indicate return type
+- Consistent with frontend patterns
+
+**Why options object pattern?**
+
+- Easy to extend in the future (e.g., `{ limit, cursor, filters }`)
+- Consistent API across all functions
+- Better TypeScript inference
+
+**Note:** Backend Convex queries use `get*`/`list*` pattern for clarity in database operations, but frontend server functions use singular/plural for consistency with React hooks.
+
+## Convex Query Naming Conventions
+
+### Identifier Pattern
+
+**Use simple name (`getItem`) when:**
+
+- ✅ Looking up by ID (primary key)
+- ✅ Internal use (relationships, references)
+- ✅ ID is the default identifier
+
+**Use `By{Identifier}` when:**
+
+- ✅ Looking up by slug (public-facing, URLs)
+- ✅ Looking up by other unique fields (email, username, etc.)
+- ✅ Secondary identifier (not the primary key)
+
+**Examples:**
+
+- `getItem(id)` - By ID (internal, relationships)
+- `getItemBySlug(slug)` - By slug (public URLs)
+- `getUserByEmail(email)` - By unique field
+
+**Why not `getItemById`?** ID is the primary key, so it's the default. Shorter and cleaner: `getItem(id)` vs `getItemById(id)`.
+
+**Keep them separate:** Don't make one function accept both ID and slug. Clear intent, better TypeScript types, follows single responsibility principle.
+
+### Relations Pattern
+
+**BySlug queries always return relations** - They're used on detail pages where relations are always needed.
+
+**Single relation type:** Use `With{Entity}` suffix
+- `getCategoryBySlug` - Returns category only
+- `getCategoryBySlugWithItems` - Returns category with items
+
+**Multiple relation types:** Default returns all relations
+- `getItemBySlug` - Returns item with author, category, tags, relatedItems
+
+**Decision Guide:**
+- **1 relation type?** → Use `With{Entity}` suffix (e.g., `getCategoryBySlugWithItems`)
+- **2+ relation types?** → Default name returns all relations
+
+### Convex Export Names
+
+**Export names should match what they return. BySlug queries always return relations.**
+
+```ts
+// ✅ Good - BySlug always returns relations
+export const getItemBySlug = queries.getItemBySlug;
+```
+
+### Server Action Names
+
+**Server action names should match their purpose. BySlug queries are for detail pages and always return relations.**
+
+```ts
+// Detail pages - BySlug queries return relations
+export async function getItemBySlug(slug: string) {
+  return await fetchQuery(api.items.getItemBySlug, { slug }, { token });
+}
+
+// Simple lookups - use getItem(id) for entities without relations
+export async function getItem(id: string) {
+  return await fetchQuery(api.items.getItem, { id }, { token });
+}
+```
+
+**When to Create "With Relations" Version:**
+
+Create combined Convex query when:
+- ✅ Always needed together (detail pages)
+- ✅ Used in 2+ places
+- ✅ Can optimize with database joins/indexes
+
+Combine in server action when:
+- ✅ Conditional/optional relationships
+- ✅ One-off combinations
+- ✅ Context-specific data aggregation
 
 ## Feature Actions (Server)
 
 Use clear verb prefixes to indicate the operation:
 
 ```ts
-// actions.ts - Server writes
+// server.ts - Server writes
 
 // CRUD operations
 export async function archiveItem(id); // Soft delete (set status to 'archived')
@@ -345,33 +410,6 @@ Ask yourself: "How would a user describe this action?"
 └─ "I added item to category" → addItemToCategory ✓ (no simpler verb)
 ```
 
-### Examples by Context
-
-**Users Domain** - Rich with natural verbs:
-
-```ts
-// User-initiated actions with clear intent
-export const favoriteItem = mutation(...)
-export const unfavoriteItem = mutation(...)
-export const followUser = mutation(...)
-export const unfollowUser = mutation(...)
-export const finishTask = mutation(...)
-export const unfinishTask = mutation(...)
-export const bookmarkArticle = mutation(...)
-export const unbookmarkArticle = mutation(...)
-```
-
-**Other Domains** - Often structural:
-
-```ts
-// collections.ts - Structural relationships
-export const addItemToCollection = mutation(...)    // No natural verb
-export const removeItemFromCollection = mutation(...) // Structural
-
-// categories.ts - Join table operations
-export const addItemToCategory = mutation(...)    // Generic association
-export const removeItemFromCategory = mutation(...) // Join table
-```
 
 ### Common Pitfalls
 

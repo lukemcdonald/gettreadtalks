@@ -170,19 +170,22 @@ export function HomeContent({ preloadedItems }) {
 ```
 
 ```ts
-// ✅ Server-only: fetchQuery
+// ✅ Server-only: fetchQuery (Detail Pages Pattern)
 // app/items/[slug]/page.tsx (Server Component)
 export default async function ItemPage({ params }) {
-  const itemData = await fetchQuery(
-    api.items.getBySlug,
-    { slug: params.slug },
-    { token: authToken },
-  );
+  const { slug } = await params;
+  const itemData = await getItemBySlug(slug);
   
   if (!itemData) notFound();
   
-  // Render directly - static content, SEO critical
-  return <ItemContent data={itemData} />;
+  const { item, author, category, tags, relatedItems } = itemData;
+  
+  return (
+    <SidebarLayout
+      content={<ItemContent item={item} relatedItems={relatedItems} />}
+      sidebar={<ItemSidebar item={item} author={author} category={category} tags={tags} />}
+    />
+  );
 }
 ```
 
@@ -203,6 +206,88 @@ export function useFavorites(limit?: number) {
 | **Public content** | `fetchQuery` only | SEO critical and static content |
 | **User dashboard/favorites** | `useQuery` hooks | User-specific data and real-time updates |
 | **Interactive lists** | Hybrid pattern | Best performance and user experience |
+
+## Data Combining Patterns
+
+### When to Combine Data
+
+**Combine in Convex when:**
+
+- ✅ Always needed together (detail pages)
+- ✅ Used in 2+ places
+- ✅ Can optimize with database joins/indexes
+- ✅ Reduces round trips significantly
+
+**Combine in server action when:**
+
+- ✅ Conditional/optional relationships
+- ✅ One-off combinations
+- ✅ Context-specific data aggregation
+
+### Decision Matrix
+
+| Scenario | Pattern | Example |
+|----------|---------|---------|
+| **Always needed together** | Combine in Convex | `getItemBySlugWithRelations` for detail pages |
+| **Used in 2+ places** | Combine in Convex | `listItemsWithAuthors` used in multiple pages |
+| **Conditional/optional** | Combine in server action | Filter dropdowns with optional data |
+| **One-off combination** | Combine in server action | Custom dashboard aggregations |
+
+### Anti-Pattern: N+1 Queries
+
+**Don't create N+1 queries in server actions:**
+
+```ts
+// ❌ Bad - N+1 queries (1 for items + N for authors)
+const items = await fetchQuery(api.items.listItems, {...}, { token });
+const itemsWithAuthors = await Promise.all(
+  items.map(item =>
+    fetchQuery(api.users.getUser, { id: item.authorId }, { token })
+  )
+);
+
+// ✅ Good - Use combined query
+const itemsWithAuthors = await fetchQuery(
+  api.items.listItemsWithAuthors,
+  {...},
+  { token }
+);
+```
+
+**Why avoid N+1:**
+- Multiple round trips to database
+- Poor performance with large datasets
+- Unnecessary network overhead
+- Slower response times
+
+**Solution:** Create combined Convex query that uses `Promise.all` for parallel queries within a single function call.
+
+### Example: Combined Query in Convex
+
+```ts
+// convex/model/items/queries.ts
+export const getItemBySlugWithRelations = query({
+  handler: async (ctx, args) => {
+    const item = await getOneFrom(ctx.db, 'items', 'by_slug', args.slug);
+    if (!item) return null;
+
+    // Use Promise.all for parallel queries
+    const [author, category, tags] = await Promise.all([
+      item.authorId ? ctx.db.get(item.authorId) : null,
+      item.categoryId ? ctx.db.get(item.categoryId) : null,
+      getManyVia(ctx.db, 'itemsOnTags', 'tagId', 'by_itemId', item._id, 'itemId'),
+    ]);
+
+    return { item, author, category, tags };
+  },
+});
+```
+
+**Benefits:**
+- Single database round trip
+- Optimized with indexes
+- Reusable across server and client
+- Type-safe return values
 
 ## Authentication Patterns
 

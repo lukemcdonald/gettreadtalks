@@ -28,17 +28,17 @@ globs: convex/**/*.ts
 
 ```typescript
 // ❌ Bad - Convex .filter() after index (scans all results)
-const publishedClips = await ctx.db
-  .query("clips")
-  .withIndex("by_talk_id", (q) => q.eq("talkId", talkId))
+const publishedItems = await ctx.db
+  .query("items")
+  .withIndex("by_category_id", (q) => q.eq("categoryId", categoryId))
   .filter((q) => q.eq(q.field("status"), "published")) // Database scan
   .collect();
 
 // ✅ Good - Use compound index for filtering
-const publishedClips = await ctx.db
-  .query("clips")
-  .withIndex("by_talk_id_and_status", (q) => 
-    q.eq("talkId", talkId).eq("status", "published")
+const publishedItems = await ctx.db
+  .query("items")
+  .withIndex("by_category_id_and_status", (q) => 
+    q.eq("categoryId", categoryId).eq("status", "published")
   )
   .collect();
 

@@ -35,31 +35,41 @@ Business domains and entities (e.g., items, posts, users).
 
 ```sh
 lib/features/items/
-├─ actions.ts      # Server: Write operations (createItem, updateItem)
-├─ hooks.ts        # Client: React hooks (useItems, useCreateItem)
-├─ queries.ts      # Server: Read operations (getItems, getItem)
+├─ hooks/          # Client: React hooks (folder when 3+ hooks)
+│  ├─ index.ts     # Barrel export
+│  ├─ use-item.ts
+│  ├─ use-items.ts
+│  └─ use-create-item.ts
+├─ server.ts       # Server: Read & write operations (getItems, createItem)
 ├─ types.ts        # Shared: TypeScript types
-├─ utils.ts        # Shared: Pure functions
-└─ validation.ts   # Shared: Zod schemas
+├─ utils.ts        # Shared: Pure functions (optional)
+└─ index.ts        # Barrel export
 ```
 
 ### Which File Within a Feature?
 
-- **`actions.ts`** - Server-side writes? Uses `fetchMutation`? Has `"use server"`?
-- **`hooks.ts`** - React hooks? Client-side state? Uses `useQuery`/`useMutation`?
-- **`queries.ts`** - Server-side reads? Uses `fetchQuery`? Called from Server Components?
+- **`server.ts`** - Server-side operations? Uses `fetchQuery` or `fetchMutation`? Has `"use server"`?
+  - Contains both read operations (`fetchQuery`) and write operations (`fetchMutation`)
+  - Called from Server Components or Server Actions
+- **`hooks/`** - Multiple React hooks (3+)? Client-side state? Uses `useQuery`/`useMutation`?
+  - Use folder structure when feature has 3+ hooks
+  - Each hook in its own file with barrel export from `index.ts`
+- **`hooks.ts`** - Single React hook or 1-2 simple hooks? (alternative to folder)
 - **`types.ts`** - TypeScript types? No runtime code?
-- **`utils.ts`** - Pure functions? No side effects?
-- **`validation.ts`** - Zod schemas? Used by both client and server?
+- **`utils.ts`** - Pure functions? No side effects? (optional, only if needed)
+- **`index.ts`** - Barrel export for clean imports
 
 ### Import Examples
 
 ```ts
 // ✅ Good - Feature-based imports
-import { createItem } from '@/lib/features/items/actions';
-import { getItems } from '@/lib/features/items/queries';
-import { useItems } from '@/lib/features/items/hooks';
-import type { Item } from '@/lib/features/items/types';
+import { createItem, getItems } from '@/features/items/server';
+import { useItems, useCreateItem } from '@/features/items/hooks';
+import type { Item } from '@/features/items/types';
+
+// ✅ Good - Barrel exports
+import { useItems } from '@/features/items';
+import { getItems } from '@/features/items';
 
 // ❌ Bad - Generic/unclear paths
 import { getItems } from '@/lib/queries';
@@ -130,11 +140,12 @@ import { formatDate } from '@/utils';
 - Uses: `useQuery`, `useMutation`, `useState`, `useEffect`, browser APIs
 - Example: React hooks, client-side state management
 
-### Server Files (`queries.ts`, `actions.ts`, `server.ts`)
+### Server Files (`server.ts`)
 
-- **Queries** - Uses `fetchQuery`, no `"use server"` needed, called from Server Components
-- **Actions** - Must include `"use server"` directive, uses `fetchMutation`
-- Uses: `fetchQuery`, `fetchMutation`, `cookies`, `headers`, secrets
+- Must include `"use server"` directive
+- Contains both read operations (`fetchQuery`) and write operations (`fetchMutation`)
+- Uses: `fetchQuery`, `fetchMutation`, `preloadQuery`, `cookies`, `headers`, secrets
+- Called from Server Components or Server Actions
 
 ### Shared Files (`types.ts`, `validation.ts`, `utils.ts`)
 
@@ -165,11 +176,12 @@ Benefits: Single source of truth, easier refactoring, better naming
 ```sh
 // ✅ Feature contains all its code
 lib/features/items/
-├─ actions.ts
-├─ hooks.ts
-├─ queries.ts
+├─ hooks/
+│  ├─ index.ts
+│  └─ use-items.ts
+├─ server.ts
 ├─ types.ts
-└─ validation.ts
+└─ index.ts
 ```
 
 Easy to find, easy to delete/move the feature

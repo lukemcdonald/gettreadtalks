@@ -123,7 +123,7 @@ return <TalksClient initialData={initialTalks} />;
 ```typescript
 // convex/talks.ts
 export const getTalk = queries.getTalk;           // api.talks.getTalk
-export const getTalkBySlug = queries.getTalkBySlugWithRelations;
+export const getTalkBySlug = queries.getTalkBySlug; // Returns relations (default for detail pages)
 export const listTalks = queries.getTalks;        // api.talks.listTalks
 export const createTalk = mutations.createTalk;   // api.talks.createTalk
 ```

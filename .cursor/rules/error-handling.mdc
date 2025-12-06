@@ -23,18 +23,27 @@ Always wrap Convex mutations in custom hooks that handle errors automatically to
 
 ```typescript
 // ✅ Good - Custom hook with error handling
-import { useMutation } from '@/lib/hooks';
+import { useMutation } from '@/hooks';
 
-const { mutate, isLoading, error } = useMutation(api.items.create, {
+const { mutateAsync, isLoading, error } = useMutation(api.items.createItem, {
   onSuccess: () => toast.success('Created!'),
   onError: (error) => toast.error(getErrorMessage(error)),
 });
 
+// Usage
+await mutateAsync({ title: 'New Item' });
+
 // ❌ Bad - Direct Convex mutation without error handling
 import { useMutation } from 'convex/react';
 
-const createItem = useMutation(api.items.create);
+const createItem = useMutation(api.items.createItem);
 ```
+
+**Note:** The `useMutation` hook from `@/hooks` automatically handles:
+- Error state management
+- Sentry error reporting with proper fingerprinting
+- Error code extraction and tagging
+- Loading state tracking
 
 ### Manual Error Capture
 
