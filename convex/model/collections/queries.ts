@@ -6,7 +6,7 @@ import { asyncMap } from 'convex-helpers';
 import { getAll, getOneFrom } from 'convex-helpers/server/relationships';
 
 import { query } from '../../_generated/server';
-import { talkWithSpeakerValidator } from '../../lib/validators';
+import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
 
 const collectionPageValidator = paginationResultValidator(doc('collections'));
