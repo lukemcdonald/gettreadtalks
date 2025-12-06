@@ -29,7 +29,6 @@ export function ClipsList({ clips }: ClipsListProps) {
   const searchParams = useSearchParams();
   const search = searchParams.get('search')?.toLowerCase() || '';
   const speakerSlug = searchParams.get('speaker') || 'all';
-  const _topicSlug = searchParams.get('topic') || 'all';
   const sort = searchParams.get('sort') || 'recent';
 
   const filteredAndSorted = useMemo(() => {
