@@ -23,21 +23,6 @@ export const getTopic = query({
 });
 
 /**
- * Get topic by slug.
- *
- * @param ctx - Database context
- * @param args - Query arguments
- * @returns Topic or null if not found
- */
-export const getTopicBySlug = query({
-  args: {
-    slug: v.string(),
-  },
-  handler: async (ctx, args) => await getOneFrom(ctx.db, 'topics', 'by_slug', args.slug),
-  returns: doc('topics').nullable(),
-});
-
-/**
  * Get topic with related talks and clips.
  *
  * @param ctx - Database context
@@ -58,13 +43,11 @@ export const getTopicWithContent = query({
       return null;
     }
 
-    // Get related talks and clips via join tables
     const [allClips, allTalks] = await Promise.all([
       getManyVia(ctx.db, 'clipsOnTopics', 'clipId', 'by_topicId', topic._id, 'topicId'),
       getManyVia(ctx.db, 'talksOnTopics', 'talkId', 'by_topicId', topic._id, 'topicId'),
     ]);
 
-    // Filter for published content only and apply limits
     const clips = allClips
       .filter((clip): clip is Doc<'clips'> => clip !== null && clip.status === 'published')
       .slice(0, limit);
@@ -76,6 +59,61 @@ export const getTopicWithContent = query({
     return {
       clips,
       talks,
+      topic,
+    };
+  },
+  returns: v.nullable(
+    v.object({
+      clips: docs('clips'),
+      talks: docs('talks'),
+      topic: doc('topics'),
+    }),
+  ),
+});
+
+/**
+ * Get topic by slug with related data (default for detail pages).
+ * Returns topic with related talks (each with speaker) and clips.
+ *
+ * @param ctx - Database context
+ * @param args - Query arguments with defaults
+ * @returns Topic with related talks (each with speaker) and clips
+ */
+export const getTopicBySlug = query({
+  args: {
+    limit: v.optional(v.number()),
+    slug: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const { limit = 50, slug } = args;
+
+    const topic = await getOneFrom(ctx.db, 'topics', 'by_slug', slug);
+
+    if (!topic) {
+      return null;
+    }
+
+    const [allClips, allTalks] = await Promise.all([
+      getManyVia(ctx.db, 'clipsOnTopics', 'clipId', 'by_topicId', topic._id, 'topicId'),
+      getManyVia(ctx.db, 'talksOnTopics', 'talkId', 'by_topicId', topic._id, 'topicId'),
+    ]);
+
+    const clips = allClips
+      .filter((clip): clip is Doc<'clips'> => clip !== null && clip.status === 'published')
+      .slice(0, limit);
+
+    const publishedTalks = allTalks
+      .filter((talk): talk is Doc<'talks'> => talk !== null && talk.status === 'published')
+      .slice(0, limit);
+
+    const talksWithSpeakers = await asyncMap(publishedTalks, async (talk: Doc<'talks'>) => {
+      const speaker = await ctx.db.get(talk.speakerId);
+      return { ...talk, speaker };
+    });
+
+    return {
+      clips,
+      talks: talksWithSpeakers,
       topic,
     };
   },
@@ -123,7 +161,6 @@ export const listTopicsWithCount = query({
 
     const topics = await ctx.db.query('topics').withIndex('by_title').take(limit);
 
-    // Get talk counts for each topic in parallel
     const topicsWithCounts = await asyncMap(topics, async (topic) => {
       const talkTopics = await getManyFrom(ctx.db, 'talksOnTopics', 'by_topicId', topic._id);
 
@@ -133,7 +170,6 @@ export const listTopicsWithCount = query({
       };
     });
 
-    // Sort by count descending
     return topicsWithCounts.sort((a, b) => b.count - a.count);
   },
   returns: v.array(

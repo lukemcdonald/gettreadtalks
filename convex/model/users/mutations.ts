@@ -185,7 +185,7 @@ export const unfavoriteSpeaker = mutation({
       .first();
 
     if (!favorite) {
-      throwNotFound('Favorite not found', { resource: 'userFavoriteClips' });
+      throwNotFound('Favorite not found', { resource: 'userFavoriteSpeakers' });
     }
 
     await ctx.db.delete(favorite._id);
@@ -215,7 +215,7 @@ export const unfavoriteTalk = mutation({
       .first();
 
     if (!favorite) {
-      throwNotFound('Favorite not found', { resource: 'userFavoriteClips' });
+      throwNotFound('Favorite not found', { resource: 'userFavoriteTalks' });
     }
 
     await ctx.db.delete(favorite._id);

@@ -11,38 +11,21 @@ export async function getTopicsWithCounts() {
 }
 
 /**
- * Get all topics (for selector dropdown).
+ * Get topics (for selector dropdown).
  */
-export async function getAllTopics() {
+export async function getTopics({ limit }: { limit?: number } = {}) {
   const token = await getAuthToken();
-  return await fetchQuery(api.topics.listTopics, { limit: 1000 }, { token });
+  const topics = await fetchQuery(api.topics.listTopics, { limit: limit ?? 1000 }, { token });
+
+  return {
+    topics: topics ?? [],
+    continueCursor: null,
+    isDone: true,
+  };
 }
 
 export async function getTopicBySlug(slug: string) {
   const token = await getAuthToken();
 
-  const result = await fetchQuery(api.topics.getTopicWithContent, { limit: 100, slug }, { token });
-
-  if (!result) {
-    return null;
-  }
-
-  const talksWithSpeakers = await Promise.all(
-    result.talks.map(async (talk) => {
-      const speaker = talk.speakerId
-        ? await fetchQuery(api.speakers.getSpeaker, { id: talk.speakerId }, { token })
-        : null;
-
-      return {
-        ...talk,
-        speaker,
-      };
-    }),
-  );
-
-  return {
-    clips: result.clips,
-    talks: talksWithSpeakers,
-    topic: result.topic,
-  };
+  return await fetchQuery(api.topics.getTopicBySlug, { limit: 100, slug }, { token });
 }
