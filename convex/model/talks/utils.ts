@@ -83,4 +83,3 @@ export async function getTalksByTopic(ctx: QueryCtx, topicId: Id<'topics'>) {
 
   return talks.filter((talk): talk is Doc<'talks'> => talk !== null);
 }
-
