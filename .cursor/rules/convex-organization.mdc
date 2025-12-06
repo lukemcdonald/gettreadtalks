@@ -34,18 +34,33 @@ Follow the `get` vs `list` pattern:
 
 **`get*` queries** - Return single document or null:
 ```ts
-export const get = query(...)              // Get by ID
-export const getBySlug = query(...)        // Get by unique field
-export const getWithRelations = query(...) // Get with joined data
+export const getItem = query(...)                    // Get by ID (primary key)
+export const getItemBySlug = query(...)              // Get by slug (public identifier)
+export const getItemBySlugWithRelations = query(...) // Get with joined data
 ```
 
 **`list*` queries** - Return array of documents:
 ```ts
-export const list = query(...)                // Basic array query
-export const listByAuthor = query(...)        // Filtered by relation
-export const listByType = query(...)          // Filtered by field
-export const listWithAuthors = query(...)     // With joined data
+export const listItems = query(...)                // Basic array query
+export const listItemsByAuthor = query(...)        // Filtered by relation
+export const listItemsByType = query(...)          // Filtered by field
+export const listItemsWithAuthors = query(...)     // With joined data
 ```
+
+**Identifier Pattern:**
+
+- **Simple name (`getItem`)** - By ID (primary key, internal use, relationships)
+- **`BySlug` (`getItemBySlug`)** - By slug (public identifier, URLs)
+- **`By{Field}`** - Other unique fields (e.g., `getUserByEmail`, `getUserByUsername`)
+
+**Why separate functions?** Clear intent, better TypeScript types, single responsibility principle. Don't make one function accept both ID and slug.
+
+**Relations Pattern:**
+
+- **`With{Entity}`** - Single related entity type (e.g., `getCollectionWithItems`, `listItemsWithAuthors`)
+- **`WithRelations`** - Multiple different entity types (2+ types, e.g., `getItemBySlugWithRelations` returns item + author + categories + tags)
+
+**Decision:** 1 entity type = `With{Entity}`, 2+ entity types = `WithRelations`
 
 ### Mutation Functions (writes)
 
@@ -85,11 +100,11 @@ Use the appropriate verb based on what actually happens:
 
 **Naming Pattern Summary:**
 
-**Domain files (`convex/items.ts`)** - Use single-word verbs (file provides context):
+**Domain files (`convex/items.ts`)** - Always include the noun for clarity:
 ```ts
-export const archive = mutation(...)     // api.items.archive
-export const create = mutation(...)      // api.items.create
-export const update = mutation(...)      // api.items.update
+export const archiveItem = mutation(...)     // api.items.archiveItem
+export const createItem = mutation(...)      // api.items.createItem
+export const updateItem = mutation(...)      // api.items.updateItem
 ```
 
 **Helper files (`convex/model/items/mutations.ts`)** - Include noun (clarity when imported):
@@ -99,55 +114,54 @@ export async function createItem(ctx, data) {...}
 export async function updateItem(ctx, id, data) {...}
 ```
 
+**Why full names in domain files?** Better autocomplete, clearer intent, consistent with helper functions, easier to search and understand.
+
 **Exception: Join Table Operations**
 
 For many-to-many relationships, use descriptive compound verbs for clarity:
 
 ```ts
 // ✅ Join operations - compound names acceptable
-export const addClipToTopic = mutation(...)     // Add to join table
-export const removeClipFromTopic = mutation(...) // Remove from join table
-export const addFavoriteClip = mutation(...)     // Add to user favorites
-export const removeFavoriteClip = mutation(...)  // Remove from user favorites
-export const addFinishedTalk = mutation(...)     // Mark talk as finished
-export const removeFinishedTalk = mutation(...)  // Unmark talk as finished
+export const addItemToTag = mutation(...)     // Add to join table
+export const removeItemFromTag = mutation(...) // Remove from join table
+export const addFavoriteItem = mutation(...)     // Add to user favorites
+export const removeFavoriteItem = mutation(...)  // Remove from user favorites
+export const finishItem = mutation(...)     // Mark item as finished
+export const unfinishItem = mutation(...)  // Unmark item as finished
 ```
 
-**Rationale:** Join operations are semantically different from CRUD. Explicit naming improves clarity when multiple join tables exist (e.g., `userFavoriteClips`, `userFavoriteSpeakers`, `clipsOnTopics`, `talksOnTopics`).
+**Rationale:** Join operations are semantically different from CRUD. Explicit naming improves clarity when multiple join tables exist (e.g., `userFavoriteItems`, `userFavoriteCategories`, `itemsOnTopics`, `categoriesOnItems`).
 
 ### Function Naming Examples
 
 ```ts
 // ✅ Clear - Return type obvious from name
-export const get = query(...)             // Returns: Doc<"items"> | null
-export const getBySlug = query(...)       // Returns: Doc<"items"> | null
-export const list = query(...)            // Returns: Doc<"items">[]
-export const listByAuthor = query(...)    // Returns: Doc<"items">[]
+export const getItem = query(...)             // Returns: Doc<"items"> | null
+export const getItemBySlug = query(...)       // Returns: Doc<"items"> | null
+export const listItems = query(...)            // Returns: Doc<"items">[]
+export const listItemsByAuthor = query(...)    // Returns: Doc<"items">[]
 
 // ❌ Vague
 export const data = query(...)
 export const stuff = query(...)
 
 // ❌ Confusing - Doesn't indicate return type
-export const getByCollection = query(...) // Returns array but starts with "get"
-export const getItems = query(...)        // Redundant with file name
+export const getItemsByCollection = query(...) // Returns array but starts with "get"
+export const items = query(...)                 // Unclear what it returns
 
-// ✅ Concise (file provides context)
-export const get = query(...)            // api.items.get
-export const list = query(...)           // api.items.list
-
-// ❌ Redundant
-export const getItem = query(...)        // in items.ts
-export const listItems = query(...)      // in items.ts
+// ✅ Good - Full names for clarity
+export const getItem = query(...)            // api.items.getItem
+export const listItems = query(...)          // api.items.listItems
+export const getItemBySlug = query(...)      // api.items.getItemBySlug
 ```
 
 **Naming Pattern Summary:**
 
-**Domain files (`convex/items.ts`)** - Omit noun (file provides context):
+**Domain files (`convex/items.ts`)** - Always include the noun:
 ```ts
-export const get = query(...)             // api.items.get
-export const getBySlug = query(...)       // api.items.getBySlug
-export const list = query(...)            // api.items.list
+export const getItem = query(...)             // api.items.getItem
+export const getItemBySlug = query(...)      // api.items.getItemBySlug
+export const listItems = query(...)           // api.items.listItems
 ```
 
 **Helper files (`convex/model/items/queries.ts`)** - Include noun (clarity when imported):
@@ -157,16 +171,20 @@ export async function getItemBySlug(ctx, slug) {...}
 export async function getItems(ctx, args) {...}
 ```
 
-**Why:** Domain exports are accessed via `api.items.*` so the context is clear. Helper functions are imported directly and need the noun to be self-documenting: `import { getItem } from './model/items/queries'`.
+**Why:** Full names improve autocomplete, make intent clear, and are consistent across the codebase. Even though domain exports are accessed via `api.items.*`, the full name makes the API more discoverable and self-documenting.
 
 ### Helper Function Naming Pattern
 
-Domain files use simple names (file provides context), helpers use descriptive names (clarity when imported):
+Both domain files and helper files use full descriptive names for consistency:
 
 ```ts
-// Domain file: convex/talks.ts
-export const getBySlug = query({...})  
-  → queries.getTalkBySlugWithRelations()  // Descriptive helper name
+// Domain file: convex/items.ts
+export const getItemBySlug = queries.getItemBySlug;
+export const getItemBySlugWithRelations = queries.getItemBySlugWithRelations;
+
+// Helper file: convex/model/items/queries.ts
+export async function getItemBySlug(ctx, slug) {...}
+export async function getItemBySlugWithRelations(ctx, slug) {...}
 ```
 
 ### Query Design Decision Tree
@@ -174,14 +192,26 @@ export const getBySlug = query({...})
 When deciding whether to create a new query function, follow this tree:
 
 **For Single Items:**
-1. **By ID?** → Use/reuse `get(id)`
-2. **By unique field (slug, email)?** → Add `getBySlug(slug)`
-3. **Need common relations included?** → Include in `getBySlug` by default
+1. **By ID?** → Use/reuse `getItem(id)` (primary key, internal use)
+2. **By unique field (slug, email)?** → Add `getItemBySlug(slug)` or `getItemByEmail(email)`
+3. **Need relations?** → Create separate `getItemBySlugWithRelations` if always needed together
 
 **For Arrays:**
-1. **Just different filter values?** → Add optional params to existing `list({ status?, authorId?, limit? })`
-2. **Special filtering logic or ordering?** → Add `listByX` (e.g., `listByAuthor` with published-only filter)
-3. **Needs joined data?** → Add `listWithX` (e.g., `listWithAuthors`)
+1. **Just different filter values?** → Add optional params to existing `listItems({ status?, authorId?, limit? })`
+2. **Special filtering logic or ordering?** → Add `listItemsByAuthor` (e.g., with published-only filter)
+3. **Needs joined data?** → Add `listItemsWithAuthors` (single entity type) or `listItemsWithRelations` (multiple types)
+
+**When to Create "With Relations" Version:**
+
+Create combined Convex query when:
+- ✅ Always needed together (detail pages)
+- ✅ Used in 2+ places
+- ✅ Can optimize with database joins/indexes
+
+Combine in server action when:
+- ✅ Conditional/optional relationships
+- ✅ One-off combinations
+- ✅ Context-specific data aggregation
 
 **Examples:**
 
@@ -253,8 +283,8 @@ api.items.listWithTags()
 ```
 
 **Typical Query Count per Entity:** 5-8 queries is manageable and clear:
-- 2-3 single-item: `get`, `getBySlug`, maybe `getWithRelations`
-- 3-5 arrays: `list`, 1-2 `listBy*`, 1-2 `listWith*`
+- 2-3 single-item: `getItem`, `getItemBySlug`, maybe `getItemBySlugWithRelations`
+- 3-5 arrays: `listItems`, 1-2 `listItemsBy*`, 1-2 `listItemsWith*`
 
 ## Database Schema Conventions
 
@@ -296,16 +326,16 @@ One file per domain/entity:
 
 ```ts
 // convex/items.ts
-export const create = mutation(...)
-export const get = query(...)
-export const list = query(...)
-export const remove = mutation(...)
-export const update = mutation(...)
+export const createItem = mutation(...)
+export const getItem = query(...)
+export const listItems = query(...)
+export const removeItem = mutation(...)
+export const updateItem = mutation(...)
 
 // convex/categories.ts
-export const get = query(...)
-export const getBySlug = query(...)
-export const list = query(...)
+export const getCategory = query(...)
+export const getCategoryBySlug = query(...)
+export const listCategories = query(...)
 ```
 
 ### Entity-Specific Helpers in model/
@@ -382,27 +412,50 @@ export const update = mutation({
 
 ## Data Enrichment Pattern
 
-Enrich data with relationships using model helpers:
+Enrich data with relationships using model helpers. Prefer combining in Convex when data is always needed together:
 
 ```ts
-import { getBySlug, getItemTags } from './model';
-
-export const getBySlug = query({
+// ✅ Good - Combined query in Convex (always needed together)
+export const getItemBySlugWithRelations = query({
   handler: async (ctx, args) => {
-    const item = await getBySlug(ctx, 'items', args.slug, 'published');
+    const item = await getOneFrom(ctx.db, 'items', 'by_slug', args.slug);
     if (!item) return null;
 
-    // Use helper functions for related data
+    // Use Promise.all for parallel queries
     const [author, category, tags] = await Promise.all([
       item.authorId ? ctx.db.get(item.authorId) : null,
       item.categoryId ? ctx.db.get(item.categoryId) : null,
-      getItemTags(ctx, item._id, 20),
+      getManyVia(ctx.db, 'itemsOnTags', 'tagId', 'by_itemId', item._id, 'itemId'),
     ]);
 
     return { item, author, category, tags };
   },
 });
 ```
+
+**Avoid N+1 Queries:**
+
+```ts
+// ❌ Bad - N+1 queries in server action
+const items = await fetchQuery(api.items.listItems, {...});
+const itemsWithAuthors = await Promise.all(
+  items.map(item =>
+    fetchQuery(api.users.getUser, { id: item.authorId }, { token })
+  )
+);
+
+// ✅ Good - Use combined query
+const itemsWithAuthors = await fetchQuery(
+  api.items.listItemsWithAuthors,
+  {...},
+  { token }
+);
+```
+
+**When to Combine:**
+
+- **In Convex:** Always needed together, used in 2+ places, can optimize with joins
+- **In Server Action:** Conditional/optional relationships, one-off combinations
 
 ## Model Directory Structure
 

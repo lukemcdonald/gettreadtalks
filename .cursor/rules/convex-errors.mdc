@@ -318,16 +318,16 @@ if (!item) {
 
 ```ts
 // ✅ Good - includes resource context
-throwNotFound('Topic not found', {
-  resource: 'topic',
-  resourceId: topicId,
+throwNotFound('Item not found', {
+  resource: 'item',
+  resourceId: itemId,
 });
 
 // ✅ Good - includes field context
-throwDuplicateSlug('Topic with this title already exists', 'title');
+throwDuplicateSlug('Item with this title already exists', 'title');
 
 // ⚠️ Okay but less helpful
-throwNotFound('Topic not found');
+throwNotFound('Item not found');
 ```
 
 ### Use Specific Functions Over Generic

@@ -8,14 +8,27 @@ globs: **/*.tsx,**/*.ts
 ## Core Principles
 
 - **One component per file** - Split complex components, use composition
-- **Folder-based structure** - Each component gets its own folder with barrel export to keep related
-  files together and make components easy to move/delete as a unit
+- **Folder-based when needed** - Use folders when component has related files (types, utils, sub-components), use single file for simple components
 - **Kebab-case naming** - `auth-status/`, `user-profile.tsx` for consistency with URL conventions
   and to avoid case-sensitivity issues across systems
 - **Co-located files** - Types, tests, utils in same folder so everything related to a component is
   in one place
 
-## Folder Structure
+## Component Structure Decision Tree
+
+**Use folder-based structure when:**
+- Component has related files (types, utils, sub-components)
+- Component has tests
+- Component is complex and benefits from organization
+- Component has multiple exports
+
+**Use single-file structure when:**
+- Component is simple and self-contained
+- No related files needed
+- No tests (or tests are elsewhere)
+- Single export
+
+### Folder Structure (When Needed)
 
 ```sh
 components/
@@ -25,6 +38,14 @@ components/
 │  ├─ component-name.types.ts  # Component types
 │  ├─ index.ts                 # Barrel export
 │  └─ sub-component/           # Nested components (same pattern)
+```
+
+### Single-File Structure (Simple Components)
+
+```sh
+components/
+├─ simple-component.tsx        # Self-contained component
+├─ another-component.tsx       # Another simple component
 ```
 
 ## Component Placement
@@ -105,17 +126,16 @@ lib/features/feature-name/
 
 ### When to Split Hooks
 
-**Use individual files when:**
+**Use `hooks/` folder when:**
 
-- Feature has 8+ hooks
+- Feature has 3+ hooks
 - Working in a team (avoids merge conflicts)
 - Hooks have complex logic (easier to test)
 - Building for growth and scale
 
 **Use single `hooks.ts` file when:**
 
-- Feature has ≤3 simple hooks
-- Solo project that will stay small
+- Feature has 1-2 simple hooks
 - Hooks are truly trivial pass-throughs
 
 ### Barrel Export for Hooks

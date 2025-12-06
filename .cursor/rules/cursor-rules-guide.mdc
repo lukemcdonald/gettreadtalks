@@ -104,6 +104,21 @@ export function get(id) {
 3. Add brief explanation after dashes
 4. Keep examples minimal (5-10 lines max)
 
+**When to use ❌ Bad examples:**
+
+- ✅ Common mistakes developers might make
+- ✅ Patterns that exist but shouldn't be used
+- ✅ Clarifying edge cases or confusion
+
+**When NOT to use ❌ Bad examples:**
+
+- ❌ Deprecated patterns that no longer exist
+- ❌ Anti-patterns that were never used
+- ❌ Back-compat documentation for removed features
+- ❌ Patterns that shouldn't exist in the codebase
+
+**Rule:** Document what should be done, not what shouldn't exist. If a pattern doesn't exist in your codebase and shouldn't, don't document it as an anti-pattern.
+
 ### Decision Trees
 
 Help users choose the right approach:
@@ -251,6 +266,38 @@ These should be one file with clear sections
 ```
 
 ## Writing Guidelines
+
+### Forward-Looking Documentation
+
+**Document what should be done, not what shouldn't exist.**
+
+Rules should be forward-looking guides for how to write code, not back-compat documentation or catalogs of anti-patterns.
+
+```markdown
+# ❌ Bad - Documenting patterns that shouldn't exist
+**Note:** Don't create `getItemBySlugBasic` - use `getItem(id)` instead.
+// ❌ Bad - Don't create Basic versions
+export const getItemBySlugBasic = queries.getItemBySlugBasic;
+
+# ✅ Good - Documenting what should be done
+BySlug queries always return relations (used on detail pages).
+export const getItemBySlug = queries.getItemBySlug;
+```
+
+**Principles:**
+
+- **Don't document deprecated patterns** - If it's removed, remove it from docs
+- **Don't document anti-patterns that don't exist** - Only show ❌ for common mistakes
+- **Avoid "don't do X" unless X is a real risk** - Focus on positive guidance
+- **Remove redundant examples** - One clear example beats multiple similar ones
+- **Simplify verbose sections** - If it's obvious from context, don't over-explain
+
+**When cleaning up rules:**
+
+- Remove references to patterns that were never used
+- Consolidate duplicate examples showing the same pattern
+- Remove sections that only document what not to do
+- Focus on actionable guidance, not exhaustive lists
 
 ### Tone and Voice
 
@@ -576,7 +623,7 @@ Before publishing a new rule file:
 - [ ] Frontmatter includes description and globs
 - [ ] Examples use generic domain names
 - [ ] Code snippets are minimal and focused
-- [ ] ✅/❌ patterns used consistently
+- [ ] ✅/❌ patterns used consistently (only for real anti-patterns)
 - [ ] Includes "why" integrated naturally into statements
 - [ ] Has decision tree or when-to-use guidance
 - [ ] No cross-references to other rule files
@@ -584,3 +631,5 @@ Before publishing a new rule file:
 - [ ] Easy to scan with clear hierarchy
 - [ ] No project-specific examples
 - [ ] Self-contained and portable to other projects
+- [ ] Forward-looking (documents what should be done, not deprecated patterns)
+- [ ] No redundant examples (one clear example per pattern)
