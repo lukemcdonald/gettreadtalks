@@ -7,7 +7,7 @@ import { SidebarContent } from '@/components/sidebar-content';
 import { TalkCard } from '@/components/talk-card';
 import { TopicSelector } from '@/components/topic-selector';
 import { ViewMoreCard } from '@/components/view-more-card';
-import { getAllTopics, getTopicBySlug } from '@/features/topics';
+import { getTopicBySlug, getTopics } from '@/features/topics';
 
 type TopicPageProps = {
   params: Promise<{
@@ -19,7 +19,8 @@ const DISPLAY_LIMIT = 12;
 
 export default async function TopicPage({ params }: TopicPageProps) {
   const { topic: slug } = await params;
-  const [data, allTopics] = await Promise.all([getTopicBySlug(slug), getAllTopics()]);
+  const [data, topicsResult] = await Promise.all([getTopicBySlug(slug), getTopics()]);
+  const allTopics = topicsResult.topics;
 
   if (!data) {
     notFound();
