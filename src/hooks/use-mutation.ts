@@ -7,7 +7,7 @@ import { useCallback, useState } from 'react';
 import { useMutation as useConvexMutation } from 'convex/react';
 
 import { captureException } from '@/services/errors/client';
-import { getErrorCode, getErrorMessage } from '@/services/errors/convex';
+import { getErrorMessage, getSentryConfig } from '@/services/errors/convex';
 
 const DEFAULT_STATE: MutationState = {
   data: null,
@@ -59,16 +59,15 @@ export function useMutation<Mutation extends FunctionReference<'mutation'>>(
           status: 'error',
         });
 
-        // Report to Sentry if enabled
-        if (reportToSentry) {
-          const errorCode = getErrorCode(error);
+        // Report to Sentry if enabled and error should be logged
+        const sentryConfig = getSentryConfig(error);
+
+        if (reportToSentry && sentryConfig.shouldLog) {
           const eventId = captureException(errorObj, {
-            fingerprint: ['mutation', errorCode.toLowerCase().replace(/_/g, '-')],
-            level: 'error',
-            tags: {
-              errorCode,
-              errorType: 'mutation',
-            },
+            context: sentryConfig.context,
+            fingerprint: sentryConfig.fingerprint,
+            level: sentryConfig.level,
+            tags: { ...sentryConfig.tags, errorType: 'mutation' },
           });
 
           // Store event ID on error object for potential use
