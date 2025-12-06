@@ -1,6 +1,7 @@
 import type { MutationCtx, QueryCtx } from '../../_generated/server';
 
 import { authComponent } from '../../auth';
+import { throwAuthRequired } from '../../lib/errors';
 
 /**
  * Get the current authenticated user.
@@ -35,7 +36,7 @@ export async function requireAuth(ctx: QueryCtx | MutationCtx) {
   const user = await getCurrentUser(ctx);
 
   if (!user) {
-    throw new Error('Authentication required');
+    throwAuthRequired();
   }
 
   return user;
