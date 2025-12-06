@@ -26,21 +26,6 @@ export const getCollection = query({
 });
 
 /**
- * Get collection by slug.
- *
- * @param ctx - Database context
- * @param args - Query arguments
- * @returns Collection or null if not found
- */
-export const getCollectionBySlug = query({
-  args: {
-    slug: v.string(),
-  },
-  handler: async (ctx, args) => await getOneFrom(ctx.db, 'collections', 'by_slug', args.slug),
-  returns: doc('collections').nullable(),
-});
-
-/**
  * Get collection with its talks.
  *
  * @param ctx - Database context
@@ -74,6 +59,55 @@ export const getCollectionWithTalks = query({
     return {
       collection,
       talks,
+    };
+  },
+  returns: v.nullable(
+    v.object({
+      collection: doc('collections'),
+      talks: docs('talks'),
+    }),
+  ),
+});
+
+/**
+ * Get collection by slug with related data (default for detail pages).
+ * Returns collection with its talks (each with speaker).
+ *
+ * @param ctx - Database context
+ * @param args - Query arguments with defaults
+ * @returns Collection with its talks (each with speaker)
+ */
+export const getCollectionBySlug = query({
+  args: {
+    limit: v.optional(v.number()),
+    slug: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const { limit = 100, slug } = args;
+
+    const collection = await getOneFrom(ctx.db, 'collections', 'by_slug', slug);
+
+    if (!collection) {
+      return null;
+    }
+
+    const talks = await ctx.db
+      .query('talks')
+      .withIndex('by_collectionId_and_status', (q) =>
+        q.eq('collectionId', collection._id).eq('status', 'published'),
+      )
+      .take(limit);
+
+    talks.sort((a, b) => (a.collectionOrder || 0) - (b.collectionOrder || 0));
+
+    const talksWithSpeakers = await asyncMap(talks, async (talk: Doc<'talks'>) => {
+      const speaker = await ctx.db.get(talk.speakerId);
+      return { ...talk, speaker };
+    });
+
+    return {
+      collection,
+      talks: talksWithSpeakers,
     };
   },
   returns: v.nullable(
