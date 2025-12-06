@@ -1,1 +1,5 @@
-export { statusType, timestampFields } from './shared';
+export {
+  statusType,
+  talkWithSpeakerValidator,
+  timestampFields,
+} from './shared';

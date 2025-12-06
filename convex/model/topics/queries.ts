@@ -5,6 +5,7 @@ import { asyncMap } from 'convex-helpers';
 import { getManyFrom, getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
 
 import { query } from '../../_generated/server';
+import { talkWithSpeakerValidator } from '../../lib/validators';
 import { doc, docs } from '../../lib/validators/schema';
 
 /**
@@ -120,7 +121,7 @@ export const getTopicBySlug = query({
   returns: v.nullable(
     v.object({
       clips: docs('clips'),
-      talks: docs('talks'),
+      talks: v.array(talkWithSpeakerValidator),
       topic: doc('topics'),
     }),
   ),

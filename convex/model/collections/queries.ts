@@ -6,6 +6,7 @@ import { asyncMap } from 'convex-helpers';
 import { getAll, getOneFrom } from 'convex-helpers/server/relationships';
 
 import { query } from '../../_generated/server';
+import { talkWithSpeakerValidator } from '../../lib/validators';
 import { doc, docs } from '../../lib/validators/schema';
 
 const collectionPageValidator = paginationResultValidator(doc('collections'));
@@ -113,7 +114,7 @@ export const getCollectionBySlug = query({
   returns: v.nullable(
     v.object({
       collection: doc('collections'),
-      talks: docs('talks'),
+      talks: v.array(talkWithSpeakerValidator),
     }),
   ),
 });

@@ -11,6 +11,11 @@ import { doc, docs } from '../../lib/validators/schema';
 import { statusType } from './validators';
 
 const clipPageValidator = paginationResultValidator(doc('clips'));
+const clipPageWithSpeakersValidator = paginationResultValidator(
+  doc('clips').extend({
+    speaker: doc('speakers').nullable(),
+  }),
+);
 
 /**
  * Get clip by slug with related data (default for detail pages).
@@ -121,7 +126,7 @@ export const listClipsWithSpeakers = query({
       page: enrichedPage,
     };
   },
-  returns: clipPageValidator,
+  returns: clipPageWithSpeakersValidator,
 });
 
 /**

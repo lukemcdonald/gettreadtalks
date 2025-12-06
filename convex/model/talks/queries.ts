@@ -7,6 +7,7 @@ import { asyncMap } from 'convex-helpers';
 import { getManyFrom, getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
 
 import { query } from '../../_generated/server';
+import { talkWithSpeakerValidator } from '../../lib/validators';
 import { doc, docs } from '../../lib/validators/schema';
 import { getCurrentUser } from '../auth/utils';
 import {
@@ -18,11 +19,6 @@ import {
 import { statusType } from './validators';
 
 const talkPageValidator = paginationResultValidator(doc('talks'));
-
-// Validator for talks with speaker enrichment
-const talkWithSpeakerValidator = doc('talks').extend({
-  speaker: doc('speakers').nullable(),
-});
 const talkPageWithSpeakersValidator = paginationResultValidator(talkWithSpeakerValidator);
 
 /**
@@ -188,7 +184,7 @@ export const listFeaturedTalksWithSpeakers = query({
 
     return enrichedPage;
   },
-  returns: docs('talks'),
+  returns: v.array(talkWithSpeakerValidator),
 });
 
 /**
@@ -293,15 +289,6 @@ export const listTalks = query({
       };
     }
 
-    // Helper function to apply search filter
-    const applySearchFilter = (talks: Doc<'talks'>[]): Doc<'talks'>[] => {
-      if (!search) {
-        return talks;
-      }
-      const searchLower = search.toLowerCase();
-      return talks.filter((talk) => talk.title.toLowerCase().includes(searchLower));
-    };
-
     // Use indexes when possible for better performance
     if (featured !== undefined && status) {
       const result = await ctx.db
@@ -311,7 +298,7 @@ export const listTalks = query({
         .paginate(paginationOpts);
 
       if (search) {
-        result.page = applySearchFilter(result.page);
+        result.page = applySearchFilter(result.page, search);
         // Reset pagination when search is applied (simplified approach)
         return {
           continueCursor: '',
@@ -333,7 +320,7 @@ export const listTalks = query({
         .paginate(paginationOpts);
 
       if (search) {
-        result.page = applySearchFilter(result.page);
+        result.page = applySearchFilter(result.page, search);
         return {
           continueCursor: '',
           isDone: true,
@@ -352,7 +339,7 @@ export const listTalks = query({
         .paginate(paginationOpts);
 
       if (search) {
-        result.page = applySearchFilter(result.page);
+        result.page = applySearchFilter(result.page, search);
         return {
           continueCursor: '',
           isDone: true,
@@ -376,7 +363,7 @@ export const listTalks = query({
       }
 
       if (search) {
-        result.page = applySearchFilter(result.page);
+        result.page = applySearchFilter(result.page, search);
         return {
           continueCursor: '',
           isDone: true,
@@ -395,7 +382,7 @@ export const listTalks = query({
         .paginate(paginationOpts);
 
       if (search) {
-        result.page = applySearchFilter(result.page);
+        result.page = applySearchFilter(result.page, search);
         return {
           continueCursor: '',
           isDone: true,
@@ -411,7 +398,7 @@ export const listTalks = query({
       // For search without other filters, we need to fetch all and filter
       // This is less efficient but necessary for search functionality
       const allTalks = await ctx.db.query('talks').order('desc').collect();
-      const filtered = applySearchFilter(allTalks);
+      const filtered = applySearchFilter(allTalks, search);
       const numItems = paginationOpts.numItems || 20;
       const page = filtered.slice(0, numItems);
 
