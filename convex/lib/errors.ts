@@ -128,3 +128,82 @@ export function throwValidationError(message: string, field?: string): never {
     field,
   });
 }
+
+/**
+ * HTTP status codes that map to Convex error codes.
+ * Used by throwError to map traditional HTTP status codes to ConvexError.
+ */
+type HttpStatusCode =
+  | 400 // Bad Request
+  | 401 // Not Authenticated
+  | 402 // Payment Failure
+  | 403 // Not Authorized
+  | 404 // Not Found
+  | 409 // Conflict (Failed to Save)
+  | 422 // Validation Failure
+  | 429 // Too Many Requests
+  | 500 // Server Error
+  | 501 // Not Implemented
+  | 502 // Bad Gateway
+  | 503; // Service Unavailable
+
+/**
+ * Maps HTTP status codes to Convex error codes.
+ * Used internally by throwError.
+ */
+const STATUS_TO_ERROR_CODE: Record<HttpStatusCode, ErrorCode> = {
+  400: ErrorCodes.INVALID_INPUT,
+  401: ErrorCodes.AUTH_REQUIRED,
+  402: ErrorCodes.PAYMENT_FAILED,
+  403: ErrorCodes.FORBIDDEN,
+  404: ErrorCodes.NOT_FOUND,
+  409: ErrorCodes.DUPLICATE_SLUG,
+  422: ErrorCodes.VALIDATION_FAILED,
+  429: ErrorCodes.RATE_LIMIT_EXCEEDED,
+  500: ErrorCodes.SERVER_ERROR,
+  501: ErrorCodes.NOT_IMPLEMENTED,
+  502: ErrorCodes.NETWORK_ERROR,
+  503: ErrorCodes.SERVER_ERROR,
+};
+
+/**
+ * Throws a ConvexError mapped from an HTTP status code.
+ * Use this when you want to think in HTTP status code terms or for less common errors.
+ *
+ * For common errors, prefer the specific functions:
+ * - `throwAuthRequired()` for 401
+ * - `throwForbidden()` for 403
+ * - `throwNotFound()` for 404
+ * - `throwDuplicateSlug()` for 409
+ * - `throwValidationError()` for 422
+ *
+ * @example
+ * // Payment failure
+ * if (paymentFailed) {
+ *   throwError(402, 'Payment processing failed', { paymentId });
+ * }
+ *
+ * @example
+ * // Rate limit
+ * if (requestCount > limit) {
+ *   throwError(429, 'Too many requests', { retryAfter: 60 });
+ * }
+ *
+ * @example
+ * // Not implemented
+ * if (!isImplemented) {
+ *   throwError(501, 'Feature not yet implemented');
+ * }
+ */
+export function throwError(
+  status: HttpStatusCode,
+  message: string,
+  data?: Omit<ErrorData, 'errorCode'>,
+): never {
+  const errorCode = STATUS_TO_ERROR_CODE[status];
+
+  throw createConvexError(message, {
+    errorCode,
+    ...data,
+  });
+}
