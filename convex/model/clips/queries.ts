@@ -1,5 +1,9 @@
+import type { PaginationResult } from 'convex/server';
+import type { Doc } from '../../_generated/dataModel';
+
 import { paginationOptsValidator, paginationResultValidator } from 'convex/server';
 import { v } from 'convex/values';
+import { asyncMap } from 'convex-helpers';
 import { getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
 
 import { query } from '../../_generated/server';
@@ -9,13 +13,14 @@ import { statusType } from './validators';
 const clipPageValidator = paginationResultValidator(doc('clips'));
 
 /**
- * Get clip by slug with related data.
+ * Get clip by slug with related data (default for detail pages).
+ * Returns clip with speaker, talk, and topics.
  *
  * @param ctx - Database context
  * @param args - Query arguments
  * @returns Clip with speaker, talk, and topics data
  */
-export const getClipBySlugWithRelations = query({
+export const getClipBySlug = query({
   args: {
     slug: v.string(),
   },
@@ -76,6 +81,45 @@ export const listClips = query({
     }
 
     return await ctx.db.query('clips').order('desc').paginate(paginationOpts);
+  },
+  returns: clipPageValidator,
+});
+
+/**
+ * List clips with speaker data (paginated).
+ *
+ * @param ctx - Database context
+ * @param args - Query arguments with pagination options
+ * @returns Paginated clips with speaker information
+ */
+export const listClipsWithSpeakers = query({
+  args: {
+    paginationOpts: paginationOptsValidator,
+    status: v.optional(statusType),
+  },
+  handler: async (ctx, args) => {
+    const { paginationOpts, status } = args;
+
+    let result: PaginationResult<Doc<'clips'>>;
+    if (status) {
+      result = await ctx.db
+        .query('clips')
+        .withIndex('by_status_and_publishedAt', (q) => q.eq('status', status))
+        .order('desc')
+        .paginate(paginationOpts);
+    } else {
+      result = await ctx.db.query('clips').order('desc').paginate(paginationOpts);
+    }
+
+    const enrichedPage = await asyncMap(result.page, async (clip) => {
+      const speaker = clip.speakerId ? await ctx.db.get(clip.speakerId) : null;
+      return { ...clip, speaker };
+    });
+
+    return {
+      ...result,
+      page: enrichedPage,
+    };
   },
   returns: clipPageValidator,
 });
