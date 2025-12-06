@@ -9,9 +9,21 @@ import { getManyFrom, getManyVia, getOneFrom } from 'convex-helpers/server/relat
 import { query } from '../../_generated/server';
 import { doc, docs } from '../../lib/validators/schema';
 import { getCurrentUser } from '../auth/utils';
+import {
+  applyAdditionalFilters,
+  applySearchFilter,
+  enrichWithSpeakers,
+  getTalksByTopic,
+} from './utils';
 import { statusType } from './validators';
 
 const talkPageValidator = paginationResultValidator(doc('talks'));
+
+// Validator for talks with speaker enrichment
+const talkWithSpeakerValidator = doc('talks').extend({
+  speaker: doc('speakers').nullable(),
+});
+const talkPageWithSpeakersValidator = paginationResultValidator(talkWithSpeakerValidator);
 
 /**
  * Get talk by ID.
@@ -493,49 +505,23 @@ export const listTalksWithSpeakers = query({
     const { featured, paginationOpts, search, speakerId, status, topicId } = args;
 
     // If filtering by topic, get talks from talksOnTopics join table
+    // Note: Topic filtering requires collecting all matching talks and filtering in TypeScript,
+    // so we opt out of .paginate() and return a single manually paginated page
     if (topicId) {
-      const talksOnTopics = await ctx.db
-        .query('talksOnTopics')
-        .withIndex('by_topicId', (q) => q.eq('topicId', topicId))
-        .collect();
-
-      const talkIds = talksOnTopics.map((t) => t.talkId);
-      const talks = await Promise.all(talkIds.map((id) => ctx.db.get(id)));
-
-      // Filter out null results and apply additional filters
-      let filteredTalks = talks.filter((talk): talk is Doc<'talks'> => talk !== null);
-
-      if (status) {
-        filteredTalks = filteredTalks.filter((talk) => talk.status === status);
-      }
-      if (featured !== undefined) {
-        filteredTalks = filteredTalks.filter((talk) => talk.featured === featured);
-      }
-      if (speakerId) {
-        filteredTalks = filteredTalks.filter((talk) => talk.speakerId === speakerId);
-      }
-
-      if (search) {
-        const searchLower = search.toLowerCase();
-        filteredTalks = filteredTalks.filter((talk) =>
-          talk.title.toLowerCase().includes(searchLower),
-        );
-      }
+      const talks = await getTalksByTopic(ctx, topicId);
+      let filteredTalks = applyAdditionalFilters(talks, { featured, speakerId, status });
+      filteredTalks = applySearchFilter(filteredTalks, search);
 
       // Sort by publishedAt or _creationTime
       filteredTalks.sort(
         (a, b) => (b.publishedAt || b._creationTime) - (a.publishedAt || a._creationTime),
       );
 
-      // Manual pagination
+      // Manual pagination (opted out of .paginate() due to TypeScript filtering)
       const numItems = paginationOpts.numItems || 20;
       const page = filteredTalks.slice(0, numItems);
 
-      // Enrich with speakers
-      const enrichedPage = await asyncMap(page, async (talk: Doc<'talks'>) => {
-        const speaker = await ctx.db.get(talk.speakerId);
-        return { ...talk, speaker };
-      });
+      const enrichedPage = await enrichWithSpeakers(ctx, page);
 
       return {
         continueCursor: '',
@@ -544,18 +530,11 @@ export const listTalksWithSpeakers = query({
       };
     }
 
-    // Helper function to apply search filter
-    const applySearchFilter = (talks: Doc<'talks'>[]): Doc<'talks'>[] => {
-      if (!search) {
-        return talks;
-      }
-      const searchLower = search.toLowerCase();
-      return talks.filter((talk) => talk.title.toLowerCase().includes(searchLower));
-    };
-
     let result: PaginationResult<Doc<'talks'>>;
 
     // Use indexes when possible for better performance
+    // When search is present, we apply it after pagination and opt out of .paginate()
+    // to return a single page (simplified approach for complex filters)
     if (featured !== undefined && status) {
       result = await ctx.db
         .query('talks')
@@ -564,8 +543,8 @@ export const listTalksWithSpeakers = query({
         .paginate(paginationOpts);
 
       if (search) {
-        result.page = applySearchFilter(result.page);
-        // Reset pagination when search is applied (simplified approach)
+        result.page = applySearchFilter(result.page, search);
+        // Opt out of pagination: search filtering requires TypeScript filtering
         result = {
           continueCursor: '',
           isDone: true,
@@ -582,7 +561,8 @@ export const listTalksWithSpeakers = query({
         .paginate(paginationOpts);
 
       if (search) {
-        result.page = applySearchFilter(result.page);
+        result.page = applySearchFilter(result.page, search);
+        // Opt out of pagination: search filtering requires TypeScript filtering
         result = {
           continueCursor: '',
           isDone: true,
@@ -597,7 +577,8 @@ export const listTalksWithSpeakers = query({
         .paginate(paginationOpts);
 
       if (search) {
-        result.page = applySearchFilter(result.page);
+        result.page = applySearchFilter(result.page, search);
+        // Opt out of pagination: search filtering requires TypeScript filtering
         result = {
           continueCursor: '',
           isDone: true,
@@ -617,7 +598,8 @@ export const listTalksWithSpeakers = query({
       }
 
       if (search) {
-        result.page = applySearchFilter(result.page);
+        result.page = applySearchFilter(result.page, search);
+        // Opt out of pagination: search filtering requires TypeScript filtering
         result = {
           continueCursor: '',
           isDone: true,
@@ -632,7 +614,8 @@ export const listTalksWithSpeakers = query({
         .paginate(paginationOpts);
 
       if (search) {
-        result.page = applySearchFilter(result.page);
+        result.page = applySearchFilter(result.page, search);
+        // Opt out of pagination: search filtering requires TypeScript filtering
         result = {
           continueCursor: '',
           isDone: true,
@@ -642,8 +625,9 @@ export const listTalksWithSpeakers = query({
     } else if (search) {
       // For search without other filters, we need to fetch all and filter
       // This is less efficient but necessary for search functionality
+      // Opt out of .paginate() and use manual pagination
       const allTalks = await ctx.db.query('talks').order('desc').collect();
-      const filtered = applySearchFilter(allTalks);
+      const filtered = applySearchFilter(allTalks, search);
       const numItems = paginationOpts.numItems || 20;
       const page = filtered.slice(0, numItems);
 
@@ -653,19 +637,17 @@ export const listTalksWithSpeakers = query({
         page,
       };
     } else {
+      // Use .paginate() end-to-end when no complex filters are needed
       result = await ctx.db.query('talks').order('desc').paginate(paginationOpts);
     }
 
     // Enrich with speakers
-    const enrichedPage = await asyncMap(result.page, async (talk: Doc<'talks'>) => {
-      const speaker = await ctx.db.get(talk.speakerId);
-      return { ...talk, speaker };
-    });
+    const enrichedPage = await enrichWithSpeakers(ctx, result.page);
 
     return {
       ...result,
       page: enrichedPage,
     };
   },
-  returns: talkPageValidator,
+  returns: talkPageWithSpeakersValidator,
 });
