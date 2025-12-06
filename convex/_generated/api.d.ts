@@ -27,6 +27,7 @@ import type * as lib_validators_index from "../lib/validators/index.js";
 import type * as lib_validators_query from "../lib/validators/query.js";
 import type * as lib_validators_shared from "../lib/validators/shared.js";
 import type * as migration_batchImports from "../migration/batchImports.js";
+import type * as migration_cleanupSpeakerImages from "../migration/cleanupSpeakerImages.js";
 import type * as migration_idMap from "../migration/idMap.js";
 import type * as migration_importAffiliateLinks from "../migration/importAffiliateLinks.js";
 import type * as migration_importClips from "../migration/importClips.js";
@@ -101,6 +102,7 @@ declare const fullApi: ApiFromModules<{
   "lib/validators/query": typeof lib_validators_query;
   "lib/validators/shared": typeof lib_validators_shared;
   "migration/batchImports": typeof migration_batchImports;
+  "migration/cleanupSpeakerImages": typeof migration_cleanupSpeakerImages;
   "migration/idMap": typeof migration_idMap;
   "migration/importAffiliateLinks": typeof migration_importAffiliateLinks;
   "migration/importClips": typeof migration_importClips;

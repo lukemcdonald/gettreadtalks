@@ -6,6 +6,8 @@
     "build": "next build",
     "check": "biome check .",
     "clean": "rm -rf node_modules",
+    "db:cleanup:images": "tsx scripts/cleanup-speaker-images.ts",
+    "db:cleanup:images:prod": "tsx scripts/cleanup-speaker-images.ts --prod",
     "db:clear": "convex run migration/runMigration:clearAllData",
     "db:clear:prod": "convex run migration/runMigration:clearAllData --prod",
     "db:seed": "tsx scripts/run-seed.ts",

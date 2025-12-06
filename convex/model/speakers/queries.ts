@@ -92,6 +92,19 @@ export const getSpeakerBySlug = query({
 });
 
 /**
+ * List all speakers (for migration/cleanup purposes).
+ * Returns all speakers without pagination.
+ *
+ * @param ctx - Database context
+ * @returns All speakers
+ */
+export const listAllSpeakers = query({
+  args: {},
+  handler: async (ctx) => await ctx.db.query('speakers').collect(),
+  returns: docs('speakers'),
+});
+
+/**
  * Get total count of speakers.
  *
  * @param ctx - Database context

@@ -1,4 +1,5 @@
 export * as batchImports from './batchImports';
+export { cleanupSpeakerImages } from './cleanupSpeakerImages';
 export { createIdMapping } from './idMap';
 export { importAffiliateLinks } from './importAffiliateLinks';
 export { importClips } from './importClips';
