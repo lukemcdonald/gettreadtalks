@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 
 import { CenteredLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
-import { getAllCollections, getAllSpeakers, getTalkBySlug } from '@/features/talks';
+import { getCollections, getSpeakers, getTalkBySlug } from '@/features/talks';
 import { requireAdminUser } from '@/services/auth/server';
 import { TalkForm } from '../../new/_components/talk-form';
 
@@ -22,7 +22,9 @@ export default async function EditTalkPage({ params }: EditTalkPageProps) {
   }
 
   const { talk } = talkData;
-  const [collections, speakers] = await Promise.all([getAllCollections(), getAllSpeakers()]);
+  const [collectionsResult, speakersResult] = await Promise.all([getCollections(), getSpeakers()]);
+  const collections = collectionsResult.collections;
+  const speakers = speakersResult.speakers;
 
   return (
     <CenteredLayout

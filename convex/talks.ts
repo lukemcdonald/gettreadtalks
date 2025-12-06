@@ -2,9 +2,10 @@ import { mutations, queries } from './model/talks';
 
 // Queries
 export const getTalk = queries.getTalk;
-export const getTalkBySlug = queries.getTalkBySlugWithRelations;
+export const getTalkBySlug = queries.getTalkBySlug;
 export const getTalksCount = queries.getTalksCount;
 export const listFeaturedTalks = queries.listFeaturedTalks;
+export const listFeaturedTalksWithSpeakers = queries.listFeaturedTalksWithSpeakers;
 export const listRandomTalksBySpeaker = queries.listRandomTalksBySpeaker;
 export const listTalks = queries.listTalks;
 export const listTalksByCollection = queries.listTalksByCollection;
