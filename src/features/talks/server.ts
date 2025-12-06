@@ -24,12 +24,12 @@ export async function preloadTalks(pageSize = 12) {
 }
 
 /**
- * Get talks with optional filters and pagination.
+ * Get talks with speakers and optional filters and pagination.
  */
-export async function getTalks(filters?: {
+export async function getTalksWithSpeakers(filters?: {
   cursor?: string | null;
   featured?: boolean;
-  pageSize?: number;
+  limit?: number;
   search?: string;
   speakerId?: SpeakerId;
   status?: StatusType;
@@ -39,11 +39,11 @@ export async function getTalks(filters?: {
 
   const paginationOpts = {
     cursor: filters?.cursor || null,
-    numItems: filters?.pageSize || 20,
+    numItems: filters?.limit ?? 1000,
   };
 
   const result = await fetchQuery(
-    api.talks.listTalks,
+    api.talks.listTalksWithSpeakers,
     {
       featured: filters?.featured,
       paginationOpts,
@@ -55,25 +55,17 @@ export async function getTalks(filters?: {
     { token },
   );
 
-  // Fetch speakers for each talk
-  const talksWithSpeakers = await Promise.all(
-    result.page.map(async (talk) => {
-      const speaker = await fetchQuery(api.speakers.getSpeaker, { id: talk.speakerId }, { token });
-      return { ...talk, speaker };
-    }),
-  );
-
   return {
     continueCursor: result.continueCursor,
     isDone: result.isDone,
-    talks: talksWithSpeakers,
+    talks: result.page,
   };
 }
 
 /**
- * Get all speakers for filter dropdowns.
+ * Get speakers for filter dropdowns.
  */
-export async function getAllSpeakersForFilter() {
+export async function getSpeakersForFilter() {
   const token = await getAuthToken();
 
   const paginationOpts = {
@@ -87,9 +79,9 @@ export async function getAllSpeakersForFilter() {
 }
 
 /**
- * Get all topics for filter dropdowns.
+ * Get topics for filter dropdowns.
  */
-export async function getAllTopicsForFilter() {
+export async function getTopicsForFilter() {
   const token = await getAuthToken();
 
   return await fetchQuery(api.topics.listTopics, { limit: 1000 }, { token });
@@ -108,35 +100,43 @@ export async function getTalkBySlug(slug: string) {
 }
 
 /**
- * Get all speakers for form dropdowns.
+ * Get speakers for form dropdowns.
  */
-export async function getAllSpeakers() {
+export async function getSpeakers({ limit }: { limit?: number } = {}) {
   const token = await getAuthToken();
 
   const paginationOpts = {
     cursor: null,
-    numItems: 1000, // Large number to get all speakers
+    numItems: limit ?? 1000,
   };
 
   const result = await fetchQuery(api.speakers.listSpeakers, { paginationOpts }, { token });
 
-  return result.page;
+  return {
+    speakers: result.page,
+    continueCursor: result.continueCursor,
+    isDone: result.isDone,
+  };
 }
 
 /**
- * Get all collections for form dropdowns.
+ * Get collections for form dropdowns.
  */
-export async function getAllCollections() {
+export async function getCollections({ limit }: { limit?: number } = {}) {
   const token = await getAuthToken();
 
   const paginationOpts = {
     cursor: null,
-    numItems: 1000, // Large number to get all collections
+    numItems: limit ?? 1000,
   };
 
   const result = await fetchQuery(api.collections.listCollections, { paginationOpts }, { token });
 
-  return result.page;
+  return {
+    collections: result.page,
+    continueCursor: result.continueCursor,
+    isDone: result.isDone,
+  };
 }
 
 /**
@@ -145,16 +145,5 @@ export async function getAllCollections() {
 export async function getFeaturedTalks(limit = 6) {
   const token = await getAuthToken();
 
-  const talks = await fetchQuery(api.talks.listFeaturedTalks, { limit }, { token });
-
-  // Fetch speakers for each talk
-  const talksWithSpeakers = await Promise.all(
-    talks.map(async (talk) => {
-      const speaker = await fetchQuery(api.speakers.getSpeaker, { id: talk.speakerId }, { token });
-
-      return { ...talk, speaker };
-    }),
-  );
-
-  return talksWithSpeakers;
+  return await fetchQuery(api.talks.listFeaturedTalksWithSpeakers, { limit }, { token });
 }

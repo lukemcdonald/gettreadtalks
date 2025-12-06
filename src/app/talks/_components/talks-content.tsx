@@ -9,7 +9,7 @@ import { Pagination } from '@/app/talks/_components/pagination';
 import { TalksList } from '@/app/talks/_components/talks-list';
 import { TalksListFilter } from '@/app/talks/_components/talks-list-filter';
 import { TalksListSkeleton } from '@/app/talks/_components/talks-list-skeleton';
-import { getTalks } from '@/features/talks';
+import { getTalksWithSpeakers } from '@/features/talks';
 import { getCurrentUser } from '@/services/auth/server';
 import { isAdmin } from '@/services/auth/utils';
 
@@ -35,9 +35,10 @@ export async function TalksContent({ searchParams }: TalksContentProps) {
     ? statusParam
     : statusParam || (featured || speakerId || topicId || search ? undefined : 'published');
 
-  const result = await getTalks({
+  const result = await getTalksWithSpeakers({
     cursor,
     featured,
+    limit: 20,
     search,
     speakerId,
     status,
