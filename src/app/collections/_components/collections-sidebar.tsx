@@ -8,10 +8,10 @@ import { SortSelect } from '@/components/sort-select';
 import { getSpeakerName } from '@/features/speakers';
 
 type CollectionsSidebarProps = {
-  speakersWithCollections: Speaker[];
+  speakers: Speaker[];
 };
 
-export function CollectionsSidebar({ speakersWithCollections }: CollectionsSidebarProps) {
+export function CollectionsSidebar({ speakers }: CollectionsSidebarProps) {
   return (
     <>
       <PageHeader
@@ -22,7 +22,7 @@ export function CollectionsSidebar({ speakersWithCollections }: CollectionsSideb
         <div className="space-y-2">
           <SearchInput paramName="search" placeholder="Search collections..." />
           <SelectFilter
-            options={speakersWithCollections.map((speaker) => ({
+            options={speakers.map((speaker) => ({
               label: getSpeakerName(speaker),
               value: speaker.slug,
             }))}

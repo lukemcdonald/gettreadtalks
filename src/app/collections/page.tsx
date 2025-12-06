@@ -1,23 +1,23 @@
 import { CollectionsContent } from '@/app/collections/_components/collections-content';
 import { CollectionsSidebar } from '@/app/collections/_components/collections-sidebar';
 import { SidebarLayout } from '@/components/layouts';
-import { getAllCollectionsWithStats } from '@/features/collections';
-import { getAllSpeakers, sortSpeakersByName } from '@/features/speakers';
+import { getCollectionsWithStats } from '@/features/collections';
+import { getSpeakers, sortSpeakersByName } from '@/features/speakers';
 
 export default async function CollectionsPage() {
-  const [result, _speakers] = await Promise.all([getAllCollectionsWithStats(), getAllSpeakers()]);
+  const { collections } = await getCollectionsWithStats();
 
   // Get unique speakers who have collections
-  const allSpeakers = result.page.flatMap((item) => item.speakers);
+  const allSpeakers = collections.flatMap((item) => item.speakers);
   const speakersWithCollections = Array.from(
     new Map(allSpeakers.map((speaker) => [speaker.slug, speaker])).values(),
   );
-  const sortedSpeakersWithCollections = sortSpeakersByName(speakersWithCollections);
+  const speakers = sortSpeakersByName(speakersWithCollections);
 
   return (
     <SidebarLayout
-      content={<CollectionsContent collections={result.page} />}
-      sidebar={<CollectionsSidebar speakersWithCollections={sortedSpeakersWithCollections} />}
+      content={<CollectionsContent collections={collections} />}
+      sidebar={<CollectionsSidebar speakers={speakers} />}
       sidebarSticky
     />
   );
