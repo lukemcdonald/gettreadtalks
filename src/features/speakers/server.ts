@@ -15,25 +15,30 @@ export async function getFeaturedSpeakers(limit = 6) {
 }
 
 /**
- * Get all speakers (flat list, not grouped).
+ * Get speakers (flat list, not grouped).
  */
-export async function getAllSpeakers() {
+export async function getSpeakers({ limit }: { limit?: number } = {}) {
   const token = await getAuthToken();
 
   const paginationOpts = {
     cursor: null,
-    numItems: 1000,
+    numItems: limit ?? 1000,
   };
 
   const result = await fetchQuery(api.speakers.listSpeakers, { paginationOpts }, { token });
-  return result.page;
+
+  return {
+    speakers: result.page,
+    continueCursor: result.continueCursor,
+    isDone: result.isDone,
+  };
 }
 
 /**
- * Get all speakers grouped alphabetically by last name.
+ * Get speakers grouped alphabetically by last name.
  */
-export async function getAllSpeakersGrouped() {
-  const speakers = await getAllSpeakers();
+export async function getSpeakersGrouped({ limit }: { limit?: number } = {}) {
+  const { speakers } = await getSpeakers({ limit });
 
   // Group speakers by first letter of last name
   const grouped = new Map<string, typeof speakers>();
@@ -71,23 +76,5 @@ export async function getAllSpeakersGrouped() {
 export async function getSpeakerBySlug(slug: string) {
   const token = await getAuthToken();
 
-  const speaker = await fetchQuery(api.speakers.getSpeakerBySlug, { slug }, { token });
-
-  if (!speaker) {
-    return null;
-  }
-
-  // Fetch related content
-  const [talks, collections, clips] = await Promise.all([
-    fetchQuery(api.talks.listTalksBySpeaker, { speakerId: speaker._id, limit: 20 }, { token }),
-    fetchQuery(api.collections.listCollectionsBySpeaker, { speakerId: speaker._id }, { token }),
-    fetchQuery(api.clips.listClipsBySpeaker, { speakerId: speaker._id, limit: 20 }, { token }),
-  ]);
-
-  return {
-    clips,
-    collections,
-    speaker,
-    talks,
-  };
+  return await fetchQuery(api.speakers.getSpeakerBySlug, { slug }, { token });
 }
