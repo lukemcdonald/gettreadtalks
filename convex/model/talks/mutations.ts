@@ -3,7 +3,7 @@ import type { Doc } from '../../_generated/dataModel';
 import { v } from 'convex/values';
 
 import { mutation } from '../../_generated/server';
-import { throwDuplicateSlug, throwValidationError } from '../../lib/errors';
+import { throwDuplicateSlug, throwNotFound, throwValidationError } from '../../lib/errors';
 import { slugExists, slugify } from '../../lib/utils';
 import { requireAuth } from '../auth/utils';
 import { statusType } from './validators';
@@ -25,7 +25,7 @@ export const archiveTalk = mutation({
     const talk = await ctx.db.get(args.id);
 
     if (!talk) {
-      throw new Error('Talk not found');
+      throwNotFound('Talk not found', { resource: 'talk', resourceId: args.id });
     }
 
     // Soft delete by setting status to archived
@@ -114,7 +114,7 @@ export const updateTalk = mutation({
     const talk = await ctx.db.get(id);
 
     if (!talk) {
-      throw new Error('Talk not found');
+      throwNotFound('Talk not found', { resource: 'talk', resourceId: id });
     }
 
     // If title changed, update slug
@@ -171,7 +171,7 @@ export const updateTalkStatus = mutation({
     const talk = await ctx.db.get(args.id);
 
     if (!talk) {
-      throw new Error('Talk not found');
+      throwNotFound('Talk not found', { resource: 'talk', resourceId: args.id });
     }
 
     const updates: Partial<Doc<'talks'>> = {

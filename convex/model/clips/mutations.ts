@@ -3,7 +3,7 @@ import type { Doc } from '../../_generated/dataModel';
 import { v } from 'convex/values';
 
 import { mutation } from '../../_generated/server';
-import { throwDuplicateSlug, throwValidationError } from '../../lib/errors';
+import { throwDuplicateSlug, throwNotFound, throwValidationError } from '../../lib/errors';
 import { slugExists, slugify } from '../../lib/utils';
 import { requireAuth } from '../auth/utils';
 import { statusType } from './validators';
@@ -24,7 +24,7 @@ export const archiveClip = mutation({
     const clip = await ctx.db.get(args.id);
 
     if (!clip) {
-      throw new Error('Clip not found');
+      throwNotFound('Clip not found', { resource: 'clip', resourceId: args.id });
     }
 
     // Soft delete by setting status to archived
@@ -107,7 +107,7 @@ export const updateClip = mutation({
     const clip = await ctx.db.get(id);
 
     if (!clip) {
-      throw new Error('Clip not found');
+      throwNotFound('Clip not found', { resource: 'clip', resourceId: id });
     }
 
     // If title changed, update slug
@@ -164,7 +164,7 @@ export const updateClipStatus = mutation({
     const clip: Doc<'clips'> | null = await ctx.db.get(args.id);
 
     if (!clip) {
-      throw new Error('Clip not found');
+      throwNotFound('Clip not found', { resource: 'clip', resourceId: args.id });
     }
 
     const updates: Partial<Doc<'clips'>> = {

@@ -2,6 +2,7 @@ import { v } from 'convex/values';
 
 import { internalMutation, mutation } from '../../_generated/server';
 import { authComponent, createAuth } from '../../auth';
+import { throwNotFound, throwValidationError } from '../../lib/errors';
 import { requireAdmin } from '../auth/roles';
 import { getUserId } from '../auth/utils';
 import { userRole } from './validators';
@@ -26,7 +27,7 @@ export const favoriteClip = mutation({
       .first();
 
     if (existing) {
-      throw new Error('Clip already favorited');
+      throwValidationError('Clip already favorited');
     }
 
     return await ctx.db.insert('userFavoriteClips', {
@@ -59,7 +60,7 @@ export const favoriteSpeaker = mutation({
       .first();
 
     if (existing) {
-      throw new Error('Speaker already favorited');
+      throwValidationError('Speaker already favorited');
     }
 
     return await ctx.db.insert('userFavoriteSpeakers', {
@@ -90,7 +91,7 @@ export const favoriteTalk = mutation({
       .first();
 
     if (existing) {
-      throw new Error('Talk already favorited');
+      throwValidationError('Talk already favorited');
     }
 
     return await ctx.db.insert('userFavoriteTalks', {
@@ -121,7 +122,7 @@ export const finishTalk = mutation({
       .first();
 
     if (existing) {
-      throw new Error('Talk already marked as finished');
+      throwValidationError('Talk already marked as finished');
     }
 
     return await ctx.db.insert('userFinishedTalks', {
@@ -152,7 +153,7 @@ export const unfavoriteClip = mutation({
       .first();
 
     if (!favorite) {
-      throw new Error('Favorite not found');
+      throwNotFound('Favorite not found', { resource: 'userFavoriteClips' });
     }
 
     await ctx.db.delete(favorite._id);
@@ -184,7 +185,7 @@ export const unfavoriteSpeaker = mutation({
       .first();
 
     if (!favorite) {
-      throw new Error('Favorite not found');
+      throwNotFound('Favorite not found', { resource: 'userFavoriteClips' });
     }
 
     await ctx.db.delete(favorite._id);
@@ -214,7 +215,7 @@ export const unfavoriteTalk = mutation({
       .first();
 
     if (!favorite) {
-      throw new Error('Favorite not found');
+      throwNotFound('Favorite not found', { resource: 'userFavoriteClips' });
     }
 
     await ctx.db.delete(favorite._id);
@@ -244,7 +245,7 @@ export const unfinishTalk = mutation({
       .first();
 
     if (!finished) {
-      throw new Error('Finished talk not found');
+      throwNotFound('Finished talk not found', { resource: 'userFinishedTalks' });
     }
 
     await ctx.db.delete(finished._id);

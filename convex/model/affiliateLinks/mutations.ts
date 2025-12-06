@@ -3,7 +3,7 @@ import type { Doc } from '../../_generated/dataModel';
 import { v } from 'convex/values';
 
 import { mutation } from '../../_generated/server';
-import { throwDuplicateSlug, throwValidationError } from '../../lib/errors';
+import { throwDuplicateSlug, throwNotFound, throwValidationError } from '../../lib/errors';
 import { slugExists, slugify } from '../../lib/utils';
 import { requireAuth } from '../auth/utils';
 import { affiliateLinkTypes } from './validators';
@@ -61,7 +61,7 @@ export const destroyAffiliateLink = mutation({
     const affiliateLink = await ctx.db.get(args.id);
 
     if (!affiliateLink) {
-      throw new Error('Affiliate link not found');
+      throwNotFound('Affiliate link not found', { resource: 'affiliateLink', resourceId: args.id });
     }
 
     // Hard delete the affiliate link
@@ -98,7 +98,7 @@ export const updateAffiliateLink = mutation({
     const affiliateLink = await ctx.db.get(id);
 
     if (!affiliateLink) {
-      throw new Error('Affiliate link not found');
+      throwNotFound('Affiliate link not found', { resource: 'affiliateLink', resourceId: id });
     }
 
     // If title changed, update slug

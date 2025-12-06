@@ -4,7 +4,7 @@ import { v } from 'convex/values';
 import { getOneFrom } from 'convex-helpers/server/relationships';
 
 import { mutation } from '../../_generated/server';
-import { throwDuplicateSlug, throwValidationError } from '../../lib/errors';
+import { throwDuplicateSlug, throwNotFound, throwValidationError } from '../../lib/errors';
 import { slugExists, slugify } from '../../lib/utils';
 import { requireAuth } from '../auth/utils';
 
@@ -60,7 +60,7 @@ export const destroyCollection = mutation({
     const collection = await ctx.db.get(args.id);
 
     if (!collection) {
-      throw new Error('Collection not found');
+      throwNotFound('Collection not found', { resource: 'collection', resourceId: args.id });
     }
 
     // Check if collection is referenced by any talks
@@ -73,7 +73,7 @@ export const destroyCollection = mutation({
     );
 
     if (talksWithCollection) {
-      throw new Error('Cannot delete collection: collection has associated talks');
+      throwValidationError('Cannot delete collection: collection has associated talks');
     }
 
     // Hard delete the collection
@@ -106,7 +106,7 @@ export const updateCollection = mutation({
     const collection: Doc<'collections'> | null = await ctx.db.get(id);
 
     if (!collection) {
-      throw new Error('Collection not found');
+      throwNotFound('Collection not found', { resource: 'collection', resourceId: id });
     }
 
     if (updates.title !== undefined) {

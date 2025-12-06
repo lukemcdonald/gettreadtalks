@@ -1,6 +1,7 @@
 import type { MutationCtx, QueryCtx } from '../../_generated/server';
 import type { AdminUser, User } from './types';
 
+import { throwForbidden } from '../../lib/errors';
 import { requireAuth } from './utils';
 
 export type UserRole = 'admin' | 'user';
@@ -27,7 +28,7 @@ export async function requireAdmin(ctx: QueryCtx | MutationCtx): Promise<AdminUs
   const user = await requireAuth(ctx);
 
   if (!isAdmin(user)) {
-    throw new Error('Admin access required');
+    throwForbidden('Admin access required');
   }
 
   return user as AdminUser;
