@@ -1,3 +1,5 @@
+import type { Doc } from '../../_generated/dataModel';
+
 import { paginationOptsValidator, paginationResultValidator } from 'convex/server';
 import { v } from 'convex/values';
 import { getOneFrom } from 'convex-helpers/server/relationships';
@@ -23,18 +25,70 @@ export const getSpeaker = query({
 });
 
 /**
- * Get speaker by slug.
+ * Get speaker by slug with related data (default for detail pages).
+ * Returns speaker with related talks, collections, and clips.
  *
  * @param ctx - Database context
  * @param args - Query arguments
- * @returns Speaker or null if not found
+ * @returns Speaker with related talks, collections, and clips
  */
 export const getSpeakerBySlug = query({
   args: {
     slug: v.string(),
   },
-  handler: async (ctx, args) => await getOneFrom(ctx.db, 'speakers', 'by_slug', args.slug),
-  returns: doc('speakers').nullable(),
+  handler: async (ctx, args) => {
+    const speaker = await getOneFrom(ctx.db, 'speakers', 'by_slug', args.slug);
+
+    if (!speaker) {
+      return null;
+    }
+
+    const [talks, collections, clips] = await Promise.all([
+      ctx.db
+        .query('talks')
+        .withIndex('by_speakerId_and_status', (q) =>
+          q.eq('speakerId', speaker._id).eq('status', 'published'),
+        )
+        .order('desc')
+        .take(20),
+      ctx.db
+        .query('talks')
+        .withIndex('by_speakerId_and_status', (q) =>
+          q.eq('speakerId', speaker._id).eq('status', 'published'),
+        )
+        .collect()
+        .then((allTalks) => {
+          const collectionIds = [
+            ...new Set(allTalks.flatMap((talk) => (talk.collectionId ? [talk.collectionId] : []))),
+          ];
+          return Promise.all(collectionIds.map((id) => ctx.db.get(id))).then((cols) =>
+            cols.filter((col): col is Doc<'collections'> => col !== null),
+          );
+        }),
+      ctx.db
+        .query('clips')
+        .withIndex('by_speakerId_and_status', (q) =>
+          q.eq('speakerId', speaker._id).eq('status', 'published'),
+        )
+        .order('desc')
+        .take(20),
+    ]);
+
+    return {
+      clips,
+      collections,
+      speaker,
+      talks,
+    };
+  },
+  returns: v.nullable(
+    v.object({
+      clips: docs('clips'),
+      collections: docs('collections'),
+      speaker: doc('speakers'),
+      talks: docs('talks'),
+    }),
+  ),
 });
 
 /**
