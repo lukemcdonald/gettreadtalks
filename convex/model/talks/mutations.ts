@@ -4,7 +4,7 @@ import { v } from 'convex/values';
 
 import { mutation } from '../../_generated/server';
 import { throwDuplicateSlug, throwNotFound, throwValidationError } from '../../lib/errors';
-import { slugExists, slugify } from '../../lib/utils';
+import { slugify, talkSlugExistsForSpeaker } from '../../lib/utils';
 import { requireAuth } from '../auth/utils';
 import { statusType } from './validators';
 
@@ -62,15 +62,14 @@ export const createTalk = mutation({
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
-    // Validate input early
     if (!args.title.trim()) {
       throwValidationError('Title cannot be empty', 'title');
     }
 
     const slug = slugify(args.title);
 
-    if (await slugExists(ctx, 'talks', slug)) {
-      throwDuplicateSlug('Talk with this title already exists', 'title');
+    if (await talkSlugExistsForSpeaker(ctx, args.speakerId, slug)) {
+      throwDuplicateSlug('Talk with this title already exists for this speaker', 'title');
     }
 
     const status = args.status || 'backlog';
@@ -127,8 +126,12 @@ export const updateTalk = mutation({
       const newSlug = slugify(updates.title);
 
       if (newSlug !== talk.slug) {
-        if (await slugExists(ctx, 'talks', newSlug, id)) {
-          throwDuplicateSlug('Talk with this title already exists', 'title');
+        // Use the speakerId from the talk or from updates if it's being changed
+        const speakerIdToCheck = updates.speakerId || talk.speakerId;
+        const slugExists = await talkSlugExistsForSpeaker(ctx, speakerIdToCheck, newSlug, id);
+
+        if (slugExists) {
+          throwDuplicateSlug('Talk with this title already exists for this speaker', 'title');
         }
 
         updates.slug = newSlug;

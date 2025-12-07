@@ -7,9 +7,10 @@ import type { User } from '@/services/auth/types';
 
 import Link from 'next/link';
 
-import { FavoriteTalkButton } from '@/app/talks/[talk]/_components/favorite-talk-button';
+import { FavoriteTalkButton } from '@/app/talks/[speaker]/[talk]/_components/favorite-talk-button';
 import { SidebarContent } from '@/components/sidebar-content';
 import { Button } from '@/components/ui/button';
+import { getTalkUrl } from '@/features/talks/utils';
 import { isAdmin } from '@/services/auth/utils';
 
 type TalkSidebarProps = {
@@ -23,13 +24,14 @@ type TalkSidebarProps = {
 
 export function TalkSidebar({ clips, collection, speaker, talk, topics, user }: TalkSidebarProps) {
   const userIsAdmin = isAdmin(user);
+  const editUrl = speaker ? getTalkUrl(speaker.slug, talk.slug) + '/edit' : '';
 
   return (
     <>
       <SidebarContent title="Actions">
         <div className="flex flex-col gap-2">
-          {userIsAdmin && (
-            <Button render={<Link href={`/talks/${talk.slug}/edit`} />} variant="outline">
+          {userIsAdmin && speaker && (
+            <Button render={<Link href={editUrl} />} variant="outline">
               Edit
             </Button>
           )}

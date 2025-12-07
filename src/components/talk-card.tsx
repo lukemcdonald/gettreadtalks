@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { MediaCard } from '@/components/media-card';
 import { SpeakerAvatar } from '@/components/speaker-avatar';
 import { getSpeakerName } from '@/features/speakers';
+import { getTalkUrl } from '@/features/talks/utils';
 
 type TalkCardSpeaker = {
   firstName: Speaker['firstName'];
@@ -37,12 +38,13 @@ export function TalkCard({ featured, favorited, finished, speaker, talk }: TalkC
   const accessibleLabel = speakerName ? `${talk.title} by ${speakerName}` : talk.title;
   const statusLabels = [featured && 'Featured', favorited && 'Favorited', finished && 'Finished'];
   const statusLabel = statusLabels.filter(Boolean).join(', ');
+  const talkHref = speaker?.slug ? getTalkUrl(speaker.slug, talk.slug) : `/talks/${talk.slug}`;
 
   return (
     <MediaCard
       ariaLabel={accessibleLabel}
       data-status={statusLabel}
-      href={`/talks/${talk.slug}`}
+      href={talkHref}
       media={speaker ? <SpeakerAvatar speaker={speaker} /> : undefined}
       subtitle={
         speaker?.slug ? <SpeakerLink slug={speaker.slug}>{speakerName}</SpeakerLink> : speakerName

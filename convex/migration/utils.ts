@@ -11,7 +11,7 @@ import { slugExists, slugify } from '../lib/utils';
  * @param baseText - Text to generate slug from
  * @returns Unique slug string
  */
-export async function ensureUniqueSlug(
+export async function generateSlug(
   ctx: MutationCtx,
   table: 'affiliateLinks' | 'clips' | 'collections' | 'speakers' | 'talks' | 'topics',
   baseText: string,

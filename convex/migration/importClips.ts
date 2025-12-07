@@ -2,7 +2,7 @@ import type { Id } from '../_generated/dataModel';
 import type { MutationCtx } from '../_generated/server';
 import type { IdMapping } from './idMap';
 
-import { ensureUniqueSlug, lookupId, mapStatus, parseTimestamp } from './utils';
+import { generateSlug, lookupId, mapStatus, parseTimestamp } from './utils';
 
 /**
  * Import clips from Airtable records.
@@ -41,7 +41,7 @@ export async function importClips(
     const speakerId = lookupId(idMapping, 'speakers', fields.speakers?.[0]);
     const talkId = lookupId(idMapping, 'talks', fields.talks?.[0]);
 
-    const slug = await ensureUniqueSlug(ctx, 'clips', fields.title);
+    const slug = await generateSlug(ctx, 'clips', fields.title);
     const status = mapStatus(undefined, fields.published);
     const publishedAt = status === 'published' ? parseTimestamp(fields.publishedDate) : undefined;
 

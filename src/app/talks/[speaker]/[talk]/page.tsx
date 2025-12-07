@@ -1,18 +1,21 @@
 import { notFound } from 'next/navigation';
 
-import { TalkContent } from '@/app/talks/[talk]/_components/talk-content';
-import { TalkSidebar } from '@/app/talks/[talk]/_components/talk-sidebar';
+import { TalkContent } from '@/app/talks/[speaker]/[talk]/_components/talk-content';
+import { TalkSidebar } from '@/app/talks/[speaker]/[talk]/_components/talk-sidebar';
 import { SidebarLayout } from '@/components/layouts';
 import { getTalkBySlug } from '@/features/talks';
 import { getCurrentUser } from '@/services/auth/server';
 
 type TalkPageProps = {
-  params: Promise<{ talk: string }>;
+  params: Promise<{ speaker: string; talk: string }>;
 };
 
 export default async function TalkPage({ params }: TalkPageProps) {
-  const { talk: slug } = await params;
-  const [talkData, user] = await Promise.all([getTalkBySlug(slug), getCurrentUser()]);
+  const { speaker: speakerSlug, talk: talkSlug } = await params;
+  const [talkData, user] = await Promise.all([
+    getTalkBySlug(speakerSlug, talkSlug),
+    getCurrentUser(),
+  ]);
 
   if (!talkData) {
     notFound();

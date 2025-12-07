@@ -3,8 +3,8 @@ import type { Doc } from '../../_generated/dataModel';
 import { v } from 'convex/values';
 
 import { mutation } from '../../_generated/server';
-import { throwDuplicateSlug, throwNotFound, throwValidationError } from '../../lib/errors';
-import { slugExists, slugify } from '../../lib/utils';
+import { throwNotFound, throwValidationError } from '../../lib/errors';
+import { generateSlug, slugify } from '../../lib/utils';
 import { requireAuth } from '../auth/utils';
 import { statusType } from './validators';
 /**
@@ -63,11 +63,7 @@ export const createClip = mutation({
       throwValidationError('Title cannot be empty', 'title');
     }
 
-    const slug = slugify(args.title);
-
-    if (await slugExists(ctx, 'clips', slug)) {
-      throwDuplicateSlug('Clip with this title already exists', 'title');
-    }
+    const slug = await generateSlug(ctx, 'clips', args.title);
 
     const status = args.status ?? 'backlog';
     const publishedAt = status === 'published' ? Date.now() : undefined;
@@ -117,13 +113,9 @@ export const updateClip = mutation({
         throwValidationError('Title cannot be empty', 'title');
       }
 
-      const newSlug = slugify(updates.title);
+      const newSlug = await generateSlug(ctx, 'clips', updates.title, id);
 
       if (newSlug !== clip.slug) {
-        if (await slugExists(ctx, 'clips', newSlug, id)) {
-          throwDuplicateSlug('Clip with this title already exists', 'title');
-        }
-
         updates.slug = newSlug;
       }
     }

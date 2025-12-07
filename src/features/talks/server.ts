@@ -88,15 +88,16 @@ export async function getTopicsForFilter() {
 }
 
 /**
- * Get talk by slug with all related data (speaker, collection, clips, topics).
+ * Get talk by speaker slug and talk slug with all related data (speaker, collection, clips, topics).
  *
- * @param slug - Talk slug identifier
+ * @param speakerSlug - Speaker slug identifier
+ * @param talkSlug - Talk slug identifier
  * @returns Talk data with relations or null if not found
  */
-export async function getTalkBySlug(slug: string) {
+export async function getTalkBySlug(speakerSlug: string, talkSlug: string) {
   const token = await getAuthToken();
 
-  return await fetchQuery(api.talks.getTalkBySlug, { slug }, { token });
+  return await fetchQuery(api.talks.getTalkBySlug, { speakerSlug, talkSlug }, { token });
 }
 
 /**

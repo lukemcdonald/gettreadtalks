@@ -5,6 +5,7 @@ import Link from 'next/link';
 
 import { SidebarContent } from '@/components/sidebar-content';
 import { getSpeakerName } from '@/features/speakers';
+import { getTalkUrl } from '@/features/talks/utils';
 
 type ClipSidebarProps = {
   speaker: Speaker | null;
@@ -32,14 +33,17 @@ export function ClipSidebar({ speaker, talk }: ClipSidebarProps) {
         </SidebarContent>
       )}
 
-      {talk && (
+      {talk && speaker && (
         <SidebarContent title="Related Talk">
           <div className="space-y-2">
             <p className="font-semibold">{talk.title}</p>
             {talk.description && (
               <p className="line-clamp-2 text-muted-foreground text-sm">{talk.description}</p>
             )}
-            <Link className="text-primary text-sm hover:underline" href={`/talks/${talk.slug}`}>
+            <Link
+              className="text-primary text-sm hover:underline"
+              href={getTalkUrl(speaker.slug, talk.slug)}
+            >
               View talk →
             </Link>
           </div>
