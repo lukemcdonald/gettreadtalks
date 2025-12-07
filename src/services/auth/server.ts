@@ -1,8 +1,11 @@
 'use server';
 
+import 'server-only';
+
 import type { Route } from 'next';
 import type { AdminUser } from '@/services/auth/types';
 
+import { cache } from 'react';
 import { getToken } from '@convex-dev/better-auth/nextjs';
 import { fetchQuery } from 'convex/nextjs';
 import { cookies } from 'next/headers';
@@ -14,16 +17,18 @@ import { isAdmin } from '@/services/auth/utils';
 
 /**
  * Get the authentication token for the current user.
+ * Wrapped with React's cache() to ensure the token is only retrieved once per request,
+ * even if called multiple times. This reduces redundant cookie reads and improves performance.
  *
  * @returns Authentication token or null if not authenticated
  */
-export const getAuthToken = async () => {
+export const getAuthToken = cache(async () => {
   // Always access cookies to satisfy Next.js 16 Turbopack requirements
   // This ensures dynamic rendering before Math.random() usage in betterAuth
   // Avoids the "used Math.random() before accessing Request data" error on page and builds.
   await cookies();
   return await getToken(createAuth);
-};
+});
 
 /**
  * Get the current authenticated user server-side.

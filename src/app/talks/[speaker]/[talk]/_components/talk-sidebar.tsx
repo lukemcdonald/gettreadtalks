@@ -24,7 +24,7 @@ type TalkSidebarProps = {
 
 export function TalkSidebar({ clips, collection, speaker, talk, topics, user }: TalkSidebarProps) {
   const userIsAdmin = isAdmin(user);
-  const editUrl = speaker ? getTalkUrl(speaker.slug, talk.slug) + '/edit' : '';
+  const editUrl = speaker ? `${getTalkUrl(speaker.slug, talk.slug)}/edit` : '';
 
   return (
     <>

@@ -4,18 +4,27 @@ import type { StatusType } from '@/convex/lib/validators/shared';
 import type { Collection, CollectionId } from '@/features/collections/types';
 import type { Speaker, SpeakerId } from '@/features/speakers/types';
 import type { TalkId } from '@/features/talks';
+import type { TalkFormData } from '@/features/talks/schemas/talk-form';
 
-import { useState } from 'react';
+import { useEffect, useState, useTransition } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
+import { Controller, type SubmitErrorHandler, type SubmitHandler, useForm } from 'react-hook-form';
 
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Field, FieldControl, FieldLabel } from '@/components/ui/field';
+import { FieldMessage } from '@/components/ui/field-message';
+import { Form } from '@/components/ui/form';
+import { FormMessage } from '@/components/ui/form-message';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { slugify } from '@/convex/lib/utils';
-import { useArchiveTalk, useCreateTalk, useUpdateTalk } from '@/features/talks/hooks';
+import { createTalkAction, updateTalkAction } from '@/features/talks/actions';
+import { useArchiveTalk, useUpdateTalk } from '@/features/talks/hooks';
+import { talkFormSchema } from '@/features/talks/schemas/talk-form';
 import { getTalkUrl } from '@/features/talks/utils';
+import { setServerErrors } from '@/lib/forms/react-hook-form';
 import { CollectionSelectField } from './collection-select-field';
 import { SpeakerSelectField } from './speaker-select-field';
 import { StatusSelectField } from './status-select-field';
@@ -48,69 +57,78 @@ export function TalkForm({
   talkSlug,
 }: TalkFormProps) {
   const router = useRouter();
-
   const archiveTalk = useArchiveTalk();
-  const createTalk = useCreateTalk();
   const updateTalk = useUpdateTalk();
 
   const [isDeleting, setIsDeleting] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
   const [status, setStatus] = useState<StatusType>(initialData?.status || 'backlog');
+  const [isPending, startTransition] = useTransition();
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setErrors({});
+  // React Hook Form setup
+  // Note: zodResolver works with Zod 4 when using type assertion
+  const form = useForm<TalkFormData>({
+    // biome-ignore lint/suspicious/noExplicitAny: Type assertion needed for Zod 4 compatibility with zodResolver
+    resolver: zodResolver(talkFormSchema as any), // Type assertion needed for Zod 4 compatibility
+    mode: 'onBlur',
+    defaultValues: {
+      collectionId: initialData?.collectionId,
+      collectionOrder: initialData?.collectionOrder,
+      description: initialData?.description,
+      featured: initialData?.featured ?? false,
+      mediaUrl: initialData?.mediaUrl ?? '',
+      scripture: initialData?.scripture,
+      speakerId: initialData?.speakerId ?? ('' as SpeakerId),
+      status: initialData?.status ?? 'backlog',
+      title: initialData?.title ?? '',
+    },
+  });
 
-    const formData = new FormData(e.currentTarget);
+  const onSubmit: SubmitHandler<TalkFormData> = (values) => {
+    // biome-ignore lint/complexity: its fine
+    startTransition(async () => {
+      const result = talkId
+        ? await updateTalkAction(values, talkId)
+        : await createTalkAction(values);
 
-    const collectionId = formData.get('collectionId') as string;
-    const collectionOrder = formData.get('collectionOrder') as string;
-    const description = formData.get('description') as string;
-    const featured = formData.get('featured') === 'on';
-    const formStatus = formData.get('status') as StatusType;
-    const mediaUrl = formData.get('mediaUrl') as string;
-    const scripture = formData.get('scripture') as string;
-    const speakerId = formData.get('speakerId') as SpeakerId;
-    const title = formData.get('title') as string;
-
-    const data = {
-      collectionId: collectionId ? (collectionId as CollectionId) : undefined,
-      collectionOrder: collectionOrder ? Number.parseInt(collectionOrder, 10) : undefined,
-      description: description || undefined,
-      featured,
-      mediaUrl: mediaUrl.trim(),
-      scripture: scripture || undefined,
-      speakerId,
-      status: formStatus,
-      title: title.trim(),
-    };
-
-    try {
-      // Find the speaker to get their slug
-      const selectedSpeaker = speakers.find((s) => s._id === speakerId);
-
-      if (!selectedSpeaker) {
-        setErrors({ speakerId: 'Speaker not found' });
+      // Handle errors early and return
+      if (!result.success) {
+        setServerErrors(form.setError, result.errors);
         return;
       }
 
-      if (talkId) {
-        await updateTalk.mutateAsync({ ...data, id: talkId });
+      // Handle successful submission
+      const selectedSpeaker = speakers.find((s) => s._id === values.speakerId);
 
-        const newSlug = slugify(title);
-        const finalTalkSlug =
-          newSlug === slugify(initialData?.title) ? (talkSlug ?? newSlug) : newSlug;
-        const finalSpeakerSlug = speakerSlug ?? selectedSpeaker.slug;
-        router.push(getTalkUrl(finalSpeakerSlug, finalTalkSlug));
-      } else {
-        await createTalk.mutateAsync(data);
-
-        const finalTalkSlug = slugify(title);
-        router.push(getTalkUrl(selectedSpeaker.slug, finalTalkSlug));
+      if (!selectedSpeaker) {
+        form.setError('speakerId', {
+          type: 'server',
+          message: 'Speaker not found',
+        });
+        return;
       }
-    } catch (error) {
-      console.error('Failed to save talk:', error);
-    }
+
+      // Determine talk slug
+      const newSlug = slugify(values.title);
+      let finalTalkSlug = newSlug;
+
+      if (talkId) {
+        const titleUnchanged = newSlug === slugify(initialData?.title || '');
+        finalTalkSlug = titleUnchanged ? (talkSlug ?? newSlug) : newSlug;
+      }
+
+      // Determine speaker slug
+      const finalSpeakerSlug = talkId
+        ? (speakerSlug ?? selectedSpeaker.slug)
+        : selectedSpeaker.slug;
+
+      // Redirect to talk page
+      router.push(getTalkUrl(finalSpeakerSlug, finalTalkSlug));
+    });
+  };
+
+  const onError: SubmitErrorHandler<TalkFormData> = () => {
+    // Validation failed - errors are automatically set in form.formState.errors
+    // and displayed via FieldMessage component
   };
 
   const handleArchiveToggle = async () => {
@@ -146,7 +164,7 @@ export function TalkForm({
     }
   };
 
-  const isLoading = createTalk.isLoading || updateTalk.isLoading;
+  const isLoading = isPending || updateTalk.isLoading;
 
   const getSubmitButtonText = () => {
     if (isLoading) {
@@ -169,76 +187,130 @@ export function TalkForm({
   };
 
   return (
-    <form className="space-y-6" onSubmit={handleSubmit}>
+    <Form className="space-y-6" form={form} onSubmit={form.handleSubmit(onSubmit, onError)}>
+      <FormMessage error={form.formState.errors.root} />
+
       <div className="space-y-4">
-        <div>
-          <Label htmlFor="title">
-            Title <span className="text-destructive">*</span>
-          </Label>
-          <Input defaultValue={initialData?.title} id="title" name="title" required type="text" />
-        </div>
-
-        <SpeakerSelectField
-          defaultValue={initialData?.speakerId}
-          error={errors.speakerId}
-          speakers={speakers}
+        <Controller
+          control={form.control}
+          name="title"
+          render={({ field, fieldState }) => (
+            <Field>
+              <FieldLabel required>Title</FieldLabel>
+              <FieldControl error={fieldState.error} required type="text" {...field} />
+              <FieldMessage error={fieldState.error} />
+            </Field>
+          )}
         />
 
-        <div>
-          <Label htmlFor="mediaUrl">
-            Media URL <span className="text-destructive">*</span>
-          </Label>
-          <Input
-            defaultValue={initialData?.mediaUrl}
-            id="mediaUrl"
-            name="mediaUrl"
-            required
-            type="url"
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="description">Description</Label>
-          <Textarea
-            defaultValue={initialData?.description ?? ''}
-            id="description"
-            name="description"
-            rows={4}
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="scripture">Scripture</Label>
-          <Input
-            defaultValue={initialData?.scripture ?? ''}
-            id="scripture"
-            name="scripture"
-            type="text"
-          />
-        </div>
-
-        <CollectionSelectField collections={collections} defaultValue={initialData?.collectionId} />
-
-        <div>
-          <Label htmlFor="collectionOrder">Collection Order</Label>
-          <Input
-            defaultValue={initialData?.collectionOrder ?? undefined}
-            id="collectionOrder"
-            name="collectionOrder"
-            type="number"
-          />
-        </div>
-
-        <StatusSelectField
-          defaultValue={initialData?.status ?? 'backlog'}
-          onChange={setStatus}
-          value={status}
+        <Controller
+          control={form.control}
+          name="speakerId"
+          render={({ field, fieldState }) => (
+            <SpeakerSelectField
+              error={fieldState.error}
+              onValueChange={field.onChange}
+              speakers={speakers}
+              value={field.value as SpeakerId}
+            />
+          )}
         />
 
-        <div className="flex items-center gap-2">
-          <Checkbox defaultChecked={initialData?.featured ?? false} id="featured" name="featured" />
-          <Label htmlFor="featured">Featured</Label>
-        </div>
+        <Controller
+          control={form.control}
+          name="mediaUrl"
+          render={({ field, fieldState }) => (
+            <Field>
+              <FieldLabel required>Media URL</FieldLabel>
+              <FieldControl error={fieldState.error} required type="url" {...field} />
+              <FieldMessage error={fieldState.error} />
+            </Field>
+          )}
+        />
+
+        <Controller
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <Field>
+              <FieldLabel>Description</FieldLabel>
+              <FieldControl render={(props) => <Textarea {...props} {...field} rows={4} />} />
+            </Field>
+          )}
+        />
+
+        <Controller
+          control={form.control}
+          name="scripture"
+          render={({ field }) => (
+            <Field>
+              <FieldLabel>Scripture</FieldLabel>
+              <FieldControl {...field} type="text" />
+            </Field>
+          )}
+        />
+
+        <Controller
+          control={form.control}
+          name="collectionId"
+          render={({ field }) => (
+            <CollectionSelectField
+              collections={collections}
+              onValueChange={(value) => field.onChange(value || undefined)}
+              value={(field.value as CollectionId | undefined) || ''}
+            />
+          )}
+        />
+
+        <Controller
+          control={form.control}
+          name="collectionOrder"
+          render={({ field, fieldState }) => (
+            <Field>
+              <FieldLabel>Collection Order</FieldLabel>
+              <FieldControl
+                {...field}
+                error={fieldState.error}
+                onChange={(e) => field.onChange(e.target.valueAsNumber || undefined)}
+                type="number"
+                value={field.value ?? ''}
+              />
+              <FieldMessage error={fieldState.error} />
+            </Field>
+          )}
+        />
+
+        <Controller
+          control={form.control}
+          name="status"
+          render={({ field }) => (
+            <StatusSelectField
+              onChange={(value) => {
+                field.onChange(value);
+                setStatus(value);
+              }}
+              value={field.value}
+            />
+          )}
+        />
+
+        <Controller
+          control={form.control}
+          name="featured"
+          render={({ field }) => (
+            <Field>
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  checked={field.value}
+                  id="featured"
+                  name="featured"
+                  onCheckedChange={(checked) => field.onChange(checked === true)}
+                />
+                <FieldLabel htmlFor="featured">Featured</FieldLabel>
+              </div>
+            </Field>
+          )}
+        />
       </div>
 
       <div className="flex items-center gap-4">
@@ -257,6 +329,6 @@ export function TalkForm({
           </Button>
         )}
       </div>
-    </form>
+    </Form>
   );
 }

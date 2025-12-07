@@ -12,21 +12,36 @@ import {
 type CollectionSelectFieldProps = {
   collections: Pick<Collection, '_id' | 'title'>[];
   defaultValue?: CollectionId | null;
+  onValueChange?: (value: CollectionId | '') => void;
+  placeholder?: string;
+  value?: CollectionId | '';
 };
 
-export function CollectionSelectField({ collections, defaultValue }: CollectionSelectFieldProps) {
-  const items = [
-    { label: 'None', value: '' },
-    ...collections.map((collection) => ({
-      label: collection.title,
-      value: collection._id,
-    })),
-  ];
+export function CollectionSelectField({
+  collections,
+  defaultValue,
+  onValueChange,
+  placeholder,
+  value,
+}: CollectionSelectFieldProps) {
+  const items = collections.map((collection) => ({
+    label: collection.title,
+    value: collection._id,
+  }));
+
+  const allOption = placeholder ? { label: placeholder, value: '' } : null;
+  const allOptions = allOption ? [allOption, ...items] : items;
 
   return (
     <div>
       <Label htmlFor="collectionId">Collection</Label>
-      <Select defaultValue={defaultValue ?? undefined} items={items} name="collectionId">
+      <Select
+        defaultValue={defaultValue}
+        items={allOptions}
+        name="collectionId"
+        onValueChange={(v) => onValueChange?.(v as CollectionId)}
+        value={value}
+      >
         <SelectTrigger id="collectionId">
           <SelectValue />
         </SelectTrigger>
