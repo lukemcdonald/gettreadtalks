@@ -22,11 +22,11 @@ export function CollectionsSidebar({ speakers }: CollectionsSidebarProps) {
         <div className="space-y-2">
           <SearchInput paramName="search" placeholder="Search collections..." />
           <SelectFilter
+            name="speaker"
             options={speakers.map((speaker) => ({
               label: getSpeakerName(speaker),
               value: speaker.slug,
             }))}
-            paramName="speaker"
             placeholder="All Speakers"
           />
           <SortSelect

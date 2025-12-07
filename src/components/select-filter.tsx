@@ -13,44 +13,70 @@ import {
 } from '@/components/ui/select';
 import { cn } from '@/utils';
 
+const ALL_OPTION_VALUE = 'all';
+
 type FilterOption = {
   label: string;
-  value: string;
+  value: string | null;
 };
 
 type SelectFilterProps = {
   className?: string;
+  defaultValue?: string;
   label?: string;
+  name?: string;
   options: FilterOption[];
-  paramName?: string;
   placeholder?: string;
 };
 
 export function SelectFilter({
   className,
+  defaultValue,
   label,
+  name,
   options,
-  paramName,
-  placeholder = 'All',
+  placeholder,
 }: SelectFilterProps) {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
 
-  if (!paramName) {
-    throw new Error('SelectFilter requires a paramName prop');
+  if (!name) {
+    throw new Error('SelectFilter requires a name prop');
   }
 
-  const value = searchParams.get(paramName) ?? '';
+  const searchParamValue = searchParams.get(name);
 
-  const handleChange = (newValue: string) => {
+  // Only show "All" option if placeholder is provided
+  const allOption = placeholder ? { label: placeholder, value: ALL_OPTION_VALUE } : null;
+  const allOptions = allOption ? [allOption, ...options] : options;
+
+  const getInitialValue = (): string | null => {
+    // If search param exists and is valid, use it
+    if (searchParamValue) {
+      const isValidSearchParamValue = allOptions.some((opt) => opt.value === searchParamValue);
+      if (isValidSearchParamValue) {
+        return searchParamValue;
+      }
+    }
+
+    if (allOption) {
+      return ALL_OPTION_VALUE;
+    }
+
+    return defaultValue ?? null;
+  };
+
+  const initialValue = getInitialValue();
+
+  const handleChange = (newValue: string | null) => {
     const params = new URLSearchParams(searchParams.toString());
 
-    if (newValue && newValue !== 'all') {
-      params.set(paramName, newValue);
+    if (newValue && newValue !== ALL_OPTION_VALUE) {
+      params.set(name, newValue);
     } else {
-      params.delete(paramName);
+      params.delete(name);
     }
 
     params.delete('cursor');
@@ -61,17 +87,18 @@ export function SelectFilter({
     });
   };
 
-  // Add "All" option if not present
-  const allOptions: FilterOption[] = options.some((opt) => opt.value === 'all')
-    ? options
-    : [{ label: placeholder, value: 'all' }, ...options];
-
   return (
     <div className={cn('space-y-2', className)}>
-      {label && <Label htmlFor={paramName}>{label}</Label>}
+      {label && <Label htmlFor={name}>{label}</Label>}
 
-      <Select disabled={isPending} onValueChange={handleChange} value={value || 'all'}>
-        <SelectTrigger id={paramName}>
+      <Select
+        disabled={isPending}
+        items={allOptions}
+        name={name}
+        onValueChange={handleChange}
+        value={initialValue}
+      >
+        <SelectTrigger id={name}>
           <SelectValue />
         </SelectTrigger>
         <SelectPopup>

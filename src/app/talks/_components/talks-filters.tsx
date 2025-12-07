@@ -75,26 +75,21 @@ export function TalksFilters({
       {speakerOptions.length > 0 && (
         <SelectFilter
           label="Speaker"
+          name="speaker"
           options={speakerOptions}
-          paramName="speaker"
           placeholder="All Speakers"
         />
       )}
 
       {topicOptions.length > 0 && (
-        <SelectFilter
-          label="Topic"
-          options={topicOptions}
-          paramName="topic"
-          placeholder="All Topics"
-        />
+        <SelectFilter label="Topic" name="topic" options={topicOptions} placeholder="All Topics" />
       )}
 
       {isAdmin && (
         <SelectFilter
           label="Status"
+          name="status"
           options={statusOptions}
-          paramName="status"
           placeholder="All Statuses"
         />
       )}

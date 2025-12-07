@@ -21,22 +21,14 @@ export function SpeakersSidebar({ speakers }: SpeakersSidebarProps) {
       <PageHeader
         description="Listen to faithful ambassadors of Christ and be blessed."
         title="Speakers"
-        // variant="lg"
       />
       <SidebarContent>
         <SearchInput label="Search" paramName="search" placeholder="Search speakers..." />
         <SelectFilter
           label="Role"
+          name="role"
           options={roles.map((role) => ({ label: role, value: role }))}
-          paramName="role"
           placeholder="All Roles"
-        />
-        <SortSelect
-          label="Sort by"
-          options={[
-            { label: 'Alphabetical', value: 'alphabetical' },
-            { label: 'Featured First', value: 'featured' },
-          ]}
         />
       </SidebarContent>
     </>

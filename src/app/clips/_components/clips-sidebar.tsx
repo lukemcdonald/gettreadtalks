@@ -23,20 +23,20 @@ export function ClipsSidebar({ speakersWithClips, topics }: ClipsSidebarProps) {
       <SearchInput label="Search" paramName="search" placeholder="Search clips..." />
       <SelectFilter
         label="Speaker"
+        name="speaker"
         options={speakersWithClips.map((speaker) => ({
           label: getSpeakerName(speaker),
           value: speaker.slug,
         }))}
-        paramName="speaker"
         placeholder="All Speakers"
       />
       <SelectFilter
         label="Topic"
+        name="topic"
         options={topics.map(({ topic }) => ({
           label: topic.title,
           value: topic.slug,
         }))}
-        paramName="topic"
         placeholder="All Topics"
       />
       <SortSelect
