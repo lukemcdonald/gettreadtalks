@@ -4,24 +4,24 @@ import { CenteredLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { getCollections, getSpeakers, getTalkBySlug } from '@/features/talks';
 import { requireAdminUser } from '@/services/auth/server';
-import { TalkForm } from '../../new/_components/talk-form';
+import { TalkForm } from '../../../new/_components/talk-form';
 
 type EditTalkPageProps = {
-  params: Promise<{ talk: string }>;
+  params: Promise<{ speaker: string; talk: string }>;
 };
 
 export default async function EditTalkPage({ params }: EditTalkPageProps) {
-  const { talk: slug } = await params;
+  const { speaker: speakerSlug, talk: talkSlug } = await params;
 
-  await requireAdminUser(`/login?redirect=/talks/${slug}/edit`);
+  await requireAdminUser(`/login?redirect=/talks/${speakerSlug}/${talkSlug}/edit`);
 
-  const talkData = await getTalkBySlug(slug);
+  const talkData = await getTalkBySlug(speakerSlug, talkSlug);
 
   if (!talkData) {
     notFound();
   }
 
-  const { talk } = talkData;
+  const { talk, speaker } = talkData;
   const [collectionsResult, speakersResult] = await Promise.all([getCollections(), getSpeakers()]);
   const collections = collectionsResult.collections;
   const speakers = speakersResult.speakers;
@@ -42,6 +42,7 @@ export default async function EditTalkPage({ params }: EditTalkPageProps) {
             status: talk.status,
             title: talk.title,
           }}
+          speakerSlug={speaker?.slug}
           speakers={speakers}
           talkId={talk._id}
           talkSlug={talk.slug}

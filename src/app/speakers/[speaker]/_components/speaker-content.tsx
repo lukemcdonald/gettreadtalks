@@ -40,9 +40,12 @@ export function SpeakerContent({ clips, collections, speaker, talks }: SpeakerCo
                   key={talk._id}
                   speaker={{
                     firstName: speaker.firstName,
+                    imageUrl: speaker.imageUrl,
                     lastName: speaker.lastName,
+                    slug: speaker.slug,
                   }}
                   talk={{
+                    description: talk.description,
                     slug: talk.slug,
                     title: talk.title,
                   }}

@@ -2,7 +2,7 @@ import type { Id } from '../_generated/dataModel';
 import type { MutationCtx } from '../_generated/server';
 import type { IdMapping } from './idMap';
 
-import { ensureUniqueSlug } from './utils';
+import { generateSlug } from './utils';
 
 /**
  * Import speakers from Airtable records.
@@ -39,7 +39,7 @@ export async function importSpeakers(
       continue;
     }
 
-    const slug = await ensureUniqueSlug(ctx, 'speakers', `${fields.firstName} ${fields.lastName}`);
+    const slug = await generateSlug(ctx, 'speakers', `${fields.firstName} ${fields.lastName}`);
 
     const speakerId = await ctx.db.insert('speakers', {
       description: fields.description,

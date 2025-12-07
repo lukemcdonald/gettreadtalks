@@ -15,6 +15,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { slugify } from '@/convex/lib/utils';
 import { useArchiveTalk, useCreateTalk, useUpdateTalk } from '@/features/talks/hooks';
+import { getTalkUrl } from '@/features/talks/utils';
 import { CollectionSelectField } from './collection-select-field';
 import { SpeakerSelectField } from './speaker-select-field';
 import { StatusSelectField } from './status-select-field';
@@ -32,12 +33,20 @@ type TalkFormProps = {
     status?: StatusType;
     title: string;
   };
+  speakerSlug?: string;
   speakers: Pick<Speaker, '_id' | 'firstName' | 'lastName' | 'slug'>[];
   talkId?: TalkId;
   talkSlug?: string;
 };
 
-export function TalkForm({ collections, initialData, speakers, talkId, talkSlug }: TalkFormProps) {
+export function TalkForm({
+  collections,
+  initialData,
+  speakerSlug,
+  speakers,
+  talkId,
+  talkSlug,
+}: TalkFormProps) {
   const router = useRouter();
 
   const archiveTalk = useArchiveTalk();
@@ -77,17 +86,27 @@ export function TalkForm({ collections, initialData, speakers, talkId, talkSlug 
     };
 
     try {
+      // Find the speaker to get their slug
+      const selectedSpeaker = speakers.find((s) => s._id === speakerId);
+
+      if (!selectedSpeaker) {
+        setErrors({ speakerId: 'Speaker not found' });
+        return;
+      }
+
       if (talkId) {
         await updateTalk.mutateAsync({ ...data, id: talkId });
 
         const newSlug = slugify(title);
-        const slug = newSlug === slugify(initialData?.title) ? (talkSlug ?? newSlug) : newSlug;
-        router.push(`/talks/${slug}`);
+        const finalTalkSlug =
+          newSlug === slugify(initialData?.title) ? (talkSlug ?? newSlug) : newSlug;
+        const finalSpeakerSlug = speakerSlug ?? selectedSpeaker.slug;
+        router.push(getTalkUrl(finalSpeakerSlug, finalTalkSlug));
       } else {
         await createTalk.mutateAsync(data);
 
-        const slug = slugify(title);
-        router.push(`/talks/${slug}`);
+        const finalTalkSlug = slugify(title);
+        router.push(getTalkUrl(selectedSpeaker.slug, finalTalkSlug));
       }
     } catch (error) {
       console.error('Failed to save talk:', error);

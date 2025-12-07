@@ -2,7 +2,7 @@ import type { Id } from '../_generated/dataModel';
 import type { MutationCtx } from '../_generated/server';
 import type { IdMapping } from './idMap';
 
-import { ensureUniqueSlug } from './utils';
+import { generateSlug } from './utils';
 
 /**
  * Import collections (from Airtable Series) from Airtable records.
@@ -33,7 +33,7 @@ export async function importCollections(
       continue;
     }
 
-    const slug = await ensureUniqueSlug(ctx, 'collections', fields.title);
+    const slug = await generateSlug(ctx, 'collections', fields.title);
 
     const collectionId = await ctx.db.insert('collections', {
       description: undefined,

@@ -1,3 +1,4 @@
+import type { Id } from '../_generated/dataModel';
 import type { MutationCtx, QueryCtx } from '../_generated/server';
 
 import { getOneFrom } from 'convex-helpers/server/relationships';
@@ -49,4 +50,86 @@ export async function slugExists(
   }
 
   return true;
+}
+
+/**
+ * Check if a talk slug already exists for a specific speaker.
+ * This allows multiple speakers to have talks with the same slug.
+ *
+ * @param ctx - Database context (QueryCtx or MutationCtx)
+ * @param speakerId - Speaker ID to check within
+ * @param slug - Talk slug to check
+ * @param excludeId - Optional talk ID to exclude from check (for updates)
+ * @returns True if slug exists for this speaker, false otherwise
+ */
+export async function talkSlugExistsForSpeaker(
+  ctx: QueryCtx | MutationCtx,
+  speakerId: Id<'speakers'>,
+  slug: string,
+  excludeId?: Id<'talks'>,
+) {
+  const speakerTalks = await ctx.db
+    .query('talks')
+    .withIndex('by_speakerId_and_status', (q) => q.eq('speakerId', speakerId))
+    .collect();
+
+  const existing = speakerTalks.find((talk) => {
+    if (talk.slug !== slug) {
+      return false;
+    }
+
+    // If we're updating a talk, exclude the current talk from the check
+    if (excludeId && talk._id === excludeId) {
+      return false;
+    }
+
+    return true;
+  });
+
+  return existing !== undefined;
+}
+
+/**
+ * Generate a unique slug for a table, appending numeric suffix if needed.
+ *
+ * @param ctx - Database context (QueryCtx or MutationCtx)
+ * @param table - Table name with 'by_slug' index
+ * @param baseText - Text to generate slug from
+ * @param excludeId - Optional ID to exclude from check (for updates)
+ * @returns Unique slug string
+ */
+export async function generateSlug(
+  ctx: QueryCtx | MutationCtx,
+  table: SlugTable,
+  baseText: string,
+  excludeId?: string,
+) {
+  const baseSlug = slugify(baseText);
+  const baseSlugExists = await slugExists(ctx, table, baseSlug, excludeId);
+
+  if (!baseSlugExists) {
+    return baseSlug;
+  }
+
+  let counter = 2;
+  let candidateSlug = `${baseSlug}-${counter}`;
+
+  // Try with numeric suffix
+  while (await slugExists(ctx, table, candidateSlug, excludeId)) {
+    counter += 1;
+    candidateSlug = `${baseSlug}-${counter}`;
+  }
+
+  return candidateSlug;
+}
+
+/**
+ * Extract value from a Promise.allSettled result with a fallback.
+ *
+ * @param result - PromiseSettledResult from Promise.allSettled
+ * @param fallback - Value to return if promise was rejected
+ * @returns The fulfilled value or the fallback
+ */
+export function getSettledValue<T, F = T>(result: PromiseSettledResult<T>, fallback: F): T | F {
+  return result.status === 'fulfilled' ? result.value : fallback;
 }

@@ -4,8 +4,8 @@ import { v } from 'convex/values';
 import { getOneFrom } from 'convex-helpers/server/relationships';
 
 import { mutation } from '../../_generated/server';
-import { throwDuplicateSlug, throwNotFound, throwValidationError } from '../../lib/errors';
-import { slugExists, slugify } from '../../lib/utils';
+import { throwNotFound, throwValidationError } from '../../lib/errors';
+import { generateSlug } from '../../lib/utils';
 import { requireAuth } from '../auth/utils';
 
 /**
@@ -29,11 +29,7 @@ export const createCollection = mutation({
       throwValidationError('Title cannot be empty', 'title');
     }
 
-    const slug = slugify(args.title);
-
-    if (await slugExists(ctx, 'collections', slug)) {
-      throwDuplicateSlug('Collection with this title already exists', 'title');
-    }
+    const slug = await generateSlug(ctx, 'collections', args.title);
 
     return await ctx.db.insert('collections', {
       ...args,
@@ -115,13 +111,9 @@ export const updateCollection = mutation({
         throwValidationError('Title cannot be empty', 'title');
       }
 
-      const newSlug = slugify(updates.title);
+      const newSlug = await generateSlug(ctx, 'collections', updates.title, id);
 
       if (newSlug !== collection.slug) {
-        if (await slugExists(ctx, 'collections', newSlug, id)) {
-          throwDuplicateSlug('Collection with this title already exists', 'title');
-        }
-
         updates.slug = newSlug;
       }
     }

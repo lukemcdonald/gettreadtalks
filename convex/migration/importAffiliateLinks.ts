@@ -1,7 +1,7 @@
 import type { Id } from '../_generated/dataModel';
 import type { MutationCtx } from '../_generated/server';
 
-import { ensureUniqueSlug } from './utils';
+import { generateSlug } from './utils';
 
 /**
  * Import affiliate links from Airtable records.
@@ -43,7 +43,7 @@ export async function importAffiliateLinks(
       continue;
     }
 
-    const slug = await ensureUniqueSlug(ctx, 'affiliateLinks', fields.title);
+    const slug = await generateSlug(ctx, 'affiliateLinks', fields.title);
 
     const affiliateLinkId = await ctx.db.insert('affiliateLinks', {
       affiliate: fields.affiliate,

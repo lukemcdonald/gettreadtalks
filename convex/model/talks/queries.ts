@@ -7,6 +7,7 @@ import { asyncMap } from 'convex-helpers';
 import { getManyFrom, getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
 
 import { query } from '../../_generated/server';
+import { getSettledValue } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
 import { getCurrentUser } from '../auth/utils';
@@ -37,20 +38,35 @@ export const getTalk = query({
 });
 
 /**
- * Get talk by slug with related data (default for detail pages).
+ * Get talk by speaker slug and talk slug with related data (default for detail pages).
  * Returns talk with speaker, collection, clips, and topics.
  *
  * @param ctx - Database context
- * @param args - Query arguments
+ * @param args - Query arguments with speakerSlug and talkSlug
  * @returns Talk with speaker, collection, clips, and topics data
  */
 export const getTalkBySlug = query({
   args: {
-    slug: v.string(),
+    speakerSlug: v.string(),
+    talkSlug: v.string(),
   },
   handler: async (ctx, args) => {
     const user = await getCurrentUser(ctx);
-    const talk = await getOneFrom(ctx.db, 'talks', 'by_slug', args.slug);
+
+    // First, get the speaker by slug
+    const speaker = await getOneFrom(ctx.db, 'speakers', 'by_slug', args.speakerSlug);
+
+    if (!speaker) {
+      return null;
+    }
+
+    // Then, find the talk with the given slug for this speaker
+    const talks = await ctx.db
+      .query('talks')
+      .withIndex('by_speakerId_and_status', (q) => q.eq('speakerId', speaker._id))
+      .collect();
+
+    const talk = talks.find((t) => t.slug === args.talkSlug);
 
     if (!talk) {
       return null;
@@ -69,14 +85,12 @@ export const getTalkBySlug = query({
         )
         .collect(),
       collection: talk.collectionId ? ctx.db.get(talk.collectionId) : null,
-      speaker: talk.speakerId ? ctx.db.get(talk.speakerId) : null,
       topics: getManyVia(ctx.db, 'talksOnTopics', 'topicId', 'by_talkId', talk._id, 'talkId'),
     };
 
-    const [clips, collection, speaker, topics] = await Promise.all([
+    const [clips, collection, topics] = await Promise.all([
       queries.clips,
       queries.collection,
-      queries.speaker,
       queries.topics,
     ]);
 
