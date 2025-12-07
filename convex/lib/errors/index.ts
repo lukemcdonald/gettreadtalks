@@ -35,17 +35,17 @@ export function createConvexError(message: string, data?: ErrorData): ConvexErro
  * }
  */
 export function throwConvexError(
-  status: HttpStatusCode,
+  statusCode: HttpStatusCode,
   message: string,
   data?: Omit<ErrorData, 'errorCode' | 'statusCode' | 'level'>,
 ): never {
-  const errorCode = STATUS_TO_ERROR_CODE[status];
-  const level = STATUS_TO_LEVEL[status];
+  const errorCode = STATUS_TO_ERROR_CODE[statusCode];
+  const level = STATUS_TO_LEVEL[statusCode];
 
   throw createConvexError(message, {
     errorCode,
     level,
-    statusCode: status,
+    statusCode,
     ...data,
   });
 }
@@ -56,8 +56,8 @@ export function throwConvexError(
  * @example
  * if (!userId) throwAuthRequired();
  */
-export function throwAuthRequired(message = 'Authentication required'): never {
-  throwConvexError(401, message);
+export function throwAuthRequired(message?: string): never {
+  throwConvexError(401, message ?? 'Authentication required');
 }
 
 /**
@@ -68,8 +68,8 @@ export function throwAuthRequired(message = 'Authentication required'): never {
  *   throwForbidden('You do not have permission to edit this resource');
  * }
  */
-export function throwForbidden(message = 'Forbidden'): never {
-  throwConvexError(403, message);
+export function throwForbidden(message?: string): never {
+  throwConvexError(403, message ?? 'Forbidden');
 }
 
 /**
@@ -82,10 +82,10 @@ export function throwForbidden(message = 'Forbidden'): never {
  * }
  */
 export function throwNotFound(
-  message = 'Resource not found',
+  message?: string,
   data?: Pick<ErrorData, 'resource' | 'resourceId'>,
 ): never {
-  throwConvexError(404, message, data);
+  throwConvexError(404, message ?? 'Resource not found', data);
 }
 
 /**
@@ -96,8 +96,8 @@ export function throwNotFound(
  *   throwDuplicateSlug('Topic with this title already exists', 'title');
  * }
  */
-export function throwDuplicateSlug(message = 'Resource already exists', field?: string): never {
-  throwConvexError(409, message, { field });
+export function throwDuplicateSlug(message?: string, field?: string): never {
+  throwConvexError(409, message ?? 'Resource already exists', { field });
 }
 
 /**
