@@ -14,25 +14,42 @@ function Field({ className, ...props }: FieldPrimitive.Root.Props) {
   );
 }
 
-function FieldLabel({ className, ...props }: FieldPrimitive.Label.Props) {
+type FieldLabelProps = FieldPrimitive.Label.Props & {
+  /**
+   * When true, automatically displays a red asterisk (*) to indicate the field is required.
+   */
+  required?: boolean;
+};
+
+function FieldLabel({ className, required, children, ...props }: FieldLabelProps) {
   return (
     <FieldPrimitive.Label
       className={cn('inline-flex items-center gap-2 text-sm/4', className)}
       data-slot="field-label"
       {...props}
-    />
+    >
+      {children}
+      {required && <span className="text-destructive">*</span>}
+    </FieldPrimitive.Label>
   );
 }
 
 function FieldControl({
   className,
+  error,
   size = 'default',
   ...props
 }: Omit<FieldPrimitive.Control.Props, 'size'> & {
+  error?: { message?: string } | boolean;
   size?: 'sm' | 'default' | 'lg' | number;
 }) {
+  const hasError = Boolean(error);
+  const ariaInvalid = hasError ? 'true' : undefined;
+
   if (props.render) {
-    return <FieldPrimitive.Control data-slot="field-control" {...props} />;
+    return (
+      <FieldPrimitive.Control aria-invalid={ariaInvalid} data-slot="field-control" {...props} />
+    );
   }
 
   return (
@@ -44,6 +61,7 @@ function FieldControl({
       data-slot="field-control"
     >
       <FieldPrimitive.Control
+        aria-invalid={props['aria-invalid'] ?? ariaInvalid}
         className={cn(
           'w-full min-w-0 rounded-[inherit] px-[calc(--spacing(3)-1px)] py-[calc(--spacing(1.5)-1px)] outline-none placeholder:text-muted-foreground/64',
           size === 'sm' && 'px-[calc(--spacing(2.5)-1px)] py-[calc(--spacing(1)-1px)]',

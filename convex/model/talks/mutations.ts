@@ -105,6 +105,7 @@ export const updateTalk = mutation({
     status: v.optional(statusType),
     title: v.optional(v.string()),
   },
+  // biome-ignore lint/complexity: its fine
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
