@@ -1,6 +1,7 @@
 import { v } from 'convex/values';
 
 import { query } from '../../_generated/server';
+import { getSettledValue } from '../../lib/utils';
 import { getCurrentUser as getAuthUser } from '../auth/utils';
 import { getUserFavoriteClips, getUserFavoriteSpeakers, getUserFavoriteTalks } from './utils';
 
@@ -155,11 +156,15 @@ export const listUserFavorites = query({
     const userId = user._id;
     const limit = args.limit ?? 100;
 
-    const [clips, speakers, talks] = await Promise.all([
+    const [clipsResult, speakersResult, talksResult] = await Promise.allSettled([
       getUserFavoriteClips(ctx, userId, limit),
       getUserFavoriteSpeakers(ctx, userId, limit),
       getUserFavoriteTalks(ctx, userId, limit),
     ]);
+
+    const clips = getSettledValue(clipsResult, []);
+    const speakers = getSettledValue(speakersResult, []);
+    const talks = getSettledValue(talksResult, []);
 
     return {
       clips,
