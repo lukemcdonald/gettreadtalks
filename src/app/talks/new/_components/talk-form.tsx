@@ -21,9 +21,10 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { slugify } from '@/convex/lib/utils';
 import { createTalkAction, updateTalkAction } from '@/features/talks/actions';
-import { useArchiveTalk, useUpdateTalk } from '@/features/talks/hooks';
+import { useArchiveTalk, useDestroyTalk, useUpdateTalk } from '@/features/talks/hooks';
 import { talkFormSchema } from '@/features/talks/schemas/talk-form';
 import { getTalkUrl } from '@/features/talks/utils';
+import { useFormStatus } from '@/lib/forms/hooks';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
 import { CollectionSelectField } from './collection-select-field';
 import { SpeakerSelectField } from './speaker-select-field';
@@ -58,9 +59,19 @@ export function TalkForm({
 }: TalkFormProps) {
   const router = useRouter();
   const archiveTalk = useArchiveTalk();
+  const destroyTalk = useDestroyTalk();
   const updateTalk = useUpdateTalk();
 
-  const [isDeleting, setIsDeleting] = useState(false);
+  const {
+    isArchiving,
+    isBusy: isFormBusy,
+    isCreating,
+    isDeleting,
+    isUnarchiving,
+    isUpdating,
+    setStatus: setFormStatus,
+    status: formStatus,
+  } = useFormStatus();
   const [status, setStatus] = useState<StatusType>(initialData?.status || 'backlog');
   const [isPending, startTransition] = useTransition();
 
@@ -83,20 +94,22 @@ export function TalkForm({
     },
   });
 
-  const onSubmit: SubmitHandler<TalkFormData> = (values) => {
+  const handleSubmitSuccess: SubmitHandler<TalkFormData> = (values) => {
     // biome-ignore lint/complexity: its fine
     startTransition(async () => {
+      setFormStatus(talkId ? 'updating' : 'creating');
+
       const result = talkId
         ? await updateTalkAction(values, talkId)
         : await createTalkAction(values);
 
       // Handle errors early and return
       if (!result.success) {
+        setFormStatus('idle');
         setServerErrors(form.setError, result.errors);
         return;
       }
 
-      // Handle successful submission
       const selectedSpeaker = speakers.find((s) => s._id === values.speakerId);
 
       if (!selectedSpeaker) {
@@ -121,14 +134,13 @@ export function TalkForm({
         ? (speakerSlug ?? selectedSpeaker.slug)
         : selectedSpeaker.slug;
 
-      // Redirect to talk page
+      setFormStatus('idle');
       router.push(getTalkUrl(finalSpeakerSlug, finalTalkSlug));
     });
   };
 
-  const onError: SubmitErrorHandler<TalkFormData> = () => {
-    // Validation failed - errors are automatically set in form.formState.errors
-    // and displayed via FieldMessage component
+  const handleSubmitError: SubmitErrorHandler<TalkFormData> = () => {
+    // TODO: Add eventing
   };
 
   const handleArchiveToggle = async () => {
@@ -137,7 +149,6 @@ export function TalkForm({
     }
 
     const isArchived = status === 'archived';
-    const action = isArchived ? 'unarchive' : 'archive';
     const confirmMessage = isArchived
       ? 'Are you sure you want to unarchive this talk?'
       : 'Are you sure you want to archive this talk?';
@@ -147,7 +158,7 @@ export function TalkForm({
       return;
     }
 
-    setIsDeleting(true);
+    setFormStatus(isArchived ? 'unarchiving' : 'archiving');
 
     try {
       if (isArchived) {
@@ -159,16 +170,39 @@ export function TalkForm({
       }
       router.push('/talks');
     } catch (error) {
-      console.error(`Failed to ${action} talk:`, error);
-      setIsDeleting(false);
+      setFormStatus('idle');
     }
   };
 
-  const isLoading = isPending || updateTalk.isLoading;
+  const handleDestroy = async () => {
+    if (!talkId) {
+      return;
+    }
+
+    // biome-ignore lint/suspicious/noAlert: confirm dialog
+    if (!window.confirm('Are you sure you want to permanently delete this talk?')) {
+      return;
+    }
+
+    setFormStatus('deleting');
+
+    try {
+      await destroyTalk.mutateAsync({ id: talkId });
+      // Navigation happens in onSuccess callback
+    } catch (error) {
+      setFormStatus('idle');
+    }
+  };
+
+  const isBusy = isFormBusy || isPending;
 
   const getSubmitButtonText = () => {
-    if (isLoading) {
-      return 'Saving...';
+    if (isCreating) {
+      return 'Creating...';
+    }
+
+    if (isUpdating) {
+      return 'Updating...';
     }
 
     if (talkId) {
@@ -179,15 +213,23 @@ export function TalkForm({
   };
 
   const getArchiveButtonText = () => {
-    if (isDeleting) {
-      return status === 'archived' ? 'Unarchiving...' : 'Archiving...';
+    if (isArchiving) {
+      return 'Archiving...';
+    }
+
+    if (isUnarchiving) {
+      return 'Unarchiving...';
     }
 
     return status === 'archived' ? 'Unarchive Talk' : 'Archive Talk';
   };
 
   return (
-    <Form className="space-y-6" form={form} onSubmit={form.handleSubmit(onSubmit, onError)}>
+    <Form
+      className="space-y-6"
+      form={form}
+      onSubmit={form.handleSubmit(handleSubmitSuccess, handleSubmitError)}
+    >
       <FormMessage error={form.formState.errors.root} />
 
       <div className="space-y-4">
@@ -314,19 +356,24 @@ export function TalkForm({
       </div>
 
       <div className="flex items-center gap-4">
-        <Button disabled={isLoading} type="submit">
+        <Button disabled={isBusy} type="submit">
           {getSubmitButtonText()}
         </Button>
 
         {talkId && (
-          <Button
-            disabled={isDeleting || isLoading}
-            onClick={handleArchiveToggle}
-            type="button"
-            variant={status === 'archived' ? 'outline' : 'destructive'}
-          >
-            {getArchiveButtonText()}
-          </Button>
+          <>
+            <Button
+              disabled={isBusy}
+              onClick={handleArchiveToggle}
+              type="button"
+              variant={status === 'archived' ? 'outline' : 'destructive'}
+            >
+              {getArchiveButtonText()}
+            </Button>
+            <Button disabled={isBusy} onClick={handleDestroy} type="button" variant="destructive">
+              {isDeleting ? 'Deleting...' : 'Delete Talk'}
+            </Button>
+          </>
         )}
       </div>
     </Form>
