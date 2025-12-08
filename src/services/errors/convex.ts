@@ -120,9 +120,6 @@ export function isErrorCode(error: unknown, code: ErrorCode): boolean {
 
 /**
  * Formats error details for display or logging.
- *
- * @example
- * console.error(formatErrorDetails(error));
  */
 export function formatErrorDetails(error: unknown): string {
   const data = getConvexErrorData(error);

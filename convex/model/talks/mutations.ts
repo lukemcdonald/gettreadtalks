@@ -1,6 +1,7 @@
 import type { Doc } from '../../_generated/dataModel';
 
 import { v } from 'convex/values';
+import { getManyFrom } from 'convex-helpers/server/relationships';
 
 import { mutation } from '../../_generated/server';
 import { throwDuplicateSlug, throwNotFound, throwValidationError } from '../../lib/errors';
@@ -195,4 +196,63 @@ export const updateTalkStatus = mutation({
     return args.id;
   },
   returns: v.id('talks'),
+});
+
+/**
+ * Destroy a talk (permanently delete from database with cleanup of related records).
+ *
+ * @param ctx - Database context
+ * @param args - Destroy arguments
+ * @returns null
+ */
+export const destroyTalk = mutation({
+  args: {
+    id: v.id('talks'),
+  },
+  handler: async (ctx, args) => {
+    await requireAuth(ctx);
+
+    const talk = await ctx.db.get(args.id);
+
+    if (!talk) {
+      throwNotFound('Talk not found', { resource: 'talk', resourceId: args.id });
+    }
+
+    // Delete talk-topic relationships
+    const talksOnTopics = await ctx.db
+      .query('talksOnTopics')
+      .withIndex('by_talkId', (q) => q.eq('talkId', args.id))
+      .collect();
+
+    for (const relation of talksOnTopics) {
+      await ctx.db.delete(relation._id);
+    }
+
+    // Delete user favorites for this talk
+    // Note: userFavoriteTalks only has by_userId_and_talkId index, so we query all and filter
+    const allFavorites = await ctx.db.query('userFavoriteTalks').collect();
+    const favorites = allFavorites.filter((f) => f.talkId === args.id);
+
+    for (const favorite of favorites) {
+      await ctx.db.delete(favorite._id);
+    }
+
+    // Delete user finished records for this talk
+    // Note: userFinishedTalks only has by_userId_and_talkId index, so we query all and filter
+    const allFinished = await ctx.db.query('userFinishedTalks').collect();
+    const finished = allFinished.filter((f) => f.talkId === args.id);
+
+    for (const record of finished) {
+      await ctx.db.delete(record._id);
+    }
+
+    // Note: Clips have optional talkId, so we don't need to delete them
+    // They can remain without a talk reference
+
+    // Hard delete the talk
+    await ctx.db.delete(args.id);
+
+    return null;
+  },
+  returns: v.null(),
 });
