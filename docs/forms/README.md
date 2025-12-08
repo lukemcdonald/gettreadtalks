@@ -23,17 +23,17 @@ if (!result.success) {
 ### Displaying Form-Level Errors
 
 ```typescript
-import { FormError } from '@/components/ui/form-error';
+import { FormMessage } from '@/components/ui/form-message';
 
-<FormError error={form.formState.errors.root} />
+<FormMessage error={form.formState.errors.root} />
 ```
 
 ### Displaying Field-Level Errors
 
 ```typescript
-{fieldState.error && (
-  <FieldError>{fieldState.error.message}</FieldError>
-)}
+import { FieldMessage } from '@/components/ui/field-message';
+
+<FieldMessage error={fieldState.error} />
 ```
 
 ## Utilities
@@ -41,6 +41,32 @@ import { FormError } from '@/components/ui/form-error';
 - `setServerErrors()` - Sets server errors in React Hook Form (field + form-level)
 - `mapZodErrors()` - Maps Zod validation errors to form errors
 - `mapConvexErrorToFormErrors()` - Maps Convex errors to form errors
+
+## Component Features
+
+### Form Component
+- Automatically wraps children with `FormProvider` when `form` prop is provided
+- Sets `noValidate={true}` by default to prevent HTML5 validation (React Hook Form handles all validation)
+- Usage: `<Form form={form} onSubmit={form.handleSubmit(onSubmit)}>`
+
+### FieldLabel Component
+- Automatically displays a red asterisk (`*`) when `required={true}` is passed
+- Usage: `<FieldLabel required>Title</FieldLabel>`
+
+### FieldControl Component
+- Automatically sets `aria-invalid="true"` when `error` prop is provided
+- Usage: `<FieldControl error={fieldState.error} {...field} />`
+
+### FieldMessage Component
+- Displays field-level validation errors
+- Automatically handles null/undefined (returns null if no error)
+- Usage: `<FieldMessage error={fieldState.error} />`
+
+### FormMessage Component
+- Displays form-level (non-field) errors
+- Automatically handles null/undefined (returns null if no error)
+- Can accept either `error` prop (from `form.formState.errors.root`) or `message` prop
+- Usage: `<FormMessage error={form.formState.errors.root} />`
 
 ## References
 

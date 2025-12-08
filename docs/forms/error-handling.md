@@ -56,36 +56,34 @@ const handleSubmit = async (values: FormData) => {
 ## Displaying Errors
 
 ### Field-Level Errors
-Field errors are automatically displayed via `fieldState.error`:
+Field errors are automatically displayed via `fieldState.error`. Use the `FieldMessage` component:
 
 ```typescript
+import { FieldMessage } from '@/components/ui/field-message';
+
 <Controller
   control={form.control}
   name="title"
   render={({ field, fieldState }) => (
     <Field>
-      <FieldLabel>Title</FieldLabel>
-      <FieldControl>
-        <Input {...field} />
-      </FieldControl>
-      {fieldState.error && (
-        <FieldError>{fieldState.error.message}</FieldError>
-      )}
+      <FieldLabel required>Title</FieldLabel>
+      <FieldControl error={fieldState.error} {...field} />
+      <FieldMessage error={fieldState.error} />
     </Field>
   )}
 />
 ```
 
 ### Form-Level Errors
-Form-level errors are stored in React Hook Form's `root` error. Use the `FormError` component to display them:
+Form-level errors are stored in React Hook Form's `root` error. Use the `FormMessage` component to display them:
 
 ```typescript
-import { FormError } from '@/components/ui/form-error';
+import { FormMessage } from '@/components/ui/form-message';
 
-<FormError error={form.formState.errors.root} />
+<FormMessage error={form.formState.errors.root} />
 ```
 
-The `FormError` component:
+The `FormMessage` component:
 - Automatically handles null/undefined errors (returns null if no error)
 - Provides consistent styling across all forms
 - Includes proper accessibility attributes (`role="alert"`)
@@ -119,7 +117,12 @@ import { setServerErrors } from '@/lib/forms/react-hook-form';
 import { createItemAction } from '@/features/items/actions';
 import { itemSchema } from '@/features/items/schemas/item-form';
 
-import { FormError } from '@/components/ui/form-error';
+import { Form } from '@/components/ui/form';
+import { FormMessage } from '@/components/ui/form-message';
+import { Field, FieldLabel, FieldControl } from '@/components/ui/field';
+import { FieldMessage } from '@/components/ui/field-message';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 export function ItemForm() {
   const [isPending, startTransition] = useTransition();
@@ -145,9 +148,9 @@ export function ItemForm() {
   };
 
   return (
-    <form onSubmit={form.handleSubmit(handleSubmit)}>
+    <Form form={form} onSubmit={form.handleSubmit(handleSubmit)}>
       {/* Form-level error */}
-      <FormError error={form.formState.errors.root} />
+      <FormMessage error={form.formState.errors.root} />
       
       {/* Field with error display */}
       <Controller
@@ -155,13 +158,9 @@ export function ItemForm() {
         name="title"
         render={({ field, fieldState }) => (
           <Field>
-            <FieldLabel>Title</FieldLabel>
-            <FieldControl>
-              <Input {...field} />
-            </FieldControl>
-            {fieldState.error && (
-              <FieldError>{fieldState.error.message}</FieldError>
-            )}
+            <FieldLabel required>Title</FieldLabel>
+            <FieldControl error={fieldState.error} {...field} />
+            <FieldMessage error={fieldState.error} />
           </Field>
         )}
       />
@@ -169,7 +168,7 @@ export function ItemForm() {
       <Button type="submit" disabled={isPending}>
         Submit
       </Button>
-    </form>
+    </Form>
   );
 }
 ```

@@ -14,6 +14,7 @@ export const listTalksWithSpeakers = queries.listTalksWithSpeakers;
 
 // Mutations
 export const archiveTalk = mutations.archiveTalk;
+export const destroyTalk = mutations.destroyTalk;
 export const createTalk = mutations.createTalk;
 export const updateTalk = mutations.updateTalk;
 export const updateTalkStatus = mutations.updateTalkStatus;
