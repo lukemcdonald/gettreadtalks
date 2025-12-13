@@ -2,8 +2,8 @@ import type { NextConfig } from 'next';
 
 import { withSentryConfig } from '@sentry/nextjs';
 
-import { IS_SENTRY_ENABLED } from './src/configs/sentry';
 import { IS_PROD } from '@/constants/env';
+import { IS_SENTRY_ENABLED } from './src/configs/sentry';
 
 const cspHeader = `
   base-uri 'self';
@@ -32,19 +32,17 @@ const nextConfig = {
     ],
   },
   typedRoutes: false,
-  headers: async () => {
-    return [
-      {
-        headers: [
-          {
-            key: 'Content-Security-Policy',
-            value: cspHeader.replace(/\n/g, ''),
-          },
-        ],
-        source: '/(.*)',
-      },
-    ];
-  },
+  headers: async () => [
+    {
+      headers: [
+        {
+          key: 'Content-Security-Policy',
+          value: cspHeader.replace(/\n/g, ''),
+        },
+      ],
+      source: '/(.*)',
+    },
+  ],
 } satisfies NextConfig;
 
 // Wrap with Sentry configuration if Sentry is enabled
@@ -72,13 +70,10 @@ const config = IS_SENTRY_ENABLED
       // See: https://docs.sentry.io/platforms/javascript/guides/nextjs/sourcemaps/
       sourcemaps: {
         disable: false, // Source maps are enabled by default
-        assets: [
-          "**/*.js",
-          "**/*.js.map",
-        ],
+        assets: ['**/*.js', '**/*.js.map'],
         ignore: [
-          "**/node_modules/**",
-          "**/.next/static/chunks/**", // Exclude Next.js chunks
+          '**/node_modules/**',
+          '**/.next/static/chunks/**', // Exclude Next.js chunks
         ],
         deleteSourcemapsAfterUpload: true, // Security: delete after upload
       },
@@ -86,7 +81,7 @@ const config = IS_SENTRY_ENABLED
       // Application key for third-party error filtering
       // This marks your application code so it can be distinguished from third-party code
       unstable_sentryWebpackPluginOptions: {
-        applicationKey: "gettreadtalks-app",
+        applicationKey: 'gettreadtalks-app',
       },
     })
   : nextConfig;

@@ -32,7 +32,7 @@ export default async function RootLayout({
 }>) {
   return (
     <html className={cn('h-full', inter.variable)} lang="en" suppressHydrationWarning>
-      <body className={'flex min-h-full flex-col bg-background bg-cover'}>
+      <body className={'flex min-h-full flex-col bg-background bg-cover text-foreground'}>
         <ErrorBoundary>
           <ThemeProvider>
             <AuthProvider>

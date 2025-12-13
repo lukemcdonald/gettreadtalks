@@ -44,4 +44,3 @@ export function getArchiveButtonLabel(status: FormStatus, talkStatus: StatusType
 
   return talkStatus === 'archived' ? 'Unarchive Talk' : 'Archive Talk';
 }
-
