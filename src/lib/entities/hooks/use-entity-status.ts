@@ -63,4 +63,3 @@ export function useEntityStatus(initialStatus: StatusType = 'backlog'): UseEntit
     status,
   };
 }
-
