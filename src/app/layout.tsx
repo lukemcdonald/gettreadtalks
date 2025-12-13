@@ -15,10 +15,7 @@ import { Suspense } from 'react';
 import { SkipNavLink } from '@/components/site-header/navigation/skip-nav-link';
 import { cn } from '@/utils';
 
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-});
+const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
 export const metadata: Metadata = {
   description: 'Faith-based talks and content platform',
@@ -34,8 +31,8 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html className="h-full" lang="en" suppressHydrationWarning>
-      <body className={cn(inter.className, 'flex min-h-full flex-col bg-background bg-cover')}>
+    <html className={cn('h-full', inter.variable)} lang="en" suppressHydrationWarning>
+      <body className={'flex min-h-full flex-col bg-background bg-cover'}>
         <ErrorBoundary>
           <ThemeProvider>
             <AuthProvider>
