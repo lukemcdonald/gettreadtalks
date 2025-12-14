@@ -3,14 +3,14 @@
 import { useState } from 'react';
 import { LoaderCircleIcon, X as RemoveIcon } from 'lucide-react';
 
-import { GroupItem } from '@/components/ui/group';
 import {
+  GroupItem,
   Select,
   SelectItem,
   SelectPopup,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/components/ui';
 import { cn } from '@/utils';
 
 type FilterOption = {

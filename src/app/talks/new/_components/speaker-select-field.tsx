@@ -1,15 +1,16 @@
 import type { FieldError } from 'react-hook-form';
 import type { Speaker, SpeakerId } from '@/features/speakers/types';
 
-import { Field, FieldLabel } from '@/components/ui/field';
-import { FieldMessage } from '@/components/ui/field-message';
 import {
+  Field,
+  type FieldError,
+  FieldLabel,
   Select,
   SelectItem,
   SelectPopup,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/components/ui';
 import { getSpeakerName } from '@/features/speakers';
 
 type SpeakerSelectFieldProps = {
@@ -56,7 +57,7 @@ export function SpeakerSelectField({
           ))}
         </SelectPopup>
       </Select>
-      <FieldMessage error={error} />
+      <FieldError errors={error ? [error] : undefined} />
     </Field>
   );
 }

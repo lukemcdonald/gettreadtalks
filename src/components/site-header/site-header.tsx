@@ -5,7 +5,7 @@ import { PrimaryNav } from '@/components/site-header/navigation/primary-nav';
 import { SecondaryNav } from '@/components/site-header/navigation/secondary-nav';
 import { SiteBranding } from '@/components/site-header/site-branding';
 import { SiteNavigation } from '@/components/site-header/site-navigation';
-import { Separator } from '@/components/ui/separator';
+import { Separator } from '@/components/ui';
 import { getCurrentUser } from '@/services/auth/server';
 
 export async function SiteHeader() {

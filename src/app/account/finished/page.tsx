@@ -1,4 +1,4 @@
-import { Card, CardHeader } from '@/components/ui/card';
+import { Card, CardHeader } from '@/components/ui';
 
 export default function FinishedPage() {
   return (

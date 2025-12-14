@@ -7,7 +7,7 @@ import { ClipCard } from '@/components/clip-card';
 import { CollectionCard } from '@/components/collection-card';
 import { GridList } from '@/components/grid-list';
 import { TalkCard } from '@/components/talk-card';
-import { Separator } from '@/components/ui/separator';
+import { Separator } from '@/components/ui';
 import { getSpeakerName } from '@/features/speakers';
 
 type SpeakerContentProps = {

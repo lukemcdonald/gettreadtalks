@@ -3,14 +3,14 @@
 import { useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 
-import { Label } from '@/components/ui/label';
 import {
+  Label,
   Select,
   SelectPopup as SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/components/ui';
 import { cn } from '@/utils';
 
 type Topic = {

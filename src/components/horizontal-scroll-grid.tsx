@@ -4,7 +4,7 @@ import { useRef } from 'react';
 
 import { Container } from '@/components/container';
 import { Section } from '@/components/section';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui';
 
 type HorizontalScrollGridProps = {
   children: React.ReactNode;

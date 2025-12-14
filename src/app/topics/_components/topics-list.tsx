@@ -7,7 +7,7 @@ import { useSearchParams } from 'next/navigation';
 
 import { GridList } from '@/components/grid-list';
 import { TopicCard } from '@/components/topic-card';
-import { Empty, EmptyDescription } from '@/components/ui/empty';
+import { Empty, EmptyDescription } from '@/components/ui';
 
 type TopicWithCount = {
   count: number;

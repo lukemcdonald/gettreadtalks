@@ -1,5 +1,5 @@
 import { LoginForm } from '@/app/login/_components/login-form';
-import { Card } from '@/components/ui/card';
+import { Card } from '@/components/ui';
 
 export function LoginContent() {
   return (

@@ -5,8 +5,7 @@ import type { ComponentType } from 'react';
 
 import Link from 'next/link';
 
-import { Button } from '@/components/ui/button';
-import { MenuItem } from '@/components/ui/menu';
+import { Button, MenuItem } from '@/components/ui';
 
 type AccountMenuItemProps = {
   href?: string;

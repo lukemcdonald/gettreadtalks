@@ -7,14 +7,18 @@ import type { TalkId } from '@/features/talks';
 
 import { Controller } from 'react-hook-form';
 
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Field, FieldControl, FieldLabel } from '@/components/ui/field';
-import { FieldMessage } from '@/components/ui/field-message';
-import { Form } from '@/components/ui/form';
-import { FormMessage } from '@/components/ui/form-message';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import {
+  Button,
+  Checkbox,
+  Field,
+  FieldControl,
+  FieldError,
+  FieldLabel,
+  Form,
+  FormError,
+  Input,
+  Textarea,
+} from '@/components/ui';
 import { useTalkForm } from '@/features/talks/hooks';
 import { CollectionSelectField } from './collection-select-field';
 import { SpeakerSelectField } from './speaker-select-field';
@@ -70,7 +74,7 @@ export function TalkForm({
 
   return (
     <Form className="space-y-6" form={form} onSubmit={form.handleSubmit(onSubmit, onError)}>
-      <FormMessage error={form.formState.errors.root} />
+      <FormError error={form.formState.errors.root} />
 
       <div className="space-y-4">
         <Controller
@@ -80,7 +84,7 @@ export function TalkForm({
             <Field>
               <FieldLabel required>Title</FieldLabel>
               <FieldControl error={fieldState.error} required type="text" {...field} />
-              <FieldMessage error={fieldState.error} />
+              <FieldError errors={fieldState.error ? [fieldState.error] : undefined} />
             </Field>
           )}
         />
@@ -105,7 +109,7 @@ export function TalkForm({
             <Field>
               <FieldLabel required>Media URL</FieldLabel>
               <FieldControl error={fieldState.error} required type="url" {...field} />
-              <FieldMessage error={fieldState.error} />
+              <FieldError errors={fieldState.error ? [fieldState.error] : undefined} />
             </Field>
           )}
         />
@@ -157,7 +161,7 @@ export function TalkForm({
                 type="number"
                 value={field.value ?? ''}
               />
-              <FieldMessage error={fieldState.error} />
+              <FieldError errors={fieldState.error ? [fieldState.error] : undefined} />
             </Field>
           )}
         />

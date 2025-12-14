@@ -3,7 +3,7 @@
 import { useCallback } from 'react';
 import { useTheme } from 'next-themes';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui';
 import { cn } from '@/utils';
 
 export function ModeSwitcher({ className }: { className?: string }) {

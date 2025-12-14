@@ -1,5 +1,4 @@
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
+import { Card, CardContent, CardHeader, Separator } from '@/components/ui';
 import { getUserFavorites } from '@/features/users/server';
 import { getCurrentUser } from '@/services/auth/server';
 

@@ -1,13 +1,13 @@
 import type { Collection, CollectionId } from '@/features/collections/types';
 
-import { Label } from '@/components/ui/label';
 import {
+  Label,
   Select,
   SelectItem,
   SelectPopup,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/components/ui';
 
 type CollectionSelectFieldProps = {
   collections: Pick<Collection, '_id' | 'title'>[];

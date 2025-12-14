@@ -4,12 +4,18 @@ import { useId, useState } from 'react';
 import { CircleAlertIcon } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
-import { Field, FieldError, FieldLabel } from '@/components/ui/field';
-import { Fieldset } from '@/components/ui/fieldset';
-import { Form } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  Button,
+  Field,
+  FieldError,
+  FieldLabel,
+  Fieldset,
+  Form,
+  Input,
+} from '@/components/ui';
 import { signIn, signUp } from '@/services/auth/client';
 import { AUTH_ERRORS } from '@/services/auth/config';
 import { captureException } from '@/services/errors/client';

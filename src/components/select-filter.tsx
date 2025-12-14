@@ -3,14 +3,14 @@
 import { useTransition } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
-import { Label } from '@/components/ui/label';
 import {
+  Label,
   Select,
   SelectItem,
   SelectPopup,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/components/ui';
 import { cn } from '@/utils';
 
 const ALL_OPTION_VALUE = 'all';
