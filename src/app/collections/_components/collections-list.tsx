@@ -8,7 +8,7 @@ import { useSearchParams } from 'next/navigation';
 
 import { CollectionCard } from '@/components/collection-card';
 import { GridList } from '@/components/grid-list';
-import { Empty, EmptyDescription } from '@/components/ui/empty';
+import { Empty, EmptyDescription } from '@/components/ui';
 
 type CollectionWithStats = {
   collection: Collection;

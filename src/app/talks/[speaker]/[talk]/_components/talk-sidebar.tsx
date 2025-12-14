@@ -9,7 +9,7 @@ import Link from 'next/link';
 
 import { FavoriteTalkButton } from '@/app/talks/[speaker]/[talk]/_components/favorite-talk-button';
 import { SidebarContent } from '@/components/sidebar-content';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui';
 import { getTalkUrl } from '@/features/talks/utils';
 import { isAdmin } from '@/services/auth/utils';
 

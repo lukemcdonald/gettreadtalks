@@ -7,8 +7,7 @@ import { useCallback, useEffect, useState, useTransition } from 'react';
 import { LoaderCircleIcon, X as RemoveIcon } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-import { Button } from '@/components/ui/button';
-import { Group, GroupItem, GroupSeparator } from '@/components/ui/group';
+import { Button, Group, GroupItem, GroupSeparator } from '@/components/ui';
 import { cn } from '@/utils';
 import { FilterSelect } from './filter-select';
 import { SearchInput } from './search-input';

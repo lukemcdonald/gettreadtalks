@@ -7,7 +7,7 @@ import { useSearchParams } from 'next/navigation';
 
 import { AlphabeticalGrid } from '@/components/alphabetical-grid';
 import { SpeakerCard } from '@/components/speaker-card';
-import { Empty, EmptyDescription } from '@/components/ui/empty';
+import { Empty, EmptyDescription } from '@/components/ui';
 import { getSpeakerName } from '@/features/speakers';
 
 type SpeakersListProps = {

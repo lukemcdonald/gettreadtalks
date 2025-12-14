@@ -6,7 +6,7 @@ import type { Topic } from '@/features/topics/types';
 import { X as RemoveIcon } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui';
 
 type ActiveFiltersProps = {
   speakers: Pick<Speaker, '_id' | 'firstName' | 'lastName'>[];

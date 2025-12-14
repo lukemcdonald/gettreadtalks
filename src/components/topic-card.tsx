@@ -3,7 +3,7 @@
 import Link from 'next/link';
 
 import { FauxLink } from '@/components/faux-link';
-import { Card, CardDescription, CardTitle } from '@/components/ui/card';
+import { Card, CardDescription, CardTitle } from '@/components/ui';
 
 type TopicCardProps = {
   talkCount: number;

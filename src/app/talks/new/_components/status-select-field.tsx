@@ -1,13 +1,13 @@
 import type { StatusType } from '@/convex/lib/validators/shared';
 
-import { Label } from '@/components/ui/label';
 import {
+  Label,
   Select,
   SelectItem,
   SelectPopup,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from '@/components/ui';
 
 type StatusSelectFieldProps = {
   defaultValue?: StatusType;

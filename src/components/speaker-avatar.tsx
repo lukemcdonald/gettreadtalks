@@ -2,7 +2,7 @@ import type { Speaker } from '@/features/speakers/types';
 
 import { cva } from 'class-variance-authority';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui';
 import { getSpeakerInitials, getSpeakerName } from '@/features/speakers';
 import { cn } from '@/utils';
 

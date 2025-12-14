@@ -4,7 +4,7 @@ import { mergeProps } from '@base-ui/react/merge-props';
 import { useRender } from '@base-ui/react/use-render';
 import { type VariantProps, cva } from 'class-variance-authority';
 
-import { Separator } from '@/components/ui/separator';
+import { Separator } from './separator';
 import { cn } from '@/utils';
 
 const groupVariants = cva(

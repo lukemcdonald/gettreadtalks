@@ -5,8 +5,7 @@ import type { TalkId } from '@/features/talks';
 import { Authenticated } from 'convex/react';
 import { DynamicIcon } from 'lucide-react/dynamic';
 
-import { Button } from '@/components/ui/button';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui';
 import { useFavoriteTalk, useIsTalkFavorited, useUnfavoriteTalk } from '@/features/users/hooks';
 
 type FavoriteTalkButtonProps = {

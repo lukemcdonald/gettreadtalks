@@ -3,7 +3,7 @@ import type { Talk } from '@/features/talks';
 
 import { GridList } from '@/components/grid-list';
 import { TalkCard } from '@/components/talk-card';
-import { Empty, EmptyDescription } from '@/components/ui/empty';
+import { Empty, EmptyDescription } from '@/components/ui';
 
 type TalkWithSpeaker = Talk & { speaker: Speaker | null };
 type TalksListProps = {

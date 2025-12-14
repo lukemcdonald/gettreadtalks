@@ -6,18 +6,18 @@ import { useRender } from '@base-ui/react/use-render';
 import { type VariantProps, cva } from 'class-variance-authority';
 import { PanelLeftIcon } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Separator } from '@/components/ui/separator';
+import { Button } from './button';
+import { Input } from './input';
+import { Separator } from './separator';
 import {
   Sheet,
   SheetDescription,
   SheetHeader,
   SheetPopup,
   SheetTitle,
-} from '@/components/ui/sheet';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Tooltip, TooltipPopup, TooltipTrigger } from '@/components/ui/tooltip';
+} from './sheet';
+import { Skeleton } from './skeleton';
+import { Tooltip, TooltipPopup, TooltipTrigger } from './tooltip';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/utils';
 

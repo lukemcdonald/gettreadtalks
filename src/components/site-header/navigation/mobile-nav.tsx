@@ -10,8 +10,7 @@ import { usePathname } from 'next/navigation';
 import { Logo } from '@/components/logo';
 import { NAVIGATION_LINKS } from '@/components/site-header/constants';
 import { ModeSwitcher } from '@/components/site-header/mode-switcher';
-import { Button } from '@/components/ui/button';
-import { Sheet, SheetClose, SheetHeader, SheetPopup, SheetTrigger } from '@/components/ui/sheet';
+import { Button, Sheet, SheetClose, SheetHeader, SheetPopup, SheetTrigger } from '@/components/ui';
 import { cn } from '@/utils';
 
 type MobileNavProps = {

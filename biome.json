@@ -79,7 +79,7 @@
       "!**/next-env.d.ts",
       "!**/node_modules",
       "!**/pnpm-lock.yaml",
-      "!**/src/components/ui"
+      "!**/src/components/ui/primitives"
     ]
   }
 }

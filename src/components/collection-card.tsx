@@ -4,8 +4,16 @@ import type { Collection } from '@/features/collections/types';
 import type { Speaker } from '@/features/speakers/types';
 
 import { FauxLink } from '@/components/faux-link';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui';
 import { getSpeakerInitials, getSpeakerName } from '@/features/speakers';
 
 type CollectionCardProps = {
