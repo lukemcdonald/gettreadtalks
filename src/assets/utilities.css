@@ -1,7 +1,7 @@
 @utility container {
-  width: 100%;
-  margin-inline: auto;
   max-width: var(--max-width-container);
+  margin-inline: auto;
+  width: 100%;
 }
 
 @utility scrollbar-hidden {
@@ -10,5 +10,17 @@
 
   &::-webkit-scrollbar {
     display: none;
+  }
+}
+
+@utility card-interactive {
+  @apply isolate ring-1 ring-transparent transition duration-300;
+
+  &:hover {
+    @apply shadow-md/3 ring-card;
+
+    &::before {
+      inset: -0.25rem;
+    }
   }
 }
