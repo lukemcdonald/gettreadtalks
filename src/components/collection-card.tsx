@@ -4,14 +4,8 @@ import type { Collection } from '@/features/collections/types';
 import type { Speaker } from '@/features/speakers/types';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardLink,
-  CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { FauxLink } from '@/components/ui/faux-link';
 import { getSpeakerInitials, getSpeakerName } from '@/features/speakers';
 
 type CollectionCardProps = {
@@ -25,10 +19,10 @@ export function CollectionCard({ collection, speakers = [], talkCount }: Collect
   const remainingCount = speakers.length > 3 ? speakers.length - 3 : 0;
 
   return (
-    <Card variant="interactive">
+    <Card interactive>
       <CardHeader className="grow content-start gap-4">
         <CardTitle>
-          <CardLink href={`/collections/${collection.slug}`}>{collection.title}</CardLink>
+          <FauxLink href={`/collections/${collection.slug}`}>{collection.title}</FauxLink>
         </CardTitle>
 
         {collection.description && <CardDescription>{collection.description}</CardDescription>}
