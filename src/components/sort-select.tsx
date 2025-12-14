@@ -33,7 +33,7 @@ export function SortSelect({ className, label, options, paramName = 'sort' }: So
 
   const value = searchParams.get(paramName) ?? options[0]?.value ?? '';
 
-  const handleChange = (newValue: string) => {
+  const handleChange = (newValue: string | null) => {
     const params = new URLSearchParams(searchParams.toString());
 
     if (newValue && newValue !== options[0]?.value) {

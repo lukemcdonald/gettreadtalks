@@ -3,10 +3,9 @@
 import type { FieldErrors, FieldValues } from 'react-hook-form';
 
 import { useMemo } from 'react';
-// biome-ignore lint/style/useImportType: used for type inference
-import { FieldError as BaseFieldErrorPrimitive } from '@base-ui/react/field';
 
 import { cn } from '@/utils';
+import { FieldError as BaseFieldError } from '../primitives/field';
 
 /**
  * Enhanced field-level error component that supports error arrays and deduplication.
@@ -22,7 +21,7 @@ export function FieldError({
   children,
   errors,
   ...props
-}: React.ComponentProps<typeof BaseFieldErrorPrimitive> & {
+}: React.ComponentProps<typeof BaseFieldError> & {
   errors?: FieldErrors<FieldValues>['root'][];
 }) {
   const content = useMemo(() => {
@@ -54,9 +53,8 @@ export function FieldError({
   }
 
   return (
-    <BaseFieldErrorPrimitive className={cn('text-destructive-foreground text-xs', className)} {...props}>
+    <BaseFieldError className={cn('text-destructive-foreground text-xs', className)} {...props}>
       {content}
-    </BaseFieldErrorPrimitive>
+    </BaseFieldError>
   );
 }
-

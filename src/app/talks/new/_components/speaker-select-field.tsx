@@ -1,9 +1,9 @@
-import type { FieldError } from 'react-hook-form';
+import type { FieldError as FieldErrorType } from 'react-hook-form';
 import type { Speaker, SpeakerId } from '@/features/speakers/types';
 
 import {
   Field,
-  type FieldError,
+  FieldError,
   FieldLabel,
   Select,
   SelectItem,
@@ -15,7 +15,7 @@ import { getSpeakerName } from '@/features/speakers';
 
 type SpeakerSelectFieldProps = {
   defaultValue?: SpeakerId | null;
-  error?: FieldError;
+  error?: FieldErrorType;
   onValueChange?: (value: SpeakerId) => void;
   speakers: Pick<Speaker, '_id' | 'firstName' | 'lastName'>[];
   value?: SpeakerId;
@@ -35,9 +35,7 @@ export function SpeakerSelectField({
 
   return (
     <Field>
-      <FieldLabel htmlFor="speakerId" required>
-        Speaker
-      </FieldLabel>
+      <FieldLabel htmlFor="speakerId">Speaker</FieldLabel>
       <Select
         defaultValue={defaultValue}
         items={items}

@@ -26,10 +26,11 @@ This directory contains vendor components from Coss UI (similar to Shadcn). Thes
 
 If you need to customize a primitive:
 
-1. Create an extension in `../extensions/`
-2. Import and compose the primitive
-3. Export it from `../index.ts` to replace the primitive
-4. Feature code will automatically use your extension
+1. Create a component directory in `../{component}/` (e.g., `../field/`)
+2. Create `index.ts` that re-exports from the primitive and adds overrides
+3. Create custom component files in that directory
+4. Update `../index.ts` to export from the component directory instead of primitive
+5. Feature code will automatically use your customizations
 
 ## Example
 
@@ -38,12 +39,16 @@ Instead of editing `field.tsx`:
 ```tsx
 // ❌ DON'T edit primitives/field.tsx
 
-// ✅ DO create extensions/field-error.tsx
-import { FieldError as BaseFieldError } from "@base-ui/react/field";
+// ✅ DO create field/index.ts
+export * from "../primitives/field";
+export { FieldError } from "./field-error";
+
+// ✅ DO create field/field-error.tsx
+import { FieldError as BaseFieldError } from "../primitives/field";
 // ... your customization
 
-// ✅ DO export from ui/index.ts
-export { FieldError } from "./extensions/field-error";
+// ✅ DO update ui/index.ts
+export * from "./field"; // Uses custom wrapper
 ```
 
 ## Updating Components
@@ -53,4 +58,3 @@ When updating via `components.json`:
 1. Components are synced here automatically
 2. Internal relative imports may need manual updates
 3. Extensions should continue working if API is compatible
-

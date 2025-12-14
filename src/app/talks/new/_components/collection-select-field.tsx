@@ -14,7 +14,7 @@ type CollectionSelectFieldProps = {
   defaultValue?: CollectionId | null;
   onValueChange?: (value: CollectionId | '') => void;
   placeholder?: string;
-  value?: CollectionId | '';
+  value?: CollectionId;
 };
 
 export function CollectionSelectField({

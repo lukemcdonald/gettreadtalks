@@ -46,9 +46,12 @@ export function FilterSelect({
     onClear();
   };
 
-  const handleValueChange = (newValue: string) => {
+  const handleValueChange = (newValue: string | null) => {
     setIsOpen(false);
-    onValueChange(newValue);
+
+    if (newValue) {
+      onValueChange(newValue);
+    }
   };
 
   const displayValue = value ?? 'all';
