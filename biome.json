@@ -58,15 +58,6 @@
           }
         }
       }
-    },
-    {
-      "includes": ["src/components/ui/**/*"],
-      "linter": {
-        "rules": {
-          "a11y": "off",
-          "suspicious": "off"
-        }
-      }
     }
   ],
   "files": {
@@ -87,7 +78,8 @@
       "!**/dist",
       "!**/next-env.d.ts",
       "!**/node_modules",
-      "!**/pnpm-lock.yaml"
+      "!**/pnpm-lock.yaml",
+      "!**/src/components/ui"
     ]
   }
 }

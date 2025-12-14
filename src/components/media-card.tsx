@@ -2,8 +2,8 @@
 
 import type { ComponentProps, ReactNode } from 'react';
 
+import { FauxLink } from '@/components/faux-link';
 import { Card, CardDescription, CardTitle } from '@/components/ui/card';
-import { FauxLink } from '@/components/ui/faux-link';
 import { cn } from '@/utils';
 
 type MediaCardProps = {
@@ -24,7 +24,10 @@ export function MediaCard({
   ...delegated
 }: MediaCardProps) {
   return (
-    <Card className={cn('relative flex-row gap-4 p-4', className)} interactive {...delegated}>
+    <Card
+      className={cn('card-interactive group relative flex-row gap-4 p-4', className)}
+      {...delegated}
+    >
       {media}
       <div className="flex-1 space-y-0.5">
         <CardTitle className="line-clamp-2">

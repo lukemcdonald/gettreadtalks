@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 
+import { FauxLink } from '@/components/faux-link';
 import { Card, CardDescription, CardTitle } from '@/components/ui/card';
 
 type TopicCardProps = {
@@ -11,12 +12,10 @@ type TopicCardProps = {
 
 export function TopicCard({ talkCount, topic }: TopicCardProps) {
   return (
-    <Card
-      className="relative flex-row items-center gap-4 p-4"
-      render={<Link href={`/topics/${topic.slug}`} />}
-      variant="interactive"
-    >
-      <CardTitle>{topic.title}</CardTitle>
+    <Card className="card-interactive relative flex-row items-center gap-4 p-4">
+      <CardTitle>
+        <FauxLink href={`/topics/${topic.slug}`}>{topic.title}</FauxLink>
+      </CardTitle>
       <CardDescription>
         {talkCount} {talkCount === 1 ? 'Talk' : 'Talks'}
       </CardDescription>
