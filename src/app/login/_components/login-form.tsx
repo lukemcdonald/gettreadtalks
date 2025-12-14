@@ -112,12 +112,18 @@ export function LoginForm(props: React.ComponentPropsWithoutRef<'form'>) {
         </Field>
 
         <div className="mt-4 flex gap-4">
-          <Button disabled={isDisabled} fullWidth name="intent" type="submit" value="signIn">
+          <Button
+            className="flex-1"
+            disabled={isDisabled}
+            name="intent"
+            type="submit"
+            value="signIn"
+          >
             'Sign In'
           </Button>
           <Button
+            className="flex-1"
             disabled={isDisabled}
-            fullWidth
             name="intent"
             type="submit"
             value="signUp"

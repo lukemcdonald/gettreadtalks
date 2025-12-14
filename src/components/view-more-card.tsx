@@ -4,6 +4,7 @@ import type { Route } from 'next';
 
 import Link from 'next/link';
 
+import { FauxLink } from '@/components/faux-link';
 import { Card, CardHeader } from '@/components/ui';
 import { cn } from '@/utils';
 
@@ -16,15 +17,14 @@ type ViewMoreCardProps = {
 
 export function ViewMoreCard({ className, count, href, label = 'View More' }: ViewMoreCardProps) {
   return (
-    <Card
-      className={cn('group min-w-[300px] shrink-0 transition-all hover:shadow-md', className)}
-      render={<Link href={href as Route} />}
-    >
+    <Card className={cn('card-interactive', className)}>
       <CardHeader>
         <div className="flex h-full min-h-[120px] items-center justify-center">
           <div className="text-center">
-            <p className="font-semibold group-hover:text-primary">{label}</p>
-            {count !== undefined && (
+            <FauxLink href={href}>
+              <p className="font-semibold">{label}</p>
+            </FauxLink>
+            {count && (
               <p className="mt-1 text-muted-foreground text-sm">
                 {count} {count === 1 ? 'more item' : 'more items'}
               </p>

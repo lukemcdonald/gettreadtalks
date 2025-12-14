@@ -30,7 +30,7 @@ export function TopicSelector({ className, currentSlug, label, topics }: TopicSe
   const router = useRouter();
   const [_isPending, startTransition] = useTransition();
 
-  const handleChange = (value: string) => {
+  const handleChange = (value: string | null) => {
     startTransition(() => {
       router.push(`/topics/${value}`);
     });

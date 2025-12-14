@@ -16,16 +16,18 @@ Our UI component system is organized into three tiers:
 - Maintenance: Updated via `components.json` when syncing from Coss UI
 - **Rule**: Never import directly from `@/components/ui/primitives/*` in feature code
 
-### 2. Extensions (`src/components/ui/extensions/`)
+### 2. Custom Component Groups (`src/components/ui/{component}/`)
 
-**Custom wrappers that enhance primitives** - These are our customizations that add functionality or styling.
+**Custom wrappers that enhance primitives** - Component directories that re-export primitives and add customizations.
 
-- Location: `src/components/ui/extensions/*.tsx`
-- Purpose: Enhanced versions of primitives with additional features
+- Location: `src/components/ui/{component}/` (e.g., `field/`, `form/`)
+- Structure:
+  - `index.ts` - Re-exports primitives, overrides/adds custom components
+  - `{component}-{name}.tsx` - Custom component implementations
 - Examples:
-  - `field-error.tsx` - Enhanced FieldError with error array support and deduplication
-  - `form-errors.tsx` - Form-level error display component
-- **Rule**: Extensions can import primitives directly for composition
+  - `field/field-error.tsx` - Enhanced FieldError with error array support
+  - `form/form-error.tsx` - Form-level error display component
+- **Rule**: Custom component groups can import primitives directly for composition
 
 ### 3. Feature Components (`src/components/*.tsx`)
 
@@ -53,10 +55,10 @@ import { Button } from "@/components/ui/primitives/button";
 import { FieldError } from "@/components/ui/primitives/field";
 ```
 
-### ✅ Correct: Extensions Importing Primitives
+### ✅ Correct: Custom Component Groups Importing Primitives
 
 ```tsx
-// Extensions can import primitives directly
+// Custom component groups can import primitives directly
 import { FieldError as BaseFieldError } from "@base-ui/react/field";
 // or
 import { FieldError } from "../primitives/field";
@@ -80,40 +82,50 @@ Create an extension when you need to:
    - When you have a common pattern used across the app
    - When you want to encapsulate complex interactions
 
-### Example: Creating an Extension
+### Example: Creating a Custom Component Group
 
 ```tsx
-// src/components/ui/extensions/my-extension.tsx
+// src/components/ui/my-component/my-component.tsx
 "use client";
 
 import { BaseComponent } from "../primitives/base-component";
 import { cn } from "@/utils";
 
-export function MyExtension({ className, ...props }) {
+export function MyComponent({ className, ...props }) {
   return <BaseComponent className={cn("custom-styles", className)} {...props} />;
 }
 ```
 
-Then export it from the barrel (`src/components/ui/index.ts`):
+Then create the wrapper barrel (`src/components/ui/my-component/index.ts`):
 
 ```ts
-// Replace the primitive export
-export { MyExtension as BaseComponent } from "./extensions/my-extension";
+// Re-export everything from primitive
+export * from "../primitives/base-component";
+// Override with custom version
+export { MyComponent as BaseComponent } from "./my-component";
+```
+
+The main barrel (`src/components/ui/index.ts`) will use it automatically:
+
+```ts
+export * from "./my-component"; // Uses custom wrapper
+export * from "./primitives/other-component"; // Uses primitive directly
 ```
 
 ## Barrel Export (`src/components/ui/index.ts`)
 
 The barrel file (`index.ts`) is the **single source of truth** for UI component imports:
 
-- Re-exports all primitives (for components used as-is)
-- Re-exports extensions (replacing primitives where custom versions exist)
+- Re-exports from component directories (e.g., `./field`, `./form`) for customized components
+- Re-exports from primitives (e.g., `./primitives/button`) for unchanged components
 - Feature code imports from here: `import { X } from '@/components/ui'`
 
 This ensures:
 
-- Extensions automatically replace primitives in feature code
-- No need to know whether a component is a primitive or extension
+- Custom component groups automatically replace primitives in feature code
+- No need to know whether a component is a primitive or customized
 - Easy to swap implementations without changing feature code
+- Clear structure: if a component directory exists, it's customized
 
 ## Maintenance Notes
 
@@ -128,12 +140,12 @@ When updating components via `components.json`:
 3. **Extensions** should continue to work if API is compatible
 4. **Feature code** requires no changes (uses barrel)
 
-### Adding New Extensions
+### Adding New Custom Component Groups
 
-1. Create file in `src/components/ui/extensions/`
-2. Import and compose the primitive
-3. Add export to `src/components/ui/index.ts`
-4. If replacing a primitive, remove the primitive export and add the extension export
+1. Create directory `src/components/ui/{component}/`
+2. Create `index.ts` that re-exports from `../primitives/{component}` and adds overrides
+3. Create custom component files (e.g., `{component}-{name}.tsx`)
+4. Update `src/components/ui/index.ts` to use the custom directory instead of primitive
 
 ## Examples
 
@@ -152,7 +164,7 @@ function MyComponent() {
 }
 ```
 
-### Using Extensions
+### Using Custom Components
 
 ```tsx
 import { FieldError, FormError } from "@/components/ui";
@@ -199,4 +211,3 @@ If you're unsure whether to:
 - Import from barrel vs. direct path
 
 Refer to this guide or ask the team for guidance.
-

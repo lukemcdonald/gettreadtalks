@@ -52,8 +52,11 @@ export function AccountMenu({ initialUser }: AccountMenuProps) {
   }
 
   return (
-    <Menu openOnHover>
-      <MenuTrigger render={<Button className="size-10" size="icon-lg" variant="ghost" />}>
+    <Menu>
+      <MenuTrigger
+        openOnHover
+        render={<Button className="size-10" size="icon-lg" variant="ghost" />}
+      >
         <UserIcon className="size-6" />
       </MenuTrigger>
       <MenuPopup>
