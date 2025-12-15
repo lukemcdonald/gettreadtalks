@@ -63,23 +63,12 @@
   "files": {
     "ignoreUnknown": false,
     "includes": [
-      "**/*",
-      "!**/*.config.*",
-      "!**/*.d.ts",
-      "!**/*.tsbuildinfo",
-      "!**/.git",
-      "!**/.next",
-      "!**/.notes",
-      "!**/.vercel",
-      "!**/build",
-      "!**/convex/**/_generated",
-      "!**/convex/betterAuth/schema.ts",
-      "!**/convex/convex.json",
-      "!**/dist",
-      "!**/next-env.d.ts",
-      "!**/node_modules",
-      "!**/pnpm-lock.yaml",
-      "!**/src/components/ui/primitives"
+      "convex/**/*",
+      "src/**/*",
+      "!convex/**/_generated",
+      "!convex/betterAuth/schema.ts",
+      "!convex/convex.json",
+      "!src/components/ui/primitives"
     ]
   }
 }
