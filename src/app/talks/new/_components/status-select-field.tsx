@@ -1,7 +1,8 @@
 import type { StatusType } from '@/convex/lib/validators/shared';
 
 import {
-  Label,
+  Field,
+  FieldLabel,
   Select,
   SelectItem,
   SelectPopup,
@@ -28,8 +29,8 @@ export function StatusSelectField({
   ];
 
   return (
-    <div>
-      <Label htmlFor="status">Status</Label>
+    <Field name="status">
+      <FieldLabel htmlFor="status">Status</FieldLabel>
       <Select
         defaultValue={defaultValue}
         items={items}
@@ -48,6 +49,6 @@ export function StatusSelectField({
           <SelectItem value="published">Published</SelectItem>
         </SelectPopup>
       </Select>
-    </div>
+    </Field>
   );
 }

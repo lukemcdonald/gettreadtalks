@@ -10,11 +10,11 @@ import {
   Button,
   Checkbox,
   Field,
-  FieldControl,
   FieldError,
   FieldLabel,
   Form,
   FormError,
+  Input,
   Textarea,
 } from '@/components/ui';
 import { useTalkForm } from '@/features/talks/hooks';
@@ -80,10 +80,15 @@ export function TalkForm({
             control={form.control}
             name="title"
             render={({ field, fieldState }) => (
-              <Field>
+              <Field
+                dirty={fieldState.isDirty}
+                invalid={fieldState.invalid}
+                name={field.name}
+                touched={fieldState.isTouched}
+              >
                 <FieldLabel>Title</FieldLabel>
-                <FieldControl error={fieldState.error} required type="text" {...field} />
-                <FieldError errors={fieldState.error ? [fieldState.error] : undefined} />
+                <Input aria-invalid={fieldState.invalid} required type="text" {...field} />
+                <FieldError error={fieldState.error} />
               </Field>
             )}
           />
@@ -105,10 +110,15 @@ export function TalkForm({
             control={form.control}
             name="mediaUrl"
             render={({ field, fieldState }) => (
-              <Field>
+              <Field
+                dirty={fieldState.isDirty}
+                invalid={fieldState.invalid}
+                name={field.name}
+                touched={fieldState.isTouched}
+              >
                 <FieldLabel>Media URL</FieldLabel>
-                <FieldControl error={fieldState.error} required type="url" {...field} />
-                <FieldError errors={fieldState.error ? [fieldState.error] : undefined} />
+                <Input aria-invalid={fieldState.invalid} required type="url" {...field} />
+                <FieldError error={fieldState.error} />
               </Field>
             )}
           />
@@ -117,9 +127,9 @@ export function TalkForm({
             control={form.control}
             name="description"
             render={({ field }) => (
-              <Field>
+              <Field name={field.name}>
                 <FieldLabel>Description</FieldLabel>
-                <FieldControl render={(props) => <Textarea {...props} {...field} rows={4} />} />
+                <Textarea rows={4} {...field} />
               </Field>
             )}
           />
@@ -128,9 +138,9 @@ export function TalkForm({
             control={form.control}
             name="scripture"
             render={({ field }) => (
-              <Field>
+              <Field name={field.name}>
                 <FieldLabel>Scripture</FieldLabel>
-                <FieldControl {...field} type="text" />
+                <Input type="text" {...field} />
               </Field>
             )}
           />
@@ -141,8 +151,10 @@ export function TalkForm({
             render={({ field }) => (
               <CollectionSelectField
                 collections={collections}
-                onValueChange={(value) => field.onChange(value || undefined)}
-                value={(field.value as CollectionId | undefined) || ''}
+                onValueChange={(value) => {
+                  field.onChange(value === '' ? undefined : (value as CollectionId));
+                }}
+                value={field.value as CollectionId | undefined}
               />
             )}
           />
@@ -150,19 +162,27 @@ export function TalkForm({
           <Controller
             control={form.control}
             name="collectionOrder"
-            render={({ field, fieldState }) => (
-              <Field>
-                <FieldLabel>Collection Order</FieldLabel>
-                <FieldControl
-                  {...field}
-                  error={fieldState.error}
-                  onChange={(e) => field.onChange(e.target.valueAsNumber || undefined)}
-                  type="number"
-                  value={field.value ?? ''}
-                />
-                <FieldError errors={fieldState.error ? [fieldState.error] : undefined} />
-              </Field>
-            )}
+            render={({ field, fieldState }) => {
+              const { onChange, value, ...inputProps } = field;
+              return (
+                <Field
+                  dirty={fieldState.isDirty}
+                  invalid={fieldState.invalid}
+                  name={field.name}
+                  touched={fieldState.isTouched}
+                >
+                  <FieldLabel>Collection Order</FieldLabel>
+                  <Input
+                    aria-invalid={fieldState.invalid}
+                    onChange={(e) => onChange(e.target.valueAsNumber || undefined)}
+                    type="number"
+                    value={value ?? ''}
+                    {...inputProps}
+                  />
+                  <FieldError error={fieldState.error} />
+                </Field>
+              );
+            }}
           />
 
           <Controller
@@ -183,16 +203,14 @@ export function TalkForm({
             control={form.control}
             name="featured"
             render={({ field }) => (
-              <Field>
-                <div className="flex items-center gap-2">
+              <Field name={field.name}>
+                <FieldLabel>
                   <Checkbox
                     checked={field.value}
-                    id="featured"
-                    name="featured"
                     onCheckedChange={(checked) => field.onChange(checked === true)}
                   />
-                  <FieldLabel htmlFor="featured">Featured</FieldLabel>
-                </div>
+                  Featured
+                </FieldLabel>
               </Field>
             )}
           />
