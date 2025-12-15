@@ -1,7 +1,8 @@
 import type { Collection, CollectionId } from '@/features/collections/types';
 
 import {
-  Label,
+  Field,
+  FieldLabel,
   Select,
   SelectItem,
   SelectPopup,
@@ -33,8 +34,8 @@ export function CollectionSelectField({
   const allOptions = allOption ? [allOption, ...items] : items;
 
   return (
-    <div>
-      <Label htmlFor="collectionId">Collection</Label>
+    <Field name="collectionId">
+      <FieldLabel htmlFor="collectionId">Collection</FieldLabel>
       <Select
         defaultValue={defaultValue}
         items={allOptions}
@@ -54,6 +55,6 @@ export function CollectionSelectField({
           ))}
         </SelectPopup>
       </Select>
-    </div>
+    </Field>
   );
 }

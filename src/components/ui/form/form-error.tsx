@@ -25,15 +25,13 @@ export function FormError({ className, error }: FormErrorProps) {
     return null;
   }
 
-  const errors = Array.isArray(error) ? error : [error];
-
   return (
     <div
       className={cn('rounded-md bg-destructive/15 p-3', className)}
       data-slot="form-error"
       role="alert"
     >
-      <FieldErrorComponent errors={errors} />
+      <FieldErrorComponent error={error} />
     </div>
   );
 }
