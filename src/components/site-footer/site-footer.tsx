@@ -1,7 +1,6 @@
-import { Container } from '@/components/container';
-import { Section } from '@/components/section';
 import { FooterInfo } from '@/components/site-footer/footer-info';
 import { FooterNav } from '@/components/site-footer/footer-nav';
+import { Container, Section } from '@/components/ui';
 
 export function SiteFooter() {
   return (

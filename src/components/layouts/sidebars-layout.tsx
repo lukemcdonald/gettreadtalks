@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react';
 
-import { Container } from '@/components/container';
-import { Section } from '@/components/section';
+import { Container, Section } from '@/components/ui';
 import { cn } from '@/utils';
 
 type SidebarsLayoutProps = {
