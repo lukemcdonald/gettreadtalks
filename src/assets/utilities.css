@@ -19,8 +19,8 @@
   &:hover {
     @apply shadow-md/3 ring-card;
 
-    &::before {
+    /* &::before {
       inset: -0.25rem;
-    }
+    } */
   }
 }
