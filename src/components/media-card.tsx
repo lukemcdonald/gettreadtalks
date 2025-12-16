@@ -25,12 +25,12 @@ export function MediaCard({
 }: MediaCardProps) {
   return (
     <Card
-      className={cn('card-interactive group relative flex-row gap-4 p-4', className)}
+      className={cn('card-interactive group relative flex-row gap-4 border-0 p-4', className)}
       {...delegated}
     >
       {media}
       <div className="flex-1 space-y-0.5">
-        <CardTitle className="line-clamp-2">
+        <CardTitle className="line-clamp-2 text-base">
           <FauxLink aria-label={ariaLabel} href={href}>
             {title}
           </FauxLink>
