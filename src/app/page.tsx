@@ -1,10 +1,9 @@
-import { Container } from '@/components/container';
 import { FeaturedGrid } from '@/components/featured-grid';
 import { HeroSection } from '@/components/hero-section';
 import { Main } from '@/components/main';
-import { Section } from '@/components/section';
 import { SpeakerCard } from '@/components/speaker-card';
 import { TalkCard } from '@/components/talk-card';
+import { Container, Section } from '@/components/ui';
 import { getFeaturedSpeakers } from '@/features/speakers';
 import { getFeaturedTalks } from '@/features/talks';
 
