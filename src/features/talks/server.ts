@@ -4,6 +4,7 @@ import type { StatusType } from '@/convex/lib/validators/shared';
 import type { SpeakerId } from '@/features/speakers/types';
 import type { TopicId } from '@/features/topics/types';
 
+import { cache } from 'react';
 import { fetchQuery, preloadQuery } from 'convex/nextjs';
 
 import { api } from '@/convex/_generated/api';
@@ -64,8 +65,10 @@ export async function getTalksWithSpeakers(filters?: {
 
 /**
  * Get speakers for filter dropdowns.
+ * Wrapped with cache() to ensure it's only called once per request,
+ * even if the filter component is rendered multiple times.
  */
-export async function getSpeakersForFilter() {
+export const getSpeakersForFilter = cache(async () => {
   const token = await getAuthToken();
 
   const paginationOpts = {
@@ -76,16 +79,18 @@ export async function getSpeakersForFilter() {
   const result = await fetchQuery(api.speakers.listSpeakers, { paginationOpts }, { token });
 
   return result.page;
-}
+});
 
 /**
  * Get topics for filter dropdowns.
+ * Wrapped with cache() to ensure it's only called once per request,
+ * even if the filter component is rendered multiple times.
  */
-export async function getTopicsForFilter() {
+export const getTopicsForFilter = cache(async () => {
   const token = await getAuthToken();
 
   return await fetchQuery(api.topics.listTopics, { limit: 1000 }, { token });
-}
+});
 
 /**
  * Get talk by speaker slug and talk slug with all related data (speaker, collection, clips, topics).
