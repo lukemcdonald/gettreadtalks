@@ -60,7 +60,7 @@ export async function enrichWithSpeakers(
   talks: Doc<'talks'>[],
 ): Promise<Array<Doc<'talks'> & { speaker: Doc<'speakers'> | null }>> {
   return await asyncMap(talks, async (talk: Doc<'talks'>) => {
-    const speaker = await ctx.db.get(talk.speakerId);
+    const speaker = await ctx.db.get('speakers', talk.speakerId);
     return { ...talk, speaker };
   });
 }
@@ -79,7 +79,7 @@ export async function getTalksByTopic(ctx: QueryCtx, topicId: Id<'topics'>) {
     .collect();
 
   const talkIds = talksOnTopics.map((t) => t.talkId);
-  const talks = await Promise.all(talkIds.map((id) => ctx.db.get(id)));
+  const talks = await Promise.all(talkIds.map((id) => ctx.db.get('talks', id)));
 
   return talks.filter((talk): talk is Doc<'talks'> => talk !== null);
 }

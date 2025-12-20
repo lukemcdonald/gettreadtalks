@@ -19,7 +19,7 @@ export const getTopic = query({
   args: {
     id: v.id('topics'),
   },
-  handler: async (ctx, args) => await ctx.db.get(args.id),
+  handler: async (ctx, args) => await ctx.db.get('topics', args.id),
   returns: doc('topics').nullable(),
 });
 
@@ -108,7 +108,7 @@ export const getTopicBySlug = query({
       .slice(0, limit);
 
     const talksWithSpeakers = await asyncMap(publishedTalks, async (talk: Doc<'talks'>) => {
-      const speaker = await ctx.db.get(talk.speakerId);
+      const speaker = await ctx.db.get('speakers', talk.speakerId);
       return { ...talk, speaker };
     });
 

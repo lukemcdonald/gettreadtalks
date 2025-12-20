@@ -76,7 +76,7 @@ export function throwForbidden(message?: string): never {
  * Throws a not found error (404).
  *
  * @example
- * const topic = await ctx.db.get(topicId);
+ * const topic = await ctx.db.get('topics', topicId);
  * if (!topic) {
  *   throwNotFound('Topic not found', { resource: 'topic', resourceId: topicId });
  * }

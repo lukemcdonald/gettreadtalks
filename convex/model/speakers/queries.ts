@@ -20,7 +20,7 @@ export const getSpeaker = query({
   args: {
     id: v.id('speakers'),
   },
-  handler: async (ctx, args) => await ctx.db.get(args.id),
+  handler: async (ctx, args) => await ctx.db.get('speakers', args.id),
   returns: doc('speakers').nullable(),
 });
 
@@ -61,8 +61,8 @@ export const getSpeakerBySlug = query({
           const collectionIds = [
             ...new Set(allTalks.flatMap((talk) => (talk.collectionId ? [talk.collectionId] : []))),
           ];
-          return Promise.all(collectionIds.map((id) => ctx.db.get(id))).then((cols) =>
-            cols.filter((col): col is Doc<'collections'> => col !== null),
+          return Promise.all(collectionIds.map((id) => ctx.db.get('collections', id))).then(
+            (cols) => cols.filter((col): col is Doc<'collections'> => col !== null),
           );
         }),
       ctx.db

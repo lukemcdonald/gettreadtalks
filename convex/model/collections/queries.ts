@@ -22,7 +22,7 @@ export const getCollection = query({
   args: {
     id: v.id('collections'),
   },
-  handler: async (ctx, args) => await ctx.db.get(args.id),
+  handler: async (ctx, args) => await ctx.db.get('collections', args.id),
   returns: doc('collections').nullable(),
 });
 
@@ -41,7 +41,7 @@ export const getCollectionWithTalks = query({
   handler: async (ctx, args) => {
     const { limit = 100, id } = args;
 
-    const collection = await ctx.db.get(id);
+    const collection = await ctx.db.get('collections', id);
 
     if (!collection) {
       return null;
@@ -102,7 +102,7 @@ export const getCollectionBySlug = query({
     talks.sort((a, b) => (a.collectionOrder || 0) - (b.collectionOrder || 0));
 
     const talksWithSpeakers = await asyncMap(talks, async (talk: Doc<'talks'>) => {
-      const speaker = await ctx.db.get(talk.speakerId);
+      const speaker = await ctx.db.get('speakers', talk.speakerId);
       return { ...talk, speaker };
     });
 

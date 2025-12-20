@@ -22,7 +22,7 @@ export const cleanupSpeakerImages = mutation({
     let cleaned = 0;
 
     for (const speakerId of args.speakerIds) {
-      const speaker = await ctx.db.get(speakerId);
+      const speaker = await ctx.db.get('speakers', speakerId);
 
       if (!speaker) {
         continue;

@@ -23,7 +23,7 @@ export const archiveTalk = mutation({
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
-    const talk = await ctx.db.get(args.id);
+    const talk = await ctx.db.get('talks', args.id);
 
     if (!talk) {
       throwNotFound('Talk not found', { resource: 'talk', resourceId: args.id });
@@ -112,7 +112,7 @@ export const updateTalk = mutation({
 
     const { id, ...rest } = args;
     const updates: Partial<Doc<'talks'>> = rest;
-    const talk = await ctx.db.get(id);
+    const talk = await ctx.db.get('talks', id);
 
     if (!talk) {
       throwNotFound('Talk not found', { resource: 'talk', resourceId: id });
@@ -173,7 +173,7 @@ export const updateTalkStatus = mutation({
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
-    const talk = await ctx.db.get(args.id);
+    const talk = await ctx.db.get('talks', args.id);
 
     if (!talk) {
       throwNotFound('Talk not found', { resource: 'talk', resourceId: args.id });
@@ -212,7 +212,7 @@ export const destroyTalk = mutation({
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
-    const talk = await ctx.db.get(args.id);
+    const talk = await ctx.db.get('talks', args.id);
 
     if (!talk) {
       throwNotFound('Talk not found', { resource: 'talk', resourceId: args.id });
