@@ -44,7 +44,7 @@ export function CollectionCard({ collection, speakers = [], talkCount }: Collect
       {speakers.length > 0 && (
         <CardContent>
           <div className="flex items-center gap-2">
-            <div className="-space-x-2 flex">
+            <div className="flex -space-x-2">
               {displaySpeakers.map((speaker) => {
                 const speakerName = getSpeakerName(speaker);
                 const speakerInitials = getSpeakerInitials(speaker);
