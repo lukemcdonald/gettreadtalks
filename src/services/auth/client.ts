@@ -9,9 +9,15 @@ import { createAuthClient } from 'better-auth/react';
 /**
  * Create a Better Auth client instance for interacting with Better Auth server from the client.
  *
+ * The convexClient() plugin automatically routes auth requests to the Convex deployment.
+ * baseURL is optional - if not provided, it uses relative URLs which work with the Next.js proxy.
+ *
  * @returns The Better Auth client instance.
  */
 export const authClient = createAuthClient({
+  // baseURL is optional - convexClient() plugin handles routing to Convex
+  // If you need to specify it, use the Next.js site URL (not Convex site URL)
+  // since requests go through /api/auth/[...all] which proxies to Convex
   plugins: [convexClient(), adminClient()],
 });
 
