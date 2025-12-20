@@ -1,19 +1,30 @@
-'use server';
-
 import 'server-only';
 
 import type { Route } from 'next';
 import type { AdminUser } from '@/services/auth/types';
 
 import { cache } from 'react';
-import { getToken } from '@convex-dev/better-auth/nextjs';
+import { convexBetterAuthNextJs } from '@convex-dev/better-auth/nextjs';
 import { fetchQuery } from 'convex/nextjs';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 import { api } from '@/convex/_generated/api';
-import { createAuth } from '@/convex/auth';
 import { isAdmin } from '@/services/auth/utils';
+
+// Framework-specific utilities from Convex + Better Auth
+const {
+  fetchAuthAction,
+  fetchAuthMutation,
+  fetchAuthQuery,
+  handler,
+  getToken,
+  isAuthenticated,
+  preloadAuthQuery,
+} = convexBetterAuthNextJs({
+  convexSiteUrl: process.env.NEXT_PUBLIC_CONVEX_SITE_URL!,
+  convexUrl: process.env.NEXT_PUBLIC_CONVEX_URL!,
+});
 
 /**
  * Get the authentication token for the current user.
@@ -22,12 +33,12 @@ import { isAdmin } from '@/services/auth/utils';
  *
  * @returns Authentication token or null if not authenticated
  */
-export const getAuthToken = cache(async () => {
+const getAuthToken = cache(async () => {
   // Always access cookies to satisfy Next.js 16 Turbopack requirements
   // This ensures dynamic rendering before Math.random() usage in betterAuth
   // Avoids the "used Math.random() before accessing Request data" error on page and builds.
   await cookies();
-  return await getToken(createAuth);
+  return await getToken();
 });
 
 /**
@@ -35,7 +46,7 @@ export const getAuthToken = cache(async () => {
  *
  * @returns User object or null if not authenticated
  */
-export const getCurrentUser = async () => {
+const getCurrentUser = async () => {
   const token = await getAuthToken();
 
   if (!token) {
@@ -52,7 +63,7 @@ export const getCurrentUser = async () => {
  * @param redirectTo - URL to redirect to if not authenticated (default: '/login')
  * @returns User object
  */
-export const requireCurrentUser = async (redirectTo: Route<string> = '/login') => {
+const requireCurrentUser = async (redirectTo: Route<string> = '/login') => {
   const user = await getCurrentUser();
 
   if (!user) {
@@ -69,9 +80,7 @@ export const requireCurrentUser = async (redirectTo: Route<string> = '/login') =
  * @param redirectTo - URL to redirect to if not authenticated (default: '/login')
  * @returns Admin user object
  */
-export const requireAdminUser = async (
-  redirectTo: Route<string> = '/login',
-): Promise<AdminUser> => {
+const requireAdminUser = async (redirectTo: Route<string> = '/login'): Promise<AdminUser> => {
   const user = await getCurrentUser();
 
   if (!user) {
@@ -83,4 +92,17 @@ export const requireAdminUser = async (
   }
 
   return user as AdminUser;
+};
+
+export {
+  fetchAuthAction,
+  fetchAuthMutation,
+  fetchAuthQuery,
+  getAuthToken,
+  getCurrentUser,
+  handler,
+  isAuthenticated,
+  preloadAuthQuery,
+  requireAdminUser,
+  requireCurrentUser,
 };

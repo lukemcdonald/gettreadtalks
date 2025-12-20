@@ -1,9 +1,8 @@
-import { getStaticAuth } from '@convex-dev/better-auth';
-
 import { createAuth } from '../auth';
 
 /**
- * Static auth export for Better Auth schema generation.
- * The CLI needs this to generate the schema.
+ * Export a static instance for Better Auth schema generation.
+ *
+ * @link https://labs.convex.dev/better-auth/features/local-install
  */
-export const auth = getStaticAuth(createAuth);
+export const auth = createAuth({} as any);
