@@ -35,7 +35,7 @@ const ModeSwitcherIcon = ({
   strokeWidth?: number;
 }) => (
   <svg
-    className={cn('-rotate-45 size-6 transition-all', className)}
+    className={cn('size-6 -rotate-45 transition-all', className)}
     fill="none"
     viewBox="0 0 24 24"
     xmlns="http://www.w3.org/2000/svg"
