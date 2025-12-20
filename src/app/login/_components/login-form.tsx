@@ -119,7 +119,7 @@ export function LoginForm(props: React.ComponentPropsWithoutRef<'form'>) {
             type="submit"
             value="signIn"
           >
-            'Sign In'
+            Sign In
           </Button>
           <Button
             className="flex-1"
@@ -129,7 +129,7 @@ export function LoginForm(props: React.ComponentPropsWithoutRef<'form'>) {
             value="signUp"
             variant="outline"
           >
-            'Create Account'
+            Create Account
           </Button>
         </div>
       </Fieldset>
