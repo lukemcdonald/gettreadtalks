@@ -12,7 +12,6 @@
     "db:clear:prod": "convex run migration/runMigration:clearAllData --prod",
     "db:seed": "tsx scripts/run-seed.ts",
     "db:seed:prod": "tsx scripts/run-seed.ts --prod",
-    "deploy": "next build && convex deploy --yes",
     "dev": "npm-run-all --parallel dev:backend dev:frontend dev:open",
     "dev:backend": "convex dev",
     "dev:frontend": "next dev --experimental-https",
@@ -21,6 +20,8 @@
     "format:fix": "biome format --write .",
     "lint": "biome lint .",
     "lint:fix": "biome lint --write .",
+    "release": "convex deploy --yes",
+    "release:full": "pnpm build && pnpm release",
     "start": "next start",
     "style": "biome check --write",
     "typecheck": "tsc --noEmit"
