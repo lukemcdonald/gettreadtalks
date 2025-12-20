@@ -58,7 +58,7 @@ export const destroyAffiliateLink = mutation({
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
-    const affiliateLink = await ctx.db.get(args.id);
+    const affiliateLink = await ctx.db.get('affiliateLinks', args.id);
 
     if (!affiliateLink) {
       throwNotFound('Affiliate link not found', { resource: 'affiliateLink', resourceId: args.id });
@@ -95,7 +95,7 @@ export const updateAffiliateLink = mutation({
     const { id, ...rest } = args;
     const updates: Partial<Doc<'affiliateLinks'>> = rest;
 
-    const affiliateLink = await ctx.db.get(id);
+    const affiliateLink = await ctx.db.get('affiliateLinks', id);
 
     if (!affiliateLink) {
       throwNotFound('Affiliate link not found', { resource: 'affiliateLink', resourceId: id });

@@ -65,7 +65,7 @@ export const destroySpeaker = mutation({
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
-    const speaker = await ctx.db.get(args.id);
+    const speaker = await ctx.db.get('speakers', args.id);
 
     if (!speaker) {
       throwNotFound('Speaker not found', { resource: 'speaker', resourceId: args.id });
@@ -131,7 +131,7 @@ export const updateSpeaker = mutation({
     const { id, ...rest } = args;
     const updates: Partial<Doc<'speakers'>> = rest;
 
-    const speaker = await ctx.db.get(id);
+    const speaker = await ctx.db.get('speakers', id);
 
     if (!speaker) {
       throwNotFound('Speaker not found', { resource: 'speaker', resourceId: id });

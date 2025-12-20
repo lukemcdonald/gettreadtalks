@@ -24,12 +24,12 @@ export const addClipToTopic = mutation({
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
-    const clip = await ctx.db.get(args.clipId);
+    const clip = await ctx.db.get('clips', args.clipId);
     if (!clip) {
       throwNotFound('Clip not found', { resource: 'clip', resourceId: args.clipId });
     }
 
-    const topic = await ctx.db.get(args.topicId);
+    const topic = await ctx.db.get('topics', args.topicId);
     if (!topic) {
       throwNotFound('Topic not found', { resource: 'topic', resourceId: args.topicId });
     }
@@ -68,12 +68,12 @@ export const addTalkToTopic = mutation({
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
-    const talk = await ctx.db.get(args.talkId);
+    const talk = await ctx.db.get('talks', args.talkId);
     if (!talk) {
       throwNotFound('Talk not found', { resource: 'talk', resourceId: args.talkId });
     }
 
-    const topic = await ctx.db.get(args.topicId);
+    const topic = await ctx.db.get('topics', args.topicId);
     if (!topic) {
       throwNotFound('Topic not found', { resource: 'topic', resourceId: args.topicId });
     }
@@ -140,7 +140,7 @@ export const destroyTopic = mutation({
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
-    const topic = await ctx.db.get(args.id);
+    const topic = await ctx.db.get('topics', args.id);
 
     if (!topic) {
       throwNotFound('Topic not found', { resource: 'topic', resourceId: args.id });
@@ -254,7 +254,7 @@ export const updateTopic = mutation({
     const { id, ...rest } = args;
     const updates: Partial<Doc<'topics'>> = rest;
 
-    const topic = await ctx.db.get(id);
+    const topic = await ctx.db.get('topics', id);
 
     if (!topic) {
       throwNotFound('Topic not found', { resource: 'topic', resourceId: id });

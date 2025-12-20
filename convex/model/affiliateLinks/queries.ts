@@ -16,7 +16,7 @@ export const getAffiliateLink = query({
   args: {
     id: v.id('affiliateLinks'),
   },
-  handler: async (ctx, args) => await ctx.db.get(args.id),
+  handler: async (ctx, args) => await ctx.db.get('affiliateLinks', args.id),
   returns: doc('affiliateLinks').nullable(),
 });
 

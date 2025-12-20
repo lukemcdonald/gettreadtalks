@@ -53,7 +53,7 @@ export const destroyCollection = mutation({
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
-    const collection = await ctx.db.get(args.id);
+    const collection = await ctx.db.get('collections', args.id);
 
     if (!collection) {
       throwNotFound('Collection not found', { resource: 'collection', resourceId: args.id });
@@ -99,7 +99,7 @@ export const updateCollection = mutation({
 
     const { id, ...rest } = args;
     const updates: Partial<Doc<'collections'>> = rest;
-    const collection: Doc<'collections'> | null = await ctx.db.get(id);
+    const collection: Doc<'collections'> | null = await ctx.db.get('collections', id);
 
     if (!collection) {
       throwNotFound('Collection not found', { resource: 'collection', resourceId: id });

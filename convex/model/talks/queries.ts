@@ -32,7 +32,7 @@ export const getTalk = query({
   args: {
     id: v.id('talks'),
   },
-  handler: async (ctx, args) => await ctx.db.get(args.id),
+  handler: async (ctx, args) => await ctx.db.get('talks', args.id),
   returns: doc('talks').nullable(),
 });
 
@@ -83,7 +83,7 @@ export const getTalkBySlug = query({
           q.eq('talkId', talk._id).eq('status', 'published'),
         )
         .collect(),
-      collection: talk.collectionId ? ctx.db.get(talk.collectionId) : null,
+      collection: talk.collectionId ? ctx.db.get('collections', talk.collectionId) : null,
       topics: getManyVia(ctx.db, 'talksOnTopics', 'topicId', 'by_talkId', talk._id, 'talkId'),
     };
 
@@ -191,7 +191,7 @@ export const listFeaturedTalksWithSpeakers = query({
     const page = shuffled.slice(0, limit);
 
     const enrichedPage = await asyncMap(page, async (talk: Doc<'talks'>) => {
-      const speaker = await ctx.db.get(talk.speakerId);
+      const speaker = await ctx.db.get('speakers', talk.speakerId);
       return { ...talk, speaker };
     });
 
@@ -264,7 +264,7 @@ export const listTalks = query({
         .collect();
 
       const talkIds = talksOnTopics.map((t) => t.talkId);
-      const talks = await Promise.all(talkIds.map((id) => ctx.db.get(id)));
+      const talks = await Promise.all(talkIds.map((id) => ctx.db.get('talks', id)));
 
       // Filter out null results and apply additional filters
       let filteredTalks = talks.filter((talk): talk is Doc<'talks'> => talk !== null);

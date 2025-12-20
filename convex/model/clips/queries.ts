@@ -37,8 +37,8 @@ export const getClipBySlug = query({
     }
 
     const queries = {
-      speaker: clip.speakerId ? ctx.db.get(clip.speakerId) : null,
-      talk: clip.talkId ? ctx.db.get(clip.talkId) : null,
+      speaker: clip.speakerId ? ctx.db.get('speakers', clip.speakerId) : null,
+      talk: clip.talkId ? ctx.db.get('talks', clip.talkId) : null,
       topics: getManyVia(ctx.db, 'clipsOnTopics', 'topicId', 'by_clipId', clip._id, 'clipId'),
     };
 
@@ -117,7 +117,7 @@ export const listClipsWithSpeakers = query({
     }
 
     const enrichedPage = await asyncMap(result.page, async (clip) => {
-      const speaker = clip.speakerId ? await ctx.db.get(clip.speakerId) : null;
+      const speaker = clip.speakerId ? await ctx.db.get('speakers', clip.speakerId) : null;
       return { ...clip, speaker };
     });
 

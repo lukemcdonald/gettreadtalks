@@ -21,7 +21,7 @@ export const archiveClip = mutation({
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
-    const clip = await ctx.db.get(args.id);
+    const clip = await ctx.db.get('clips', args.id);
 
     if (!clip) {
       throwNotFound('Clip not found', { resource: 'clip', resourceId: args.id });
@@ -100,7 +100,7 @@ export const updateClip = mutation({
 
     const { id, ...rest } = args;
     const updates: Partial<Doc<'clips'>> = rest;
-    const clip = await ctx.db.get(id);
+    const clip = await ctx.db.get('clips', id);
 
     if (!clip) {
       throwNotFound('Clip not found', { resource: 'clip', resourceId: id });
@@ -153,7 +153,7 @@ export const updateClipStatus = mutation({
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
-    const clip: Doc<'clips'> | null = await ctx.db.get(args.id);
+    const clip: Doc<'clips'> | null = await ctx.db.get('clips', args.id);
 
     if (!clip) {
       throwNotFound('Clip not found', { resource: 'clip', resourceId: args.id });
