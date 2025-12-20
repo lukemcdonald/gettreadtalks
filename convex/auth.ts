@@ -3,7 +3,6 @@ import type { DataModel } from './_generated/dataModel';
 import { type GenericCtx, createClient } from '@convex-dev/better-auth';
 import { convex as convexPlugin } from '@convex-dev/better-auth/plugins';
 import { type BetterAuthOptions, betterAuth } from 'better-auth';
-import { nextCookies } from 'better-auth/next-js';
 import { admin as adminPlugin } from 'better-auth/plugins';
 
 import { components } from './_generated/api';
@@ -26,21 +25,18 @@ export const authComponent = createClient<DataModel, typeof authSchema>(componen
 });
 
 /**
- * Creates Better Auth options without instantiating Better Auth.
- * This allows the component directory to access options without triggering
- * environment variable errors.
- *
- * @param ctx - The Convex context.
- * @returns Better Auth options object.
+ * Creates Better Auth options. Uses fallback values during module analysis.
  */
 export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
-  const secret = process.env.BETTER_AUTH_SECRET;
+  const secret = process.env.BETTER_AUTH_SECRET ?? 'analysis-placeholder-secret';
+  const siteUrl = process.env.SITE_URL ?? 'https://localhost:3000';
+  const isHttps = siteUrl.startsWith('https://');
 
   return {
     advanced: {
-      useSecureCookies: true, // Set to true and use `next dev --experimental-https`
+      useSecureCookies: isHttps,
     },
-    baseURL: process.env.SITE_URL,
+    baseURL: siteUrl,
     database: authComponent.adapter(ctx),
     emailAndPassword: {
       enabled: true,
@@ -51,8 +47,10 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
         adminRoles: ['admin'],
         defaultRole: 'user',
       }),
-      convexPlugin({ authConfig }),
-      nextCookies(), // Add nextCookies as the last plugin for automatic cookie handling
+      convexPlugin({
+        authConfig,
+        jwksRotateOnTokenGenerationError: true,
+      }),
     ],
     secret,
     trustedOrigins: [
@@ -65,13 +63,9 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
 };
 
 /**
- * Creates a new Better Auth instance.
- *
- * @param ctx - The Convex context.
- * @returns The Better Auth instance.
+ * Creates a Better Auth instance.
  */
 export const createAuth = (ctx: GenericCtx<DataModel>) => {
   const options = createAuthOptions(ctx);
-
   return betterAuth(options);
 };

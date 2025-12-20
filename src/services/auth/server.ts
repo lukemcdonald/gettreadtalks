@@ -5,7 +5,6 @@ import type { AdminUser } from '@/services/auth/types';
 
 import { cache } from 'react';
 import { convexBetterAuthNextJs } from '@convex-dev/better-auth/nextjs';
-import { fetchQuery } from 'convex/nextjs';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
@@ -44,17 +43,26 @@ const getAuthToken = cache(async () => {
 /**
  * Get the current authenticated user server-side.
  *
+ * Uses fetchAuthQuery which automatically handles:
+ * - Cookie reading and token extraction
+ * - Passing auth token to Convex query
+ * - Error handling for unauthenticated requests
+ *
  * @returns User object or null if not authenticated
  */
-const getCurrentUser = async () => {
-  const token = await getAuthToken();
+const getCurrentUser = cache(async () => {
+  // Always access cookies to satisfy Next.js 16 Turbopack requirements
+  // This ensures dynamic rendering before Math.random() usage in betterAuth
+  await cookies();
 
-  if (!token) {
+  // fetchAuthQuery handles token extraction and passing automatically
+  try {
+    return await fetchAuthQuery(api.users.getCurrentUser, {});
+  } catch {
+    // If query fails, user is not authenticated
     return null;
   }
-
-  return await fetchQuery(api.users.getCurrentUser, {}, { token });
-};
+});
 
 /**
  * Require authentication and return the current user.
