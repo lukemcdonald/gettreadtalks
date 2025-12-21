@@ -60,28 +60,32 @@ const config = IS_SENTRY_ENABLED
       // Upload a larger set of source maps for prettier stack traces (increases build time)
       widenClientFileUpload: true,
 
-      // Automatically tree-shake Sentry logger statements to reduce bundle size
-      disableLogger: IS_PROD,
-
-      // Enables automatic instrumentation of Vercel Cron Monitors
-      automaticVercelMonitors: true,
-
       // Enhanced source map configuration for better debugging
       // See: https://docs.sentry.io/platforms/javascript/guides/nextjs/sourcemaps/
       sourcemaps: {
-        disable: false, // Source maps are enabled by default
+        deleteSourcemapsAfterUpload: true, // Security: delete after upload
         assets: ['**/*.js', '**/*.js.map'],
+        disable: false, // Source maps are enabled by default
         ignore: [
           '**/node_modules/**',
           '**/.next/static/chunks/**', // Exclude Next.js chunks
         ],
-        deleteSourcemapsAfterUpload: true, // Security: delete after upload
       },
 
-      // Application key for third-party error filtering
-      // This marks your application code so it can be distinguished from third-party code
-      unstable_sentryWebpackPluginOptions: {
-        applicationKey: 'gettreadtalks-app',
+      webpack: {
+        // Enables automatic instrumentation of Vercel Cron Monitors
+        automaticVercelMonitors: true,
+
+        // Automatically tree-shake Sentry logger statements to reduce bundle size
+        treeshake: {
+          removeDebugLogging: IS_PROD,
+        },
+
+        // Application key for third-party error filtering
+        // This marks your application code so it can be distinguished from third-party code
+        unstable_sentryWebpackPluginOptions: {
+          applicationKey: 'gettreadtalks-app',
+        },
       },
     })
   : nextConfig;

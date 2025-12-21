@@ -25,7 +25,12 @@ export const IS_LOCAL = DEPLOY_ENV === 'local';
 export const IS_PREVIEW = DEPLOY_ENV === 'dev'; // Preview deployments are "dev"
 
 function getStandardizedEnvironment(): DeployEnvironment {
-  switch (process.env.VERCEL_ENV) {
+  // Server-side: Use VERCEL_ENV (automatically set by Vercel)
+  // Client-side: Use NEXT_PUBLIC_VERCEL_ENV (must be set in Vercel environment variables)
+  const vercelEnv =
+    typeof window === 'undefined' ? process.env.VERCEL_ENV : process.env.NEXT_PUBLIC_VERCEL_ENV;
+
+  switch (vercelEnv) {
     case 'production':
       return 'prod';
     case 'preview':

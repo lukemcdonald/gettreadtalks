@@ -7,7 +7,8 @@ import { captureRouterTransitionStart } from '@sentry/nextjs';
 import { IS_SENTRY_ENABLED } from './src/configs/sentry';
 
 if (IS_SENTRY_ENABLED) {
-  import('./src/configs/sentry/client');
+  // Silently handle import failures - Sentry is non-critical
+  import('./src/configs/sentry/client').catch(() => {});
 }
 
 // Export the router transition hook for Sentry navigation instrumentation

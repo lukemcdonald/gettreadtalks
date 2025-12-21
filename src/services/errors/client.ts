@@ -46,7 +46,7 @@ export function captureException(
 
     // Add context data (appears in Context section in Sentry)
     if (context) {
-      scope.setContext('error_context', context);
+      scope.setContext('Details', context);
     }
 
     // Set custom fingerprint for error grouping
@@ -125,6 +125,61 @@ export function getEventIdFromError(error: unknown): string | undefined {
  */
 export function clearUserContext(): void {
   sentrySetUser(null);
+}
+
+/**
+ * Captures a message and reports it to Sentry.
+ * Use this for logging important events or non-error messages.
+ *
+ * @example
+ * captureMessage('User completed checkout', {
+ *   level: 'info',
+ *   tags: { feature: 'checkout' },
+ *   extras: { orderId: '123' },
+ * });
+ */
+export function captureMessage(
+  message: string,
+  options: Omit<ErrorReportOptions, 'transactionName'> = {},
+): string | undefined {
+  const { context, extras, fingerprint, level = 'info', tags, user } = options;
+
+  return sentryWithScope((scope) => {
+    // Set message level
+    scope.setLevel(level);
+
+    // Add context data
+    if (context) {
+      scope.setContext('message_context', context);
+    }
+
+    // Set custom fingerprint for message grouping
+    if (fingerprint) {
+      scope.setFingerprint(fingerprint);
+      scope.setExtra('fingerprint', fingerprint.join('|'));
+    }
+
+    // Add tags for filtering
+    if (tags) {
+      for (const [key, value] of Object.entries(tags)) {
+        scope.setTag(key, value);
+      }
+    }
+
+    // Set user context
+    if (user) {
+      scope.setUser(user);
+    }
+
+    // Add extra data
+    if (extras) {
+      for (const [key, value] of Object.entries(extras)) {
+        scope.setExtra(key, value);
+      }
+    }
+
+    return sentryCaptureMessage(message, level);
+  });
 }
 
 /**
