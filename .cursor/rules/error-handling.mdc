@@ -15,6 +15,23 @@ Comprehensive error handling patterns for frontend and backend with Sentry integ
 - **Provide user context** - Associate errors with users and operations when available
 - **Handle gracefully** - Show user-friendly messages while capturing technical details
 
+## Sentry Usage
+
+**`captureException()`** - Use for actual errors/exceptions:
+- Try/catch blocks, failed API calls, validation failures
+- Any error that needs investigation
+
+**`captureMessage()`** - Use for important non-error events:
+- Business milestones: "User completed checkout", "Payment processed"
+- Warnings that need tracking but aren't errors
+- Info-level events you want to monitor
+
+**`addBreadcrumb()`** - Use for context leading up to errors:
+- User actions: "User clicked submit", "Form field changed"
+- API calls: "Fetching user data"
+- Navigation: "User navigated to /checkout"
+- Appears in breadcrumb trail when an error occurs
+
 ## Frontend Error Handling
 
 ### Use Custom Hooks for Convex Mutations
