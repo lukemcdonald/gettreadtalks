@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs';
 import { NextResponse } from 'next/server';
 
 import { DEPLOY_ENV } from '@/constants/env';
@@ -48,6 +49,14 @@ export async function GET(request: Request) {
           },
         });
 
+        // Flush with longer timeout and catch errors
+        let flushResult = false;
+        try {
+          flushResult = await Sentry.flush(10_000);
+        } catch (flushError) {
+          console.error('Sentry flush error:', flushError);
+        }
+
         return NextResponse.json({
           success: true,
           eventId,
@@ -55,8 +64,13 @@ export async function GET(request: Request) {
           debug: {
             deployEnv: DEPLOY_ENV,
             hasEventId: !!eventId,
+            flushCompleted: flushResult,
             sentryEnabled: process.env.NEXT_PUBLIC_SENTRY_ENABLED,
             hasDsn: !!process.env.NEXT_PUBLIC_SENTRY_DSN,
+            dsnPreview: process.env.NEXT_PUBLIC_SENTRY_DSN
+              ? `${process.env.NEXT_PUBLIC_SENTRY_DSN.substring(0, 20)}...`
+              : 'Not set',
+            runtime: process.env.NEXT_RUNTIME,
           },
         });
       }
@@ -75,10 +89,21 @@ export async function GET(request: Request) {
           },
         });
 
+        // Flush with longer timeout and catch errors
+        let flushResult = false;
+        try {
+          flushResult = await Sentry.flush(10_000);
+        } catch (flushError) {
+          console.error('Sentry flush error:', flushError);
+        }
+
         return NextResponse.json({
           success: true,
           eventId,
           message: 'Server-side message sent to Sentry',
+          debug: {
+            flushCompleted: flushResult,
+          },
         });
       }
 
