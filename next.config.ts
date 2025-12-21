@@ -2,7 +2,6 @@ import type { NextConfig } from 'next';
 
 import { withSentryConfig } from '@sentry/nextjs';
 
-import { IS_PROD } from '@/constants/env';
 import { IS_SENTRY_ENABLED } from './src/configs/sentry';
 
 const cspHeader = `
@@ -12,7 +11,7 @@ const cspHeader = `
   font-src 'self' data:;
   form-action 'self';
   frame-ancestors 'none';
-  frame-src 'self';
+  frame-src 'self' https://vercel.live;
   img-src 'self' blob: data: https:;
   object-src 'none';
   script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live;
@@ -45,47 +44,17 @@ const nextConfig = {
   ],
 } satisfies NextConfig;
 
-// Wrap with Sentry configuration if Sentry is enabled
 const config = IS_SENTRY_ENABLED
   ? withSentryConfig(nextConfig, {
-      // For all available options, see:
-      // https://www.npmjs.com/package/@sentry/webpack-plugin#options
       authToken: process.env.SENTRY_AUTH_TOKEN,
       org: process.env.SENTRY_ORG,
       project: process.env.SENTRY_PROJECT,
-
-      // Only print logs for uploading source maps in CI
       silent: !process.env.CI,
-
-      // Upload a larger set of source maps for prettier stack traces (increases build time)
-      widenClientFileUpload: true,
-
-      // Enhanced source map configuration for better debugging
-      // See: https://docs.sentry.io/platforms/javascript/guides/nextjs/sourcemaps/
       sourcemaps: {
-        deleteSourcemapsAfterUpload: true, // Security: delete after upload
-        assets: ['**/*.js', '**/*.js.map'],
-        disable: false, // Source maps are enabled by default
-        ignore: [
-          '**/node_modules/**',
-          '**/.next/static/chunks/**', // Exclude Next.js chunks
-        ],
+        disable: true,
       },
-
-      webpack: {
-        // Enables automatic instrumentation of Vercel Cron Monitors
-        automaticVercelMonitors: true,
-
-        // Automatically tree-shake Sentry logger statements to reduce bundle size
-        treeshake: {
-          removeDebugLogging: IS_PROD,
-        },
-
-        // Application key for third-party error filtering
-        // This marks your application code so it can be distinguished from third-party code
-        unstable_sentryWebpackPluginOptions: {
-          applicationKey: 'gettreadtalks-app',
-        },
+      release: {
+        create: false,
       },
     })
   : nextConfig;
