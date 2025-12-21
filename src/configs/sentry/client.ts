@@ -3,6 +3,11 @@ import * as Sentry from '@sentry/nextjs';
 import { IS_PROD } from '@/constants/env';
 import { baseSentryConfig } from './index';
 
+// Expose Sentry on window for debugging (Next.js doesn't do this by default)
+if (typeof window !== 'undefined') {
+  (window as any).Sentry = Sentry;
+}
+
 Sentry.init({
   ...baseSentryConfig,
   attachStacktrace: true,
@@ -14,7 +19,7 @@ Sentry.init({
       blockAllMedia: true,
       maskAllText: true,
     }),
-    // Reduce noise by disabling most breadcrumbs
+    // Disable all automatic breadcrumbs to reduce noise
     Sentry.breadcrumbsIntegration({
       console: false,
       dom: false,
@@ -39,7 +44,7 @@ Sentry.init({
     if (event.exception) {
       event.extra = {
         ...event.extra,
-        referrer: document.referrer || 'direct',
+        referrer: document.referrer,
       };
     }
     return event;

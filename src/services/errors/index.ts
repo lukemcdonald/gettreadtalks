@@ -11,6 +11,7 @@ export type {
 export {
   addBreadcrumb,
   captureException,
+  captureMessage,
   clearUserContext,
   setUserContext,
 } from './client';
