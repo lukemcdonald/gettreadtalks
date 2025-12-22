@@ -31,7 +31,7 @@ Fast initial render, no loading state, SEO-friendly.
 ```ts
 // app/items/page.tsx (Server Component)
 import { ItemList } from '@/components/items/item-list';
-import { getItems } from '@/lib/features/items/queries';
+import { getItems } from '@/features/items/queries';
 
 export default async function ItemsPage() {
   const items = await getItems();
@@ -65,7 +65,7 @@ Server renders initial data, client subscribes for updates.
 
 ```ts
 // app/items/page.tsx (Server Component)
-import { getItems } from '@/lib/features/items/queries';
+import { getItems } from '@/features/items/queries';
 import { ItemsClient } from './items-client';
 
 export default async function ItemsPage() {
@@ -75,7 +75,7 @@ export default async function ItemsPage() {
 
 // app/items/items-client.tsx (Client Component)
 'use client';
-import { useItems } from '@/lib/features/items/hooks';
+import { useItems } from '@/features/items/hooks';
 import { ItemList } from '@/components/items/item-list';
 
 export function ItemsClient({ initialData }) {
@@ -92,14 +92,16 @@ Handle form submissions with Server Actions.
 // app/items/new/page.tsx (Client Component)
 'use client';
 import { useRouter } from 'next/navigation';
-import { createItem } from '@/lib/features/items/actions';
+import { createItemAction } from '@/features/items/actions';
 
 export default function NewItemPage() {
   const router = useRouter();
 
   const handleSubmit = async (data) => {
-    await createItem(data);
-    router.push('/items');
+    const result = await createItemAction(data);
+    if (result.success) {
+      router.push('/items');
+    }
   };
 
   return <ItemForm onSubmit={handleSubmit} />;
@@ -113,7 +115,7 @@ Quick interactions use client-side mutations.
 ```ts
 // components/items/favorite-button.tsx (Client Component)
 'use client';
-import { useFavoriteToggle } from '@/lib/features/favorites/hooks';
+import { useFavoriteToggle } from '@/features/favorites/hooks';
 
 export function FavoriteButton({ itemId }) {
   const toggleFavorite = useFavoriteToggle();
@@ -191,7 +193,7 @@ export default async function ItemPage({ params }) {
 
 ```ts
 // ✅ Client-only: useQuery hooks
-// lib/features/users/hooks/use-favorites.ts
+// src/features/users/hooks/use-favorites.ts
 export function useFavorites(limit?: number) {
   const data = useQuery(api.users.getFavorites, { limit });
   return { data, isLoading: data === undefined };

@@ -182,7 +182,7 @@ export function useItemWithRelated(id: string) {
 Use singular/plural nouns to indicate return type:
 
 ```ts
-// server.ts - Server reads
+// queries.ts - Server reads
 
 // Single items (return one or null)
 export async function getItem(id);
@@ -232,7 +232,7 @@ getItemsWithAuthors({ limit: 20, cursor, featured, search, ... }) → { items, c
 - Consistent API across all functions
 - Better TypeScript inference
 
-**Note:** Backend Convex queries use `get*`/`list*` pattern for clarity in database operations, but frontend server functions use singular/plural for consistency with React hooks.
+**Note:** Backend Convex queries use `get*`/`list*` pattern for clarity in database operations, but frontend query functions (in `queries.ts`) use singular/plural for consistency with React hooks.
 
 ## Convex Query Naming Conventions
 
@@ -284,19 +284,38 @@ getItemsWithAuthors({ limit: 20, cursor, featured, search, ... }) → { items, c
 export const getItemBySlug = queries.getItemBySlug;
 ```
 
-### Server Action Names
+### Query Function Names (queries.ts)
 
-**Server action names should match their purpose. BySlug queries are for detail pages and always return relations.**
+**Query function names should match their purpose. BySlug queries are for detail pages and always return relations.**
 
 ```ts
-// Detail pages - BySlug queries return relations
+// queries.ts - Detail pages - BySlug queries return relations
 export async function getItemBySlug(slug: string) {
   return await fetchQuery(api.items.getItemBySlug, { slug }, { token });
 }
 
-// Simple lookups - use getItem(id) for entities without relations
+// queries.ts - Simple lookups - use getItem(id) for entities without relations
 export async function getItem(id: string) {
   return await fetchQuery(api.items.getItem, { id }, { token });
+}
+```
+
+### Server Action Names (actions/)
+
+**Server Action names should end with `Action` suffix and match their purpose.**
+
+```ts
+// actions/create-item.ts
+export async function createItemAction(data: unknown): Promise<ActionResult<{ itemId: string }>> {
+  // ...
+}
+
+// actions/update-item.ts
+export async function updateItemAction(
+  data: unknown,
+  itemId: string,
+): Promise<ActionResult<{ itemId: string }>> {
+  // ...
 }
 ```
 
@@ -312,21 +331,21 @@ Combine in server action when:
 - ✅ One-off combinations
 - ✅ Context-specific data aggregation
 
-## Feature Actions (Server)
+## Feature Actions (Server Actions)
 
-Use clear verb prefixes to indicate the operation:
+Use clear verb prefixes with `Action` suffix for Server Actions:
 
 ```ts
-// server.ts - Server writes
+// actions/ - Server Actions (form submissions with validation)
 
 // CRUD operations
-export async function archiveItem(id); // Soft delete (set status to 'archived')
-export async function createItem(data); // Create new
-export async function destroyItem(id); // Hard delete (permanent removal from DB)
-export async function updateItem(id, data); // Update existing
+export async function archiveItemAction(id); // Soft delete (set status to 'archived')
+export async function createItemAction(data); // Create new
+export async function destroyItemAction(id); // Hard delete (permanent removal from DB)
+export async function updateItemAction(id, data); // Update existing
 
 // Status changes
-export async function publishItem(id); // Specific status action
+export async function publishItemAction(id); // Specific status action
 
 // Relationship management (always specify "from X")
 export async function removeItemFromCategory(itemId, categoryId);
