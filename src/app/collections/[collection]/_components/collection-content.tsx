@@ -1,4 +1,5 @@
 import type { CollectionData } from '@/features/collections/types';
+import type { TalkWithSpeaker } from '@/features/talks/types';
 
 import { GridList } from '@/components/grid-list';
 import { TalkCard } from '@/components/talk-card';
@@ -10,7 +11,7 @@ type CollectionContentProps = {
 export function CollectionContent({ talks }: CollectionContentProps) {
   return (
     <GridList>
-      {talks.map((talk) => (
+      {talks.map((talk: TalkWithSpeaker) => (
         <TalkCard
           featured={talk.featured}
           key={talk._id}

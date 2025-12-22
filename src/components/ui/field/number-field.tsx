@@ -10,8 +10,14 @@ import {
   FieldError,
   FieldLabel,
   FieldRequired,
-  Input,
-} from '@/components/ui';
+} from '@/components/ui/field';
+import {
+  NumberFieldDecrement,
+  NumberFieldGroup,
+  NumberFieldIncrement,
+  NumberFieldInput,
+  NumberField as NumberFieldPrimitive,
+} from '@/components/ui/primitives/number-field';
 
 type NumberFieldProps<T extends FieldValues> = {
   control: Control<T>;
@@ -22,11 +28,12 @@ type NumberFieldProps<T extends FieldValues> = {
   name: FieldPath<T>;
   placeholder?: string;
   required?: boolean;
+  showButtons?: boolean;
   step?: number;
 };
 
 /**
- * Reusable number input field component that wraps Controller + Field + Input with type="number".
+ * Reusable number input field component that wraps Controller + Field + Base UI NumberField.
  * Handles validation errors automatically via React Hook Form.
  *
  * @example
@@ -36,6 +43,7 @@ type NumberFieldProps<T extends FieldValues> = {
  *   label="Collection Order"
  *   name="collectionOrder"
  *   min={0}
+ *   showButtons
  * />
  * ```
  */
@@ -48,6 +56,7 @@ export function NumberField<T extends FieldValues>({
   name,
   placeholder,
   required,
+  showButtons = false,
   step,
 }: NumberFieldProps<T>) {
   return (
@@ -68,18 +77,27 @@ export function NumberField<T extends FieldValues>({
               <FieldRequired required={required} />
             </FieldLabel>
             <FieldDescription>{description}</FieldDescription>
-            <Input
+            <NumberFieldPrimitive
               aria-invalid={fieldState.invalid}
               max={max}
               min={min}
-              onChange={(e) => onChange(e.target.valueAsNumber || undefined)}
-              placeholder={placeholder}
+              onValueChange={(newValue) => {
+                onChange(newValue ?? undefined);
+              }}
               required={required}
               step={step}
-              type="number"
-              value={value ?? ''}
-              {...inputProps}
-            />
+              value={value ?? null}
+            >
+              {showButtons ? (
+                <NumberFieldGroup>
+                  <NumberFieldDecrement />
+                  <NumberFieldInput placeholder={placeholder} {...inputProps} />
+                  <NumberFieldIncrement />
+                </NumberFieldGroup>
+              ) : (
+                <NumberFieldInput placeholder={placeholder} {...inputProps} />
+              )}
+            </NumberFieldPrimitive>
             <FieldError error={fieldState.error} />
           </Field>
         );
