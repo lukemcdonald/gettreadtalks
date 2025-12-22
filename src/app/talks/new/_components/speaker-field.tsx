@@ -94,15 +94,6 @@ export function SpeakerField<T extends FieldValues>({
                   placeholder="Search speakers..."
                   showClear
                 />
-                <ComboboxValue>
-                  {(value: SpeakerId | null) => {
-                    if (!value) {
-                      return '';
-                    }
-                    const speaker = speakers.find((s) => s._id === value);
-                    return getSpeakerName(speaker);
-                  }}
-                </ComboboxValue>
 
                 <ComboboxPopup>
                   <ComboboxEmpty>
