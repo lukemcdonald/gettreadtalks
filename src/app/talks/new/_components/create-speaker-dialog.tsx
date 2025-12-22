@@ -4,7 +4,6 @@ import type { SpeakerId } from '@/features/speakers/types';
 
 import { useState, useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { PlusIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
