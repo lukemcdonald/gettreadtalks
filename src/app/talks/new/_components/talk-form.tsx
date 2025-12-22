@@ -8,19 +8,18 @@ import { Controller, FormProvider } from 'react-hook-form';
 
 import {
   Button,
-  Checkbox,
-  Field,
-  FieldError,
-  FieldLabel,
+  FeaturedField,
   Form,
   FormError,
-  Input,
-  Textarea,
+  NumberField,
+  StatusField,
+  TextField,
+  TextareaField,
+  UrlField,
 } from '@/components/ui';
 import { useTalkForm } from '@/features/talks/hooks';
 import { CollectionSelectField } from './collection-select-field';
 import { SpeakerSelectField } from './speaker-select-field';
-import { StatusSelectField } from './status-select-field';
 
 type TalkFormProps = {
   collections: Pick<Collection, '_id' | 'slug' | 'title'>[];
@@ -76,22 +75,7 @@ export function TalkForm({
         <FormError error={form.formState.errors.root} />
 
         <div className="space-y-4">
-          <Controller
-            control={form.control}
-            name="title"
-            render={({ field, fieldState }) => (
-              <Field
-                dirty={fieldState.isDirty}
-                invalid={fieldState.invalid}
-                name={field.name}
-                touched={fieldState.isTouched}
-              >
-                <FieldLabel>Title</FieldLabel>
-                <Input aria-invalid={fieldState.invalid} required type="text" {...field} />
-                <FieldError error={fieldState.error} />
-              </Field>
-            )}
-          />
+          <TextField control={form.control} label="Title" name="title" required />
 
           <Controller
             control={form.control}
@@ -106,44 +90,11 @@ export function TalkForm({
             )}
           />
 
-          <Controller
-            control={form.control}
-            name="mediaUrl"
-            render={({ field, fieldState }) => (
-              <Field
-                dirty={fieldState.isDirty}
-                invalid={fieldState.invalid}
-                name={field.name}
-                touched={fieldState.isTouched}
-              >
-                <FieldLabel>Media URL</FieldLabel>
-                <Input aria-invalid={fieldState.invalid} required type="url" {...field} />
-                <FieldError error={fieldState.error} />
-              </Field>
-            )}
-          />
+          <UrlField control={form.control} label="Media URL" name="mediaUrl" required />
 
-          <Controller
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <Field name={field.name}>
-                <FieldLabel>Description</FieldLabel>
-                <Textarea rows={4} {...field} />
-              </Field>
-            )}
-          />
+          <TextareaField control={form.control} label="Description" name="description" rows={4} />
 
-          <Controller
-            control={form.control}
-            name="scripture"
-            render={({ field }) => (
-              <Field name={field.name}>
-                <FieldLabel>Scripture</FieldLabel>
-                <Input type="text" {...field} />
-              </Field>
-            )}
-          />
+          <TextField control={form.control} label="Scripture" name="scripture" />
 
           <Controller
             control={form.control}
@@ -159,61 +110,17 @@ export function TalkForm({
             )}
           />
 
-          <Controller
+          <NumberField control={form.control} label="Collection Order" name="collectionOrder" />
+
+          <StatusField
             control={form.control}
-            name="collectionOrder"
-            render={({ field, fieldState }) => {
-              const { onChange, value, ...inputProps } = field;
-              return (
-                <Field
-                  dirty={fieldState.isDirty}
-                  invalid={fieldState.invalid}
-                  name={field.name}
-                  touched={fieldState.isTouched}
-                >
-                  <FieldLabel>Collection Order</FieldLabel>
-                  <Input
-                    aria-invalid={fieldState.invalid}
-                    onChange={(e) => onChange(e.target.valueAsNumber || undefined)}
-                    type="number"
-                    value={value ?? ''}
-                    {...inputProps}
-                  />
-                  <FieldError error={fieldState.error} />
-                </Field>
-              );
+            name="status"
+            onChange={(value) => {
+              setTalkStatus(value as StatusType);
             }}
           />
 
-          <Controller
-            control={form.control}
-            name="status"
-            render={({ field }) => (
-              <StatusSelectField
-                onChange={(value) => {
-                  field.onChange(value);
-                  setTalkStatus(value);
-                }}
-                value={field.value}
-              />
-            )}
-          />
-
-          <Controller
-            control={form.control}
-            name="featured"
-            render={({ field }) => (
-              <Field name={field.name}>
-                <FieldLabel>
-                  <Checkbox
-                    checked={field.value}
-                    onCheckedChange={(checked) => field.onChange(checked === true)}
-                  />
-                  Featured
-                </FieldLabel>
-              </Field>
-            )}
-          />
+          <FeaturedField control={form.control} name="featured" />
         </div>
 
         <div className="flex items-center gap-4">
