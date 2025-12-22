@@ -20,3 +20,14 @@
 export type ActionResult<T> =
   | { success: true; data: T }
   | { success: false; errors: Record<string, string> };
+
+/**
+ * Status of form operations (creating, updating, deleting, etc.).
+ */
+export type FormStatus =
+  | 'archiving'
+  | 'creating'
+  | 'deleting'
+  | 'idle'
+  | 'unarchiving'
+  | 'updating';
