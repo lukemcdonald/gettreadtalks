@@ -51,3 +51,13 @@ certificates
 
 # Seed data (keep locally, not in repo)
 convex/migration/data/
+
+# Memory Bank - temporary ignore while testing
+.cursor/commands/van.md
+.cursor/commands/plan.md
+.cursor/commands/creative.md
+.cursor/commands/build.md
+.cursor/commands/reflect.md
+.cursor/commands/archive.md
+.cursor/rules/isolation_rules/
+memory-bank/
