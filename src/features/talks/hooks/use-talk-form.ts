@@ -95,10 +95,10 @@ export function useTalkForm({
     defaultValues: {
       collectionId: initialData?.collectionId,
       collectionOrder: initialData?.collectionOrder,
-      description: initialData?.description,
+      description: initialData?.description ?? '',
       featured: initialData?.featured ?? false,
       mediaUrl: initialData?.mediaUrl ?? '',
-      scripture: initialData?.scripture,
+      scripture: initialData?.scripture ?? '',
       speakerId: initialData?.speakerId ?? ('' as SpeakerId),
       status: initialData?.status ?? 'backlog',
       title: initialData?.title ?? '',

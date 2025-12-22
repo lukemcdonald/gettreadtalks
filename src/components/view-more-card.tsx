@@ -2,8 +2,6 @@
 
 import type { Route } from 'next';
 
-import Link from 'next/link';
-
 import { FauxLink } from '@/components/faux-link';
 import { Card, CardHeader } from '@/components/ui';
 import { cn } from '@/utils';

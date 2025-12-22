@@ -100,7 +100,7 @@ export function TalkForm({
                 onValueChange={(value) => {
                   field.onChange(value === '' ? undefined : (value as CollectionId));
                 }}
-                value={field.value as CollectionId | undefined}
+                value={field.value || ''}
               />
             )}
           />

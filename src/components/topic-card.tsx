@@ -1,7 +1,5 @@
 'use client';
 
-import Link from 'next/link';
-
 import { FauxLink } from '@/components/faux-link';
 import { Card, CardDescription, CardTitle } from '@/components/ui';
 
