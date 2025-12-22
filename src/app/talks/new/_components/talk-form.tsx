@@ -19,7 +19,7 @@ import {
 } from '@/components/ui';
 import { useTalkForm } from '@/features/talks/hooks';
 import { CollectionSelectField } from './collection-select-field';
-import { SpeakerSelectField } from './speaker-select-field';
+import { SpeakerField } from './speaker-field';
 
 type TalkFormProps = {
   collections: Pick<Collection, '_id' | 'slug' | 'title'>[];
@@ -35,7 +35,7 @@ type TalkFormProps = {
     title: string;
   };
   speakerSlug?: string;
-  speakers: Pick<Speaker, '_id' | 'firstName' | 'lastName' | 'slug'>[];
+  speakers: Pick<Speaker, '_id' | 'firstName' | 'lastName' | 'slug' | 'imageUrl' | 'role'>[];
   talkId?: TalkId;
   talkSlug?: string;
 };
@@ -77,17 +77,12 @@ export function TalkForm({
         <div className="space-y-4">
           <TextField control={form.control} label="Title" name="title" required />
 
-          <Controller
+          <SpeakerField
             control={form.control}
+            label="Speaker"
             name="speakerId"
-            render={({ field, fieldState }) => (
-              <SpeakerSelectField
-                error={fieldState.error}
-                onValueChange={field.onChange}
-                speakers={speakers}
-                value={field.value as SpeakerId}
-              />
-            )}
+            required
+            speakers={speakers}
           />
 
           <UrlField control={form.control} label="Media URL" name="mediaUrl" required />
@@ -128,7 +123,7 @@ export function TalkForm({
             {submitLabel}
           </Button>
 
-          {talkId && (
+          {Boolean(talkId) && (
             <>
               <Button
                 disabled={isBusy}
