@@ -23,7 +23,7 @@ export const talkFormSchema = z.object({
     .enum(['approved', 'archived', 'backlog', 'published'])
     .default('backlog')
     .transform((val) => val as StatusType),
-  title: z.string().min(2, 'Title must be at least 2 characters').trim(),
+  title: z.string().trim().min(2, 'Title must be at least 2 characters'),
 });
 
 /**

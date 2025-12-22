@@ -19,11 +19,8 @@ import { api } from '@/convex/_generated/api';
 import { withConvexAuth } from '@/lib/convex/server-action';
 import { mapConvexErrorToFormErrors, mapZodErrors } from '@/lib/forms/validation';
 import { requireAdminUser } from '@/services/auth/server';
+import type { ActionResult } from '@/lib/forms/types';
 import { formSchema, type FormData } from './schemas/form-schema';
-
-type ActionResult<T> =
-  | { success: true; data: T }
-  | { success: false; errors: Record<string, string> };
 
 export async function createItemAction(
   data: unknown
@@ -107,12 +104,15 @@ catch (error) {
 
 ## Return Type
 
-Server Actions return a discriminated union:
+Server Actions return a discriminated union defined in `@/lib/forms/types`:
 
 ```typescript
-type ActionResult<T> =
-  | { success: true; data: T }
-  | { success: false; errors: Record<string, string> };
+import type { ActionResult } from '@/lib/forms/types';
+
+// ActionResult<T> is defined as:
+// type ActionResult<T> =
+//   | { success: true; data: T }
+//   | { success: false; errors: Record<string, string> };
 ```
 
 - **Success**: `{ success: true, data: {...} }`

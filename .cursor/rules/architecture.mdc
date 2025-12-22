@@ -35,12 +35,24 @@ Business domains and entities (e.g., items, posts, users).
 
 ```sh
 lib/features/items/
+├─ queries.ts      # Server: Read operations (fetchQuery, Server Components only)
+│                  # Use queries/ folder when 3+ query functions
+├─ queries/        # Read operations folder (when 3+ queries)
+│  ├─ index.ts     # Barrel export
+│  ├─ get-item.ts
+│  └─ get-items.ts
+├─ actions/        # Server: Write operations (Server Actions, can be called from Client)
+│                  # Always use folder for consistency (even with 1 action)
+│  ├─ index.ts     # Barrel export
+│  ├─ create-item.ts
+│  └─ update-item.ts
 ├─ hooks/          # Client: React hooks (folder when 3+ hooks)
 │  ├─ index.ts     # Barrel export
 │  ├─ use-item.ts
 │  ├─ use-items.ts
 │  └─ use-create-item.ts
-├─ server.ts       # Server: Read & write operations (getItems, createItem)
+├─ schemas/        # Shared Zod validation schemas (when used by multiple actions)
+│  └─ *-form.ts    # Shared form schemas
 ├─ types.ts        # Shared: TypeScript types
 ├─ utils.ts        # Shared: Pure functions (optional)
 └─ index.ts        # Barrel export
@@ -48,9 +60,21 @@ lib/features/items/
 
 ### Which File Within a Feature?
 
-- **`server.ts`** - Server-side operations? Uses `fetchQuery` or `fetchMutation`? Has `"use server"`?
-  - Contains both read operations (`fetchQuery`) and write operations (`fetchMutation`)
-  - Called from Server Components or Server Actions
+- **`queries.ts`** / **`queries/`** - Server-side read operations? Uses `fetchQuery`? Has `"use server"`?
+  - Contains read operations (`fetchQuery`, `preloadQuery`)
+  - Called from Server Components only
+  - Returns data for initial page loads
+  - SEO-friendly, no loading states
+  - Use single file when 1-2 query functions (common pattern)
+  - Use folder when feature has 3+ query functions
+
+- **`actions/`** - Server Actions for form submissions? Uses `fetchMutation`? Has `"use server"`?
+  - Contains write operations (`fetchMutation`) with form validation
+  - Can be called from Client Components (Server Actions)
+  - Includes Zod validation and returns `ActionResult<T>`
+  - **Always use folder** for consistency (even with 1 action)
+  - Each action in its own file with barrel export from `index.ts`
+  - Schema co-located with action when action-specific, or in `schemas/` when shared
 - **`hooks/`** - Multiple React hooks (3+)? Client-side state? Uses `useQuery`/`useMutation`?
   - Use folder structure when feature has 3+ hooks
   - Each hook in its own file with barrel export from `index.ts`
@@ -63,13 +87,13 @@ lib/features/items/
 
 ```ts
 // ✅ Good - Feature-based imports
-import { createItem, getItems } from '@/features/items/server';
+import { getItems } from '@/features/items/queries';
+import { createItemAction } from '@/features/items/actions';
 import { useItems, useCreateItem } from '@/features/items/hooks';
 import type { Item } from '@/features/items/types';
 
 // ✅ Good - Barrel exports
-import { useItems } from '@/features/items';
-import { getItems } from '@/features/items';
+import { getItems, createItemAction, useItems } from '@/features/items';
 
 // ❌ Bad - Generic/unclear paths
 import { getItems } from '@/lib/queries';
@@ -140,12 +164,21 @@ import { formatDate } from '@/utils';
 - Uses: `useQuery`, `useMutation`, `useState`, `useEffect`, browser APIs
 - Example: React hooks, client-side state management
 
-### Server Files (`server.ts`)
+### Server Files (`queries.ts`, `actions/`)
 
+**`queries.ts`** - Read operations:
 - Must include `"use server"` directive
-- Contains both read operations (`fetchQuery`) and write operations (`fetchMutation`)
-- Uses: `fetchQuery`, `fetchMutation`, `preloadQuery`, `cookies`, `headers`, secrets
-- Called from Server Components or Server Actions
+- Contains read operations (`fetchQuery`, `preloadQuery`)
+- Uses: `fetchQuery`, `preloadQuery`, `cookies`, `headers`, secrets
+- Called from Server Components only
+- Returns data for initial page loads
+
+**`actions/`** - Write operations (Server Actions):
+- Must include `"use server"` and `"server-only"` directives
+- Contains write operations (`fetchMutation`) with form validation
+- Uses: `fetchMutation`, Zod schemas, error mapping
+- Can be called from Client Components (Server Actions)
+- Returns `ActionResult<T>` for form error handling
 
 ### Shared Files (`types.ts`, `validation.ts`, `utils.ts`)
 
@@ -176,10 +209,13 @@ Benefits: Single source of truth, easier refactoring, better naming
 ```sh
 // ✅ Feature contains all its code
 lib/features/items/
+├─ queries.ts       # Read operations
+├─ actions/         # Write operations (Server Actions)
+│  ├─ index.ts
+│  └─ create-item.ts
 ├─ hooks/
 │  ├─ index.ts
 │  └─ use-items.ts
-├─ server.ts
 ├─ types.ts
 └─ index.ts
 ```

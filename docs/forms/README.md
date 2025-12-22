@@ -7,6 +7,7 @@ This directory contains documentation for form patterns and best practices used 
 - **[Data Flow](./data-flow.md)**: Complete 7-step data flow from user input to database persistence
 - **[Error Handling](./error-handling.md)**: How to handle and display server-side errors with React Hook Form
 - **[Server Actions](./server-actions.md)**: Standard pattern for creating Server Actions that work with forms
+- **[Reusable Fields](./reusable-fields.md)**: Reusable form field components for consistent form implementation
 
 ## Quick Reference
 

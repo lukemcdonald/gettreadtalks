@@ -19,9 +19,9 @@ import { requireAdminUser } from '@/services/auth/server';
  */
 const createSpeakerSchema = z.object({
   description: z.string().optional(),
-  firstName: z.string().min(1, 'First name is required').trim(),
+  firstName: z.string().trim().min(1, 'First name is required'),
   imageUrl: z.string().url().optional().or(z.literal('')),
-  lastName: z.string().min(1, 'Last name is required').trim(),
+  lastName: z.string().trim().min(1, 'Last name is required'),
   ministry: z.string().optional(),
   role: z.string().optional(),
   websiteUrl: z.string().url().optional().or(z.literal('')),
