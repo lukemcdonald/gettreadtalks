@@ -148,10 +148,10 @@ import { SelectField } from '@/components/ui';
   label="Category"
   name="categoryId"
   options={[
+    { label: 'Select category', value: '' }, // Placeholder option (optional)
     { label: 'Option 1', value: '1' },
     { label: 'Option 2', value: '2' },
   ]}
-  placeholder="Select category"
   required
 />
 ```
@@ -160,8 +160,7 @@ import { SelectField } from '@/components/ui';
 - `control` - React Hook Form control object
 - `name` - Field name
 - `label` - Field label
-- `options` - Array of `{ label: string, value: string }` objects
-- `placeholder` - Placeholder text for empty selection (optional)
+- `options` - Array of `{ label: string, value: string }` objects. To include a placeholder, add it as the first option with an empty string value (e.g., `{ label: 'Select...', value: '' }`)
 - `required` - Show required asterisk (optional)
 - `description` - Help text (optional)
 
