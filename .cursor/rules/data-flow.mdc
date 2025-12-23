@@ -7,7 +7,7 @@ globs: **/*.tsx,**/*.ts
 
 ## Server Component vs Client Component
 
-### Use Server Component (default) when:
+### Use Server Component (default) when
 
 - No interactivity needed
 - No React hooks (`useState`, `useEffect`)
@@ -15,7 +15,7 @@ globs: **/*.tsx,**/*.ts
 - Want fast initial load with no loading states
 - SEO important
 
-### Use Client Component when:
+### Use Client Component when
 
 - Need interactivity (forms, buttons with `onClick`)
 - Need React hooks (`useState`, `useEffect`, `useContext`)
@@ -30,8 +30,8 @@ Fast initial render, no loading state, SEO-friendly.
 
 ```ts
 // app/items/page.tsx (Server Component)
-import { ItemList } from '@/components/items/item-list';
-import { getItems } from '@/features/items/queries';
+import { ItemList } from "@/components/items/item-list";
+import { getItems } from "@/features/items/queries";
 
 export default async function ItemsPage() {
   const items = await getItems();
@@ -45,15 +45,15 @@ Subscribe to Convex for real-time updates.
 
 ```ts
 // app/dashboard/page.tsx (Client Component)
-'use client';
-import { useMyItems } from '@/lib/features/items/hooks';
+"use client";
+import { useMyItems } from "@/lib/features/items/hooks";
 
 export default function DashboardPage() {
   const items = useMyItems();
 
   if (!items) {
-    return <div>Loading...</div>
-  };
+    return <div>Loading...</div>;
+  }
 
   return <ItemList items={items} />;
 }
@@ -65,18 +65,20 @@ Server renders initial data, client subscribes for updates.
 
 ```ts
 // app/items/page.tsx (Server Component)
-import { getItems } from '@/features/items/queries';
-import { ItemsClient } from './items-client';
+import { getItems } from "@/features/items/queries";
+import { ItemsClient } from "./items-client";
 
 export default async function ItemsPage() {
   const initialItems = await getItems();
   return <ItemsClient initialData={initialItems} />;
 }
+```
 
+```ts
 // app/items/items-client.tsx (Client Component)
-'use client';
-import { useItems } from '@/features/items/hooks';
-import { ItemList } from '@/components/items/item-list';
+"use client";
+import { useItems } from "@/features/items/hooks";
+import { ItemList } from "@/components/items/item-list";
 
 export function ItemsClient({ initialData }) {
   const items = useItems() ?? initialData;
@@ -90,9 +92,9 @@ Handle form submissions with Server Actions.
 
 ```ts
 // app/items/new/page.tsx (Client Component)
-'use client';
-import { useRouter } from 'next/navigation';
-import { createItemAction } from '@/features/items/actions';
+"use client";
+import { useRouter } from "next/navigation";
+import { createItemAction } from "@/features/items/actions";
 
 export default function NewItemPage() {
   const router = useRouter();
@@ -100,7 +102,7 @@ export default function NewItemPage() {
   const handleSubmit = async (data) => {
     const result = await createItemAction(data);
     if (result.success) {
-      router.push('/items');
+      router.push("/items");
     }
   };
 
@@ -114,8 +116,8 @@ Quick interactions use client-side mutations.
 
 ```ts
 // components/items/favorite-button.tsx (Client Component)
-'use client';
-import { useFavoriteToggle } from '@/features/favorites/hooks';
+"use client";
+import { useFavoriteToggle } from "@/features/favorites/hooks";
 
 export function FavoriteButton({ itemId }) {
   const toggleFavorite = useFavoriteToggle();
@@ -133,17 +135,20 @@ export function FavoriteButton({ itemId }) {
 ### Decision Tree: When to Use Each Pattern
 
 **Use `preloadQuery` + `usePreloadedQuery` when:**
+
 - Critical above-the-fold content (homepage, landing pages)
 - SEO is important (public pages, content indexing)
 - Want zero loading states for initial render
 - Need both server rendering and client interactivity
 
 **Use `fetchQuery` (server-only) when:**
+
 - Static data that doesn't change during user session
 - No client-side interactivity needed
 - SEO critical but no real-time updates required
 
 **Use `useQuery` hooks when:**
+
 - User-specific data (favorites, profiles, dashboard content)
 - Need real-time updates during user session
 - Interactive features that respond to user actions
@@ -155,21 +160,36 @@ export function FavoriteButton({ itemId }) {
 // ✅ Hybrid: preloadQuery + usePreloadedQuery
 // app/page.tsx (Server Component)
 export default async function HomePage() {
-  const preloadedItems = await preloadQuery(
+  const preloadedItems = await preloadQuery(api.items.list, { limit: 12 }, { token: authToken });
+  return <HomeContent preloadedItems={preloadedItems} />;
+}
+
+// ✅ Alternative: Wrap preloadQuery in feature function
+// src/features/items/queries.ts
+export async function preloadItems(limit = 12) {
+  const token = await getAuthToken();
+  return await preloadQuery(
     api.items.list,
-    { limit: 12 },
-    { token: authToken },
+    { paginationOpts: { cursor: null, numItems: limit } },
+    { token }
   );
+}
+
+// app/page.tsx (Server Component)
+export default async function HomePage() {
+  const preloadedItems = await preloadItems(12);
   return <HomeContent preloadedItems={preloadedItems} />;
 }
 
 // app/_components/home-content.tsx (Client Component)
-'use client';
+("use client");
 export function HomeContent({ preloadedItems }) {
   const initialItems = usePreloadedQuery(preloadedItems);
   // Add interactivity: pagination, filtering, real-time updates
 }
 ```
+
+**Note:** Wrapping `preloadQuery` in feature functions (like `preloadItems()`) is a valid pattern that provides a cleaner API and encapsulates Convex-specific details.
 
 ```ts
 // ✅ Server-only: fetchQuery (Detail Pages Pattern)
@@ -177,11 +197,11 @@ export function HomeContent({ preloadedItems }) {
 export default async function ItemPage({ params }) {
   const { slug } = await params;
   const itemData = await getItemBySlug(slug);
-  
+
   if (!itemData) notFound();
-  
+
   const { item, author, category, tags, relatedItems } = itemData;
-  
+
   return (
     <SidebarLayout
       content={<ItemContent item={item} relatedItems={relatedItems} />}
@@ -202,12 +222,12 @@ export function useFavorites(limit?: number) {
 
 ### Quick Decision Matrix
 
-| Scenario | Pattern | Rationale |
-|----------|---------|-----------|
-| **Homepage/data listing** | `preloadQuery` + `usePreloadedQuery` | Zero loading states and real-time updates |
-| **Public content** | `fetchQuery` only | SEO critical and static content |
-| **User dashboard/favorites** | `useQuery` hooks | User-specific data and real-time updates |
-| **Interactive lists** | Hybrid pattern | Best performance and user experience |
+| Scenario                     | Pattern                              | Rationale                                 |
+| ---------------------------- | ------------------------------------ | ----------------------------------------- |
+| **Homepage/data listing**    | `preloadQuery` + `usePreloadedQuery` | Zero loading states and real-time updates |
+| **Public content**           | `fetchQuery` only                    | SEO critical and static content           |
+| **User dashboard/favorites** | `useQuery` hooks                     | User-specific data and real-time updates  |
+| **Interactive lists**        | Hybrid pattern                       | Best performance and user experience      |
 
 ## Data Combining Patterns
 
@@ -228,12 +248,12 @@ export function useFavorites(limit?: number) {
 
 ### Decision Matrix
 
-| Scenario | Pattern | Example |
-|----------|---------|---------|
-| **Always needed together** | Combine in Convex | `getItemBySlugWithRelations` for detail pages |
-| **Used in 2+ places** | Combine in Convex | `listItemsWithAuthors` used in multiple pages |
-| **Conditional/optional** | Combine in server action | Filter dropdowns with optional data |
-| **One-off combination** | Combine in server action | Custom dashboard aggregations |
+| Scenario                   | Pattern                  | Example                                       |
+| -------------------------- | ------------------------ | --------------------------------------------- |
+| **Always needed together** | Combine in Convex        | `getItemBySlugWithRelations` for detail pages |
+| **Used in 2+ places**      | Combine in Convex        | `listItemsWithAuthors` used in multiple pages |
+| **Conditional/optional**   | Combine in server action | Filter dropdowns with optional data           |
+| **One-off combination**    | Combine in server action | Custom dashboard aggregations                 |
 
 ### Anti-Pattern: N+1 Queries
 
@@ -257,6 +277,7 @@ const itemsWithAuthors = await fetchQuery(
 ```
 
 **Why avoid N+1:**
+
 - Multiple round trips to database
 - Poor performance with large datasets
 - Unnecessary network overhead
@@ -270,14 +291,14 @@ const itemsWithAuthors = await fetchQuery(
 // convex/model/items/queries.ts
 export const getItemBySlugWithRelations = query({
   handler: async (ctx, args) => {
-    const item = await getOneFrom(ctx.db, 'items', 'by_slug', args.slug);
+    const item = await getOneFrom(ctx.db, "items", "by_slug", args.slug);
     if (!item) return null;
 
     // Use Promise.all for parallel queries
     const [author, category, tags] = await Promise.all([
       item.authorId ? ctx.db.get(item.authorId) : null,
       item.categoryId ? ctx.db.get(item.categoryId) : null,
-      getManyVia(ctx.db, 'itemsOnTags', 'tagId', 'by_itemId', item._id, 'itemId'),
+      getManyVia(ctx.db, "itemsOnTags", "tagId", "by_itemId", item._id, "itemId"),
     ]);
 
     return { item, author, category, tags };
@@ -286,6 +307,7 @@ export const getItemBySlugWithRelations = query({
 ```
 
 **Benefits:**
+
 - Single database round trip
 - Optimized with indexes
 - Reusable across server and client
@@ -299,23 +321,23 @@ Use server functions for initial data fetch and route protection:
 
 ```ts
 // lib/services/auth/server.ts
-import { getAuthUser, requireAuthUser } from '@/lib/services/auth/server';
+import { getAuthUser, requireAuthUser } from "@/lib/services/auth/server";
 
 // Get current user (returns null if not authenticated)
 const user = await getAuthUser();
 
 // Require authentication (redirects if not authenticated)
-const user = await requireAuthUser('/login?redirect=/account');
+const user = await requireAuthUser("/login?redirect=/account");
 ```
 
 ### Server Component Protection
 
 ```ts
 // app/account/page.tsx
-import { requireAuthUser } from '@/lib/services/auth/server';
+import { requireAuthUser } from "@/lib/services/auth/server";
 
 export default async function AccountPage() {
-  const user = await requireAuthUser('/login?redirect=/account');
+  const user = await requireAuthUser("/login?redirect=/account");
   return <AccountContent initialUser={user} />;
 }
 ```
@@ -326,7 +348,7 @@ Use React hooks for client components with SSR hydration:
 
 ```ts
 // lib/features/users/hooks/use-auth-user.ts
-import { useAuthUser } from '@/lib/features/users/hooks';
+import { useAuthUser } from "@/lib/features/users/hooks";
 
 // Basic usage (shows loading state)
 const { data: user, isLoading } = useAuthUser();
@@ -378,8 +400,8 @@ User types are automatically inferred from Convex API:
 
 ```ts
 // lib/services/auth/types.ts
-import type { FunctionReturnType } from 'convex/server';
-import type { api } from '@/convex/_generated/api';
+import type { FunctionReturnType } from "convex/server";
+import type { api } from "@/convex/_generated/api";
 
 // Automatically stays in sync with the actual return type
 export type User = FunctionReturnType<typeof api.users.getAuthUser>;
