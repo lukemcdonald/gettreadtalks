@@ -4,10 +4,10 @@ import { notFound } from 'next/navigation';
 import { HorizontalScrollGrid } from '@/components/horizontal-scroll-grid';
 import { PageHeader } from '@/components/page-header';
 import { SidebarContent } from '@/components/sidebar-content';
-import { TalkCard } from '@/components/talk-card';
-import { TopicSelector } from '@/components/topic-selector';
 import { ViewMoreCard } from '@/components/view-more-card';
+import { TalkCard } from '@/features/talks/components';
 import { getTopicBySlug, getTopics } from '@/features/topics';
+import { TopicSelector } from '@/features/topics/components';
 
 type TopicPageProps = {
   params: Promise<{

@@ -6,8 +6,8 @@ import { useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 
 import { GridList } from '@/components/grid-list';
-import { TopicCard } from '@/components/topic-card';
 import { Empty, EmptyDescription } from '@/components/ui';
+import { TopicCard } from './topic-card';
 
 type TopicWithCount = {
   count: number;
@@ -16,12 +16,18 @@ type TopicWithCount = {
 
 type TopicsListProps = {
   topics: TopicWithCount[];
+  /**
+   * If true, enables filtering and sorting via URL search params.
+   * If false, displays topics as-is without filtering.
+   * @default true
+   */
+  enableFiltering?: boolean;
 };
 
-export function TopicsList({ topics }: TopicsListProps) {
+export function TopicsList({ topics, enableFiltering = true }: TopicsListProps) {
   const searchParams = useSearchParams();
-  const search = searchParams.get('search')?.toLowerCase() || '';
-  const sort = searchParams.get('sort') || 'alphabetical';
+  const search = enableFiltering ? searchParams.get('search')?.toLowerCase() || '' : '';
+  const sort = enableFiltering ? searchParams.get('sort') || 'alphabetical' : 'alphabetical';
 
   const filteredAndSorted = useMemo(() => {
     let filtered = topics;

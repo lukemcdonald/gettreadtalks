@@ -4,8 +4,8 @@ import type { Clip } from '@/features/clips/types';
 import type { Speaker } from '@/features/speakers/types';
 
 import { MediaCard } from '@/components/media-card';
-import { SpeakerAvatar } from '@/components/speaker-avatar';
 import { getSpeakerName } from '@/features/speakers';
+import { SpeakerAvatar } from '@/features/speakers/components';
 
 type ClipCardProps = {
   clip: Pick<Clip, 'description' | 'slug' | 'title'>;

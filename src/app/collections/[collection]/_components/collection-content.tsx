@@ -2,7 +2,7 @@ import type { CollectionData } from '@/features/collections/types';
 import type { TalkWithSpeaker } from '@/features/talks/types';
 
 import { GridList } from '@/components/grid-list';
-import { TalkCard } from '@/components/talk-card';
+import { TalkCard } from '@/features/talks/components';
 
 type CollectionContentProps = {
   talks: CollectionData['talks'];

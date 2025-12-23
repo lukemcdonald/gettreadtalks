@@ -1,11 +1,11 @@
 import { FeaturedGrid } from '@/components/featured-grid';
 import { HeroSection } from '@/components/hero-section';
 import { Main } from '@/components/main';
-import { SpeakerCard } from '@/components/speaker-card';
-import { TalkCard } from '@/components/talk-card';
 import { Container, Section } from '@/components/ui';
 import { getFeaturedSpeakers } from '@/features/speakers';
+import { SpeakerCard } from '@/features/speakers/components';
 import { getFeaturedTalks } from '@/features/talks';
+import { TalkCard } from '@/features/talks/components';
 
 export default async function HomePage() {
   const [featuredTalks, featuredSpeakers] = await Promise.all([

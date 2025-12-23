@@ -6,9 +6,9 @@ import type { Speaker } from '@/features/speakers/types';
 import { useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-import { CollectionCard } from '@/components/collection-card';
 import { GridList } from '@/components/grid-list';
 import { Empty, EmptyDescription } from '@/components/ui';
+import { CollectionCard } from '@/features/collections/components';
 
 type CollectionWithStats = {
   collection: Collection;

@@ -17,12 +17,14 @@ globs: **/*.tsx,**/*.ts
 ## Component Structure Decision Tree
 
 **Use folder-based structure when:**
+
 - Component has related files (types, utils, sub-components)
 - Component has tests
 - Component is complex and benefits from organization
 - Component has multiple exports
 
 **Use single-file structure when:**
+
 - Component is simple and self-contained
 - No related files needed
 - No tests (or tests are elsewhere)
@@ -52,30 +54,50 @@ components/
 
 ### Decision Tree: Where Should This Component Live?
 
-1. **Used in multiple pages/features?** → `components/` (shared)
-2. **Used only on one page?** → `app/page-name/_components/` (page-specific)
-3. **Part of a complex feature?** → `lib/features/feature-name/components/` (feature-specific)
+1. **Is it a UI primitive or generic layout?**
+
+   - ✅ Yes → `src/components/` (e.g., `Button`, `Card`, `PageHeader`, `GridList`)
+
+2. **Is it domain-specific (talks, speakers, collections, etc.)?**
+
+   - ✅ Yes → `src/features/[domain]/components/` (e.g., `TalkCard`, `SpeakerCard`, `ClipsList`)
+
+3. **Is it only used on one specific page/route?**
+
+   - ✅ Yes → `src/app/[route]/_components/` (e.g., `talks-filters.tsx`)
+
+4. **Is it used across multiple routes but domain-specific?**
+   - ✅ Yes → `src/features/[domain]/components/` (e.g., `TalkCard` used in talks, speakers, collections)
 
 ### Placement Guidelines
 
-- **Shared components**: `components/` (reusable across app)
-  - Examples: buttons, cards, modals, layouts
-  - Test: "Would another page/feature benefit from this?"
-- **Page-specific**: `app/page-name/_components/` (one-off components)
-  - Examples: page headers, specific forms, unique sections
-  - Test: "Is this only used on this one page?"
-- **Feature-specific**: `lib/features/feature-name/components/` (complex domains)
-  - Examples: feature dashboards, feature-specific widgets
-  - Test: "Does this belong to a specific business domain?"
+- **Generic/shared components**: `src/components/` (reusable across app)
+
+  - Examples: UI primitives (`Button`, `Card`, `Input`), layouts (`PageHeader`, `GridList`), utilities (`FauxLink`, `ErrorBoundary`)
+  - Test: "Would another domain/feature benefit from this?"
+  - Test: "Is this a generic UI building block?"
+
+- **Domain-specific components**: `src/features/[domain]/components/` (domain entities)
+
+  - Examples: `TalkCard`, `SpeakerCard`, `ClipsList`, `TalksList`, `ClipsListSkeleton`
+  - Components that use domain types/queries/hooks
+  - Components that might be reused across routes for the same domain
+  - Test: "Does this belong to a specific business domain (talks, speakers, collections, etc.)?"
+  - Test: "Would this be used in multiple places for the same domain?"
+
+- **Page-specific**: `src/app/[route]/_components/` (one-off compositions)
+  - Examples: page-specific filters, route-specific layouts, unique sections
+  - Components tightly coupled to a single route
+  - Test: "Is this only used on this one page/route?"
 
 ## Import Patterns
 
 ```ts
 // ✅ Barrel imports
-import ComponentName from '@/components/component-name';
+import ComponentName from "@/components/component-name";
 
 // ❌ Direct file imports
-import ComponentName from '@/components/component-name/component-name';
+import ComponentName from "@/components/component-name/component-name";
 ```
 
 ## Barrel Export Pattern
@@ -85,8 +107,8 @@ refactoring without breaking external dependencies.
 
 ```ts
 // component-name/index.ts
-export { default } from './component-name';
-export type { ComponentNameProps } from './component-name.types';
+export { default } from "./component-name";
+export type { ComponentNameProps } from "./component-name.types";
 ```
 
 **Benefits:**
@@ -110,7 +132,11 @@ For features with multiple hooks (8+ or complex logic), use individual files in 
 directory:
 
 ```sh
-lib/features/feature-name/
+src/features/feature-name/
+├─ components/     # Domain-specific components
+│  ├─ index.ts
+│  ├─ item-card.tsx
+│  └─ items-list.tsx
 ├─ hooks/
 │  ├─ use-item.ts              # Single item query
 │  ├─ use-items.ts             # List query
@@ -120,7 +146,7 @@ lib/features/feature-name/
 │  ├─ use-update-item.ts       # Mutation
 │  ├─ use-item-detail-page.ts  # Composite hook
 │  └─ index.ts                 # Barrel export
-├─ actions.ts
+├─ actions/
 └─ index.ts
 ```
 
@@ -142,13 +168,13 @@ lib/features/feature-name/
 
 ```ts
 // hooks/index.ts
-export { useItem } from './use-item';
-export { useItems } from './use-items';
-export { useItemBySlug } from './use-item-by-slug';
-export { useIsItemFavorited } from './use-is-item-favorited';
-export { useCreateItem } from './use-create-item';
-export { useUpdateItem } from './use-update-item';
-export { useItemDetailPage } from './use-item-detail-page';
+export { useItem } from "./use-item";
+export { useItems } from "./use-items";
+export { useItemBySlug } from "./use-item-by-slug";
+export { useIsItemFavorited } from "./use-is-item-favorited";
+export { useCreateItem } from "./use-create-item";
+export { useUpdateItem } from "./use-update-item";
+export { useItemDetailPage } from "./use-item-detail-page";
 ```
 
 **Benefits:**
@@ -163,8 +189,10 @@ export { useItemDetailPage } from './use-item-detail-page';
 
 ```ts
 // ✅ Clean imports work the same
-import { useItem, useItems, useCreateItem } from '@/lib/features/items/hooks';
+import { useItem, useItems, useCreateItem } from "@/features/items/hooks";
+import { ItemCard, ItemsList } from "@/features/items/components";
 
-// ✅ Or import specific hook directly
-import { useItem } from '@/lib/features/items/hooks/use-item';
+// ✅ Or import specific hook/component directly
+import { useItem } from "@/features/items/hooks/use-item";
+import { ItemCard } from "@/features/items/components/item-card";
 ```

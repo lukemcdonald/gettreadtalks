@@ -6,10 +6,9 @@ import type { TopicId } from '@/features/topics/types';
 import { Suspense } from 'react';
 
 import { Pagination } from '@/app/talks/_components/pagination';
-import { TalksList } from '@/app/talks/_components/talks-list';
 import { TalksListFilter } from '@/app/talks/_components/talks-list-filter';
-import { TalksListSkeleton } from '@/app/talks/_components/talks-list-skeleton';
 import { getTalksWithSpeakers } from '@/features/talks';
+import { TalksList, TalksListSkeleton } from '@/features/talks/components';
 import { getCurrentUser } from '@/services/auth/server';
 import { isAdmin } from '@/services/auth/utils';
 

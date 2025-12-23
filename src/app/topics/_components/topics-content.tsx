@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 
-import { TopicsList } from '@/app/topics/_components/topics-list';
 import { getTopicsWithCounts } from '@/features/topics';
+import { TopicsList } from '@/features/topics/components';
 
 export async function TopicsContent() {
   const topics = await getTopicsWithCounts();

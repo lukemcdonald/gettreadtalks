@@ -3,9 +3,9 @@
 import { useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-import { ClipCard } from '@/components/clip-card';
 import { GridList } from '@/components/grid-list';
 import { Empty, EmptyDescription } from '@/components/ui';
+import { ClipCard } from './clip-card';
 
 type ClipWithSpeaker = {
   _id: string;
@@ -23,13 +23,19 @@ type ClipWithSpeaker = {
 
 type ClipsListProps = {
   clips: ClipWithSpeaker[];
+  /**
+   * If true, enables filtering and sorting via URL search params.
+   * If false, displays clips as-is without filtering.
+   * @default true
+   */
+  enableFiltering?: boolean;
 };
 
-export function ClipsList({ clips }: ClipsListProps) {
+export function ClipsList({ clips, enableFiltering = true }: ClipsListProps) {
   const searchParams = useSearchParams();
-  const search = searchParams.get('search')?.toLowerCase() || '';
-  const speakerSlug = searchParams.get('speaker') || 'all';
-  const sort = searchParams.get('sort') || 'recent';
+  const search = enableFiltering ? searchParams.get('search')?.toLowerCase() || '' : '';
+  const speakerSlug = enableFiltering ? searchParams.get('speaker') || 'all' : 'all';
+  const sort = enableFiltering ? searchParams.get('sort') || 'recent' : 'recent';
 
   const filteredAndSorted = useMemo(() => {
     let filtered = clips;
