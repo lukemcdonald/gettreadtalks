@@ -47,12 +47,12 @@ export function StatusField<T extends FieldValues>({
     <SelectField
       control={control}
       description={description}
-      items={STATUS_OPTIONS}
       label={label}
       name={name}
       onChange={(value) => {
         onChange?.(value as StatusType);
       }}
+      options={STATUS_OPTIONS}
       required={required}
     />
   );

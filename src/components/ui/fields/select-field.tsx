@@ -24,10 +24,10 @@ type SelectOption = {
 type SelectFieldProps<T extends FieldValues> = {
   control: Control<T>;
   description?: string;
-  items: SelectOption[];
   label: string;
   name: FieldPath<T>;
   onChange?: (value: string) => void;
+  options: SelectOption[];
   required?: boolean;
 };
 
@@ -39,7 +39,8 @@ type SelectFieldProps<T extends FieldValues> = {
  * ```tsx
  * <SelectField
  *   control={form.control}
- *   items={[
+ *   options={[
+ *     { label: 'Select an option', value: '' },
  *     { label: 'Option 1', value: 'option1' },
  *     { label: 'Option 2', value: 'option2' },
  *   ]}
@@ -52,10 +53,10 @@ type SelectFieldProps<T extends FieldValues> = {
 export function SelectField<T extends FieldValues>({
   control,
   description,
-  items,
   label,
   name,
   onChange,
+  options,
   required,
 }: SelectFieldProps<T>) {
   return (
@@ -72,31 +73,32 @@ export function SelectField<T extends FieldValues>({
           <FieldLabel htmlFor={field.name} required={required}>
             {label}
           </FieldLabel>
-          {description && <FieldDescription>{description}</FieldDescription>}
+          {Boolean(description) && <FieldDescription>{description}</FieldDescription>}
           <Select
-            items={items}
+            items={options}
             name={field.name}
             onValueChange={(value) => {
-              if (typeof value === 'string') {
-                field.onChange(value);
-                onChange?.(value);
+              const normalizedValue = value ?? '';
+              field.onChange(normalizedValue);
+              if (onChange) {
+                onChange(normalizedValue);
               }
             }}
             required={required}
-            value={typeof field.value === 'string' ? field.value : ''}
+            value={field.value ?? ''}
           >
             <SelectTrigger aria-invalid={fieldState.invalid} id={field.name}>
               <SelectValue />
             </SelectTrigger>
             <SelectPopup>
-              {items.map((item) => (
+              {options.map((item) => (
                 <SelectItem key={item.value} value={item.value}>
                   {item.label}
                 </SelectItem>
               ))}
             </SelectPopup>
           </Select>
-          {fieldState.error?.message && <FieldError>{fieldState.error.message}</FieldError>}
+          {Boolean(fieldState.error) && <FieldError>{fieldState.error?.message}</FieldError>}
         </Field>
       )}
     />
