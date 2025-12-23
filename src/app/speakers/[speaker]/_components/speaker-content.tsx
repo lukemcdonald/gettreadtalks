@@ -3,12 +3,12 @@ import type { Collection } from '@/features/collections/types';
 import type { Speaker } from '@/features/speakers/types';
 import type { Talk } from '@/features/talks';
 
-import { ClipCard } from '@/components/clip-card';
-import { CollectionCard } from '@/components/collection-card';
 import { GridList } from '@/components/grid-list';
-import { TalkCard } from '@/components/talk-card';
 import { Separator } from '@/components/ui';
+import { ClipCard } from '@/features/clips/components';
+import { CollectionCard } from '@/features/collections/components';
 import { getSpeakerName } from '@/features/speakers';
+import { TalkCard } from '@/features/talks/components';
 
 type SpeakerContentProps = {
   clips: Clip[];

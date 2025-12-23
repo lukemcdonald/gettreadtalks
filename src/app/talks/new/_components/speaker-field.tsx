@@ -7,7 +7,6 @@ import { useState } from 'react';
 import { PlusIcon } from 'lucide-react';
 import { Controller } from 'react-hook-form';
 
-import { SpeakerAvatar } from '@/components/speaker-avatar';
 import {
   Button,
   Combobox,
@@ -23,6 +22,7 @@ import {
   FieldLabel,
 } from '@/components/ui';
 import { getSpeakerName } from '@/features/speakers';
+import { SpeakerAvatar } from '@/features/speakers/components';
 import { CreateSpeakerDialog } from './create-speaker-dialog';
 
 type SpeakerFieldProps<T extends FieldValues> = {

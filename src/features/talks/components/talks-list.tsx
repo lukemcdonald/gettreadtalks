@@ -1,9 +1,9 @@
 import type { Speaker } from '@/features/speakers/types';
-import type { Talk } from '@/features/talks';
+import type { Talk } from '@/features/talks/types';
 
 import { GridList } from '@/components/grid-list';
-import { TalkCard } from '@/components/talk-card';
 import { Empty, EmptyDescription } from '@/components/ui';
+import { TalkCard } from './talk-card';
 
 type TalkWithSpeaker = Talk & { speaker: Speaker | null };
 type TalksListProps = {

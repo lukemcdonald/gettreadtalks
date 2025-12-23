@@ -6,9 +6,9 @@ import { useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 
 import { AlphabeticalGrid } from '@/components/alphabetical-grid';
-import { SpeakerCard } from '@/components/speaker-card';
 import { Empty, EmptyDescription } from '@/components/ui';
 import { getSpeakerName } from '@/features/speakers';
+import { SpeakerCard } from '@/features/speakers/components';
 
 type SpeakersListProps = {
   speakers: Speaker[];

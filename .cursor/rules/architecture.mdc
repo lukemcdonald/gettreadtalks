@@ -13,7 +13,7 @@ server, and shared code.
 ## Directory Structure
 
 ```sh
-lib/
+src/
 ├─ features/  # Business domains (domain entities like users, posts, etc.)
 ├─ services/  # Infrastructure (auth, email, analytics)
 └─ utils/     # Generic utilities (date, array, string helpers)
@@ -22,9 +22,9 @@ lib/
 ## Decision Tree: Where Should This Code Live?
 
 1. **Interacts with database?** → `convex/{domain}.ts`
-2. **Business domain/entity?** → `lib/features/{domain}/`
-3. **Infrastructure/cross-cutting?** → `lib/services/{service}/`
-4. **Generic/reusable utility?** → `lib/utils/`
+2. **Business domain/entity?** → `src/features/{domain}/`
+3. **Infrastructure/cross-cutting?** → `src/services/{service}/`
+4. **Generic/reusable utility?** → `src/utils/`
 5. **Otherwise** → Inline in component or create if reused 3+ times
 
 ## Features Directory
@@ -34,7 +34,12 @@ Business domains and entities (e.g., items, posts, users).
 ### Feature Structure
 
 ```sh
-lib/features/items/
+src/features/items/
+├─ components/     # Domain-specific React components
+│  ├─ index.ts     # Barrel export
+│  ├─ item-card.tsx
+│  ├─ items-list.tsx
+│  └─ items-list-skeleton.tsx
 ├─ queries.ts      # Server: Read operations (fetchQuery, Server Components only)
 │                  # Use queries/ folder when 3+ query functions
 ├─ queries/        # Read operations folder (when 3+ queries)
@@ -79,6 +84,11 @@ lib/features/items/
   - Use folder structure when feature has 3+ hooks
   - Each hook in its own file with barrel export from `index.ts`
 - **`hooks.ts`** - Single React hook or 1-2 simple hooks? (alternative to folder)
+- **`components/`** - Domain-specific React components? Uses domain types/queries/hooks?
+  - Contains domain-specific cards, lists, displays, skeletons
+  - Components that might be reused across routes for the same domain
+  - Each component in its own file with barrel export from `index.ts`
+  - Examples: `item-card.tsx`, `items-list.tsx`, `items-list-skeleton.tsx`
 - **`types.ts`** - TypeScript types? No runtime code?
 - **`utils.ts`** - Pure functions? No side effects? (optional, only if needed)
 - **`index.ts`** - Barrel export for clean imports
@@ -90,14 +100,16 @@ lib/features/items/
 import { getItems } from '@/features/items/queries';
 import { createItemAction } from '@/features/items/actions';
 import { useItems, useCreateItem } from '@/features/items/hooks';
+import { ItemCard, ItemsList } from '@/features/items/components';
 import type { Item } from '@/features/items/types';
 
 // ✅ Good - Barrel exports
-import { getItems, createItemAction, useItems } from '@/features/items';
+import { getItems, createItemAction, useItems, ItemCard } from '@/features/items';
 
 // ❌ Bad - Generic/unclear paths
 import { getItems } from '@/lib/queries';
 import { useItems } from '@/hooks/items';
+import { ItemCard } from '@/components/item-card';
 ```
 
 ## Services Directory
@@ -107,16 +119,16 @@ Infrastructure and cross-cutting concerns (e.g., analytics, auth, email).
 ### Service Structure
 
 ```sh
-lib/services/analytics/
+src/services/analytics/
 ├─ client.ts   # Client: trackEvent
 └─ server.ts   # Server: server-side tracking
 
-lib/services/auth/
+src/services/auth/
 ├─ client.ts   # Client: signIn, signUp, useSession
 ├─ config.ts   # Shared: Configuration
 └─ server.ts   # Server: getSession, requireAuth
 
-lib/services/email/
+src/services/email/
 └─ server.ts   # Server: sendEmail
 ```
 
@@ -124,8 +136,8 @@ lib/services/email/
 
 ```ts
 // ✅ Good - Service imports
-import { getServerSession } from '@/lib/services/auth/server';
-import { useSession } from '@/lib/services/auth/client';
+import { getServerSession } from '@/services/auth/server';
+import { useSession } from '@/services/auth/client';
 
 // ❌ Bad
 import { useSession } from '@/lib/auth';
@@ -138,7 +150,7 @@ Generic, reusable utilities that don't belong to a specific domain.
 ### Utils Structure
 
 ```sh
-lib/utils/
+src/utils/
 ├─ array.ts    # Array helpers
 ├─ cn.ts       # className utility
 ├─ date.ts     # Date formatting
@@ -149,8 +161,8 @@ lib/utils/
 
 ```ts
 // ✅ Good - Utility imports
-import { cn } from '@/lib/utils/cn';
-import { formatDate } from '@/lib/utils/date';
+import { cn } from '@/utils/cn';
+import { formatDate } from '@/utils/date';
 
 // ❌ Bad
 import { formatDate } from '@/utils';
@@ -208,7 +220,11 @@ Benefits: Single source of truth, easier refactoring, better naming
 
 ```sh
 // ✅ Feature contains all its code
-lib/features/items/
+src/features/items/
+├─ components/      # Domain components
+│  ├─ index.ts
+│  ├─ item-card.tsx
+│  └─ items-list.tsx
 ├─ queries.ts       # Read operations
 ├─ actions/         # Write operations (Server Actions)
 │  ├─ index.ts
@@ -225,5 +241,5 @@ Easy to find, easy to delete/move the feature
 ### Minimal Cross-Feature Dependencies
 
 - Features should be self-contained
-- Shared logic goes in `lib/services/` or `lib/utils/`
+- Shared logic goes in `src/services/` or `src/utils/`
 - Avoid importing from other features when possible

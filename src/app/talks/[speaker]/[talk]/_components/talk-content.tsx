@@ -1,10 +1,10 @@
 import type { Clip } from '@/features/clips/types';
 import type { Talk } from '@/features/talks/types';
 
-import { ClipsList } from '@/app/clips/_components/clips-list';
 import { MediaEmbed } from '@/components/media-embed';
 import { PageHeader } from '@/components/page-header';
 import { Separator } from '@/components/ui';
+import { ClipsList } from '@/features/clips/components';
 
 type TalkContentProps = {
   clips: Clip[];
@@ -39,7 +39,7 @@ export function TalkContent({ clips, talk }: TalkContentProps) {
       {clips.length > 0 && (
         <div className="space-y-4">
           <Separator />
-          <ClipsList clips={clips} />
+          <ClipsList clips={clips} enableFiltering={false} />
         </div>
       )}
     </>

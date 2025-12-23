@@ -6,8 +6,8 @@ import type { Talk } from '@/features/talks/types';
 import Link from 'next/link';
 
 import { MediaCard } from '@/components/media-card';
-import { SpeakerAvatar } from '@/components/speaker-avatar';
 import { getSpeakerName } from '@/features/speakers';
+import { SpeakerAvatar } from '@/features/speakers/components';
 import { getTalkUrl } from '@/features/talks/utils';
 
 type TalkCardSpeaker = {
