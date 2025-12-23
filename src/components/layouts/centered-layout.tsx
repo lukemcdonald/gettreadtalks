@@ -32,7 +32,7 @@ export function CenteredLayout({
     <Section spacing={spacing}>
       <Container>
         <div className={cn('mx-auto', maxWidthClasses[maxWidth], className)}>
-          {header && <div className="mb-10">{header}</div>}
+          {!!header && <div className="mb-10">{header}</div>}
           <div className="space-y-6">{content}</div>
         </div>
       </Container>

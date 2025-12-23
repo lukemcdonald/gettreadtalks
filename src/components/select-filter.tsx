@@ -89,7 +89,7 @@ export function SelectFilter({
 
   return (
     <div className={cn('space-y-2', className)}>
-      {label && <Label htmlFor={name}>{label}</Label>}
+      {!!label && <Label htmlFor={name}>{label}</Label>}
 
       <Select
         disabled={isPending}

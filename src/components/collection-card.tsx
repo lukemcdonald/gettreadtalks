@@ -33,7 +33,7 @@ export function CollectionCard({ collection, speakers = [], talkCount }: Collect
           <FauxLink href={`/collections/${collection.slug}`}>{collection.title}</FauxLink>
         </CardTitle>
 
-        {collection.description && <CardDescription>{collection.description}</CardDescription>}
+        {!!collection.description && <CardDescription>{collection.description}</CardDescription>}
         {talkCount !== undefined && (
           <CardDescription>
             {talkCount} {talkCount === 1 ? 'Talk' : 'Talks'}
@@ -51,7 +51,7 @@ export function CollectionCard({ collection, speakers = [], talkCount }: Collect
 
                 return (
                   <Avatar className="size-8 border-2 border-background" key={speaker.slug}>
-                    {speaker.imageUrl && <AvatarImage alt={speakerName} src={speaker.imageUrl} />}
+                    {!!speaker.imageUrl && <AvatarImage alt={speakerName} src={speaker.imageUrl} />}
                     <AvatarFallback className="text-xs">{speakerInitials}</AvatarFallback>
                   </Avatar>
                 );

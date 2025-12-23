@@ -5,7 +5,7 @@ import { baseSentryConfig } from './index';
 
 // Expose Sentry on window for debugging (Next.js doesn't do this by default)
 if (typeof window !== 'undefined') {
-  (window as any).Sentry = Sentry;
+  (window as unknown as { Sentry?: typeof Sentry }).Sentry = Sentry;
 }
 
 Sentry.init({

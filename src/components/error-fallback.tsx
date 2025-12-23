@@ -28,7 +28,7 @@ export function ErrorFallback({
           <p className="text-muted-foreground">
             We encountered an unexpected error. This has been reported to our team.
           </p>
-          {eventId && (
+          {!!eventId && (
             <div className="mt-3 rounded-md bg-muted p-3">
               <p className="text-muted-foreground text-sm">
                 Error ID: <span className="font-mono text-foreground">{eventId}</span>

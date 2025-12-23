@@ -15,12 +15,12 @@ type ClipSidebarProps = {
 export function ClipSidebar({ speaker, talk }: ClipSidebarProps) {
   return (
     <>
-      {speaker && (
+      {!!speaker && (
         <SidebarContent title="Speaker">
           <div className="space-y-2">
             <p className="font-semibold">{getSpeakerName(speaker)}</p>
-            {speaker.role && <p className="text-muted-foreground text-sm">{speaker.role}</p>}
-            {speaker.ministry && (
+            {!!speaker.role && <p className="text-muted-foreground text-sm">{speaker.role}</p>}
+            {!!speaker.ministry && (
               <p className="text-muted-foreground text-sm">{speaker.ministry}</p>
             )}
             <Link
@@ -33,11 +33,11 @@ export function ClipSidebar({ speaker, talk }: ClipSidebarProps) {
         </SidebarContent>
       )}
 
-      {talk && speaker && (
+      {!!talk && !!speaker && (
         <SidebarContent title="Related Talk">
           <div className="space-y-2">
             <p className="font-semibold">{talk.title}</p>
-            {talk.description && (
+            {!!talk.description && (
               <p className="line-clamp-2 text-muted-foreground text-sm">{talk.description}</p>
             )}
             <Link

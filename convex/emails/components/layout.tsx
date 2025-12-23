@@ -20,7 +20,7 @@ export function EmailLayout({ children, preview }: EmailLayoutProps) {
   return (
     <Html>
       <Head />
-      {preview && <Preview>{preview}</Preview>}
+      {!!preview && <Preview>{preview}</Preview>}
       <Body style={main}>
         <Container style={container}>
           <Section style={content}>

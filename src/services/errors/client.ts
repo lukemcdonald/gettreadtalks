@@ -1,3 +1,4 @@
+import type { Scope } from '@sentry/nextjs';
 import type { ErrorReportOptions, ErrorWithEventId, SeverityLevel } from './types';
 
 import {
@@ -128,6 +129,44 @@ export function clearUserContext(): void {
 }
 
 /**
+ * Applies scope options to a Sentry scope for message capture.
+ * Helper function that configures level, context, fingerprint, tags, user, and extras.
+ */
+function applyScopeOptions(
+  scope: Scope,
+  options: Omit<ErrorReportOptions, 'transactionName'>,
+): void {
+  const { context, extras, fingerprint, level = 'info', tags, user } = options;
+
+  scope.setLevel(level);
+
+  if (context) {
+    scope.setContext('message_context', context);
+  }
+
+  if (fingerprint) {
+    scope.setFingerprint(fingerprint);
+    scope.setExtra('fingerprint', fingerprint.join('|'));
+  }
+
+  if (tags) {
+    for (const [key, value] of Object.entries(tags)) {
+      scope.setTag(key, value);
+    }
+  }
+
+  if (user) {
+    scope.setUser(user);
+  }
+
+  if (extras) {
+    for (const [key, value] of Object.entries(extras)) {
+      scope.setExtra(key, value);
+    }
+  }
+}
+
+/**
  * Captures a message and reports it to Sentry.
  * Use this for logging important events or non-error messages.
  *
@@ -142,43 +181,9 @@ export function captureMessage(
   message: string,
   options: Omit<ErrorReportOptions, 'transactionName'> = {},
 ): string | undefined {
-  const { context, extras, fingerprint, level = 'info', tags, user } = options;
-
   return sentryWithScope((scope) => {
-    // Set message level
-    scope.setLevel(level);
-
-    // Add context data
-    if (context) {
-      scope.setContext('message_context', context);
-    }
-
-    // Set custom fingerprint for message grouping
-    if (fingerprint) {
-      scope.setFingerprint(fingerprint);
-      scope.setExtra('fingerprint', fingerprint.join('|'));
-    }
-
-    // Add tags for filtering
-    if (tags) {
-      for (const [key, value] of Object.entries(tags)) {
-        scope.setTag(key, value);
-      }
-    }
-
-    // Set user context
-    if (user) {
-      scope.setUser(user);
-    }
-
-    // Add extra data
-    if (extras) {
-      for (const [key, value] of Object.entries(extras)) {
-        scope.setExtra(key, value);
-      }
-    }
-
-    return sentryCaptureMessage(message, level);
+    applyScopeOptions(scope, options);
+    return sentryCaptureMessage(message, options.level ?? 'info');
   });
 }
 

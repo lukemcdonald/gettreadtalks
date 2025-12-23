@@ -30,7 +30,7 @@ export function TalkSidebar({ clips, collection, speaker, talk, topics, user }: 
     <>
       <SidebarContent title="Actions">
         <div className="flex flex-col gap-2">
-          {userIsAdmin && speaker && (
+          {!!userIsAdmin && !!speaker && (
             <Button render={<Link href={editUrl} />} variant="outline">
               Edit
             </Button>
@@ -39,17 +39,17 @@ export function TalkSidebar({ clips, collection, speaker, talk, topics, user }: 
         </div>
       </SidebarContent>
 
-      {speaker && (
+      {!!speaker && (
         <SidebarContent title="Speaker">
           <div className="space-y-2">
             <p className="font-semibold">
               {speaker.firstName} {speaker.lastName}
             </p>
-            {speaker.role && <p className="text-muted-foreground text-sm">{speaker.role}</p>}
-            {speaker.ministry && (
+            {!!speaker.role && <p className="text-muted-foreground text-sm">{speaker.role}</p>}
+            {!!speaker.ministry && (
               <p className="text-muted-foreground text-sm">{speaker.ministry}</p>
             )}
-            {speaker.description && (
+            {!!speaker.description && (
               <p className="text-muted-foreground text-sm">{speaker.description}</p>
             )}
             <Link
@@ -79,11 +79,11 @@ export function TalkSidebar({ clips, collection, speaker, talk, topics, user }: 
         </SidebarContent>
       )}
 
-      {collection && (
+      {!!collection && (
         <SidebarContent title="Collection">
           <div className="space-y-2">
             <p className="font-semibold">{collection.title}</p>
-            {collection.description && (
+            {!!collection.description && (
               <p className="text-muted-foreground text-sm">{collection.description}</p>
             )}
             <Link
@@ -114,7 +114,7 @@ export function TalkSidebar({ clips, collection, speaker, talk, topics, user }: 
             <span className="font-semibold">Status:</span>{' '}
             <span className="text-muted-foreground capitalize">{talk.status}</span>
           </div>
-          {talk.publishedAt && (
+          {!!talk.publishedAt && (
             <div>
               <span className="font-semibold">Published:</span>{' '}
               <span className="text-muted-foreground">
@@ -122,7 +122,7 @@ export function TalkSidebar({ clips, collection, speaker, talk, topics, user }: 
               </span>
             </div>
           )}
-          {talk.featured && (
+          {!!talk.featured && (
             <div>
               <span className="font-semibold text-primary">Featured Talk</span>
             </div>

@@ -45,7 +45,7 @@ export function SearchInput({
 
   return (
     <div className={cn('space-y-2', className)}>
-      {label && <Label htmlFor={paramName}>{label}</Label>}
+      {!!label && <Label htmlFor={paramName}>{label}</Label>}
       <Input
         id={paramName}
         onChange={(e) => handleChange(e.target.value)}

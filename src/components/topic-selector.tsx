@@ -40,7 +40,7 @@ export function TopicSelector({ className, currentSlug, label, topics }: TopicSe
 
   return (
     <div className={cn('space-y-2', className)}>
-      {label && <Label htmlFor="topic-selector">{label}</Label>}
+      {!!label && <Label htmlFor="topic-selector">{label}</Label>}
       <Select defaultValue={currentSlug} onValueChange={handleChange}>
         <SelectTrigger id="topic-selector">
           <SelectValue />

@@ -22,7 +22,7 @@ export function ViewMoreCard({ className, count, href, label = 'View More' }: Vi
             <FauxLink href={href}>
               <p className="font-semibold">{label}</p>
             </FauxLink>
-            {count && (
+            {!!count && (
               <p className="mt-1 text-muted-foreground text-sm">
                 {count} {count === 1 ? 'more item' : 'more items'}
               </p>

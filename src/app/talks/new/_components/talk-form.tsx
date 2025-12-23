@@ -123,7 +123,7 @@ export function TalkForm({
             {submitLabel}
           </Button>
 
-          {Boolean(talkId) && (
+          {!!talkId && (
             <>
               <Button
                 disabled={isBusy}

@@ -9,13 +9,13 @@ type ClipContentProps = {
 export function ClipContent({ clip }: ClipContentProps) {
   return (
     <>
-      {clip.mediaUrl && (
+      {!!clip.mediaUrl && (
         <div className="space-y-4">
           <MediaEmbed mediaUrl={clip.mediaUrl} />
         </div>
       )}
 
-      {clip.description && (
+      {!!clip.description && (
         <div className="space-y-2">
           <h2 className="font-semibold text-lg">Description</h2>
           <p className="text-muted-foreground">{clip.description}</p>

@@ -52,7 +52,7 @@ export function SortSelect({ className, label, options, paramName = 'sort' }: So
 
   return (
     <div className={cn('space-y-2', className)}>
-      {label && <Label htmlFor={paramName}>{label}</Label>}
+      {!!label && <Label htmlFor={paramName}>{label}</Label>}
       <Select disabled={isPending} items={options} onValueChange={handleChange} value={value}>
         <SelectTrigger id={paramName}>
           <SelectValue />

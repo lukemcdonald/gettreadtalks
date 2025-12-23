@@ -84,7 +84,7 @@ export function TalksFilters({
         <SelectFilter label="Topic" name="topic" options={topicOptions} placeholder="All Topics" />
       )}
 
-      {isAdmin && (
+      {!!isAdmin && (
         <SelectFilter
           label="Status"
           name="status"
@@ -107,7 +107,7 @@ export function TalksFilters({
 
       {/* Fixed height loading indicator to prevent layout shift */}
       <div className="h-5">
-        {isPending && <span className="text-muted-foreground text-sm">Updating...</span>}
+        {!!isPending && <span className="text-muted-foreground text-sm">Updating...</span>}
       </div>
     </div>
   );

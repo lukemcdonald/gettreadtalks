@@ -56,38 +56,40 @@ const handleSubmit = async (values: FormData) => {
 ## Displaying Errors
 
 ### Field-Level Errors
-Field errors are automatically displayed via `fieldState.error`. Use the `FieldMessage` component:
+Reusable field components (TextField, SelectField, etc.) automatically display field-level errors. You don't need to manually handle error display when using these components.
+
+For custom Controller usage, use `FieldError` directly:
 
 ```typescript
-import { FieldMessage } from '@/components/ui/field-message';
+import { FieldError } from '@/components/ui/fields';
 
 <Controller
   control={form.control}
   name="title"
   render={({ field, fieldState }) => (
-    <Field>
+    <Field invalid={fieldState.invalid}>
       <FieldLabel required>Title</FieldLabel>
-      <FieldControl error={fieldState.error} {...field} />
-      <FieldMessage error={fieldState.error} />
+      <Input {...field} aria-invalid={fieldState.invalid} />
+      {!!fieldState.error && <FieldError>{fieldState.error?.message}</FieldError>}
     </Field>
   )}
 />
 ```
 
 ### Form-Level Errors
-Form-level errors are stored in React Hook Form's `root` error. Use the `FormMessage` component to display them:
+Form-level errors are stored in React Hook Form's `root` error. Use the `FormError` component to display them:
 
 ```typescript
-import { FormMessage } from '@/components/ui/form-message';
+import { FormError } from '@/components/ui/form';
 
-<FormMessage error={form.formState.errors.root} />
+<FormError error={form.formState.errors.root} />
 ```
 
-The `FormMessage` component:
+The `FormError` component:
 - Automatically handles null/undefined errors (returns null if no error)
 - Provides consistent styling across all forms
 - Includes proper accessibility attributes (`role="alert"`)
-- Can also accept a direct message prop for custom errors
+- Handles both single errors and arrays of errors
 
 ## How `setServerErrors` Works
 
@@ -110,18 +112,14 @@ form.clearErrors(); // Clears all errors (field + root)
 ```typescript
 'use client';
 
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTransition } from 'react';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
 import { createItemAction } from '@/features/items/actions';
 import { itemSchema } from '@/features/items/schemas/item-form';
 
-import { Form } from '@/components/ui/form';
-import { FormMessage } from '@/components/ui/form-message';
-import { Field, FieldLabel, FieldControl } from '@/components/ui/field';
-import { FieldMessage } from '@/components/ui/field-message';
-import { Input } from '@/components/ui/input';
+import { Form, FormError, TextField } from '@/components/ui';
 import { Button } from '@/components/ui/button';
 
 export function ItemForm() {
@@ -148,27 +146,24 @@ export function ItemForm() {
   };
 
   return (
-    <Form form={form} onSubmit={form.handleSubmit(handleSubmit)}>
-      {/* Form-level error */}
-      <FormMessage error={form.formState.errors.root} />
-      
-      {/* Field with error display */}
-      <Controller
-        control={form.control}
-        name="title"
-        render={({ field, fieldState }) => (
-          <Field>
-            <FieldLabel required>Title</FieldLabel>
-            <FieldControl error={fieldState.error} {...field} />
-            <FieldMessage error={fieldState.error} />
-          </Field>
-        )}
-      />
-      
-      <Button type="submit" disabled={isPending}>
-        Submit
-      </Button>
-    </Form>
+    <FormProvider {...form}>
+      <Form noValidate onSubmit={form.handleSubmit(handleSubmit)}>
+        {/* Form-level error */}
+        <FormError error={form.formState.errors.root} />
+        
+        {/* Reusable field component - errors displayed automatically */}
+        <TextField
+          control={form.control}
+          label="Title"
+          name="title"
+          required
+        />
+        
+        <Button type="submit" disabled={isPending}>
+          Submit
+        </Button>
+      </Form>
+    </FormProvider>
   );
 }
 ```

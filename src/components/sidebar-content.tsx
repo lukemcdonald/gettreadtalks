@@ -9,7 +9,7 @@ type SidebarContentProps = {
 export function SidebarContent({ children, className, title }: SidebarContentProps) {
   return (
     <div className={cn('space-y-2', className)}>
-      {title && (
+      {!!title && (
         <h3 className="font-semibold text-muted-foreground text-xs uppercase tracking-wide">
           {title}
         </h3>

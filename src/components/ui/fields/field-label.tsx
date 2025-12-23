@@ -19,7 +19,7 @@ export function FieldLabel({ className, required, children, ...props }: FieldLab
   return (
     <BaseFieldLabel className={className} {...props}>
       {children}
-      {required && <span className="text-destructive">*</span>}
+      {!!required && <span className="text-destructive">*</span>}
     </BaseFieldLabel>
   );
 }

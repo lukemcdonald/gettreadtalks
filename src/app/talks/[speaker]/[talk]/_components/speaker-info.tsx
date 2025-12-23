@@ -15,13 +15,13 @@ export function SpeakerInfo({ speaker }: SpeakerInfoProps) {
       <p>
         {speaker.firstName} {speaker.lastName}
       </p>
-      {speaker.description && <p>{speaker.description}</p>}
-      {speaker.role && (
+      {!!speaker.description && <p>{speaker.description}</p>}
+      {!!speaker.role && (
         <p>
           <strong>Role:</strong> {speaker.role}
         </p>
       )}
-      {speaker.ministry && (
+      {!!speaker.ministry && (
         <p>
           <strong>Ministry:</strong> {speaker.ministry}
         </p>

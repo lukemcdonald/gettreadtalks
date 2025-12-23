@@ -24,7 +24,7 @@ export function SpeakerLeftSidebar({
 }: SpeakerLeftSidebarProps) {
   return (
     <>
-      {speaker.imageUrl && (
+      {!!speaker.imageUrl && (
         <SidebarContent>
           <div className="relative aspect-square overflow-hidden rounded-lg">
             <Image
@@ -39,13 +39,13 @@ export function SpeakerLeftSidebar({
 
       <SidebarContent title="About">
         <dl>
-          {speaker.role && (
+          {!!speaker.role && (
             <>
               <dt className="font-semibold">Role:</dt>
               <dd>{speaker.role}</dd>
             </>
           )}
-          {speaker.ministry && (
+          {!!speaker.ministry && (
             <>
               <dt className="font-semibold">Ministry:</dt>
               <dd>{speaker.ministry}</dd>

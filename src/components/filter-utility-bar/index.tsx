@@ -266,7 +266,7 @@ export function FilterUtilityBar({
         )}
 
         {/* Status Filter (only if authenticated) */}
-        {isAdmin && (
+        {!!isAdmin && (
           <>
             <FilterSelect
               isPending={isPending}

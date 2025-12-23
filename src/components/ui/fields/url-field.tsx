@@ -49,7 +49,7 @@ export function UrlField<T extends FieldValues>({
           touched={fieldState.isTouched}
         >
           <FieldLabel required={required}>{label}</FieldLabel>
-          {Boolean(description) && <FieldDescription>{description}</FieldDescription>}
+          {!!description && <FieldDescription>{description}</FieldDescription>}
           <Input
             aria-invalid={fieldState.invalid}
             placeholder={placeholder}
@@ -57,7 +57,7 @@ export function UrlField<T extends FieldValues>({
             type="url"
             {...field}
           />
-          {Boolean(fieldState.error) && <FieldError>{fieldState.error?.message}</FieldError>}
+          {!!fieldState.error && <FieldError>{fieldState.error?.message}</FieldError>}
         </Field>
       )}
     />

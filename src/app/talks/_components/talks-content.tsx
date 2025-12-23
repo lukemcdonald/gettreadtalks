@@ -30,7 +30,7 @@ export async function TalksContent({ searchParams }: TalksContentProps) {
     status: statusParam,
   } = searchParams;
 
-  const featured = Boolean(featuredParam);
+  const featured = !!featuredParam;
   const status = userIsAdmin
     ? statusParam
     : statusParam || (featured || speakerId || topicId || search ? undefined : 'published');
@@ -52,7 +52,7 @@ export async function TalksContent({ searchParams }: TalksContentProps) {
       <Pagination
         continueCursor={result.continueCursor}
         hasNextPage={!result.isDone}
-        hasPrevPage={Boolean(cursor)}
+        hasPrevPage={!!cursor}
       />
     </Suspense>
   );

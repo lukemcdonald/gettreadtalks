@@ -65,7 +65,7 @@ export function SpeakerField<T extends FieldValues>({
               <FieldLabel htmlFor={field.name} required={required}>
                 {label}
               </FieldLabel>
-              {description && <FieldDescription>{description}</FieldDescription>}
+              {!!description && <FieldDescription>{description}</FieldDescription>}
 
               <Combobox
                 filter={(itemValue: SpeakerId, query: string) => {
@@ -119,7 +119,7 @@ export function SpeakerField<T extends FieldValues>({
                             <SpeakerAvatar rounded="full" size="sm" speaker={speaker} />
                             <div className="flex flex-col">
                               <span className="font-medium">{getSpeakerName(speaker)}</span>
-                              {Boolean(speaker.role) && (
+                              {!!speaker.role && (
                                 <span className="text-muted-foreground text-xs">
                                   {speaker.role}
                                 </span>
@@ -133,7 +133,7 @@ export function SpeakerField<T extends FieldValues>({
                 </ComboboxPopup>
               </Combobox>
 
-              {fieldState.error?.message && <FieldError>{fieldState.error.message}</FieldError>}
+              {!!fieldState.error?.message && <FieldError>{fieldState.error.message}</FieldError>}
             </Field>
 
             <CreateSpeakerDialog
