@@ -23,14 +23,24 @@ export async function getUserFavorites(limit?: number) {
  * Get user finished talks server-side.
  *
  * @param limit - Maximum number of finished talks to return
- * @returns User finished talks or null if not authenticated
+ * @returns User finished talks with pagination metadata, or empty result if not authenticated
  */
 export async function getUserFinishedTalks(limit?: number) {
   const authToken = await getAuthToken();
 
   if (!authToken) {
-    return null;
+    return {
+      continueCursor: null,
+      isDone: true,
+      talks: [],
+    };
   }
 
-  return await fetchQuery(api.users.listUserFinishedTalks, { limit }, { token: authToken });
+  const result = await fetchQuery(api.users.listUserFinishedTalks, { limit }, { token: authToken });
+
+  return {
+    continueCursor: null,
+    isDone: true,
+    talks: result ?? [],
+  };
 }

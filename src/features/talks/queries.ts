@@ -151,5 +151,11 @@ export async function getCollections({ limit }: { limit?: number } = {}) {
 export async function getFeaturedTalks(limit = 6) {
   const token = await getAuthToken();
 
-  return await fetchQuery(api.talks.listFeaturedTalksWithSpeakers, { limit }, { token });
+  const result = await fetchQuery(api.talks.listFeaturedTalksWithSpeakers, { limit }, { token });
+
+  return {
+    continueCursor: null,
+    isDone: true,
+    talks: result ?? [],
+  };
 }

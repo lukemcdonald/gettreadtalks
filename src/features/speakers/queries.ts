@@ -11,7 +11,13 @@ import { getAuthToken } from '@/services/auth/server';
 export async function getFeaturedSpeakers(limit = 6) {
   const token = await getAuthToken();
 
-  return await fetchQuery(api.speakers.listFeaturedSpeakers, { limit }, { token });
+  const result = await fetchQuery(api.speakers.listFeaturedSpeakers, { limit }, { token });
+
+  return {
+    continueCursor: null,
+    isDone: true,
+    speakers: result ?? [],
+  };
 }
 
 /**

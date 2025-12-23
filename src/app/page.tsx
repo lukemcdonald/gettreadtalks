@@ -8,10 +8,13 @@ import { getFeaturedTalks } from '@/features/talks';
 import { TalkCard } from '@/features/talks/components';
 
 export default async function HomePage() {
-  const [featuredTalks, featuredSpeakers] = await Promise.all([
+  const [featuredTalksResult, featuredSpeakersResult] = await Promise.all([
     getFeaturedTalks(6),
     getFeaturedSpeakers(6),
   ]);
+
+  const featuredTalks = featuredTalksResult.talks;
+  const featuredSpeakers = featuredSpeakersResult.speakers;
 
   return (
     <Main>

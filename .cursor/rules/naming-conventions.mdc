@@ -116,6 +116,8 @@ export function useItemsCount() {
 
 ### Mutation Hook Patterns
 
+**Important:** Mutation hooks return the mutation function directly, not a `{ data, isLoading }` object like query hooks.
+
 **Simple mutations** - Direct pass-through when no error handling needed:
 
 ```ts
@@ -123,10 +125,15 @@ export function useCreateItem() {
   return useMutation(/* your backend mutation */);
 }
 
-// Usage
+// Usage - returns mutation function directly
 const createItem = useCreateItem();
-await createItem({ title: 'New Item' });
+await createItem({ title: "New Item" });
 ```
+
+**Note:** Mutation hooks follow a different return pattern than query hooks:
+
+- **Query hooks** return `{ data, isLoading, notFound? }`
+- **Mutation hooks** return the mutation function directly (from `useMutation()`)
 
 **With error handling** - Use custom error handling wrapper if needed:
 
@@ -151,7 +158,7 @@ Combine multiple queries for reusable patterns across components:
 export function useItemWithRelated(id: string) {
   const { data: item, isLoading } = useItem(id);
   const { data: relatedItems } = useItems(
-    item ? { categoryId: item.categoryId, limit: 3 } : 'skip',
+    item ? { categoryId: item.categoryId, limit: 3 } : "skip"
   );
 
   return {
@@ -201,10 +208,55 @@ export async function getItemsWithAuthors({ limit = 12, cursor, ...filters });
 **Pagination Standard:**
 
 All plural functions:
+
 - Accept options object: `{ limit?: number }` (no default - undefined means fetch all)
 - Return pagination metadata: `{ [pluralNoun], continueCursor, isDone }`
 - Use `limit` parameter (not `pageSize` or `numItems`)
 - When `limit` is undefined, fetch all items (uses 1000 internally)
+
+**Convex Pagination Parameter Mapping:**
+
+The public API uses `limit`, but internally Convex requires `paginationOpts.numItems`:
+
+```ts
+// queries.ts - Public API uses limit
+export async function getItems({ limit }: { limit?: number } = {}) {
+  const token = await getAuthToken();
+
+  // Map limit to Convex paginationOpts.numItems
+  const paginationOpts = {
+    cursor: null,
+    numItems: limit ?? 1000,
+  };
+
+  const result = await fetchQuery(api.items.listItems, { paginationOpts }, { token });
+
+  return {
+    items: result.page,
+    continueCursor: result.continueCursor,
+    isDone: result.isDone,
+  };
+}
+```
+
+**Exception: Fixed-Size Queries**
+
+For queries that return a fixed, limited set (like featured items), you can return pagination metadata with `continueCursor: null` and `isDone: true`:
+
+```ts
+// Fixed-size query (e.g., featured items)
+export async function getFeaturedItems(limit = 6) {
+  const result = await fetchQuery(api.items.listFeatured, { limit }, { token });
+
+  return {
+    items: result ?? [],
+    continueCursor: null, // No pagination for fixed-size queries
+    isDone: true, // Always complete
+  };
+}
+```
+
+This maintains consistency with the pagination metadata pattern while indicating no further pages are available.
 
 **Examples:**
 
@@ -265,15 +317,25 @@ getItemsWithAuthors({ limit: 20, cursor, featured, search, ... }) → { items, c
 **BySlug queries always return relations** - They're used on detail pages where relations are always needed.
 
 **Single relation type:** Use `With{Entity}` suffix
+
 - `getCategoryBySlug` - Returns category only
 - `getCategoryBySlugWithItems` - Returns category with items
 
 **Multiple relation types:** Default returns all relations
+
 - `getItemBySlug` - Returns item with author, category, tags, relatedItems
 
 **Decision Guide:**
+
 - **1 relation type?** → Use `With{Entity}` suffix (e.g., `getCategoryBySlugWithItems`)
 - **2+ relation types?** → Default name returns all relations
+
+**Important:** The `With{Entity}` suffix refers to the **relation type**, not the count. For example:
+
+- `getTalksWithSpeakers()` - Returns talks with speaker relation (could be one or many speakers)
+- `listItemsWithAuthors()` - Returns items with author relation (each item has one author, but many items)
+
+The plural form (`Speakers`, `Authors`) indicates the relation type name, not that multiple relations are returned per item.
 
 ### Convex Export Names
 
@@ -313,7 +375,7 @@ export async function createItemAction(data: unknown): Promise<ActionResult<{ it
 // actions/update-item.ts
 export async function updateItemAction(
   data: unknown,
-  itemId: string,
+  itemId: string
 ): Promise<ActionResult<{ itemId: string }>> {
   // ...
 }
@@ -322,11 +384,13 @@ export async function updateItemAction(
 **When to Create "With Relations" Version:**
 
 Create combined Convex query when:
+
 - ✅ Always needed together (detail pages)
 - ✅ Used in 2+ places
 - ✅ Can optimize with database joins/indexes
 
 Combine in server action when:
+
 - ✅ Conditional/optional relationships
 - ✅ One-off combinations
 - ✅ Context-specific data aggregation
@@ -429,7 +493,6 @@ Ask yourself: "How would a user describe this action?"
 └─ "I added item to category" → addItemToCategory ✓ (no simpler verb)
 ```
 
-
 ### Common Pitfalls
 
 ```ts
@@ -453,7 +516,7 @@ export const unfinish = mutation(...)
 ```ts
 // Example mutation definition
 export const favoriteItem = mutation({
-  args: { itemId: v.id('items') },
+  args: { itemId: v.id("items") },
   handler: async (ctx, args) => {
     // Implementation
   },
@@ -470,7 +533,7 @@ export function useFavoriteItem() {
 
 // Component usage
 const favoriteItem = useFavoriteItem();
-await favoriteItem({ itemId: '123' });
+await favoriteItem({ itemId: "123" });
 ```
 
 ## Service Functions
@@ -550,7 +613,7 @@ Use `UPPER_SNAKE_CASE` for true constants:
 
 ```ts
 // constants.ts
-export const API_BASE_URL = 'https://api.example.com';
+export const API_BASE_URL = "https://api.example.com";
 export const DEFAULT_PAGE_SIZE = 20;
 export const MAX_ITEMS_PER_USER = 100;
 ```
