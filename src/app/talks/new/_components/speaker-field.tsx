@@ -21,7 +21,6 @@ import {
   FieldDescription,
   FieldError,
   FieldLabel,
-  FieldRequired,
 } from '@/components/ui';
 import { getSpeakerName } from '@/features/speakers';
 import { CreateSpeakerDialog } from './create-speaker-dialog';
@@ -63,9 +62,8 @@ export function SpeakerField<T extends FieldValues>({
         return (
           <>
             <Field invalid={fieldState.invalid} name={field.name}>
-              <FieldLabel htmlFor={field.name}>
+              <FieldLabel htmlFor={field.name} required={required}>
                 {label}
-                {required && <FieldRequired />}
               </FieldLabel>
               {description && <FieldDescription>{description}</FieldDescription>}
 

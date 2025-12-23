@@ -9,7 +9,6 @@ import {
   FieldDescription,
   FieldError,
   FieldLabel,
-  FieldRequired,
   Select,
   SelectItem,
   SelectPopup,
@@ -70,9 +69,8 @@ export function SelectField<T extends FieldValues>({
           name={field.name}
           touched={fieldState.isTouched}
         >
-          <FieldLabel htmlFor={field.name}>
+          <FieldLabel htmlFor={field.name} required={required}>
             {label}
-            {required && <FieldRequired />}
           </FieldLabel>
           {description && <FieldDescription>{description}</FieldDescription>}
           <Select
