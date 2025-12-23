@@ -10,42 +10,40 @@ import {
   FieldError,
   FieldLabel,
   FieldRequired,
-  Textarea,
+  Input,
 } from '@/components/ui';
 
-type TextareaFieldProps<T extends FieldValues> = {
+type UrlFieldProps<T extends FieldValues> = {
   control: Control<T>;
   description?: string;
   label: string;
   name: FieldPath<T>;
   placeholder?: string;
   required?: boolean;
-  rows?: number;
 };
 
 /**
- * Reusable textarea field component that wraps Controller + Field + Textarea.
+ * Reusable URL input field component that wraps Controller + Field + Input with type="url".
  * Handles validation errors automatically via React Hook Form.
  *
  * @example
  * ```tsx
- * <TextareaField
+ * <UrlField
  *   control={form.control}
- *   label="Description"
- *   name="description"
- *   rows={4}
+ *   label="Media URL"
+ *   name="mediaUrl"
+ *   required
  * />
  * ```
  */
-export function TextareaField<T extends FieldValues>({
+export function UrlField<T extends FieldValues>({
   control,
   description,
   label,
   name,
   placeholder,
   required,
-  rows,
-}: TextareaFieldProps<T>) {
+}: UrlFieldProps<T>) {
   return (
     <Controller
       control={control}
@@ -59,17 +57,17 @@ export function TextareaField<T extends FieldValues>({
         >
           <FieldLabel>
             {label}
-            <FieldRequired required={required} />
+            {required && <FieldRequired />}
           </FieldLabel>
-          <FieldDescription>{description}</FieldDescription>
-          <Textarea
+          {description && <FieldDescription>{description}</FieldDescription>}
+          <Input
             aria-invalid={fieldState.invalid}
             placeholder={placeholder}
             required={required}
-            rows={rows}
+            type="url"
             {...field}
           />
-          <FieldError error={fieldState.error} />
+          {fieldState.error?.message && <FieldError>{fieldState.error.message}</FieldError>}
         </Field>
       )}
     />

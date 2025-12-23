@@ -2,7 +2,7 @@
 // Primitives - Vendor components from Coss UI (never edit directly)
 
 export * from './container';
-export * from './field';
+export * from './fields';
 export * from './form';
 export * from './primitives';
 export * from './section';

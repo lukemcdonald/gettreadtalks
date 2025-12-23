@@ -92,7 +92,6 @@ export function LoginForm(props: React.ComponentPropsWithoutRef<'form'>) {
             type="email"
             value={email}
           />
-          <FieldError />
         </Field>
 
         <Field>
@@ -108,7 +107,6 @@ export function LoginForm(props: React.ComponentPropsWithoutRef<'form'>) {
             type="password"
             value={password}
           />
-          <FieldError />
         </Field>
 
         <div className="mt-4 flex gap-4">

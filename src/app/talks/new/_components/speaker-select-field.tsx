@@ -55,7 +55,7 @@ export function SpeakerSelectField({
           ))}
         </SelectPopup>
       </Select>
-      <FieldError error={error} />
+      {error?.message && <FieldError>{error.message}</FieldError>}
     </Field>
   );
 }
