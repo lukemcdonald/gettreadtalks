@@ -1,10 +1,16 @@
-// Re-export field primitives (also exported from primitives/index.ts for convenience)
-export * from '../primitives/field';
+// Re-export field primitives (FieldLabel customized below)
+export {
+  Field,
+  FieldControl,
+  FieldDescription,
+  FieldError,
+  FieldValidity,
+} from '../primitives/field';
 export * from '../primitives/number-field';
 // Export custom field components
 export { CheckboxField } from './checkbox-field';
 export { FeaturedField } from './featured-field';
-export { FieldRequired } from './field-required';
+export { FieldLabel } from './field-label';
 export { NumberField } from './number-field';
 export { SelectField } from './select-field';
 export { StatusField } from './status-field';

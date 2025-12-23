@@ -4,14 +4,7 @@ import type { Control, FieldPath, FieldValues } from 'react-hook-form';
 
 import { Controller } from 'react-hook-form';
 
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldLabel,
-  FieldRequired,
-  Input,
-} from '@/components/ui';
+import { Field, FieldDescription, FieldError, FieldLabel, Input } from '@/components/ui';
 
 type TextFieldProps<T extends FieldValues> = {
   control: Control<T>;
@@ -57,11 +50,8 @@ export function TextField<T extends FieldValues>({
           name={field.name}
           touched={fieldState.isTouched}
         >
-          <FieldLabel>
-            {label}
-            {required && <FieldRequired />}
-          </FieldLabel>
-          {description && <FieldDescription>{description}</FieldDescription>}
+          <FieldLabel required={required}>{label}</FieldLabel>
+          {Boolean(description) && <FieldDescription>{description}</FieldDescription>}
           <Input
             aria-invalid={fieldState.invalid}
             placeholder={placeholder}
@@ -69,7 +59,7 @@ export function TextField<T extends FieldValues>({
             type={type}
             {...field}
           />
-          {fieldState.error?.message && <FieldError>{fieldState.error.message}</FieldError>}
+          {Boolean(fieldState.error) && <FieldError>{fieldState.error?.message}</FieldError>}
         </Field>
       )}
     />

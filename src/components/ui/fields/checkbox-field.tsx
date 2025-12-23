@@ -40,13 +40,14 @@ export function CheckboxField<T extends FieldValues>({
         <Field invalid={fieldState.invalid} name={field.name}>
           <FieldLabel>
             <Checkbox
+              aria-invalid={fieldState.invalid}
               checked={field.value}
               onCheckedChange={(checked) => field.onChange(checked === true)}
             />
             {label}
           </FieldLabel>
-          {description && <FieldDescription>{description}</FieldDescription>}
-          {fieldState.error?.message && <FieldError>{fieldState.error.message}</FieldError>}
+          {Boolean(description) && <FieldDescription>{description}</FieldDescription>}
+          {Boolean(fieldState.error) && <FieldError>{fieldState.error?.message}</FieldError>}
         </Field>
       )}
     />
