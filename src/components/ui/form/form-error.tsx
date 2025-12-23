@@ -2,8 +2,10 @@
 
 import type { FieldError, FieldErrors, FieldValues } from 'react-hook-form';
 
+import { useMemo } from 'react';
+
 import { cn } from '@/utils';
-import { FieldError as FieldErrorComponent } from '../field/field-error';
+import { FieldError as FieldErrorComponent } from '../fields';
 
 type FormErrorProps = {
   className?: string;
@@ -12,16 +14,39 @@ type FormErrorProps = {
 
 /**
  * Displays form-level (non-field) error messages.
- * Reuses FieldError's error handling logic with form-specific styling.
+ * Handles single errors, arrays of errors, and root form errors.
  *
  * @example
  * ```tsx
- * <FormError error={form.formState.errors.root} />
- * <FormError error={[error1, error2]} />
+ * {form.formState.errors.root && (
+ *   <FormError error={form.formState.errors.root} />
+ * )}
  * ```
  */
 export function FormError({ className, error }: FormErrorProps) {
-  if (!error) {
+  const errorMessage = useMemo(() => {
+    if (!error) {
+      return null;
+    }
+
+    if (Array.isArray(error)) {
+      const uniqueErrors = [...new Map(error.map((err) => [err?.message, err])).values()];
+
+      if (uniqueErrors.length === 1) {
+        return uniqueErrors[0]?.message;
+      }
+
+      return (
+        <ul className="ml-4 flex list-disc flex-col gap-1">
+          {uniqueErrors.map((err) => err?.message && <li key={err.message}>{err.message}</li>)}
+        </ul>
+      );
+    }
+
+    return error?.message;
+  }, [error]);
+
+  if (!errorMessage) {
     return null;
   }
 
@@ -31,7 +56,7 @@ export function FormError({ className, error }: FormErrorProps) {
       data-slot="form-error"
       role="alert"
     >
-      <FieldErrorComponent error={error} />
+      <FieldErrorComponent>{errorMessage}</FieldErrorComponent>
     </div>
   );
 }

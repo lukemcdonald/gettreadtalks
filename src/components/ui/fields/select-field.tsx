@@ -72,9 +72,9 @@ export function SelectField<T extends FieldValues>({
         >
           <FieldLabel htmlFor={field.name}>
             {label}
-            <FieldRequired required={required} />
+            {required && <FieldRequired />}
           </FieldLabel>
-          <FieldDescription>{description}</FieldDescription>
+          {description && <FieldDescription>{description}</FieldDescription>}
           <Select
             items={items}
             name={field.name}
@@ -98,7 +98,7 @@ export function SelectField<T extends FieldValues>({
               ))}
             </SelectPopup>
           </Select>
-          <FieldError error={fieldState.error} />
+          {fieldState.error?.message && <FieldError>{fieldState.error.message}</FieldError>}
         </Field>
       )}
     />

@@ -65,9 +65,9 @@ export function SpeakerField<T extends FieldValues>({
             <Field invalid={fieldState.invalid} name={field.name}>
               <FieldLabel htmlFor={field.name}>
                 {label}
-                <FieldRequired required={required} />
+                {required && <FieldRequired />}
               </FieldLabel>
-              <FieldDescription>{description}</FieldDescription>
+              {description && <FieldDescription>{description}</FieldDescription>}
 
               <Combobox
                 filter={(itemValue: SpeakerId, query: string) => {
@@ -135,7 +135,7 @@ export function SpeakerField<T extends FieldValues>({
                 </ComboboxPopup>
               </Combobox>
 
-              <FieldError error={fieldState.error} />
+              {fieldState.error?.message && <FieldError>{fieldState.error.message}</FieldError>}
             </Field>
 
             <CreateSpeakerDialog

@@ -59,9 +59,9 @@ export function TextField<T extends FieldValues>({
         >
           <FieldLabel>
             {label}
-            <FieldRequired required={required} />
+            {required && <FieldRequired />}
           </FieldLabel>
-          <FieldDescription>{description}</FieldDescription>
+          {description && <FieldDescription>{description}</FieldDescription>}
           <Input
             aria-invalid={fieldState.invalid}
             placeholder={placeholder}
@@ -69,7 +69,7 @@ export function TextField<T extends FieldValues>({
             type={type}
             {...field}
           />
-          <FieldError error={fieldState.error} />
+          {fieldState.error?.message && <FieldError>{fieldState.error.message}</FieldError>}
         </Field>
       )}
     />

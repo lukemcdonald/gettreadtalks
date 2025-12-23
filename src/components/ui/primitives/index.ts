@@ -16,7 +16,7 @@ export * from './collapsible';
 export * from './combobox';
 export * from './dialog';
 export * from './empty';
-// export * from './field';
+export * from './field';
 export * from './fieldset';
 // export * from './form';
 export * from './frame';

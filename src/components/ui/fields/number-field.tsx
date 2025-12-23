@@ -10,7 +10,7 @@ import {
   FieldError,
   FieldLabel,
   FieldRequired,
-} from '@/components/ui/field';
+} from '@/components/ui/fields';
 import {
   NumberFieldDecrement,
   NumberFieldGroup,
@@ -74,9 +74,9 @@ export function NumberField<T extends FieldValues>({
           >
             <FieldLabel>
               {label}
-              <FieldRequired required={required} />
+              {required && <FieldRequired />}
             </FieldLabel>
-            <FieldDescription>{description}</FieldDescription>
+            {description && <FieldDescription>{description}</FieldDescription>}
             <NumberFieldPrimitive
               aria-invalid={fieldState.invalid}
               max={max}
@@ -98,7 +98,7 @@ export function NumberField<T extends FieldValues>({
                 <NumberFieldInput placeholder={placeholder} {...inputProps} />
               )}
             </NumberFieldPrimitive>
-            <FieldError error={fieldState.error} />
+            {fieldState.error?.message && <FieldError>{fieldState.error.message}</FieldError>}
           </Field>
         );
       }}
