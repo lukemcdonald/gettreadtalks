@@ -20,7 +20,7 @@ type SpeakerContentProps = {
 export function SpeakerContent({ clips, collections, speaker, talks }: SpeakerContentProps) {
   return (
     <>
-      {speaker.description && (
+      {!!speaker.description && (
         <div className="space-y-4">
           <p className="text-muted-foreground">{speaker.description}</p>
         </div>

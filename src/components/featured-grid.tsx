@@ -42,14 +42,14 @@ export function FeaturedGrid({
         <div className="space-y-6">
           <header className="space-y-3">
             <h2 className="font-semibold text-2xl leading-tight tracking-tight">{title}</h2>
-            {description && (
+            {!!description && (
               <p className="text-muted-foreground text-sm leading-relaxed sm:text-base">
                 {description}
               </p>
             )}
           </header>
 
-          {quickLinks && (
+          {!!quickLinks && (
             <div className={cn('space-y-3', className)}>
               <h3 className="font-semibold text-muted-foreground text-xs uppercase tracking-wide">
                 {title}

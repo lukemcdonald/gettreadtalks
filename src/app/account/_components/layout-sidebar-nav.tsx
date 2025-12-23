@@ -33,7 +33,7 @@ export function LayoutSidebarNav() {
             href={href}
             key={href}
           >
-            {Icon && <Icon className="size-4" />}
+            {!!Icon && <Icon className="size-4" />}
             {label}
           </Link>
         );

@@ -13,7 +13,7 @@ type SpeakersSidebarProps = {
 export function SpeakersSidebar({ speakers }: SpeakersSidebarProps) {
   // Get unique roles for filter: (r): r is string => !!r)
   const roles = Array.from(
-    new Set(speakers.map(({ role }) => role).filter((role): role is string => Boolean(role))),
+    new Set(speakers.map(({ role }) => role).filter((role): role is string => !!role)),
   ).sort();
 
   return (

@@ -20,18 +20,18 @@ export function TalkDetails({ talk }: TalkDetailsProps) {
         <strong>Published:</strong>{' '}
         {talk.publishedAt ? new Date(talk.publishedAt).toLocaleDateString() : 'Not published'}
       </p>
-      {talk.featured && (
+      {!!talk.featured && (
         <p>
           <strong>Featured Talk</strong>
         </p>
       )}
-      {talk.description && <p>{talk.description}</p>}
-      {talk.scripture && (
+      {!!talk.description && <p>{talk.description}</p>}
+      {!!talk.scripture && (
         <div>
           <strong>Scripture:</strong> {talk.scripture}
         </div>
       )}
-      {talk.mediaUrl && (
+      {!!talk.mediaUrl && (
         <div>
           <strong>Media URL:</strong>{' '}
           <a href={talk.mediaUrl} rel="noopener noreferrer" target="_blank">

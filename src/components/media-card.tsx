@@ -35,7 +35,7 @@ export function MediaCard({
             {title}
           </FauxLink>
         </CardTitle>
-        {subtitle && <CardDescription>{subtitle}</CardDescription>}
+        {!!subtitle && <CardDescription>{subtitle}</CardDescription>}
       </div>
     </Card>
   );

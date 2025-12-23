@@ -49,7 +49,7 @@ export function ActiveFilters({ speakers, topics }: ActiveFiltersProps) {
     <div className="flex flex-wrap items-center gap-2">
       <span className="text-muted-foreground text-sm">Active filters:</span>
 
-      {search && (
+      {!!search && (
         <button
           className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 font-semibold text-primary text-sm transition-colors hover:bg-primary/20"
           onClick={() => removeFilter('search')}
@@ -60,7 +60,7 @@ export function ActiveFilters({ speakers, topics }: ActiveFiltersProps) {
         </button>
       )}
 
-      {featured && (
+      {!!featured && (
         <button
           className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 font-semibold text-primary text-sm transition-colors hover:bg-primary/20"
           onClick={() => removeFilter('featured')}
@@ -71,7 +71,7 @@ export function ActiveFilters({ speakers, topics }: ActiveFiltersProps) {
         </button>
       )}
 
-      {speaker && (
+      {!!speaker && (
         <button
           className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 font-semibold text-primary text-sm transition-colors hover:bg-primary/20"
           onClick={() => removeFilter('speaker')}
@@ -82,7 +82,7 @@ export function ActiveFilters({ speakers, topics }: ActiveFiltersProps) {
         </button>
       )}
 
-      {topic && (
+      {!!topic && (
         <button
           className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 font-semibold text-primary text-sm transition-colors hover:bg-primary/20"
           onClick={() => removeFilter('topic')}
@@ -93,7 +93,7 @@ export function ActiveFilters({ speakers, topics }: ActiveFiltersProps) {
         </button>
       )}
 
-      {status && (
+      {!!status && (
         <button
           className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 font-semibold text-primary text-sm transition-colors hover:bg-primary/20"
           onClick={() => removeFilter('status')}

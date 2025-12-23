@@ -24,17 +24,19 @@ if (!result.success) {
 ### Displaying Form-Level Errors
 
 ```typescript
-import { FormMessage } from '@/components/ui/form-message';
+import { FormError } from '@/components/ui/form';
 
-<FormMessage error={form.formState.errors.root} />
+<FormError error={form.formState.errors.root} />
 ```
 
 ### Displaying Field-Level Errors
 
-```typescript
-import { FieldMessage } from '@/components/ui/field-message';
+Reusable field components (TextField, SelectField, etc.) automatically display field-level errors. For custom Controller usage, use `FieldError` directly:
 
-<FieldMessage error={fieldState.error} />
+```typescript
+import { FieldError } from '@/components/ui/fields';
+
+{!!fieldState.error && <FieldError>{fieldState.error?.message}</FieldError>}
 ```
 
 ## Utilities
@@ -46,9 +48,19 @@ import { FieldMessage } from '@/components/ui/field-message';
 ## Component Features
 
 ### Form Component
-- Automatically wraps children with `FormProvider` when `form` prop is provided
+- Must be wrapped with `FormProvider` from React Hook Form
 - Sets `noValidate={true}` by default to prevent HTML5 validation (React Hook Form handles all validation)
-- Usage: `<Form form={form} onSubmit={form.handleSubmit(onSubmit)}>`
+- Usage:
+```typescript
+import { FormProvider } from 'react-hook-form';
+import { Form } from '@/components/ui/form';
+
+<FormProvider {...form}>
+  <Form onSubmit={form.handleSubmit(onSubmit)}>
+    {/* fields */}
+  </Form>
+</FormProvider>
+```
 
 ### FieldLabel Component
 - Automatically displays a red asterisk (`*`) when `required={true}` is passed
@@ -58,16 +70,15 @@ import { FieldMessage } from '@/components/ui/field-message';
 - Automatically sets `aria-invalid="true"` when `error` prop is provided
 - Usage: `<FieldControl error={fieldState.error} {...field} />`
 
-### FieldMessage Component
+### FieldError Component
 - Displays field-level validation errors
-- Automatically handles null/undefined (returns null if no error)
-- Usage: `<FieldMessage error={fieldState.error} />`
+- Used internally by reusable field components
+- For custom Controller usage: `{!!fieldState.error && <FieldError>{fieldState.error?.message}</FieldError>}`
 
-### FormMessage Component
+### FormError Component
 - Displays form-level (non-field) errors
 - Automatically handles null/undefined (returns null if no error)
-- Can accept either `error` prop (from `form.formState.errors.root`) or `message` prop
-- Usage: `<FormMessage error={form.formState.errors.root} />`
+- Usage: `<FormError error={form.formState.errors.root} />`
 
 ## References
 

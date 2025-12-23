@@ -17,7 +17,7 @@ export function ClipsList({ clips }: ClipsListProps) {
         {clips.map((clip) => (
           <li key={clip._id}>
             <strong>{clip.title}</strong>
-            {clip.description && <p>{clip.description}</p>}
+            {!!clip.description && <p>{clip.description}</p>}
             <p>
               <strong>Media:</strong>{' '}
               <a href={clip.mediaUrl} rel="noopener noreferrer" target="_blank">
@@ -27,7 +27,7 @@ export function ClipsList({ clips }: ClipsListProps) {
             <p>
               <strong>Status:</strong> {clip.status}
             </p>
-            {clip.publishedAt && (
+            {!!clip.publishedAt && (
               <p>
                 <strong>Published:</strong> {new Date(clip.publishedAt).toLocaleDateString()}
               </p>

@@ -2,7 +2,7 @@
 
 import type { SpeakerId } from '@/features/speakers/types';
 
-import { useState, useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -15,13 +15,10 @@ import {
   DialogPanel,
   DialogPopup,
   DialogTitle,
-  Field,
-  FieldError,
-  FieldLabel,
-  Input,
   TextField,
 } from '@/components/ui';
 import { createSpeakerAction } from '@/features/speakers/actions';
+import { setServerErrors } from '@/lib/forms/react-hook-form';
 
 const createSpeakerSchema = z.object({
   firstName: z.string().trim().min(1, 'First name is required'),
@@ -52,19 +49,22 @@ export function CreateSpeakerDialog({
     resolver: zodResolver(createSpeakerSchema),
   });
 
+  // Reset form and clear errors when dialog closes
+  useEffect(() => {
+    if (!open) {
+      form.reset();
+      form.clearErrors();
+      setError(null);
+    }
+  }, [form, open]);
+
   const handleSubmit = form.handleSubmit((data) => {
     setError(null);
     startTransition(async () => {
       const result = await createSpeakerAction(data);
 
       if (!result.success) {
-        // Map errors to form errors
-        Object.entries(result.errors).forEach(([field, message]) => {
-          form.setError(field as keyof CreateSpeakerFormData, {
-            message,
-            type: 'server',
-          });
-        });
+        setServerErrors(form.setError, result.errors);
         setError('Failed to create speaker. Please check the errors below.');
         return;
       }
@@ -85,7 +85,7 @@ export function CreateSpeakerDialog({
 
         <form onSubmit={handleSubmit}>
           <DialogPanel>
-            {error && (
+            {!!error && (
               <div className="mb-4 rounded-md bg-destructive/15 p-3 text-destructive-foreground text-sm">
                 {error}
               </div>
@@ -113,7 +113,12 @@ export function CreateSpeakerDialog({
           <DialogFooter>
             <Button
               disabled={isPending}
-              onClick={() => onOpenChange(false)}
+              onClick={() => {
+                form.reset();
+                form.clearErrors();
+                setError(null);
+                onOpenChange(false);
+              }}
               type="button"
               variant="outline"
             >

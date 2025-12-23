@@ -20,7 +20,7 @@ export function AccountMenuItem({
   onClick,
   ...delegated
 }: AccountMenuItemProps) {
-  const isButton = !href && Boolean(onClick);
+  const isButton = !href && !!onClick;
 
   let renderComponent: React.ReactElement<Record<string, unknown>> | undefined;
   if (isButton) {
@@ -37,7 +37,7 @@ export function AccountMenuItem({
       nativeButton={isButton}
       onClick={onClick}
     >
-      {Icon && <Icon className="size-4" />}
+      {!!Icon && <Icon className="size-4" />}
       {label}
     </MenuItem>
   );

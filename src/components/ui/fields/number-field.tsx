@@ -67,7 +67,7 @@ export function NumberField<T extends FieldValues>({
             touched={fieldState.isTouched}
           >
             <FieldLabel required={required}>{label}</FieldLabel>
-            {Boolean(description) && <FieldDescription>{description}</FieldDescription>}
+            {!!description && <FieldDescription>{description}</FieldDescription>}
             <NumberFieldPrimitive
               aria-invalid={fieldState.invalid}
               max={max}
@@ -89,7 +89,7 @@ export function NumberField<T extends FieldValues>({
                 <NumberFieldInput placeholder={placeholder} {...inputProps} />
               )}
             </NumberFieldPrimitive>
-            {Boolean(fieldState.error) && <FieldError>{fieldState.error?.message}</FieldError>}
+            {!!fieldState.error && <FieldError>{fieldState.error?.message}</FieldError>}
           </Field>
         );
       }}

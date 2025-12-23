@@ -59,7 +59,7 @@ export default async function AccountPage() {
       <div className="px-6 py-8">
         <div className="rounded-lg bg-card p-6 shadow-lg">
           <h2 className="mb-4 font-semibold text-2xl text-card-foreground">Your Favorites</h2>
-          {favorites && (
+          {!!favorites && (
             <div className="grid gap-4">
               {favorites.talks.length > 0 && (
                 <div>

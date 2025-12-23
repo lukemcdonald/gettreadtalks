@@ -51,7 +51,7 @@ export function TextareaField<T extends FieldValues>({
           touched={fieldState.isTouched}
         >
           <FieldLabel required={required}>{label}</FieldLabel>
-          {Boolean(description) && <FieldDescription>{description}</FieldDescription>}
+          {!!description && <FieldDescription>{description}</FieldDescription>}
           <Textarea
             aria-invalid={fieldState.invalid}
             placeholder={placeholder}
@@ -59,7 +59,7 @@ export function TextareaField<T extends FieldValues>({
             rows={rows}
             {...field}
           />
-          {Boolean(fieldState.error) && <FieldError>{fieldState.error?.message}</FieldError>}
+          {!!fieldState.error && <FieldError>{fieldState.error?.message}</FieldError>}
         </Field>
       )}
     />

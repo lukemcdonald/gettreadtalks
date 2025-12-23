@@ -46,8 +46,8 @@ export function CheckboxField<T extends FieldValues>({
             />
             {label}
           </FieldLabel>
-          {Boolean(description) && <FieldDescription>{description}</FieldDescription>}
-          {Boolean(fieldState.error) && <FieldError>{fieldState.error?.message}</FieldError>}
+          {!!description && <FieldDescription>{description}</FieldDescription>}
+          {!!fieldState.error && <FieldError>{fieldState.error?.message}</FieldError>}
         </Field>
       )}
     />

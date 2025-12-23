@@ -69,7 +69,7 @@ export function LoginForm(props: React.ComponentPropsWithoutRef<'form'>) {
 
   return (
     <Form className="gap-6" onSubmit={handleSubmit} {...props}>
-      {error && (
+      {!!error && (
         <Alert variant="error">
           <CircleAlertIcon />
           <AlertTitle>Error</AlertTitle>

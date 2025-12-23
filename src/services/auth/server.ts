@@ -12,6 +12,15 @@ import { api } from '@/convex/_generated/api';
 import { isAdmin } from '@/services/auth/utils';
 
 // Framework-specific utilities from Convex + Better Auth
+const convexSiteUrl = process.env.NEXT_PUBLIC_CONVEX_SITE_URL;
+const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
+
+if (!(convexSiteUrl && convexUrl)) {
+  throw new Error(
+    'Missing required environment variables: NEXT_PUBLIC_CONVEX_SITE_URL and NEXT_PUBLIC_CONVEX_URL',
+  );
+}
+
 const {
   fetchAuthAction,
   fetchAuthMutation,
@@ -21,8 +30,8 @@ const {
   isAuthenticated,
   preloadAuthQuery,
 } = convexBetterAuthNextJs({
-  convexSiteUrl: process.env.NEXT_PUBLIC_CONVEX_SITE_URL!,
-  convexUrl: process.env.NEXT_PUBLIC_CONVEX_URL!,
+  convexSiteUrl,
+  convexUrl,
 });
 
 /**

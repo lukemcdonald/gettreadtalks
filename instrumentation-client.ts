@@ -8,7 +8,9 @@ import { IS_SENTRY_ENABLED } from './src/configs/sentry';
 
 if (IS_SENTRY_ENABLED) {
   // Silently handle import failures - Sentry is non-critical
-  import('./src/configs/sentry/client').catch(() => {});
+  import('./src/configs/sentry/client').catch(() => {
+    // Ignore import errors - Sentry is optional
+  });
 }
 
 // Export the router transition hook for Sentry navigation instrumentation

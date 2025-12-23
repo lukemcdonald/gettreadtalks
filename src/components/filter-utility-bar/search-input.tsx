@@ -27,7 +27,7 @@ export function SearchInput({
   return (
     <GroupItem className={cn('relative min-w-[200px] max-w-[300px] flex-1', className)}>
       <div className="relative flex w-full items-center">
-        {value && (
+        {!!value && (
           <button
             className="absolute left-3 z-10 flex size-6 items-center justify-center rounded-md transition-colors hover:bg-muted"
             onClick={() => onValueChange('')}
@@ -36,7 +36,7 @@ export function SearchInput({
             <RemoveIcon className="size-4 text-muted-foreground" />
           </button>
         )}
-        {isLoading && (
+        {!!isLoading && (
           <LoaderCircleIcon className="absolute left-10 z-10 size-4 animate-spin text-muted-foreground" />
         )}
         <Input

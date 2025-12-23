@@ -16,20 +16,20 @@ export function TalkContent({ clips, talk }: TalkContentProps) {
     <>
       <PageHeader title={talk.title} />
 
-      {talk.mediaUrl && (
+      {!!talk.mediaUrl && (
         <div className="space-y-4">
           <MediaEmbed mediaUrl={talk.mediaUrl} />
         </div>
       )}
 
-      {talk.description && (
+      {!!talk.description && (
         <div className="space-y-2">
           <h2 className="font-semibold text-lg">Description</h2>
           <p className="text-muted-foreground">{talk.description}</p>
         </div>
       )}
 
-      {talk.scripture && (
+      {!!talk.scripture && (
         <div className="space-y-2">
           <h2 className="font-semibold text-lg">Scripture</h2>
           <p className="text-muted-foreground">{talk.scripture}</p>

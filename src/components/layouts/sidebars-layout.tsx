@@ -28,7 +28,7 @@ export function SidebarsLayout({
     <Section spacing={spacing}>
       <Container className={className}>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-12">
-          {header && <div className="col-span-full mb-10">{header}</div>}
+          {!!header && <div className="col-span-full mb-10">{header}</div>}
 
           <div
             className={cn(
@@ -41,7 +41,7 @@ export function SidebarsLayout({
 
           <div className="min-w-0 space-y-6 md:col-span-9 lg:col-span-6">{content}</div>
 
-          {rightSidebar && (
+          {!!rightSidebar && (
             <div
               className={cn(
                 'space-y-6 md:col-span-full lg:col-span-3',

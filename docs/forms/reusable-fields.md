@@ -195,19 +195,22 @@ import { StatusField } from '@/components/ui';
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { useForm, FormProvider } from 'react-hook-form';
 import { z } from 'zod';
+import { useTransition } from 'react';
 
 import {
   Button,
   FeaturedField,
   Form,
+  FormError,
   StatusField,
   TextField,
   TextareaField,
   UrlField,
 } from '@/components/ui';
 import { createItemAction } from '@/features/items/actions';
+import { setServerErrors } from '@/lib/forms/react-hook-form';
 
 const formSchema = z.object({
   title: z.string().min(1, 'Title is required').trim(),
@@ -220,6 +223,8 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 
 export function ItemForm() {
+  const [isPending, startTransition] = useTransition();
+  
   const form = useForm<FormData>({
     defaultValues: {
       featured: false,
@@ -229,45 +234,53 @@ export function ItemForm() {
   });
 
   const handleSubmit = form.handleSubmit(async (data) => {
-    const result = await createItemAction(data);
-    if (result.success) {
+    startTransition(async () => {
+      const result = await createItemAction(data);
+      if (!result.success) {
+        setServerErrors(form.setError, result.errors);
+        return;
+      }
       // Handle success
-    } else {
-      // Handle errors (setServerErrors utility handles this)
-    }
+    });
   });
 
   return (
-    <Form form={form} onSubmit={handleSubmit}>
-      <TextField
-        control={form.control}
-        label="Title"
-        name="title"
-        required
-      />
+    <FormProvider {...form}>
+      <Form noValidate onSubmit={handleSubmit}>
+        <FormError error={form.formState.errors.root} />
+        
+        <TextField
+          control={form.control}
+          label="Title"
+          name="title"
+          required
+        />
 
-      <TextareaField
-        control={form.control}
-        label="Description"
-        name="description"
-      />
+        <TextareaField
+          control={form.control}
+          label="Description"
+          name="description"
+        />
 
-      <UrlField
-        control={form.control}
-        label="Media URL"
-        name="mediaUrl"
-      />
+        <UrlField
+          control={form.control}
+          label="Media URL"
+          name="mediaUrl"
+        />
 
-      <StatusField
-        control={form.control}
-        name="status"
-        required
-      />
+        <StatusField
+          control={form.control}
+          name="status"
+          required
+        />
 
-      <FeaturedField control={form.control} name="featured" />
+        <FeaturedField control={form.control} name="featured" />
 
-      <Button type="submit">Create Item</Button>
-    </Form>
+        <Button disabled={isPending} type="submit">
+          Create Item
+        </Button>
+      </Form>
+    </FormProvider>
   );
 }
 ```
