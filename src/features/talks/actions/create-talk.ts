@@ -13,10 +13,7 @@ import { requireAdminUser } from '@/services/auth/server';
 import { type TalkFormData, talkFormSchema } from '../schemas/talk-form';
 
 /**
- * Creates a new talk.
- *
- * @param data - Form data (validated client-side, re-validated on server)
- * @returns Success result with talkId or error result with field errors
+ * Creates a new talk. Validates data on server and requires admin authorization.
  */
 export async function createTalkAction(data: unknown): Promise<ActionResult<{ talkId: string }>> {
   // Re-verify authorization on every request

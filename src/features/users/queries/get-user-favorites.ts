@@ -6,10 +6,7 @@ import { api } from '@/convex/_generated/api';
 import { getAuthToken } from '@/services/auth/server';
 
 /**
- * Get user favorites server-side.
- *
- * @param limit - Maximum number of favorites to return
- * @returns User favorites or null if not authenticated
+ * Get user favorites server-side. Returns null if not authenticated.
  */
 export async function getUserFavorites(limit?: number) {
   const authToken = await getAuthToken();

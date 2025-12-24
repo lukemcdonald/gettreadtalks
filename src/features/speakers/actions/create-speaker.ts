@@ -30,10 +30,7 @@ const createSpeakerSchema = z.object({
 type CreateSpeakerData = z.infer<typeof createSpeakerSchema>;
 
 /**
- * Creates a new speaker.
- *
- * @param data - Speaker creation data (validated client-side, re-validated on server)
- * @returns Success result with speakerId or error result with field errors
+ * Creates a new speaker. Validates data on server and requires admin authorization.
  */
 export async function createSpeakerAction(
   data: unknown,
