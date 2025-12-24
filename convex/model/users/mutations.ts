@@ -9,10 +9,6 @@ import { userRole } from './validators';
 
 /**
  * Add a clip to user favorites.
- *
- * @param ctx - Database context
- * @param args - Arguments containing clipId
- * @returns The ID of the created favorite record
  */
 export const favoriteClip = mutation({
   args: {
@@ -40,10 +36,6 @@ export const favoriteClip = mutation({
 
 /**
  * Add a speaker to user favorites.
- *
- * @param ctx - Database context
- * @param args - Arguments containing speakerId
- * @returns The ID of the created favorite record
  */
 export const favoriteSpeaker = mutation({
   args: {
@@ -73,10 +65,6 @@ export const favoriteSpeaker = mutation({
 
 /**
  * Add a talk to user favorites.
- *
- * @param ctx - Database context
- * @param args - Arguments containing talkId
- * @returns The ID of the created favorite record
  */
 export const favoriteTalk = mutation({
   args: {
@@ -104,10 +92,6 @@ export const favoriteTalk = mutation({
 
 /**
  * Mark a talk as finished for the user.
- *
- * @param ctx - Database context
- * @param args - Arguments containing talkId
- * @returns The ID of the created finished record
  */
 export const finishTalk = mutation({
   args: {
@@ -135,10 +119,6 @@ export const finishTalk = mutation({
 
 /**
  * Remove a clip from user favorites.
- *
- * @param ctx - Database context
- * @param args - Arguments containing clipId
- * @returns null
  */
 export const unfavoriteClip = mutation({
   args: {
@@ -165,10 +145,6 @@ export const unfavoriteClip = mutation({
 
 /**
  * Remove a speaker from user favorites.
- *
- * @param ctx - Database context
- * @param args - Arguments containing speakerId
- * @returns null
  */
 export const unfavoriteSpeaker = mutation({
   args: {
@@ -197,10 +173,6 @@ export const unfavoriteSpeaker = mutation({
 
 /**
  * Remove a talk from user favorites.
- *
- * @param ctx - Database context
- * @param args - Arguments containing talkId
- * @returns null
  */
 export const unfavoriteTalk = mutation({
   args: {
@@ -227,10 +199,6 @@ export const unfavoriteTalk = mutation({
 
 /**
  * Unmark a talk as finished for the user.
- *
- * @param ctx - Database context
- * @param args - Arguments containing talkId
- * @returns null
  */
 export const unfinishTalk = mutation({
   args: {
@@ -257,10 +225,6 @@ export const unfinishTalk = mutation({
 
 /**
  * Update the user's password.
- *
- * @param ctx - Database context
- * @param args - Arguments containing current password and new password
- * @returns null
  */
 export const updatePassword = mutation({
   args: {

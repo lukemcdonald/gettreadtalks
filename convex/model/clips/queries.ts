@@ -22,10 +22,6 @@ const clipPageWithSpeakersValidator = paginationResultValidator(
 /**
  * Get clip by slug with related data (default for detail pages).
  * Returns clip with speaker, talk, and topics.
- *
- * @param ctx - Database context
- * @param args - Query arguments
- * @returns Clip with speaker, talk, and topics data
  */
 export const getClipBySlug = query({
   args: {
@@ -81,10 +77,6 @@ export const getClipBySlug = query({
 
 /**
  * List clips with optional filters and pagination.
- *
- * @param ctx - Database context
- * @param args - Query arguments with pagination options
- * @returns Paginated clips
  */
 export const listClips = query({
   args: {
@@ -109,10 +101,6 @@ export const listClips = query({
 
 /**
  * List clips with speaker data (paginated).
- *
- * @param ctx - Database context
- * @param args - Query arguments with pagination options
- * @returns Paginated clips with speaker information
  */
 export const listClipsWithSpeakers = query({
   args: {
@@ -149,10 +137,6 @@ export const listClipsWithSpeakers = query({
 
 /**
  * List clips by speaker.
- *
- * @param ctx - Database context
- * @param args - Query arguments
- * @returns Array of clips by speaker
  */
 export const listClipsBySpeaker = query({
   args: {

@@ -10,10 +10,6 @@ import { requireAuth } from '../auth/utils';
 
 /**
  * Create a new speaker.
- *
- * @param ctx - Database context
- * @param args - Speaker creation arguments
- * @returns The ID of the created speaker
  */
 export const createSpeaker = mutation({
   args: {
@@ -53,10 +49,6 @@ export const createSpeaker = mutation({
 
 /**
  * Destroy a speaker (permanently delete from database with reference checks).
- *
- * @param ctx - Database context
- * @param args - Destroy arguments
- * @returns null
  */
 export const destroySpeaker = mutation({
   args: {
@@ -108,10 +100,6 @@ export const destroySpeaker = mutation({
 
 /**
  * Update an existing speaker.
- *
- * @param ctx - Database context
- * @param args - Update arguments
- * @returns The ID of the updated speaker
  */
 export const updateSpeaker = mutation({
   args: {

@@ -10,10 +10,6 @@ import { affiliateLinkTypes } from './validators';
 
 /**
  * Create a new affiliate link.
- *
- * @param ctx - Database context
- * @param args - Affiliate link creation arguments
- * @returns The ID of the created affiliate link
  */
 export const createAffiliateLink = mutation({
   args: {
@@ -46,10 +42,6 @@ export const createAffiliateLink = mutation({
 
 /**
  * Destroy an affiliate link (permanently delete from database).
- *
- * @param ctx - Database context
- * @param args - Destroy arguments
- * @returns null
  */
 export const destroyAffiliateLink = mutation({
   args: {
@@ -74,10 +66,6 @@ export const destroyAffiliateLink = mutation({
 
 /**
  * Update an existing affiliate link.
- *
- * @param ctx - Database context
- * @param args - Update arguments
- * @returns The ID of the updated affiliate link
  */
 export const updateAffiliateLink = mutation({
   args: {

@@ -10,10 +10,6 @@ import { requireAuth } from '../auth/utils';
 
 /**
  * Create a new collection.
- *
- * @param ctx - Database context
- * @param args - Collection creation arguments
- * @returns The ID of the created collection
  */
 export const createCollection = mutation({
   args: {
@@ -41,10 +37,6 @@ export const createCollection = mutation({
 
 /**
  * Destroy a collection (permanently delete from database with reference checks).
- *
- * @param ctx - Database context
- * @param args - Destroy arguments
- * @returns null
  */
 export const destroyCollection = mutation({
   args: {
@@ -82,10 +74,6 @@ export const destroyCollection = mutation({
 
 /**
  * Update an existing collection.
- *
- * @param ctx - Database context
- * @param args - Update arguments
- * @returns The ID of the updated collection
  */
 export const updateCollection = mutation({
   args: {

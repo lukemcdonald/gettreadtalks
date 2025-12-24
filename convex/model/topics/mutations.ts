@@ -11,10 +11,6 @@ import { topicStatus } from './validators';
 
 /**
  * Add a clip to a topic.
- *
- * @param ctx - Database context
- * @param args - Arguments containing clipId and topicId
- * @returns The ID of the created association
  */
 export const addClipToTopic = mutation({
   args: {
@@ -55,10 +51,6 @@ export const addClipToTopic = mutation({
 
 /**
  * Add a talk to a topic.
- *
- * @param ctx - Database context
- * @param args - Arguments containing talkId and topicId
- * @returns The ID of the created association
  */
 export const addTalkToTopic = mutation({
   args: {
@@ -99,10 +91,6 @@ export const addTalkToTopic = mutation({
 
 /**
  * Create a new topic.
- *
- * @param ctx - Database context
- * @param args - Topic creation arguments
- * @returns The ID of the created topic
  */
 export const createTopic = mutation({
   args: {
@@ -128,10 +116,6 @@ export const createTopic = mutation({
 
 /**
  * Destroy a topic (permanently delete from database with reference checks).
- *
- * @param ctx - Database context
- * @param args - Destroy arguments
- * @returns null
  */
 export const destroyTopic = mutation({
   args: {
@@ -170,10 +154,6 @@ export const destroyTopic = mutation({
 
 /**
  * Remove a clip from a topic.
- *
- * @param ctx - Database context
- * @param args - Arguments containing clipId and topicId
- * @returns null
  */
 export const removeClipFromTopic = mutation({
   args: {
@@ -203,10 +183,6 @@ export const removeClipFromTopic = mutation({
 
 /**
  * Remove a talk from a topic.
- *
- * @param ctx - Database context
- * @param args - Arguments containing talkId and topicId
- * @returns null
  */
 export const removeTalkFromTopic = mutation({
   args: {
@@ -236,10 +212,6 @@ export const removeTalkFromTopic = mutation({
 
 /**
  * Update an existing topic.
- *
- * @param ctx - Database context
- * @param args - Update arguments
- * @returns The ID of the updated topic
  */
 export const updateTopic = mutation({
   args: {

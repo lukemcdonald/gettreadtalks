@@ -5,10 +5,6 @@ import { asyncMap } from 'convex-helpers';
 
 /**
  * Apply additional filters (status, featured, speakerId) to talks array.
- *
- * @param talks - Array of talks to filter
- * @param filters - Filter options
- * @returns Filtered array of talks
  */
 export function applyAdditionalFilters(
   talks: Doc<'talks'>[],
@@ -35,10 +31,6 @@ export function applyAdditionalFilters(
 
 /**
  * Apply search filter to talks array.
- *
- * @param talks - Array of talks to filter
- * @param search - Optional search string
- * @returns Filtered array of talks
  */
 export function applySearchFilter(talks: Doc<'talks'>[], search?: string): Doc<'talks'>[] {
   if (!search) {
@@ -50,10 +42,6 @@ export function applySearchFilter(talks: Doc<'talks'>[], search?: string): Doc<'
 
 /**
  * Enrich talks with speaker data.
- *
- * @param ctx - Database context
- * @param talks - Array of talks to enrich
- * @returns Array of talks with speaker information
  */
 export async function enrichWithSpeakers(
   ctx: QueryCtx,
@@ -67,10 +55,6 @@ export async function enrichWithSpeakers(
 
 /**
  * Get talks filtered by topic from talksOnTopics join table.
- *
- * @param ctx - Database context
- * @param topicId - Topic ID to filter by
- * @returns Array of talks filtered by topic
  */
 export async function getTalksByTopic(ctx: QueryCtx, topicId: Id<'topics'>) {
   const talksOnTopics = await ctx.db

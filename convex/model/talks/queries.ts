@@ -24,10 +24,6 @@ const talkPageWithSpeakersValidator = paginationResultValidator(talkWithSpeakerV
 
 /**
  * Get talk by ID.
- *
- * @param ctx - Database context
- * @param args - Query arguments
- * @returns Talk or null if not found
  */
 export const getTalk = query({
   args: {
@@ -40,10 +36,6 @@ export const getTalk = query({
 /**
  * Get talk by speaker slug and talk slug with related data (default for detail pages).
  * Returns talk with speaker, collection, clips, and topics.
- *
- * @param ctx - Database context
- * @param args - Query arguments with speakerSlug and talkSlug
- * @returns Talk with speaker, collection, clips, and topics data
  */
 export const getTalkBySlug = query({
   args: {
@@ -116,9 +108,6 @@ export const getTalkBySlug = query({
 
 /**
  * Get total count of published talks.
- *
- * @param ctx - Database context
- * @returns Count of published talks
  */
 export const getTalksCount = query({
   args: {},
@@ -138,10 +127,6 @@ export const getTalksCount = query({
 
 /**
  * Get featured talks (random selection).
- *
- * @param ctx - Database context
- * @param args - Query arguments with defaults
- * @returns Array of random featured talks
  */
 export const listFeaturedTalks = query({
   args: {
@@ -167,10 +152,6 @@ export const listFeaturedTalks = query({
 
 /**
  * Get featured talks with speaker data.
- *
- * @param ctx - Database context
- * @param args - Query arguments with limit
- * @returns Array of featured talks with speaker information
  */
 export const listFeaturedTalksWithSpeakers = query({
   args: {
@@ -202,10 +183,6 @@ export const listFeaturedTalksWithSpeakers = query({
 
 /**
  * Get random talks by speaker (excluding a specific talk).
- *
- * @param ctx - Database context
- * @param args - Query arguments
- * @returns Array of random talks by speaker
  */
 export const listRandomTalksBySpeaker = query({
   args: {
@@ -238,10 +215,6 @@ export const listRandomTalksBySpeaker = query({
 
 /**
  * List talks with optional filters and pagination.
- *
- * @param ctx - Database context
- * @param args - Query arguments with pagination options
- * @returns Paginated talks
  */
 export const listTalks = query({
   args: {
@@ -428,11 +401,7 @@ export const listTalks = query({
 });
 
 /**
- * Get talks by collection with status filter.
- *
- * @param ctx - Database context
- * @param args - Query arguments with defaults
- * @returns Array of talks sorted by collection order
+ * Get talks by collection with status filter. Returns talks sorted by collection order.
  */
 export const listTalksByCollection = query({
   args: {
@@ -459,10 +428,6 @@ export const listTalksByCollection = query({
 
 /**
  * Get talks by speaker with status filter.
- *
- * @param ctx - Database context
- * @param args - Query arguments with defaults
- * @returns Array of talks
  */
 export const listTalksBySpeaker = query({
   args: {
@@ -484,12 +449,7 @@ export const listTalksBySpeaker = query({
 });
 
 /**
- * Get talks with speaker data (paginated).
- * Supports all the same filters as listTalks.
- *
- * @param ctx - Database context
- * @param args - Query arguments with pagination options and filters
- * @returns Paginated talks with speaker information
+ * Get talks with speaker data (paginated). Supports all the same filters as listTalks.
  */
 export const listTalksWithSpeakers = query({
   args: {

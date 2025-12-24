@@ -9,10 +9,6 @@ import { requireAuth } from '../auth/utils';
 import { statusType } from './validators';
 /**
  * Archive a clip (soft delete by setting status to archived).
- *
- * @param ctx - Database context
- * @param args - Archive arguments
- * @returns null
  */
 export const archiveClip = mutation({
   args: {
@@ -41,10 +37,6 @@ export const archiveClip = mutation({
 
 /**
  * Create a new clip.
- *
- * @param ctx - Database context
- * @param args - Clip creation arguments
- * @returns The ID of the created clip
  */
 export const createClip = mutation({
   args: {
@@ -80,10 +72,6 @@ export const createClip = mutation({
 
 /**
  * Update an existing clip.
- *
- * @param ctx - Database context
- * @param args - Update arguments
- * @returns The ID of the updated clip
  */
 export const updateClip = mutation({
   args: {
@@ -140,10 +128,6 @@ export const updateClip = mutation({
 
 /**
  * Update clip status.
- *
- * @param ctx - Database context
- * @param args - Update arguments
- * @returns The ID of the updated clip
  */
 export const updateClipStatus = mutation({
   args: {
