@@ -5,10 +5,16 @@ import { fetchQuery } from 'convex/nextjs';
 import { api } from '@/convex/_generated/api';
 import { getAuthToken } from '@/services/auth/server';
 
+type GetCollectionsWithStatsProps = {
+  limit?: number;
+};
+
 /**
  * Get collections with stats (talk counts and speakers) for list page.
  */
-export async function getCollectionsWithStats({ limit }: { limit?: number } = {}) {
+export async function getCollectionsWithStats(args?: GetCollectionsWithStatsProps) {
+  const { limit } = args ?? {};
+
   const token = await getAuthToken();
 
   const paginationOpts = {

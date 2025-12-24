@@ -5,10 +5,16 @@ import { fetchQuery } from 'convex/nextjs';
 import { api } from '@/convex/_generated/api';
 import { getAuthToken } from '@/services/auth/server';
 
+type GetSpeakersProps = {
+  limit?: number;
+};
+
 /**
  * Get speakers (flat list, not grouped).
  */
-export async function getSpeakers({ limit }: { limit?: number } = {}) {
+export async function getSpeakers(args?: GetSpeakersProps) {
+  const { limit } = args ?? {};
+
   const token = await getAuthToken();
 
   const paginationOpts = {

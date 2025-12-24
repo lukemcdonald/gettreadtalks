@@ -2,10 +2,15 @@
 
 import { getSpeakers } from './get-speakers';
 
+type GetSpeakersGroupedProps = {
+  limit?: number;
+};
+
 /**
  * Get speakers grouped alphabetically by last name.
  */
-export async function getSpeakersGrouped({ limit }: { limit?: number } = {}) {
+export async function getSpeakersGrouped(args?: GetSpeakersGroupedProps) {
+  const { limit } = args ?? {};
   const { speakers } = await getSpeakers({ limit });
 
   // Group speakers by first letter of last name

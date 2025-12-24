@@ -9,6 +9,7 @@ import { getManyFrom, getManyVia, getOneFrom } from 'convex-helpers/server/relat
 import { query } from '../../_generated/server';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
+import { canViewContent } from '../auth/roles';
 import { getCurrentUser } from '../auth/utils';
 import {
   applyAdditionalFilters,
@@ -71,8 +72,7 @@ export const getTalkBySlug = query({
       return null;
     }
 
-    // Unauthenticated users can only view published talks
-    if (!user && talk.status !== 'published') {
+    if (!canViewContent(user, talk.status)) {
       return null;
     }
 

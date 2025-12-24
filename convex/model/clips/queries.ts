@@ -8,6 +8,8 @@ import { getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
 
 import { query } from '../../_generated/server';
 import { doc, docs } from '../../lib/validators/schema';
+import { canViewContent } from '../auth/roles';
+import { getCurrentUser } from '../auth/utils';
 import { statusType } from './validators';
 
 const clipPageValidator = paginationResultValidator(doc('clips'));
@@ -32,13 +34,23 @@ export const getClipBySlug = query({
   handler: async (ctx, args) => {
     const clip = await getOneFrom(ctx.db, 'clips', 'by_slug', args.slug);
 
-    if (!clip || clip.status !== 'published') {
+    if (!clip) {
       return null;
     }
 
+    const user = await getCurrentUser(ctx);
+
+    // Non-admin users can only view published clips
+    if (!canViewContent(user, clip.status)) {
+      return null;
+    }
+
+    const speakerId = clip.speakerId;
+    const talkId = clip.talkId;
+
     const queries = {
-      speaker: clip.speakerId ? ctx.db.get('speakers', clip.speakerId) : null,
-      talk: clip.talkId ? ctx.db.get('talks', clip.talkId) : null,
+      speaker: speakerId ? ctx.db.get('speakers', speakerId) : null,
+      talk: talkId ? ctx.db.get('talks', talkId) : null,
       topics: getManyVia(ctx.db, 'clipsOnTopics', 'topicId', 'by_clipId', clip._id, 'clipId'),
     };
 
@@ -50,7 +62,12 @@ export const getClipBySlug = query({
 
     const validTopics = topics.filter((topic) => topic !== null);
 
-    return { clip, speaker, talk, topics: validTopics };
+    return {
+      clip,
+      speaker,
+      talk,
+      topics: validTopics,
+    };
   },
   returns: v.nullable(
     v.object({
@@ -106,6 +123,7 @@ export const listClipsWithSpeakers = query({
     const { paginationOpts, status } = args;
 
     let result: PaginationResult<Doc<'clips'>>;
+
     if (status) {
       result = await ctx.db
         .query('clips')
