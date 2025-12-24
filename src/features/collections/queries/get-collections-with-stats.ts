@@ -28,12 +28,3 @@ export async function getCollectionsWithStats({ limit }: { limit?: number } = {}
     isDone: result.isDone,
   };
 }
-
-/**
- * Get collection by slug with talks in order.
- */
-export async function getCollectionBySlug(slug: string) {
-  const token = await getAuthToken();
-
-  return await fetchQuery(api.collections.getCollectionBySlug, { slug }, { token });
-}

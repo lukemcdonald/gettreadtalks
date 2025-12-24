@@ -28,12 +28,3 @@ export async function getClipsWithSpeakers({ limit }: { limit?: number } = {}) {
     isDone: result.isDone,
   };
 }
-
-/**
- * Get clip by slug with speaker and talk.
- */
-export async function getClipBySlug(slug: string) {
-  const token = await getAuthToken();
-
-  return await fetchQuery(api.clips.getClipBySlug, { slug }, { token });
-}
