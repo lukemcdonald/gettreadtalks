@@ -14,11 +14,7 @@ import { requireAdminUser } from '@/services/auth/server';
 import { type TalkFormData, talkFormSchema } from '../schemas/talk-form';
 
 /**
- * Updates an existing talk.
- *
- * @param data - Form data (validated client-side, re-validated on server)
- * @param talkId - ID of the talk to update
- * @returns Success result with talkId or error result with field errors
+ * Updates an existing talk. Validates data on server and requires admin authorization.
  */
 export async function updateTalkAction(
   data: unknown,

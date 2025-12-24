@@ -5,7 +5,9 @@ import { fetchMutation } from 'convex/nextjs';
 import { api } from '@/convex/_generated/api';
 import { getAuthToken } from '@/services/auth/server';
 
-// Authenticated mutation via server function
+/**
+ * Update user password. Requires authentication.
+ */
 export async function updatePassword({
   currentPassword,
   newPassword,

@@ -6,7 +6,7 @@ import { api } from '@/convex/_generated/api';
 import { getAuthToken } from '@/services/auth/server';
 
 /**
- * Get topics (for selector dropdown).
+ * Get topics for selector dropdowns.
  */
 export async function getTopics({ limit }: { limit?: number } = {}) {
   const token = await getAuthToken();
