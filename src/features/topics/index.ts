@@ -1,2 +1,2 @@
 export * from './components';
-export { getTopicBySlug, getTopics, getTopicsWithCounts } from './queries';
+export * from './queries';
