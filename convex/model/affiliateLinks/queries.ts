@@ -7,10 +7,6 @@ import { affiliateLinkTypes } from './validators';
 
 /**
  * Get affiliate link by ID.
- *
- * @param ctx - Database context
- * @param args - Query arguments
- * @returns Affiliate link or null if not found
  */
 export const getAffiliateLink = query({
   args: {
@@ -22,10 +18,6 @@ export const getAffiliateLink = query({
 
 /**
  * Get affiliate link by slug.
- *
- * @param ctx - Database context
- * @param args - Query arguments
- * @returns Affiliate link or null if not found
  */
 export const getAffiliateLinkBySlug = query({
   args: {
@@ -37,10 +29,6 @@ export const getAffiliateLinkBySlug = query({
 
 /**
  * List all affiliate links with optional filters.
- *
- * @param ctx - Database context
- * @param args - Query arguments with defaults
- * @returns Array of affiliate links
  */
 export const listAffiliateLinks = query({
   args: {
@@ -83,10 +71,6 @@ export const listAffiliateLinks = query({
 
 /**
  * List affiliate links by affiliate.
- *
- * @param ctx - Database context
- * @param args - Query arguments with defaults
- * @returns Array of affiliate links from the specified affiliate
  */
 export const listAffiliateLinksByAffiliate = query({
   args: {
@@ -107,10 +91,6 @@ export const listAffiliateLinksByAffiliate = query({
 
 /**
  * List affiliate links by type.
- *
- * @param ctx - Database context
- * @param args - Query arguments with defaults
- * @returns Array of affiliate links of the specified type
  */
 export const listAffiliateLinksByType = query({
   args: {

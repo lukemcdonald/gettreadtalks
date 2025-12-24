@@ -11,10 +11,6 @@ import { statusType } from './validators';
 
 /**
  * Archive a talk (soft delete by setting status to archived).
- *
- * @param ctx - Database context
- * @param args - Archive arguments
- * @returns null
  */
 export const archiveTalk = mutation({
   args: {
@@ -43,10 +39,6 @@ export const archiveTalk = mutation({
 
 /**
  * Create a new talk.
- *
- * @param ctx - Database context
- * @param args - Talk creation arguments
- * @returns The ID of the created talk
  */
 export const createTalk = mutation({
   args: {
@@ -88,10 +80,6 @@ export const createTalk = mutation({
 
 /**
  * Update an existing talk.
- *
- * @param ctx - Database context
- * @param args - Update arguments
- * @returns The ID of the updated talk
  */
 export const updateTalk = mutation({
   args: {
@@ -160,10 +148,6 @@ export const updateTalk = mutation({
 
 /**
  * Update talk status.
- *
- * @param ctx - Database context
- * @param args - Update arguments
- * @returns The ID of the updated talk
  */
 export const updateTalkStatus = mutation({
   args: {
@@ -200,10 +184,6 @@ export const updateTalkStatus = mutation({
 
 /**
  * Destroy a talk (permanently delete from database with cleanup of related records).
- *
- * @param ctx - Database context
- * @param args - Destroy arguments
- * @returns null
  */
 export const destroyTalk = mutation({
   args: {

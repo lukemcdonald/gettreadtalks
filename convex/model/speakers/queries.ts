@@ -11,10 +11,6 @@ const speakerPageValidator = paginationResultValidator(doc('speakers'));
 
 /**
  * Get speaker by ID.
- *
- * @param ctx - Database context
- * @param args - Query arguments
- * @returns Speaker or null if not found
  */
 export const getSpeaker = query({
   args: {
@@ -27,10 +23,6 @@ export const getSpeaker = query({
 /**
  * Get speaker by slug with related data (default for detail pages).
  * Returns speaker with related talks, collections, and clips.
- *
- * @param ctx - Database context
- * @param args - Query arguments
- * @returns Speaker with related talks, collections, and clips
  */
 export const getSpeakerBySlug = query({
   args: {
@@ -92,11 +84,7 @@ export const getSpeakerBySlug = query({
 });
 
 /**
- * List all speakers (for migration/cleanup purposes).
- * Returns all speakers without pagination.
- *
- * @param ctx - Database context
- * @returns All speakers
+ * List all speakers (for migration/cleanup purposes). Returns all speakers without pagination.
  */
 export const listAllSpeakers = query({
   args: {},
@@ -106,9 +94,6 @@ export const listAllSpeakers = query({
 
 /**
  * Get total count of speakers.
- *
- * @param ctx - Database context
- * @returns Count of speakers
  */
 export const getSpeakersCount = query({
   args: {},
@@ -122,10 +107,6 @@ export const getSpeakersCount = query({
 
 /**
  * Get featured speakers (random selection).
- *
- * @param ctx - Database context
- * @param args - Query arguments with defaults
- * @returns Array of random featured speakers
  */
 export const listFeaturedSpeakers = query({
   args: {
@@ -151,10 +132,6 @@ export const listFeaturedSpeakers = query({
 
 /**
  * List speakers with pagination.
- *
- * @param ctx - Database context
- * @param args - Query arguments with pagination options
- * @returns Paginated speakers
  */
 export const listSpeakers = query({
   args: {

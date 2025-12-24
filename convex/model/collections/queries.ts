@@ -13,10 +13,6 @@ const collectionPageValidator = paginationResultValidator(doc('collections'));
 
 /**
  * Get collection by ID.
- *
- * @param ctx - Database context
- * @param args - Query arguments
- * @returns Collection or null if not found
  */
 export const getCollection = query({
   args: {
@@ -28,10 +24,6 @@ export const getCollection = query({
 
 /**
  * Get collection with its talks.
- *
- * @param ctx - Database context
- * @param args - Query arguments with defaults
- * @returns Collection with its talks
  */
 export const getCollectionWithTalks = query({
   args: {
@@ -73,10 +65,6 @@ export const getCollectionWithTalks = query({
 /**
  * Get collection by slug with related data (default for detail pages).
  * Returns collection with its talks (each with speaker).
- *
- * @param ctx - Database context
- * @param args - Query arguments with defaults
- * @returns Collection with its talks (each with speaker)
  */
 export const getCollectionBySlug = query({
   args: {
@@ -121,10 +109,6 @@ export const getCollectionBySlug = query({
 
 /**
  * Get collection with unique speakers from its talks.
- *
- * @param ctx - Database context
- * @param args - Query arguments
- * @returns Collection with array of unique speakers
  */
 export const getCollectionWithSpeakers = query({
   args: {
@@ -168,10 +152,6 @@ export const getCollectionWithSpeakers = query({
 
 /**
  * List collections with pagination.
- *
- * @param ctx - Database context
- * @param args - Query arguments with pagination options
- * @returns Paginated collections
  */
 export const listCollections = query({
   args: {
@@ -183,11 +163,7 @@ export const listCollections = query({
 });
 
 /**
- * List collections by speaker.
- *
- * @param ctx - Database context
- * @param args - Query arguments
- * @returns Array of collections that contain talks by the speaker
+ * List collections by speaker. Returns collections that contain talks by the speaker.
  */
 export const listCollectionsBySpeaker = query({
   args: {
@@ -220,10 +196,6 @@ export const listCollectionsBySpeaker = query({
 
 /**
  * List collections with stats (talk counts and speakers).
- *
- * @param ctx - Database context
- * @param args - Query arguments with pagination options
- * @returns Paginated collections with talk counts and speakers
  */
 export const listCollectionsWithStats = query({
   args: {

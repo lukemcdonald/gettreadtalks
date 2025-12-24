@@ -10,10 +10,6 @@ import { doc, docs } from '../../lib/validators/schema';
 
 /**
  * Get topic by ID.
- *
- * @param ctx - Database context
- * @param args - Query arguments
- * @returns Topic or null if not found
  */
 export const getTopic = query({
   args: {
@@ -25,10 +21,6 @@ export const getTopic = query({
 
 /**
  * Get topic with related talks and clips.
- *
- * @param ctx - Database context
- * @param args - Query arguments with defaults
- * @returns Topic with related talks and clips
  */
 export const getTopicWithContent = query({
   args: {
@@ -75,10 +67,6 @@ export const getTopicWithContent = query({
 /**
  * Get topic by slug with related data (default for detail pages).
  * Returns topic with related talks (each with speaker) and clips.
- *
- * @param ctx - Database context
- * @param args - Query arguments with defaults
- * @returns Topic with related talks (each with speaker) and clips
  */
 export const getTopicBySlug = query({
   args: {
@@ -129,10 +117,6 @@ export const getTopicBySlug = query({
 
 /**
  * List topics.
- *
- * @param ctx - Database context
- * @param args - Query arguments with defaults
- * @returns Array of topics
  */
 export const listTopics = query({
   args: {
@@ -148,10 +132,6 @@ export const listTopics = query({
 
 /**
  * List topics with talk counts.
- *
- * @param ctx - Database context
- * @param args - Query arguments with defaults
- * @returns Array of topics with talk counts
  */
 export const listTopicsWithCount = query({
   args: {

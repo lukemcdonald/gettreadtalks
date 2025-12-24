@@ -6,10 +6,7 @@ import { getCurrentUser as getAuthUser } from '../auth/utils';
 import { getUserFavoriteClips, getUserFavoriteSpeakers, getUserFavoriteTalks } from './utils';
 
 /**
- * Get the current authenticated user.
- *
- * @param ctx - Query context
- * @returns User object or null if not authenticated
+ * Get the current authenticated user. Returns null if not authenticated.
  */
 export const getCurrentUser = query({
   args: {},
@@ -19,10 +16,6 @@ export const getCurrentUser = query({
 
 /**
  * Check if user has favorited a clip.
- *
- * @param ctx - Database context
- * @param args - Query arguments
- * @returns True if favorited, false otherwise
  */
 export const isClipFavorited = query({
   args: {
@@ -47,10 +40,6 @@ export const isClipFavorited = query({
 
 /**
  * Check if user has favorited a speaker.
- *
- * @param ctx - Database context
- * @param args - Query arguments
- * @returns True if favorited, false otherwise
  */
 export const isSpeakerFavorited = query({
   args: {
@@ -77,10 +66,6 @@ export const isSpeakerFavorited = query({
 
 /**
  * Check if user has favorited a talk.
- *
- * @param ctx - Database context
- * @param args - Query arguments
- * @returns True if favorited, false otherwise
  */
 export const isTalkFavorited = query({
   args: {
@@ -105,10 +90,6 @@ export const isTalkFavorited = query({
 
 /**
  * Check if user has finished a talk.
- *
- * @param ctx - Database context
- * @param args - Query arguments
- * @returns True if finished, false otherwise
  */
 export const isTalkFinished = query({
   args: {
@@ -132,11 +113,7 @@ export const isTalkFinished = query({
 });
 
 /**
- * List all user favorites.
- *
- * @param ctx - Database context
- * @param args - Query arguments with defaults
- * @returns Object with clips, speakers, and talks favorites
+ * List all user favorites. Returns object with clips, speakers, and talks favorites.
  */
 export const listUserFavorites = query({
   args: {
@@ -183,10 +160,6 @@ export const listUserFavorites = query({
 
 /**
  * List all user finished talks.
- *
- * @param ctx - Database context
- * @param args - Query arguments with defaults
- * @returns Array of finished talk records
  */
 export const listUserFinishedTalks = query({
   args: {
