@@ -30,9 +30,7 @@ export async function TalksContent({ searchParams }: TalksContentProps) {
   } = searchParams;
 
   const featured = !!featuredParam;
-  const status = userIsAdmin
-    ? statusParam
-    : statusParam || (featured || speakerId || topicId || search ? undefined : 'published');
+  const status = userIsAdmin ? statusParam : 'published';
 
   const result = await getTalksWithSpeakers({
     cursor,

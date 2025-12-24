@@ -9,10 +9,7 @@ import { fetchQuery } from 'convex/nextjs';
 import { api } from '@/convex/_generated/api';
 import { getAuthToken } from '@/services/auth/server';
 
-/**
- * Get talks with speakers and optional filters and pagination.
- */
-export async function getTalksWithSpeakers(filters?: {
+type GetTalksWithSpeakersProps = {
   cursor?: string | null;
   featured?: boolean;
   limit?: number;
@@ -20,23 +17,30 @@ export async function getTalksWithSpeakers(filters?: {
   speakerId?: SpeakerId;
   status?: StatusType;
   topicId?: TopicId;
-}) {
+};
+
+/**
+ * Get talks with speakers and optional filters and pagination.
+ */
+export async function getTalksWithSpeakers(args?: GetTalksWithSpeakersProps) {
+  const { cursor, featured, limit, search, speakerId, status, topicId } = args ?? {};
+
   const token = await getAuthToken();
 
   const paginationOpts = {
-    cursor: filters?.cursor || null,
-    numItems: filters?.limit ?? 1000,
+    cursor: cursor || null,
+    numItems: limit ?? 1000,
   };
 
   const result = await fetchQuery(
     api.talks.listTalksWithSpeakers,
     {
-      featured: filters?.featured,
+      featured,
       paginationOpts,
-      search: filters?.search,
-      speakerId: filters?.speakerId,
-      status: filters?.status,
-      topicId: filters?.topicId,
+      search,
+      speakerId,
+      status,
+      topicId,
     },
     { token },
   );

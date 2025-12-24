@@ -5,10 +5,16 @@ import { fetchQuery } from 'convex/nextjs';
 import { api } from '@/convex/_generated/api';
 import { getAuthToken } from '@/services/auth/server';
 
+type GetCollectionsProps = {
+  limit?: number;
+};
+
 /**
  * Get collections for form dropdowns.
  */
-export async function getCollections({ limit }: { limit?: number } = {}) {
+export async function getCollections(args?: GetCollectionsProps) {
+  const { limit } = args ?? {};
+
   const token = await getAuthToken();
 
   const paginationOpts = {
