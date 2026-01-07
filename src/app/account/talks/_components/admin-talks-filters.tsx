@@ -7,11 +7,7 @@ export function AdminTalksFilters() {
   return (
     <div className="flex gap-4">
       <div className="flex-1">
-        <SearchInput
-          label="Search"
-          paramName="search"
-          placeholder="Search by talk title or speaker name..."
-        />
+        <SearchInput label="Search" paramName="search" placeholder="Search talks and speakers..." />
       </div>
       <div className="w-48">
         <SelectFilter

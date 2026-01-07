@@ -41,6 +41,35 @@ export function applySearchFilter(talks: Doc<'talks'>[], search?: string): Doc<'
 }
 
 /**
+ * Apply search filter with speaker data to talks+speaker array.
+ */
+export function applySearchFilterWithSpeaker(
+  talks: Array<Doc<'talks'> & { speaker: Doc<'speakers'> | null }>,
+  search?: string,
+  searchType?: 'title' | 'speaker',
+): Array<Doc<'talks'> & { speaker: Doc<'speakers'> | null }> {
+  if (!search) {
+    return talks;
+  }
+
+  const searchLower = search.toLowerCase();
+  const type = searchType || 'title';
+
+  return talks.filter((talk) => {
+    if (type === 'title') {
+      return talk.title.toLowerCase().includes(searchLower);
+    }
+
+    if (type === 'speaker' && talk.speaker) {
+      const speakerName = `${talk.speaker.firstName} ${talk.speaker.lastName}`.toLowerCase();
+      return speakerName.includes(searchLower);
+    }
+
+    return false;
+  });
+}
+
+/**
  * Enrich talks with speaker data.
  */
 export async function enrichWithSpeakers(
