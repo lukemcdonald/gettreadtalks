@@ -543,7 +543,9 @@ export const listTalksWithSpeakers = query({
       // Fetch speakers for search
       const speakerIds = [...new Set(talks.map((talk) => talk.speakerId))];
       const speakers = await Promise.all(speakerIds.map((id) => ctx.db.get('speakers', id)));
-      const speakersMap = new Map(speakers.map((s) => (s ? [s._id, s] : null)).filter(Boolean));
+      const speakersMap = new Map(
+        speakers.filter((s): s is NonNullable<typeof s> => s !== null).map((s) => [s._id, s]),
+      );
 
       talks = talks.filter((talk) => {
         // Search in talk title
@@ -565,7 +567,7 @@ export const listTalksWithSpeakers = query({
     }
 
     // Manual pagination after filtering
-    const startIndex = paginationOpts.cursor ? Number.parseInt(paginationOpts.cursor) : 0;
+    const startIndex = paginationOpts.cursor ? Number.parseInt(paginationOpts.cursor, 10) : 0;
     const endIndex = startIndex + paginationOpts.numItems;
     const page = talks.slice(startIndex, endIndex);
     const hasMore = endIndex < talks.length;

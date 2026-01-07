@@ -38,7 +38,9 @@ function getStatusVariant(status: string) {
 }
 
 function formatDate(timestamp?: number) {
-  if (!timestamp) return 'N/A';
+  if (!timestamp) {
+    return 'N/A';
+  }
   return new Date(timestamp).toLocaleDateString('en-US', {
     day: 'numeric',
     month: 'short',
@@ -76,7 +78,7 @@ export function AdminTalksTable({ talks }: AdminTalksTableProps) {
               <TableRow key={talk._id}>
                 <TableCell className="font-medium">
                   <div className="flex items-start gap-2">
-                    {talk.featured && (
+                    {!!talk.featured && (
                       <StarIcon className="mt-0.5 size-4 shrink-0 fill-yellow-400 text-yellow-400" />
                     )}
                     <div className="min-w-0 flex-1">
@@ -87,7 +89,7 @@ export function AdminTalksTable({ talks }: AdminTalksTableProps) {
                       >
                         {talk.title}
                       </Link>
-                      {talk.speaker && (
+                      {!!talk.speaker && (
                         <p className="text-muted-foreground text-sm">
                           by {getSpeakerName(talk.speaker)}
                         </p>

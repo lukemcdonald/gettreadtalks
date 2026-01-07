@@ -9,7 +9,6 @@ import {
   PencilIcon,
   TrashIcon,
 } from 'lucide-react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import {
@@ -55,23 +54,19 @@ export function TalkActionsMenu({ talk, talkUrl }: TalkActionsMenuProps) {
         Edit
       </Button>
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
+        <DropdownMenuTrigger>
           <Button size="sm" variant="ghost">
             <MoreVerticalIcon className="size-4" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem asChild>
-            <Link href={talkUrl}>
-              <ExternalLinkIcon className="mr-2 size-4" />
-              View Talk
-            </Link>
+          <DropdownMenuItem onClick={handleView}>
+            <ExternalLinkIcon className="mr-2 size-4" />
+            View Talk
           </DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href={editUrl}>
-              <PencilIcon className="mr-2 size-4" />
-              Edit Talk
-            </Link>
+          <DropdownMenuItem onClick={handleEdit}>
+            <PencilIcon className="mr-2 size-4" />
+            Edit Talk
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleArchive}>

@@ -21,7 +21,9 @@ export function Pagination({ continueCursor, hasNextPage, hasPrevPage }: Paginat
   };
 
   const handleNext = () => {
-    if (!continueCursor) return;
+    if (!continueCursor) {
+      return;
+    }
     const params = new URLSearchParams(searchParams.toString());
     params.set('cursor', continueCursor);
     router.push(`?${params.toString()}`);
