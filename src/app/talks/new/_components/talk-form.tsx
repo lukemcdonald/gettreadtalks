@@ -22,6 +22,7 @@ import { CollectionSelectField } from './collection-select-field';
 import { SpeakerField } from './speaker-field';
 
 type TalkFormProps = {
+  actionsMenu?: React.ReactNode;
   collections: Pick<Collection, '_id' | 'slug' | 'title'>[];
   initialData?: {
     collectionId?: CollectionId;
@@ -34,6 +35,7 @@ type TalkFormProps = {
     status?: StatusType;
     title: string;
   };
+  mode?: 'create' | 'edit';
   speakerSlug?: string;
   speakers: Pick<Speaker, '_id' | 'firstName' | 'lastName' | 'slug' | 'imageUrl' | 'role'>[];
   talkId?: TalkId;
@@ -41,26 +43,16 @@ type TalkFormProps = {
 };
 
 export function TalkForm({
+  actionsMenu,
   collections,
   initialData,
+  mode = 'create',
   speakerSlug,
   speakers,
   talkId,
   talkSlug,
 }: TalkFormProps) {
-  const {
-    archiveLabel,
-    form,
-    isArchived,
-    isBusy,
-    isDeleting,
-    onArchiveToggle,
-    onDelete,
-    onError,
-    onSubmit,
-    setTalkStatus,
-    submitLabel,
-  } = useTalkForm({
+  const { form, isBusy, onError, onSubmit, setTalkStatus, submitLabel } = useTalkForm({
     collections,
     initialData,
     speakerSlug,
@@ -118,26 +110,26 @@ export function TalkForm({
           <FeaturedField control={form.control} name="featured" />
         </div>
 
-        <div className="flex items-center gap-4">
-          <Button disabled={isBusy} type="submit">
-            {submitLabel}
-          </Button>
-
-          {!!talkId && (
-            <>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            {actionsMenu ? (
+              actionsMenu
+            ) : (
+              <Button disabled={isBusy} type="submit">
+                {submitLabel}
+              </Button>
+            )}
+            {mode === 'edit' && (
               <Button
                 disabled={isBusy}
-                onClick={onArchiveToggle}
+                onClick={() => window.history.back()}
                 type="button"
-                variant={isArchived ? 'outline' : 'destructive'}
+                variant="outline"
               >
-                {archiveLabel}
+                Cancel
               </Button>
-              <Button disabled={isBusy} onClick={onDelete} type="button" variant="destructive">
-                {isDeleting ? 'Deleting...' : 'Delete Talk'}
-              </Button>
-            </>
-          )}
+            )}
+          </div>
         </div>
       </Form>
     </FormProvider>
