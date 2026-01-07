@@ -17,6 +17,11 @@ export type TalkWithSpeaker = Talk & {
   speaker: Doc<'speakers'> | null;
 };
 
+export type TalkWithSpeakerAndTopics = Talk & {
+  speaker: Doc<'speakers'> | null;
+  topicSlugs: string[];
+};
+
 export type TalksPaginationResult = PaginationResult<Talk>;
 
 export type TalksResult = Omit<PaginationResult<Talk>, 'page'> & {

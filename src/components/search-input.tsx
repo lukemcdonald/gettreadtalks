@@ -1,6 +1,6 @@
 'use client';
 
-import { useTransition } from 'react';
+import { useRef, useState, useTransition } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import { Input, Label } from '@/components/ui';
@@ -23,24 +23,38 @@ export function SearchInput({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [_isPending, startTransition] = useTransition();
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
-  const value = searchParams.get(paramName) ?? '';
+  // Local state for responsive typing
+  const [value, setValue] = useState(searchParams.get(paramName) ?? '');
 
   const handleChange = (newValue: string) => {
-    const params = new URLSearchParams(searchParams.toString());
+    // Update local state immediately for responsive UI
+    setValue(newValue);
 
-    if (newValue.trim()) {
-      params.set(paramName, newValue.trim());
-    } else {
-      params.delete(paramName);
+    // Clear existing debounce timer
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
     }
 
-    params.delete('cursor');
+    // Debounce the URL update to avoid hammering the database
+    debounceRef.current = setTimeout(() => {
+      const params = new URLSearchParams(searchParams.toString());
 
-    startTransition(() => {
-      const query = params.toString();
-      router.push(query ? `${pathname}?${query}` : pathname);
-    });
+      if (newValue.trim()) {
+        params.set(paramName, newValue.trim());
+      } else {
+        params.delete(paramName);
+      }
+
+      // Reset cursor when search changes
+      params.delete('cursor');
+
+      startTransition(() => {
+        const query = params.toString();
+        router.push(query ? `${pathname}?${query}` : pathname, { scroll: false });
+      });
+    }, 300);
   };
 
   return (
