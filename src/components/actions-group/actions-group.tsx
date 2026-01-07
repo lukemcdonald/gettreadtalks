@@ -51,6 +51,7 @@ export function ActionsGroup({ primaryAction, menuItems, disabled }: ActionsGrou
     <Group aria-label="Actions">
       {!!primaryAction && (
         <Button
+          className="hidden md:inline-flex"
           disabled={disabled || primaryAction.disabled}
           onClick={primaryAction.onClick}
           render={primaryAction.href ? <Link href={primaryAction.href} /> : undefined}
