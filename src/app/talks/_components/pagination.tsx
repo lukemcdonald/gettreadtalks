@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui';
 
 type PaginationProps = {
-  continueCursor: string;
+  continueCursor: string | null;
   hasNextPage: boolean;
   hasPrevPage: boolean;
 };
@@ -14,17 +14,17 @@ export function Pagination({ continueCursor, hasNextPage, hasPrevPage }: Paginat
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const handlePageChange = (cursor: string | null) => {
+  const handlePrevious = () => {
     const params = new URLSearchParams(searchParams.toString());
+    params.delete('cursor');
+    router.push(`?${params.toString()}`);
+  };
 
-    if (cursor) {
-      params.set('cursor', cursor);
-    } else {
-      params.delete('cursor');
-    }
-
-    const query = params.toString();
-    router.push(query ? `/talks?${query}` : '/talks');
+  const handleNext = () => {
+    if (!continueCursor) return;
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('cursor', continueCursor);
+    router.push(`?${params.toString()}`);
   };
 
   if (!(hasNextPage || hasPrevPage)) {
@@ -32,21 +32,11 @@ export function Pagination({ continueCursor, hasNextPage, hasPrevPage }: Paginat
   }
 
   return (
-    <div className="mt-8 flex items-center justify-center gap-2">
-      <Button
-        disabled={!hasPrevPage}
-        onClick={() => handlePageChange(null)}
-        size="sm"
-        variant="outline"
-      >
+    <div className="mt-8 flex justify-center gap-4">
+      <Button disabled={!hasPrevPage} onClick={handlePrevious} variant="outline">
         Previous
       </Button>
-      <Button
-        disabled={!hasNextPage}
-        onClick={() => handlePageChange(continueCursor)}
-        size="sm"
-        variant="outline"
-      >
+      <Button disabled={!hasNextPage} onClick={handleNext} variant="outline">
         Next
       </Button>
     </div>

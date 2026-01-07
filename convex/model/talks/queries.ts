@@ -489,6 +489,11 @@ export const listTalksBySpeaker = query({
 /**
  * Get talks with speaker data (paginated). Supports all the same filters as listTalks.
  */
+/**
+ * List talks with speakers, with optional server-side filtering and pagination.
+ * Filters: search, speaker, topic, featured, status
+ * Much simpler than previous implementation - uses single index and TypeScript filtering.
+ */
 export const listTalksWithSpeakers = query({
   args: {
     featured: v.optional(v.boolean()),
@@ -498,189 +503,84 @@ export const listTalksWithSpeakers = query({
     status: v.optional(statusType),
     topicId: v.optional(v.id('topics')),
   },
-  // biome-ignore lint/complexity: query
   handler: async (ctx, args) => {
     const { featured, paginationOpts, search, speakerId, status, topicId } = args;
 
-    // If filtering by topic, get talks from talksOnTopics join table
-    // Note: Topic filtering requires collecting all matching talks and filtering in TypeScript,
-    // so we opt out of .paginate() and return a single manually paginated page
+    // Default to 'published' if no status provided
+    const effectiveStatus = status || 'published';
+
+    // Fetch all talks for the status (using index for efficiency)
+    let talks = await ctx.db
+      .query('talks')
+      .withIndex('by_status_and_publishedAt', (q) => q.eq('status', effectiveStatus))
+      .order('desc')
+      .collect();
+
+    // Apply speaker filter
+    if (speakerId) {
+      talks = talks.filter((talk) => talk.speakerId === speakerId);
+    }
+
+    // Apply featured filter
+    if (featured !== undefined) {
+      talks = talks.filter((talk) => talk.featured === featured);
+    }
+
+    // Apply topic filter (requires checking join table)
     if (topicId) {
-      const talks = await getTalksByTopic(ctx, topicId);
-      let filteredTalks = applyAdditionalFilters(talks, { featured, speakerId, status });
-      filteredTalks = applySearchFilter(filteredTalks, search);
+      const talksOnTopics = await ctx.db
+        .query('talksOnTopics')
+        .withIndex('by_topicId', (q) => q.eq('topicId', topicId))
+        .collect();
+      const talkIdsWithTopic = new Set(talksOnTopics.map((t) => t.talkId));
+      talks = talks.filter((talk) => talkIdsWithTopic.has(talk._id));
+    }
 
-      // Sort by publishedAt or _creationTime
-      filteredTalks.sort(
-        (a, b) => (b.publishedAt || b._creationTime) - (a.publishedAt || a._creationTime),
-      );
+    // Apply search filter
+    if (search) {
+      const searchLower = search.toLowerCase();
+      talks = talks.filter((talk) => talk.title.toLowerCase().includes(searchLower));
+    }
 
-      // Manual pagination (opted out of .paginate() due to TypeScript filtering)
-      const numItems = paginationOpts.numItems || 20;
-      const page = filteredTalks.slice(0, numItems);
+    // Manual pagination after filtering
+    const startIndex = paginationOpts.cursor ? Number.parseInt(paginationOpts.cursor) : 0;
+    const endIndex = startIndex + paginationOpts.numItems;
+    const page = talks.slice(startIndex, endIndex);
+    const hasMore = endIndex < talks.length;
 
-      const enrichedPage = await enrichWithSpeakers(ctx, page);
+    // Enrich with speaker and topic data
+    const enrichedPage = await asyncMap(page, async (talk) => {
+      const speaker = await ctx.db.get('speakers', talk.speakerId);
+
+      // Get topics for this talk
+      const talksOnTopics = await ctx.db
+        .query('talksOnTopics')
+        .withIndex('by_talkId', (q) => q.eq('talkId', talk._id))
+        .collect();
+
+      const topics = await Promise.all(talksOnTopics.map((t) => ctx.db.get('topics', t.topicId)));
+
+      const validTopics = topics.filter((topic): topic is Doc<'topics'> => topic !== null);
+      const topicSlugs = validTopics.map((topic) => topic.slug);
 
       return {
-        continueCursor: '',
-        isDone: true,
-        page: enrichedPage,
+        ...talk,
+        speaker,
+        topicSlugs,
       };
-    }
-
-    let result: PaginationResult<Doc<'talks'>>;
-
-    // Use indexes when possible for better performance
-    // When search is present, we apply it after pagination and opt out of .paginate()
-    // to return a single page (simplified approach for complex filters)
-    // Handle combinations: featured + status + speakerId
-    if (featured !== undefined && status) {
-      result = await ctx.db
-        .query('talks')
-        .withIndex('by_featured_and_status', (q) => q.eq('featured', featured).eq('status', status))
-        .order('desc')
-        .paginate(paginationOpts);
-
-      // Apply speakerId filter if needed (after fetching, since index doesn't include it)
-      if (speakerId) {
-        result.page = result.page.filter((talk) => talk.speakerId === speakerId);
-      }
-
-      if (search) {
-        result.page = applySearchFilter(result.page, search);
-        // Opt out of pagination: search filtering requires TypeScript filtering
-        result = {
-          continueCursor: '',
-          isDone: true,
-          page: result.page,
-        };
-      }
-    } else if (speakerId && status) {
-      result = await ctx.db
-        .query('talks')
-        .withIndex('by_speakerId_and_status', (q) =>
-          q.eq('speakerId', speakerId).eq('status', status),
-        )
-        .order('desc')
-        .paginate(paginationOpts);
-
-      // Apply featured filter if needed (after fetching, since index doesn't include it)
-      if (featured !== undefined) {
-        result.page = result.page.filter((talk) => talk.featured === featured);
-      }
-
-      if (search) {
-        result.page = applySearchFilter(result.page, search);
-        // Opt out of pagination: search filtering requires TypeScript filtering
-        result = {
-          continueCursor: '',
-          isDone: true,
-          page: result.page,
-        };
-      }
-    } else if (status) {
-      result = await ctx.db
-        .query('talks')
-        .withIndex('by_status_and_publishedAt', (q) => q.eq('status', status))
-        .order('desc')
-        .paginate(paginationOpts);
-
-      // Apply speakerId filter if needed (after fetching, since index doesn't include it)
-      if (speakerId) {
-        result.page = result.page.filter((talk) => talk.speakerId === speakerId);
-      }
-
-      // Apply featured filter if needed (after fetching, since index doesn't include it)
-      if (featured !== undefined) {
-        result.page = result.page.filter((talk) => talk.featured === featured);
-      }
-
-      if (search) {
-        result.page = applySearchFilter(result.page, search);
-        // Opt out of pagination: search filtering requires TypeScript filtering
-        result = {
-          continueCursor: '',
-          isDone: true,
-          page: result.page,
-        };
-      }
-    } else if (speakerId) {
-      // When speakerId is provided without status, default to 'published' for public access
-      // This ensures users only see published talks when filtering by speaker
-      const effectiveStatus = status || 'published';
-      result = await ctx.db
-        .query('talks')
-        .withIndex('by_speakerId_and_status', (q) =>
-          q.eq('speakerId', speakerId).eq('status', effectiveStatus),
-        )
-        .order('desc')
-        .paginate(paginationOpts);
-
-      // Apply featured filter if needed
-      if (featured !== undefined) {
-        result.page = result.page.filter((talk) => talk.featured === featured);
-      }
-
-      if (search) {
-        result.page = applySearchFilter(result.page, search);
-        // Opt out of pagination: search filtering requires TypeScript filtering
-        result = {
-          continueCursor: '',
-          isDone: true,
-          page: result.page,
-        };
-      }
-    } else if (featured !== undefined) {
-      // When featured is provided without status, default to 'published' for public access
-      const effectiveStatus = status || 'published';
-      result = await ctx.db
-        .query('talks')
-        .withIndex('by_featured_and_status', (q) =>
-          q.eq('featured', featured).eq('status', effectiveStatus),
-        )
-        .order('desc')
-        .paginate(paginationOpts);
-
-      // Apply speakerId filter if needed (after fetching, since index doesn't include it)
-      if (speakerId) {
-        result.page = result.page.filter((talk) => talk.speakerId === speakerId);
-      }
-
-      if (search) {
-        result.page = applySearchFilter(result.page, search);
-        // Opt out of pagination: search filtering requires TypeScript filtering
-        result = {
-          continueCursor: '',
-          isDone: true,
-          page: result.page,
-        };
-      }
-    } else if (search) {
-      // For search without other filters, we need to fetch all and filter
-      // This is less efficient but necessary for search functionality
-      // Opt out of .paginate() and use manual pagination
-      const allTalks = await ctx.db.query('talks').order('desc').collect();
-      const filtered = applySearchFilter(allTalks, search);
-      const numItems = paginationOpts.numItems || 20;
-      const page = filtered.slice(0, numItems);
-
-      result = {
-        continueCursor: '',
-        isDone: filtered.length <= numItems,
-        page,
-      };
-    } else {
-      // Use .paginate() end-to-end when no complex filters are needed
-      result = await ctx.db.query('talks').order('desc').paginate(paginationOpts);
-    }
-
-    // Enrich with speakers
-    const enrichedPage = await enrichWithSpeakers(ctx, result.page);
+    });
 
     return {
-      ...result,
+      continueCursor: hasMore ? endIndex.toString() : '',
+      isDone: !hasMore,
       page: enrichedPage,
     };
   },
-  returns: talkPageWithSpeakersValidator,
+  returns: paginationResultValidator(
+    v.object({
+      ...doc('talks').fields,
+      speaker: doc('speakers').nullable(),
+      topicSlugs: v.array(v.string()),
+    }),
+  ),
 });
