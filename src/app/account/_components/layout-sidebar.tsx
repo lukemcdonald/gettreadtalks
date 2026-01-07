@@ -1,6 +1,12 @@
-import { LayoutSidebarNav } from '@/app/account/_components/layout-sidebar-nav';
+import { SidebarNav } from '@/components/layouts/sidebar-nav';
 import { UserAvatar } from '@/components/user-avatar';
 import { getCurrentUser } from '@/services/auth/server';
+
+const NAV_ITEMS = [
+  { href: '/account', label: 'Settings' },
+  { href: '/account/favorites', label: 'Favorites' },
+  { href: '/account/finished', label: 'Finished' },
+];
 
 export async function LayoutSidebar() {
   const user = await getCurrentUser();
@@ -20,7 +26,7 @@ export async function LayoutSidebar() {
         </p>
       </div>
 
-      <LayoutSidebarNav />
+      <SidebarNav items={NAV_ITEMS} />
     </div>
   );
 }
