@@ -536,10 +536,32 @@ export const listTalksWithSpeakers = query({
       talks = talks.filter((talk) => talkIdsWithTopic.has(talk._id));
     }
 
-    // Apply search filter
+    // Apply search filter (search by title AND speaker name)
     if (search) {
       const searchLower = search.toLowerCase();
-      talks = talks.filter((talk) => talk.title.toLowerCase().includes(searchLower));
+
+      // Fetch speakers for search
+      const speakerIds = [...new Set(talks.map((talk) => talk.speakerId))];
+      const speakers = await Promise.all(speakerIds.map((id) => ctx.db.get('speakers', id)));
+      const speakersMap = new Map(speakers.map((s) => (s ? [s._id, s] : null)).filter(Boolean));
+
+      talks = talks.filter((talk) => {
+        // Search in talk title
+        if (talk.title.toLowerCase().includes(searchLower)) {
+          return true;
+        }
+
+        // Search in speaker name
+        const speaker = speakersMap.get(talk.speakerId);
+        if (speaker) {
+          const speakerName = `${speaker.firstName} ${speaker.lastName}`.toLowerCase();
+          if (speakerName.includes(searchLower)) {
+            return true;
+          }
+        }
+
+        return false;
+      });
     }
 
     // Manual pagination after filtering
