@@ -1,11 +1,20 @@
 import { SidebarNav } from '@/components/layouts/sidebar-nav';
 import { UserAvatar } from '@/components/user-avatar';
 import { getCurrentUser } from '@/services/auth/server';
+import { isAdmin } from '@/services/auth/utils';
 
-const NAV_ITEMS = [
+const ACCOUNT_NAV_ITEMS = [
   { href: '/account', label: 'Settings' },
   { href: '/account/favorites', label: 'Favorites' },
   { href: '/account/finished', label: 'Finished' },
+];
+
+const ADMIN_NAV_ITEMS = [
+  { href: '/account/talks', label: 'Talks' },
+  { href: '/account/clips', label: 'Clips' },
+  { href: '/account/speakers', label: 'Speakers' },
+  { href: '/account/topics', label: 'Topics' },
+  { href: '/account/collections', label: 'Collections' },
 ];
 
 export async function LayoutSidebar() {
@@ -14,6 +23,8 @@ export async function LayoutSidebar() {
   if (!user) {
     return null;
   }
+
+  const showAdminSection = isAdmin(user);
 
   return (
     <div className="space-y-4">
@@ -26,7 +37,18 @@ export async function LayoutSidebar() {
         </p>
       </div>
 
-      <SidebarNav items={NAV_ITEMS} />
+      <div className="space-y-6">
+        <SidebarNav items={ACCOUNT_NAV_ITEMS} />
+
+        {!!showAdminSection && (
+          <div className="space-y-3">
+            <h3 className="font-semibold text-muted-foreground text-xs uppercase tracking-wider">
+              Content Management
+            </h3>
+            <SidebarNav items={ADMIN_NAV_ITEMS} />
+          </div>
+        )}
+      </div>
     </div>
   );
 }

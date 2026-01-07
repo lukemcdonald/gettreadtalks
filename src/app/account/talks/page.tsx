@@ -1,6 +1,6 @@
 import type { StatusType } from '@/convex/lib/validators/shared';
 
-import { AdminTalksContent } from '@/app/admin/talks/_components/admin-talks-content';
+import { AdminTalksContent } from '@/app/account/talks/_components/admin-talks-content';
 import { PageHeader } from '@/components/page-header';
 
 export type AdminTalksSearchParams = {
@@ -18,11 +18,7 @@ export default async function AdminTalksPage({ searchParams }: AdminTalksPagePro
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        description="Manage all talks across all statuses"
-        title="Manage Talks"
-        variant="lg"
-      />
+      <PageHeader description="Manage all talks across all statuses" title="Manage Talks" />
       <AdminTalksContent searchParams={params} />
     </div>
   );

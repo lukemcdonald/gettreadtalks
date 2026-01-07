@@ -5,6 +5,7 @@ import type { User } from '@/services/auth/types';
 
 import {
   ArrowRight as ArrowRightIcon,
+  LayoutDashboard as DashboardIcon,
   Heart as FavoritesIcon,
   CheckCircle2 as FinishedIcon,
   Settings as SettingsIcon,
@@ -18,6 +19,7 @@ import { AccountMenuItem } from '@/components/site-header/account-menu/account-m
 import { NavLink } from '@/components/site-header/navigation/nav-link';
 import { Button, Menu, MenuPopup, MenuSeparator, MenuTrigger } from '@/components/ui';
 import { useCurrentUser } from '@/features/users/hooks';
+import { isAdmin } from '@/services/auth/utils';
 
 type AccountMenuProps = {
   initialUser?: User;
@@ -51,6 +53,8 @@ export function AccountMenu({ initialUser }: AccountMenuProps) {
     );
   }
 
+  const showAdminLink = isAdmin(user);
+
   return (
     <Menu>
       <MenuTrigger
@@ -65,9 +69,15 @@ export function AccountMenu({ initialUser }: AccountMenuProps) {
           <span className="font-semibold text-foreground text-sm">{user.email}</span>
         </div>
         <MenuSeparator />
+        <AccountMenuItem href="/account" icon={SettingsIcon} label="Settings" />
         <AccountMenuItem href="/account/favorites" icon={FavoritesIcon} label="Favorites" />
         <AccountMenuItem href="/account/finished" icon={FinishedIcon} label="Finished" />
-        <AccountMenuItem href="/account" icon={SettingsIcon} label="Settings" />
+        {!!showAdminLink && (
+          <>
+            <MenuSeparator />
+            <AccountMenuItem href="/account/talks" icon={DashboardIcon} label="Admin Dashboard" />
+          </>
+        )}
         <MenuSeparator />
         <AccountMenuItem href={'/logout' as Route} icon={SignOutIcon} label="Sign out" />
       </MenuPopup>
