@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 
-import { TalkForm } from '@/app/talks/new/_components/talk-form';
+import { EditTalkContent } from '@/app/talks/[speaker]/[talk]/edit/_components/edit-talk-content';
 import { CenteredLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { getCollections, getSpeakers, getTalkBySlug } from '@/features/talks';
@@ -29,7 +29,7 @@ export default async function EditTalkPage({ params }: EditTalkPageProps) {
   return (
     <CenteredLayout
       content={
-        <TalkForm
+        <EditTalkContent
           collections={collections}
           initialData={{
             collectionId: talk.collectionId,
@@ -44,7 +44,7 @@ export default async function EditTalkPage({ params }: EditTalkPageProps) {
           }}
           speakerSlug={speaker?.slug}
           speakers={speakers}
-          talkId={talk._id}
+          talk={talk}
           talkSlug={talk.slug}
         />
       }

@@ -27,12 +27,18 @@ export type ContentActionsGroupProps = {
     title?: string;
   };
   contentType: 'talk' | 'clip' | 'collection' | 'speaker' | 'topic';
-  editUrl: string;
+  editUrl?: string;
   viewUrl?: string;
   listUrl?: string;
   onArchive?: (id: ContentActionsGroupProps['content']['_id']) => Promise<void>;
   onDelete?: (id: ContentActionsGroupProps['content']['_id']) => Promise<void>;
   additionalActions?: ActionsGroupMenuItem[];
+  primaryAction?: {
+    label: string;
+    onClick?: () => void;
+    href?: string;
+    type?: 'button' | 'submit';
+  };
 };
 
 export function ContentActionsGroup({
@@ -44,6 +50,7 @@ export function ContentActionsGroup({
   onArchive,
   onDelete,
   additionalActions = [],
+  primaryAction,
 }: ContentActionsGroupProps) {
   const router = useRouter();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -59,16 +66,6 @@ export function ContentActionsGroup({
   } else if (isArchived) {
     archiveLabel = 'Unarchive';
   }
-
-  const handleEdit = () => {
-    router.push(editUrl);
-  };
-
-  const handleView = () => {
-    if (viewUrl) {
-      router.push(viewUrl);
-    }
-  };
 
   const handleArchive = async () => {
     if (!onArchive) {
@@ -129,15 +126,19 @@ export function ContentActionsGroup({
     ...(viewUrl
       ? [
           {
-            label: `View ${capitalize(contentType)}`,
-            onClick: handleView,
+            label: 'View',
+            href: viewUrl,
           },
         ]
       : []),
-    {
-      label: `Edit ${capitalize(contentType)}`,
-      onClick: handleEdit,
-    },
+    ...(editUrl
+      ? [
+          {
+            label: 'Edit',
+            href: editUrl,
+          },
+        ]
+      : []),
     ...(onArchive
       ? [
           {
@@ -161,15 +162,19 @@ export function ContentActionsGroup({
       : []),
   ];
 
+  const defaultPrimaryAction = editUrl
+    ? {
+        label: 'Edit',
+        href: editUrl,
+      }
+    : undefined;
+
   return (
     <>
       <ActionsGroup
         disabled={isLoading}
         menuItems={menuItems}
-        primaryAction={{
-          label: 'Edit',
-          onClick: handleEdit,
-        }}
+        primaryAction={primaryAction || defaultPrimaryAction}
       />
 
       {!!onDelete && (
