@@ -16,7 +16,7 @@ type GetTalksWithSpeakersProps = {
   limit?: number;
   search?: string;
   speakerId?: SpeakerId;
-  status?: StatusType;
+  status?: StatusType | 'all';
   topicId?: TopicId;
 };
 
@@ -24,6 +24,7 @@ type GetTalksWithSpeakersProps = {
  * Get talks with speakers for list page.
  * - General users can only see published talks.
  * - Admin users can filter by status via the status parameter.
+ * - Status 'all' shows all talks across all statuses ordered by creation date.
  * - Supports server-side filtering: search, speaker, topic, featured
  * - Supports pagination via cursor
  */
@@ -33,12 +34,16 @@ export async function getTalksWithSpeakers(args?: GetTalksWithSpeakersProps) {
   const token = await getAuthToken();
   const user = await getCurrentUser();
 
+  // For non-admin users, always force 'published' status
+  // For admin users, use their selected status (including 'all')
+  const effectiveStatus = isAdmin(user) ? status : 'published';
+
   const fetchArgs = {
     featured,
     paginationOpts: { cursor: cursor || null, numItems: limit ?? 20 },
     search,
     speakerId,
-    status: isAdmin(user) ? status : 'published',
+    status: effectiveStatus,
     topicId,
   };
 

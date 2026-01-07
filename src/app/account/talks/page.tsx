@@ -10,7 +10,7 @@ import { Button } from '@/components/ui';
 export type AdminTalksSearchParams = {
   cursor?: string;
   search?: string;
-  status?: StatusType;
+  status?: StatusType | 'all';
 };
 
 type AdminTalksPageProps = {

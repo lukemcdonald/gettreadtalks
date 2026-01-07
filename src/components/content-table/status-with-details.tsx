@@ -3,14 +3,7 @@ import type { ContentWithTimestamps } from './content-table.types';
 
 import { CalendarIcon, ClockIcon } from 'lucide-react';
 
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui';
 import { cn } from '@/utils';
 
 type StatusWithDetailsProps = {
@@ -51,16 +44,18 @@ function formatDate(timestamp?: number) {
 export function StatusWithDetails({ content, status }: StatusWithDetailsProps) {
   return (
     <Popover>
-      <Tooltip>
-        <TooltipTrigger>
-          <PopoverTrigger>
-            <div className={cn('size-2.5 rounded-full', getStatusColor(status))} />
-          </PopoverTrigger>
-        </TooltipTrigger>
-        <TooltipContent>{getStatusLabel(status)}</TooltipContent>
-      </Tooltip>
+      <PopoverTrigger>
+        <div className={cn('size-2.5 rounded-full', getStatusColor(status))} />
+      </PopoverTrigger>
       <PopoverContent align="start" className="w-64 text-sm">
         <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <div className={cn('size-2.5 rounded-full', getStatusColor(status))} />
+            <div>
+              <div className="font-medium">Status</div>
+              <div className="text-muted-foreground">{getStatusLabel(status)}</div>
+            </div>
+          </div>
           <div className="flex items-center gap-2">
             <CalendarIcon className="size-4 text-muted-foreground" />
             <div>
