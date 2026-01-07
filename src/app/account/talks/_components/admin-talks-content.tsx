@@ -19,7 +19,7 @@ export async function AdminTalksContent({ searchParams }: AdminTalksContentProps
     cursor,
     limit: 50,
     search,
-    status,
+    status: status || 'all',
   });
 
   return (

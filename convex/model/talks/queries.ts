@@ -500,21 +500,29 @@ export const listTalksWithSpeakers = query({
     paginationOpts: paginationOptsValidator,
     search: v.optional(v.string()),
     speakerId: v.optional(v.id('speakers')),
-    status: v.optional(statusType),
+    status: v.optional(v.union(statusType, v.literal('all'))),
     topicId: v.optional(v.id('topics')),
   },
   handler: async (ctx, args) => {
     const { featured, paginationOpts, search, speakerId, status, topicId } = args;
 
-    // Default to 'published' if no status provided
-    const effectiveStatus = status || 'published';
+    // Fetch talks based on status
+    let talks: Doc<'talks'>[];
 
-    // Fetch all talks for the status (using index for efficiency)
-    let talks = await ctx.db
-      .query('talks')
-      .withIndex('by_status_and_publishedAt', (q) => q.eq('status', effectiveStatus))
-      .order('desc')
-      .collect();
+    if (status === 'all') {
+      // Fetch all talks across all statuses, ordered by creation time (newest first)
+      talks = await ctx.db.query('talks').order('desc').collect();
+    } else {
+      // Default to 'published' if no status provided
+      const effectiveStatus = status || 'published';
+
+      // Fetch all talks for the specific status (using index for efficiency)
+      talks = await ctx.db
+        .query('talks')
+        .withIndex('by_status_and_publishedAt', (q) => q.eq('status', effectiveStatus))
+        .order('desc')
+        .collect();
+    }
 
     // Apply speaker filter
     if (speakerId) {
