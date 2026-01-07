@@ -25,10 +25,13 @@ export const archiveTalk = mutation({
       throwNotFound('Talk not found', { resource: 'talk', resourceId: args.id });
     }
 
-    // Soft delete by setting status to archived
+    // Toggle archive status
+    const isArchived = talk.status === 'archived';
+    const newStatus = isArchived ? 'backlog' : 'archived';
+
     await ctx.db.patch(args.id, {
-      publishedAt: undefined,
-      status: 'archived',
+      publishedAt: isArchived ? undefined : talk.publishedAt,
+      status: newStatus,
       updatedAt: Date.now(),
     });
 
