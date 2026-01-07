@@ -1,9 +1,9 @@
-import type { AdminTalksSearchParams } from '@/app/admin/talks/page';
+import type { AdminTalksSearchParams } from '@/app/account/talks/page';
 
 import { Suspense } from 'react';
 
-import { AdminTalksFilters } from '@/app/admin/talks/_components/admin-talks-filters';
-import { AdminTalksTable } from '@/app/admin/talks/_components/admin-talks-table';
+import { AdminTalksFilters } from '@/app/account/talks/_components/admin-talks-filters';
+import { AdminTalksTable } from '@/app/account/talks/_components/admin-talks-table';
 import { Pagination } from '@/app/talks/_components/pagination';
 import { Skeleton } from '@/components/ui';
 import { getTalksWithSpeakers } from '@/features/talks';

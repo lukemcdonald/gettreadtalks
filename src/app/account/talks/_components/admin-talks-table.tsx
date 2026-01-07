@@ -3,7 +3,7 @@ import type { TalkWithSpeakerAndTopics } from '@/features/talks/types';
 import { StarIcon } from 'lucide-react';
 import Link from 'next/link';
 
-import { TalkActionsMenu } from '@/app/admin/talks/_components/talk-actions-menu';
+import { TalkActionsMenu } from '@/app/account/talks/_components/talk-actions-menu';
 import {
   Badge,
   Empty,
