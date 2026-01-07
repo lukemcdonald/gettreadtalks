@@ -54,10 +54,8 @@ export function TalkActionsMenu({ talk, talkUrl }: TalkActionsMenuProps) {
         Edit
       </Button>
       <DropdownMenu>
-        <DropdownMenuTrigger>
-          <Button size="sm" variant="ghost">
-            <MoreVerticalIcon className="size-4" />
-          </Button>
+        <DropdownMenuTrigger className="inline-flex h-9 items-center justify-center rounded-md px-3 text-sm transition-colors hover:bg-accent hover:text-accent-foreground">
+          <MoreVerticalIcon className="size-4" />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem onClick={handleView}>

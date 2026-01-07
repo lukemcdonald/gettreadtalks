@@ -1,10 +1,10 @@
 import { notFound } from 'next/navigation';
 
+import { TalkForm } from '@/app/talks/new/_components/talk-form';
 import { CenteredLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { getCollections, getSpeakers, getTalkBySlug } from '@/features/talks';
 import { requireAdminUser } from '@/services/auth/server';
-import { TalkForm } from '../../../new/_components/talk-form';
 
 type EditTalkPageProps = {
   params: Promise<{ speaker: string; talk: string }>;
