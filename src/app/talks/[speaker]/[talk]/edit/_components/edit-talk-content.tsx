@@ -54,6 +54,7 @@ export function EditTalkContent({
         <ContentActionsGroup
           content={talk}
           contentType="talk"
+          disabled={isBusy}
           editUrl={undefined}
           listUrl="/account/talks"
           onArchiveAction={handleArchive}

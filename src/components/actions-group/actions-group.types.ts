@@ -40,6 +40,7 @@ export type ContentActionsGroupProps = {
     title?: string;
   };
   contentType: 'talk' | 'clip' | 'collection' | 'speaker' | 'topic';
+  disabled?: boolean;
   editUrl?: string;
   viewUrl?: string;
   listUrl?: string;

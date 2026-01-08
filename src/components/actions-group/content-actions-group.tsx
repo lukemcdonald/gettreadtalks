@@ -21,6 +21,7 @@ import { ActionsGroup } from './actions-group';
 export function ContentActionsGroup({
   content,
   contentType,
+  disabled,
   editUrl,
   viewUrl,
   listUrl,
@@ -36,6 +37,7 @@ export function ContentActionsGroup({
 
   const isArchived = content.status === 'archived';
   const isLoading = isArchiving || isDeleting;
+  const isDisabled = disabled || isLoading;
 
   let archiveLabel = 'Archive';
   if (isArchiving) {
@@ -128,7 +130,7 @@ export function ContentActionsGroup({
   return (
     <>
       <ActionsGroup
-        disabled={isLoading}
+        disabled={isDisabled}
         menuItems={menuItems}
         primaryAction={primaryAction || defaultPrimaryAction}
       />
