@@ -1,13 +1,12 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import type { ActionsGroupMenuItem, ActionsGroupProps } from './actions-group.types';
 
 import { Fragment } from 'react';
 import { EllipsisIcon } from 'lucide-react';
 import Link from 'next/link';
 
 import { Button } from '@/components/ui';
-import { Group } from '@/components/ui/primitives/group';
 import {
   Menu,
   MenuItem,
@@ -15,30 +14,6 @@ import {
   MenuSeparator,
   MenuTrigger,
 } from '@/components/ui/primitives/menu';
-
-export type ActionsGroupMenuItem = {
-  label: string;
-  icon?: ReactNode;
-  onClick?: () => void;
-  href?: string;
-  variant?: 'default' | 'destructive';
-  disabled?: boolean;
-  hidden?: boolean;
-  separator?: boolean;
-};
-
-export type ActionsGroupProps = {
-  primaryAction?: {
-    label: string;
-    icon?: ReactNode;
-    onClick?: () => void;
-    href?: string;
-    disabled?: boolean;
-    type?: 'button' | 'submit';
-  };
-  menuItems: ActionsGroupMenuItem[];
-  disabled?: boolean;
-};
 
 export function ActionsGroup({ primaryAction, menuItems, disabled }: ActionsGroupProps) {
   const visibleItems = menuItems.filter((item) => !item.hidden);
@@ -48,14 +23,13 @@ export function ActionsGroup({ primaryAction, menuItems, disabled }: ActionsGrou
   }
 
   return (
-    <Group aria-label="Actions">
+    <div className="flex items-center gap-2">
       {!!primaryAction && (
         <Button
-          className="hidden md:inline-flex"
           disabled={disabled || primaryAction.disabled}
           onClick={primaryAction.onClick}
           render={primaryAction.href ? <Link href={primaryAction.href} /> : undefined}
-          type={primaryAction.type || 'button'}
+          type={primaryAction.type}
         >
           {primaryAction.icon}
           {primaryAction.label}
@@ -89,6 +63,6 @@ export function ActionsGroup({ primaryAction, menuItems, disabled }: ActionsGrou
           </MenuPopup>
         </Menu>
       )}
-    </Group>
+    </div>
   );
 }

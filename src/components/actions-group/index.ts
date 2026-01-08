@@ -1,4 +1,4 @@
-export type { ActionsGroupMenuItem, ActionsGroupProps } from './actions-group';
+export type { ActionsGroupMenuItem, ActionsGroupProps } from './actions-group.types';
 export type { ContentActionsGroupProps } from './content-actions-group';
 
 export { ActionsGroup } from './actions-group';
