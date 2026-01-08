@@ -8,6 +8,7 @@ import { Controller, FormProvider } from 'react-hook-form';
 import {
   Button,
   FeaturedField,
+  Fieldset,
   FormError,
   NumberField,
   StatusField,
@@ -67,49 +68,51 @@ export function TalkForm({
       >
         <FormError error={form.formState.errors.root} />
 
-        <div className="space-y-4">
-          <TextField control={form.control} label="Title" name="title" required />
+        <Fieldset className="max-w-none" disabled={isBusy}>
+          <div className="space-y-4">
+            <TextField control={form.control} label="Title" name="title" required />
 
-          <SpeakerField
-            control={form.control}
-            label="Speaker"
-            name="speakerId"
-            required
-            speakers={speakers}
-          />
+            <SpeakerField
+              control={form.control}
+              label="Speaker"
+              name="speakerId"
+              required
+              speakers={speakers}
+            />
 
-          <UrlField control={form.control} label="Media URL" name="mediaUrl" required />
+            <UrlField control={form.control} label="Media URL" name="mediaUrl" required />
 
-          <TextareaField control={form.control} label="Description" name="description" rows={4} />
+            <TextareaField control={form.control} label="Description" name="description" rows={4} />
 
-          <TextField control={form.control} label="Scripture" name="scripture" />
+            <TextField control={form.control} label="Scripture" name="scripture" />
 
-          <Controller
-            control={form.control}
-            name="collectionId"
-            render={({ field }) => (
-              <CollectionSelectField
-                collections={collections}
-                onValueChange={(value) => {
-                  field.onChange(value === '' ? undefined : (value as CollectionId));
-                }}
-                value={field.value}
-              />
-            )}
-          />
+            <Controller
+              control={form.control}
+              name="collectionId"
+              render={({ field }) => (
+                <CollectionSelectField
+                  collections={collections}
+                  onValueChange={(value) => {
+                    field.onChange(value === '' ? undefined : (value as CollectionId));
+                  }}
+                  value={field.value}
+                />
+              )}
+            />
 
-          <NumberField control={form.control} label="Collection Order" name="collectionOrder" />
+            <NumberField control={form.control} label="Collection Order" name="collectionOrder" />
 
-          <StatusField
-            control={form.control}
-            name="status"
-            onChange={(value) => {
-              setTalkStatus(value as TalkStatus);
-            }}
-          />
+            <StatusField
+              control={form.control}
+              name="status"
+              onChange={(value) => {
+                setTalkStatus(value as TalkStatus);
+              }}
+            />
 
-          <FeaturedField control={form.control} name="featured" />
-        </div>
+            <FeaturedField control={form.control} name="featured" />
+          </div>
+        </Fieldset>
 
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
