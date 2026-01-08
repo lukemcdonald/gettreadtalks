@@ -1,8 +1,7 @@
 'use client';
-import type { StatusType } from '@/convex/lib/validators/shared';
 import type { Collection, CollectionId } from '@/features/collections/types';
 import type { Speaker, SpeakerId } from '@/features/speakers/types';
-import type { TalkId } from '@/features/talks';
+import type { TalkId, TalkStatus } from '@/features/talks/types';
 
 import { Controller, FormProvider } from 'react-hook-form';
 
@@ -31,7 +30,7 @@ type TalkFormProps = {
     mediaUrl: string;
     scripture?: string;
     speakerId: SpeakerId;
-    status?: StatusType;
+    status?: TalkStatus;
     title: string;
   };
   mode?: 'create' | 'edit';
@@ -105,7 +104,7 @@ export function TalkForm({
             control={form.control}
             name="status"
             onChange={(value) => {
-              setTalkStatus(value as StatusType);
+              setTalkStatus(value as TalkStatus);
             }}
           />
 

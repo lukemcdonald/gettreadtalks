@@ -1,9 +1,8 @@
 'use client';
 
-import type { Doc } from '@/convex/_generated/dataModel';
-import type { StatusType } from '@/convex/lib/validators/shared';
 import type { Collection, CollectionId } from '@/features/collections/types';
 import type { Speaker, SpeakerId } from '@/features/speakers/types';
+import type { Talk, TalkStatus } from '@/features/talks/types';
 
 import { TalkForm } from '@/app/talks/new/_components/talk-form';
 import { ContentActionsGroup } from '@/components/actions-group';
@@ -19,12 +18,12 @@ type EditTalkContentProps = {
     mediaUrl: string;
     scripture?: string;
     speakerId: SpeakerId;
-    status?: StatusType;
+    status?: TalkStatus;
     title: string;
   };
   speakerSlug?: string;
   speakers: Pick<Speaker, '_id' | 'firstName' | 'lastName' | 'slug' | 'imageUrl' | 'role'>[];
-  talk: Doc<'talks'>;
+  talk: Talk;
   talkSlug: string;
 };
 
@@ -57,8 +56,8 @@ export function EditTalkContent({
           contentType="talk"
           editUrl={undefined}
           listUrl="/account/talks"
-          onArchive={handleArchive}
-          onDelete={handleDelete}
+          onArchiveAction={handleArchive}
+          onDeleteAction={handleDelete}
           primaryAction={{
             label: 'Save',
             type: 'submit',

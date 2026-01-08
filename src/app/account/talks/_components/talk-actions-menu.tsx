@@ -28,8 +28,8 @@ export function TalkActionsMenu({ talk, talkUrl }: TalkActionsMenuProps) {
       contentType="talk"
       editUrl={`${talkUrl}/edit`}
       listUrl="/account/talks"
-      onArchive={handleArchive}
-      onDelete={handleDelete}
+      onArchiveAction={handleArchive}
+      onDeleteAction={handleDelete}
       viewUrl={talkUrl}
     />
   );
