@@ -484,3 +484,76 @@ export const listTalksWithSpeakers = query({
     }),
   ),
 });
+
+/**
+ * Admin-specific query for talks with speakers that supports pagination and server-side filtering.
+ * Supports status='all' to fetch talks across all statuses.
+ *
+ * @param status - Filter by status or 'all' for all statuses (defaults to 'published')
+ * @param search - Search by title (optional)
+ * @param paginationOpts - Pagination options
+ */
+export const listTalksWithSpeakersAdmin = query({
+  args: {
+    paginationOpts: paginationOptsValidator,
+    search: v.optional(v.string()),
+    status: v.optional(v.union(statusType, v.literal('all'))),
+  },
+  handler: async (ctx, args) => {
+    const { paginationOpts, search, status = 'published' } = args;
+
+    let talks: Doc<'talks'>[];
+
+    if (status === 'all') {
+      talks = await ctx.db.query('talks').order('desc').collect();
+    } else {
+      talks = await ctx.db
+        .query('talks')
+        .withIndex('by_status_and_publishedAt', (q) => q.eq('status', status))
+        .order('desc')
+        .collect();
+    }
+
+    if (search) {
+      talks = applySearchFilter(talks, search);
+    }
+
+    const startIndex = paginationOpts.cursor ? Number.parseInt(paginationOpts.cursor, 10) : 0;
+    const endIndex = startIndex + paginationOpts.numItems;
+    const page = talks.slice(startIndex, endIndex);
+    const hasMore = endIndex < talks.length;
+
+    const enrichedPage = await asyncMap(page, async (talk) => {
+      const speaker = await ctx.db.get('speakers', talk.speakerId);
+
+      const talksOnTopics = await ctx.db
+        .query('talksOnTopics')
+        .withIndex('by_talkId', (q) => q.eq('talkId', talk._id))
+        .collect();
+
+      const topics = await Promise.all(talksOnTopics.map((t) => ctx.db.get('topics', t.topicId)));
+
+      const validTopics = topics.filter((topic): topic is Doc<'topics'> => topic !== null);
+      const topicSlugs = validTopics.map((topic) => topic.slug);
+
+      return {
+        ...talk,
+        speaker,
+        topicSlugs,
+      };
+    });
+
+    return {
+      continueCursor: hasMore ? endIndex.toString() : '',
+      isDone: !hasMore,
+      page: enrichedPage,
+    };
+  },
+  returns: paginationResultValidator(
+    v.object({
+      ...doc('talks').fields,
+      speaker: doc('speakers').nullable(),
+      topicSlugs: v.array(v.string()),
+    }),
+  ),
+});
