@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useTransition } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import { Input, Label } from '@/components/ui';
@@ -23,24 +23,34 @@ export function SearchInput({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [_isPending, startTransition] = useTransition();
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
-  // Local state for responsive typing
-  const [value, setValue] = useState(searchParams.get(paramName) ?? '');
+  const urlValue = searchParams.get(paramName) ?? '';
+  const [localValue, setLocalValue] = useState(urlValue);
 
-  const handleChange = (newValue: string) => {
-    setValue(newValue);
+  // Sync local value when URL changes (e.g., browser back/forward)
+  useEffect(() => {
+    setLocalValue(urlValue);
+  }, [urlValue]);
 
-    if (debounceRef.current) {
-      clearTimeout(debounceRef.current);
+  // Debounced URL update
+  useEffect(() => {
+    // Don't update if values already match
+    if (localValue === urlValue) {
+      return;
     }
 
-    // Debounce the URL update to avoid hammering the database
-    debounceRef.current = setTimeout(() => {
+    // Clear previous timeout
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    // Set new timeout for debounced update (300ms)
+    timeoutRef.current = setTimeout(() => {
       const params = new URLSearchParams(searchParams.toString());
 
-      if (newValue.trim()) {
-        params.set(paramName, newValue.trim());
+      if (localValue.trim()) {
+        params.set(paramName, localValue.trim());
       } else {
         params.delete(paramName);
       }
@@ -52,17 +62,24 @@ export function SearchInput({
         router.push(query ? `${pathname}?${query}` : pathname, { scroll: false });
       });
     }, 300);
-  };
+
+    // Cleanup timeout on unmount or value change
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [localValue, urlValue, pathname, paramName, router, searchParams]);
 
   return (
     <div className={cn('space-y-2', className)}>
       {!!label && <Label htmlFor={paramName}>{label}</Label>}
       <Input
         id={paramName}
-        onChange={(e) => handleChange(e.target.value)}
+        onChange={(e) => setLocalValue(e.target.value)}
         placeholder={placeholder}
         type="search"
-        value={value}
+        value={localValue}
       />
     </div>
   );
