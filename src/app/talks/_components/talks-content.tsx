@@ -28,7 +28,6 @@ export async function TalksContent({ searchParams, speakers, topics }: TalksCont
     topic: topicSlug,
   } = searchParams;
 
-  // Convert speaker/topic slugs to IDs
   const speakerId = speakerSlug ? speakers.find((s) => s.slug === speakerSlug)?._id : undefined;
 
   const topicId = topicSlug ? topics.find((t) => t.topic.slug === topicSlug)?.topic._id : undefined;
