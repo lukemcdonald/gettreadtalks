@@ -4,5 +4,6 @@ export { getSpeakers } from './get-speakers';
 export { getSpeakersForFilter } from './get-speakers-for-filter';
 export { getTalkBySlug } from './get-talk-by-slug';
 export { getTalksWithSpeakers } from './get-talks-with-speakers';
+export { getTalksWithSpeakersAdmin } from './get-talks-with-speakers-admin';
 export { getTopicsForFilter } from './get-topics-for-filter';
 export { preloadTalks } from './preload-talks';

@@ -11,6 +11,7 @@ export const listTalks = queries.listTalks;
 export const listTalksByCollection = queries.listTalksByCollection;
 export const listTalksBySpeaker = queries.listTalksBySpeaker;
 export const listTalksWithSpeakers = queries.listTalksWithSpeakers;
+export const listTalksWithSpeakersAdmin = queries.listTalksWithSpeakersAdmin;
 
 // Mutations
 export const archiveTalk = mutations.archiveTalk;

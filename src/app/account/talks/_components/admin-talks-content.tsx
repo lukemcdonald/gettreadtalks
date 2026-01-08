@@ -6,7 +6,7 @@ import { AdminTalksFilters } from '@/app/account/talks/_components/admin-talks-f
 import { AdminTalksTable } from '@/app/account/talks/_components/admin-talks-table';
 import { Pagination } from '@/app/talks/_components/pagination';
 import { Skeleton } from '@/components/ui';
-import { getTalksWithSpeakers } from '@/features/talks';
+import { getTalksWithSpeakersAdmin } from '@/features/talks';
 
 type AdminTalksContentProps = {
   searchParams: AdminTalksSearchParams;
@@ -15,7 +15,7 @@ type AdminTalksContentProps = {
 export async function AdminTalksContent({ searchParams }: AdminTalksContentProps) {
   const { cursor, search, status } = searchParams;
 
-  const result = await getTalksWithSpeakers({
+  const result = await getTalksWithSpeakersAdmin({
     cursor,
     limit: 50,
     search,
