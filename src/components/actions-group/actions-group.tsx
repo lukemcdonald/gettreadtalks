@@ -1,12 +1,12 @@
 'use client';
 
-import type { ActionsGroupMenuItem, ActionsGroupProps } from './actions-group.types';
+import type { ActionsGroupProps } from './actions-group.types';
 
 import { Fragment } from 'react';
 import { EllipsisIcon } from 'lucide-react';
 import Link from 'next/link';
 
-import { Button } from '@/components/ui';
+import { Button, Group, GroupSeparator } from '@/components/ui';
 import {
   Menu,
   MenuItem,
@@ -15,15 +15,16 @@ import {
   MenuTrigger,
 } from '@/components/ui/primitives/menu';
 
-export function ActionsGroup({ primaryAction, menuItems, disabled }: ActionsGroupProps) {
+export function ActionsGroup({ disabled, menuItems, primaryAction }: ActionsGroupProps) {
   const visibleItems = menuItems.filter((item) => !item.hidden);
+  const hasItems = visibleItems.length > 0;
 
-  if (visibleItems.length === 0 && !primaryAction) {
+  if (!(hasItems || primaryAction)) {
     return null;
   }
 
   return (
-    <div className="flex items-center gap-2">
+    <Group aria-label="Actions group">
       {!!primaryAction && (
         <Button
           disabled={disabled || primaryAction.disabled}
@@ -36,7 +37,9 @@ export function ActionsGroup({ primaryAction, menuItems, disabled }: ActionsGrou
         </Button>
       )}
 
-      {visibleItems.length > 0 && (
+      {!!hasItems && !!primaryAction && <GroupSeparator className="bg-primary/72" />}
+
+      {!!hasItems && (
         <Menu>
           <MenuTrigger
             render={<Button aria-label="More actions" disabled={disabled} size="icon" />}
@@ -63,6 +66,6 @@ export function ActionsGroup({ primaryAction, menuItems, disabled }: ActionsGrou
           </MenuPopup>
         </Menu>
       )}
-    </div>
+    </Group>
   );
 }
