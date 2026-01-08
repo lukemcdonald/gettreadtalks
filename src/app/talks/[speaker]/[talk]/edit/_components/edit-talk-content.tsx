@@ -50,7 +50,7 @@ export function EditTalkContent({
 
   return (
     <TalkForm
-      actionsMenu={
+      actionsMenu={({ isBusy }) => (
         <ContentActionsGroup
           content={talk}
           contentType="talk"
@@ -60,11 +60,13 @@ export function EditTalkContent({
           onDeleteAction={handleDelete}
           primaryAction={{
             label: 'Save',
+            loading: isBusy,
+            loadingLabel: 'Saving...',
             type: 'submit',
           }}
           viewUrl={talkUrl}
         />
-      }
+      )}
       collections={collections}
       initialData={initialData}
       mode="edit"
