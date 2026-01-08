@@ -33,7 +33,6 @@ export function TalksList({ talks, enableFiltering = true }: TalksListProps) {
   const filteredAndSorted = useMemo(() => {
     let filtered = talks;
 
-    // Filter by search
     if (search) {
       filtered = filtered.filter(
         (talk) =>
@@ -42,12 +41,10 @@ export function TalksList({ talks, enableFiltering = true }: TalksListProps) {
       );
     }
 
-    // Filter by speaker
     if (speakerSlug !== 'all') {
       filtered = filtered.filter((talk) => talk.speaker?.slug === speakerSlug);
     }
 
-    // Filter by topic (uses topicSlugs array enriched server-side)
     if (topicSlug !== 'all') {
       filtered = filtered.filter((talk) => {
         // @ts-expect-error - topicSlugs is added by server-side enrichment
@@ -55,12 +52,10 @@ export function TalksList({ talks, enableFiltering = true }: TalksListProps) {
       });
     }
 
-    // Filter by featured
     if (featuredOnly) {
       filtered = filtered.filter((talk) => talk.featured);
     }
 
-    // Sort
     const sorted = [...filtered].sort((a, b) => {
       switch (sort) {
         case 'alphabetical':
