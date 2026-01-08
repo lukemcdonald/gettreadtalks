@@ -9,7 +9,6 @@ import { getTopicsWithCounts } from '@/features/topics';
 export default async function TalksPage() {
   const [talks, topics] = await Promise.all([getTalksWithSpeakers(), getTopicsWithCounts()]);
 
-  // Get unique speakers who have talks
   const allSpeakers = talks.map((talk) => talk.speaker).filter((speaker) => speaker !== null);
   const speakersWithTalks = Array.from(
     new Map(allSpeakers.map((speaker) => [speaker.slug, speaker])).values(),

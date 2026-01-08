@@ -91,16 +91,13 @@ export async function enrichWithTopics<T extends Doc<'talks'>>(
   talks: T[],
 ): Promise<Array<T & { topicSlugs: string[] }>> {
   return await asyncMap(talks, async (talk: T) => {
-    // Get all topic associations for this talk
     const talksOnTopics = await ctx.db
       .query('talksOnTopics')
       .withIndex('by_talkId', (q) => q.eq('talkId', talk._id))
       .collect();
 
-    // Get the actual topic documents
     const topics = await Promise.all(talksOnTopics.map((tot) => ctx.db.get('topics', tot.topicId)));
 
-    // Extract slugs, filtering out any null topics
     const topicSlugs = topics
       .filter((topic): topic is Doc<'topics'> => topic !== null)
       .map((topic) => topic.slug);

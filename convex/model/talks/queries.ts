@@ -467,17 +467,13 @@ export const listTalksWithSpeakers = query({
   handler: async (ctx, args) => {
     const { limit = 1000, status = 'published' } = args;
 
-    // Use the by_status_and_publishedAt index for optimal performance
     const talks = await ctx.db
       .query('talks')
       .withIndex('by_status_and_publishedAt', (q) => q.eq('status', status))
       .order('desc')
       .take(limit);
 
-    // Enrich with speaker data
     const talksWithSpeakers = await enrichWithSpeakers(ctx, talks);
-
-    // Enrich with topic slugs for client-side filtering
     const enrichedTalks = await enrichWithTopics(ctx, talksWithSpeakers);
 
     return enrichedTalks;
