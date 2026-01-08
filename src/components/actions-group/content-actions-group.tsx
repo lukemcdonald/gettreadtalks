@@ -1,8 +1,6 @@
 'use client';
 
-import type { Id } from '@/convex/_generated/dataModel';
-import type { StatusType } from '@/convex/lib/validators/shared';
-import type { ActionsGroupMenuItem } from './actions-group';
+import type { ActionsGroupMenuItem, ContentActionsGroupProps } from './actions-group.types';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -20,35 +18,14 @@ import {
 import { toastManager } from '@/components/ui/primitives/toast';
 import { ActionsGroup } from './actions-group';
 
-export type ContentActionsGroupProps = {
-  content: {
-    _id: Id<'talks'> | Id<'clips'> | Id<'collections'> | Id<'speakers'> | Id<'topics'>;
-    status?: StatusType;
-    title?: string;
-  };
-  contentType: 'talk' | 'clip' | 'collection' | 'speaker' | 'topic';
-  editUrl?: string;
-  viewUrl?: string;
-  listUrl?: string;
-  onArchive?: (id: ContentActionsGroupProps['content']['_id']) => Promise<void>;
-  onDelete?: (id: ContentActionsGroupProps['content']['_id']) => Promise<void>;
-  additionalActions?: ActionsGroupMenuItem[];
-  primaryAction?: {
-    label: string;
-    onClick?: () => void;
-    href?: string;
-    type?: 'button' | 'submit';
-  };
-};
-
 export function ContentActionsGroup({
   content,
   contentType,
   editUrl,
   viewUrl,
   listUrl,
-  onArchive,
-  onDelete,
+  onArchiveAction,
+  onDeleteAction,
   additionalActions = [],
   primaryAction,
 }: ContentActionsGroupProps) {
@@ -68,13 +45,13 @@ export function ContentActionsGroup({
   }
 
   const handleArchive = async () => {
-    if (!onArchive) {
+    if (!onArchiveAction) {
       return;
     }
 
     setIsArchiving(true);
     try {
-      await onArchive(content._id);
+      await onArchiveAction(content._id);
       toastManager.add({
         title: isArchived
           ? `${capitalize(contentType)} unarchived`
@@ -94,13 +71,13 @@ export function ContentActionsGroup({
   };
 
   const handleDelete = async () => {
-    if (!onDelete) {
+    if (!onDeleteAction) {
       return;
     }
 
     setIsDeleting(true);
     try {
-      await onDelete(content._id);
+      await onDeleteAction(content._id);
       toastManager.add({
         title: `${capitalize(contentType)} deleted`,
         type: 'success',
@@ -125,17 +102,17 @@ export function ContentActionsGroup({
   const menuItems: ActionsGroupMenuItem[] = [
     ...(viewUrl ? [{ label: 'View', href: viewUrl }] : []),
     ...(editUrl ? [{ label: 'Edit', href: editUrl }] : []),
-    ...(onArchive
+    ...(onArchiveAction
       ? [{ label: archiveLabel, onClick: handleArchive, disabled: isArchiving, separator: true }]
       : []),
     ...additionalActions,
-    ...(onDelete
+    ...(onDeleteAction
       ? [
           {
             label: 'Delete',
             onClick: () => setDeleteDialogOpen(true),
             variant: 'destructive' as const,
-            separator: !onArchive && additionalActions.length === 0,
+            separator: !onArchiveAction && additionalActions.length === 0,
           },
         ]
       : []),
@@ -156,7 +133,7 @@ export function ContentActionsGroup({
         primaryAction={primaryAction || defaultPrimaryAction}
       />
 
-      {!!onDelete && (
+      {!!onDeleteAction && (
         <AlertDialog onOpenChange={setDeleteDialogOpen} open={deleteDialogOpen}>
           <AlertDialogContent>
             <AlertDialogHeader>

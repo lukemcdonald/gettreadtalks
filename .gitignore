@@ -61,3 +61,7 @@ convex/migration/data/
 .cursor/commands/archive.md
 .cursor/rules/isolation_rules/
 memory-bank/
+
+# Claude Code - keep CLAUDE.md, ignore local settings
+.claude/settings.local.json
+.claude/plans/
