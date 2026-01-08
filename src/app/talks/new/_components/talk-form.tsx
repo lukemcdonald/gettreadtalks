@@ -9,7 +9,6 @@ import { Controller, FormProvider } from 'react-hook-form';
 import {
   Button,
   FeaturedField,
-  Form,
   FormError,
   NumberField,
   StatusField,
@@ -63,7 +62,10 @@ export function TalkForm({
 
   return (
     <FormProvider {...form}>
-      <Form className="space-y-6" noValidate onSubmit={form.handleSubmit(onSubmit, onError)}>
+      <form
+        className="flex w-full flex-col gap-4 space-y-6"
+        onSubmit={form.handleSubmit(onSubmit, onError)}
+      >
         <FormError error={form.formState.errors.root} />
 
         <div className="space-y-4">
@@ -131,7 +133,7 @@ export function TalkForm({
             )}
           </div>
         </div>
-      </Form>
+      </form>
     </FormProvider>
   );
 }

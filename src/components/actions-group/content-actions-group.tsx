@@ -123,31 +123,10 @@ export function ContentActionsGroup({
   };
 
   const menuItems: ActionsGroupMenuItem[] = [
-    ...(viewUrl
-      ? [
-          {
-            label: 'View',
-            href: viewUrl,
-          },
-        ]
-      : []),
-    ...(editUrl
-      ? [
-          {
-            label: 'Edit',
-            href: editUrl,
-          },
-        ]
-      : []),
+    ...(viewUrl ? [{ label: 'View', href: viewUrl }] : []),
+    ...(editUrl ? [{ label: 'Edit', href: editUrl }] : []),
     ...(onArchive
-      ? [
-          {
-            label: archiveLabel,
-            onClick: handleArchive,
-            disabled: isArchiving,
-            separator: true,
-          },
-        ]
+      ? [{ label: archiveLabel, onClick: handleArchive, disabled: isArchiving, separator: true }]
       : []),
     ...additionalActions,
     ...(onDelete
