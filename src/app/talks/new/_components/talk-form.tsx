@@ -20,7 +20,7 @@ import { CollectionSelectField } from './collection-select-field';
 import { SpeakerField } from './speaker-field';
 
 type TalkFormProps = {
-  actionsMenu?: React.ReactNode;
+  actionsMenu?: (props: { isBusy: boolean }) => React.ReactNode;
   collections: Pick<Collection, '_id' | 'slug' | 'title'>[];
   initialData?: {
     collectionId?: CollectionId;
@@ -114,7 +114,7 @@ export function TalkForm({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             {actionsMenu ? (
-              actionsMenu
+              actionsMenu({ isBusy })
             ) : (
               <Button disabled={isBusy} type="submit">
                 {submitLabel}

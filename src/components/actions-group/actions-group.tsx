@@ -27,13 +27,14 @@ export function ActionsGroup({ disabled, menuItems, primaryAction }: ActionsGrou
     <Group aria-label="Actions group">
       {!!primaryAction && (
         <Button
-          disabled={disabled || primaryAction.disabled}
+          disabled={disabled || primaryAction.disabled || primaryAction.loading}
           onClick={primaryAction.onClick}
           render={primaryAction.href ? <Link href={primaryAction.href} /> : undefined}
           type={primaryAction.type}
         >
-          {primaryAction.icon}
-          {primaryAction.label}
+          {primaryAction.loading
+            ? primaryAction.loadingLabel || primaryAction.label
+            : primaryAction.label}
         </Button>
       )}
 

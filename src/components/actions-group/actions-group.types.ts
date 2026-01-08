@@ -23,6 +23,8 @@ export type ActionsGroupProps = {
     onClick?: () => void;
     href?: string;
     disabled?: boolean;
+    loading?: boolean;
+    loadingLabel?: string;
     type?: 'button' | 'submit';
   };
   menuItems: ActionsGroupMenuItem[];
@@ -48,6 +50,8 @@ export type ContentActionsGroupProps = {
     label: string;
     onClick?: () => void;
     href?: string;
+    loading?: boolean;
+    loadingLabel?: string;
     type?: 'button' | 'submit';
   };
 };
