@@ -45,14 +45,12 @@ export const getTalkBySlug = query({
   handler: async (ctx, args) => {
     const user = await getCurrentUser(ctx);
 
-    // First, get the speaker by slug
     const speaker = await getOneFrom(ctx.db, 'speakers', 'by_slug', args.speakerSlug);
 
     if (!speaker) {
       return null;
     }
 
-    // Then, find the talk with the given slug for this speaker
     const talks = await ctx.db
       .query('talks')
       .withIndex('by_speakerId_and_status', (q) => q.eq('speakerId', speaker._id))
@@ -200,12 +198,10 @@ export const listRandomTalksBySpeaker = query({
       )
       .collect();
 
-    // Filter out excluded talk if provided
     const filteredTalks = excludeTalkId
       ? talks.filter((talk) => talk._id !== excludeTalkId)
       : talks;
 
-    // Shuffle and return limited number
     const shuffled = filteredTalks.sort(() => Math.random() - 0.5);
 
     return shuffled.slice(0, limit);
@@ -229,7 +225,6 @@ export const listTalks = query({
   handler: async (ctx, args) => {
     const { featured, paginationOpts, search, speakerId, status, topicId } = args;
 
-    // If filtering by topic, get talks from talksOnTopics join table
     if (topicId) {
       const talksOnTopics = await ctx.db
         .query('talksOnTopics')
@@ -239,7 +234,6 @@ export const listTalks = query({
       const talkIds = talksOnTopics.map((t) => t.talkId);
       const talks = await Promise.all(talkIds.map((id) => ctx.db.get('talks', id)));
 
-      // Filter out null results and apply additional filters
       let filteredTalks = talks.filter((talk): talk is Doc<'talks'> => talk !== null);
 
       if (status) {
@@ -259,12 +253,10 @@ export const listTalks = query({
         );
       }
 
-      // Sort by publishedAt or _creationTime
       filteredTalks.sort(
         (a, b) => (b.publishedAt || b._creationTime) - (a.publishedAt || a._creationTime),
       );
 
-      // Manual pagination
       const numItems = paginationOpts.numItems || 20;
       const page = filteredTalks.slice(0, numItems);
 
@@ -276,7 +268,6 @@ export const listTalks = query({
     }
 
     // Use indexes when possible for better performance
-    // Handle combinations: featured + status + speakerId
     if (featured !== undefined && status) {
       const result = await ctx.db
         .query('talks')
@@ -524,17 +515,15 @@ export const listTalksWithSpeakers = query({
         .collect();
     }
 
-    // Apply speaker filter
     if (speakerId) {
       talks = talks.filter((talk) => talk.speakerId === speakerId);
     }
 
-    // Apply featured filter
     if (featured !== undefined) {
       talks = talks.filter((talk) => talk.featured === featured);
     }
 
-    // Apply topic filter (requires checking join table)
+    // Requires checking join table
     if (topicId) {
       const talksOnTopics = await ctx.db
         .query('talksOnTopics')
@@ -544,11 +533,10 @@ export const listTalksWithSpeakers = query({
       talks = talks.filter((talk) => talkIdsWithTopic.has(talk._id));
     }
 
-    // Apply search filter (search by title AND speaker name)
+    // Search by title AND speaker name
     if (search) {
       const searchLower = search.toLowerCase();
 
-      // Fetch speakers for search
       const speakerIds = [...new Set(talks.map((talk) => talk.speakerId))];
       const speakers = await Promise.all(speakerIds.map((id) => ctx.db.get('speakers', id)));
       const speakersMap = new Map(
@@ -556,12 +544,10 @@ export const listTalksWithSpeakers = query({
       );
 
       talks = talks.filter((talk) => {
-        // Search in talk title
         if (talk.title.toLowerCase().includes(searchLower)) {
           return true;
         }
 
-        // Search in speaker name
         const speaker = speakersMap.get(talk.speakerId);
         if (speaker) {
           const speakerName = `${speaker.firstName} ${speaker.lastName}`.toLowerCase();
@@ -574,17 +560,14 @@ export const listTalksWithSpeakers = query({
       });
     }
 
-    // Manual pagination after filtering
     const startIndex = paginationOpts.cursor ? Number.parseInt(paginationOpts.cursor, 10) : 0;
     const endIndex = startIndex + paginationOpts.numItems;
     const page = talks.slice(startIndex, endIndex);
     const hasMore = endIndex < talks.length;
 
-    // Enrich with speaker and topic data
     const enrichedPage = await asyncMap(page, async (talk) => {
       const speaker = await ctx.db.get('speakers', talk.speakerId);
 
-      // Get topics for this talk
       const talksOnTopics = await ctx.db
         .query('talksOnTopics')
         .withIndex('by_talkId', (q) => q.eq('talkId', talk._id))

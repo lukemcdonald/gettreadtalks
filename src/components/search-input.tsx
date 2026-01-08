@@ -29,10 +29,8 @@ export function SearchInput({
   const [value, setValue] = useState(searchParams.get(paramName) ?? '');
 
   const handleChange = (newValue: string) => {
-    // Update local state immediately for responsive UI
     setValue(newValue);
 
-    // Clear existing debounce timer
     if (debounceRef.current) {
       clearTimeout(debounceRef.current);
     }
@@ -47,7 +45,6 @@ export function SearchInput({
         params.delete(paramName);
       }
 
-      // Reset cursor when search changes
       params.delete('cursor');
 
       startTransition(() => {

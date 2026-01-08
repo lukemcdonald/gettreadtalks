@@ -49,7 +49,6 @@ export function CreateSpeakerDialog({
     resolver: zodResolver(createSpeakerSchema),
   });
 
-  // Reset form and clear errors when dialog closes
   useEffect(() => {
     if (!open) {
       form.reset();
@@ -69,7 +68,6 @@ export function CreateSpeakerDialog({
         return;
       }
 
-      // Success - close dialog, reset form, and notify parent
       form.reset();
       onOpenChange(false);
       onSpeakerCreated(result.data.speakerId);

@@ -33,7 +33,6 @@ export function TalksSidebar({ speakers, topics }: TalksSidebarProps) {
     } else {
       params.delete('featured');
     }
-    // Reset cursor when filter changes
     params.delete('cursor');
     router.push(`?${params.toString()}`);
   };

@@ -31,8 +31,6 @@ export function CollectionSelectField({
   const allOption = placeholder ? { label: placeholder, value: '' } : null;
   const allOptions = allOption ? [allOption, ...items] : items;
 
-  // Normalize value to always be a string (empty string if undefined)
-  // This ensures the Select is always controlled
   const normalizedValue = value || '';
 
   return (
