@@ -12,13 +12,7 @@ import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
 import { canViewContent } from '../auth/roles';
 import { getCurrentUser } from '../auth/utils';
-import {
-  applyAdditionalFilters,
-  applySearchFilter,
-  enrichWithSpeakers,
-  enrichWithTopics,
-  getTalksByTopic,
-} from './utils';
+import { applySearchFilter, enrichWithSpeakers, enrichWithTopics, getTalksByTopic } from './utils';
 import { statusType } from './validators';
 
 const talkPageValidator = paginationResultValidator(doc('talks'));
