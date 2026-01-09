@@ -1,95 +1,48 @@
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-import { HorizontalScrollGrid } from '@/components/horizontal-scroll-grid';
+import { TopicContent } from '@/app/topics/[topic]/_components/topic-content';
+import { TopicSidebar } from '@/app/topics/[topic]/_components/topic-sidebar';
+import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
-import { SidebarContent } from '@/components/sidebar-content';
-import { ViewMoreCard } from '@/components/view-more-card';
-import { TalkCard } from '@/features/talks/components';
 import { getTopicBySlug, getTopics } from '@/features/topics';
-import { TopicSelector } from '@/features/topics/components';
+
+export type TopicPageSearchParams = {
+  cursor?: string;
+};
 
 type TopicPageProps = {
   params: Promise<{
     topic: string;
   }>;
+  searchParams: Promise<TopicPageSearchParams>;
 };
 
-const DISPLAY_LIMIT = 12;
-
-export default async function TopicPage({ params }: TopicPageProps) {
+export default async function TopicPage({ params, searchParams }: TopicPageProps) {
   const { topic: slug } = await params;
-  const [data, topicsResult] = await Promise.all([getTopicBySlug(slug), getTopics()]);
-  const allTopics = topicsResult.topics;
+  const { cursor } = await searchParams;
+
+  const [data, topicsResult] = await Promise.all([getTopicBySlug({ cursor, slug }), getTopics()]);
 
   if (!data) {
     notFound();
   }
 
-  const { talks, topic } = data;
-  const displayedTalks = talks.slice(0, DISPLAY_LIMIT);
-  const remainingCount = talks.length - DISPLAY_LIMIT;
+  const { continueCursor, isDone, talks, topic, totalTalks } = data;
+  const allTopics = topicsResult.topics;
 
   return (
-    <HorizontalScrollGrid
-      sidebar={
-        <>
-          <PageHeader title={topic.title} />
-
-          <SidebarContent title="Browse Topics">
-            <TopicSelector
-              currentSlug={slug}
-              topics={allTopics.map((t) => ({
-                _id: t._id,
-                slug: t.slug,
-                title: t.title,
-              }))}
-            />
-            <Link className="text-primary text-sm hover:underline" href="/topics">
-              View all topics →
-            </Link>
-          </SidebarContent>
-
-          <SidebarContent title="About">
-            <div className="space-y-2 text-sm">
-              <div>
-                <span className="font-semibold">Talks:</span>{' '}
-                <span className="text-muted-foreground">{talks.length}</span>
-              </div>
-            </div>
-          </SidebarContent>
-        </>
-      }
-    >
-      {displayedTalks.map((talk) => (
-        <div className="min-w-[300px] shrink-0" key={talk._id}>
-          <TalkCard
-            featured={talk.featured}
-            speaker={
-              talk.speaker
-                ? {
-                    firstName: talk.speaker.firstName,
-                    imageUrl: talk.speaker.imageUrl,
-                    lastName: talk.speaker.lastName,
-                    slug: talk.speaker.slug,
-                  }
-                : undefined
-            }
-            talk={{
-              description: talk.description,
-              slug: talk.slug,
-              title: talk.title,
-            }}
-          />
-        </div>
-      ))}
-      {remainingCount > 0 && (
-        <ViewMoreCard
-          count={remainingCount}
-          href={`/talks?topic=${topic._id}`}
-          label="View All Talks"
+    <SidebarLayout
+      content={
+        <TopicContent
+          continueCursor={continueCursor}
+          hasNextPage={!isDone}
+          hasPrevPage={!!cursor}
+          talks={talks}
         />
-      )}
-    </HorizontalScrollGrid>
+      }
+      header={<PageHeader title={topic.title} variant="lg" />}
+      sidebar={<TopicSidebar currentSlug={slug} topics={allTopics} totalTalks={totalTalks} />}
+      sidebarSticky
+    />
   );
 }
