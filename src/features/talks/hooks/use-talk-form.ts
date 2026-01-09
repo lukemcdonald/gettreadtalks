@@ -105,48 +105,40 @@ export function useTalkForm({
     },
   });
 
-  const onSubmit: SubmitHandler<TalkFormData> = (values) => {
-    // biome-ignore lint/complexity: its fine
-    startTransition(async () => {
-      setFormStatus(talkId ? 'updating' : 'creating');
+  async function handleFormSubmit(values: TalkFormData) {
+    setFormStatus(talkId ? 'updating' : 'creating');
 
-      const result = talkId
-        ? await updateTalkAction(values, talkId)
-        : await createTalkAction(values);
+    const result = talkId ? await updateTalkAction(values, talkId) : await createTalkAction(values);
 
-      // Handle errors early and return
-      if (!result.success) {
-        setFormStatus('idle');
-        setServerErrors(form.setError, result.errors);
-        return;
-      }
-
-      const selectedSpeaker = speakers.find((s) => s._id === values.speakerId);
-
-      if (!selectedSpeaker) {
-        form.setError('speakerId', {
-          type: 'server',
-          message: 'Speaker not found',
-        });
-        return;
-      }
-
-      // Determine talk slug
-      const newSlug = slugify(values.title);
-      let finalTalkSlug = newSlug;
-
-      if (talkId) {
-        const titleUnchanged = newSlug === slugify(initialData?.title || '');
-        finalTalkSlug = titleUnchanged ? (talkSlug ?? newSlug) : newSlug;
-      }
-
-      // Determine speaker slug
-      const finalSpeakerSlug = talkId
-        ? (speakerSlug ?? selectedSpeaker.slug)
-        : selectedSpeaker.slug;
-
+    if (!result.success) {
       setFormStatus('idle');
-      router.push(getTalkUrl(finalSpeakerSlug, finalTalkSlug));
+      setServerErrors(form.setError, result.errors);
+      return;
+    }
+
+    const selectedSpeaker = speakers.find((s) => s._id === values.speakerId);
+
+    if (!selectedSpeaker) {
+      setFormStatus('idle');
+      form.setError('speakerId', {
+        type: 'server',
+        message: 'Speaker not found',
+      });
+      return;
+    }
+
+    const newSlug = slugify(values.title);
+    const isEditingWithUnchangedTitle = talkId && newSlug === slugify(initialData?.title || '');
+    const finalTalkSlug = isEditingWithUnchangedTitle ? (talkSlug ?? newSlug) : newSlug;
+    const finalSpeakerSlug = speakerSlug ?? selectedSpeaker.slug;
+
+    setFormStatus('idle');
+    router.push(getTalkUrl(finalSpeakerSlug, finalTalkSlug));
+  }
+
+  const onSubmit: SubmitHandler<TalkFormData> = (values) => {
+    startTransition(async () => {
+      await handleFormSubmit(values);
     });
   };
 
