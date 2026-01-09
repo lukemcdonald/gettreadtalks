@@ -4,32 +4,6 @@ import type { QueryCtx } from '../../_generated/server';
 import { asyncMap } from 'convex-helpers';
 
 /**
- * Apply additional filters (status, featured, speakerId) to talks array.
- */
-export function applyAdditionalFilters(
-  talks: Doc<'talks'>[],
-  filters: {
-    featured?: boolean;
-    speakerId?: Id<'speakers'>;
-    status?: string;
-  },
-): Doc<'talks'>[] {
-  let filteredTalks = talks;
-
-  if (filters.status) {
-    filteredTalks = filteredTalks.filter((talk) => talk.status === filters.status);
-  }
-  if (filters.featured !== undefined) {
-    filteredTalks = filteredTalks.filter((talk) => talk.featured === filters.featured);
-  }
-  if (filters.speakerId) {
-    filteredTalks = filteredTalks.filter((talk) => talk.speakerId === filters.speakerId);
-  }
-
-  return filteredTalks;
-}
-
-/**
  * Apply search filter to talks array.
  */
 export function applySearchFilter(talks: Doc<'talks'>[], search?: string): Doc<'talks'>[] {
