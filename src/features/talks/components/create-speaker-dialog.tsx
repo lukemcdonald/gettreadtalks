@@ -68,9 +68,8 @@ export function CreateSpeakerDialog({
         return;
       }
 
-      form.reset();
-      onOpenChange(false);
       onSpeakerCreated(result.data.speakerId);
+      onOpenChange(false);
     });
   });
 
@@ -112,9 +111,6 @@ export function CreateSpeakerDialog({
             <Button
               disabled={isPending}
               onClick={() => {
-                form.reset();
-                form.clearErrors();
-                setError(null);
                 onOpenChange(false);
               }}
               type="button"
