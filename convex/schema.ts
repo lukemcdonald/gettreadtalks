@@ -48,12 +48,15 @@ export default defineSchema({
   userFavoriteTalks: defineTable({
     talkId: v.id('talks'),
     userId: v.string(),
-  }).index('by_userId_and_talkId', ['userId', 'talkId']),
+  })
+    .index('by_talkId', ['talkId'])
+    .index('by_userId_and_talkId', ['userId', 'talkId']),
 
   userFinishedTalks: defineTable({
     talkId: v.id('talks'),
     userId: v.string(),
   })
+    .index('by_talkId', ['talkId'])
     .index('by_userId', ['userId'])
     .index('by_userId_and_talkId', ['userId', 'talkId']),
 });

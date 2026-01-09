@@ -364,8 +364,7 @@ export const listTalks = query({
 
     // Default query - apply search if provided
     if (search) {
-      // For search without other filters, we need to fetch all and filter
-      // This is less efficient but necessary for search functionality
+      // Search requires in-memory filtering, can't use .paginate()
       const allTalks = await ctx.db.query('talks').order('desc').collect();
       const filtered = applySearchFilter(allTalks, search);
       const numItems = paginationOpts.numItems || 20;
@@ -486,6 +485,7 @@ export const listTalksWithSpeakersAdmin = query({
   handler: async (ctx, args) => {
     const { paginationOpts, search, status = 'published' } = args;
 
+    // Search requires in-memory filtering, can't use .paginate()
     let talks: Doc<'talks'>[];
 
     if (status === 'all') {
