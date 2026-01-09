@@ -6,10 +6,26 @@ import { sortSpeakersByName } from '@/features/speakers';
 import { getTalksWithSpeakers } from '@/features/talks';
 import { getTopicsWithCounts } from '@/features/topics';
 
-export default async function TalksPage() {
-  const [talks, topics] = await Promise.all([getTalksWithSpeakers(), getTopicsWithCounts()]);
+export type TalksPageSearchParams = {
+  cursor?: string;
+};
 
-  const allSpeakers = talks.map((talk) => talk.speaker).filter((speaker) => speaker !== null);
+type TalksPageProps = {
+  searchParams: Promise<TalksPageSearchParams>;
+};
+
+export default async function TalksPage({ searchParams }: TalksPageProps) {
+  const params = await searchParams;
+  const { cursor } = params;
+
+  const [result, topics] = await Promise.all([
+    getTalksWithSpeakers({ cursor }),
+    getTopicsWithCounts(),
+  ]);
+
+  const allSpeakers = result.talks
+    .map((talk) => talk.speaker)
+    .filter((speaker) => speaker !== null);
   const speakersWithTalks = Array.from(
     new Map(allSpeakers.map((speaker) => [speaker.slug, speaker])).values(),
   );
@@ -17,7 +33,14 @@ export default async function TalksPage() {
 
   return (
     <SidebarLayout
-      content={<TalksContent talks={talks} />}
+      content={
+        <TalksContent
+          continueCursor={result.continueCursor}
+          hasNextPage={!result.isDone}
+          hasPrevPage={!!cursor}
+          talks={result.talks}
+        />
+      }
       header={
         <PageHeader
           description="Elevate your spiritual heartbeat with Christ centered talks."

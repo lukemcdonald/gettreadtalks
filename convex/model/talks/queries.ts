@@ -450,35 +450,37 @@ export const listTalksBySpeaker = query({
 });
 
 /**
- * Get talks with speaker data. Simplified query that only accepts status parameter.
- * All other filtering (speaker, topic, featured, search) should be done client-side.
+ * Get talks with speaker data with pagination support.
  *
  * For public pages: Always pass status='published'
  * For admin pages: Pass appropriate status or omit for default 'published'
  *
  * @param status - Filter by status (defaults to 'published')
- * @param limit - Maximum number of talks to return (defaults to 50)
+ * @param paginationOpts - Pagination options
  */
 export const listTalksWithSpeakers = query({
   args: {
-    limit: v.optional(v.number()),
+    paginationOpts: paginationOptsValidator,
     status: v.optional(statusType),
   },
   handler: async (ctx, args) => {
-    const { limit = 50, status = 'published' } = args;
+    const { paginationOpts, status = 'published' } = args;
 
-    const talks = await ctx.db
+    const result = await ctx.db
       .query('talks')
       .withIndex('by_status_and_publishedAt', (q) => q.eq('status', status))
       .order('desc')
-      .take(limit);
+      .paginate(paginationOpts);
 
-    const talksWithSpeakers = await enrichWithSpeakers(ctx, talks);
+    const talksWithSpeakers = await enrichWithSpeakers(ctx, result.page);
     const enrichedTalks = await enrichWithTopics(ctx, talksWithSpeakers);
 
-    return enrichedTalks;
+    return {
+      ...result,
+      page: enrichedTalks,
+    };
   },
-  returns: v.array(
+  returns: paginationResultValidator(
     talkWithSpeakerValidator.extend({
       topicSlugs: v.array(v.string()),
     }),
