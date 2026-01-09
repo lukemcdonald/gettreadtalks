@@ -6,10 +6,9 @@ import { asyncMap } from 'convex-helpers';
 import { getManyFrom, getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
 
 import { query } from '../../_generated/server';
-import { paginateArray } from '../../lib/utils';
+import { enrichWithSpeakers, paginateArray } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
-import { enrichWithSpeakers } from '../talks/utils';
 
 /**
  * Get topic by ID.

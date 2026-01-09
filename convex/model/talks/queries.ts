@@ -7,12 +7,17 @@ import { asyncMap } from 'convex-helpers';
 import { getManyFrom, getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
 
 import { query } from '../../_generated/server';
-import { paginateArray, shuffleAndLimit } from '../../lib/utils';
+import {
+  applySearchFilter,
+  enrichWithSpeakers,
+  paginateArray,
+  shuffleAndLimit,
+} from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
 import { canViewContent } from '../auth/roles';
 import { getCurrentUser } from '../auth/utils';
-import { applySearchFilter, enrichWithSpeakers, enrichWithTopics, getTalksByTopic } from './utils';
+import { enrichWithTopics, getTalksByTopic } from './utils';
 import { statusType } from './validators';
 
 const talkPageValidator = paginationResultValidator(doc('talks'));
