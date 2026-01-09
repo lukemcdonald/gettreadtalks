@@ -31,6 +31,7 @@ export async function AdminTalksContent({ searchParams }: AdminTalksContentProps
           continueCursor={result.continueCursor}
           hasNextPage={!result.isDone}
           hasPrevPage={!!cursor}
+          itemCount={result.talks.length}
         />
       </Suspense>
     </div>

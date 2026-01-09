@@ -25,6 +25,7 @@ export function TalksContent({
         continueCursor={continueCursor}
         hasNextPage={hasNextPage}
         hasPrevPage={hasPrevPage}
+        itemCount={talks.length}
       />
     </>
   );
