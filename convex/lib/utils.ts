@@ -200,3 +200,16 @@ export function paginateArray<T>(
     page,
   };
 }
+
+/**
+ * Delete all items from the database in a loop.
+ * Used for cascade deletions of related records.
+ */
+export async function deleteAll<T extends { _id: Id<TableNames> }>(
+  ctx: MutationCtx,
+  items: T[],
+): Promise<void> {
+  for (const item of items) {
+    await ctx.db.delete(item._id);
+  }
+}
