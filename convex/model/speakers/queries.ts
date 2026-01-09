@@ -143,3 +143,37 @@ export const listSpeakers = query({
       .paginate(args.paginationOpts),
   returns: speakerPageValidator,
 });
+
+/**
+ * List speakers with pagination (only speakers with published talks).
+ */
+export const listSpeakersWithPublishedTalks = query({
+  args: {
+    paginationOpts: paginationOptsValidator,
+  },
+  handler: async (ctx, args) => {
+    const result = await ctx.db
+      .query('speakers')
+      .withIndex('by_lastName')
+      .order('asc')
+      .paginate(args.paginationOpts);
+
+    const speakersWithTalks = await Promise.all(
+      result.page.map(async (speaker) => {
+        const hasTalks = await ctx.db
+          .query('talks')
+          .withIndex('by_speakerId_and_status', (q) =>
+            q.eq('speakerId', speaker._id).eq('status', 'published'),
+          )
+          .first();
+        return hasTalks ? speaker : null;
+      }),
+    );
+
+    return {
+      ...result,
+      page: speakersWithTalks.filter((s): s is Doc<'speakers'> => s !== null),
+    };
+  },
+  returns: speakerPageValidator,
+});
