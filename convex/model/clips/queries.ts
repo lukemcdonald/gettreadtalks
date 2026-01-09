@@ -7,7 +7,9 @@ import { asyncMap } from 'convex-helpers';
 import { getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
 
 import { query } from '../../_generated/server';
+import { filterClipsByPublishedTalks } from '../../lib/filters';
 import { doc, docs } from '../../lib/validators/schema';
+import { statusFilterType } from '../../lib/validators/shared';
 import { canViewContent } from '../auth/roles';
 import { getCurrentUser } from '../auth/utils';
 import { statusType } from './validators';
@@ -100,7 +102,10 @@ export const listClips = query({
 });
 
 /**
- * List clips with speaker data (paginated).
+ * List clips with speaker data (paginated, public-facing).
+ * Filters clips to only those with published parent talks.
+ * Clips without a parent talk (standalone) are included.
+ * Defaults to published status.
  */
 export const listClipsWithSpeakers = query({
   args: {
@@ -108,7 +113,7 @@ export const listClipsWithSpeakers = query({
     status: v.optional(statusType),
   },
   handler: async (ctx, args) => {
-    const { paginationOpts, status } = args;
+    const { paginationOpts, status = 'published' } = args;
 
     let result: PaginationResult<Doc<'clips'>>;
 
@@ -122,7 +127,9 @@ export const listClipsWithSpeakers = query({
       result = await ctx.db.query('clips').order('desc').paginate(paginationOpts);
     }
 
-    const enrichedPage = await asyncMap(result.page, async (clip) => {
+    const filtered = await filterClipsByPublishedTalks(ctx, result.page);
+
+    const enrichedPage = await asyncMap(filtered, async (clip) => {
       const speaker = clip.speakerId ? await ctx.db.get('speakers', clip.speakerId) : null;
       return { ...clip, speaker };
     });
@@ -158,20 +165,23 @@ export const listClipsBySpeaker = query({
 });
 
 /**
- * List clips with speaker data, filtering by parent talk published status (paginated).
- * Only returns clips where the parent talk is published (or clips without a parent talk).
+ * List clips with speaker data (admin).
+ * Returns all clips without filtering by parent talk status.
+ * Allows viewing all status types including drafts.
  */
-export const listClipsWithSpeakersAndPublishedTalks = query({
+export const listClipsAdmin = query({
   args: {
     paginationOpts: paginationOptsValidator,
-    status: v.optional(statusType),
+    status: v.optional(statusFilterType),
   },
   handler: async (ctx, args) => {
     const { paginationOpts, status } = args;
 
     let result: PaginationResult<Doc<'clips'>>;
 
-    if (status) {
+    if (status === 'all') {
+      result = await ctx.db.query('clips').order('desc').paginate(paginationOpts);
+    } else if (status) {
       result = await ctx.db
         .query('clips')
         .withIndex('by_status_and_publishedAt', (q) => q.eq('status', status))
@@ -183,23 +193,12 @@ export const listClipsWithSpeakersAndPublishedTalks = query({
 
     const enrichedPage = await asyncMap(result.page, async (clip) => {
       const speaker = clip.speakerId ? await ctx.db.get('speakers', clip.speakerId) : null;
-
-      // If clip has a parent talk, check if it's published
-      if (clip.talkId) {
-        const talk = await ctx.db.get('talks', clip.talkId);
-        if (!talk || talk.status !== 'published') {
-          return null;
-        }
-      }
-
       return { ...clip, speaker };
     });
 
     return {
       ...result,
-      page: enrichedPage.filter(
-        (clip): clip is { speaker: Doc<'speakers'> | null } & Doc<'clips'> => clip !== null,
-      ),
+      page: enrichedPage,
     };
   },
   returns: clipPageWithSpeakersValidator,
