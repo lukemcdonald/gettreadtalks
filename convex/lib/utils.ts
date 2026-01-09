@@ -2,6 +2,7 @@ import type { Doc, Id, TableNames } from '../_generated/dataModel';
 import type { MutationCtx, QueryCtx } from '../_generated/server';
 import type { StatusType } from './validators/shared';
 
+import { asyncMap } from 'convex-helpers';
 import { getOneFrom } from 'convex-helpers/server/relationships';
 
 import { throwNotFound } from './errors';
@@ -212,4 +213,30 @@ export async function deleteAll<T extends { _id: Id<TableNames> }>(
   for (const item of items) {
     await ctx.db.delete(item._id);
   }
+}
+
+/**
+ * Apply text search filter to array of items with a title field.
+ * Generic utility for client-side text filtering.
+ */
+export function applySearchFilter<T extends { title: string }>(items: T[], search?: string): T[] {
+  if (!search) {
+    return items;
+  }
+  const searchLower = search.toLowerCase();
+  return items.filter((item) => item.title.toLowerCase().includes(searchLower));
+}
+
+/**
+ * Enrich items with speaker data.
+ * Works with any entity that has a speakerId field (talks, clips, etc).
+ */
+export async function enrichWithSpeakers<T extends { speakerId: Id<'speakers'> }>(
+  ctx: QueryCtx,
+  items: T[],
+): Promise<Array<T & { speaker: Doc<'speakers'> | null }>> {
+  return await asyncMap(items, async (item: T) => {
+    const speaker = await ctx.db.get('speakers', item.speakerId);
+    return { ...item, speaker };
+  });
 }

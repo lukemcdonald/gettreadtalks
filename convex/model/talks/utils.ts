@@ -4,17 +4,6 @@ import type { QueryCtx } from '../../_generated/server';
 import { asyncMap } from 'convex-helpers';
 
 /**
- * Apply search filter to talks array.
- */
-export function applySearchFilter(talks: Doc<'talks'>[], search?: string): Doc<'talks'>[] {
-  if (!search) {
-    return talks;
-  }
-  const searchLower = search.toLowerCase();
-  return talks.filter((talk) => talk.title.toLowerCase().includes(searchLower));
-}
-
-/**
  * Apply search filter with speaker data to talks+speaker array.
  */
 export function applySearchFilterWithSpeaker(
@@ -40,20 +29,6 @@ export function applySearchFilterWithSpeaker(
     }
 
     return false;
-  });
-}
-
-/**
- * Enrich items with speaker data.
- * Works with any entity that has a speakerId field (talks, clips, etc).
- */
-export async function enrichWithSpeakers<T extends { speakerId: Id<'speakers'> }>(
-  ctx: QueryCtx,
-  items: T[],
-): Promise<Array<T & { speaker: Doc<'speakers'> | null }>> {
-  return await asyncMap(items, async (item: T) => {
-    const speaker = await ctx.db.get('speakers', item.speakerId);
-    return { ...item, speaker };
   });
 }
 
