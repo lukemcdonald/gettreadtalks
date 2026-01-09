@@ -25,6 +25,7 @@ export function TopicContent({
         continueCursor={continueCursor}
         hasNextPage={hasNextPage}
         hasPrevPage={hasPrevPage}
+        itemCount={talks.length}
       />
     </>
   );
