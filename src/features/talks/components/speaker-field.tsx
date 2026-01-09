@@ -46,6 +46,12 @@ export function SpeakerField<T extends FieldValues>({
 }: SpeakerFieldProps<T>) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+  const sortedSpeakers = [...speakers].sort((a, b) => {
+    const nameA = getSpeakerName(a).toLowerCase();
+    const nameB = getSpeakerName(b).toLowerCase();
+    return nameA.localeCompare(nameB);
+  });
+
   return (
     <Controller
       control={control}
@@ -69,16 +75,16 @@ export function SpeakerField<T extends FieldValues>({
 
               <Combobox
                 filter={(itemValue: SpeakerId, query: string) => {
-                  const speaker = speakers.find((s) => s._id === itemValue);
+                  const speaker = sortedSpeakers.find((s) => s._id === itemValue);
                   if (!speaker) {
                     return false;
                   }
                   const fullName = getSpeakerName(speaker).toLowerCase();
                   return fullName.includes(query.toLowerCase());
                 }}
-                items={speakers.map((s) => s._id)}
+                items={sortedSpeakers.map((s) => s._id)}
                 itemToStringLabel={(itemValue: SpeakerId) => {
-                  const speaker = speakers.find((s) => s._id === itemValue);
+                  const speaker = sortedSpeakers.find((s) => s._id === itemValue);
                   return speaker ? getSpeakerName(speaker) : '';
                 }}
                 onValueChange={(selected: SpeakerId | null) => {
@@ -109,7 +115,7 @@ export function SpeakerField<T extends FieldValues>({
                   </ComboboxEmpty>
                   <ComboboxList>
                     {(itemValue: SpeakerId) => {
-                      const speaker = speakers.find((s) => s._id === itemValue);
+                      const speaker = sortedSpeakers.find((s) => s._id === itemValue);
                       if (!speaker) {
                         return null;
                       }
