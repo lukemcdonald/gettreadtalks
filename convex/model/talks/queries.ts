@@ -7,7 +7,7 @@ import { asyncMap } from 'convex-helpers';
 import { getManyFrom, getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
 
 import { query } from '../../_generated/server';
-import { shuffleAndLimit } from '../../lib/utils';
+import { paginateArray, shuffleAndLimit } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
 import { canViewContent } from '../auth/roles';
@@ -507,10 +507,11 @@ export const listTalksWithSpeakersAdmin = query({
       talks = applySearchFilter(talks, search);
     }
 
-    const startIndex = paginationOpts.cursor ? Number.parseInt(paginationOpts.cursor, 10) : 0;
-    const endIndex = startIndex + paginationOpts.numItems;
-    const page = talks.slice(startIndex, endIndex);
-    const hasMore = endIndex < talks.length;
+    const { continueCursor, isDone, page } = paginateArray(
+      talks,
+      paginationOpts.cursor,
+      paginationOpts.numItems,
+    );
 
     const enrichedPage = await asyncMap(page, async (talk) => {
       const speaker = await ctx.db.get('speakers', talk.speakerId);
@@ -533,8 +534,8 @@ export const listTalksWithSpeakersAdmin = query({
     });
 
     return {
-      continueCursor: hasMore ? endIndex.toString() : '',
-      isDone: !hasMore,
+      continueCursor,
+      isDone,
       page: enrichedPage,
     };
   },
