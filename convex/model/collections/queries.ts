@@ -241,7 +241,7 @@ export const listCollectionsWithStats = query({
  * List collections with stats (admin).
  * Returns all collections without filtering.
  */
-export const listCollectionsAdmin = query({
+export const listCollectionsWithStatsAdmin = query({
   args: {
     paginationOpts: paginationOptsValidator,
   },

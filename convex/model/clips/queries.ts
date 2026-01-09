@@ -169,7 +169,7 @@ export const listClipsBySpeaker = query({
  * Returns all clips without filtering by parent talk status.
  * Allows viewing all status types including drafts.
  */
-export const listClipsAdmin = query({
+export const listClipsWithSpeakersAdmin = query({
   args: {
     paginationOpts: paginationOptsValidator,
     status: v.optional(statusFilterType),
