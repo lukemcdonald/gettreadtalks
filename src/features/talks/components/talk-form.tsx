@@ -114,26 +114,24 @@ export function TalkForm({
           </div>
         </Fieldset>
 
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            {actionsMenu ? (
-              actionsMenu({ isBusy })
-            ) : (
-              <Button disabled={isBusy} type="submit">
-                {submitLabel}
-              </Button>
-            )}
-            {mode === 'edit' && (
-              <Button
-                disabled={isBusy}
-                onClick={() => window.history.back()}
-                type="button"
-                variant="outline"
-              >
-                Cancel
-              </Button>
-            )}
-          </div>
+        <div className="flex items-center gap-4">
+          {actionsMenu ? (
+            actionsMenu({ isBusy })
+          ) : (
+            <Button disabled={isBusy} type="submit">
+              {submitLabel}
+            </Button>
+          )}
+          {mode === 'edit' && (
+            <Button
+              disabled={isBusy}
+              onClick={() => window.history.back()}
+              type="button"
+              variant="outline"
+            >
+              Cancel
+            </Button>
+          )}
         </div>
       </form>
     </FormProvider>

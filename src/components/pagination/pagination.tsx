@@ -18,20 +18,20 @@ export function Pagination({ continueCursor, hasNextPage, hasPrevPage }: Paginat
     return null;
   }
 
-  const handlePrevious = () => {
+  function handlePrevious() {
     const params = new URLSearchParams(searchParams.toString());
     params.delete('cursor');
     router.push(`?${params.toString()}`);
-  };
+  }
 
-  const handleNext = () => {
+  function handleNext() {
     if (!continueCursor) {
       return;
     }
     const params = new URLSearchParams(searchParams.toString());
     params.set('cursor', continueCursor);
     router.push(`?${params.toString()}`);
-  };
+  }
 
   return (
     <div className="mt-8 flex justify-center gap-4">

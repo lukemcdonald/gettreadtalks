@@ -52,7 +52,7 @@ export function SelectFilter({
   const allOption = placeholder ? { label: placeholder, value: ALL_OPTION_VALUE } : null;
   const allOptions = allOption ? [allOption, ...options] : options;
 
-  const getInitialValue = (): string | null => {
+  function getInitialValue(): string | null {
     if (searchParamValue && allOptions.some((opt) => opt.value === searchParamValue)) {
       return searchParamValue;
     }
@@ -62,7 +62,7 @@ export function SelectFilter({
     }
 
     return defaultValue ?? null;
-  };
+  }
 
   const initialValue = getInitialValue();
 
