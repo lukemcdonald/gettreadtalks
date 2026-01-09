@@ -24,7 +24,6 @@ export const createSpeaker = mutation({
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
-    // Validate input early
     if (!args.firstName.trim()) {
       throwValidationError('First name cannot be empty', 'firstName');
     }
@@ -63,7 +62,7 @@ export const destroySpeaker = mutation({
       throwNotFound('Speaker not found', { resource: 'speaker', resourceId: args.id });
     }
 
-    // Check if speaker is referenced by any talks
+    // Prevent deletion if speaker has associated content
     const talksWithSpeaker = await getOneFrom(
       ctx.db,
       'talks',
@@ -76,21 +75,19 @@ export const destroySpeaker = mutation({
       throwValidationError('Cannot delete speaker: speaker has associated talks');
     }
 
-    // Check if speaker is referenced by any clips
     const clipsWithSpeaker = await getOneFrom(ctx.db, 'clips', 'by_speakerId', args.id);
 
     if (clipsWithSpeaker) {
       throwValidationError('Cannot delete speaker: speaker has associated clips');
     }
 
-    // Delete user favorites for this speaker
+    // Clean up user favorites before deleting speaker
     const favorites = await getManyFrom(ctx.db, 'userFavoriteSpeakers', 'by_speakerId', args.id);
 
     for (const favorite of favorites) {
       await ctx.db.delete(favorite._id);
     }
 
-    // Hard delete the speaker
     await ctx.db.delete(args.id);
 
     return null;
@@ -125,12 +122,11 @@ export const updateSpeaker = mutation({
       throwNotFound('Speaker not found', { resource: 'speaker', resourceId: id });
     }
 
-    // If name changed, update slug
+    // Regenerate slug if name changed to ensure URL consistency
     if (updates.firstName !== undefined || updates.lastName !== undefined) {
       const firstName = updates.firstName ?? speaker.firstName;
       const lastName = updates.lastName ?? speaker.lastName;
 
-      // Validate input early
       if (!firstName.trim()) {
         throwValidationError('First name cannot be empty', 'firstName');
       }
