@@ -108,6 +108,7 @@ export const updateTalk = mutation({
       throwNotFound('Talk not found', { resource: 'talk', resourceId: id });
     }
 
+    // Regenerate slug if title changed to ensure URL consistency
     if (updates.title !== undefined) {
       if (!updates.title.trim()) {
         throwValidationError('Title cannot be empty', 'title');
@@ -116,7 +117,6 @@ export const updateTalk = mutation({
       const newSlug = slugify(updates.title);
 
       if (newSlug !== talk.slug) {
-        // Use the speakerId from the talk or from updates if it's being changed
         const speakerIdToCheck = updates.speakerId || talk.speakerId;
         const slugExists = await talkSlugExistsForSpeaker(ctx, speakerIdToCheck, newSlug, id);
 
@@ -206,7 +206,7 @@ export const destroyTalk = mutation({
       await ctx.db.delete(relation._id);
     }
 
-    // Note: userFavoriteTalks only has by_userId_and_talkId index, so we query all and filter
+    // No by_talkId index, so collect and filter client-side
     const allFavorites = await ctx.db.query('userFavoriteTalks').collect();
     const favorites = allFavorites.filter((f) => f.talkId === args.id);
 
@@ -214,7 +214,7 @@ export const destroyTalk = mutation({
       await ctx.db.delete(favorite._id);
     }
 
-    // Note: userFinishedTalks only has by_userId_and_talkId index, so we query all and filter
+    // No by_talkId index, so collect and filter client-side
     const allFinished = await ctx.db.query('userFinishedTalks').collect();
     const finished = allFinished.filter((f) => f.talkId === args.id);
 
@@ -222,8 +222,7 @@ export const destroyTalk = mutation({
       await ctx.db.delete(record._id);
     }
 
-    // Note: Clips have optional talkId, so we don't need to delete them
-    // They can remain without a talk reference
+    // Clips remain intact - talkId is optional and nullability is intentional
 
     await ctx.db.delete(args.id);
 

@@ -6,11 +6,12 @@ import { doc as convexDoc } from 'convex-helpers/validators';
 import schema from '../../schema';
 
 /**
- * Creates a document validator that includes system fields for the specified table.
- * @param tableName - The table name
+ * Type-safe document validator with system fields (_id, _creationTime).
+ *
  * @example
- * doc('talks')
- * doc('talks').nullable()
+ * returns: doc('talks')
+ * returns: doc('talks').nullable()
+ * returns: v.array(doc('talks'))
  */
 export function doc<T extends TableNames>(tableName: T) {
   const docValidator = convexDoc(schema, tableName);
@@ -21,8 +22,10 @@ export function doc<T extends TableNames>(tableName: T) {
 }
 
 /**
- * Creates a validator for an array of documents.
- * @param tableName - The table name
+ * Type-safe validator for arrays of documents.
+ *
+ * @example
+ * returns: docs('talks')
  */
 export function docs<T extends TableNames>(tableName: T) {
   return v.array(convexDoc(schema, tableName));
