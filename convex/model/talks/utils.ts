@@ -34,9 +34,9 @@ export function applySearchFilterWithSpeaker(
 
 /**
  * Enrich talks with topic slugs for client-side filtering.
- * Adds a topicSlugs array to each talk containing the slugs of all topics it belongs to.
+ * Composable: works with raw talks or already-enriched talks.
  */
-export async function enrichWithTopics<T extends Doc<'talks'>>(
+export async function enrichWithTopics<T extends { _id: Id<'talks'> }>(
   ctx: QueryCtx,
   talks: T[],
 ): Promise<Array<T & { topicSlugs: string[] }>> {
