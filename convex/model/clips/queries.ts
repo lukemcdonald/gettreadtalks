@@ -156,3 +156,51 @@ export const listClipsBySpeaker = query({
   },
   returns: docs('clips'),
 });
+
+/**
+ * List clips with speaker data, filtering by parent talk published status (paginated).
+ * Only returns clips where the parent talk is published (or clips without a parent talk).
+ */
+export const listClipsWithSpeakersAndPublishedTalks = query({
+  args: {
+    paginationOpts: paginationOptsValidator,
+    status: v.optional(statusType),
+  },
+  handler: async (ctx, args) => {
+    const { paginationOpts, status } = args;
+
+    let result: PaginationResult<Doc<'clips'>>;
+
+    if (status) {
+      result = await ctx.db
+        .query('clips')
+        .withIndex('by_status_and_publishedAt', (q) => q.eq('status', status))
+        .order('desc')
+        .paginate(paginationOpts);
+    } else {
+      result = await ctx.db.query('clips').order('desc').paginate(paginationOpts);
+    }
+
+    const enrichedPage = await asyncMap(result.page, async (clip) => {
+      const speaker = clip.speakerId ? await ctx.db.get('speakers', clip.speakerId) : null;
+
+      // If clip has a parent talk, check if it's published
+      if (clip.talkId) {
+        const talk = await ctx.db.get('talks', clip.talkId);
+        if (!talk || talk.status !== 'published') {
+          return null;
+        }
+      }
+
+      return { ...clip, speaker };
+    });
+
+    return {
+      ...result,
+      page: enrichedPage.filter(
+        (clip): clip is { speaker: Doc<'speakers'> | null } & Doc<'clips'> => clip !== null,
+      ),
+    };
+  },
+  returns: clipPageWithSpeakersValidator,
+});
