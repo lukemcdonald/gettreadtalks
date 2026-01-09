@@ -8,7 +8,7 @@ export const getCollectionWithTalks = queries.getCollectionWithTalks;
 export const listCollections = queries.listCollections;
 export const listCollectionsBySpeaker = queries.listCollectionsBySpeaker;
 export const listCollectionsWithStats = queries.listCollectionsWithStats; // Public: filtered
-export const listCollectionsAdmin = queries.listCollectionsAdmin; // Admin: all collections
+export const listCollectionsWithStatsAdmin = queries.listCollectionsWithStatsAdmin; // Admin: all collections
 
 // Mutations
 export const createCollection = mutations.createCollection;
