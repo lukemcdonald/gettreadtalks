@@ -6,6 +6,7 @@ import { asyncMap } from 'convex-helpers';
 import { getManyFrom, getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
 
 import { query } from '../../_generated/server';
+import { paginateArray } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
 
@@ -96,11 +97,11 @@ export const getTopicBySlug = query({
       (talk): talk is Doc<'talks'> => talk !== null && talk.status === 'published',
     );
 
-    // Manual pagination
-    const startIndex = paginationOpts.cursor ? Number.parseInt(paginationOpts.cursor, 10) : 0;
-    const endIndex = startIndex + paginationOpts.numItems;
-    const page = publishedTalks.slice(startIndex, endIndex);
-    const hasMore = endIndex < publishedTalks.length;
+    const { continueCursor, isDone, page } = paginateArray(
+      publishedTalks,
+      paginationOpts.cursor,
+      paginationOpts.numItems,
+    );
 
     const talksWithSpeakers = await asyncMap(page, async (talk: Doc<'talks'>) => {
       const speaker = await ctx.db.get('speakers', talk.speakerId);
@@ -108,8 +109,8 @@ export const getTopicBySlug = query({
     });
 
     return {
-      continueCursor: hasMore ? endIndex.toString() : '',
-      isDone: !hasMore,
+      continueCursor,
+      isDone,
       page: talksWithSpeakers,
       topic,
       totalTalks: publishedTalks.length,

@@ -179,3 +179,24 @@ export function getPublishedAtForStatus(
 export function shuffleAndLimit<T>(items: T[], limit: number): T[] {
   return items.sort(() => Math.random() - 0.5).slice(0, limit);
 }
+
+/**
+ * Manually paginate an array with cursor support.
+ * Returns page, continuation cursor, and done status.
+ */
+export function paginateArray<T>(
+  items: T[],
+  cursor: string | null,
+  numItems: number,
+): { continueCursor: string; isDone: boolean; page: T[] } {
+  const startIndex = cursor ? Number.parseInt(cursor, 10) : 0;
+  const endIndex = startIndex + numItems;
+  const page = items.slice(startIndex, endIndex);
+  const hasMore = endIndex < items.length;
+
+  return {
+    continueCursor: hasMore ? endIndex.toString() : '',
+    isDone: !hasMore,
+    page,
+  };
+}
