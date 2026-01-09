@@ -4,8 +4,8 @@ import { v } from 'convex/values';
 import { getManyFrom } from 'convex-helpers/server/relationships';
 
 import { mutation } from '../../_generated/server';
-import { throwDuplicateSlug, throwNotFound, throwValidationError } from '../../lib/errors';
-import { slugify, talkSlugExistsForSpeaker } from '../../lib/utils';
+import { throwDuplicateSlug, throwValidationError } from '../../lib/errors';
+import { getOrThrow, slugify, talkSlugExistsForSpeaker } from '../../lib/utils';
 import { requireAuth } from '../auth/utils';
 import { statusType } from './validators';
 
@@ -19,11 +19,7 @@ export const archiveTalk = mutation({
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
-    const talk = await ctx.db.get('talks', args.id);
-
-    if (!talk) {
-      throwNotFound('Talk not found', { resource: 'talk', resourceId: args.id });
-    }
+    const talk = await getOrThrow(ctx, 'talks', args.id);
 
     const isArchived = talk.status === 'archived';
     const newStatus = isArchived ? 'backlog' : 'archived';
@@ -96,17 +92,12 @@ export const updateTalk = mutation({
     status: v.optional(statusType),
     title: v.optional(v.string()),
   },
-  // biome-ignore lint/complexity: its fine
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
     const { id, ...rest } = args;
     const updates: Partial<Doc<'talks'>> = rest;
-    const talk = await ctx.db.get('talks', id);
-
-    if (!talk) {
-      throwNotFound('Talk not found', { resource: 'talk', resourceId: id });
-    }
+    const talk = await getOrThrow(ctx, 'talks', id);
 
     // Regenerate slug if title changed to ensure URL consistency
     if (updates.title !== undefined) {
@@ -156,11 +147,7 @@ export const updateTalkStatus = mutation({
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
-    const talk = await ctx.db.get('talks', args.id);
-
-    if (!talk) {
-      throwNotFound('Talk not found', { resource: 'talk', resourceId: args.id });
-    }
+    const talk = await getOrThrow(ctx, 'talks', args.id);
 
     const updates: Partial<Doc<'talks'>> = {
       status: args.status,
@@ -191,11 +178,7 @@ export const destroyTalk = mutation({
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
-    const talk = await ctx.db.get('talks', args.id);
-
-    if (!talk) {
-      throwNotFound('Talk not found', { resource: 'talk', resourceId: args.id });
-    }
+    const talk = await getOrThrow(ctx, 'talks', args.id);
 
     const talksOnTopics = await ctx.db
       .query('talksOnTopics')

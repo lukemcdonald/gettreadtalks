@@ -4,8 +4,8 @@ import { v } from 'convex/values';
 import { getManyFrom, getOneFrom } from 'convex-helpers/server/relationships';
 
 import { mutation } from '../../_generated/server';
-import { throwDuplicateSlug, throwNotFound, throwValidationError } from '../../lib/errors';
-import { slugExists, slugify } from '../../lib/utils';
+import { throwDuplicateSlug, throwValidationError } from '../../lib/errors';
+import { getOrThrow, slugExists, slugify } from '../../lib/utils';
 import { requireAuth } from '../auth/utils';
 
 /**
@@ -56,11 +56,7 @@ export const destroySpeaker = mutation({
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
-    const speaker = await ctx.db.get('speakers', args.id);
-
-    if (!speaker) {
-      throwNotFound('Speaker not found', { resource: 'speaker', resourceId: args.id });
-    }
+    const speaker = await getOrThrow(ctx, 'speakers', args.id);
 
     // Prevent deletion if speaker has associated content
     const talksWithSpeaker = await getOneFrom(
@@ -116,11 +112,7 @@ export const updateSpeaker = mutation({
     const { id, ...rest } = args;
     const updates: Partial<Doc<'speakers'>> = rest;
 
-    const speaker = await ctx.db.get('speakers', id);
-
-    if (!speaker) {
-      throwNotFound('Speaker not found', { resource: 'speaker', resourceId: id });
-    }
+    const speaker = await getOrThrow(ctx, 'speakers', id);
 
     // Regenerate slug if name changed to ensure URL consistency
     if (updates.firstName !== undefined || updates.lastName !== undefined) {

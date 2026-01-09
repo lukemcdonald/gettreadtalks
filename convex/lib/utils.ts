@@ -1,7 +1,9 @@
-import type { Id } from '../_generated/dataModel';
+import type { Doc, Id, TableNames } from '../_generated/dataModel';
 import type { MutationCtx, QueryCtx } from '../_generated/server';
 
 import { getOneFrom } from 'convex-helpers/server/relationships';
+
+import { throwNotFound } from './errors';
 
 /**
  * Normalizes text into a URL-friendly slug
@@ -132,4 +134,25 @@ export async function generateSlug(
  */
 export function getSettledValue<T, F = T>(result: PromiseSettledResult<T>, fallback: F): T | F {
   return result.status === 'fulfilled' ? result.value : fallback;
+}
+
+/**
+ * Gets an entity by ID or throws NotFound error.
+ * Eliminates repetitive null checking boilerplate.
+ */
+export async function getOrThrow<T extends TableNames>(
+  ctx: QueryCtx | MutationCtx,
+  table: T,
+  id: Id<T>,
+): Promise<Doc<T>> {
+  const entity = await ctx.db.get(table, id);
+
+  if (!entity) {
+    throwNotFound(`${table} not found`, {
+      resource: table,
+      resourceId: id,
+    });
+  }
+
+  return entity;
 }
