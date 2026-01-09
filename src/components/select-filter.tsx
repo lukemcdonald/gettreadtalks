@@ -53,12 +53,8 @@ export function SelectFilter({
   const allOptions = allOption ? [allOption, ...options] : options;
 
   const getInitialValue = (): string | null => {
-    // If search param exists and is valid, use it
-    if (searchParamValue) {
-      const isValidSearchParamValue = allOptions.some((opt) => opt.value === searchParamValue);
-      if (isValidSearchParamValue) {
-        return searchParamValue;
-      }
+    if (searchParamValue && allOptions.some((opt) => opt.value === searchParamValue)) {
+      return searchParamValue;
     }
 
     if (allOption) {

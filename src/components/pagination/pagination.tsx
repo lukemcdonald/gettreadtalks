@@ -14,6 +14,10 @@ export function Pagination({ continueCursor, hasNextPage, hasPrevPage }: Paginat
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  if (!(hasNextPage || hasPrevPage)) {
+    return null;
+  }
+
   const handlePrevious = () => {
     const params = new URLSearchParams(searchParams.toString());
     params.delete('cursor');
@@ -28,10 +32,6 @@ export function Pagination({ continueCursor, hasNextPage, hasPrevPage }: Paginat
     params.set('cursor', continueCursor);
     router.push(`?${params.toString()}`);
   };
-
-  if (!(hasNextPage || hasPrevPage)) {
-    return null;
-  }
 
   return (
     <div className="mt-8 flex justify-center gap-4">

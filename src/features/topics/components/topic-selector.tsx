@@ -28,19 +28,21 @@ type TopicSelectorProps = {
 
 export function TopicSelector({ className, currentSlug, label, topics }: TopicSelectorProps) {
   const router = useRouter();
-  const [_isPending, startTransition] = useTransition();
-
-  const handleChange = (value: string | null) => {
-    startTransition(() => {
-      router.push(`/topics/${value}`);
-    });
-  };
+  const [, startTransition] = useTransition();
 
   const sortedTopics = [...topics].sort((a, b) => a.title.localeCompare(b.title));
   const items = sortedTopics.map((topic) => ({
     label: topic.title,
     value: topic.slug,
   }));
+
+  const handleChange = (value: string | null) => {
+    if (value) {
+      startTransition(() => {
+        router.push(`/topics/${value}`);
+      });
+    }
+  };
 
   return (
     <div className={cn('space-y-2', className)}>

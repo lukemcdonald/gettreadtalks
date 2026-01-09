@@ -1,7 +1,7 @@
 import type { Speaker } from '@/features/speakers/types';
 import type { Talk } from '@/features/talks/types';
 
-import { Pagination } from '@/app/talks/_components/pagination';
+import { Pagination } from '@/components/pagination';
 import { TalksList } from '@/features/talks/components';
 
 type TalkWithSpeaker = Talk & { speaker: Speaker | null };

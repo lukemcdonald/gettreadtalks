@@ -4,7 +4,7 @@ import { Suspense } from 'react';
 
 import { AdminTalksFilters } from '@/app/account/talks/_components/admin-talks-filters';
 import { AdminTalksTable } from '@/app/account/talks/_components/admin-talks-table';
-import { Pagination } from '@/app/talks/_components/pagination';
+import { Pagination } from '@/components/pagination';
 import { Skeleton } from '@/components/ui';
 import { getTalksWithSpeakersAdmin } from '@/features/talks';
 

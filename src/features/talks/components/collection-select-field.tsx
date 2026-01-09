@@ -28,10 +28,8 @@ export function CollectionSelectField({
     value: collection._id,
   }));
 
-  const allOption = placeholder ? { label: placeholder, value: '' } : null;
-  const allOptions = allOption ? [allOption, ...items] : items;
-
-  const normalizedValue = value || '';
+  const noneOption = { label: placeholder || 'None', value: '' };
+  const allOptions = [noneOption, ...items];
 
   return (
     <Field name="collectionId">
@@ -40,16 +38,15 @@ export function CollectionSelectField({
         items={allOptions}
         name="collectionId"
         onValueChange={(v) => onValueChange?.(v as CollectionId)}
-        value={normalizedValue}
+        value={value || ''}
       >
         <SelectTrigger id="collectionId">
           <SelectValue />
         </SelectTrigger>
         <SelectPopup>
-          <SelectItem value="">None</SelectItem>
-          {collections.map((collection) => (
-            <SelectItem key={collection._id} value={collection._id}>
-              {collection.title}
+          {allOptions.map((option) => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
             </SelectItem>
           ))}
         </SelectPopup>
