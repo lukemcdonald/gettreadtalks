@@ -513,30 +513,13 @@ export const listTalksWithSpeakersAdmin = query({
       paginationOpts.numItems,
     );
 
-    const enrichedPage = await asyncMap(page, async (talk) => {
-      const speaker = await ctx.db.get('speakers', talk.speakerId);
-
-      const talksOnTopics = await ctx.db
-        .query('talksOnTopics')
-        .withIndex('by_talkId', (q) => q.eq('talkId', talk._id))
-        .collect();
-
-      const topics = await Promise.all(talksOnTopics.map((t) => ctx.db.get('topics', t.topicId)));
-
-      const validTopics = topics.filter((topic): topic is Doc<'topics'> => topic !== null);
-      const topicSlugs = validTopics.map((topic) => topic.slug);
-
-      return {
-        ...talk,
-        speaker,
-        topicSlugs,
-      };
-    });
+    const talksWithSpeakers = await enrichWithSpeakers(ctx, page);
+    const talksWithSpeakersAndTopics = await enrichWithTopics(ctx, talksWithSpeakers);
 
     return {
       continueCursor,
       isDone,
-      page: enrichedPage,
+      page: talksWithSpeakersAndTopics,
     };
   },
   returns: paginationResultValidator(
