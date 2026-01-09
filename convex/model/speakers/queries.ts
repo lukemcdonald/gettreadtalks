@@ -5,6 +5,7 @@ import { v } from 'convex/values';
 import { getOneFrom } from 'convex-helpers/server/relationships';
 
 import { query } from '../../_generated/server';
+import { filterSpeakersWithPublishedTalks } from '../../lib/filters';
 import { shuffleAndLimit } from '../../lib/utils';
 import { doc, docs } from '../../lib/validators/schema';
 
@@ -129,25 +130,10 @@ export const listFeaturedSpeakers = query({
 });
 
 /**
- * List speakers with pagination.
+ * List speakers with pagination (public-facing).
+ * Defaults to filtering speakers who have at least one published talk.
  */
 export const listSpeakers = query({
-  args: {
-    paginationOpts: paginationOptsValidator,
-  },
-  handler: async (ctx, args) =>
-    await ctx.db
-      .query('speakers')
-      .withIndex('by_lastName')
-      .order('asc')
-      .paginate(args.paginationOpts),
-  returns: speakerPageValidator,
-});
-
-/**
- * List speakers with pagination (only speakers with published talks).
- */
-export const listSpeakersWithPublishedTalks = query({
   args: {
     paginationOpts: paginationOptsValidator,
   },
@@ -158,22 +144,29 @@ export const listSpeakersWithPublishedTalks = query({
       .order('asc')
       .paginate(args.paginationOpts);
 
-    const speakersWithTalks = await Promise.all(
-      result.page.map(async (speaker) => {
-        const hasTalks = await ctx.db
-          .query('talks')
-          .withIndex('by_speakerId_and_status', (q) =>
-            q.eq('speakerId', speaker._id).eq('status', 'published'),
-          )
-          .first();
-        return hasTalks ? speaker : null;
-      }),
-    );
+    const filtered = await filterSpeakersWithPublishedTalks(ctx, result.page);
 
     return {
       ...result,
-      page: speakersWithTalks.filter((s): s is Doc<'speakers'> => s !== null),
+      page: filtered,
     };
   },
+  returns: speakerPageValidator,
+});
+
+/**
+ * List speakers with pagination (admin).
+ * Returns all speakers without filtering.
+ */
+export const listSpeakersAdmin = query({
+  args: {
+    paginationOpts: paginationOptsValidator,
+  },
+  handler: async (ctx, args) =>
+    await ctx.db
+      .query('speakers')
+      .withIndex('by_lastName')
+      .order('asc')
+      .paginate(args.paginationOpts),
   returns: speakerPageValidator,
 });

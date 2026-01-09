@@ -6,6 +6,7 @@ import { asyncMap } from 'convex-helpers';
 import { getAll, getOneFrom } from 'convex-helpers/server/relationships';
 
 import { query } from '../../_generated/server';
+import { filterCollectionsWithPublishedTalks } from '../../lib/filters';
 import { enrichWithSpeakers } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
@@ -193,7 +194,8 @@ export const listCollectionsBySpeaker = query({
 });
 
 /**
- * List collections with stats (talk counts and speakers).
+ * List collections with stats (talk counts and speakers, public-facing).
+ * Filters to only collections with published talks.
  */
 export const listCollectionsWithStats = query({
   args: {
@@ -202,19 +204,16 @@ export const listCollectionsWithStats = query({
   handler: async (ctx, args) => {
     const result = await ctx.db.query('collections').order('desc').paginate(args.paginationOpts);
 
+    const filtered = await filterCollectionsWithPublishedTalks(ctx, result.page);
+
     // Enrich each collection with stats
-    const enrichedPage = await asyncMap(result.page, async (collection: Doc<'collections'>) => {
+    const enrichedPage = await asyncMap(filtered, async (collection: Doc<'collections'>) => {
       const talks = await ctx.db
         .query('talks')
         .withIndex('by_collectionId_and_status', (q) =>
           q.eq('collectionId', collection._id).eq('status', 'published'),
         )
         .collect();
-
-      // Filter out collections without published talks
-      if (talks.length === 0) {
-        return null;
-      }
 
       // Get unique speaker IDs
       const speakerIds = [...new Set(talks.map((talk) => talk.speakerId))];
@@ -232,7 +231,49 @@ export const listCollectionsWithStats = query({
 
     return {
       ...result,
-      page: enrichedPage.filter((item) => item !== null),
+      page: enrichedPage,
+    };
+  },
+  returns: v.any(), // PaginationResult with enriched page: Array<{ collection, speakers, talkCount }>
+});
+
+/**
+ * List collections with stats (admin).
+ * Returns all collections without filtering.
+ */
+export const listCollectionsAdmin = query({
+  args: {
+    paginationOpts: paginationOptsValidator,
+  },
+  handler: async (ctx, args) => {
+    const result = await ctx.db.query('collections').order('desc').paginate(args.paginationOpts);
+
+    // Enrich each collection with stats
+    const enrichedPage = await asyncMap(result.page, async (collection: Doc<'collections'>) => {
+      const talks = await ctx.db
+        .query('talks')
+        .withIndex('by_collectionId_and_status', (q) =>
+          q.eq('collectionId', collection._id).eq('status', 'published'),
+        )
+        .collect();
+
+      // Get unique speaker IDs
+      const speakerIds = [...new Set(talks.map((talk) => talk.speakerId))];
+
+      // Fetch speakers in parallel
+      const speakers = await getAll(ctx.db, speakerIds);
+      const validSpeakers = speakers.filter((speaker) => speaker !== null);
+
+      return {
+        collection,
+        speakers: validSpeakers,
+        talkCount: talks.length,
+      };
+    });
+
+    return {
+      ...result,
+      page: enrichedPage,
     };
   },
   returns: v.any(), // PaginationResult with enriched page: Array<{ collection, speakers, talkCount }>

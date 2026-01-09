@@ -5,8 +5,8 @@ export const getSpeaker = queries.getSpeaker;
 export const getSpeakerBySlug = queries.getSpeakerBySlug;
 export const getSpeakersCount = queries.getSpeakersCount;
 export const listFeaturedSpeakers = queries.listFeaturedSpeakers;
-export const listSpeakers = queries.listSpeakers;
-export const listSpeakersWithPublishedTalks = queries.listSpeakersWithPublishedTalks;
+export const listSpeakers = queries.listSpeakers; // Public: filtered to speakers with published talks
+export const listSpeakersAdmin = queries.listSpeakersAdmin; // Admin: all speakers
 
 // Mutations
 export const createSpeaker = mutations.createSpeaker;
