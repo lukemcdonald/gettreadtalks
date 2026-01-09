@@ -44,15 +44,16 @@ export function applySearchFilterWithSpeaker(
 }
 
 /**
- * Enrich talks with speaker data.
+ * Enrich items with speaker data.
+ * Works with any entity that has a speakerId field (talks, clips, etc).
  */
-export async function enrichWithSpeakers(
+export async function enrichWithSpeakers<T extends { speakerId: Id<'speakers'> }>(
   ctx: QueryCtx,
-  talks: Doc<'talks'>[],
-): Promise<Array<Doc<'talks'> & { speaker: Doc<'speakers'> | null }>> {
-  return await asyncMap(talks, async (talk: Doc<'talks'>) => {
-    const speaker = await ctx.db.get('speakers', talk.speakerId);
-    return { ...talk, speaker };
+  items: T[],
+): Promise<Array<T & { speaker: Doc<'speakers'> | null }>> {
+  return await asyncMap(items, async (item: T) => {
+    const speaker = await ctx.db.get('speakers', item.speakerId);
+    return { ...item, speaker };
   });
 }
 
