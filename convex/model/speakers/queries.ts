@@ -5,6 +5,7 @@ import { v } from 'convex/values';
 import { getOneFrom } from 'convex-helpers/server/relationships';
 
 import { query } from '../../_generated/server';
+import { shuffleAndLimit } from '../../lib/utils';
 import { doc, docs } from '../../lib/validators/schema';
 
 const speakerPageValidator = paginationResultValidator(doc('speakers'));
@@ -122,10 +123,7 @@ export const listFeaturedSpeakers = query({
       .withIndex('by_featured', (q) => q.eq('featured', true))
       .take(50);
 
-    // Shuffle and return limited number
-    const shuffled = speakers.sort(() => Math.random() - 0.5);
-
-    return shuffled.slice(0, limit);
+    return shuffleAndLimit(speakers, limit);
   },
   returns: docs('speakers'),
 });
