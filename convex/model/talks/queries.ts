@@ -15,6 +15,7 @@ import {
 } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
+import { statusFilterType } from '../../lib/validators/shared';
 import { canViewContent } from '../auth/roles';
 import { getCurrentUser } from '../auth/utils';
 import { enrichWithTopics, getTalksByTopic } from './utils';
@@ -485,7 +486,7 @@ export const listTalksWithSpeakersAdmin = query({
   args: {
     paginationOpts: paginationOptsValidator,
     search: v.optional(v.string()),
-    status: v.optional(v.union(statusType, v.literal('all'))),
+    status: v.optional(statusFilterType),
   },
   handler: async (ctx, args) => {
     const { paginationOpts, search, status = 'published' } = args;
