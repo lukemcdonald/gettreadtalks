@@ -9,35 +9,43 @@ import { getAuthToken, getCurrentUser } from '@/services/auth/server';
 import { isAdmin } from '@/services/auth/utils';
 
 type GetTalksWithSpeakersProps = {
+  cursor?: string;
   limit?: number;
   status?: StatusType;
 };
 
 /**
- * Get talks with speakers. Returns all talks matching the status filter.
- * Client-side filtering should be used for speaker, topic, featured, and search.
+ * Get talks with speakers with pagination support.
  *
  * For security: Non-admin users will only see published talks (enforced here).
  *
  * @param status - Filter by status (defaults to 'published')
- * @param limit - Maximum number of talks to return (defaults to 1000)
+ * @param cursor - Pagination cursor
+ * @param limit - Maximum number of talks to return (defaults to 50)
  */
 export async function getTalksWithSpeakers(args?: GetTalksWithSpeakersProps) {
-  const { limit, status } = args ?? {};
+  const { cursor, limit = 50, status } = args ?? {};
 
   const token = await getAuthToken();
   const user = await getCurrentUser();
 
   const effectiveStatus = isAdmin(user) ? status : 'published';
 
-  const talks = await fetchQuery(
+  const result = await fetchQuery(
     api.talks.listTalksWithSpeakers,
     {
-      limit,
+      paginationOpts: {
+        cursor: cursor || null,
+        numItems: limit,
+      },
       status: effectiveStatus,
     },
     { token },
   );
 
-  return talks;
+  return {
+    continueCursor: result.continueCursor,
+    isDone: result.isDone,
+    talks: result.page,
+  };
 }
