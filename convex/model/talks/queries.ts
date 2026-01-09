@@ -7,6 +7,7 @@ import { asyncMap } from 'convex-helpers';
 import { getManyFrom, getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
 
 import { query } from '../../_generated/server';
+import { shuffleAndLimit } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
 import { canViewContent } from '../auth/roles';
@@ -143,10 +144,7 @@ export const listFeaturedTalks = query({
       .withIndex('by_featured_and_status', (q) => q.eq('featured', true).eq('status', 'published'))
       .take(50);
 
-    // Shuffle and return limited number
-    const shuffled = talks.sort(() => Math.random() - 0.5);
-
-    return shuffled.slice(0, limit);
+    return shuffleAndLimit(talks, limit);
   },
   returns: docs('talks'),
 });
@@ -168,9 +166,7 @@ export const listFeaturedTalksWithSpeakers = query({
       .withIndex('by_featured_and_status', (q) => q.eq('featured', true).eq('status', 'published'))
       .take(50);
 
-    // Shuffle and return limited number
-    const shuffled = talks.sort(() => Math.random() - 0.5);
-    const page = shuffled.slice(0, limit);
+    const page = shuffleAndLimit(talks, limit);
 
     const enrichedPage = await asyncMap(page, async (talk: Doc<'talks'>) => {
       const speaker = await ctx.db.get('speakers', talk.speakerId);
@@ -206,10 +202,7 @@ export const listRandomTalksBySpeaker = query({
       ? talks.filter((talk) => talk._id !== excludeTalkId)
       : talks;
 
-    // Shuffle and return limited number
-    const shuffled = filteredTalks.sort(() => Math.random() - 0.5);
-
-    return shuffled.slice(0, limit);
+    return shuffleAndLimit(filteredTalks, limit);
   },
   returns: docs('talks'),
 });
