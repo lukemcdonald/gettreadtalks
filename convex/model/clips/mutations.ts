@@ -3,8 +3,8 @@ import type { Doc } from '../../_generated/dataModel';
 import { v } from 'convex/values';
 
 import { mutation } from '../../_generated/server';
-import { throwNotFound, throwValidationError } from '../../lib/errors';
-import { generateSlug, slugify } from '../../lib/utils';
+import { throwValidationError } from '../../lib/errors';
+import { generateSlug, getOrThrow, getPublishedAtForStatus, slugify } from '../../lib/utils';
 import { requireAuth } from '../auth/utils';
 import { statusType } from './validators';
 /**
@@ -17,11 +17,7 @@ export const archiveClip = mutation({
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
-    const clip = await ctx.db.get('clips', args.id);
-
-    if (!clip) {
-      throwNotFound('Clip not found', { resource: 'clip', resourceId: args.id });
-    }
+    await getOrThrow(ctx, 'clips', args.id);
 
     // Soft delete by setting status to archived
     await ctx.db.patch(args.id, {
@@ -58,7 +54,7 @@ export const createClip = mutation({
     const slug = await generateSlug(ctx, 'clips', args.title);
 
     const status = args.status ?? 'backlog';
-    const publishedAt = status === 'published' ? Date.now() : undefined;
+    const publishedAt = getPublishedAtForStatus(status);
 
     return await ctx.db.insert('clips', {
       ...args,
@@ -88,11 +84,7 @@ export const updateClip = mutation({
 
     const { id, ...rest } = args;
     const updates: Partial<Doc<'clips'>> = rest;
-    const clip = await ctx.db.get('clips', id);
-
-    if (!clip) {
-      throwNotFound('Clip not found', { resource: 'clip', resourceId: id });
-    }
+    const clip = await getOrThrow(ctx, 'clips', id);
 
     // If title changed, update slug
     if (updates.title !== undefined) {
@@ -110,11 +102,7 @@ export const updateClip = mutation({
 
     // Handle status changes
     if (updates.status) {
-      if (updates.status === 'published' && !clip.publishedAt) {
-        updates.publishedAt = Date.now();
-      } else if (updates.status !== 'published') {
-        updates.publishedAt = undefined;
-      }
+      updates.publishedAt = getPublishedAtForStatus(updates.status, clip.publishedAt);
     }
 
     updates.updatedAt = Date.now();
@@ -137,21 +125,12 @@ export const updateClipStatus = mutation({
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
-    const clip: Doc<'clips'> | null = await ctx.db.get('clips', args.id);
-
-    if (!clip) {
-      throwNotFound('Clip not found', { resource: 'clip', resourceId: args.id });
-    }
+    const clip = await getOrThrow(ctx, 'clips', args.id);
 
     const updates: Partial<Doc<'clips'>> = {
+      publishedAt: getPublishedAtForStatus(args.status, clip.publishedAt),
       status: args.status,
     };
-
-    if (args.status === 'published' && !clip.publishedAt) {
-      updates.publishedAt = Date.now();
-    } else if (args.status !== 'published') {
-      updates.publishedAt = undefined;
-    }
 
     updates.updatedAt = Date.now();
 
