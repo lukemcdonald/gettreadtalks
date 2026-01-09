@@ -4,8 +4,8 @@ import type { Collection, CollectionId } from '@/features/collections/types';
 import type { Speaker, SpeakerId } from '@/features/speakers/types';
 import type { Talk, TalkStatus } from '@/features/talks/types';
 
-import { TalkForm } from '@/app/talks/new/_components/talk-form';
 import { ContentActionsGroup } from '@/components/actions-group';
+import { TalkForm } from '@/features/talks/components';
 import { useArchiveTalk, useDestroyTalk } from '@/features/talks/hooks';
 
 type EditTalkContentProps = {

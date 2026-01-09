@@ -7,10 +7,10 @@ import type { User } from '@/services/auth/types';
 
 import Link from 'next/link';
 
-import { FavoriteTalkButton } from '@/app/talks/[speaker]/[talk]/_components/favorite-talk-button';
 import { SidebarContent } from '@/components/sidebar-content';
 import { Button } from '@/components/ui';
 import { getTalkUrl } from '@/features/talks/utils';
+import { FavoriteTalkButton } from '@/features/users/components';
 import { isAdmin } from '@/services/auth/utils';
 
 type TalkSidebarProps = {
