@@ -15,7 +15,7 @@ type GetClipsWithSpeakersProps = {
 
 /**
  * Get clips with speakers for list page.
- * - General users can only see published clips.
+ * - General users can only see published clips with published parent talks.
  * - Admin users can filter by status via the status parameter.
  */
 export async function getClipsWithSpeakers(args?: GetClipsWithSpeakersProps) {
@@ -29,7 +29,9 @@ export async function getClipsWithSpeakers(args?: GetClipsWithSpeakersProps) {
     status: isAdmin(user) ? status : 'published',
   };
 
-  const result = await fetchQuery(api.clips.listClipsWithSpeakers, fetchArgs, { token });
+  const result = await fetchQuery(api.clips.listClipsWithSpeakersAndPublishedTalks, fetchArgs, {
+    token,
+  });
 
   return {
     clips: result.page,
