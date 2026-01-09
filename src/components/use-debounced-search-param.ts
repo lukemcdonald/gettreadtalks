@@ -24,6 +24,14 @@ export function useDebouncedSearchParam(paramName: string, delay = 300) {
   const [_isPending, startTransition] = useTransition();
   const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
+  const pathnameRef = useRef(pathname);
+  const searchParamsRef = useRef(searchParams);
+  const routerRef = useRef(router);
+
+  pathnameRef.current = pathname;
+  searchParamsRef.current = searchParams;
+  routerRef.current = router;
+
   const urlValue = searchParams.get(paramName) ?? '';
   const [localValue, setLocalValue] = useState(urlValue);
 
@@ -41,7 +49,7 @@ export function useDebouncedSearchParam(paramName: string, delay = 300) {
     }
 
     timeoutRef.current = setTimeout(() => {
-      const params = new URLSearchParams(searchParams.toString());
+      const params = new URLSearchParams(searchParamsRef.current.toString());
 
       if (localValue.trim()) {
         params.set(paramName, localValue.trim());
@@ -53,7 +61,9 @@ export function useDebouncedSearchParam(paramName: string, delay = 300) {
 
       startTransition(() => {
         const query = params.toString();
-        router.push(query ? `${pathname}?${query}` : pathname, { scroll: false });
+        routerRef.current.push(query ? `${pathnameRef.current}?${query}` : pathnameRef.current, {
+          scroll: false,
+        });
       });
     }, delay);
 
@@ -62,7 +72,7 @@ export function useDebouncedSearchParam(paramName: string, delay = 300) {
         clearTimeout(timeoutRef.current);
       }
     };
-  }, [localValue, urlValue, pathname, paramName, router, searchParams, delay]);
+  }, [localValue, urlValue, delay, paramName]);
 
   return [localValue, setLocalValue] as const;
 }
