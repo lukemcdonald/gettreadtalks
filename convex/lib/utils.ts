@@ -1,5 +1,6 @@
 import type { Doc, Id, TableNames } from '../_generated/dataModel';
 import type { MutationCtx, QueryCtx } from '../_generated/server';
+import type { StatusType } from './validators/shared';
 
 import { getOneFrom } from 'convex-helpers/server/relationships';
 
@@ -155,4 +156,18 @@ export async function getOrThrow<T extends TableNames>(
   }
 
   return entity;
+}
+
+/**
+ * Calculates publishedAt timestamp based on status change.
+ * Returns existing timestamp if already published, Date.now() if transitioning to published, or undefined for other statuses.
+ */
+export function getPublishedAtForStatus(
+  newStatus: StatusType,
+  currentPublishedAt?: number,
+): number | undefined {
+  if (newStatus === 'published') {
+    return currentPublishedAt ?? Date.now();
+  }
+  return;
 }

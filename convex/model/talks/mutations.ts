@@ -5,7 +5,12 @@ import { getManyFrom } from 'convex-helpers/server/relationships';
 
 import { mutation } from '../../_generated/server';
 import { throwDuplicateSlug, throwValidationError } from '../../lib/errors';
-import { getOrThrow, slugify, talkSlugExistsForSpeaker } from '../../lib/utils';
+import {
+  getOrThrow,
+  getPublishedAtForStatus,
+  slugify,
+  talkSlugExistsForSpeaker,
+} from '../../lib/utils';
 import { requireAuth } from '../auth/utils';
 import { statusType } from './validators';
 
@@ -64,7 +69,7 @@ export const createTalk = mutation({
     }
 
     const status = args.status || 'backlog';
-    const publishedAt = status === 'published' ? Date.now() : undefined;
+    const publishedAt = getPublishedAtForStatus(status);
 
     return await ctx.db.insert('talks', {
       ...args,
@@ -120,11 +125,7 @@ export const updateTalk = mutation({
     }
 
     if (updates.status) {
-      if (updates.status === 'published' && !talk.publishedAt) {
-        updates.publishedAt = Date.now();
-      } else if (updates.status !== 'published') {
-        updates.publishedAt = undefined;
-      }
+      updates.publishedAt = getPublishedAtForStatus(updates.status, talk.publishedAt);
     }
 
     updates.updatedAt = Date.now();
@@ -150,14 +151,9 @@ export const updateTalkStatus = mutation({
     const talk = await getOrThrow(ctx, 'talks', args.id);
 
     const updates: Partial<Doc<'talks'>> = {
+      publishedAt: getPublishedAtForStatus(args.status, talk.publishedAt),
       status: args.status,
     };
-
-    if (args.status === 'published' && !talk.publishedAt) {
-      updates.publishedAt = Date.now();
-    } else if (args.status !== 'published') {
-      updates.publishedAt = undefined;
-    }
 
     updates.updatedAt = Date.now();
 
