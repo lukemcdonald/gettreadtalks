@@ -457,7 +457,7 @@ export const listTalksBySpeaker = query({
  * For admin pages: Pass appropriate status or omit for default 'published'
  *
  * @param status - Filter by status (defaults to 'published')
- * @param limit - Maximum number of talks to return (defaults to 1000)
+ * @param limit - Maximum number of talks to return (defaults to 50)
  */
 export const listTalksWithSpeakers = query({
   args: {
@@ -465,7 +465,7 @@ export const listTalksWithSpeakers = query({
     status: v.optional(statusType),
   },
   handler: async (ctx, args) => {
-    const { limit = 1000, status = 'published' } = args;
+    const { limit = 50, status = 'published' } = args;
 
     const talks = await ctx.db
       .query('talks')
