@@ -6,6 +6,7 @@ import { getManyFrom } from 'convex-helpers/server/relationships';
 import { mutation } from '../../_generated/server';
 import { throwDuplicateSlug, throwValidationError } from '../../lib/errors';
 import {
+  deleteAll,
   getOrThrow,
   getPublishedAtForStatus,
   slugify,
@@ -181,25 +182,19 @@ export const destroyTalk = mutation({
       .withIndex('by_talkId', (q) => q.eq('talkId', args.id))
       .collect();
 
-    for (const relation of talksOnTopics) {
-      await ctx.db.delete(relation._id);
-    }
+    await deleteAll(ctx, talksOnTopics);
 
     // No by_talkId index, so collect and filter client-side
     const allFavorites = await ctx.db.query('userFavoriteTalks').collect();
     const favorites = allFavorites.filter((f) => f.talkId === args.id);
 
-    for (const favorite of favorites) {
-      await ctx.db.delete(favorite._id);
-    }
+    await deleteAll(ctx, favorites);
 
     // No by_talkId index, so collect and filter client-side
     const allFinished = await ctx.db.query('userFinishedTalks').collect();
     const finished = allFinished.filter((f) => f.talkId === args.id);
 
-    for (const record of finished) {
-      await ctx.db.delete(record._id);
-    }
+    await deleteAll(ctx, finished);
 
     // Clips remain intact - talkId is optional and nullability is intentional
 

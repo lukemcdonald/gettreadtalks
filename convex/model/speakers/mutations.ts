@@ -5,7 +5,7 @@ import { getManyFrom, getOneFrom } from 'convex-helpers/server/relationships';
 
 import { mutation } from '../../_generated/server';
 import { throwDuplicateSlug, throwValidationError } from '../../lib/errors';
-import { getOrThrow, slugExists, slugify } from '../../lib/utils';
+import { deleteAll, getOrThrow, slugExists, slugify } from '../../lib/utils';
 import { requireAuth } from '../auth/utils';
 
 /**
@@ -80,9 +80,7 @@ export const destroySpeaker = mutation({
     // Clean up user favorites before deleting speaker
     const favorites = await getManyFrom(ctx.db, 'userFavoriteSpeakers', 'by_speakerId', args.id);
 
-    for (const favorite of favorites) {
-      await ctx.db.delete(favorite._id);
-    }
+    await deleteAll(ctx, favorites);
 
     await ctx.db.delete(args.id);
 
