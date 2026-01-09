@@ -37,11 +37,15 @@ export function TopicSelector({ className, currentSlug, label, topics }: TopicSe
   };
 
   const sortedTopics = [...topics].sort((a, b) => a.title.localeCompare(b.title));
+  const items = sortedTopics.map((topic) => ({
+    label: topic.title,
+    value: topic.slug,
+  }));
 
   return (
     <div className={cn('space-y-2', className)}>
       {!!label && <Label htmlFor="topic-selector">{label}</Label>}
-      <Select defaultValue={currentSlug} onValueChange={handleChange}>
+      <Select defaultValue={currentSlug} items={items} onValueChange={handleChange}>
         <SelectTrigger id="topic-selector">
           <SelectValue />
         </SelectTrigger>

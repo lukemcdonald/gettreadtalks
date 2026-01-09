@@ -5,19 +5,19 @@ import { Pagination } from '@/app/talks/_components/pagination';
 import { TalksList } from '@/features/talks/components';
 
 type TalkWithSpeaker = Talk & { speaker: Speaker | null };
-type TalksContentProps = {
+type TopicContentProps = {
   continueCursor: string;
   hasNextPage: boolean;
   hasPrevPage: boolean;
   talks: TalkWithSpeaker[];
 };
 
-export function TalksContent({
+export function TopicContent({
   continueCursor,
   hasNextPage,
   hasPrevPage,
   talks,
-}: TalksContentProps) {
+}: TopicContentProps) {
   return (
     <>
       <TalksList talks={talks} />

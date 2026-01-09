@@ -1,5 +1,6 @@
 import type { Doc } from '../../_generated/dataModel';
 
+import { paginationOptsValidator, paginationResultValidator } from 'convex/server';
 import { v } from 'convex/values';
 import { asyncMap } from 'convex-helpers';
 import { getManyFrom, getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
@@ -65,16 +66,16 @@ export const getTopicWithContent = query({
 });
 
 /**
- * Get topic by slug with related data (default for detail pages).
+ * Get topic by slug with related data and pagination support.
  * Returns topic with related talks (each with speaker) and clips.
  */
 export const getTopicBySlug = query({
   args: {
-    limit: v.optional(v.number()),
+    paginationOpts: paginationOptsValidator,
     slug: v.string(),
   },
   handler: async (ctx, args) => {
-    const { limit = 50, slug } = args;
+    const { paginationOpts, slug } = args;
 
     const topic = await getOneFrom(ctx.db, 'topics', 'by_slug', slug);
 
@@ -82,35 +83,45 @@ export const getTopicBySlug = query({
       return null;
     }
 
-    const [allClips, allTalks] = await Promise.all([
-      getManyVia(ctx.db, 'clipsOnTopics', 'clipId', 'by_topicId', topic._id, 'topicId'),
-      getManyVia(ctx.db, 'talksOnTopics', 'talkId', 'by_topicId', topic._id, 'topicId'),
-    ]);
+    const allTalks = await getManyVia(
+      ctx.db,
+      'talksOnTopics',
+      'talkId',
+      'by_topicId',
+      topic._id,
+      'topicId',
+    );
 
-    const clips = allClips
-      .filter((clip): clip is Doc<'clips'> => clip !== null && clip.status === 'published')
-      .slice(0, limit);
+    const publishedTalks = allTalks.filter(
+      (talk): talk is Doc<'talks'> => talk !== null && talk.status === 'published',
+    );
 
-    const publishedTalks = allTalks
-      .filter((talk): talk is Doc<'talks'> => talk !== null && talk.status === 'published')
-      .slice(0, limit);
+    // Manual pagination
+    const startIndex = paginationOpts.cursor ? Number.parseInt(paginationOpts.cursor, 10) : 0;
+    const endIndex = startIndex + paginationOpts.numItems;
+    const page = publishedTalks.slice(startIndex, endIndex);
+    const hasMore = endIndex < publishedTalks.length;
 
-    const talksWithSpeakers = await asyncMap(publishedTalks, async (talk: Doc<'talks'>) => {
+    const talksWithSpeakers = await asyncMap(page, async (talk: Doc<'talks'>) => {
       const speaker = await ctx.db.get('speakers', talk.speakerId);
       return { ...talk, speaker };
     });
 
     return {
-      clips,
-      talks: talksWithSpeakers,
+      continueCursor: hasMore ? endIndex.toString() : '',
+      isDone: !hasMore,
+      page: talksWithSpeakers,
       topic,
+      totalTalks: publishedTalks.length,
     };
   },
   returns: v.nullable(
     v.object({
-      clips: docs('clips'),
-      talks: v.array(talkWithSpeakerValidator),
+      continueCursor: v.string(),
+      isDone: v.boolean(),
+      page: v.array(talkWithSpeakerValidator),
       topic: doc('topics'),
+      totalTalks: v.number(),
     }),
   ),
 });
