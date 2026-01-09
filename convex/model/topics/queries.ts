@@ -9,6 +9,7 @@ import { query } from '../../_generated/server';
 import { paginateArray } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
+import { enrichWithSpeakers } from '../talks/utils';
 
 /**
  * Get topic by ID.
@@ -103,10 +104,7 @@ export const getTopicBySlug = query({
       paginationOpts.numItems,
     );
 
-    const talksWithSpeakers = await asyncMap(page, async (talk: Doc<'talks'>) => {
-      const speaker = await ctx.db.get('speakers', talk.speakerId);
-      return { ...talk, speaker };
-    });
+    const talksWithSpeakers = await enrichWithSpeakers(ctx, page);
 
     return {
       continueCursor,

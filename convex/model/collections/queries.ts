@@ -8,6 +8,7 @@ import { getAll, getOneFrom } from 'convex-helpers/server/relationships';
 import { query } from '../../_generated/server';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
+import { enrichWithSpeakers } from '../talks/utils';
 
 const collectionPageValidator = paginationResultValidator(doc('collections'));
 
@@ -89,10 +90,7 @@ export const getCollectionBySlug = query({
 
     talks.sort((a, b) => (a.collectionOrder || 0) - (b.collectionOrder || 0));
 
-    const talksWithSpeakers = await asyncMap(talks, async (talk: Doc<'talks'>) => {
-      const speaker = await ctx.db.get('speakers', talk.speakerId);
-      return { ...talk, speaker };
-    });
+    const talksWithSpeakers = await enrichWithSpeakers(ctx, talks);
 
     return {
       collection,

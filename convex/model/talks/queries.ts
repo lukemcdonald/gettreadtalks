@@ -162,12 +162,7 @@ export const listFeaturedTalksWithSpeakers = query({
 
     const page = shuffleAndLimit(talks, limit);
 
-    const enrichedPage = await asyncMap(page, async (talk: Doc<'talks'>) => {
-      const speaker = await ctx.db.get('speakers', talk.speakerId);
-      return { ...talk, speaker };
-    });
-
-    return enrichedPage;
+    return await enrichWithSpeakers(ctx, page);
   },
   returns: v.array(talkWithSpeakerValidator),
 });
