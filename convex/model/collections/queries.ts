@@ -211,6 +211,11 @@ export const listCollectionsWithStats = query({
         )
         .collect();
 
+      // Filter out collections without published talks
+      if (talks.length === 0) {
+        return null;
+      }
+
       // Get unique speaker IDs
       const speakerIds = [...new Set(talks.map((talk) => talk.speakerId))];
 
@@ -227,7 +232,7 @@ export const listCollectionsWithStats = query({
 
     return {
       ...result,
-      page: enrichedPage,
+      page: enrichedPage.filter((item) => item !== null),
     };
   },
   returns: v.any(), // PaginationResult with enriched page: Array<{ collection, speakers, talkCount }>
