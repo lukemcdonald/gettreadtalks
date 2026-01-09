@@ -127,7 +127,8 @@ export const getTopicBySlug = query({
 });
 
 /**
- * List topics.
+ * List topics that have at least one published talk.
+ * Returns topics sorted alphabetically by title.
  */
 export const listTopics = query({
   args: {
@@ -136,13 +137,30 @@ export const listTopics = query({
   handler: async (ctx, args) => {
     const { limit = 100 } = args;
 
-    return await ctx.db.query('topics').withIndex('by_title').take(limit);
+    const allTopics = await ctx.db.query('topics').withIndex('by_title').take(limit);
+
+    const topicsWithTalks = await asyncMap(allTopics, async (topic) => {
+      const talksOnTopics = await getManyFrom(ctx.db, 'talksOnTopics', 'by_topicId', topic._id);
+      const talks = await Promise.all(
+        talksOnTopics.map((entry) => ctx.db.get('talks', entry.talkId)),
+      );
+
+      const publishedTalks = talks.filter(
+        (talk): talk is Doc<'talks'> => talk !== null && talk.status === 'published',
+      );
+
+      return publishedTalks.length > 0 ? topic : null;
+    });
+
+    return topicsWithTalks.filter((topic): topic is Doc<'topics'> => topic !== null);
   },
   returns: docs('topics'),
 });
 
 /**
- * List topics with talk counts.
+ * List topics with their published talk counts.
+ * Only returns topics that have at least one published talk.
+ * Returns topics sorted alphabetically by title.
  */
 export const listTopicsWithCount = query({
   args: {
@@ -154,15 +172,24 @@ export const listTopicsWithCount = query({
     const topics = await ctx.db.query('topics').withIndex('by_title').take(limit);
 
     const topicsWithCounts = await asyncMap(topics, async (topic) => {
-      const talkTopics = await getManyFrom(ctx.db, 'talksOnTopics', 'by_topicId', topic._id);
+      const talksOnTopics = await getManyFrom(ctx.db, 'talksOnTopics', 'by_topicId', topic._id);
+      const talks = await Promise.all(
+        talksOnTopics.map((entry) => ctx.db.get('talks', entry.talkId)),
+      );
+
+      const publishedTalks = talks.filter(
+        (talk): talk is Doc<'talks'> => talk !== null && talk.status === 'published',
+      );
 
       return {
-        count: talkTopics.length,
+        count: publishedTalks.length,
         topic,
       };
     });
 
-    return topicsWithCounts.sort((a, b) => b.count - a.count);
+    const topicsWithTalks = topicsWithCounts.filter((item) => item.count > 0);
+
+    return topicsWithTalks.sort((a, b) => a.topic.title.localeCompare(b.topic.title));
   },
   returns: v.array(
     v.object({
