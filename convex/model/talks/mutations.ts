@@ -184,15 +184,17 @@ export const destroyTalk = mutation({
 
     await deleteAll(ctx, talksOnTopics);
 
-    // No by_talkId index, so collect and filter client-side
-    const allFavorites = await ctx.db.query('userFavoriteTalks').collect();
-    const favorites = allFavorites.filter((f) => f.talkId === args.id);
+    const favorites = await ctx.db
+      .query('userFavoriteTalks')
+      .withIndex('by_talkId', (q) => q.eq('talkId', args.id))
+      .collect();
 
     await deleteAll(ctx, favorites);
 
-    // No by_talkId index, so collect and filter client-side
-    const allFinished = await ctx.db.query('userFinishedTalks').collect();
-    const finished = allFinished.filter((f) => f.talkId === args.id);
+    const finished = await ctx.db
+      .query('userFinishedTalks')
+      .withIndex('by_talkId', (q) => q.eq('talkId', args.id))
+      .collect();
 
     await deleteAll(ctx, finished);
 
