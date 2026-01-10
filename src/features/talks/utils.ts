@@ -14,12 +14,12 @@ export function getTalkUrl(speakerSlug: string, talkSlug: string): string {
 /**
  * Get submit button label based on form operation status.
  */
-export function getSubmitButtonLabel(status: FormStatus, talkId?: string): string {
-  if (status === 'creating') {
+export function getSubmitButtonLabel(formStatus: FormStatus, talkId?: string): string {
+  if (formStatus === 'creating') {
     return 'Creating...';
   }
 
-  if (status === 'updating') {
+  if (formStatus === 'updating') {
     return 'Updating...';
   }
 
@@ -33,14 +33,18 @@ export function getSubmitButtonLabel(status: FormStatus, talkId?: string): strin
 /**
  * Get archive button label based on form operation status and talk status.
  */
-export function getArchiveButtonLabel(status: FormStatus, talkStatus: StatusType): string {
-  if (status === 'archiving') {
+export function getArchiveButtonLabel(formStatus: FormStatus, talkStatus: StatusType): string {
+  if (formStatus === 'archiving') {
     return 'Archiving...';
   }
 
-  if (status === 'unarchiving') {
+  if (formStatus === 'unarchiving') {
     return 'Unarchiving...';
   }
 
-  return talkStatus === 'archived' ? 'Unarchive Talk' : 'Archive Talk';
+  if (talkStatus === 'archived') {
+    return 'Unarchive Talk';
+  }
+
+  return 'Archive Talk';
 }

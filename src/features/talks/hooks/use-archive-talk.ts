@@ -1,16 +1,10 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import type { UseMutationOptions } from '@/hooks/use-mutation';
 
 import { api } from '@/convex/_generated/api';
 import { useMutation } from '@/hooks';
 
-export function useArchiveTalk() {
-  const router = useRouter();
-
-  return useMutation(api.talks.archiveTalk, {
-    onSuccess: () => {
-      router.push('/talks');
-    },
-  });
+export function useArchiveTalk(options?: UseMutationOptions) {
+  return useMutation(api.talks.archiveTalk, options);
 }
