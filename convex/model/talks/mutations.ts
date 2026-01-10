@@ -20,17 +20,19 @@ import { statusType } from './validators';
  */
 export const archiveTalk = mutation({
   args: {
-    id: v.id('talks'),
+    talkId: v.id('talks'),
   },
   handler: async (ctx, args) => {
+    const { talkId } = args;
+
     await requireAuth(ctx);
 
-    const talk = await getOrThrow(ctx, 'talks', args.id);
+    const talk = await getOrThrow(ctx, 'talks', talkId);
 
     const isArchived = talk.status === 'archived';
     const newStatus = isArchived ? 'backlog' : 'archived';
 
-    await ctx.db.patch(args.id, {
+    await ctx.db.patch(talkId, {
       publishedAt: isArchived ? undefined : talk.publishedAt,
       status: newStatus,
       updatedAt: Date.now(),
@@ -91,19 +93,20 @@ export const updateTalk = mutation({
     collectionOrder: v.optional(v.number()),
     description: v.optional(v.string()),
     featured: v.optional(v.boolean()),
-    id: v.id('talks'),
     mediaUrl: v.optional(v.string()),
     scripture: v.optional(v.string()),
     speakerId: v.optional(v.id('speakers')),
     status: v.optional(statusType),
+    talkId: v.id('talks'),
     title: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    const { talkId, ...rest } = args;
+
     await requireAuth(ctx);
 
-    const { id, ...rest } = args;
     const updates: Partial<Doc<'talks'>> = rest;
-    const talk = await getOrThrow(ctx, 'talks', id);
+    const talk = await getOrThrow(ctx, 'talks', talkId);
 
     // Regenerate slug if title changed to ensure URL consistency
     if (updates.title !== undefined) {
@@ -115,7 +118,7 @@ export const updateTalk = mutation({
 
       if (newSlug !== talk.slug) {
         const speakerIdToCheck = updates.speakerId || talk.speakerId;
-        const slugExists = await talkSlugExistsForSpeaker(ctx, speakerIdToCheck, newSlug, id);
+        const slugExists = await talkSlugExistsForSpeaker(ctx, speakerIdToCheck, newSlug, talkId);
 
         if (slugExists) {
           throwDuplicateSlug('Talk with this title already exists for this speaker', 'title');
@@ -131,9 +134,9 @@ export const updateTalk = mutation({
 
     updates.updatedAt = Date.now();
 
-    await ctx.db.patch(id, updates);
+    await ctx.db.patch(talkId, updates);
 
-    return id;
+    return talkId;
   },
   returns: v.id('talks'),
 });
@@ -143,13 +146,15 @@ export const updateTalk = mutation({
  */
 export const updateTalkStatus = mutation({
   args: {
-    id: v.id('talks'),
+    talkId: v.id('talks'),
     status: statusType,
   },
   handler: async (ctx, args) => {
+    const { talkId } = args;
+
     await requireAuth(ctx);
 
-    const talk = await getOrThrow(ctx, 'talks', args.id);
+    const talk = await getOrThrow(ctx, 'talks', talkId);
 
     const updates: Partial<Doc<'talks'>> = {
       publishedAt: getPublishedAtForStatus(args.status, talk.publishedAt),
@@ -158,9 +163,9 @@ export const updateTalkStatus = mutation({
 
     updates.updatedAt = Date.now();
 
-    await ctx.db.patch(args.id, updates);
+    await ctx.db.patch(talkId, updates);
 
-    return args.id;
+    return talkId;
   },
   returns: v.id('talks'),
 });
@@ -170,37 +175,39 @@ export const updateTalkStatus = mutation({
  */
 export const destroyTalk = mutation({
   args: {
-    id: v.id('talks'),
+    talkId: v.id('talks'),
   },
   handler: async (ctx, args) => {
+    const { talkId } = args;
+
     await requireAuth(ctx);
 
-    const talk = await getOrThrow(ctx, 'talks', args.id);
+    const talk = await getOrThrow(ctx, 'talks', talkId);
 
     const talksOnTopics = await ctx.db
       .query('talksOnTopics')
-      .withIndex('by_talkId', (q) => q.eq('talkId', args.id))
+      .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
       .collect();
 
     await deleteAll(ctx, talksOnTopics);
 
     const favorites = await ctx.db
       .query('userFavoriteTalks')
-      .withIndex('by_talkId', (q) => q.eq('talkId', args.id))
+      .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
       .collect();
 
     await deleteAll(ctx, favorites);
 
     const finished = await ctx.db
       .query('userFinishedTalks')
-      .withIndex('by_talkId', (q) => q.eq('talkId', args.id))
+      .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
       .collect();
 
     await deleteAll(ctx, finished);
 
     // Clips remain intact - talkId is optional and nullability is intentional
 
-    await ctx.db.delete(args.id);
+    await ctx.db.delete(talkId);
 
     return null;
   },

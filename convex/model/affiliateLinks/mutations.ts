@@ -45,19 +45,23 @@ export const createAffiliateLink = mutation({
  */
 export const destroyAffiliateLink = mutation({
   args: {
-    id: v.id('affiliateLinks'),
+    affiliateLinkId: v.id('affiliateLinks'),
   },
   handler: async (ctx, args) => {
+    const { affiliateLinkId } = args;
+
     await requireAuth(ctx);
 
-    const affiliateLink = await ctx.db.get('affiliateLinks', args.id);
+    const affiliateLink = await ctx.db.get('affiliateLinks', affiliateLinkId);
 
     if (!affiliateLink) {
-      throwNotFound('Affiliate link not found', { resource: 'affiliateLink', resourceId: args.id });
+      throwNotFound('Affiliate link not found', {
+        resource: 'affiliateLink',
+        resourceId: affiliateLinkId,
+      });
     }
 
-    // Hard delete the affiliate link
-    await ctx.db.delete(args.id);
+    await ctx.db.delete(affiliateLinkId);
 
     return null;
   },
@@ -70,23 +74,27 @@ export const destroyAffiliateLink = mutation({
 export const updateAffiliateLink = mutation({
   args: {
     affiliate: v.optional(v.string()),
+    affiliateLinkId: v.id('affiliateLinks'),
     description: v.optional(v.string()),
     featured: v.optional(v.boolean()),
-    id: v.id('affiliateLinks'),
     title: v.optional(v.string()),
     type: v.optional(affiliateLinkTypes),
     url: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    const { affiliateLinkId, ...rest } = args;
+
     await requireAuth(ctx);
 
-    const { id, ...rest } = args;
     const updates: Partial<Doc<'affiliateLinks'>> = rest;
 
-    const affiliateLink = await ctx.db.get('affiliateLinks', id);
+    const affiliateLink = await ctx.db.get('affiliateLinks', affiliateLinkId);
 
     if (!affiliateLink) {
-      throwNotFound('Affiliate link not found', { resource: 'affiliateLink', resourceId: id });
+      throwNotFound('Affiliate link not found', {
+        resource: 'affiliateLink',
+        resourceId: affiliateLinkId,
+      });
     }
 
     // If title changed, update slug
@@ -99,7 +107,7 @@ export const updateAffiliateLink = mutation({
       const newSlug = slugify(updates.title);
 
       if (newSlug !== affiliateLink.slug) {
-        if (await slugExists(ctx, 'affiliateLinks', newSlug, id)) {
+        if (await slugExists(ctx, 'affiliateLinks', newSlug, affiliateLinkId)) {
           throwDuplicateSlug('Affiliate link with this title already exists', 'title');
         }
 
@@ -109,9 +117,9 @@ export const updateAffiliateLink = mutation({
 
     updates.updatedAt = Date.now();
 
-    await ctx.db.patch(id, updates);
+    await ctx.db.patch(affiliateLinkId, updates);
 
-    return id;
+    return affiliateLinkId;
   },
   returns: v.id('affiliateLinks'),
 });

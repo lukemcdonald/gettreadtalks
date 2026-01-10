@@ -43,13 +43,14 @@ export const getClipBySlug = query({
       return null;
     }
 
+    const clipId = clip._id;
     const speakerId = clip.speakerId;
     const talkId = clip.talkId;
 
     const queries = {
       speaker: speakerId ? ctx.db.get('speakers', speakerId) : null,
       talk: talkId ? ctx.db.get('talks', talkId) : null,
-      topics: getManyVia(ctx.db, 'clipsOnTopics', 'topicId', 'by_clipId', clip._id, 'clipId'),
+      topics: getManyVia(ctx.db, 'clipsOnTopics', 'topicId', 'by_clipId', clipId, 'clipId'),
     };
 
     const [speaker, talk, topics] = await Promise.all([
@@ -116,28 +117,29 @@ export const listClipsWithSpeakers = query({
   handler: async (ctx, args) => {
     const { paginationOpts, status = 'published' } = args;
 
-    let result: PaginationResult<Doc<'clips'>>;
+    let clipPages: PaginationResult<Doc<'clips'>>;
 
     if (status) {
       // TODO: Can we build this query and do a single return await result?
-      result = await ctx.db
+      clipPages = await ctx.db
         .query('clips')
         .withIndex('by_status_and_publishedAt', (q) => q.eq('status', status))
         .order('desc')
         .paginate(paginationOpts);
     } else {
-      result = await ctx.db.query('clips').order('desc').paginate(paginationOpts);
+      clipPages = await ctx.db.query('clips').order('desc').paginate(paginationOpts);
     }
 
-    const filtered = await filterClipsByPublishedTalks(ctx, result.page);
+    const filtered = await filterClipsByPublishedTalks(ctx, clipPages.page);
 
     const enrichedPage = await asyncMap(filtered, async (clip) => {
-      const speaker = clip.speakerId ? await ctx.db.get('speakers', clip.speakerId) : null;
+      const speakerId = clip.speakerId;
+      const speaker = speakerId ? await ctx.db.get('speakers', speakerId) : null;
       return { ...clip, speaker };
     });
 
     return {
-      ...result,
+      ...clipPages,
       page: enrichedPage,
     };
   },
@@ -179,28 +181,29 @@ export const listClipsWithSpeakersAdmin = query({
   handler: async (ctx, args) => {
     const { paginationOpts, status } = args;
 
-    let result: PaginationResult<Doc<'clips'>>;
+    let clipPages: PaginationResult<Doc<'clips'>>;
 
     // Simplify: !status || status === 'all'. Maybe build query with single await
     if (status === 'all') {
-      result = await ctx.db.query('clips').order('desc').paginate(paginationOpts);
+      clipPages = await ctx.db.query('clips').order('desc').paginate(paginationOpts);
     } else if (status) {
-      result = await ctx.db
+      clipPages = await ctx.db
         .query('clips')
         .withIndex('by_status_and_publishedAt', (q) => q.eq('status', status))
         .order('desc')
         .paginate(paginationOpts);
     } else {
-      result = await ctx.db.query('clips').order('desc').paginate(paginationOpts);
+      clipPages = await ctx.db.query('clips').order('desc').paginate(paginationOpts);
     }
 
-    const enrichedPage = await asyncMap(result.page, async (clip) => {
-      const speaker = clip.speakerId ? await ctx.db.get('speakers', clip.speakerId) : null;
+    const enrichedPage = await asyncMap(clipPages.page, async (clip) => {
+      const speakerId = clip.speakerId;
+      const speaker = speakerId ? await ctx.db.get('speakers', speakerId) : null;
       return { ...clip, speaker };
     });
 
     return {
-      ...result,
+      ...clipPages,
       page: enrichedPage,
     };
   },

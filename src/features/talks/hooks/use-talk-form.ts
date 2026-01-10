@@ -165,10 +165,10 @@ export function useTalkForm({
 
     try {
       if (isArchived) {
-        await updateTalk.mutateAsync({ id: talkId, status: 'backlog' });
+        await updateTalk.mutateAsync({ talkId, status: 'backlog' });
         setTalkStatus('backlog');
       } else {
-        await archiveTalk.mutateAsync({ id: talkId });
+        await archiveTalk.mutateAsync({ talkId });
         setTalkStatus('archived');
       }
       router.push('/talks');
@@ -190,7 +190,7 @@ export function useTalkForm({
     setFormStatus('deleting');
 
     try {
-      await destroyTalk.mutateAsync({ id: talkId });
+      await destroyTalk.mutateAsync({ talkId });
     } catch (error) {
       setFormStatus('idle');
     }
