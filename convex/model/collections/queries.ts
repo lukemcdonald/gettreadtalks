@@ -127,13 +127,8 @@ export const getCollectionWithSpeakers = query({
       )
       .collect();
 
-    // Get unique speaker IDs
     const speakerIds = [...new Set(talks.map((talk) => talk.speakerId))];
-
-    // Fetch all speakers in parallel
     const speakers = await getAll(ctx.db, speakerIds);
-
-    // Filter out null speakers
     const validSpeakers = speakers.filter((speaker) => speaker !== null);
 
     return {
@@ -156,8 +151,14 @@ export const listCollections = query({
   args: {
     paginationOpts: paginationOptsValidator,
   },
-  handler: async (ctx, args) =>
-    await ctx.db.query('collections').order('desc').paginate(args.paginationOpts),
+  handler: async (ctx, args) => {
+    const collectionPages = await ctx.db
+      .query('collections')
+      .order('desc')
+      .paginate(args.paginationOpts);
+
+    return collectionPages;
+  },
   returns: collectionPageValidator,
 });
 
@@ -181,11 +182,7 @@ export const listCollectionsBySpeaker = query({
     const collectionIds = [
       ...new Set(talks.flatMap((talk) => (talk.collectionId ? [talk.collectionId] : []))),
     ];
-
-    // Fetch all collections in parallel
     const collections = await getAll(ctx.db, collectionIds);
-
-    // Filter out null collections
     const validCollections = collections.filter((collection) => collection !== null);
 
     return validCollections;
@@ -202,12 +199,19 @@ export const listCollectionsWithStats = query({
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
-    const result = await ctx.db.query('collections').order('desc').paginate(args.paginationOpts);
+    const collectionPages = await ctx.db
+      .query('collections')
+      .order('desc')
+      .paginate(args.paginationOpts);
 
-    const filtered = await filterCollectionsWithPublishedTalks(ctx, result.page);
+    const collectionsWithTalks = await filterCollectionsWithPublishedTalks(
+      ctx,
+      collectionPages.page,
+    );
 
     // Enrich each collection with stats
-    const enrichedPage = await asyncMap(filtered, async (collection: Doc<'collections'>) => {
+    const enrichedPage = await asyncMap(collectionsWithTalks, async (collection) => {
+      // TODO: Should we create a util to getCollectionTalks?
       const talks = await ctx.db
         .query('talks')
         .withIndex('by_collectionId_and_status', (q) =>
@@ -217,8 +221,6 @@ export const listCollectionsWithStats = query({
 
       // Get unique speaker IDs
       const speakerIds = [...new Set(talks.map((talk) => talk.speakerId))];
-
-      // Fetch speakers in parallel
       const speakers = await getAll(ctx.db, speakerIds);
       const validSpeakers = speakers.filter((speaker) => speaker !== null);
 
@@ -230,10 +232,11 @@ export const listCollectionsWithStats = query({
     });
 
     return {
-      ...result,
+      ...collectionPages,
       page: enrichedPage,
     };
   },
+  // TODO: Remove v.any()
   returns: v.any(), // PaginationResult with enriched page: Array<{ collection, speakers, talkCount }>
 });
 
@@ -246,10 +249,13 @@ export const listCollectionsWithStatsAdmin = query({
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
-    const result = await ctx.db.query('collections').order('desc').paginate(args.paginationOpts);
+    const collectionPages = await ctx.db
+      .query('collections')
+      .order('desc')
+      .paginate(args.paginationOpts);
 
     // Enrich each collection with stats
-    const enrichedPage = await asyncMap(result.page, async (collection: Doc<'collections'>) => {
+    const enrichedPage = await asyncMap(collectionPages.page, async (collection) => {
       const talks = await ctx.db
         .query('talks')
         .withIndex('by_collectionId_and_status', (q) =>
@@ -257,10 +263,7 @@ export const listCollectionsWithStatsAdmin = query({
         )
         .collect();
 
-      // Get unique speaker IDs
       const speakerIds = [...new Set(talks.map((talk) => talk.speakerId))];
-
-      // Fetch speakers in parallel
       const speakers = await getAll(ctx.db, speakerIds);
       const validSpeakers = speakers.filter((speaker) => speaker !== null);
 
@@ -272,9 +275,10 @@ export const listCollectionsWithStatsAdmin = query({
     });
 
     return {
-      ...result,
+      ...collectionPages,
       page: enrichedPage,
     };
   },
+  // TODO: remove v.any
   returns: v.any(), // PaginationResult with enriched page: Array<{ collection, speakers, talkCount }>
 });

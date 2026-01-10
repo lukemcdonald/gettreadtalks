@@ -16,9 +16,9 @@ import {
   TextareaField,
   UrlField,
 } from '@/components/ui';
+import { CollectionSelectField } from '@/features/collections/components';
+import { SpeakerField } from '@/features/speakers/components/speaker-field';
 import { useTalkForm } from '@/features/talks/hooks';
-import { CollectionSelectField } from './collection-select-field';
-import { SpeakerField } from './speaker-field';
 
 type TalkFormProps = {
   actionsMenu?: (props: { isBusy: boolean }) => React.ReactNode;
