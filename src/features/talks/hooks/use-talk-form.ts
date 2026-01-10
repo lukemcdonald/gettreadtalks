@@ -69,8 +69,9 @@ export function useTalkForm({
   talkSlug,
 }: UseTalkFormProps): UseTalkFormReturn {
   const router = useRouter();
-  const archiveTalk = useArchiveTalk();
-  const destroyTalk = useDestroyTalk();
+
+  const archiveTalk = useArchiveTalk({ onSuccess: () => router.push('/talks') });
+  const destroyTalk = useDestroyTalk({ onSuccess: () => router.push('/talks') });
   const updateTalk = useUpdateTalk();
 
   const {
@@ -151,10 +152,8 @@ export function useTalkForm({
       return;
     }
 
-    // isArchived is already available from useEntityStatus
-    const confirmMessage = isArchived
-      ? 'Are you sure you want to unarchive this talk?'
-      : 'Are you sure you want to archive this talk?';
+    const archiveIntent = isArchived ? 'unarchive' : 'archive';
+    const confirmMessage = `Are you sure you want to ${archiveIntent} this talk?`;
 
     // biome-ignore lint/suspicious/noAlert: confirm dialog
     if (!window.confirm(confirmMessage)) {
@@ -192,6 +191,7 @@ export function useTalkForm({
     try {
       await destroyTalk.mutateAsync({ talkId });
     } catch (error) {
+      // TODO: Should this be in finally and should we capture the error in catch?
       setFormStatus('idle');
     }
   };

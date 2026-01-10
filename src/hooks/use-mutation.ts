@@ -15,7 +15,7 @@ const DEFAULT_STATE: MutationState = {
   status: 'idle' as MutationStatus,
 };
 
-type UseMutationOptions = {
+export type UseMutationOptions = {
   onError?: (error: Error) => void;
   onSuccess?: (data: unknown) => void;
   reportToSentry?: boolean;
