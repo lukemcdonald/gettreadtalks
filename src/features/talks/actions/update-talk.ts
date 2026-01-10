@@ -35,7 +35,7 @@ export async function updateTalkAction(
     // Call Convex mutation with authenticated token
     await withConvexAuth(
       async (token) =>
-        await fetchMutation(api.talks.updateTalk, { ...validatedData, id: talkId }, { token }),
+        await fetchMutation(api.talks.updateTalk, { ...validatedData, talkId }, { token }),
     );
 
     return {

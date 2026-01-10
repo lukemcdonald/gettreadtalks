@@ -16,9 +16,9 @@ const speakerPageValidator = paginationResultValidator(doc('speakers'));
  */
 export const getSpeaker = query({
   args: {
-    id: v.id('speakers'),
+    speakerId: v.id('speakers'),
   },
-  handler: async (ctx, args) => await ctx.db.get('speakers', args.id),
+  handler: async (ctx, args) => await ctx.db.get('speakers', args.speakerId),
   returns: doc('speakers').nullable(),
 });
 
@@ -37,18 +37,21 @@ export const getSpeakerBySlug = query({
       return null;
     }
 
+    const { _id: speakerId } = speaker;
+
     const [talks, collections, clips] = await Promise.all([
       ctx.db
         .query('talks')
         .withIndex('by_speakerId_and_status', (q) =>
-          q.eq('speakerId', speaker._id).eq('status', 'published'),
+          q.eq('speakerId', speakerId).eq('status', 'published'),
         )
         .order('desc')
-        .take(20),
+        .collect(),
+      // TODO: Simplify
       ctx.db
         .query('talks')
         .withIndex('by_speakerId_and_status', (q) =>
-          q.eq('speakerId', speaker._id).eq('status', 'published'),
+          q.eq('speakerId', speakerId).eq('status', 'published'),
         )
         .collect()
         .then((allTalks) => {
@@ -62,10 +65,10 @@ export const getSpeakerBySlug = query({
       ctx.db
         .query('clips')
         .withIndex('by_speakerId_and_status', (q) =>
-          q.eq('speakerId', speaker._id).eq('status', 'published'),
+          q.eq('speakerId', speakerId).eq('status', 'published'),
         )
         .order('desc')
-        .take(20),
+        .collect(),
     ]);
 
     return {
@@ -162,11 +165,14 @@ export const listSpeakersAdmin = query({
   args: {
     paginationOpts: paginationOptsValidator,
   },
-  handler: async (ctx, args) =>
-    await ctx.db
+  handler: async (ctx, args) => {
+    const speakerPages = await ctx.db
       .query('speakers')
       .withIndex('by_lastName')
       .order('asc')
-      .paginate(args.paginationOpts),
+      .paginate(args.paginationOpts);
+
+    return speakerPages;
+  },
   returns: speakerPageValidator,
 });

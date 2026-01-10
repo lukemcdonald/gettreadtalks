@@ -12,16 +12,14 @@ import { statusType } from './validators';
  */
 export const archiveClip = mutation({
   args: {
-    id: v.id('clips'),
+    clipId: v.id('clips'),
   },
   handler: async (ctx, args) => {
-    const { id: clipId } = args;
-
     await requireAuth(ctx);
 
-    await getOrThrow(ctx, 'clips', clipId);
+    await getOrThrow(ctx, 'clips', args.clipId);
 
-    await ctx.db.patch(clipId, {
+    await ctx.db.patch(args.clipId, {
       publishedAt: undefined,
       status: 'archived',
       updatedAt: Date.now(),
@@ -72,7 +70,7 @@ export const createClip = mutation({
 export const updateClip = mutation({
   args: {
     description: v.optional(v.string()),
-    id: v.id('clips'),
+    clipId: v.id('clips'),
     mediaUrl: v.optional(v.string()),
     speakerId: v.optional(v.id('speakers')),
     status: v.optional(statusType),
@@ -82,7 +80,8 @@ export const updateClip = mutation({
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
-    const { id: clipId, ...rest } = args;
+    // TODO: Do we really need to destructure clipId off of args?
+    const { clipId, ...rest } = args;
     const updates: Partial<Doc<'clips'>> = rest;
 
     const clip = await getOrThrow(ctx, 'clips', clipId);
@@ -118,13 +117,13 @@ export const updateClip = mutation({
  */
 export const updateClipStatus = mutation({
   args: {
-    id: v.id('clips'),
+    clipId: v.id('clips'),
     status: statusType,
   },
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
-    const clip = await getOrThrow(ctx, 'clips', args.id);
+    const clip = await getOrThrow(ctx, 'clips', args.clipId);
 
     const updates: Partial<Doc<'clips'>> = {
       publishedAt: getPublishedAtForStatus(args.status, clip.publishedAt),
@@ -133,9 +132,9 @@ export const updateClipStatus = mutation({
 
     updates.updatedAt = Date.now();
 
-    await ctx.db.patch(args.id, updates);
+    await ctx.db.patch(args.clipId, updates);
 
-    return args.id;
+    return args.clipId;
   },
   returns: v.id('clips'),
 });

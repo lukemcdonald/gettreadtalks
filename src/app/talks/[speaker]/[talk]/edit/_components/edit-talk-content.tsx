@@ -41,11 +41,11 @@ export function EditTalkContent({
   const talkUrl = `/talks/${speakerSlug}/${talkSlug}`;
 
   const handleArchive = async () => {
-    await archiveTalk.mutateAsync({ id: talk._id });
+    await archiveTalk.mutateAsync({ talkId: talk._id });
   };
 
   const handleDelete = async () => {
-    await destroyTalk.mutateAsync({ id: talk._id });
+    await destroyTalk.mutateAsync({ talkId: talk._id });
   };
 
   return (

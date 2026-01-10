@@ -18,9 +18,9 @@ const collectionPageValidator = paginationResultValidator(doc('collections'));
  */
 export const getCollection = query({
   args: {
-    id: v.id('collections'),
+    collectionId: v.id('collections'),
   },
-  handler: async (ctx, args) => await ctx.db.get('collections', args.id),
+  handler: async (ctx, args) => await ctx.db.get('collections', args.collectionId),
   returns: doc('collections').nullable(),
 });
 
@@ -29,13 +29,13 @@ export const getCollection = query({
  */
 export const getCollectionWithTalks = query({
   args: {
-    id: v.id('collections'),
+    collectionId: v.id('collections'),
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const { limit = 100, id } = args;
+    const { limit = 100, collectionId } = args;
 
-    const collection = await ctx.db.get('collections', id);
+    const collection = await ctx.db.get('collections', collectionId);
 
     if (!collection) {
       return null;

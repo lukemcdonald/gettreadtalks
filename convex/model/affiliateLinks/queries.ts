@@ -10,9 +10,9 @@ import { affiliateLinkTypes } from './validators';
  */
 export const getAffiliateLink = query({
   args: {
-    id: v.id('affiliateLinks'),
+    affiliateLinkId: v.id('affiliateLinks'),
   },
-  handler: async (ctx, args) => await ctx.db.get('affiliateLinks', args.id),
+  handler: async (ctx, args) => await ctx.db.get('affiliateLinks', args.affiliateLinkId),
   returns: doc('affiliateLinks').nullable(),
 });
 

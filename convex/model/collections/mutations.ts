@@ -39,12 +39,12 @@ export const createCollection = mutation({
  */
 export const destroyCollection = mutation({
   args: {
-    id: v.id('collections'),
+    collectionId: v.id('collections'),
   },
   handler: async (ctx, args) => {
-    await requireAuth(ctx);
+    const { collectionId } = args;
 
-    const { id: collectionId } = args;
+    await requireAuth(ctx);
 
     const collection = await ctx.db.get('collections', collectionId);
 
@@ -81,15 +81,17 @@ export const destroyCollection = mutation({
  */
 export const updateCollection = mutation({
   args: {
+    collectionId: v.id('collections'),
     description: v.optional(v.string()),
-    id: v.id('collections'),
     title: v.optional(v.string()),
     url: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    // TODO: Do we really need to destruction collectionId from rest
+    const { collectionId, ...rest } = args;
+
     await requireAuth(ctx);
 
-    const { id: collectionId, ...rest } = args;
     const updates: Partial<Doc<'collections'>> = rest;
     const collection: Doc<'collections'> | null = await ctx.db.get('collections', collectionId);
 

@@ -51,19 +51,21 @@ export const createSpeaker = mutation({
  */
 export const destroySpeaker = mutation({
   args: {
-    id: v.id('speakers'),
+    speakerId: v.id('speakers'),
   },
   handler: async (ctx, args) => {
+    const { speakerId } = args;
+
     await requireAuth(ctx);
 
-    const speaker = await getOrThrow(ctx, 'speakers', args.id);
+    const speaker = await getOrThrow(ctx, 'speakers', speakerId);
 
     // Prevent deletion if speaker has associated content
     const talksWithSpeaker = await getOneFrom(
       ctx.db,
       'talks',
       'by_speakerId_and_status',
-      args.id,
+      speakerId,
       'speakerId',
     );
 
@@ -71,18 +73,18 @@ export const destroySpeaker = mutation({
       throwValidationError('Cannot delete speaker: speaker has associated talks');
     }
 
-    const clipsWithSpeaker = await getOneFrom(ctx.db, 'clips', 'by_speakerId', args.id);
+    const clipsWithSpeaker = await getOneFrom(ctx.db, 'clips', 'by_speakerId', speakerId);
 
     if (clipsWithSpeaker) {
       throwValidationError('Cannot delete speaker: speaker has associated clips');
     }
 
     // Clean up user favorites before deleting speaker
-    const favorites = await getManyFrom(ctx.db, 'userFavoriteSpeakers', 'by_speakerId', args.id);
+    const favorites = await getManyFrom(ctx.db, 'userFavoriteSpeakers', 'by_speakerId', speakerId);
 
     await deleteAll(ctx, favorites);
 
-    await ctx.db.delete(args.id);
+    await ctx.db.delete(speakerId);
 
     return null;
   },
@@ -97,20 +99,20 @@ export const updateSpeaker = mutation({
     description: v.optional(v.string()),
     featured: v.optional(v.boolean()),
     firstName: v.optional(v.string()),
-    id: v.id('speakers'),
     imageUrl: v.optional(v.string()),
     lastName: v.optional(v.string()),
     ministry: v.optional(v.string()),
     role: v.optional(v.string()),
+    speakerId: v.id('speakers'),
     websiteUrl: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
-    const { id, ...rest } = args;
+    const { speakerId, ...rest } = args;
     const updates: Partial<Doc<'speakers'>> = rest;
 
-    const speaker = await getOrThrow(ctx, 'speakers', id);
+    const speaker = await getOrThrow(ctx, 'speakers', speakerId);
 
     // Regenerate slug if name changed to ensure URL consistency
     if (updates.firstName !== undefined || updates.lastName !== undefined) {
@@ -128,7 +130,7 @@ export const updateSpeaker = mutation({
       const newSlug = slugify(`${firstName} ${lastName}`);
 
       if (newSlug !== speaker.slug) {
-        if (await slugExists(ctx, 'speakers', newSlug, id)) {
+        if (await slugExists(ctx, 'speakers', newSlug, speakerId)) {
           throwDuplicateSlug('Speaker with this name already exists', 'firstName');
         }
 
@@ -138,9 +140,9 @@ export const updateSpeaker = mutation({
 
     updates.updatedAt = Date.now();
 
-    await ctx.db.patch(id, updates);
+    await ctx.db.patch(speakerId, updates);
 
-    return id;
+    return speakerId;
   },
   returns: v.id('speakers'),
 });
