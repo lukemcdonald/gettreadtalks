@@ -63,6 +63,7 @@ export async function filterCollectionsWithPublishedTalks(
           q.eq('collectionId', collection._id).eq('status', 'published'),
         )
         .first();
+
       return hasTalks ? collection : null;
     }),
   );

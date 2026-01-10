@@ -15,12 +15,13 @@ export const archiveClip = mutation({
     id: v.id('clips'),
   },
   handler: async (ctx, args) => {
+    const { id: clipId } = args;
+
     await requireAuth(ctx);
 
-    await getOrThrow(ctx, 'clips', args.id);
+    await getOrThrow(ctx, 'clips', clipId);
 
-    // Soft delete by setting status to archived
-    await ctx.db.patch(args.id, {
+    await ctx.db.patch(clipId, {
       publishedAt: undefined,
       status: 'archived',
       updatedAt: Date.now(),
@@ -46,7 +47,6 @@ export const createClip = mutation({
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
-    // Validate input early
     if (!args.title.trim()) {
       throwValidationError('Title cannot be empty', 'title');
     }
@@ -82,34 +82,33 @@ export const updateClip = mutation({
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
-    const { id, ...rest } = args;
+    const { id: clipId, ...rest } = args;
     const updates: Partial<Doc<'clips'>> = rest;
-    const clip = await getOrThrow(ctx, 'clips', id);
+
+    const clip = await getOrThrow(ctx, 'clips', clipId);
 
     // If title changed, update slug
     if (updates.title !== undefined) {
-      // Validate input early
       if (!updates.title.trim()) {
         throwValidationError('Title cannot be empty', 'title');
       }
 
-      const newSlug = await generateSlug(ctx, 'clips', updates.title, id);
+      const newSlug = await generateSlug(ctx, 'clips', updates.title, clipId);
 
       if (newSlug !== clip.slug) {
         updates.slug = newSlug;
       }
     }
 
-    // Handle status changes
     if (updates.status) {
       updates.publishedAt = getPublishedAtForStatus(updates.status, clip.publishedAt);
     }
 
     updates.updatedAt = Date.now();
 
-    await ctx.db.patch(id, updates);
+    await ctx.db.patch(clipId, updates);
 
-    return id;
+    return clipId;
   },
   returns: v.id('clips'),
 });

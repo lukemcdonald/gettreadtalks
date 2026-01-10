@@ -89,6 +89,7 @@ export const listClips = query({
     const { paginationOpts, status } = args;
 
     if (status) {
+      // TODO: Can we build this query and do a single return await at end?
       return await ctx.db
         .query('clips')
         .withIndex('by_status_and_publishedAt', (q) => q.eq('status', status))
@@ -118,6 +119,7 @@ export const listClipsWithSpeakers = query({
     let result: PaginationResult<Doc<'clips'>>;
 
     if (status) {
+      // TODO: Can we build this query and do a single return await result?
       result = await ctx.db
         .query('clips')
         .withIndex('by_status_and_publishedAt', (q) => q.eq('status', status))
@@ -179,6 +181,7 @@ export const listClipsWithSpeakersAdmin = query({
 
     let result: PaginationResult<Doc<'clips'>>;
 
+    // Simplify: !status || status === 'all'. Maybe build query with single await
     if (status === 'all') {
       result = await ctx.db.query('clips').order('desc').paginate(paginationOpts);
     } else if (status) {

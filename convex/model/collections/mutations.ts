@@ -20,7 +20,6 @@ export const createCollection = mutation({
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
-    // Validate input early
     if (!args.title.trim()) {
       throwValidationError('Title cannot be empty', 'title');
     }
@@ -45,10 +44,15 @@ export const destroyCollection = mutation({
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
-    const collection = await ctx.db.get('collections', args.id);
+    const { id: collectionId } = args;
+
+    const collection = await ctx.db.get('collections', collectionId);
 
     if (!collection) {
-      throwNotFound('Collection not found', { resource: 'collection', resourceId: args.id });
+      throwNotFound('Collection not found', {
+        resource: 'collection',
+        resourceId: collectionId,
+      });
     }
 
     // Check if collection is referenced by any talks
@@ -56,7 +60,7 @@ export const destroyCollection = mutation({
       ctx.db,
       'talks',
       'by_collectionId_and_status',
-      args.id,
+      collectionId,
       'collectionId',
     );
 
@@ -65,7 +69,7 @@ export const destroyCollection = mutation({
     }
 
     // Hard delete the collection
-    await ctx.db.delete(args.id);
+    await ctx.db.delete(collectionId);
 
     return null;
   },
@@ -85,21 +89,23 @@ export const updateCollection = mutation({
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
-    const { id, ...rest } = args;
+    const { id: collectionId, ...rest } = args;
     const updates: Partial<Doc<'collections'>> = rest;
-    const collection: Doc<'collections'> | null = await ctx.db.get('collections', id);
+    const collection: Doc<'collections'> | null = await ctx.db.get('collections', collectionId);
 
     if (!collection) {
-      throwNotFound('Collection not found', { resource: 'collection', resourceId: id });
+      throwNotFound('Collection not found', {
+        resource: 'collection',
+        resourceId: collectionId,
+      });
     }
 
     if (updates.title !== undefined) {
-      // Validate input early
       if (!updates.title.trim()) {
         throwValidationError('Title cannot be empty', 'title');
       }
 
-      const newSlug = await generateSlug(ctx, 'collections', updates.title, id);
+      const newSlug = await generateSlug(ctx, 'collections', updates.title, collectionId);
 
       if (newSlug !== collection.slug) {
         updates.slug = newSlug;
@@ -108,9 +114,9 @@ export const updateCollection = mutation({
 
     updates.updatedAt = Date.now();
 
-    await ctx.db.patch(id, updates);
+    await ctx.db.patch(collectionId, updates);
 
-    return id;
+    return collectionId;
   },
   returns: v.id('collections'),
 });
