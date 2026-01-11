@@ -4,6 +4,8 @@ import type { Collection, CollectionId } from '@/features/collections/types';
 import type { Speaker, SpeakerId } from '@/features/speakers/types';
 import type { Talk, TalkStatus } from '@/features/talks/types';
 
+import { useRouter } from 'next/navigation';
+
 import { ContentActionsGroup } from '@/components/actions-group';
 import { TalkForm } from '@/features/talks/components';
 import { useArchiveTalk, useDestroyTalk } from '@/features/talks/hooks';
@@ -35,8 +37,9 @@ export function EditTalkContent({
   talk,
   talkSlug,
 }: EditTalkContentProps) {
-  const archiveTalk = useArchiveTalk();
-  const destroyTalk = useDestroyTalk();
+  const router = useRouter();
+  const archiveTalk = useArchiveTalk({ onSuccess: () => router.push('/talks') });
+  const destroyTalk = useDestroyTalk({ onSuccess: () => router.push('/talks') });
 
   const talkUrl = `/talks/${speakerSlug}/${talkSlug}`;
 

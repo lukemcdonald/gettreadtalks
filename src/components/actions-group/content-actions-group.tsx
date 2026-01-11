@@ -16,6 +16,8 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/primitives/alert-dialog';
 import { toastManager } from '@/components/ui/primitives/toast';
+import { getErrorMessage } from '@/services/errors';
+import { capitalize } from '@/utils';
 import { ActionsGroup } from './actions-group';
 
 export function ContentActionsGroup({
@@ -40,6 +42,8 @@ export function ContentActionsGroup({
   const isDisabled = disabled || isLoading;
 
   let archiveLabel = 'Archive';
+
+  // TODO: Should this use a utility to get archive label? I think talks had one.
   if (isArchiving) {
     archiveLabel = 'Archiving...';
   } else if (isArchived) {
@@ -52,20 +56,19 @@ export function ContentActionsGroup({
     }
 
     setIsArchiving(true);
+
     try {
       await onArchiveAction(content._id);
       toastManager.add({
-        title: isArchived
-          ? `${capitalize(contentType)} unarchived`
-          : `${capitalize(contentType)} archived`,
         type: 'success',
+        title: `${capitalize(contentType)} ${isArchived ? 'unarchived' : 'archived'}`,
       });
       router.refresh();
     } catch (error: unknown) {
       toastManager.add({
-        title: `Failed to archive ${contentType}`,
-        description: error instanceof Error ? error.message : 'An error occurred',
         type: 'error',
+        title: `Failed to archive ${contentType}`,
+        description: getErrorMessage(error),
       });
     } finally {
       setIsArchiving(false);
@@ -78,13 +81,17 @@ export function ContentActionsGroup({
     }
 
     setIsDeleting(true);
+
     try {
       await onDeleteAction(content._id);
+
       toastManager.add({
         title: `${capitalize(contentType)} deleted`,
         type: 'success',
       });
+
       setDeleteDialogOpen(false);
+
       if (listUrl) {
         router.push(listUrl);
       } else {
@@ -92,15 +99,16 @@ export function ContentActionsGroup({
       }
     } catch (error: unknown) {
       toastManager.add({
-        title: `Failed to delete ${contentType}`,
-        description: error instanceof Error ? error.message : 'An error occurred',
         type: 'error',
+        title: `Failed to delete ${contentType}`,
+        description: getErrorMessage(error),
       });
     } finally {
       setIsDeleting(false);
     }
   };
 
+  // TODO: Clean this up...
   const menuItems: ActionsGroupMenuItem[] = [
     ...(viewUrl ? [{ label: 'View', href: viewUrl }] : []),
     ...(editUrl ? [{ label: 'Edit', href: editUrl }] : []),
@@ -120,12 +128,7 @@ export function ContentActionsGroup({
       : []),
   ];
 
-  const defaultPrimaryAction = editUrl
-    ? {
-        label: 'Edit',
-        href: editUrl,
-      }
-    : undefined;
+  const defaultPrimaryAction = editUrl ? { label: 'Edit', href: editUrl } : undefined;
 
   return (
     <>
@@ -158,8 +161,4 @@ export function ContentActionsGroup({
       )}
     </>
   );
-}
-
-function capitalize(str: string): string {
-  return str.charAt(0).toUpperCase() + str.slice(1);
 }
