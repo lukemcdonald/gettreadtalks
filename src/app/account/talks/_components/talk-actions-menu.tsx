@@ -2,6 +2,8 @@
 
 import type { TalkWithSpeakerAndTopics } from '@/features/talks/types';
 
+import { useRouter } from 'next/navigation';
+
 import { ContentActionsGroup } from '@/components/actions-group';
 import { useArchiveTalk, useDestroyTalk } from '@/features/talks/hooks';
 
@@ -11,8 +13,9 @@ type TalkActionsMenuProps = {
 };
 
 export function TalkActionsMenu({ talk, talkUrl }: TalkActionsMenuProps) {
-  const archiveTalk = useArchiveTalk();
-  const destroyTalk = useDestroyTalk();
+  const router = useRouter();
+  const archiveTalk = useArchiveTalk({ onSuccess: () => router.push('/talks') });
+  const destroyTalk = useDestroyTalk({ onSuccess: () => router.push('/talks') });
 
   const handleArchive = async () => {
     await archiveTalk.mutateAsync({ talkId: talk._id });

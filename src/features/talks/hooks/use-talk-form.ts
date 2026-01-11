@@ -100,7 +100,7 @@ export function useTalkForm({
       featured: initialData?.featured ?? false,
       mediaUrl: initialData?.mediaUrl ?? '',
       scripture: initialData?.scripture ?? '',
-      speakerId: initialData?.speakerId ?? ('' as SpeakerId),
+      speakerId: initialData?.speakerId,
       status: initialData?.status ?? 'backlog',
       title: initialData?.title ?? '',
     },
@@ -201,6 +201,7 @@ export function useTalkForm({
   const archiveLabel = getArchiveButtonLabel(formStatus, talkStatus);
   const submitLabel = getSubmitButtonLabel(formStatus, talkId);
 
+  // TODO: Are all of these used? Can this be simplified?
   return {
     archiveLabel,
     form,
