@@ -18,7 +18,7 @@ export type TalkWithSpeaker = Talk & {
 };
 
 export type TalkWithSpeakerAndTopics = Talk & {
-  speaker: Doc<'speakers'> | null;
+  speaker: Doc<'speakers'>;
   topicSlugs: string[];
 };
 

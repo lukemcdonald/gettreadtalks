@@ -3,7 +3,7 @@
 import { SearchInput } from '@/components/search-input';
 import { SelectFilter } from '@/components/select-filter';
 
-export function AdminTalksFilters() {
+export function TalksFilters() {
   return (
     <div className="flex gap-4">
       <div className="flex-1">
