@@ -1,7 +1,6 @@
 'use client';
 
-import type { Speaker } from '@/features/speakers/types';
-import type { Talk } from '@/features/talks/types';
+import type { TalkWithSpeaker } from '@/features/talks/types';
 
 import { useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
@@ -10,15 +9,14 @@ import { GridList } from '@/components/grid-list';
 import { Empty, EmptyDescription } from '@/components/ui';
 import { TalkCard } from './talk-card';
 
-type TalkWithSpeaker = Talk & { speaker: Speaker | null };
 type TalksListProps = {
-  talks: TalkWithSpeaker[];
   /**
    * If true, enables filtering and sorting via URL search params.
    * If false, displays talks as-is without filtering.
    * @default true
    */
   enableFiltering?: boolean;
+  talks: TalkWithSpeaker[];
 };
 
 export function TalksList({ talks, enableFiltering = true }: TalksListProps) {

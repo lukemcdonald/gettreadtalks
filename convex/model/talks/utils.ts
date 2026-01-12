@@ -48,6 +48,7 @@ export async function enrichWithTopics<T extends { _id: Id<'talks'> }>(
 
     const topics = await Promise.all(talksOnTopics.map((tot) => ctx.db.get('topics', tot.topicId)));
 
+    // TODO: Should this be topics and returned with just topic.slug to allow for it to be extended in the future.
     const topicSlugs = topics
       .filter((topic): topic is Doc<'topics'> => topic !== null)
       .map((topic) => topic.slug);

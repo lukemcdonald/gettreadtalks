@@ -1,14 +1,14 @@
-import type { StatusType } from '@/convex/lib/validators/shared';
+import type { StatusType } from '@/lib/types';
 
-export function formatDate(timestamp?: number) {
-  if (!timestamp) {
-    return null;
-  }
-  return new Date(timestamp).toLocaleDateString('en-US', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  });
+import { type ClassValue, clsx } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+export function capitalize(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
 }
 
 export function getStatusColor(status?: StatusType) {

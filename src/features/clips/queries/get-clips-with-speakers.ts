@@ -1,6 +1,6 @@
 'use server';
 
-import type { StatusType } from '@/convex/lib/validators/shared';
+import type { StatusType } from '@/lib/types';
 
 import { fetchQuery } from 'convex/nextjs';
 

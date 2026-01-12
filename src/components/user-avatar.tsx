@@ -1,7 +1,7 @@
 import type { User } from '@/services/auth/types';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui';
-import { getGravatarUrl } from '@/utils/gravatar';
+import { getGravatarUrl } from '@/utils';
 
 type UserAvatarProps = {
   user: NonNullable<User>;

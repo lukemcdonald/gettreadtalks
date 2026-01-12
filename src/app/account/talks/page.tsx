@@ -1,4 +1,4 @@
-import type { StatusType } from '@/convex/lib/validators/shared';
+import type { StatusType } from '@/lib/types';
 
 import { PlusIcon } from 'lucide-react';
 import Link from 'next/link';

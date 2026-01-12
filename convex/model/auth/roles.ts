@@ -1,5 +1,5 @@
 import type { MutationCtx, QueryCtx } from '../../_generated/server';
-import type { StatusType } from '../../lib/validators/shared';
+import type { StatusType } from '../../lib/types';
 import type { AdminUser, User } from './types';
 
 import { throwForbidden } from '../../lib/errors';

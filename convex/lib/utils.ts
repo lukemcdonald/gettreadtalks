@@ -1,6 +1,6 @@
 import type { Doc, Id, TableNames } from '../_generated/dataModel';
 import type { MutationCtx, QueryCtx } from '../_generated/server';
-import type { StatusType } from './validators/shared';
+import type { StatusType } from './types';
 
 import { asyncMap } from 'convex-helpers';
 import { getOneFrom } from 'convex-helpers/server/relationships';

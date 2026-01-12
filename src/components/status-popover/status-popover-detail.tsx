@@ -9,7 +9,7 @@ type ContentTableItemDetailProps = {
   title: string;
 };
 
-export function ContentTableItemDetail({
+export function StatusPopoverDetail({
   description,
   icon: Icon,
   iconClass,

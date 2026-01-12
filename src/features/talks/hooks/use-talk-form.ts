@@ -1,10 +1,10 @@
 'use client';
 
-import type { StatusType } from '@/convex/lib/validators/shared';
 import type { Collection, CollectionId } from '@/features/collections/types';
 import type { Speaker, SpeakerId } from '@/features/speakers/types';
 import type { TalkId } from '@/features/talks';
 import type { TalkFormData } from '@/features/talks/schemas/talk-form';
+import type { StatusType } from '@/lib/types';
 
 import { useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
