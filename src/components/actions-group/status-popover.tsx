@@ -1,5 +1,4 @@
-import type { StatusType } from '@/convex/lib/validators/shared';
-import type { ContentWithTimestamps } from './content-table.types';
+import type { StatusType } from '@/lib/types';
 
 import {
   CalendarIcon as CreatedAtIcon,
@@ -9,22 +8,17 @@ import {
 } from 'lucide-react';
 
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui';
-import { formatDate, getStatusColor, getStatusLabel } from './content-table.utils';
-import { ContentTableItemDetail } from './content-table-item-detail';
+import { formatDate, getStatusColor, getStatusLabel } from '@/utils';
+import { StatusPopoverDetail } from '../status-popover/status-popover-detail';
 
-type ContentTableItemDetailsProps = {
-  createdAt: ContentWithTimestamps['_creationTime'];
-  publishedAt?: ContentWithTimestamps['publishedAt'];
-  updatedAt?: ContentWithTimestamps['updatedAt'];
+type StatusPopoverProps = {
+  createdAt: number;
+  publishedAt?: number;
+  updatedAt?: number;
   status?: StatusType;
 };
 
-export function ContentTableItemDetails({
-  createdAt,
-  updatedAt,
-  publishedAt,
-  status,
-}: ContentTableItemDetailsProps) {
+export function StatusPopover({ createdAt, updatedAt, publishedAt, status }: StatusPopoverProps) {
   const statusColor = getStatusColor(status);
 
   return (
@@ -35,27 +29,27 @@ export function ContentTableItemDetails({
       <PopoverContent align="start" className="w-64 text-sm">
         <div className="space-y-3">
           {!!status && (
-            <ContentTableItemDetail
+            <StatusPopoverDetail
               description={getStatusLabel(status)}
               icon={StatusIcon}
               iconClass={statusColor}
               title="Status"
             />
           )}
-          <ContentTableItemDetail
+          <StatusPopoverDetail
             description={formatDate(createdAt) ?? 'N/A'}
             icon={CreatedAtIcon}
             title="Created"
           />
           {!!publishedAt && (
-            <ContentTableItemDetail
+            <StatusPopoverDetail
               description={formatDate(publishedAt) ?? 'N/A'}
               icon={PublishedAtIcon}
               title="Published"
             />
           )}
           {!!updatedAt && (
-            <ContentTableItemDetail
+            <StatusPopoverDetail
               description={formatDate(updatedAt) ?? 'N/A'}
               icon={UpdatedAtIcon}
               title="Updated"

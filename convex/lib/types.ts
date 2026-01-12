@@ -1,6 +1,5 @@
-/**
- * Common type definitions for the Convex backend.
- * These types are shared across multiple modules and avoid circular dependencies.
- */
+import type { Infer } from 'convex/values';
+import type { statusFilterType, statusType } from './validators/shared';
 
-export type StatusType = 'backlog' | 'approved' | 'published' | 'archived';
+export type StatusFilterType = Infer<typeof statusFilterType>;
+export type StatusType = Infer<typeof statusType>;

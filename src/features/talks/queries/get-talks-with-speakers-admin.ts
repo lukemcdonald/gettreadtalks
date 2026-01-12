@@ -1,6 +1,6 @@
 'use server';
 
-import type { StatusType } from '@/convex/lib/validators/shared';
+import type { StatusFilterType } from '@/lib/types';
 
 import { fetchQuery } from 'convex/nextjs';
 
@@ -11,7 +11,7 @@ type GetTalksWithSpeakersAdminProps = {
   cursor?: string;
   limit?: number;
   search?: string;
-  status?: StatusType | 'all';
+  status?: StatusFilterType;
 };
 
 /**
@@ -24,15 +24,18 @@ type GetTalksWithSpeakersAdminProps = {
  * @param search - Search by title
  * @param status - Filter by status or 'all' for all statuses
  */
-export async function getTalksWithSpeakersAdmin(args?: GetTalksWithSpeakersAdminProps) {
-  const { cursor, limit = 50, search, status = 'published' } = args ?? {};
-
+export async function getTalksWithSpeakersAdmin(args: GetTalksWithSpeakersAdminProps = {}) {
   const token = await getAuthToken();
+
+  const cursor = args.cursor ?? null;
+  const limit = args.limit ?? 50;
+  const search = args?.search;
+  const status = args.status ?? 'published';
 
   const result = await fetchQuery(
     api.talks.listTalksWithSpeakersAdmin,
     {
-      paginationOpts: { cursor: cursor || null, numItems: limit },
+      paginationOpts: { cursor, numItems: limit },
       search,
       status,
     },

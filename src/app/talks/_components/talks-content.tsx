@@ -1,10 +1,8 @@
-import type { Speaker } from '@/features/speakers/types';
-import type { Talk } from '@/features/talks/types';
+import type { TalkWithSpeaker } from '@/features/talks/types';
 
 import { Pagination } from '@/components/pagination';
 import { TalksList } from '@/features/talks/components';
 
-type TalkWithSpeaker = Talk & { speaker: Speaker | null };
 type TalksContentProps = {
   continueCursor: string;
   hasNextPage: boolean;

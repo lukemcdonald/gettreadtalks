@@ -1,24 +1,23 @@
 import type { Preloaded } from 'convex/react';
 import type { FunctionReturnType, PaginationResult } from 'convex/server';
 import type { Doc, Id } from '@/convex/_generated/dataModel';
-import type { StatusType } from '@/convex/lib/validators/shared';
+import type { Speaker } from '@/features/speakers';
+import type { StatusType } from '@/lib/types';
 
-// biome-ignore lint/style/useImportType: Convex API imports needed for typeof in type definitions
+// biome-ignore lint/style/useImportType: Convex imports for typeof definitions
 import { api } from '@/convex/_generated/api';
 
 export type Talk = Doc<'talks'>;
 export type TalkId = Id<'talks'>;
 
-// Re-export commonly used Convex types for talks
 export type PreloadedTalks = Preloaded<typeof api.talks.listTalks>;
 export type TalkData = NonNullable<FunctionReturnType<typeof api.talks.getTalkBySlug>>;
 export type TalkStatus = StatusType;
 export type TalkWithSpeaker = Talk & {
-  speaker: Doc<'speakers'> | null;
+  speaker: Speaker | null;
 };
-
-export type TalkWithSpeakerAndTopics = Talk & {
-  speaker: Doc<'speakers'>;
+export type TalkWithSpeakerAndTopics = TalkWithSpeaker & {
+  // TODO: should this just be topics and not just topicSlugs
   topicSlugs: string[];
 };
 

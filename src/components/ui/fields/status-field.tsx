@@ -1,7 +1,7 @@
 'use client';
 
 import type { Control, FieldPath, FieldValues } from 'react-hook-form';
-import type { StatusType } from '@/convex/lib/validators/shared';
+import type { StatusType } from '@/lib/types';
 
 import { SelectField } from './select-field';
 
