@@ -1,7 +1,7 @@
 'use client';
 
 import type { Control, FieldPath, FieldValues } from 'react-hook-form';
-import type { StatusType } from '@/lib/types';
+import type { StatusType } from '@/lib/entities/types';
 
 import { SelectField } from './select-field';
 

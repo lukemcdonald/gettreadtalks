@@ -1,6 +1,6 @@
 'use server';
 
-import type { StatusFilterType } from '@/lib/types';
+import type { StatusFilterType } from '@/lib/entities/types';
 
 import { fetchQuery } from 'convex/nextjs';
 

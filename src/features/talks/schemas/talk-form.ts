@@ -1,5 +1,5 @@
 import type { SpeakerId } from '@/features/speakers/types';
-import type { StatusType } from '@/lib/types';
+import type { StatusType } from '@/lib/entities/types';
 
 import { zid } from 'convex-helpers/server/zod4';
 import { z } from 'zod';

@@ -1,5 +1,5 @@
+import type { StatusType } from '@/lib/entities/types';
 import type { FormStatus } from '@/lib/forms/types';
-import type { StatusType } from '@/lib/types';
 
 /**
  * Generate a talk URL with speaker and talk slugs.

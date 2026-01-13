@@ -9,6 +9,8 @@ import { getAuthToken } from '@/services/auth/server';
  * Automatically retrieves and passes the authentication token to the callback.
  * The auth token is cached per request, so multiple calls won't cause redundant cookie reads.
  *
+ * TODO: Is this wrapper function necessary? Can it be simplified? Should we keep it?
+ *
  * @param callback - Function that receives the auth token and performs the Convex operation
  * @returns The result of the callback function
  *
