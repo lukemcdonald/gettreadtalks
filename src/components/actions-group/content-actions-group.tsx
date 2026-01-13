@@ -43,7 +43,6 @@ export function ContentActionsGroup({
 
   let archiveLabel = 'Archive';
 
-  // TODO: Should this use a utility to get archive label? I think talks had one.
   if (isArchiving) {
     archiveLabel = 'Archiving...';
   } else if (isArchived) {
@@ -108,7 +107,6 @@ export function ContentActionsGroup({
     }
   };
 
-  // TODO: Clean this up...
   const menuItems: ActionsGroupMenuItem[] = [
     ...(viewUrl ? [{ label: 'View', href: viewUrl }] : []),
     ...(editUrl ? [{ label: 'Edit', href: editUrl }] : []),

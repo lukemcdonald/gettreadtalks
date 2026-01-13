@@ -16,23 +16,23 @@ export type ActionsGroupMenuItem = {
   variant?: 'default' | 'destructive';
 };
 
+export type PrimaryAction = {
+  disabled?: boolean;
+  href?: string;
+  icon?: ReactNode;
+  label: string;
+  loading?: boolean;
+  loadingLabel?: string;
+  onClick?: () => void;
+  type?: 'button' | 'submit';
+};
+
 export type ActionsGroupProps = {
   disabled?: boolean;
   menuItems: ActionsGroupMenuItem[];
-  // TODO: Should this infer types from HTMLButtonElement and HTMLAnchorElement
-  primaryAction?: {
-    disabled?: boolean;
-    href?: string;
-    icon?: ReactNode;
-    label: string;
-    loading?: boolean;
-    loadingLabel?: string;
-    onClick?: () => void;
-    type?: 'button' | 'submit';
-  };
+  primaryAction?: PrimaryAction;
 };
 
-// TODO: Is there a better way to do with more dynamically?
 type ContentId = TalkId | ClipId | CollectionId | SpeakerId | TopicId;
 type ContentType = 'talk' | 'clip' | 'collection' | 'speaker' | 'topic';
 
@@ -49,14 +49,6 @@ export type ContentActionsGroupProps = {
   listUrl?: string;
   onArchiveAction?: (id: ContentId) => Promise<void>;
   onDeleteAction?: (id: ContentId) => Promise<void>;
-  // TODO: Dry this up with ActionsGroupProps primaryAction. Should be similar.
-  primaryAction?: {
-    label: string;
-    onClick?: () => void;
-    href?: string;
-    loading?: boolean;
-    loadingLabel?: string;
-    type?: 'button' | 'submit';
-  };
+  primaryAction?: PrimaryAction;
   viewUrl?: string;
 };
