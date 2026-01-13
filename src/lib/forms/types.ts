@@ -9,13 +9,11 @@
  * @template T - The data type returned on success
  *
  * @example
- * ```ts
  * export async function createItemAction(
  *   data: unknown
  * ): Promise<ActionResult<{ itemId: string }>> {
  *   // ...
  * }
- * ```
  */
 export type ActionResult<T> =
   | { success: true; data: T }

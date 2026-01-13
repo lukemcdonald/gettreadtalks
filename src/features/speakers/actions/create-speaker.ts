@@ -38,29 +38,18 @@ export async function createSpeakerAction(
   // Re-verify authorization on every request
   await requireAdminUser();
 
-  // Validate data on server (client validation can be bypassed)
   const parsed = createSpeakerSchema.safeParse(data);
+
   if (!parsed.success) {
-    return { success: false, errors: mapZodErrors(parsed.error) };
+    return {
+      success: false,
+      errors: mapZodErrors(parsed.error),
+    };
   }
 
-  const validatedData: CreateSpeakerData = parsed.data;
-
-  // Clean up empty strings to undefined for optional fields
-  const mutationData = {
-    firstName: validatedData.firstName,
-    lastName: validatedData.lastName,
-    role: validatedData.role || undefined,
-    ministry: validatedData.ministry || undefined,
-    description: validatedData.description || undefined,
-    websiteUrl: validatedData.websiteUrl || undefined,
-    imageUrl: validatedData.imageUrl || undefined,
-  };
-
   try {
-    // Call Convex mutation with authenticated token
     const speakerId = await withConvexAuth(
-      async (token) => await fetchMutation(api.speakers.createSpeaker, mutationData, { token }),
+      async (token) => await fetchMutation(api.speakers.createSpeaker, parsed.data, { token }),
     );
 
     return {
@@ -68,7 +57,6 @@ export async function createSpeakerAction(
       data: { speakerId },
     };
   } catch (error) {
-    // Map Convex errors to form errors using structured error data
     return {
       success: false,
       errors: mapConvexErrorToFormErrors(error),
