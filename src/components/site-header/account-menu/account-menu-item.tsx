@@ -1,7 +1,7 @@
 'use client';
 
 import type { Route } from 'next';
-import type { ComponentType } from 'react';
+import type { ComponentType, ReactElement } from 'react';
 
 import Link from 'next/link';
 
@@ -22,7 +22,7 @@ export function AccountMenuItem({
 }: AccountMenuItemProps) {
   const isButton = !href && !!onClick;
 
-  let renderComponent: React.ReactElement<Record<string, unknown>> | undefined;
+  let renderComponent: ReactElement<Record<string, unknown>> | undefined;
   if (isButton) {
     renderComponent = <Button size="xs" variant="ghost" />;
   } else if (href) {

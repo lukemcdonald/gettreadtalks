@@ -1,4 +1,4 @@
-import type { StatusType } from '@/lib/types';
+import type { StatusType } from '@/lib/entities/types';
 
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';

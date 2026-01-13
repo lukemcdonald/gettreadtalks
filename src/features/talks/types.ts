@@ -2,7 +2,7 @@ import type { Preloaded } from 'convex/react';
 import type { FunctionReturnType, PaginationResult } from 'convex/server';
 import type { Doc, Id } from '@/convex/_generated/dataModel';
 import type { Speaker } from '@/features/speakers';
-import type { StatusType } from '@/lib/types';
+import type { StatusType } from '@/lib/entities/types';
 
 // biome-ignore lint/style/useImportType: Convex imports for typeof definitions
 import { api } from '@/convex/_generated/api';

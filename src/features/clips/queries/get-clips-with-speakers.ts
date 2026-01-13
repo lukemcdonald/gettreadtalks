@@ -1,6 +1,6 @@
 'use server';
 
-import type { StatusType } from '@/lib/types';
+import type { StatusType } from '@/lib/entities/types';
 
 import { fetchQuery } from 'convex/nextjs';
 

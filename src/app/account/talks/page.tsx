@@ -1,4 +1,4 @@
-import type { StatusType } from '@/lib/types';
+import type { StatusType } from '@/lib/entities/types';
 
 import { PlusIcon } from 'lucide-react';
 import Link from 'next/link';
