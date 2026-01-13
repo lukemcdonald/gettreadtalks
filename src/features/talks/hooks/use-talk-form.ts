@@ -13,9 +13,8 @@ import { type SubmitErrorHandler, type SubmitHandler, useForm } from 'react-hook
 
 import { slugify } from '@/convex/lib/utils';
 import { createTalkAction, updateTalkAction } from '@/features/talks/actions';
-import { useArchiveTalk, useDestroyTalk, useUpdateTalk } from '@/features/talks/hooks';
 import { talkFormSchema } from '@/features/talks/schemas/talk-form';
-import { getArchiveButtonLabel, getSubmitButtonLabel, getTalkUrl } from '@/features/talks/utils';
+import { getSubmitButtonLabel, getTalkUrl } from '@/features/talks/utils';
 import { useEntityStatus } from '@/lib/entities/hooks';
 import { useFormStatus } from '@/lib/forms/hooks';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
@@ -40,23 +39,17 @@ type UseTalkFormProps = {
 };
 
 type UseTalkFormReturn = {
-  archiveLabel: string;
   form: ReturnType<typeof useForm<TalkFormData>>;
-  isArchived: boolean;
   isBusy: boolean;
-  isDeleting: boolean;
-  onArchiveToggle: () => Promise<void>;
-  onDelete: () => Promise<void>;
   onError: SubmitErrorHandler<TalkFormData>;
   onSubmit: SubmitHandler<TalkFormData>;
   setTalkStatus: (status: StatusType) => void;
   submitLabel: string;
-  talkStatus: StatusType;
 };
 
 /**
  * Hook to manage talk form state and operations.
- * Handles form initialization, submission, archiving, and deletion.
+ * Handles form initialization and submission.
  *
  * @param props - Form configuration and initial data
  * @returns Form instance and handlers
@@ -70,22 +63,9 @@ export function useTalkForm({
 }: UseTalkFormProps): UseTalkFormReturn {
   const router = useRouter();
 
-  const archiveTalk = useArchiveTalk({ onSuccess: () => router.push('/talks') });
-  const destroyTalk = useDestroyTalk({ onSuccess: () => router.push('/talks') });
-  const updateTalk = useUpdateTalk();
+  const { isBusy: isFormBusy, setStatus: setFormStatus, status: formStatus } = useFormStatus();
 
-  const {
-    isBusy: isFormBusy,
-    isDeleting,
-    setStatus: setFormStatus,
-    status: formStatus,
-  } = useFormStatus();
-
-  const {
-    isArchived,
-    setStatus: setTalkStatus,
-    status: talkStatus,
-  } = useEntityStatus(initialData?.status || 'backlog');
+  const { setStatus: setTalkStatus } = useEntityStatus(initialData?.status || 'backlog');
 
   const [isPending, startTransition] = useTransition();
 
@@ -144,76 +124,18 @@ export function useTalkForm({
   };
 
   const onError: SubmitErrorHandler<TalkFormData> = () => {
-    // TODO: Add eventing
-  };
-
-  const onArchiveToggle = async () => {
-    if (!talkId) {
-      return;
-    }
-
-    const archiveIntent = isArchived ? 'unarchive' : 'archive';
-    const confirmMessage = `Are you sure you want to ${archiveIntent} this talk?`;
-
-    // biome-ignore lint/suspicious/noAlert: confirm dialog
-    if (!window.confirm(confirmMessage)) {
-      return;
-    }
-
-    setFormStatus(isArchived ? 'unarchiving' : 'archiving');
-
-    try {
-      if (isArchived) {
-        await updateTalk.mutateAsync({ talkId, status: 'backlog' });
-        setTalkStatus('backlog');
-      } else {
-        await archiveTalk.mutateAsync({ talkId });
-        setTalkStatus('archived');
-      }
-      router.push('/talks');
-    } catch (error) {
-      setFormStatus('idle');
-    }
-  };
-
-  const onDelete = async () => {
-    if (!talkId) {
-      return;
-    }
-
-    // biome-ignore lint/suspicious/noAlert: confirm dialog
-    if (!window.confirm('Are you sure you want to permanently delete this talk?')) {
-      return;
-    }
-
-    setFormStatus('deleting');
-
-    try {
-      await destroyTalk.mutateAsync({ talkId });
-    } catch (error) {
-      // TODO: Should this be in finally and should we capture the error in catch?
-      setFormStatus('idle');
-    }
+    // Empty - form errors are displayed inline
   };
 
   const isBusy = isFormBusy || isPending;
-
-  const archiveLabel = getArchiveButtonLabel(formStatus, talkStatus);
   const submitLabel = getSubmitButtonLabel(formStatus, talkId);
 
-  // TODO: Are all of these used? Can this be simplified?
   return {
-    archiveLabel,
     form,
-    isArchived,
     isBusy,
-    isDeleting,
-    onArchiveToggle,
-    onDelete,
     onError,
     onSubmit,
     setTalkStatus,
     submitLabel,
-    talkStatus,
   };
 }
