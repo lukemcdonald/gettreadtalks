@@ -80,7 +80,6 @@ export const updateClip = mutation({
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
-    // TODO: Do we really need to destructure clipId off of args?
     const { clipId, ...rest } = args;
     const updates: Partial<Doc<'clips'>> = rest;
 
