@@ -5,12 +5,9 @@ import 'server-only';
 import type { ActionResult } from '@/lib/forms/types';
 import type { TalkId } from '../types';
 
-import { fetchMutation } from 'convex/nextjs';
-
 import { api } from '@/convex/_generated/api';
-import { withConvexAuth } from '@/lib/convex/server-action';
 import { mapConvexErrorToFormErrors, mapZodErrors } from '@/lib/forms/validation';
-import { requireAdminUser } from '@/services/auth/server';
+import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
 import { talkFormSchema } from '../schemas/talk-form';
 
 /**
@@ -33,10 +30,7 @@ export async function updateTalkAction(
   }
 
   try {
-    await withConvexAuth(
-      async (token) =>
-        await fetchMutation(api.talks.updateTalk, { ...parsed.data, talkId }, { token }),
-    );
+    await fetchAuthMutation(api.talks.updateTalk, { ...parsed.data, talkId });
 
     return {
       success: true,

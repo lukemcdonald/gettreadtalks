@@ -5,13 +5,11 @@ import 'server-only';
 import type { ActionResult } from '@/lib/forms/types';
 import type { SpeakerId } from '../types';
 
-import { fetchMutation } from 'convex/nextjs';
 import { z } from 'zod';
 
 import { api } from '@/convex/_generated/api';
-import { withConvexAuth } from '@/lib/convex/server-action';
 import { mapConvexErrorToFormErrors, mapZodErrors } from '@/lib/forms/validation';
-import { requireAdminUser } from '@/services/auth/server';
+import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
 
 /**
  * Zod schema for creating a speaker.
@@ -48,9 +46,7 @@ export async function createSpeakerAction(
   }
 
   try {
-    const speakerId = await withConvexAuth(
-      async (token) => await fetchMutation(api.speakers.createSpeaker, parsed.data, { token }),
-    );
+    const speakerId = await fetchAuthMutation(api.speakers.createSpeaker, parsed.data);
 
     return {
       success: true,
