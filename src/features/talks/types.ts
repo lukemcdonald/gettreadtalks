@@ -17,7 +17,6 @@ export type TalkWithSpeaker = Talk & {
   speaker: Speaker | null;
 };
 export type TalkWithSpeakerAndTopics = TalkWithSpeaker & {
-  // TODO: should this just be topics and not just topicSlugs
   topicSlugs: string[];
 };
 

@@ -236,7 +236,6 @@ export const listCollectionsWithStats = query({
       page: enrichedPage,
     };
   },
-  // TODO: Remove v.any()
   returns: v.any(), // PaginationResult with enriched page: Array<{ collection, speakers, talkCount }>
 });
 
@@ -279,6 +278,5 @@ export const listCollectionsWithStatsAdmin = query({
       page: enrichedPage,
     };
   },
-  // TODO: remove v.any
   returns: v.any(), // PaginationResult with enriched page: Array<{ collection, speakers, talkCount }>
 });

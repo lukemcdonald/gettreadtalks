@@ -87,7 +87,6 @@ export const updateCollection = mutation({
     url: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    // TODO: Do we really need to destruction collectionId from rest
     const { collectionId, ...rest } = args;
 
     await requireAuth(ctx);
