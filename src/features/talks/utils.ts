@@ -29,22 +29,3 @@ export function getSubmitButtonLabel(formStatus: FormStatus, talkId?: string): s
 
   return 'Create Talk';
 }
-
-/**
- * Get archive button label based on form operation status and talk status.
- */
-export function getArchiveButtonLabel(formStatus: FormStatus, talkStatus: StatusType): string {
-  if (formStatus === 'archiving') {
-    return 'Archiving...';
-  }
-
-  if (formStatus === 'unarchiving') {
-    return 'Unarchiving...';
-  }
-
-  if (talkStatus === 'archived') {
-    return 'Unarchive Talk';
-  }
-
-  return 'Archive Talk';
-}
