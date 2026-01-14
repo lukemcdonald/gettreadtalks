@@ -39,7 +39,7 @@ export const getSpeakerBySlug = query({
 
     const { _id: speakerId } = speaker;
 
-    const [talks, collections, clips] = await Promise.all([
+    const [talks, clips] = await Promise.all([
       ctx.db
         .query('talks')
         .withIndex('by_speakerId_and_status', (q) =>
@@ -47,21 +47,6 @@ export const getSpeakerBySlug = query({
         )
         .order('desc')
         .collect(),
-      // TODO: Simplify
-      ctx.db
-        .query('talks')
-        .withIndex('by_speakerId_and_status', (q) =>
-          q.eq('speakerId', speakerId).eq('status', 'published'),
-        )
-        .collect()
-        .then((allTalks) => {
-          const collectionIds = [
-            ...new Set(allTalks.flatMap((talk) => (talk.collectionId ? [talk.collectionId] : []))),
-          ];
-          return Promise.all(collectionIds.map((id) => ctx.db.get('collections', id))).then(
-            (cols) => cols.filter((col): col is Doc<'collections'> => col !== null),
-          );
-        }),
       ctx.db
         .query('clips')
         .withIndex('by_speakerId_and_status', (q) =>
@@ -70,6 +55,14 @@ export const getSpeakerBySlug = query({
         .order('desc')
         .collect(),
     ]);
+
+    const collectionIds = [
+      ...new Set(talks.flatMap((talk) => (talk.collectionId ? [talk.collectionId] : []))),
+    ];
+    const collectionsData = await Promise.all(
+      collectionIds.map((id) => ctx.db.get('collections', id)),
+    );
+    const collections = collectionsData.filter((col): col is Doc<'collections'> => col !== null);
 
     return {
       clips,
