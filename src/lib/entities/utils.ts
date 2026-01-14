@@ -1,19 +1,21 @@
+import type { StatusType } from './types';
+
 /**
- * Get archive action label based on loading and archived state.
+ * Get archive action label based on entity status and loading state.
  * Used across entity types for consistent archive/unarchive labeling.
  */
 export function getArchiveLabel({
+  status,
   isLoading,
-  isArchived,
 }: {
+  status?: StatusType;
   isLoading: boolean;
-  isArchived: boolean;
 }): string {
   if (isLoading) {
     return 'Archiving...';
   }
 
-  if (isArchived) {
+  if (status === 'archived') {
     return 'Unarchive';
   }
 
