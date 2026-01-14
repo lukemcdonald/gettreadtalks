@@ -42,7 +42,7 @@ export function ContentActionsGroup({
   const isLoading = isArchiving || isDeleting;
   const isDisabled = disabled || isLoading;
 
-  const archiveLabel = getArchiveLabel({ status: content.status, isLoading: isArchiving });
+  const archiveLabel = getArchiveLabel({ isLoading: isArchiving, status: content.status });
 
   const handleArchive = async () => {
     if (!onArchiveAction) {

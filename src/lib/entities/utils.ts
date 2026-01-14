@@ -5,11 +5,11 @@ import type { StatusType } from './types';
  * Used across entity types for consistent archive/unarchive labeling.
  */
 export function getArchiveLabel({
-  status,
   isLoading,
+  status,
 }: {
-  status?: StatusType;
   isLoading: boolean;
+  status?: StatusType;
 }): string {
   if (isLoading) {
     return 'Archiving...';
