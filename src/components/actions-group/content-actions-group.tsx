@@ -16,6 +16,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/primitives/alert-dialog';
 import { toastManager } from '@/components/ui/primitives/toast';
+import { getArchiveLabel } from '@/lib/entities/utils';
 import { getErrorMessage } from '@/services/errors';
 import { capitalize } from '@/utils';
 import { ActionsGroup } from './actions-group';
@@ -41,17 +42,7 @@ export function ContentActionsGroup({
   const isLoading = isArchiving || isDeleting;
   const isDisabled = disabled || isLoading;
 
-  function getArchiveLabel() {
-    if (isArchiving) {
-      return 'Archiving...';
-    }
-    if (isArchived) {
-      return 'Unarchive';
-    }
-    return 'Archive';
-  }
-
-  const archiveLabel = getArchiveLabel();
+  const archiveLabel = getArchiveLabel({ isLoading: isArchiving, isArchived });
 
   const handleArchive = async () => {
     if (!onArchiveAction) {
