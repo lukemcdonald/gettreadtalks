@@ -41,13 +41,17 @@ export function ContentActionsGroup({
   const isLoading = isArchiving || isDeleting;
   const isDisabled = disabled || isLoading;
 
-  let archiveLabel = 'Archive';
-
-  if (isArchiving) {
-    archiveLabel = 'Archiving...';
-  } else if (isArchived) {
-    archiveLabel = 'Unarchive';
+  function getArchiveLabel() {
+    if (isArchiving) {
+      return 'Archiving...';
+    }
+    if (isArchived) {
+      return 'Unarchive';
+    }
+    return 'Archive';
   }
+
+  const archiveLabel = getArchiveLabel();
 
   const handleArchive = async () => {
     if (!onArchiveAction) {
