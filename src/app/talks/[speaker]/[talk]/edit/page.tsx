@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { EditTalkContent } from '@/app/talks/[speaker]/[talk]/edit/_components/edit-talk-content';
 import { CenteredLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
-import { getCollections, getSpeakers, getTalkBySlug } from '@/features/talks';
+import { getCollections, getSpeakers, getTalkBySlug } from '@/features/talks/queries';
 import { requireAdminUser } from '@/services/auth/server';
 
 type EditTalkPageProps = {

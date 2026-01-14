@@ -1,5 +1,5 @@
 import type { Speaker } from '@/features/speakers/types';
-import type { Talk } from '@/features/talks';
+import type { Talk } from '@/features/talks/types';
 
 import Link from 'next/link';
 

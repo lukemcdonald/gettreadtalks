@@ -3,7 +3,7 @@ import { TalksSidebar } from '@/app/talks/_components/talks-sidebar';
 import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { sortSpeakersByName } from '@/features/speakers';
-import { getTalksWithSpeakers } from '@/features/talks';
+import { getTalksWithSpeakers } from '@/features/talks/queries';
 import { getTopicsWithCounts } from '@/features/topics';
 
 export type TalksPageSearchParams = {

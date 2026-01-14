@@ -1,7 +1,7 @@
 import { CenteredLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
-import { getCollections, getSpeakers } from '@/features/talks';
 import { TalkForm } from '@/features/talks/components';
+import { getCollections, getSpeakers } from '@/features/talks/queries';
 import { requireAdminUser } from '@/services/auth/server';
 
 export default async function NewTalkPage() {

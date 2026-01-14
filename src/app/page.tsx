@@ -4,8 +4,8 @@ import { Main } from '@/components/main';
 import { Container, Section } from '@/components/ui';
 import { getFeaturedSpeakers } from '@/features/speakers';
 import { SpeakerCard } from '@/features/speakers/components';
-import { getFeaturedTalks } from '@/features/talks';
 import { TalkCard } from '@/features/talks/components';
+import { getFeaturedTalks } from '@/features/talks/queries';
 
 export default async function HomePage() {
   const [featuredTalksResult, featuredSpeakersResult] = await Promise.all([
