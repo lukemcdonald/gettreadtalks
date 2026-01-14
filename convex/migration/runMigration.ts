@@ -11,11 +11,9 @@ import { importTalks } from './importTalks';
 import { importTopics } from './importTopics';
 
 /**
- * Clear all data from tables (for development reset).
+ * Clear all data from tables (for development/testing).
  * WARNING: This permanently deletes all data!
- *
- * This is a PUBLIC mutation for development use.
- * TODO: Remove or protect this after migration is complete.
+ * Only works in non-production deployments.
  */
 export const clearAllData = mutation({
   args: {},
@@ -23,6 +21,9 @@ export const clearAllData = mutation({
     deleted: v.record(v.string(), v.number()),
   }),
   handler: async (ctx) => {
+    if (process.env.CONVEX_CLOUD_URL?.includes('prod.convex.cloud')) {
+      throw new Error('Migration functions are disabled in production');
+    }
     // Delete in reverse dependency order
     const tables = [
       'clipsOnTopics',
@@ -61,8 +62,7 @@ export const clearAllData = mutation({
 /**
  * Main migration mutation that orchestrates the entire migration process.
  * This is called from a local script that fetches Airtable data first.
- *
- * TODO: Remove or protect this after migration is complete.
+ * Only works in non-production deployments.
  */
 export const runMigration = mutation({
   args: {
@@ -82,6 +82,9 @@ export const runMigration = mutation({
     topics: v.number(),
   }),
   handler: async (ctx, args) => {
+    if (process.env.CONVEX_CLOUD_URL?.includes('prod.convex.cloud')) {
+      throw new Error('Migration functions are disabled in production');
+    }
     console.log('Starting Airtable to Convex migration...');
     console.log(
       `Importing ${args.speakers.length} speakers, ${args.topics.length} topics, ${args.series.length} series, ${args.talks.length} talks, ${args.clips.length} clips, ${args.affiliateLinks.length} affiliate links`,
