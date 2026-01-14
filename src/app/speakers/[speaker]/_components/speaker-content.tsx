@@ -1,7 +1,7 @@
 import type { Clip } from '@/features/clips/types';
 import type { Collection } from '@/features/collections/types';
 import type { Speaker } from '@/features/speakers/types';
-import type { Talk } from '@/features/talks';
+import type { Talk } from '@/features/talks/types';
 
 import { GridList } from '@/components/grid-list';
 import { Separator } from '@/components/ui';

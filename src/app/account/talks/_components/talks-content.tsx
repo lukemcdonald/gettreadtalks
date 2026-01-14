@@ -6,7 +6,7 @@ import { TalksFilters } from '@/app/account/talks/_components/talks-filters';
 import { TalksTable } from '@/app/account/talks/_components/talks-table';
 import { Pagination } from '@/components/pagination';
 import { Skeleton } from '@/components/ui';
-import { getTalksWithSpeakersAdmin } from '@/features/talks';
+import { getTalksWithSpeakersAdmin } from '@/features/talks/queries';
 
 type AdminTalksContentProps = {
   searchParams: AdminTalksSearchParams;

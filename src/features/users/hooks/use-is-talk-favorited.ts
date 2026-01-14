@@ -1,6 +1,6 @@
 'use client';
 
-import type { TalkId } from '@/features/talks';
+import type { TalkId } from '@/features/talks/types';
 
 import { useQuery } from 'convex/react';
 

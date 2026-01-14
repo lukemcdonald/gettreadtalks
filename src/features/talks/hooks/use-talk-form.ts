@@ -2,8 +2,8 @@
 
 import type { Collection, CollectionId } from '@/features/collections/types';
 import type { Speaker, SpeakerId } from '@/features/speakers/types';
-import type { TalkId } from '@/features/talks';
 import type { TalkFormData } from '@/features/talks/schemas/talk-form';
+import type { TalkId } from '@/features/talks/types';
 import type { StatusType } from '@/lib/entities/types';
 
 import { useTransition } from 'react';

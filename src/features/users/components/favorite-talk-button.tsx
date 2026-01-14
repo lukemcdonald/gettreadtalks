@@ -1,6 +1,6 @@
 'use client';
 
-import type { TalkId } from '@/features/talks';
+import type { TalkId } from '@/features/talks/types';
 
 import { Authenticated } from 'convex/react';
 import { DynamicIcon } from 'lucide-react/dynamic';
