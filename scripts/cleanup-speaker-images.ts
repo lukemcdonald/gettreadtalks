@@ -121,7 +121,7 @@ async function main() {
   const client = new ConvexHttpClient(convexUrl);
 
   // Get all speakers
-  const allSpeakers = await client.query(api.model.speakers.queries.listAllSpeakers, {});
+  const allSpeakers = await client.query(api.model.speakers.queries.listAllSpeakersRaw, {});
 
   console.log(`✅ Found ${allSpeakers.length} speakers in database\n`);
 

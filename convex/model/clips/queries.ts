@@ -12,9 +12,7 @@ import { doc, docs } from '../../lib/validators/schema';
 import { statusFilterType } from '../../lib/validators/shared';
 import { canViewContent } from '../auth/roles';
 import { getCurrentUser } from '../auth/utils';
-import { statusType } from './validators';
 
-const clipPageValidator = paginationResultValidator(doc('clips'));
 const clipPageWithSpeakersValidator = paginationResultValidator(
   doc('clips').extend({
     speaker: doc('speakers').nullable(),
@@ -79,54 +77,22 @@ export const getClipBySlug = query({
 });
 
 /**
- * List clips with optional filters and pagination.
+ * List published clips with speaker data (public-facing).
+ * Filters clips to only those with published parent talks.
+ * Clips without a parent talk (standalone) are included.
  */
 export const listClips = query({
   args: {
     paginationOpts: paginationOptsValidator,
-    status: v.optional(statusType),
   },
   handler: async (ctx, args) => {
-    const { paginationOpts, status } = args;
+    const { paginationOpts } = args;
 
-    if (status) {
-      return await ctx.db
-        .query('clips')
-        .withIndex('by_status_and_publishedAt', (q) => q.eq('status', status))
-        .order('desc')
-        .paginate(paginationOpts);
-    }
-
-    return await ctx.db.query('clips').order('desc').paginate(paginationOpts);
-  },
-  returns: clipPageValidator,
-});
-
-/**
- * List clips with speaker data (paginated, public-facing).
- * Filters clips to only those with published parent talks.
- * Clips without a parent talk (standalone) are included.
- * Defaults to published status.
- */
-export const listClipsWithSpeakers = query({
-  args: {
-    paginationOpts: paginationOptsValidator,
-    status: v.optional(statusType),
-  },
-  handler: async (ctx, args) => {
-    const { paginationOpts, status = 'published' } = args;
-
-    let clipPages: PaginationResult<Doc<'clips'>>;
-
-    if (status) {
-      clipPages = await ctx.db
-        .query('clips')
-        .withIndex('by_status_and_publishedAt', (q) => q.eq('status', status))
-        .order('desc')
-        .paginate(paginationOpts);
-    } else {
-      clipPages = await ctx.db.query('clips').order('desc').paginate(paginationOpts);
-    }
+    const clipPages = await ctx.db
+      .query('clips')
+      .withIndex('by_status_and_publishedAt', (q) => q.eq('status', 'published'))
+      .order('desc')
+      .paginate(paginationOpts);
 
     const filtered = await filterClipsByPublishedTalks(ctx, clipPages.page);
 
@@ -167,11 +133,11 @@ export const listClipsBySpeaker = query({
 });
 
 /**
- * List clips with speaker data (admin).
+ * List all clips with speaker data.
  * Returns all clips without filtering by parent talk status.
- * Allows viewing all status types including drafts.
+ * Supports status='all' to fetch clips across all statuses.
  */
-export const listClipsWithSpeakersAdmin = query({
+export const listAllClips = query({
   args: {
     paginationOpts: paginationOptsValidator,
     status: v.optional(statusFilterType),

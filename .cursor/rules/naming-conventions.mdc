@@ -186,7 +186,7 @@ export function useItemWithRelated(id: string) {
 
 ## Feature Queries (Server)
 
-Use singular/plural nouns to indicate return type:
+Use singular/plural nouns with **safe-by-default** naming:
 
 ```ts
 // queries.ts - Server reads
@@ -195,15 +195,18 @@ Use singular/plural nouns to indicate return type:
 export async function getItem(id);
 export async function getItemBySlug(slug);
 
-// Arrays with pagination (return pagination metadata)
-export async function getItems({ limit = 12 });
-export async function getItemsWithAuthors({ limit = 12, cursor, ...filters });
+// Arrays - filtered (public pages)
+export async function getItems({ limit });
+
+// Arrays - unfiltered (admin pages)
+export async function getAllItems({ limit, status });
 ```
 
 **Pattern:**
 
 - **`get*` (singular)** - Returns single item or null (e.g., `getItem`, `getItemBySlug`)
-- **`get*` (plural)** - Returns pagination metadata (e.g., `getItems({ limit = 12 })` → `{ items, continueCursor, isDone }`)
+- **`get*` (plural)** - Filtered/public, returns pagination metadata
+- **`getAll*` (plural)** - Unfiltered/admin, supports status filtering
 
 **Pagination Standard:**
 
@@ -316,49 +319,42 @@ getItemsWithAuthors({ limit: 20, cursor, featured, search, ... }) → { items, c
 
 **BySlug queries always return relations** - They're used on detail pages where relations are always needed.
 
-**Single relation type:** Use `With{Entity}` suffix
+**Key Pattern:**
 
-- `getCategoryBySlug` - Returns category only
-- `getCategoryBySlugWithItems` - Returns category with items
+- `getItemBySlug` - Returns item with all relations (author, category, tags, etc.)
+- `getItems` - Returns items with built-in data enrichment
+- `getAllItems` - Returns all items with enrichment
 
-**Multiple relation types:** Default returns all relations
-
-- `getItemBySlug` - Returns item with author, category, tags, relatedItems
-
-**Decision Guide:**
-
-- **1 relation type?** → Use `With{Entity}` suffix (e.g., `getCategoryBySlugWithItems`)
-- **2+ relation types?** → Default name returns all relations
-
-**Important:** The `With{Entity}` suffix refers to the **relation type**, not the count. For example:
-
-- `getTalksWithSpeakers()` - Returns talks with speaker relation (could be one or many speakers)
-- `listItemsWithAuthors()` - Returns items with author relation (each item has one author, but many items)
-
-The plural form (`Speakers`, `Authors`) indicates the relation type name, not that multiple relations are returned per item.
+**Data enrichment is implicit** - Base queries (`getItems`, `getAllItems`) include related data (speakers, topics, etc.) without needing explicit `With*` suffixes. This simplifies the API while ensuring commonly needed data is always available.
 
 ### Convex Export Names
 
-**Export names should match what they return. BySlug queries always return relations.**
+**Export names should match their access level and purpose:**
 
 ```ts
-// ✅ Good - BySlug always returns relations
-export const getItemBySlug = queries.getItemBySlug;
+// ✅ Good - Clear naming
+export const getItemBySlug = queries.getItemBySlug;  // Detail page
+export const listItems = queries.listItems;          // Public (filtered)
+export const listAllItems = queries.listAllItems;    // Admin (unfiltered)
 ```
 
 ### Query Function Names (queries.ts)
 
-**Query function names should match their purpose. BySlug queries are for detail pages and always return relations.**
+**Feature layer queries wrap Convex calls with consistent naming:**
 
 ```ts
-// queries.ts - Detail pages - BySlug queries return relations
+// queries.ts - Public queries
 export async function getItemBySlug(slug: string) {
   return await fetchQuery(api.items.getItemBySlug, { slug }, { token });
 }
 
-// queries.ts - Simple lookups - use getItem(id) for entities without relations
-export async function getItem(id: string) {
-  return await fetchQuery(api.items.getItem, { id }, { token });
+export async function getItems({ limit }: { limit?: number } = {}) {
+  return await fetchQuery(api.items.listItems, { paginationOpts }, { token });
+}
+
+// queries.ts - Admin queries
+export async function getAllItems({ limit, status }) {
+  return await fetchQuery(api.items.listAllItems, { paginationOpts, status }, { token });
 }
 ```
 

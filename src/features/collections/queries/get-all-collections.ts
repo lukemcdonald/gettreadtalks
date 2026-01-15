@@ -5,14 +5,14 @@ import { fetchQuery } from 'convex/nextjs';
 import { api } from '@/convex/_generated/api';
 import { getAuthToken } from '@/services/auth/server';
 
-type GetCollectionsProps = {
+type GetAllCollectionsProps = {
   limit?: number;
 };
 
 /**
- * Get collections for form dropdowns.
+ * Get all collections with stats (talk counts and speakers).
  */
-export async function getCollections(args?: GetCollectionsProps) {
+export async function getAllCollections(args?: GetAllCollectionsProps) {
   const { limit } = args ?? {};
 
   const token = await getAuthToken();
@@ -22,7 +22,11 @@ export async function getCollections(args?: GetCollectionsProps) {
     numItems: limit ?? 1000,
   };
 
-  const result = await fetchQuery(api.collections.listCollections, { paginationOpts }, { token });
+  const result = await fetchQuery(
+    api.collections.listAllCollections,
+    { paginationOpts },
+    { token },
+  );
 
   return {
     collections: result.page,

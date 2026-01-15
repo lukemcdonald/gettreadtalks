@@ -1,2 +1,3 @@
+export { getAllClips } from './get-all-clips';
 export { getClipBySlug } from './get-clip-by-slug';
-export { getClipsWithSpeakers } from './get-clips-with-speakers';
+export { getClips } from './get-clips';

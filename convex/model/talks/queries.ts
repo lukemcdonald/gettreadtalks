@@ -1,9 +1,7 @@
-import type { PaginationResult } from 'convex/server';
 import type { Doc } from '../../_generated/dataModel';
 
 import { paginationOptsValidator, paginationResultValidator } from 'convex/server';
 import { v } from 'convex/values';
-import { asyncMap } from 'convex-helpers';
 import { getManyFrom, getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
 
 import { query } from '../../_generated/server';
@@ -18,11 +16,7 @@ import { doc, docs } from '../../lib/validators/schema';
 import { statusFilterType } from '../../lib/validators/shared';
 import { canViewContent } from '../auth/roles';
 import { getCurrentUser } from '../auth/utils';
-import { enrichWithTopics, getTalksByTopic } from './utils';
-import { statusType } from './validators';
-
-const talkPageValidator = paginationResultValidator(doc('talks'));
-const talkPageWithSpeakersValidator = paginationResultValidator(talkWithSpeakerValidator);
+import { enrichWithTopics } from './utils';
 
 /**
  * Get talk by ID.
@@ -137,8 +131,6 @@ export const listFeaturedTalks = query({
   handler: async (ctx, args) => {
     const { limit = 5 } = args;
 
-    // Intentionally unbounded: Need all featured talks for random selection
-    // Limited to 50 to prevent memory issues if featured talks grow
     const talks = await ctx.db
       .query('talks')
       .withIndex('by_featured_and_status', (q) => q.eq('featured', true).eq('status', 'published'))
@@ -159,8 +151,6 @@ export const listFeaturedTalksWithSpeakers = query({
   handler: async (ctx, args) => {
     const { limit = 5 } = args;
 
-    // Intentionally unbounded: Need all featured talks for random selection
-    // Limited to 50 to prevent memory issues if featured talks grow
     const talks = await ctx.db
       .query('talks')
       .withIndex('by_featured_and_status', (q) => q.eq('featured', true).eq('status', 'published'))
@@ -203,192 +193,6 @@ export const listRandomTalksBySpeaker = query({
 });
 
 /**
- * List talks with optional filters and pagination.
- */
-export const listTalks = query({
-  args: {
-    featured: v.optional(v.boolean()),
-    paginationOpts: paginationOptsValidator,
-    search: v.optional(v.string()),
-    speakerId: v.optional(v.id('speakers')),
-    status: v.optional(statusType),
-    topicId: v.optional(v.id('topics')),
-  },
-  // biome-ignore lint/complexity: query
-  handler: async (ctx, args) => {
-    const { featured, paginationOpts, search, speakerId, status, topicId } = args;
-
-    // If filtering by topic, get talks from talksOnTopics join table
-    if (topicId) {
-      const talksOnTopics = await ctx.db
-        .query('talksOnTopics')
-        .withIndex('by_topicId', (q) => q.eq('topicId', topicId))
-        .collect();
-
-      const talkIds = talksOnTopics.map((t) => t.talkId);
-      const talks = await Promise.all(talkIds.map((id) => ctx.db.get('talks', id)));
-
-      // Filter out null results and apply additional filters
-      let filteredTalks = talks.filter((talk): talk is Doc<'talks'> => talk !== null);
-
-      if (status) {
-        filteredTalks = filteredTalks.filter((talk) => talk.status === status);
-      }
-      if (featured !== undefined) {
-        filteredTalks = filteredTalks.filter((talk) => talk.featured === featured);
-      }
-      if (speakerId) {
-        filteredTalks = filteredTalks.filter((talk) => talk.speakerId === speakerId);
-      }
-
-      if (search) {
-        const searchLower = search.toLowerCase();
-        filteredTalks = filteredTalks.filter((talk) =>
-          talk.title.toLowerCase().includes(searchLower),
-        );
-      }
-
-      // Sort by publishedAt or _creationTime
-      filteredTalks.sort(
-        (a, b) => (b.publishedAt || b._creationTime) - (a.publishedAt || a._creationTime),
-      );
-
-      // Manual pagination
-      const numItems = paginationOpts.numItems || 20;
-      const page = filteredTalks.slice(0, numItems);
-
-      return {
-        continueCursor: '',
-        isDone: true,
-        page,
-      };
-    }
-
-    // Use indexes when possible for better performance
-    if (featured !== undefined && status) {
-      const result = await ctx.db
-        .query('talks')
-        .withIndex('by_featured_and_status', (q) => q.eq('featured', featured).eq('status', status))
-        .order('desc')
-        .paginate(paginationOpts);
-
-      if (search) {
-        result.page = applySearchFilter(result.page, search);
-        // Reset pagination when search is applied (simplified approach)
-        return {
-          continueCursor: '',
-          isDone: true,
-          page: result.page,
-        };
-      }
-
-      return result;
-    }
-
-    if (speakerId && status) {
-      const result = await ctx.db
-        .query('talks')
-        .withIndex('by_speakerId_and_status', (q) =>
-          q.eq('speakerId', speakerId).eq('status', status),
-        )
-        .order('desc')
-        .paginate(paginationOpts);
-
-      if (search) {
-        result.page = applySearchFilter(result.page, search);
-        return {
-          continueCursor: '',
-          isDone: true,
-          page: result.page,
-        };
-      }
-
-      return result;
-    }
-
-    if (status) {
-      const result = await ctx.db
-        .query('talks')
-        .withIndex('by_status_and_publishedAt', (q) => q.eq('status', status))
-        .order('desc')
-        .paginate(paginationOpts);
-
-      if (search) {
-        result.page = applySearchFilter(result.page, search);
-        return {
-          continueCursor: '',
-          isDone: true,
-          page: result.page,
-        };
-      }
-
-      return result;
-    }
-
-    if (speakerId) {
-      const result = await ctx.db
-        .query('talks')
-        .withIndex('by_speakerId_and_status', (q) => q.eq('speakerId', speakerId))
-        .order('desc')
-        .paginate(paginationOpts);
-
-      // Apply featured filter if needed
-      if (featured !== undefined) {
-        result.page = result.page.filter((talk) => talk.featured === featured);
-      }
-
-      if (search) {
-        result.page = applySearchFilter(result.page, search);
-        return {
-          continueCursor: '',
-          isDone: true,
-          page: result.page,
-        };
-      }
-
-      return result;
-    }
-
-    if (featured !== undefined) {
-      const result = await ctx.db
-        .query('talks')
-        .withIndex('by_featured_and_status', (q) => q.eq('featured', featured))
-        .order('desc')
-        .paginate(paginationOpts);
-
-      if (search) {
-        result.page = applySearchFilter(result.page, search);
-        return {
-          continueCursor: '',
-          isDone: true,
-          page: result.page,
-        };
-      }
-
-      return result;
-    }
-
-    // Default query - apply search if provided
-    if (search) {
-      // Search requires in-memory filtering, can't use .paginate()
-      const allTalks = await ctx.db.query('talks').order('desc').collect();
-      const filtered = applySearchFilter(allTalks, search);
-      const numItems = paginationOpts.numItems || 20;
-      const page = filtered.slice(0, numItems);
-
-      return {
-        continueCursor: '',
-        isDone: filtered.length <= numItems,
-        page,
-      };
-    }
-
-    return await ctx.db.query('talks').order('desc').paginate(paginationOpts);
-  },
-  returns: talkPageValidator,
-});
-
-/**
  * Get talks by collection with status filter. Returns talks sorted by collection order.
  */
 export const listTalksByCollection = query({
@@ -406,7 +210,6 @@ export const listTalksByCollection = query({
       )
       .take(limit);
 
-    // Sort by collection order.
     const sortedTalks = talks.sort((a, b) => (a.collectionOrder || 0) - (b.collectionOrder || 0));
 
     return sortedTalks;
@@ -437,25 +240,20 @@ export const listTalksBySpeaker = query({
 });
 
 /**
- * Get talks with speaker data with pagination support.
+ * List published talks with speaker data.
  *
- * For public pages: Always pass status='published'
- * For admin pages: Pass appropriate status or omit for default 'published'
- *
- * @param status - Filter by status (defaults to 'published')
  * @param paginationOpts - Pagination options
  */
-export const listTalksWithSpeakers = query({
+export const listTalks = query({
   args: {
     paginationOpts: paginationOptsValidator,
-    status: v.optional(statusType),
   },
   handler: async (ctx, args) => {
-    const { paginationOpts, status = 'published' } = args;
+    const { paginationOpts } = args;
 
     const result = await ctx.db
       .query('talks')
-      .withIndex('by_status_and_publishedAt', (q) => q.eq('status', status))
+      .withIndex('by_status_and_publishedAt', (q) => q.eq('status', 'published'))
       .order('desc')
       .paginate(paginationOpts);
 
@@ -475,14 +273,14 @@ export const listTalksWithSpeakers = query({
 });
 
 /**
- * Admin-specific query for talks with speakers that supports pagination and server-side filtering.
+ * List all talks with speaker data and filtering support.
  * Supports status='all' to fetch talks across all statuses.
  *
  * @param status - Filter by status or 'all' for all statuses (defaults to 'published')
  * @param search - Search by title (optional)
  * @param paginationOpts - Pagination options
  */
-export const listTalksWithSpeakersAdmin = query({
+export const listAllTalks = query({
   args: {
     paginationOpts: paginationOptsValidator,
     search: v.optional(v.string()),

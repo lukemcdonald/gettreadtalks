@@ -5,14 +5,14 @@ import { fetchQuery } from 'convex/nextjs';
 import { api } from '@/convex/_generated/api';
 import { getAuthToken } from '@/services/auth/server';
 
-type GetSpeakersProps = {
+type GetAllSpeakersProps = {
   limit?: number;
 };
 
 /**
- * Get speakers with published content.
+ * Get all speakers.
  */
-export async function getSpeakers(args?: GetSpeakersProps) {
+export async function getAllSpeakers(args?: GetAllSpeakersProps) {
   const { limit } = args ?? {};
 
   const token = await getAuthToken();
@@ -22,7 +22,7 @@ export async function getSpeakers(args?: GetSpeakersProps) {
     numItems: limit ?? 1000,
   };
 
-  const result = await fetchQuery(api.speakers.listSpeakers, { paginationOpts }, { token });
+  const result = await fetchQuery(api.speakers.listAllSpeakers, { paginationOpts }, { token });
 
   return {
     continueCursor: result.continueCursor,

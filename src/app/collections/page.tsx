@@ -1,11 +1,11 @@
 import { CollectionsContent } from '@/app/collections/_components/collections-content';
 import { CollectionsSidebar } from '@/app/collections/_components/collections-sidebar';
 import { SidebarLayout } from '@/components/layouts';
-import { getCollectionsWithStats } from '@/features/collections';
-import { getSpeakers, sortSpeakersByName } from '@/features/speakers';
+import { getCollections } from '@/features/collections';
+import { sortSpeakersByName } from '@/features/speakers';
 
 export default async function CollectionsPage() {
-  const { collections } = await getCollectionsWithStats();
+  const { collections } = await getCollections();
 
   // Get unique speakers who have collections
   const allSpeakers = collections.flatMap((item) => item.speakers);

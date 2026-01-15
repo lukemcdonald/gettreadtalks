@@ -3,7 +3,9 @@ import { notFound } from 'next/navigation';
 import { EditTalkContent } from '@/app/talks/[speaker]/[talk]/edit/_components/edit-talk-content';
 import { CenteredLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
-import { getCollections, getSpeakers, getTalkBySlug } from '@/features/talks/queries';
+import { getAllCollections } from '@/features/collections';
+import { getAllSpeakers } from '@/features/speakers';
+import { getTalkBySlug } from '@/features/talks/queries';
 import { requireAdminUser } from '@/services/auth/server';
 
 type EditTalkPageProps = {
@@ -22,8 +24,11 @@ export default async function EditTalkPage({ params }: EditTalkPageProps) {
   }
 
   const { talk, speaker } = talkData;
-  const [collectionsResult, speakersResult] = await Promise.all([getCollections(), getSpeakers()]);
-  const collections = collectionsResult.collections;
+  const [collectionsResult, speakersResult] = await Promise.all([
+    getAllCollections(),
+    getAllSpeakers(),
+  ]);
+  const collections = collectionsResult.collections.map((item) => item.collection);
   const speakers = speakersResult.speakers;
 
   return (

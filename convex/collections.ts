@@ -5,10 +5,9 @@ export const getCollection = queries.getCollection;
 export const getCollectionBySlug = queries.getCollectionBySlug;
 export const getCollectionWithSpeakers = queries.getCollectionWithSpeakers;
 export const getCollectionWithTalks = queries.getCollectionWithTalks;
+export const listAllCollections = queries.listAllCollections;
 export const listCollections = queries.listCollections;
 export const listCollectionsBySpeaker = queries.listCollectionsBySpeaker;
-export const listCollectionsWithStats = queries.listCollectionsWithStats; // Public: filtered
-export const listCollectionsWithStatsAdmin = queries.listCollectionsWithStatsAdmin; // Admin: all collections
 
 // Mutations
 export const createCollection = mutations.createCollection;

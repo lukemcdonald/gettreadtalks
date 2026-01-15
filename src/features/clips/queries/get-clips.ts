@@ -5,31 +5,29 @@ import { fetchQuery } from 'convex/nextjs';
 import { api } from '@/convex/_generated/api';
 import { getAuthToken } from '@/services/auth/server';
 
-type GetCollectionsWithStatsProps = {
+type GetClipsProps = {
   limit?: number;
 };
 
 /**
- * Get collections with stats (talk counts and speakers) for list page.
+ * Get published clips with speakers.
+ * Returns only published clips with published parent talks.
  */
-export async function getCollectionsWithStats(args?: GetCollectionsWithStatsProps) {
+export async function getClips(args?: GetClipsProps) {
   const { limit } = args ?? {};
 
   const token = await getAuthToken();
 
-  const paginationOpts = {
-    cursor: null,
-    numItems: limit ?? 1000,
-  };
-
   const result = await fetchQuery(
-    api.collections.listCollectionsWithStats,
-    { paginationOpts },
+    api.clips.listClips,
+    {
+      paginationOpts: { cursor: null, numItems: limit ?? 1000 },
+    },
     { token },
   );
 
   return {
-    collections: result.page,
+    clips: result.page,
     continueCursor: result.continueCursor,
     isDone: result.isDone,
   };
