@@ -35,14 +35,24 @@ export function useDebouncedSearchParam(paramName: string, delay = 300) {
   const urlValue = searchParams.get(paramName) ?? '';
   const [localValue, setLocalValue] = useState(urlValue);
 
+  // Track whether user has pending edits that haven't synced to URL yet
+  const hasPendingEditRef = useRef(false);
+
+  // Sync from URL only when user is not actively editing
+  // This handles external URL changes (back navigation, direct URL entry)
   useEffect(() => {
-    setLocalValue(urlValue);
+    if (!hasPendingEditRef.current) {
+      setLocalValue(urlValue);
+    }
   }, [urlValue]);
 
   useEffect(() => {
     if (localValue === urlValue) {
+      hasPendingEditRef.current = false;
       return;
     }
+
+    hasPendingEditRef.current = true;
 
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
