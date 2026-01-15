@@ -3,7 +3,7 @@ import { TalksSidebar } from '@/app/talks/_components/talks-sidebar';
 import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { sortSpeakersByName } from '@/features/speakers';
-import { getTalksWithSpeakers } from '@/features/talks/queries';
+import { getTalks } from '@/features/talks/queries';
 import { getTopicsWithCounts } from '@/features/topics';
 
 export type TalksPageSearchParams = {
@@ -18,10 +18,7 @@ export default async function TalksPage({ searchParams }: TalksPageProps) {
   const params = await searchParams;
   const { cursor } = params;
 
-  const [result, topics] = await Promise.all([
-    getTalksWithSpeakers({ cursor }),
-    getTopicsWithCounts(),
-  ]);
+  const [result, topics] = await Promise.all([getTalks({ cursor }), getTopicsWithCounts()]);
 
   const allSpeakers = result.talks
     .map((talk) => talk.speaker)

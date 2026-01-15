@@ -30,37 +30,39 @@ convex/
 
 ### Query Functions (reads)
 
-Follow the `get` vs `list` pattern:
+Follow the `get` vs `list` pattern with **safe-by-default** naming:
 
 **`get*` queries** - Return single document or null:
 ```ts
-export const getItem = query(...)                    // Get by ID (primary key)
-export const getItemBySlug = query(...)              // Get by slug (public identifier)
-export const getItemBySlugWithRelations = query(...) // Get with joined data
+export const getItem = query(...)       // Get by ID (primary key)
+export const getItemBySlug = query(...) // Get by slug (public identifier)
 ```
 
-**`list*` queries** - Return array of documents:
+**`list*` queries** - Return filtered/public arrays (safe for public pages):
 ```ts
-export const listItems = query(...)                // Basic array query
-export const listItemsByAuthor = query(...)        // Filtered by relation
-export const listItemsByType = query(...)          // Filtered by field
-export const listItemsWithAuthors = query(...)     // With joined data
+export const listItems = query(...)          // Published items with enriched data
+export const listItemsByAuthor = query(...)  // Published items by author
 ```
+
+**`listAll*` queries** - Return unfiltered arrays (admin/internal use):
+```ts
+export const listAllItems = query(...)       // All items regardless of status
+```
+
+**Naming Philosophy:**
+
+- **`list*`** = Filtered, public-safe (default) - includes data enrichment
+- **`listAll*`** = Unfiltered, admin use - all statuses, all items
+
+This "safe-by-default" pattern means the base function (`listItems`) returns filtered data suitable for public pages, while explicit `All` suffix indicates unfiltered access.
 
 **Identifier Pattern:**
 
 - **Simple name (`getItem`)** - By ID (primary key, internal use, relationships)
 - **`BySlug` (`getItemBySlug`)** - By slug (public identifier, URLs)
-- **`By{Field}`** - Other unique fields (e.g., `getUserByEmail`, `getUserByUsername`)
+- **`By{Field}`** - Other unique fields (e.g., `getUserByEmail`)
 
-**Why separate functions?** Clear intent, better TypeScript types, single responsibility principle. Don't make one function accept both ID and slug.
-
-**Relations Pattern:**
-
-- **`With{Entity}`** - Single related entity type (e.g., `getCollectionWithItems`, `listItemsWithAuthors`)
-- **`WithRelations`** - Multiple different entity types (2+ types, e.g., `getItemBySlugWithRelations` returns item + author + categories + tags)
-
-**Decision:** 1 entity type = `With{Entity}`, 2+ entity types = `WithRelations`
+**Why separate functions?** Clear intent, better TypeScript types, single responsibility principle.
 
 ### Mutation Functions (writes)
 
@@ -135,43 +137,32 @@ export const unfinishItem = mutation(...)  // Unmark item as finished
 ### Function Naming Examples
 
 ```ts
-// ✅ Clear - Return type obvious from name
-export const getItem = query(...)             // Returns: Doc<"items"> | null
-export const getItemBySlug = query(...)       // Returns: Doc<"items"> | null
-export const listItems = query(...)            // Returns: Doc<"items">[]
-export const listItemsByAuthor = query(...)    // Returns: Doc<"items">[]
+// ✅ Clear - Return type and access level obvious from name
+export const getItem = query(...)        // Single item by ID
+export const getItemBySlug = query(...)  // Single item by slug (with relations)
+export const listItems = query(...)      // Filtered/public array
+export const listAllItems = query(...)   // Unfiltered/admin array
 
 // ❌ Vague
 export const data = query(...)
-export const stuff = query(...)
-
-// ❌ Confusing - Doesn't indicate return type
-export const getItemsByCollection = query(...) // Returns array but starts with "get"
-export const items = query(...)                 // Unclear what it returns
-
-// ✅ Good - Full names for clarity
-export const getItem = query(...)            // api.items.getItem
-export const listItems = query(...)          // api.items.listItems
-export const getItemBySlug = query(...)      // api.items.getItemBySlug
+export const items = query(...)
 ```
 
-**Naming Pattern Summary:**
-
-**Domain files (`convex/items.ts`)** - Always include the noun:
+**Domain files (`convex/items.ts`):**
 ```ts
-export const getItem = query(...)             // api.items.getItem
-export const getItemBySlug = query(...)      // api.items.getItemBySlug
-export const listItems = query(...)           // api.items.listItems
+export const getItem = queries.getItem;           // api.items.getItem
+export const getItemBySlug = queries.getItemBySlug;
+export const listItems = queries.listItems;       // Filtered (public)
+export const listAllItems = queries.listAllItems; // Unfiltered (admin)
 ```
 
-**Helper files (`convex/model/items/queries.ts`)** - Include noun (clarity when imported):
+**Helper files (`convex/model/items/queries.ts`):**
 ```ts
-export async function getItem(ctx, id) {...}
-export async function getItemBySlug(ctx, slug) {...}
-export async function getItems(ctx, args) {...}
+export const getItem = query({...});
+export const getItemBySlug = query({...});
+export const listItems = query({...});     // Filtered with data enrichment
+export const listAllItems = query({...});  // Unfiltered
 ```
-
-**Why:** Full names improve autocomplete, make intent clear, and are consistent across the codebase. Even though domain exports are accessed via `api.items.*`, the full name makes the API more discoverable and self-documenting.
 
 ### Helper Function Naming Pattern
 
@@ -180,11 +171,13 @@ Both domain files and helper files use full descriptive names for consistency:
 ```ts
 // Domain file: convex/items.ts
 export const getItemBySlug = queries.getItemBySlug;
-export const getItemBySlugWithRelations = queries.getItemBySlugWithRelations;
+export const listItems = queries.listItems;         // Filtered (public)
+export const listAllItems = queries.listAllItems;   // Unfiltered (admin)
 
 // Helper file: convex/model/items/queries.ts
-export async function getItemBySlug(ctx, slug) {...}
-export async function getItemBySlugWithRelations(ctx, slug) {...}
+export const getItemBySlug = query({...});  // Returns item with relations
+export const listItems = query({...});      // Filtered with enrichment
+export const listAllItems = query({...});   // All items
 ```
 
 ### Query Design Decision Tree
@@ -192,99 +185,51 @@ export async function getItemBySlugWithRelations(ctx, slug) {...}
 When deciding whether to create a new query function, follow this tree:
 
 **For Single Items:**
-1. **By ID?** → Use/reuse `getItem(id)` (primary key, internal use)
-2. **By unique field (slug, email)?** → Add `getItemBySlug(slug)` or `getItemByEmail(email)`
-3. **Need relations?** → Create separate `getItemBySlugWithRelations` if always needed together
+1. **By ID?** → Use `getItem(id)` (primary key, internal use)
+2. **By slug?** → Use `getItemBySlug(slug)` - includes relations for detail pages
 
 **For Arrays:**
-1. **Just different filter values?** → Add optional params to existing `listItems({ status?, authorId?, limit? })`
-2. **Special filtering logic or ordering?** → Add `listItemsByAuthor` (e.g., with published-only filter)
-3. **Needs joined data?** → Add `listItemsWithAuthors` (single entity type) or `listItemsWithRelations` (multiple types)
+1. **Public page?** → Use `listItems()` - filtered with data enrichment
+2. **Admin page?** → Use `listAllItems()` - unfiltered, supports status filtering
+3. **Specific filter?** → Use `listItemsByAuthor()` etc.
 
-**When to Create "With Relations" Version:**
-
-Create combined Convex query when:
-- ✅ Always needed together (detail pages)
-- ✅ Used in 2+ places
-- ✅ Can optimize with database joins/indexes
-
-Combine in server action when:
-- ✅ Conditional/optional relationships
-- ✅ One-off combinations
-- ✅ Context-specific data aggregation
+**Key Pattern:**
+- Base queries (`listItems`) include data enrichment (speakers, topics, etc.)
+- No separate `WithSpeakers` variants needed - enrichment is built into the base query
 
 **Examples:**
 
 ```ts
-import { doc, docs } from '../lib/validators';
-
-// ✅ Good: Smart base query with optional filters
-export const list = query({
-  args: {
-    authorId: v.optional(v.id('users')),
-    categoryId: v.optional(v.id('categories')),
-    limit: v.optional(v.number()),
-    status: v.optional(statusType),
-  },
+// ✅ Good: Public query with built-in enrichment
+export const listItems = query({
+  args: { paginationOpts: paginationOptsValidator },
   handler: async (ctx, args) => {
-    // Can handle multiple filter combinations
-  }
-});
-
-// ✅ Good: Specific query when special logic needed
-export const listByAuthor = query({
-  args: { authorId: v.id('users'), limit: v.optional(v.number()) },
-  handler: async (ctx, args) => {
-    // Special ordering: published only, sorted by date desc
-    return await ctx.db
+    const items = await ctx.db
       .query('items')
-      .withIndex('by_author_id_and_status', q => 
-        q.eq('authorId', args.authorId).eq('status', 'published')
-      )
+      .withIndex('by_status', q => q.eq('status', 'published'))
       .order('desc')
-      .take(args.limit ?? 20);
+      .paginate(args.paginationOpts);
+
+    // Enrichment built into base query
+    return enrichWithAuthors(ctx, items.page);
   }
 });
 
-// ✅ Good: Separate function for joined data (type safety)
-// Recommended approach: Separate fields for clarity (matches your codebase pattern)
-export const listWithAuthors = query({
-  args: { limit: v.optional(v.number()) },
-  returns: v.array(v.object({
-    item: doc('items'), // Main item with system fields
-    author: doc('users', true), 
-  })),
-  handler: async (ctx, args) => {
-    // Returns items with author data
-  }
-});
-```
-
-**Why Not Parameterized?**
-```ts
-// ❌ Bad: Loses type safety
-export const list = query({
-  args: { 
-    with: v.optional(v.array(v.string())), // 'authors'? 'categories'?
+// ✅ Good: Admin query with status filtering
+export const listAllItems = query({
+  args: {
+    paginationOpts: paginationOptsValidator,
+    status: v.optional(statusFilterType), // 'all' | specific status
   },
-  returns: v.array(v.any()), // Can't know return type at compile time
+  handler: async (ctx, args) => {
+    // Returns all items, supports filtering
+  }
 });
-
-// ❌ Bad: Not discoverable
-// Developer has to remember what options exist
-api.items.list({ with: ['authors'] }) // What other options?
-
-// vs
-
-// ✅ Good: Autocomplete shows all options
-api.items.listWithAuthors()
-api.items.listWithCategories()
-api.items.listWithTags()
 ```
 
-**Typical Query Count per Entity:** 5-8 queries is manageable and clear:
-- 2-3 single-item: `getItem`, `getItemBySlug`, maybe `getItemBySlugWithRelations`
-- 3-5 arrays: `listItems`, 1-2 `listItemsBy*`, 1-2 `listItemsWith*`
+**Typical Query Count per Entity:** 4-6 queries:
+- Single-item: `getItem`, `getItemBySlug`
+- Arrays: `listItems` (public), `listAllItems` (admin), 1-2 `listItemsBy*`
 
 ## Database Schema Conventions
 

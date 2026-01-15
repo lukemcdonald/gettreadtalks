@@ -7,7 +7,7 @@ import { fetchQuery } from 'convex/nextjs';
 import { api } from '@/convex/_generated/api';
 import { getAuthToken } from '@/services/auth/server';
 
-type GetTalksWithSpeakersAdminProps = {
+type GetAllTalksProps = {
   cursor?: string;
   limit?: number;
   search?: string;
@@ -15,8 +15,7 @@ type GetTalksWithSpeakersAdminProps = {
 };
 
 /**
- * Get talks with speakers for admin management.
- * Supports pagination and server-side filtering.
+ * Get all talks with speakers with filtering support.
  * Supports status='all' to fetch talks across all statuses.
  *
  * @param cursor - Pagination cursor
@@ -24,7 +23,7 @@ type GetTalksWithSpeakersAdminProps = {
  * @param search - Search by title
  * @param status - Filter by status or 'all' for all statuses
  */
-export async function getTalksWithSpeakersAdmin(args: GetTalksWithSpeakersAdminProps = {}) {
+export async function getAllTalks(args: GetAllTalksProps = {}) {
   const token = await getAuthToken();
 
   const cursor = args.cursor ?? null;
@@ -33,7 +32,7 @@ export async function getTalksWithSpeakersAdmin(args: GetTalksWithSpeakersAdminP
   const status = args.status ?? 'published';
 
   const result = await fetchQuery(
-    api.talks.listTalksWithSpeakersAdmin,
+    api.talks.listAllTalks,
     {
       paginationOpts: { cursor, numItems: limit },
       search,

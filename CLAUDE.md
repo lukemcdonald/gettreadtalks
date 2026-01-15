@@ -104,11 +104,10 @@ return <TalksClient initialData={initialTalks} />;
 
 **Naming Conventions:**
 
-*Queries (reads):*
+*Queries (reads) - Safe-by-default pattern:*
 - `get*` - Returns single document or null (e.g., `getTalk`, `getTalkBySlug`)
-- `list*` - Returns array of documents (e.g., `listTalks`, `listTalksBySpeaker`)
-- `get*With*` - Returns single document with specific relations (e.g., `getCollectionWithSpeakers`)
-- `list*With*` - Returns array with relations (e.g., `listTalksWithSpeakers`)
+- `list*` - Returns filtered/public array with data enrichment (e.g., `listTalks`, `listSpeakers`)
+- `listAll*` - Returns unfiltered array for admin use (e.g., `listAllTalks`, `listAllSpeakers`)
 
 *Mutations (writes):*
 - `create*` - Create new entity (e.g., `createTalk`)
@@ -123,8 +122,9 @@ return <TalksClient initialData={initialTalks} />;
 ```typescript
 // convex/talks.ts
 export const getTalk = queries.getTalk;           // api.talks.getTalk
-export const getTalkBySlug = queries.getTalkBySlug; // Returns relations (default for detail pages)
-export const listTalks = queries.getTalks;        // api.talks.listTalks
+export const getTalkBySlug = queries.getTalkBySlug; // Returns relations (detail pages)
+export const listTalks = queries.listTalks;       // Filtered/public with enrichment
+export const listAllTalks = queries.listAllTalks; // Unfiltered/admin
 export const createTalk = mutations.createTalk;   // api.talks.createTalk
 ```
 
@@ -133,7 +133,8 @@ export const createTalk = mutations.createTalk;   // api.talks.createTalk
 // convex/model/talks/queries.ts
 export const getTalk = query({...});
 export const getTalkBySlug = query({...});
-export const getTalks = query({...});
+export const listTalks = query({...});     // Filtered with data enrichment
+export const listAllTalks = query({...});  // Unfiltered
 ```
 
 ### Feature Structure
@@ -272,4 +273,4 @@ The database uses Convex with the following domain tables:
 
 6. **Minimal cross-feature dependencies** - Features should be self-contained. Shared logic goes in `lib/services/` or `lib/utils/`
 
-7. **Consistent naming** - Follow the established patterns for queries (`get*`/`list*` with nouns), mutations (action verbs with nouns), and hooks (`use` + mirror backend names)
+7. **Consistent naming** - Follow the established patterns for queries (`get*`/`list*` for public, `listAll*` for admin), mutations (action verbs with nouns), and hooks (`use` + mirror backend names)

@@ -1,2 +1,3 @@
+export { getAllCollections } from './get-all-collections';
 export { getCollectionBySlug } from './get-collection-by-slug';
-export { getCollectionsWithStats } from './get-collections-with-stats';
+export { getCollections } from './get-collections';

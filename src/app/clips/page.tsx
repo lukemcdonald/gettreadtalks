@@ -2,12 +2,12 @@ import { ClipsContent } from '@/app/clips/_components/clips-content';
 import { ClipsSidebar } from '@/app/clips/_components/clips-sidebar';
 import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
-import { getClipsWithSpeakers } from '@/features/clips';
+import { getClips } from '@/features/clips';
 import { sortSpeakersByName } from '@/features/speakers';
 import { getTopicsWithCounts } from '@/features/topics';
 
 export default async function ClipsPage() {
-  const [clipsResult, topics] = await Promise.all([getClipsWithSpeakers(), getTopicsWithCounts()]);
+  const [clipsResult, topics] = await Promise.all([getClips(), getTopicsWithCounts()]);
 
   const clips = clipsResult.clips;
 

@@ -1,6 +1,6 @@
 'use server';
 
-import { getSpeakers } from './get-speakers';
+import { getSpeakers } from '@/features/speakers';
 
 type GetSpeakersGroupedProps = {
   limit?: number;

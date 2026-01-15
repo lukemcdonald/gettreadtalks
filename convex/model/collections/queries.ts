@@ -11,8 +11,6 @@ import { enrichWithSpeakers } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
 
-const collectionPageValidator = paginationResultValidator(doc('collections'));
-
 /**
  * Get collection by ID.
  */
@@ -145,24 +143,6 @@ export const getCollectionWithSpeakers = query({
 });
 
 /**
- * List collections with pagination.
- */
-export const listCollections = query({
-  args: {
-    paginationOpts: paginationOptsValidator,
-  },
-  handler: async (ctx, args) => {
-    const collectionPages = await ctx.db
-      .query('collections')
-      .order('desc')
-      .paginate(args.paginationOpts);
-
-    return collectionPages;
-  },
-  returns: collectionPageValidator,
-});
-
-/**
  * List collections by speaker. Returns collections that contain talks by the speaker.
  */
 export const listCollectionsBySpeaker = query({
@@ -191,10 +171,10 @@ export const listCollectionsBySpeaker = query({
 });
 
 /**
- * List collections with stats (talk counts and speakers, public-facing).
+ * List collections with stats (public-facing).
  * Filters to only collections with published talks.
  */
-export const listCollectionsWithStats = query({
+export const listCollections = query({
   args: {
     paginationOpts: paginationOptsValidator,
   },
@@ -240,10 +220,10 @@ export const listCollectionsWithStats = query({
 });
 
 /**
- * List collections with stats (admin).
+ * List all collections with stats.
  * Returns all collections without filtering.
  */
-export const listCollectionsWithStatsAdmin = query({
+export const listAllCollections = query({
   args: {
     paginationOpts: paginationOptsValidator,
   },

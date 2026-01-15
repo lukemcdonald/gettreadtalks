@@ -82,9 +82,9 @@ export const getSpeakerBySlug = query({
 });
 
 /**
- * List all speakers (for migration/cleanup purposes). Returns all speakers without pagination.
+ * List all speakers without pagination (for migration/cleanup scripts).
  */
-export const listAllSpeakers = query({
+export const listAllSpeakersRaw = query({
   args: {},
   handler: async (ctx) => await ctx.db.query('speakers').collect(),
   returns: docs('speakers'),
@@ -126,8 +126,8 @@ export const listFeaturedSpeakers = query({
 });
 
 /**
- * List speakers with pagination (public-facing).
- * Defaults to filtering speakers who have at least one published talk.
+ * List speakers with pagination.
+ * Filters to speakers who have at least one published talk or clip.
  */
 export const listSpeakers = query({
   args: {
@@ -151,10 +151,10 @@ export const listSpeakers = query({
 });
 
 /**
- * List speakers with pagination (admin).
+ * List all speakers with pagination.
  * Returns all speakers without filtering.
  */
-export const listSpeakersAdmin = query({
+export const listAllSpeakers = query({
   args: {
     paginationOpts: paginationOptsValidator,
   },
