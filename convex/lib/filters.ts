@@ -2,7 +2,7 @@ import type { Doc } from '../_generated/dataModel';
 import type { QueryCtx } from '../_generated/server';
 
 /**
- * Filter speakers to only those with at least one published talk.
+ * Filter speakers to only those with at least one published talk or clip.
  * Used in public-facing queries to show only active speakers.
  */
 export async function filterSpeakersWithPublishedTalks(
@@ -11,13 +11,22 @@ export async function filterSpeakersWithPublishedTalks(
 ): Promise<Doc<'speakers'>[]> {
   const results = await Promise.all(
     speakers.map(async (speaker) => {
-      const hasTalks = await ctx.db
-        .query('talks')
-        .withIndex('by_speakerId_and_status', (q) =>
-          q.eq('speakerId', speaker._id).eq('status', 'published'),
-        )
-        .first();
-      return hasTalks ? speaker : null;
+      const [hasTalks, hasClips] = await Promise.all([
+        ctx.db
+          .query('talks')
+          .withIndex('by_speakerId_and_status', (q) =>
+            q.eq('speakerId', speaker._id).eq('status', 'published'),
+          )
+          .first(),
+        ctx.db
+          .query('clips')
+          .withIndex('by_speakerId_and_status', (q) =>
+            q.eq('speakerId', speaker._id).eq('status', 'published'),
+          )
+          .first(),
+      ]);
+
+      return hasTalks || hasClips ? speaker : null;
     }),
   );
 
