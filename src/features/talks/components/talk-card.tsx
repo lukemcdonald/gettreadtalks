@@ -3,6 +3,7 @@
 import type { Speaker } from '@/features/speakers/types';
 import type { Talk } from '@/features/talks/types';
 
+import { memo } from 'react';
 import Link from 'next/link';
 
 import { MediaCard } from '@/components/media-card';
@@ -33,7 +34,13 @@ function SpeakerLink({ children, slug }: { children: React.ReactNode; slug: stri
   );
 }
 
-export function TalkCard({ featured, favorited, finished, speaker, talk }: TalkCardProps) {
+export const TalkCard = memo(function TalkCard({
+  featured,
+  favorited,
+  finished,
+  speaker,
+  talk,
+}: TalkCardProps) {
   const speakerName = getSpeakerName(speaker);
   const accessibleLabel = speakerName ? `${talk.title} by ${speakerName}` : talk.title;
   const statusLabels = [featured && 'Featured', favorited && 'Favorited', finished && 'Finished'];
@@ -52,4 +59,4 @@ export function TalkCard({ featured, favorited, finished, speaker, talk }: TalkC
       title={talk.title}
     />
   );
-}
+});
