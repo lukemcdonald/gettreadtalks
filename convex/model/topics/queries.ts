@@ -155,17 +155,23 @@ export const listTopics = query({
   returns: docs('topics'),
 });
 
+const topicSortType = v.optional(
+  v.union(v.literal('alphabetical'), v.literal('least-talks'), v.literal('most-talks')),
+);
+
 /**
  * List topics with their published talk counts.
+ * Supports filtering by search and sorting.
  * Only returns topics that have at least one published talk.
- * Returns topics sorted alphabetically by title.
  */
 export const listTopicsWithCount = query({
   args: {
     limit: v.optional(v.number()),
+    search: v.optional(v.string()),
+    sort: topicSortType,
   },
   handler: async (ctx, args) => {
-    const { limit = 100 } = args;
+    const { limit = 100, search, sort = 'alphabetical' } = args;
 
     const topics = await ctx.db.query('topics').withIndex('by_title').take(limit);
 
@@ -185,9 +191,28 @@ export const listTopicsWithCount = query({
       };
     });
 
-    const topicsWithTalks = topicsWithCounts.filter((item) => item.count > 0);
+    // Filter to topics with at least one published talk
+    let results = topicsWithCounts.filter((item) => item.count > 0);
 
-    return topicsWithTalks.sort((a, b) => a.topic.title.localeCompare(b.topic.title));
+    // Apply search filter
+    if (search) {
+      const searchLower = search.toLowerCase();
+      results = results.filter((item) => item.topic.title.toLowerCase().includes(searchLower));
+    }
+
+    // Apply sorting
+    results.sort((a, b) => {
+      switch (sort) {
+        case 'most-talks':
+          return b.count - a.count;
+        case 'least-talks':
+          return a.count - b.count;
+        default:
+          return a.topic.title.localeCompare(b.topic.title);
+      }
+    });
+
+    return results;
   },
   returns: v.array(
     v.object({
