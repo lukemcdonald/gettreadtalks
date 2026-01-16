@@ -13,18 +13,18 @@ type TopicWithCount = {
 };
 
 type TalksSidebarProps = {
-  speakersWithTalks: Speaker[];
+  speakers: Speaker[];
   topics: TopicWithCount[];
 };
 
-export function TalksSidebar({ speakersWithTalks, topics }: TalksSidebarProps) {
+export function TalksSidebar({ speakers, topics }: TalksSidebarProps) {
   return (
     <SidebarContent className="space-y-4">
       <SearchInput label="Search" paramName="search" placeholder="Search talks..." />
       <SelectFilter
         label="Speaker"
         name="speaker"
-        options={speakersWithTalks.map((speaker) => ({
+        options={speakers.map((speaker) => ({
           label: getSpeakerName(speaker),
           value: speaker.slug,
         }))}

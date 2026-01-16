@@ -239,29 +239,119 @@ export const listTalksBySpeaker = query({
   returns: docs('talks'),
 });
 
+const sortType = v.optional(
+  v.union(v.literal('alphabetical'), v.literal('oldest'), v.literal('recent')),
+);
+
 /**
- * List published talks with speaker data.
+ * List published talks with speaker data, optional filtering, and sorting.
+ * When filters or non-default sort are applied, uses in-memory pagination for accurate results.
  *
  * @param paginationOpts - Pagination options
+ * @param featured - Filter to featured talks only (optional)
+ * @param search - Search by title (optional)
+ * @param sort - Sort order: 'recent' (default), 'oldest', 'alphabetical'
+ * @param speakerSlug - Filter by speaker slug (optional)
+ * @param topicSlug - Filter by topic slug (optional)
  */
 export const listTalks = query({
   args: {
+    featured: v.optional(v.boolean()),
     paginationOpts: paginationOptsValidator,
+    search: v.optional(v.string()),
+    sort: sortType,
+    speakerSlug: v.optional(v.string()),
+    topicSlug: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const { paginationOpts } = args;
+    const { featured, paginationOpts, search, sort = 'recent', speakerSlug, topicSlug } = args;
 
-    const result = await ctx.db
+    const hasFilters = search || speakerSlug || topicSlug || featured;
+    const needsCustomSort = sort !== 'recent';
+
+    // When no filters and default sort, use native Convex pagination for efficiency
+    if (!(hasFilters || needsCustomSort)) {
+      const result = await ctx.db
+        .query('talks')
+        .withIndex('by_status_and_publishedAt', (q) => q.eq('status', 'published'))
+        .order('desc')
+        .paginate(paginationOpts);
+
+      const talksWithSpeakers = await enrichWithSpeakers(ctx, result.page);
+      const enrichedTalks = await enrichWithTopics(ctx, talksWithSpeakers);
+
+      return {
+        ...result,
+        page: enrichedTalks,
+      };
+    }
+
+    // With filters or custom sort, collect all and paginate in-memory
+    let talks = await ctx.db
       .query('talks')
       .withIndex('by_status_and_publishedAt', (q) => q.eq('status', 'published'))
       .order('desc')
-      .paginate(paginationOpts);
+      .collect();
 
-    const talksWithSpeakers = await enrichWithSpeakers(ctx, result.page);
+    // Apply search filter
+    if (search) {
+      talks = applySearchFilter(talks, search);
+    }
+
+    // Apply speaker filter
+    if (speakerSlug) {
+      const speaker = await getOneFrom(ctx.db, 'speakers', 'by_slug', speakerSlug);
+      if (speaker) {
+        talks = talks.filter((talk) => talk.speakerId === speaker._id);
+      } else {
+        talks = []; // No matching speaker
+      }
+    }
+
+    // Apply topic filter
+    if (topicSlug) {
+      const topic = await getOneFrom(ctx.db, 'topics', 'by_slug', topicSlug);
+      if (topic) {
+        const talkIdsOnTopic = await ctx.db
+          .query('talksOnTopics')
+          .withIndex('by_topicId', (q) => q.eq('topicId', topic._id))
+          .collect();
+        const topicTalkIds = new Set(talkIdsOnTopic.map((t) => t.talkId));
+        talks = talks.filter((talk) => topicTalkIds.has(talk._id));
+      } else {
+        talks = []; // No matching topic
+      }
+    }
+
+    // Apply featured filter
+    if (featured) {
+      talks = talks.filter((talk) => talk.featured);
+    }
+
+    // Apply sorting
+    talks.sort((a, b) => {
+      switch (sort) {
+        case 'alphabetical':
+          return a.title.localeCompare(b.title);
+        case 'oldest':
+          return (a.publishedAt || 0) - (b.publishedAt || 0);
+        default:
+          return (b.publishedAt || 0) - (a.publishedAt || 0);
+      }
+    });
+
+    const { continueCursor, isDone, page } = paginateArray(
+      talks,
+      paginationOpts.cursor,
+      paginationOpts.numItems,
+    );
+
+    const talksWithSpeakers = await enrichWithSpeakers(ctx, page);
     const enrichedTalks = await enrichWithTopics(ctx, talksWithSpeakers);
 
     return {
-      ...result,
+      continueCursor,
+      isDone,
       page: enrichedTalks,
     };
   },

@@ -2,12 +2,17 @@ import { TalksContent } from '@/app/talks/_components/talks-content';
 import { TalksSidebar } from '@/app/talks/_components/talks-sidebar';
 import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
-import { sortSpeakersByName } from '@/features/speakers';
+import { getSpeakers, sortSpeakersByName } from '@/features/speakers';
 import { getTalks } from '@/features/talks/queries';
 import { getTopicsWithCounts } from '@/features/topics';
 
 export type TalksPageSearchParams = {
   cursor?: string;
+  featured?: string;
+  search?: string;
+  sort?: string;
+  speaker?: string;
+  topic?: string;
 };
 
 type TalksPageProps = {
@@ -16,23 +21,32 @@ type TalksPageProps = {
 
 export default async function TalksPage({ searchParams }: TalksPageProps) {
   const params = await searchParams;
-  const { cursor } = params;
+  const { cursor, featured, search, sort, speaker: speakerSlug, topic: topicSlug } = params;
 
-  const [result, topics] = await Promise.all([getTalks({ cursor }), getTopicsWithCounts()]);
+  // Check if any filters are active (for showing "clear filters" option)
+  const hasActiveFilters = !!(search || speakerSlug || topicSlug || featured === 'true');
 
-  const allSpeakers = result.talks
-    .map((talk) => talk.speaker)
-    .filter((speaker) => speaker !== null);
-  const speakersWithTalks = Array.from(
-    new Map(allSpeakers.map((speaker) => [speaker.slug, speaker])).values(),
-  );
-  const sortedSpeakersWithTalks = sortSpeakersByName(speakersWithTalks);
+  const [result, speakersResult, topics] = await Promise.all([
+    getTalks({
+      cursor,
+      featured: featured === 'true',
+      search,
+      sort,
+      speakerSlug,
+      topicSlug,
+    }),
+    getSpeakers(), // Fetch ALL speakers with published content (independent of filters)
+    getTopicsWithCounts(),
+  ]);
+
+  const sortedSpeakers = sortSpeakersByName(speakersResult.speakers);
 
   return (
     <SidebarLayout
       content={
         <TalksContent
           continueCursor={result.continueCursor}
+          hasActiveFilters={hasActiveFilters}
           hasNextPage={!result.isDone}
           hasPrevPage={!!cursor}
           talks={result.talks}
@@ -45,7 +59,7 @@ export default async function TalksPage({ searchParams }: TalksPageProps) {
           variant="lg"
         />
       }
-      sidebar={<TalksSidebar speakersWithTalks={sortedSpeakersWithTalks} topics={topics} />}
+      sidebar={<TalksSidebar speakers={sortedSpeakers} topics={topics} />}
       sidebarSticky
     />
   );
