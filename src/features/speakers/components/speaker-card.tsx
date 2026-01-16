@@ -2,6 +2,8 @@
 
 import type { Speaker } from '@/features/speakers/types';
 
+import { memo } from 'react';
+
 import { MediaCard } from '@/components/media-card';
 import { getSpeakerName } from '@/features/speakers';
 import { SpeakerAvatar } from '@/features/speakers/components';
@@ -11,7 +13,7 @@ type SpeakerCardProps = {
   speaker: Pick<Speaker, 'featured' | 'firstName' | 'lastName' | 'imageUrl' | 'role' | 'slug'>;
 };
 
-export function SpeakerCard({ favorited, speaker }: SpeakerCardProps) {
+export const SpeakerCard = memo(function SpeakerCard({ favorited, speaker }: SpeakerCardProps) {
   const speakerName = getSpeakerName(speaker);
   const statusLabels = [speaker.featured && 'Featured', favorited && 'Favorited'];
   const statusLabel = statusLabels.filter(Boolean).join(', ');
@@ -25,4 +27,4 @@ export function SpeakerCard({ favorited, speaker }: SpeakerCardProps) {
       title={speakerName}
     />
   );
-}
+});

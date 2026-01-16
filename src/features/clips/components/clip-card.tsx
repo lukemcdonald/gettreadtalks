@@ -3,6 +3,8 @@
 import type { Clip } from '@/features/clips/types';
 import type { Speaker } from '@/features/speakers/types';
 
+import { memo } from 'react';
+
 import { MediaCard } from '@/components/media-card';
 import { getSpeakerName } from '@/features/speakers';
 import { SpeakerAvatar } from '@/features/speakers/components';
@@ -13,7 +15,7 @@ type ClipCardProps = {
   speaker?: Pick<Speaker, 'firstName' | 'lastName' | 'imageUrl' | 'slug'>;
 };
 
-export function ClipCard({ clip, favorited, speaker }: ClipCardProps) {
+export const ClipCard = memo(function ClipCard({ clip, favorited, speaker }: ClipCardProps) {
   const speakerName = getSpeakerName(speaker);
   const accessibleLabel = speakerName ? `${clip.title} by ${speakerName}` : clip.title;
   const statusLabels = [favorited && 'Favorited'];
@@ -30,4 +32,4 @@ export function ClipCard({ clip, favorited, speaker }: ClipCardProps) {
       title={clip.title}
     />
   );
-}
+});
