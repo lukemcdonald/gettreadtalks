@@ -13,18 +13,18 @@ type TopicWithCount = {
 };
 
 type ClipsSidebarProps = {
-  speakersWithClips: Speaker[];
+  speakers: Speaker[];
   topics: TopicWithCount[];
 };
 
-export function ClipsSidebar({ speakersWithClips, topics }: ClipsSidebarProps) {
+export function ClipsSidebar({ speakers, topics }: ClipsSidebarProps) {
   return (
     <SidebarContent className="space-y-4">
       <SearchInput label="Search" paramName="search" placeholder="Search clips..." />
       <SelectFilter
         label="Speaker"
         name="speakerSlug"
-        options={speakersWithClips.map((speaker) => ({
+        options={speakers.map((speaker) => ({
           label: getSpeakerName(speaker),
           value: speaker.slug,
         }))}
