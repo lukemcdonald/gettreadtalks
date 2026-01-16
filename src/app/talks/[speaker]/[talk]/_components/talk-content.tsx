@@ -39,7 +39,7 @@ export function TalkContent({ clips, talk }: TalkContentProps) {
       {clips.length > 0 && (
         <div className="space-y-4">
           <Separator />
-          <ClipsList clips={clips} enableFiltering={false} />
+          <ClipsList clips={clips} />
         </div>
       )}
     </>

@@ -8,6 +8,7 @@ import { getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
 
 import { query } from '../../_generated/server';
 import { filterClipsByPublishedTalks } from '../../lib/filters';
+import { applySearchFilter, paginateArray } from '../../lib/utils';
 import { doc, docs } from '../../lib/validators/schema';
 import { statusFilterType } from '../../lib/validators/shared';
 import { canViewContent } from '../auth/roles';
@@ -76,35 +77,116 @@ export const getClipBySlug = query({
   ),
 });
 
+const sortType = v.optional(
+  v.union(v.literal('alphabetical'), v.literal('oldest'), v.literal('recent')),
+);
+
 /**
  * List published clips with speaker data (public-facing).
+ * Supports filtering by search, speaker, topic, and sorting.
  * Filters clips to only those with published parent talks.
- * Clips without a parent talk (standalone) are included.
  */
 export const listClips = query({
   args: {
     paginationOpts: paginationOptsValidator,
+    search: v.optional(v.string()),
+    sort: sortType,
+    speakerSlug: v.optional(v.string()),
+    topicSlug: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const { paginationOpts } = args;
+    const { paginationOpts, search, sort = 'recent', speakerSlug, topicSlug } = args;
 
-    const clipPages = await ctx.db
+    const hasFilters = search || speakerSlug || topicSlug;
+    const needsCustomSort = sort !== 'recent';
+
+    // When no filters and default sort, use native Convex pagination
+    if (!(hasFilters || needsCustomSort)) {
+      const clipPages = await ctx.db
+        .query('clips')
+        .withIndex('by_status_and_publishedAt', (q) => q.eq('status', 'published'))
+        .order('desc')
+        .paginate(paginationOpts);
+
+      const filtered = await filterClipsByPublishedTalks(ctx, clipPages.page);
+      const enrichedPage = await asyncMap(filtered, async (clip) => {
+        const speaker = clip.speakerId ? await ctx.db.get('speakers', clip.speakerId) : null;
+        return { ...clip, speaker };
+      });
+
+      return {
+        ...clipPages,
+        page: enrichedPage,
+      };
+    }
+
+    // With filters or custom sort, collect all and paginate in-memory
+    let clips = await ctx.db
       .query('clips')
       .withIndex('by_status_and_publishedAt', (q) => q.eq('status', 'published'))
       .order('desc')
-      .paginate(paginationOpts);
+      .collect();
 
-    const filtered = await filterClipsByPublishedTalks(ctx, clipPages.page);
+    // Filter to only clips with published parent talks
+    clips = await filterClipsByPublishedTalks(ctx, clips);
 
-    const enrichedPage = await asyncMap(filtered, async (clip) => {
-      const speakerId = clip.speakerId;
-      const speaker = speakerId ? await ctx.db.get('speakers', speakerId) : null;
+    // Apply search filter
+    if (search) {
+      clips = applySearchFilter(clips, search);
+    }
+
+    // Apply speaker filter
+    if (speakerSlug) {
+      const speaker = await getOneFrom(ctx.db, 'speakers', 'by_slug', speakerSlug);
+      if (speaker) {
+        clips = clips.filter((clip) => clip.speakerId === speaker._id);
+      } else {
+        clips = [];
+      }
+    }
+
+    // Apply topic filter
+    if (topicSlug) {
+      const topic = await getOneFrom(ctx.db, 'topics', 'by_slug', topicSlug);
+      if (topic) {
+        const clipIdsOnTopic = await ctx.db
+          .query('clipsOnTopics')
+          .withIndex('by_topicId', (q) => q.eq('topicId', topic._id))
+          .collect();
+        const topicClipIds = new Set(clipIdsOnTopic.map((c) => c.clipId));
+        clips = clips.filter((clip) => topicClipIds.has(clip._id));
+      } else {
+        clips = [];
+      }
+    }
+
+    // Apply sorting
+    clips.sort((a, b) => {
+      switch (sort) {
+        case 'alphabetical':
+          return a.title.localeCompare(b.title);
+        case 'oldest':
+          return (a.publishedAt || 0) - (b.publishedAt || 0);
+        default:
+          return (b.publishedAt || 0) - (a.publishedAt || 0);
+      }
+    });
+
+    const { continueCursor, isDone, page } = paginateArray(
+      clips,
+      paginationOpts.cursor,
+      paginationOpts.numItems,
+    );
+
+    const clipsWithSpeakers = await asyncMap(page, async (clip) => {
+      const speaker = clip.speakerId ? await ctx.db.get('speakers', clip.speakerId) : null;
       return { ...clip, speaker };
     });
 
     return {
-      ...clipPages,
-      page: enrichedPage,
+      continueCursor,
+      isDone,
+      page: clipsWithSpeakers,
     };
   },
   returns: clipPageWithSpeakersValidator,
@@ -161,8 +243,7 @@ export const listAllClips = query({
     }
 
     const enrichedPage = await asyncMap(clipPages.page, async (clip) => {
-      const speakerId = clip.speakerId;
-      const speaker = speakerId ? await ctx.db.get('speakers', speakerId) : null;
+      const speaker = clip.speakerId ? await ctx.db.get('speakers', clip.speakerId) : null;
       return { ...clip, speaker };
     });
 
