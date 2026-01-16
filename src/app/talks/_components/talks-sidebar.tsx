@@ -23,7 +23,7 @@ export function TalksSidebar({ speakers, topics }: TalksSidebarProps) {
       <SearchInput label="Search" paramName="search" placeholder="Search talks..." />
       <SelectFilter
         label="Speaker"
-        name="speaker"
+        name="speakerSlug"
         options={speakers.map((speaker) => ({
           label: getSpeakerName(speaker),
           value: speaker.slug,
@@ -32,7 +32,7 @@ export function TalksSidebar({ speakers, topics }: TalksSidebarProps) {
       />
       <SelectFilter
         label="Topic"
-        name="topic"
+        name="topicSlug"
         options={topics.map(({ topic }) => ({
           label: topic.title,
           value: topic.slug,

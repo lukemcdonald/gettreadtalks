@@ -11,8 +11,8 @@ export type TalksPageSearchParams = {
   featured?: string;
   search?: string;
   sort?: string;
-  speaker?: string;
-  topic?: string;
+  speakerSlug?: string;
+  topicSlug?: string;
 };
 
 type TalksPageProps = {
@@ -21,7 +21,7 @@ type TalksPageProps = {
 
 export default async function TalksPage({ searchParams }: TalksPageProps) {
   const params = await searchParams;
-  const { cursor, featured, search, sort, speaker: speakerSlug, topic: topicSlug } = params;
+  const { cursor, featured, search, sort, speakerSlug, topicSlug } = params;
 
   // Check if any filters are active (for showing "clear filters" option)
   const hasActiveFilters = !!(search || speakerSlug || topicSlug || featured === 'true');

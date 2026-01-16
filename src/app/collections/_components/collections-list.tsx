@@ -23,7 +23,7 @@ type CollectionsListProps = {
 export function CollectionsList({ collections }: CollectionsListProps) {
   const searchParams = useSearchParams();
   const search = searchParams.get('search')?.toLowerCase() || '';
-  const speakerSlug = searchParams.get('speaker') || 'all';
+  const speakerSlug = searchParams.get('speakerSlug') || 'all';
   const sort = searchParams.get('sort') || 'alphabetical';
 
   const filteredAndSorted = useMemo(() => {
