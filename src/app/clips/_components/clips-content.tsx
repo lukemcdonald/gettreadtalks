@@ -1,12 +1,8 @@
-'use client';
-
 import type { Doc } from '@/convex/_generated/dataModel';
 import type { Speaker } from '@/features/speakers/types';
 
-import { useRouter } from 'next/navigation';
-
+import { ListEmpty } from '@/components/list-empty';
 import { Pagination } from '@/components/pagination';
-import { Button, Empty, EmptyDescription, EmptyTitle } from '@/components/ui';
 import { ClipsList } from '@/features/clips/components';
 
 type ClipWithSpeaker = Doc<'clips'> & {
@@ -28,27 +24,15 @@ export function ClipsContent({
   hasNextPage,
   hasPrevPage,
 }: ClipsContentProps) {
-  const router = useRouter();
-
-  function handleClearFilters() {
-    router.push('/clips');
-  }
-
   if (clips.length === 0) {
     return (
-      <Empty>
-        <EmptyTitle>No clips found</EmptyTitle>
-        <EmptyDescription>
-          {hasActiveFilters
-            ? 'No clips match your current filters. Try adjusting your search or clearing filters.'
-            : 'There are no clips available at this time.'}
-        </EmptyDescription>
-        {!!hasActiveFilters && (
-          <Button className="mt-4" onClick={handleClearFilters} variant="outline">
-            Clear all filters
-          </Button>
-        )}
-      </Empty>
+      <ListEmpty
+        clearPath="/clips"
+        description="There are no clips available at this time."
+        filteredDescription="No clips match your current filters. Try adjusting your search or clearing filters."
+        hasActiveFilters={hasActiveFilters}
+        title="No clips found"
+      />
     );
   }
 
