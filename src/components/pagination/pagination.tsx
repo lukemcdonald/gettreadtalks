@@ -26,8 +26,21 @@ export function Pagination({
 
   function handlePrevious() {
     const params = new URLSearchParams(searchParams.toString());
+
+    // Get the previous cursor from URL (stored when we navigated forward)
+    const prevCursor = params.get('prevCursor');
+
+    // Remove current cursor
     params.delete('cursor');
-    router.push(`?${params.toString()}`);
+    params.delete('prevCursor');
+
+    // If we have a previous cursor, set it as the current cursor
+    if (prevCursor) {
+      params.set('cursor', prevCursor);
+    }
+
+    const queryString = params.toString();
+    router.push(queryString ? `?${queryString}` : window.location.pathname);
   }
 
   function handleNext() {
@@ -35,6 +48,15 @@ export function Pagination({
       return;
     }
     const params = new URLSearchParams(searchParams.toString());
+
+    // Store current cursor as previous before moving forward
+    const currentCursor = params.get('cursor');
+    if (currentCursor) {
+      params.set('prevCursor', currentCursor);
+    } else {
+      params.delete('prevCursor');
+    }
+
     params.set('cursor', continueCursor);
     router.push(`?${params.toString()}`);
   }
