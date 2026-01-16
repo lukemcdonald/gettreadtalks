@@ -34,7 +34,7 @@ type ClipsListProps = {
 export function ClipsList({ clips, enableFiltering = true }: ClipsListProps) {
   const searchParams = useSearchParams();
   const search = enableFiltering ? searchParams.get('search')?.toLowerCase() || '' : '';
-  const speakerSlug = enableFiltering ? searchParams.get('speaker') || 'all' : 'all';
+  const speakerSlug = enableFiltering ? searchParams.get('speakerSlug') || 'all' : 'all';
   const sort = enableFiltering ? searchParams.get('sort') || 'recent' : 'recent';
 
   const filteredAndSorted = useMemo(() => {
