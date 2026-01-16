@@ -245,14 +245,7 @@ const sortType = v.optional(
 
 /**
  * List published talks with speaker data, optional filtering, and sorting.
- * When filters or non-default sort are applied, uses in-memory pagination for accurate results.
- *
- * @param paginationOpts - Pagination options
- * @param featured - Filter to featured talks only (optional)
- * @param search - Search by title (optional)
- * @param sort - Sort order: 'recent' (default), 'oldest', 'alphabetical'
- * @param speakerSlug - Filter by speaker slug (optional)
- * @param topicSlug - Filter by topic slug (optional)
+ * Defaults to 50 items per page, sorted by most recent.
  */
 export const listTalks = query({
   args: {
@@ -364,11 +357,7 @@ export const listTalks = query({
 
 /**
  * List all talks with speaker data and filtering support.
- * Supports status='all' to fetch talks across all statuses.
- *
- * @param status - Filter by status or 'all' for all statuses (defaults to 'published')
- * @param search - Search by title (optional)
- * @param paginationOpts - Pagination options
+ * Use status='all' to fetch across all statuses, defaults to 'published'.
  */
 export const listAllTalks = query({
   args: {

@@ -8,9 +8,8 @@ import { getOneFrom } from 'convex-helpers/server/relationships';
 import { throwNotFound } from './errors';
 
 /**
- * Normalizes text into a URL-friendly slug
- * @param text - The text to normalize (can be undefined, null, or empty string)
- * @returns A normalized slug string, or empty string if input is falsy
+ * Normalizes text into a URL-friendly slug.
+ * Returns empty string if input is falsy.
  */
 export function slugify(text: string | undefined | null): string {
   if (!text) {
@@ -29,12 +28,8 @@ export function slugify(text: string | undefined | null): string {
 type SlugTable = 'affiliateLinks' | 'clips' | 'collections' | 'speakers' | 'talks' | 'topics';
 
 /**
- * Check if a slug already exists in a table
- * @param ctx - Database context (QueryCtx or MutationCtx)
- * @param table - Table name (must have a 'by_slug' index)
- * @param slug - Slug to check
- * @param excludeId - Optional ID to exclude from check (for updates)
- * @returns True if slug exists, false otherwise
+ * Check if a slug already exists in a table.
+ * @param excludeId - Exclude this ID from check (useful for updates)
  */
 export async function slugExists(
   ctx: QueryCtx | MutationCtx,
@@ -58,13 +53,8 @@ export async function slugExists(
 
 /**
  * Check if a talk slug already exists for a specific speaker.
- * This allows multiple speakers to have talks with the same slug.
- *
- * @param ctx - Database context (QueryCtx or MutationCtx)
- * @param speakerId - Speaker ID to check within
- * @param slug - Talk slug to check
- * @param excludeId - Optional talk ID to exclude from check (for updates)
- * @returns True if slug exists for this speaker, false otherwise
+ * Allows multiple speakers to have talks with the same slug.
+ * @param excludeId - Exclude this talk ID from check (useful for updates)
  */
 export async function talkSlugExistsForSpeaker(
   ctx: QueryCtx | MutationCtx,
@@ -95,12 +85,7 @@ export async function talkSlugExistsForSpeaker(
 
 /**
  * Generate a unique slug for a table, appending numeric suffix if needed.
- *
- * @param ctx - Database context (QueryCtx or MutationCtx)
- * @param table - Table name with 'by_slug' index
- * @param baseText - Text to generate slug from
- * @param excludeId - Optional ID to exclude from check (for updates)
- * @returns Unique slug string
+ * @param excludeId - Exclude this ID from uniqueness check (useful for updates)
  */
 export async function generateSlug(
   ctx: QueryCtx | MutationCtx,
@@ -129,10 +114,6 @@ export async function generateSlug(
 
 /**
  * Extract value from a Promise.allSettled result with a fallback.
- *
- * @param result - PromiseSettledResult from Promise.allSettled
- * @param fallback - Value to return if promise was rejected
- * @returns The fulfilled value or the fallback
  */
 export function getSettledValue<T, F = T>(result: PromiseSettledResult<T>, fallback: F): T | F {
   return result.status === 'fulfilled' ? result.value : fallback;

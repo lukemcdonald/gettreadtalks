@@ -16,12 +16,7 @@ type GetAllTalksProps = {
 
 /**
  * Get all talks with speakers with filtering support.
- * Supports status='all' to fetch talks across all statuses.
- *
- * @param cursor - Pagination cursor
- * @param limit - Number of items per page (defaults to 50)
- * @param search - Search by title
- * @param status - Filter by status or 'all' for all statuses
+ * Use status='all' to fetch across all statuses, defaults to 'published'.
  */
 export async function getAllTalks(args: GetAllTalksProps = {}) {
   const token = await getAuthToken();
