@@ -49,8 +49,7 @@ export function TalksContent({
 
   return (
     <>
-      {/* Filtering is done server-side, so disable client-side filtering */}
-      <TalksList enableFiltering={false} talks={talks} />
+      <TalksList talks={talks} />
       <Pagination
         continueCursor={continueCursor}
         hasNextPage={hasNextPage}

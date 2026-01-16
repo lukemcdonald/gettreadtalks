@@ -1,6 +1,7 @@
 import type { TalkWithSpeaker } from '@/features/talks/types';
 
 import { Pagination } from '@/components/pagination';
+import { Empty, EmptyDescription } from '@/components/ui';
 import { TalksList } from '@/features/talks/components';
 
 type TopicContentProps = {
@@ -16,6 +17,14 @@ export function TopicContent({
   hasPrevPage,
   talks,
 }: TopicContentProps) {
+  if (talks.length === 0) {
+    return (
+      <Empty>
+        <EmptyDescription>No talks in this topic yet</EmptyDescription>
+      </Empty>
+    );
+  }
+
   return (
     <>
       <TalksList talks={talks} />
