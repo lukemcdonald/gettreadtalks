@@ -5,6 +5,7 @@ import { v } from 'convex/values';
 import { getManyFrom, getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
 
 import { query } from '../../_generated/server';
+import { type ContentSortOption, getContentComparator } from '../../lib/sort';
 import {
   applySearchFilter,
   enrichWithSpeakers,
@@ -322,16 +323,7 @@ export const listTalks = query({
     }
 
     // Apply sorting
-    talks.sort((a, b) => {
-      switch (sort) {
-        case 'alphabetical':
-          return a.title.localeCompare(b.title);
-        case 'oldest':
-          return (a.publishedAt || 0) - (b.publishedAt || 0);
-        default:
-          return (b.publishedAt || 0) - (a.publishedAt || 0);
-      }
-    });
+    talks.sort(getContentComparator(sort as ContentSortOption));
 
     const { continueCursor, isDone, page } = paginateArray(
       talks,

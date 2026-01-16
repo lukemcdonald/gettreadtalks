@@ -6,6 +6,7 @@ import { asyncMap } from 'convex-helpers';
 import { getManyFrom, getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
 
 import { query } from '../../_generated/server';
+import { type TopicSortOption, getTopicComparator } from '../../lib/sort';
 import { enrichWithSpeakers, paginateArray } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
@@ -201,16 +202,7 @@ export const listTopicsWithCount = query({
     }
 
     // Apply sorting
-    results.sort((a, b) => {
-      switch (sort) {
-        case 'most-talks':
-          return b.count - a.count;
-        case 'least-talks':
-          return a.count - b.count;
-        default:
-          return a.topic.title.localeCompare(b.topic.title);
-      }
-    });
+    results.sort(getTopicComparator(sort as TopicSortOption));
 
     return results;
   },

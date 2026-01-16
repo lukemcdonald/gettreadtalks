@@ -8,6 +8,7 @@ import { getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
 
 import { query } from '../../_generated/server';
 import { filterClipsByPublishedTalks } from '../../lib/filters';
+import { type ContentSortOption, getContentComparator } from '../../lib/sort';
 import { applySearchFilter, paginateArray } from '../../lib/utils';
 import { doc, docs } from '../../lib/validators/schema';
 import { statusFilterType } from '../../lib/validators/shared';
@@ -161,16 +162,7 @@ export const listClips = query({
     }
 
     // Apply sorting
-    clips.sort((a, b) => {
-      switch (sort) {
-        case 'alphabetical':
-          return a.title.localeCompare(b.title);
-        case 'oldest':
-          return (a.publishedAt || 0) - (b.publishedAt || 0);
-        default:
-          return (b.publishedAt || 0) - (a.publishedAt || 0);
-      }
-    });
+    clips.sort(getContentComparator(sort as ContentSortOption));
 
     const { continueCursor, isDone, page } = paginateArray(
       clips,
