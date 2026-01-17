@@ -1,8 +1,14 @@
-import type { SpeakerGroup } from './speakers-content';
+import type { Speaker } from '@/features/speakers/types';
 
 import { AlphabeticalGrid } from '@/components/alphabetical-grid';
 import { ListEmpty } from '@/components/list-empty';
 import { SpeakerCard } from '@/features/speakers/components';
+
+export type SpeakerGroup = {
+  items: Speaker[];
+  letter: string;
+  range: string;
+};
 
 type SpeakersListProps = {
   groups: SpeakerGroup[];

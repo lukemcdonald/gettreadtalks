@@ -1,4 +1,4 @@
-import { SpeakersContent } from '@/app/speakers/_components/speakers-content';
+import { SpeakersList } from '@/app/speakers/_components/speakers-list';
 import { SpeakersSidebar } from '@/app/speakers/_components/speakers-sidebar';
 import { SidebarLayout } from '@/components/layouts';
 import { getSpeakers, getSpeakersGrouped } from '@/features/speakers';
@@ -26,7 +26,7 @@ export default async function SpeakersPage({ searchParams }: SpeakersPageProps) 
 
   return (
     <SidebarLayout
-      content={<SpeakersContent groups={groups} hasActiveFilters={hasActiveFilters} />}
+      content={<SpeakersList groups={groups} hasActiveFilters={hasActiveFilters} />}
       sidebar={<SpeakersSidebar speakers={allSpeakers} />}
       sidebarSticky
     />
