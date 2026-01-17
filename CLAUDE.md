@@ -52,46 +52,45 @@ pnpm seed:force             # Force re-seed (clears existing data)
 Code is organized by **domain/feature**, not technical layer. Each feature contains all its client, server, and shared code together.
 
 **Directory Structure:**
-- `lib/features/` - Business domains (talks, users, clips, speakers, topics, collections)
-- `lib/services/` - Infrastructure (auth, email, errors)
-- `lib/utils/` - Generic utilities
+- `src/features/` - Business domains (talks, users, clips, speakers, topics, collections)
+- `src/services/` - Infrastructure (auth, email, errors)
+- `src/lib/` - Cross-cutting concerns (forms, entities)
+- `src/utils/` - Generic utilities
+- `src/constants/` - Shared constants
 - `convex/` - Database schema + backend functions
 - `convex/model/` - Entity-specific helper functions organized by domain
-- `app/` - Next.js App Router pages
-- `components/` - Shared UI components
+- `src/app/` - Next.js App Router pages
+- `src/components/` - Shared UI components
+
+**Path Alias:** `@/*` maps to `src/*`
 
 ### Data Flow Patterns
 
-**Server Components (default)** - Use for initial data fetch, SEO-critical pages:
+**Server Components (default)** - Fetch data server-side, no hooks needed:
 ```typescript
-// app/talks/page.tsx
-import { getTalks } from '@/lib/features/talks/queries';
+// src/app/talks/page.tsx
+import { getTalks } from '@/features/talks';
 
-export default async function TalksPage() {
-  const talks = await getTalks();
+export default async function TalksPage({ searchParams }) {
+  const params = await searchParams;
+  const { talks } = await getTalks({ search: params.search, sort: params.sort });
   return <TalksList talks={talks} />;
 }
 ```
 
-**Client Components** - Use for interactivity, real-time updates, React hooks:
+**Client Components** - Use only for interactivity, forms, and mutations:
 ```typescript
-// app/dashboard/page.tsx
+// src/app/talks/new/page.tsx
 'use client';
-import { useTalks } from '@/lib/features/talks/hooks';
+import { useTalkForm } from '@/features/talks/hooks';
 
-export default function Dashboard() {
-  const { data: talks, isLoading } = useTalks();
-  if (isLoading) return <Loading />;
-  return <TalksList talks={talks} />;
+export function TalkFormClient({ speakers, collections }) {
+  const { form, onSubmit, isBusy } = useTalkForm({ speakers, collections });
+  return <form onSubmit={onSubmit}>...</form>;
 }
 ```
 
-**Hybrid Pattern** - Best of both (server render + client subscribe):
-```typescript
-// Server component passes initial data to client component
-const initialTalks = await getTalks();
-return <TalksClient initialData={initialTalks} />;
-```
+**Important:** Data fetching happens server-side. Client hooks are for mutations only, not queries.
 
 ### Convex Backend Organization
 
@@ -99,6 +98,7 @@ return <TalksClient initialData={initialTalks} />;
 - `convex/{domain}.ts` - Public API exports (queries, mutations)
 - `convex/model/{domain}/` - Entity-specific helpers (queries.ts, mutations.ts, schema.ts, validators.ts)
 - `convex/model/auth/` - Authentication helpers (cross-cutting)
+- `convex/lib/` - Shared utilities (filters, sort, utils)
 - `convex/schema.ts` - Database schema definition
 - `convex/http.ts` - HTTP endpoints (webhooks)
 
@@ -128,95 +128,115 @@ export const listAllTalks = queries.listAllTalks; // Unfiltered/admin
 export const createTalk = mutations.createTalk;   // api.talks.createTalk
 ```
 
-**Helper files mirror export names** (consistency):
-```typescript
-// convex/model/talks/queries.ts
-export const getTalk = query({...});
-export const getTalkBySlug = query({...});
-export const listTalks = query({...});     // Filtered with data enrichment
-export const listAllTalks = query({...});  // Unfiltered
-```
-
 ### Feature Structure
 
-Each feature follows a consistent structure:
+Each feature follows a consistent structure with subdirectories:
 
 ```
-lib/features/{domain}/
-├─ hooks/              # Client: React hooks (individual files or single file)
-│  ├─ use-talk.ts
-│  ├─ use-talks.ts
-│  ├─ use-create-talk.ts
-│  └─ index.ts         # Barrel export
-├─ actions.ts          # Server: Write operations (uses fetchMutation)
-├─ queries.ts          # Server: Read operations (uses fetchQuery)
-├─ types.ts            # Shared: TypeScript types
-├─ utils.ts            # Shared: Pure functions
-└─ validation.ts       # Shared: Zod schemas
+src/features/{domain}/
+├─ actions/            # Server actions (write operations)
+│  ├─ index.ts         # Barrel export
+│  ├─ create-talk.ts   # Individual action files
+│  └─ update-talk.ts
+├─ queries/            # Server queries (read operations)
+│  ├─ index.ts         # Barrel export
+│  ├─ get-talk.ts      # Individual query files
+│  └─ get-talks.ts
+├─ hooks/              # Client hooks (mutations/forms only)
+│  ├─ index.ts         # Barrel export
+│  ├─ use-talk-form.ts # Form hooks
+│  └─ use-archive-talk.ts # Mutation hooks
+├─ components/         # Feature-specific components
+│  ├─ index.ts
+│  └─ talk-card.tsx
+├─ schemas/            # Zod validation schemas
+│  └─ talk-form.ts
+├─ types.ts            # TypeScript types
+├─ utils.ts            # Pure functions
+└─ index.ts            # Public barrel export
+```
+
+**Server Functions Pattern:**
+```typescript
+// src/features/talks/queries/get-talks.ts
+'use server';
+
+import { fetchQuery } from 'convex/nextjs';
+import { api } from '@/convex/_generated/api';
+import { getAuthToken } from '@/services/auth/server';
+
+export async function getTalks(args?: GetTalksProps) {
+  const token = await getAuthToken();
+  const result = await fetchQuery(api.talks.listTalks, { ... }, { token });
+  return { talks: result.page };
+}
 ```
 
 **Hook Organization:**
-- Use individual files in `hooks/` directory for features with 8+ hooks or complex logic
-- Use single `hooks.ts` file for features with ≤3 simple hooks
-- All hooks return `{ data, isLoading, notFound }` pattern (React Query-style)
+- Hooks are for **mutations and forms only**, not data fetching
+- Data fetching happens server-side in page components
+- Use `useMutation` from `@/hooks` for Convex mutations
+- Form hooks manage form state and submission
 
 ### Component Organization
 
-**Component Placement:**
-- `components/` - Shared components used across multiple pages
-- `components/ui/primitives/` - **NEVER EDIT** - Vendor UI components (see below)
-- `app/{page}/_components/` - Page-specific components (prefix with `_`)
-- `lib/features/{domain}/components/` - Feature-specific components
+**Three Component Locations:**
+
+1. **Shared components** - `src/components/`
+   - Used across multiple pages/features
+   - Examples: `grid-list`, `page-header`, `layouts/`
+
+2. **Feature components** - `src/features/{domain}/components/`
+   - Used by a specific feature
+   - Examples: `talk-card`, `speaker-avatar`
+
+3. **Page-specific components** - `src/app/{route}/_components/`
+   - Used only by that route
+   - Examples: `talks-sidebar`, `speakers-list`
 
 **⚠️ UI Primitives - Do Not Modify:**
-Files in `components/ui/primitives/` are vendor components and must NEVER be edited directly. These are base UI components that the rest of the application builds upon. If you need to customize behavior:
-- Create a wrapper component in `components/ui/`
+Files in `src/components/ui/primitives/` are vendor components and must NEVER be edited directly. These are base UI components that the rest of the application builds upon. If you need to customize behavior:
+- Create a wrapper component in `src/components/ui/`
 - Extend via composition, not modification
 - Report issues upstream if the primitive needs fixing
-
-**Component Structure:**
-```
-components/component-name/
-├─ component-name.tsx
-├─ component-name.types.ts
-├─ component-name.test.tsx
-└─ index.ts                    # Barrel export
-```
 
 **Naming:** Use kebab-case for all folders and files
 
 ### Authentication
 
 **Better Auth** is used with Convex integration:
-- Client: `import { useSession } from '@/lib/services/auth/client'`
-- Server: `import { getAuthUser, requireAuthUser } from '@/lib/services/auth/server'`
-- Convex: `import { getCurrentUser } from '@/convex/model/auth'`
+- Client: `import { useCurrentUser } from '@/features/users/hooks'`
+- Server: `import { getCurrentUser, requireAdminUser, getAuthToken } from '@/services/auth/server'`
+- Convex: `import { getCurrentUser, requireAuth } from '@/convex/model/auth'`
 
 ### Error Handling
 
 **For Convex Mutations** - Always use custom hook:
 ```typescript
-import { useMutation } from '@/lib/hooks'; // NOT from 'convex/react'
+import { useMutation } from '@/hooks';
 import { api } from '@/convex/_generated/api';
 
-const { mutate, isLoading, error } = useMutation(api.talks.create, {
+const { mutate, isLoading, error } = useMutation(api.talks.createTalk, {
   onSuccess: () => toast.success('Created!'),
   onError: (error) => toast.error(getErrorMessage(error)),
 });
 ```
 
-**For Component Errors** - Wrap with ErrorBoundary:
+**For Server Actions** - Use try/catch with error mapping:
 ```typescript
-import { ErrorBoundary } from '@/components/error-boundary';
+import { mapConvexErrorToFormErrors } from '@/lib/forms/validation';
 
-<ErrorBoundary>
-  <ComponentWithQueries />
-</ErrorBoundary>
+try {
+  const result = await fetchAuthMutation(api.talks.createTalk, data);
+  return { success: true, data: result };
+} catch (error) {
+  return { success: false, errors: mapConvexErrorToFormErrors(error) };
+}
 ```
 
 **Manual Error Handling:**
 ```typescript
-import { captureException, getErrorMessage } from '@/lib/services/errors';
+import { captureException, getErrorMessage } from '@/services/errors';
 
 try {
   await riskyOperation();
@@ -268,18 +288,22 @@ The database uses Convex with the following domain tables:
 
 ## Key Principles
 
-1. **Always wrap Convex calls** - Never call `useQuery(api.talks.list)` directly in components. Create custom hooks in `lib/features/{domain}/hooks/`
+1. **Server-first data fetching** - Fetch data in server components, pass to client components. No client-side data fetching hooks for main features.
 
 2. **Organize by domain, not layer** - Related code lives together in features, not scattered across `hooks/`, `queries/`, `actions/` directories
 
-3. **Server Components by default** - Only use Client Components when you need interactivity, hooks, or browser APIs
+3. **Server Components by default** - Only use Client Components when you need interactivity, forms, or browser APIs
 
 4. **Type safety** - Convex provides end-to-end type safety from database to frontend
 
 5. **Co-located code** - Tests, types, and utils live next to the components/features they support
 
-6. **Minimal cross-feature dependencies** - Features should be self-contained. Shared logic goes in `lib/services/` or `lib/utils/`
+6. **Minimal cross-feature dependencies** - Features should be self-contained. Shared logic goes in `src/services/` or `src/lib/`
 
-7. **Consistent naming** - Follow the established patterns for queries (`get*`/`list*` for public, `listAll*` for admin), mutations (action verbs with nouns), and hooks (`use` + mirror backend names)
+7. **Consistent naming** - Follow the established patterns for queries (`get*`/`list*` for public, `listAll*` for admin), mutations (action verbs with nouns), and hooks (`use` + action name)
 
-8. **Never edit UI primitives** - Files in `components/ui/primitives/` are vendor components and must never be modified. Create wrappers in `components/ui/` instead
+8. **Never edit UI primitives** - Files in `src/components/ui/primitives/` are vendor components and must never be modified. Create wrappers in `src/components/ui/` instead
+
+9. **No unnecessary memoization** - React 19 handles optimization automatically. Avoid `memo()`, `useCallback()`, `useMemo()` unless profiling shows a specific need
+
+10. **Filter/sort server-side** - Move filtering and sorting logic to server components or Convex queries, not client-side hooks
