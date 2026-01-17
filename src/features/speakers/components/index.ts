@@ -1,4 +1,4 @@
-export { CreateSpeakerDialog } from './create-speaker-dialog';
+export { CreateSpeakerSheet } from './create-speaker-sheet';
 export { SpeakerAvatar } from './speaker-avatar';
 export { SpeakerCard } from './speaker-card';
 export { SpeakerField } from './speaker-field';

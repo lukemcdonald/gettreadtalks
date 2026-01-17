@@ -15,7 +15,6 @@ import {
   ComboboxItem,
   ComboboxList,
   ComboboxPopup,
-  ComboboxValue,
   Field,
   FieldDescription,
   FieldError,
@@ -23,7 +22,9 @@ import {
 } from '@/components/ui';
 import { getSpeakerName } from '@/features/speakers';
 import { SpeakerAvatar } from '@/features/speakers/components';
-import { CreateSpeakerDialog } from './create-speaker-dialog';
+import { CreateSpeakerSheet } from './create-speaker-sheet';
+
+type SpeakerListItem = Pick<Speaker, '_id' | 'firstName' | 'lastName' | 'imageUrl' | 'role'>;
 
 type SpeakerFieldProps<T extends FieldValues> = {
   control: Control<T>;
@@ -32,7 +33,7 @@ type SpeakerFieldProps<T extends FieldValues> = {
   name: FieldPath<T>;
   onSpeakerCreated?: (speakerId: SpeakerId) => void;
   required?: boolean;
-  speakers: Pick<Speaker, '_id' | 'firstName' | 'lastName' | 'imageUrl' | 'role'>[];
+  speakers: SpeakerListItem[];
 };
 
 export function SpeakerField<T extends FieldValues>({
@@ -42,11 +43,12 @@ export function SpeakerField<T extends FieldValues>({
   name,
   onSpeakerCreated,
   required,
-  speakers,
+  speakers: initialSpeakers,
 }: SpeakerFieldProps<T>) {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [localSpeakers, setLocalSpeakers] = useState<SpeakerListItem[]>(initialSpeakers);
 
-  const sortedSpeakers = [...speakers].sort((a, b) => {
+  const sortedSpeakers = [...localSpeakers].sort((a, b) => {
     const nameA = getSpeakerName(a).toLowerCase();
     const nameB = getSpeakerName(b).toLowerCase();
     return nameA.localeCompare(nameB);
@@ -57,12 +59,13 @@ export function SpeakerField<T extends FieldValues>({
       control={control}
       name={name}
       render={({ field, fieldState }) => {
-        const handleSpeakerCreated = (speakerId: SpeakerId) => {
+        const handleSpeakerCreated = (speakerId: SpeakerId, newSpeaker: SpeakerListItem) => {
+          setLocalSpeakers((prev) => [...prev, newSpeaker]);
           field.onChange(speakerId);
           if (onSpeakerCreated) {
             onSpeakerCreated(speakerId);
           }
-          setIsDialogOpen(false);
+          setIsSheetOpen(false);
         };
 
         return (
@@ -103,9 +106,7 @@ export function SpeakerField<T extends FieldValues>({
                   <ComboboxEmpty>
                     <Button
                       className="w-full justify-start"
-                      onClick={() => {
-                        setIsDialogOpen(true);
-                      }}
+                      onClick={() => setIsSheetOpen(true)}
                       type="button"
                       variant="ghost"
                     >
@@ -142,10 +143,10 @@ export function SpeakerField<T extends FieldValues>({
               {!!fieldState.error?.message && <FieldError>{fieldState.error.message}</FieldError>}
             </Field>
 
-            <CreateSpeakerDialog
-              onOpenChange={setIsDialogOpen}
+            <CreateSpeakerSheet
+              onOpenChange={setIsSheetOpen}
               onSpeakerCreated={handleSpeakerCreated}
-              open={isDialogOpen}
+              open={isSheetOpen}
             />
           </>
         );
