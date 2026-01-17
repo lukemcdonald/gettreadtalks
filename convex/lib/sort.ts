@@ -83,3 +83,35 @@ export function getTopicComparator<T extends { count: number; topic: { title: st
       return (a, b) => a.topic.title.localeCompare(b.topic.title);
   }
 }
+
+/**
+ * Compare by lastName alphabetically.
+ */
+export function byLastName<T extends { lastName: string }>(a: T, b: T): number {
+  return a.lastName.localeCompare(b.lastName);
+}
+
+/**
+ * Speaker sort options.
+ * - alphabetical: A-Z by lastName (default)
+ * - featured: featured first, then alphabetical
+ */
+export type SpeakerSortOption = 'alphabetical' | 'featured';
+
+/**
+ * Get comparator for speakers based on sort option.
+ */
+export function getSpeakerComparator<T extends { featured?: boolean; lastName: string }>(
+  sort: SpeakerSortOption = 'alphabetical',
+): (a: T, b: T) => number {
+  switch (sort) {
+    case 'featured':
+      return (a, b) => {
+        if (a.featured && !b.featured) return -1;
+        if (!a.featured && b.featured) return 1;
+        return byLastName(a, b);
+      };
+    default:
+      return byLastName;
+  }
+}
