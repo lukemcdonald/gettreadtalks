@@ -164,8 +164,15 @@ lib/features/{domain}/
 
 **Component Placement:**
 - `components/` - Shared components used across multiple pages
+- `components/ui/primitives/` - **NEVER EDIT** - Vendor UI components (see below)
 - `app/{page}/_components/` - Page-specific components (prefix with `_`)
 - `lib/features/{domain}/components/` - Feature-specific components
+
+**⚠️ UI Primitives - Do Not Modify:**
+Files in `components/ui/primitives/` are vendor components and must NEVER be edited directly. These are base UI components that the rest of the application builds upon. If you need to customize behavior:
+- Create a wrapper component in `components/ui/`
+- Extend via composition, not modification
+- Report issues upstream if the primitive needs fixing
 
 **Component Structure:**
 ```
@@ -274,3 +281,5 @@ The database uses Convex with the following domain tables:
 6. **Minimal cross-feature dependencies** - Features should be self-contained. Shared logic goes in `lib/services/` or `lib/utils/`
 
 7. **Consistent naming** - Follow the established patterns for queries (`get*`/`list*` for public, `listAll*` for admin), mutations (action verbs with nouns), and hooks (`use` + mirror backend names)
+
+8. **Never edit UI primitives** - Files in `components/ui/primitives/` are vendor components and must never be modified. Create wrappers in `components/ui/` instead
