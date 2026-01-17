@@ -1,6 +1,5 @@
 'use client';
 
-import { useCallback } from 'react';
 import { useTheme } from 'next-themes';
 
 import { Button } from '@/components/ui';
@@ -9,15 +8,11 @@ import { cn } from '@/utils';
 export function ModeSwitcher({ className }: { className?: string }) {
   const { resolvedTheme, setTheme } = useTheme();
 
-  const toggleTheme = useCallback(() => {
-    setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
-  }, [resolvedTheme, setTheme]);
-
   return (
     <Button
       aria-label="Toggle theme"
       className={className}
-      onClick={toggleTheme}
+      onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
       size="icon-lg"
       title="Toggle theme"
       variant="ghost"
