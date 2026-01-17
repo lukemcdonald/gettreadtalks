@@ -3,8 +3,7 @@ import { getUserFavorites } from '@/features/users/queries';
 import { getCurrentUser } from '@/services/auth/server';
 
 export default async function AccountPage() {
-  const user = await getCurrentUser();
-  const favorites = await getUserFavorites();
+  const [user, favorites] = await Promise.all([getCurrentUser(), getUserFavorites()]);
 
   return (
     <Card>
