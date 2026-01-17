@@ -107,8 +107,12 @@ export function getSpeakerComparator<T extends { featured?: boolean; lastName: s
   switch (sort) {
     case 'featured':
       return (a, b) => {
-        if (a.featured && !b.featured) return -1;
-        if (!a.featured && b.featured) return 1;
+        if (a.featured && !b.featured) {
+          return -1;
+        }
+        if (!a.featured && b.featured) {
+          return 1;
+        }
         return byLastName(a, b);
       };
     default:

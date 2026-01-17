@@ -15,7 +15,11 @@ type ClipCardProps = {
   speaker?: Pick<Speaker, 'firstName' | 'lastName' | 'imageUrl' | 'slug'>;
 };
 
-export const ClipCard = memo(function ClipCard({ clip, favorited, speaker }: ClipCardProps) {
+export const ClipCard = memo(function ClipCardComponent({
+  clip,
+  favorited,
+  speaker,
+}: ClipCardProps) {
   const speakerName = getSpeakerName(speaker);
   const accessibleLabel = speakerName ? `${clip.title} by ${speakerName}` : clip.title;
   const statusLabels = [favorited && 'Favorited'];

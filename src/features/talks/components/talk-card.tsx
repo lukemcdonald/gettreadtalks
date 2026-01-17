@@ -34,7 +34,7 @@ function SpeakerLink({ children, slug }: { children: React.ReactNode; slug: stri
   );
 }
 
-export const TalkCard = memo(function TalkCard({
+export const TalkCard = memo(function TalkCardComponent({
   featured,
   favorited,
   finished,
