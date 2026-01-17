@@ -13,7 +13,10 @@ type SpeakerCardProps = {
   speaker: Pick<Speaker, 'featured' | 'firstName' | 'lastName' | 'imageUrl' | 'role' | 'slug'>;
 };
 
-export const SpeakerCard = memo(function SpeakerCard({ favorited, speaker }: SpeakerCardProps) {
+export const SpeakerCard = memo(function SpeakerCardComponent({
+  favorited,
+  speaker,
+}: SpeakerCardProps) {
   const speakerName = getSpeakerName(speaker);
   const statusLabels = [speaker.featured && 'Featured', favorited && 'Favorited'];
   const statusLabel = statusLabels.filter(Boolean).join(', ');
