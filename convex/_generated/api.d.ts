@@ -22,6 +22,7 @@ import type * as lib_errors_constants from "../lib/errors/constants.js";
 import type * as lib_errors_index from "../lib/errors/index.js";
 import type * as lib_errors_types from "../lib/errors/types.js";
 import type * as lib_filters from "../lib/filters.js";
+import type * as lib_sort from "../lib/sort.js";
 import type * as lib_types from "../lib/types.js";
 import type * as lib_utils from "../lib/utils.js";
 import type * as lib_validators_index from "../lib/validators/index.js";
@@ -98,6 +99,7 @@ declare const fullApi: ApiFromModules<{
   "lib/errors/index": typeof lib_errors_index;
   "lib/errors/types": typeof lib_errors_types;
   "lib/filters": typeof lib_filters;
+  "lib/sort": typeof lib_sort;
   "lib/types": typeof lib_types;
   "lib/utils": typeof lib_utils;
   "lib/validators/index": typeof lib_validators_index;
