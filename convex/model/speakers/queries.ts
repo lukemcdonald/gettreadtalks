@@ -7,7 +7,7 @@ import { getOneFrom } from 'convex-helpers/server/relationships';
 import { query } from '../../_generated/server';
 import { filterSpeakersWithPublishedTalks } from '../../lib/filters';
 import { type SpeakerSortOption, getSpeakerComparator } from '../../lib/sort';
-import { shuffleAndLimit } from '../../lib/utils';
+import { paginateArray, shuffleAndLimit } from '../../lib/utils';
 import { doc, docs } from '../../lib/validators/schema';
 
 const speakerPageValidator = paginationResultValidator(doc('speakers'));
@@ -138,21 +138,37 @@ export const listSpeakers = query({
     sort: v.optional(v.union(v.literal('alphabetical'), v.literal('featured'))),
   },
   handler: async (ctx, args) => {
-    const { role, search, sort = 'alphabetical' } = args;
+    const { paginationOpts, role, search, sort = 'alphabetical' } = args;
 
-    const result = await ctx.db
-      .query('speakers')
-      .withIndex('by_lastName')
-      .order('asc')
-      .paginate(args.paginationOpts);
+    const hasFilters = search || (role && role !== 'all');
+    const needsCustomSort = sort !== 'alphabetical';
+
+    // When no filters and default sort, use native Convex pagination
+    if (!(hasFilters || needsCustomSort)) {
+      const result = await ctx.db
+        .query('speakers')
+        .withIndex('by_lastName')
+        .order('asc')
+        .paginate(paginationOpts);
+
+      const filtered = await filterSpeakersWithPublishedTalks(ctx, result.page);
+
+      return {
+        ...result,
+        page: filtered,
+      };
+    }
+
+    // With filters or custom sort, collect all and paginate in-memory
+    let speakers = await ctx.db.query('speakers').withIndex('by_lastName').order('asc').collect();
 
     // Filter to speakers with published content
-    let filtered = await filterSpeakersWithPublishedTalks(ctx, result.page);
+    speakers = await filterSpeakersWithPublishedTalks(ctx, speakers);
 
     // Filter by search term (firstName, lastName)
     if (search) {
       const searchLower = search.toLowerCase();
-      filtered = filtered.filter(
+      speakers = speakers.filter(
         (speaker) =>
           speaker.firstName.toLowerCase().includes(searchLower) ||
           speaker.lastName.toLowerCase().includes(searchLower) ||
@@ -162,16 +178,22 @@ export const listSpeakers = query({
 
     // Filter by role
     if (role && role !== 'all') {
-      filtered = filtered.filter((speaker) => speaker.role === role);
+      speakers = speakers.filter((speaker) => speaker.role === role);
     }
 
     // Sort using comparator
-    const comparator = getSpeakerComparator(sort as SpeakerSortOption);
-    filtered.sort(comparator);
+    speakers.sort(getSpeakerComparator(sort as SpeakerSortOption));
+
+    const { continueCursor, isDone, page } = paginateArray(
+      speakers,
+      paginationOpts.cursor,
+      paginationOpts.numItems,
+    );
 
     return {
-      ...result,
-      page: filtered,
+      continueCursor,
+      isDone,
+      page,
     };
   },
   returns: speakerPageValidator,
