@@ -1,4 +1,3 @@
-import type { PaginationResult } from 'convex/server';
 import type { Doc } from '../../_generated/dataModel';
 
 import { paginationOptsValidator, paginationResultValidator } from 'convex/server';
@@ -219,20 +218,14 @@ export const listAllClips = query({
   handler: async (ctx, args) => {
     const { paginationOpts, status } = args;
 
-    let clipPages: PaginationResult<Doc<'clips'>>;
-
-    // Simplify: !status || status === 'all'. Maybe build query with single await
-    if (status === 'all') {
-      clipPages = await ctx.db.query('clips').order('desc').paginate(paginationOpts);
-    } else if (status) {
-      clipPages = await ctx.db
-        .query('clips')
-        .withIndex('by_status_and_publishedAt', (q) => q.eq('status', status))
-        .order('desc')
-        .paginate(paginationOpts);
-    } else {
-      clipPages = await ctx.db.query('clips').order('desc').paginate(paginationOpts);
-    }
+    const clipPages =
+      !status || status === 'all'
+        ? await ctx.db.query('clips').order('desc').paginate(paginationOpts)
+        : await ctx.db
+            .query('clips')
+            .withIndex('by_status_and_publishedAt', (q) => q.eq('status', status))
+            .order('desc')
+            .paginate(paginationOpts);
 
     const enrichedPage = await asyncMap(clipPages.page, async (clip) => {
       const speaker = clip.speakerId ? await ctx.db.get('speakers', clip.speakerId) : null;
