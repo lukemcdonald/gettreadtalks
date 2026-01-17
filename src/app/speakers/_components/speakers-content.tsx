@@ -1,18 +1,18 @@
 import type { Speaker } from '@/features/speakers/types';
 
-import { Suspense } from 'react';
-
 import { SpeakersList } from '@/app/speakers/_components/speakers-list';
-import { SpeakersListSkeleton } from '@/app/speakers/_components/speakers-skeleton';
 
-type SpeakersContentProps = {
-  speakers: Speaker[];
+export type SpeakerGroup = {
+  items: Speaker[];
+  letter: string;
+  range: string;
 };
 
-export function SpeakersContent({ speakers }: SpeakersContentProps) {
-  return (
-    <Suspense fallback={<SpeakersListSkeleton />}>
-      <SpeakersList speakers={speakers} />
-    </Suspense>
-  );
+type SpeakersContentProps = {
+  groups: SpeakerGroup[];
+  hasActiveFilters: boolean;
+};
+
+export function SpeakersContent({ groups, hasActiveFilters }: SpeakersContentProps) {
+  return <SpeakersList groups={groups} hasActiveFilters={hasActiveFilters} />;
 }

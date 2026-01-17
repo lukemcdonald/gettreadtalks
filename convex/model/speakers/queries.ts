@@ -6,6 +6,7 @@ import { getOneFrom } from 'convex-helpers/server/relationships';
 
 import { query } from '../../_generated/server';
 import { filterSpeakersWithPublishedTalks } from '../../lib/filters';
+import { type SpeakerSortOption, getSpeakerComparator } from '../../lib/sort';
 import { shuffleAndLimit } from '../../lib/utils';
 import { doc, docs } from '../../lib/validators/schema';
 
@@ -126,21 +127,47 @@ export const listFeaturedSpeakers = query({
 });
 
 /**
- * List speakers with pagination.
+ * List speakers with pagination and optional filtering.
  * Filters to speakers who have at least one published talk or clip.
  */
 export const listSpeakers = query({
   args: {
     paginationOpts: paginationOptsValidator,
+    role: v.optional(v.string()),
+    search: v.optional(v.string()),
+    sort: v.optional(v.union(v.literal('alphabetical'), v.literal('featured'))),
   },
   handler: async (ctx, args) => {
+    const { role, search, sort = 'alphabetical' } = args;
+
     const result = await ctx.db
       .query('speakers')
       .withIndex('by_lastName')
       .order('asc')
       .paginate(args.paginationOpts);
 
-    const filtered = await filterSpeakersWithPublishedTalks(ctx, result.page);
+    // Filter to speakers with published content
+    let filtered = await filterSpeakersWithPublishedTalks(ctx, result.page);
+
+    // Filter by search term (firstName, lastName)
+    if (search) {
+      const searchLower = search.toLowerCase();
+      filtered = filtered.filter(
+        (speaker) =>
+          speaker.firstName.toLowerCase().includes(searchLower) ||
+          speaker.lastName.toLowerCase().includes(searchLower) ||
+          `${speaker.firstName} ${speaker.lastName}`.toLowerCase().includes(searchLower),
+      );
+    }
+
+    // Filter by role
+    if (role && role !== 'all') {
+      filtered = filtered.filter((speaker) => speaker.role === role);
+    }
+
+    // Sort using comparator
+    const comparator = getSpeakerComparator(sort as SpeakerSortOption);
+    filtered.sort(comparator);
 
     return {
       ...result,

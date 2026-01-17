@@ -4,14 +4,17 @@ import { getSpeakers } from '@/features/speakers';
 
 type GetSpeakersGroupedProps = {
   limit?: number;
+  role?: string;
+  search?: string;
+  sort?: string;
 };
 
 /**
  * Get speakers grouped alphabetically by last name.
  */
 export async function getSpeakersGrouped(args?: GetSpeakersGroupedProps) {
-  const { limit } = args ?? {};
-  const { speakers } = await getSpeakers({ limit });
+  const { limit, role, search, sort } = args ?? {};
+  const { speakers } = await getSpeakers({ limit, role, search, sort });
 
   // Group speakers by first letter of last name
   const grouped = new Map<string, typeof speakers>();
