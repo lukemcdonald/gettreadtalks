@@ -1,7 +1,5 @@
 'use client';
 
-import { useMemo } from 'react';
-
 import { cn } from '@/utils';
 
 type MediaEmbedProps = {
@@ -69,39 +67,41 @@ function detectMediaType(url: string): 'youtube' | 'vimeo' | 'video' | 'audio' |
   return 'unknown';
 }
 
-export function MediaEmbed({ className, mediaUrl, type }: MediaEmbedProps) {
-  const embedConfig = useMemo(() => {
-    const detectedType = type || detectMediaType(mediaUrl);
+function getEmbedConfig(mediaUrl: string, type?: 'audio' | 'video') {
+  const detectedType = type || detectMediaType(mediaUrl);
 
-    if (detectedType === 'youtube') {
-      const videoId = parseYouTubeUrl(mediaUrl);
-      if (videoId) {
-        return {
-          embedUrl: `https://www.youtube.com/embed/${videoId}`,
-          type: 'youtube' as const,
-        };
-      }
-    }
-
-    if (detectedType === 'vimeo') {
-      const videoId = parseVimeoUrl(mediaUrl);
-      if (videoId) {
-        return {
-          embedUrl: `https://player.vimeo.com/video/${videoId}`,
-          type: 'vimeo' as const,
-        };
-      }
-    }
-
-    if (detectedType === 'video' || detectedType === 'audio') {
+  if (detectedType === 'youtube') {
+    const videoId = parseYouTubeUrl(mediaUrl);
+    if (videoId) {
       return {
-        embedUrl: mediaUrl,
-        type: detectedType,
+        embedUrl: `https://www.youtube.com/embed/${videoId}`,
+        type: 'youtube' as const,
       };
     }
+  }
 
-    return null;
-  }, [mediaUrl, type]);
+  if (detectedType === 'vimeo') {
+    const videoId = parseVimeoUrl(mediaUrl);
+    if (videoId) {
+      return {
+        embedUrl: `https://player.vimeo.com/video/${videoId}`,
+        type: 'vimeo' as const,
+      };
+    }
+  }
+
+  if (detectedType === 'video' || detectedType === 'audio') {
+    return {
+      embedUrl: mediaUrl,
+      type: detectedType,
+    };
+  }
+
+  return null;
+}
+
+export function MediaEmbed({ className, mediaUrl, type }: MediaEmbedProps) {
+  const embedConfig = getEmbedConfig(mediaUrl, type);
 
   if (!embedConfig) {
     return (
