@@ -1,6 +1,6 @@
 'use client';
 
-import { useId, useState } from 'react';
+import { type ComponentPropsWithoutRef, type FormEvent, useId, useState } from 'react';
 import { CircleAlertIcon } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 
@@ -22,7 +22,7 @@ import { captureException } from '@/services/errors/client';
 
 type AuthIntent = 'signIn' | 'signUp';
 
-export function LoginForm(props: React.ComponentPropsWithoutRef<'form'>) {
+export function LoginForm(props: ComponentPropsWithoutRef<'form'>) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -37,7 +37,7 @@ export function LoginForm(props: React.ComponentPropsWithoutRef<'form'>) {
 
   const isDisabled = isLoading || !email || !password;
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
     const intent = (formData.get('intent') as AuthIntent) || 'signIn';

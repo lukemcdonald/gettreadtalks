@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 import {
   Body,
   Container,
@@ -12,7 +14,7 @@ import {
 } from '@react-email/components';
 
 type EmailLayoutProps = {
-  children: React.ReactNode;
+  children: ReactNode;
   preview?: string;
 };
 

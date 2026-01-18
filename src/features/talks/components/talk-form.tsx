@@ -1,4 +1,5 @@
 'use client';
+import type { ReactNode } from 'react';
 import type { Collection, CollectionId } from '@/features/collections/types';
 import type { Speaker, SpeakerId } from '@/features/speakers/types';
 import type { TalkId, TalkStatus } from '@/features/talks/types';
@@ -21,7 +22,7 @@ import { SpeakerField } from '@/features/speakers/components/speaker-field';
 import { useTalkForm } from '@/features/talks/hooks';
 
 type TalkFormProps = {
-  actionsMenu?: (props: { isBusy: boolean }) => React.ReactNode;
+  actionsMenu?: (props: { isBusy: boolean }) => ReactNode;
   collections: Pick<Collection, '_id' | 'slug' | 'title'>[];
   initialData?: {
     collectionId?: CollectionId;

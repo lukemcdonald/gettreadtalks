@@ -10,6 +10,8 @@ import { ThemeProvider } from '@/components/theme-provider';
 
 import '@/assets/styles.css';
 
+import type { ReactNode } from 'react';
+
 import { Suspense } from 'react';
 
 import { SkipNavLink } from '@/components/site-header/navigation/skip-nav-link';
@@ -28,7 +30,7 @@ export const metadata: Metadata = {
 export default async function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: ReactNode;
 }>) {
   return (
     <html className={cn('h-full', inter.variable)} lang="en" suppressHydrationWarning>

@@ -1,7 +1,9 @@
+import type { ReactNode } from 'react';
+
 import { cn } from '@/utils';
 
 type GridListProps = {
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
   columns?: {
     default?: 1 | 2 | 3 | 4 | 5;

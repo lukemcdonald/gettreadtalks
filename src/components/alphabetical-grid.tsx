@@ -1,8 +1,10 @@
+import type { ReactNode } from 'react';
+
 import { cn } from '@/utils';
 import { GridList } from './grid-list';
 
 type AlphabeticalGroup = {
-  items: React.ReactNode[];
+  items: ReactNode[];
   letter: string;
   range: string;
 };

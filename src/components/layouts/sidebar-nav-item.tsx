@@ -1,6 +1,6 @@
 'use client';
 
-import type { ComponentType } from 'react';
+import type { ComponentType, SVGProps } from 'react';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -9,7 +9,7 @@ import { cn } from '@/utils';
 
 type SidebarNavItemProps = {
   href: string;
-  icon?: ComponentType<React.SVGProps<SVGSVGElement>>;
+  icon?: ComponentType<SVGProps<SVGSVGElement>>;
   label: string;
 };
 

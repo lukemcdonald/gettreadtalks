@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 import Link from 'next/link';
 
 import { cn } from '@/utils';
@@ -17,11 +19,12 @@ type NavItem = {
 };
 
 type FeaturedGridProps = {
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
   columns?: GridColumns;
   description?: string;
   quickLinks?: NavItem[];
+  sticky?: boolean;
   title?: string;
 };
 
@@ -31,16 +34,18 @@ export function FeaturedGrid({
   columns,
   description,
   quickLinks,
+  sticky,
   title,
 }: FeaturedGridProps) {
   const defaultColumns: GridColumns = { default: 1, sm: 2, md: 2, lg: 3, xl: 3 };
   const gridColumns = columns || defaultColumns;
+  const stickyClass = sticky ? 'lg:sticky lg:top-16 lg:h-fit' : undefined;
 
   return (
-    <div className={cn('grid gap-8 lg:grid-cols-[280px_1fr]', className)}>
-      <aside className="lg:sticky lg:top-8 lg:h-fit">
+    <div className={cn('grid gap-12 lg:grid-cols-[280px_1fr]', className)}>
+      <aside className={cn(stickyClass)}>
         <div className="space-y-6">
-          <header className="space-y-3">
+          <header className="mt-4 space-y-3">
             <h2 className="font-semibold text-2xl leading-tight tracking-tight">{title}</h2>
             {!!description && (
               <p className="text-muted-foreground text-sm leading-relaxed sm:text-base">
