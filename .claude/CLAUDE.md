@@ -1,123 +1,170 @@
-# Ultracite Code Standards
+# CLAUDE.md
 
-This project uses **Ultracite**, a zero-config Biome preset that enforces strict code quality standards through automated formatting and linting.
+This file provides guidance to Claude Code when working with this repository.
 
-## Quick Reference
+## Project Overview
 
-- **Format code**: `npx ultracite fix`
-- **Check for issues**: `npx ultracite check`
-- **Diagnose setup**: `npx ultracite doctor`
+TREAD Talks is a full-stack faith-based talks platform built with Next.js 16, React 19, Convex (backend + database), and Better Auth. Uses Tailwind CSS v4, deployed on Vercel.
 
-Biome (the underlying engine) provides extremely fast Rust-based linting and formatting. Most issues are automatically fixable.
+## Development Commands
 
----
+```bash
+# Development
+pnpm dev                    # Next.js + Convex dev servers + opens browser
+pnpm dev:frontend           # Next.js only
+pnpm dev:backend            # Convex only
 
-## Core Principles
+# Code Quality
+pnpm typecheck              # TypeScript checking (tsc --noEmit)
+pnpm style                  # Format and lint with --write flag
+pnpm check                  # All Biome checks (lint + format)
 
-Write code that is **accessible, performant, type-safe, and maintainable**. Focus on clarity and explicit intent over brevity.
+# Build & Deploy
+pnpm build                  # Deploy Convex + build Next.js (production)
+pnpm push                   # Deploy Convex functions to production
 
-### Type Safety & Explicitness
+# Database
+pnpm seed                   # Seed with sample data
+pnpm seed:force             # Force re-seed (clears existing)
+```
 
-- Use explicit types for function parameters and return values when they enhance clarity
-- Prefer `unknown` over `any` when the type is genuinely unknown
-- Use const assertions (`as const`) for immutable values and literal types
-- Leverage TypeScript's type narrowing instead of type assertions
-- Use meaningful variable names instead of magic numbers - extract constants with descriptive names
+## Code Quality
 
-### Modern JavaScript/TypeScript
+This project uses **Ultracite** (Biome-based) for linting and formatting. Run `pnpm style` before committing.
 
-- Use arrow functions for callbacks and short functions
-- Prefer `for...of` loops over `.forEach()` and indexed `for` loops
-- Use optional chaining (`?.`) and nullish coalescing (`??`) for safer property access
-- Prefer template literals over string concatenation
-- Use destructuring for object and array assignments
-- Use `const` by default, `let` only when reassignment is needed, never `var`
+**What Biome handles:** formatting, import ordering, unused variables, type safety, accessibility violations.
 
-### Async & Promises
+**What requires judgment:** business logic, meaningful naming, architecture, edge cases, UX.
 
-- Always `await` promises in async functions - don't forget to use the return value
-- Use `async/await` syntax instead of promise chains for better readability
-- Handle errors appropriately in async code with try-catch blocks
-- Don't use async functions as Promise executors
+### React 19+ Patterns
+- Use `ref` as a prop instead of `React.forwardRef`
+- No unnecessary memoization - React 19 optimizes automatically
 
-### React & JSX
+## Architecture
 
-- Use function components over class components
-- Call hooks at the top level only, never conditionally
-- Specify all dependencies in hook dependency arrays correctly
-- Use the `key` prop for elements in iterables (prefer unique IDs over array indices)
-- Nest children between opening and closing tags instead of passing as props
-- Don't define components inside other components
-- Use semantic HTML and ARIA attributes for accessibility:
-  - Provide meaningful alt text for images
-  - Use proper heading hierarchy
-  - Add labels for form inputs
-  - Include keyboard event handlers alongside mouse events
-  - Use semantic elements (`<button>`, `<nav>`, etc.) instead of divs with roles
+### Feature-Based Organization
 
-### Error Handling & Debugging
+Code is organized by **domain/feature**, not technical layer.
 
-- Remove `console.log`, `debugger`, and `alert` statements from production code
-- Throw `Error` objects with descriptive messages, not strings or other values
-- Use `try-catch` blocks meaningfully - don't catch errors just to rethrow them
-- Prefer early returns over nested conditionals for error cases
+**Directory Structure:**
+- `src/features/` - Business domains (talks, users, clips, speakers, topics, collections)
+- `src/services/` - Infrastructure (auth, email, errors)
+- `src/lib/` - Cross-cutting concerns (forms, entities)
+- `src/utils/` - Generic utilities
+- `src/constants/` - Shared constants
+- `convex/` - Database schema + backend functions
+- `convex/model/` - Entity-specific helpers organized by domain
+- `src/app/` - Next.js App Router pages
+- `src/components/` - Shared UI components
 
-### Code Organization
+**Path Alias:** `@/*` maps to `src/*`
 
-- Keep functions focused and under reasonable cognitive complexity limits
-- Extract complex conditions into well-named boolean variables
-- Use early returns to reduce nesting
-- Prefer simple conditionals over nested ternary operators
-- Group related code together and separate concerns
+### Data Flow Patterns
 
-### Security
+**Server Components (default)** - Fetch data server-side:
+```typescript
+import { getTalks } from '@/features/talks';
 
-- Add `rel="noopener"` when using `target="_blank"` on links
-- Avoid `dangerouslySetInnerHTML` unless absolutely necessary
-- Don't use `eval()` or assign directly to `document.cookie`
-- Validate and sanitize user input
+export default async function TalksPage({ searchParams }) {
+  const params = await searchParams;
+  const { talks } = await getTalks({ search: params.search });
+  return <TalksList talks={talks} />;
+}
+```
 
-### Performance
+**Client Components** - Only for interactivity, forms, and mutations:
+```typescript
+'use client';
+import { useTalkForm } from '@/features/talks/hooks';
 
-- Avoid spread syntax in accumulators within loops
-- Use top-level regex literals instead of creating them in loops
-- Prefer specific imports over namespace imports
-- Avoid barrel files (index files that re-export everything)
-- Use proper image components (e.g., Next.js `<Image>`) over `<img>` tags
+export function TalkFormClient({ speakers, collections }) {
+  const { form, onSubmit, isBusy } = useTalkForm({ speakers, collections });
+  return <form onSubmit={onSubmit}>...</form>;
+}
+```
 
-### Framework-Specific Guidance
+### Convex Backend Organization
 
-**Next.js:**
-- Use Next.js `<Image>` component for images
-- Use `next/head` or App Router metadata API for head elements
-- Use Server Components for async data fetching instead of async Client Components
+**File Structure:**
+- `convex/{domain}.ts` - Public API exports
+- `convex/model/{domain}/` - Entity helpers (queries.ts, mutations.ts, schema.ts, validators.ts)
+- `convex/model/auth/` - Authentication helpers
+- `convex/lib/` - Shared utilities
 
-**React 19+:**
-- Use ref as a prop instead of `React.forwardRef`
+**Naming Conventions:**
 
-**Solid/Svelte/Vue/Qwik:**
-- Use `class` and `for` attributes (not `className` or `htmlFor`)
+*Queries:*
+- `get*` - Single document or null
+- `list*` - Filtered/public array with enrichment
+- `listAll*` - Unfiltered array for admin
 
----
+*Mutations:*
+- `create*`, `update*`, `archive*` (soft delete), `destroy*` (hard delete)
+- `add*To*`, `remove*From*` - Associations
+- `favorite*`, `unfavorite*`, `finish*`, `unfinish*` - User actions
 
-## Testing
+### Feature Structure
 
-- Write assertions inside `it()` or `test()` blocks
-- Avoid done callbacks in async tests - use async/await instead
-- Don't use `.only` or `.skip` in committed code
-- Keep test suites reasonably flat - avoid excessive `describe` nesting
+```
+src/features/{domain}/
+├─ actions/            # Server actions (writes)
+├─ queries/            # Server queries (reads)
+├─ hooks/              # Client hooks (mutations/forms only)
+├─ components/         # Feature-specific components
+├─ schemas/            # Zod validation
+├─ types.ts
+├─ utils.ts
+└─ index.ts            # Public barrel export
+```
 
-## When Biome Can't Help
+### Component Organization
 
-Biome's linter will catch most issues automatically. Focus your attention on:
+1. **Shared** - `src/components/` - Used across features
+2. **Feature** - `src/features/{domain}/components/` - Feature-specific
+3. **Page** - `src/app/{route}/_components/` - Route-specific
 
-1. **Business logic correctness** - Biome can't validate your algorithms
-2. **Meaningful naming** - Use descriptive names for functions, variables, and types
-3. **Architecture decisions** - Component structure, data flow, and API design
-4. **Edge cases** - Handle boundary conditions and error states
-5. **User experience** - Accessibility, performance, and usability considerations
-6. **Documentation** - Add comments for complex logic, but prefer self-documenting code
+**UI Primitives:** Files in `src/components/ui/primitives/` are vendor components - never edit directly. Create wrappers in `src/components/ui/`.
 
----
+**Naming:** kebab-case for all folders and files
 
-Most formatting and common issues are automatically fixed by Biome. Run `npx ultracite fix` before committing to ensure compliance.
+### Authentication
+
+Better Auth with Convex integration:
+- Client: `import { useCurrentUser } from '@/features/users/hooks'`
+- Server: `import { getCurrentUser, requireAdminUser, getAuthToken } from '@/services/auth/server'`
+- Convex: `import { getCurrentUser, requireAuth } from '@/convex/model/auth'`
+
+### Error Handling
+
+**Convex Mutations** - Use custom hook:
+```typescript
+import { useMutation } from '@/hooks';
+
+const { mutate, isLoading, error } = useMutation(api.talks.createTalk, {
+  onSuccess: () => toast.success('Created!'),
+  onError: (error) => toast.error(getErrorMessage(error)),
+});
+```
+
+**Server Actions** - Try/catch with error mapping:
+```typescript
+import { mapConvexErrorToFormErrors } from '@/lib/forms/validation';
+
+try {
+  const result = await fetchAuthMutation(api.talks.createTalk, data);
+  return { success: true, data: result };
+} catch (error) {
+  return { success: false, errors: mapConvexErrorToFormErrors(error) };
+}
+```
+
+## Key Principles
+
+1. **Server-first data fetching** - Fetch in server components, pass to client
+2. **Organize by domain** - Related code lives together in features
+3. **Server Components by default** - Client only for interactivity
+4. **Type safety** - Convex provides end-to-end types
+5. **Co-located code** - Tests, types, utils next to their components
+6. **Minimal cross-feature dependencies** - Shared logic in `src/services/` or `src/lib/`
+7. **Consistent naming** - Follow established patterns
+8. **Filter/sort server-side** - Not in client-side hooks
