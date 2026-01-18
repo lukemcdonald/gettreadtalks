@@ -30,6 +30,13 @@ export function SpeakersSidebar({ speakers }: SpeakersSidebarProps) {
           options={roles.map((role) => ({ label: role, value: role }))}
           placeholder="All Roles"
         />
+        <SortSelect
+          label="Sort by"
+          options={[
+            { label: 'Alphabetical', value: 'alphabetical' },
+            { label: 'Featured', value: 'featured' },
+          ]}
+        />
       </SidebarContent>
     </>
   );

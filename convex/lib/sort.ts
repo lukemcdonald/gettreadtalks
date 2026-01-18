@@ -41,18 +41,29 @@ export function byCount<T extends { count: number }>(
  * - recent: newest first (default)
  * - oldest: oldest first
  * - alphabetical: A-Z by title
+ * - featured: featured first, then by recent
  */
-export type ContentSortOption = 'alphabetical' | 'oldest' | 'recent';
+export type ContentSortOption = 'alphabetical' | 'featured' | 'oldest' | 'recent';
 
 /**
  * Get comparator for content (talks, clips) based on sort option.
  */
-export function getContentComparator<T extends { title: string; publishedAt?: number }>(
-  sort: ContentSortOption = 'recent',
-): (a: T, b: T) => number {
+export function getContentComparator<
+  T extends { featured?: boolean; title: string; publishedAt?: number },
+>(sort: ContentSortOption = 'recent'): (a: T, b: T) => number {
   switch (sort) {
     case 'alphabetical':
       return byTitle;
+    case 'featured':
+      return (a, b) => {
+        if (a.featured && !b.featured) {
+          return -1;
+        }
+        if (!a.featured && b.featured) {
+          return 1;
+        }
+        return byPublishedAt(a, b, 'desc');
+      };
     case 'oldest':
       return (a, b) => byPublishedAt(a, b, 'asc');
     default:

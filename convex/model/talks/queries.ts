@@ -241,7 +241,12 @@ export const listTalksBySpeaker = query({
 });
 
 const sortType = v.optional(
-  v.union(v.literal('alphabetical'), v.literal('oldest'), v.literal('recent')),
+  v.union(
+    v.literal('alphabetical'),
+    v.literal('featured'),
+    v.literal('oldest'),
+    v.literal('recent'),
+  ),
 );
 
 /**
