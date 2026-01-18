@@ -4,7 +4,7 @@ import { Container, Section } from '@/components/ui';
 
 export function SiteFooter() {
   return (
-    <footer className="bg-card" id="footer">
+    <footer id="footer">
       <Section render={<div />} spacing="xl">
         <Container>
           <FooterNav />

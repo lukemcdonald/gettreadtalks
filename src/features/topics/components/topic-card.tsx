@@ -10,7 +10,7 @@ type TopicCardProps = {
 
 export function TopicCard({ talkCount, topic }: TopicCardProps) {
   return (
-    <Card className="card-interactive relative flex-row items-center gap-4 p-4">
+    <Card className="card-interactive relative flex-row items-center justify-between gap-4 p-4">
       <CardTitle>
         <FauxLink href={`/topics/${topic.slug}`}>{topic.title}</FauxLink>
       </CardTitle>
