@@ -12,9 +12,8 @@ import {
   ComboboxPopup,
   Label,
 } from '@/components/ui';
+import { FILTER_ALL_VALUE } from '@/constants/ui';
 import { cn } from '@/utils';
-
-const ALL_OPTION_VALUE = '__all__';
 
 type FilterOption = {
   label: string;
@@ -48,14 +47,14 @@ export function ComboboxFilter({
   const searchParamValue = searchParams.get(name);
 
   // Build options with "All" at the top
-  const allOption: FilterOption = { label: placeholder, value: ALL_OPTION_VALUE };
+  const allOption: FilterOption = { label: placeholder, value: FILTER_ALL_VALUE };
   const allOptions = [allOption, ...options];
 
   function getInitialValue(): string {
     if (searchParamValue && options.some((opt) => opt.value === searchParamValue)) {
       return searchParamValue;
     }
-    return ALL_OPTION_VALUE;
+    return FILTER_ALL_VALUE;
   }
 
   const currentValue = getInitialValue();
@@ -63,7 +62,7 @@ export function ComboboxFilter({
   const handleChange = (newValue: string | null) => {
     const params = new URLSearchParams(searchParams.toString());
 
-    if (newValue && newValue !== ALL_OPTION_VALUE) {
+    if (newValue && newValue !== FILTER_ALL_VALUE) {
       params.set(name, newValue);
     } else {
       params.delete(name);
@@ -88,6 +87,10 @@ export function ComboboxFilter({
   };
 
   const getItemLabel = (itemValue: string): string => {
+    // Return empty string for "All" option so placeholder shows instead of editable text
+    if (itemValue === FILTER_ALL_VALUE) {
+      return '';
+    }
     const option = allOptions.find((opt) => opt.value === itemValue);
     return option?.label ?? '';
   };
@@ -106,8 +109,8 @@ export function ComboboxFilter({
       >
         <ComboboxInput
           id={name}
-          placeholder={`Search ${label?.toLowerCase() ?? 'options'}...`}
-          showClear={currentValue !== ALL_OPTION_VALUE}
+          placeholder={placeholder}
+          showClear={currentValue !== FILTER_ALL_VALUE}
         />
 
         <ComboboxPopup>
