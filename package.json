@@ -24,7 +24,9 @@
     "release:full": "pnpm build && pnpm release",
     "start": "next start",
     "style": "biome check --write",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "update:ui": "pnpm dlx shadcn@latest add @coss/ui --overwrite",
+    "update:ui:styles": "pnpm dlx shadcn@latest add @coss/colors-neutral --overwrite"
   },
   "dependencies": {
     "@base-ui/react": "^1.0.0",
