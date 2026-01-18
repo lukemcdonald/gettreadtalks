@@ -43,6 +43,7 @@ export function TalksSidebar({ speakers, topics }: TalksSidebarProps) {
         label="Sort by"
         options={[
           { label: 'Recently Added', value: 'recent' },
+          { label: 'Featured', value: 'featured' },
           { label: 'Oldest First', value: 'oldest' },
           { label: 'Alphabetical', value: 'alphabetical' },
         ]}

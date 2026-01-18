@@ -5,7 +5,7 @@ import { fetchQuery } from 'convex/nextjs';
 import { api } from '@/convex/_generated/api';
 import { getAuthToken } from '@/services/auth/server';
 
-type SortOption = 'alphabetical' | 'oldest' | 'recent';
+type SortOption = 'alphabetical' | 'featured' | 'oldest' | 'recent';
 
 type GetTalksProps = {
   cursor?: string;
@@ -27,7 +27,7 @@ export async function getTalks(args?: GetTalksProps) {
   const token = await getAuthToken();
 
   // Validate sort option
-  const validSorts: SortOption[] = ['alphabetical', 'oldest', 'recent'];
+  const validSorts: SortOption[] = ['alphabetical', 'featured', 'oldest', 'recent'];
   const sortOption: SortOption = validSorts.includes(sort as SortOption)
     ? (sort as SortOption)
     : 'recent';
