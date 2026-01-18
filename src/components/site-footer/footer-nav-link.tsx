@@ -1,9 +1,10 @@
 import type { Route } from 'next';
+import type { ReactNode } from 'react';
 
 import Link from 'next/link';
 
 type FooterLinkProps = {
-  children: React.ReactNode;
+  children: ReactNode;
   href: string;
 };
 

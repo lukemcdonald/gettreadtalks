@@ -1,7 +1,7 @@
 'use client';
 
 import type { Route } from 'next';
-import type { ComponentType, ReactElement } from 'react';
+import type { ComponentProps, ComponentType, ReactElement, SVGProps } from 'react';
 
 import Link from 'next/link';
 
@@ -9,9 +9,9 @@ import { Button, MenuItem } from '@/components/ui';
 
 type AccountMenuItemProps = {
   href?: string;
-  icon?: ComponentType<React.SVGProps<SVGSVGElement>>;
+  icon?: ComponentType<SVGProps<SVGSVGElement>>;
   label: string;
-} & Omit<React.ComponentProps<typeof MenuItem>, 'render' | 'children'>;
+} & Omit<ComponentProps<typeof MenuItem>, 'render' | 'children'>;
 
 export function AccountMenuItem({
   href,

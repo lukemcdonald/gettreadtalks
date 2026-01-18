@@ -1,8 +1,10 @@
 'use client';
 
+import type { ComponentProps } from 'react';
+
 import { FieldLabel as BaseFieldLabel } from '../primitives/field';
 
-type FieldLabelProps = React.ComponentProps<typeof BaseFieldLabel> & {
+type FieldLabelProps = ComponentProps<typeof BaseFieldLabel> & {
   required?: boolean;
 };
 

@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import type { Speaker } from '@/features/speakers/types';
 import type { Talk } from '@/features/talks/types';
 
@@ -25,7 +26,7 @@ type TalkCardProps = {
   talk: Pick<Talk, 'description' | 'slug' | 'title'>;
 };
 
-function SpeakerLink({ children, slug }: { children: React.ReactNode; slug: string }) {
+function SpeakerLink({ children, slug }: { children: ReactNode; slug: string }) {
   return (
     <Link className="relative z-10 hover:underline" href={`/speakers/${slug}`}>
       {children}

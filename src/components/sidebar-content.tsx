@@ -1,7 +1,9 @@
+import type { ReactNode } from 'react';
+
 import { cn } from '@/utils';
 
 type SidebarContentProps = {
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
   title?: string;
 };
