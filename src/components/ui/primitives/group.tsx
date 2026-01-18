@@ -1,24 +1,25 @@
-import type * as React from 'react';
+"use client";
 
-import { mergeProps } from '@base-ui/react/merge-props';
-import { useRender } from '@base-ui/react/use-render';
-import { type VariantProps, cva } from 'class-variance-authority';
+import { mergeProps } from "@base-ui/react/merge-props";
+import { useRender } from "@base-ui/react/use-render";
+import { cva, type VariantProps } from "class-variance-authority";
+import type * as React from "react";
 
-import { Separator } from './separator';
-import { cn } from '@/utils';
+import { cn } from "@/utils";
+import { Separator } from "@/components/ui/primitives/separator";
 
 const groupVariants = cva(
-  'flex w-fit *:focus-visible:z-10 has-[>[data-slot=group]]:gap-2 *:has-focus-visible:z-10',
+  "flex w-fit *:focus-visible:z-1 has-[>[data-slot=group]]:gap-2 *:has-focus-visible:z-1 dark:*:[[data-slot=button]:hover~[data-slot=separator]:not([data-slot]:hover~[data-slot=separator]~[data-slot=separator]),[data-slot][data-pressed]~[data-slot=separator]:not([data-slot][data-pressed]~[data-slot=separator]~[data-slot=separator])]:before:bg-input/64 dark:*:[[data-slot=separator]:has(~[data-slot=button]:hover):not(:has(~[data-slot=separator]~[data-slot]:hover)),[data-slot=separator]:has(~[data-slot][data-pressed]):not(:has(~[data-slot=separator]~[data-slot][data-pressed]))]:before:bg-input/64",
   {
     defaultVariants: {
-      orientation: 'horizontal',
+      orientation: "horizontal",
     },
     variants: {
       orientation: {
         horizontal:
-          '*:not-first:before:-start-[0.5px] *:not-[&:nth-last-child(1_of_:not(span[data-base-ui-focus-guard],span[data-base-ui-inert]))]:before:-end-[0.5px] *:not-first:rounded-s-none *:not-[&:nth-last-child(1_of_:not(span[data-base-ui-focus-guard],span[data-base-ui-inert]))]:rounded-e-none *:not-first:border-s-0 *:not-[&:nth-last-child(1_of_:not(span[data-base-ui-focus-guard],span[data-base-ui-inert]))]:border-e-0 *:not-first:before:rounded-s-none *:not-[&:nth-last-child(1_of_:not(span[data-base-ui-focus-guard],span[data-base-ui-inert]))]:before:rounded-e-none *:after:absolute *:after:start-full *:after:h-full *:after:w-px *:pointer-coarse:after:min-w-auto',
+          "*:[[data-slot]~[data-slot]:not([data-slot=separator])]:before:-start-[0.5px] *:data-slot:not-data-[slot=separator]:has-[~[data-slot]]:before:-end-[0.5px] *:pointer-coarse:after:min-w-auto *:data-slot:has-[~[data-slot]]:rounded-e-none *:data-slot:has-[~[data-slot]]:border-e-0 *:data-slot:has-[~[data-slot]]:before:rounded-e-none *:[[data-slot]~[data-slot]]:rounded-s-none *:[[data-slot]~[data-slot]]:border-s-0 *:[[data-slot]~[data-slot]]:before:rounded-s-none",
         vertical:
-          '*:not-first:before:-top-[0.5px] *:not-[&:nth-last-child(1_of_:not(span[data-base-ui-focus-guard],span[data-base-ui-inert]))]:before:-bottom-[0.5px] flex-col *:not-first:rounded-t-none *:not-[&:nth-last-child(1_of_:not(span[data-base-ui-focus-guard],span[data-base-ui-inert]))]:rounded-b-none *:not-first:border-t-0 *:not-[&:nth-last-child(1_of_:not(span[data-base-ui-focus-guard],span[data-base-ui-inert]))]:border-b-0 *:not-[&:nth-last-child(1_of_:not(span[data-base-ui-focus-guard],span[data-base-ui-inert]))]:before:hidden *:not-first:before:rounded-t-none *:not-[&:nth-last-child(1_of_:not(span[data-base-ui-focus-guard],span[data-base-ui-inert]))]:before:rounded-b-none *:after:absolute *:after:top-full *:after:h-px *:pointer-coarse:after:min-h-auto *:after:w-full dark:*:last:before:hidden dark:*:first:before:block',
+          "*:[[data-slot]~[data-slot]:not([data-slot=separator])]:before:-top-[0.5px] *:data-slot:not-data-[slot=separator]:has-[~[data-slot]]:before:-bottom-[0.5px] flex-col *:pointer-coarse:after:min-h-auto *:data-slot:has-[~[data-slot]]:rounded-b-none *:data-slot:has-[~[data-slot]]:border-b-0 *:data-slot:not-data-[slot=separator]:has-[~[data-slot]]:before:hidden *:data-slot:has-[~[data-slot]]:before:rounded-b-none dark:*:last:before:hidden dark:*:first:before:block *:[[data-slot]~[data-slot]]:rounded-t-none *:[[data-slot]~[data-slot]]:border-t-0 *:[[data-slot]~[data-slot]]:before:rounded-t-none",
       },
     },
   },
@@ -31,9 +32,9 @@ function Group({
   ...props
 }: {
   className?: string;
-  orientation?: VariantProps<typeof groupVariants>['orientation'];
+  orientation?: VariantProps<typeof groupVariants>["orientation"];
   children: React.ReactNode;
-} & React.ComponentProps<'div'>) {
+} & React.ComponentProps<"div">) {
   return (
     <div
       className={cn(groupVariants({ orientation }), className)}
@@ -47,30 +48,20 @@ function Group({
   );
 }
 
-function GroupItem({ className, render, ...props }: useRender.ComponentProps<'div'>) {
+function GroupText({
+  className,
+  render,
+  ...props
+}: useRender.ComponentProps<"div">) {
   const defaultProps = {
     className: cn(
-      'not-first:before:-start-0.5 not-last:before:-end-0.5 not-first:rounded-s-none not-last:rounded-e-none border-x-0 not-first:before:rounded-s-none not-last:before:rounded-e-none first:border-s last:border-e focus-visible:z-10 has-focus-visible:z-10 before:[clip-path:inset(-1rem_var(--clip-end)_-1rem_var(--clip-start))] not-first:before:[--clip-start:2px] not-last:before:[--clip-end:2px] not-last:has-[+[data-slot=separator]]:before:[--clip-end:1.5px] [[data-slot=separator]+&]:before:[--clip-start:1.5px]',
+      "relative inline-flex items-center whitespace-nowrap rounded-lg border border-input bg-muted not-dark:bg-clip-padding px-[calc(--spacing(3)-1px)] text-muted-foreground text-base sm:text-sm shadow-xs/5 outline-none transition-shadow before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-lg)-1px)] before:shadow-[0_1px_--theme(--color-black/6%)] dark:bg-input/64 dark:before:shadow-[0_-1px_--theme(--color-white/6%)] [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4 [&_svg]:shrink-0 [&_svg]:-mx-0.5",
       className,
     ),
+    "data-slot": "group-text",
   };
   return useRender({
-    defaultTagName: 'div',
-    render,
-    props: mergeProps(defaultProps, props),
-  });
-}
-
-function GroupText({ className, render, ...props }: useRender.ComponentProps<'div'>) {
-  const defaultProps = {
-    className: cn(
-      "relative inline-flex items-center whitespace-nowrap rounded-lg border border-border bg-muted bg-clip-padding px-[calc(--spacing(3)-1px)] font-medium text-sm shadow-xs outline-none transition-shadow before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-lg)-1px)] before:shadow-[0_1px_--theme(--color-black/4%)] dark:bg-input/64 dark:before:shadow-[0_-1px_--theme(--color-white/8%)] [&_svg:not([class*='size-'])]:size-4 [&_svg]:shrink-0",
-      className,
-    ),
-    'data-slot': 'group-text',
-  };
-  return useRender({
-    defaultTagName: 'div',
+    defaultTagName: "div",
     props: mergeProps(defaultProps, props),
     render,
   });
@@ -78,7 +69,7 @@ function GroupText({ className, render, ...props }: useRender.ComponentProps<'di
 
 function GroupSeparator({
   className,
-  orientation = 'vertical',
+  orientation = "vertical",
   ...props
 }: {
   className?: string;
@@ -86,7 +77,7 @@ function GroupSeparator({
   return (
     <Separator
       className={cn(
-        '[[data-slot=input-control]:focus-within+&,[data-slot=select-trigger]:focus-visible+*+&]:-translate-x-px pointer-events-none relative z-20 has-[+[data-slot=input-control]:focus-within,+[data-slot=select-trigger]:focus-visible+*,+[data-slot=number-field]:focus-within]:translate-x-px has-[+[data-slot=input-control]:focus-within,+[data-slot=select-trigger]:focus-visible+*,+[data-slot=number-field]:focus-within]:bg-ring [[data-slot=input-control]:focus-within+&,[data-slot=select-trigger]:focus-visible+*+&,[data-slot=number-field]:focus-within+&]:bg-ring',
+        "[[data-slot=input-control]:focus-within+&,[data-slot=input-group]:focus-within+&,[data-slot=select-trigger]:focus-visible+*+&,[data-slot=number-field]:focus-within+input+&]:-translate-x-px pointer-events-none relative z-2 before:absolute before:inset-0 has-[+[data-slot=input-control]:focus-within,+[data-slot=input-group]:focus-within,+[data-slot=select-trigger]:focus-visible+*,+[data-slot=number-field]:focus-within]:translate-x-px has-[+[data-slot=input-control]:focus-within,+[data-slot=input-group]:focus-within,+[data-slot=select-trigger]:focus-visible+*,+[data-slot=number-field]:focus-within]:bg-ring dark:before:bg-input/32 [[data-slot=input-control]:focus-within+&,[data-slot=input-group]:focus-within+&,[data-slot=select-trigger]:focus-visible+*+&,[data-slot=number-field]:focus-within+&,[data-slot=number-field]:focus-within+input+&]:bg-ring",
         className,
       )}
       orientation={orientation}
@@ -98,11 +89,9 @@ function GroupSeparator({
 export {
   Group,
   Group as ButtonGroup,
-  GroupItem,
-  GroupItem as ButtonGroupItem,
-  GroupSeparator,
-  GroupSeparator as ButtonGroupSeparator,
   GroupText,
   GroupText as ButtonGroupText,
+  GroupSeparator,
+  GroupSeparator as ButtonGroupSeparator,
   groupVariants,
 };
