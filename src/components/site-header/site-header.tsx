@@ -10,7 +10,7 @@ export async function SiteHeader() {
 
   return (
     <Section
-      className="sticky top-0 z-50 bg-background text-foreground dark:text-muted-foreground"
+      className="sticky top-0 z-50 border-primary border-t-4 bg-background text-foreground dark:text-muted-foreground"
       id="header"
       render={<header />}
       role="banner"

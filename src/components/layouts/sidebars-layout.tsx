@@ -27,7 +27,7 @@ export function SidebarsLayout({
   return (
     <Section spacing={spacing}>
       <Container className={className}>
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-12">
+        <div className="grid grid-cols-1 gap-12 md:grid-cols-12">
           {!!header && <div className="col-span-full mb-10">{header}</div>}
 
           <div
