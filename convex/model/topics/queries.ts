@@ -1,4 +1,5 @@
 import type { Doc } from '../../_generated/dataModel';
+import type { TopicSortOption } from '../../lib/sort';
 
 import { paginationOptsValidator, paginationResultValidator } from 'convex/server';
 import { v } from 'convex/values';
@@ -6,7 +7,7 @@ import { asyncMap } from 'convex-helpers';
 import { getManyFrom, getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
 
 import { query } from '../../_generated/server';
-import { type TopicSortOption, getTopicComparator } from '../../lib/sort';
+import { getTopicComparator } from '../../lib/sort';
 import { enrichWithSpeakers, paginateArray } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';

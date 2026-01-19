@@ -1,9 +1,10 @@
 'use client';
 
 import type { ComponentType, ErrorInfo, ReactNode } from 'react';
+import type { FallbackProps } from 'react-error-boundary';
 import type { ErrorWithEventId } from '@/services/errors/types';
 
-import { type FallbackProps, ErrorBoundary as ReactErrorBoundary } from 'react-error-boundary';
+import { ErrorBoundary as ReactErrorBoundary } from 'react-error-boundary';
 
 import { ErrorFallback } from '@/components/error-fallback';
 import { captureException } from '@/services/errors/client';

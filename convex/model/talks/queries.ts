@@ -1,11 +1,12 @@
 import type { Doc } from '../../_generated/dataModel';
+import type { ContentSortOption } from '../../lib/sort';
 
 import { paginationOptsValidator, paginationResultValidator } from 'convex/server';
 import { v } from 'convex/values';
 import { getManyFrom, getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
 
 import { query } from '../../_generated/server';
-import { type ContentSortOption, getContentComparator } from '../../lib/sort';
+import { getContentComparator } from '../../lib/sort';
 import {
   applySearchFilter,
   enrichWithSpeakers,

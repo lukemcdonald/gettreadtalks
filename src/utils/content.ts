@@ -1,6 +1,7 @@
+import type { ClassValue } from 'clsx';
 import type { StatusType } from '@/lib/entities/types';
 
-import { type ClassValue, clsx } from 'clsx';
+import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
 export function capitalize(str: string): string {

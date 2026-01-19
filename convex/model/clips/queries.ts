@@ -1,4 +1,4 @@
-import type { Doc } from '../../_generated/dataModel';
+import type { ContentSortOption } from '../../lib/sort';
 
 import { paginationOptsValidator, paginationResultValidator } from 'convex/server';
 import { v } from 'convex/values';
@@ -7,7 +7,7 @@ import { getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
 
 import { query } from '../../_generated/server';
 import { filterClipsByPublishedTalks } from '../../lib/filters';
-import { type ContentSortOption, getContentComparator } from '../../lib/sort';
+import { getContentComparator } from '../../lib/sort';
 import { applySearchFilter, paginateArray } from '../../lib/utils';
 import { doc, docs } from '../../lib/validators/schema';
 import { statusFilterType } from '../../lib/validators/shared';
