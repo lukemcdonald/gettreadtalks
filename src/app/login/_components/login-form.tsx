@@ -1,6 +1,8 @@
 'use client';
 
-import { type ComponentPropsWithoutRef, type FormEvent, useId, useState } from 'react';
+import type { ComponentPropsWithoutRef, FormEvent } from 'react';
+
+import { useId, useState } from 'react';
 import { CircleAlertIcon } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 

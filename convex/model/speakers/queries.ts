@@ -1,4 +1,5 @@
 import type { Doc } from '../../_generated/dataModel';
+import type { SpeakerSortOption } from '../../lib/sort';
 
 import { paginationOptsValidator, paginationResultValidator } from 'convex/server';
 import { v } from 'convex/values';
@@ -6,7 +7,7 @@ import { getOneFrom } from 'convex-helpers/server/relationships';
 
 import { query } from '../../_generated/server';
 import { filterSpeakersWithPublishedTalks } from '../../lib/filters';
-import { type SpeakerSortOption, getSpeakerComparator } from '../../lib/sort';
+import { getSpeakerComparator } from '../../lib/sort';
 import { paginateArray, shuffleAndLimit } from '../../lib/utils';
 import { doc, docs } from '../../lib/validators/schema';
 

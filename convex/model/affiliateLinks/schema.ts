@@ -1,5 +1,7 @@
+import type { Infer } from 'convex/values';
+
 import { defineTable } from 'convex/server';
-import { type Infer, v } from 'convex/values';
+import { v } from 'convex/values';
 
 import { timestampFields } from '../../lib/validators';
 import { affiliateLinkTypes } from './validators';

@@ -1,5 +1,6 @@
 'use client';
 
+import type { SubmitErrorHandler, SubmitHandler } from 'react-hook-form';
 import type { Collection, CollectionId } from '@/features/collections/types';
 import type { Speaker, SpeakerId } from '@/features/speakers/types';
 import type { TalkFormData } from '@/features/talks/schemas/talk-form';
@@ -9,7 +10,7 @@ import type { StatusType } from '@/lib/entities/types';
 import { useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
-import { type SubmitErrorHandler, type SubmitHandler, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 
 import { slugify } from '@/convex/lib/utils';
 import { createTalkAction, updateTalkAction } from '@/features/talks/actions';
