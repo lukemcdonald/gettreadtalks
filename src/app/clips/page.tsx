@@ -10,7 +10,7 @@ export interface ClipsPageSearchParams {
   cursor?: string;
   search?: string;
   sort?: string;
-  speakerSlug?: string;
+  speakers?: string;
   topicSlug?: string;
 }
 
@@ -20,17 +20,20 @@ interface ClipsPageProps {
 
 export default async function ClipsPage({ searchParams }: ClipsPageProps) {
   const params = await searchParams;
-  const { cursor, search, sort, speakerSlug, topicSlug } = params;
+  const { cursor, search, sort, speakers, topicSlug } = params;
+
+  // Parse comma-separated speakers into array
+  const speakerSlugs = speakers ? speakers.split(',').filter(Boolean) : undefined;
 
   // Check if any filters are active (for showing "clear filters" option)
-  const hasActiveFilters = !!(search || speakerSlug || topicSlug);
+  const hasActiveFilters = !!(search || speakerSlugs?.length || topicSlug);
 
   const [result, speakersResult, topics] = await Promise.all([
     getClips({
       cursor,
       search,
       sort,
-      speakerSlug,
+      speakerSlugs,
       topicSlug,
     }),
     getSpeakers(), // Fetch ALL speakers with published content (independent of filters)

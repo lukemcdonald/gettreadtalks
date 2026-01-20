@@ -2,6 +2,7 @@ import type { Speaker } from '@/features/speakers/types';
 import type { Topic } from '@/features/topics/types';
 
 import { ComboboxFilter } from '@/components/combobox-filter';
+import { ComboboxMultiFilter } from '@/components/combobox-multi-filter';
 import { SearchInput } from '@/components/search-input';
 import { SidebarContent } from '@/components/sidebar-content';
 import { SortSelect } from '@/components/sort-select';
@@ -21,9 +22,9 @@ export function ClipsSidebar({ speakers, topics }: ClipsSidebarProps) {
   return (
     <SidebarContent className="space-y-4">
       <SearchInput label="Search" paramName="search" placeholder="Search clips..." />
-      <ComboboxFilter
-        label="Speaker"
-        name="speakerSlug"
+      <ComboboxMultiFilter
+        label="Speakers"
+        name="speakers"
         options={speakers.map((speaker) => ({
           label: getSpeakerName(speaker),
           value: speaker.slug,

@@ -260,13 +260,14 @@ export const listTalks = query({
     paginationOpts: paginationOptsValidator,
     search: v.optional(v.string()),
     sort: sortType,
-    speakerSlug: v.optional(v.string()),
+    speakerSlugs: v.optional(v.array(v.string())),
     topicSlug: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const { featured, paginationOpts, search, sort = 'recent', speakerSlug, topicSlug } = args;
+    const { featured, paginationOpts, search, sort = 'recent', speakerSlugs, topicSlug } = args;
 
-    const hasFilters = search || speakerSlug || topicSlug || featured;
+    const hasSpeakerFilter = speakerSlugs && speakerSlugs.length > 0;
+    const hasFilters = search || hasSpeakerFilter || topicSlug || featured;
     const needsCustomSort = sort !== 'recent';
 
     // When no filters and default sort, use native Convex pagination for efficiency
@@ -298,13 +299,18 @@ export const listTalks = query({
       talks = applySearchFilter(talks, search);
     }
 
-    // Apply speaker filter
-    if (speakerSlug) {
-      const speaker = await getOneFrom(ctx.db, 'speakers', 'by_slug', speakerSlug);
-      if (speaker) {
-        talks = talks.filter((talk) => talk.speakerId === speaker._id);
+    // Apply speaker filter (multi-select)
+    if (hasSpeakerFilter) {
+      const speakers = await Promise.all(
+        speakerSlugs.map((slug) => getOneFrom(ctx.db, 'speakers', 'by_slug', slug)),
+      );
+      const validSpeakers = speakers.filter((s): s is NonNullable<typeof s> => s !== null);
+      const speakerIds = new Set(validSpeakers.map((s) => s._id));
+
+      if (speakerIds.size > 0) {
+        talks = talks.filter((talk) => speakerIds.has(talk.speakerId));
       } else {
-        talks = []; // No matching speaker
+        talks = []; // No matching speakers found
       }
     }
 
