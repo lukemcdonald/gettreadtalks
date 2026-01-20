@@ -26,7 +26,7 @@ import { CreateSpeakerSheet } from './create-speaker-sheet';
 
 type SpeakerListItem = Pick<Speaker, '_id' | 'firstName' | 'lastName' | 'imageUrl' | 'role'>;
 
-type SpeakerFieldProps<T extends FieldValues> = {
+interface SpeakerFieldProps<T extends FieldValues> {
   control: Control<T>;
   description?: string;
   label?: string;
@@ -34,7 +34,7 @@ type SpeakerFieldProps<T extends FieldValues> = {
   onSpeakerCreated?: (speakerId: SpeakerId) => void;
   required?: boolean;
   speakers: SpeakerListItem[];
-};
+}
 
 export function SpeakerField<T extends FieldValues>({
   control,

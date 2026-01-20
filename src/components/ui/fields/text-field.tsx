@@ -6,7 +6,7 @@ import { Controller } from 'react-hook-form';
 
 import { Field, FieldDescription, FieldError, FieldLabel, Input } from '@/components/ui';
 
-type TextFieldProps<T extends FieldValues> = {
+interface TextFieldProps<T extends FieldValues> {
   control: Control<T>;
   description?: string;
   label: string;
@@ -14,7 +14,7 @@ type TextFieldProps<T extends FieldValues> = {
   placeholder?: string;
   required?: boolean;
   type?: 'text' | 'email' | 'password' | 'search' | 'tel';
-};
+}
 
 /**
  * Reusable text input field component that wraps Controller + Field + Input.

@@ -5,9 +5,9 @@ import { fetchQuery } from 'convex/nextjs';
 import { api } from '@/convex/_generated/api';
 import { getAuthToken } from '@/services/auth/server';
 
-type GetAllSpeakersProps = {
+interface GetAllSpeakersProps {
   limit?: number;
-};
+}
 
 /**
  * Get all speakers.

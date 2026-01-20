@@ -9,12 +9,12 @@ import Link from 'next/link';
 import { SidebarContent } from '@/components/sidebar-content';
 import { getSpeakerName } from '@/features/speakers';
 
-type SpeakerLeftSidebarProps = {
+interface SpeakerLeftSidebarProps {
   clips: Clip[];
   collections: Collection[];
   speaker: Speaker;
   talks: Talk[];
-};
+}
 
 export function SpeakerLeftSidebar({
   clips,

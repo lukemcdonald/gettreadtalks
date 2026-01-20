@@ -7,7 +7,7 @@ import { getAuthToken } from '@/services/auth/server';
 
 type SortOption = 'alphabetical' | 'featured' | 'oldest' | 'recent';
 
-type GetTalksProps = {
+interface GetTalksProps {
   cursor?: string;
   featured?: boolean;
   limit?: number;
@@ -15,7 +15,7 @@ type GetTalksProps = {
   sort?: string;
   speakerSlug?: string;
   topicSlug?: string;
-};
+}
 
 /**
  * Get published talks with speakers and optional filtering.

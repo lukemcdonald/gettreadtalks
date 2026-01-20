@@ -14,19 +14,19 @@ import {
 import { FILTER_ALL_VALUE } from '@/constants/ui';
 import { cn } from '@/utils';
 
-type FilterOption = {
+interface FilterOption {
   label: string;
   value: string | null;
-};
+}
 
-type SelectFilterProps = {
+interface SelectFilterProps {
   className?: string;
   defaultValue?: string;
   label?: string;
   name?: string;
   options: FilterOption[];
   placeholder?: string;
-};
+}
 
 export function SelectFilter({
   className,

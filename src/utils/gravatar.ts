@@ -4,11 +4,11 @@ const BASE_URL = 'https://gravatar.com/avatar';
 const DEFAULT_SIZE = 80;
 const DEFAULT_IMAGE = '404';
 
-type GravatarProps = {
+interface GravatarProps {
   default?: string;
   email: string | null | undefined;
   size?: number;
-};
+}
 
 /**
  * Generate a Gravatar URL for an email address using SHA256 hash.

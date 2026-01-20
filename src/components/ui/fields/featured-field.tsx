@@ -4,12 +4,12 @@ import type { Control, FieldPath, FieldValues } from 'react-hook-form';
 
 import { CheckboxField } from './checkbox-field';
 
-type FeaturedFieldProps<T extends FieldValues> = {
+interface FeaturedFieldProps<T extends FieldValues> {
   control: Control<T>;
   description?: string;
   label?: string;
   name: FieldPath<T>;
-};
+}
 
 /**
  * Reusable featured field component for marking entities as featured.

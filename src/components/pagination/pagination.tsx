@@ -4,12 +4,12 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 import { Button } from '@/components/ui';
 
-type PaginationProps = {
+interface PaginationProps {
   continueCursor: string | null;
   hasNextPage: boolean;
   hasPrevPage: boolean;
   itemCount: number;
-};
+}
 
 export function Pagination({
   continueCursor,

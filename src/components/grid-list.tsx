@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 
 import { cn } from '@/utils';
 
-type GridListProps = {
+interface GridListProps {
   children: ReactNode;
   className?: string;
   columns?: {
@@ -12,7 +12,7 @@ type GridListProps = {
     sm?: 1 | 2 | 3 | 4 | 5;
     xl?: 1 | 2 | 3 | 4 | 5;
   };
-};
+}
 
 const gridColsClassMap = {
   1: 'grid-cols-1',

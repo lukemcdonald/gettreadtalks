@@ -7,9 +7,9 @@ import { StatusPopover } from '@/components/status-popover';
 import { TableCell, TableRow } from '@/components/ui';
 import { getSpeakerName } from '@/features/speakers';
 
-type TalksTableRowProps = {
+interface TalksTableRowProps {
   talk: TalkWithSpeakerAndTopics;
-};
+}
 
 export function TalksTableRow({ talk }: TalksTableRowProps) {
   const talkUrl = talk.speaker ? `/talks/${talk.speaker.slug}/${talk.slug}` : '';

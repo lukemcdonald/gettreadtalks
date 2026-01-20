@@ -6,10 +6,10 @@ import { MediaCard } from '@/components/media-card';
 import { getSpeakerName } from '@/features/speakers';
 import { SpeakerAvatar } from '@/features/speakers/components';
 
-type SpeakerCardProps = {
+interface SpeakerCardProps {
   favorited?: boolean;
   speaker: Pick<Speaker, 'featured' | 'firstName' | 'lastName' | 'imageUrl' | 'role' | 'slug'>;
-};
+}
 
 export function SpeakerCard({ favorited, speaker }: SpeakerCardProps) {
   const speakerName = getSpeakerName(speaker);

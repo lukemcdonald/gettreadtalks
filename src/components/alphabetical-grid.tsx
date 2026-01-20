@@ -3,16 +3,16 @@ import type { ReactNode } from 'react';
 import { cn } from '@/utils';
 import { GridList } from './grid-list';
 
-type AlphabeticalGroup = {
+interface AlphabeticalGroup {
   items: ReactNode[];
   letter: string;
   range: string;
-};
+}
 
-type AlphabeticalGridProps = {
+interface AlphabeticalGridProps {
   className?: string;
   groups: AlphabeticalGroup[];
-};
+}
 
 export function AlphabeticalGrid({ className, groups }: AlphabeticalGridProps) {
   return (

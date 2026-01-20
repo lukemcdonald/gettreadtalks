@@ -5,11 +5,11 @@ import NextError from 'next/error';
 
 import { captureException } from '@/services/errors';
 
-type GlobalErrorProps = {
+interface GlobalErrorProps {
   error: Error & {
     digest?: string;
   };
-};
+}
 
 export default function GlobalError({ error }: GlobalErrorProps) {
   useEffect(() => {

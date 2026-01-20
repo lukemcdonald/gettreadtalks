@@ -7,15 +7,15 @@ import { AdminTalksContent } from '@/app/account/talks/_components/talks-content
 import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui';
 
-export type AdminTalksSearchParams = {
+export interface AdminTalksSearchParams {
   cursor?: string;
   search?: string;
   status?: StatusType | 'all';
-};
+}
 
-type AdminTalksPageProps = {
+interface AdminTalksPageProps {
   searchParams: Promise<AdminTalksSearchParams>;
-};
+}
 
 export default async function AdminTalksPage({ searchParams }: AdminTalksPageProps) {
   const params = await searchParams;

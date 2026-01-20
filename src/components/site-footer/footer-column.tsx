@@ -2,11 +2,11 @@ import type { ReactNode } from 'react';
 
 import { cn } from '@/utils';
 
-type FooterColumnProps = {
+interface FooterColumnProps {
   children: ReactNode;
   className?: string;
   title: string;
-};
+}
 
 export function FooterColumn({ children, className, title }: FooterColumnProps) {
   return (

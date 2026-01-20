@@ -21,7 +21,7 @@ import { CollectionSelectField } from '@/features/collections/components';
 import { SpeakerField } from '@/features/speakers/components/speaker-field';
 import { useTalkForm } from '@/features/talks/hooks';
 
-type TalkFormProps = {
+interface TalkFormProps {
   actionsMenu?: (props: { isBusy: boolean }) => ReactNode;
   collections: Pick<Collection, '_id' | 'slug' | 'title'>[];
   initialData?: {
@@ -40,7 +40,7 @@ type TalkFormProps = {
   speakers: Pick<Speaker, '_id' | 'firstName' | 'lastName' | 'slug' | 'imageUrl' | 'role'>[];
   talkId?: TalkId;
   talkSlug?: string;
-};
+}
 
 export function TalkForm({
   actionsMenu,

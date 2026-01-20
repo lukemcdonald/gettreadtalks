@@ -10,7 +10,7 @@ import { ContentActionsGroup } from '@/components/actions-group';
 import { TalkForm } from '@/features/talks/components';
 import { useArchiveTalk, useDestroyTalk } from '@/features/talks/hooks';
 
-type EditTalkContentProps = {
+interface EditTalkContentProps {
   collections: Pick<Collection, '_id' | 'slug' | 'title'>[];
   initialData: {
     collectionId?: CollectionId;
@@ -27,7 +27,7 @@ type EditTalkContentProps = {
   speakers: Pick<Speaker, '_id' | 'firstName' | 'lastName' | 'slug' | 'imageUrl' | 'role'>[];
   talk: Talk;
   talkSlug: string;
-};
+}
 
 export function EditTalkContent({
   collections,

@@ -4,12 +4,12 @@ import { Pagination } from '@/components/pagination';
 import { Empty, EmptyDescription } from '@/components/ui';
 import { TalksList } from '@/features/talks/components';
 
-type TopicContentProps = {
+interface TopicContentProps {
   continueCursor: string;
   hasNextPage: boolean;
   hasPrevPage: boolean;
   talks: TalkWithSpeaker[];
-};
+}
 
 export function TopicContent({
   continueCursor,

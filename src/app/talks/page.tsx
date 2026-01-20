@@ -6,18 +6,18 @@ import { getSpeakers, sortSpeakersByName } from '@/features/speakers';
 import { getTalks } from '@/features/talks/queries';
 import { getTopicsWithCounts } from '@/features/topics';
 
-export type TalksPageSearchParams = {
+export interface TalksPageSearchParams {
   cursor?: string;
   featured?: string;
   search?: string;
   sort?: string;
   speakerSlug?: string;
   topicSlug?: string;
-};
+}
 
-type TalksPageProps = {
+interface TalksPageProps {
   searchParams: Promise<TalksPageSearchParams>;
-};
+}
 
 export default async function TalksPage({ searchParams }: TalksPageProps) {
   const params = await searchParams;

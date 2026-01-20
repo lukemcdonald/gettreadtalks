@@ -28,10 +28,10 @@ const DATA_DIR = 'convex/migration/data';
 // Check for --prod flag
 const isProd = process.argv.includes('--prod');
 
-type AirtableRecord = {
+interface AirtableRecord {
   fields: Record<string, unknown>;
   id: string;
-};
+}
 
 function loadJsonFile(fileName: string): AirtableRecord[] {
   const filePath = path.join(process.cwd(), DATA_DIR, fileName);

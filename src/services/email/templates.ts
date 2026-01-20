@@ -8,11 +8,11 @@ export const EMAIL_TEMPLATES = {
 
 export type EmailTemplateName = (typeof EMAIL_TEMPLATES)[keyof typeof EMAIL_TEMPLATES];
 
-export type TemplatePropsMap = {
+export interface TemplatePropsMap {
   [EMAIL_TEMPLATES.WELCOME]: WelcomeEmailProps;
   [EMAIL_TEMPLATES.VERIFY_EMAIL]: VerificationEmailProps;
   [EMAIL_TEMPLATES.RESET_PASSWORD]: PasswordResetEmailProps;
-};
+}
 
 export function getEmailSubject(template: EmailTemplateName): string {
   switch (template) {

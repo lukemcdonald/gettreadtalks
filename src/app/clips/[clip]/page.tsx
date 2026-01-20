@@ -6,9 +6,9 @@ import { getClipBySlug } from '@/features/clips';
 import { ClipContent } from './_components/clip-content';
 import { ClipSidebar } from './_components/clip-sidebar';
 
-type ClipPageProps = {
+interface ClipPageProps {
   params: Promise<{ clip: string }>;
-};
+}
 
 export default async function ClipPage({ params }: ClipPageProps) {
   const { clip: slug } = await params;

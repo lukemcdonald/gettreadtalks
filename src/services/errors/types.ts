@@ -33,7 +33,7 @@ export type Fingerprint = [FingerprintKind, ...string[]];
 /**
  * Options for error reporting to Sentry.
  */
-export type ErrorReportOptions = {
+export interface ErrorReportOptions {
   /** Structured context data (appears in separate section in Sentry) */
   context?: ErrorContext;
   /** Additional unstructured data (appears as Extra Data in Sentry) */
@@ -48,7 +48,7 @@ export type ErrorReportOptions = {
   transactionName?: string;
   /** User information to associate with the error */
   user?: SentryUser;
-};
+}
 
 /**
  * Mutation status enum, similar to React Query/TanStack Query pattern.
@@ -58,18 +58,18 @@ export type MutationStatus = 'idle' | 'loading' | 'success' | 'error';
 /**
  * Internal state for mutation hooks with error handling.
  */
-export type MutationState<TData = unknown> = {
+export interface MutationState<TData = unknown> {
   data: TData | null;
   error: Error | null;
   status: MutationStatus;
-};
+}
 
 export type { SeverityLevel } from '@sentry/nextjs';
 
 /**
  * Configuration for Sentry error reporting derived from Convex error data.
  */
-export type SentryConfig = {
+export interface SentryConfig {
   /** Whether the error should be logged to Sentry */
   shouldLog: boolean;
   /** Severity level for the error */
@@ -80,4 +80,4 @@ export type SentryConfig = {
   context: Record<string, unknown>;
   /** Tags for filtering and categorization */
   tags: Record<string, string>;
-};
+}

@@ -2,11 +2,11 @@
 
 import { cn } from '@/utils';
 
-type MediaEmbedProps = {
+interface MediaEmbedProps {
   className?: string;
   mediaUrl: string;
   type?: 'audio' | 'video';
-};
+}
 
 const YOUTUBE_PATTERNS = [
   /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,

@@ -1,8 +1,8 @@
-export type EmailTemplateProps = {
+export interface EmailTemplateProps {
   email: string;
   firstName?: string;
   lastName?: string;
-};
+}
 
 export type WelcomeEmailProps = EmailTemplateProps & {
   name: string;
@@ -18,11 +18,11 @@ export type PasswordResetEmailProps = EmailTemplateProps & {
   token: string;
 };
 
-export type EmailSendOptions = {
+export interface EmailSendOptions {
   from: string;
   html?: string;
   replyTo?: string;
   subject: string;
   text?: string;
   to: string[];
-};
+}

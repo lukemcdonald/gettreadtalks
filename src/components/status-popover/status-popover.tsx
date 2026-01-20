@@ -11,12 +11,12 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui';
 import { formatDate, getStatusColor, getStatusLabel } from '@/utils';
 import { StatusPopoverDetail } from './status-popover-detail';
 
-type StatusPopoverProps = {
+interface StatusPopoverProps {
   createdAt: number;
   publishedAt?: number;
   updatedAt?: number;
   status?: StatusType;
-};
+}
 
 export function StatusPopover({ createdAt, updatedAt, publishedAt, status }: StatusPopoverProps) {
   const statusColor = getStatusColor(status);

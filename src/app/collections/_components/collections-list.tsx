@@ -5,16 +5,16 @@ import { GridList } from '@/components/grid-list';
 import { ListEmpty } from '@/components/list-empty';
 import { CollectionCard } from '@/features/collections/components';
 
-type CollectionWithStats = {
+interface CollectionWithStats {
   collection: Collection;
   speakers: Speaker[];
   talkCount: number;
-};
+}
 
-type CollectionsListProps = {
+interface CollectionsListProps {
   collections: CollectionWithStats[];
   hasActiveFilters: boolean;
-};
+}
 
 /**
  * Renders collections in a grid.

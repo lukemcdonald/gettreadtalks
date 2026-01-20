@@ -13,17 +13,17 @@ import {
 } from '@/components/ui';
 import { cn } from '@/utils';
 
-type SortOption = {
+interface SortOption {
   label: string;
   value: string;
-};
+}
 
-type SortSelectProps = {
+interface SortSelectProps {
   className?: string;
   label?: string;
   options: SortOption[];
   paramName?: string;
-};
+}
 
 export function SortSelect({ className, label, options, paramName = 'sort' }: SortSelectProps) {
   const pathname = usePathname();

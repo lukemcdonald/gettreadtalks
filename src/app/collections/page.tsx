@@ -4,15 +4,15 @@ import { SidebarLayout } from '@/components/layouts';
 import { getCollections } from '@/features/collections';
 import { sortSpeakersByName } from '@/features/speakers';
 
-export type CollectionsPageSearchParams = {
+export interface CollectionsPageSearchParams {
   search?: string;
   sort?: string;
   speakerSlug?: string;
-};
+}
 
-type CollectionsPageProps = {
+interface CollectionsPageProps {
   searchParams: Promise<CollectionsPageSearchParams>;
-};
+}
 
 export default async function CollectionsPage({ searchParams }: CollectionsPageProps) {
   const params = await searchParams;

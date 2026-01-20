@@ -3,14 +3,14 @@ import type { ReactNode } from 'react';
 import { Container, Section } from '@/components/ui';
 import { cn } from '@/utils';
 
-type SidebarLayoutProps = {
+interface SidebarLayoutProps {
   content: ReactNode;
   header?: ReactNode;
   sidebar: ReactNode;
   className?: string;
   sidebarSticky?: boolean;
   spacing?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-};
+}
 
 export function SidebarLayout({
   content,

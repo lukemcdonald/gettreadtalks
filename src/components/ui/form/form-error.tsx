@@ -5,10 +5,10 @@ import type { FieldError, FieldErrors, FieldValues } from 'react-hook-form';
 import { cn } from '@/utils';
 import { FieldError as FieldErrorComponent } from '../fields';
 
-type FormErrorProps = {
+interface FormErrorProps {
   className?: string;
   error?: FieldError | FieldError[] | FieldErrors<FieldValues>['root'];
-};
+}
 
 function getErrorMessage(error: FormErrorProps['error']) {
   if (!error) {

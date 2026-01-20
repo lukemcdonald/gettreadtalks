@@ -5,9 +5,9 @@ import { CollectionSidebar } from '@/app/collections/[collection]/_components/co
 import { SidebarLayout } from '@/components/layouts';
 import { getCollectionBySlug } from '@/features/collections';
 
-type CollectionPageProps = {
+interface CollectionPageProps {
   params: Promise<{ collection: string }>;
-};
+}
 
 export default async function CollectionPage({ params }: CollectionPageProps) {
   const { collection: slug } = await params;

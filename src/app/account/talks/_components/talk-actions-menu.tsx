@@ -7,10 +7,10 @@ import { useRouter } from 'next/navigation';
 import { ContentActionsGroup } from '@/components/actions-group';
 import { useArchiveTalk, useDestroyTalk } from '@/features/talks/hooks';
 
-type TalkActionsMenuProps = {
+interface TalkActionsMenuProps {
   talk: TalkWithSpeakerAndTopics;
   talkUrl: string;
-};
+}
 
 export function TalkActionsMenu({ talk, talkUrl }: TalkActionsMenuProps) {
   const router = useRouter();

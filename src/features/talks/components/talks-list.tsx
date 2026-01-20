@@ -3,9 +3,9 @@ import type { TalkWithSpeaker } from '@/features/talks/types';
 import { GridList } from '@/components/grid-list';
 import { TalkCard } from './talk-card';
 
-type TalksListProps = {
+interface TalksListProps {
   talks: TalkWithSpeaker[];
-};
+}
 
 /**
  * Renders a grid of talk cards.

@@ -6,10 +6,10 @@ import { PageHeader } from '@/components/page-header';
 import { Separator } from '@/components/ui';
 import { ClipsList } from '@/features/clips/components';
 
-type TalkContentProps = {
+interface TalkContentProps {
   clips: Clip[];
   talk: Talk;
-};
+}
 
 export function TalkContent({ clips, talk }: TalkContentProps) {
   return (

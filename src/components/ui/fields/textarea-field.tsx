@@ -6,7 +6,7 @@ import { Controller } from 'react-hook-form';
 
 import { Field, FieldDescription, FieldError, FieldLabel, Textarea } from '@/components/ui';
 
-type TextareaFieldProps<T extends FieldValues> = {
+interface TextareaFieldProps<T extends FieldValues> {
   control: Control<T>;
   description?: string;
   label: string;
@@ -14,7 +14,7 @@ type TextareaFieldProps<T extends FieldValues> = {
   placeholder?: string;
   required?: boolean;
   rows?: number;
-};
+}
 
 /**
  * Reusable textarea field component that wraps Controller + Field + Textarea.

@@ -7,10 +7,10 @@ import { SidebarContent } from '@/components/sidebar-content';
 import { getSpeakerName } from '@/features/speakers';
 import { getTalkUrl } from '@/features/talks/utils';
 
-type ClipSidebarProps = {
+interface ClipSidebarProps {
   speaker: Speaker | null;
   talk: Talk | null;
-};
+}
 
 export function ClipSidebar({ speaker, talk }: ClipSidebarProps) {
   return (

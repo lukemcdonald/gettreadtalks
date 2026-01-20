@@ -13,7 +13,7 @@ import {
   NumberField as NumberFieldPrimitive,
 } from '@/components/ui/primitives/number-field';
 
-type NumberFieldProps<T extends FieldValues> = {
+interface NumberFieldProps<T extends FieldValues> {
   control: Control<T>;
   description?: string;
   label: string;
@@ -24,7 +24,7 @@ type NumberFieldProps<T extends FieldValues> = {
   required?: boolean;
   showButtons?: boolean;
   step?: number;
-};
+}
 
 /**
  * Reusable number input field component that wraps Controller + Field + Base UI NumberField.

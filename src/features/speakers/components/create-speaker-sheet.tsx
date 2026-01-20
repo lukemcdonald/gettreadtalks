@@ -36,11 +36,11 @@ type CreateSpeakerFormData = z.infer<typeof createSpeakerSchema>;
 
 type NewSpeaker = Pick<Speaker, '_id' | 'firstName' | 'lastName' | 'imageUrl' | 'role'>;
 
-type CreateSpeakerSheetProps = {
+interface CreateSpeakerSheetProps {
   onOpenChange: (open: boolean) => void;
   onSpeakerCreated: (speakerId: SpeakerId, speaker: NewSpeaker) => void;
   open: boolean;
-};
+}
 
 export function CreateSpeakerSheet({
   onOpenChange,

@@ -5,7 +5,7 @@ import type { SpeakerId } from '@/features/speakers/types';
 import type { TalkId, TalkStatus } from '@/features/talks/types';
 import type { TopicId } from '@/features/topics/types';
 
-export type ActionsGroupMenuItem = {
+export interface ActionsGroupMenuItem {
   disabled?: boolean;
   hidden?: boolean;
   href?: string;
@@ -14,9 +14,9 @@ export type ActionsGroupMenuItem = {
   onClick?: () => void;
   separator?: boolean;
   variant?: 'default' | 'destructive';
-};
+}
 
-export type PrimaryAction = {
+export interface PrimaryAction {
   disabled?: boolean;
   href?: string;
   icon?: ReactNode;
@@ -25,18 +25,18 @@ export type PrimaryAction = {
   loadingLabel?: string;
   onClick?: () => void;
   type?: 'button' | 'submit';
-};
+}
 
-export type ActionsGroupProps = {
+export interface ActionsGroupProps {
   disabled?: boolean;
   menuItems: ActionsGroupMenuItem[];
   primaryAction?: PrimaryAction;
-};
+}
 
 type ContentId = TalkId | ClipId | CollectionId | SpeakerId | TopicId;
 type ContentType = 'talk' | 'clip' | 'collection' | 'speaker' | 'topic';
 
-export type ContentActionsGroupProps = {
+export interface ContentActionsGroupProps {
   additionalActions?: ActionsGroupMenuItem[];
   content: {
     _id: ContentId;
@@ -51,4 +51,4 @@ export type ContentActionsGroupProps = {
   onDeleteAction?: (id: ContentId) => Promise<void>;
   primaryAction?: PrimaryAction;
   viewUrl?: string;
-};
+}

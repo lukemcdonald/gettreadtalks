@@ -4,13 +4,13 @@ import { ListEmpty } from '@/components/list-empty';
 import { Pagination } from '@/components/pagination';
 import { TalksList } from '@/features/talks/components';
 
-type TalksContentProps = {
+interface TalksContentProps {
   continueCursor: string;
   hasActiveFilters: boolean;
   hasNextPage: boolean;
   hasPrevPage: boolean;
   talks: TalkWithSpeaker[];
-};
+}
 
 export function TalksContent({
   continueCursor,

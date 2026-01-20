@@ -5,9 +5,9 @@ import { PrimaryNav } from '@/components/site-header/navigation/primary-nav';
 import { SecondaryNav } from '@/components/site-header/navigation/secondary-nav';
 import { Separator } from '@/components/ui';
 
-type SiteNavigationProps = {
+interface SiteNavigationProps {
   initialUser?: User;
-};
+}
 
 export function SiteNavigation({ initialUser }: SiteNavigationProps) {
   return (

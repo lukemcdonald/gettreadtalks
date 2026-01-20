@@ -5,14 +5,14 @@ import type { StatusType } from '@/lib/entities/types';
 
 import { SelectField } from './select-field';
 
-type StatusFieldProps<T extends FieldValues> = {
+interface StatusFieldProps<T extends FieldValues> {
   control: Control<T>;
   description?: string;
   label?: string;
   name: FieldPath<T>;
   onChange?: (value: StatusType) => void;
   required?: boolean;
-};
+}
 
 const STATUS_OPTIONS: Array<{ label: string; value: string }> = [
   { label: 'Approved', value: 'approved' },

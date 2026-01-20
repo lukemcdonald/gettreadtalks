@@ -8,9 +8,9 @@ import { DynamicIcon } from 'lucide-react/dynamic';
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui';
 import { useFavoriteTalk, useIsTalkFavorited, useUnfavoriteTalk } from '@/features/users/hooks';
 
-type FavoriteTalkButtonProps = {
+interface FavoriteTalkButtonProps {
   talkId: TalkId;
-};
+}
 
 function FavoriteButton({ talkId }: FavoriteTalkButtonProps) {
   const { data: isFavorited, isLoading: isCheckingFavorite } = useIsTalkFavorited(talkId);

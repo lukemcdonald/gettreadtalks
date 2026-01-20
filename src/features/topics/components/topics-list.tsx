@@ -3,14 +3,14 @@ import type { Topic } from '@/features/topics/types';
 import { GridList } from '@/components/grid-list';
 import { TopicCard } from './topic-card';
 
-type TopicWithCount = {
+interface TopicWithCount {
   count: number;
   topic: Pick<Topic, 'slug' | 'title'>;
-};
+}
 
-type TopicsListProps = {
+interface TopicsListProps {
   topics: TopicWithCount[];
-};
+}
 
 /**
  * Renders a grid of topic cards.

@@ -4,9 +4,9 @@ import type { TalkWithSpeaker } from '@/features/talks/types';
 import { GridList } from '@/components/grid-list';
 import { TalkCard } from '@/features/talks/components';
 
-type CollectionContentProps = {
+interface CollectionContentProps {
   talks: CollectionData['talks'];
-};
+}
 
 export function CollectionContent({ talks }: CollectionContentProps) {
   return (

@@ -13,18 +13,18 @@ import {
 } from '@/components/ui';
 import { cn } from '@/utils';
 
-type Topic = {
+interface Topic {
   _id: string;
   slug: string;
   title: string;
-};
+}
 
-type TopicSelectorProps = {
+interface TopicSelectorProps {
   className?: string;
   currentSlug: string;
   label?: string;
   topics: Topic[];
-};
+}
 
 export function TopicSelector({ className, currentSlug, label, topics }: TopicSelectorProps) {
   const router = useRouter();

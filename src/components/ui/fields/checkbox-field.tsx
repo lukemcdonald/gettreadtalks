@@ -6,12 +6,12 @@ import { Controller } from 'react-hook-form';
 
 import { Checkbox, Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui';
 
-type CheckboxFieldProps<T extends FieldValues> = {
+interface CheckboxFieldProps<T extends FieldValues> {
   control: Control<T>;
   description?: string;
   label: string;
   name: FieldPath<T>;
-};
+}
 
 /**
  * Reusable checkbox field component that wraps Controller + Field + Checkbox.

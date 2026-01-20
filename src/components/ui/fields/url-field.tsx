@@ -6,14 +6,14 @@ import { Controller } from 'react-hook-form';
 
 import { Field, FieldDescription, FieldError, FieldLabel, Input } from '@/components/ui';
 
-type UrlFieldProps<T extends FieldValues> = {
+interface UrlFieldProps<T extends FieldValues> {
   control: Control<T>;
   description?: string;
   label: string;
   name: FieldPath<T>;
   placeholder?: string;
   required?: boolean;
-};
+}
 
 /**
  * Reusable URL input field component that wraps Controller + Field + Input with type="url".

@@ -5,20 +5,20 @@ import Link from 'next/link';
 import { cn } from '@/utils';
 import { GridList } from './grid-list';
 
-type GridColumns = {
+interface GridColumns {
   default?: 1 | 2 | 3 | 4 | 5;
   lg?: 1 | 2 | 3 | 4 | 5;
   md?: 1 | 2 | 3 | 4 | 5;
   sm?: 1 | 2 | 3 | 4 | 5;
   xl?: 1 | 2 | 3 | 4 | 5;
-};
+}
 
-type NavItem = {
+interface NavItem {
   href: string;
   label: string;
-};
+}
 
-type FeaturedGridProps = {
+interface FeaturedGridProps {
   children: ReactNode;
   className?: string;
   columns?: GridColumns;
@@ -26,7 +26,7 @@ type FeaturedGridProps = {
   quickLinks?: NavItem[];
   sticky?: boolean;
   title?: string;
-};
+}
 
 export function FeaturedGrid({
   children,

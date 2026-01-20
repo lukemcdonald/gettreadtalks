@@ -9,13 +9,13 @@ type ClipWithSpeaker = Doc<'clips'> & {
   speaker: Speaker | null;
 };
 
-type ClipsContentProps = {
+interface ClipsContentProps {
   clips: ClipWithSpeaker[];
   continueCursor: string;
   hasActiveFilters: boolean;
   hasNextPage: boolean;
   hasPrevPage: boolean;
-};
+}
 
 export function ClipsContent({
   clips,

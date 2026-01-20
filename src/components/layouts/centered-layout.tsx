@@ -6,13 +6,13 @@ import { cn } from '@/utils';
 type MaxWidth = 'prose' | 'wide' | 'narrow' | 'full';
 type Spacing = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
-type CenteredLayoutProps = {
+interface CenteredLayoutProps {
   content: ReactNode;
   header?: ReactNode;
   className?: string;
   maxWidth?: MaxWidth;
   spacing?: Spacing;
-};
+}
 
 const maxWidthClasses: Record<MaxWidth, string> = {
   prose: 'max-w-prose',

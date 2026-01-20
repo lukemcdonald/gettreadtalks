@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 
-type CopyrightProps = {
+interface CopyrightProps {
   className?: string;
-};
+}
 
 export function Copyright({ className }: CopyrightProps) {
   const [year, setYear] = useState<number | null>(null);

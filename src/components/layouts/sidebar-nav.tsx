@@ -2,9 +2,9 @@ import type { ComponentProps } from 'react';
 
 import { SidebarNavItem } from '@/components/layouts/sidebar-nav-item';
 
-type SidebarNavProps = {
+interface SidebarNavProps {
   items: ComponentProps<typeof SidebarNavItem>[];
-};
+}
 
 export function SidebarNav({ items }: SidebarNavProps) {
   return (

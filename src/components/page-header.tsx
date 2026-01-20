@@ -2,12 +2,12 @@ import { cva } from 'class-variance-authority';
 
 import { cn } from '@/utils';
 
-type PageHeaderProps = {
+interface PageHeaderProps {
   className?: string;
   description?: string;
   variant?: 'sm' | 'md' | 'lg';
   title: string;
-};
+}
 
 const titleVariants = cva('text-balance tracking-tight', {
   variants: {

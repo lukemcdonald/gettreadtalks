@@ -4,13 +4,13 @@ import { useRouter } from 'next/navigation';
 
 import { Button, Empty, EmptyDescription, EmptyTitle } from '@/components/ui';
 
-type ListEmptyProps = {
+interface ListEmptyProps {
   clearPath: string;
   description: string;
   filteredDescription: string;
   hasActiveFilters: boolean;
   title: string;
-};
+}
 
 /**
  * Empty state for filtered list views.

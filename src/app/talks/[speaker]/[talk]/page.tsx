@@ -6,9 +6,9 @@ import { SidebarLayout } from '@/components/layouts';
 import { getTalkBySlug } from '@/features/talks/queries';
 import { getCurrentUser } from '@/services/auth/server';
 
-type TalkPageProps = {
+interface TalkPageProps {
   params: Promise<{ speaker: string; talk: string }>;
-};
+}
 
 export default async function TalkPage({ params }: TalkPageProps) {
   const { speaker: speakerSlug, talk: talkSlug } = await params;

@@ -12,7 +12,7 @@ import { captureException } from '@/services/errors/client';
 // Regex to remove "error" suffix from error names (case-insensitive)
 const ERROR_NAME_SUFFIX_REGEX = /error$/i;
 
-type ErrorBoundaryProps = {
+interface ErrorBoundaryProps {
   /**
    * The content to render within the error boundary.
    */
@@ -35,7 +35,7 @@ type ErrorBoundaryProps = {
    * Use this to reset application state if needed.
    */
   onReset?: () => void;
-};
+}
 
 /**
  * Error boundary component that catches React errors and reports them to Sentry.
@@ -72,21 +72,23 @@ export function ErrorBoundary({
   onError,
   onReset,
 }: ErrorBoundaryProps) {
-  const handleError = (error: Error, info: ErrorInfo) => {
+  const handleError = (error: unknown, info: ErrorInfo) => {
+    const err = error instanceof Error ? error : new Error(String(error));
+
     // Report to Sentry with fingerprinting and capture event ID
-    const eventId = captureException(error, {
+    const eventId = captureException(err, {
       context: {
         details: { componentStack: info.componentStack },
       },
-      fingerprint: ['error', error.name.toLowerCase().replace(ERROR_NAME_SUFFIX_REGEX, '')],
-      tags: { errorName: error.name },
+      fingerprint: ['error', err.name.toLowerCase().replace(ERROR_NAME_SUFFIX_REGEX, '')],
+      tags: { errorName: err.name },
     });
 
     // Store event ID for the fallback component
-    (error as ErrorWithEventId).__sentryEventId = eventId;
+    (err as ErrorWithEventId).__sentryEventId = eventId;
 
     // Call custom error handler if provided
-    onError?.(error, info);
+    onError?.(err, info);
   };
 
   return (

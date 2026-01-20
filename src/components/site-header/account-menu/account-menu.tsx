@@ -21,9 +21,9 @@ import { Button, Menu, MenuPopup, MenuSeparator, MenuTrigger } from '@/component
 import { useCurrentUser } from '@/features/users/hooks';
 import { isAdmin } from '@/services/auth/utils';
 
-type AccountMenuProps = {
+interface AccountMenuProps {
   initialUser?: User;
-};
+}
 
 export function AccountMenu({ initialUser }: AccountMenuProps) {
   const { data: user } = useCurrentUser(initialUser);

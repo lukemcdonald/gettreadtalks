@@ -10,12 +10,12 @@ import { CollectionCard } from '@/features/collections/components';
 import { getSpeakerName } from '@/features/speakers';
 import { TalkCard } from '@/features/talks/components';
 
-type SpeakerContentProps = {
+interface SpeakerContentProps {
   clips: Clip[];
   collections: Collection[];
   speaker: Speaker;
   talks: Talk[];
-};
+}
 
 export function SpeakerContent({ clips, collections, speaker, talks }: SpeakerContentProps) {
   return (
