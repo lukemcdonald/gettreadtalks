@@ -11,7 +11,7 @@ export interface TalksPageSearchParams {
   featured?: string;
   search?: string;
   sort?: string;
-  speakerSlug?: string;
+  speakers?: string;
   topicSlug?: string;
 }
 
@@ -21,10 +21,13 @@ interface TalksPageProps {
 
 export default async function TalksPage({ searchParams }: TalksPageProps) {
   const params = await searchParams;
-  const { cursor, featured, search, sort, speakerSlug, topicSlug } = params;
+  const { cursor, featured, search, sort, speakers, topicSlug } = params;
+
+  // Parse comma-separated speakers into array
+  const speakerSlugs = speakers ? speakers.split(',').filter(Boolean) : undefined;
 
   // Check if any filters are active (for showing "clear filters" option)
-  const hasActiveFilters = !!(search || speakerSlug || topicSlug || featured === 'true');
+  const hasActiveFilters = !!(search || speakerSlugs?.length || topicSlug || featured === 'true');
 
   const [result, speakersResult, topics] = await Promise.all([
     getTalks({
@@ -32,7 +35,7 @@ export default async function TalksPage({ searchParams }: TalksPageProps) {
       featured: featured === 'true',
       search,
       sort,
-      speakerSlug,
+      speakerSlugs,
       topicSlug,
     }),
     getSpeakers(), // Fetch ALL speakers with published content (independent of filters)

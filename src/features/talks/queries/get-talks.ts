@@ -13,7 +13,7 @@ interface GetTalksProps {
   limit?: number;
   search?: string;
   sort?: string;
-  speakerSlug?: string;
+  speakerSlugs?: string[];
   topicSlug?: string;
 }
 
@@ -22,7 +22,7 @@ interface GetTalksProps {
  * Defaults to 50 items per page, sorted by most recent.
  */
 export async function getTalks(args?: GetTalksProps) {
-  const { cursor, featured, limit = 50, search, sort, speakerSlug, topicSlug } = args ?? {};
+  const { cursor, featured, limit = 50, search, sort, speakerSlugs, topicSlug } = args ?? {};
 
   const token = await getAuthToken();
 
@@ -42,7 +42,7 @@ export async function getTalks(args?: GetTalksProps) {
       },
       search: search || undefined,
       sort: sortOption,
-      speakerSlug: speakerSlug || undefined,
+      speakerSlugs: speakerSlugs?.length ? speakerSlugs : undefined,
       topicSlug: topicSlug || undefined,
     },
     { token },
