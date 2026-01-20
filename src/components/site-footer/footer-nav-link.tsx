@@ -3,10 +3,10 @@ import type { ReactNode } from 'react';
 
 import Link from 'next/link';
 
-type FooterLinkProps = {
+interface FooterLinkProps {
   children: ReactNode;
   href: string;
-};
+}
 
 export function FooterLink({ children, href }: FooterLinkProps) {
   return (

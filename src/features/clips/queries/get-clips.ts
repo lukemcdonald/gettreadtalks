@@ -7,14 +7,14 @@ import { getAuthToken } from '@/services/auth/server';
 
 type SortOption = 'alphabetical' | 'oldest' | 'recent';
 
-type GetClipsProps = {
+interface GetClipsProps {
   cursor?: string;
   limit?: number;
   search?: string;
   sort?: string;
   speakerSlug?: string;
   topicSlug?: string;
-};
+}
 
 /**
  * Get published clips with speakers and optional filtering.

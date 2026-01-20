@@ -6,7 +6,7 @@ import { fetchMutation } from 'convex/nextjs';
 
 import { internal } from '@/convex/_generated/api';
 
-export type EmailService = {
+export interface EmailService {
   sendWelcomeEmail: (params: { userId: string; email: string; name: string }) => Promise<void>;
   sendVerificationEmail: (params: {
     email: string;
@@ -18,7 +18,7 @@ export type EmailService = {
     resetUrl: string;
     token: string;
   }) => Promise<void>;
-};
+}
 
 export async function sendWelcomeEmail({
   email,

@@ -2,9 +2,9 @@ import Link from 'next/link';
 
 import { Logo } from '@/components/logo';
 
-type SiteBrandingProps = {
+interface SiteBrandingProps {
   className?: string;
-};
+}
 
 export function SiteBranding({ className }: SiteBrandingProps) {
   return (

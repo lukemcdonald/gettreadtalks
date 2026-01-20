@@ -2,12 +2,12 @@ import type { LucideIcon } from 'lucide-react';
 
 import { cn } from '@/utils';
 
-type ContentTableItemDetailProps = {
+interface ContentTableItemDetailProps {
   description: string;
   icon: LucideIcon;
   iconClass?: string;
   title: string;
-};
+}
 
 export function StatusPopoverDetail({
   description,

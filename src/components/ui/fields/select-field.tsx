@@ -16,12 +16,12 @@ import {
   SelectValue,
 } from '@/components/ui';
 
-type SelectOption = {
+interface SelectOption {
   label: string;
   value: string;
-};
+}
 
-type SelectFieldProps<T extends FieldValues> = {
+interface SelectFieldProps<T extends FieldValues> {
   control: Control<T>;
   description?: string;
   label: string;
@@ -29,7 +29,7 @@ type SelectFieldProps<T extends FieldValues> = {
   onChange?: (value: string) => void;
   options: SelectOption[];
   required?: boolean;
-};
+}
 
 /**
  * Generic reusable select field component that wraps Controller + Field + Select.

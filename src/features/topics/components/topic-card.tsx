@@ -3,10 +3,10 @@
 import { FauxLink } from '@/components/faux-link';
 import { Card, CardDescription, CardTitle } from '@/components/ui';
 
-type TopicCardProps = {
+interface TopicCardProps {
   talkCount: number;
   topic: { slug: string; title: string };
-};
+}
 
 export function TopicCard({ talkCount, topic }: TopicCardProps) {
   return (

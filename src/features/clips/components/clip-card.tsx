@@ -7,11 +7,11 @@ import { MediaCard } from '@/components/media-card';
 import { getSpeakerName } from '@/features/speakers';
 import { SpeakerAvatar } from '@/features/speakers/components';
 
-type ClipCardProps = {
+interface ClipCardProps {
   clip: Pick<Clip, 'description' | 'slug' | 'title'>;
   favorited?: boolean;
   speaker?: Pick<Speaker, 'firstName' | 'lastName' | 'imageUrl' | 'slug'>;
-};
+}
 
 export function ClipCard({ clip, favorited, speaker }: ClipCardProps) {
   const speakerName = getSpeakerName(speaker);

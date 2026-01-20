@@ -20,7 +20,7 @@ import { useEntityStatus } from '@/lib/entities/hooks';
 import { useFormStatus } from '@/lib/forms/hooks';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
 
-type UseTalkFormProps = {
+interface UseTalkFormProps {
   collections: Pick<Collection, '_id' | 'slug' | 'title'>[];
   initialData?: {
     collectionId?: CollectionId;
@@ -37,16 +37,16 @@ type UseTalkFormProps = {
   speakers: Pick<Speaker, '_id' | 'firstName' | 'lastName' | 'slug'>[];
   talkId?: TalkId;
   talkSlug?: string;
-};
+}
 
-type UseTalkFormReturn = {
+interface UseTalkFormReturn {
   form: ReturnType<typeof useForm<TalkFormData>>;
   isBusy: boolean;
   onError: SubmitErrorHandler<TalkFormData>;
   onSubmit: SubmitHandler<TalkFormData>;
   setTalkStatus: (status: StatusType) => void;
   submitLabel: string;
-};
+}
 
 /**
  * Hook to manage talk form state and operations.

@@ -13,14 +13,14 @@ import { getTalkUrl } from '@/features/talks/utils';
 import { FavoriteTalkButton } from '@/features/users/components';
 import { isAdmin } from '@/services/auth/utils';
 
-type TalkSidebarProps = {
+interface TalkSidebarProps {
   talk: Talk;
   speaker?: Speaker | null;
   collection?: Collection | null;
   clips?: Clip[];
   topics?: Topic[];
   user: User;
-};
+}
 
 export function TalkSidebar({ clips, collection, speaker, talk, topics, user }: TalkSidebarProps) {
   const userIsAdmin = isAdmin(user);

@@ -2,12 +2,12 @@
 
 import { getSpeakers } from '@/features/speakers';
 
-type GetSpeakersGroupedProps = {
+interface GetSpeakersGroupedProps {
   limit?: number;
   role?: string;
   search?: string;
   sort?: string;
-};
+}
 
 /**
  * Get speakers grouped alphabetically by last name.

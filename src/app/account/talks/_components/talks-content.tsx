@@ -8,9 +8,9 @@ import { Pagination } from '@/components/pagination';
 import { Skeleton } from '@/components/ui';
 import { getAllTalks } from '@/features/talks/queries';
 
-type AdminTalksContentProps = {
+interface AdminTalksContentProps {
   searchParams: AdminTalksSearchParams;
-};
+}
 
 export async function AdminTalksContent({ searchParams }: AdminTalksContentProps) {
   const { cursor, search, status } = searchParams;

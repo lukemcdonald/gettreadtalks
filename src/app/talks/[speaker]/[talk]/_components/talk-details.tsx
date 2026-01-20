@@ -1,4 +1,4 @@
-type TalkDetailsProps = {
+interface TalkDetailsProps {
   talk: {
     status: string;
     publishedAt?: number;
@@ -7,7 +7,7 @@ type TalkDetailsProps = {
     scripture?: string;
     mediaUrl?: string;
   };
-};
+}
 
 export function TalkDetails({ talk }: TalkDetailsProps) {
   return (

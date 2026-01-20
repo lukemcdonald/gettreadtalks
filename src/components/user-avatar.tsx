@@ -3,9 +3,9 @@ import type { User } from '@/services/auth/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui';
 import { getGravatarUrl } from '@/utils';
 
-type UserAvatarProps = {
+interface UserAvatarProps {
   user: NonNullable<User>;
-};
+}
 
 export function UserAvatar({ user }: UserAvatarProps) {
   const imageUrl = user.image ?? getGravatarUrl({ email: user.email, size: 96 });

@@ -15,21 +15,21 @@ import {
 import { FILTER_ALL_VALUE } from '@/constants/ui';
 import { cn } from '@/utils';
 
-type FilterOption = {
+interface FilterOption {
   label: string;
   value: string;
-};
+}
 
 type FilterMode = 'contains' | 'startsWith';
 
-type ComboboxFilterProps = {
+interface ComboboxFilterProps {
   className?: string;
   filterMode?: FilterMode;
   label?: string;
   name: string;
   options: FilterOption[];
   placeholder?: string;
-};
+}
 
 export function ComboboxFilter({
   className,

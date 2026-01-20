@@ -6,9 +6,9 @@ import { SelectFilter } from '@/components/select-filter';
 import { SidebarContent } from '@/components/sidebar-content';
 import { SortSelect } from '@/components/sort-select';
 
-type SpeakersSidebarProps = {
+interface SpeakersSidebarProps {
   speakers: Speaker[];
-};
+}
 
 export function SpeakersSidebar({ speakers }: SpeakersSidebarProps) {
   // Get unique roles for filter: (r): r is string => !!r)

@@ -7,10 +7,10 @@ import { fetchQuery } from 'convex/nextjs';
 import { api } from '@/convex/_generated/api';
 import { getAuthToken } from '@/services/auth/server';
 
-type GetAllClipsProps = {
+interface GetAllClipsProps {
   limit?: number;
   status?: StatusFilterType;
-};
+}
 
 /**
  * Get all clips with speakers with filtering support.

@@ -4,10 +4,10 @@ import Link from 'next/link';
 
 import { getSpeakerName } from '@/features/speakers';
 
-type TalkTitleCellProps = {
+interface TalkTitleCellProps {
   talk: TalkWithSpeakerAndTopics;
   talkUrl: string;
-};
+}
 
 export function TalkTitleCell({ talk, talkUrl }: TalkTitleCellProps) {
   return (

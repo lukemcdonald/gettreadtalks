@@ -7,11 +7,11 @@ import { usePathname } from 'next/navigation';
 
 import { cn } from '@/utils';
 
-type SidebarNavItemProps = {
+interface SidebarNavItemProps {
   href: string;
   icon?: ComponentType<SVGProps<SVGSVGElement>>;
   label: string;
-};
+}
 
 export function SidebarNavItem({ href, label, icon: Icon }: SidebarNavItemProps) {
   const pathname = usePathname();

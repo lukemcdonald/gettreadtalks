@@ -3,15 +3,15 @@ import { SpeakersSidebar } from '@/app/speakers/_components/speakers-sidebar';
 import { SidebarLayout } from '@/components/layouts';
 import { getSpeakers, getSpeakersGrouped } from '@/features/speakers';
 
-export type SpeakersPageSearchParams = {
+export interface SpeakersPageSearchParams {
   role?: string;
   search?: string;
   sort?: string;
-};
+}
 
-type SpeakersPageProps = {
+interface SpeakersPageProps {
   searchParams: Promise<SpeakersPageSearchParams>;
-};
+}
 
 export default async function SpeakersPage({ searchParams }: SpeakersPageProps) {
   const params = await searchParams;

@@ -7,15 +7,15 @@ import { SidebarContent } from '@/components/sidebar-content';
 import { SortSelect } from '@/components/sort-select';
 import { getSpeakerName } from '@/features/speakers';
 
-type TopicWithCount = {
+interface TopicWithCount {
   count: number;
   topic: Topic;
-};
+}
 
-type ClipsSidebarProps = {
+interface ClipsSidebarProps {
   speakers: Speaker[];
   topics: TopicWithCount[];
-};
+}
 
 export function ClipsSidebar({ speakers, topics }: ClipsSidebarProps) {
   return (

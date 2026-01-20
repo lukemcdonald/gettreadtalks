@@ -6,11 +6,11 @@ import Link from 'next/link';
 import { Button } from '@/components/ui';
 import { cn } from '@/utils';
 
-type NavLinkProps = {
+interface NavLinkProps {
   children: ReactNode;
   href: string;
   isActive: boolean;
-};
+}
 
 export function NavLink({ href, isActive, children }: NavLinkProps) {
   const classes = {

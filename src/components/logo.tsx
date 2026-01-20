@@ -1,12 +1,12 @@
 import { cn } from '@/utils';
 
-type Props = {
+interface Props {
   className?: string;
   colors?: {
     tread?: string;
     talks?: string;
   };
-};
+}
 
 const defaultColors = {
   tread: 'text-primary',

@@ -4,12 +4,12 @@ import { Input, Label } from '@/components/ui';
 import { cn } from '@/utils';
 import { useDebouncedSearchParam } from './use-debounced-search-param';
 
-type SearchInputProps = {
+interface SearchInputProps {
   className?: string;
   label?: string;
   paramName?: string;
   placeholder?: string;
-};
+}
 
 export function SearchInput({
   className,

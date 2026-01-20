@@ -10,12 +10,12 @@ import {
   SelectValue,
 } from '@/components/ui';
 
-type CollectionSelectFieldProps = {
+interface CollectionSelectFieldProps {
   collections: Pick<Collection, '_id' | 'title'>[];
   onValueChange?: (value: CollectionId | '') => void;
   placeholder?: string;
   value?: CollectionId;
-};
+}
 
 export function CollectionSelectField({
   collections,

@@ -13,9 +13,9 @@ import { ModeSwitcher } from '@/components/site-header/mode-switcher';
 import { Button, Sheet, SheetClose, SheetHeader, SheetPopup, SheetTrigger } from '@/components/ui';
 import { cn } from '@/utils';
 
-type MobileNavProps = {
+interface MobileNavProps {
   className?: string;
-};
+}
 
 export function MobileNav({ className }: MobileNavProps) {
   const pathname = usePathname();

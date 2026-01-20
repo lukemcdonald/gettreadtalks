@@ -2,11 +2,11 @@ import type { ReactNode } from 'react';
 
 import { cn } from '@/utils';
 
-type SidebarContentProps = {
+interface SidebarContentProps {
   children: ReactNode;
   className?: string;
   title?: string;
-};
+}
 
 export function SidebarContent({ children, className, title }: SidebarContentProps) {
   return (

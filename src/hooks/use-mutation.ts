@@ -15,11 +15,11 @@ const DEFAULT_STATE: MutationState = {
   status: 'idle' as MutationStatus,
 };
 
-export type UseMutationOptions = {
+export interface UseMutationOptions {
   onError?: (error: Error) => void;
   onSuccess?: (data: unknown) => void;
   reportToSentry?: boolean;
-};
+}
 
 export function useMutation<Mutation extends FunctionReference<'mutation'>>(
   mutation: Mutation,

@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { Container, Section } from '@/components/ui';
 import { cn } from '@/utils';
 
-type SidebarsLayoutProps = {
+interface SidebarsLayoutProps {
   content: ReactNode;
   header?: ReactNode;
   leftSidebar: ReactNode;
@@ -12,7 +12,7 @@ type SidebarsLayoutProps = {
   leftSidebarSticky?: boolean;
   rightSidebarSticky?: boolean;
   spacing?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-};
+}
 
 export function SidebarsLayout({
   className,

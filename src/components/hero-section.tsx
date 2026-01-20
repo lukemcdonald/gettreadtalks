@@ -6,12 +6,12 @@ import Link from 'next/link';
 import { Button } from '@/components/ui';
 import { cn } from '@/utils';
 
-type HeroAction = {
+interface HeroAction {
   href: string;
   label: string;
-};
+}
 
-type HeroSectionProps = {
+interface HeroSectionProps {
   className?: string;
   description: string;
   imageAlt: string;
@@ -19,7 +19,7 @@ type HeroSectionProps = {
   primaryAction?: HeroAction;
   secondaryAction?: HeroAction;
   title: string;
-};
+}
 
 export function HeroSection({
   className,

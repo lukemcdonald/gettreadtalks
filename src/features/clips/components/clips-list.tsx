@@ -1,7 +1,7 @@
 import { GridList } from '@/components/grid-list';
 import { ClipCard } from './clip-card';
 
-type ClipWithSpeaker = {
+interface ClipWithSpeaker {
   _id: string;
   description?: string;
   slug: string;
@@ -12,11 +12,11 @@ type ClipWithSpeaker = {
     lastName: string;
     slug: string;
   } | null;
-};
+}
 
-type ClipsListProps = {
+interface ClipsListProps {
   clips: ClipWithSpeaker[];
-};
+}
 
 /**
  * Renders a grid of clip cards.

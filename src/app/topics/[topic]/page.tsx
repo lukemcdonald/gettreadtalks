@@ -6,16 +6,16 @@ import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { getTopicBySlug, getTopics } from '@/features/topics';
 
-export type TopicPageSearchParams = {
+export interface TopicPageSearchParams {
   cursor?: string;
-};
+}
 
-type TopicPageProps = {
+interface TopicPageProps {
   params: Promise<{
     topic: string;
   }>;
   searchParams: Promise<TopicPageSearchParams>;
-};
+}
 
 export default async function TopicPage({ params, searchParams }: TopicPageProps) {
   const { topic: slug } = await params;

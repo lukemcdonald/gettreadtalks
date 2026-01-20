@@ -5,11 +5,11 @@ import Link from 'next/link';
 import { SidebarContent } from '@/components/sidebar-content';
 import { TopicSelector } from '@/features/topics/components';
 
-type TopicSidebarProps = {
+interface TopicSidebarProps {
   currentSlug: string;
   topics: Topic[];
   totalTalks: number;
-};
+}
 
 export function TopicSidebar({ currentSlug, topics, totalTalks }: TopicSidebarProps) {
   return (

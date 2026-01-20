@@ -7,12 +7,12 @@ import { getAuthToken } from '@/services/auth/server';
 
 type SortOption = 'alphabetical' | 'featured';
 
-type GetSpeakersProps = {
+interface GetSpeakersProps {
   limit?: number;
   role?: string;
   search?: string;
   sort?: string;
-};
+}
 
 /**
  * Get speakers with published content and optional filtering.

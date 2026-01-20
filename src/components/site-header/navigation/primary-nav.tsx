@@ -6,9 +6,9 @@ import { NAVIGATION_LINKS } from '@/components/site-header/constants';
 import { NavLink } from '@/components/site-header/navigation/nav-link';
 import { cn } from '@/utils';
 
-type PrimaryNavProps = {
+interface PrimaryNavProps {
   className?: string;
-};
+}
 
 export function PrimaryNav({ className }: PrimaryNavProps) {
   const pathname = usePathname();

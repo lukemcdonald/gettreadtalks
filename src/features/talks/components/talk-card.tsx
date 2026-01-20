@@ -11,20 +11,20 @@ import { getSpeakerName } from '@/features/speakers';
 import { SpeakerAvatar } from '@/features/speakers/components';
 import { getTalkUrl } from '@/features/talks/utils';
 
-type TalkCardSpeaker = {
+interface TalkCardSpeaker {
   firstName: Speaker['firstName'];
   imageUrl?: Speaker['imageUrl'];
   lastName: Speaker['lastName'];
   slug?: Speaker['slug'];
-};
+}
 
-type TalkCardProps = {
+interface TalkCardProps {
   featured?: boolean;
   favorited?: boolean;
   finished?: boolean;
   speaker?: TalkCardSpeaker;
   talk: Pick<Talk, 'description' | 'slug' | 'title'>;
-};
+}
 
 function SpeakerLink({ children, slug }: { children: ReactNode; slug: string }) {
   return (

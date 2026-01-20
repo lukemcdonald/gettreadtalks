@@ -6,10 +6,10 @@ import Link from 'next/link';
 import { PageHeader } from '@/components/page-header';
 import { SidebarContent } from '@/components/sidebar-content';
 
-type CollectionSidebarProps = {
+interface CollectionSidebarProps {
   collection: CollectionData['collection'];
   speakers: Speaker[];
-};
+}
 
 export function CollectionSidebar({ collection, speakers }: CollectionSidebarProps) {
   return (

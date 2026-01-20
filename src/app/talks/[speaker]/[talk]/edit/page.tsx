@@ -8,9 +8,9 @@ import { getAllSpeakers } from '@/features/speakers';
 import { getTalkBySlug } from '@/features/talks/queries';
 import { requireAdminUser } from '@/services/auth/server';
 
-type EditTalkPageProps = {
+interface EditTalkPageProps {
   params: Promise<{ speaker: string; talk: string }>;
-};
+}
 
 export default async function EditTalkPage({ params }: EditTalkPageProps) {
   const { speaker: speakerSlug, talk: talkSlug } = await params;

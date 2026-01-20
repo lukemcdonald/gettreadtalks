@@ -6,17 +6,17 @@ import { getClips } from '@/features/clips';
 import { getSpeakers, sortSpeakersByName } from '@/features/speakers';
 import { getTopicsWithCounts } from '@/features/topics';
 
-export type ClipsPageSearchParams = {
+export interface ClipsPageSearchParams {
   cursor?: string;
   search?: string;
   sort?: string;
   speakerSlug?: string;
   topicSlug?: string;
-};
+}
 
-type ClipsPageProps = {
+interface ClipsPageProps {
   searchParams: Promise<ClipsPageSearchParams>;
-};
+}
 
 export default async function ClipsPage({ searchParams }: ClipsPageProps) {
   const params = await searchParams;

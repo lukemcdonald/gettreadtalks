@@ -4,16 +4,16 @@ import { AlphabeticalGrid } from '@/components/alphabetical-grid';
 import { ListEmpty } from '@/components/list-empty';
 import { SpeakerCard } from '@/features/speakers/components';
 
-export type SpeakerGroup = {
+export interface SpeakerGroup {
   items: Speaker[];
   letter: string;
   range: string;
-};
+}
 
-type SpeakersListProps = {
+interface SpeakersListProps {
   groups: SpeakerGroup[];
   hasActiveFilters: boolean;
-};
+}
 
 /**
  * Renders speakers in an alphabetical grid.

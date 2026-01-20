@@ -40,7 +40,7 @@ export function ErrorFallback({
           )}
         </div>
 
-        {process.env.NODE_ENV === 'development' && (
+        {process.env.NODE_ENV === 'development' && error instanceof Error && (
           <details className="mt-4 rounded-md bg-muted p-4 text-left">
             <summary className="cursor-pointer font-semibold text-foreground">
               Error Details (Development Only)

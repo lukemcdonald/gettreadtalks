@@ -7,10 +7,10 @@ import { getAuthToken } from '@/services/auth/server';
 
 type SortOption = 'alphabetical' | 'least-talks' | 'most-talks';
 
-type GetTopicsWithCountsProps = {
+interface GetTopicsWithCountsProps {
   search?: string;
   sort?: string;
-};
+}
 
 /**
  * Get topics with their associated talk counts.

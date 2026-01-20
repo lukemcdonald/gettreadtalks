@@ -16,11 +16,11 @@ import {
 } from '@/components/ui';
 import { getSpeakerInitials, getSpeakerName } from '@/features/speakers';
 
-type CollectionCardProps = {
+interface CollectionCardProps {
   collection: Pick<Collection, 'description' | 'slug' | 'title'>;
   speakers?: Pick<Speaker, 'firstName' | 'lastName' | 'imageUrl' | 'slug'>[];
   talkCount?: number;
-};
+}
 
 export function CollectionCard({ collection, speakers = [], talkCount }: CollectionCardProps) {
   const displaySpeakers = speakers.slice(0, 3);

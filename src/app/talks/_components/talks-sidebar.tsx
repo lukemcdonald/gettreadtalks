@@ -7,15 +7,15 @@ import { SidebarContent } from '@/components/sidebar-content';
 import { SortSelect } from '@/components/sort-select';
 import { getSpeakerName } from '@/features/speakers';
 
-type TopicWithCount = {
+interface TopicWithCount {
   count: number;
   topic: Topic;
-};
+}
 
-type TalksSidebarProps = {
+interface TalksSidebarProps {
   speakers: Speaker[];
   topics: TopicWithCount[];
-};
+}
 
 export function TalksSidebar({ speakers, topics }: TalksSidebarProps) {
   return (

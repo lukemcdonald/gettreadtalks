@@ -40,7 +40,6 @@ export function captureException(
 ): string | undefined {
   const { context, extras, fingerprint, level = 'error', tags, transactionName, user } = options;
 
-  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: relative
   return sentryWithScope((scope) => {
     // Set error level
     scope.setLevel(level);

@@ -5,9 +5,9 @@ import { fetchQuery } from 'convex/nextjs';
 import { api } from '@/convex/_generated/api';
 import { getAuthToken } from '@/services/auth/server';
 
-type GetTopicsProps = {
+interface GetTopicsProps {
   limit?: number;
-};
+}
 
 /**
  * Get topics for selector dropdowns.

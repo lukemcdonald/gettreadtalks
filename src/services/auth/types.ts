@@ -23,16 +23,16 @@ export type AdminUser = AuthUser & {
 /**
  * Sign up parameters
  */
-export type SignUpParams = {
+export interface SignUpParams {
   email: string;
   name?: string;
   password: string;
-};
+}
 
 /**
  * Sign in parameters
  */
-export type SignInParams = {
+export interface SignInParams {
   email: string;
   password: string;
-};
+}

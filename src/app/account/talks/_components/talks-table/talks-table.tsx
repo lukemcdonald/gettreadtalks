@@ -11,9 +11,9 @@ import {
 } from '@/components/ui';
 import { TalksTableRow } from './talks-table-row';
 
-type AdminTalksTableProps = {
+interface AdminTalksTableProps {
   talks: TalkWithSpeakerAndTopics[];
-};
+}
 
 export function TalksTable({ talks }: AdminTalksTableProps) {
   if (talks.length === 0) {

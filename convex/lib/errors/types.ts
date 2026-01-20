@@ -29,7 +29,7 @@ export type SeverityLevel = 'fatal' | 'error' | 'warning' | 'log' | 'info' | 'de
  * Additional context data for errors.
  * Status codes and severity levels are metadata for logging/debugging, not returned to clients.
  */
-export type ErrorData = {
+export interface ErrorData {
   [key: string]: unknown;
   errorCode?: ErrorCode;
   field?: string;
@@ -38,4 +38,4 @@ export type ErrorData = {
   resource?: string;
   resourceId?: string;
   statusCode?: HttpStatusCode;
-};
+}

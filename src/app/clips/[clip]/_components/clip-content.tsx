@@ -2,9 +2,9 @@ import type { Clip } from '@/features/clips/types';
 
 import { MediaEmbed } from '@/components/media-embed';
 
-type ClipContentProps = {
+interface ClipContentProps {
   clip: Clip;
-};
+}
 
 export function ClipContent({ clip }: ClipContentProps) {
   return (

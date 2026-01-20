@@ -7,9 +7,9 @@ import { SidebarContent } from '@/components/sidebar-content';
 import { SortSelect } from '@/components/sort-select';
 import { getSpeakerName } from '@/features/speakers';
 
-type CollectionsSidebarProps = {
+interface CollectionsSidebarProps {
   speakers: Speaker[];
-};
+}
 
 export function CollectionsSidebar({ speakers }: CollectionsSidebarProps) {
   return (
