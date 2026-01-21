@@ -18,6 +18,7 @@
     "dev:open": "wait-on https://localhost:3000 && open https://localhost:3000",
     "format": "biome format .",
     "format:fix": "biome format --write .",
+    "format:fix:yolo": "pnpm biome check --write --unsafe .",
     "lint": "biome lint .",
     "lint:fix": "biome lint --write .",
     "release": "convex deploy --yes",
