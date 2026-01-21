@@ -47,8 +47,6 @@ interface EditTalkSheetProps {
   open: boolean;
   speakers: SpeakerListItem[];
   talk: TalkData | null;
-  /** For nested sheets, use 'nested' to stack above other sheets */
-  zIndex?: 'default' | 'nested';
 }
 
 export function EditTalkSheet({
@@ -58,7 +56,6 @@ export function EditTalkSheet({
   open,
   speakers,
   talk,
-  zIndex = 'default',
 }: EditTalkSheetProps) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -123,7 +120,7 @@ export function EditTalkSheet({
 
   return (
     <Sheet onOpenChange={onOpenChange} open={open}>
-      <SheetPopup side="right" size="lg" zIndex={zIndex}>
+      <SheetPopup side="right">
         <SheetHeader>
           <SheetTitle>Edit Talk</SheetTitle>
         </SheetHeader>
@@ -138,12 +135,7 @@ export function EditTalkSheet({
 
             <FormError error={form.formState.errors.root} />
 
-            <TalkFormFields
-              collections={collections}
-              control={form.control}
-              inSheet
-              speakers={speakers}
-            />
+            <TalkFormFields collections={collections} control={form.control} speakers={speakers} />
           </SheetPanel>
 
           <SheetFooter>

@@ -36,15 +36,12 @@ interface CreateCollectionSheetProps {
   onOpenChange: (open: boolean) => void;
   onCollectionCreated: (collectionId: CollectionId, collection: NewCollection) => void;
   open: boolean;
-  /** For nested sheets, use 'nested' to stack above other sheets */
-  zIndex?: 'default' | 'nested';
 }
 
 export function CreateCollectionSheet({
   onOpenChange,
   onCollectionCreated,
   open,
-  zIndex = 'default',
 }: CreateCollectionSheetProps) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -90,7 +87,7 @@ export function CreateCollectionSheet({
 
   return (
     <Sheet onOpenChange={onOpenChange} open={open}>
-      <SheetPopup side="right" size="sm" zIndex={zIndex}>
+      <SheetPopup side="right">
         <SheetHeader>
           <SheetTitle>Add New Collection</SheetTitle>
         </SheetHeader>

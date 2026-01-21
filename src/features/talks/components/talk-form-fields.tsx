@@ -24,8 +24,6 @@ type CollectionListItem = Pick<Collection, '_id' | 'slug' | 'title'>;
 interface TalkFormFieldsProps<T extends FieldValues> {
   collections: CollectionListItem[];
   control: Control<T>;
-  /** Whether the form is inside a sheet (affects nested sheet z-index) */
-  inSheet?: boolean;
   onSpeakerCreated?: (speakerId: SpeakerId) => void;
   onStatusChange?: (status: TalkStatus) => void;
   speakers: SpeakerListItem[];
@@ -34,7 +32,6 @@ interface TalkFormFieldsProps<T extends FieldValues> {
 export function TalkFormFields<T extends FieldValues>({
   collections,
   control,
-  inSheet = false,
   onSpeakerCreated,
   onStatusChange,
   speakers,
@@ -55,7 +52,6 @@ export function TalkFormFields<T extends FieldValues>({
         name={'speakerId' as Path<T>}
         onSpeakerCreated={onSpeakerCreated}
         required
-        sheetZIndex={inSheet ? 'nested' : 'default'}
         speakers={speakers}
       />
 

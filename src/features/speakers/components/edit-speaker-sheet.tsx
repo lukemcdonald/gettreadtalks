@@ -53,8 +53,6 @@ interface EditSpeakerSheetProps {
   onSpeakerUpdated: (speakerId: SpeakerId) => void;
   open: boolean;
   speaker: SpeakerData | null;
-  /** For nested sheets, use 'nested' to stack above other sheets */
-  zIndex?: 'default' | 'nested';
 }
 
 export function EditSpeakerSheet({
@@ -62,7 +60,6 @@ export function EditSpeakerSheet({
   onSpeakerUpdated,
   open,
   speaker,
-  zIndex = 'default',
 }: EditSpeakerSheetProps) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -123,7 +120,7 @@ export function EditSpeakerSheet({
 
   return (
     <Sheet onOpenChange={onOpenChange} open={open}>
-      <SheetPopup side="right" size="md" zIndex={zIndex}>
+      <SheetPopup side="right">
         <SheetHeader>
           <SheetTitle>Edit Speaker</SheetTitle>
         </SheetHeader>

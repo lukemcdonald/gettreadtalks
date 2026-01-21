@@ -36,17 +36,9 @@ interface EditTopicSheetProps {
   onTopicUpdated: (topicId: TopicId) => void;
   open: boolean;
   topic: TopicData | null;
-  /** For nested sheets, use 'nested' to stack above other sheets */
-  zIndex?: 'default' | 'nested';
 }
 
-export function EditTopicSheet({
-  onOpenChange,
-  onTopicUpdated,
-  open,
-  topic,
-  zIndex = 'default',
-}: EditTopicSheetProps) {
+export function EditTopicSheet({ onOpenChange, onTopicUpdated, open, topic }: EditTopicSheetProps) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -92,7 +84,7 @@ export function EditTopicSheet({
 
   return (
     <Sheet onOpenChange={onOpenChange} open={open}>
-      <SheetPopup side="right" size="sm" zIndex={zIndex}>
+      <SheetPopup side="right">
         <SheetHeader>
           <SheetTitle>Edit Topic</SheetTitle>
         </SheetHeader>
