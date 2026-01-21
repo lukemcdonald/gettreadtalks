@@ -1,7 +1,6 @@
 import type { Speaker } from '@/features/speakers/types';
 import type { Topic } from '@/features/topics/types';
 
-import { ComboboxFilter } from '@/components/combobox-filter';
 import { ComboboxMultiFilter } from '@/components/combobox-multi-filter';
 import { SearchInput } from '@/components/search-input';
 import { SidebarContent } from '@/components/sidebar-content';
@@ -31,9 +30,9 @@ export function ClipsSidebar({ speakers, topics }: ClipsSidebarProps) {
         }))}
         placeholder="All Speakers"
       />
-      <ComboboxFilter
-        label="Topic"
-        name="topicSlug"
+      <ComboboxMultiFilter
+        label="Topics"
+        name="topics"
         options={topics.map(({ topic }) => ({
           label: topic.title,
           value: topic.slug,

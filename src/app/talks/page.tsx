@@ -12,7 +12,7 @@ export interface TalksPageSearchParams {
   search?: string;
   sort?: string;
   speakers?: string;
-  topicSlug?: string;
+  topics?: string;
 }
 
 interface TalksPageProps {
@@ -21,22 +21,28 @@ interface TalksPageProps {
 
 export default async function TalksPage({ searchParams }: TalksPageProps) {
   const params = await searchParams;
-  const { cursor, featured, search, sort, speakers, topicSlug } = params;
+  const { cursor, featured, search, sort, speakers, topics } = params;
 
-  // Parse comma-separated speakers into array
+  // Parse comma-separated values into arrays
   const speakerSlugs = speakers ? speakers.split(',').filter(Boolean) : undefined;
+  const topicSlugs = topics ? topics.split(',').filter(Boolean) : undefined;
 
   // Check if any filters are active (for showing "clear filters" option)
-  const hasActiveFilters = !!(search || speakerSlugs?.length || topicSlug || featured === 'true');
+  const hasActiveFilters = !!(
+    search ||
+    speakerSlugs?.length ||
+    topicSlugs?.length ||
+    featured === 'true'
+  );
 
-  const [result, speakersResult, topics] = await Promise.all([
+  const [result, speakersResult, topicsResult] = await Promise.all([
     getTalks({
       cursor,
       featured: featured === 'true',
       search,
       sort,
       speakerSlugs,
-      topicSlug,
+      topicSlugs,
     }),
     getSpeakers(), // Fetch ALL speakers with published content (independent of filters)
     getTopicsWithCounts(),
@@ -62,7 +68,7 @@ export default async function TalksPage({ searchParams }: TalksPageProps) {
           variant="lg"
         />
       }
-      sidebar={<TalksSidebar speakers={sortedSpeakers} topics={topics} />}
+      sidebar={<TalksSidebar speakers={sortedSpeakers} topics={topicsResult} />}
       sidebarSticky
     />
   );
