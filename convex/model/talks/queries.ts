@@ -6,6 +6,7 @@ import { v } from 'convex/values';
 import { getManyFrom, getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
 
 import { query } from '../../_generated/server';
+import { getTalkIdsByTopicSlugs } from '../../lib/filters';
 import { getContentComparator } from '../../lib/sort';
 import {
   applySearchFilter,
@@ -261,13 +262,14 @@ export const listTalks = query({
     search: v.optional(v.string()),
     sort: sortType,
     speakerSlugs: v.optional(v.array(v.string())),
-    topicSlug: v.optional(v.string()),
+    topicSlugs: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
-    const { featured, paginationOpts, search, sort = 'recent', speakerSlugs, topicSlug } = args;
+    const { featured, paginationOpts, search, sort = 'recent', speakerSlugs, topicSlugs } = args;
 
     const hasSpeakerFilter = speakerSlugs && speakerSlugs.length > 0;
-    const hasFilters = search || hasSpeakerFilter || topicSlug || featured;
+    const hasTopicFilter = topicSlugs && topicSlugs.length > 0;
+    const hasFilters = search || hasSpeakerFilter || hasTopicFilter || featured;
     const needsCustomSort = sort !== 'recent';
 
     // When no filters and default sort, use native Convex pagination for efficiency
@@ -314,18 +316,14 @@ export const listTalks = query({
       }
     }
 
-    // Apply topic filter
-    if (topicSlug) {
-      const topic = await getOneFrom(ctx.db, 'topics', 'by_slug', topicSlug);
-      if (topic) {
-        const talkIdsOnTopic = await ctx.db
-          .query('talksOnTopics')
-          .withIndex('by_topicId', (q) => q.eq('topicId', topic._id))
-          .collect();
-        const topicTalkIds = new Set(talkIdsOnTopic.map((t) => t.talkId));
+    // Apply topic filter (multi-select)
+    if (hasTopicFilter) {
+      const topicTalkIds = await getTalkIdsByTopicSlugs(ctx, topicSlugs);
+
+      if (topicTalkIds) {
         talks = talks.filter((talk) => topicTalkIds.has(talk._id));
       } else {
-        talks = []; // No matching topic
+        talks = []; // No matching topics found
       }
     }
 

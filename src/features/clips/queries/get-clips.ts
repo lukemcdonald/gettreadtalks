@@ -13,7 +13,7 @@ interface GetClipsProps {
   search?: string;
   sort?: string;
   speakerSlugs?: string[];
-  topicSlug?: string;
+  topicSlugs?: string[];
 }
 
 /**
@@ -22,7 +22,7 @@ interface GetClipsProps {
  * Defaults to 50 items per page, sorted by most recent.
  */
 export async function getClips(args?: GetClipsProps) {
-  const { cursor, limit = 50, search, sort, speakerSlugs, topicSlug } = args ?? {};
+  const { cursor, limit = 50, search, sort, speakerSlugs, topicSlugs } = args ?? {};
 
   const token = await getAuthToken();
 
@@ -42,7 +42,7 @@ export async function getClips(args?: GetClipsProps) {
       search: search || undefined,
       sort: sortOption,
       speakerSlugs: speakerSlugs?.length ? speakerSlugs : undefined,
-      topicSlug: topicSlug || undefined,
+      topicSlugs: topicSlugs?.length ? topicSlugs : undefined,
     },
     { token },
   );

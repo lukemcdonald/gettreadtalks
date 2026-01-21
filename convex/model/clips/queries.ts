@@ -6,7 +6,7 @@ import { asyncMap } from 'convex-helpers';
 import { getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
 
 import { query } from '../../_generated/server';
-import { filterClipsByPublishedTalks } from '../../lib/filters';
+import { filterClipsByPublishedTalks, getClipIdsByTopicSlugs } from '../../lib/filters';
 import { getContentComparator } from '../../lib/sort';
 import { applySearchFilter, paginateArray } from '../../lib/utils';
 import { doc, docs } from '../../lib/validators/schema';
@@ -92,13 +92,14 @@ export const listClips = query({
     search: v.optional(v.string()),
     sort: sortType,
     speakerSlugs: v.optional(v.array(v.string())),
-    topicSlug: v.optional(v.string()),
+    topicSlugs: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
-    const { paginationOpts, search, sort = 'recent', speakerSlugs, topicSlug } = args;
+    const { paginationOpts, search, sort = 'recent', speakerSlugs, topicSlugs } = args;
 
     const hasSpeakerFilter = speakerSlugs && speakerSlugs.length > 0;
-    const hasFilters = search || hasSpeakerFilter || topicSlug;
+    const hasTopicFilter = topicSlugs && topicSlugs.length > 0;
+    const hasFilters = search || hasSpeakerFilter || hasTopicFilter;
     const needsCustomSort = sort !== 'recent';
 
     // When no filters and default sort, use native Convex pagination
@@ -151,18 +152,13 @@ export const listClips = query({
       }
     }
 
-    // Apply topic filter
-    if (topicSlug) {
-      const topic = await getOneFrom(ctx.db, 'topics', 'by_slug', topicSlug);
-      if (topic) {
-        const clipIdsOnTopic = await ctx.db
-          .query('clipsOnTopics')
-          .withIndex('by_topicId', (q) => q.eq('topicId', topic._id))
-          .collect();
-        const topicClipIds = new Set(clipIdsOnTopic.map((c) => c.clipId));
+    // Apply topic filter (multi-select)
+    if (hasTopicFilter) {
+      const topicClipIds = await getClipIdsByTopicSlugs(ctx, topicSlugs);
+      if (topicClipIds) {
         clips = clips.filter((clip) => topicClipIds.has(clip._id));
       } else {
-        clips = [];
+        clips = []; // No matching topics found
       }
     }
 
