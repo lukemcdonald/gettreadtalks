@@ -32,16 +32,9 @@ interface CreateTopicSheetProps {
   onOpenChange: (open: boolean) => void;
   onTopicCreated: (topicId: TopicId, topic: NewTopic) => void;
   open: boolean;
-  /** For nested sheets, use 'nested' to stack above other sheets */
-  zIndex?: 'default' | 'nested';
 }
 
-export function CreateTopicSheet({
-  onOpenChange,
-  onTopicCreated,
-  open,
-  zIndex = 'default',
-}: CreateTopicSheetProps) {
+export function CreateTopicSheet({ onOpenChange, onTopicCreated, open }: CreateTopicSheetProps) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -84,7 +77,7 @@ export function CreateTopicSheet({
 
   return (
     <Sheet onOpenChange={onOpenChange} open={open}>
-      <SheetPopup side="right" size="sm" zIndex={zIndex}>
+      <SheetPopup side="right">
         <SheetHeader>
           <SheetTitle>Add New Topic</SheetTitle>
         </SheetHeader>

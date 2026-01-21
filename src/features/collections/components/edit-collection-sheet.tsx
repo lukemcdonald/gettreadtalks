@@ -42,8 +42,6 @@ interface EditCollectionSheetProps {
   onCollectionUpdated: (collectionId: CollectionId) => void;
   onOpenChange: (open: boolean) => void;
   open: boolean;
-  /** For nested sheets, use 'nested' to stack above other sheets */
-  zIndex?: 'default' | 'nested';
 }
 
 export function EditCollectionSheet({
@@ -51,7 +49,6 @@ export function EditCollectionSheet({
   onCollectionUpdated,
   onOpenChange,
   open,
-  zIndex = 'default',
 }: EditCollectionSheetProps) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -102,7 +99,7 @@ export function EditCollectionSheet({
 
   return (
     <Sheet onOpenChange={onOpenChange} open={open}>
-      <SheetPopup side="right" size="sm" zIndex={zIndex}>
+      <SheetPopup side="right">
         <SheetHeader>
           <SheetTitle>Edit Collection</SheetTitle>
         </SheetHeader>

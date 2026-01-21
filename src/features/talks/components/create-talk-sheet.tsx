@@ -33,8 +33,6 @@ interface CreateTalkSheetProps {
   onTalkCreated: (talkId: TalkId) => void;
   open: boolean;
   speakers: SpeakerListItem[];
-  /** For nested sheets, use 'nested' to stack above other sheets */
-  zIndex?: 'default' | 'nested';
 }
 
 export function CreateTalkSheet({
@@ -43,7 +41,6 @@ export function CreateTalkSheet({
   onTalkCreated,
   open,
   speakers,
-  zIndex = 'default',
 }: CreateTalkSheetProps) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -91,7 +88,7 @@ export function CreateTalkSheet({
 
   return (
     <Sheet onOpenChange={onOpenChange} open={open}>
-      <SheetPopup side="right" size="lg" zIndex={zIndex}>
+      <SheetPopup side="right">
         <SheetHeader>
           <SheetTitle>Add New Talk</SheetTitle>
         </SheetHeader>
@@ -106,12 +103,7 @@ export function CreateTalkSheet({
 
             <FormError error={form.formState.errors.root} />
 
-            <TalkFormFields
-              collections={collections}
-              control={form.control}
-              inSheet
-              speakers={speakers}
-            />
+            <TalkFormFields collections={collections} control={form.control} speakers={speakers} />
           </SheetPanel>
 
           <SheetFooter>

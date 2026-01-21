@@ -67,8 +67,6 @@ interface EditClipSheetProps {
   open: boolean;
   speakers: SpeakerListItem[];
   talks: TalkListItem[];
-  /** For nested sheets, use 'nested' to stack above other sheets */
-  zIndex?: 'default' | 'nested';
 }
 
 export function EditClipSheet({
@@ -78,7 +76,6 @@ export function EditClipSheet({
   open,
   speakers,
   talks,
-  zIndex = 'default',
 }: EditClipSheetProps) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -145,7 +142,7 @@ export function EditClipSheet({
 
   return (
     <Sheet onOpenChange={onOpenChange} open={open}>
-      <SheetPopup side="right" size="md" zIndex={zIndex}>
+      <SheetPopup side="right">
         <SheetHeader>
           <SheetTitle>Edit Clip</SheetTitle>
         </SheetHeader>

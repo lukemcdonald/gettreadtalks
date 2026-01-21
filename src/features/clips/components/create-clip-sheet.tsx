@@ -56,8 +56,6 @@ interface CreateClipSheetProps {
   open: boolean;
   speakers: SpeakerListItem[];
   talks: TalkListItem[];
-  /** For nested sheets, use 'nested' to stack above other sheets */
-  zIndex?: 'default' | 'nested';
 }
 
 export function CreateClipSheet({
@@ -66,7 +64,6 @@ export function CreateClipSheet({
   open,
   speakers,
   talks,
-  zIndex = 'default',
 }: CreateClipSheetProps) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -119,7 +116,7 @@ export function CreateClipSheet({
 
   return (
     <Sheet onOpenChange={onOpenChange} open={open}>
-      <SheetPopup side="right" size="md" zIndex={zIndex}>
+      <SheetPopup side="right">
         <SheetHeader>
           <SheetTitle>Add New Clip</SheetTitle>
         </SheetHeader>
