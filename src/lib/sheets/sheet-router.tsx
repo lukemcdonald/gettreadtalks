@@ -20,6 +20,7 @@ import {
   SheetPanel,
   SheetPopup,
   SheetTitle,
+  Spinner,
 } from '@/components/ui';
 import { getEntityForEdit, getFormOptions } from './queries';
 
@@ -252,7 +253,9 @@ export function SheetRouter() {
 
     const parsed = parseSheetParam(sheetParamRaw);
     if (!parsed) {
-      setIsReady(false);
+      setError('Invalid sheet parameter');
+      setIsReady(true);
+      setIsOpen(true);
       return;
     }
 
@@ -302,10 +305,6 @@ export function SheetRouter() {
     };
   }, [sheetParamRaw]);
 
-  if (!(sheetParam && isReady)) {
-    return null;
-  }
-
   function handleOpenChange(open: boolean) {
     if (!open) {
       closeSheet();
@@ -315,6 +314,27 @@ export function SheetRouter() {
   function handleSuccess() {
     closeSheet();
     router.refresh();
+  }
+
+  // No sheet param in URL
+  if (!sheetParamRaw) {
+    return null;
+  }
+
+  // Loading state while fetching data
+  if (!isReady) {
+    return (
+      <Sheet onOpenChange={handleOpenChange} open>
+        <SheetPopup side="right">
+          <SheetHeader>
+            <SheetTitle>Loading...</SheetTitle>
+          </SheetHeader>
+          <SheetPanel className="flex items-center justify-center">
+            <Spinner className="size-8" />
+          </SheetPanel>
+        </SheetPopup>
+      </Sheet>
+    );
   }
 
   if (error) {
@@ -335,6 +355,11 @@ export function SheetRouter() {
         </SheetPopup>
       </Sheet>
     );
+  }
+
+  // Safety guard - sheetParam should always exist here after passing previous checks
+  if (!sheetParam) {
+    return null;
   }
 
   return renderSheet({
