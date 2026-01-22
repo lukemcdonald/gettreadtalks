@@ -15,6 +15,7 @@ import type { ReactNode } from 'react';
 import { Suspense } from 'react';
 
 import { SkipNavLink } from '@/components/site-header/navigation/skip-nav-link';
+import { SheetManager } from '@/lib/sheets';
 import { cn } from '@/utils';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
@@ -46,6 +47,7 @@ export default async function RootLayout({
                 {children}
               </div>
               <SiteFooter />
+              <SheetManager />
             </AuthProvider>
           </ThemeProvider>
         </ErrorBoundary>
