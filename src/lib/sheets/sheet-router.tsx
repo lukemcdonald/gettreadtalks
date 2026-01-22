@@ -12,6 +12,15 @@ import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 
+import {
+  Button,
+  Sheet,
+  SheetFooter,
+  SheetHeader,
+  SheetPanel,
+  SheetPopup,
+  SheetTitle,
+} from '@/components/ui';
 import { getEntityForEdit, getFormOptions } from './queries';
 
 const CreateClipSheet = dynamic(() =>
@@ -229,6 +238,7 @@ export function SheetRouter() {
   const [entityData, setEntityData] = useState<EntityData>(null);
   const [isReady, setIsReady] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!sheetParamRaw) {
@@ -236,6 +246,7 @@ export function SheetRouter() {
       setIsOpen(false);
       setEntityData(null);
       setFormOptions(null);
+      setError(null);
       return;
     }
 
@@ -273,8 +284,14 @@ export function SheetRouter() {
         setEntityData(entity as EntityData);
         setIsReady(true);
         setIsOpen(true);
-      } catch (error) {
-        console.error('Failed to load sheet data:', error);
+      } catch (err) {
+        if (cancelled) {
+          return;
+        }
+        console.error('Failed to load sheet data:', err);
+        setError('Failed to load data. Please try again.');
+        setIsReady(true);
+        setIsOpen(true);
       }
     }
 
@@ -298,6 +315,26 @@ export function SheetRouter() {
   function handleSuccess() {
     closeSheet();
     router.refresh();
+  }
+
+  if (error) {
+    return (
+      <Sheet onOpenChange={handleOpenChange} open={isOpen}>
+        <SheetPopup side="right">
+          <SheetHeader>
+            <SheetTitle>Error</SheetTitle>
+          </SheetHeader>
+          <SheetPanel>
+            <p className="text-muted-foreground">{error}</p>
+          </SheetPanel>
+          <SheetFooter>
+            <Button onClick={() => handleOpenChange(false)} variant="outline">
+              Close
+            </Button>
+          </SheetFooter>
+        </SheetPopup>
+      </Sheet>
+    );
   }
 
   return renderSheet({
