@@ -20,7 +20,6 @@ import {
   SheetPanel,
   SheetPopup,
   SheetTitle,
-  Spinner,
 } from '@/components/ui';
 import { getEntityForEdit, getFormOptions } from './queries';
 
@@ -316,25 +315,9 @@ export function SheetRouter() {
     router.refresh();
   }
 
-  // No sheet param in URL
-  if (!sheetParamRaw) {
+  // No sheet param in URL or still loading
+  if (!(sheetParamRaw && isReady)) {
     return null;
-  }
-
-  // Loading state while fetching data
-  if (!isReady) {
-    return (
-      <Sheet onOpenChange={handleOpenChange} open>
-        <SheetPopup side="right">
-          <SheetHeader>
-            <SheetTitle>Loading...</SheetTitle>
-          </SheetHeader>
-          <SheetPanel className="flex items-center justify-center">
-            <Spinner className="size-8" />
-          </SheetPanel>
-        </SheetPopup>
-      </Sheet>
-    );
   }
 
   if (error) {
