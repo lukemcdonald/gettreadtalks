@@ -21,6 +21,17 @@ const clipPageWithSpeakersValidator = paginationResultValidator(
 );
 
 /**
+ * Get clip by ID.
+ */
+export const getClip = query({
+  args: {
+    id: v.id('clips'),
+  },
+  handler: async (ctx, args) => await ctx.db.get('clips', args.id),
+  returns: doc('clips').nullable(),
+});
+
+/**
  * Get clip by slug with related data (default for detail pages).
  * Returns clip with speaker, talk, and topics.
  */
