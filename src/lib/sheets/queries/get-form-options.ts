@@ -20,8 +20,21 @@ export async function getFormOptions() {
   ]);
 
   return {
-    speakers: speakersResult.page,
-    collections: collectionsResult.page.map((item) => item.collection),
-    talks: talksResult.page,
+    speakers: speakersResult.page.map((s) => ({
+      _id: s._id,
+      firstName: s.firstName,
+      lastName: s.lastName,
+      imageUrl: s.imageUrl,
+      role: s.role,
+    })),
+    collections: collectionsResult.page.map((item) => ({
+      _id: item.collection._id,
+      slug: item.collection.slug,
+      title: item.collection.title,
+    })),
+    talks: talksResult.page.map((t) => ({
+      _id: t._id,
+      title: t.title,
+    })),
   };
 }
