@@ -9,14 +9,42 @@ import type { Topic } from '@/features/topics/types';
 import type { ParsedSheetParam, SheetAction, SheetEntity } from './types';
 
 import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 
-import { CreateClipSheet, EditClipSheet } from '@/features/clips/components';
-import { CreateCollectionSheet, EditCollectionSheet } from '@/features/collections/components';
-import { CreateSpeakerSheet, EditSpeakerSheet } from '@/features/speakers/components';
-import { CreateTalkSheet, EditTalkSheet } from '@/features/talks/components';
-import { CreateTopicSheet, EditTopicSheet } from '@/features/topics/components';
 import { getEntityForEdit, getFormOptions } from './queries';
+
+const CreateClipSheet = dynamic(() =>
+  import('@/features/clips/components').then((mod) => mod.CreateClipSheet),
+);
+const EditClipSheet = dynamic(() =>
+  import('@/features/clips/components').then((mod) => mod.EditClipSheet),
+);
+const CreateCollectionSheet = dynamic(() =>
+  import('@/features/collections/components').then((mod) => mod.CreateCollectionSheet),
+);
+const EditCollectionSheet = dynamic(() =>
+  import('@/features/collections/components').then((mod) => mod.EditCollectionSheet),
+);
+const CreateSpeakerSheet = dynamic(() =>
+  import('@/features/speakers/components').then((mod) => mod.CreateSpeakerSheet),
+);
+const EditSpeakerSheet = dynamic(() =>
+  import('@/features/speakers/components').then((mod) => mod.EditSpeakerSheet),
+);
+const CreateTalkSheet = dynamic(() =>
+  import('@/features/talks/components').then((mod) => mod.CreateTalkSheet),
+);
+const EditTalkSheet = dynamic(() =>
+  import('@/features/talks/components').then((mod) => mod.EditTalkSheet),
+);
+const CreateTopicSheet = dynamic(() =>
+  import('@/features/topics/components').then((mod) => mod.CreateTopicSheet),
+);
+const EditTopicSheet = dynamic(() =>
+  import('@/features/topics/components').then((mod) => mod.EditTopicSheet),
+);
+
 import { parseSheetParam, useSheet } from './use-sheet';
 
 interface FormOptions {
