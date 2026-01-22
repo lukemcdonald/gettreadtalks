@@ -1,8 +1,8 @@
 'use client';
 
 import type { ClipId } from '@/features/clips/types';
-import type { Speaker, SpeakerId } from '@/features/speakers/types';
-import type { Talk, TalkId } from '@/features/talks/types';
+import type { SpeakerId, SpeakerListItem } from '@/features/speakers/types';
+import type { TalkId, TalkListItem } from '@/features/talks/types';
 import type { StatusType } from '@/lib/entities/types';
 
 import { useEffect, useState, useTransition } from 'react';
@@ -46,9 +46,6 @@ const updateClipSchema = z.object({
 });
 
 type UpdateClipFormData = z.infer<typeof updateClipSchema>;
-
-type SpeakerListItem = Pick<Speaker, '_id' | 'firstName' | 'lastName'>;
-type TalkListItem = Pick<Talk, '_id' | 'title'>;
 
 interface ClipData {
   _id: ClipId;

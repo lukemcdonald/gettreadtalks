@@ -1,9 +1,8 @@
 'use client';
 
 import type { ClipId } from '@/features/clips/types';
-import type { Speaker, SpeakerId } from '@/features/speakers/types';
-import type { Talk, TalkId } from '@/features/talks/types';
-import type { StatusType } from '@/lib/entities/types';
+import type { SpeakerId, SpeakerListItem } from '@/features/speakers/types';
+import type { TalkId, TalkListItem } from '@/features/talks/types';
 
 import { useEffect, useState, useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -46,9 +45,6 @@ const createClipSchema = z.object({
 });
 
 type CreateClipFormData = z.infer<typeof createClipSchema>;
-
-type SpeakerListItem = Pick<Speaker, '_id' | 'firstName' | 'lastName'>;
-type TalkListItem = Pick<Talk, '_id' | 'title'>;
 
 interface CreateClipSheetProps {
   onClipCreated: (clipId: ClipId) => void;

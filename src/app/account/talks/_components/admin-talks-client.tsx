@@ -1,7 +1,7 @@
 'use client';
 
-import type { Collection, CollectionId } from '@/features/collections/types';
-import type { Speaker, SpeakerId } from '@/features/speakers/types';
+import type { CollectionId, CollectionListItem } from '@/features/collections/types';
+import type { SpeakerId, SpeakerListItem } from '@/features/speakers/types';
 import type { Talk, TalkId, TalkStatus } from '@/features/talks/types';
 
 import { useState } from 'react';
@@ -10,9 +10,6 @@ import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui';
 import { CreateTalkSheet, EditTalkSheet } from '@/features/talks/components';
-
-type SpeakerListItem = Pick<Speaker, '_id' | 'firstName' | 'lastName' | 'imageUrl' | 'role'>;
-type CollectionListItem = Pick<Collection, '_id' | 'slug' | 'title'>;
 
 interface TalkData {
   _id: TalkId;

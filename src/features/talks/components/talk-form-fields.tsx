@@ -1,8 +1,8 @@
 'use client';
 
 import type { Control, FieldValues, Path } from 'react-hook-form';
-import type { Collection, CollectionId } from '@/features/collections/types';
-import type { Speaker, SpeakerId } from '@/features/speakers/types';
+import type { CollectionId, CollectionListItem } from '@/features/collections/types';
+import type { SpeakerId, SpeakerListItem } from '@/features/speakers/types';
 import type { TalkStatus } from '@/features/talks/types';
 
 import { Controller } from 'react-hook-form';
@@ -17,9 +17,6 @@ import {
 } from '@/components/ui';
 import { CollectionSelectField } from '@/features/collections/components';
 import { SpeakerField } from '@/features/speakers/components/speaker-field';
-
-type SpeakerListItem = Pick<Speaker, '_id' | 'firstName' | 'lastName' | 'imageUrl' | 'role'>;
-type CollectionListItem = Pick<Collection, '_id' | 'slug' | 'title'>;
 
 interface TalkFormFieldsProps<T extends FieldValues> {
   collections: CollectionListItem[];
