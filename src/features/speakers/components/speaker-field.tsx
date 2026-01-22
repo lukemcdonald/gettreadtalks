@@ -1,7 +1,7 @@
 'use client';
 
 import type { Control, FieldPath, FieldValues } from 'react-hook-form';
-import type { Speaker, SpeakerId } from '@/features/speakers/types';
+import type { SpeakerId, SpeakerListItem } from '@/features/speakers/types';
 
 import { useState } from 'react';
 import { PlusIcon } from 'lucide-react';
@@ -23,8 +23,6 @@ import {
 import { getSpeakerName } from '@/features/speakers';
 import { SpeakerAvatar } from '@/features/speakers/components';
 import { CreateSpeakerSheet } from './create-speaker-sheet';
-
-type SpeakerListItem = Pick<Speaker, '_id' | 'firstName' | 'lastName' | 'imageUrl' | 'role'>;
 
 interface SpeakerFieldProps<T extends FieldValues> {
   control: Control<T>;

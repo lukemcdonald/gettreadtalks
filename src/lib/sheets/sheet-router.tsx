@@ -2,9 +2,9 @@
 
 import type { ReactNode } from 'react';
 import type { Clip } from '@/features/clips/types';
-import type { Collection } from '@/features/collections/types';
-import type { Speaker } from '@/features/speakers/types';
-import type { Talk } from '@/features/talks/types';
+import type { Collection, CollectionListItem } from '@/features/collections/types';
+import type { Speaker, SpeakerListItem } from '@/features/speakers/types';
+import type { Talk, TalkListItem } from '@/features/talks/types';
 import type { Topic } from '@/features/topics/types';
 import type { ParsedSheetParam, SheetAction, SheetEntity } from './types';
 
@@ -58,9 +58,9 @@ const EditTopicSheet = dynamic(() =>
 import { parseSheetParam, useSheet } from './use-sheet';
 
 interface FormOptions {
-  speakers: Pick<Speaker, '_id' | 'firstName' | 'lastName' | 'imageUrl' | 'role'>[];
-  collections: Pick<Collection, '_id' | 'slug' | 'title'>[];
-  talks: Pick<Talk, '_id' | 'title'>[];
+  speakers: SpeakerListItem[];
+  collections: CollectionListItem[];
+  talks: TalkListItem[];
 }
 
 type EntityData = Talk | Speaker | Clip | Collection | Topic | null;

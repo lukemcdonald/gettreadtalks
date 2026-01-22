@@ -1,7 +1,7 @@
 'use client';
 
-import type { Collection, CollectionId } from '@/features/collections/types';
-import type { Speaker, SpeakerId } from '@/features/speakers/types';
+import type { CollectionListItem } from '@/features/collections/types';
+import type { SpeakerId, SpeakerListItem } from '@/features/speakers/types';
 import type { TalkFormData } from '@/features/talks/schemas/talk-form';
 import type { TalkId } from '@/features/talks/types';
 
@@ -23,9 +23,6 @@ import { createTalkAction } from '@/features/talks/actions';
 import { TalkFormFields } from '@/features/talks/components/talk-form-fields';
 import { talkFormSchema } from '@/features/talks/schemas/talk-form';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
-
-type SpeakerListItem = Pick<Speaker, '_id' | 'firstName' | 'lastName' | 'imageUrl' | 'role'>;
-type CollectionListItem = Pick<Collection, '_id' | 'slug' | 'title'>;
 
 interface CreateTalkSheetProps {
   collections: CollectionListItem[];

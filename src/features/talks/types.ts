@@ -10,6 +10,9 @@ import { api } from '@/convex/_generated/api';
 export type Talk = Doc<'talks'>;
 export type TalkId = Id<'talks'>;
 
+/** Talk fields used in selection/dropdown UIs */
+export type TalkListItem = Pick<Talk, '_id' | 'title'>;
+
 export type PreloadedTalks = Preloaded<typeof api.talks.listTalks>;
 export type TalkData = NonNullable<FunctionReturnType<typeof api.talks.getTalkBySlug>>;
 export type TalkStatus = StatusType;
