@@ -17,7 +17,7 @@ export default async function SpeakersPage({ searchParams }: SpeakersPageProps) 
   const params = await searchParams;
   const { role, search, sort } = params;
 
-  const hasActiveFilters = !!(search || (role && role !== 'all'));
+  const hasActiveFilters = !!(search || role);
 
   const [groups, { speakers: allSpeakers }] = await Promise.all([
     getSpeakersGrouped({ role, search, sort }),
