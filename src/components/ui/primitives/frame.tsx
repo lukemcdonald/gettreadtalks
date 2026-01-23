@@ -65,7 +65,7 @@ function FrameDescription({
 function FrameFooter({ className, ...props }: React.ComponentProps<"footer">) {
   return (
     <footer
-      className={cn("flex flex-col gap-1 px-5 py-4", className)}
+      className={cn("px-5 py-4", className)}
       data-slot="frame-panel-footer"
       {...props}
     />

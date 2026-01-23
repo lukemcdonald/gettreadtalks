@@ -26,7 +26,7 @@ function AutocompleteInput({
   const sizeValue = (size ?? "default") as "sm" | "default" | "lg" | number;
 
   return (
-    <div className="relative not-has-[>*.w-full]:w-fit w-full has-disabled:opacity-64">
+    <div className="relative not-has-[>*.w-full]:w-fit w-full text-foreground has-disabled:opacity-64">
       {startAddon && (
         <div
           aria-hidden="true"
@@ -95,7 +95,7 @@ function AutocompletePopup({
           )}
         >
           <AutocompletePrimitive.Popup
-            className="flex max-h-[min(var(--available-height),23rem)] w-(--anchor-width) max-w-(--available-width) flex-col"
+            className="flex max-h-[min(var(--available-height),23rem)] w-(--anchor-width) max-w-(--available-width) flex-col text-foreground"
             data-slot="autocomplete-popup"
             {...props}
           >
