@@ -22,11 +22,15 @@ interface TopicSelectorProps {
   items: Pick<Topic, '_id' | 'slug' | 'title'>[];
 }
 
-export function TopicSelector({ className, currentSlug, label, topics }: TopicSelectorProps) {
+export function TopicSelector({ className, currentSlug, items, label }: TopicSelectorProps) {
   const router = useRouter();
   const [, startTransition] = useTransition();
 
-  const sortedTopics = [...topics].sort((a, b) => a.title.localeCompare(b.title));
+  const sortedTopics = [...items].sort((a, b) => a.title.localeCompare(b.title));
+  const selectItems = sortedTopics.map((topic) => ({
+    label: topic.title,
+    value: topic.slug,
+  }));
 
   const handleChange = (value: string | null) => {
     if (value) {
@@ -39,21 +43,14 @@ export function TopicSelector({ className, currentSlug, label, topics }: TopicSe
   return (
     <div className={cn('space-y-2', className)}>
       {!!label && <Label htmlFor="topic-selector">{label}</Label>}
-      <Select
-        defaultValue={currentSlug}
-        items={sortedTopics.map((topic) => ({
-          label: topic.title,
-          value: topic.slug,
-        }))}
-        onValueChange={handleChange}
-      >
+      <Select defaultValue={currentSlug} items={selectItems} onValueChange={handleChange}>
         <SelectTrigger id="topic-selector">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
-          {sortedTopics.map((topic) => (
-            <SelectItem key={topic._id} value={topic.slug}>
-              {topic.title}
+          {selectItems.map((topic) => (
+            <SelectItem key={topic.value} value={topic.value}>
+              {topic.label}
             </SelectItem>
           ))}
         </SelectContent>

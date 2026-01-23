@@ -12,16 +12,17 @@ interface TalkPageProps {
 
 export default async function TalkPage({ params }: TalkPageProps) {
   const { speaker: speakerSlug, talk: talkSlug } = await params;
-  const [talkData, user] = await Promise.all([
+
+  const [talkResult, userResult] = await Promise.all([
     getTalkBySlug(speakerSlug, talkSlug),
     getCurrentUser(),
   ]);
 
-  if (!talkData) {
+  if (!talkResult) {
     notFound();
   }
 
-  const { talk, speaker, collection, clips, topics } = talkData;
+  const { clips, collection, speaker, talk, topics } = talkResult;
 
   return (
     <SidebarLayout
@@ -33,7 +34,7 @@ export default async function TalkPage({ params }: TalkPageProps) {
           speaker={speaker}
           talk={talk}
           topics={topics}
-          user={user}
+          user={userResult}
         />
       }
     />
