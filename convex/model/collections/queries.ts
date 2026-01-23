@@ -1,4 +1,5 @@
-import type { Doc } from '../../_generated/dataModel';
+import type { Doc, Id } from '../../_generated/dataModel';
+import type { QueryCtx } from '../../_generated/server';
 
 import { paginationOptsValidator, paginationResultValidator } from 'convex/server';
 import { v } from 'convex/values';
@@ -10,6 +11,17 @@ import { filterCollectionsWithPublishedTalks } from '../../lib/filters';
 import { enrichWithSpeakers } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
+
+/** Fetches published talks for a collection, with optional limit. */
+async function getPublishedTalks(ctx: QueryCtx, collectionId: Id<'collections'>, limit?: number) {
+  const query = ctx.db
+    .query('talks')
+    .withIndex('by_collectionId_and_status', (q) =>
+      q.eq('collectionId', collectionId).eq('status', 'published'),
+    );
+
+  return await (limit ? query.take(limit) : query.collect());
+}
 
 /**
  * Get collection by ID.
@@ -39,12 +51,7 @@ export const getCollectionWithTalks = query({
       return null;
     }
 
-    const talks = await ctx.db
-      .query('talks')
-      .withIndex('by_collectionId_and_status', (q) =>
-        q.eq('collectionId', collection._id).eq('status', 'published'),
-      )
-      .take(limit);
+    const talks = await getPublishedTalks(ctx, collection._id, limit);
 
     // Sort by collectionOrder
     talks.sort((a, b) => (a.collectionOrder || 0) - (b.collectionOrder || 0));
@@ -80,12 +87,7 @@ export const getCollectionBySlug = query({
       return null;
     }
 
-    const talks = await ctx.db
-      .query('talks')
-      .withIndex('by_collectionId_and_status', (q) =>
-        q.eq('collectionId', collection._id).eq('status', 'published'),
-      )
-      .take(limit);
+    const talks = await getPublishedTalks(ctx, collection._id, limit);
 
     talks.sort((a, b) => (a.collectionOrder || 0) - (b.collectionOrder || 0));
 
@@ -118,12 +120,7 @@ export const getCollectionWithSpeakers = query({
       return null;
     }
 
-    const talks = await ctx.db
-      .query('talks')
-      .withIndex('by_collectionId_and_status', (q) =>
-        q.eq('collectionId', collection._id).eq('status', 'published'),
-      )
-      .collect();
+    const talks = await getPublishedTalks(ctx, collection._id);
 
     const speakerIds = [...new Set(talks.map((talk) => talk.speakerId))];
     const speakers = await getAll(ctx.db, speakerIds);
@@ -191,13 +188,7 @@ export const listCollections = query({
 
     // Enrich each collection with stats
     const enrichedPage = await asyncMap(collectionsWithTalks, async (collection) => {
-      // TODO: Should we create a util to getCollectionTalks?
-      const talks = await ctx.db
-        .query('talks')
-        .withIndex('by_collectionId_and_status', (q) =>
-          q.eq('collectionId', collection._id).eq('status', 'published'),
-        )
-        .collect();
+      const talks = await getPublishedTalks(ctx, collection._id);
 
       // Get unique speaker IDs
       const speakerIds = [...new Set(talks.map((talk) => talk.speakerId))];
@@ -235,12 +226,7 @@ export const listAllCollections = query({
 
     // Enrich each collection with stats
     const enrichedPage = await asyncMap(collectionPages.page, async (collection) => {
-      const talks = await ctx.db
-        .query('talks')
-        .withIndex('by_collectionId_and_status', (q) =>
-          q.eq('collectionId', collection._id).eq('status', 'published'),
-        )
-        .collect();
+      const talks = await getPublishedTalks(ctx, collection._id);
 
       const speakerIds = [...new Set(talks.map((talk) => talk.speakerId))];
       const speakers = await getAll(ctx.db, speakerIds);
