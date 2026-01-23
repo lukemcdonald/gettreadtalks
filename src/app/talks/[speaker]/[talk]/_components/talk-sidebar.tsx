@@ -10,7 +10,6 @@ import Link from 'next/link';
 import { SidebarContent } from '@/components/sidebar-content';
 import { Button } from '@/components/ui';
 import { FavoriteTalkButton } from '@/features/users/components';
-import { EditTalkLink } from '@/lib/sheets';
 import { isAdmin } from '@/services/auth/utils';
 
 interface TalkSidebarProps {
@@ -30,7 +29,7 @@ export function TalkSidebar({ clips, collection, speaker, talk, topics, user }: 
       <SidebarContent title="Actions">
         <div className="flex flex-col gap-2">
           {!!userIsAdmin && (
-            <Button render={<EditTalkLink talkId={talk._id} />} variant="outline">
+            <Button render={<Link href={`/talks/edit/${talk._id}`} />} variant="outline">
               Edit
             </Button>
           )}
