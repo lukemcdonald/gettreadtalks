@@ -6,16 +6,13 @@ import { getClipForEdit, getFormOptions } from '@/lib/sheets/queries';
 import { EditClipSheetRoute } from './_components/edit-clip-sheet-route';
 
 interface PageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: ClipId }>;
 }
 
 export default async function Page({ params }: PageProps) {
   const { id } = await params;
 
-  const [clip, { speakers, talks }] = await Promise.all([
-    getClipForEdit(id as ClipId),
-    getFormOptions(),
-  ]);
+  const [clip, { speakers, talks }] = await Promise.all([getClipForEdit(id), getFormOptions()]);
 
   if (!clip) {
     redirect('/clips');

@@ -1,5 +1,7 @@
 'use client';
 
+import type { Topic } from '@/features/topics/types';
+
 import { useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -13,17 +15,11 @@ import {
 } from '@/components/ui';
 import { cn } from '@/utils';
 
-interface Topic {
-  _id: string;
-  slug: string;
-  title: string;
-}
-
 interface TopicSelectorProps {
   className?: string;
   currentSlug: string;
   label?: string;
-  topics: Topic[];
+  items: Pick<Topic, '_id' | 'slug' | 'title'>[];
 }
 
 export function TopicSelector({ className, currentSlug, label, topics }: TopicSelectorProps) {

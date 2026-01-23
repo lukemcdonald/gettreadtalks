@@ -26,16 +26,11 @@ const updateTopicSchema = z.object({
 
 type UpdateTopicFormData = z.infer<typeof updateTopicSchema>;
 
-interface TopicData {
-  _id: TopicId;
-  title: string;
-}
-
 interface EditTopicSheetProps {
   onOpenChange: (open: boolean) => void;
   onTopicUpdated: (topicId: TopicId) => void;
   open: boolean;
-  topic: TopicData | null;
+  topic: Pick<Topic, '_id' | 'title'> | null;
 }
 
 export function EditTopicSheet({ onOpenChange, onTopicUpdated, open, topic }: EditTopicSheetProps) {
