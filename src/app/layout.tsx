@@ -30,8 +30,10 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({
   children,
+  sheet,
 }: Readonly<{
   children: ReactNode;
+  sheet: ReactNode;
 }>) {
   return (
     <html className={cn('h-full', inter.variable)} lang="en" suppressHydrationWarning>
@@ -47,6 +49,7 @@ export default async function RootLayout({
                 {children}
               </div>
               <SiteFooter />
+              {sheet}
               <SheetManager />
             </AuthProvider>
           </ThemeProvider>
