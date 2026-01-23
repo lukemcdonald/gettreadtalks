@@ -2,7 +2,8 @@ import type { TalkId } from '@/features/talks/types';
 
 import { redirect } from 'next/navigation';
 
-import { getFormOptions, getTalkForEdit } from '@/lib/sheets/queries';
+import { getTalk } from '@/features/talks/queries';
+import { getFormOptions } from '@/lib/sheets/queries';
 import { EditTalkSheetRoute } from './_components/edit-talk-sheet-route';
 
 interface PageProps {
@@ -12,10 +13,7 @@ interface PageProps {
 export default async function Page({ params }: PageProps) {
   const { id } = await params;
 
-  const [talk, { speakers, collections }] = await Promise.all([
-    getTalkForEdit(id),
-    getFormOptions(),
-  ]);
+  const [talk, { speakers, collections }] = await Promise.all([getTalk(id), getFormOptions()]);
 
   if (!talk) {
     redirect('/account/talks');
