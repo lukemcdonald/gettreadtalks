@@ -12,6 +12,7 @@ export default async function NewTalkPage() {
     getAllCollections(),
     getAllSpeakers(),
   ]);
+
   const collections = collectionsResult.collections.map((item) => item.collection);
   const speakers = speakersResult.speakers;
 

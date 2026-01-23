@@ -11,9 +11,7 @@ export interface TopicPageSearchParams {
 }
 
 interface TopicPageProps {
-  params: Promise<{
-    topic: string;
-  }>;
+  params: Promise<{ topic: string }>;
   searchParams: Promise<TopicPageSearchParams>;
 }
 
@@ -21,14 +19,16 @@ export default async function TopicPage({ params, searchParams }: TopicPageProps
   const { topic: slug } = await params;
   const { cursor } = await searchParams;
 
-  const [data, topicsResult] = await Promise.all([getTopicBySlug({ cursor, slug }), getTopics()]);
+  const [topicResult, topicsResult] = await Promise.all([
+    getTopicBySlug({ cursor, slug }),
+    getTopics(),
+  ]);
 
-  if (!data) {
+  if (!topicResult) {
     notFound();
   }
 
-  const { continueCursor, isDone, talks, topic, totalTalks } = data;
-  const allTopics = topicsResult.topics;
+  const { continueCursor, isDone, talks, topic, totalTalks } = topicResult;
 
   return (
     <SidebarLayout
@@ -41,7 +41,9 @@ export default async function TopicPage({ params, searchParams }: TopicPageProps
         />
       }
       header={<PageHeader title={topic.title} variant="lg" />}
-      sidebar={<TopicSidebar currentSlug={slug} topics={allTopics} totalTalks={totalTalks} />}
+      sidebar={
+        <TopicSidebar currentSlug={slug} topics={topicsResult.topics} totalTalks={totalTalks} />
+      }
       sidebarSticky
     />
   );

@@ -17,14 +17,11 @@ export default async function TopicsPage({ searchParams }: TopicsPageProps) {
   const params = await searchParams;
   const { search, sort } = params;
 
-  // Check if any filters are active (for showing "clear filters" option)
-  const hasActiveFilters = !!search;
-
   const topics = await getTopicsWithCounts({ search, sort });
 
   return (
     <SidebarLayout
-      content={<TopicsContent hasActiveFilters={hasActiveFilters} topics={topics} />}
+      content={<TopicsContent hasActiveFilters={!!search} topics={topics} />}
       header={
         <PageHeader
           description="Explore talks organized by topic and theme."
