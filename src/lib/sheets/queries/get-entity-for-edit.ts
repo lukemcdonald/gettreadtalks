@@ -5,7 +5,6 @@ import type { CollectionId } from '@/features/collections/types';
 import type { SpeakerId } from '@/features/speakers/types';
 import type { TalkId } from '@/features/talks/types';
 import type { TopicId } from '@/features/topics/types';
-import type { SheetEntity } from '../types';
 
 import { fetchQuery } from 'convex/nextjs';
 
@@ -35,21 +34,4 @@ export async function getCollectionForEdit(id: CollectionId) {
 export async function getTopicForEdit(id: TopicId) {
   const token = await getAuthToken();
   return fetchQuery(api.topics.getTopic, { id }, { token });
-}
-
-export async function getEntityForEdit(entity: SheetEntity, id: string) {
-  switch (entity) {
-    case 'clip':
-      return await getClipForEdit(id as ClipId);
-    case 'collection':
-      return await getCollectionForEdit(id as CollectionId);
-    case 'speaker':
-      return await getSpeakerForEdit(id as SpeakerId);
-    case 'talk':
-      return await getTalkForEdit(id as TalkId);
-    case 'topic':
-      return await getTopicForEdit(id as TopicId);
-    default:
-      return null;
-  }
 }
