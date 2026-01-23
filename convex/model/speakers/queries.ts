@@ -10,6 +10,7 @@ import { filterSpeakersWithPublishedTalks } from '../../lib/filters';
 import { getSpeakerComparator } from '../../lib/sort';
 import { paginateArray, shuffleAndLimit } from '../../lib/utils';
 import { doc, docs } from '../../lib/validators/schema';
+import { speakerRoleType } from './validators';
 
 const speakerPageValidator = paginationResultValidator(doc('speakers'));
 
@@ -134,14 +135,14 @@ export const listFeaturedSpeakers = query({
 export const listSpeakers = query({
   args: {
     paginationOpts: paginationOptsValidator,
-    role: v.optional(v.string()),
+    role: v.optional(speakerRoleType),
     search: v.optional(v.string()),
     sort: v.optional(v.union(v.literal('alphabetical'), v.literal('featured'))),
   },
   handler: async (ctx, args) => {
     const { paginationOpts, role, search, sort = 'alphabetical' } = args;
 
-    const hasFilters = search || (role && role !== 'all');
+    const hasFilters = search || role;
     const needsCustomSort = sort !== 'alphabetical';
 
     // When no filters and default sort, use native Convex pagination
@@ -178,7 +179,7 @@ export const listSpeakers = query({
     }
 
     // Filter by role
-    if (role && role !== 'all') {
+    if (role) {
       speakers = speakers.filter((speaker) => speaker.role === role);
     }
 

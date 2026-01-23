@@ -5,22 +5,10 @@ import 'server-only';
 import type { ActionResult } from '@/lib/forms/types';
 import type { SpeakerId } from '../types';
 
-import { z } from 'zod';
-
 import { api } from '@/convex/_generated/api';
 import { mapConvexErrorToFormErrors, mapZodErrors } from '@/lib/forms/validation';
 import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
-
-const updateSpeakerSchema = z.object({
-  description: z.string().optional(),
-  featured: z.boolean().optional(),
-  firstName: z.string().trim().min(1, 'First name is required'),
-  imageUrl: z.string().url('Must be a valid URL').optional().or(z.literal('')),
-  lastName: z.string().trim().min(1, 'Last name is required'),
-  ministry: z.string().optional(),
-  role: z.string().optional(),
-  websiteUrl: z.string().url('Must be a valid URL').optional().or(z.literal('')),
-});
+import { updateSpeakerSchema } from '../schemas/speaker-form';
 
 export async function updateSpeakerAction(
   data: unknown,
