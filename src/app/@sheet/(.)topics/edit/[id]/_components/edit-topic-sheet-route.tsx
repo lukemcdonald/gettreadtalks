@@ -2,8 +2,8 @@
 
 import type { Topic } from '@/features/topics/types';
 
+import { useSheetRoute } from '@/app/@sheet/_hooks/use-sheet-route';
 import { EditTopicSheet } from '@/features/topics/components';
-import { useSheetRoute } from '@/lib/sheets/use-sheet-route';
 
 interface EditTopicSheetRouteProps {
   topic: Topic;

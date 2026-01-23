@@ -3,8 +3,8 @@
 import type { CollectionListItem } from '@/features/collections/types';
 import type { SpeakerListItem } from '@/features/speakers/types';
 
+import { useSheetRoute } from '@/app/@sheet/_hooks/use-sheet-route';
 import { CreateTalkSheet } from '@/features/talks/components';
-import { useSheetRoute } from '@/lib/sheets/use-sheet-route';
 
 interface CreateTalkSheetRouteProps {
   collections: CollectionListItem[];

@@ -2,8 +2,8 @@
 
 import type { Speaker } from '@/features/speakers/types';
 
+import { useSheetRoute } from '@/app/@sheet/_hooks/use-sheet-route';
 import { EditSpeakerSheet } from '@/features/speakers/components';
-import { useSheetRoute } from '@/lib/sheets/use-sheet-route';
 
 interface EditSpeakerSheetRouteProps {
   speaker: Speaker;

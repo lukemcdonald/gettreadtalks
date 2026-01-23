@@ -1,7 +1,7 @@
 'use client';
 
+import { useSheetRoute } from '@/app/@sheet/_hooks/use-sheet-route';
 import { CreateTopicSheet } from '@/features/topics/components';
-import { useSheetRoute } from '@/lib/sheets/use-sheet-route';
 
 export default function Page() {
   const { handleOpenChange, handleSuccess } = useSheetRoute();
