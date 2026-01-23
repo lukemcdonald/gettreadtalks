@@ -29,7 +29,7 @@ export function TalkActionsMenu({ talk, talkUrl }: TalkActionsMenuProps) {
     <ContentActionsGroup
       content={talk}
       contentType="talk"
-      editUrl={`${talkUrl}/edit`}
+      editUrl={`/talks/edit/${talk._id}`}
       listUrl="/account/talks"
       onArchiveAction={handleArchive}
       onDeleteAction={handleDelete}
