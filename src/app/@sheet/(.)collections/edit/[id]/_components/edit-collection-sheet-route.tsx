@@ -5,7 +5,7 @@ import type { Collection } from '@/features/collections/types';
 import { EditCollectionSheet } from '@/features/collections/components';
 import { useSheetRoute } from '@/lib/sheets/use-sheet-route';
 
-type CollectionData = Pick<Collection, '_id' | 'description' | 'title' | 'url'>;
+type CollectionData = Omit<Collection, '_creationTime' | 'createdAt' | 'updatedAt' | 'slug'>;
 
 interface EditCollectionSheetRouteProps {
   collection: CollectionData;

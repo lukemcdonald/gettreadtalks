@@ -7,19 +7,7 @@ import type { Talk } from '@/features/talks/types';
 import { EditTalkSheet } from '@/features/talks/components';
 import { useSheetRoute } from '@/lib/sheets/use-sheet-route';
 
-type TalkData = Pick<
-  Talk,
-  | '_id'
-  | 'collectionId'
-  | 'collectionOrder'
-  | 'description'
-  | 'featured'
-  | 'mediaUrl'
-  | 'scripture'
-  | 'speakerId'
-  | 'status'
-  | 'title'
->;
+type TalkData = Omit<Talk, '_creationTime' | 'createdAt' | 'updatedAt' | 'slug' | 'publishedAt'>;
 
 interface EditTalkSheetRouteProps {
   collections: CollectionListItem[];
