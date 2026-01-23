@@ -2,7 +2,6 @@ import type { TopicId } from '@/features/topics/types';
 
 import { redirect } from 'next/navigation';
 
-import { SheetScrollLock } from '@/app/@sheet/_components/sheet-scroll-lock';
 import { getTopic } from '@/features/topics/queries';
 import { EditTopicSheetRoute } from './_components/edit-topic-sheet-route';
 
@@ -18,10 +17,5 @@ export default async function Page({ params }: PageProps) {
     redirect('/topics');
   }
 
-  return (
-    <>
-      <SheetScrollLock />
-      <EditTopicSheetRoute topic={topic} />
-    </>
-  );
+  return <EditTopicSheetRoute topic={topic} />;
 }

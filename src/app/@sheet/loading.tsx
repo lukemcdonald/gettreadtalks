@@ -1,11 +1,8 @@
 import { Skeleton } from '@/components/ui';
-import { SheetScrollLock } from './_components/sheet-scroll-lock';
 
 export default function SheetLoading() {
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
-      <SheetScrollLock />
-
       {/* Backdrop */}
       <div className="fixed inset-0 bg-black/32 backdrop-blur-sm" />
 
