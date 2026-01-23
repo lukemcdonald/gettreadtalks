@@ -2,8 +2,8 @@
 
 import type { Collection } from '@/features/collections/types';
 
+import { useSheetRoute } from '@/app/@sheet/_hooks/use-sheet-route';
 import { EditCollectionSheet } from '@/features/collections/components';
-import { useSheetRoute } from '@/lib/sheets/use-sheet-route';
 
 interface EditCollectionSheetRouteProps {
   collection: Collection;

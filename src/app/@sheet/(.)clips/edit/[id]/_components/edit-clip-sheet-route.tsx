@@ -4,8 +4,8 @@ import type { Clip } from '@/features/clips/types';
 import type { SpeakerListItem } from '@/features/speakers/types';
 import type { TalkListItem } from '@/features/talks/types';
 
+import { useSheetRoute } from '@/app/@sheet/_hooks/use-sheet-route';
 import { EditClipSheet } from '@/features/clips/components';
-import { useSheetRoute } from '@/lib/sheets/use-sheet-route';
 
 interface EditClipSheetRouteProps {
   clip: Clip;
