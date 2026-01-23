@@ -2,6 +2,7 @@ import type { ClipId } from '@/features/clips/types';
 
 import { redirect } from 'next/navigation';
 
+import { SheetScrollLock } from '@/app/@sheet/_components/sheet-scroll-lock';
 import { getFormOptions } from '@/app/@sheet/_queries/get-form-options';
 import { getClip } from '@/features/clips/queries';
 import { EditClipSheetRoute } from './_components/edit-clip-sheet-route';
@@ -19,5 +20,10 @@ export default async function Page({ params }: PageProps) {
     redirect('/clips');
   }
 
-  return <EditClipSheetRoute clip={clip} speakers={speakers} talks={talks} />;
+  return (
+    <>
+      <SheetScrollLock />
+      <EditClipSheetRoute clip={clip} speakers={speakers} talks={talks} />
+    </>
+  );
 }
