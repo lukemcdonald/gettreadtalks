@@ -5,22 +5,17 @@ import 'server-only';
 import type { ActionResult } from '@/lib/forms/types';
 import type { TopicId } from '../types';
 
-import { z } from 'zod';
-
 import { api } from '@/convex/_generated/api';
 import { mapConvexErrorToFormErrors, mapZodErrors } from '@/lib/forms/validation';
 import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
-
-const createTopicSchema = z.object({
-  title: z.string().trim().min(1, 'Title is required'),
-});
+import { topicFormSchema } from '../schemas/topic-form';
 
 export async function createTopicAction(
   data: unknown,
 ): Promise<ActionResult<{ topicId: TopicId }>> {
   await requireAdminUser();
 
-  const parsed = createTopicSchema.safeParse(data);
+  const parsed = topicFormSchema.safeParse(data);
 
   if (!parsed.success) {
     return {

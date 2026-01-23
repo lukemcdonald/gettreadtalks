@@ -1,11 +1,11 @@
 'use client';
 
+import type { TopicFormData } from '@/features/topics/schemas/topic-form';
 import type { Topic, TopicId } from '@/features/topics/types';
 
 import { useEffect, useState, useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 
 import {
   Button,
@@ -18,13 +18,8 @@ import {
   TextField,
 } from '@/components/ui';
 import { updateTopicAction } from '@/features/topics/actions';
+import { topicFormSchema } from '@/features/topics/schemas/topic-form';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
-
-const updateTopicSchema = z.object({
-  title: z.string().trim().min(1, 'Title is required'),
-});
-
-type UpdateTopicFormData = z.infer<typeof updateTopicSchema>;
 
 interface EditTopicSheetProps {
   onOpenChange: (open: boolean) => void;
@@ -37,11 +32,11 @@ export function EditTopicSheet({ onOpenChange, onTopicUpdated, open, topic }: Ed
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
-  const form = useForm<UpdateTopicFormData>({
+  const form = useForm<TopicFormData>({
     defaultValues: {
       title: topic?.title ?? '',
     },
-    resolver: zodResolver(updateTopicSchema),
+    resolver: zodResolver(topicFormSchema),
   });
 
   useEffect(() => {

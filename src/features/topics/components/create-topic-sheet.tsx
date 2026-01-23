@@ -1,11 +1,11 @@
 'use client';
 
+import type { TopicFormData } from '@/features/topics/schemas/topic-form';
 import type { Topic, TopicId } from '@/features/topics/types';
 
 import { useEffect, useState, useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 
 import {
   Button,
@@ -18,13 +18,8 @@ import {
   TextField,
 } from '@/components/ui';
 import { createTopicAction } from '@/features/topics/actions';
+import { topicFormSchema } from '@/features/topics/schemas/topic-form';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
-
-const createTopicSchema = z.object({
-  title: z.string().trim().min(1, 'Title is required'),
-});
-
-type CreateTopicFormData = z.infer<typeof createTopicSchema>;
 
 type NewTopic = Pick<Topic, '_id' | 'title' | 'slug'>;
 
@@ -38,11 +33,11 @@ export function CreateTopicSheet({ onOpenChange, onTopicCreated, open }: CreateT
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
-  const form = useForm<CreateTopicFormData>({
+  const form = useForm<TopicFormData>({
     defaultValues: {
       title: '',
     },
-    resolver: zodResolver(createTopicSchema),
+    resolver: zodResolver(topicFormSchema),
   });
 
   useEffect(() => {

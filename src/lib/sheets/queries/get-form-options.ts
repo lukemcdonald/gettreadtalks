@@ -5,6 +5,7 @@ import { fetchQuery } from 'convex/nextjs';
 import { api } from '@/convex/_generated/api';
 import { getAuthToken } from '@/services/auth/server';
 
+// TODO: Why do we have this here? Is this specific to an entity? Will it be used later? Does it belong elsewhere? SHoudl those fetches use getter methods from the entity features?
 export async function getFormOptions() {
   const token = await getAuthToken();
 
