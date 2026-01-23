@@ -1,7 +1,6 @@
 export {
   getClipForEdit,
   getCollectionForEdit,
-  getEntityForEdit,
   getSpeakerForEdit,
   getTalkForEdit,
   getTopicForEdit,
