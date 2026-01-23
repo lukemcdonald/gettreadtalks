@@ -121,11 +121,15 @@ src/features/{domain}/
 
 1. **Shared** - `src/components/` - Used across features
 2. **Feature** - `src/features/{domain}/components/` - Feature-specific
-3. **Page** - `src/app/{route}/_components/` - Route-specific
+3. **Route** - `src/app/{route}/_components/` - Route-specific
 
 **UI Primitives:** Files in `src/components/ui/primitives/` are vendor components - never edit directly. Create wrappers in `src/components/ui/`.
 
 **Naming:** kebab-case for all folders and files
+
+### Route-Level Co-location
+
+Route groups can co-locate `_hooks/`, `_queries/`, and `_components/` for code shared across pages within that group but not specific to a feature domain. Feature-specific code stays in `src/features/{domain}/`.
 
 ### Authentication
 

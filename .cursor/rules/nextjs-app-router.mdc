@@ -244,9 +244,9 @@ export default function ItemsPage() {
 }
 ```
 
-### 2. Co-locate Page-Specific Components
+### 2. Co-locate Route-Specific Code
 
-Use `_components/` or `_lib/` prefix - Next.js ignores folders starting with `_`.
+Use `_` prefix for private directories — Next.js ignores folders starting with `_`.
 
 ```sh
 app/
@@ -258,6 +258,21 @@ app/
    └─ [id]/
       └─ page.tsx
 ```
+
+For route groups with shared concerns across multiple pages, use `_hooks/` and `_queries/` at the group level:
+
+```sh
+app/
+└─ @panel/
+   ├─ _components/          # Shared components for this route group
+   ├─ _hooks/               # Client hooks scoped to this group
+   ├─ _queries/             # Server queries scoped to this group
+   └─ (.)items/edit/[id]/
+      ├─ page.tsx
+      └─ _components/       # Page-specific components
+```
+
+Feature-specific code belongs in `src/features/{domain}/`. Route-level directories are for cross-feature concerns scoped to a route group (e.g., aggregating multiple entities for dropdowns, navigation hooks specific to a UI pattern).
 
 ### 3. Use Metadata API
 
