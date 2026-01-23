@@ -2,8 +2,8 @@ import type { ClipId } from '@/features/clips/types';
 
 import { redirect } from 'next/navigation';
 
+import { getFormOptions } from '@/app/@sheet/_queries/get-form-options';
 import { getClip } from '@/features/clips/queries';
-import { getFormOptions } from '@/lib/sheets/queries';
 import { EditClipSheetRoute } from './_components/edit-clip-sheet-route';
 
 interface PageProps {
