@@ -15,8 +15,6 @@ const createTopicSchema = z.object({
   title: z.string().trim().min(1, 'Title is required'),
 });
 
-type CreateTopicData = z.infer<typeof createTopicSchema>;
-
 export async function createTopicAction(
   data: unknown,
 ): Promise<ActionResult<{ topicId: TopicId }>> {

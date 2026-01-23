@@ -1,11 +1,13 @@
 'use client';
 
+import type { Topic } from '@/features/topics/types';
+
 import { FauxLink } from '@/components/faux-link';
 import { Card, CardDescription, CardTitle } from '@/components/ui';
 
 interface TopicCardProps {
   talkCount: number;
-  topic: { slug: string; title: string };
+  topic: Pick<Topic, 'slug' | 'title'>;
 }
 
 export function TopicCard({ talkCount, topic }: TopicCardProps) {

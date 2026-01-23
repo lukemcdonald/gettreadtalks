@@ -13,10 +13,10 @@ import { FavoriteTalkButton } from '@/features/users/components';
 import { isAdmin } from '@/services/auth/utils';
 
 interface TalkSidebarProps {
-  talk: Talk;
-  speaker?: Speaker | null;
-  collection?: Collection | null;
   clips?: Clip[];
+  collection?: Collection | null;
+  speaker?: Speaker | null;
+  talk: Talk;
   topics?: Topic[];
   user: User;
 }

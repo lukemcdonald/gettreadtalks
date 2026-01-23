@@ -6,14 +6,14 @@ import { getFormOptions, getTalkForEdit } from '@/lib/sheets/queries';
 import { EditTalkSheetRoute } from './_components/edit-talk-sheet-route';
 
 interface PageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: TalkId }>;
 }
 
 export default async function Page({ params }: PageProps) {
   const { id } = await params;
 
   const [talk, { speakers, collections }] = await Promise.all([
-    getTalkForEdit(id as TalkId),
+    getTalkForEdit(id),
     getFormOptions(),
   ]);
 

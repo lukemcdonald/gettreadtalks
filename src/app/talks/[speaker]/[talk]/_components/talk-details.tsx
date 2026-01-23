@@ -1,12 +1,7 @@
+import type { Talk } from '@/features/talks/types';
+
 interface TalkDetailsProps {
-  talk: {
-    status: string;
-    publishedAt?: number;
-    featured?: boolean;
-    description?: string;
-    scripture?: string;
-    mediaUrl?: string;
-  };
+  talk: Talk;
 }
 
 export function TalkDetails({ talk }: TalkDetailsProps) {

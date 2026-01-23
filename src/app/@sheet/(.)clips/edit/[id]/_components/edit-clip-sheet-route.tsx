@@ -7,10 +7,8 @@ import type { TalkListItem } from '@/features/talks/types';
 import { EditClipSheet } from '@/features/clips/components';
 import { useSheetRoute } from '@/lib/sheets/use-sheet-route';
 
-type ClipData = Omit<Clip, '_creationTime' | 'createdAt' | 'updatedAt' | 'slug' | 'publishedAt'>;
-
 interface EditClipSheetRouteProps {
-  clip: ClipData;
+  clip: Clip;
   speakers: SpeakerListItem[];
   talks: TalkListItem[];
 }
