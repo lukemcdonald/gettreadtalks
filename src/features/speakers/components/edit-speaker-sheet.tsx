@@ -1,15 +1,17 @@
 'use client';
 
-import type { Speaker, SpeakerId } from '@/features/speakers/types';
+import type { SpeakerRole } from '@/convex/model/speakers/validators';
+import type { UpdateSpeakerFormData } from '@/features/speakers/schemas/speaker-form';
+import type { SpeakerId } from '@/features/speakers/types';
 
 import { useEffect, useState, useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 
 import {
   Button,
   FeaturedField,
+  SelectField,
   Sheet,
   SheetFooter,
   SheetHeader,
@@ -20,21 +22,15 @@ import {
   TextareaField,
   UrlField,
 } from '@/components/ui';
+import { speakerRoles } from '@/convex/model/speakers/validators';
 import { updateSpeakerAction } from '@/features/speakers/actions';
+import { updateSpeakerSchema } from '@/features/speakers/schemas/speaker-form';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
 
-const updateSpeakerSchema = z.object({
-  description: z.string().optional(),
-  featured: z.boolean().optional(),
-  firstName: z.string().trim().min(1, 'First name is required'),
-  imageUrl: z.string().url('Must be a valid URL').optional().or(z.literal('')),
-  lastName: z.string().trim().min(1, 'Last name is required'),
-  ministry: z.string().optional(),
-  role: z.string().optional(),
-  websiteUrl: z.string().url('Must be a valid URL').optional().or(z.literal('')),
-});
-
-type UpdateSpeakerFormData = z.infer<typeof updateSpeakerSchema>;
+const roleOptions = [
+  { label: 'Select a role', value: '' },
+  ...speakerRoles.map((role) => ({ label: role, value: role })),
+];
 
 interface SpeakerData {
   _id: SpeakerId;
@@ -44,7 +40,7 @@ interface SpeakerData {
   imageUrl?: string;
   lastName: string;
   ministry?: string;
-  role?: string;
+  role?: SpeakerRole;
   websiteUrl?: string;
 }
 
@@ -152,13 +148,7 @@ export function EditSpeakerSheet({
                 />
               </div>
 
-              <TextField
-                control={form.control}
-                description="e.g., Pastor, Author, Evangelist"
-                label="Role"
-                name="role"
-                placeholder="Pastor"
-              />
+              <SelectField control={form.control} label="Role" name="role" options={roleOptions} />
 
               <TextField
                 control={form.control}

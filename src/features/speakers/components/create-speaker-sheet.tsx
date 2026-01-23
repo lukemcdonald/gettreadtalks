@@ -1,14 +1,15 @@
 'use client';
 
+import type { CreateSpeakerFormData } from '@/features/speakers/schemas/speaker-form';
 import type { Speaker, SpeakerId } from '@/features/speakers/types';
 
 import { useEffect, useState, useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 
 import {
   Button,
+  SelectField,
   Sheet,
   SheetFooter,
   SheetHeader,
@@ -19,20 +20,15 @@ import {
   TextareaField,
   UrlField,
 } from '@/components/ui';
+import { speakerRoles } from '@/convex/model/speakers/validators';
 import { createSpeakerAction } from '@/features/speakers/actions';
+import { createSpeakerSchema } from '@/features/speakers/schemas/speaker-form';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
 
-const createSpeakerSchema = z.object({
-  description: z.string().optional(),
-  firstName: z.string().trim().min(1, 'First name is required'),
-  imageUrl: z.string().url('Must be a valid URL').optional().or(z.literal('')),
-  lastName: z.string().trim().min(1, 'Last name is required'),
-  ministry: z.string().optional(),
-  role: z.string().optional(),
-  websiteUrl: z.string().url('Must be a valid URL').optional().or(z.literal('')),
-});
-
-type CreateSpeakerFormData = z.infer<typeof createSpeakerSchema>;
+const roleOptions = [
+  { label: 'Select a role', value: '' },
+  ...speakerRoles.map((role) => ({ label: role, value: role })),
+];
 
 type NewSpeaker = Pick<Speaker, '_id' | 'firstName' | 'lastName' | 'imageUrl' | 'role'>;
 
@@ -129,13 +125,7 @@ export function CreateSpeakerSheet({
                 />
               </div>
 
-              <TextField
-                control={form.control}
-                description="e.g., Pastor, Author, Evangelist"
-                label="Role"
-                name="role"
-                placeholder="Pastor"
-              />
+              <SelectField control={form.control} label="Role" name="role" options={roleOptions} />
 
               <TextField
                 control={form.control}

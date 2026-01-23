@@ -3,6 +3,7 @@
 import { fetchQuery } from 'convex/nextjs';
 
 import { api } from '@/convex/_generated/api';
+import { speakerRoles } from '@/convex/model/speakers/validators';
 import { getAuthToken } from '@/services/auth/server';
 
 type SortOption = 'alphabetical' | 'featured';
@@ -33,11 +34,13 @@ export async function getSpeakers(args?: GetSpeakersProps) {
     numItems: limit ?? 1000,
   };
 
+  const validRole = speakerRoles.find((r) => r === role);
+
   const result = await fetchQuery(
     api.speakers.listSpeakers,
     {
       paginationOpts,
-      role: role || undefined,
+      role: validRole,
       search: search || undefined,
       sort: sortOption,
     },

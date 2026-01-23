@@ -2,6 +2,7 @@ import { defineTable } from 'convex/server';
 import { v } from 'convex/values';
 
 import { timestampFields } from '../../lib/validators';
+import { speakerRoleType } from './validators';
 
 export const speakerFields = {
   ...timestampFields,
@@ -11,7 +12,7 @@ export const speakerFields = {
   imageUrl: v.optional(v.string()),
   lastName: v.string(),
   ministry: v.optional(v.string()),
-  role: v.optional(v.string()),
+  role: v.optional(speakerRoleType),
   slug: v.string(),
   websiteUrl: v.optional(v.string()),
 };

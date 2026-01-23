@@ -1,3 +1,4 @@
+import type { SpeakerRole } from '@/convex/model/speakers/validators';
 import type { Speaker } from '@/features/speakers/types';
 
 import { PageHeader } from '@/components/page-header';
@@ -11,9 +12,8 @@ interface SpeakersSidebarProps {
 }
 
 export function SpeakersSidebar({ speakers }: SpeakersSidebarProps) {
-  // Get unique roles for filter: (r): r is string => !!r)
   const roles = Array.from(
-    new Set(speakers.map(({ role }) => role).filter((role): role is string => !!role)),
+    new Set(speakers.map(({ role }) => role).filter((role): role is SpeakerRole => !!role)),
   ).sort();
 
   return (

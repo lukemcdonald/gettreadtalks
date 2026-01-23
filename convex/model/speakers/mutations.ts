@@ -7,6 +7,7 @@ import { mutation } from '../../_generated/server';
 import { throwDuplicateSlug, throwValidationError } from '../../lib/errors';
 import { deleteAll, getOrThrow, slugExists, slugify } from '../../lib/utils';
 import { requireAuth } from '../auth/utils';
+import { speakerRoleType } from './validators';
 
 /**
  * Create a new speaker.
@@ -18,7 +19,7 @@ export const createSpeaker = mutation({
     imageUrl: v.optional(v.string()),
     lastName: v.string(),
     ministry: v.optional(v.string()),
-    role: v.optional(v.string()),
+    role: v.optional(speakerRoleType),
     websiteUrl: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
@@ -102,7 +103,7 @@ export const updateSpeaker = mutation({
     imageUrl: v.optional(v.string()),
     lastName: v.optional(v.string()),
     ministry: v.optional(v.string()),
-    role: v.optional(v.string()),
+    role: v.optional(speakerRoleType),
     speakerId: v.id('speakers'),
     websiteUrl: v.optional(v.string()),
   },

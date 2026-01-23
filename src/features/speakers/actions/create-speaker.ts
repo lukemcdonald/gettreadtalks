@@ -5,27 +5,10 @@ import 'server-only';
 import type { ActionResult } from '@/lib/forms/types';
 import type { SpeakerId } from '../types';
 
-import { z } from 'zod';
-
 import { api } from '@/convex/_generated/api';
 import { mapConvexErrorToFormErrors, mapZodErrors } from '@/lib/forms/validation';
 import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
-
-/**
- * Zod schema for creating a speaker.
- * Used for form validation in Server Actions.
- */
-const createSpeakerSchema = z.object({
-  description: z.string().optional(),
-  firstName: z.string().trim().min(1, 'First name is required'),
-  imageUrl: z.string().url().optional().or(z.literal('')),
-  lastName: z.string().trim().min(1, 'Last name is required'),
-  ministry: z.string().optional(),
-  role: z.string().optional(),
-  websiteUrl: z.string().url().optional().or(z.literal('')),
-});
-
-type CreateSpeakerData = z.infer<typeof createSpeakerSchema>;
+import { createSpeakerSchema } from '../schemas/speaker-form';
 
 /**
  * Creates a new speaker. Validates data on server and requires admin authorization.
@@ -46,7 +29,10 @@ export async function createSpeakerAction(
   }
 
   try {
-    const speakerId = await fetchAuthMutation(api.speakers.createSpeaker, parsed.data);
+    const speakerId = await fetchAuthMutation(api.speakers.createSpeaker, {
+      ...parsed.data,
+      role: parsed.data.role || undefined,
+    });
 
     return {
       success: true,

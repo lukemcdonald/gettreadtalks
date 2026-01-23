@@ -1,5 +1,6 @@
 import type { Id } from '../_generated/dataModel';
 import type { MutationCtx } from '../_generated/server';
+import type { SpeakerRole } from '../model/speakers/validators';
 import type { IdMapping } from './idMap';
 
 import { generateSlug } from './utils';
@@ -48,7 +49,7 @@ export async function importSpeakers(
       imageUrl: `/images/speakers/${slug}.jpg`,
       lastName: fields.lastName,
       ministry: fields.ministry,
-      role: fields.role,
+      role: fields.role as SpeakerRole | undefined,
       slug,
       websiteUrl: fields.website,
     });
