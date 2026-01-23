@@ -2,7 +2,6 @@ import type { CollectionId } from '@/features/collections/types';
 
 import { redirect } from 'next/navigation';
 
-import { SheetScrollLock } from '@/app/@sheet/_components/sheet-scroll-lock';
 import { getCollection } from '@/features/collections/queries';
 import { EditCollectionSheetRoute } from './_components/edit-collection-sheet-route';
 
@@ -18,10 +17,5 @@ export default async function Page({ params }: PageProps) {
     redirect('/collections');
   }
 
-  return (
-    <>
-      <SheetScrollLock />
-      <EditCollectionSheetRoute collection={collection} />
-    </>
-  );
+  return <EditCollectionSheetRoute collection={collection} />;
 }

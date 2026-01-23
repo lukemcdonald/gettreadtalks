@@ -2,7 +2,6 @@ import type { SpeakerId } from '@/features/speakers/types';
 
 import { redirect } from 'next/navigation';
 
-import { SheetScrollLock } from '@/app/@sheet/_components/sheet-scroll-lock';
 import { getSpeaker } from '@/features/speakers/queries';
 import { EditSpeakerSheetRoute } from './_components/edit-speaker-sheet-route';
 
@@ -18,10 +17,5 @@ export default async function Page({ params }: PageProps) {
     redirect('/speakers');
   }
 
-  return (
-    <>
-      <SheetScrollLock />
-      <EditSpeakerSheetRoute speaker={speaker} />
-    </>
-  );
+  return <EditSpeakerSheetRoute speaker={speaker} />;
 }
