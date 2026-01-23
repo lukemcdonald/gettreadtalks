@@ -2,7 +2,7 @@ import type { CollectionId } from '@/features/collections/types';
 
 import { redirect } from 'next/navigation';
 
-import { getCollectionForEdit } from '@/lib/sheets/queries';
+import { getCollection } from '@/features/collections/queries';
 import { EditCollectionSheetRoute } from './_components/edit-collection-sheet-route';
 
 interface PageProps {
@@ -11,7 +11,7 @@ interface PageProps {
 
 export default async function Page({ params }: PageProps) {
   const { id } = await params;
-  const collection = await getCollectionForEdit(id);
+  const collection = await getCollection(id);
 
   if (!collection) {
     redirect('/collections');
