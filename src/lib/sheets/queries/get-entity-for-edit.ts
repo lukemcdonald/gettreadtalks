@@ -11,6 +11,8 @@ import { fetchQuery } from 'convex/nextjs';
 import { api } from '@/convex/_generated/api';
 import { getAuthToken } from '@/services/auth/server';
 
+// TODO: Are these functions needed here? Should they be in each entities features? Do we need the "ForEdit" suffix? Should it be getEntityById?
+
 export async function getTalkForEdit(id: TalkId) {
   const token = await getAuthToken();
   return fetchQuery(api.talks.getTalk, { id }, { token });
