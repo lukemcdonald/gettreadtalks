@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui';
-import { FILTER_ALL_VALUE } from '@/constants/ui';
+import { FILTER_ALL } from '@/constants/ui';
 import { cn } from '@/utils';
 
 interface FilterOption {
@@ -48,7 +48,7 @@ export function SelectFilter({
   const searchParamValue = searchParams.get(name);
 
   // Only show "All" option if placeholder is provided
-  const allOption = placeholder ? { label: placeholder, value: FILTER_ALL_VALUE } : null;
+  const allOption = placeholder ? { label: placeholder, value: FILTER_ALL } : null;
   const allOptions = allOption ? [allOption, ...options] : options;
 
   function getInitialValue(): string | null {
@@ -57,7 +57,7 @@ export function SelectFilter({
     }
 
     if (allOption) {
-      return FILTER_ALL_VALUE;
+      return FILTER_ALL;
     }
 
     return defaultValue ?? null;
@@ -68,7 +68,7 @@ export function SelectFilter({
   const handleChange = (newValue: string | null) => {
     const params = new URLSearchParams(searchParams.toString());
 
-    if (newValue && newValue !== FILTER_ALL_VALUE) {
+    if (newValue && newValue !== FILTER_ALL) {
       params.set(name, newValue);
     } else {
       params.delete(name);

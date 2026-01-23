@@ -18,7 +18,7 @@ export default async function CollectionsPage({ searchParams }: CollectionsPageP
   const params = await searchParams;
   const { search, sort = 'alphabetical', speakerSlug } = params;
 
-  const hasActiveFilters = !!(search || (speakerSlug && speakerSlug !== 'all'));
+  const hasActiveFilters = !!(search || speakerSlug);
 
   const { collections: allCollections } = await getCollections();
 
@@ -34,7 +34,7 @@ export default async function CollectionsPage({ searchParams }: CollectionsPageP
     );
   }
 
-  if (speakerSlug && speakerSlug !== 'all') {
+  if (speakerSlug) {
     filtered = filtered.filter((item) => item.speakers.some((s) => s.slug === speakerSlug));
   }
 
