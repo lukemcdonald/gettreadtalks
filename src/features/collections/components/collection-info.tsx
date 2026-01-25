@@ -1,8 +1,7 @@
+import type { Collection } from '@/features/collections/types';
+
 interface CollectionInfoProps {
-  collection: {
-    title: string;
-    description?: string;
-  };
+  collection: Pick<Collection, 'title' | 'description'>;
 }
 
 export function CollectionInfo({ collection }: CollectionInfoProps) {

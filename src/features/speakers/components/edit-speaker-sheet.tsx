@@ -1,8 +1,7 @@
 'use client';
 
-import type { SpeakerRole } from '@/convex/model/speakers/validators';
 import type { UpdateSpeakerFormData } from '@/features/speakers/schemas/speaker-form';
-import type { SpeakerId } from '@/features/speakers/types';
+import type { Speaker, SpeakerId } from '@/features/speakers/types';
 
 import { useEffect, useState, useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -32,23 +31,11 @@ const roleOptions = [
   ...speakerRoles.map((role) => ({ label: role, value: role })),
 ];
 
-interface SpeakerData {
-  _id: SpeakerId;
-  description?: string;
-  featured?: boolean;
-  firstName: string;
-  imageUrl?: string;
-  lastName: string;
-  ministry?: string;
-  role?: SpeakerRole;
-  websiteUrl?: string;
-}
-
 interface EditSpeakerSheetProps {
   onOpenChange: (open: boolean) => void;
   onSpeakerUpdated: (speakerId: SpeakerId) => void;
   open: boolean;
-  speaker: SpeakerData | null;
+  speaker: Speaker | null;
 }
 
 export function EditSpeakerSheet({

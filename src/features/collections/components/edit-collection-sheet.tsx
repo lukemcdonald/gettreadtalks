@@ -22,23 +22,17 @@ import {
 import { updateCollectionAction } from '@/features/collections/actions';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
 
+// TODO: Move to schema.ts file to be shared.
 const updateCollectionSchema = z.object({
   description: z.string().optional(),
   title: z.string().trim().min(1, 'Title is required'),
   url: z.string().url('Must be a valid URL').optional().or(z.literal('')),
 });
-
+// TODO: move to types.ts file to be shared.
 type UpdateCollectionFormData = z.infer<typeof updateCollectionSchema>;
 
-interface CollectionData {
-  _id: CollectionId;
-  description?: string;
-  title: string;
-  url?: string;
-}
-
 interface EditCollectionSheetProps {
-  collection: CollectionData | null;
+  collection: Collection | null;
   onCollectionUpdated: (collectionId: CollectionId) => void;
   onOpenChange: (open: boolean) => void;
   open: boolean;

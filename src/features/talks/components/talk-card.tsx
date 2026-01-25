@@ -11,18 +11,11 @@ import { getSpeakerName } from '@/features/speakers';
 import { SpeakerAvatar } from '@/features/speakers/components';
 import { getTalkUrl } from '@/features/talks/utils';
 
-interface TalkCardSpeaker {
-  firstName: Speaker['firstName'];
-  imageUrl?: Speaker['imageUrl'];
-  lastName: Speaker['lastName'];
-  slug?: Speaker['slug'];
-}
-
 interface TalkCardProps {
   featured?: boolean;
   favorited?: boolean;
   finished?: boolean;
-  speaker?: TalkCardSpeaker;
+  speaker?: Pick<Speaker, 'firstName' | 'lastName' | 'imageUrl' | 'slug'>;
   talk: Pick<Talk, 'description' | 'slug' | 'title'>;
 }
 

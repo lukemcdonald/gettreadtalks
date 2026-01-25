@@ -1,9 +1,9 @@
 'use client';
 
-import type { CollectionId, CollectionListItem } from '@/features/collections/types';
+import type { CollectionListItem } from '@/features/collections/types';
 import type { SpeakerId, SpeakerListItem } from '@/features/speakers/types';
 import type { TalkFormData } from '@/features/talks/schemas/talk-form';
-import type { TalkId, TalkStatus } from '@/features/talks/types';
+import type { Talk, TalkId, TalkStatus } from '@/features/talks/types';
 
 import { useEffect, useState, useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -24,26 +24,13 @@ import { TalkFormFields } from '@/features/talks/components/talk-form-fields';
 import { talkFormSchema } from '@/features/talks/schemas/talk-form';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
 
-interface TalkData {
-  _id: TalkId;
-  collectionId?: CollectionId;
-  collectionOrder?: number;
-  description?: string;
-  featured?: boolean;
-  mediaUrl: string;
-  scripture?: string;
-  speakerId: SpeakerId;
-  status?: TalkStatus;
-  title: string;
-}
-
 interface EditTalkSheetProps {
   collections: CollectionListItem[];
   onOpenChange: (open: boolean) => void;
   onTalkUpdated: (talkId: TalkId) => void;
   open: boolean;
   speakers: SpeakerListItem[];
-  talk: TalkData | null;
+  talk: Talk;
 }
 
 export function EditTalkSheet({
