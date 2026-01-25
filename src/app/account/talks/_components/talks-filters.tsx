@@ -1,7 +1,7 @@
 'use client';
 
-import { SearchInput } from '@/components/search-input';
-import { SelectFilter } from '@/components/select-filter';
+import { SearchInput } from '@/components/ui/search-input';
+import { SelectFilter } from '@/components/ui/select-filter';
 
 export function TalksFilters() {
   return (

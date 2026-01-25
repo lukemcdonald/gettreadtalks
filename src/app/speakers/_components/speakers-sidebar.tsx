@@ -2,10 +2,10 @@ import type { SpeakerRole } from '@/convex/model/speakers/validators';
 import type { Speaker } from '@/features/speakers/types';
 
 import { PageHeader } from '@/components/page-header';
-import { SearchInput } from '@/components/search-input';
-import { SelectFilter } from '@/components/select-filter';
 import { SidebarContent } from '@/components/sidebar-content';
-import { SortSelect } from '@/components/sort-select';
+import { SearchInput } from '@/components/ui/search-input';
+import { SelectFilter } from '@/components/ui/select-filter';
+import { SortSelect } from '@/components/ui/sort-select';
 
 interface SpeakersSidebarProps {
   speakers: Speaker[];

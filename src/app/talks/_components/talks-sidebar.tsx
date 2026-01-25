@@ -1,10 +1,10 @@
 import type { Speaker } from '@/features/speakers/types';
 import type { Topic } from '@/features/topics/types';
 
-import { ComboboxMultiFilter } from '@/components/combobox-multi-filter';
-import { SearchInput } from '@/components/search-input';
 import { SidebarContent } from '@/components/sidebar-content';
-import { SortSelect } from '@/components/sort-select';
+import { ComboboxMultiFilter } from '@/components/ui/combobox-multi-filter';
+import { SearchInput } from '@/components/ui/search-input';
+import { SortSelect } from '@/components/ui/sort-select';
 import { getSpeakerName } from '@/features/speakers';
 
 interface TopicWithCount {

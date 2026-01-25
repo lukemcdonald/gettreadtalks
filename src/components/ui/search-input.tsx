@@ -1,8 +1,8 @@
 'use client';
 
 import { Input, Label } from '@/components/ui';
+import { useDebouncedSearchParam } from '@/hooks/use-debounced-search-param';
 import { cn } from '@/utils';
-import { useDebouncedSearchParam } from './use-debounced-search-param';
 
 interface SearchInputProps {
   className?: string;

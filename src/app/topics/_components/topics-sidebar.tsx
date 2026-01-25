@@ -1,6 +1,6 @@
-import { SearchInput } from '@/components/search-input';
 import { SidebarContent } from '@/components/sidebar-content';
-import { SortSelect } from '@/components/sort-select';
+import { SearchInput } from '@/components/ui/search-input';
+import { SortSelect } from '@/components/ui/sort-select';
 
 export function TopicsSidebar() {
   return (
