@@ -12,7 +12,7 @@ interface NavLinkProps {
   isActive: boolean;
 }
 
-export function NavLink({ href, isActive, children }: NavLinkProps) {
+export function NavLink({ children, href, isActive }: NavLinkProps) {
   const classes = {
     default: 'text-foreground dark:text-muted-foreground',
     active: 'text-primary dark:text-primary-foreground',

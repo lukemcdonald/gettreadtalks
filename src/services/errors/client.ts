@@ -51,6 +51,7 @@ export function captureException(
 
     // Set custom fingerprint for error grouping
     if (fingerprint) {
+      // TODO: Filter out falsy values from fingerprint.
       scope.setFingerprint(fingerprint);
       // Also add as extra for visibility in Sentry UI
       scope.setExtra('fingerprint', fingerprint.join('|'));

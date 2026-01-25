@@ -4,12 +4,12 @@ import { Container, Section } from '@/components/ui';
 import { cn } from '@/utils';
 
 interface SidebarsLayoutProps {
+  className?: string;
   content: ReactNode;
   header?: ReactNode;
   leftSidebar: ReactNode;
-  rightSidebar?: ReactNode;
-  className?: string;
   leftSidebarSticky?: boolean;
+  rightSidebar?: ReactNode;
   rightSidebarSticky?: boolean;
   spacing?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 }

@@ -2,13 +2,6 @@ import { cva } from 'class-variance-authority';
 
 import { cn } from '@/utils';
 
-interface PageHeaderProps {
-  className?: string;
-  description?: string;
-  variant?: 'sm' | 'md' | 'lg';
-  title: string;
-}
-
 const titleVariants = cva('text-balance tracking-tight', {
   variants: {
     variant: {
@@ -31,6 +24,13 @@ const descriptionVariants = cva('text-muted-foreground', {
     },
   },
 });
+
+interface PageHeaderProps {
+  className?: string;
+  description?: string;
+  variant?: 'sm' | 'md' | 'lg';
+  title: string;
+}
 
 export function PageHeader({ className, description, title, variant = 'md' }: PageHeaderProps) {
   return (

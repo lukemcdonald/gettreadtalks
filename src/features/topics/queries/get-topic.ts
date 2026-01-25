@@ -9,5 +9,6 @@ import { getAuthToken } from '@/services/auth/server';
 
 export async function getTopic(id: TopicId) {
   const token = await getAuthToken();
+
   return fetchQuery(api.topics.getTopic, { id }, { token });
 }

@@ -11,13 +11,12 @@ import { api } from '@/convex/_generated/api';
 import { mapConvexErrorToFormErrors, mapZodErrors } from '@/lib/forms/validation';
 import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
 
+// TODO: Move to schems file?
 const createCollectionSchema = z.object({
   description: z.string().optional(),
   title: z.string().trim().min(1, 'Title is required'),
   url: z.string().url('Must be a valid URL').optional().or(z.literal('')),
 });
-
-type CreateCollectionData = z.infer<typeof createCollectionSchema>;
 
 export async function createCollectionAction(
   data: unknown,

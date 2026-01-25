@@ -14,16 +14,24 @@ interface GetSpeakersGroupedProps {
  */
 export async function getSpeakersGrouped(args?: GetSpeakersGroupedProps) {
   const { limit, role, search, sort } = args ?? {};
-  const { speakers } = await getSpeakers({ limit, role, search, sort });
+
+  const { speakers } = await getSpeakers({
+    limit,
+    role,
+    search,
+    sort,
+  });
 
   // Group speakers by first letter of last name
   const grouped = new Map<string, typeof speakers>();
 
   for (const speaker of speakers) {
     const firstLetter = speaker.lastName[0]?.toUpperCase() || 'Other';
+
     if (!grouped.has(firstLetter)) {
       grouped.set(firstLetter, []);
     }
+
     grouped.get(firstLetter)?.push(speaker);
   }
 

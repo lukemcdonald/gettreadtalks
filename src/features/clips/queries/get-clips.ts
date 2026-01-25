@@ -32,13 +32,15 @@ export async function getClips(args?: GetClipsProps) {
     ? (sort as SortOption)
     : 'recent';
 
+  const paginationOpts = {
+    cursor: cursor || null,
+    numItems: limit,
+  };
+
   const result = await fetchQuery(
     api.clips.listClips,
     {
-      paginationOpts: {
-        cursor: cursor || null,
-        numItems: limit,
-      },
+      paginationOpts,
       search: search || undefined,
       sort: sortOption,
       speakerSlugs: speakerSlugs?.length ? speakerSlugs : undefined,

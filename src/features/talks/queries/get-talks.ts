@@ -32,14 +32,16 @@ export async function getTalks(args?: GetTalksProps) {
     ? (sort as SortOption)
     : 'recent';
 
+  const paginationOpts = {
+    cursor: cursor || null,
+    numItems: limit,
+  };
+
   const result = await fetchQuery(
     api.talks.listTalks,
     {
       featured: featured || undefined,
-      paginationOpts: {
-        cursor: cursor || null,
-        numItems: limit,
-      },
+      paginationOpts,
       search: search || undefined,
       sort: sortOption,
       speakerSlugs: speakerSlugs?.length ? speakerSlugs : undefined,

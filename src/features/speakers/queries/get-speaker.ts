@@ -9,5 +9,6 @@ import { getAuthToken } from '@/services/auth/server';
 
 export async function getSpeaker(id: SpeakerId) {
   const token = await getAuthToken();
+
   return fetchQuery(api.speakers.getSpeaker, { speakerId: id }, { token });
 }

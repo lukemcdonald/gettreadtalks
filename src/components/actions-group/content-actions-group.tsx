@@ -22,16 +22,16 @@ import { capitalize } from '@/utils';
 import { ActionsGroup } from './actions-group';
 
 export function ContentActionsGroup({
+  additionalActions = [],
   content,
   contentType,
   disabled,
   editUrl,
-  viewUrl,
   listUrl,
   onArchiveAction,
   onDeleteAction,
-  additionalActions = [],
   primaryAction,
+  viewUrl,
 }: ContentActionsGroupProps) {
   const router = useRouter();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -42,7 +42,10 @@ export function ContentActionsGroup({
   const isLoading = isArchiving || isDeleting;
   const isDisabled = disabled || isLoading;
 
-  const archiveLabel = getArchiveLabel({ isLoading: isArchiving, status: content.status });
+  const archiveLabel = getArchiveLabel({
+    isLoading: isArchiving,
+    status: content.status,
+  });
 
   const handleArchive = async () => {
     if (!onArchiveAction) {

@@ -4,19 +4,19 @@ import { Container, Section } from '@/components/ui';
 import { cn } from '@/utils';
 
 interface SidebarLayoutProps {
+  className?: string;
   content: ReactNode;
   header?: ReactNode;
   sidebar: ReactNode;
-  className?: string;
   sidebarSticky?: boolean;
   spacing?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 }
 
 export function SidebarLayout({
+  className,
   content,
   header,
   sidebar,
-  className,
   sidebarSticky = false,
   spacing = 'xl',
 }: SidebarLayoutProps) {
