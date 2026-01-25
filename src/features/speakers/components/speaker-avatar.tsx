@@ -33,17 +33,11 @@ const sizeClasses = cva('shrink-0', {
   },
 });
 
-interface SpeakerAvatarSpeaker {
-  firstName: Speaker['firstName'];
-  imageUrl?: Speaker['imageUrl'];
-  lastName: Speaker['lastName'];
-}
-
 interface SpeakerAvatarProps {
   className?: string;
   rounded?: 'sm' | 'md' | 'lg' | 'full';
   size?: 'sm' | 'md' | 'lg';
-  speaker: SpeakerAvatarSpeaker;
+  speaker: Pick<Speaker, 'firstName' | 'lastName' | 'imageUrl'>;
 }
 
 export function SpeakerAvatar({ className, rounded, size, speaker }: SpeakerAvatarProps) {

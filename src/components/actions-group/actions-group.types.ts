@@ -1,8 +1,9 @@
 import type { ReactNode } from 'react';
+import type { StatusType } from '@/convex/lib/types';
 import type { ClipId } from '@/features/clips/types';
 import type { CollectionId } from '@/features/collections/types';
 import type { SpeakerId } from '@/features/speakers/types';
-import type { TalkId, TalkStatus } from '@/features/talks/types';
+import type { TalkId } from '@/features/talks/types';
 import type { TopicId } from '@/features/topics/types';
 
 export interface ActionsGroupMenuItem {
@@ -40,7 +41,7 @@ export interface ContentActionsGroupProps {
   additionalActions?: ActionsGroupMenuItem[];
   content: {
     _id: ContentId;
-    status?: TalkStatus;
+    status?: StatusType;
     title?: string;
   };
   contentType: ContentType;

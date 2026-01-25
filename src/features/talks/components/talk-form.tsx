@@ -1,8 +1,9 @@
 'use client';
+
 import type { ReactNode } from 'react';
 import type { Collection, CollectionId } from '@/features/collections/types';
 import type { Speaker, SpeakerId } from '@/features/speakers/types';
-import type { TalkId, TalkStatus } from '@/features/talks/types';
+import type { Talk, TalkId, TalkStatus } from '@/features/talks/types';
 
 import { Controller, FormProvider } from 'react-hook-form';
 
@@ -24,17 +25,7 @@ import { useTalkForm } from '@/features/talks/hooks';
 interface TalkFormProps {
   actionsMenu?: (props: { isBusy: boolean }) => ReactNode;
   collections: Pick<Collection, '_id' | 'slug' | 'title'>[];
-  initialData?: {
-    collectionId?: CollectionId;
-    collectionOrder?: number;
-    description?: string;
-    featured?: boolean;
-    mediaUrl: string;
-    scripture?: string;
-    speakerId: SpeakerId;
-    status?: TalkStatus;
-    title: string;
-  };
+  initialData?: Talk;
   mode?: 'create' | 'edit';
   speakerSlug?: string;
   speakers: Pick<Speaker, '_id' | 'firstName' | 'lastName' | 'slug' | 'imageUrl' | 'role'>[];

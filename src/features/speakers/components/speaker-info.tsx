@@ -1,11 +1,7 @@
+import type { Speaker } from '@/features/speakers/types';
+
 interface SpeakerInfoProps {
-  speaker: {
-    firstName: string;
-    lastName: string;
-    description?: string;
-    role?: string;
-    ministry?: string;
-  };
+  speaker: Speaker;
 }
 
 export function SpeakerInfo({ speaker }: SpeakerInfoProps) {
