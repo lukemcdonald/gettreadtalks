@@ -15,6 +15,7 @@ import {
   CardTitle,
 } from '@/components/ui';
 import { getSpeakerInitials, getSpeakerName } from '@/features/speakers';
+import { CollectionCardSpeaker } from '@/features/collections/components/collection-card-speaker';
 
 interface CollectionCardProps {
   collection: Pick<Collection, 'description' | 'slug' | 'title'>;
@@ -45,17 +46,9 @@ export function CollectionCard({ collection, speakers = [], talkCount }: Collect
         <CardContent>
           <div className="flex items-center gap-2">
             <div className="flex -space-x-2">
-              {displaySpeakers.map((speaker) => {
-                const speakerName = getSpeakerName(speaker);
-                const speakerInitials = getSpeakerInitials(speaker);
-
-                return (
-                  <Avatar className="size-8 border-2 border-background" key={speaker.slug}>
-                    {!!speaker.imageUrl && <AvatarImage alt={speakerName} src={speaker.imageUrl} />}
-                    <AvatarFallback className="text-xs">{speakerInitials}</AvatarFallback>
-                  </Avatar>
-                );
-              })}
+              {displaySpeakers.map((speaker) => (
+                <CollectionCardSpeaker key={speaker.slug} speaker={speaker} />
+              ))}
             </div>
             {remainingCount > 0 && (
               <span className="text-muted-foreground text-sm">+{remainingCount} more</span>
