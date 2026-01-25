@@ -74,20 +74,9 @@ export function ErrorBoundary({
 }: ErrorBoundaryProps) {
   const handleError = (error: unknown, info: ErrorInfo) => {
     const err = error instanceof Error ? error : new Error(String(error));
-
-    // Report to Sentry with fingerprinting and capture event ID
-    const eventId = captureException(err, {
-      context: {
-        details: { componentStack: info.componentStack },
-      },
-      fingerprint: ['error', err.name.toLowerCase().replace(ERROR_NAME_SUFFIX_REGEX, '')],
-      tags: { errorName: err.name },
-    });
-
+    const eventId = captureException(err);
     // Store event ID for the fallback component
     (err as ErrorWithEventId).__sentryEventId = eventId;
-
-    // Call custom error handler if provided
     onError?.(err, info);
   };
 
