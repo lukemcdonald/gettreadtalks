@@ -1,20 +1,8 @@
-'use client';
-
 import type { Collection } from '@/features/collections/types';
 import type { Speaker } from '@/features/speakers/types';
 
 import { FauxLink } from '@/components/faux-link';
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui';
-import { getSpeakerInitials, getSpeakerName } from '@/features/speakers';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui';
 import { CollectionCardSpeaker } from '@/features/collections/components/collection-card-speaker';
 
 interface CollectionCardProps {

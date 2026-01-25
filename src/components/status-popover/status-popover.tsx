@@ -14,11 +14,11 @@ import { StatusPopoverDetail } from './status-popover-detail';
 interface StatusPopoverProps {
   createdAt: number;
   publishedAt?: number;
-  updatedAt?: number;
   status?: StatusType;
+  updatedAt?: number;
 }
 
-export function StatusPopover({ createdAt, updatedAt, publishedAt, status }: StatusPopoverProps) {
+export function StatusPopover({ createdAt, publishedAt, status, updatedAt }: StatusPopoverProps) {
   const statusColor = getStatusColor(status);
 
   return (

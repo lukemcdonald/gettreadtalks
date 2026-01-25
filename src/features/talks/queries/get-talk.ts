@@ -9,5 +9,6 @@ import { getAuthToken } from '@/services/auth/server';
 
 export async function getTalk(id: TalkId) {
   const token = await getAuthToken();
+
   return fetchQuery(api.talks.getTalk, { id }, { token });
 }

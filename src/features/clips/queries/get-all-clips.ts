@@ -21,10 +21,15 @@ export async function getAllClips(args?: GetAllClipsProps) {
 
   const token = await getAuthToken();
 
+  const paginationOpts = {
+    cursor: null,
+    numItems: limit ?? 1000,
+  };
+
   const result = await fetchQuery(
     api.clips.listAllClips,
     {
-      paginationOpts: { cursor: null, numItems: limit ?? 1000 },
+      paginationOpts,
       status,
     },
     { token },

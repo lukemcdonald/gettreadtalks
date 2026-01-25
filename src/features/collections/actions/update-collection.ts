@@ -11,6 +11,7 @@ import { api } from '@/convex/_generated/api';
 import { mapConvexErrorToFormErrors, mapZodErrors } from '@/lib/forms/validation';
 import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
 
+// TODO: Move to schema file to be shared?
 const updateCollectionSchema = z.object({
   description: z.string().optional(),
   title: z.string().trim().min(1, 'Title is required'),

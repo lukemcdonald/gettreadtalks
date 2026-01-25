@@ -16,15 +16,18 @@ interface GetTopicBySlugProps {
  */
 export async function getTopicBySlug(args: GetTopicBySlugProps) {
   const { cursor, limit = 50, slug } = args;
+
   const token = await getAuthToken();
+
+  const paginationOpts = {
+    cursor: cursor || null,
+    numItems: limit,
+  };
 
   const result = await fetchQuery(
     api.topics.getTopicBySlug,
     {
-      paginationOpts: {
-        cursor: cursor || null,
-        numItems: limit,
-      },
+      paginationOpts,
       slug,
     },
     { token },

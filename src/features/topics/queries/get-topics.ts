@@ -16,6 +16,7 @@ export async function getTopics(args?: GetTopicsProps) {
   const { limit } = args ?? {};
 
   const token = await getAuthToken();
+
   const topics = await fetchQuery(api.topics.listTopics, { limit: limit ?? 1000 }, { token });
 
   return {

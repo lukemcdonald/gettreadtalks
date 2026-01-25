@@ -21,15 +21,17 @@ interface GetAllTalksProps {
 export async function getAllTalks(args: GetAllTalksProps = {}) {
   const token = await getAuthToken();
 
-  const cursor = args.cursor ?? null;
-  const limit = args.limit ?? 50;
+  const paginationOpts = {
+    cursor: args.cursor ?? null,
+    numItems: args.limit ?? 50,
+  };
   const search = args?.search;
   const status = args.status ?? 'published';
 
   const result = await fetchQuery(
     api.talks.listAllTalks,
     {
-      paginationOpts: { cursor, numItems: limit },
+      paginationOpts,
       search,
       status,
     },

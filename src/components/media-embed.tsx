@@ -14,9 +14,7 @@ const YOUTUBE_PATTERNS = [
 ];
 
 const VIMEO_PATTERNS = [/(?:vimeo\.com\/|player\.vimeo\.com\/video\/)(\d+)/];
-
 const VIDEO_EXTENSION_PATTERN = /\.(mp4|webm|ogg|mov)(\?|$)/i;
-
 const AUDIO_EXTENSION_PATTERN = /\.(mp3|wav|ogg|m4a|aac)(\?|$)/i;
 
 /**

@@ -12,7 +12,7 @@ const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
 invariant(convexUrl, 'NEXT_PUBLIC_CONVEX_URL is not set');
 
 const convex = new ConvexReactClient(convexUrl, {
-  expectAuth: false, // Consider enabling for dashboard pages
+  expectAuth: false, // TODO: Consider enabling for account pages
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {

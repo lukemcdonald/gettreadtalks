@@ -7,24 +7,24 @@ type MaxWidth = 'prose' | 'wide' | 'narrow' | 'full';
 type Spacing = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 interface CenteredLayoutProps {
+  className?: string;
   content: ReactNode;
   header?: ReactNode;
-  className?: string;
   maxWidth?: MaxWidth;
   spacing?: Spacing;
 }
 
 const maxWidthClasses: Record<MaxWidth, string> = {
+  full: 'max-w-full',
+  narrow: 'max-w-md',
   prose: 'max-w-prose',
   wide: 'max-w-4xl',
-  narrow: 'max-w-md',
-  full: 'max-w-full',
 };
 
 export function CenteredLayout({
+  className,
   content,
   header,
-  className,
   maxWidth = 'prose',
   spacing = 'xl',
 }: CenteredLayoutProps) {
