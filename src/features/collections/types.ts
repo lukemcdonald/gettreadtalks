@@ -11,5 +11,5 @@ export type CollectionListItem = Pick<Collection, '_id' | 'slug' | 'title'>;
  * This includes the collection with its talks and speakers.
  */
 export type CollectionData = NonNullable<
-  Awaited<ReturnType<typeof import('./queries').getCollectionBySlug>>
+  Awaited<ReturnType<typeof import('./queries/get-collection-by-slug').getCollectionBySlug>>
 >;

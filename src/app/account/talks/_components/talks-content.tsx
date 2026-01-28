@@ -5,8 +5,8 @@ import { Suspense } from 'react';
 import { TalksFilters } from '@/app/account/talks/_components/talks-filters';
 import { Pagination } from '@/components/pagination';
 import { Skeleton } from '@/components/ui';
-import { TalksTable } from '@/features/talks/components/talks-table';
-import { getAllTalks } from '@/features/talks/queries';
+import { TalksTable } from '@/features/talks/components/talks-table/talks-table';
+import { getAllTalks } from '@/features/talks/queries/get-all-talks';
 
 interface AdminTalksContentProps {
   searchParams: AdminTalksSearchParams;

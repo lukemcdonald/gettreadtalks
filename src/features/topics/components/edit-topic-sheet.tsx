@@ -17,7 +17,7 @@ import {
   SheetTitle,
   TextField,
 } from '@/components/ui';
-import { updateTopicAction } from '@/features/topics/actions';
+import { updateTopicAction } from '@/features/topics/actions/update-topic';
 import { topicFormSchema } from '@/features/topics/schemas/topic-form';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
 

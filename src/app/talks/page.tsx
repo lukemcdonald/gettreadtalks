@@ -2,9 +2,10 @@ import { TalksContent } from '@/app/talks/_components/talks-content';
 import { TalksSidebar } from '@/app/talks/_components/talks-sidebar';
 import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
-import { getSpeakers, sortSpeakersByName } from '@/features/speakers';
-import { getTalks } from '@/features/talks/queries';
-import { getTopicsWithCounts } from '@/features/topics';
+import { getSpeakers } from '@/features/speakers/queries/get-speakers';
+import { sortSpeakersByName } from '@/features/speakers/utils';
+import { getTalks } from '@/features/talks/queries/get-talks';
+import { getTopicsWithCounts } from '@/features/topics/queries/get-topics-with-counts';
 
 export interface TalksPageSearchParams {
   cursor?: string;

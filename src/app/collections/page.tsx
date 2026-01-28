@@ -1,8 +1,8 @@
 import { CollectionsList } from '@/app/collections/_components/collections-list';
 import { CollectionsSidebar } from '@/app/collections/_components/collections-sidebar';
 import { SidebarLayout } from '@/components/layouts';
-import { getCollections } from '@/features/collections';
-import { sortSpeakersByName } from '@/features/speakers';
+import { getCollections } from '@/features/collections/queries/get-collections';
+import { sortSpeakersByName } from '@/features/speakers/utils';
 
 export interface CollectionsPageSearchParams {
   search?: string;

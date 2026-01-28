@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { TalkContent } from '@/app/talks/[speaker]/[talk]/_components/talk-content';
 import { TalkSidebar } from '@/app/talks/[speaker]/[talk]/_components/talk-sidebar';
 import { SidebarLayout } from '@/components/layouts';
-import { getTalkBySlug } from '@/features/talks/queries';
+import { getTalkBySlug } from '@/features/talks/queries/get-talk-by-slug';
 import { getCurrentUser } from '@/services/auth/server';
 
 interface TalkPageProps {

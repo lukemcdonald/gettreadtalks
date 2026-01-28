@@ -2,9 +2,10 @@ import { ClipsContent } from '@/app/clips/_components/clips-content';
 import { ClipsSidebar } from '@/app/clips/_components/clips-sidebar';
 import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
-import { getClips } from '@/features/clips';
-import { getSpeakers, sortSpeakersByName } from '@/features/speakers';
-import { getTopicsWithCounts } from '@/features/topics';
+import { getClips } from '@/features/clips/queries/get-clips';
+import { getSpeakers } from '@/features/speakers/queries/get-speakers';
+import { sortSpeakersByName } from '@/features/speakers/utils';
+import { getTopicsWithCounts } from '@/features/topics/queries/get-topics-with-counts';
 
 export interface ClipsPageSearchParams {
   cursor?: string;

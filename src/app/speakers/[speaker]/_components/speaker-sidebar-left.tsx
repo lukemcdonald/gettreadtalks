@@ -7,7 +7,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { SidebarContent } from '@/components/sidebar-content';
-import { getSpeakerName } from '@/features/speakers';
+import { getSpeakerName } from '@/features/speakers/utils';
 
 interface SpeakerLeftSidebarProps {
   clips: Clip[];

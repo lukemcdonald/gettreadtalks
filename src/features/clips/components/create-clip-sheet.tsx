@@ -31,8 +31,8 @@ import {
   TextareaField,
   UrlField,
 } from '@/components/ui';
-import { createClipAction } from '@/features/clips/actions';
-import { getSpeakerName } from '@/features/speakers';
+import { createClipAction } from '@/features/clips/actions/create-clip';
+import { getSpeakerName } from '@/features/speakers/utils';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
 
 const createClipSchema = z.object({

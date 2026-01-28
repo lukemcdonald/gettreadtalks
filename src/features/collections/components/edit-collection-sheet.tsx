@@ -19,7 +19,7 @@ import {
   TextareaField,
   UrlField,
 } from '@/components/ui';
-import { updateCollectionAction } from '@/features/collections/actions';
+import { updateCollectionAction } from '@/features/collections/actions/update-collection';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
 
 // TODO: Move to schema.ts file to be shared.

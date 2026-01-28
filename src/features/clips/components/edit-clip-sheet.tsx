@@ -32,8 +32,8 @@ import {
   TextareaField,
   UrlField,
 } from '@/components/ui';
-import { updateClipAction } from '@/features/clips/actions';
-import { getSpeakerName } from '@/features/speakers';
+import { updateClipAction } from '@/features/clips/actions/update-clip';
+import { getSpeakerName } from '@/features/speakers/utils';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
 
 const updateClipSchema = z.object({

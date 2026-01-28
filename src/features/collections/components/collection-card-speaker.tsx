@@ -3,7 +3,7 @@
 import type { Speaker } from '@/features/speakers/types';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui';
-import { getSpeakerInitials, getSpeakerName } from '@/features/speakers';
+import { getSpeakerInitials, getSpeakerName } from '@/features/speakers/utils';
 
 interface CollectionCardSpeakerProps {
   speaker: Pick<Speaker, 'firstName' | 'lastName' | 'imageUrl' | 'slug'>;

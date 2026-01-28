@@ -18,7 +18,7 @@ import { usePathname } from 'next/navigation';
 import { AccountMenuItem } from '@/components/site-header/account-menu/account-menu-item';
 import { NavLink } from '@/components/site-header/navigation/nav-link';
 import { Button, Menu, MenuPopup, MenuSeparator, MenuTrigger } from '@/components/ui';
-import { useCurrentUser } from '@/features/users/hooks';
+import { useCurrentUser } from '@/features/users/hooks/use-current-user';
 import { isAdmin } from '@/services/auth/utils';
 
 interface AccountMenuProps {

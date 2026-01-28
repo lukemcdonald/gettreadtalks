@@ -20,8 +20,8 @@ import {
   FieldError,
   FieldLabel,
 } from '@/components/ui';
-import { getSpeakerName } from '@/features/speakers';
-import { SpeakerAvatar } from '@/features/speakers/components';
+import { SpeakerAvatar } from '@/features/speakers/components/speaker-avatar';
+import { getSpeakerName } from '@/features/speakers/utils';
 import { CreateSpeakerSheet } from './create-speaker-sheet';
 
 interface SpeakerFieldProps<T extends FieldValues> {

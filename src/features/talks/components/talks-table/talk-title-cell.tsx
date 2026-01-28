@@ -2,7 +2,7 @@ import type { TalkWithSpeakerAndTopics } from '@/features/talks/types';
 
 import Link from 'next/link';
 
-import { getSpeakerName } from '@/features/speakers';
+import { getSpeakerName } from '@/features/speakers/utils';
 
 interface TalkTitleCellProps {
   talk: TalkWithSpeakerAndTopics;

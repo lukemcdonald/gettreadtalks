@@ -3,8 +3,8 @@
 import type { Speaker } from '@/features/speakers/types';
 
 import { MediaCard } from '@/components/media-card';
-import { getSpeakerName } from '@/features/speakers';
-import { SpeakerAvatar } from '@/features/speakers/components';
+import { SpeakerAvatar } from '@/features/speakers/components/speaker-avatar';
+import { getSpeakerName } from '@/features/speakers/utils';
 
 interface SpeakerCardProps {
   favorited?: boolean;

@@ -5,7 +5,8 @@ import { SpeakerLeftSidebar } from '@/app/speakers/[speaker]/_components/speaker
 import { SpeakerRightSidebar } from '@/app/speakers/[speaker]/_components/speaker-sidebar-right';
 import { SidebarsLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
-import { getSpeakerBySlug, getSpeakerName } from '@/features/speakers';
+import { getSpeakerBySlug } from '@/features/speakers/queries/get-speaker-by-slug';
+import { getSpeakerName } from '@/features/speakers/utils';
 
 interface SpeakerPageProps {
   params: Promise<{ speaker: string }>;

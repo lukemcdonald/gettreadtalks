@@ -9,7 +9,7 @@ import Link from 'next/link';
 
 import { SidebarContent } from '@/components/sidebar-content';
 import { Button } from '@/components/ui';
-import { FavoriteTalkButton } from '@/features/users/components';
+import { FavoriteTalkButton } from '@/features/users/components/favorite-talk-button';
 import { isAdmin } from '@/services/auth/utils';
 
 interface TalkSidebarProps {

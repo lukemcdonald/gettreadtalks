@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 
 import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
-import { getClipBySlug } from '@/features/clips';
+import { getClipBySlug } from '@/features/clips/queries/get-clip-by-slug';
 import { ClipContent } from './_components/clip-content';
 import { ClipSidebar } from './_components/clip-sidebar';
 
