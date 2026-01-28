@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 import { StatusPopover } from '@/components/status-popover';
 import { TableCell, TableRow } from '@/components/ui';
-import { getSpeakerName } from '@/features/speakers';
+import { getSpeakerName } from '@/features/speakers/utils';
 import { TalkActionsMenu } from '@/features/talks/components/talk-actions-menu';
 
 interface TalksTableRowProps {

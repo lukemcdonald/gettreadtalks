@@ -1,7 +1,7 @@
 'use client';
 
 import { useSheetRoute } from '@/app/@sheet/_hooks/use-sheet-route';
-import { CreateSpeakerSheet } from '@/features/speakers/components';
+import { CreateSpeakerSheet } from '@/features/speakers/components/create-speaker-sheet';
 
 export default function Page() {
   const { handleOpenChange, handleSuccess } = useSheetRoute();

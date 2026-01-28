@@ -22,7 +22,7 @@ import {
   UrlField,
 } from '@/components/ui';
 import { speakerRoles } from '@/convex/model/speakers/validators';
-import { updateSpeakerAction } from '@/features/speakers/actions';
+import { updateSpeakerAction } from '@/features/speakers/actions/update-speaker';
 import { updateSpeakerSchema } from '@/features/speakers/schemas/speaker-form';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
 

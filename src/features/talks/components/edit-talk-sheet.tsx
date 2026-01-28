@@ -19,7 +19,7 @@ import {
   SheetPopup,
   SheetTitle,
 } from '@/components/ui';
-import { updateTalkAction } from '@/features/talks/actions';
+import { updateTalkAction } from '@/features/talks/actions/update-talk';
 import { TalkFormFields } from '@/features/talks/components/talk-form-fields';
 import { talkFormSchema } from '@/features/talks/schemas/talk-form';
 import { setServerErrors } from '@/lib/forms/react-hook-form';

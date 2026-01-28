@@ -4,7 +4,7 @@ import type { Talk } from '@/features/talks/types';
 import Link from 'next/link';
 
 import { SidebarContent } from '@/components/sidebar-content';
-import { getSpeakerName } from '@/features/speakers';
+import { getSpeakerName } from '@/features/speakers/utils';
 import { getTalkUrl } from '@/features/talks/utils';
 
 interface ClipSidebarProps {

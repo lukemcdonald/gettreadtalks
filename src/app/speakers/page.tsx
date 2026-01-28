@@ -1,7 +1,8 @@
 import { SpeakersList } from '@/app/speakers/_components/speakers-list';
 import { SpeakersSidebar } from '@/app/speakers/_components/speakers-sidebar';
 import { SidebarLayout } from '@/components/layouts';
-import { getSpeakers, getSpeakersGrouped } from '@/features/speakers';
+import { getSpeakers } from '@/features/speakers/queries/get-speakers';
+import { getSpeakersGrouped } from '@/features/speakers/queries/get-speakers-grouped';
 
 export interface SpeakersPageSearchParams {
   role?: string;

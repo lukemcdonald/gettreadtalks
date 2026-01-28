@@ -4,7 +4,8 @@ import { TopicContent } from '@/app/topics/[topic]/_components/topic-content';
 import { TopicSidebar } from '@/app/topics/[topic]/_components/topic-sidebar';
 import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
-import { getTopicBySlug, getTopics } from '@/features/topics';
+import { getTopicBySlug } from '@/features/topics/queries/get-topic-by-slug';
+import { getTopics } from '@/features/topics/queries/get-topics';
 
 export interface TopicPageSearchParams {
   cursor?: string;

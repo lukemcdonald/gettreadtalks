@@ -5,7 +5,7 @@ import type { SpeakerListItem } from '@/features/speakers/types';
 import type { Talk } from '@/features/talks/types';
 
 import { useSheetRoute } from '@/app/@sheet/_hooks/use-sheet-route';
-import { EditTalkSheet } from '@/features/talks/components';
+import { EditTalkSheet } from '@/features/talks/components/edit-talk-sheet';
 
 interface EditTalkSheetRouteProps {
   collections: CollectionListItem[];

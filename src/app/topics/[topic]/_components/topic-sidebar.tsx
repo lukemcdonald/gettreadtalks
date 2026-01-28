@@ -3,7 +3,7 @@ import type { Topic } from '@/features/topics/types';
 import Link from 'next/link';
 
 import { SidebarContent } from '@/components/sidebar-content';
-import { TopicSelector } from '@/features/topics/components';
+import { TopicSelector } from '@/features/topics/components/topic-selector';
 
 interface TopicSidebarProps {
   currentSlug: string;

@@ -13,7 +13,8 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 
 import { slugify } from '@/convex/lib/utils';
-import { createTalkAction, updateTalkAction } from '@/features/talks/actions';
+import { createTalkAction } from '@/features/talks/actions/create-talk';
+import { updateTalkAction } from '@/features/talks/actions/update-talk';
 import { talkFormSchema } from '@/features/talks/schemas/talk-form';
 import { getSubmitButtonLabel, getTalkUrl } from '@/features/talks/utils';
 import { useEntityStatus } from '@/lib/entities/hooks';

@@ -3,7 +3,7 @@ import type { Speaker } from '@/features/speakers/types';
 
 import { GridList } from '@/components/grid-list';
 import { ListEmpty } from '@/components/list-empty';
-import { CollectionCard } from '@/features/collections/components';
+import { CollectionCard } from '@/features/collections/components/collection-card';
 
 interface CollectionWithStats {
   collection: Collection;

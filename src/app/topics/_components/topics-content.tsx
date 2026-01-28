@@ -1,7 +1,7 @@
 import type { Topic } from '@/features/topics/types';
 
 import { ListEmpty } from '@/components/list-empty';
-import { TopicsList } from '@/features/topics/components';
+import { TopicsList } from '@/features/topics/components/topics-list';
 
 interface TopicWithCount {
   count: number;

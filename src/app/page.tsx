@@ -2,10 +2,10 @@ import { FeaturedGrid } from '@/components/featured-grid';
 import { HeroSection } from '@/components/hero-section';
 import { Main } from '@/components/main';
 import { Container, Section } from '@/components/ui';
-import { getFeaturedSpeakers } from '@/features/speakers';
-import { SpeakerCard } from '@/features/speakers/components';
-import { TalkCard } from '@/features/talks/components';
-import { getFeaturedTalks } from '@/features/talks/queries';
+import { SpeakerCard } from '@/features/speakers/components/speaker-card';
+import { getFeaturedSpeakers } from '@/features/speakers/queries/get-featured-speakers';
+import { TalkCard } from '@/features/talks/components/talk-card';
+import { getFeaturedTalks } from '@/features/talks/queries/get-featured-talks';
 
 export default async function HomePage() {
   const [featuredTalksResult, featuredSpeakersResult] = await Promise.all([

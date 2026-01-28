@@ -4,7 +4,7 @@ import type { CollectionListItem } from '@/features/collections/types';
 import type { SpeakerListItem } from '@/features/speakers/types';
 
 import { useSheetRoute } from '@/app/@sheet/_hooks/use-sheet-route';
-import { CreateTalkSheet } from '@/features/talks/components';
+import { CreateTalkSheet } from '@/features/talks/components/create-talk-sheet';
 
 interface CreateTalkSheetRouteProps {
   collections: CollectionListItem[];

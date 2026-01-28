@@ -5,7 +5,7 @@ import { SidebarContent } from '@/components/sidebar-content';
 import { SearchInput } from '@/components/ui/search-input';
 import { SelectFilter } from '@/components/ui/select-filter';
 import { SortSelect } from '@/components/ui/sort-select';
-import { getSpeakerName } from '@/features/speakers';
+import { getSpeakerName } from '@/features/speakers/utils';
 
 interface CollectionsSidebarProps {
   speakers: Speaker[];

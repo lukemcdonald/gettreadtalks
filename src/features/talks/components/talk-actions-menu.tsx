@@ -5,7 +5,8 @@ import type { TalkWithSpeakerAndTopics } from '@/features/talks/types';
 import { useRouter } from 'next/navigation';
 
 import { ContentActionsGroup } from '@/components/actions-group';
-import { useArchiveTalk, useDestroyTalk } from '@/features/talks/hooks';
+import { useArchiveTalk } from '@/features/talks/hooks/use-archive-talk';
+import { useDestroyTalk } from '@/features/talks/hooks/use-destroy-talk';
 
 interface TalkActionsMenuProps {
   talk: TalkWithSpeakerAndTopics;

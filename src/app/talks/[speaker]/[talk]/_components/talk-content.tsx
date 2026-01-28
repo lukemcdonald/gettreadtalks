@@ -4,7 +4,7 @@ import type { Talk } from '@/features/talks/types';
 import { MediaEmbed } from '@/components/media-embed';
 import { PageHeader } from '@/components/page-header';
 import { Separator } from '@/components/ui';
-import { ClipsList } from '@/features/clips/components';
+import { ClipsList } from '@/features/clips/components/clips-list';
 
 interface TalkContentProps {
   clips: Clip[];

@@ -2,7 +2,7 @@ import type { TopicId } from '@/features/topics/types';
 
 import { redirect } from 'next/navigation';
 
-import { getTopic } from '@/features/topics/queries';
+import { getTopic } from '@/features/topics/queries/get-topic';
 import { EditTopicSheetRoute } from './_components/edit-topic-sheet-route';
 
 interface PageProps {

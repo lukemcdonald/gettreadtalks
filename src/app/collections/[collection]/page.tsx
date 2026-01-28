@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { CollectionContent } from '@/app/collections/[collection]/_components/collection-content';
 import { CollectionSidebar } from '@/app/collections/[collection]/_components/collection-sidebar';
 import { SidebarLayout } from '@/components/layouts';
-import { getCollectionBySlug } from '@/features/collections';
+import { getCollectionBySlug } from '@/features/collections/queries/get-collection-by-slug';
 
 interface CollectionPageProps {
   params: Promise<{ collection: string }>;

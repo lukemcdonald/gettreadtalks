@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, Separator } from '@/components/ui';
-import { getUserFavorites } from '@/features/users/queries';
+import { getUserFavorites } from '@/features/users/queries/get-user-favorites';
 import { getCurrentUser } from '@/services/auth/server';
 
 export default async function AccountPage() {

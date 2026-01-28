@@ -2,7 +2,7 @@ import type { TalkWithSpeaker } from '@/features/talks/types';
 
 import { Pagination } from '@/components/pagination';
 import { Empty, EmptyDescription } from '@/components/ui';
-import { TalksList } from '@/features/talks/components';
+import { TalksList } from '@/features/talks/components/talks-list';
 
 interface TopicContentProps {
   continueCursor: string;

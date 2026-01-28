@@ -3,7 +3,7 @@ import type { Speaker } from '@/features/speakers/types';
 
 import { ListEmpty } from '@/components/list-empty';
 import { Pagination } from '@/components/pagination';
-import { ClipsList } from '@/features/clips/components';
+import { ClipsList } from '@/features/clips/components/clips-list';
 
 type ClipWithSpeaker = Doc<'clips'> & {
   speaker: Speaker | null;

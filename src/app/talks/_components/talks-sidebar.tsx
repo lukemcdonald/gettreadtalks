@@ -5,7 +5,7 @@ import { SidebarContent } from '@/components/sidebar-content';
 import { ComboboxMultiFilter } from '@/components/ui/combobox-multi-filter';
 import { SearchInput } from '@/components/ui/search-input';
 import { SortSelect } from '@/components/ui/sort-select';
-import { getSpeakerName } from '@/features/speakers';
+import { getSpeakerName } from '@/features/speakers/utils';
 
 interface TopicWithCount {
   count: number;

@@ -2,7 +2,7 @@ import type { Speaker } from '@/features/speakers/types';
 
 import { AlphabeticalGrid } from '@/components/alphabetical-grid';
 import { ListEmpty } from '@/components/list-empty';
-import { SpeakerCard } from '@/features/speakers/components';
+import { SpeakerCard } from '@/features/speakers/components/speaker-card';
 
 export interface SpeakerGroup {
   items: Speaker[];

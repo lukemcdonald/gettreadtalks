@@ -5,10 +5,10 @@ import type { Talk } from '@/features/talks/types';
 
 import { GridList } from '@/components/grid-list';
 import { Separator } from '@/components/ui';
-import { ClipCard } from '@/features/clips/components';
-import { CollectionCard } from '@/features/collections/components';
-import { getSpeakerName } from '@/features/speakers';
-import { TalkCard } from '@/features/talks/components';
+import { ClipCard } from '@/features/clips/components/clip-card';
+import { CollectionCard } from '@/features/collections/components/collection-card';
+import { getSpeakerName } from '@/features/speakers/utils';
+import { TalkCard } from '@/features/talks/components/talk-card';
 
 interface SpeakerContentProps {
   clips: Clip[];

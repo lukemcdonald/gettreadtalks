@@ -21,7 +21,7 @@ import {
   UrlField,
 } from '@/components/ui';
 import { speakerRoles } from '@/convex/model/speakers/validators';
-import { createSpeakerAction } from '@/features/speakers/actions';
+import { createSpeakerAction } from '@/features/speakers/actions/create-speaker';
 import { createSpeakerSchema } from '@/features/speakers/schemas/speaker-form';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
 

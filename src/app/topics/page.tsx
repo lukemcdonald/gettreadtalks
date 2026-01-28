@@ -2,7 +2,7 @@ import { TopicsContent } from '@/app/topics/_components/topics-content';
 import { TopicsSidebar } from '@/app/topics/_components/topics-sidebar';
 import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
-import { getTopicsWithCounts } from '@/features/topics';
+import { getTopicsWithCounts } from '@/features/topics/queries/get-topics-with-counts';
 
 export interface TopicsPageSearchParams {
   search?: string;
