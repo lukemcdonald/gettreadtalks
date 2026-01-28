@@ -1,9 +1,9 @@
-'use server';
+'use cache';
 
 import { fetchQuery } from 'convex/nextjs';
+import { cacheLife, cacheTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
-import { getAuthToken } from '@/services/auth/server';
 
 interface GetTopicsProps {
   limit?: number;
@@ -13,11 +13,12 @@ interface GetTopicsProps {
  * Get topics for selector dropdowns.
  */
 export async function getTopics(args?: GetTopicsProps) {
+  cacheLife('hours');
+  cacheTag('topics');
+
   const { limit } = args ?? {};
 
-  const token = await getAuthToken();
-
-  const topics = await fetchQuery(api.topics.listTopics, { limit: limit ?? 1000 }, { token });
+  const topics = await fetchQuery(api.topics.listTopics, { limit: limit ?? 1000 });
 
   return {
     continueCursor: null,

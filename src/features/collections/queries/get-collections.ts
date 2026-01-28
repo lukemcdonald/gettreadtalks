@@ -1,9 +1,9 @@
-'use server';
+'use cache';
 
 import { fetchQuery } from 'convex/nextjs';
+import { cacheLife, cacheTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
-import { getAuthToken } from '@/services/auth/server';
 
 interface GetCollectionsProps {
   limit?: number;
@@ -14,16 +14,17 @@ interface GetCollectionsProps {
  * Filters to only collections with published talks.
  */
 export async function getCollections(args?: GetCollectionsProps) {
-  const { limit } = args ?? {};
+  cacheLife('hours');
+  cacheTag('collections');
 
-  const token = await getAuthToken();
+  const { limit } = args ?? {};
 
   const paginationOpts = {
     cursor: null,
     numItems: limit ?? 1000,
   };
 
-  const result = await fetchQuery(api.collections.listCollections, { paginationOpts }, { token });
+  const result = await fetchQuery(api.collections.listCollections, { paginationOpts });
 
   return {
     collections: result.page,

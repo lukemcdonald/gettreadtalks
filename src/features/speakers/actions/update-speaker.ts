@@ -5,6 +5,8 @@ import 'server-only';
 import type { ActionResult } from '@/lib/forms/types';
 import type { SpeakerId } from '../types';
 
+import { revalidateTag } from 'next/cache';
+
 import { api } from '@/convex/_generated/api';
 import { mapConvexErrorToFormErrors, mapZodErrors } from '@/lib/forms/validation';
 import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
@@ -37,6 +39,8 @@ export async function updateSpeakerAction(
       role: parsed.data.role || undefined,
       websiteUrl: parsed.data.websiteUrl || undefined,
     });
+
+    revalidateTag('speakers', 'hours');
 
     return {
       success: true,

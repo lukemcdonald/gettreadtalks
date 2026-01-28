@@ -4,6 +4,8 @@ import 'server-only';
 
 import type { ActionResult } from '@/lib/forms/types';
 
+import { revalidateTag } from 'next/cache';
+
 import { api } from '@/convex/_generated/api';
 import { mapConvexErrorToFormErrors, mapZodErrors } from '@/lib/forms/validation';
 import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
@@ -27,6 +29,8 @@ export async function createTalkAction(data: unknown): Promise<ActionResult<{ ta
 
   try {
     const talkId = await fetchAuthMutation(api.talks.createTalk, parsed.data);
+
+    revalidateTag('talks', 'hours');
 
     return {
       success: true,

@@ -1,10 +1,10 @@
-'use server';
+'use cache';
 
 import { fetchQuery } from 'convex/nextjs';
+import { cacheLife, cacheTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
 import { speakerRoles } from '@/convex/model/speakers/validators';
-import { getAuthToken } from '@/services/auth/server';
 
 type SortOption = 'alphabetical' | 'featured';
 
@@ -19,9 +19,10 @@ interface GetSpeakersProps {
  * Get speakers with published content and optional filtering.
  */
 export async function getSpeakers(args?: GetSpeakersProps) {
-  const { limit, role, search, sort } = args ?? {};
+  cacheLife('hours');
+  cacheTag('speakers');
 
-  const token = await getAuthToken();
+  const { limit, role, search, sort } = args ?? {};
 
   // Validate sort option
   const validSorts: SortOption[] = ['alphabetical', 'featured'];
@@ -36,16 +37,12 @@ export async function getSpeakers(args?: GetSpeakersProps) {
 
   const validRole = speakerRoles.find((r) => r === role);
 
-  const result = await fetchQuery(
-    api.speakers.listSpeakers,
-    {
-      paginationOpts,
-      role: validRole,
-      search: search || undefined,
-      sort: sortOption,
-    },
-    { token },
-  );
+  const result = await fetchQuery(api.speakers.listSpeakers, {
+    paginationOpts,
+    role: validRole,
+    search: search || undefined,
+    sort: sortOption,
+  });
 
   return {
     continueCursor: result.continueCursor,

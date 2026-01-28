@@ -1,17 +1,18 @@
-'use server';
+'use cache';
 
 import { fetchQuery } from 'convex/nextjs';
+import { cacheLife, cacheTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
-import { getAuthToken } from '@/services/auth/server';
 
 /**
  * Get featured speakers for homepage.
  */
 export async function getFeaturedSpeakers(limit = 6) {
-  const token = await getAuthToken();
+  cacheLife('hours');
+  cacheTag('speakers');
 
-  const result = await fetchQuery(api.speakers.listFeaturedSpeakers, { limit }, { token });
+  const result = await fetchQuery(api.speakers.listFeaturedSpeakers, { limit });
 
   return {
     continueCursor: null,

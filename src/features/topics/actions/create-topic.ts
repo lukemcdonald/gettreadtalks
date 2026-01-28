@@ -5,6 +5,8 @@ import 'server-only';
 import type { ActionResult } from '@/lib/forms/types';
 import type { TopicId } from '../types';
 
+import { revalidateTag } from 'next/cache';
+
 import { api } from '@/convex/_generated/api';
 import { mapConvexErrorToFormErrors, mapZodErrors } from '@/lib/forms/validation';
 import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
@@ -26,6 +28,8 @@ export async function createTopicAction(
 
   try {
     const topicId = await fetchAuthMutation(api.topics.createTopic, parsed.data);
+
+    revalidateTag('topics', 'hours');
 
     return {
       success: true,

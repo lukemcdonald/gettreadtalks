@@ -1,15 +1,16 @@
-'use server';
+'use cache';
 
 import { fetchQuery } from 'convex/nextjs';
+import { cacheLife, cacheTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
-import { getAuthToken } from '@/services/auth/server';
 
 /**
  * Get speaker by slug with related talks, collections, and clips.
  */
 export async function getSpeakerBySlug(slug: string) {
-  const token = await getAuthToken();
+  cacheLife('hours');
+  cacheTag('speakers');
 
-  return await fetchQuery(api.speakers.getSpeakerBySlug, { slug }, { token });
+  return await fetchQuery(api.speakers.getSpeakerBySlug, { slug });
 }

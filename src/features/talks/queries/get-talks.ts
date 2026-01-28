@@ -1,9 +1,9 @@
-'use server';
+'use cache';
 
 import { fetchQuery } from 'convex/nextjs';
+import { cacheLife, cacheTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
-import { getAuthToken } from '@/services/auth/server';
 
 type SortOption = 'alphabetical' | 'featured' | 'oldest' | 'recent';
 
@@ -22,9 +22,10 @@ interface GetTalksProps {
  * Defaults to 50 items per page, sorted by most recent.
  */
 export async function getTalks(args?: GetTalksProps) {
-  const { cursor, featured, limit = 50, search, sort, speakerSlugs, topicSlugs } = args ?? {};
+  cacheLife('hours');
+  cacheTag('talks');
 
-  const token = await getAuthToken();
+  const { cursor, featured, limit = 50, search, sort, speakerSlugs, topicSlugs } = args ?? {};
 
   // Validate sort option
   const validSorts: SortOption[] = ['alphabetical', 'featured', 'oldest', 'recent'];
@@ -37,18 +38,14 @@ export async function getTalks(args?: GetTalksProps) {
     numItems: limit,
   };
 
-  const result = await fetchQuery(
-    api.talks.listTalks,
-    {
-      featured: featured || undefined,
-      paginationOpts,
-      search: search || undefined,
-      sort: sortOption,
-      speakerSlugs: speakerSlugs?.length ? speakerSlugs : undefined,
-      topicSlugs: topicSlugs?.length ? topicSlugs : undefined,
-    },
-    { token },
-  );
+  const result = await fetchQuery(api.talks.listTalks, {
+    featured: featured || undefined,
+    paginationOpts,
+    search: search || undefined,
+    sort: sortOption,
+    speakerSlugs: speakerSlugs?.length ? speakerSlugs : undefined,
+    topicSlugs: topicSlugs?.length ? topicSlugs : undefined,
+  });
 
   return {
     continueCursor: result.continueCursor,

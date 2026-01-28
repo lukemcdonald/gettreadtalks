@@ -1,9 +1,9 @@
-'use server';
+'use cache';
 
 import { fetchQuery } from 'convex/nextjs';
+import { cacheLife, cacheTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
-import { getAuthToken } from '@/services/auth/server';
 
 type SortOption = 'alphabetical' | 'oldest' | 'recent';
 
@@ -22,9 +22,10 @@ interface GetClipsProps {
  * Defaults to 50 items per page, sorted by most recent.
  */
 export async function getClips(args?: GetClipsProps) {
-  const { cursor, limit = 50, search, sort, speakerSlugs, topicSlugs } = args ?? {};
+  cacheLife('hours');
+  cacheTag('clips');
 
-  const token = await getAuthToken();
+  const { cursor, limit = 50, search, sort, speakerSlugs, topicSlugs } = args ?? {};
 
   // Validate sort option
   const validSorts: SortOption[] = ['alphabetical', 'oldest', 'recent'];
@@ -37,17 +38,13 @@ export async function getClips(args?: GetClipsProps) {
     numItems: limit,
   };
 
-  const result = await fetchQuery(
-    api.clips.listClips,
-    {
-      paginationOpts,
-      search: search || undefined,
-      sort: sortOption,
-      speakerSlugs: speakerSlugs?.length ? speakerSlugs : undefined,
-      topicSlugs: topicSlugs?.length ? topicSlugs : undefined,
-    },
-    { token },
-  );
+  const result = await fetchQuery(api.clips.listClips, {
+    paginationOpts,
+    search: search || undefined,
+    sort: sortOption,
+    speakerSlugs: speakerSlugs?.length ? speakerSlugs : undefined,
+    topicSlugs: topicSlugs?.length ? topicSlugs : undefined,
+  });
 
   return {
     clips: result.page,

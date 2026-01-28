@@ -1,9 +1,9 @@
-'use server';
+'use cache';
 
 import { fetchQuery } from 'convex/nextjs';
+import { cacheLife, cacheTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
-import { getAuthToken } from '@/services/auth/server';
 
 type SortOption = 'alphabetical' | 'least-talks' | 'most-talks';
 
@@ -17,9 +17,10 @@ interface GetTopicsWithCountsProps {
  * Supports optional search and sort filtering.
  */
 export async function getTopicsWithCounts(args?: GetTopicsWithCountsProps) {
-  const { search, sort } = args ?? {};
+  cacheLife('hours');
+  cacheTag('topics');
 
-  const token = await getAuthToken();
+  const { search, sort } = args ?? {};
 
   // Validate sort option
   const validSorts: SortOption[] = ['alphabetical', 'least-talks', 'most-talks'];
@@ -27,12 +28,8 @@ export async function getTopicsWithCounts(args?: GetTopicsWithCountsProps) {
     ? (sort as SortOption)
     : 'alphabetical';
 
-  return await fetchQuery(
-    api.topics.listTopicsWithCount,
-    {
-      search: search || undefined,
-      sort: sortOption,
-    },
-    { token },
-  );
+  return await fetchQuery(api.topics.listTopicsWithCount, {
+    search: search || undefined,
+    sort: sortOption,
+  });
 }
