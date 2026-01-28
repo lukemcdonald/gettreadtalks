@@ -1,9 +1,9 @@
-'use server';
+'use cache';
 
 import { fetchQuery } from 'convex/nextjs';
+import { cacheLife, cacheTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
-import { getAuthToken } from '@/services/auth/server';
 
 interface GetTopicBySlugProps {
   cursor?: string;
@@ -15,23 +15,20 @@ interface GetTopicBySlugProps {
  * Get topic by slug with associated talks (paginated).
  */
 export async function getTopicBySlug(args: GetTopicBySlugProps) {
-  const { cursor, limit = 50, slug } = args;
+  cacheLife('hours');
+  cacheTag('topics');
 
-  const token = await getAuthToken();
+  const { cursor, limit = 50, slug } = args;
 
   const paginationOpts = {
     cursor: cursor || null,
     numItems: limit,
   };
 
-  const result = await fetchQuery(
-    api.topics.getTopicBySlug,
-    {
-      paginationOpts,
-      slug,
-    },
-    { token },
-  );
+  const result = await fetchQuery(api.topics.getTopicBySlug, {
+    paginationOpts,
+    slug,
+  });
 
   if (!result) {
     return null;

@@ -6,6 +6,7 @@ import type { ActionResult } from '@/lib/forms/types';
 import type { ClipId } from '../types';
 
 import { zid } from 'convex-helpers/server/zod4';
+import { revalidateTag } from 'next/cache';
 import { z } from 'zod';
 
 import { api } from '@/convex/_generated/api';
@@ -44,6 +45,8 @@ export async function createClipAction(data: unknown): Promise<ActionResult<{ cl
       talkId: parsed.data.talkId || undefined,
       title: parsed.data.title,
     });
+
+    revalidateTag('clips', 'hours');
 
     return {
       success: true,

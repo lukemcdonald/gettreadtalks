@@ -5,6 +5,8 @@ import 'server-only';
 import type { ActionResult } from '@/lib/forms/types';
 import type { TalkId } from '../types';
 
+import { revalidateTag } from 'next/cache';
+
 import { api } from '@/convex/_generated/api';
 import { mapConvexErrorToFormErrors, mapZodErrors } from '@/lib/forms/validation';
 import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
@@ -31,6 +33,8 @@ export async function updateTalkAction(
 
   try {
     await fetchAuthMutation(api.talks.updateTalk, { ...parsed.data, talkId });
+
+    revalidateTag('talks', 'hours');
 
     return {
       success: true,

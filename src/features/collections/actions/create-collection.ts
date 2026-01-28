@@ -5,6 +5,7 @@ import 'server-only';
 import type { ActionResult } from '@/lib/forms/types';
 import type { CollectionId } from '../types';
 
+import { revalidateTag } from 'next/cache';
 import { z } from 'zod';
 
 import { api } from '@/convex/_generated/api';
@@ -38,6 +39,8 @@ export async function createCollectionAction(
       title: parsed.data.title,
       url: parsed.data.url || undefined,
     });
+
+    revalidateTag('collections', 'hours');
 
     return {
       success: true,
