@@ -9,26 +9,17 @@ import { useForm } from 'react-hook-form';
 
 import {
   Button,
-  SelectField,
   Sheet,
   SheetFooter,
   SheetHeader,
   SheetPanel,
   SheetPopup,
   SheetTitle,
-  TextField,
-  TextareaField,
-  UrlField,
 } from '@/components/ui';
-import { speakerRoles } from '@/convex/model/speakers/validators';
 import { createSpeakerAction } from '@/features/speakers/actions/create-speaker';
 import { createSpeakerSchema } from '@/features/speakers/schemas/speaker-form';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
-
-const roleOptions = [
-  { label: 'Select a role', value: '' },
-  ...speakerRoles.map((role) => ({ label: role, value: role })),
-];
+import { SpeakerFormFields } from './speaker-form-fields';
 
 type NewSpeaker = Pick<Speaker, '_id' | 'firstName' | 'lastName' | 'imageUrl' | 'role'>;
 
@@ -37,8 +28,6 @@ interface CreateSpeakerSheetProps {
   onSpeakerCreated: (speakerId: SpeakerId, speaker: NewSpeaker) => void;
   open: boolean;
 }
-
-// TODO: Find a way to simplify this component. It is too large. Consider splitting out logic and making smaller components where it makes sense. Maybe a speaker-form and speaker-form-fields, etc. Consider drying things up with edit-speaker-sheet.tsx
 
 export function CreateSpeakerSheet({
   onOpenChange,
@@ -108,57 +97,7 @@ export function CreateSpeakerSheet({
               </div>
             )}
 
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <TextField
-                  control={form.control}
-                  label="First Name"
-                  name="firstName"
-                  placeholder="John"
-                  required
-                />
-
-                <TextField
-                  control={form.control}
-                  label="Last Name"
-                  name="lastName"
-                  placeholder="Doe"
-                  required
-                />
-              </div>
-
-              <SelectField control={form.control} label="Role" name="role" options={roleOptions} />
-
-              <TextField
-                control={form.control}
-                description="Church or organization affiliation"
-                label="Ministry"
-                name="ministry"
-                placeholder="Grace Community Church"
-              />
-
-              <TextareaField
-                control={form.control}
-                label="Description"
-                name="description"
-                placeholder="Brief biography..."
-                rows={3}
-              />
-
-              <UrlField
-                control={form.control}
-                label="Profile Image URL"
-                name="imageUrl"
-                placeholder="https://example.com/image.jpg"
-              />
-
-              <UrlField
-                control={form.control}
-                label="Website URL"
-                name="websiteUrl"
-                placeholder="https://example.com"
-              />
-            </div>
+            <SpeakerFormFields control={form.control} />
           </SheetPanel>
 
           <SheetFooter>
