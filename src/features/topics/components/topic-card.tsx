@@ -2,8 +2,8 @@
 
 import type { Topic } from '@/features/topics/types';
 
-import { FauxLink } from '@/components/faux-link';
 import { Card, CardDescription, CardTitle } from '@/components/ui';
+import { FauxLink } from '@/components/ui/link';
 
 interface TopicCardProps {
   talkCount: number;

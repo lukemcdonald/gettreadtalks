@@ -23,6 +23,7 @@ import { setServerErrors } from '@/lib/forms/react-hook-form';
 
 interface UseTalkFormProps {
   collections: Pick<Collection, '_id' | 'slug' | 'title'>[];
+  // TODO: Can this use a convex type or something from types.ts
   initialData?: {
     collectionId?: CollectionId;
     collectionOrder?: number;

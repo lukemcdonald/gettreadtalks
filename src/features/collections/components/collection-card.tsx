@@ -1,8 +1,8 @@
 import type { Collection } from '@/features/collections/types';
 import type { Speaker } from '@/features/speakers/types';
 
-import { FauxLink } from '@/components/faux-link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui';
+import { FauxLink } from '@/components/ui/link';
 import { CollectionCardSpeaker } from '@/features/collections/components/collection-card-speaker';
 
 interface CollectionCardProps {

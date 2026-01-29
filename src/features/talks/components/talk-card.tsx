@@ -27,17 +27,14 @@ function SpeakerLink({ children, slug }: { children: ReactNode; slug: string }) 
   );
 }
 
-export function TalkCard({ featured, favorited, finished, speaker, talk }: TalkCardProps) {
+export function TalkCard({ speaker, talk }: TalkCardProps) {
   const speakerName = getSpeakerName(speaker);
   const accessibleLabel = speakerName ? `${talk.title} by ${speakerName}` : talk.title;
-  const statusLabels = [featured && 'Featured', favorited && 'Favorited', finished && 'Finished'];
-  const statusLabel = statusLabels.filter(Boolean).join(', ');
   const talkHref = speaker?.slug ? getTalkUrl(speaker.slug, talk.slug) : `/talks/${talk.slug}`;
 
   return (
     <MediaCard
       ariaLabel={accessibleLabel}
-      data-status={statusLabel}
       href={talkHref}
       media={speaker ? <SpeakerAvatar speaker={speaker} /> : undefined}
       subtitle={

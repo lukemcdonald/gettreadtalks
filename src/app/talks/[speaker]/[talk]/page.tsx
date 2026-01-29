@@ -7,7 +7,10 @@ import { getTalkBySlug } from '@/features/talks/queries/get-talk-by-slug';
 import { getCurrentUser } from '@/services/auth/server';
 
 interface TalkPageProps {
-  params: Promise<{ speaker: string; talk: string }>;
+  params: Promise<{
+    speaker: string;
+    talk: string;
+  }>;
 }
 
 export default async function TalkPage({ params }: TalkPageProps) {

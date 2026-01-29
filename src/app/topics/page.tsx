@@ -4,17 +4,16 @@ import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { getTopicsWithCounts } from '@/features/topics/queries/get-topics-with-counts';
 
-export interface TopicsPageSearchParams {
-  search?: string;
-  sort?: string;
-}
-
 interface TopicsPageProps {
-  searchParams: Promise<TopicsPageSearchParams>;
+  searchParams: Promise<{
+    search?: string;
+    sort?: string;
+  }>;
 }
 
 export default async function TopicsPage({ searchParams }: TopicsPageProps) {
   const params = await searchParams;
+
   const { search, sort } = params;
 
   const topics = await getTopicsWithCounts({ search, sort });

@@ -38,6 +38,8 @@ interface EditCollectionSheetProps {
   open: boolean;
 }
 
+// TODO: Simplify and DRY this up with create-collection-sheet where possible. This file is too big.
+
 export function EditCollectionSheet({
   collection,
   onCollectionUpdated,

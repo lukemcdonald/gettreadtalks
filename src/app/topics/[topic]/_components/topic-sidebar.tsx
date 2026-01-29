@@ -12,16 +12,17 @@ interface TopicSidebarProps {
 }
 
 export function TopicSidebar({ currentSlug, topics, totalTalks }: TopicSidebarProps) {
-  const selectItems = topics.map((t) => ({
-    _id: t._id,
-    slug: t.slug,
-    title: t.title,
-  }));
-
   return (
     <>
       <SidebarContent title="Browse Topics">
-        <TopicSelector currentSlug={currentSlug} items={selectItems} />
+        <TopicSelector
+          currentSlug={currentSlug}
+          items={topics.map((item) => ({
+            _id: item._id,
+            slug: item.slug,
+            title: item.title,
+          }))}
+        />
         <Link className="text-primary text-sm hover:underline" href="/topics">
           View all topics →
         </Link>

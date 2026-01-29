@@ -13,6 +13,7 @@ import { api } from '@/convex/_generated/api';
 import { mapConvexErrorToFormErrors, mapZodErrors } from '@/lib/forms/validation';
 import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
 
+// TODO: Should this be imported from in a features/clips/schema.ts file?
 const updateClipSchema = z.object({
   description: z.string().optional(),
   mediaUrl: z.string().trim().url('Please enter a valid URL'),

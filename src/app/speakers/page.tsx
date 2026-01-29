@@ -4,31 +4,30 @@ import { SidebarLayout } from '@/components/layouts';
 import { getSpeakers } from '@/features/speakers/queries/get-speakers';
 import { getSpeakersGrouped } from '@/features/speakers/queries/get-speakers-grouped';
 
-export interface SpeakersPageSearchParams {
-  role?: string;
-  search?: string;
-  sort?: string;
-}
-
 interface SpeakersPageProps {
-  searchParams: Promise<SpeakersPageSearchParams>;
+  searchParams: Promise<{
+    role?: string;
+    search?: string;
+    sort?: string;
+  }>;
 }
 
 export default async function SpeakersPage({ searchParams }: SpeakersPageProps) {
   const params = await searchParams;
+
   const { role, search, sort } = params;
 
-  const hasActiveFilters = !!(search || role);
-
-  const [groups, { speakers: allSpeakers }] = await Promise.all([
+  const [speakerGroups, { speakers }] = await Promise.all([
     getSpeakersGrouped({ role, search, sort }),
-    getSpeakers(), // For sidebar (all speakers for role counts)
+    getSpeakers(),
   ]);
+
+  const hasActiveFilters = Boolean(search || role);
 
   return (
     <SidebarLayout
-      content={<SpeakersList groups={groups} hasActiveFilters={hasActiveFilters} />}
-      sidebar={<SpeakersSidebar speakers={allSpeakers} />}
+      content={<SpeakersList groups={speakerGroups} hasActiveFilters={hasActiveFilters} />}
+      sidebar={<SpeakersSidebar speakers={speakers} />}
       sidebarSticky
     />
   );

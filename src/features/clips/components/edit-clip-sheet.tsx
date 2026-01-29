@@ -66,6 +66,8 @@ interface EditClipSheetProps {
   talks: TalkListItem[];
 }
 
+// TODO: Simplify and DRY this up with create-clip-sheet where possible. This file is too big.
+
 export function EditClipSheet({
   clip,
   onClipUpdated,

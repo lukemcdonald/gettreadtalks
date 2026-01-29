@@ -7,6 +7,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+// TODO: Find a way to simplify this component. It is too large. Consider splitting out logic and making smaller components where it makes sense. Maybe a collection-form and collection-form-fields, etc. Consider drying things up with edit-collection-sheet.tsx
+
 import {
   Button,
   Sheet,

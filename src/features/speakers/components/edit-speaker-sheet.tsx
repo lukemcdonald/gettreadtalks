@@ -38,6 +38,8 @@ interface EditSpeakerSheetProps {
   speaker: Speaker | null;
 }
 
+// TODO: Simplify and DRY this up with create-speaker-sheet where possible. This file is too big.
+
 export function EditSpeakerSheet({
   onOpenChange,
   onSpeakerUpdated,

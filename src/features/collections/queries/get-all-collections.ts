@@ -9,9 +9,6 @@ interface GetAllCollectionsProps {
   limit?: number;
 }
 
-/**
- * Get all collections with stats (talk counts and speakers).
- */
 export async function getAllCollections(args?: GetAllCollectionsProps) {
   const { limit } = args ?? {};
 

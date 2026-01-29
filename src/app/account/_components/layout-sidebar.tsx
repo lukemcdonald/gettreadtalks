@@ -24,7 +24,7 @@ export async function LayoutSidebar() {
     return null;
   }
 
-  const showAdminSection = isAdmin(user);
+  const isAdminUser = isAdmin(user);
 
   return (
     <div className="space-y-4">
@@ -40,7 +40,7 @@ export async function LayoutSidebar() {
       <div className="space-y-6">
         <SidebarNav items={ACCOUNT_NAV_ITEMS} />
 
-        {!!showAdminSection && (
+        {!!isAdminUser && (
           <div className="space-y-3">
             <h3 className="font-semibold text-muted-foreground text-xs uppercase tracking-wider">
               Content Management

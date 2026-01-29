@@ -7,14 +7,12 @@ import { SearchInput } from '@/components/ui/search-input';
 import { SortSelect } from '@/components/ui/sort-select';
 import { getSpeakerName } from '@/features/speakers/utils';
 
-interface TopicWithCount {
-  count: number;
-  topic: Topic;
-}
-
 interface ClipsSidebarProps {
   speakers: Speaker[];
-  topics: TopicWithCount[];
+  topics: {
+    count: number;
+    topic: Topic;
+  }[];
 }
 
 export function ClipsSidebar({ speakers, topics }: ClipsSidebarProps) {

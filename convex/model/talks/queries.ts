@@ -361,6 +361,7 @@ export const listTalks = query({
  * List all talks with speaker data and filtering support.
  * Use status='all' to fetch across all statuses, defaults to 'published'.
  */
+// TODO: Should this be listTalksByStatus? The naming convention is a bit odd but maybe it is fine. THere are other similar queries for other domains.
 export const listAllTalks = query({
   args: {
     paginationOpts: paginationOptsValidator,

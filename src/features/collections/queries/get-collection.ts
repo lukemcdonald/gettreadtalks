@@ -9,5 +9,6 @@ import { getAuthToken } from '@/services/auth/server';
 
 export async function getCollection(id: CollectionId) {
   const token = await getAuthToken();
+
   return fetchQuery(api.collections.getCollection, { collectionId: id }, { token });
 }

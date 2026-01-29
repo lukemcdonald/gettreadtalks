@@ -5,14 +5,12 @@ import { GridList } from '@/components/grid-list';
 import { ListEmpty } from '@/components/list-empty';
 import { CollectionCard } from '@/features/collections/components/collection-card';
 
-interface CollectionWithStats {
-  collection: Collection;
-  speakers: Speaker[];
-  talkCount: number;
-}
-
-interface CollectionsListProps {
-  collections: CollectionWithStats[];
+interface CollectionsContentProps {
+  collections: {
+    collection: Collection;
+    speakers: Speaker[];
+    talkCount: number;
+  }[];
   hasActiveFilters: boolean;
 }
 
@@ -20,7 +18,7 @@ interface CollectionsListProps {
  * Renders collections in a grid.
  * Data is pre-filtered and sorted on the server.
  */
-export function CollectionsList({ collections, hasActiveFilters }: CollectionsListProps) {
+export function CollectionsContent({ collections, hasActiveFilters }: CollectionsContentProps) {
   if (collections.length === 0) {
     return (
       <ListEmpty

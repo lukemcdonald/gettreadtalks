@@ -36,7 +36,6 @@ export function SpeakerContent({ clips, collections, speaker, talks }: SpeakerCo
             <GridList>
               {talks.map((talk) => (
                 <TalkCard
-                  featured={talk.featured}
                   key={talk._id}
                   speaker={{
                     firstName: speaker.firstName,

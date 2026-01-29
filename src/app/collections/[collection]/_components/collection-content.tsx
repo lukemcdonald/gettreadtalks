@@ -13,7 +13,6 @@ export function CollectionContent({ talks }: CollectionContentProps) {
     <GridList>
       {talks.map((talk: TalkWithSpeaker) => (
         <TalkCard
-          featured={talk.featured}
           key={talk._id}
           speaker={
             talk.speaker
