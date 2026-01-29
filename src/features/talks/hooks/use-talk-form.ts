@@ -1,10 +1,10 @@
 'use client';
 
 import type { SubmitErrorHandler, SubmitHandler } from 'react-hook-form';
-import type { Collection, CollectionId } from '@/features/collections/types';
-import type { Speaker, SpeakerId } from '@/features/speakers/types';
+import type { Collection } from '@/features/collections/types';
+import type { Speaker } from '@/features/speakers/types';
 import type { TalkFormData } from '@/features/talks/schemas/talk-form';
-import type { TalkId } from '@/features/talks/types';
+import type { TalkFormInitialData, TalkId } from '@/features/talks/types';
 import type { StatusType } from '@/lib/entities/types';
 
 import { useTransition } from 'react';
@@ -23,18 +23,7 @@ import { setServerErrors } from '@/lib/forms/react-hook-form';
 
 interface UseTalkFormProps {
   collections: Pick<Collection, '_id' | 'slug' | 'title'>[];
-  // TODO: Can this use a convex type or something from types.ts
-  initialData?: {
-    collectionId?: CollectionId;
-    collectionOrder?: number;
-    description?: string;
-    featured?: boolean;
-    mediaUrl: string;
-    scripture?: string;
-    speakerId: SpeakerId;
-    status?: StatusType;
-    title: string;
-  };
+  initialData?: Partial<TalkFormInitialData>;
   speakerSlug?: string;
   speakers: Pick<Speaker, '_id' | 'firstName' | 'lastName' | 'slug'>[];
   talkId?: TalkId;

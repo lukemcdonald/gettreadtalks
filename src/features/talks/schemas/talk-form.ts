@@ -8,7 +8,6 @@ import { z } from 'zod';
  * Zod schema for talk form validation.
  * Works with React Hook Form which passes typed values directly (not FormData).
  */
-// TODO: Should this be in ../schema.ts file?
 export const talkFormSchema = z.object({
   collectionId: zid('collections').optional(),
   collectionOrder: z.number().optional(),
