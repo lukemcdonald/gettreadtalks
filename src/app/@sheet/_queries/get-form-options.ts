@@ -1,28 +1,25 @@
 'use server';
 
-import { fetchQuery } from 'convex/nextjs';
-
 import { api } from '@/convex/_generated/api';
-import { getAuthToken } from '@/services/auth/server';
+import { fetchAuthQuery } from '@/services/auth/server';
 
+/**
+ * Fetches form options for admin forms (collections, speakers, talks).
+ * Returns minimal data subsets to reduce payload size.
+ */
 export async function getFormOptions() {
-  const token = await getAuthToken();
-
   const paginationOpts = {
     cursor: null,
     numItems: 1000,
   };
 
   const [collectionsResult, speakersResult, talksResult] = await Promise.all([
-    // TODO: Should these use fetchAuthQuery instead of fetchQuery with a token?
-    fetchQuery(api.collections.listAllCollections, { paginationOpts }, { token }),
-    fetchQuery(api.speakers.listAllSpeakers, { paginationOpts }, { token }),
-    fetchQuery(api.talks.listAllTalks, { paginationOpts, status: 'all' }, { token }),
+    fetchAuthQuery(api.collections.listAllCollections, { paginationOpts }),
+    fetchAuthQuery(api.speakers.listAllSpeakers, { paginationOpts }),
+    fetchAuthQuery(api.talks.listAllTalks, { paginationOpts, status: 'all' }),
   ]);
 
-  // TODO: What is teh benefit of returning partial speaker, collection, or talk that we need to map over these and return a subset of properties?
   return {
-    // TODO: Why do collections have a collection property on item but speakers and talks do not?
     collections: collectionsResult.page.map((item) => ({
       _id: item.collection._id,
       slug: item.collection.slug,
