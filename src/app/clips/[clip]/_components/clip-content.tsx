@@ -11,7 +11,7 @@ export function ClipContent({ clip }: ClipContentProps) {
     <>
       {!!clip.mediaUrl && (
         <div className="space-y-4">
-          <MediaEmbed mediaUrl={clip.mediaUrl} />
+          <MediaEmbed mediaUrl={clip.mediaUrl} title={clip.title} />
         </div>
       )}
 
