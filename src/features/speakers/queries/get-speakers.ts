@@ -25,8 +25,7 @@ export async function getSpeakers(args?: GetSpeakersProps) {
 
   const { limit, role, search, sort } = args ?? {};
 
-  // Validate sort option
-  // TODO: This seems over complicatd for such a simple type enum for sortoption being one of two values
+  // Validate sort option from URL params (untrusted input)
   const sortOption = VALID_SORT_OPTIONS.includes(sort as SortOption)
     ? (sort as SortOption)
     : 'alphabetical';
