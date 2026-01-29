@@ -18,6 +18,5 @@ export const updateSpeakerSchema = baseSpeakerSchema.extend({
   featured: z.boolean().optional(),
 });
 
-// TODO: Should these move to the ../types.ts file?
 export type CreateSpeakerFormData = z.infer<typeof createSpeakerSchema>;
 export type UpdateSpeakerFormData = z.infer<typeof updateSpeakerSchema>;

@@ -28,3 +28,16 @@ export type TalksPaginationResult = PaginationResult<Talk>;
 export type TalksResult = Omit<PaginationResult<Talk>, 'page'> & {
   talks: TalkWithSpeaker[];
 };
+
+export type TalkFormInitialData = Pick<
+  Talk,
+  | 'collectionId'
+  | 'collectionOrder'
+  | 'description'
+  | 'featured'
+  | 'mediaUrl'
+  | 'scripture'
+  | 'speakerId'
+  | 'status'
+  | 'title'
+>;
