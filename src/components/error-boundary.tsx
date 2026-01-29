@@ -9,31 +9,10 @@ import { ErrorBoundary as ReactErrorBoundary } from 'react-error-boundary';
 import { ErrorFallback } from '@/components/error-fallback';
 import { captureException } from '@/services/errors/client';
 
-// Regex to remove "error" suffix from error names (case-insensitive)
-const ERROR_NAME_SUFFIX_REGEX = /error$/i;
-
 interface ErrorBoundaryProps {
-  /**
-   * The content to render within the error boundary.
-   */
   children: ReactNode;
-
-  /**
-   * Custom fallback component to render when an error occurs.
-   * If not provided, uses the default ErrorFallback component.
-   */
   fallback?: ComponentType<FallbackProps & { eventId?: string }>;
-
-  /**
-   * Callback fired when an error is caught.
-   * Useful for custom logging or side effects.
-   */
   onError?: (error: Error, info: ErrorInfo) => void;
-
-  /**
-   * Callback fired when the error boundary resets.
-   * Use this to reset application state if needed.
-   */
   onReset?: () => void;
 }
 

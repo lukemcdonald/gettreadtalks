@@ -54,6 +54,8 @@ interface CreateClipSheetProps {
   talks: TalkListItem[];
 }
 
+// TODO: Find a way to simplify this component. It is too large. Consider splitting out logic and making smaller components where it makes sense. Maybe a clip-form and clip-form-fields, etc. Consider drying things up with edit-clip-sheet.tsx
+
 export function CreateClipSheet({
   onClipCreated,
   onOpenChange,

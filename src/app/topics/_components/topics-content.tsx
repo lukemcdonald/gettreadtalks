@@ -3,14 +3,12 @@ import type { Topic } from '@/features/topics/types';
 import { ListEmpty } from '@/components/list-empty';
 import { TopicsList } from '@/features/topics/components/topics-list';
 
-interface TopicWithCount {
-  count: number;
-  topic: Topic;
-}
-
 interface TopicsContentProps {
   hasActiveFilters: boolean;
-  topics: TopicWithCount[];
+  topics: {
+    count: number;
+    topic: Topic;
+  }[];
 }
 
 export function TopicsContent({ hasActiveFilters, topics }: TopicsContentProps) {

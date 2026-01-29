@@ -3,6 +3,13 @@
 import { SearchInput } from '@/components/ui/search-input';
 import { SelectFilter } from '@/components/ui/select-filter';
 
+const FILTER_OPTIONS = [
+  { label: 'Published', value: 'published' },
+  { label: 'Approved', value: 'approved' },
+  { label: 'Backlog', value: 'backlog' },
+  { label: 'Archived', value: 'archived' },
+];
+
 export function TalksFilters() {
   return (
     <div className="flex gap-4">
@@ -13,12 +20,7 @@ export function TalksFilters() {
         <SelectFilter
           label="Status"
           name="status"
-          options={[
-            { label: 'Published', value: 'published' },
-            { label: 'Approved', value: 'approved' },
-            { label: 'Backlog', value: 'backlog' },
-            { label: 'Archived', value: 'archived' },
-          ]}
+          options={FILTER_OPTIONS}
           placeholder="All Statuses"
         />
       </div>

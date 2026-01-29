@@ -34,6 +34,8 @@ interface SpeakerFieldProps<T extends FieldValues> {
   speakers: SpeakerListItem[];
 }
 
+// TODO: Consider ways to split this component up into smaller components if it makes sense. It is getting pretty big.s
+
 export function SpeakerField<T extends FieldValues>({
   control,
   description,

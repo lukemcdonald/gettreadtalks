@@ -28,7 +28,7 @@ export default async function ClipsPage({ searchParams }: ClipsPageProps) {
   const topicSlugs = topics ? topics.split(',').filter(Boolean) : undefined;
 
   // Check if any filters are active (for showing "clear filters" option)
-  const hasActiveFilters = !!(search || speakerSlugs?.length || topicSlugs?.length);
+  const hasActiveFilters = Boolean(search || speakerSlugs?.length || topicSlugs?.length);
 
   const [result, speakersResult, topicsResult] = await Promise.all([
     getClips({
@@ -38,7 +38,7 @@ export default async function ClipsPage({ searchParams }: ClipsPageProps) {
       speakerSlugs,
       topicSlugs,
     }),
-    getSpeakers(), // Fetch ALL speakers with published content (independent of filters)
+    getSpeakers(),
     getTopicsWithCounts(),
   ]);
 

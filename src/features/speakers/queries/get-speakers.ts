@@ -7,6 +7,7 @@ import { api } from '@/convex/_generated/api';
 import { speakerRoles } from '@/convex/model/speakers/validators';
 
 type SortOption = 'alphabetical' | 'featured';
+const VALID_SORT_OPTIONS = ['alphabetical', 'featured'];
 
 interface GetSpeakersProps {
   limit?: number;
@@ -25,8 +26,8 @@ export async function getSpeakers(args?: GetSpeakersProps) {
   const { limit, role, search, sort } = args ?? {};
 
   // Validate sort option
-  const validSorts: SortOption[] = ['alphabetical', 'featured'];
-  const sortOption: SortOption = validSorts.includes(sort as SortOption)
+  // TODO: This seems over complicatd for such a simple type enum for sortoption being one of two values
+  const sortOption = VALID_SORT_OPTIONS.includes(sort as SortOption)
     ? (sort as SortOption)
     : 'alphabetical';
 

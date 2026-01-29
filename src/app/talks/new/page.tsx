@@ -8,17 +8,16 @@ import { requireAdminUser } from '@/services/auth/server';
 export default async function NewTalkPage() {
   await requireAdminUser('/login?redirect=/talks/new');
 
-  const [collectionsResult, speakersResult] = await Promise.all([
+  const [{ collections }, { speakers }] = await Promise.all([
     getAllCollections(),
     getAllSpeakers(),
   ]);
 
-  const collections = collectionsResult.collections.map((item) => item.collection);
-  const speakers = speakersResult.speakers;
+  const collectionItems = collections.map((item) => item.collection);
 
   return (
     <CenteredLayout
-      content={<TalkForm collections={collections} speakers={speakers} />}
+      content={<TalkForm collections={collectionItems} speakers={speakers} />}
       header={<PageHeader title="Create New Talk" />}
     />
   );

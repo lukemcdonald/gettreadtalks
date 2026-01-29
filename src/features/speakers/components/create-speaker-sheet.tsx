@@ -38,6 +38,8 @@ interface CreateSpeakerSheetProps {
   open: boolean;
 }
 
+// TODO: Find a way to simplify this component. It is too large. Consider splitting out logic and making smaller components where it makes sense. Maybe a speaker-form and speaker-form-fields, etc. Consider drying things up with edit-speaker-sheet.tsx
+
 export function CreateSpeakerSheet({
   onOpenChange,
   onSpeakerCreated,

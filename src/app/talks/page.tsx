@@ -29,11 +29,8 @@ export default async function TalksPage({ searchParams }: TalksPageProps) {
   const topicSlugs = topics ? topics.split(',').filter(Boolean) : undefined;
 
   // Check if any filters are active (for showing "clear filters" option)
-  const hasActiveFilters = !!(
-    search ||
-    speakerSlugs?.length ||
-    topicSlugs?.length ||
-    featured === 'true'
+  const hasActiveFilters = Boolean(
+    search || speakerSlugs?.length || topicSlugs?.length || featured === 'true',
   );
 
   const [result, speakersResult, topicsResult] = await Promise.all([
@@ -45,7 +42,7 @@ export default async function TalksPage({ searchParams }: TalksPageProps) {
       speakerSlugs,
       topicSlugs,
     }),
-    getSpeakers(), // Fetch ALL speakers with published content (independent of filters)
+    getSpeakers(),
     getTopicsWithCounts(),
   ]);
 

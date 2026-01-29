@@ -13,28 +13,31 @@ export async function getFormOptions() {
     numItems: 1000,
   };
 
-  const [speakersResult, collectionsResult, talksResult] = await Promise.all([
-    fetchQuery(api.speakers.listAllSpeakers, { paginationOpts }, { token }),
+  const [collectionsResult, speakersResult, talksResult] = await Promise.all([
+    // TODO: Should these use fetchAuthQuery instead of fetchQuery with a token?
     fetchQuery(api.collections.listAllCollections, { paginationOpts }, { token }),
+    fetchQuery(api.speakers.listAllSpeakers, { paginationOpts }, { token }),
     fetchQuery(api.talks.listAllTalks, { paginationOpts, status: 'all' }, { token }),
   ]);
 
+  // TODO: What is teh benefit of returning partial speaker, collection, or talk that we need to map over these and return a subset of properties?
   return {
-    speakers: speakersResult.page.map((s) => ({
-      _id: s._id,
-      firstName: s.firstName,
-      lastName: s.lastName,
-      imageUrl: s.imageUrl,
-      role: s.role,
-    })),
+    // TODO: Why do collections have a collection property on item but speakers and talks do not?
     collections: collectionsResult.page.map((item) => ({
       _id: item.collection._id,
       slug: item.collection.slug,
       title: item.collection.title,
     })),
-    talks: talksResult.page.map((t) => ({
-      _id: t._id,
-      title: t.title,
+    speakers: speakersResult.page.map((item) => ({
+      _id: item._id,
+      firstName: item.firstName,
+      lastName: item.lastName,
+      imageUrl: item.imageUrl,
+      role: item.role,
+    })),
+    talks: talksResult.page.map((item) => ({
+      _id: item._id,
+      title: item.title,
     })),
   };
 }

@@ -1,4 +1,4 @@
-import { CollectionsList } from '@/app/collections/_components/collections-list';
+import { CollectionsContent } from '@/app/collections/_components/collections-content';
 import { CollectionsSidebar } from '@/app/collections/_components/collections-sidebar';
 import { SidebarLayout } from '@/components/layouts';
 import { getCollections } from '@/features/collections/queries/get-collections';
@@ -16,13 +16,12 @@ interface CollectionsPageProps {
 
 export default async function CollectionsPage({ searchParams }: CollectionsPageProps) {
   const params = await searchParams;
-  const { search, sort = 'alphabetical', speakerSlug } = params;
-
-  const hasActiveFilters = !!(search || speakerSlug);
 
   const { collections: allCollections } = await getCollections();
 
-  // Filter collections server-side
+  const { search, sort, speakerSlug } = params;
+  const hasActiveFilters = Boolean(search || speakerSlug);
+
   let filtered = allCollections;
 
   if (search) {
@@ -39,13 +38,14 @@ export default async function CollectionsPage({ searchParams }: CollectionsPageP
   }
 
   // Sort collections server-side
+  // TODO: Should this be a sort util or combined with another one?
   const collections = [...filtered].sort((a, b) => {
     switch (sort) {
-      case 'most-talks':
-        return b.talkCount - a.talkCount;
       case 'least-talks':
         return a.talkCount - b.talkCount;
-      default:
+      case 'most-talks':
+        return b.talkCount - a.talkCount;
+      default: // alphabetical
         return a.collection.title.localeCompare(b.collection.title);
     }
   });
@@ -59,7 +59,7 @@ export default async function CollectionsPage({ searchParams }: CollectionsPageP
 
   return (
     <SidebarLayout
-      content={<CollectionsList collections={collections} hasActiveFilters={hasActiveFilters} />}
+      content={<CollectionsContent collections={collections} hasActiveFilters={hasActiveFilters} />}
       sidebar={<CollectionsSidebar speakers={speakers} />}
       sidebarSticky
     />

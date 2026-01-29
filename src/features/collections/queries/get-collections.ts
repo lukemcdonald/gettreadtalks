@@ -9,10 +9,6 @@ interface GetCollectionsProps {
   limit?: number;
 }
 
-/**
- * Get collections with stats.
- * Filters to only collections with published talks.
- */
 export async function getCollections(args?: GetCollectionsProps) {
   cacheLife('hours');
   cacheTag('collections');

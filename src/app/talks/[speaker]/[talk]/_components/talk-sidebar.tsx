@@ -22,13 +22,13 @@ interface TalkSidebarProps {
 }
 
 export function TalkSidebar({ clips, collection, speaker, talk, topics, user }: TalkSidebarProps) {
-  const userIsAdmin = isAdmin(user);
+  const isAdminUser = isAdmin(user);
 
   return (
     <>
       <SidebarContent title="Actions">
         <div className="flex flex-col gap-2">
-          {!!userIsAdmin && (
+          {!!isAdminUser && (
             <Button render={<Link href={`/talks/edit/${talk._id}`} />} variant="outline">
               Edit
             </Button>

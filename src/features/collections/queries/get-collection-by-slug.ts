@@ -5,9 +5,6 @@ import { cacheLife, cacheTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
 
-/**
- * Get collection by slug with talks in order.
- */
 export async function getCollectionBySlug(slug: string) {
   cacheLife('hours');
   cacheTag('collections');

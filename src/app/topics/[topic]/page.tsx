@@ -7,13 +7,14 @@ import { PageHeader } from '@/components/page-header';
 import { getTopicBySlug } from '@/features/topics/queries/get-topic-by-slug';
 import { getTopics } from '@/features/topics/queries/get-topics';
 
-export interface TopicPageSearchParams {
-  cursor?: string;
-}
-
+// TODO: Having params and searchParams is odd. We often have searchParams but params could possibly be a topic. What pattern do we use in other pages?
 interface TopicPageProps {
-  params: Promise<{ topic: string }>;
-  searchParams: Promise<TopicPageSearchParams>;
+  params: Promise<{
+    topic: string;
+  }>;
+  searchParams: Promise<{
+    cursor?: string;
+  }>;
 }
 
 export default async function TopicPage({ params, searchParams }: TopicPageProps) {

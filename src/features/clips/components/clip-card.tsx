@@ -9,21 +9,17 @@ import { getSpeakerName } from '@/features/speakers/utils';
 
 interface ClipCardProps {
   clip: Pick<Clip, 'description' | 'slug' | 'title'>;
-  favorited?: boolean;
   speaker?: Pick<Speaker, 'firstName' | 'lastName' | 'imageUrl' | 'slug'>;
 }
 
-export function ClipCard({ clip, favorited, speaker }: ClipCardProps) {
+export function ClipCard({ clip, speaker }: ClipCardProps) {
   const speakerName = getSpeakerName(speaker);
   const accessibleLabel = speakerName ? `${clip.title} by ${speakerName}` : clip.title;
-  const statusLabels = [favorited && 'Favorited'];
-  const statusLabel = statusLabels.filter(Boolean).join(', ');
 
   return (
     <MediaCard
       ariaLabel={accessibleLabel}
       className="items-center"
-      data-status={statusLabel}
       href={`/clips/${clip.slug}`}
       media={speaker ? <SpeakerAvatar speaker={speaker} /> : undefined}
       subtitle={speakerName}

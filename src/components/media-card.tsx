@@ -1,7 +1,7 @@
 import type { ComponentProps, ReactNode } from 'react';
 
-import { FauxLink } from '@/components/faux-link';
 import { Card, CardDescription, CardTitle } from '@/components/ui';
+import { FauxLink } from '@/components/ui/link';
 import { cn } from '@/utils';
 
 type MediaCardProps = {

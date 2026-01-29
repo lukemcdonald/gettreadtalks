@@ -9,5 +9,6 @@ import { getAuthToken } from '@/services/auth/server';
 
 export async function getClip(id: ClipId) {
   const token = await getAuthToken();
+
   return fetchQuery(api.clips.getClip, { id }, { token });
 }
