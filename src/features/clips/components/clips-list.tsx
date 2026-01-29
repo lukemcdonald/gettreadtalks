@@ -1,19 +1,7 @@
+import type { ClipWithSpeaker } from '../types';
+
 import { GridList } from '@/components/grid-list';
 import { ClipCard } from './clip-card';
-
-// TODO: infer or get from convex schemas
-interface ClipWithSpeaker {
-  _id: string;
-  description?: string;
-  slug: string;
-  title: string;
-  speaker?: {
-    firstName: string;
-    imageUrl?: string;
-    lastName: string;
-    slug: string;
-  } | null;
-}
 
 interface ClipsListProps {
   clips: ClipWithSpeaker[];
