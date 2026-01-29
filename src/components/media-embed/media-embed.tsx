@@ -1,5 +1,3 @@
-'use client';
-
 import { cn } from '@/utils';
 import { AudioPlayer } from './media/audio-player';
 import { ExternalLinkButton } from './media/external-link-button';
@@ -14,7 +12,6 @@ interface MediaEmbedProps {
   title?: string;
 }
 
-// TODO: Does this component need 'use client'?
 export function MediaEmbed({ className, mediaUrl, title = 'Media player' }: MediaEmbedProps) {
   const media = detectMediaType(mediaUrl);
 

@@ -12,7 +12,9 @@ const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
 invariant(convexUrl, 'NEXT_PUBLIC_CONVEX_URL is not set');
 
 const convex = new ConvexReactClient(convexUrl, {
-  expectAuth: false, // TODO: Consider enabling for account pages
+  // Global provider wraps both public and authenticated routes - keep false to avoid
+  // auth errors on public pages. Authenticated routes handle their own auth requirements.
+  expectAuth: false,
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
