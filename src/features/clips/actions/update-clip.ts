@@ -5,23 +5,12 @@ import 'server-only';
 import type { ActionResult } from '@/lib/forms/types';
 import type { ClipId } from '../types';
 
-import { zid } from 'convex-helpers/server/zod4';
 import { revalidateTag } from 'next/cache';
-import { z } from 'zod';
 
 import { api } from '@/convex/_generated/api';
 import { mapConvexErrorToFormErrors, mapZodErrors } from '@/lib/forms/validation';
 import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
-
-// TODO: Should this be imported from in a features/clips/schema.ts file?
-const updateClipSchema = z.object({
-  description: z.string().optional(),
-  mediaUrl: z.string().trim().url('Please enter a valid URL'),
-  speakerId: zid('speakers').optional(),
-  status: z.enum(['approved', 'archived', 'backlog', 'published']).default('backlog'),
-  talkId: zid('talks').optional(),
-  title: z.string().trim().min(1, 'Title is required'),
-});
+import { clipFormSchema } from '../schemas/clip-form';
 
 export async function updateClipAction(
   data: unknown,
@@ -29,7 +18,7 @@ export async function updateClipAction(
 ): Promise<ActionResult<{ clipId: ClipId }>> {
   await requireAdminUser();
 
-  const parsed = updateClipSchema.safeParse(data);
+  const parsed = clipFormSchema.safeParse(data);
 
   if (!parsed.success) {
     return {
