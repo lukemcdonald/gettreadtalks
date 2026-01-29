@@ -1,11 +1,11 @@
 'use client';
 
 import type { Collection, CollectionId } from '@/features/collections/types';
+import type { CollectionFormData } from '../schemas/collection-form';
 
 import { useEffect, useState, useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 
 // TODO: Find a way to simplify this component. It is too large. Consider splitting out logic and making smaller components where it makes sense. Maybe a collection-form and collection-form-fields, etc. Consider drying things up with edit-collection-sheet.tsx
 
@@ -23,16 +23,8 @@ import {
 } from '@/components/ui';
 import { createCollectionAction } from '@/features/collections/actions/create-collection';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
+import { collectionFormSchema } from '../schemas/collection-form';
 
-// TODO: Move to schema.ts file to be shared.
-const createCollectionSchema = z.object({
-  description: z.string().optional(),
-  title: z.string().trim().min(1, 'Title is required'),
-  url: z.string().url('Must be a valid URL').optional().or(z.literal('')),
-});
-
-// TODO: Move to ../types.ts file?
-type CreateCollectionFormData = z.infer<typeof createCollectionSchema>;
 type NewCollection = Pick<Collection, '_id' | 'title' | 'slug'>;
 
 interface CreateCollectionSheetProps {
@@ -49,13 +41,13 @@ export function CreateCollectionSheet({
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
-  const form = useForm<CreateCollectionFormData>({
+  const form = useForm<CollectionFormData>({
     defaultValues: {
       description: '',
       title: '',
       url: '',
     },
-    resolver: zodResolver(createCollectionSchema),
+    resolver: zodResolver(collectionFormSchema),
   });
 
   useEffect(() => {

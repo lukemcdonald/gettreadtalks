@@ -6,25 +6,18 @@ import type { ActionResult } from '@/lib/forms/types';
 import type { CollectionId } from '../types';
 
 import { revalidateTag } from 'next/cache';
-import { z } from 'zod';
 
 import { api } from '@/convex/_generated/api';
 import { mapConvexErrorToFormErrors, mapZodErrors } from '@/lib/forms/validation';
 import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
-
-// TODO: Move to src/collections/schema.ts file?
-const createCollectionSchema = z.object({
-  description: z.string().optional(),
-  title: z.string().trim().min(1, 'Title is required'),
-  url: z.string().url('Must be a valid URL').optional().or(z.literal('')),
-});
+import { collectionFormSchema } from '../schemas/collection-form';
 
 export async function createCollectionAction(
   data: unknown,
 ): Promise<ActionResult<{ collectionId: CollectionId }>> {
   await requireAdminUser();
 
-  const parsed = createCollectionSchema.safeParse(data);
+  const parsed = collectionFormSchema.safeParse(data);
 
   if (!parsed.success) {
     return {

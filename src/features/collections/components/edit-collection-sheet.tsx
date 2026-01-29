@@ -1,11 +1,11 @@
 'use client';
 
 import type { Collection, CollectionId } from '@/features/collections/types';
+import type { CollectionFormData } from '../schemas/collection-form';
 
 import { useEffect, useState, useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 
 import {
   Button,
@@ -21,15 +21,7 @@ import {
 } from '@/components/ui';
 import { updateCollectionAction } from '@/features/collections/actions/update-collection';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
-
-// TODO: Move to schema.ts file to be shared.
-const updateCollectionSchema = z.object({
-  description: z.string().optional(),
-  title: z.string().trim().min(1, 'Title is required'),
-  url: z.string().url('Must be a valid URL').optional().or(z.literal('')),
-});
-// TODO: move to types.ts file to be shared.
-type UpdateCollectionFormData = z.infer<typeof updateCollectionSchema>;
+import { collectionFormSchema } from '../schemas/collection-form';
 
 interface EditCollectionSheetProps {
   collection: Collection | null;
@@ -49,13 +41,13 @@ export function EditCollectionSheet({
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
-  const form = useForm<UpdateCollectionFormData>({
+  const form = useForm<CollectionFormData>({
     defaultValues: {
       description: collection?.description ?? '',
       title: collection?.title ?? '',
       url: collection?.url ?? '',
     },
-    resolver: zodResolver(updateCollectionSchema),
+    resolver: zodResolver(collectionFormSchema),
   });
 
   useEffect(() => {
