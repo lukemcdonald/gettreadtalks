@@ -11,7 +11,7 @@ const cspHeader = `
   font-src 'self' data:;
   form-action 'self';
   frame-ancestors 'none';
-  frame-src 'self' https://vercel.live;
+  frame-src 'self' https://vercel.live https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com;
   img-src 'self' blob: data: https:;
   object-src 'none';
   script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live;
@@ -26,6 +26,14 @@ const nextConfig = {
     remotePatterns: [
       {
         hostname: 'gravatar.com',
+        protocol: 'https',
+      },
+      {
+        hostname: 'vumbnail.com',
+        protocol: 'https',
+      },
+      {
+        hostname: 'i.ytimg.com',
         protocol: 'https',
       },
     ],

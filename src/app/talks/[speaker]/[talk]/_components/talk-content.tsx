@@ -18,7 +18,7 @@ export function TalkContent({ clips, talk }: TalkContentProps) {
 
       {!!talk.mediaUrl && (
         <div className="space-y-4">
-          <MediaEmbed mediaUrl={talk.mediaUrl} />
+          <MediaEmbed mediaUrl={talk.mediaUrl} title={talk.title} />
         </div>
       )}
 
