@@ -1,6 +1,9 @@
+import type { CollectionSortOption } from '@/convex/lib/sort';
+
 import { CollectionsContent } from '@/app/collections/_components/collections-content';
 import { CollectionsSidebar } from '@/app/collections/_components/collections-sidebar';
 import { SidebarLayout } from '@/components/layouts';
+import { getCollectionComparator } from '@/convex/lib/sort';
 import { getCollections } from '@/features/collections/queries/get-collections';
 import { sortSpeakersByName } from '@/features/speakers/utils';
 
@@ -37,18 +40,7 @@ export default async function CollectionsPage({ searchParams }: CollectionsPageP
     filtered = filtered.filter((item) => item.speakers.some((s) => s.slug === speakerSlug));
   }
 
-  // Sort collections server-side
-  // TODO: Should this be a sort util or combined with another one?
-  const collections = [...filtered].sort((a, b) => {
-    switch (sort) {
-      case 'least-talks':
-        return a.talkCount - b.talkCount;
-      case 'most-talks':
-        return b.talkCount - a.talkCount;
-      default: // alphabetical
-        return a.collection.title.localeCompare(b.collection.title);
-    }
-  });
+  const collections = [...filtered].sort(getCollectionComparator(sort as CollectionSortOption));
 
   // Get unique speakers who have collections (for sidebar)
   const allSpeakers = allCollections.flatMap((item) => item.speakers);
