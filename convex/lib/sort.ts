@@ -96,6 +96,30 @@ export function getTopicComparator<T extends { count: number; topic: { title: st
 }
 
 /**
+ * Collection sort options.
+ * - alphabetical: A-Z by title (default)
+ * - most-talks: highest count first
+ * - least-talks: lowest count first
+ */
+export type CollectionSortOption = 'alphabetical' | 'least-talks' | 'most-talks';
+
+/**
+ * Get comparator for collections with talk counts based on sort option.
+ */
+export function getCollectionComparator<
+  T extends { talkCount: number; collection: { title: string } },
+>(sort: CollectionSortOption = 'alphabetical'): (a: T, b: T) => number {
+  switch (sort) {
+    case 'most-talks':
+      return (a, b) => b.talkCount - a.talkCount;
+    case 'least-talks':
+      return (a, b) => a.talkCount - b.talkCount;
+    default:
+      return (a, b) => a.collection.title.localeCompare(b.collection.title);
+  }
+}
+
+/**
  * Compare by lastName alphabetically.
  */
 export function byLastName<T extends { lastName: string }>(a: T, b: T): number {
