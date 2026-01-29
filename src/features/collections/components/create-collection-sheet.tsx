@@ -7,8 +7,6 @@ import { useEffect, useState, useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
-// TODO: Find a way to simplify this component. It is too large. Consider splitting out logic and making smaller components where it makes sense. Maybe a collection-form and collection-form-fields, etc. Consider drying things up with edit-collection-sheet.tsx
-
 import {
   Button,
   Sheet,
@@ -17,13 +15,11 @@ import {
   SheetPanel,
   SheetPopup,
   SheetTitle,
-  TextField,
-  TextareaField,
-  UrlField,
 } from '@/components/ui';
 import { createCollectionAction } from '@/features/collections/actions/create-collection';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
 import { collectionFormSchema } from '../schemas/collection-form';
+import { CollectionFormFields } from './collection-form-fields';
 
 type NewCollection = Pick<Collection, '_id' | 'title' | 'slug'>;
 
@@ -95,33 +91,7 @@ export function CreateCollectionSheet({
               </div>
             )}
 
-            <div className="space-y-4">
-              <TextField
-                control={form.control}
-                description="Name of the sermon series or collection"
-                label="Title"
-                name="title"
-                placeholder="Romans Series"
-                required
-              />
-
-              <TextareaField
-                control={form.control}
-                description="Brief description of this collection"
-                label="Description"
-                name="description"
-                placeholder="A verse-by-verse study through the book of Romans..."
-                rows={3}
-              />
-
-              <UrlField
-                control={form.control}
-                description="Link to the collection's page on the speaker's site"
-                label="URL"
-                name="url"
-                placeholder="https://example.com/series/romans"
-              />
-            </div>
+            <CollectionFormFields control={form.control} />
           </SheetPanel>
 
           <SheetFooter>

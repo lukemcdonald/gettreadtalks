@@ -15,13 +15,11 @@ import {
   SheetPanel,
   SheetPopup,
   SheetTitle,
-  TextField,
-  TextareaField,
-  UrlField,
 } from '@/components/ui';
 import { updateCollectionAction } from '@/features/collections/actions/update-collection';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
 import { collectionFormSchema } from '../schemas/collection-form';
+import { CollectionFormFields } from './collection-form-fields';
 
 interface EditCollectionSheetProps {
   collection: Collection | null;
@@ -29,8 +27,6 @@ interface EditCollectionSheetProps {
   onOpenChange: (open: boolean) => void;
   open: boolean;
 }
-
-// TODO: Simplify and DRY this up with create-collection-sheet where possible. This file is too big.
 
 export function EditCollectionSheet({
   collection,
@@ -100,33 +96,7 @@ export function EditCollectionSheet({
               </div>
             )}
 
-            <div className="space-y-4">
-              <TextField
-                control={form.control}
-                description="Name of the sermon series or collection"
-                label="Title"
-                name="title"
-                placeholder="Romans Series"
-                required
-              />
-
-              <TextareaField
-                control={form.control}
-                description="Brief description of this collection"
-                label="Description"
-                name="description"
-                placeholder="A verse-by-verse study through the book of Romans..."
-                rows={3}
-              />
-
-              <UrlField
-                control={form.control}
-                description="Link to the collection's page on the speaker's site"
-                label="URL"
-                name="url"
-                placeholder="https://example.com/series/romans"
-              />
-            </div>
+            <CollectionFormFields control={form.control} />
           </SheetPanel>
 
           <SheetFooter>
