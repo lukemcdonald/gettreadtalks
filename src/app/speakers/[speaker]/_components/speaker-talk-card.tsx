@@ -1,8 +1,8 @@
 import type { Talk } from '@/features/talks/types';
 
-import Link from 'next/link';
+import { MicIcon } from 'lucide-react';
 
-import { Card, CardContent } from '@/components/ui';
+import { MediaCard } from '@/components/media-card';
 import { getTalkUrl } from '@/features/talks/utils';
 
 interface SpeakerTalkCardProps {
@@ -12,19 +12,16 @@ interface SpeakerTalkCardProps {
 
 export function SpeakerTalkCard({ speakerSlug, talk }: SpeakerTalkCardProps) {
   return (
-    <Card className="card-interactive group relative">
-      <Link className="absolute inset-0 z-10" href={getTalkUrl(speakerSlug, talk.slug)}>
-        <span className="sr-only">{talk.title}</span>
-      </Link>
-      <CardContent className="space-y-2 p-5">
-        <h3 className="line-clamp-2 font-semibold leading-snug transition-colors group-hover:text-primary">
-          {talk.title}
-        </h3>
-        {talk.scripture && <p className="font-medium text-primary/80 text-sm">{talk.scripture}</p>}
-        {talk.description && (
-          <p className="line-clamp-2 text-muted-foreground text-sm">{talk.description}</p>
-        )}
-      </CardContent>
-    </Card>
+    <MediaCard
+      ariaLabel={talk.title}
+      href={getTalkUrl(speakerSlug, talk.slug)}
+      media={
+        <div className="flex size-12 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
+          <MicIcon className="size-5" />
+        </div>
+      }
+      subtitle={talk.scripture}
+      title={talk.title}
+    />
   );
 }
