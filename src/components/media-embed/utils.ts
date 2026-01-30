@@ -28,6 +28,21 @@ function parseVimeoUrl(url: string) {
   return match?.[1] ?? null;
 }
 
+export function getVideoThumbnail(url?: string) {
+  if (!url) {
+    return null;
+  }
+
+  const youtubeId = parseYouTubeUrl(url);
+
+  // Vimeo requires API call for thumbnails, so we skip it
+  if (!youtubeId) {
+    return null;
+  }
+
+  return `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`;
+}
+
 export function detectMediaType(url: string): MediaType {
   const youtubeId = parseYouTubeUrl(url);
   if (youtubeId) {
