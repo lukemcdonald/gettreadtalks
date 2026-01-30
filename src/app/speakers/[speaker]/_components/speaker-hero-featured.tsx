@@ -15,7 +15,7 @@ interface SpeakerHeroFeaturedTalkProps {
 export function SpeakerHeroFeaturedTalk({ speaker, talk }: SpeakerHeroFeaturedTalkProps) {
   return (
     <div className="flex flex-col">
-      <div className="mb-3 flex items-center justify-between">
+      <div className="mb-2 flex items-center justify-between">
         <span className="font-semibold text-white/50 text-xs uppercase tracking-widest">
           Featured Talk
         </span>
@@ -26,12 +26,13 @@ export function SpeakerHeroFeaturedTalk({ speaker, talk }: SpeakerHeroFeaturedTa
           View Details <ArrowRightIcon className="size-3.5" />
         </Link>
       </div>
-      <div className="overflow-hidden rounded-xl shadow-2xl ring-1 ring-white/10">
+      {/* Video with dramatic drop shadow for depth */}
+      <div className="overflow-hidden rounded-xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] ring-1 ring-white/10">
         <MediaEmbed mediaUrl={talk.mediaUrl} title={talk.title} />
       </div>
-      <div className="mt-3 space-y-1">
-        <h2 className="font-semibold text-white">{talk.title}</h2>
-        {talk.scripture && <p className="text-primary text-sm">{talk.scripture}</p>}
+      <div className="mt-2.5 space-y-0.5">
+        <h2 className="font-semibold text-sm text-white">{talk.title}</h2>
+        {talk.scripture && <p className="text-primary text-xs">{talk.scripture}</p>}
       </div>
     </div>
   );
