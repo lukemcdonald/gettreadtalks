@@ -10,12 +10,11 @@ interface SpeakerMinistryLinkProps {
 }
 
 export function SpeakerMinistryLink({ ministry, websiteUrl, className }: SpeakerMinistryLinkProps) {
-  // Ministry with website: link the ministry name
   if (ministry && websiteUrl) {
     return (
       <Link
         className={cn(
-          'inline-flex items-center gap-1.5 transition-colors hover:text-white',
+          'inline-flex items-center gap-1.5 transition-colors hover:underline',
           className,
         )}
         href={websiteUrl}
@@ -28,12 +27,10 @@ export function SpeakerMinistryLink({ ministry, websiteUrl, className }: Speaker
     );
   }
 
-  // Ministry without website: plain text
   if (ministry) {
     return <span className={className}>{ministry}</span>;
   }
 
-  // No ministry but has website: show website link
   if (websiteUrl) {
     return (
       <Link

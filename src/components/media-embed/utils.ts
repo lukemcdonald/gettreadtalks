@@ -64,3 +64,11 @@ export function detectMediaType(url: string): MediaType {
 
   return { type: 'unknown', href: url };
 }
+
+export function isVideoMediaType(url?: string): boolean {
+  if (!url) {
+    return false;
+  }
+  const mediaType = detectMediaType(url);
+  return mediaType.type === 'youtube' || mediaType.type === 'vimeo' || mediaType.type === 'video';
+}

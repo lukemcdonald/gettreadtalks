@@ -49,7 +49,12 @@ export function SpeakerAvatar({ className, rounded, size, speaker }: SpeakerAvat
       render={<figure />}
     >
       <AvatarImage alt={getSpeakerName(speaker)} src={imageUrl} />
-      <AvatarFallback className={cn(roundedClasses({ rounded }), 'text-base')}>
+      <AvatarFallback
+        className={cn(
+          roundedClasses({ rounded }),
+          'bg-neutral-200 text-base text-neutral-600 dark:bg-neutral-700 dark:text-neutral-300',
+        )}
+      >
         {getSpeakerInitials(speaker)}
       </AvatarFallback>
     </Avatar>
