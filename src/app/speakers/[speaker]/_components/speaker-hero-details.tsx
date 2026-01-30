@@ -1,9 +1,8 @@
 import type { Speaker } from '@/features/speakers/types';
 
-import { ExternalLinkIcon } from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link';
 
+import { SpeakerMinistryLink } from '@/app/speakers/[speaker]/_components/speaker-ministry-link';
 import { getSpeakerInitials, getSpeakerName } from '@/features/speakers/utils';
 
 interface SpeakerHeroDetailsProps {
@@ -45,23 +44,15 @@ export function SpeakerHeroDetails({ speaker }: SpeakerHeroDetailsProps) {
           <h1 className="font-bold text-3xl text-white tracking-tight sm:text-4xl">
             {speakerName}
           </h1>
-          {speaker.ministry && <p className="mt-1 text-white/70">{speaker.ministry}</p>}
+          <SpeakerMinistryLink
+            className="mt-1 text-white/70"
+            ministry={speaker.ministry}
+            websiteUrl={speaker.websiteUrl}
+          />
         </div>
 
         {speaker.description && (
           <p className="max-w-xl text-sm text-white/60">{speaker.description}</p>
-        )}
-
-        {speaker.websiteUrl && (
-          <Link
-            className="inline-flex items-center gap-1.5 text-sm text-white/60 transition-colors hover:text-white"
-            href={speaker.websiteUrl}
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Website
-            <ExternalLinkIcon className="size-3.5" />
-          </Link>
         )}
       </div>
     </div>
