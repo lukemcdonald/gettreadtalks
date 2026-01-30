@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { SpeakerContentSections } from '@/app/speakers/[speaker]/_components/speaker-content-sections';
 import { SpeakerHero } from '@/app/speakers/[speaker]/_components/speaker-hero';
 import { EditorialProfileLayout } from '@/components/layouts';
+import { isVideoMediaType } from '@/components/media-embed';
 import { getSpeakerBySlug } from '@/features/speakers/queries/get-speaker-by-slug';
 
 interface SpeakerPageProps {
@@ -22,9 +23,14 @@ export default async function SpeakerPage({ params }: SpeakerPageProps) {
   // Find featured talk, or fall back to first talk
   const featuredTalk = talks.find((t) => t.featured) ?? talks[0];
 
-  // Exclude featured talk from regular list if we have more than one
+  // Check if featured talk has video content
+  const hasFeaturedVideo = featuredTalk && isVideoMediaType(featuredTalk.mediaUrl);
+
+  // Exclude featured talk from regular list only if it's a video (shown in hero)
   const remainingTalks =
-    talks.length > 1 && featuredTalk ? talks.filter((t) => t._id !== featuredTalk._id) : talks;
+    hasFeaturedVideo && talks.length > 1 && featuredTalk
+      ? talks.filter((t) => t._id !== featuredTalk._id)
+      : talks;
 
   return (
     <EditorialProfileLayout
@@ -36,7 +42,9 @@ export default async function SpeakerPage({ params }: SpeakerPageProps) {
           talks={remainingTalks}
         />
       }
-      hero={<SpeakerHero featuredTalk={featuredTalk} speaker={speaker} />}
+      hero={
+        <SpeakerHero featuredTalk={hasFeaturedVideo ? featuredTalk : undefined} speaker={speaker} />
+      }
     />
   );
 }
