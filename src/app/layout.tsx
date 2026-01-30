@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 
-import { Inter } from 'next/font/google';
+import { Inter, Playfair_Display } from 'next/font/google';
 
 import { AuthProvider } from '@/components/auth-provider';
 import { ErrorBoundary } from '@/components/error-boundary';
@@ -18,6 +18,7 @@ import { SkipNavLink } from '@/components/site-header/navigation/skip-nav-link';
 import { cn } from '@/utils';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
+const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-display' });
 
 export const metadata: Metadata = {
   description: 'Faith-based talks and content platform',
@@ -35,7 +36,11 @@ export default async function RootLayout({
   sheet: ReactNode;
 }>) {
   return (
-    <html className={cn('h-full', inter.variable)} lang="en" suppressHydrationWarning>
+    <html
+      className={cn('h-full', inter.variable, playfair.variable)}
+      lang="en"
+      suppressHydrationWarning
+    >
       <body className={'flex min-h-full flex-col bg-background bg-cover text-foreground'}>
         <ErrorBoundary>
           <ThemeProvider>

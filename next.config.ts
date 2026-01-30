@@ -36,6 +36,10 @@ const nextConfig = {
         hostname: 'i.ytimg.com',
         protocol: 'https',
       },
+      {
+        hostname: 'img.youtube.com',
+        protocol: 'https',
+      },
     ],
   },
   typedRoutes: false,
