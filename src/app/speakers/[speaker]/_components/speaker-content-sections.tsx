@@ -3,12 +3,15 @@ import type { Collection } from '@/features/collections/types';
 import type { Speaker } from '@/features/speakers/types';
 import type { Talk } from '@/features/talks/types';
 
-import { GridList } from '@/components/grid-list';
-import { ClipCard } from '@/features/clips/components/clip-card';
-import { CollectionCard } from '@/features/collections/components/collection-card';
+import { FeaturedGrid } from '@/components/featured-grid';
 import { getSpeakerName } from '@/features/speakers/utils';
-import { SpeakerSection } from './speaker-section';
+import { SpeakerClipCard } from './speaker-clip-card';
+import { SpeakerCollectionCard } from './speaker-collection-card';
 import { SpeakerTalkCard } from './speaker-talk-card';
+
+const MAX_TALKS = 6;
+const MAX_COLLECTIONS = 4;
+const MAX_CLIPS = 4;
 
 interface SpeakerContentSectionsProps {
   clips: Clip[];
@@ -24,59 +27,98 @@ export function SpeakerContentSections({
   talks,
 }: SpeakerContentSectionsProps) {
   const speakerName = getSpeakerName(speaker);
+  const speakerTitle = speaker.role ? `${speaker.role} ${speakerName}` : speakerName;
+  const displayedTalks = talks.slice(0, MAX_TALKS);
+  const displayedCollections = collections.slice(0, MAX_COLLECTIONS);
+  const displayedClips = clips.slice(0, MAX_CLIPS);
+
+  const hasMoreTalks = talks.length > MAX_TALKS;
+  const hasMoreCollections = collections.length > MAX_COLLECTIONS;
+  const hasMoreClips = clips.length > MAX_CLIPS;
 
   return (
     <>
       {talks.length > 0 && (
-        <SpeakerSection
-          description={`More teachings by ${speakerName}`}
-          id="talks"
-          title="All Talks"
+        <FeaturedGrid
+          columns={{ default: 1, sm: 2, md: 2, lg: 2 }}
+          description={`Enjoy more sermons by ${speakerTitle}.`}
+          quickLinks={
+            hasMoreTalks
+              ? [
+                  {
+                    label: `View all ${talks.length} talks →`,
+                    href: `/talks?speakers=${speaker.slug}`,
+                  },
+                ]
+              : undefined
+          }
+          quickLinksTitle=""
+          title="Talks"
         >
-          <GridList>
-            {talks.map((talk) => (
-              <SpeakerTalkCard key={talk._id} speakerSlug={speaker.slug} talk={talk} />
-            ))}
-          </GridList>
-        </SpeakerSection>
+          {displayedTalks.map((talk) => (
+            <SpeakerTalkCard key={talk._id} speakerSlug={speaker.slug} talk={talk} />
+          ))}
+        </FeaturedGrid>
       )}
 
       {collections.length > 0 && (
-        <SpeakerSection
-          description="Curated series and themed collections"
-          id="collections"
+        <FeaturedGrid
+          columns={{ default: 1, sm: 2, md: 2, lg: 2 }}
+          description={`Curated series featuring ${speakerTitle}.`}
+          quickLinks={
+            hasMoreCollections
+              ? [
+                  {
+                    label: `View all ${collections.length} collections →`,
+                    href: `/collections?speakerSlug=${speaker.slug}`,
+                  },
+                ]
+              : undefined
+          }
+          quickLinksTitle=""
           title="Collections"
         >
-          <GridList>
-            {collections.map((collection) => (
-              <CollectionCard
-                collection={{
-                  description: collection.description,
-                  slug: collection.slug,
-                  title: collection.title,
-                }}
-                key={collection._id}
-              />
-            ))}
-          </GridList>
-        </SpeakerSection>
+          {displayedCollections.map((collection) => (
+            <SpeakerCollectionCard
+              collection={{
+                description: collection.description,
+                slug: collection.slug,
+                title: collection.title,
+              }}
+              key={collection._id}
+            />
+          ))}
+        </FeaturedGrid>
       )}
 
       {clips.length > 0 && (
-        <SpeakerSection description="Short, impactful moments" id="clips" title="Clips">
-          <GridList>
-            {clips.map((clip) => (
-              <ClipCard
-                clip={{
-                  description: clip.description,
-                  slug: clip.slug,
-                  title: clip.title,
-                }}
-                key={clip._id}
-              />
-            ))}
-          </GridList>
-        </SpeakerSection>
+        <FeaturedGrid
+          columns={{ default: 1, sm: 2, md: 2, lg: 2 }}
+          description={`Short, impactful moments from ${speakerTitle}.`}
+          quickLinks={
+            hasMoreClips
+              ? [
+                  {
+                    label: `View all ${clips.length} clips →`,
+                    href: `/clips?speakers=${speaker.slug}`,
+                  },
+                ]
+              : undefined
+          }
+          quickLinksTitle=""
+          title="Clips"
+        >
+          {displayedClips.map((clip) => (
+            <SpeakerClipCard
+              clip={{
+                description: clip.description,
+                slug: clip.slug,
+                title: clip.title,
+              }}
+              key={clip._id}
+            />
+          ))}
+        </FeaturedGrid>
       )}
     </>
   );
