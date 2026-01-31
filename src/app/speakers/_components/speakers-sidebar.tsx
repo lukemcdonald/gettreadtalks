@@ -19,7 +19,7 @@ export function SpeakersSidebar({ speakers }: SpeakersSidebarProps) {
   return (
     <>
       <PageHeader
-        description="Listen to faithful ambassadors of Christ and be blessed."
+        description={`Listen to ${speakers.length} faithful ambassadors of Christ and be blessed.`}
         title="Speakers"
       />
       <SidebarContent>
