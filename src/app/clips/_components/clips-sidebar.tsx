@@ -3,7 +3,6 @@ import type { Topic } from '@/features/topics/types';
 
 import { SidebarContent } from '@/components/sidebar-content';
 import { ComboboxMultiFilter } from '@/components/ui/combobox-multi-filter';
-import { SearchInput } from '@/components/ui/search-input';
 import { SortSelect } from '@/components/ui/sort-select';
 import { getSpeakerName } from '@/features/speakers/utils';
 
@@ -18,7 +17,6 @@ interface ClipsSidebarProps {
 export function ClipsSidebar({ speakers, topics }: ClipsSidebarProps) {
   return (
     <SidebarContent className="space-y-4">
-      <SearchInput label="Search" paramName="search" placeholder="Search clips..." />
       <ComboboxMultiFilter
         label="Speakers"
         name="speakers"
