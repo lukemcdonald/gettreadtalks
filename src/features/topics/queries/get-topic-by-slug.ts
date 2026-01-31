@@ -8,6 +8,7 @@ import { api } from '@/convex/_generated/api';
 interface GetTopicBySlugProps {
   cursor?: string;
   limit?: number;
+  search?: string;
   slug: string;
 }
 
@@ -18,7 +19,7 @@ export async function getTopicBySlug(args: GetTopicBySlugProps) {
   cacheLife('hours');
   cacheTag('topics');
 
-  const { cursor, limit = 50, slug } = args;
+  const { cursor, limit = 50, search, slug } = args;
 
   const paginationOpts = {
     cursor: cursor || null,
@@ -27,6 +28,7 @@ export async function getTopicBySlug(args: GetTopicBySlugProps) {
 
   const result = await fetchQuery(api.topics.getTopicBySlug, {
     paginationOpts,
+    search,
     slug,
   });
 

@@ -71,14 +71,16 @@ export const getTopicWithContent = query({
 /**
  * Get topic by slug with related data and pagination support.
  * Returns topic with related talks (each with speaker) and clips.
+ * Supports search filtering on talk title and speaker name.
  */
 export const getTopicBySlug = query({
   args: {
     paginationOpts: paginationOptsValidator,
+    search: v.optional(v.string()),
     slug: v.string(),
   },
   handler: async (ctx, args) => {
-    const { paginationOpts, slug } = args;
+    const { paginationOpts, search, slug } = args;
 
     const topic = await getOneFrom(ctx.db, 'topics', 'by_slug', slug);
 
@@ -99,20 +101,36 @@ export const getTopicBySlug = query({
       (talk): talk is Doc<'talks'> => talk !== null && talk.status === 'published',
     );
 
+    // Enrich with speakers before filtering so we can search by speaker name
+    const talksWithSpeakers = await enrichWithSpeakers(ctx, publishedTalks);
+
+    // Apply search filter
+    let filteredTalks = talksWithSpeakers;
+    if (search) {
+      const searchLower = search.toLowerCase();
+      filteredTalks = talksWithSpeakers.filter((talk) => {
+        const titleMatch = talk.title.toLowerCase().includes(searchLower);
+        const speakerMatch = talk.speaker
+          ? `${talk.speaker.firstName ?? ''} ${talk.speaker.lastName ?? ''}`
+              .toLowerCase()
+              .includes(searchLower)
+          : false;
+        return titleMatch || speakerMatch;
+      });
+    }
+
     const { continueCursor, isDone, page } = paginateArray(
-      publishedTalks,
+      filteredTalks,
       paginationOpts.cursor,
       paginationOpts.numItems,
     );
 
-    const talksWithSpeakers = await enrichWithSpeakers(ctx, page);
-
     return {
       continueCursor,
       isDone,
-      page: talksWithSpeakers,
+      page,
       topic,
-      totalTalks: publishedTalks.length,
+      totalTalks: filteredTalks.length,
     };
   },
   returns: v.nullable(
