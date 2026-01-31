@@ -12,9 +12,6 @@ import { getSpeakerName } from '@/features/speakers/utils';
 import { getTalkUrl } from '@/features/talks/utils';
 
 interface TalkCardProps {
-  featured?: boolean;
-  favorited?: boolean;
-  finished?: boolean;
   speaker?: Pick<Speaker, 'firstName' | 'lastName' | 'imageUrl' | 'slug'>;
   talk: Pick<Talk, 'description' | 'slug' | 'title'>;
 }

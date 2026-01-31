@@ -7,7 +7,6 @@ import { SpeakerAvatar } from '@/features/speakers/components/speaker-avatar';
 import { getSpeakerName } from '@/features/speakers/utils';
 
 interface SpeakerCardProps {
-  favorited?: boolean;
   speaker: Pick<Speaker, 'featured' | 'firstName' | 'lastName' | 'imageUrl' | 'role' | 'slug'>;
 }
 
