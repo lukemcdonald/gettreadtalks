@@ -5,7 +5,6 @@ import { TopicSidebar } from '@/app/topics/[topic]/_components/topic-sidebar';
 import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { getTopicBySlug } from '@/features/topics/queries/get-topic-by-slug';
-import { getTopics } from '@/features/topics/queries/get-topics';
 
 interface TopicPageProps {
   params: Promise<{
@@ -13,17 +12,15 @@ interface TopicPageProps {
   }>;
   searchParams: Promise<{
     cursor?: string;
+    search?: string;
   }>;
 }
 
 export default async function TopicPage({ params, searchParams }: TopicPageProps) {
   const { topic: slug } = await params;
-  const { cursor } = await searchParams;
+  const { cursor, search } = await searchParams;
 
-  const [topicResult, topicsResult] = await Promise.all([
-    getTopicBySlug({ cursor, slug }),
-    getTopics(),
-  ]);
+  const topicResult = await getTopicBySlug({ cursor, search, slug });
 
   if (!topicResult) {
     notFound();
@@ -42,9 +39,7 @@ export default async function TopicPage({ params, searchParams }: TopicPageProps
         />
       }
       header={<PageHeader title={topic.title} variant="lg" />}
-      sidebar={
-        <TopicSidebar currentSlug={slug} topics={topicsResult.topics} totalTalks={totalTalks} />
-      }
+      sidebar={<TopicSidebar hasActiveFilters={!!search} topic={topic} totalTalks={totalTalks} />}
       sidebarSticky
     />
   );
