@@ -1,6 +1,6 @@
 import { ExternalLinkIcon } from 'lucide-react';
-import Link from 'next/link';
 
+import { Link } from '@/components/ui';
 import { cn } from '@/utils';
 
 interface SpeakerMinistryLinkProps {
@@ -18,7 +18,6 @@ export function SpeakerMinistryLink({ ministry, websiteUrl, className }: Speaker
           className,
         )}
         href={websiteUrl}
-        rel="noopener noreferrer"
         target="_blank"
       >
         {ministry}
@@ -39,7 +38,6 @@ export function SpeakerMinistryLink({ ministry, websiteUrl, className }: Speaker
           className,
         )}
         href={websiteUrl}
-        rel="noopener noreferrer"
         target="_blank"
       >
         Website

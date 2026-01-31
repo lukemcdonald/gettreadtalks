@@ -1,6 +1,6 @@
 import type { ComponentProps } from 'react';
 
-import Link from 'next/link';
+import { Link } from './link';
 
 function FauxLink({ children, ...delegated }: ComponentProps<typeof Link>) {
   return (
