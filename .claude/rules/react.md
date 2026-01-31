@@ -25,3 +25,19 @@ type ExampleProps = { children: ReactNode };
 ❌ import * from 'react'
 type ExampleProps = { children: React.ReactNode };
 ```
+
+## Prop Delegation Naming
+
+When spreading props onto a child element, use `delegated` instead of `props` or `rest`:
+
+```ts
+✅ function Link({ href, target, ...delegated }: LinkProps) {
+     return <NextLink href={href} target={target} {...delegated} />;
+   }
+
+❌ function Link({ href, target, ...props }: LinkProps) {
+     return <NextLink href={href} target={target} {...props} />;
+   }
+```
+
+The name `delegated` communicates intent - these props are being delegated to a child component.
