@@ -1,6 +1,7 @@
 import { SpeakersList } from '@/app/speakers/_components/speakers-list';
 import { SpeakersSidebar } from '@/app/speakers/_components/speakers-sidebar';
 import { SidebarLayout } from '@/components/layouts';
+import { PageHeader } from '@/components/page-header';
 import { getSpeakers } from '@/features/speakers/queries/get-speakers';
 import { getSpeakersGrouped } from '@/features/speakers/queries/get-speakers-grouped';
 
@@ -27,6 +28,13 @@ export default async function SpeakersPage({ searchParams }: SpeakersPageProps) 
   return (
     <SidebarLayout
       content={<SpeakersList groups={speakerGroups} hasActiveFilters={hasActiveFilters} />}
+      header={
+        <PageHeader
+          description={`Listen to ${speakers.length} faithful ambassadors of Christ and be blessed.`}
+          title="Speakers"
+          variant="lg"
+        />
+      }
       sidebar={<SpeakersSidebar speakers={speakers} />}
       sidebarSticky
     />

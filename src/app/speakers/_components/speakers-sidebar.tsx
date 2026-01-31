@@ -1,7 +1,6 @@
 import type { SpeakerRole } from '@/convex/model/speakers/validators';
 import type { Speaker } from '@/features/speakers/types';
 
-import { PageHeader } from '@/components/page-header';
 import { SidebarContent } from '@/components/sidebar-content';
 import { SearchInput } from '@/components/ui/search-input';
 import { SelectFilter } from '@/components/ui/select-filter';
@@ -17,27 +16,21 @@ export function SpeakersSidebar({ speakers }: SpeakersSidebarProps) {
   ).sort();
 
   return (
-    <>
-      <PageHeader
-        description={`Listen to ${speakers.length} faithful ambassadors of Christ and be blessed.`}
-        title="Speakers"
+    <SidebarContent className="space-y-4">
+      <SearchInput label="Search" paramName="search" placeholder="Search speakers..." />
+      <SelectFilter
+        label="Role"
+        name="role"
+        options={roles.map((role) => ({ label: role, value: role }))}
+        placeholder="All Roles"
       />
-      <SidebarContent>
-        <SearchInput label="Search" paramName="search" placeholder="Search speakers..." />
-        <SelectFilter
-          label="Role"
-          name="role"
-          options={roles.map((role) => ({ label: role, value: role }))}
-          placeholder="All Roles"
-        />
-        <SortSelect
-          label="Sort by"
-          options={[
-            { label: 'Alphabetical', value: 'alphabetical' },
-            { label: 'Featured', value: 'featured' },
-          ]}
-        />
-      </SidebarContent>
-    </>
+      <SortSelect
+        label="Sort by"
+        options={[
+          { label: 'Alphabetical', value: 'alphabetical' },
+          { label: 'Featured', value: 'featured' },
+        ]}
+      />
+    </SidebarContent>
   );
 }
