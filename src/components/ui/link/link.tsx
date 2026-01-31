@@ -4,9 +4,9 @@ import NextLink from 'next/link';
 
 type LinkProps = ComponentProps<typeof NextLink>;
 
-export function Link({ rel, target, ...delegated }: LinkProps) {
+export function Link({ rel, target, ...props }: LinkProps) {
   const isBlank = target === '_blank';
-  const finalRel = isBlank ? (rel ?? 'noopener noreferrer') : rel;
+  const resolvedRel = isBlank ? (rel ?? 'noopener noreferrer') : rel;
 
-  return <NextLink rel={finalRel} target={target} {...delegated} />;
+  return <NextLink rel={resolvedRel} target={target} {...props} />;
 }

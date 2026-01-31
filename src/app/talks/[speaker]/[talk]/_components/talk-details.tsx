@@ -1,5 +1,7 @@
 import type { Talk } from '@/features/talks/types';
 
+import { Link } from '@/components/ui';
+
 interface TalkDetailsProps {
   talk: Talk;
 }
@@ -29,9 +31,9 @@ export function TalkDetails({ talk }: TalkDetailsProps) {
       {!!talk.mediaUrl && (
         <div>
           <strong>Media URL:</strong>{' '}
-          <a href={talk.mediaUrl} rel="noopener noreferrer" target="_blank">
+          <Link href={talk.mediaUrl} target="_blank">
             {talk.mediaUrl}
-          </a>
+          </Link>
         </div>
       )}
     </section>

@@ -4,6 +4,7 @@
 export * from './container';
 export * from './fields';
 export * from './form';
+export * from './link';
 export * from './primitives';
 export * from './section';
 export * from './toggle-group';
