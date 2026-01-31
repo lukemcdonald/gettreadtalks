@@ -35,6 +35,7 @@ export async function updateTalkAction(
     await fetchAuthMutation(api.talks.updateTalk, { ...parsed.data, talkId });
 
     revalidateTag('talks', 'hours');
+    revalidateTag('form-options', 'hours');
 
     return {
       success: true,

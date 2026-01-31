@@ -41,6 +41,7 @@ export async function updateSpeakerAction(
     });
 
     revalidateTag('speakers', 'hours');
+    revalidateTag('form-options', 'hours');
 
     return {
       success: true,

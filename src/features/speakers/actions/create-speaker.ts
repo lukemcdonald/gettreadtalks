@@ -33,6 +33,7 @@ export async function createSpeakerAction(
     });
 
     revalidateTag('speakers', 'hours');
+    revalidateTag('form-options', 'hours');
 
     return {
       success: true,
