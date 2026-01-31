@@ -34,6 +34,7 @@ export async function createCollectionAction(
     });
 
     revalidateTag('collections', 'hours');
+    revalidateTag('form-options', 'hours');
 
     return {
       success: true,

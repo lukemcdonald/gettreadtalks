@@ -31,6 +31,7 @@ export async function createTalkAction(data: unknown): Promise<ActionResult<{ ta
     const talkId = await fetchAuthMutation(api.talks.createTalk, parsed.data);
 
     revalidateTag('talks', 'hours');
+    revalidateTag('form-options', 'hours');
 
     return {
       success: true,

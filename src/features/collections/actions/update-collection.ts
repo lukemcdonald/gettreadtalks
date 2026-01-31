@@ -36,6 +36,7 @@ export async function updateCollectionAction(
     });
 
     revalidateTag('collections', 'hours');
+    revalidateTag('form-options', 'hours');
 
     return {
       success: true,

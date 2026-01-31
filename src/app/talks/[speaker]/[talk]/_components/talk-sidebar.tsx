@@ -5,10 +5,9 @@ import type { Talk } from '@/features/talks/types';
 import type { Topic } from '@/features/topics/types';
 import type { User } from '@/services/auth/types';
 
-import Link from 'next/link';
-
 import { SidebarContent } from '@/components/sidebar-content';
 import { Button } from '@/components/ui';
+import { Link } from '@/components/ui/link';
 import { FavoriteTalkButton } from '@/features/users/components/favorite-talk-button';
 import { isAdmin } from '@/services/auth/utils';
 
@@ -29,7 +28,10 @@ export function TalkSidebar({ clips, collection, speaker, talk, topics, user }: 
       <SidebarContent title="Actions">
         <div className="flex flex-col gap-2">
           {!!isAdminUser && (
-            <Button render={<Link href={`/talks/edit/${talk._id}`} />} variant="outline">
+            <Button
+              render={<Link href={`/talks/edit/${talk._id}`} prefetch="hover" />}
+              variant="outline"
+            >
               Edit
             </Button>
           )}
