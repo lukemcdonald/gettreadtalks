@@ -3,12 +3,12 @@ import type { CollectionSortOption } from '@/convex/lib/sort';
 import { CollectionsContent } from '@/app/collections/_components/collections-content';
 import { CollectionsSidebar } from '@/app/collections/_components/collections-sidebar';
 import { SidebarLayout } from '@/components/layouts';
+import { PageHeader } from '@/components/page-header';
 import { getCollectionComparator } from '@/convex/lib/sort';
 import { getCollections } from '@/features/collections/queries/get-collections';
 import { sortSpeakersByName } from '@/features/speakers/utils';
 
 export interface CollectionsPageSearchParams {
-  search?: string;
   sort?: string;
   speakerSlug?: string;
 }
@@ -22,19 +22,10 @@ export default async function CollectionsPage({ searchParams }: CollectionsPageP
 
   const { collections: allCollections } = await getCollections();
 
-  const { search, sort, speakerSlug } = params;
-  const hasActiveFilters = Boolean(search || speakerSlug);
+  const { sort, speakerSlug } = params;
+  const hasActiveFilters = Boolean(speakerSlug);
 
   let filtered = allCollections;
-
-  if (search) {
-    const searchLower = search.toLowerCase();
-    filtered = filtered.filter(
-      ({ collection }) =>
-        collection.title.toLowerCase().includes(searchLower) ||
-        collection.description?.toLowerCase().includes(searchLower),
-    );
-  }
 
   if (speakerSlug) {
     filtered = filtered.filter((item) => item.speakers.some((s) => s.slug === speakerSlug));
@@ -52,6 +43,13 @@ export default async function CollectionsPage({ searchParams }: CollectionsPageP
   return (
     <SidebarLayout
       content={<CollectionsContent collections={collections} hasActiveFilters={hasActiveFilters} />}
+      header={
+        <PageHeader
+          description="Each series includes talks given by one or more speakers on the same topic or book of the Bible."
+          title="Collections"
+          variant="lg"
+        />
+      }
       sidebar={<CollectionsSidebar speakers={speakers} />}
       sidebarSticky
     />
