@@ -5,7 +5,7 @@ import 'server-only';
 import type { ActionResult } from '@/lib/forms/types';
 import type { ClipId } from '../types';
 
-import { revalidateTag } from 'next/cache';
+import { updateTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
 import { mapConvexErrorToFormErrors, mapZodErrors } from '@/lib/forms/validation';
@@ -34,7 +34,7 @@ export async function createClipAction(data: unknown): Promise<ActionResult<{ cl
       title: parsed.data.title,
     });
 
-    revalidateTag('clips', 'hours');
+    updateTag('clips');
 
     return {
       success: true,

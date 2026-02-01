@@ -5,7 +5,7 @@ import 'server-only';
 import type { ActionResult } from '@/lib/forms/types';
 import type { TopicId } from '../types';
 
-import { revalidateTag } from 'next/cache';
+import { updateTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
 import { mapConvexErrorToFormErrors, mapZodErrors } from '@/lib/forms/validation';
@@ -33,7 +33,7 @@ export async function updateTopicAction(
       title: parsed.data.title,
     });
 
-    revalidateTag('topics', 'hours');
+    updateTag('topics');
 
     return {
       success: true,
