@@ -138,6 +138,18 @@ Better Auth with Convex integration:
 - Server: `import { getCurrentUser, requireAdminUser, getAuthToken } from '@/services/auth/server'`
 - Convex: `import { getCurrentUser, requireAuth } from '@/convex/model/auth'`
 
+### Cache Invalidation
+
+Admin actions use `updateTag` for read-your-writes semantics (user sees their change immediately):
+```typescript
+import { updateTag } from 'next/cache';
+
+updateTag('talks');        // Invalidate talks cache
+updateTag('form-options'); // Invalidate form options cache
+```
+
+Use `revalidateTag(tag, profile)` for background/webhook invalidation where SWR behavior is preferred.
+
 ### Error Handling
 
 **Convex Mutations** - Use custom hook:

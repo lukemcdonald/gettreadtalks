@@ -5,7 +5,7 @@ import 'server-only';
 import type { ActionResult } from '@/lib/forms/types';
 import type { CollectionId } from '../types';
 
-import { revalidateTag } from 'next/cache';
+import { updateTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
 import { mapConvexErrorToFormErrors, mapZodErrors } from '@/lib/forms/validation';
@@ -33,8 +33,8 @@ export async function createCollectionAction(
       url: parsed.data.url || undefined,
     });
 
-    revalidateTag('collections', 'hours');
-    revalidateTag('form-options', 'hours');
+    updateTag('collections');
+    updateTag('form-options');
 
     return {
       success: true,
