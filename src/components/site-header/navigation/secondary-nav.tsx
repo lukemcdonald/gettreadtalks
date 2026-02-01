@@ -1,18 +1,20 @@
-import type { User } from '@/services/auth/types';
+import { Suspense } from 'react';
 
-import { AccountMenu } from '@/components/site-header/account-menu/account-menu';
+import { AccountMenuServer } from '@/components/site-header/account-menu/account-menu-server';
+import { AccountMenuSkeleton } from '@/components/site-header/account-menu/account-menu-skeleton';
 import { ModeSwitcher } from '@/components/site-header/mode-switcher';
 import { cn } from '@/utils';
 
 interface SecondaryNavProps {
   className?: string;
-  initialUser?: User;
 }
 
-export function SecondaryNav({ className, initialUser }: SecondaryNavProps) {
+export function SecondaryNav({ className }: SecondaryNavProps) {
   return (
     <div className={cn('flex items-center', className)}>
-      <AccountMenu initialUser={initialUser} />
+      <Suspense fallback={<AccountMenuSkeleton />}>
+        <AccountMenuServer />
+      </Suspense>
       <ModeSwitcher className="hidden size-10 md:flex" />
     </div>
   );
