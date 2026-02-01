@@ -1,3 +1,5 @@
+import { Suspense } from 'react';
+
 import { MobileNav } from '@/components/site-header/navigation/mobile-nav';
 import { PrimaryNav } from '@/components/site-header/navigation/primary-nav';
 import { SecondaryNav } from '@/components/site-header/navigation/secondary-nav';
@@ -15,9 +17,13 @@ export function SiteHeader() {
     >
       <Container className="flex items-center justify-between gap-2">
         <SiteBranding className="flex flex-1 justify-start" />
-        <PrimaryNav className="hidden justify-center md:flex lg:flex-1" />
+        <Suspense>
+          <PrimaryNav className="hidden justify-center md:flex lg:flex-1" />
+        </Suspense>
         <SecondaryNav className="flex justify-end lg:flex-1" />
-        <MobileNav className="md:hidden" />
+        <Suspense>
+          <MobileNav className="md:hidden" />
+        </Suspense>
       </Container>
     </Section>
   );
