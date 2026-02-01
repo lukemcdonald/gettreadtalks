@@ -117,6 +117,28 @@ src/features/{domain}/
 └─ index.ts            # Public barrel export
 ```
 
+### Query & Action Directives
+
+File-level directives for single-function files:
+
+| Directive | Use Case | Location |
+|-----------|----------|----------|
+| `'use cache'` | Public queries (no auth) | `queries/` |
+| `'use cache: private'` | Auth-dependent queries | `queries/` |
+| `'use server'` | Server Actions (mutations) | `actions/` |
+
+Cached queries include `cacheLife()` and `cacheTag()` for invalidation:
+```typescript
+'use cache: private';
+// imports...
+
+export async function getEntity(id: EntityId) {
+  cacheLife('hours');
+  cacheTag('entities');
+  // ...
+}
+```
+
 ### Component Organization
 
 1. **Shared** - `src/components/` - Used across features
@@ -140,15 +162,14 @@ Better Auth with Convex integration:
 
 ### Cache Invalidation
 
-Admin actions use `updateTag` for read-your-writes semantics (user sees their change immediately):
+Actions use `updateTag` for read-your-writes semantics (user sees their change immediately):
 ```typescript
 import { updateTag } from 'next/cache';
 
-updateTag('talks');        // Invalidate talks cache
-updateTag('form-options'); // Invalidate form options cache
+updateTag('entities'); // Invalidate after mutation
 ```
 
-Use `revalidateTag(tag, profile)` for background/webhook invalidation where SWR behavior is preferred.
+Use `revalidateTag()` for background/webhook invalidation where SWR behavior is preferred.
 
 ### Error Handling
 
