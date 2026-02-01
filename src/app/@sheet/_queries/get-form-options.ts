@@ -1,3 +1,5 @@
+'use cache: private';
+
 import { cacheLife, cacheTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
@@ -5,10 +7,9 @@ import { fetchAuthQuery } from '@/services/auth/server';
 
 /**
  * Fetches form options for admin forms (collections, speakers, talks).
- * Cached per-user with 'use cache: private' since fetchAuthQuery reads cookies.
+ * Cached per-user since fetchAuthQuery reads cookies.
  */
 export async function getFormOptions() {
-  'use cache: private';
   cacheLife('hours');
   cacheTag('form-options');
 
