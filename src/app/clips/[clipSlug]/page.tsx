@@ -7,12 +7,12 @@ import { ClipContent } from './_components/clip-content';
 import { ClipSidebar } from './_components/clip-sidebar';
 
 interface ClipPageProps {
-  params: Promise<{ clip: string }>;
+  params: Promise<{ clipSlug: string }>;
 }
 
 export default async function ClipPage({ params }: ClipPageProps) {
-  const { clip: slug } = await params;
-  const data = await getClipBySlug(slug);
+  const { clipSlug } = await params;
+  const data = await getClipBySlug(clipSlug);
 
   if (!data) {
     notFound();

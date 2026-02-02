@@ -1,18 +1,18 @@
 import { notFound } from 'next/navigation';
 
-import { SpeakerContentSections } from '@/app/speakers/[speaker]/_components/speaker-content-sections';
-import { SpeakerHero } from '@/app/speakers/[speaker]/_components/speaker-hero';
+import { SpeakerContentSections } from '@/app/speakers/[speakerSlug]/_components/speaker-content-sections';
+import { SpeakerHero } from '@/app/speakers/[speakerSlug]/_components/speaker-hero';
 import { EditorialProfileLayout } from '@/components/layouts';
 import { isVideoMediaType } from '@/components/media-embed';
 import { getSpeakerBySlug } from '@/features/speakers/queries/get-speaker-by-slug';
 
 interface SpeakerPageProps {
-  params: Promise<{ speaker: string }>;
+  params: Promise<{ speakerSlug: string }>;
 }
 
 export default async function SpeakerPage({ params }: SpeakerPageProps) {
-  const { speaker: slug } = await params;
-  const data = await getSpeakerBySlug(slug);
+  const { speakerSlug } = await params;
+  const data = await getSpeakerBySlug(speakerSlug);
 
   if (!data) {
     notFound();

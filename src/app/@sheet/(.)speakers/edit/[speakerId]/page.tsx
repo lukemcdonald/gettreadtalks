@@ -6,12 +6,12 @@ import { getSpeaker } from '@/features/speakers/queries/get-speaker';
 import { EditSpeakerSheetRoute } from './_components/edit-speaker-sheet-route';
 
 interface PageProps {
-  params: Promise<{ id: SpeakerId }>;
+  params: Promise<{ speakerId: SpeakerId }>;
 }
 
 export default async function Page({ params }: PageProps) {
-  const { id } = await params;
-  const speaker = await getSpeaker(id);
+  const { speakerId } = await params;
+  const speaker = await getSpeaker(speakerId);
 
   if (!speaker) {
     redirect('/speakers');

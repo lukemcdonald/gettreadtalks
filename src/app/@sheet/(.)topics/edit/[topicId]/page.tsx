@@ -6,12 +6,12 @@ import { getTopic } from '@/features/topics/queries/get-topic';
 import { EditTopicSheetRoute } from './_components/edit-topic-sheet-route';
 
 interface PageProps {
-  params: Promise<{ id: TopicId }>;
+  params: Promise<{ topicId: TopicId }>;
 }
 
 export default async function Page({ params }: PageProps) {
-  const { id } = await params;
-  const topic = await getTopic(id);
+  const { topicId } = await params;
+  const topic = await getTopic(topicId);
 
   if (!topic) {
     redirect('/topics');
