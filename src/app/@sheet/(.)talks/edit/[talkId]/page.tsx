@@ -7,13 +7,13 @@ import { getTalk } from '@/features/talks/queries/get-talk';
 import { EditTalkSheetRoute } from './_components/edit-talk-sheet-route';
 
 interface PageProps {
-  params: Promise<{ id: TalkId }>;
+  params: Promise<{ talkId: TalkId }>;
 }
 
 export default async function Page({ params }: PageProps) {
-  const { id } = await params;
+  const { talkId } = await params;
 
-  const [talk, { collections, speakers }] = await Promise.all([getTalk(id), getFormOptions()]);
+  const [talk, { collections, speakers }] = await Promise.all([getTalk(talkId), getFormOptions()]);
 
   if (!talk) {
     redirect('/account/talks');

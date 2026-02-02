@@ -1,9 +1,9 @@
 import type { Speaker } from '@/features/speakers/types';
 import type { Talk } from '@/features/talks/types';
 
-import { SpeakerHeroBackground } from '@/app/speakers/[speaker]/_components/speaker-hero-background';
-import { SpeakerHeroDetails } from '@/app/speakers/[speaker]/_components/speaker-hero-details';
-import { SpeakerHeroFeaturedTalk } from '@/app/speakers/[speaker]/_components/speaker-hero-featured-talk';
+import { SpeakerHeroBackground } from '@/app/speakers/[speakerSlug]/_components/speaker-hero-background';
+import { SpeakerHeroDetails } from '@/app/speakers/[speakerSlug]/_components/speaker-hero-details';
+import { SpeakerHeroFeaturedTalk } from '@/app/speakers/[speakerSlug]/_components/speaker-hero-featured-talk';
 import { getVideoThumbnail, isVideoMediaType } from '@/components/media-embed';
 import { Container, Section } from '@/components/ui';
 import { cn } from '@/utils';

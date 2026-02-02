@@ -1,17 +1,17 @@
 import { notFound } from 'next/navigation';
 
-import { CollectionContent } from '@/app/collections/[collection]/_components/collection-content';
-import { CollectionSidebar } from '@/app/collections/[collection]/_components/collection-sidebar';
+import { CollectionContent } from '@/app/collections/[collectionSlug]/_components/collection-content';
+import { CollectionSidebar } from '@/app/collections/[collectionSlug]/_components/collection-sidebar';
 import { SidebarLayout } from '@/components/layouts';
 import { getCollectionBySlug } from '@/features/collections/queries/get-collection-by-slug';
 
 interface CollectionPageProps {
-  params: Promise<{ collection: string }>;
+  params: Promise<{ collectionSlug: string }>;
 }
 
 export default async function CollectionPage({ params }: CollectionPageProps) {
-  const { collection: slug } = await params;
-  const data = await getCollectionBySlug(slug);
+  const { collectionSlug } = await params;
+  const data = await getCollectionBySlug(collectionSlug);
 
   if (!data) {
     notFound();
