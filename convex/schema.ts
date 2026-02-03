@@ -17,14 +17,6 @@ export default defineSchema({
   ...topicTables,
 
   // Join tables
-  clipsOnTopics: defineTable({
-    clipId: v.id('clips'),
-    topicId: v.id('topics'),
-  })
-    .index('by_clipId', ['clipId'])
-    .index('by_clipId_and_topicId', ['clipId', 'topicId'])
-    .index('by_topicId', ['topicId']),
-
   talksOnTopics: defineTable({
     talkId: v.id('talks'),
     topicId: v.id('topics'),

@@ -142,34 +142,3 @@ export async function getTalkIdsByTopicSlugs(
 
   return talkIds;
 }
-
-/**
- * Get clip IDs that match any of the given topic slugs.
- * Returns null if no valid topics found (to signal "no results").
- */
-export async function getClipIdsByTopicSlugs(
-  ctx: QueryCtx,
-  topicSlugs: string[],
-): Promise<Set<Id<'clips'>> | null> {
-  const topics = await Promise.all(
-    topicSlugs.map((slug) => getOneFrom(ctx.db, 'topics', 'by_slug', slug)),
-  );
-  const validTopics = topics.filter((t): t is Doc<'topics'> => t !== null);
-
-  if (validTopics.length === 0) {
-    return null;
-  }
-
-  const clipIds = new Set<Id<'clips'>>();
-  for (const topic of validTopics) {
-    const entries = await ctx.db
-      .query('clipsOnTopics')
-      .withIndex('by_topicId', (q) => q.eq('topicId', topic._id))
-      .collect();
-    for (const entry of entries) {
-      clipIds.add(entry.clipId);
-    }
-  }
-
-  return clipIds;
-}

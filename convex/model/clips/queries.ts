@@ -3,10 +3,10 @@ import type { ContentSortOption } from '../../lib/sort';
 import { paginationOptsValidator, paginationResultValidator } from 'convex/server';
 import { v } from 'convex/values';
 import { asyncMap } from 'convex-helpers';
-import { getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
+import { getOneFrom } from 'convex-helpers/server/relationships';
 
 import { query } from '../../_generated/server';
-import { filterClipsByPublishedTalks, getClipIdsByTopicSlugs } from '../../lib/filters';
+import { filterClipsByPublishedTalks } from '../../lib/filters';
 import { getContentComparator } from '../../lib/sort';
 import { applySearchFilter, paginateArray } from '../../lib/utils';
 import { doc, docs } from '../../lib/validators/schema';
@@ -33,7 +33,7 @@ export const getClip = query({
 
 /**
  * Get clip by slug with related data (default for detail pages).
- * Returns clip with speaker, talk, and topics.
+ * Returns clip with speaker and talk.
  */
 export const getClipBySlug = query({
   args: {
@@ -53,29 +53,15 @@ export const getClipBySlug = query({
       return null;
     }
 
-    const clipId = clip._id;
-    const speakerId = clip.speakerId;
-    const talkId = clip.talkId;
-
-    const queries = {
-      speaker: speakerId ? ctx.db.get('speakers', speakerId) : null,
-      talk: talkId ? ctx.db.get('talks', talkId) : null,
-      topics: getManyVia(ctx.db, 'clipsOnTopics', 'topicId', 'by_clipId', clipId, 'clipId'),
-    };
-
-    const [speaker, talk, topics] = await Promise.all([
-      queries.speaker,
-      queries.talk,
-      queries.topics,
+    const [speaker, talk] = await Promise.all([
+      clip.speakerId ? ctx.db.get('speakers', clip.speakerId) : null,
+      clip.talkId ? ctx.db.get('talks', clip.talkId) : null,
     ]);
-
-    const validTopics = topics.filter((topic) => topic !== null);
 
     return {
       clip,
       speaker,
       talk,
-      topics: validTopics,
     };
   },
   returns: v.nullable(
@@ -83,7 +69,6 @@ export const getClipBySlug = query({
       clip: doc('clips'),
       speaker: doc('speakers').nullable(),
       talk: doc('talks').nullable(),
-      topics: docs('topics'),
     }),
   ),
 });
@@ -94,7 +79,7 @@ const sortType = v.optional(
 
 /**
  * List published clips with speaker data (public-facing).
- * Supports filtering by search, speaker, topic, and sorting.
+ * Supports filtering by search, speaker, and sorting.
  * Filters clips to only those with published parent talks.
  */
 export const listClips = query({
@@ -103,14 +88,12 @@ export const listClips = query({
     search: v.optional(v.string()),
     sort: sortType,
     speakerSlugs: v.optional(v.array(v.string())),
-    topicSlugs: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
-    const { paginationOpts, search, sort = 'recent', speakerSlugs, topicSlugs } = args;
+    const { paginationOpts, search, sort = 'recent', speakerSlugs } = args;
 
     const hasSpeakerFilter = speakerSlugs && speakerSlugs.length > 0;
-    const hasTopicFilter = topicSlugs && topicSlugs.length > 0;
-    const hasFilters = search || hasSpeakerFilter || hasTopicFilter;
+    const hasFilters = search || hasSpeakerFilter;
     const needsCustomSort = sort !== 'recent';
 
     // When no filters and default sort, use native Convex pagination
@@ -160,16 +143,6 @@ export const listClips = query({
         clips = clips.filter((clip) => clip.speakerId && speakerIds.has(clip.speakerId));
       } else {
         clips = []; // No matching speakers found
-      }
-    }
-
-    // Apply topic filter (multi-select)
-    if (hasTopicFilter) {
-      const topicClipIds = await getClipIdsByTopicSlugs(ctx, topicSlugs);
-      if (topicClipIds) {
-        clips = clips.filter((clip) => topicClipIds.has(clip._id));
-      } else {
-        clips = []; // No matching topics found
       }
     }
 

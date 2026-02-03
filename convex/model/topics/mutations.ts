@@ -10,46 +10,6 @@ import { requireAuth } from '../auth/utils';
 import { topicStatus } from './validators';
 
 /**
- * Add a clip to a topic.
- */
-export const addClipToTopic = mutation({
-  args: {
-    clipId: v.id('clips'),
-    topicId: v.id('topics'),
-  },
-  handler: async (ctx, args) => {
-    await requireAuth(ctx);
-
-    const clip = await ctx.db.get('clips', args.clipId);
-    if (!clip) {
-      throwNotFound('Clip not found', { resource: 'clip', resourceId: args.clipId });
-    }
-
-    const topic = await ctx.db.get('topics', args.topicId);
-    if (!topic) {
-      throwNotFound('Topic not found', { resource: 'topic', resourceId: args.topicId });
-    }
-
-    const existing = await ctx.db
-      .query('clipsOnTopics')
-      .withIndex('by_clipId_and_topicId', (q) =>
-        q.eq('clipId', args.clipId).eq('topicId', args.topicId),
-      )
-      .unique();
-
-    if (existing) {
-      throwValidationError('Clip is already associated with this topic');
-    }
-
-    return await ctx.db.insert('clipsOnTopics', {
-      clipId: args.clipId,
-      topicId: args.topicId,
-    });
-  },
-  returns: v.id('clipsOnTopics'),
-});
-
-/**
  * Add a talk to a topic.
  */
 export const addTalkToTopic = mutation({
@@ -137,44 +97,8 @@ export const destroyTopic = mutation({
       throwValidationError('Cannot delete topic: topic has associated talks');
     }
 
-    // Check if topic is referenced by any clips
-    const clipsWithTopic = await getOneFrom(ctx.db, 'clipsOnTopics', 'by_topicId', args.id);
-
-    if (clipsWithTopic) {
-      throwValidationError('Cannot delete topic: topic has associated clips');
-    }
-
     // Hard delete the topic
     await ctx.db.delete(args.id);
-
-    return null;
-  },
-  returns: v.null(),
-});
-
-/**
- * Remove a clip from a topic.
- */
-export const removeClipFromTopic = mutation({
-  args: {
-    clipId: v.id('clips'),
-    topicId: v.id('topics'),
-  },
-  handler: async (ctx, args) => {
-    await requireAuth(ctx);
-
-    const association = await ctx.db
-      .query('clipsOnTopics')
-      .withIndex('by_clipId_and_topicId', (q) =>
-        q.eq('clipId', args.clipId).eq('topicId', args.topicId),
-      )
-      .first();
-
-    if (!association) {
-      throwNotFound('Association not found', { resource: 'clipsOnTopics' });
-    }
-
-    await ctx.db.delete(association._id);
 
     return null;
   },

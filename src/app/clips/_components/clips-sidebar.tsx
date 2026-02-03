@@ -1,5 +1,4 @@
 import type { Speaker } from '@/features/speakers/types';
-import type { Topic } from '@/features/topics/types';
 
 import { SidebarContent } from '@/components/sidebar-content';
 import { ComboboxMultiFilter } from '@/components/ui/combobox-multi-filter';
@@ -8,13 +7,9 @@ import { getSpeakerName } from '@/features/speakers/utils';
 
 interface ClipsSidebarProps {
   speakers: Speaker[];
-  topics: {
-    count: number;
-    topic: Topic;
-  }[];
 }
 
-export function ClipsSidebar({ speakers, topics }: ClipsSidebarProps) {
+export function ClipsSidebar({ speakers }: ClipsSidebarProps) {
   return (
     <SidebarContent className="space-y-4">
       <ComboboxMultiFilter
@@ -25,15 +20,6 @@ export function ClipsSidebar({ speakers, topics }: ClipsSidebarProps) {
           value: speaker.slug,
         }))}
         placeholder="All Speakers"
-      />
-      <ComboboxMultiFilter
-        label="Topics"
-        name="topics"
-        options={topics.map(({ topic }) => ({
-          label: topic.title,
-          value: topic.slug,
-        }))}
-        placeholder="All Topics"
       />
       <SortSelect
         label="Sort by"

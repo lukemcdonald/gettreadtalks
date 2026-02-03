@@ -5,7 +5,7 @@ import { createIdMapping } from './idMap';
 import { importAffiliateLinks } from './importAffiliateLinks';
 import { importClips } from './importClips';
 import { importCollections } from './importCollections';
-import { importClipsOnTopics, importTalksOnTopics } from './importJoinTables';
+import { importTalksOnTopics } from './importJoinTables';
 import { importSpeakers } from './importSpeakers';
 import { importTalks } from './importTalks';
 import { importTopics } from './importTopics';
@@ -26,7 +26,6 @@ export const clearAllData = mutation({
     }
     // Delete in reverse dependency order
     const tables = [
-      'clipsOnTopics',
       'talksOnTopics',
       'userFavoriteClips',
       'userFavoriteSpeakers',
@@ -113,7 +112,6 @@ export const runMigration = mutation({
 
     console.log('Importing join tables...');
     await importTalksOnTopics(ctx, args.talks, idMapping);
-    await importClipsOnTopics(ctx, args.clips, idMapping);
 
     console.log('Migration completed successfully!');
 

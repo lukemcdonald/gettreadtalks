@@ -24,7 +24,7 @@ export const getTopic = query({
 });
 
 /**
- * Get topic with related talks and clips.
+ * Get topic with related talks.
  */
 export const getTopicWithContent = query({
   args: {
@@ -40,28 +40,26 @@ export const getTopicWithContent = query({
       return null;
     }
 
-    const [allClips, allTalks] = await Promise.all([
-      getManyVia(ctx.db, 'clipsOnTopics', 'clipId', 'by_topicId', topic._id, 'topicId'),
-      getManyVia(ctx.db, 'talksOnTopics', 'talkId', 'by_topicId', topic._id, 'topicId'),
-    ]);
-
-    const clips = allClips
-      .filter((clip): clip is Doc<'clips'> => clip !== null && clip.status === 'published')
-      .slice(0, limit);
+    const allTalks = await getManyVia(
+      ctx.db,
+      'talksOnTopics',
+      'talkId',
+      'by_topicId',
+      topic._id,
+      'topicId',
+    );
 
     const talks = allTalks
       .filter((talk): talk is Doc<'talks'> => talk !== null && talk.status === 'published')
       .slice(0, limit);
 
     return {
-      clips,
       talks,
       topic,
     };
   },
   returns: v.nullable(
     v.object({
-      clips: docs('clips'),
       talks: docs('talks'),
       topic: doc('topics'),
     }),
