@@ -1,17 +1,10 @@
 import type { ReactNode } from 'react';
+import type { GridColumns } from './grid-list';
 
 import Link from 'next/link';
 
 import { cn } from '@/utils';
 import { GridList } from './grid-list';
-
-interface GridColumns {
-  default?: 1 | 2 | 3 | 4 | 5;
-  lg?: 1 | 2 | 3 | 4 | 5;
-  md?: 1 | 2 | 3 | 4 | 5;
-  sm?: 1 | 2 | 3 | 4 | 5;
-  xl?: 1 | 2 | 3 | 4 | 5;
-}
 
 interface NavItem {
   href: string;

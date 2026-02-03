@@ -32,7 +32,7 @@ export function CollectionsContent({ collections, hasActiveFilters }: Collection
   }
 
   return (
-    <GridList>
+    <GridList columns={{ default: 1, sm: 2, md: 2, lg: 2, xl: 2 }}>
       {collections.map((item) => (
         <CollectionCard
           collection={{
