@@ -1,9 +1,9 @@
+import { Spinner } from '@/components/ui';
+
 export default function Loading() {
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <div className="text-center">
-        <div className="text-lg">Loading...</div>
-      </div>
+    <div className="flex min-h-[50vh] items-center justify-center">
+      <Spinner className="size-6 text-muted-foreground" />
     </div>
   );
 }
