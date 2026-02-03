@@ -7,7 +7,7 @@ import { internalMutation } from '../_generated/server';
 import { importAffiliateLinks } from './importAffiliateLinks';
 import { importClips } from './importClips';
 import { importCollections } from './importCollections';
-import { importClipsOnTopics, importTalksOnTopics } from './importJoinTables';
+import { importTalksOnTopics } from './importJoinTables';
 import { importSpeakers } from './importSpeakers';
 import { importTalks } from './importTalks';
 import { importTopics } from './importTopics';
@@ -128,20 +128,6 @@ export const importTalksOnTopicsBatch = internalMutation({
   handler: async (ctx, args) => {
     const idMapping = deserializeIdMapping(args.idMapping);
     return await importTalksOnTopics(ctx, args.records, idMapping);
-  },
-});
-
-/**
- * Internal mutation to import clipsOnTopics join table.
- */
-export const importClipsOnTopicsBatch = internalMutation({
-  args: {
-    idMapping: v.any(),
-    records: v.array(v.any()),
-  },
-  handler: async (ctx, args) => {
-    const idMapping = deserializeIdMapping(args.idMapping);
-    return await importClipsOnTopics(ctx, args.records, idMapping);
   },
 });
 

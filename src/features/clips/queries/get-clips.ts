@@ -13,7 +13,6 @@ interface GetClipsProps {
   search?: string;
   sort?: string;
   speakerSlugs?: string[];
-  topicSlugs?: string[];
 }
 
 /**
@@ -25,7 +24,7 @@ export async function getClips(args?: GetClipsProps) {
   cacheLife('hours');
   cacheTag('clips');
 
-  const { cursor, limit = 50, search, sort, speakerSlugs, topicSlugs } = args ?? {};
+  const { cursor, limit = 50, search, sort, speakerSlugs } = args ?? {};
 
   // Validate sort option
   const validSorts: SortOption[] = ['alphabetical', 'oldest', 'recent'];
@@ -43,7 +42,6 @@ export async function getClips(args?: GetClipsProps) {
     search: search || undefined,
     sort: sortOption,
     speakerSlugs: speakerSlugs?.length ? speakerSlugs : undefined,
-    topicSlugs: topicSlugs?.length ? topicSlugs : undefined,
   });
 
   return {

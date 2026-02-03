@@ -8,10 +8,8 @@ export const listTopics = queries.listTopics;
 export const listTopicsWithCount = queries.listTopicsWithCount;
 
 // Mutations
-export const addClipToTopic = mutations.addClipToTopic;
 export const addTalkToTopic = mutations.addTalkToTopic;
 export const createTopic = mutations.createTopic;
 export const destroyTopic = mutations.destroyTopic;
-export const removeClipFromTopic = mutations.removeClipFromTopic;
 export const removeTalkFromTopic = mutations.removeTalkFromTopic;
 export const updateTopic = mutations.updateTopic;
