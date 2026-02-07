@@ -34,9 +34,12 @@ This project uses **Ultracite** (Biome-based) for linting and formatting. Run `p
 
 **What Biome handles:** formatting, import ordering, unused variables, type safety, accessibility violations.
 
+Alphabatize when possible, including props when destructuring.
+
 **What requires judgment:** business logic, meaningful naming, architecture, edge cases, UX.
 
 ### React 19+ Patterns
+
 - Use `ref` as a prop instead of `React.forwardRef`
 - No unnecessary memoization - React 19 optimizes automatically
 
@@ -47,23 +50,25 @@ This project uses **Ultracite** (Biome-based) for linting and formatting. Run `p
 Code is organized by **domain/feature**, not technical layer.
 
 **Directory Structure:**
-- `src/features/` - Business domains (talks, users, clips, speakers, topics, collections)
-- `src/services/` - Infrastructure (auth, email, errors)
-- `src/lib/` - Cross-cutting concerns (forms, entities)
-- `src/utils/` - Generic utilities
-- `src/constants/` - Shared constants
+
 - `convex/` - Database schema + backend functions
 - `convex/model/` - Entity-specific helpers organized by domain
 - `src/app/` - Next.js App Router pages
 - `src/components/` - Shared UI components
+- `src/constants/` - Shared constants
+- `src/features/` - Business domains (talks, users, clips, speakers, topics, collections)
+- `src/lib/` - Cross-cutting concerns (forms, entities)
+- `src/services/` - Infrastructure (auth, email, errors)
+- `src/utils/` - Generic utilities
 
 **Path Alias:** `@/*` maps to `src/*`
 
 ### Data Flow Patterns
 
 **Server Components (default)** - Fetch data server-side:
+
 ```typescript
-import { getTalks } from '@/features/talks';
+import { getTalks } from '@/features/talks/queries/get-talks';
 
 export default async function TalksPage({ searchParams }) {
   const params = await searchParams;
@@ -73,12 +78,13 @@ export default async function TalksPage({ searchParams }) {
 ```
 
 **Client Components** - Only for interactivity, forms, and mutations:
+
 ```typescript
 'use client';
 import { useTalkForm } from '@/features/talks/hooks';
 
-export function TalkFormClient({ speakers, collections }) {
-  const { form, onSubmit, isBusy } = useTalkForm({ speakers, collections });
+export function TalkFormClient({ collections, speakers }) {
+  const { form, isBusy, onSubmit } = useTalkForm({ collections, speakers });
   return <form onSubmit={onSubmit}>...</form>;
 }
 ```
@@ -86,6 +92,7 @@ export function TalkFormClient({ speakers, collections }) {
 ### Convex Backend Organization
 
 **File Structure:**
+
 - `convex/{domain}.ts` - Public API exports
 - `convex/model/{domain}/` - Entity helpers (queries.ts, mutations.ts, schema.ts, validators.ts)
 - `convex/model/auth/` - Authentication helpers
@@ -94,27 +101,28 @@ export function TalkFormClient({ speakers, collections }) {
 **Naming Conventions:**
 
 *Queries:*
+
 - `get*` - Single document or null
 - `list*` - Filtered/public array with enrichment
 - `listAll*` - Unfiltered array for admin
 
 *Mutations:*
+
 - `create*`, `update*`, `archive*` (soft delete), `destroy*` (hard delete)
 - `add*To*`, `remove*From*` - Associations
 - `favorite*`, `unfavorite*`, `finish*`, `unfinish*` - User actions
 
 ### Feature Structure
 
-```
+```sh
 src/features/{domain}/
 ├─ actions/            # Server actions (writes)
-├─ queries/            # Server queries (reads)
-├─ hooks/              # Client hooks (mutations/forms only)
 ├─ components/         # Feature-specific components
-├─ schemas/            # Zod validation
+├─ hooks/              # Client hooks (mutations/forms only)
+├─ queries/            # Server queries (reads)
+├─ schemas/            # Zod validations
 ├─ types.ts
-├─ utils.ts
-└─ index.ts            # Public barrel export
+└─ utils.ts
 ```
 
 ### Query & Action Directives
@@ -122,12 +130,13 @@ src/features/{domain}/
 File-level directives for single-function files:
 
 | Directive | Use Case | Location |
-|-----------|----------|----------|
+| --------- | -------- | -------- |
 | `'use cache'` | Public queries (no auth) | `queries/` |
 | `'use cache: private'` | Auth-dependent queries | `queries/` |
 | `'use server'` | Server Actions (mutations) | `actions/` |
 
 Cached queries include `cacheLife()` and `cacheTag()` for invalidation:
+
 ```typescript
 'use cache: private';
 // imports...
@@ -147,15 +156,16 @@ export async function getEntity(id: EntityId) {
 
 **UI Primitives:** Files in `src/components/ui/primitives/` are vendor components - never edit directly. Create wrappers in `src/components/ui/`.
 
-**Naming:** kebab-case for all folders and files
+**Naming:** kebab-case for all folders
 
 ### Route-Level Co-location
 
-Route groups can co-locate `_hooks/`, `_queries/`, and `_components/` for code shared across pages within that group but not specific to a feature domain. Feature-specific code stays in `src/features/{domain}/`.
+Route groups can co-locate `_components/`, `_hooks/`, and `_queries/` for code shared across pages within that group but not specific to a feature domain. Feature-specific code stays in `src/features/{domain}/`.
 
 ### Authentication
 
 Better Auth with Convex integration:
+
 - Client: `import { useCurrentUser } from '@/features/users/hooks'`
 - Server: `import { getCurrentUser, requireAdminUser, getAuthToken } from '@/services/auth/server'`
 - Convex: `import { getCurrentUser, requireAuth } from '@/convex/model/auth'`
@@ -163,6 +173,7 @@ Better Auth with Convex integration:
 ### Cache Invalidation
 
 Actions use `updateTag` for read-your-writes semantics (user sees their change immediately):
+
 ```typescript
 import { updateTag } from 'next/cache';
 
@@ -174,6 +185,7 @@ Use `revalidateTag()` for background/webhook invalidation where SWR behavior is 
 ### Error Handling
 
 **Convex Mutations** - Use custom hook:
+
 ```typescript
 import { useMutation } from '@/hooks';
 
@@ -184,6 +196,7 @@ const { mutate, isLoading, error } = useMutation(api.talks.createTalk, {
 ```
 
 **Server Actions** - Try/catch with error mapping:
+
 ```typescript
 import { mapConvexErrorToFormErrors } from '@/lib/forms/validation';
 
@@ -198,7 +211,7 @@ try {
 ## Key Principles
 
 1. **Server-first data fetching** - Fetch in server components, pass to client
-2. **Organize by domain** - Related code lives together in features
+2. **Organize by domain** - Related code lives together in `src/features/`
 3. **Server Components by default** - Client only for interactivity
 4. **Type safety** - Convex provides end-to-end types
 5. **Co-located code** - Tests, types, utils next to their components

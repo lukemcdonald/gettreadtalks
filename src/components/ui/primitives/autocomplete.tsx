@@ -76,26 +76,35 @@ function AutocompleteInput({
 function AutocompletePopup({
   className,
   children,
+  side = "bottom",
   sideOffset = 4,
+  alignOffset,
+  align = "start",
   ...props
 }: AutocompletePrimitive.Popup.Props & {
-  sideOffset?: number;
+  align?: AutocompletePrimitive.Positioner.Props["align"];
+  sideOffset?: AutocompletePrimitive.Positioner.Props["sideOffset"];
+  alignOffset?: AutocompletePrimitive.Positioner.Props["alignOffset"];
+  side?: AutocompletePrimitive.Positioner.Props["side"];
 }) {
   return (
     <AutocompletePrimitive.Portal>
       <AutocompletePrimitive.Positioner
+        align={align}
+        alignOffset={alignOffset}
         className="z-50 select-none"
         data-slot="autocomplete-positioner"
+        side={side}
         sideOffset={sideOffset}
       >
         <span
           className={cn(
-            "relative flex max-h-full origin-(--transform-origin) rounded-lg border bg-popover not-dark:bg-clip-padding shadow-lg/5 transition-[scale,opacity] before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-lg)-1px)] before:shadow-[0_1px_--theme(--color-black/6%)] dark:before:shadow-[0_-1px_--theme(--color-white/6%)]",
+            "relative flex max-h-full min-w-(--anchor-width) max-w-(--available-width) origin-(--transform-origin) rounded-lg border bg-popover not-dark:bg-clip-padding shadow-lg/5 transition-[scale,opacity] before:pointer-events-none before:absolute before:inset-0 before:rounded-[calc(var(--radius-lg)-1px)] before:shadow-[0_1px_--theme(--color-black/4%)] dark:before:shadow-[0_-1px_--theme(--color-white/6%)]",
             className,
           )}
         >
           <AutocompletePrimitive.Popup
-            className="flex max-h-[min(var(--available-height),23rem)] w-(--anchor-width) max-w-(--available-width) flex-col text-foreground"
+            className="flex max-h-[min(var(--available-height),23rem)] flex-1 flex-col text-foreground"
             data-slot="autocomplete-popup"
             {...props}
           >
