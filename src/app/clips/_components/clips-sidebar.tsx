@@ -1,5 +1,7 @@
 import type { Speaker } from '@/features/speakers/types';
 
+import { SearchIcon } from 'lucide-react';
+
 import { SidebarContent } from '@/components/sidebar-content';
 import { ComboboxMultiFilter } from '@/components/ui/combobox-multi-filter';
 import { SortSelect } from '@/components/ui/sort-select';
@@ -20,6 +22,7 @@ export function ClipsSidebar({ speakers }: ClipsSidebarProps) {
           value: speaker.slug,
         }))}
         placeholder="All Speakers"
+        startAddon={<SearchIcon />}
       />
       <SortSelect
         label="Sort by"

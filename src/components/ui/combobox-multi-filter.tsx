@@ -1,6 +1,6 @@
 'use client';
 
-import { useTransition } from 'react';
+import { type ComponentProps, useTransition } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import {
@@ -28,6 +28,7 @@ interface ComboboxMultiFilterProps {
   name: string;
   options: FilterOption[];
   placeholder?: string;
+  startAddon?: React.ReactNode;
 }
 
 export function ComboboxMultiFilter({
@@ -36,6 +37,7 @@ export function ComboboxMultiFilter({
   name,
   options,
   placeholder = 'Select...',
+  startAddon,
 }: ComboboxMultiFilterProps) {
   const pathname = usePathname();
   const router = useRouter();
@@ -81,7 +83,7 @@ export function ComboboxMultiFilter({
         onValueChange={handleChange}
         value={selectedOptions}
       >
-        <ComboboxChips>
+        <ComboboxChips startAddon={startAddon}>
           <ComboboxValue>
             {(value: FilterOption[]) => (
               <>
