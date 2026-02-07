@@ -7,8 +7,8 @@ import {
   Combobox,
   ComboboxChip,
   ComboboxChips,
+  ComboboxChipsInput,
   ComboboxEmpty,
-  ComboboxInput,
   ComboboxItem,
   ComboboxList,
   ComboboxPopup,
@@ -90,9 +90,8 @@ export function ComboboxMultiFilter({
                     {item.label}
                   </ComboboxChip>
                 ))}
-                <ComboboxInput
+                <ComboboxChipsInput
                   aria-label={label ?? name}
-                  id={name}
                   placeholder={value.length > 0 ? undefined : placeholder}
                 />
               </>
@@ -101,9 +100,9 @@ export function ComboboxMultiFilter({
         </ComboboxChips>
 
         <ComboboxPopup>
-          <ComboboxEmpty>No matches found</ComboboxEmpty>
+          <ComboboxEmpty>No items found.</ComboboxEmpty>
           <ComboboxList>
-            {(item: FilterOption) => (
+            {(item) => (
               <ComboboxItem key={item.value} value={item}>
                 {item.label}
               </ComboboxItem>
