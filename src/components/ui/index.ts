@@ -6,5 +6,6 @@ export * from './fields';
 export * from './form';
 export * from './link';
 export * from './primitives';
+export * from './scroll-area';
 export * from './section';
 export * from './toggle-group';

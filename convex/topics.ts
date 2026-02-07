@@ -6,6 +6,7 @@ export const getTopicBySlug = queries.getTopicBySlug;
 export const getTopicWithContent = queries.getTopicWithContent;
 export const listTopics = queries.listTopics;
 export const listTopicsWithCount = queries.listTopicsWithCount;
+export const listTopicsWithTalks = queries.listTopicsWithTalks;
 
 // Mutations
 export const addTalkToTopic = mutations.addTalkToTopic;
