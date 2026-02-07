@@ -33,7 +33,7 @@ export * from './popover';
 export * from './preview-card';
 export * from './progress';
 export * from './radio-group';
-export * from './scroll-area';
+// export * from './scroll-area';
 export * from './select';
 export * from './separator';
 export * from './sheet';

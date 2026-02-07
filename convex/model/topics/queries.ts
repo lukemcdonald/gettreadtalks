@@ -230,3 +230,57 @@ export const listTopicsWithCount = query({
     }),
   ),
 });
+
+/**
+ * List topics with their talks for browsing.
+ * Returns topics with up to 5 talks each (featured first), enriched with speakers.
+ * Used for the topics browse page with horizontal scroll sections.
+ */
+export const listTopicsWithTalks = query({
+  args: {
+    limit: v.optional(v.number()),
+    talksPerTopic: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const { limit = 100, talksPerTopic = 5 } = args;
+
+    const topics = await ctx.db.query('topics').withIndex('by_title').take(limit);
+
+    const topicsWithTalks = await asyncMap(topics, async (topic) => {
+      const talksOnTopics = await getManyFrom(ctx.db, 'talksOnTopics', 'by_topicId', topic._id);
+      const talks = await Promise.all(
+        talksOnTopics.map((entry) => ctx.db.get('talks', entry.talkId)),
+      );
+
+      const publishedTalks = talks.filter(
+        (talk): talk is Doc<'talks'> => talk !== null && talk.status === 'published',
+      );
+
+      // Sort: featured talks first, then by creation date (newest first)
+      publishedTalks.sort((a, b) => {
+        if (a.featured && !b.featured) return -1;
+        if (!a.featured && b.featured) return 1;
+        return b._creationTime - a._creationTime;
+      });
+
+      const limitedTalks = publishedTalks.slice(0, talksPerTopic);
+      const talksWithSpeakers = await enrichWithSpeakers(ctx, limitedTalks);
+
+      return {
+        talkCount: publishedTalks.length,
+        talks: talksWithSpeakers,
+        topic,
+      };
+    });
+
+    // Filter to topics with at least one published talk
+    return topicsWithTalks.filter((item) => item.talkCount > 0);
+  },
+  returns: v.array(
+    v.object({
+      talkCount: v.number(),
+      talks: v.array(talkWithSpeakerValidator),
+      topic: doc('topics'),
+    }),
+  ),
+});
