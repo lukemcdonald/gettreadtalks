@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { CollectionContent } from '@/app/collections/[collectionSlug]/_components/collection-content';
 import { CollectionSidebar } from '@/app/collections/[collectionSlug]/_components/collection-sidebar';
 import { SidebarLayout } from '@/components/layouts';
+import { PageHeader } from '@/components/page-header';
 import { getCollectionBySlug } from '@/features/collections/queries/get-collection-by-slug';
 
 interface CollectionPageProps {
@@ -26,7 +27,10 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
   return (
     <SidebarLayout
       content={<CollectionContent talks={talks} />}
-      sidebar={<CollectionSidebar collection={collection} speakers={uniqueSpeakers} />}
+      header={
+        <PageHeader description={collection.description} title={collection.title} variant="lg" />
+      }
+      sidebar={<CollectionSidebar speakers={uniqueSpeakers} />}
     />
   );
 }

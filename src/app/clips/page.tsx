@@ -1,15 +1,10 @@
 import { ClipsContent } from '@/app/clips/_components/clips-content';
-import { ClipsSidebar } from '@/app/clips/_components/clips-sidebar';
-import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
+import { Container, Section } from '@/components/ui';
 import { getClips } from '@/features/clips/queries/get-clips';
-import { getSpeakers } from '@/features/speakers/queries/get-speakers';
-import { sortSpeakersByName } from '@/features/speakers/utils';
 
 export interface ClipsPageSearchParams {
   cursor?: string;
-  sort?: string;
-  speakers?: string;
 }
 
 interface ClipsPageProps {
@@ -18,45 +13,32 @@ interface ClipsPageProps {
 
 export default async function ClipsPage({ searchParams }: ClipsPageProps) {
   const params = await searchParams;
-  const { cursor, sort, speakers } = params;
+  const { cursor } = params;
 
-  // Parse comma-separated values into arrays
-  const speakerSlugs = speakers ? speakers.split(',').filter(Boolean) : undefined;
-
-  // Check if any filters are active (for showing "clear filters" option)
-  const hasActiveFilters = Boolean(speakerSlugs?.length);
-
-  const [result, speakersResult] = await Promise.all([
-    getClips({
-      cursor,
-      sort,
-      speakerSlugs,
-    }),
-    getSpeakers(),
-  ]);
-
-  const sortedSpeakers = sortSpeakersByName(speakersResult.speakers);
+  const result = await getClips({ cursor });
 
   return (
-    <SidebarLayout
-      content={
-        <ClipsContent
-          clips={result.clips}
-          continueCursor={result.continueCursor}
-          hasActiveFilters={hasActiveFilters}
-          hasNextPage={!result.isDone}
-          hasPrevPage={!!cursor}
-        />
-      }
-      header={
-        <PageHeader
-          description="Be encouraged by these short Christ centered clips."
-          title="Clips"
-          variant="lg"
-        />
-      }
-      sidebar={<ClipsSidebar speakers={sortedSpeakers} />}
-      sidebarSticky
-    />
+    <>
+      <Section>
+        <Container>
+          <PageHeader
+            description="Be encouraged by these short Christ centered clips."
+            title="Clips"
+            variant="lg"
+          />
+        </Container>
+      </Section>
+
+      <Section>
+        <Container>
+          <ClipsContent
+            clips={result.clips}
+            continueCursor={result.continueCursor}
+            hasNextPage={!result.isDone}
+            hasPrevPage={!!cursor}
+          />
+        </Container>
+      </Section>
+    </>
   );
 }
