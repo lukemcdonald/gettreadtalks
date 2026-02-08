@@ -3,7 +3,9 @@
 
 export * from './container';
 export * from './fields';
+export * from './filter-popup';
 export * from './form';
+export * from './inline-multi-filter';
 export * from './link';
 export * from './primitives';
 export * from './scroll-area';
