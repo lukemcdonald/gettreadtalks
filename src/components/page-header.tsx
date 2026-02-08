@@ -39,7 +39,7 @@ export function PageHeader({ className, description, title, variant = 'md' }: Pa
     <header className={cn('flex flex-col gap-4', className)}>
       <div className="max-w-prose space-y-2">
         <h1 className={titleVariants({ variant })}>{title}</h1>
-        {!!description && <p className={descriptionVariants({ variant })}>{description}</p>}
+        {!!description && <div className={descriptionVariants({ variant })}>{description}</div>}
       </div>
     </header>
   );

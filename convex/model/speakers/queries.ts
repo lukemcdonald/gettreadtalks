@@ -7,8 +7,9 @@ import { getOneFrom } from 'convex-helpers/server/relationships';
 
 import { query } from '../../_generated/server';
 import { filterSpeakersWithPublishedTalks } from '../../lib/filters';
+import { rotateContent } from '../../lib/rotateContent';
 import { getSpeakerComparator } from '../../lib/sort';
-import { paginateArray, shuffleAndLimit } from '../../lib/utils';
+import { paginateArray } from '../../lib/utils';
 import { doc, docs } from '../../lib/validators/schema';
 import { speakerRoleType } from './validators';
 
@@ -107,7 +108,7 @@ export const getSpeakersCount = query({
 });
 
 /**
- * Get featured speakers (random selection).
+ * Get featured speakers with daily rotation.
  */
 export const listFeaturedSpeakers = query({
   args: {
@@ -116,14 +117,14 @@ export const listFeaturedSpeakers = query({
   handler: async (ctx, args) => {
     const { limit = 6 } = args;
 
-    // Intentionally unbounded: Need all featured speakers for random selection
+    // Intentionally unbounded: Need all featured speakers for rotation
     // Limited to 50 to prevent memory issues if featured speakers grow
     const speakers = await ctx.db
       .query('speakers')
       .withIndex('by_featured', (q) => q.eq('featured', true))
       .take(50);
 
-    return shuffleAndLimit(speakers, limit);
+    return rotateContent(speakers, { count: limit, period: 'daily' });
   },
   returns: docs('speakers'),
 });

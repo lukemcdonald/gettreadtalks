@@ -7,13 +7,9 @@ import { getManyFrom, getManyVia, getOneFrom } from 'convex-helpers/server/relat
 
 import { query } from '../../_generated/server';
 import { getTalkIdsByTopicSlugs } from '../../lib/filters';
+import { rotateContent } from '../../lib/rotateContent';
 import { getContentComparator } from '../../lib/sort';
-import {
-  applySearchFilter,
-  enrichWithSpeakers,
-  paginateArray,
-  shuffleAndLimit,
-} from '../../lib/utils';
+import { applySearchFilter, enrichWithSpeakers, paginateArray } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
 import { statusFilterType } from '../../lib/validators/shared';
@@ -125,7 +121,7 @@ export const getTalksCount = query({
 });
 
 /**
- * Get featured talks (random selection).
+ * Get featured talks with daily rotation.
  */
 export const listFeaturedTalks = query({
   args: {
@@ -139,13 +135,13 @@ export const listFeaturedTalks = query({
       .withIndex('by_featured_and_status', (q) => q.eq('featured', true).eq('status', 'published'))
       .take(50);
 
-    return shuffleAndLimit(talks, limit);
+    return rotateContent(talks, { count: limit, period: 'daily' });
   },
   returns: docs('talks'),
 });
 
 /**
- * Get featured talks with speaker data.
+ * Get featured talks with daily rotation.
  */
 export const listFeaturedTalksWithSpeakers = query({
   args: {
@@ -159,7 +155,7 @@ export const listFeaturedTalksWithSpeakers = query({
       .withIndex('by_featured_and_status', (q) => q.eq('featured', true).eq('status', 'published'))
       .take(50);
 
-    const page = shuffleAndLimit(talks, limit);
+    const page = rotateContent(talks, { count: limit, period: 'daily' });
 
     return await enrichWithSpeakers(ctx, page);
   },
@@ -167,7 +163,7 @@ export const listFeaturedTalksWithSpeakers = query({
 });
 
 /**
- * Get random talks by speaker (excluding a specific talk).
+ * Get rotated talks by speaker with daily rotation.
  */
 export const listRandomTalksBySpeaker = query({
   args: {
@@ -185,12 +181,11 @@ export const listRandomTalksBySpeaker = query({
       )
       .collect();
 
-    // Filter out excluded talk if provided
     const filteredTalks = excludeTalkId
       ? talks.filter((talk) => talk._id !== excludeTalkId)
       : talks;
 
-    return shuffleAndLimit(filteredTalks, limit);
+    return rotateContent(filteredTalks, { count: limit, period: 'daily' });
   },
   returns: docs('talks'),
 });

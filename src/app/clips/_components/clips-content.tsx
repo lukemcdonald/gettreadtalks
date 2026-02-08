@@ -1,8 +1,8 @@
 import type { Doc } from '@/convex/_generated/dataModel';
 import type { Speaker } from '@/features/speakers/types';
 
-import { ListEmpty } from '@/components/list-empty';
 import { Pagination } from '@/components/pagination';
+import { Empty, EmptyDescription, EmptyTitle } from '@/components/ui';
 import { ClipsList } from '@/features/clips/components/clips-list';
 
 type ClipWithSpeaker = Doc<'clips'> & {
@@ -24,7 +24,10 @@ export function ClipsContent({
 }: ClipsContentProps) {
   if (clips.length === 0) {
     return (
-      <ListEmpty description="There are no clips available at this time." title="No clips found" />
+      <Empty>
+        <EmptyTitle>No clips found</EmptyTitle>
+        <EmptyDescription>There are no clips available at this time.</EmptyDescription>
+      </Empty>
     );
   }
 

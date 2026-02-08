@@ -155,14 +155,6 @@ export function getPublishedAtForStatus(
 }
 
 /**
- * Shuffles an array and returns a limited number of items.
- * Uses Fisher-Yates shuffle via Array.sort() for simplicity.
- */
-export function shuffleAndLimit<T>(items: T[], limit: number): T[] {
-  return items.sort(() => Math.random() - 0.5).slice(0, limit);
-}
-
-/**
  * Manually paginate an array with cursor support.
  * Returns page, continuation cursor, and done status.
  */
