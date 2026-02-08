@@ -98,6 +98,14 @@ export function TalkFormClient({ collections, speakers }) {
 - `convex/model/auth/` - Authentication helpers
 - `convex/lib/` - Shared utilities
 
+**File Naming:**
+
+Convex enforces strict file naming - only alphanumeric characters, underscores, or periods allowed.
+
+- Multi-word files/folders: **camelCase** (e.g., `affiliateLinks.ts`, `betterAuth/`, `rotateContent.ts`)
+- Single-word files: lowercase (e.g., `filters.ts`, `sort.ts`, `utils.ts`)
+- **Never use kebab-case/hyphens** - will cause deployment errors
+
 **Naming Conventions:**
 
 *Queries:*

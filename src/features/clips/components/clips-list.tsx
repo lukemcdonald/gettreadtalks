@@ -1,6 +1,7 @@
 import type { ClipWithSpeaker } from '../types';
 
 import { MediaEmbed } from '@/components/media-embed';
+import { rotateContent } from '@/utils';
 import { ClipCard } from './clip-card';
 
 interface ClipsListProps {
@@ -12,7 +13,7 @@ export function ClipsList({ clips }: ClipsListProps) {
     return null;
   }
 
-  const [featuredClip] = clips;
+  const [featuredClip] = rotateContent(clips, { period: 'daily', count: 1 });
 
   return (
     <div className="grid auto-rows-min grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-2 lg:grid-cols-3">
