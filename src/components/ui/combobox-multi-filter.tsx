@@ -1,6 +1,8 @@
 'use client';
 
-import { type ComponentProps, useTransition } from 'react';
+import type { ReactNode } from 'react';
+
+import { useTransition } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import {
@@ -8,13 +10,10 @@ import {
   ComboboxChip,
   ComboboxChips,
   ComboboxChipsInput,
-  ComboboxEmpty,
-  ComboboxItem,
-  ComboboxList,
-  ComboboxPopup,
   ComboboxValue,
   Label,
 } from '@/components/ui';
+import { FilterPopup } from '@/components/ui/filter-popup';
 import { cn } from '@/utils';
 
 interface FilterOption {
@@ -24,17 +23,20 @@ interface FilterOption {
 
 interface ComboboxMultiFilterProps {
   className?: string;
-  endAddon?: React.ReactNode;
   label?: string;
   name: string;
   options: FilterOption[];
   placeholder?: string;
-  startAddon?: React.ReactNode;
+  startAddon?: ReactNode;
 }
 
+/**
+ * Multi-select filter with chip-based input.
+ * Shows individual chips for all selected items - ideal for sidebars.
+ * Uses shared FilterPopup with search at top (industry standard UX).
+ */
 export function ComboboxMultiFilter({
   className,
-  endAddon,
   label,
   name,
   options,
@@ -46,13 +48,11 @@ export function ComboboxMultiFilter({
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
 
-  // Parse comma-separated values from URL
   const searchParamValue = searchParams.get(name);
   const selectedValues = searchParamValue
     ? searchParamValue.split(',').filter((v) => options.some((opt) => opt.value === v))
     : [];
 
-  // Convert selected values to option objects for the Combobox
   const selectedOptions = selectedValues
     .map((value) => options.find((opt) => opt.value === value))
     .filter((opt): opt is FilterOption => opt !== undefined);
@@ -77,8 +77,8 @@ export function ComboboxMultiFilter({
   return (
     <div className={cn('space-y-2', className)}>
       {!!label && <Label htmlFor={name}>{label}</Label>}
-
       <Combobox
+        autoHighlight
         disabled={isPending}
         items={options}
         multiple
@@ -101,19 +101,8 @@ export function ComboboxMultiFilter({
               </>
             )}
           </ComboboxValue>
-          {endAddon && <span className="pointer-events-none shrink-0">{endAddon}</span>}
         </ComboboxChips>
-
-        <ComboboxPopup>
-          <ComboboxEmpty>No items found.</ComboboxEmpty>
-          <ComboboxList>
-            {(item) => (
-              <ComboboxItem key={item.value} value={item}>
-                {item.label}
-              </ComboboxItem>
-            )}
-          </ComboboxList>
-        </ComboboxPopup>
+        <FilterPopup label={label} name={name} />
       </Combobox>
     </div>
   );
