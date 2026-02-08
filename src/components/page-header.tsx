@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 import { cva } from 'class-variance-authority';
 
 import { cn } from '@/utils';
@@ -27,7 +29,7 @@ const descriptionVariants = cva('text-muted-foreground', {
 
 interface PageHeaderProps {
   className?: string;
-  description?: string;
+  description?: ReactNode;
   variant?: 'sm' | 'md' | 'lg';
   title: string;
 }

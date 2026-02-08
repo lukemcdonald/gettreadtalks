@@ -24,6 +24,7 @@ interface FilterOption {
 
 interface ComboboxMultiFilterProps {
   className?: string;
+  endAddon?: React.ReactNode;
   label?: string;
   name: string;
   options: FilterOption[];
@@ -33,6 +34,7 @@ interface ComboboxMultiFilterProps {
 
 export function ComboboxMultiFilter({
   className,
+  endAddon,
   label,
   name,
   options,
@@ -99,6 +101,7 @@ export function ComboboxMultiFilter({
               </>
             )}
           </ComboboxValue>
+          {endAddon && <span className="pointer-events-none shrink-0">{endAddon}</span>}
         </ComboboxChips>
 
         <ComboboxPopup>
