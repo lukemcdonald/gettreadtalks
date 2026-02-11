@@ -21,5 +21,5 @@ export const unfavoriteClip = mutations.unfavoriteClip;
 export const unfavoriteSpeaker = mutations.unfavoriteSpeaker;
 export const unfavoriteTalk = mutations.unfavoriteTalk;
 export const unfinishTalk = mutations.unfinishTalk;
-export const updatePassword = mutations.updatePassword;
+export const updateUserPassword = mutations.updateUserPassword;
 export const updateUserProfile = mutations.updateUserProfile;

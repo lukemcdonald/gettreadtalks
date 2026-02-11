@@ -5,7 +5,7 @@ import { useForm, useWatch } from 'react-hook-form';
 
 import { Button, Fieldset, FormError, TextField } from '@/components/ui';
 import { toastManager } from '@/components/ui/primitives/toast';
-import { updatePassword } from '@/features/users/actions/update-password';
+import { updateUserPassword } from '@/features/users/actions/update-password';
 
 interface PasswordFormValues {
   confirmPassword: string;
@@ -26,7 +26,7 @@ export function PasswordForm() {
   function onSubmit(values: PasswordFormValues) {
     startTransition(async () => {
       try {
-        await updatePassword({
+        await updateUserPassword({
           currentPassword: values.currentPassword,
           newPassword: values.newPassword,
         });
