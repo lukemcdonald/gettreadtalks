@@ -5,6 +5,8 @@ import type { Topic } from '@/features/topics/types';
 
 import { useSearchParams } from 'next/navigation';
 
+import { Button } from '@/components/ui';
+import { Link } from '@/components/ui/link';
 import { TopicBrowseSection } from './topic-browse-section';
 
 interface TopicWithTalks {
@@ -53,6 +55,16 @@ export function TopicsBrowseContent({ topics }: TopicsBrowseContentProps) {
           topic={item.topic}
         />
       ))}
+      {selectedTopics.length > 0 && (
+        <div className="pt-4">
+          <Link
+            className="font-medium text-lg text-primary hover:underline"
+            href={`/talks?topics=${selectedTopics.join(',')}`}
+          >
+            View all talks in these topics →
+          </Link>
+        </div>
+      )}
     </div>
   );
 }
