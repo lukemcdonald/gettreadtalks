@@ -1,106 +1,122 @@
-import { Card, CardContent, CardHeader, Separator } from '@/components/ui';
+import { Badge, Card, CardContent, CardHeader, Separator } from '@/components/ui';
 import { getUserFavorites } from '@/features/users/queries/get-user-favorites';
+import { getUserFinishedTalks } from '@/features/users/queries/get-user-finished-talks';
 import { getCurrentUser } from '@/services/auth/server';
+import { isAdmin } from '@/services/auth/utils';
+import { DeleteAccountForm } from './_components/delete-account-form';
+import { PasswordForm } from './_components/password-form';
+import { ProfileForm } from './_components/profile-form';
 
 export default async function AccountPage() {
-  const [user, favorites] = await Promise.all([getCurrentUser(), getUserFavorites()]);
+  const [user, favorites, finished] = await Promise.all([
+    getCurrentUser(),
+    getUserFavorites(),
+    getUserFinishedTalks(),
+  ]);
 
   return (
     <Card>
       <CardHeader>
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-1">
           <h1 className="font-semibold text-3xl text-card-foreground">Account Settings</h1>
-          <p className="mt-2 text-muted-foreground">Welcome back, {user?.name || 'User'}!</p>
+          <p className="text-muted-foreground">Welcome back, {user?.name || 'User'}!</p>
         </div>
       </CardHeader>
 
       <Separator />
 
       <CardContent className="px-6 py-8">
-        <div className="grid gap-8 md:grid-cols-2">
-          <div>
+        <div className="space-y-10">
+          {/* Profile Information */}
+          <section>
             <h2 className="mb-4 font-semibold text-card-foreground text-xl">Profile Information</h2>
             <div className="rounded-lg bg-muted p-4">
-              <div className="space-y-3">
+              <dl className="space-y-3">
                 <div>
-                  <label
-                    className="block font-semibold text-muted-foreground text-sm"
-                    htmlFor="email"
-                  >
-                    Email
-                  </label>
-                  <p className="text-card-foreground">{user?.email}</p>
+                  <dt className="font-semibold text-muted-foreground text-sm">Name</dt>
+                  <dd className="text-card-foreground">{user?.name}</dd>
                 </div>
                 <div>
-                  <label
-                    className="block font-semibold text-muted-foreground text-sm"
-                    htmlFor="name"
-                  >
-                    Name
-                  </label>
-                  <p className="text-card-foreground">{user?.name}</p>
+                  <dt className="font-semibold text-muted-foreground text-sm">Email</dt>
+                  <dd className="text-card-foreground">{user?.email}</dd>
                 </div>
                 <div>
-                  <label
-                    className="block font-semibold text-muted-foreground text-sm"
-                    htmlFor="userId"
-                  >
-                    User ID
-                  </label>
-                  <p className="font-mono text-muted-foreground text-sm">{user?._id}</p>
+                  <dt className="font-semibold text-muted-foreground text-sm">Role</dt>
+                  <dd>
+                    <Badge variant={isAdmin(user) ? 'default' : 'outline'}>
+                      {isAdmin(user) ? 'Admin' : 'User'}
+                    </Badge>
+                  </dd>
                 </div>
+                <div>
+                  <dt className="font-semibold text-muted-foreground text-sm">User ID</dt>
+                  <dd className="font-mono text-muted-foreground text-sm">{user?._id}</dd>
+                </div>
+              </dl>
+            </div>
+          </section>
+
+          <Separator />
+
+          {/* Update Profile */}
+          <section>
+            <h2 className="mb-4 font-semibold text-card-foreground text-xl">Update Profile</h2>
+            <div className="max-w-sm">
+              <ProfileForm currentEmail={user?.email ?? ''} currentName={user?.name ?? ''} />
+            </div>
+          </section>
+
+          <Separator />
+
+          {/* Change Password */}
+          <section>
+            <h2 className="mb-4 font-semibold text-card-foreground text-xl">Change Password</h2>
+            <div className="max-w-sm">
+              <PasswordForm />
+            </div>
+          </section>
+
+          <Separator />
+
+          {/* Activity */}
+          <section>
+            <h2 className="mb-4 font-semibold text-card-foreground text-xl">Activity</h2>
+            <div className="rounded-lg bg-muted p-4">
+              <dl className="space-y-3">
+                <div>
+                  <dt className="font-semibold text-muted-foreground text-sm">Favorites</dt>
+                  <dd className="text-card-foreground text-sm">
+                    {favorites?.talks.length ?? 0} talks &middot; {favorites?.clips.length ?? 0}{' '}
+                    clips &middot; {favorites?.speakers.length ?? 0} speakers
+                  </dd>
+                </div>
+                <div>
+                  <dt className="font-semibold text-muted-foreground text-sm">Finished</dt>
+                  <dd className="text-card-foreground text-sm">{finished.talks.length} talks</dd>
+                </div>
+              </dl>
+            </div>
+          </section>
+
+          <Separator />
+
+          {/* Danger Zone */}
+          <section>
+            <h2 className="mb-4 font-semibold text-destructive text-xl">Danger Zone</h2>
+            <div className="rounded-lg border border-destructive/32 p-4">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="font-medium text-card-foreground text-sm">Delete Account</p>
+                  <p className="text-muted-foreground text-sm">
+                    Permanently delete your account and all associated data.
+                  </p>
+                </div>
+                <DeleteAccountForm />
               </div>
             </div>
-          </div>
+          </section>
         </div>
       </CardContent>
-
-      <div className="px-6 py-8">
-        <div className="rounded-lg bg-card p-6 shadow-lg">
-          <h2 className="mb-4 font-semibold text-2xl text-card-foreground">Your Favorites</h2>
-          {!!favorites && (
-            <div className="grid gap-4">
-              {favorites.talks.length > 0 && (
-                <div>
-                  <h3 className="mb-2 font-semibold text-card-foreground text-lg">
-                    Favorite Talks ({favorites.talks.length})
-                  </h3>
-                  <p className="text-muted-foreground text-sm">
-                    You have {favorites.talks.length} favorite talks saved.
-                  </p>
-                </div>
-              )}
-              {favorites.clips.length > 0 && (
-                <div>
-                  <h3 className="mb-2 font-semibold text-card-foreground text-lg">
-                    Favorite Clips ({favorites.clips.length})
-                  </h3>
-                  <p className="text-muted-foreground text-sm">
-                    You have {favorites.clips.length} favorite clips saved.
-                  </p>
-                </div>
-              )}
-              {favorites.speakers.length > 0 && (
-                <div>
-                  <h3 className="mb-2 font-semibold text-card-foreground text-lg">
-                    Favorite Speakers ({favorites.speakers.length})
-                  </h3>
-                  <p className="text-muted-foreground text-sm">
-                    You have {favorites.speakers.length} favorite speakers saved.
-                  </p>
-                </div>
-              )}
-              {favorites.talks.length === 0 &&
-                favorites.clips.length === 0 &&
-                favorites.speakers.length === 0 && (
-                  <p className="text-muted-foreground">
-                    No favorites yet. Start exploring talks and clips to build your collection!
-                  </p>
-                )}
-            </div>
-          )}
-        </div>
-      </div>
     </Card>
   );
 }
