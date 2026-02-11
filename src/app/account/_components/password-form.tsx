@@ -1,7 +1,7 @@
 'use client';
 
 import { useTransition } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 
 import { Button, Fieldset, FormError, TextField } from '@/components/ui';
 import { toastManager } from '@/components/ui/primitives/toast';
@@ -19,12 +19,11 @@ export function PasswordForm() {
     defaultValues: { confirmPassword: '', currentPassword: '', newPassword: '' },
   });
 
-  function onSubmit(values: PasswordFormValues) {
-    if (values.newPassword !== values.confirmPassword) {
-      form.setError('confirmPassword', { message: 'Passwords do not match' });
-      return;
-    }
+  const newPassword = useWatch({ control: form.control, name: 'newPassword' });
+  const confirmPassword = useWatch({ control: form.control, name: 'confirmPassword' });
+  const passwordsMatch = newPassword.length > 0 && newPassword === confirmPassword;
 
+  function onSubmit(values: PasswordFormValues) {
     startTransition(async () => {
       try {
         await updatePassword({
@@ -42,36 +41,40 @@ export function PasswordForm() {
   }
 
   return (
-    <form className="flex flex-col gap-3" onSubmit={form.handleSubmit(onSubmit)}>
-      <FormError error={form.formState.errors.root} />
-      <Fieldset disabled={isPending}>
+    <form onSubmit={form.handleSubmit(onSubmit)}>
+      <FormError className="mb-3" error={form.formState.errors.root} />
+      <Fieldset className="space-y-3" disabled={isPending}>
         <TextField
           control={form.control}
-          label="Current Password"
-          name="currentPassword"
-          required
-          type="password"
-        />
-        <TextField
-          control={form.control}
-          label="New Password"
+          label="New password"
           name="newPassword"
           required
           type="password"
         />
         <TextField
           control={form.control}
-          label="Confirm New Password"
+          label="Confirm new password"
           name="confirmPassword"
           required
           type="password"
         />
+        {passwordsMatch && (
+          <TextField
+            control={form.control}
+            label="Current password"
+            name="currentPassword"
+            required
+            type="password"
+          />
+        )}
       </Fieldset>
-      <div>
-        <Button disabled={isPending} size="sm" type="submit">
-          Update Password
-        </Button>
-      </div>
+      {passwordsMatch && (
+        <div className="mt-4">
+          <Button disabled={isPending} size="sm" type="submit">
+            Update password
+          </Button>
+        </div>
+      )}
     </form>
   );
 }

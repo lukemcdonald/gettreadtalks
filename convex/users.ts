@@ -12,6 +12,7 @@ export const listUserFinishedTalks = queries.listUserFinishedTalks;
 // Mutations
 export const deleteUser = mutations.deleteUser;
 export const favoriteClip = mutations.favoriteClip;
+export const updateUserEmail = mutations.updateUserEmail;
 export const favoriteSpeaker = mutations.favoriteSpeaker;
 export const favoriteTalk = mutations.favoriteTalk;
 export const finishTalk = mutations.finishTalk;
