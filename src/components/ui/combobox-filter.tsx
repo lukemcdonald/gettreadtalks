@@ -1,8 +1,5 @@
 'use client';
 
-import { useTransition } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-
 import {
   Combobox,
   ComboboxEmpty,
@@ -13,6 +10,7 @@ import {
   Label,
 } from '@/components/ui';
 import { FILTER_ALL } from '@/constants/ui';
+import { useFilterParam } from '@/hooks';
 import { cn } from '@/utils';
 
 interface FilterOption {
@@ -39,41 +37,17 @@ export function ComboboxFilter({
   options,
   placeholder = 'All',
 }: ComboboxFilterProps) {
-  const pathname = usePathname();
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const [isPending, startTransition] = useTransition();
-
-  const searchParamValue = searchParams.get(name);
+  const { current, isPending, update } = useFilterParam(name);
 
   // Build options with "All" at the top
   const allOption: FilterOption = { label: placeholder, value: FILTER_ALL };
   const allOptions = [allOption, ...options];
 
-  function getInitialValue(): string {
-    if (searchParamValue && options.some((opt) => opt.value === searchParamValue)) {
-      return searchParamValue;
-    }
-    return FILTER_ALL;
-  }
-
-  const currentValue = getInitialValue();
+  const currentValue =
+    current && options.some((opt) => opt.value === current) ? current : FILTER_ALL;
 
   const handleChange = (newValue: string | null) => {
-    const params = new URLSearchParams(searchParams.toString());
-
-    if (newValue && newValue !== FILTER_ALL) {
-      params.set(name, newValue);
-    } else {
-      params.delete(name);
-    }
-
-    params.delete('cursor');
-
-    startTransition(() => {
-      const query = params.toString();
-      router.push(query ? `${pathname}?${query}` : pathname);
-    });
+    update(newValue && newValue !== FILTER_ALL ? newValue : null);
   };
 
   const filterOptions = (itemValue: string, query: string): boolean => {
