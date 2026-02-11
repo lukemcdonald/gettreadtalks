@@ -91,6 +91,7 @@ export function LoginForm(props: ComponentPropsWithoutRef<'form'>) {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="name@example.com"
             required
+            size="lg"
             type="email"
             value={email}
           />
@@ -106,6 +107,7 @@ export function LoginForm(props: ComponentPropsWithoutRef<'form'>) {
             name="password"
             onChange={(e) => setPassword(e.target.value)}
             required
+            size="lg"
             type="password"
             value={password}
           />

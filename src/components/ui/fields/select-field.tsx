@@ -87,7 +87,7 @@ export function SelectField<T extends FieldValues>({
             required={required}
             value={field.value ?? ''}
           >
-            <SelectTrigger aria-invalid={fieldState.invalid} id={field.name}>
+            <SelectTrigger aria-invalid={fieldState.invalid} id={field.name} size="lg">
               <SelectValue />
             </SelectTrigger>
             <SelectPopup>

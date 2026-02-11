@@ -26,6 +26,7 @@ export function SearchInput({
         id={paramName}
         onChange={(e) => setValue(e.target.value)}
         placeholder={placeholder}
+        size="lg"
         type="search"
         value={value}
       />
