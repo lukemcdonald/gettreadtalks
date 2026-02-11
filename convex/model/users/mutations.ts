@@ -224,6 +224,49 @@ export const unfinishTalk = mutation({
 });
 
 /**
+ * Update the user's profile (name and/or email).
+ */
+export const updateUserProfile = mutation({
+  args: {
+    email: v.optional(v.string()),
+    name: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    await createAuth(ctx).api.updateUser({
+      body: {
+        email: args.email,
+        name: args.name,
+      },
+      headers: await authComponent.getHeaders(ctx),
+    });
+
+    return null;
+  },
+  returns: v.null(),
+});
+
+/**
+ * Delete the user's account.
+ */
+export const deleteUser = mutation({
+  args: {
+    password: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await createAuth(ctx).api.deleteUser({
+      body: {
+        callbackURL: '/',
+        password: args.password,
+      },
+      headers: await authComponent.getHeaders(ctx),
+    });
+
+    return null;
+  },
+  returns: v.null(),
+});
+
+/**
  * Update the user's password.
  */
 export const updatePassword = mutation({
