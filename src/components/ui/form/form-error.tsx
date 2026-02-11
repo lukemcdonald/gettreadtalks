@@ -3,7 +3,6 @@
 import type { FieldError, FieldErrors, FieldValues } from 'react-hook-form';
 
 import { cn } from '@/utils';
-import { FieldError as FieldErrorComponent } from '../fields';
 
 interface FormErrorProps {
   className?: string;
@@ -56,7 +55,7 @@ export function FormError({ className, error }: FormErrorProps) {
       data-slot="form-error"
       role="alert"
     >
-      <FieldErrorComponent>{errorMessage}</FieldErrorComponent>
+      <p className="text-destructive-foreground text-xs">{errorMessage}</p>
     </div>
   );
 }

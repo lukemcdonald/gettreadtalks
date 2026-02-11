@@ -1,29 +1,27 @@
 'use client';
 
 import { useTransition } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, useWatch } from 'react-hook-form';
 
-import { Button, Fieldset, FormError, TextField } from '@/components/ui';
+import { Button, Fieldset, FormError, PasswordField } from '@/components/ui';
 import { toastManager } from '@/components/ui/primitives/toast';
 import { updateUserPassword } from '@/features/users/actions/update-password';
-
-interface PasswordFormValues {
-  confirmPassword: string;
-  currentPassword: string;
-  newPassword: string;
-}
+import { type PasswordFormData, passwordFormSchema } from '@/features/users/schemas/password-form';
 
 export function PasswordForm() {
   const [isPending, startTransition] = useTransition();
-  const form = useForm<PasswordFormValues>({
+  const form = useForm<PasswordFormData>({
     defaultValues: { confirmPassword: '', currentPassword: '', newPassword: '' },
+    mode: 'onTouched',
+    resolver: zodResolver(passwordFormSchema),
   });
 
   const newPassword = useWatch({ control: form.control, name: 'newPassword' });
   const confirmPassword = useWatch({ control: form.control, name: 'confirmPassword' });
   const passwordsMatch = newPassword.length > 0 && newPassword === confirmPassword;
 
-  function onSubmit(values: PasswordFormValues) {
+  function onSubmit(values: PasswordFormData) {
     startTransition(async () => {
       try {
         await updateUserPassword({
@@ -44,27 +42,19 @@ export function PasswordForm() {
     <form onSubmit={form.handleSubmit(onSubmit)}>
       <FormError className="mb-3" error={form.formState.errors.root} />
       <Fieldset className="space-y-3" disabled={isPending}>
-        <TextField
-          control={form.control}
-          label="New password"
-          name="newPassword"
-          required
-          type="password"
-        />
-        <TextField
+        <PasswordField control={form.control} label="New password" name="newPassword" required />
+        <PasswordField
           control={form.control}
           label="Confirm new password"
           name="confirmPassword"
           required
-          type="password"
         />
         {passwordsMatch && (
-          <TextField
+          <PasswordField
             control={form.control}
             label="Current password"
             name="currentPassword"
             required
-            type="password"
           />
         )}
       </Fieldset>
