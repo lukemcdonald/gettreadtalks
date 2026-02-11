@@ -8,7 +8,7 @@ import { getAuthToken } from '@/services/auth/server';
 /**
  * Update user password. Requires authentication.
  */
-export async function updatePassword({
+export async function updateUserPassword({
   currentPassword,
   newPassword,
 }: {
@@ -18,7 +18,7 @@ export async function updatePassword({
   const authToken = await getAuthToken();
 
   await fetchMutation(
-    api.users.updatePassword,
+    api.users.updateUserPassword,
     { currentPassword, newPassword },
     { token: authToken },
   );

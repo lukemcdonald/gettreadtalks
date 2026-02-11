@@ -287,7 +287,7 @@ export const deleteUser = mutation({
 /**
  * Update the user's password.
  */
-export const updatePassword = mutation({
+export const updateUserPassword = mutation({
   args: {
     currentPassword: v.string(),
     newPassword: v.string(),
