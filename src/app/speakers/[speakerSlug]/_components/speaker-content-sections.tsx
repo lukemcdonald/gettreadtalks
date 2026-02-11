@@ -52,7 +52,6 @@ export function SpeakerContentSections({
                 ]
               : undefined
           }
-          quickLinksTitle=""
           title="Talks"
         >
           {displayedTalks.map((talk) => (
@@ -75,7 +74,6 @@ export function SpeakerContentSections({
                 ]
               : undefined
           }
-          quickLinksTitle=""
           title="Collections"
         >
           {displayedCollections.map((collection) => (
@@ -105,7 +103,6 @@ export function SpeakerContentSections({
                 ]
               : undefined
           }
-          quickLinksTitle=""
           title="Clips"
         >
           {displayedClips.map((clip) => (
