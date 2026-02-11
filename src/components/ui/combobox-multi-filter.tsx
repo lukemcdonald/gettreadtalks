@@ -97,6 +97,7 @@ export function ComboboxMultiFilter({
                 <ComboboxChipsInput
                   aria-label={label ?? name}
                   placeholder={value.length > 0 ? undefined : placeholder}
+                  size="lg"
                 />
               </>
             )}

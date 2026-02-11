@@ -57,6 +57,7 @@ export function TextareaField<T extends FieldValues>({
             placeholder={placeholder}
             required={required}
             rows={rows}
+            size="lg"
             {...field}
           />
           {!!fieldState.error && <FieldError>{fieldState.error?.message}</FieldError>}

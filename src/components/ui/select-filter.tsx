@@ -93,7 +93,7 @@ export function SelectFilter({
         onValueChange={handleChange}
         value={initialValue}
       >
-        <SelectTrigger id={name}>
+        <SelectTrigger id={name} size="lg">
           <SelectValue />
         </SelectTrigger>
         <SelectPopup>

@@ -56,6 +56,7 @@ export function TextField<T extends FieldValues>({
             aria-invalid={fieldState.invalid}
             placeholder={placeholder}
             required={required}
+            size="lg"
             type={type}
             {...field}
           />
