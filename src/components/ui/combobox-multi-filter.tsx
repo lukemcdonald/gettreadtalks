@@ -2,9 +2,6 @@
 
 import type { ReactNode } from 'react';
 
-import { useTransition } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-
 import {
   Combobox,
   ComboboxChip,
@@ -14,6 +11,7 @@ import {
   Label,
 } from '@/components/ui';
 import { FilterPopup } from '@/components/ui/filter-popup';
+import { useFilterParam } from '@/hooks';
 import { cn } from '@/utils';
 
 interface FilterOption {
@@ -43,35 +41,16 @@ export function ComboboxMultiFilter({
   placeholder = 'Select...',
   startAddon,
 }: ComboboxMultiFilterProps) {
-  const pathname = usePathname();
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const [isPending, startTransition] = useTransition();
+  const { current, isPending, update } = useFilterParam(name);
 
-  const searchParamValue = searchParams.get(name);
-  const selectedValues = searchParamValue
-    ? searchParamValue.split(',').filter((v) => options.some((opt) => opt.value === v))
-    : [];
-
-  const selectedOptions = selectedValues
+  const selectedOptions = (current ? current.split(',') : [])
     .map((value) => options.find((opt) => opt.value === value))
     .filter((opt): opt is FilterOption => opt !== undefined);
 
   const handleChange = (newValue: FilterOption[] | null) => {
-    const params = new URLSearchParams(searchParams.toString());
-
-    if (newValue && newValue.length > 0) {
-      params.set(name, newValue.map((opt) => opt.value).join(','));
-    } else {
-      params.delete(name);
-    }
-
-    params.delete('cursor');
-
-    startTransition(() => {
-      const query = params.toString();
-      router.push(query ? `${pathname}?${query}` : pathname);
-    });
+    const joined =
+      newValue && newValue.length > 0 ? newValue.map((opt) => opt.value).join(',') : null;
+    update(joined);
   };
 
   return (
