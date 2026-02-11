@@ -3,7 +3,12 @@ import { v } from 'convex/values';
 import { query } from '../../_generated/server';
 import { getSettledValue } from '../../lib/utils';
 import { getCurrentUser as getAuthUser } from '../auth/utils';
-import { getUserFavoriteClips, getUserFavoriteSpeakers, getUserFavoriteTalks } from './utils';
+import {
+  getUserFavoriteClips,
+  getUserFavoriteSpeakers,
+  getUserFavoriteTalks,
+  getUserFinishedTalks,
+} from './utils';
 
 /**
  * Get the current authenticated user. Returns null if not authenticated.
@@ -159,7 +164,7 @@ export const listUserFavorites = query({
 });
 
 /**
- * List all user finished talks.
+ * List all user finished talks with talk and speaker data.
  */
 export const listUserFinishedTalks = query({
   args: {
@@ -174,11 +179,7 @@ export const listUserFinishedTalks = query({
 
     const limit = args.limit ?? 100;
 
-    return await ctx.db
-      .query('userFinishedTalks')
-      .withIndex('by_userId', (q) => q.eq('userId', user._id))
-      .order('desc')
-      .take(limit);
+    return await getUserFinishedTalks(ctx, user._id, limit);
   },
   returns: v.array(v.any()),
 });
