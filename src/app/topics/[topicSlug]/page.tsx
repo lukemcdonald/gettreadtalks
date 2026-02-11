@@ -5,6 +5,7 @@ import { TopicSidebar } from '@/app/topics/[topicSlug]/_components/topic-sidebar
 import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { getTopicBySlug } from '@/features/topics/queries/get-topic-by-slug';
+import { pluralize } from '@/utils/pluralize';
 
 interface TopicPageProps {
   params: Promise<{
@@ -28,6 +29,8 @@ export default async function TopicPage({ params, searchParams }: TopicPageProps
 
   const { continueCursor, isDone, talks, topic, totalTalks } = topicResult;
 
+  const description = `Elevate your spiritual heartbeat with ${totalTalks === 1 ? 'this' : `these ${totalTalks}`} Christ centered ${pluralize(totalTalks, 'talk', 'talks')}.`;
+
   return (
     <SidebarLayout
       content={
@@ -38,8 +41,8 @@ export default async function TopicPage({ params, searchParams }: TopicPageProps
           talks={talks}
         />
       }
-      header={<PageHeader title={topic.title} variant="lg" />}
-      sidebar={<TopicSidebar hasActiveFilters={!!search} topic={topic} totalTalks={totalTalks} />}
+      header={<PageHeader description={description} title={topic.title} variant="lg" />}
+      sidebar={<TopicSidebar hasActiveFilters={!!search} topic={topic} />}
       sidebarSticky
     />
   );
