@@ -2,9 +2,9 @@
 
 import { useTransition } from 'react';
 import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
 
 import { Button, Fieldset, FormError, TextField } from '@/components/ui';
+import { toastManager } from '@/components/ui/primitives/toast';
 import { updatePassword } from '@/features/users/actions/update-password';
 
 interface PasswordFormValues {
@@ -31,7 +31,7 @@ export function PasswordForm() {
           currentPassword: values.currentPassword,
           newPassword: values.newPassword,
         });
-        toast.success('Password updated');
+        toastManager.add({ title: 'Password updated', type: 'success' });
         form.reset();
       } catch {
         form.setError('root', {

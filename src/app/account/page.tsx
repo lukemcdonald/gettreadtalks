@@ -62,7 +62,7 @@ export default async function AccountPage() {
           <section>
             <h2 className="mb-4 font-semibold text-card-foreground text-xl">Update Profile</h2>
             <div className="max-w-sm">
-              <ProfileForm currentEmail={user?.email ?? ''} currentName={user?.name ?? ''} />
+              <ProfileForm currentName={user?.name ?? ''} />
             </div>
           </section>
 

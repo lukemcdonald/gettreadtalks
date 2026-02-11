@@ -6,10 +6,10 @@ import { api } from '@/convex/_generated/api';
 import { getAuthToken } from '@/services/auth/server';
 
 /**
- * Update user profile (name and/or email). Requires authentication.
+ * Update user display name. Requires authentication.
  */
-export async function updateProfile({ email, name }: { email?: string; name?: string }) {
+export async function updateProfile({ name }: { name: string }) {
   const authToken = await getAuthToken();
 
-  await fetchMutation(api.users.updateUserProfile, { email, name }, { token: authToken });
+  await fetchMutation(api.users.updateUserProfile, { name }, { token: authToken });
 }

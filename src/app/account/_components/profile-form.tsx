@@ -2,25 +2,20 @@
 
 import { useTransition } from 'react';
 import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
 
 import { Button, Fieldset, FormError, TextField } from '@/components/ui';
+import { toastManager } from '@/components/ui/primitives/toast';
 import { updateProfile } from '@/features/users/actions/update-profile';
 
 interface NameFormValues {
   name: string;
 }
 
-interface EmailFormValues {
-  email: string;
-}
-
 interface ProfileFormProps {
-  currentEmail: string;
   currentName: string;
 }
 
-function NameForm({ currentName }: { currentName: string }) {
+export function ProfileForm({ currentName }: ProfileFormProps) {
   const [isPending, startTransition] = useTransition();
   const form = useForm<NameFormValues>({ defaultValues: { name: currentName } });
 
@@ -28,7 +23,7 @@ function NameForm({ currentName }: { currentName: string }) {
     startTransition(async () => {
       try {
         await updateProfile({ name: values.name });
-        toast.success('Name updated');
+        toastManager.add({ title: 'Name updated', type: 'success' });
       } catch {
         form.setError('root', { message: 'Failed to update name. Please try again.' });
       }
@@ -47,44 +42,5 @@ function NameForm({ currentName }: { currentName: string }) {
         </Button>
       </div>
     </form>
-  );
-}
-
-function EmailForm({ currentEmail }: { currentEmail: string }) {
-  const [isPending, startTransition] = useTransition();
-  const form = useForm<EmailFormValues>({ defaultValues: { email: currentEmail } });
-
-  function onSubmit(values: EmailFormValues) {
-    startTransition(async () => {
-      try {
-        await updateProfile({ email: values.email });
-        toast.success('Email updated');
-      } catch {
-        form.setError('root', { message: 'Failed to update email. Please try again.' });
-      }
-    });
-  }
-
-  return (
-    <form className="flex flex-col gap-3" onSubmit={form.handleSubmit(onSubmit)}>
-      <FormError error={form.formState.errors.root} />
-      <Fieldset disabled={isPending}>
-        <TextField control={form.control} label="Email" name="email" required type="email" />
-      </Fieldset>
-      <div>
-        <Button disabled={isPending} size="sm" type="submit">
-          Save Email
-        </Button>
-      </div>
-    </form>
-  );
-}
-
-export function ProfileForm({ currentEmail, currentName }: ProfileFormProps) {
-  return (
-    <div className="space-y-6">
-      <NameForm currentName={currentName} />
-      <EmailForm currentEmail={currentEmail} />
-    </div>
   );
 }

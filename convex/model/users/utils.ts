@@ -12,12 +12,14 @@ export async function getUserFavoriteClips(ctx: QueryCtx, userId: string, limit:
   const enriched = await Promise.all(
     rows.map(async (row) => {
       const clip = await ctx.db.get(row.clipId);
-      if (!clip) return null;
+      if (!clip) {
+        return null;
+      }
       return { _id: clip._id, favoriteId: row._id, slug: clip.slug, title: clip.title };
     }),
   );
 
-  return enriched.filter(Boolean);
+  return enriched.filter((x): x is NonNullable<typeof x> => x !== null);
 }
 
 /**
@@ -32,7 +34,9 @@ export async function getUserFavoriteSpeakers(ctx: QueryCtx, userId: string, lim
   const enriched = await Promise.all(
     rows.map(async (row) => {
       const speaker = await ctx.db.get(row.speakerId);
-      if (!speaker) return null;
+      if (!speaker) {
+        return null;
+      }
       return {
         _id: speaker._id,
         favoriteId: row._id,
@@ -44,7 +48,7 @@ export async function getUserFavoriteSpeakers(ctx: QueryCtx, userId: string, lim
     }),
   );
 
-  return enriched.filter(Boolean);
+  return enriched.filter((x): x is NonNullable<typeof x> => x !== null);
 }
 
 /**
@@ -59,7 +63,9 @@ export async function getUserFavoriteTalks(ctx: QueryCtx, userId: string, limit:
   const enriched = await Promise.all(
     rows.map(async (row) => {
       const talk = await ctx.db.get(row.talkId);
-      if (!talk) return null;
+      if (!talk) {
+        return null;
+      }
       const speaker = await ctx.db.get(talk.speakerId);
       return {
         _id: talk._id,
@@ -73,7 +79,7 @@ export async function getUserFavoriteTalks(ctx: QueryCtx, userId: string, limit:
     }),
   );
 
-  return enriched.filter(Boolean);
+  return enriched.filter((x): x is NonNullable<typeof x> => x !== null);
 }
 
 /**
@@ -89,7 +95,9 @@ export async function getUserFinishedTalks(ctx: QueryCtx, userId: string, limit:
   const enriched = await Promise.all(
     rows.map(async (row) => {
       const talk = await ctx.db.get(row.talkId);
-      if (!talk) return null;
+      if (!talk) {
+        return null;
+      }
       const speaker = await ctx.db.get(talk.speakerId);
       return {
         _id: talk._id,
@@ -103,5 +111,5 @@ export async function getUserFinishedTalks(ctx: QueryCtx, userId: string, limit:
     }),
   );
 
-  return enriched.filter(Boolean);
+  return enriched.filter((x): x is NonNullable<typeof x> => x !== null);
 }
