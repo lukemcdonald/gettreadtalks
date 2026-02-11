@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 
+import { Analytics } from '@vercel/analytics/next';
 import { Inter, Playfair_Display } from 'next/font/google';
 
 import { AuthProvider } from '@/components/auth-provider';
@@ -53,6 +54,7 @@ export default async function RootLayout({
             </AuthProvider>
           </ThemeProvider>
         </ErrorBoundary>
+        <Analytics />
       </body>
     </html>
   );
