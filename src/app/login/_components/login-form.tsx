@@ -79,7 +79,7 @@ export function LoginForm(props: ComponentPropsWithoutRef<'form'>) {
         </Alert>
       )}
 
-      <Fieldset disabled={isLoading}>
+      <Fieldset className="max-w-full" disabled={isLoading}>
         <Field>
           <FieldLabel htmlFor={emailId}>
             Email address <span className="text-destructive">*</span>
