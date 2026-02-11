@@ -8,7 +8,7 @@ export default async function TopicsPage() {
   const topicsWithTalks = await getTopicsWithTalks();
 
   return (
-    <Section>
+    <Section spacing="xl">
       <Container>
         <div className="space-y-8">
           <PageHeader
