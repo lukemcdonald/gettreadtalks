@@ -224,17 +224,15 @@ export const unfinishTalk = mutation({
 });
 
 /**
- * Update the user's profile (name and/or email).
+ * Update the user's display name.
  */
 export const updateUserProfile = mutation({
   args: {
-    email: v.optional(v.string()),
-    name: v.optional(v.string()),
+    name: v.string(),
   },
   handler: async (ctx, args) => {
     await createAuth(ctx).api.updateUser({
       body: {
-        email: args.email,
         name: args.name,
       },
       headers: await authComponent.getHeaders(ctx),

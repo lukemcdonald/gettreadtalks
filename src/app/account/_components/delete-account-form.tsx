@@ -2,7 +2,6 @@
 
 import { useTransition } from 'react';
 import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
 
 import {
   AlertDialog,
@@ -18,6 +17,7 @@ import {
   FormError,
   TextField,
 } from '@/components/ui';
+import { toastManager } from '@/components/ui/primitives/toast';
 import { deleteAccount } from '@/features/users/actions/delete-account';
 
 interface DeleteFormValues {
@@ -32,7 +32,7 @@ export function DeleteAccountForm() {
     startTransition(async () => {
       try {
         await deleteAccount({ password: values.password });
-        toast.success('Account deleted');
+        toastManager.add({ title: 'Account deleted', type: 'success' });
       } catch {
         form.setError('root', {
           message: 'Failed to delete account. Check your password and try again.',
