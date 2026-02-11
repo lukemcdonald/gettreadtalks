@@ -258,8 +258,12 @@ export const listTopicsWithTalks = query({
 
       // Sort: featured talks first, then by creation date (newest first)
       publishedTalks.sort((a, b) => {
-        if (a.featured && !b.featured) return -1;
-        if (!a.featured && b.featured) return 1;
+        if (a.featured && !b.featured) {
+          return -1;
+        }
+        if (!a.featured && b.featured) {
+          return 1;
+        }
         return b._creationTime - a._creationTime;
       });
 

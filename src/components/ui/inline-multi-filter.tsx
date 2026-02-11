@@ -76,7 +76,9 @@ export function InlineMultiFilter({
   };
 
   const renderTriggerContent = () => {
-    if (selectedOptions.length === 0) return placeholder;
+    if (selectedOptions.length === 0) {
+      return placeholder;
+    }
     const firstOption = selectedOptions[0];
     const remainingCount = selectedOptions.length - 1;
 

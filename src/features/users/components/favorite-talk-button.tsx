@@ -34,8 +34,10 @@ function FavoriteButton({ talkId }: FavoriteTalkButtonProps) {
       <TooltipTrigger
         render={() => (
           <Button
+            className="rounded-full"
             disabled={isProcessing}
             onClick={handleToggleFavorite}
+            size="icon"
             type="button"
             variant={isFavorited ? 'destructive' : 'default'}
           >
