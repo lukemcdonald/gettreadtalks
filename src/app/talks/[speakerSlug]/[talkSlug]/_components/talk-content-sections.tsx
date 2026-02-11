@@ -38,7 +38,6 @@ export function TalkContentSections({
         <FeaturedGrid
           columns={{ default: 1, sm: 2, md: 2, lg: 2 }}
           description="Short, impactful moments from this talk."
-          quickLinksTitle=""
           title="Highlights"
         >
           {clips.map((clip) => (
@@ -70,7 +69,6 @@ export function TalkContentSections({
                 ]
               : undefined
           }
-          quickLinksTitle=""
           title="More Talks"
         >
           {relatedTalks.map((relatedTalk) => (
