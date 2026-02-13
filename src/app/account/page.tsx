@@ -16,9 +16,7 @@ export default async function AccountPage() {
           <CardDescription>Manage the email address associated with your account.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="max-w-sm">
-            <EmailForm currentEmail={user?.email ?? ''} />
-          </div>
+          <EmailForm currentEmail={user?.email ?? ''} />
         </CardContent>
       </Card>
 
@@ -29,9 +27,7 @@ export default async function AccountPage() {
           <CardDescription>Update the password associated with your account.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="max-w-sm">
-            <PasswordForm />
-          </div>
+          <PasswordForm />
         </CardContent>
       </Card>
 

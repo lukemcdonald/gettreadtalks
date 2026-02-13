@@ -45,7 +45,7 @@ export function PasswordField<T extends FieldValues>({
           <div className="relative">
             <Input
               aria-invalid={fieldState.invalid}
-              className="**:data-[slot=input]:pr-10"
+              className="w-full **:data-[slot=input]:pr-10"
               placeholder={placeholder}
               required={required}
               size="lg"

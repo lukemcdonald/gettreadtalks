@@ -89,7 +89,7 @@ export function NumberField<T extends FieldValues>({
                 <NumberFieldInput placeholder={placeholder} {...inputProps} />
               )}
             </NumberFieldPrimitive>
-            {!!fieldState.error && <FieldError>{fieldState.error?.message}</FieldError>}
+            {!!fieldState.error && <FieldError match>{fieldState.error?.message}</FieldError>}
           </Field>
         );
       }}

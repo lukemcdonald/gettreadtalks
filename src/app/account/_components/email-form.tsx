@@ -33,7 +33,7 @@ export function EmailForm({ currentEmail }: EmailFormProps) {
   return (
     <form onSubmit={form.handleSubmit(onSubmit)}>
       <FormError className="mb-3" error={form.formState.errors.root} />
-      <Fieldset disabled={isPending}>
+      <Fieldset className="max-w-full" disabled={isPending}>
         <TextField
           control={form.control}
           label="Email address"

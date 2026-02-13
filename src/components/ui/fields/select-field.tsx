@@ -98,7 +98,7 @@ export function SelectField<T extends FieldValues>({
               ))}
             </SelectPopup>
           </Select>
-          {!!fieldState.error && <FieldError>{fieldState.error?.message}</FieldError>}
+          {!!fieldState.error && <FieldError match>{fieldState.error?.message}</FieldError>}
         </Field>
       )}
     />
