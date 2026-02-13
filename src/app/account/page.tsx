@@ -3,12 +3,24 @@ import { getCurrentUser } from '@/services/auth/server';
 import { DeleteAccountForm } from './_components/delete-account-form';
 import { EmailForm } from './_components/email-form';
 import { PasswordForm } from './_components/password-form';
+import { ProfileForm } from './_components/profile-form';
 
 export default async function AccountPage() {
   const user = await getCurrentUser();
 
   return (
     <div className="space-y-4">
+      {/* Profile settings */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Profile settings</CardTitle>
+          <CardDescription>Update the name associated with your account.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ProfileForm currentName={user?.name ?? ''} />
+        </CardContent>
+      </Card>
+
       {/* Email settings */}
       <Card>
         <CardHeader>
