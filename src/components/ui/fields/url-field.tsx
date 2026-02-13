@@ -58,7 +58,7 @@ export function UrlField<T extends FieldValues>({
             type="url"
             {...field}
           />
-          {!!fieldState.error && <FieldError>{fieldState.error?.message}</FieldError>}
+          {!!fieldState.error && <FieldError match>{fieldState.error?.message}</FieldError>}
         </Field>
       )}
     />

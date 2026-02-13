@@ -8,6 +8,7 @@ import { ErrorBoundary } from '@/components/error-boundary';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
 import { ThemeProvider } from '@/components/theme-provider';
+import { ToastProvider } from '@/components/ui/primitives/toast';
 
 import '@/assets/styles.css';
 
@@ -44,13 +45,15 @@ export default async function RootLayout({
         <ErrorBoundary>
           <ThemeProvider>
             <AuthProvider>
-              <SkipNavLink href="#main" />
-              <SiteHeader />
-              <div className="flex-1 py-6 sm:py-8 md:py-10 lg:py-12" id="content">
-                {children}
-              </div>
-              <SiteFooter />
-              {sheet}
+              <ToastProvider>
+                <SkipNavLink href="#main" />
+                <SiteHeader />
+                <div className="flex-1 py-6 sm:py-8 md:py-10 lg:py-12" id="content">
+                  {children}
+                </div>
+                <SiteFooter />
+                {sheet}
+              </ToastProvider>
             </AuthProvider>
           </ThemeProvider>
         </ErrorBoundary>

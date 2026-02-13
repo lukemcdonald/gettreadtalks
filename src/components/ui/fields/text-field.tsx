@@ -60,7 +60,7 @@ export function TextField<T extends FieldValues>({
             type={type}
             {...field}
           />
-          {!!fieldState.error && <FieldError>{fieldState.error?.message}</FieldError>}
+          {!!fieldState.error && <FieldError match>{fieldState.error?.message}</FieldError>}
         </Field>
       )}
     />
