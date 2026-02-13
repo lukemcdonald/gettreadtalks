@@ -1,6 +1,7 @@
 'use client';
 
 import { useTransition } from 'react';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 
 import { Button, Fieldset, FormError, TextField } from '@/components/ui';
@@ -18,12 +19,14 @@ interface ProfileFormProps {
 export function ProfileForm({ currentName }: ProfileFormProps) {
   const [isPending, startTransition] = useTransition();
   const form = useForm<NameFormValues>({ defaultValues: { name: currentName } });
+  const router = useRouter();
 
   function onSubmit(values: NameFormValues) {
     startTransition(async () => {
       try {
         await updateProfile({ name: values.name });
         toastManager.add({ title: 'Name updated', type: 'success' });
+        router.refresh();
       } catch {
         form.setError('root', { message: 'Failed to update name. Please try again.' });
       }
