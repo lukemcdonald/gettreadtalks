@@ -1,6 +1,7 @@
 'use client';
 
 import { useTransition } from 'react';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 
 import { Button, Fieldset, FormError, TextField } from '@/components/ui';
@@ -18,12 +19,14 @@ interface EmailFormProps {
 export function EmailForm({ currentEmail }: EmailFormProps) {
   const [isPending, startTransition] = useTransition();
   const form = useForm<EmailFormValues>({ defaultValues: { email: currentEmail } });
+  const router = useRouter();
 
   function onSubmit(values: EmailFormValues) {
     startTransition(async () => {
       try {
         await updateEmail({ newEmail: values.email });
         toastManager.add({ title: 'Email updated', type: 'success' });
+        router.refresh();
       } catch {
         form.setError('root', { message: 'Failed to update email. Please try again.' });
       }
