@@ -42,7 +42,7 @@ export function PasswordField<T extends FieldValues>({
         >
           <FieldLabel required={required}>{label}</FieldLabel>
           {!!description && <FieldDescription>{description}</FieldDescription>}
-          <div className="relative">
+          <div className="relative w-full">
             <Input
               aria-invalid={fieldState.invalid}
               className="w-full **:data-[slot=input]:pr-10"
