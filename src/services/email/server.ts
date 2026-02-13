@@ -2,7 +2,7 @@
 
 import type { FunctionReference } from 'convex/server';
 
-import { fetchMutation } from 'convex/nextjs';
+import { fetchAction, fetchMutation } from 'convex/nextjs';
 
 import { internal } from '@/convex/_generated/api';
 
@@ -71,10 +71,8 @@ export async function sendPasswordResetEmail({
   resetUrl: string;
   token: string;
 }) {
-  // Note: Using type assertion because fetchMutation from convex/nextjs doesn't support internal mutations
-  // and these email functions are internal mutations by design for security
-  await fetchMutation(
-    internal.emails.sendPasswordResetEmail as unknown as FunctionReference<'mutation'>,
+  await fetchAction(
+    internal.emails.sendPasswordResetEmail as unknown as FunctionReference<'action'>,
     {
       email,
       resetUrl,

@@ -4,10 +4,11 @@ import type { DataModel } from './_generated/dataModel';
 
 import { createClient } from '@convex-dev/better-auth';
 import { convex as convexPlugin } from '@convex-dev/better-auth/plugins';
+import { requireActionCtx } from '@convex-dev/better-auth/utils';
 import { betterAuth } from 'better-auth';
 import { admin as adminPlugin } from 'better-auth/plugins';
 
-import { components } from './_generated/api';
+import { components, internal } from './_generated/api';
 import authConfig from './auth.config';
 import authSchema from './betterAuth/schema';
 
@@ -43,6 +44,15 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
     emailAndPassword: {
       enabled: true,
       requireEmailVerification: false,
+      sendResetPassword: async ({ token, url, user }) => {
+        // console.log('[DEV] Password reset URL:', url);
+        const actionCtx = requireActionCtx(ctx);
+        await actionCtx.runAction(internal.emails.sendPasswordResetEmail, {
+          email: user.email,
+          resetUrl: url,
+          token,
+        });
+      },
     },
     user: {
       changeEmail: {
