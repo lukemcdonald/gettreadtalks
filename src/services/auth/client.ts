@@ -39,3 +39,17 @@ export async function signIn({ email, password }: SignInParams) {
 export async function signOut() {
   return await authClient.signOut();
 }
+
+export async function requestPasswordReset({ email }: { email: string }) {
+  return await authClient.requestPasswordReset({ email, redirectTo: '/reset-password' });
+}
+
+export async function resetPassword({
+  newPassword,
+  token,
+}: {
+  newPassword: string;
+  token: string;
+}) {
+  return await authClient.resetPassword({ newPassword, token });
+}

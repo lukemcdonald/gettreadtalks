@@ -4,6 +4,7 @@ import type { ComponentPropsWithoutRef, FormEvent } from 'react';
 
 import { useId, useState } from 'react';
 import { CircleAlertIcon } from 'lucide-react';
+import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
 import {
@@ -111,6 +112,11 @@ export function LoginForm(props: ComponentPropsWithoutRef<'form'>) {
             type="password"
             value={password}
           />
+          <div className="flex justify-end">
+            <Link className="text-muted-foreground text-sm hover:underline" href="/forgot-password">
+              Forgot password?
+            </Link>
+          </div>
         </Field>
 
         <div className="mt-4 flex gap-4">

@@ -3,7 +3,7 @@ import { render } from '@react-email/render';
 import { v } from 'convex/values';
 
 import { components, internal } from './_generated/api';
-import { internalMutation } from './_generated/server';
+import { internalAction, internalMutation } from './_generated/server';
 import { ResetPasswordTemplate } from './emails/resetPassword';
 import { VerifyEmailTemplate } from './emails/verifyEmail';
 import { WelcomeEmail } from './emails/welcome';
@@ -73,13 +73,13 @@ export const handleEmailEvent = internalMutation({
   },
 });
 
-export const sendPasswordResetEmail = internalMutation({
+export const sendPasswordResetEmail = internalAction({
   args: {
     email: v.string(),
     resetUrl: v.string(),
     token: v.string(),
   },
-  returns: vEmailId,
+  returns: v.null(),
   handler: async (ctx, args) => {
     try {
       const html = await render(
@@ -90,16 +90,14 @@ export const sendPasswordResetEmail = internalMutation({
         }),
       );
 
-      const emailId = await resend.sendEmail(ctx, {
+      await resend.sendEmail(ctx, {
         from: getFromAddress(),
         html,
         replyTo: [getReplyToAddress()],
         subject: 'Reset your password',
         to: args.email,
       });
-
-      return emailId;
-    } catch {
+    } catch (err) {
       throwConvexError(500, 'Failed to send password reset email', {
         resource: 'email',
         resourceId: args.email,
