@@ -28,6 +28,7 @@ type AuthIntent = 'signIn' | 'signUp';
 export function LoginForm(props: ComponentPropsWithoutRef<'form'>) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [intent, setIntent] = useState<AuthIntent | null>(null);
 
   const searchParams = useSearchParams();
   const initialEmail = searchParams.get('email') || '';
@@ -35,22 +36,29 @@ export function LoginForm(props: ComponentPropsWithoutRef<'form'>) {
 
   const [email, setEmail] = useState(initialEmail);
   const emailId = useId();
+  const [name, setName] = useState('');
+  const nameId = useId();
   const [password, setPassword] = useState('');
   const passwordId = useId();
 
+  const isSignUp = intent === 'signUp';
   const isDisabled = isLoading || !email || !password;
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const intent = (formData.get('intent') as AuthIntent) || 'signIn';
+    const submittedIntent = (formData.get('intent') as AuthIntent) || 'signIn';
 
     setError('');
     setIsLoading(true);
 
     try {
-      const submitAction = intent === 'signIn' ? signIn : signUp;
-      const { data: submitData, error: submitError } = await submitAction({ email, password });
+      const submitAction = submittedIntent === 'signIn' ? signIn : signUp;
+      const { data: submitData, error: submitError } = await submitAction({
+        email,
+        name,
+        password,
+      });
 
       if (submitData) {
         // Use window.location.href to force full page reload and set JWT cookie
@@ -60,7 +68,7 @@ export function LoginForm(props: ComponentPropsWithoutRef<'form'>) {
           signIn: AUTH_ERRORS.INVALID_CREDENTIALS,
           signUp: AUTH_ERRORS.REGISTRATION_FAILED,
         };
-        setError(submitError?.message ?? errorMessages[intent]);
+        setError(submitError?.message ?? errorMessages[submittedIntent]);
       }
     } catch (err) {
       captureException(err, { fingerprint: ['auth', intent] });
@@ -81,6 +89,22 @@ export function LoginForm(props: ComponentPropsWithoutRef<'form'>) {
       )}
 
       <Fieldset className="max-w-full" disabled={isLoading}>
+        {isSignUp && (
+          <Field>
+            <FieldLabel htmlFor={nameId}>Name</FieldLabel>
+            <Input
+              autoComplete="name"
+              id={nameId}
+              name="name"
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Your name"
+              size="lg"
+              type="text"
+              value={name}
+            />
+          </Field>
+        )}
+
         <Field>
           <FieldLabel htmlFor={emailId}>
             Email address <span className="text-destructive">*</span>
@@ -131,9 +155,12 @@ export function LoginForm(props: ComponentPropsWithoutRef<'form'>) {
           </Button>
           <Button
             className="flex-1"
-            disabled={isDisabled}
+            disabled={isSignUp ? isDisabled : isLoading}
             name="intent"
-            type="submit"
+            onClick={() => {
+              if (!isSignUp) setIntent('signUp');
+            }}
+            type={isSignUp ? 'submit' : 'button'}
             value="signUp"
             variant="outline"
           >
