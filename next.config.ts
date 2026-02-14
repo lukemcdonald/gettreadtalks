@@ -6,7 +6,7 @@ import { IS_SENTRY_ENABLED } from './src/configs/sentry';
 
 const cspHeader = `
   base-uri 'self';
-  connect-src 'self' https://*.convex.cloud wss://*.convex.cloud https://*.sentry.io https://*.ingest.us.sentry.io;
+  connect-src 'self' https://*.convex.cloud wss://*.convex.cloud https://*.sentry.io https://*.ingest.us.sentry.io https://va.vercel-scripts.com;
   default-src 'self';
   font-src 'self' data:;
   form-action 'self';
@@ -14,7 +14,7 @@ const cspHeader = `
   frame-src 'self' https://vercel.live https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com;
   img-src 'self' blob: data: https:;
   object-src 'none';
-  script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live;
+  script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live https://va.vercel-scripts.com;
   style-src 'self' 'unsafe-inline';
   worker-src 'self' blob:;
   upgrade-insecure-requests;
