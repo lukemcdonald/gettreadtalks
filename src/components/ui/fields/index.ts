@@ -13,6 +13,7 @@ export { FeaturedField } from './featured-field';
 export { FieldLabel } from './field-label';
 export { NumberField } from './number-field';
 export { PasswordField } from './password-field';
+export { PasswordInput } from './password-input';
 export { SelectField } from './select-field';
 export { StatusField } from './status-field';
 export { TextField } from './text-field';
