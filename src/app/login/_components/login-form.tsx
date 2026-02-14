@@ -13,11 +13,11 @@ import {
   AlertTitle,
   Button,
   Field,
-  FieldError,
   FieldLabel,
   Fieldset,
   Form,
   Input,
+  PasswordInput,
 } from '@/components/ui';
 import { signIn, signUp } from '@/services/auth/client';
 import { AUTH_ERRORS } from '@/services/auth/config';
@@ -46,8 +46,7 @@ export function LoginForm(props: ComponentPropsWithoutRef<'form'>) {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const submittedIntent = (formData.get('intent') as AuthIntent) || 'signIn';
+    const submittedIntent: AuthIntent = intent ?? 'signIn';
 
     setError('');
     setIsLoading(true);
@@ -126,14 +125,12 @@ export function LoginForm(props: ComponentPropsWithoutRef<'form'>) {
           <FieldLabel htmlFor={passwordId}>
             Password <span className="text-destructive">*</span>
           </FieldLabel>
-          <Input
+          <PasswordInput
             autoComplete="current-password"
             id={passwordId}
             name="password"
             onChange={(e) => setPassword(e.target.value)}
             required
-            size="lg"
-            type="password"
             value={password}
           />
           <div className="flex justify-end">
@@ -157,9 +154,7 @@ export function LoginForm(props: ComponentPropsWithoutRef<'form'>) {
             className="flex-1"
             disabled={isSignUp ? isDisabled : isLoading}
             name="intent"
-            onClick={() => {
-              if (!isSignUp) setIntent('signUp');
-            }}
+            onClick={() => setIntent('signUp')}
             type={isSignUp ? 'submit' : 'button'}
             value="signUp"
             variant="outline"
