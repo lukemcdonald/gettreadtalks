@@ -10,8 +10,8 @@ export default function LoginPage() {
       content={<LoginContent />}
       leftSidebar={
         <PageHeader
-          description="Sign in or create a free account to save your favorite content."
-          title="Login"
+          description="Sign in to your account to access your saved content."
+          title="Sign In"
         />
       }
       rightSidebar={<slot />}
