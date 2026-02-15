@@ -164,6 +164,18 @@ export async function getEntity(id: EntityId) {
 
 **UI Primitives:** Files in `src/components/ui/primitives/` are vendor components - never edit directly. Create wrappers in `src/components/ui/`.
 
+**UI imports** — always import from `@/components/ui`, never from primitive paths directly. This single entry point abstracts whether a component is a vendor primitive or a local customization — consumers don't need to know or remember which it is.
+
+```typescript
+// ✅ Always use the barrel
+import { Button, Card, TextField } from '@/components/ui';
+
+// ❌ Never import primitives directly in feature/page code
+import { Button } from '@/components/ui/primitives/button';
+```
+
+The one exception: heavy components that are conditionally rendered (modals, sheets, comboboxes used in rare flows) may use `next/dynamic` at the call site if bundle impact is measurable.
+
 **Naming:** kebab-case for all folders
 
 ### Route-Level Co-location
@@ -177,6 +189,19 @@ Better Auth with Convex integration:
 - Client: `import { useCurrentUser } from '@/features/users/hooks'`
 - Server: `import { getCurrentUser, requireAdminUser, getAuthToken } from '@/services/auth/server'`
 - Convex: `import { getCurrentUser, requireAuth } from '@/convex/model/auth'`
+
+**Derived auth hooks** — prefer derived hooks over reading raw user fields when a component only needs auth state, not user data:
+
+```typescript
+// ✅ Component only needs admin check
+import { useIsAdmin } from '@/features/users/hooks/use-is-admin';
+
+// ✅ Component only needs auth state
+import { useIsAuthenticated } from '@/features/users/hooks/use-is-authenticated';
+
+// ✅ Component needs user data (email, name, etc.)
+import { useCurrentUser } from '@/features/users/hooks/use-current-user';
+```
 
 ### Cache Invalidation
 
