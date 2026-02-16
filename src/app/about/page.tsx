@@ -1,5 +1,13 @@
+import type { Metadata } from 'next';
+
 import { CenteredLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
+
+export const metadata: Metadata = {
+  description:
+    'TREAD Talks began as a way to bookmark sermons listened to while walking. Now a resource for finding and sharing Christ centered talks.',
+  title: 'About',
+};
 
 function AboutContent() {
   return (

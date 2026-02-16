@@ -1,8 +1,16 @@
+import type { Metadata } from 'next';
+
 import { CollectionsContent } from '@/app/collections/_components/collections-content';
 import { CollectionsSidebar } from '@/app/collections/_components/collections-sidebar';
 import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { getCollections } from '@/features/collections/queries/get-collections';
+
+export const metadata: Metadata = {
+  description:
+    'Explore curated talk series — each collection covers one topic or book of the Bible.',
+  title: 'Collections',
+};
 
 export interface CollectionsPageSearchParams {
   sort?: string;

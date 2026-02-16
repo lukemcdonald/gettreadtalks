@@ -1,9 +1,16 @@
+import type { Metadata } from 'next';
+
 import { SpeakersList } from '@/app/speakers/_components/speakers-list';
 import { SpeakersSidebar } from '@/app/speakers/_components/speakers-sidebar';
 import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { getSpeakers } from '@/features/speakers/queries/get-speakers';
 import { getSpeakersGrouped } from '@/features/speakers/queries/get-speakers-grouped';
+
+export const metadata: Metadata = {
+  description: 'Discover faithful ministers of the Gospel and be strengthened by their teaching.',
+  title: 'Speakers',
+};
 
 interface SpeakersPageProps {
   searchParams: Promise<{
