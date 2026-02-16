@@ -16,7 +16,9 @@ export async function generateMetadata({ params }: ClipPageProps): Promise<Metad
   const { clipSlug } = await params;
   const data = await getClipBySlug(clipSlug);
 
-  if (!data) return {};
+  if (!data) {
+    return {};
+  }
 
   const { clip, speaker } = data;
   const speakerName = speaker ? `${speaker.firstName} ${speaker.lastName}` : '';

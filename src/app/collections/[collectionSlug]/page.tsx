@@ -17,7 +17,9 @@ export async function generateMetadata({ params }: CollectionPageProps): Promise
   const { collectionSlug } = await params;
   const data = await getCollectionBySlug(collectionSlug);
 
-  if (!data) return {};
+  if (!data) {
+    return {};
+  }
 
   const { collection } = data;
 

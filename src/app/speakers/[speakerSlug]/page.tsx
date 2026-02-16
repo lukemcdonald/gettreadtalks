@@ -17,7 +17,9 @@ export async function generateMetadata({ params }: SpeakerPageProps): Promise<Me
   const { speakerSlug } = await params;
   const data = await getSpeakerBySlug(speakerSlug);
 
-  if (!data) return {};
+  if (!data) {
+    return {};
+  }
 
   const { speaker } = data;
   const name = `${speaker.firstName} ${speaker.lastName}`;

@@ -15,7 +15,9 @@ function PostHogPageView() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    if (!(pathname && posthogClient)) return;
+    if (!(pathname && posthogClient)) {
+      return;
+    }
     const url = searchParams.toString()
       ? `${window.origin}${pathname}?${searchParams}`
       : `${window.origin}${pathname}`;
@@ -30,7 +32,9 @@ function PostHogIdentify() {
   const posthogClient = usePostHog();
 
   useEffect(() => {
-    if (isLoading || !posthogClient) return;
+    if (isLoading || !posthogClient) {
+      return;
+    }
 
     if (user) {
       posthogClient.identify(user._id, {
@@ -46,8 +50,8 @@ function PostHogIdentify() {
   return null;
 }
 
-if (typeof window !== 'undefined') {
-  posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
+if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_POSTHOG_KEY) {
+  posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY, {
     api_host: '/ingest',
     capture_pageleave: true,
     capture_pageview: false,

@@ -1,4 +1,4 @@
-export type EventMap = {
+export interface EventMap {
   // Navigation (page_viewed is auto-tracked by analytics-provider)
   search_performed: { query: string; results_count?: number };
   filter_applied: { filter_type: string; filter_value: string };
@@ -30,7 +30,7 @@ export type EventMap = {
 
   // Errors
   not_found_hit: { path: string };
-};
+}
 
 /** Events that carry no payload — derived automatically from EventMap. */
 export type NoPayloadEvents = {

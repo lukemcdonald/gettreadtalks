@@ -7,17 +7,19 @@ import { useRef } from 'react';
 import { useAnalytics } from '@/lib/analytics';
 
 interface VideoPlayerProps {
-  trackingContext?: MediaTrackingContext;
   src: string;
+  trackingContext?: MediaTrackingContext;
 }
 
-export function VideoPlayer({ trackingContext, src }: VideoPlayerProps) {
+export function VideoPlayer({ src, trackingContext }: VideoPlayerProps) {
   const { track } = useAnalytics();
   const hasPlayed = useRef(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   const handlePlay = () => {
-    if (!trackingContext || hasPlayed.current) return;
+    if (!trackingContext || hasPlayed.current) {
+      return;
+    }
     hasPlayed.current = true;
 
     if (trackingContext.entityType === 'talk') {
@@ -35,7 +37,9 @@ export function VideoPlayer({ trackingContext, src }: VideoPlayerProps) {
   };
 
   const handlePause = () => {
-    if (!(trackingContext && videoRef.current)) return;
+    if (!(trackingContext && videoRef.current)) {
+      return;
+    }
     const el = videoRef.current;
     const progress_pct = Math.round((el.currentTime / el.duration) * 100);
 
@@ -55,7 +59,9 @@ export function VideoPlayer({ trackingContext, src }: VideoPlayerProps) {
   };
 
   const handleEnded = () => {
-    if (!trackingContext) return;
+    if (!trackingContext) {
+      return;
+    }
 
     if (trackingContext.entityType === 'talk') {
       track('talk_completed', {
