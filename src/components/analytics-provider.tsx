@@ -28,6 +28,9 @@ if (typeof window !== 'undefined') {
     api_host: '/ingest',
     capture_pageleave: true,
     capture_pageview: false,
+    session_recording: {
+      maskAllInputs: true,
+    },
     ui_host: 'https://us.posthog.com',
   });
 }

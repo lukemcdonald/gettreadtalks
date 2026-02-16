@@ -1,6 +1,5 @@
 import * as Sentry from '@sentry/nextjs';
 
-import { IS_PROD } from '@/constants/env';
 import { baseSentryConfig } from './index';
 
 // Expose Sentry on window for debugging (Next.js doesn't do this by default)
@@ -14,10 +13,6 @@ Sentry.init({
   integrations: [
     Sentry.browserTracingIntegration({
       enableInp: true,
-    }),
-    Sentry.replayIntegration({
-      blockAllMedia: true,
-      maskAllText: true,
     }),
     // Disable all automatic breadcrumbs to reduce noise
     Sentry.breadcrumbsIntegration({
@@ -36,8 +31,6 @@ Sentry.init({
       behaviour: 'apply-tag-if-contains-third-party-frames',
     }),
   ],
-  replaysOnErrorSampleRate: 1.0,
-  replaysSessionSampleRate: IS_PROD ? 0.1 : 1.0,
 
   // Add useful debugging context
   beforeSend(event) {
