@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+
 import { notFound } from 'next/navigation';
 
 import { TopicContent } from '@/app/topics/[topicSlug]/_components/topic-content';
@@ -15,6 +17,22 @@ interface TopicPageProps {
     cursor?: string;
     search?: string;
   }>;
+}
+
+export async function generateMetadata({ params }: TopicPageProps): Promise<Metadata> {
+  const { topicSlug } = await params;
+  const topicResult = await getTopicBySlug({ slug: topicSlug });
+
+  if (!topicResult) return {};
+
+  const { topic, totalTalks } = topicResult;
+  const count = totalTalks === 1 ? 'this' : `these ${totalTalks}`;
+  const noun = totalTalks === 1 ? 'talk' : 'talks';
+
+  return {
+    description: `Elevate your spiritual heartbeat with ${count} Christ centered ${noun} on ${topic.title}.`,
+    title: topic.title,
+  };
 }
 
 export default async function TopicPage({ params, searchParams }: TopicPageProps) {

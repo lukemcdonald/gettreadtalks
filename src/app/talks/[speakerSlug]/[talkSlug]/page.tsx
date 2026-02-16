@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+
 import { notFound } from 'next/navigation';
 
 import { TalkContentSections } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-content-sections';
@@ -11,6 +13,22 @@ interface TalkPageProps {
     speakerSlug: string;
     talkSlug: string;
   }>;
+}
+
+export async function generateMetadata({ params }: TalkPageProps): Promise<Metadata> {
+  const { speakerSlug, talkSlug } = await params;
+  const talkResult = await getTalkBySlug(speakerSlug, talkSlug);
+
+  if (!talkResult) return {};
+
+  const { speaker, talk } = talkResult;
+  const speakerName = speaker ? `${speaker.firstName} ${speaker.lastName}` : '';
+
+  return {
+    description: talk.description ?? (speakerName ? `A talk by ${speakerName}.` : undefined),
+    openGraph: speaker?.imageUrl ? { images: [speaker.imageUrl] } : undefined,
+    title: talk.title,
+  };
 }
 
 export default async function TalkPage({ params }: TalkPageProps) {
