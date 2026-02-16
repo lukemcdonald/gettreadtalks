@@ -19,6 +19,7 @@ import {
   Input,
   PasswordInput,
 } from '@/components/ui';
+import { useAnalytics } from '@/lib/analytics';
 import { signUp } from '@/services/auth/client';
 import { AUTH_ERRORS } from '@/services/auth/config';
 import { captureException } from '@/services/errors/client';
@@ -38,6 +39,7 @@ export function RegisterForm(props: ComponentPropsWithoutRef<'form'>) {
   const passwordId = useId();
 
   const isDisabled = isLoading || !email || !password;
+  const { track } = useAnalytics();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -49,6 +51,7 @@ export function RegisterForm(props: ComponentPropsWithoutRef<'form'>) {
       const { data, error: signUpError } = await signUp({ email, name, password });
 
       if (data) {
+        track('signed_up');
         // Use window.location.href to force full page reload and set JWT cookie
         window.location.href = redirectTo;
       } else {

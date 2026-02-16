@@ -11,7 +11,15 @@ export function ClipContent({ clip }: ClipContentProps) {
     <>
       {!!clip.mediaUrl && (
         <div className="space-y-4">
-          <MediaEmbed mediaUrl={clip.mediaUrl} title={clip.title} />
+          <MediaEmbed
+            mediaUrl={clip.mediaUrl}
+            title={clip.title}
+            trackingContext={{
+              entityId: clip._id,
+              entitySlug: clip.slug,
+              entityType: 'clip',
+            }}
+          />
         </div>
       )}
 

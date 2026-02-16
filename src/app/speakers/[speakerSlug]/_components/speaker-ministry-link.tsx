@@ -1,15 +1,34 @@
+'use client';
+
 import { ExternalLinkIcon } from 'lucide-react';
 
 import { Link } from '@/components/ui';
+import { useAnalytics } from '@/lib/analytics';
 import { cn } from '@/utils';
 
 interface SpeakerMinistryLinkProps {
-  ministry?: string;
-  websiteUrl?: string;
   className?: string;
+  ministry?: string;
+  speakerSlug: string;
+  websiteUrl?: string;
 }
 
-export function SpeakerMinistryLink({ ministry, websiteUrl, className }: SpeakerMinistryLinkProps) {
+export function SpeakerMinistryLink({
+  className,
+  ministry,
+  speakerSlug,
+  websiteUrl,
+}: SpeakerMinistryLinkProps) {
+  const { track } = useAnalytics();
+
+  const handleClick = (url: string, linkType: string) => {
+    track('speaker_link_clicked', {
+      link_type: linkType,
+      speaker_slug: speakerSlug,
+      url,
+    });
+  };
+
   if (ministry && websiteUrl) {
     return (
       <Link
@@ -18,6 +37,7 @@ export function SpeakerMinistryLink({ ministry, websiteUrl, className }: Speaker
           className,
         )}
         href={websiteUrl}
+        onClick={() => handleClick(websiteUrl, 'ministry')}
         target="_blank"
       >
         {ministry}
@@ -38,6 +58,7 @@ export function SpeakerMinistryLink({ ministry, websiteUrl, className }: Speaker
           className,
         )}
         href={websiteUrl}
+        onClick={() => handleClick(websiteUrl, 'website')}
         target="_blank"
       >
         Website
