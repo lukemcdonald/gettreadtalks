@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+
 import { notFound } from 'next/navigation';
 
 import { SpeakerContentSections } from '@/app/speakers/[speakerSlug]/_components/speaker-content-sections';
@@ -8,6 +10,22 @@ import { getSpeakerBySlug } from '@/features/speakers/queries/get-speaker-by-slu
 
 interface SpeakerPageProps {
   params: Promise<{ speakerSlug: string }>;
+}
+
+export async function generateMetadata({ params }: SpeakerPageProps): Promise<Metadata> {
+  const { speakerSlug } = await params;
+  const data = await getSpeakerBySlug(speakerSlug);
+
+  if (!data) return {};
+
+  const { speaker } = data;
+  const name = `${speaker.firstName} ${speaker.lastName}`;
+
+  return {
+    description: speaker.description ?? `${name} — faithful minister of the Gospel.`,
+    openGraph: speaker.imageUrl ? { images: [speaker.imageUrl] } : undefined,
+    title: name,
+  };
 }
 
 export default async function SpeakerPage({ params }: SpeakerPageProps) {

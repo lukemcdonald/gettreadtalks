@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+
 import { notFound } from 'next/navigation';
 
 import { SidebarLayout } from '@/components/layouts';
@@ -8,6 +10,21 @@ import { ClipSidebar } from './_components/clip-sidebar';
 
 interface ClipPageProps {
   params: Promise<{ clipSlug: string }>;
+}
+
+export async function generateMetadata({ params }: ClipPageProps): Promise<Metadata> {
+  const { clipSlug } = await params;
+  const data = await getClipBySlug(clipSlug);
+
+  if (!data) return {};
+
+  const { clip, speaker } = data;
+  const speakerName = speaker ? `${speaker.firstName} ${speaker.lastName}` : '';
+
+  return {
+    description: clip.description ?? (speakerName ? `A clip from ${speakerName}.` : undefined),
+    title: clip.title,
+  };
 }
 
 export default async function ClipPage({ params }: ClipPageProps) {

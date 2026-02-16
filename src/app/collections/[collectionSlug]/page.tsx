@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+
 import { notFound } from 'next/navigation';
 
 import { CollectionContent } from '@/app/collections/[collectionSlug]/_components/collection-content';
@@ -8,6 +10,20 @@ import { getCollectionBySlug } from '@/features/collections/queries/get-collecti
 
 interface CollectionPageProps {
   params: Promise<{ collectionSlug: string }>;
+}
+
+export async function generateMetadata({ params }: CollectionPageProps): Promise<Metadata> {
+  const { collectionSlug } = await params;
+  const data = await getCollectionBySlug(collectionSlug);
+
+  if (!data) return {};
+
+  const { collection } = data;
+
+  return {
+    description: collection.description,
+    title: collection.title,
+  };
 }
 
 export default async function CollectionPage({ params }: CollectionPageProps) {
