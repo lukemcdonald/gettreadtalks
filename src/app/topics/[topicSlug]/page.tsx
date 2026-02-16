@@ -23,7 +23,9 @@ export async function generateMetadata({ params }: TopicPageProps): Promise<Meta
   const { topicSlug } = await params;
   const topicResult = await getTopicBySlug({ slug: topicSlug });
 
-  if (!topicResult) return {};
+  if (!topicResult) {
+    return {};
+  }
 
   const { topic, totalTalks } = topicResult;
   const count = totalTalks === 1 ? 'this' : `these ${totalTalks}`;

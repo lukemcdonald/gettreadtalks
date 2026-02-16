@@ -21,7 +21,9 @@ export async function generateMetadata({ params }: TalkPageProps): Promise<Metad
   const { speakerSlug, talkSlug } = await params;
   const talkResult = await getTalkBySlug(speakerSlug, talkSlug);
 
-  if (!talkResult) return {};
+  if (!talkResult) {
+    return {};
+  }
 
   const { speaker, talk } = talkResult;
   const speakerName = speaker ? `${speaker.firstName} ${speaker.lastName}` : '';

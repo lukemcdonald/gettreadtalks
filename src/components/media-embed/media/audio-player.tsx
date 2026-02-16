@@ -7,17 +7,19 @@ import { useRef } from 'react';
 import { useAnalytics } from '@/lib/analytics';
 
 interface AudioPlayerProps {
-  trackingContext?: MediaTrackingContext;
   src: string;
+  trackingContext?: MediaTrackingContext;
 }
 
-export function AudioPlayer({ trackingContext, src }: AudioPlayerProps) {
+export function AudioPlayer({ src, trackingContext }: AudioPlayerProps) {
   const { track } = useAnalytics();
   const hasPlayed = useRef(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const handlePlay = () => {
-    if (!trackingContext || hasPlayed.current) return;
+    if (!trackingContext || hasPlayed.current) {
+      return;
+    }
     hasPlayed.current = true;
 
     if (trackingContext.entityType === 'talk') {
@@ -35,7 +37,9 @@ export function AudioPlayer({ trackingContext, src }: AudioPlayerProps) {
   };
 
   const handlePause = () => {
-    if (!(trackingContext && audioRef.current)) return;
+    if (!(trackingContext && audioRef.current)) {
+      return;
+    }
     const el = audioRef.current;
     const progress_pct = Math.round((el.currentTime / el.duration) * 100);
 
@@ -55,7 +59,9 @@ export function AudioPlayer({ trackingContext, src }: AudioPlayerProps) {
   };
 
   const handleEnded = () => {
-    if (!trackingContext) return;
+    if (!trackingContext) {
+      return;
+    }
 
     if (trackingContext.entityType === 'talk') {
       track('talk_completed', {

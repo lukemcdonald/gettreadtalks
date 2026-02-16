@@ -31,7 +31,9 @@ export const listTalkSlugsForSitemap = query({
     const results = await Promise.all(
       talks.map(async (talk) => {
         const speaker = await ctx.db.get('speakers', talk.speakerId);
-        if (!speaker) return null;
+        if (!speaker) {
+          return null;
+        }
         return {
           speakerSlug: speaker.slug,
           talkSlug: talk.slug,

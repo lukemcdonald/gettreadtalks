@@ -5,10 +5,12 @@ import type { EventMap, NoPayloadEvents, PayloadEvents } from './events';
 import { usePostHog } from 'posthog-js/react';
 
 function warnInDev(event: string, properties: Record<string, unknown>) {
-  if (process.env.NODE_ENV === 'production') return;
+  if (process.env.NODE_ENV === 'production') {
+    return;
+  }
 
   for (const [key, value] of Object.entries(properties)) {
-    if (value === '' || value === undefined || (typeof value === 'number' && isNaN(value))) {
+    if (value === '' || value === undefined || (typeof value === 'number' && Number.isNaN(value))) {
       console.warn(`[analytics] "${event}.${key}" has a suspicious value:`, value);
     }
   }
