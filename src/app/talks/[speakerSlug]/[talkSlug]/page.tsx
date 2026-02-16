@@ -4,7 +4,9 @@ import { notFound } from 'next/navigation';
 
 import { TalkContentSections } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-content-sections';
 import { TalkHero } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-hero';
+import { JsonLd } from '@/components/json-ld';
 import { EditorialProfileLayout } from '@/components/layouts';
+import { isVideoMediaType } from '@/components/media-embed';
 import { getRandomTalksBySpeaker } from '@/features/talks/queries/get-random-talks-by-speaker';
 import { getTalkBySlug } from '@/features/talks/queries/get-talk-by-slug';
 
@@ -44,26 +46,41 @@ export default async function TalkPage({ params }: TalkPageProps) {
   // Fetch related talks from same speaker
   const relatedTalks = speaker ? await getRandomTalksBySpeaker(speaker._id, talk._id, 5) : [];
 
+  const speakerName = speaker ? `${speaker.firstName} ${speaker.lastName}` : undefined;
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': isVideoMediaType(talk.mediaUrl) ? 'VideoObject' : 'AudioObject',
+    description: talk.description,
+    embedUrl: talk.mediaUrl,
+    name: talk.title,
+    ...(speakerName && { creator: { '@type': 'Person', name: speakerName } }),
+    ...(talk.publishedAt && { uploadDate: new Date(talk.publishedAt).toISOString() }),
+    url: `https://gettreadtalks.com/talks/${speakerSlug}/${talkSlug}`,
+  };
+
   return (
-    <EditorialProfileLayout
-      content={
-        <TalkContentSections
-          clips={clips}
-          collection={collection}
-          relatedTalks={relatedTalks}
-          speaker={speaker}
-          talk={talk}
-        />
-      }
-      hero={
-        <TalkHero
-          speaker={speaker}
-          speakerSlug={speakerSlug}
-          talk={talk}
-          talkSlug={talkSlug}
-          topics={topics}
-        />
-      }
-    />
+    <>
+      <JsonLd data={jsonLd} />
+      <EditorialProfileLayout
+        content={
+          <TalkContentSections
+            clips={clips}
+            collection={collection}
+            relatedTalks={relatedTalks}
+            speaker={speaker}
+            talk={talk}
+          />
+        }
+        hero={
+          <TalkHero
+            speaker={speaker}
+            speakerSlug={speakerSlug}
+            talk={talk}
+            talkSlug={talkSlug}
+            topics={topics}
+          />
+        }
+      />
+    </>
   );
 }
