@@ -28,7 +28,9 @@ export async function generateMetadata({ params }: TalkPageProps): Promise<Metad
 
   return {
     description: talk.description ?? (speakerName ? `A talk by ${speakerName}.` : undefined),
-    openGraph: speaker?.imageUrl ? { images: [speaker.imageUrl] } : undefined,
+    openGraph: speaker?.imageUrl
+      ? { images: [{ alt: speakerName, height: 630, url: speaker.imageUrl, width: 1200 }] }
+      : undefined,
     title: talk.title,
   };
 }

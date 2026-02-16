@@ -24,7 +24,9 @@ export async function generateMetadata({ params }: SpeakerPageProps): Promise<Me
 
   return {
     description: speaker.description ?? `${name} — faithful minister of the Gospel.`,
-    openGraph: speaker.imageUrl ? { images: [speaker.imageUrl] } : undefined,
+    openGraph: speaker.imageUrl
+      ? { images: [{ alt: name, height: 630, url: speaker.imageUrl, width: 1200 }] }
+      : undefined,
     title: name,
   };
 }
