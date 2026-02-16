@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { Analytics } from '@vercel/analytics/next';
 import { Inter, Playfair_Display } from 'next/font/google';
 
+import { AnalyticsProvider } from '@/components/analytics-provider';
 import { AuthProvider } from '@/components/auth-provider';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { SiteFooter } from '@/components/site-footer';
@@ -62,21 +63,23 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <body className={'flex min-h-full flex-col bg-background bg-cover text-foreground'}>
-        <ErrorBoundary>
-          <ThemeProvider>
-            <AuthProvider>
-              <ToastProvider>
-                <SkipNavLink href="#main" />
-                <SiteHeader />
-                <div className="flex-1 py-6 sm:py-8 md:py-10 lg:py-12" id="content">
-                  {children}
-                </div>
-                <SiteFooter />
-                {sheet}
-              </ToastProvider>
-            </AuthProvider>
-          </ThemeProvider>
-        </ErrorBoundary>
+        <AnalyticsProvider>
+          <ErrorBoundary>
+            <ThemeProvider>
+              <AuthProvider>
+                <ToastProvider>
+                  <SkipNavLink href="#main" />
+                  <SiteHeader />
+                  <div className="flex-1 py-6 sm:py-8 md:py-10 lg:py-12" id="content">
+                    {children}
+                  </div>
+                  <SiteFooter />
+                  {sheet}
+                </ToastProvider>
+              </AuthProvider>
+            </ThemeProvider>
+          </ErrorBoundary>
+        </AnalyticsProvider>
         <Analytics />
       </body>
     </html>
