@@ -63,10 +63,10 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <body className={'flex min-h-full flex-col bg-background bg-cover text-foreground'}>
-        <AnalyticsProvider>
-          <ErrorBoundary>
-            <ThemeProvider>
-              <AuthProvider>
+        <ErrorBoundary>
+          <ThemeProvider>
+            <AuthProvider>
+              <AnalyticsProvider>
                 <ToastProvider>
                   <SkipNavLink href="#main" />
                   <SiteHeader />
@@ -76,10 +76,10 @@ export default async function RootLayout({
                   <SiteFooter />
                   {sheet}
                 </ToastProvider>
-              </AuthProvider>
-            </ThemeProvider>
-          </ErrorBoundary>
-        </AnalyticsProvider>
+              </AnalyticsProvider>
+            </AuthProvider>
+          </ThemeProvider>
+        </ErrorBoundary>
         <Analytics />
       </body>
     </html>

@@ -10,16 +10,16 @@ import { detectMediaType } from './utils';
 
 interface MediaEmbedProps {
   className?: string;
-  trackingContext?: MediaTrackingContext;
   mediaUrl: string;
   title?: string;
+  trackingContext?: MediaTrackingContext;
 }
 
 export function MediaEmbed({
   className,
-  trackingContext,
   mediaUrl,
   title = 'Media player',
+  trackingContext,
 }: MediaEmbedProps) {
   const media = detectMediaType(mediaUrl);
 
