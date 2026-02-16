@@ -91,11 +91,11 @@ export function CreateSpeakerSheet({
 
         <form className="grid min-h-0 flex-1 grid-rows-[1fr_auto]" onSubmit={handleSubmit}>
           <SheetPanel>
-            {error ? (
+            {!!error && (
               <div className="mb-4 rounded-md bg-destructive/15 p-3 text-destructive-foreground text-sm">
                 {error}
               </div>
-            ) : null}
+            )}
 
             <SpeakerFormFields control={form.control} />
           </SheetPanel>
