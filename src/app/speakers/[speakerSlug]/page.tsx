@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 
 import { SpeakerContentSections } from '@/app/speakers/[speakerSlug]/_components/speaker-content-sections';
 import { SpeakerHero } from '@/app/speakers/[speakerSlug]/_components/speaker-hero';
+import { JsonLd } from '@/components/json-ld';
 import { EditorialProfileLayout } from '@/components/layouts';
 import { isVideoMediaType } from '@/components/media-embed';
 import { getSpeakerBySlug } from '@/features/speakers/queries/get-speaker-by-slug';
@@ -50,19 +51,36 @@ export default async function SpeakerPage({ params }: SpeakerPageProps) {
       ? talks.filter((t) => t._id !== featuredTalk._id)
       : talks;
 
+  const name = `${speaker.firstName} ${speaker.lastName}`;
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    description: speaker.description,
+    image: speaker.imageUrl,
+    name,
+    ...(speaker.websiteUrl && { sameAs: [speaker.websiteUrl] }),
+    url: `https://gettreadtalks.com/speakers/${speakerSlug}`,
+  };
+
   return (
-    <EditorialProfileLayout
-      content={
-        <SpeakerContentSections
-          clips={clips}
-          collections={collections}
-          speaker={speaker}
-          talks={remainingTalks}
-        />
-      }
-      hero={
-        <SpeakerHero featuredTalk={hasFeaturedVideo ? featuredTalk : undefined} speaker={speaker} />
-      }
-    />
+    <>
+      <JsonLd data={jsonLd} />
+      <EditorialProfileLayout
+        content={
+          <SpeakerContentSections
+            clips={clips}
+            collections={collections}
+            speaker={speaker}
+            talks={remainingTalks}
+          />
+        }
+        hero={
+          <SpeakerHero
+            featuredTalk={hasFeaturedVideo ? featuredTalk : undefined}
+            speaker={speaker}
+          />
+        }
+      />
+    </>
   );
 }
