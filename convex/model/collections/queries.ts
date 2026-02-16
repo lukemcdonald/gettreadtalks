@@ -24,6 +24,21 @@ async function getPublishedTalks(ctx: QueryCtx, collectionId: Id<'collections'>,
 }
 
 /**
+ * List collection slugs for sitemap generation.
+ */
+export const listCollectionSlugsForSitemap = query({
+  args: {},
+  handler: async (ctx) => {
+    const collections = await ctx.db.query('collections').collect();
+    return collections.map((c) => ({
+      slug: c.slug,
+      updatedAt: c.updatedAt ?? c._creationTime,
+    }));
+  },
+  returns: v.array(v.object({ slug: v.string(), updatedAt: v.number() })),
+});
+
+/**
  * Get collection by ID.
  */
 export const getCollection = query({

@@ -2,6 +2,7 @@ import { mutations, queries } from './model/speakers';
 
 // Queries
 export const getSpeaker = queries.getSpeaker;
+export const listAllSpeakersRaw = queries.listAllSpeakersRaw;
 export const getSpeakerBySlug = queries.getSpeakerBySlug;
 export const getSpeakersCount = queries.getSpeakersCount;
 export const listFeaturedSpeakers = queries.listFeaturedSpeakers;

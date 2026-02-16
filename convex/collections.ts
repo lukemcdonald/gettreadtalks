@@ -2,6 +2,7 @@ import { mutations, queries } from './model/collections';
 
 // Queries
 export const getCollection = queries.getCollection;
+export const listCollectionSlugsForSitemap = queries.listCollectionSlugsForSitemap;
 export const getCollectionBySlug = queries.getCollectionBySlug;
 export const getCollectionWithSpeakers = queries.getCollectionWithSpeakers;
 export const getCollectionWithTalks = queries.getCollectionWithTalks;
