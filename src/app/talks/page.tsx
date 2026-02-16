@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+
 import { TalksContent } from '@/app/talks/_components/talks-content';
 import { TalksSidebar } from '@/app/talks/_components/talks-sidebar';
 import { SidebarLayout } from '@/components/layouts';
@@ -6,6 +8,11 @@ import { getSpeakers } from '@/features/speakers/queries/get-speakers';
 import { sortSpeakersByName } from '@/features/speakers/utils';
 import { getTalks } from '@/features/talks/queries/get-talks';
 import { getTopicsWithCounts } from '@/features/topics/queries/get-topics-with-counts';
+
+export const metadata: Metadata = {
+  description: 'Browse Christ centered talks from faithful ministers of the Gospel.',
+  title: 'Talks',
+};
 
 export interface TalksPageSearchParams {
   cursor?: string;
