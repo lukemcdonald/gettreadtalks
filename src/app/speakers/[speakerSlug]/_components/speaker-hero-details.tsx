@@ -42,6 +42,7 @@ export function SpeakerHeroDetails({ centered = false, speaker }: SpeakerHeroDet
           <SpeakerMinistryLink
             className="mt-2 text-muted-foreground"
             ministry={speaker.ministry}
+            speakerSlug={speaker.slug}
             websiteUrl={speaker.websiteUrl}
           />
         </div>

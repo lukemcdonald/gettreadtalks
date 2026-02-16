@@ -29,7 +29,7 @@ export function TalkHero({ speaker, speakerSlug, talk, talkSlug, topics }: TalkH
         <TalkHeroDetails speaker={speaker} talk={talk} />
 
         {/* Video Player - Full Width */}
-        {talk.mediaUrl && <TalkHeroMedia talk={talk} />}
+        {talk.mediaUrl && <TalkHeroMedia speakerSlug={speakerSlug} talk={talk} />}
 
         {/* Actions, Topics, Scripture - Below Video */}
         <TalkHeroMetadata

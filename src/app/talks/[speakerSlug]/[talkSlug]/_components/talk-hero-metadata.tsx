@@ -29,7 +29,7 @@ export function TalkHeroMetadata({ speakerSlug, talk, talkSlug, topics }: TalkHe
           <div className="flex items-center gap-2">
             <FavoriteTalkButton talkId={talk._id} />
             <FinishTalkButton talkId={talk._id} />
-            <ShareTalkButton title={talk.title} url={talkUrl} />
+            <ShareTalkButton talkId={talk._id} title={talk.title} url={talkUrl} />
           </div>
         </div>
 
