@@ -18,6 +18,40 @@ import { getCurrentUser } from '../auth/utils';
 import { enrichWithTopics } from './utils';
 
 /**
+ * List published talk slugs with their speaker slugs for sitemap generation.
+ */
+export const listTalkSlugsForSitemap = query({
+  args: {},
+  handler: async (ctx) => {
+    const talks = await ctx.db
+      .query('talks')
+      .withIndex('by_status_and_publishedAt', (q) => q.eq('status', 'published'))
+      .collect();
+
+    const results = await Promise.all(
+      talks.map(async (talk) => {
+        const speaker = await ctx.db.get('speakers', talk.speakerId);
+        if (!speaker) return null;
+        return {
+          speakerSlug: speaker.slug,
+          talkSlug: talk.slug,
+          updatedAt: talk.updatedAt ?? talk._creationTime,
+        };
+      }),
+    );
+
+    return results.filter((item): item is NonNullable<typeof item> => item !== null);
+  },
+  returns: v.array(
+    v.object({
+      speakerSlug: v.string(),
+      talkSlug: v.string(),
+      updatedAt: v.number(),
+    }),
+  ),
+});
+
+/**
  * Get talk by ID.
  */
 export const getTalk = query({
