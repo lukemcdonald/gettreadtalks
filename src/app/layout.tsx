@@ -21,11 +21,31 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-display' });
 
 export const metadata: Metadata = {
-  description: 'Faith-based talks and content platform',
+  description: 'Christ centered sermons to elevate your spiritual heartbeat.',
   icons: {
-    // icon: '/favicon.svg', // place in public folder. Add apple icon too.
+    apple: '/favicon.png',
+    icon: [
+      { type: 'image/svg+xml', url: '/favicon.svg' },
+      { type: 'image/png', url: '/favicon.png' },
+    ],
   },
-  title: 'TREAD Talks',
+  metadataBase: new URL('https://gettreadtalks.com'),
+  openGraph: {
+    images: [{ alt: 'TREAD Talks', height: 630, url: '/default-seo-image.png', width: 1200 }],
+    locale: 'en_US',
+    siteName: 'TREAD Talks',
+    type: 'website',
+  },
+  title: {
+    default: 'TREAD Talks',
+    template: '%s | TREAD Talks',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    ...(process.env.NEXT_PUBLIC_TWITTER_HANDLE && {
+      site: process.env.NEXT_PUBLIC_TWITTER_HANDLE,
+    }),
+  },
 };
 
 export default async function RootLayout({
