@@ -2,7 +2,9 @@
 
 import type { Id } from '@/convex/_generated/dataModel';
 
-import { Button } from '@/components/ui';
+import { HeartMinusIcon } from 'lucide-react';
+
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui';
 import { api } from '@/convex/_generated/api';
 import { useMutation } from '@/hooks';
 
@@ -14,9 +16,24 @@ export function UnfavoriteTalkButton({ talkId }: UnfavoriteTalkButtonProps) {
   const { isLoading, mutate } = useMutation(api.users.unfavoriteTalk);
 
   return (
-    <Button disabled={isLoading} onClick={() => mutate({ talkId })} size="xs" variant="ghost">
-      Unfavorite
-    </Button>
+    <Tooltip>
+      <TooltipTrigger
+        render={() => (
+          <Button
+            disabled={isLoading}
+            onClick={() => mutate({ talkId })}
+            size="icon-sm"
+            type="button"
+            variant="ghost"
+          >
+            <HeartMinusIcon />
+          </Button>
+        )}
+      />
+      <TooltipContent>
+        <p>Remove from favorites</p>
+      </TooltipContent>
+    </Tooltip>
   );
 }
 
@@ -28,9 +45,24 @@ export function UnfavoriteSpeakerButton({ speakerId }: UnfavoriteSpeakerButtonPr
   const { isLoading, mutate } = useMutation(api.users.unfavoriteSpeaker);
 
   return (
-    <Button disabled={isLoading} onClick={() => mutate({ speakerId })} size="xs" variant="ghost">
-      Unfavorite
-    </Button>
+    <Tooltip>
+      <TooltipTrigger
+        render={() => (
+          <Button
+            disabled={isLoading}
+            onClick={() => mutate({ speakerId })}
+            size="icon-sm"
+            type="button"
+            variant="ghost"
+          >
+            <HeartMinusIcon />
+          </Button>
+        )}
+      />
+      <TooltipContent>
+        <p>Remove from favorites</p>
+      </TooltipContent>
+    </Tooltip>
   );
 }
 
@@ -42,8 +74,23 @@ export function UnfavoriteClipButton({ clipId }: UnfavoriteClipButtonProps) {
   const { isLoading, mutate } = useMutation(api.users.unfavoriteClip);
 
   return (
-    <Button disabled={isLoading} onClick={() => mutate({ clipId })} size="xs" variant="ghost">
-      Unfavorite
-    </Button>
+    <Tooltip>
+      <TooltipTrigger
+        render={() => (
+          <Button
+            disabled={isLoading}
+            onClick={() => mutate({ clipId })}
+            size="icon-sm"
+            type="button"
+            variant="ghost"
+          >
+            <HeartMinusIcon />
+          </Button>
+        )}
+      />
+      <TooltipContent>
+        <p>Remove from favorites</p>
+      </TooltipContent>
+    </Tooltip>
   );
 }

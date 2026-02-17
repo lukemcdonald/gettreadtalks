@@ -1,13 +1,20 @@
 import {
   Card,
-  CardContent,
+  CardDescription,
   CardHeader,
+  CardTitle,
   Empty,
   EmptyDescription,
   EmptyHeader,
   EmptyTitle,
   Link,
   Separator,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@/components/ui';
 import { getUserFinishedTalks } from '@/features/users/queries/get-user-finished-talks';
 import { UnfinishTalkButton } from './_components/unfinish-talk-button';
@@ -18,17 +25,13 @@ export default async function FinishedPage() {
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center gap-3">
-          <h1 className="font-semibold text-3xl text-card-foreground">Finished Talks</h1>
-          {talks.length > 0 && (
-            <span className="text-muted-foreground text-sm">{talks.length} talks</span>
-          )}
-        </div>
+        <CardTitle>Finished Talks</CardTitle>
+        {talks.length > 0 && <CardDescription>{talks.length} talks</CardDescription>}
       </CardHeader>
 
       <Separator />
 
-      <CardContent className="px-6 py-8">
+      <div className="p-6">
         {talks.length === 0 ? (
           <Empty>
             <EmptyHeader>
@@ -37,28 +40,43 @@ export default async function FinishedPage() {
             </EmptyHeader>
           </Empty>
         ) : (
-          <ul className="divide-y divide-border rounded-lg border">
-            {talks.map((talk) => (
-              <li className="flex items-center justify-between gap-4 px-4 py-3" key={talk._id}>
-                <div className="min-w-0">
-                  <Link
-                    className="truncate font-medium text-card-foreground text-sm hover:text-primary"
-                    href={`/talks/${talk.speaker?.slug}/${talk.slug}`}
-                  >
-                    {talk.title}
-                  </Link>
-                  {talk.speaker && (
-                    <p className="truncate text-muted-foreground text-sm">
-                      {talk.speaker.firstName} {talk.speaker.lastName}
-                    </p>
-                  )}
-                </div>
-                <UnfinishTalkButton talkId={talk._id} />
-              </li>
-            ))}
-          </ul>
+          <div className="overflow-x-auto rounded-lg border">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>
+                    <span className="sr-only">Talk</span>
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {talks.map((talk) => (
+                  <TableRow key={talk._id}>
+                    <TableCell>
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="min-w-0 flex-1">
+                          <Link
+                            className="line-clamp-2 block hover:underline"
+                            href={`/talks/${talk.speaker?.slug}/${talk.slug}`}
+                          >
+                            {talk.title}
+                          </Link>
+                          {talk.speaker && (
+                            <p className="truncate text-muted-foreground text-sm">
+                              {talk.speaker.firstName} {talk.speaker.lastName}
+                            </p>
+                          )}
+                        </div>
+                        <UnfinishTalkButton talkId={talk._id} />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         )}
-      </CardContent>
+      </div>
     </Card>
   );
 }
