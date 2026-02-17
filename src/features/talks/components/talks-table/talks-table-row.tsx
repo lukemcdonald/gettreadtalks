@@ -24,21 +24,18 @@ export function TalksTableRow({ talk }: TalksTableRowProps) {
           updatedAt={talk.updatedAt}
         />
       </TableCell>
-      <TableCell>
-        <div className="flex items-center justify-between gap-4">
-          <div className="min-w-0 flex-1">
-            <Link className="line-clamp-2 block hover:underline" href={talkUrl}>
-              {talk.title}
-            </Link>
-            {!!talk.speaker && (
-              <p className="truncate text-muted-foreground text-sm">
-                by {getSpeakerName(talk.speaker)}
-              </p>
-            )}
-          </div>
-
-          <TalkActionsMenu talk={talk} talkUrl={talkUrl} />
-        </div>
+      <TableCell className="whitespace-normal">
+        <Link className="line-clamp-2 block hover:underline" href={talkUrl}>
+          {talk.title}
+        </Link>
+        {!!talk.speaker && (
+          <p className="truncate text-muted-foreground text-sm">
+            by {getSpeakerName(talk.speaker)}
+          </p>
+        )}
+      </TableCell>
+      <TableCell className="w-px text-right">
+        <TalkActionsMenu talk={talk} talkUrl={talkUrl} />
       </TableCell>
     </TableRow>
   );

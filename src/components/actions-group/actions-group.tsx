@@ -43,7 +43,14 @@ export function ActionsGroup({ disabled, menuItems, primaryAction }: ActionsGrou
       {!!hasItems && (
         <Menu>
           <MenuTrigger
-            render={<Button aria-label="More actions" disabled={disabled} size="icon" />}
+            render={
+              <Button
+                aria-label="More actions"
+                disabled={disabled}
+                size="icon-sm"
+                variant="ghost"
+              />
+            }
           >
             <EllipsisIcon className="size-4" />
           </MenuTrigger>
