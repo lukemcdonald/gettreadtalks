@@ -51,7 +51,12 @@ export default async function FavoritesPage() {
   const clips = favorites?.clips ?? [];
   const total = talks.length + speakers.length + clips.length;
 
-  const defaultTab = talks.length > 0 ? 'talks' : speakers.length > 0 ? 'speakers' : 'clips';
+  let defaultTab = 'clips';
+  if (talks.length > 0) {
+    defaultTab = 'talks';
+  } else if (speakers.length > 0) {
+    defaultTab = 'speakers';
+  }
 
   return (
     <Card>

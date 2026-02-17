@@ -8,6 +8,8 @@ import { Button, Fieldset, FormError, TextField } from '@/components/ui';
 import { toastManager } from '@/components/ui/primitives/toast';
 import { updateEmail } from '@/features/users/actions/update-email';
 
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 interface EmailFormValues {
   email: string;
 }
@@ -47,7 +49,7 @@ export function EmailForm({ currentEmail }: EmailFormProps) {
           rules={{
             pattern: {
               message: 'Please enter a valid email address.',
-              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+              value: EMAIL_PATTERN,
             },
             required: 'Email address is required.',
           }}
