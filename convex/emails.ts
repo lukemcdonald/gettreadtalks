@@ -32,7 +32,6 @@ export const handleEmailEvent = internalMutation({
     event: vEmailEvent,
     id: vEmailId,
   },
-  returns: v.null(),
   handler: (_ctx, args) => {
     console.log('Email event received:', {
       emailId: args.id,
@@ -71,6 +70,7 @@ export const handleEmailEvent = internalMutation({
 
     return null;
   },
+  returns: v.null(),
 });
 
 export const sendPasswordResetEmail = internalAction({

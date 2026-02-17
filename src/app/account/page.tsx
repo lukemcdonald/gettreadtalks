@@ -1,4 +1,11 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  Separator,
+} from '@/components/ui';
 import { getCurrentUser } from '@/services/auth/server';
 import { DeleteAccountForm } from './_components/delete-account-form';
 import { EmailForm } from './_components/email-form';
@@ -10,19 +17,18 @@ export default async function AccountPage() {
 
   return (
     <div className="space-y-4">
-      {/* Profile settings */}
+      {/* Profile + Email + Password settings */}
       <Card>
         <CardHeader>
           <CardTitle>Profile settings</CardTitle>
-          <CardDescription>Update the name associated with your account.</CardDescription>
+          <CardDescription>Update the name and email associated with your account.</CardDescription>
         </CardHeader>
         <CardContent>
           <ProfileForm currentName={user?.name ?? ''} />
         </CardContent>
-      </Card>
 
-      {/* Email settings */}
-      <Card>
+        <Separator />
+
         <CardHeader>
           <CardTitle>Email settings</CardTitle>
           <CardDescription>Manage the email address associated with your account.</CardDescription>
@@ -30,10 +36,9 @@ export default async function AccountPage() {
         <CardContent>
           <EmailForm currentEmail={user?.email ?? ''} />
         </CardContent>
-      </Card>
 
-      {/* Password settings */}
-      <Card>
+        <Separator />
+
         <CardHeader>
           <CardTitle>Password settings</CardTitle>
           <CardDescription>Update the password associated with your account.</CardDescription>

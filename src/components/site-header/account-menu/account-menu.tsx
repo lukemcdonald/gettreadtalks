@@ -64,7 +64,7 @@ export function AccountMenu({ initialUser }: AccountMenuProps) {
         <UserIcon className="size-6" />
       </MenuTrigger>
       <MenuPopup className="w-60">
-        <div className="flex flex-col px-3 py-3">
+        <div className="flex flex-col px-3 pt-2 pb-1">
           <span className="text-muted-foreground text-xs">Signed in as</span>
           <span className="truncate font-semibold text-foreground text-sm">{user.email}</span>
         </div>
