@@ -2,7 +2,9 @@
 
 import type { Id } from '@/convex/_generated/dataModel';
 
-import { Button } from '@/components/ui';
+import { CircleCheckBigIcon } from 'lucide-react';
+
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui';
 import { api } from '@/convex/_generated/api';
 import { useMutation } from '@/hooks';
 
@@ -14,8 +16,23 @@ export function UnfinishTalkButton({ talkId }: UnfinishTalkButtonProps) {
   const { isLoading, mutate } = useMutation(api.users.unfinishTalk);
 
   return (
-    <Button disabled={isLoading} onClick={() => mutate({ talkId })} size="xs" variant="ghost">
-      Unfinish
-    </Button>
+    <Tooltip>
+      <TooltipTrigger
+        render={() => (
+          <Button
+            disabled={isLoading}
+            onClick={() => mutate({ talkId })}
+            size="icon-sm"
+            type="button"
+            variant="ghost"
+          >
+            <CircleCheckBigIcon />
+          </Button>
+        )}
+      />
+      <TooltipContent>
+        <p>Mark as not finished</p>
+      </TooltipContent>
+    </Tooltip>
   );
 }
