@@ -2,7 +2,7 @@
 
 import { useTransition } from 'react';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 
 import { Button, Fieldset, FormError, TextField } from '@/components/ui';
 import { toastManager } from '@/components/ui/primitives/toast';
@@ -20,6 +20,9 @@ export function ProfileForm({ currentName }: ProfileFormProps) {
   const [isPending, startTransition] = useTransition();
   const form = useForm<NameFormValues>({ defaultValues: { name: currentName } });
   const router = useRouter();
+
+  const watchedName = useWatch({ control: form.control, name: 'name' });
+  const hasChanged = watchedName !== currentName;
 
   function onSubmit(values: NameFormValues) {
     startTransition(async () => {
@@ -39,11 +42,13 @@ export function ProfileForm({ currentName }: ProfileFormProps) {
       <Fieldset className="max-w-full" disabled={isPending}>
         <TextField control={form.control} label="Name" name="name" required />
       </Fieldset>
-      <div>
-        <Button disabled={isPending} size="sm" type="submit">
-          Save Name
-        </Button>
-      </div>
+      {hasChanged && (
+        <div>
+          <Button disabled={isPending} size="sm" type="submit">
+            Save name
+          </Button>
+        </div>
+      )}
     </form>
   );
 }

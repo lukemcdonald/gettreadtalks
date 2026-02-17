@@ -24,6 +24,7 @@ export async function LayoutSidebar() {
     return null;
   }
 
+  const signedInAs = user.name ?? user.email;
   const isAdminUser = isAdmin(user);
 
   return (
@@ -33,7 +34,7 @@ export async function LayoutSidebar() {
 
         <p className="flex flex-col truncate">
           <span className="text-muted-foreground text-xs">Signed in as</span>
-          <span className="font-semibold text-foreground text-sm">{user.email}</span>
+          <span className="truncate font-semibold text-foreground text-sm">{signedInAs}</span>
         </p>
       </div>
 
