@@ -124,15 +124,9 @@ export function ContentActionsGroup({
       : []),
   ];
 
-  const defaultPrimaryAction = editUrl ? { label: 'Edit', href: editUrl } : undefined;
-
   return (
     <>
-      <ActionsGroup
-        disabled={isDisabled}
-        menuItems={menuItems}
-        primaryAction={primaryAction || defaultPrimaryAction}
-      />
+      <ActionsGroup disabled={isDisabled} menuItems={menuItems} primaryAction={primaryAction} />
 
       {!!onDeleteAction && (
         <AlertDialog onOpenChange={setDeleteDialogOpen} open={deleteDialogOpen}>
