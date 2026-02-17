@@ -7,6 +7,7 @@ export * from './filter-popup';
 export * from './form';
 export * from './inline-multi-filter';
 export * from './link';
+export * from './mobile-filter-sheet';
 export * from './primitives';
 export * from './scroll-area';
 export * from './section';
