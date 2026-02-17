@@ -1,6 +1,6 @@
 'use client';
 
-import type { Control, FieldPath, FieldValues } from 'react-hook-form';
+import type { Control, FieldPath, FieldValues, RegisterOptions } from 'react-hook-form';
 
 import { Controller } from 'react-hook-form';
 
@@ -13,6 +13,7 @@ interface TextFieldProps<T extends FieldValues> {
   name: FieldPath<T>;
   placeholder?: string;
   required?: boolean;
+  rules?: RegisterOptions<T, FieldPath<T>>;
   type?: 'text' | 'email' | 'password' | 'search' | 'tel';
 }
 
@@ -37,6 +38,7 @@ export function TextField<T extends FieldValues>({
   name,
   placeholder,
   required,
+  rules,
   type = 'text',
 }: TextFieldProps<T>) {
   return (
@@ -63,6 +65,7 @@ export function TextField<T extends FieldValues>({
           {!!fieldState.error && <FieldError match>{fieldState.error?.message}</FieldError>}
         </Field>
       )}
+      rules={rules}
     />
   );
 }
