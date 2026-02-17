@@ -63,22 +63,19 @@ export function AccountMenu({ initialUser }: AccountMenuProps) {
       >
         <UserIcon className="size-6" />
       </MenuTrigger>
-      <MenuPopup>
-        <div className="flex flex-col px-2 pt-1">
+      <MenuPopup className="w-60">
+        <div className="flex flex-col px-3 py-3">
           <span className="text-muted-foreground text-xs">Signed in as</span>
-          <span className="font-semibold text-foreground text-sm">{user.email}</span>
+          <span className="truncate font-semibold text-foreground text-sm">{user.email}</span>
         </div>
         <MenuSeparator />
-        <AccountMenuItem href="/account" icon={SettingsIcon} label="Settings" />
         <AccountMenuItem href="/account/favorites" icon={FavoritesIcon} label="Favorites" />
         <AccountMenuItem href="/account/finished" icon={FinishedIcon} label="Finished" />
-        {!!showAdminLink && (
-          <>
-            <MenuSeparator />
-            <AccountMenuItem href="/account/talks" icon={DashboardIcon} label="Admin Dashboard" />
-          </>
-        )}
         <MenuSeparator />
+        <AccountMenuItem href="/account" icon={SettingsIcon} label="Settings" />
+        {!!showAdminLink && (
+          <AccountMenuItem href="/account/talks" icon={DashboardIcon} label="Admin Dashboard" />
+        )}
         <AccountMenuItem href={'/logout' as Route} icon={SignOutIcon} label="Sign out" />
       </MenuPopup>
     </Menu>

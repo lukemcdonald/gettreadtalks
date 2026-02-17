@@ -31,13 +31,13 @@ export function AccountMenuItem({
 
   return (
     <MenuItem
-      className="w-full items-center justify-start"
+      className="min-h-10 w-full items-center justify-start px-3 py-2"
       render={renderComponent}
       {...delegated}
       nativeButton={isButton}
       onClick={onClick}
     >
-      {!!Icon && <Icon className="size-4" />}
+      {!!Icon && <Icon className="size-5" />}
       {label}
     </MenuItem>
   );
