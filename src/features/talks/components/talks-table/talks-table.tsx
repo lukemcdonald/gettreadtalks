@@ -27,14 +27,11 @@ export function TalksTable({ talks }: AdminTalksTableProps) {
   return (
     <div className="overflow-x-auto rounded-lg border">
       <Table>
-        <TableHeader>
+        <TableHeader className="sr-only">
           <TableRow>
-            <TableHead className="w-[40px]">
-              <span className="sr-only">Status</span>
-            </TableHead>
-            <TableHead>
-              <span className="sr-only">Content</span>
-            </TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Title</TableHead>
+            <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

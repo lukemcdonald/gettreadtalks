@@ -10,11 +10,7 @@ import {
   EmptyTitle,
   Link,
   Separator,
-  Table,
-  TableBody,
   TableCell,
-  TableHead,
-  TableHeader,
   TableRow,
   Tabs,
   TabsList,
@@ -22,11 +18,30 @@ import {
   TabsTab,
 } from '@/components/ui';
 import { getUserFavorites } from '@/features/users/queries/get-user-favorites';
+import { AccountTable } from '../_components/account-table';
+import { TalkTableRow } from '../_components/talk-table-row';
 import {
   UnfavoriteClipButton,
   UnfavoriteSpeakerButton,
   UnfavoriteTalkButton,
 } from './_components/unfavorite-buttons';
+
+interface FavoritesTabProps {
+  count: number;
+  label: string;
+  value: string;
+}
+
+function FavoritesTab({ count, label, value }: FavoritesTabProps) {
+  return (
+    <TabsTab value={value}>
+      {label}
+      <Badge className="not-in-data-active:text-muted-foreground" variant="outline">
+        {count}
+      </Badge>
+    </TabsTab>
+  );
+}
 
 export default async function FavoritesPage() {
   const favorites = await getUserFavorites();
@@ -65,135 +80,68 @@ export default async function FavoritesPage() {
           <div className="border-b px-6">
             <TabsList variant="underline">
               {talks.length > 0 && (
-                <TabsTab value="talks">
-                  Talks
-                  <Badge className="not-in-data-active:text-muted-foreground" variant="outline">
-                    {talks.length}
-                  </Badge>
-                </TabsTab>
+                <FavoritesTab count={talks.length} label="Talks" value="talks" />
               )}
               {speakers.length > 0 && (
-                <TabsTab value="speakers">
-                  Speakers
-                  <Badge className="not-in-data-active:text-muted-foreground" variant="outline">
-                    {speakers.length}
-                  </Badge>
-                </TabsTab>
+                <FavoritesTab count={speakers.length} label="Speakers" value="speakers" />
               )}
               {clips.length > 0 && (
-                <TabsTab value="clips">
-                  Clips
-                  <Badge className="not-in-data-active:text-muted-foreground" variant="outline">
-                    {clips.length}
-                  </Badge>
-                </TabsTab>
+                <FavoritesTab count={clips.length} label="Clips" value="clips" />
               )}
             </TabsList>
           </div>
 
           {talks.length > 0 && (
             <TabsPanel value="talks">
-              <div className="p-6">
-                <div className="overflow-x-auto rounded-lg border">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>
-                          <span className="sr-only">Talk</span>
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {talks.map((talk) => (
-                        <TableRow key={talk._id}>
-                          <TableCell>
-                            <div className="flex items-center justify-between gap-4">
-                              <div className="min-w-0 flex-1">
-                                <Link
-                                  className="line-clamp-2 block hover:underline"
-                                  href={`/talks/${talk.speaker?.slug}/${talk.slug}`}
-                                >
-                                  {talk.title}
-                                </Link>
-                                {talk.speaker && (
-                                  <p className="truncate text-muted-foreground text-sm">
-                                    {talk.speaker.firstName} {talk.speaker.lastName}
-                                  </p>
-                                )}
-                              </div>
-                              <UnfavoriteTalkButton talkId={talk._id} />
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              </div>
+              <AccountTable label="Talk">
+                {talks.map((talk) => (
+                  <TalkTableRow
+                    action={<UnfavoriteTalkButton talkId={talk._id} />}
+                    href={`/talks/${talk.speaker?.slug}/${talk.slug}`}
+                    key={talk._id}
+                    speaker={talk.speaker}
+                    title={talk.title}
+                  />
+                ))}
+              </AccountTable>
             </TabsPanel>
           )}
 
           {speakers.length > 0 && (
             <TabsPanel value="speakers">
-              <div className="p-6">
-                <div className="overflow-x-auto rounded-lg border">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>
-                          <span className="sr-only">Speaker</span>
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {speakers.map((speaker) => (
-                        <TableRow key={speaker._id}>
-                          <TableCell>
-                            <div className="flex items-center justify-between gap-4">
-                              <Link className="hover:underline" href={`/speakers/${speaker.slug}`}>
-                                {speaker.firstName} {speaker.lastName}
-                              </Link>
-                              <UnfavoriteSpeakerButton speakerId={speaker._id} />
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              </div>
+              <AccountTable label="Speaker">
+                {speakers.map((speaker) => (
+                  <TableRow key={speaker._id}>
+                    <TableCell>
+                      <div className="flex items-center justify-between gap-4">
+                        <Link className="hover:underline" href={`/speakers/${speaker.slug}`}>
+                          {speaker.firstName} {speaker.lastName}
+                        </Link>
+                        <UnfavoriteSpeakerButton speakerId={speaker._id} />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </AccountTable>
             </TabsPanel>
           )}
 
           {clips.length > 0 && (
             <TabsPanel value="clips">
-              <div className="p-6">
-                <div className="overflow-x-auto rounded-lg border">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>
-                          <span className="sr-only">Clip</span>
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {clips.map((clip) => (
-                        <TableRow key={clip._id}>
-                          <TableCell>
-                            <div className="flex items-center justify-between gap-4">
-                              <Link className="hover:underline" href={`/clips/${clip.slug}`}>
-                                {clip.title}
-                              </Link>
-                              <UnfavoriteClipButton clipId={clip._id} />
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              </div>
+              <AccountTable label="Clip">
+                {clips.map((clip) => (
+                  <TableRow key={clip._id}>
+                    <TableCell>
+                      <div className="flex items-center justify-between gap-4">
+                        <Link className="hover:underline" href={`/clips/${clip.slug}`}>
+                          {clip.title}
+                        </Link>
+                        <UnfavoriteClipButton clipId={clip._id} />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </AccountTable>
             </TabsPanel>
           )}
         </Tabs>

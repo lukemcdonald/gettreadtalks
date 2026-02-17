@@ -7,16 +7,11 @@ import {
   EmptyDescription,
   EmptyHeader,
   EmptyTitle,
-  Link,
   Separator,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
 } from '@/components/ui';
 import { getUserFinishedTalks } from '@/features/users/queries/get-user-finished-talks';
+import { AccountTable } from '../_components/account-table';
+import { TalkTableRow } from '../_components/talk-table-row';
 import { UnfinishTalkButton } from './_components/unfinish-talk-button';
 
 export default async function FinishedPage() {
@@ -31,52 +26,28 @@ export default async function FinishedPage() {
 
       <Separator />
 
-      <div className="p-6">
-        {talks.length === 0 ? (
+      {talks.length === 0 ? (
+        <div className="p-6">
           <Empty>
             <EmptyHeader>
               <EmptyTitle>No finished talks yet</EmptyTitle>
               <EmptyDescription>Mark talks as finished as you go!</EmptyDescription>
             </EmptyHeader>
           </Empty>
-        ) : (
-          <div className="overflow-x-auto rounded-lg border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>
-                    <span className="sr-only">Talk</span>
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {talks.map((talk) => (
-                  <TableRow key={talk._id}>
-                    <TableCell>
-                      <div className="flex items-center justify-between gap-4">
-                        <div className="min-w-0 flex-1">
-                          <Link
-                            className="line-clamp-2 block hover:underline"
-                            href={`/talks/${talk.speaker?.slug}/${talk.slug}`}
-                          >
-                            {talk.title}
-                          </Link>
-                          {talk.speaker && (
-                            <p className="truncate text-muted-foreground text-sm">
-                              {talk.speaker.firstName} {talk.speaker.lastName}
-                            </p>
-                          )}
-                        </div>
-                        <UnfinishTalkButton talkId={talk._id} />
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        )}
-      </div>
+        </div>
+      ) : (
+        <AccountTable label="Talk">
+          {talks.map((talk) => (
+            <TalkTableRow
+              action={<UnfinishTalkButton talkId={talk._id} />}
+              href={`/talks/${talk.speaker?.slug}/${talk.slug}`}
+              key={talk._id}
+              speaker={talk.speaker}
+              title={talk.title}
+            />
+          ))}
+        </AccountTable>
+      )}
     </Card>
   );
 }

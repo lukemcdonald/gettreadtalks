@@ -8,20 +8,19 @@ import { Button, Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui
 import { api } from '@/convex/_generated/api';
 import { useMutation } from '@/hooks';
 
-interface UnfavoriteTalkButtonProps {
-  talkId: Id<'talks'>;
+interface UnfavoriteButtonProps {
+  disabled?: boolean;
+  onRemove: () => void;
 }
 
-export function UnfavoriteTalkButton({ talkId }: UnfavoriteTalkButtonProps) {
-  const { isLoading, mutate } = useMutation(api.users.unfavoriteTalk);
-
+function UnfavoriteButton({ disabled, onRemove }: UnfavoriteButtonProps) {
   return (
     <Tooltip>
       <TooltipTrigger
         render={() => (
           <Button
-            disabled={isLoading}
-            onClick={() => mutate({ talkId })}
+            disabled={disabled}
+            onClick={onRemove}
             size="icon-sm"
             type="button"
             variant="ghost"
@@ -37,60 +36,17 @@ export function UnfavoriteTalkButton({ talkId }: UnfavoriteTalkButtonProps) {
   );
 }
 
-interface UnfavoriteSpeakerButtonProps {
-  speakerId: Id<'speakers'>;
-}
-
-export function UnfavoriteSpeakerButton({ speakerId }: UnfavoriteSpeakerButtonProps) {
-  const { isLoading, mutate } = useMutation(api.users.unfavoriteSpeaker);
-
-  return (
-    <Tooltip>
-      <TooltipTrigger
-        render={() => (
-          <Button
-            disabled={isLoading}
-            onClick={() => mutate({ speakerId })}
-            size="icon-sm"
-            type="button"
-            variant="ghost"
-          >
-            <HeartMinusIcon />
-          </Button>
-        )}
-      />
-      <TooltipContent>
-        <p>Remove from favorites</p>
-      </TooltipContent>
-    </Tooltip>
-  );
-}
-
-interface UnfavoriteClipButtonProps {
-  clipId: Id<'clips'>;
-}
-
-export function UnfavoriteClipButton({ clipId }: UnfavoriteClipButtonProps) {
+export function UnfavoriteClipButton({ clipId }: { clipId: Id<'clips'> }) {
   const { isLoading, mutate } = useMutation(api.users.unfavoriteClip);
+  return <UnfavoriteButton disabled={isLoading} onRemove={() => mutate({ clipId })} />;
+}
 
-  return (
-    <Tooltip>
-      <TooltipTrigger
-        render={() => (
-          <Button
-            disabled={isLoading}
-            onClick={() => mutate({ clipId })}
-            size="icon-sm"
-            type="button"
-            variant="ghost"
-          >
-            <HeartMinusIcon />
-          </Button>
-        )}
-      />
-      <TooltipContent>
-        <p>Remove from favorites</p>
-      </TooltipContent>
-    </Tooltip>
-  );
+export function UnfavoriteSpeakerButton({ speakerId }: { speakerId: Id<'speakers'> }) {
+  const { isLoading, mutate } = useMutation(api.users.unfavoriteSpeaker);
+  return <UnfavoriteButton disabled={isLoading} onRemove={() => mutate({ speakerId })} />;
+}
+
+export function UnfavoriteTalkButton({ talkId }: { talkId: Id<'talks'> }) {
+  const { isLoading, mutate } = useMutation(api.users.unfavoriteTalk);
+  return <UnfavoriteButton disabled={isLoading} onRemove={() => mutate({ talkId })} />;
 }
