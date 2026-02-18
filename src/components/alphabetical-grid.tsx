@@ -16,9 +16,9 @@ interface AlphabeticalGridProps {
 
 export function AlphabeticalGrid({ className, groups }: AlphabeticalGridProps) {
   return (
-    <div className={cn('space-y-12', className)}>
+    <div className={cn('space-y-6 md:space-y-12', className)}>
       {groups.map((group) => (
-        <section className="space-y-6" key={group.letter}>
+        <section className="space-y-3 md:space-y-6" key={group.letter}>
           <div className="flex items-center gap-2">
             <h2 className="font-semibold text-2xl">{group.letter}</h2>
             <span className="text-muted-foreground text-sm">{group.range}</span>

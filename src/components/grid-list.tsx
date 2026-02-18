@@ -81,8 +81,8 @@ const CONTAINER_CLASSES = {
 } as const;
 
 const GAP_CLASSES = {
-  tight: 'gap-4',
-  normal: 'gap-6',
+  tight: 'gap-2 sm:gap-3 md:gap-4',
+  normal: 'gap-2 sm:gap-4 md:gap-6',
 } as const;
 
 export function GridList({
