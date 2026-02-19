@@ -1,11 +1,11 @@
 'use client';
 
 import type { CollectionListItem } from '@/features/collections/types';
-import type { SpeakerId, SpeakerListItem } from '@/features/speakers/types';
+import type { SpeakerListItem } from '@/features/speakers/types';
 import type { TalkFormData } from '@/features/talks/schemas/talk-form';
-import type { Talk, TalkId, TalkStatus } from '@/features/talks/types';
+import type { Talk, TalkId } from '@/features/talks/types';
 
-import { useEffect, useMemo, useTransition } from 'react';
+import { useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
@@ -42,29 +42,22 @@ export function EditTalkSheet({
   talk,
 }: EditTalkSheetProps) {
   const [isPending, startTransition] = useTransition();
-  const maybeResetForm = open && talk;
 
-  const defaultValues = useMemo(
-    () => ({
+  const form = useForm<TalkFormData>({
+    // biome-ignore lint/suspicious/noExplicitAny: Type assertion needed for Zod 4 compatibility with zodResolver
+    resolver: zodResolver(talkFormSchema as any),
+    mode: 'onBlur',
+    values: {
       collectionId: talk?.collectionId,
       collectionOrder: talk?.collectionOrder,
       description: talk?.description ?? '',
       featured: talk?.featured ?? false,
       mediaUrl: talk?.mediaUrl ?? '',
       scripture: talk?.scripture ?? '',
-      // speakerId: talk?.speakerId ?? ('' as SpeakerId),
       speakerId: talk?.speakerId ?? '',
       status: talk?.status ?? 'backlog',
       title: talk?.title ?? '',
-    }),
-    [talk],
-  );
-
-  const form = useForm<TalkFormData>({
-    // biome-ignore lint/suspicious/noExplicitAny: Type assertion needed for Zod 4 compatibility with zodResolver
-    resolver: zodResolver(talkFormSchema as any),
-    mode: 'onBlur',
-    defaultValues,
+    },
   });
 
   const handleSubmit = form.handleSubmit((data) => {
@@ -88,12 +81,6 @@ export function EditTalkSheet({
       onOpenChange(false);
     });
   });
-
-  useEffect(() => {
-    if (maybeResetForm) {
-      form.reset(defaultValues);
-    }
-  }, [defaultValues, form, maybeResetForm]);
 
   if (!talk) {
     return null;

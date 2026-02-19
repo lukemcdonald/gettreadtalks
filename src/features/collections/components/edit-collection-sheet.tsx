@@ -3,7 +3,7 @@
 import type { Collection, CollectionId } from '@/features/collections/types';
 import type { CollectionFormData } from '../schemas/collection-form';
 
-import { useEffect, useMemo, useTransition } from 'react';
+import { useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
@@ -36,20 +36,14 @@ export function EditCollectionSheet({
   open,
 }: EditCollectionSheetProps) {
   const [isPending, startTransition] = useTransition();
-  const maybeResetForm = open && collection;
 
-  const defaultValues = useMemo(
-    () => ({
+  const form = useForm<CollectionFormData>({
+    resolver: zodResolver(collectionFormSchema),
+    values: {
       description: collection?.description ?? '',
       title: collection?.title ?? '',
       url: collection?.url ?? '',
-    }),
-    [collection],
-  );
-
-  const form = useForm<CollectionFormData>({
-    defaultValues,
-    resolver: zodResolver(collectionFormSchema),
+    },
   });
 
   const handleSubmit = form.handleSubmit((data) => {
@@ -73,12 +67,6 @@ export function EditCollectionSheet({
       onOpenChange(false);
     });
   });
-
-  useEffect(() => {
-    if (maybeResetForm) {
-      form.reset(defaultValues);
-    }
-  }, [defaultValues, form, maybeResetForm]);
 
   if (!collection) {
     return null;

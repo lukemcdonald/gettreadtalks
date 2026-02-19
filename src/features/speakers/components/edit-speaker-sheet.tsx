@@ -3,7 +3,7 @@
 import type { UpdateSpeakerFormData } from '@/features/speakers/schemas/speaker-form';
 import type { Speaker, SpeakerId } from '@/features/speakers/types';
 
-import { useEffect, useMemo, useTransition } from 'react';
+import { useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
@@ -37,10 +37,10 @@ export function EditSpeakerSheet({
   speaker,
 }: EditSpeakerSheetProps) {
   const [isPending, startTransition] = useTransition();
-  const maybeResetForm = open && speaker;
 
-  const defaultValues = useMemo(
-    () => ({
+  const form = useForm<UpdateSpeakerFormData>({
+    resolver: zodResolver(updateSpeakerSchema),
+    values: {
       description: speaker?.description ?? '',
       featured: speaker?.featured ?? false,
       firstName: speaker?.firstName ?? '',
@@ -49,13 +49,7 @@ export function EditSpeakerSheet({
       ministry: speaker?.ministry ?? '',
       role: speaker?.role ?? undefined,
       websiteUrl: speaker?.websiteUrl ?? '',
-    }),
-    [speaker],
-  );
-
-  const form = useForm<UpdateSpeakerFormData>({
-    defaultValues,
-    resolver: zodResolver(updateSpeakerSchema),
+    },
   });
 
   const handleSubmit = form.handleSubmit((data) => {
@@ -79,12 +73,6 @@ export function EditSpeakerSheet({
       onOpenChange(false);
     });
   });
-
-  useEffect(() => {
-    if (maybeResetForm) {
-      form.reset(defaultValues);
-    }
-  }, [defaultValues, form, maybeResetForm]);
 
   if (!speaker) {
     return null;

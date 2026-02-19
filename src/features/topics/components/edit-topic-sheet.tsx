@@ -3,7 +3,7 @@
 import type { TopicFormData } from '@/features/topics/schemas/topic-form';
 import type { Topic, TopicId } from '@/features/topics/types';
 
-import { useEffect, useMemo, useTransition } from 'react';
+import { useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
@@ -31,18 +31,12 @@ interface EditTopicSheetProps {
 
 export function EditTopicSheet({ onOpenChange, onTopicUpdated, open, topic }: EditTopicSheetProps) {
   const [isPending, startTransition] = useTransition();
-  const maybeResetForm = open && topic;
-
-  const defaultValues = useMemo(
-    () => ({
-      title: topic?.title ?? '',
-    }),
-    [topic],
-  );
 
   const form = useForm<TopicFormData>({
-    defaultValues,
     resolver: zodResolver(topicFormSchema),
+    values: {
+      title: topic?.title ?? '',
+    },
   });
 
   const handleSubmit = form.handleSubmit((data) => {
@@ -66,12 +60,6 @@ export function EditTopicSheet({ onOpenChange, onTopicUpdated, open, topic }: Ed
       onOpenChange(false);
     });
   });
-
-  useEffect(() => {
-    if (maybeResetForm) {
-      form.reset(defaultValues);
-    }
-  }, [defaultValues, form, maybeResetForm]);
 
   if (!topic) {
     return null;
