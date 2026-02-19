@@ -1,5 +1,3 @@
-'use client';
-
 import { SearchInput } from '@/components/ui/search-input';
 import { SelectFilter } from '@/components/ui/select-filter';
 
