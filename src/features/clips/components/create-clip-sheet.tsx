@@ -60,10 +60,6 @@ export function CreateClipSheet({
       const result = await createClipAction(data);
 
       if (!result.success) {
-        form.setError('root', {
-          type: 'server',
-          message: 'Failed to create clip. Please check the errors below.',
-        });
         setServerErrors(form.setError, result.errors);
         return;
       }

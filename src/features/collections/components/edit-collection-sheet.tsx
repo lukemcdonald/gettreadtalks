@@ -55,10 +55,6 @@ export function EditCollectionSheet({
       const result = await updateCollectionAction(data, collection._id);
 
       if (!result.success) {
-        form.setError('root', {
-          type: 'server',
-          message: 'Failed to update collection. Please check the errors below.',
-        });
         setServerErrors(form.setError, result.errors);
         return;
       }

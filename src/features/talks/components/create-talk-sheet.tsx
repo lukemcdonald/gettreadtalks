@@ -63,10 +63,6 @@ export function CreateTalkSheet({
       const result = await createTalkAction(data);
 
       if (!result.success) {
-        form.setError('root', {
-          type: 'server',
-          message: 'Failed to create talk. Please check the errors below.',
-        });
         setServerErrors(form.setError, result.errors);
         return;
       }

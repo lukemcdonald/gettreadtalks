@@ -51,10 +51,6 @@ export function CreateCollectionSheet({
       const result = await createCollectionAction(data);
 
       if (!result.success) {
-        form.setError('root', {
-          type: 'server',
-          message: 'Failed to create collection. Please check the errors below.',
-        });
         setServerErrors(form.setError, result.errors);
         return;
       }
