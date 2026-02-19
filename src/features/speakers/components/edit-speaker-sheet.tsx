@@ -3,13 +3,14 @@
 import type { UpdateSpeakerFormData } from '@/features/speakers/schemas/speaker-form';
 import type { Speaker, SpeakerId } from '@/features/speakers/types';
 
-import { useEffect, useMemo, useState, useTransition } from 'react';
+import { useEffect, useMemo, useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
 import {
   Button,
   FeaturedField,
+  FormError,
   Sheet,
   SheetFooter,
   SheetHeader,
@@ -36,7 +37,6 @@ export function EditSpeakerSheet({
   speaker,
 }: EditSpeakerSheetProps) {
   const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
   const maybeResetForm = open && speaker;
 
   const defaultValues = useMemo(
@@ -63,13 +63,15 @@ export function EditSpeakerSheet({
       return;
     }
 
-    setError(null);
     startTransition(async () => {
       const result = await updateSpeakerAction(data, speaker._id);
 
       if (!result.success) {
+        form.setError('root', {
+          type: 'server',
+          message: 'Failed to update speaker. Please check the errors below.',
+        });
         setServerErrors(form.setError, result.errors);
-        setError('Failed to update speaker. Please check the errors below.');
         return;
       }
 
@@ -81,7 +83,6 @@ export function EditSpeakerSheet({
   useEffect(() => {
     if (maybeResetForm) {
       form.reset(defaultValues);
-      setError(null);
     }
   }, [defaultValues, form, maybeResetForm]);
 
@@ -98,11 +99,7 @@ export function EditSpeakerSheet({
 
         <form className="grid min-h-0 flex-1 grid-rows-[1fr_auto]" onSubmit={handleSubmit}>
           <SheetPanel>
-            {!!error && (
-              <div className="mb-4 rounded-md bg-destructive/15 p-3 text-destructive-foreground text-sm">
-                {error}
-              </div>
-            )}
+            <FormError error={form.formState.errors.root} />
 
             <SpeakerFormFields control={form.control} />
             <FeaturedField control={form.control} name="featured" />
