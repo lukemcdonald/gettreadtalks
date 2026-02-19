@@ -6,7 +6,7 @@ import type { TalkId, TalkListItem } from '@/features/talks/types';
 import type { StatusType } from '@/lib/entities/types';
 import type { ClipFormData } from '../schemas/clip-form';
 
-import { useEffect, useState, useTransition } from 'react';
+import { useEffect, useMemo, useState, useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
@@ -54,34 +54,26 @@ export function EditClipSheet({
 }: EditClipSheetProps) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const maybeResetForm = open && clip;
 
-  const form = useForm<ClipFormData>({
-    // biome-ignore lint/suspicious/noExplicitAny: Type assertion needed for Zod 4 compatibility with zodResolver
-    resolver: zodResolver(clipFormSchema as any),
-    mode: 'onBlur',
-    defaultValues: {
+  const defaultValues = useMemo(
+    () => ({
       description: clip?.description ?? '',
       mediaUrl: clip?.mediaUrl ?? '',
       speakerId: clip?.speakerId,
       status: clip?.status ?? 'backlog',
       talkId: clip?.talkId,
       title: clip?.title ?? '',
-    },
-  });
+    }),
+    [clip],
+  );
 
-  useEffect(() => {
-    if (open && clip) {
-      form.reset({
-        description: clip.description ?? '',
-        mediaUrl: clip.mediaUrl,
-        speakerId: clip.speakerId,
-        status: clip.status ?? 'backlog',
-        talkId: clip.talkId,
-        title: clip.title,
-      });
-      setError(null);
-    }
-  }, [form, open, clip]);
+  const form = useForm<ClipFormData>({
+    // biome-ignore lint/suspicious/noExplicitAny: Zod 4 compatibility with zodResolver
+    resolver: zodResolver(clipFormSchema as any),
+    mode: 'onBlur',
+    defaultValues,
+  });
 
   const handleSubmit = form.handleSubmit((data) => {
     if (!clip) {
@@ -102,6 +94,13 @@ export function EditClipSheet({
       onOpenChange(false);
     });
   });
+
+  useEffect(() => {
+    if (maybeResetForm) {
+      form.reset(defaultValues);
+      setError(null);
+    }
+  }, [form, defaultValues, maybeResetForm]);
 
   if (!clip) {
     return null;

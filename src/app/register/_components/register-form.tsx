@@ -25,21 +25,23 @@ import { AUTH_ERRORS } from '@/services/auth/config';
 import { captureException } from '@/services/errors/client';
 
 export function RegisterForm(props: ComponentPropsWithoutRef<'form'>) {
+  const { track } = useAnalytics();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get('redirect') || '/account';
 
-  const [name, setName] = useState('');
-  const nameId = useId();
-  const [email, setEmail] = useState('');
   const emailId = useId();
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
+
+  const nameId = useId();
+  const [name, setName] = useState('');
+
   const passwordId = useId();
+  const [password, setPassword] = useState('');
 
   const isDisabled = isLoading || !email || !password;
-  const { track } = useAnalytics();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

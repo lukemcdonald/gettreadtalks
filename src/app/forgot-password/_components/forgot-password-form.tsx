@@ -12,7 +12,7 @@ import { requestPasswordReset } from '@/services/auth/client';
 import { AUTH_ERRORS } from '@/services/auth/config';
 
 const forgotPasswordSchema = z.object({
-  email: z.string().email('Please enter a valid email address.'),
+  email: z.email('Please enter a valid email address.'),
 });
 
 type ForgotPasswordData = z.infer<typeof forgotPasswordSchema>;
@@ -22,7 +22,9 @@ export function ForgotPasswordForm() {
   const [error, setError] = useState('');
 
   const form = useForm<ForgotPasswordData>({
-    defaultValues: { email: '' },
+    defaultValues: {
+      email: '',
+    },
     mode: 'onTouched',
     resolver: zodResolver(forgotPasswordSchema),
   });

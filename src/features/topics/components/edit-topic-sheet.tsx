@@ -3,7 +3,7 @@
 import type { TopicFormData } from '@/features/topics/schemas/topic-form';
 import type { Topic, TopicId } from '@/features/topics/types';
 
-import { useEffect, useState, useTransition } from 'react';
+import { useEffect, useMemo, useState, useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
@@ -31,22 +31,19 @@ interface EditTopicSheetProps {
 export function EditTopicSheet({ onOpenChange, onTopicUpdated, open, topic }: EditTopicSheetProps) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const maybeResetForm = open && topic;
+
+  const defaultValues = useMemo(
+    () => ({
+      title: topic?.title ?? '',
+    }),
+    [topic],
+  );
 
   const form = useForm<TopicFormData>({
-    defaultValues: {
-      title: topic?.title ?? '',
-    },
+    defaultValues,
     resolver: zodResolver(topicFormSchema),
   });
-
-  useEffect(() => {
-    if (open && topic) {
-      form.reset({
-        title: topic.title,
-      });
-      setError(null);
-    }
-  }, [form, open, topic]);
 
   const handleSubmit = form.handleSubmit((data) => {
     if (!topic) {
@@ -67,6 +64,13 @@ export function EditTopicSheet({ onOpenChange, onTopicUpdated, open, topic }: Ed
       onOpenChange(false);
     });
   });
+
+  useEffect(() => {
+    if (maybeResetForm) {
+      form.reset(defaultValues);
+      setError(null);
+    }
+  }, [defaultValues, form, maybeResetForm]);
 
   if (!topic) {
     return null;

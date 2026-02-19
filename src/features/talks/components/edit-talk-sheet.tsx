@@ -5,7 +5,7 @@ import type { SpeakerId, SpeakerListItem } from '@/features/speakers/types';
 import type { TalkFormData } from '@/features/talks/schemas/talk-form';
 import type { Talk, TalkId, TalkStatus } from '@/features/talks/types';
 
-import { useEffect, useState, useTransition } from 'react';
+import { useEffect, useMemo, useState, useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
@@ -43,40 +43,30 @@ export function EditTalkSheet({
 }: EditTalkSheetProps) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const maybeResetForm = open && talk;
 
-  const form = useForm<TalkFormData>({
-    // biome-ignore lint/suspicious/noExplicitAny: Type assertion needed for Zod 4 compatibility with zodResolver
-    resolver: zodResolver(talkFormSchema as any),
-    mode: 'onBlur',
-    defaultValues: {
+  const defaultValues = useMemo(
+    () => ({
       collectionId: talk?.collectionId,
       collectionOrder: talk?.collectionOrder,
       description: talk?.description ?? '',
       featured: talk?.featured ?? false,
       mediaUrl: talk?.mediaUrl ?? '',
       scripture: talk?.scripture ?? '',
-      speakerId: talk?.speakerId ?? ('' as SpeakerId),
+      // speakerId: talk?.speakerId ?? ('' as SpeakerId),
+      speakerId: talk?.speakerId ?? '',
       status: talk?.status ?? 'backlog',
       title: talk?.title ?? '',
-    },
-  });
+    }),
+    [talk],
+  );
 
-  useEffect(() => {
-    if (open && talk) {
-      form.reset({
-        collectionId: talk.collectionId,
-        collectionOrder: talk.collectionOrder,
-        description: talk.description ?? '',
-        featured: talk.featured ?? false,
-        mediaUrl: talk.mediaUrl,
-        scripture: talk.scripture ?? '',
-        speakerId: talk.speakerId,
-        status: talk.status ?? 'backlog',
-        title: talk.title,
-      });
-      setError(null);
-    }
-  }, [form, open, talk]);
+  const form = useForm<TalkFormData>({
+    // biome-ignore lint/suspicious/noExplicitAny: Type assertion needed for Zod 4 compatibility with zodResolver
+    resolver: zodResolver(talkFormSchema as any),
+    mode: 'onBlur',
+    defaultValues,
+  });
 
   const handleSubmit = form.handleSubmit((data) => {
     if (!talk) {
@@ -97,6 +87,13 @@ export function EditTalkSheet({
       onOpenChange(false);
     });
   });
+
+  useEffect(() => {
+    if (maybeResetForm) {
+      form.reset(defaultValues);
+      setError(null);
+    }
+  }, [defaultValues, form, maybeResetForm]);
 
   if (!talk) {
     return null;

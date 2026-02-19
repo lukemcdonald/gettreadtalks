@@ -18,8 +18,12 @@ interface ProfileFormProps {
 
 export function ProfileForm({ currentName }: ProfileFormProps) {
   const [isPending, startTransition] = useTransition();
-  const form = useForm<NameFormValues>({ defaultValues: { name: currentName } });
   const router = useRouter();
+  const form = useForm<NameFormValues>({
+    defaultValues: {
+      name: currentName,
+    },
+  });
 
   const watchedName = useWatch({ control: form.control, name: 'name' });
   const hasChanged = watchedName !== currentName;
@@ -28,10 +32,15 @@ export function ProfileForm({ currentName }: ProfileFormProps) {
     startTransition(async () => {
       try {
         await updateProfile({ name: values.name });
-        toastManager.add({ title: 'Name updated', type: 'success' });
+        toastManager.add({
+          title: 'Name updated',
+          type: 'success',
+        });
         router.refresh();
       } catch {
-        form.setError('root', { message: 'Failed to update name. Please try again.' });
+        form.setError('root', {
+          message: 'Failed to update name. Please try again.',
+        });
       }
     });
   }
