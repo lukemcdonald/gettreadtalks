@@ -12,7 +12,6 @@ export function useSheetRoute() {
       }
     },
     handleSuccess: () => {
-      router.back();
       router.refresh();
     },
   };
