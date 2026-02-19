@@ -24,7 +24,6 @@ export function LayoutSidebarNavItem({ href, icon: Icon, label }: LayoutSidebarN
         isActive ? 'text-foreground' : 'text-muted-foreground',
       )}
       href={href}
-      key={href}
     >
       {!!Icon && <Icon className="size-4" />}
       {label}
