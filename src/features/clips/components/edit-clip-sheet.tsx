@@ -10,16 +10,7 @@ import { useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
-import {
-  Button,
-  FormError,
-  Sheet,
-  SheetFooter,
-  SheetHeader,
-  SheetPanel,
-  SheetPopup,
-  SheetTitle,
-} from '@/components/ui';
+import { FormSheet } from '@/components/ui';
 import { updateClipAction } from '@/features/clips/actions/update-clip';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
 import { clipFormSchema } from '../schemas/clip-form';
@@ -91,33 +82,16 @@ export function EditClipSheet({
   }
 
   return (
-    <Sheet onOpenChange={onOpenChange} open={open}>
-      <SheetPopup side="right">
-        <SheetHeader>
-          <SheetTitle>Edit Clip</SheetTitle>
-        </SheetHeader>
-
-        <form className="grid min-h-0 flex-1 grid-rows-[1fr_auto]" onSubmit={handleSubmit}>
-          <SheetPanel>
-            <FormError error={form.formState.errors.root} />
-            <ClipFormFields control={form.control} speakers={speakers} talks={talks} />
-          </SheetPanel>
-
-          <SheetFooter>
-            <Button
-              disabled={isPending}
-              onClick={() => onOpenChange(false)}
-              type="button"
-              variant="outline"
-            >
-              Cancel
-            </Button>
-            <Button disabled={isPending} type="submit">
-              {isPending ? 'Saving...' : 'Save Changes'}
-            </Button>
-          </SheetFooter>
-        </form>
-      </SheetPopup>
-    </Sheet>
+    <FormSheet
+      error={form.formState.errors.root}
+      isPending={isPending}
+      onOpenChange={onOpenChange}
+      onSubmit={handleSubmit}
+      open={open}
+      submitLabel="Save Changes"
+      title="Edit Clip"
+    >
+      <ClipFormFields control={form.control} speakers={speakers} talks={talks} />
+    </FormSheet>
   );
 }

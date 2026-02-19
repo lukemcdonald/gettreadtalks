@@ -1,36 +1,19 @@
 'use client';
 
 import type { TopicFormData } from '@/features/topics/schemas/topic-form';
-import type { Topic, TopicId } from '@/features/topics/types';
 
-import { useEffect, useTransition } from 'react';
+import { useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
-import {
-  Button,
-  FormError,
-  Sheet,
-  SheetFooter,
-  SheetHeader,
-  SheetPanel,
-  SheetPopup,
-  SheetTitle,
-  TextField,
-} from '@/components/ui';
+import { useSheetRoute } from '@/app/@sheet/_hooks/use-sheet-route';
+import { FormSheet, TextField } from '@/components/ui';
 import { createTopicAction } from '@/features/topics/actions/create-topic';
 import { topicFormSchema } from '@/features/topics/schemas/topic-form';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
 
-type NewTopic = Pick<Topic, '_id' | 'title' | 'slug'>;
-
-interface CreateTopicSheetProps {
-  onOpenChange: (open: boolean) => void;
-  onTopicCreated: (topicId: TopicId, topic: NewTopic) => void;
-  open: boolean;
-}
-
-export function CreateTopicSheet({ onOpenChange, onTopicCreated, open }: CreateTopicSheetProps) {
+export function CreateTopicSheet() {
+  const { handleOpenChange, handleSuccess } = useSheetRoute();
   const [isPending, startTransition] = useTransition();
 
   const form = useForm<TopicFormData>({
@@ -49,61 +32,31 @@ export function CreateTopicSheet({ onOpenChange, onTopicCreated, open }: CreateT
         return;
       }
 
-      const newTopic: NewTopic = {
-        _id: result.data.topicId,
-        title: data.title,
-        slug: data.title.toLowerCase().replace(/\s+/g, '-'),
-      };
-
-      onTopicCreated(result.data.topicId, newTopic);
-      onOpenChange(false);
+      handleSuccess();
     });
   });
 
-  useEffect(() => {
-    if (!open) {
-      form.reset();
-    }
-  }, [form, open]);
-
   return (
-    <Sheet onOpenChange={onOpenChange} open={open}>
-      <SheetPopup side="right">
-        <SheetHeader>
-          <SheetTitle>Add New Topic</SheetTitle>
-        </SheetHeader>
-
-        <form className="grid min-h-0 flex-1 grid-rows-[1fr_auto]" onSubmit={handleSubmit}>
-          <SheetPanel>
-            <FormError error={form.formState.errors.root} />
-
-            <div className="space-y-4">
-              <TextField
-                control={form.control}
-                description="A short, descriptive name for this topic"
-                label="Title"
-                name="title"
-                placeholder="Faith"
-                required
-              />
-            </div>
-          </SheetPanel>
-
-          <SheetFooter>
-            <Button
-              disabled={isPending}
-              onClick={() => onOpenChange(false)}
-              type="button"
-              variant="outline"
-            >
-              Cancel
-            </Button>
-            <Button disabled={isPending} type="submit">
-              {isPending ? 'Creating...' : 'Create Topic'}
-            </Button>
-          </SheetFooter>
-        </form>
-      </SheetPopup>
-    </Sheet>
+    <FormSheet
+      error={form.formState.errors.root}
+      isPending={isPending}
+      onOpenChange={handleOpenChange}
+      onSubmit={handleSubmit}
+      open
+      pendingLabel="Creating..."
+      submitLabel="Create Topic"
+      title="Add New Topic"
+    >
+      <div className="space-y-4">
+        <TextField
+          control={form.control}
+          description="A short, descriptive name for this topic"
+          label="Title"
+          name="title"
+          placeholder="Faith"
+          required
+        />
+      </div>
+    </FormSheet>
   );
 }

@@ -7,17 +7,7 @@ import { useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
-import {
-  Button,
-  FormError,
-  Sheet,
-  SheetFooter,
-  SheetHeader,
-  SheetPanel,
-  SheetPopup,
-  SheetTitle,
-  TextField,
-} from '@/components/ui';
+import { FormSheet, TextField } from '@/components/ui';
 import { updateTopicAction } from '@/features/topics/actions/update-topic';
 import { topicFormSchema } from '@/features/topics/schemas/topic-form';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
@@ -62,43 +52,25 @@ export function EditTopicSheet({ onOpenChange, onTopicUpdated, open, topic }: Ed
   }
 
   return (
-    <Sheet onOpenChange={onOpenChange} open={open}>
-      <SheetPopup side="right">
-        <SheetHeader>
-          <SheetTitle>Edit Topic</SheetTitle>
-        </SheetHeader>
-
-        <form className="grid min-h-0 flex-1 grid-rows-[1fr_auto]" onSubmit={handleSubmit}>
-          <SheetPanel>
-            <FormError error={form.formState.errors.root} />
-
-            <div className="space-y-4">
-              <TextField
-                control={form.control}
-                description="A short, descriptive name for this topic"
-                label="Title"
-                name="title"
-                placeholder="Faith"
-                required
-              />
-            </div>
-          </SheetPanel>
-
-          <SheetFooter>
-            <Button
-              disabled={isPending}
-              onClick={() => onOpenChange(false)}
-              type="button"
-              variant="outline"
-            >
-              Cancel
-            </Button>
-            <Button disabled={isPending} type="submit">
-              {isPending ? 'Saving...' : 'Save Changes'}
-            </Button>
-          </SheetFooter>
-        </form>
-      </SheetPopup>
-    </Sheet>
+    <FormSheet
+      error={form.formState.errors.root}
+      isPending={isPending}
+      onOpenChange={onOpenChange}
+      onSubmit={handleSubmit}
+      open={open}
+      submitLabel="Save Changes"
+      title="Edit Topic"
+    >
+      <div className="space-y-4">
+        <TextField
+          control={form.control}
+          description="A short, descriptive name for this topic"
+          label="Title"
+          name="title"
+          placeholder="Faith"
+          required
+        />
+      </div>
+    </FormSheet>
   );
 }

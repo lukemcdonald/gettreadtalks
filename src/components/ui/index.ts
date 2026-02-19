@@ -5,6 +5,7 @@ export * from './container';
 export * from './fields';
 export * from './filter-popup';
 export * from './form';
+export * from './form-sheet';
 export * from './inline-multi-filter';
 export * from './link';
 export * from './mobile-filter-sheet';
