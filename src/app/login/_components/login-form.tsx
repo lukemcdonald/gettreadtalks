@@ -40,7 +40,10 @@ export function LoginForm(props: ComponentPropsWithoutRef<'form'>) {
   const redirectTo = searchParams.get('redirect') || '/account';
 
   const form = useForm<LoginFormData>({
-    defaultValues: { email: searchParams.get('email') || '', password: '' },
+    defaultValues: {
+      email: searchParams.get('email') || '',
+      password: '',
+    },
     resolver: zodResolver(loginFormSchema),
   });
 

@@ -41,7 +41,11 @@ export function RegisterForm(props: ComponentPropsWithoutRef<'form'>) {
   const redirectTo = searchParams.get('redirect') || '/account';
 
   const form = useForm<RegisterFormData>({
-    defaultValues: { email: '', name: '', password: '' },
+    defaultValues: {
+      email: '',
+      name: '',
+      password: '',
+    },
     resolver: zodResolver(registerFormSchema),
   });
 
