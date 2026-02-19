@@ -30,6 +30,7 @@ export function EditCollectionSheet({
 
   const form = useForm<CollectionFormData>({
     resolver: zodResolver(collectionFormSchema),
+    mode: 'onBlur',
     values: {
       description: collection?.description ?? '',
       title: collection?.title ?? '',

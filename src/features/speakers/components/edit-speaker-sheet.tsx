@@ -30,6 +30,7 @@ export function EditSpeakerSheet({
 
   const form = useForm<UpdateSpeakerFormData>({
     resolver: zodResolver(updateSpeakerSchema),
+    mode: 'onBlur',
     values: {
       description: speaker?.description ?? '',
       featured: speaker?.featured ?? false,
