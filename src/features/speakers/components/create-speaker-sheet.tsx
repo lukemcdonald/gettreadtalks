@@ -55,10 +55,6 @@ export function CreateSpeakerSheet({
       const result = await createSpeakerAction(data);
 
       if (!result.success) {
-        form.setError('root', {
-          type: 'server',
-          message: 'Failed to create speaker. Please check the errors below.',
-        });
         setServerErrors(form.setError, result.errors);
         return;
       }

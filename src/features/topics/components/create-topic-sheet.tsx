@@ -45,10 +45,6 @@ export function CreateTopicSheet({ onOpenChange, onTopicCreated, open }: CreateT
       const result = await createTopicAction(data);
 
       if (!result.success) {
-        form.setError('root', {
-          type: 'server',
-          message: 'Failed to create topic. Please check the errors below.',
-        });
         setServerErrors(form.setError, result.errors);
         return;
       }

@@ -69,10 +69,6 @@ export function EditTalkSheet({
       const result = await updateTalkAction(data, talk._id);
 
       if (!result.success) {
-        form.setError('root', {
-          type: 'server',
-          message: 'Failed to update talk. Please check the errors below.',
-        });
         setServerErrors(form.setError, result.errors);
         return;
       }

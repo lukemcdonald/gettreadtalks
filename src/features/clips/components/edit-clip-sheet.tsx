@@ -77,10 +77,6 @@ export function EditClipSheet({
       const result = await updateClipAction(data, clip._id);
 
       if (!result.success) {
-        form.setError('root', {
-          type: 'server',
-          message: 'Failed to update clip. Please check the errors below.',
-        });
         setServerErrors(form.setError, result.errors);
         return;
       }

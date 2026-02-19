@@ -48,10 +48,6 @@ export function EditTopicSheet({ onOpenChange, onTopicUpdated, open, topic }: Ed
       const result = await updateTopicAction(data, topic._id);
 
       if (!result.success) {
-        form.setError('root', {
-          type: 'server',
-          message: 'Failed to update topic. Please check the errors below.',
-        });
         setServerErrors(form.setError, result.errors);
         return;
       }

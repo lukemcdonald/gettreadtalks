@@ -61,10 +61,6 @@ export function EditSpeakerSheet({
       const result = await updateSpeakerAction(data, speaker._id);
 
       if (!result.success) {
-        form.setError('root', {
-          type: 'server',
-          message: 'Failed to update speaker. Please check the errors below.',
-        });
         setServerErrors(form.setError, result.errors);
         return;
       }
