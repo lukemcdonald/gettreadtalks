@@ -19,7 +19,6 @@ type ForgotPasswordData = z.infer<typeof forgotPasswordSchema>;
 
 export function ForgotPasswordForm() {
   const [succeeded, setSucceeded] = useState(false);
-  const [error, setError] = useState('');
 
   const form = useForm<ForgotPasswordData>({
     defaultValues: {
@@ -29,13 +28,13 @@ export function ForgotPasswordForm() {
     resolver: zodResolver(forgotPasswordSchema),
   });
 
-  async function onSubmit(values: ForgotPasswordData) {
-    setError('');
+  const { errors, isSubmitting } = form.formState;
 
+  async function onSubmit(values: ForgotPasswordData) {
     const { error: submitError } = await requestPasswordReset({ email: values.email });
 
     if (submitError) {
-      setError(submitError.message ?? AUTH_ERRORS.RESET_EMAIL_FAILED);
+      form.setError('root', { message: submitError.message ?? AUTH_ERRORS.RESET_EMAIL_FAILED });
     } else {
       setSucceeded(true);
     }
@@ -56,15 +55,15 @@ export function ForgotPasswordForm() {
 
   return (
     <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
-      {!!error && (
+      {!!errors.root && (
         <Alert variant="error">
           <CircleAlertIcon />
           <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
+          <AlertDescription>{errors.root.message}</AlertDescription>
         </Alert>
       )}
 
-      <Fieldset className="max-w-full" disabled={form.formState.isSubmitting}>
+      <Fieldset className="max-w-full" disabled={isSubmitting}>
         <TextField
           control={form.control}
           label="Email address"
@@ -76,7 +75,7 @@ export function ForgotPasswordForm() {
       </Fieldset>
 
       <div className="flex items-center gap-4">
-        <Button disabled={form.formState.isSubmitting} type="submit">
+        <Button disabled={isSubmitting} type="submit">
           Send reset link
         </Button>
         <Link className="text-muted-foreground text-sm hover:underline" href="/login">

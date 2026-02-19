@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CircleAlertIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
@@ -34,21 +33,19 @@ interface ResetPasswordFormProps {
 }
 
 export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
-  const [error, setError] = useState('');
-
   const form = useForm<ResetPasswordData>({
     defaultValues: { confirmPassword: '', newPassword: '' },
     mode: 'onTouched',
     resolver: zodResolver(resetPasswordSchema),
   });
 
-  async function onSubmit(values: ResetPasswordData) {
-    setError('');
+  const { errors, isSubmitting } = form.formState;
 
+  async function onSubmit(values: ResetPasswordData) {
     const { error: submitError } = await resetPassword({ newPassword: values.newPassword, token });
 
     if (submitError) {
-      setError(submitError.message ?? AUTH_ERRORS.RESET_TOKEN_INVALID);
+      form.setError('root', { message: submitError.message ?? AUTH_ERRORS.RESET_TOKEN_INVALID });
     } else {
       window.location.href = '/login';
     }
@@ -56,15 +53,15 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
 
   return (
     <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
-      {!!error && (
+      {!!errors.root && (
         <Alert variant="error">
           <CircleAlertIcon />
           <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
+          <AlertDescription>{errors.root.message}</AlertDescription>
         </Alert>
       )}
 
-      <Fieldset className="max-w-full" disabled={form.formState.isSubmitting}>
+      <Fieldset className="max-w-full" disabled={isSubmitting}>
         <PasswordField control={form.control} label="New password" name="newPassword" required />
         <PasswordField
           control={form.control}
@@ -74,7 +71,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
         />
       </Fieldset>
 
-      <Button disabled={form.formState.isSubmitting} type="submit">
+      <Button disabled={isSubmitting} type="submit">
         Reset password
       </Button>
     </form>
