@@ -19,6 +19,7 @@ export function CreateCollectionSheet() {
 
   const form = useForm<CollectionFormData>({
     resolver: zodResolver(collectionFormSchema),
+    mode: 'onBlur',
     defaultValues: {
       description: '',
       title: '',

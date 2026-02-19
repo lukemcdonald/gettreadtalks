@@ -38,6 +38,7 @@ export function CreateSpeakerSheet({
       role: '',
       websiteUrl: '',
     },
+    mode: 'onBlur',
     resolver: zodResolver(createSpeakerSchema),
   });
 

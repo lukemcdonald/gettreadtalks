@@ -24,6 +24,7 @@ export function EditTopicSheet({ onOpenChange, onTopicUpdated, open, topic }: Ed
 
   const form = useForm<TopicFormData>({
     resolver: zodResolver(topicFormSchema),
+    mode: 'onBlur',
     values: {
       title: topic?.title ?? '',
     },

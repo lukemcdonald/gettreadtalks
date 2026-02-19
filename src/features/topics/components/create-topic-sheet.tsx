@@ -20,6 +20,7 @@ export function CreateTopicSheet() {
     defaultValues: {
       title: '',
     },
+    mode: 'onBlur',
     resolver: zodResolver(topicFormSchema),
   });
 
