@@ -5,7 +5,7 @@ import type { SpeakerId, SpeakerListItem } from '@/features/speakers/types';
 import type { TalkFormData } from '@/features/talks/schemas/talk-form';
 import type { Talk, TalkId, TalkStatus } from '@/features/talks/types';
 
-import { useEffect, useMemo, useState, useTransition } from 'react';
+import { useEffect, useMemo, useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
@@ -42,7 +42,6 @@ export function EditTalkSheet({
   talk,
 }: EditTalkSheetProps) {
   const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
   const maybeResetForm = open && talk;
 
   const defaultValues = useMemo(
@@ -73,13 +72,15 @@ export function EditTalkSheet({
       return;
     }
 
-    setError(null);
     startTransition(async () => {
       const result = await updateTalkAction(data, talk._id);
 
       if (!result.success) {
+        form.setError('root', {
+          type: 'server',
+          message: 'Failed to update talk. Please check the errors below.',
+        });
         setServerErrors(form.setError, result.errors);
-        setError('Failed to update talk. Please check the errors below.');
         return;
       }
 
@@ -91,7 +92,6 @@ export function EditTalkSheet({
   useEffect(() => {
     if (maybeResetForm) {
       form.reset(defaultValues);
-      setError(null);
     }
   }, [defaultValues, form, maybeResetForm]);
 
@@ -108,12 +108,6 @@ export function EditTalkSheet({
 
         <form className="grid min-h-0 flex-1 grid-rows-[1fr_auto]" onSubmit={handleSubmit}>
           <SheetPanel>
-            {!!error && (
-              <div className="mb-4 rounded-md bg-destructive/15 p-3 text-destructive-foreground text-sm">
-                {error}
-              </div>
-            )}
-
             <FormError error={form.formState.errors.root} />
 
             <TalkFormFields collections={collections} control={form.control} speakers={speakers} />
