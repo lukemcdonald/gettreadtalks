@@ -6,7 +6,7 @@ import type { TalkId, TalkListItem } from '@/features/talks/types';
 import type { StatusType } from '@/lib/entities/types';
 import type { ClipFormData } from '../schemas/clip-form';
 
-import { useEffect, useMemo, useTransition } from 'react';
+import { useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
@@ -53,25 +53,19 @@ export function EditClipSheet({
   talks,
 }: EditClipSheetProps) {
   const [isPending, startTransition] = useTransition();
-  const maybeResetForm = open && clip;
 
-  const defaultValues = useMemo(
-    () => ({
+  const form = useForm<ClipFormData>({
+    // biome-ignore lint/suspicious/noExplicitAny: Zod 4 compatibility with zodResolver
+    resolver: zodResolver(clipFormSchema as any),
+    mode: 'onBlur',
+    values: {
       description: clip?.description ?? '',
       mediaUrl: clip?.mediaUrl ?? '',
       speakerId: clip?.speakerId,
       status: clip?.status ?? 'backlog',
       talkId: clip?.talkId,
       title: clip?.title ?? '',
-    }),
-    [clip],
-  );
-
-  const form = useForm<ClipFormData>({
-    // biome-ignore lint/suspicious/noExplicitAny: Zod 4 compatibility with zodResolver
-    resolver: zodResolver(clipFormSchema as any),
-    mode: 'onBlur',
-    defaultValues,
+    },
   });
 
   const handleSubmit = form.handleSubmit((data) => {
@@ -95,12 +89,6 @@ export function EditClipSheet({
       onOpenChange(false);
     });
   });
-
-  useEffect(() => {
-    if (maybeResetForm) {
-      form.reset(defaultValues);
-    }
-  }, [form, defaultValues, maybeResetForm]);
 
   if (!clip) {
     return null;
