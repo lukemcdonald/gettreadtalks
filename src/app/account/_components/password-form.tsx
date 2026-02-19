@@ -12,7 +12,11 @@ import { type PasswordFormData, passwordFormSchema } from '@/features/users/sche
 export function PasswordForm() {
   const [isPending, startTransition] = useTransition();
   const form = useForm<PasswordFormData>({
-    defaultValues: { confirmPassword: '', currentPassword: '', newPassword: '' },
+    defaultValues: {
+      confirmPassword: '',
+      currentPassword: '',
+      newPassword: '',
+    },
     mode: 'onTouched',
     resolver: zodResolver(passwordFormSchema),
   });

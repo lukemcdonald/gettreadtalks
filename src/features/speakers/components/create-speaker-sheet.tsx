@@ -50,14 +50,6 @@ export function CreateSpeakerSheet({
     resolver: zodResolver(createSpeakerSchema),
   });
 
-  useEffect(() => {
-    if (!open) {
-      form.reset();
-      form.clearErrors();
-      setError(null);
-    }
-  }, [form, open]);
-
   const handleSubmit = form.handleSubmit((data) => {
     setError(null);
     startTransition(async () => {
@@ -81,6 +73,14 @@ export function CreateSpeakerSheet({
       onOpenChange(false);
     });
   });
+
+  useEffect(() => {
+    if (!open) {
+      form.reset();
+      form.clearErrors();
+      setError(null);
+    }
+  }, [form, open]);
 
   return (
     <Sheet onOpenChange={onOpenChange} open={open}>

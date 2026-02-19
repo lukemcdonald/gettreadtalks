@@ -3,7 +3,7 @@
 import type { Collection, CollectionId } from '@/features/collections/types';
 import type { CollectionFormData } from '../schemas/collection-form';
 
-import { useEffect, useState, useTransition } from 'react';
+import { useEffect, useMemo, useState, useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
@@ -36,26 +36,21 @@ export function EditCollectionSheet({
 }: EditCollectionSheetProps) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const maybeResetForm = open && collection;
 
-  const form = useForm<CollectionFormData>({
-    defaultValues: {
+  const defaultValues = useMemo(
+    () => ({
       description: collection?.description ?? '',
       title: collection?.title ?? '',
       url: collection?.url ?? '',
-    },
+    }),
+    [collection],
+  );
+
+  const form = useForm<CollectionFormData>({
+    defaultValues,
     resolver: zodResolver(collectionFormSchema),
   });
-
-  useEffect(() => {
-    if (open && collection) {
-      form.reset({
-        description: collection.description ?? '',
-        title: collection.title,
-        url: collection.url ?? '',
-      });
-      setError(null);
-    }
-  }, [form, open, collection]);
 
   const handleSubmit = form.handleSubmit((data) => {
     if (!collection) {
@@ -76,6 +71,13 @@ export function EditCollectionSheet({
       onOpenChange(false);
     });
   });
+
+  useEffect(() => {
+    if (maybeResetForm) {
+      form.reset(defaultValues);
+      setError(null);
+    }
+  }, [defaultValues, form, maybeResetForm]);
 
   if (!collection) {
     return null;

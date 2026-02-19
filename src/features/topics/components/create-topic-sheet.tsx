@@ -40,14 +40,6 @@ export function CreateTopicSheet({ onOpenChange, onTopicCreated, open }: CreateT
     resolver: zodResolver(topicFormSchema),
   });
 
-  useEffect(() => {
-    if (!open) {
-      form.reset();
-      form.clearErrors();
-      setError(null);
-    }
-  }, [form, open]);
-
   const handleSubmit = form.handleSubmit((data) => {
     setError(null);
     startTransition(async () => {
@@ -69,6 +61,14 @@ export function CreateTopicSheet({ onOpenChange, onTopicCreated, open }: CreateT
       onOpenChange(false);
     });
   });
+
+  useEffect(() => {
+    if (!open) {
+      form.reset();
+      form.clearErrors();
+      setError(null);
+    }
+  }, [form, open]);
 
   return (
     <Sheet onOpenChange={onOpenChange} open={open}>

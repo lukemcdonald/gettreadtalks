@@ -3,7 +3,7 @@
 import type { UpdateSpeakerFormData } from '@/features/speakers/schemas/speaker-form';
 import type { Speaker, SpeakerId } from '@/features/speakers/types';
 
-import { useEffect, useState, useTransition } from 'react';
+import { useEffect, useMemo, useState, useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
@@ -37,36 +37,26 @@ export function EditSpeakerSheet({
 }: EditSpeakerSheetProps) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const maybeResetForm = open && speaker;
 
-  const form = useForm<UpdateSpeakerFormData>({
-    defaultValues: {
+  const defaultValues = useMemo(
+    () => ({
       description: speaker?.description ?? '',
       featured: speaker?.featured ?? false,
       firstName: speaker?.firstName ?? '',
       imageUrl: speaker?.imageUrl ?? '',
       lastName: speaker?.lastName ?? '',
       ministry: speaker?.ministry ?? '',
-      role: speaker?.role ?? '',
+      role: speaker?.role ?? undefined,
       websiteUrl: speaker?.websiteUrl ?? '',
-    },
+    }),
+    [speaker],
+  );
+
+  const form = useForm<UpdateSpeakerFormData>({
+    defaultValues,
     resolver: zodResolver(updateSpeakerSchema),
   });
-
-  useEffect(() => {
-    if (open && speaker) {
-      form.reset({
-        description: speaker.description ?? '',
-        featured: speaker.featured ?? false,
-        firstName: speaker.firstName,
-        imageUrl: speaker.imageUrl ?? '',
-        lastName: speaker.lastName,
-        ministry: speaker.ministry ?? '',
-        role: speaker.role ?? '',
-        websiteUrl: speaker.websiteUrl ?? '',
-      });
-      setError(null);
-    }
-  }, [form, open, speaker]);
 
   const handleSubmit = form.handleSubmit((data) => {
     if (!speaker) {
@@ -87,6 +77,13 @@ export function EditSpeakerSheet({
       onOpenChange(false);
     });
   });
+
+  useEffect(() => {
+    if (maybeResetForm) {
+      form.reset(defaultValues);
+      setError(null);
+    }
+  }, [defaultValues, form, maybeResetForm]);
 
   if (!speaker) {
     return null;

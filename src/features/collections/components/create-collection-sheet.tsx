@@ -38,21 +38,13 @@ export function CreateCollectionSheet({
   const [error, setError] = useState<string | null>(null);
 
   const form = useForm<CollectionFormData>({
+    resolver: zodResolver(collectionFormSchema),
     defaultValues: {
       description: '',
       title: '',
       url: '',
     },
-    resolver: zodResolver(collectionFormSchema),
   });
-
-  useEffect(() => {
-    if (!open) {
-      form.reset();
-      form.clearErrors();
-      setError(null);
-    }
-  }, [form, open]);
 
   const handleSubmit = form.handleSubmit((data) => {
     setError(null);
@@ -75,6 +67,14 @@ export function CreateCollectionSheet({
       onOpenChange(false);
     });
   });
+
+  useEffect(() => {
+    if (!open) {
+      form.reset();
+      form.clearErrors();
+      setError(null);
+    }
+  }, [form, open]);
 
   return (
     <Sheet onOpenChange={onOpenChange} open={open}>

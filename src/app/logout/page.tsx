@@ -10,10 +10,11 @@ import { signOut } from '@/services/auth/client';
 import { captureException } from '@/services/errors/client';
 
 export default function LogoutPage() {
+  const { track } = useAnalytics();
   const router = useRouter();
   const searchParams = useSearchParams();
+
   const redirectTo = searchParams.get('redirect') || '/';
-  const { track } = useAnalytics();
 
   useEffect(() => {
     const handleLogout = async () => {
