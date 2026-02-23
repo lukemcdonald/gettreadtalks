@@ -79,8 +79,9 @@
     "onlyBuiltDependencies": [
       "@sentry/cli",
       "@tailwindcss/oxide",
-      "better-sqlite3",
+      "core-js",
       "esbuild",
+      "protobufjs",
       "sharp",
       "unrs-resolver"
     ]
