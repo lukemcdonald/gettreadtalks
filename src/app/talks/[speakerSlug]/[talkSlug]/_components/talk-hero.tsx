@@ -17,7 +17,7 @@ export function TalkHero({ speaker, speakerSlug, talk }: TalkHeroProps) {
   const imageSrc = getVideoThumbnail(talk.mediaUrl);
 
   return (
-    <Section className="dark relative overflow-hidden" spacing="3xl">
+    <Section className="dark relative overflow-hidden py-6 sm:py-8 md:py-12 lg:py-16">
       <TalkHeroBackground imageSrc={imageSrc} />
 
       <Container className="relative space-y-8">

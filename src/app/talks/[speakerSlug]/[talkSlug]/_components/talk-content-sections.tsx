@@ -38,7 +38,7 @@ export function TalkContentSections({
       <Container>
         <div className="grid grid-cols-1 gap-x-8 gap-y-12 xl:grid-cols-12">
           {/* Main Content */}
-          <div className="order-2 space-y-16 xl:order-1 xl:col-span-9">
+          <div className="order-2 space-y-8 xl:order-1 xl:col-span-9 xl:space-y-16">
             {/* Description */}
             {talk.description && (
               <div className="space-y-4">
