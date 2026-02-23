@@ -16,7 +16,9 @@ export function FavoritesTabPanel<T>({
   renderItem,
   value,
 }: FavoritesTabPanelProps<T>) {
-  if (items.length === 0) return null;
+  if (items.length === 0) {
+    return null;
+  }
 
   return (
     <TabsPanel value={value}>

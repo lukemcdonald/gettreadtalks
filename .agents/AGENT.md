@@ -20,6 +20,11 @@ Code should be self-documenting. No comments that repeat what code does.
 
 **Never:** commented-out code, obvious comments, redundant type documentation.
 
+## Previews
+
+- Do not run `pnpm dev` unless instructed
+- When testing and viewing local urls, ensure you are using `https`
+
 ## Rules and Patterns
 
 - [Architecture](rules/architecture.md) — Folder and component composition
