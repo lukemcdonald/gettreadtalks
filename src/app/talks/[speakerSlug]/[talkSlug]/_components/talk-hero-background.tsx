@@ -13,7 +13,7 @@ export function TalkHeroBackground({ imageSrc }: TalkHeroBackgroundProps) {
     <div>
       <Image
         alt=""
-        className="scale-110 object-cover blur-xl saturate-50"
+        className="scale-110 object-cover blur-md grayscale"
         fill
         priority
         sizes="100vw"
