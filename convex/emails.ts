@@ -89,8 +89,9 @@ export const sendPasswordResetEmail = internalAction({
         text,
         to: args.email,
       });
-    } catch (err) {
+    } catch (error) {
       throwConvexError(500, 'Failed to send password reset email', {
+        cause: getErrorMessage(error),
         resource: 'email',
         resourceId: args.email,
       });
@@ -137,8 +138,9 @@ export const sendVerificationEmail = internalMutation({
       });
 
       return emailId;
-    } catch {
+    } catch (error) {
       throwConvexError(500, 'Failed to send verification email', {
+        cause: getErrorMessage(error),
         resource: 'email',
         resourceId: args.email,
       });
@@ -169,8 +171,9 @@ export const sendWelcomeEmail = internalMutation({
         text,
         to: args.email,
       });
-    } catch {
+    } catch (error) {
       throwConvexError(500, 'Failed to send welcome email', {
+        cause: getErrorMessage(error),
         resource: 'email',
         resourceId: args.email,
       });
@@ -181,6 +184,16 @@ export const sendWelcomeEmail = internalMutation({
 // ============================================
 // HELPERS
 // ============================================
+
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  if (typeof error === 'string') {
+    return error;
+  }
+  return 'Unknown error';
+}
 
 function getFromAddress() {
   return `${FROM_NAME} <${FROM_EMAIL}>`;
