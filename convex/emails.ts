@@ -1,3 +1,5 @@
+import type { MutationCtx } from './_generated/server';
+
 import { Resend, vEmailEvent, vEmailId } from '@convex-dev/resend';
 import { render } from '@react-email/render';
 import { v } from 'convex/values';
@@ -32,39 +34,28 @@ export const handleEmailEvent = internalMutation({
     event: vEmailEvent,
     id: vEmailId,
   },
-  handler: (_ctx, args) => {
-    console.log('Email event received:', {
-      emailId: args.id,
-      event: args.event.type,
-      timestamp: new Date().toISOString(),
-    });
+  handler: async (ctx, args) => {
+    const { event, id } = args;
 
-    // Handle different email events based on documentation
-    switch (args.event.type) {
-      case 'email.delivered':
-        // You can add custom logic here, such as:
-        // - Update user records with email status
-        // - Log statistics for analytics
-        console.log('Email delivered successfully:', args.id);
-        break;
-      case 'email.opened':
-        // Track email engagement
-        console.log('Email opened:', args.id);
-        break;
-      case 'email.clicked':
-        // Track link engagement
-        console.log('Email link clicked:', args.id);
-        break;
+    switch (event.type) {
       case 'email.bounced':
-        // Handle bounces - might want to mark email as invalid
-        console.log('Email bounced:', args.id, 'reason:', args.event.data.bounce.type);
+        await suppressRecipients(ctx, {
+          emails: normalizeRecipients(event.data.to),
+          reason: 'bounced',
+          resendEmailId: event.data.email_id,
+          bounceType: event.data.bounce.type,
+          bounceSubType: event.data.bounce.subType,
+        });
         break;
       case 'email.complained':
-        // Handle spam complaints
-        console.log('Email marked as spam:', args.id);
+        await suppressRecipients(ctx, {
+          emails: normalizeRecipients(event.data.to),
+          reason: 'complained',
+          resendEmailId: event.data.email_id,
+        });
         break;
       default:
-        console.log('Email event not handled:', args.event.type);
+        console.log('Email event:', event.type, id);
         break;
     }
 
@@ -195,4 +186,41 @@ function getFromAddress() {
 
 function getReplyToAddress() {
   return REPLY_TO_EMAIL;
+}
+
+function normalizeRecipients(to: string | string[]): string[] {
+  return Array.isArray(to) ? to : [to];
+}
+
+async function suppressRecipients(
+  ctx: MutationCtx,
+  params: {
+    bounceSubType?: string;
+    bounceType?: string;
+    emails: string[];
+    reason: 'bounced' | 'complained';
+    resendEmailId: string;
+  },
+) {
+  for (const email of params.emails) {
+    const existing = await ctx.db
+      .query('emailSuppressions')
+      .withIndex('by_email', (q) => q.eq('email', email))
+      .first();
+
+    if (existing) {
+      continue;
+    }
+
+    await ctx.db.insert('emailSuppressions', {
+      bounceSubType: params.bounceSubType,
+      bounceType: params.bounceType,
+      email,
+      reason: params.reason,
+      resendEmailId: params.resendEmailId,
+      suppressedAt: Date.now(),
+    });
+
+    console.log('Email suppressed:', email, 'reason:', params.reason);
+  }
 }
