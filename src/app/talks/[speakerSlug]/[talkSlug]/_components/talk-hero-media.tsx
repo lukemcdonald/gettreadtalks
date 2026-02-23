@@ -10,7 +10,7 @@ interface TalkHeroMediaProps {
 export function TalkHeroMedia({ speakerSlug, talk }: TalkHeroMediaProps) {
   return (
     <div className="mx-auto w-full max-w-4xl">
-      <div className="overflow-hidden rounded-2xl text-center shadow-2xl">
+      <div className="overflow-hidden text-center">
         <MediaEmbed
           mediaUrl={talk.mediaUrl}
           title={talk.title}

@@ -8,7 +8,7 @@ interface SectionProps extends useRender.ComponentProps<'section'> {
   spacing?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
 }
 
-const sectionVariants = cva('space-y-6 px-4 sm:px-6', {
+const sectionVariants = cva('gap-6 px-4 sm:px-6', {
   variants: {
     spacing: {
       xs: 'py-2',
