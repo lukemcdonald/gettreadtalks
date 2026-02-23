@@ -160,6 +160,7 @@ export const sendWelcomeEmail = internalMutation({
       const template = WelcomeEmail({
         email: args.email,
         name: args.name,
+        siteUrl: process.env.SITE_URL || 'https://gettreadtalks.com',
       });
       const { html, text } = await renderEmail(template);
 
