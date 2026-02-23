@@ -1,11 +1,9 @@
 import type { Speaker } from '@/features/speakers/types';
 import type { Talk } from '@/features/talks/types';
-import type { Topic } from '@/features/topics/types';
 
 import { TalkHeroBackground } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-hero-background';
 import { TalkHeroDetails } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-hero-details';
 import { TalkHeroMedia } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-hero-media';
-import { TalkHeroMetadata } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-hero-metadata';
 import { getVideoThumbnail } from '@/components/media-embed';
 import { Container, Section } from '@/components/ui';
 
@@ -13,11 +11,9 @@ interface TalkHeroProps {
   speaker: Speaker | null;
   speakerSlug: string;
   talk: Talk;
-  talkSlug: string;
-  topics: Topic[];
 }
 
-export function TalkHero({ speaker, speakerSlug, talk, talkSlug, topics }: TalkHeroProps) {
+export function TalkHero({ speaker, speakerSlug, talk }: TalkHeroProps) {
   const imageSrc = getVideoThumbnail(talk.mediaUrl);
 
   return (
@@ -30,14 +26,6 @@ export function TalkHero({ speaker, speakerSlug, talk, talkSlug, topics }: TalkH
 
         {/* Video Player - Full Width */}
         {talk.mediaUrl && <TalkHeroMedia speakerSlug={speakerSlug} talk={talk} />}
-
-        {/* Actions, Topics, Scripture - Below Video */}
-        <TalkHeroMetadata
-          speakerSlug={speakerSlug}
-          talk={talk}
-          talkSlug={talkSlug}
-          topics={topics}
-        />
       </Container>
     </Section>
   );
