@@ -36,7 +36,7 @@ export function SpeakerHeroDetails({ centered = false, speaker }: SpeakerHeroDet
               {speaker.role}
             </p>
           )}
-          <h1 className="font-bold text-4xl text-foreground tracking-tight sm:text-5xl lg:text-6xl">
+          <h1 className="font-semibold text-4xl text-foreground tracking-tight sm:text-5xl lg:text-6xl">
             {speakerName}
           </h1>
           <SpeakerMinistryLink
