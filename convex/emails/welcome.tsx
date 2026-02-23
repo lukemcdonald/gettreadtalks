@@ -4,7 +4,7 @@ import { Button, Section, Text } from '@react-email/components';
 
 import { EmailLayout } from './components/layout';
 
-export function WelcomeEmail({ name }: WelcomeEmailProps) {
+export function WelcomeEmail({ name, siteUrl }: WelcomeEmailProps) {
   return (
     <EmailLayout preview={`Welcome to TREAD Talks, ${name}!`}>
       <Text style={paragraph}>Hi {name},</Text>
@@ -18,7 +18,7 @@ export function WelcomeEmail({ name }: WelcomeEmailProps) {
       <Text style={listItem}>• Get personalized recommendations based on your interests</Text>
       <Text style={paragraph}>Get started by exploring some of our most popular talks:</Text>
       <Section style={buttonContainer}>
-        <Button href={`${process.env.SITE_URL}`} style={button}>
+        <Button href={siteUrl} style={button}>
           Explore Talks
         </Button>
       </Section>

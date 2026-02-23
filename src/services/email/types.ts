@@ -14,4 +14,5 @@ export type VerificationEmailProps = EmailTemplateProps & {
 
 export type WelcomeEmailProps = EmailTemplateProps & {
   name: string;
+  siteUrl: string;
 };
