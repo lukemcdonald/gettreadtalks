@@ -17,7 +17,7 @@ export interface TemplatePropsMap {
 export function getEmailSubject(template: EmailTemplateName): string {
   switch (template) {
     case EMAIL_TEMPLATES.WELCOME:
-      return 'Welcome to TreadTalks!';
+      return 'Welcome to TREAD Talks!';
     case EMAIL_TEMPLATES.VERIFY_EMAIL:
       return 'Verify your email address';
     case EMAIL_TEMPLATES.RESET_PASSWORD:

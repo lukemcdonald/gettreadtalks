@@ -6,10 +6,10 @@ import { EmailLayout } from './components/layout';
 
 export function ResetPasswordTemplate({ email, resetUrl }: PasswordResetEmailProps) {
   return (
-    <EmailLayout preview="Reset your TreadTalks password to regain access to your account.">
+    <EmailLayout preview="Reset your TREAD Talks password to regain access to your account.">
       <Text style={paragraph}>Hi there,</Text>
       <Text style={paragraph}>
-        We received a request to reset the password for your TreadTalks account ({email}). If you
+        We received a request to reset the password for your TREAD Talks account ({email}). If you
         made this request, click the button below to create a new password.
       </Text>
       <Section style={buttonContainer}>
@@ -33,7 +33,7 @@ export function ResetPasswordTemplate({ email, resetUrl }: PasswordResetEmailPro
         If you continue having trouble accessing your account, please contact our support team.
       </Text>
       <Text style={paragraph}>Blessings,</Text>
-      <Text style={paragraph}>The TreadTalks Team</Text>
+      <Text style={paragraph}>The TREAD Talks Team</Text>
     </EmailLayout>
   );
 }
