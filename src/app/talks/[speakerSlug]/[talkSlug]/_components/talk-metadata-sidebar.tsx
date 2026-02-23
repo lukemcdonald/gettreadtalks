@@ -30,7 +30,7 @@ export function TalkMetadataSidebar({
         <h3 className="font-semibold text-muted-foreground text-xs uppercase tracking-widest">
           Actions
         </h3>
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-wrap gap-2">
           <FavoriteTalkButton talkId={talk._id} />
           <FinishTalkButton talkId={talk._id} />
           <ShareTalkButton talkId={talk._id} title={talk.title} url={talkUrl} />
