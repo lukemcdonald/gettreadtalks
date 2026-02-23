@@ -4,6 +4,7 @@ import { v } from 'convex/values';
 import { affiliateLinkTables } from './model/affiliateLinks/schema';
 import { clipTables } from './model/clips/schema';
 import { collectionTables } from './model/collections/schema';
+import { emailTables } from './model/emails/schema';
 import { speakerTables } from './model/speakers/schema';
 import { talkTables } from './model/talks/schema';
 import { topicTables } from './model/topics/schema';
@@ -12,6 +13,7 @@ export default defineSchema({
   ...affiliateLinkTables,
   ...clipTables,
   ...collectionTables,
+  ...emailTables,
   ...speakerTables,
   ...talkTables,
   ...topicTables,
