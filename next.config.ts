@@ -13,6 +13,7 @@ const cspHeader = `
   frame-ancestors 'none';
   frame-src 'self' https://vercel.live https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com;
   img-src 'self' blob: data: https:;
+  media-src 'self' https://*.sermonaudio.com;
   object-src 'none';
   script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live https://va.vercel-scripts.com;
   style-src 'self' 'unsafe-inline';
