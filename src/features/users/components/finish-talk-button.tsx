@@ -3,9 +3,9 @@
 import type { TalkId } from '@/features/talks/types';
 
 import { Authenticated } from 'convex/react';
-import { DynamicIcon } from 'lucide-react/dynamic';
+import { CircleCheckIcon } from 'lucide-react';
 
-import { Button } from '@/components/ui';
+import { ActionIconButton } from '@/components/ui';
 import { useToggleTalkFinished } from '@/features/users/hooks/use-toggle-talk-finished';
 
 interface FinishTalkButtonProps {
@@ -16,16 +16,13 @@ function FinishButton({ talkId }: FinishTalkButtonProps) {
   const { isFinished, isLoading, toggle } = useToggleTalkFinished(talkId);
 
   return (
-    <Button
-      className="justify-start gap-2"
+    <ActionIconButton
       disabled={isLoading}
+      label={isFinished ? 'Mark unfinished' : 'Mark finished'}
       onClick={toggle}
-      type="button"
-      variant={isFinished ? 'secondary' : 'ghost'}
     >
-      <DynamicIcon className="size-4" name={isFinished ? 'circle-check-big' : 'circle-check'} />
-      {isFinished ? 'Finished' : 'Mark Finished'}
-    </Button>
+      <CircleCheckIcon strokeWidth={2.5} />
+    </ActionIconButton>
   );
 }
 
