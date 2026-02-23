@@ -1,3 +1,4 @@
+import type { ReactElement } from 'react';
 import type { MutationCtx } from './_generated/server';
 
 import { Resend, vEmailEvent, vEmailId } from '@convex-dev/resend';
@@ -73,19 +74,19 @@ export const sendPasswordResetEmail = internalAction({
   returns: v.null(),
   handler: async (ctx, args) => {
     try {
-      const html = await render(
-        ResetPasswordTemplate({
-          email: args.email,
-          resetUrl: args.resetUrl,
-          token: args.token,
-        }),
-      );
+      const template = ResetPasswordTemplate({
+        email: args.email,
+        resetUrl: args.resetUrl,
+        token: args.token,
+      });
+      const { html, text } = await renderEmail(template);
 
       await resend.sendEmail(ctx, {
         from: getFromAddress(),
         html,
         replyTo: [getReplyToAddress()],
         subject: 'Reset your password',
+        text,
         to: args.email,
       });
     } catch (err) {
@@ -104,6 +105,7 @@ export const sendTestEmail = internalMutation({
       html: '<p>This is a test email</p>',
       replyTo: [getReplyToAddress()],
       subject: 'Test email from TREAD Talks',
+      text: 'This is a test email',
       to: process.env.RESEND_TO_EMAIL || TEST_DOMAIN_EMAIL,
     });
   },
@@ -118,19 +120,19 @@ export const sendVerificationEmail = internalMutation({
   returns: vEmailId,
   handler: async (ctx, args) => {
     try {
-      const html = await render(
-        VerifyEmailTemplate({
-          email: args.email,
-          token: args.token,
-          verificationUrl: args.verificationUrl,
-        }),
-      );
+      const template = VerifyEmailTemplate({
+        email: args.email,
+        token: args.token,
+        verificationUrl: args.verificationUrl,
+      });
+      const { html, text } = await renderEmail(template);
 
       const emailId = await resend.sendEmail(ctx, {
         from: getFromAddress(),
         html,
         replyTo: [getReplyToAddress()],
         subject: 'Verify your email address',
+        text,
         to: args.email,
       });
 
@@ -153,18 +155,18 @@ export const sendWelcomeEmail = internalMutation({
   returns: vEmailId,
   handler: async (ctx, args) => {
     try {
-      const html = await render(
-        WelcomeEmail({
-          email: args.email,
-          name: args.name,
-        }),
-      );
+      const template = WelcomeEmail({
+        email: args.email,
+        name: args.name,
+      });
+      const { html, text } = await renderEmail(template);
 
       return await resend.sendEmail(ctx, {
         from: getFromAddress(),
         html,
         replyTo: [getReplyToAddress()],
         subject: 'Welcome to TREAD Talks!',
+        text,
         to: args.email,
       });
     } catch {
@@ -186,6 +188,11 @@ function getFromAddress() {
 
 function getReplyToAddress() {
   return REPLY_TO_EMAIL;
+}
+
+async function renderEmail(template: ReactElement) {
+  const [html, text] = await Promise.all([render(template), render(template, { plainText: true })]);
+  return { html, text };
 }
 
 function normalizeRecipients(to: string | string[]): string[] {
