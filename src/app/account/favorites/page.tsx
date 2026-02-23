@@ -16,6 +16,7 @@ import {
   TabsTab,
 } from '@/components/ui';
 import { getUserFavorites } from '@/features/users/queries/get-user-favorites';
+import { OptimisticRow } from '../_components/optimistic-row';
 import { TalkTableRow } from '../_components/talk-table-row';
 import { EntityTableRow } from './_components/entity-table-row';
 import { FavoritesTabPanel } from './_components/favorites-tab-panel';
@@ -60,13 +61,18 @@ export default async function FavoritesPage() {
     items: talks,
     label: 'Talk',
     renderItem: (talk) => (
-      <TalkTableRow
-        action={<UnfavoriteTalkButton talkId={talk._id} />}
-        href={`/talks/${talk.speaker?.slug}/${talk.slug}`}
-        key={talk._id}
-        speaker={talk.speaker}
-        title={talk.title}
-      />
+      <OptimisticRow key={talk._id}>
+        {({ onError, onMutate }) => (
+          <TalkTableRow
+            action={
+              <UnfavoriteTalkButton onError={onError} onMutate={onMutate} talkId={talk._id} />
+            }
+            href={`/talks/${talk.speaker?.slug}/${talk.slug}`}
+            speaker={talk.speaker}
+            title={talk.title}
+          />
+        )}
+      </OptimisticRow>
     ),
     value: 'talks',
   };
@@ -75,12 +81,21 @@ export default async function FavoritesPage() {
     items: speakers,
     label: 'Speaker',
     renderItem: (speaker) => (
-      <EntityTableRow
-        action={<UnfavoriteSpeakerButton speakerId={speaker._id} />}
-        href={`/speakers/${speaker.slug}`}
-        key={speaker._id}
-        title={`${speaker.firstName} ${speaker.lastName}`}
-      />
+      <OptimisticRow key={speaker._id}>
+        {({ onError, onMutate }) => (
+          <EntityTableRow
+            action={
+              <UnfavoriteSpeakerButton
+                onError={onError}
+                onMutate={onMutate}
+                speakerId={speaker._id}
+              />
+            }
+            href={`/speakers/${speaker.slug}`}
+            title={`${speaker.firstName} ${speaker.lastName}`}
+          />
+        )}
+      </OptimisticRow>
     ),
     value: 'speakers',
   };
@@ -89,12 +104,17 @@ export default async function FavoritesPage() {
     items: clips,
     label: 'Clip',
     renderItem: (clip) => (
-      <EntityTableRow
-        action={<UnfavoriteClipButton clipId={clip._id} />}
-        href={`/clips/${clip.slug}`}
-        key={clip._id}
-        title={clip.title}
-      />
+      <OptimisticRow key={clip._id}>
+        {({ onError, onMutate }) => (
+          <EntityTableRow
+            action={
+              <UnfavoriteClipButton clipId={clip._id} onError={onError} onMutate={onMutate} />
+            }
+            href={`/clips/${clip.slug}`}
+            title={clip.title}
+          />
+        )}
+      </OptimisticRow>
     ),
     value: 'clips',
   };

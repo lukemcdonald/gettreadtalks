@@ -36,17 +36,58 @@ function UnfavoriteButton({ disabled, onRemove }: UnfavoriteButtonProps) {
   );
 }
 
-export function UnfavoriteClipButton({ clipId }: { clipId: Id<'clips'> }) {
-  const { isLoading, mutate } = useMutation(api.users.unfavoriteClip);
-  return <UnfavoriteButton disabled={isLoading} onRemove={() => mutate({ clipId })} />;
+interface OptimisticCallbacks {
+  onError?: () => void;
+  onMutate?: () => void;
 }
 
-export function UnfavoriteSpeakerButton({ speakerId }: { speakerId: Id<'speakers'> }) {
-  const { isLoading, mutate } = useMutation(api.users.unfavoriteSpeaker);
-  return <UnfavoriteButton disabled={isLoading} onRemove={() => mutate({ speakerId })} />;
+export function UnfavoriteClipButton({
+  clipId,
+  onError,
+  onMutate,
+}: { clipId: Id<'clips'> } & OptimisticCallbacks) {
+  const { isLoading, mutate } = useMutation(api.users.unfavoriteClip, { onError });
+
+  const handleRemove = () => {
+    if (onMutate) {
+      onMutate();
+    }
+    mutate({ clipId });
+  };
+
+  return <UnfavoriteButton disabled={isLoading} onRemove={handleRemove} />;
 }
 
-export function UnfavoriteTalkButton({ talkId }: { talkId: Id<'talks'> }) {
-  const { isLoading, mutate } = useMutation(api.users.unfavoriteTalk);
-  return <UnfavoriteButton disabled={isLoading} onRemove={() => mutate({ talkId })} />;
+export function UnfavoriteSpeakerButton({
+  onError,
+  onMutate,
+  speakerId,
+}: { speakerId: Id<'speakers'> } & OptimisticCallbacks) {
+  const { isLoading, mutate } = useMutation(api.users.unfavoriteSpeaker, { onError });
+
+  const handleRemove = () => {
+    if (onMutate) {
+      onMutate();
+    }
+    mutate({ speakerId });
+  };
+
+  return <UnfavoriteButton disabled={isLoading} onRemove={handleRemove} />;
+}
+
+export function UnfavoriteTalkButton({
+  onError,
+  onMutate,
+  talkId,
+}: { talkId: Id<'talks'> } & OptimisticCallbacks) {
+  const { isLoading, mutate } = useMutation(api.users.unfavoriteTalk, { onError });
+
+  const handleRemove = () => {
+    if (onMutate) {
+      onMutate();
+    }
+    mutate({ talkId });
+  };
+
+  return <UnfavoriteButton disabled={isLoading} onRemove={handleRemove} />;
 }

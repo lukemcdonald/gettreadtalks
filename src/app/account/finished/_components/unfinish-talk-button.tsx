@@ -9,11 +9,20 @@ import { api } from '@/convex/_generated/api';
 import { useMutation } from '@/hooks';
 
 interface UnfinishTalkButtonProps {
+  onError?: () => void;
+  onMutate?: () => void;
   talkId: Id<'talks'>;
 }
 
-export function UnfinishTalkButton({ talkId }: UnfinishTalkButtonProps) {
-  const { isLoading, mutate } = useMutation(api.users.unfinishTalk);
+export function UnfinishTalkButton({ onError, onMutate, talkId }: UnfinishTalkButtonProps) {
+  const { isLoading, mutate } = useMutation(api.users.unfinishTalk, { onError });
+
+  const handleRemove = () => {
+    if (onMutate) {
+      onMutate();
+    }
+    mutate({ talkId });
+  };
 
   return (
     <Tooltip>
@@ -21,7 +30,7 @@ export function UnfinishTalkButton({ talkId }: UnfinishTalkButtonProps) {
         render={() => (
           <Button
             disabled={isLoading}
-            onClick={() => mutate({ talkId })}
+            onClick={handleRemove}
             size="icon-sm"
             type="button"
             variant="ghost"
