@@ -26,7 +26,7 @@ export function EmailLayout({ children, preview }: EmailLayoutProps) {
         <Container style={container}>
           <Section style={content}>
             <Section style={header}>
-              <Heading style={h1}>TreadTalks</Heading>
+              <Heading style={h1}>TREAD Talks</Heading>
               <Text style={subtitle}>Christian talks and insights</Text>
             </Section>
 
@@ -38,10 +38,10 @@ export function EmailLayout({ children, preview }: EmailLayoutProps) {
 
             <Section style={footer}>
               <Text style={footerText}>
-                You received this email because you have an account with TreadTalks.
+                You received this email because you have an account with TREAD Talks.
               </Text>
               <Text style={footerText}>
-                TreadTalks • Your trusted source for Christian talks and insights
+                TREAD Talks • Your trusted source for Christian talks and insights
               </Text>
             </Section>
           </Section>

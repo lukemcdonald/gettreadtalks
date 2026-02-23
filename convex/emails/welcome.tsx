@@ -6,10 +6,10 @@ import { EmailLayout } from './components/layout';
 
 export function WelcomeEmail({ name }: WelcomeEmailProps) {
   return (
-    <EmailLayout preview={`Welcome to TreadTalks, ${name}!`}>
+    <EmailLayout preview={`Welcome to TREAD Talks, ${name}!`}>
       <Text style={paragraph}>Hi {name},</Text>
       <Text style={paragraph}>
-        Welcome to TreadTalks! We're excited to have you join our community of believers seeking to
+        Welcome to TREAD Talks! We're excited to have you join our community of believers seeking to
         deepen their faith through inspiring talks and insights.
       </Text>
       <Text style={paragraph}>With your new account, you can:</Text>
@@ -26,7 +26,7 @@ export function WelcomeEmail({ name }: WelcomeEmailProps) {
         If you have any questions or need help getting started, don't hesitate to reach out to us.
       </Text>
       <Text style={paragraph}>Blessings,</Text>
-      <Text style={paragraph}>The TreadTalks Team</Text>
+      <Text style={paragraph}>The TREAD Talks Team</Text>
     </EmailLayout>
   );
 }
