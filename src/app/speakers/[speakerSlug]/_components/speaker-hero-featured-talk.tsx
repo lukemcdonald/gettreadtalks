@@ -5,6 +5,7 @@ import { ArrowRightIcon } from 'lucide-react';
 import Link from 'next/link';
 
 import { MediaEmbed } from '@/components/media-embed';
+import { Card } from '@/components/ui';
 import { getTalkUrl } from '@/features/talks/utils';
 
 interface SpeakerHeroFeaturedTalkProps {
@@ -14,20 +15,19 @@ interface SpeakerHeroFeaturedTalkProps {
 
 export function SpeakerHeroFeaturedTalk({ speaker, talk }: SpeakerHeroFeaturedTalkProps) {
   return (
-    <div className="flex flex-col">
-      <div className="overflow-hidden rounded-2xl shadow-2xl">
-        <MediaEmbed mediaUrl={talk.mediaUrl} title={talk.title} />
-      </div>
+    <Card className="overflow-clip shadow-2xl">
+      <MediaEmbed mediaUrl={talk.mediaUrl} title={talk.title} />
 
-      <div className="mt-4 flex items-center justify-between gap-4">
-        <h2 className="font-medium text-muted-foreground text-sm">{talk.title}</h2>
-        <Link
-          className="inline-flex shrink-0 items-center gap-1.5 font-medium text-muted-foreground text-sm transition-colors hover:text-foreground"
-          href={getTalkUrl(speaker.slug, talk.slug)}
-        >
+      <Link
+        className="flex items-center justify-between gap-4 px-4 py-3 text-muted-foreground text-sm transition-colors hover:text-foreground"
+        href={getTalkUrl(speaker.slug, talk.slug)}
+      >
+        <h2>{talk.title}</h2>
+
+        <span className="inline-flex shrink-0 items-center gap-1.5">
           View details <ArrowRightIcon className="size-3.5" />
-        </Link>
-      </div>
-    </div>
+        </span>
+      </Link>
+    </Card>
   );
 }

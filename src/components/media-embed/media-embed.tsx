@@ -22,10 +22,9 @@ export function MediaEmbed({
   trackingContext,
 }: MediaEmbedProps) {
   const media = detectMediaType(mediaUrl);
-  const isMediaPlayer = media.type !== 'unknown';
 
   return (
-    <div className={cn(isMediaPlayer && 'pb-4 sm:pb-6 md:pb-8', className)}>
+    <div className={className}>
       {media.type === 'audio' && <AudioPlayer src={media.src} trackingContext={trackingContext} />}
       {media.type === 'unknown' && (
         <ExternalLinkButton className="rounded-full" href={media.href} label="Open Media" />
