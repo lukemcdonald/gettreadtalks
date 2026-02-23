@@ -5,13 +5,15 @@ import type { MediaTrackingContext } from '../types';
 import { useRef } from 'react';
 
 import { useAnalytics } from '@/lib/analytics';
+import { cn } from '@/utils';
 
 interface AudioPlayerProps {
+  className?: string;
   src: string;
   trackingContext?: MediaTrackingContext;
 }
 
-export function AudioPlayer({ src, trackingContext }: AudioPlayerProps) {
+export function AudioPlayer({ className, src, trackingContext }: AudioPlayerProps) {
   const { track } = useAnalytics();
   const hasPlayed = useRef(false);
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -40,6 +42,7 @@ export function AudioPlayer({ src, trackingContext }: AudioPlayerProps) {
     if (!(trackingContext && audioRef.current)) {
       return;
     }
+
     const el = audioRef.current;
     const progress_pct = Math.round((el.currentTime / el.duration) * 100);
 
@@ -77,10 +80,10 @@ export function AudioPlayer({ src, trackingContext }: AudioPlayerProps) {
   };
 
   return (
-    <div className="rounded-lg border bg-muted/50 p-4">
+    <>
       {/* biome-ignore lint/a11y/useMediaCaption: Caption files not available for dynamically embedded media */}
       <audio
-        className="w-full"
+        className={cn('scheme-dark w-full', className)}
         controls
         onEnded={handleEnded}
         onPause={handlePause}
@@ -91,6 +94,6 @@ export function AudioPlayer({ src, trackingContext }: AudioPlayerProps) {
       >
         Your browser does not support the audio element.
       </audio>
-    </div>
+    </>
   );
 }
