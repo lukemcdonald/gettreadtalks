@@ -26,7 +26,9 @@ export function MediaEmbed({
   return (
     <div className={cn(className)}>
       {media.type === 'audio' && <AudioPlayer src={media.src} trackingContext={trackingContext} />}
-      {media.type === 'unknown' && <ExternalLinkButton href={media.href} />}
+      {media.type === 'unknown' && (
+        <ExternalLinkButton className="rounded-full" href={media.href} label="Open Media" />
+      )}
       {media.type === 'video' && <VideoPlayer src={media.src} trackingContext={trackingContext} />}
       {media.type === 'vimeo' && <VimeoEmbed id={media.id} title={title} />}
       {media.type === 'youtube' && <YouTubeEmbed id={media.id} title={title} />}

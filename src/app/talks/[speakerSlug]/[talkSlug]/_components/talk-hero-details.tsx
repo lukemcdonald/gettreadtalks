@@ -13,8 +13,8 @@ export function TalkHeroDetails({ speaker, talk }: TalkHeroDetailsProps) {
   const speakerName = getSpeakerName(speaker ?? undefined);
 
   return (
-    <div className="space-y-4 text-center">
-      <h1 className="font-bold text-3xl text-foreground tracking-tight sm:text-4xl lg:text-5xl">
+    <div className="space-y-2 text-center">
+      <h1 className="font-semibold text-2xl text-foreground tracking-tight sm:text-3xl lg:text-4xl">
         {talk.title}
       </h1>
       {speaker && (
