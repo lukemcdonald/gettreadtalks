@@ -45,24 +45,9 @@ export function ShareTalkButton({ talkId, title, url }: ShareTalkButtonProps) {
   }, [talkId, title, url, track]);
 
   return (
-    <Tooltip>
-      <TooltipTrigger
-        render={() => (
-          <Button
-            className="rounded-full"
-            onClick={handleShare}
-            size="icon"
-            type="button"
-            variant="default"
-          >
-            {copied ? <CheckIcon className="size-4" /> : <ShareIcon className="size-4" />}
-          </Button>
-        )}
-      />
-
-      <TooltipContent>
-        <p>{copied ? 'Link copied!' : 'Share this talk'}</p>
-      </TooltipContent>
-    </Tooltip>
+    <Button className="justify-start gap-2" onClick={handleShare} type="button" variant="ghost">
+      {copied ? <CheckIcon className="size-4" /> : <ShareIcon className="size-4" />}
+      {copied ? 'Link Copied!' : 'Share'}
+    </Button>
   );
 }

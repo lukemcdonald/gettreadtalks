@@ -72,18 +72,13 @@ export default async function TalkPage({ params }: TalkPageProps) {
             collection={collection}
             relatedTalks={relatedTalks}
             speaker={speaker}
-            talk={talk}
-          />
-        }
-        hero={
-          <TalkHero
-            speaker={speaker}
             speakerSlug={speakerSlug}
             talk={talk}
             talkSlug={talkSlug}
             topics={topics}
           />
         }
+        hero={<TalkHero speaker={speaker} speakerSlug={speakerSlug} talk={talk} />}
       />
     </>
   );

@@ -36,26 +36,16 @@ function FinishButton({ talkId }: FinishTalkButtonProps) {
   };
 
   return (
-    <Tooltip>
-      <TooltipTrigger
-        render={() => (
-          <Button
-            className="rounded-full"
-            disabled={isProcessing}
-            onClick={handleToggleFinish}
-            size="icon"
-            type="button"
-            variant={isFinished ? 'secondary' : 'default'}
-          >
-            <DynamicIcon name={isFinished ? 'circle-check-big' : 'circle-check'} />
-          </Button>
-        )}
-      />
-
-      <TooltipContent>
-        <p>{isFinished ? 'Mark as not finished' : 'Mark as finished'}</p>
-      </TooltipContent>
-    </Tooltip>
+    <Button
+      className="justify-start gap-2"
+      disabled={isProcessing}
+      onClick={handleToggleFinish}
+      type="button"
+      variant={isFinished ? 'secondary' : 'ghost'}
+    >
+      <DynamicIcon className="size-4" name={isFinished ? 'circle-check-big' : 'circle-check'} />
+      {isFinished ? 'Finished' : 'Mark Finished'}
+    </Button>
   );
 }
 
