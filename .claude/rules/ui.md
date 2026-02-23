@@ -1,4 +1,6 @@
-# Base UI
+# UI
+
+Project uses Coss UI components that are built on top of Base UI component library.
 
 ## FieldError with React Hook Form
 
