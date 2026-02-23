@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 import {
   Badge,
   Card,
@@ -8,18 +10,15 @@ import {
   EmptyDescription,
   EmptyHeader,
   EmptyTitle,
-  Link,
   Separator,
-  TableCell,
-  TableRow,
   Tabs,
   TabsList,
-  TabsPanel,
   TabsTab,
 } from '@/components/ui';
 import { getUserFavorites } from '@/features/users/queries/get-user-favorites';
-import { AccountTable } from '../_components/account-table';
 import { TalkTableRow } from '../_components/talk-table-row';
+import { EntityTableRow } from './_components/entity-table-row';
+import { FavoritesTabPanel } from './_components/favorites-tab-panel';
 import {
   UnfavoriteClipButton,
   UnfavoriteSpeakerButton,
@@ -43,20 +42,67 @@ function FavoritesTab({ count, label, value }: FavoritesTabProps) {
   );
 }
 
+interface TabConfig<T> {
+  items: T[];
+  label: string;
+  renderItem: (item: T) => ReactNode;
+  value: string;
+}
+
 export default async function FavoritesPage() {
   const favorites = await getUserFavorites();
 
   const talks = favorites?.talks ?? [];
   const speakers = favorites?.speakers ?? [];
   const clips = favorites?.clips ?? [];
-  const total = talks.length + speakers.length + clips.length;
 
-  let defaultTab = 'clips';
-  if (talks.length > 0) {
-    defaultTab = 'talks';
-  } else if (speakers.length > 0) {
-    defaultTab = 'speakers';
-  }
+  const talksTab: TabConfig<(typeof talks)[number]> = {
+    items: talks,
+    label: 'Talk',
+    renderItem: (talk) => (
+      <TalkTableRow
+        action={<UnfavoriteTalkButton talkId={talk._id} />}
+        href={`/talks/${talk.speaker?.slug}/${talk.slug}`}
+        key={talk._id}
+        speaker={talk.speaker}
+        title={talk.title}
+      />
+    ),
+    value: 'talks',
+  };
+
+  const speakersTab: TabConfig<(typeof speakers)[number]> = {
+    items: speakers,
+    label: 'Speaker',
+    renderItem: (speaker) => (
+      <EntityTableRow
+        action={<UnfavoriteSpeakerButton speakerId={speaker._id} />}
+        href={`/speakers/${speaker.slug}`}
+        key={speaker._id}
+        title={`${speaker.firstName} ${speaker.lastName}`}
+      />
+    ),
+    value: 'speakers',
+  };
+
+  const clipsTab: TabConfig<(typeof clips)[number]> = {
+    items: clips,
+    label: 'Clip',
+    renderItem: (clip) => (
+      <EntityTableRow
+        action={<UnfavoriteClipButton clipId={clip._id} />}
+        href={`/clips/${clip.slug}`}
+        key={clip._id}
+        title={clip.title}
+      />
+    ),
+    value: 'clips',
+  };
+
+  const tabs = [talksTab, speakersTab, clipsTab];
+  const activeTabs = tabs.filter((tab) => tab.items.length > 0);
+  const total = talks.length + speakers.length + clips.length;
+  const defaultTab = activeTabs[0]?.value ?? 'talks';
 
   return (
     <Card>
@@ -84,71 +130,26 @@ export default async function FavoritesPage() {
         <Tabs defaultValue={defaultTab}>
           <div className="border-b px-6">
             <TabsList variant="underline">
-              {talks.length > 0 && (
-                <FavoritesTab count={talks.length} label="Talks" value="talks" />
-              )}
-              {speakers.length > 0 && (
-                <FavoritesTab count={speakers.length} label="Speakers" value="speakers" />
-              )}
-              {clips.length > 0 && (
-                <FavoritesTab count={clips.length} label="Clips" value="clips" />
-              )}
+              {activeTabs.map((tab) => (
+                <FavoritesTab
+                  count={tab.items.length}
+                  key={tab.value}
+                  label={`${tab.label}s`}
+                  value={tab.value}
+                />
+              ))}
             </TabsList>
           </div>
 
-          {talks.length > 0 && (
-            <TabsPanel value="talks">
-              <AccountTable label="Talk">
-                {talks.map((talk) => (
-                  <TalkTableRow
-                    action={<UnfavoriteTalkButton talkId={talk._id} />}
-                    href={`/talks/${talk.speaker?.slug}/${talk.slug}`}
-                    key={talk._id}
-                    speaker={talk.speaker}
-                    title={talk.title}
-                  />
-                ))}
-              </AccountTable>
-            </TabsPanel>
-          )}
-
-          {speakers.length > 0 && (
-            <TabsPanel value="speakers">
-              <AccountTable label="Speaker">
-                {speakers.map((speaker) => (
-                  <TableRow key={speaker._id}>
-                    <TableCell>
-                      <div className="flex items-center justify-between gap-4">
-                        <Link className="hover:underline" href={`/speakers/${speaker.slug}`}>
-                          {speaker.firstName} {speaker.lastName}
-                        </Link>
-                        <UnfavoriteSpeakerButton speakerId={speaker._id} />
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </AccountTable>
-            </TabsPanel>
-          )}
-
-          {clips.length > 0 && (
-            <TabsPanel value="clips">
-              <AccountTable label="Clip">
-                {clips.map((clip) => (
-                  <TableRow key={clip._id}>
-                    <TableCell>
-                      <div className="flex items-center justify-between gap-4">
-                        <Link className="hover:underline" href={`/clips/${clip.slug}`}>
-                          {clip.title}
-                        </Link>
-                        <UnfavoriteClipButton clipId={clip._id} />
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </AccountTable>
-            </TabsPanel>
-          )}
+          {activeTabs.map((tab) => (
+            <FavoritesTabPanel
+              items={tab.items as never[]}
+              key={tab.value}
+              label={tab.label}
+              renderItem={tab.renderItem as (item: never) => ReactNode}
+              value={tab.value}
+            />
+          ))}
         </Tabs>
       )}
     </Card>
