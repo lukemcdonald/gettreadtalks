@@ -7,7 +7,6 @@ import {
   Heading,
   Hr,
   Html,
-  Link,
   Preview,
   Section,
   Text,
@@ -40,13 +39,6 @@ export function EmailLayout({ children, preview }: EmailLayoutProps) {
             <Section style={footer}>
               <Text style={footerText}>
                 You received this email because you have an account with TreadTalks.
-              </Text>
-              <Text style={footerText}>
-                If you no longer wish to receive these emails, you can{' '}
-                <Link href="#" style={link}>
-                  unsubscribe here
-                </Link>
-                .
               </Text>
               <Text style={footerText}>
                 TreadTalks • Your trusted source for Christian talks and insights
@@ -117,9 +109,4 @@ const footerText = {
   fontSize: '12px',
   lineHeight: '16px',
   margin: '0 0 8px',
-};
-
-const link = {
-  color: '#2754C5',
-  textDecoration: 'underline',
 };
