@@ -5,41 +5,21 @@ import type { TalkId } from '@/features/talks/types';
 import { Authenticated } from 'convex/react';
 import { DynamicIcon } from 'lucide-react/dynamic';
 
-import { Button, Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui';
-import {
-  useFinishTalk,
-  useIsTalkFinished,
-  useUnfinishTalk,
-} from '@/features/users/hooks/use-finish-talk';
-import { useAnalytics } from '@/lib/analytics';
+import { Button } from '@/components/ui';
+import { useToggleTalkFinished } from '@/features/users/hooks/use-toggle-talk-finished';
 
 interface FinishTalkButtonProps {
   talkId: TalkId;
 }
 
 function FinishButton({ talkId }: FinishTalkButtonProps) {
-  const { data: isFinished, isLoading: isCheckingFinished } = useIsTalkFinished(talkId);
-  const finishTalk = useFinishTalk();
-  const unfinishTalk = useUnfinishTalk();
-  const { track } = useAnalytics();
-
-  const isProcessing = isCheckingFinished || finishTalk.isLoading || unfinishTalk.isLoading;
-
-  const handleToggleFinish = () => {
-    if (isFinished) {
-      unfinishTalk.mutate({ talkId });
-      track('talk_unfinished', { talk_id: talkId });
-    } else {
-      finishTalk.mutate({ talkId });
-      track('talk_finished', { talk_id: talkId });
-    }
-  };
+  const { isFinished, isLoading, toggle } = useToggleTalkFinished(talkId);
 
   return (
     <Button
       className="justify-start gap-2"
-      disabled={isProcessing}
-      onClick={handleToggleFinish}
+      disabled={isLoading}
+      onClick={toggle}
       type="button"
       variant={isFinished ? 'secondary' : 'ghost'}
     >
