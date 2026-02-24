@@ -4,6 +4,7 @@ import type { Topic } from '@/features/topics/types';
 import { ExternalLinkIcon } from 'lucide-react';
 
 import { Link } from '@/components/ui/link';
+import { FeatureTalkButton } from '@/features/talks/components/feature-talk-button';
 import { ShareTalkButton } from '@/features/talks/components/share-talk-button';
 import { FavoriteTalkButton } from '@/features/users/components/favorite-talk-button';
 import { FinishTalkButton } from '@/features/users/components/finish-talk-button';
@@ -31,6 +32,7 @@ export function TalkMetadataSidebar({
           Actions
         </h3>
         <div className="flex flex-wrap gap-2">
+          <FeatureTalkButton featured={talk.featured ?? false} talkId={talk._id} />
           <FavoriteTalkButton talkId={talk._id} />
           <FinishTalkButton talkId={talk._id} />
           <ShareTalkButton talkId={talk._id} title={talk.title} url={talkUrl} />
