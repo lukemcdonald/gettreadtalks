@@ -32,10 +32,10 @@ export function TalkMetadataSidebar({
           Actions
         </h3>
         <div className="flex flex-wrap gap-2">
-          <FeatureTalkButton featured={talk.featured ?? false} talkId={talk._id} />
+          <ShareTalkButton talkId={talk._id} title={talk.title} url={talkUrl} />
           <FavoriteTalkButton talkId={talk._id} />
           <FinishTalkButton talkId={talk._id} />
-          <ShareTalkButton talkId={talk._id} title={talk.title} url={talkUrl} />
+          <FeatureTalkButton featured={talk.featured ?? false} talkId={talk._id} />
         </div>
       </div>
 
