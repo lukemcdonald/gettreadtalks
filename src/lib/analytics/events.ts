@@ -13,7 +13,9 @@ export interface EventMap {
 
   // Engagement
   talk_favorited: { talk_id: string };
+  talk_featured: { talk_id: string };
   talk_unfavorited: { talk_id: string };
+  talk_unfeatured: { talk_id: string };
   talk_finished: { talk_id: string };
   talk_unfinished: { talk_id: string };
   talk_shared: { method: 'clipboard' | 'share_api'; talk_id: string };
