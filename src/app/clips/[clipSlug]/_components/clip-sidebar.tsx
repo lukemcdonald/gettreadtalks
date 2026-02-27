@@ -1,6 +1,7 @@
 import type { Speaker } from '@/features/speakers/types';
 import type { Talk } from '@/features/talks/types';
 
+import { ArrowRightIcon } from 'lucide-react';
 import Link from 'next/link';
 
 import { SidebarContent } from '@/components/sidebar-content';
@@ -24,10 +25,11 @@ export function ClipSidebar({ speaker, talk }: ClipSidebarProps) {
               <p className="text-muted-foreground text-sm">{speaker.ministry}</p>
             )}
             <Link
-              className="text-primary text-sm hover:underline"
+              className="inline-flex items-center gap-1.5 text-primary text-sm hover:underline"
               href={`/speakers/${speaker.slug}`}
             >
-              View all talks →
+              View all talks
+              <ArrowRightIcon className="size-3.5" />
             </Link>
           </div>
         </SidebarContent>
@@ -41,10 +43,11 @@ export function ClipSidebar({ speaker, talk }: ClipSidebarProps) {
               <p className="line-clamp-2 text-muted-foreground text-sm">{talk.description}</p>
             )}
             <Link
-              className="text-primary text-sm hover:underline"
+              className="inline-flex items-center gap-1.5 text-primary text-sm hover:underline"
               href={getTalkUrl(speaker.slug, talk.slug)}
             >
-              View talk →
+              View talk
+              <ArrowRightIcon className="size-3.5" />
             </Link>
           </div>
         </SidebarContent>

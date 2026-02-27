@@ -3,6 +3,7 @@
 import type { TalkWithSpeaker } from '@/features/talks/types';
 import type { Topic } from '@/features/topics/types';
 
+import { ArrowRightIcon } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 
 import { Button } from '@/components/ui';
@@ -58,10 +59,11 @@ export function TopicsBrowseContent({ topics }: TopicsBrowseContentProps) {
       {selectedTopics.length > 0 && (
         <div className="pt-4">
           <Link
-            className="font-medium text-lg text-primary hover:underline"
+            className="inline-flex items-center gap-1.5 font-medium text-lg text-primary hover:underline"
             href={`/talks?topics=${selectedTopics.join(',')}`}
           >
-            View all talks in these topics →
+            View all talks in these topics
+            <ArrowRightIcon className="size-4" />
           </Link>
         </div>
       )}
