@@ -15,9 +15,7 @@ interface TalkContentSectionsProps {
   collection: Collection | null;
   relatedTalks?: Talk[];
   speaker: Speaker | null;
-  speakerSlug: string;
   talk: Talk;
-  talkSlug: string;
   topics: Topic[];
 }
 
@@ -26,9 +24,7 @@ export function TalkContentSections({
   collection,
   relatedTalks = [],
   speaker,
-  speakerSlug,
   talk,
-  talkSlug,
   topics,
 }: TalkContentSectionsProps) {
   const speakerName = getSpeakerName(speaker ?? undefined);
@@ -105,12 +101,7 @@ export function TalkContentSections({
 
           {/* Metadata Sidebar */}
           <aside className="order-1 xl:sticky xl:top-20 xl:order-2 xl:col-span-3 xl:h-fit">
-            <TalkMetadataSidebar
-              speakerSlug={speakerSlug}
-              talk={talk}
-              talkSlug={talkSlug}
-              topics={topics}
-            />
+            <TalkMetadataSidebar talk={talk} topics={topics} />
           </aside>
         </div>
       </Container>
