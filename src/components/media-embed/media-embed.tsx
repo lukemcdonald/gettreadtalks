@@ -22,9 +22,10 @@ export function MediaEmbed({
   trackingContext,
 }: MediaEmbedProps) {
   const media = detectMediaType(mediaUrl);
+  const isVideo = media.type === 'video' || media.type === 'vimeo' || media.type === 'youtube';
 
   return (
-    <div className={className}>
+    <div className={cn(isVideo && 'overflow-hidden rounded-2xl', className)}>
       {media.type === 'audio' && <AudioPlayer src={media.src} trackingContext={trackingContext} />}
       {media.type === 'unknown' && (
         <ExternalLinkButton className="rounded-full" href={media.href} label="Open Media" />

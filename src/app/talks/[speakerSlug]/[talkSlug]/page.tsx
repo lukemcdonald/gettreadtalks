@@ -59,6 +59,7 @@ export default async function TalkPage({ params }: TalkPageProps) {
     name: talk.title,
     ...(speakerName && { creator: { '@type': 'Person', name: speakerName } }),
     ...(talk.publishedAt && { uploadDate: new Date(talk.publishedAt).toISOString() }),
+    // TODO: Shoudl the url come from a config?
     url: `https://gettreadtalks.com/talks/${speakerSlug}/${talkSlug}`,
   };
 
