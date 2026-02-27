@@ -58,10 +58,17 @@ export function SpeakerContentSections({
                   ]
                 : undefined
             }
+            sticky
             title="Talks"
           >
             {displayedTalks.map((talk) => (
-              <SpeakerTalkCard key={talk._id} speakerSlug={speaker.slug} talk={talk} />
+              <SpeakerTalkCard
+                key={talk._id}
+                speaker={speaker}
+                // TODO: We should find and remove all speakerSlug props where speaker and speaker.slug can be used instead. Same with other entities like talkSlug and talk.slug etc.
+                speakerSlug={speaker.slug}
+                talk={talk}
+              />
             ))}
           </FeaturedGrid>
         )}
@@ -80,6 +87,7 @@ export function SpeakerContentSections({
                   ]
                 : undefined
             }
+            sticky
             title="Collections"
           >
             {displayedCollections.map((collection) => (
