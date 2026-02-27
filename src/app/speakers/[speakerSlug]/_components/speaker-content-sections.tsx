@@ -3,6 +3,7 @@ import type { Collection } from '@/features/collections/types';
 import type { Speaker } from '@/features/speakers/types';
 import type { Talk } from '@/features/talks/types';
 
+import { SpeakerMetadataSidebar } from '@/app/speakers/[speakerSlug]/_components/speaker-metadata-sidebar';
 import { FeaturedGrid } from '@/components/featured-grid';
 import { getSpeakerName } from '@/features/speakers/utils';
 import { SpeakerClipCard } from './speaker-clip-card';
@@ -37,86 +38,95 @@ export function SpeakerContentSections({
   const hasMoreClips = clips.length > MAX_CLIPS;
 
   return (
-    <>
-      {talks.length > 0 && (
-        <FeaturedGrid
-          columns={{ default: 1, sm: 2, md: 2, lg: 2 }}
-          description={`Enjoy more sermons by ${speakerTitle}.`}
-          quickLinks={
-            hasMoreTalks
-              ? [
-                  {
-                    label: `View all ${talks.length} talks →`,
-                    href: `/talks?speakers=${speaker.slug}`,
-                  },
-                ]
-              : undefined
-          }
-          title="Talks"
-        >
-          {displayedTalks.map((talk) => (
-            <SpeakerTalkCard key={talk._id} speakerSlug={speaker.slug} talk={talk} />
-          ))}
-        </FeaturedGrid>
-      )}
+    <div className="grid grid-cols-1 gap-x-8 gap-y-12 xl:grid-cols-12">
+      {/* Main Content */}
+      <div className="order-2 space-y-16 xl:order-1 xl:col-span-9">
+        {talks.length > 0 && (
+          <FeaturedGrid
+            columns={{ default: 1 }}
+            description={`Enjoy more sermons by ${speakerTitle}.`}
+            // TODO: Is there a cleaner way to handle and define these quicklinks. The markup is very ugly in all cases and seems overly complex. Is ternary needed
+            quickLinks={
+              hasMoreTalks
+                ? [
+                    {
+                      label: `View all ${talks.length} talks →`,
+                      href: `/talks?speakers=${speaker.slug}`,
+                    },
+                  ]
+                : undefined
+            }
+            title="Talks"
+          >
+            {displayedTalks.map((talk) => (
+              <SpeakerTalkCard key={talk._id} speakerSlug={speaker.slug} talk={talk} />
+            ))}
+          </FeaturedGrid>
+        )}
 
-      {collections.length > 0 && (
-        <FeaturedGrid
-          columns={{ default: 1, sm: 2, md: 2, lg: 2 }}
-          description={`Curated series featuring ${speakerTitle}.`}
-          quickLinks={
-            hasMoreCollections
-              ? [
-                  {
-                    label: `View all ${collections.length} collections →`,
-                    href: `/collections?speakerSlug=${speaker.slug}`,
-                  },
-                ]
-              : undefined
-          }
-          title="Collections"
-        >
-          {displayedCollections.map((collection) => (
-            <SpeakerCollectionCard
-              collection={{
-                description: collection.description,
-                slug: collection.slug,
-                title: collection.title,
-              }}
-              key={collection._id}
-            />
-          ))}
-        </FeaturedGrid>
-      )}
+        {collections.length > 0 && (
+          <FeaturedGrid
+            columns={{ default: 1 }}
+            description={`Curated series featuring ${speakerTitle}.`}
+            quickLinks={
+              hasMoreCollections
+                ? [
+                    {
+                      label: `View all ${collections.length} collections →`,
+                      href: `/collections?speakerSlug=${speaker.slug}`,
+                    },
+                  ]
+                : undefined
+            }
+            title="Collections"
+          >
+            {displayedCollections.map((collection) => (
+              <SpeakerCollectionCard
+                collection={{
+                  description: collection.description,
+                  slug: collection.slug,
+                  title: collection.title,
+                }}
+                key={collection._id}
+              />
+            ))}
+          </FeaturedGrid>
+        )}
 
-      {clips.length > 0 && (
-        <FeaturedGrid
-          columns={{ default: 1, sm: 2, md: 2, lg: 2 }}
-          description={`Short, impactful moments from ${speakerTitle}.`}
-          quickLinks={
-            hasMoreClips
-              ? [
-                  {
-                    label: `View all ${clips.length} clips →`,
-                    href: `/clips?speakers=${speaker.slug}`,
-                  },
-                ]
-              : undefined
-          }
-          title="Clips"
-        >
-          {displayedClips.map((clip) => (
-            <SpeakerClipCard
-              clip={{
-                description: clip.description,
-                slug: clip.slug,
-                title: clip.title,
-              }}
-              key={clip._id}
-            />
-          ))}
-        </FeaturedGrid>
-      )}
-    </>
+        {clips.length > 0 && (
+          <FeaturedGrid
+            columns={{ default: 1 }}
+            description={`Short, impactful moments from ${speakerTitle}.`}
+            quickLinks={
+              hasMoreClips
+                ? [
+                    {
+                      label: `View all ${clips.length} clips →`,
+                      href: `/clips?speakers=${speaker.slug}`,
+                    },
+                  ]
+                : undefined
+            }
+            title="Clips"
+          >
+            {displayedClips.map((clip) => (
+              <SpeakerClipCard
+                clip={{
+                  description: clip.description,
+                  slug: clip.slug,
+                  title: clip.title,
+                }}
+                key={clip._id}
+              />
+            ))}
+          </FeaturedGrid>
+        )}
+      </div>
+
+      {/* Metadata Sidebar */}
+      <aside className="order-1 xl:sticky xl:top-20 xl:order-2 xl:col-span-3 xl:h-fit">
+        <SpeakerMetadataSidebar speaker={speaker} />
+      </aside>
+    </div>
   );
 }
