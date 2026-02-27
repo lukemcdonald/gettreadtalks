@@ -5,16 +5,17 @@ import { ShareSpeakerButton } from '@/features/speakers/components/share-speaker
 import { FavoriteSpeakerButton } from '@/features/users/components/favorite-speaker-button';
 
 interface SpeakerMetadataSidebarProps {
+  hideAbout?: boolean;
   speaker: Speaker;
 }
 
-export function SpeakerMetadataSidebar({ speaker }: SpeakerMetadataSidebarProps) {
+export function SpeakerMetadataSidebar({ hideAbout, speaker }: SpeakerMetadataSidebarProps) {
   const speakerName = `${speaker.firstName} ${speaker.lastName}`;
 
   return (
     <div className="flex flex-col gap-8 sm:flex-row sm:flex-wrap sm:gap-12 xl:flex-col xl:gap-8">
       {/* About */}
-      {speaker.description && (
+      {!hideAbout && speaker.description && (
         <div className="space-y-4 sm:basis-full xl:basis-auto">
           <h3 className="font-semibold text-muted-foreground text-xs uppercase tracking-widest">
             About
@@ -24,7 +25,7 @@ export function SpeakerMetadataSidebar({ speaker }: SpeakerMetadataSidebarProps)
       )}
 
       {/* Ministry */}
-      {(speaker.ministry || speaker.websiteUrl) && (
+      {!hideAbout && (speaker.ministry || speaker.websiteUrl) && (
         <div className="space-y-4">
           <h3 className="font-semibold text-muted-foreground text-xs uppercase tracking-widest">
             Ministry

@@ -17,6 +17,7 @@ const MAX_CLIPS = 4;
 interface SpeakerContentSectionsProps {
   clips: Clip[];
   collections: Collection[];
+  hasFeaturedVideo?: boolean;
   speaker: Speaker;
   talks: Talk[];
 }
@@ -24,6 +25,7 @@ interface SpeakerContentSectionsProps {
 export function SpeakerContentSections({
   clips,
   collections,
+  hasFeaturedVideo,
   speaker,
   talks,
 }: SpeakerContentSectionsProps) {
@@ -125,7 +127,7 @@ export function SpeakerContentSections({
 
       {/* Metadata Sidebar */}
       <aside className="order-1 xl:sticky xl:top-20 xl:order-2 xl:col-span-3 xl:h-fit">
-        <SpeakerMetadataSidebar speaker={speaker} />
+        <SpeakerMetadataSidebar hideAbout={hasFeaturedVideo} speaker={speaker} />
       </aside>
     </div>
   );

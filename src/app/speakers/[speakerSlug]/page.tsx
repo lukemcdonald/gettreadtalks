@@ -74,6 +74,7 @@ export default async function SpeakerPage({ params }: SpeakerPageProps) {
           <SpeakerContentSections
             clips={clips}
             collections={collections}
+            hasFeaturedVideo={hasFeaturedVideo}
             speaker={speaker}
             talks={remainingTalks}
           />
