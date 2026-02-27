@@ -10,20 +10,11 @@ import { FavoriteTalkButton } from '@/features/users/components/favorite-talk-bu
 import { FinishTalkButton } from '@/features/users/components/finish-talk-button';
 
 interface TalkMetadataSidebarProps {
-  speakerSlug: string;
   talk: Talk;
-  talkSlug: string;
   topics: Topic[];
 }
 
-export function TalkMetadataSidebar({
-  speakerSlug,
-  talk,
-  talkSlug,
-  topics,
-}: TalkMetadataSidebarProps) {
-  const talkUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://gettreadtalks.com'}/talks/${speakerSlug}/${talkSlug}`;
-
+export function TalkMetadataSidebar({ talk, topics }: TalkMetadataSidebarProps) {
   return (
     <div className="flex flex-col gap-8 sm:flex-row sm:flex-wrap sm:gap-12 xl:flex-col xl:gap-8">
       {/* Actions */}
@@ -32,7 +23,7 @@ export function TalkMetadataSidebar({
           Actions
         </h3>
         <div className="flex flex-wrap gap-2">
-          <ShareTalkButton talkId={talk._id} title={talk.title} url={talkUrl} />
+          <ShareTalkButton talkId={talk._id} talkTitle={talk.title} />
           <FavoriteTalkButton talkId={talk._id} />
           <FinishTalkButton talkId={talk._id} />
           <FeatureTalkButton featured={talk.featured ?? false} talkId={talk._id} />
