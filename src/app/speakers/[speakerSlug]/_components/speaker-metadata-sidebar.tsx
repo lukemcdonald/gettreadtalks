@@ -11,13 +11,11 @@ interface SpeakerMetadataSidebarProps {
 export function SpeakerMetadataSidebar({ speaker }: SpeakerMetadataSidebarProps) {
   const speakerName = `${speaker.firstName} ${speaker.lastName}`;
 
-  // TODO: content should be single column like talks page now that we have right sidebar
-
   return (
     <div className="flex flex-col gap-8 sm:flex-row sm:flex-wrap sm:gap-12 xl:flex-col xl:gap-8">
       {/* About */}
       {speaker.description && (
-        <div className="space-y-4">
+        <div className="space-y-4 sm:basis-full xl:basis-auto">
           <h3 className="font-semibold text-muted-foreground text-xs uppercase tracking-widest">
             About
           </h3>
