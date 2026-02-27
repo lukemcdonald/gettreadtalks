@@ -46,13 +46,13 @@ export function SpeakerHeroDetails({ centered, showAbout, speaker }: SpeakerHero
         {showAbout && (
           <>
             {speaker.description && (
-              <p className="max-w-lg text-muted-foreground text-sm leading-relaxed">
+              <p className="max-w-lg text-muted-foreground leading-relaxed">
                 {speaker.description}
               </p>
             )}
             {hasMinistry && (
               <SpeakerMinistryLink
-                className="text-muted-foreground text-sm"
+                className="text-muted-foreground"
                 ministry={speaker.ministry}
                 speakerSlug={speaker.slug}
                 websiteUrl={speaker.websiteUrl}
