@@ -73,7 +73,12 @@ export function TalkContentSections({
             title="More Talks"
           >
             {relatedTalks.map((relatedTalk) => (
-              <TalkCard key={relatedTalk._id} speaker={speaker ?? undefined} talk={relatedTalk} />
+              <TalkCard
+                key={relatedTalk._id}
+                showAvatar={false}
+                speaker={speaker ?? undefined}
+                talk={relatedTalk}
+              />
             ))}
           </FeaturedGrid>
         )}
