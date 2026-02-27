@@ -5,7 +5,6 @@
   --layout-grid-columns: repeat(12, minmax(0, 1fr));
 }
 @theme inline {
-  --font-display: var(--font-display);
   --color-neutral-50: var(--color-zinc-50);
   --color-neutral-100: var(--color-zinc-100);
   --color-neutral-200: var(--color-zinc-200);

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 import { Analytics } from '@vercel/analytics/next';
-import { Inter, Playfair_Display } from 'next/font/google';
+import { Inter } from 'next/font/google';
 
 import { AnalyticsProvider } from '@/components/analytics-provider';
 import { AuthProvider } from '@/components/auth-provider';
@@ -19,7 +19,6 @@ import { SkipNavLink } from '@/components/site-header/navigation/skip-nav-link';
 import { cn } from '@/utils';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
-const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-display' });
 
 export const metadata: Metadata = {
   description: 'Christ centered sermons to elevate your spiritual heartbeat.',
@@ -57,11 +56,7 @@ export default async function RootLayout({
   sheet: ReactNode;
 }>) {
   return (
-    <html
-      className={cn('h-full', inter.variable, playfair.variable)}
-      lang="en"
-      suppressHydrationWarning
-    >
+    <html className={cn('h-full', inter.variable)} lang="en" suppressHydrationWarning>
       <body className={'flex min-h-full flex-col bg-background bg-cover text-foreground'}>
         <ErrorBoundary>
           <ThemeProvider>
