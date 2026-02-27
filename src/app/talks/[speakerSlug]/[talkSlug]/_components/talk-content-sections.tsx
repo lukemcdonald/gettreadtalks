@@ -35,18 +35,12 @@ export function TalkContentSections({
         <div className="grid grid-cols-1 gap-x-8 gap-y-12 xl:grid-cols-12">
           {/* Main Content */}
           <div className="order-2 space-y-8 xl:order-1 xl:col-span-9 xl:space-y-16">
-            {/* Description */}
-            {talk.description && (
-              <div className="space-y-4">
-                <p className="text-muted-foreground leading-relaxed">{talk.description}</p>
-              </div>
-            )}
-
             {/* Clips */}
             {clips.length > 0 && (
               <FeaturedGrid
                 columns={{ default: 1 }}
                 description="Short, impactful moments from this talk."
+                sticky
                 title="Highlights"
               >
                 {clips.map((clip) => (
@@ -78,6 +72,7 @@ export function TalkContentSections({
                       ]
                     : undefined
                 }
+                sticky
                 title="More Talks"
               >
                 {relatedTalks.map((relatedTalk) => (

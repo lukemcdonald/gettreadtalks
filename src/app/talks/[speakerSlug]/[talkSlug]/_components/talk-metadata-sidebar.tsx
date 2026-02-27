@@ -17,18 +17,15 @@ interface TalkMetadataSidebarProps {
 export function TalkMetadataSidebar({ talk, topics }: TalkMetadataSidebarProps) {
   return (
     <div className="flex flex-col gap-8 sm:flex-row sm:flex-wrap sm:gap-12 xl:flex-col xl:gap-8">
-      {/* Actions */}
-      <div className="space-y-4">
-        <h3 className="font-semibold text-muted-foreground text-xs uppercase tracking-widest">
-          Actions
-        </h3>
-        <div className="flex flex-wrap gap-2">
-          <ShareTalkButton talkId={talk._id} talkTitle={talk.title} />
-          <FavoriteTalkButton talkId={talk._id} />
-          <FinishTalkButton talkId={talk._id} />
-          <FeatureTalkButton featured={talk.featured ?? false} talkId={talk._id} />
+      {/* About */}
+      {talk.description && (
+        <div className="space-y-4">
+          <h3 className="font-semibold text-muted-foreground text-xs uppercase tracking-widest">
+            About
+          </h3>
+          <p className="text-muted-foreground text-sm leading-relaxed">{talk.description}</p>
         </div>
-      </div>
+      )}
 
       {/* Topics */}
       <div className="space-y-4">
@@ -69,6 +66,19 @@ export function TalkMetadataSidebar({ talk, topics }: TalkMetadataSidebarProps) 
           </Link>
         </div>
       )}
+
+      {/* Actions */}
+      <div className="space-y-4">
+        <h3 className="font-semibold text-muted-foreground text-xs uppercase tracking-widest">
+          Actions
+        </h3>
+        <div className="flex flex-wrap gap-2">
+          <ShareTalkButton talkId={talk._id} talkTitle={talk.title} />
+          <FavoriteTalkButton talkId={talk._id} />
+          <FinishTalkButton talkId={talk._id} />
+          <FeatureTalkButton featured={talk.featured ?? false} talkId={talk._id} />
+        </div>
+      </div>
     </div>
   );
 }
