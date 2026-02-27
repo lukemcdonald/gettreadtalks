@@ -9,27 +9,30 @@ import { ShareTalkButton } from '@/features/talks/components/share-talk-button';
 import { FavoriteTalkButton } from '@/features/users/components/favorite-talk-button';
 import { FinishTalkButton } from '@/features/users/components/finish-talk-button';
 
-interface TalkMetadataSidebarProps {
+interface TalkMetadataBarProps {
   talk: Talk;
   topics: Topic[];
 }
 
-export function TalkMetadataSidebar({ talk, topics }: TalkMetadataSidebarProps) {
+export function TalkMetadataBar({ talk, topics }: TalkMetadataBarProps) {
   return (
-    <div className="flex flex-col gap-8 sm:flex-row sm:flex-wrap sm:gap-12 xl:flex-col xl:gap-8">
-      {/* About */}
-      {talk.description && (
-        <div className="space-y-4 sm:basis-full xl:basis-auto">
-          <h3 className="font-semibold text-muted-foreground text-xs uppercase tracking-widest">
-            About
-          </h3>
-          <p className="text-muted-foreground text-sm leading-relaxed">{talk.description}</p>
+    <div className="flex flex-col gap-8 border-border border-b pb-8 sm:flex-row sm:flex-wrap sm:items-start sm:gap-12">
+      {/* Actions */}
+      <div className="space-y-3">
+        <h3 className="font-semibold text-muted-foreground text-xs uppercase tracking-wide">
+          Actions
+        </h3>
+        <div className="flex flex-wrap gap-2">
+          <ShareTalkButton talkId={talk._id} talkTitle={talk.title} />
+          <FavoriteTalkButton talkId={talk._id} />
+          <FinishTalkButton talkId={talk._id} />
+          <FeatureTalkButton featured={talk.featured ?? false} talkId={talk._id} />
         </div>
-      )}
+      </div>
 
       {/* Topics */}
-      <div className="space-y-4">
-        <h3 className="font-semibold text-muted-foreground text-xs uppercase tracking-widest">
+      <div className="space-y-3">
+        <h3 className="font-semibold text-muted-foreground text-xs uppercase tracking-wide">
           Topics
         </h3>
         <div className="flex flex-wrap gap-2">
@@ -51,8 +54,8 @@ export function TalkMetadataSidebar({ talk, topics }: TalkMetadataSidebarProps) 
 
       {/* Scripture */}
       {talk.scripture && (
-        <div className="space-y-4">
-          <h3 className="font-semibold text-muted-foreground text-xs uppercase tracking-widest">
+        <div className="space-y-3">
+          <h3 className="font-semibold text-muted-foreground text-xs uppercase tracking-wide">
             Scripture
           </h3>
           <Link
@@ -66,19 +69,6 @@ export function TalkMetadataSidebar({ talk, topics }: TalkMetadataSidebarProps) 
           </Link>
         </div>
       )}
-
-      {/* Actions */}
-      <div className="space-y-4">
-        <h3 className="font-semibold text-muted-foreground text-xs uppercase tracking-widest">
-          Actions
-        </h3>
-        <div className="flex flex-wrap gap-2">
-          <ShareTalkButton talkId={talk._id} talkTitle={talk.title} />
-          <FavoriteTalkButton talkId={talk._id} />
-          <FinishTalkButton talkId={talk._id} />
-          <FeatureTalkButton featured={talk.featured ?? false} talkId={talk._id} />
-        </div>
-      </div>
     </div>
   );
 }
