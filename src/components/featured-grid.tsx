@@ -54,7 +54,7 @@ export function FeaturedGrid({
               <nav className="flex flex-col gap-2">
                 {quickLinks.map((item) => (
                   <Link
-                    className="text-muted-foreground text-sm transition-colors hover:text-foreground"
+                    className="text-muted-foreground text-sm transition-colors hover:text-foreground sm:text-base"
                     href={item.href}
                     key={item.href}
                   >
