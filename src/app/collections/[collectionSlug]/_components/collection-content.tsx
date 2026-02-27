@@ -26,6 +26,7 @@ export function CollectionContent({ talks }: CollectionContentProps) {
           }
           talk={{
             description: talk.description,
+            scripture: talk.scripture,
             slug: talk.slug,
             title: talk.title,
           }}
