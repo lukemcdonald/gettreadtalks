@@ -40,9 +40,9 @@ export function SpeakerContentSections({
   const hasMoreClips = clips.length > MAX_CLIPS;
 
   return (
-    <div className="grid grid-cols-1 gap-x-8 gap-y-12 xl:grid-cols-12">
+    <div className="grid grid-cols-1 gap-x-8 gap-y-12 lg:grid-cols-12">
       {/* Main Content */}
-      <div className="order-2 space-y-16 xl:order-1 xl:col-span-9">
+      <div className="order-2 space-y-16 lg:order-1 lg:col-span-9">
         {talks.length > 0 && (
           <FeaturedGrid
             columns={{ default: 1 }}
@@ -126,7 +126,7 @@ export function SpeakerContentSections({
       </div>
 
       {/* Metadata Sidebar */}
-      <aside className="order-1 xl:sticky xl:top-20 xl:order-2 xl:col-span-3 xl:h-fit">
+      <aside className="order-1 lg:sticky lg:top-20 lg:order-2 lg:col-span-3 lg:h-fit">
         <SpeakerMetadataSidebar hideAbout={hasFeaturedVideo} speaker={speaker} />
       </aside>
     </div>

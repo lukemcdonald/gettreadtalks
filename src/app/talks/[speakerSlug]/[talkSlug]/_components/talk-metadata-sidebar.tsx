@@ -16,10 +16,10 @@ interface TalkMetadataSidebarProps {
 
 export function TalkMetadataSidebar({ talk, topics }: TalkMetadataSidebarProps) {
   return (
-    <div className="flex flex-col gap-8 sm:flex-row sm:flex-wrap sm:gap-12 xl:flex-col xl:gap-8">
+    <div className="flex flex-col gap-8 sm:flex-row sm:flex-wrap sm:gap-12 lg:flex-col lg:gap-8">
       {/* About */}
       {talk.description && (
-        <div className="space-y-4 sm:basis-full xl:basis-auto">
+        <div className="space-y-4 sm:basis-full lg:basis-auto">
           <h3 className="font-semibold text-muted-foreground text-xs uppercase tracking-widest">
             About
           </h3>
