@@ -39,7 +39,9 @@ export function FeaturedGrid({
       <aside className={cn(stickyClass)}>
         <div className="space-y-6">
           <header className="mt-4 space-y-3">
-            <h2 className="font-semibold text-2xl leading-tight tracking-tight">{title}</h2>
+            <h2 className="font-semibold text-muted-foreground text-xs uppercase tracking-wide">
+              {title}
+            </h2>
             {!!description && (
               <p className="text-muted-foreground text-sm leading-relaxed sm:text-base">
                 {description}

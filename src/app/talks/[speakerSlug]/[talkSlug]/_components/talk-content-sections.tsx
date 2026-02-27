@@ -81,7 +81,9 @@ export function TalkContentSections({
         {/* Collection Info */}
         {collection && (
           <div className="space-y-4">
-            <h2 className="font-semibold text-2xl tracking-tight">Part of a Series</h2>
+            <h2 className="font-semibold text-muted-foreground text-xs uppercase tracking-wide">
+              Part of a Series
+            </h2>
             <p className="text-muted-foreground">{collection.description}</p>
           </div>
         )}
