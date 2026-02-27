@@ -46,7 +46,7 @@ export function SpeakerHeroDetails({ centered, showAbout, speaker }: SpeakerHero
         {showAbout && (
           <>
             {speaker.description && (
-              <p className="max-w-lg text-muted-foreground leading-relaxed">
+              <p className="max-w-lg text-lg text-muted-foreground leading-relaxed">
                 {speaker.description}
               </p>
             )}
