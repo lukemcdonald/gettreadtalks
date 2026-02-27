@@ -1,34 +1,37 @@
 export interface EventMap {
   // Navigation (page_viewed is auto-tracked by analytics-provider)
-  search_performed: { query: string; results_count?: number };
   filter_applied: { filter_type: string; filter_value: string };
+  search_performed: { query: string; results_count?: number };
 
   // Media playback
-  talk_played: { talk_id: string; speaker_slug: string; media_type: 'audio' | 'video' };
-  talk_paused: { talk_id: string; speaker_slug: string; progress_pct: number };
-  talk_completed: { talk_id: string; speaker_slug: string };
-  clip_played: { clip_id: string; clip_slug: string };
-  clip_paused: { clip_id: string; clip_slug: string; progress_pct: number };
   clip_completed: { clip_id: string; clip_slug: string };
+  clip_paused: { clip_id: string; clip_slug: string; progress_pct: number };
+  clip_played: { clip_id: string; clip_slug: string };
+  talk_completed: { talk_id: string; speaker_slug: string };
+  talk_paused: { talk_id: string; speaker_slug: string; progress_pct: number };
+  talk_played: { talk_id: string; speaker_slug: string; media_type: 'audio' | 'video' };
 
   // Engagement
+  speaker_favorited: { speaker_id: string };
+  speaker_shared: { method: 'clipboard' | 'share_api'; speaker_id: string };
+  speaker_unfavorited: { speaker_id: string };
   talk_favorited: { talk_id: string };
   talk_featured: { talk_id: string };
+  talk_finished: { talk_id: string };
+  talk_shared: { method: 'clipboard' | 'share_api'; talk_id: string };
   talk_unfavorited: { talk_id: string };
   talk_unfeatured: { talk_id: string };
-  talk_finished: { talk_id: string };
   talk_unfinished: { talk_id: string };
-  talk_shared: { method: 'clipboard' | 'share_api'; talk_id: string };
 
   // Discovery
-  topic_clicked: { topic_id: string; topic_slug: string };
   collection_opened: { collection_id: string; collection_slug: string };
   speaker_link_clicked: { link_type: string; speaker_slug: string; url: string };
+  topic_clicked: { topic_id: string; topic_slug: string };
 
   // Account
-  signed_up: Record<string, never>;
   signed_in: Record<string, never>;
   signed_out: Record<string, never>;
+  signed_up: Record<string, never>;
 
   // Errors
   not_found_hit: { path: string };

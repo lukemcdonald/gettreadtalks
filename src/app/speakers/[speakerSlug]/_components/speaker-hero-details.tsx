@@ -1,6 +1,5 @@
 import type { Speaker } from '@/features/speakers/types';
 
-import { SpeakerMinistryLink } from '@/app/speakers/[speakerSlug]/_components/speaker-ministry-link';
 import { SpeakerAvatar } from '@/features/speakers/components/speaker-avatar';
 import { getSpeakerName } from '@/features/speakers/utils';
 import { cn } from '@/utils';
@@ -10,7 +9,7 @@ interface SpeakerHeroDetailsProps {
   speaker: Speaker;
 }
 
-export function SpeakerHeroDetails({ centered = false, speaker }: SpeakerHeroDetailsProps) {
+export function SpeakerHeroDetails({ centered, speaker }: SpeakerHeroDetailsProps) {
   const speakerName = getSpeakerName(speaker);
   const hasImage = !!speaker.imageUrl;
 
@@ -29,27 +28,15 @@ export function SpeakerHeroDetails({ centered = false, speaker }: SpeakerHeroDet
         />
       )}
 
-      <div className="flex-1 space-y-4">
-        <div>
-          {speaker.role && (
-            <p className="mb-2 font-semibold text-muted-foreground text-xs uppercase tracking-widest">
-              {speaker.role}
-            </p>
-          )}
-          <h1 className="font-semibold text-4xl text-foreground tracking-tight sm:text-5xl lg:text-6xl">
-            {speakerName}
-          </h1>
-          <SpeakerMinistryLink
-            className="mt-2 text-muted-foreground"
-            ministry={speaker.ministry}
-            speakerSlug={speaker.slug}
-            websiteUrl={speaker.websiteUrl}
-          />
-        </div>
-
-        {speaker.description && (
-          <p className="text-lg text-muted-foreground">{speaker.description}</p>
+      <div className="flex-1">
+        {speaker.role && (
+          <p className="mb-2 font-semibold text-muted-foreground text-xs uppercase tracking-widest">
+            {speaker.role}
+          </p>
         )}
+        <h1 className="font-semibold text-3xl text-foreground tracking-tight sm:text-4xl lg:text-5xl">
+          {speakerName}
+        </h1>
       </div>
     </header>
   );
