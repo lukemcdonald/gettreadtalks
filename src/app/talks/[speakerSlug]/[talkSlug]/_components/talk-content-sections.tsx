@@ -29,9 +29,9 @@ export function TalkContentSections({
   const speakerName = getSpeakerName(speaker ?? undefined);
 
   return (
-    <div className="grid grid-cols-1 gap-x-8 gap-y-12 lg:grid-cols-12">
+    <div className="grid grid-cols-1 gap-x-8 gap-y-12 lg:grid-cols-[1fr_280px]">
       {/* Main Content */}
-      <div className="order-2 space-y-8 lg:order-1 lg:col-span-9 lg:space-y-16">
+      <div className="order-2 space-y-8 lg:order-1 lg:space-y-16">
         {/* Clips */}
         {clips.length > 0 && (
           <FeaturedGrid
@@ -95,7 +95,7 @@ export function TalkContentSections({
       </div>
 
       {/* Metadata Sidebar */}
-      <aside className="order-1 lg:sticky lg:top-20 lg:order-2 lg:col-span-3 lg:h-fit">
+      <aside className="order-1 lg:sticky lg:top-20 lg:order-2 lg:h-fit">
         <TalkMetadataSidebar talk={talk} topics={topics} />
       </aside>
     </div>
