@@ -52,7 +52,7 @@ export function SpeakerContentSections({
               hasMoreTalks
                 ? [
                     {
-                      label: `View all ${talks.length} talks →`,
+                      label: `View all ${talks.length} talks`,
                       href: `/talks?speakers=${speaker.slug}`,
                     },
                   ]
@@ -74,7 +74,7 @@ export function SpeakerContentSections({
               hasMoreCollections
                 ? [
                     {
-                      label: `View all ${collections.length} collections →`,
+                      label: `View all ${collections.length} collections`,
                       href: `/collections?speakerSlug=${speaker.slug}`,
                     },
                   ]
@@ -103,7 +103,7 @@ export function SpeakerContentSections({
               hasMoreClips
                 ? [
                     {
-                      label: `View all ${clips.length} clips →`,
+                      label: `View all ${clips.length} clips`,
                       href: `/clips?speakers=${speaker.slug}`,
                     },
                   ]

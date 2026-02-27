@@ -64,7 +64,7 @@ export function TalkContentSections({
                 ? [
                     {
                       href: `/speakers/${speaker.slug}`,
-                      label: 'View all talks →',
+                      label: 'View all talks',
                     },
                   ]
                 : undefined
