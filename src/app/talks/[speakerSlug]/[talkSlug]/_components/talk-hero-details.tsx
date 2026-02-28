@@ -11,7 +11,7 @@ interface TalkHeroDetailsProps {
 }
 
 export function TalkHeroDetails({ speaker, talk }: TalkHeroDetailsProps) {
-  const speakerName = getSpeakerName(speaker ?? undefined);
+  const speakerName = getSpeakerName(speaker);
 
   return (
     <div className="space-y-2 text-center">

@@ -22,7 +22,7 @@ import { useCurrentUser } from '@/features/users/hooks/use-current-user';
 import { isAdmin } from '@/services/auth/utils';
 
 interface AccountMenuProps {
-  initialUser?: User;
+  initialUser?: User | null;
 }
 
 export function AccountMenu({ initialUser }: AccountMenuProps) {

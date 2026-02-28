@@ -12,7 +12,7 @@ import { getSpeakerName } from '@/features/speakers/utils';
 import { getTalkUrl } from '@/features/talks/utils';
 
 interface TalkCardProps {
-  speaker?: Pick<Speaker, 'firstName' | 'imageUrl' | 'lastName' | 'slug'>;
+  speaker?: Pick<Speaker, 'firstName' | 'imageUrl' | 'lastName' | 'slug'> | null;
   talk: Pick<Talk, 'description' | 'scripture' | 'slug' | 'title'>;
 }
 

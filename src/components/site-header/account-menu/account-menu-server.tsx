@@ -7,5 +7,5 @@ import { getCurrentUser } from '@/services/auth/server';
  */
 export async function AccountMenuServer() {
   const user = await getCurrentUser();
-  return <AccountMenu initialUser={user ?? undefined} />;
+  return <AccountMenu initialUser={user} />;
 }

@@ -49,7 +49,7 @@ export default async function HomePage() {
             title="Featured Talks"
           >
             {featuredTalks.map((talk) => (
-              <TalkCard key={talk._id} speaker={talk.speaker ?? undefined} talk={talk} />
+              <TalkCard key={talk._id} speaker={talk.speaker} talk={talk} />
             ))}
           </FeaturedGrid>
         </Container>

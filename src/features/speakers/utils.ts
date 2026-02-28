@@ -8,7 +8,7 @@ type SpeakerNameFields = Pick<Speaker, 'firstName' | 'lastName'>;
  * @param speaker - Speaker object with firstName and lastName
  * @returns Full name string
  */
-export function getSpeakerName(speaker?: SpeakerNameFields): string {
+export function getSpeakerName(speaker?: SpeakerNameFields | null): string {
   return speaker ? `${speaker.firstName} ${speaker.lastName}` : '';
 }
 
@@ -18,7 +18,7 @@ export function getSpeakerName(speaker?: SpeakerNameFields): string {
  * @param speaker - Speaker object with firstName and lastName
  * @returns Initials string (e.g., "JD")
  */
-export function getSpeakerInitials(speaker?: SpeakerNameFields): string {
+export function getSpeakerInitials(speaker?: SpeakerNameFields | null): string {
   return speaker ? `${speaker.firstName?.[0]}${speaker.lastName?.[0]}` : '';
 }
 

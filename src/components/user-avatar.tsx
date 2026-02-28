@@ -12,7 +12,7 @@ export function UserAvatar({ user }: UserAvatarProps) {
 
   return (
     <Avatar className="size-10 rounded-md">
-      <AvatarImage src={imageUrl ?? undefined} />
+      <AvatarImage src={imageUrl} />
       <AvatarFallback className="rounded-md">{user.name?.charAt(0).toUpperCase()}</AvatarFallback>
     </Avatar>
   );

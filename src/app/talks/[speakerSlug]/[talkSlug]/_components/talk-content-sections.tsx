@@ -27,7 +27,7 @@ export function TalkContentSections({
   talk,
   topics,
 }: TalkContentSectionsProps) {
-  const speakerName = getSpeakerName(speaker ?? undefined);
+  const speakerName = getSpeakerName(speaker);
 
   return (
     <div className="grid grid-cols-1 gap-x-8 gap-y-12 lg:grid-cols-[1fr_280px]">
@@ -56,7 +56,7 @@ export function TalkContentSections({
             {clips.map((clip) => (
               <TalkCard
                 key={clip._id}
-                speaker={speaker ?? undefined}
+                speaker={speaker}
                 talk={{
                   description: clip.description,
                   slug: clip.slug,
@@ -86,7 +86,7 @@ export function TalkContentSections({
             title="More Talks"
           >
             {relatedTalks.map((relatedTalk) => (
-              <TalkCard key={relatedTalk._id} speaker={speaker ?? undefined} talk={relatedTalk} />
+              <TalkCard key={relatedTalk._id} speaker={speaker} talk={relatedTalk} />
             ))}
           </FeaturedGrid>
         )}
