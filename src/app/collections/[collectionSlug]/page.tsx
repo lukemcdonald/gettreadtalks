@@ -7,6 +7,7 @@ import { CollectionSidebar } from '@/app/collections/[collectionSlug]/_component
 import { JsonLd } from '@/components/json-ld';
 import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
+import { SITE_URL } from '@/constants/env';
 import { getCollectionBySlug } from '@/features/collections/queries/get-collection-by-slug';
 
 interface CollectionPageProps {
@@ -51,12 +52,10 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
       '@type': 'ListItem',
       name: talk.title,
       position: index + 1,
-      url: talk.speaker
-        ? `https://gettreadtalks.com/talks/${talk.speaker.slug}/${talk.slug}`
-        : undefined,
+      url: talk.speaker ? `${SITE_URL}/talks/${talk.speaker.slug}/${talk.slug}` : undefined,
     })),
     name: collection.title,
-    url: `https://gettreadtalks.com/collections/${collectionSlug}`,
+    url: `${SITE_URL}/collections/${collectionSlug}`,
   };
 
   return (

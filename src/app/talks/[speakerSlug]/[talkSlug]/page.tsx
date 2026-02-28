@@ -7,6 +7,7 @@ import { TalkHero } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-
 import { JsonLd } from '@/components/json-ld';
 import { EditorialProfileLayout } from '@/components/layouts';
 import { isVideoMediaType } from '@/components/media-embed';
+import { SITE_URL } from '@/constants/env';
 import { getRandomTalksBySpeaker } from '@/features/talks/queries/get-random-talks-by-speaker';
 import { getTalkBySlug } from '@/features/talks/queries/get-talk-by-slug';
 
@@ -59,8 +60,7 @@ export default async function TalkPage({ params }: TalkPageProps) {
     name: talk.title,
     ...(speakerName && { creator: { '@type': 'Person', name: speakerName } }),
     ...(talk.publishedAt && { uploadDate: new Date(talk.publishedAt).toISOString() }),
-    // TODO: Shoudl the url come from a config?
-    url: `https://gettreadtalks.com/talks/${speakerSlug}/${talkSlug}`,
+    url: `${SITE_URL}/talks/${speakerSlug}/${talkSlug}`,
   };
 
   return (
