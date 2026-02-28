@@ -9,8 +9,7 @@ import { getSpeakerName } from '@/features/speakers/utils';
 import { getTalkUrl } from '@/features/talks/utils';
 
 interface SpeakerTalkCardProps {
-  speaker: Pick<Speaker, 'firstName' | 'lastName'>;
-  speakerSlug: string;
+  speaker: Pick<Speaker, 'firstName' | 'lastName' | 'slug'>;
   talk: Pick<Talk, 'description' | 'mediaUrl' | 'scripture' | 'slug' | 'title'>;
 }
 
@@ -35,11 +34,11 @@ function TalkMediaIcon({ mediaUrl }: { mediaUrl: string }) {
   );
 }
 
-export function SpeakerTalkCard({ speaker, speakerSlug, talk }: SpeakerTalkCardProps) {
+export function SpeakerTalkCard({ speaker, talk }: SpeakerTalkCardProps) {
   return (
     <MediaCard
       ariaLabel={talk.title}
-      href={getTalkUrl(speakerSlug, talk.slug)}
+      href={getTalkUrl(speaker.slug, talk.slug)}
       media={<TalkMediaIcon mediaUrl={talk.mediaUrl} />}
       subtitle={talk.scripture || getSpeakerName(speaker)}
       title={talk.title}
