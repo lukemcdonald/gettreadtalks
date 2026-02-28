@@ -29,7 +29,7 @@ export function CollectionsSidebar({ speakers }: CollectionsSidebarProps) {
         <MobileFilterSheet>
           <SelectFilter
             label="Speaker"
-            name="speakerSlug"
+            name="speaker"
             options={speakerOptions}
             placeholder="All Speakers"
           />
@@ -41,7 +41,7 @@ export function CollectionsSidebar({ speakers }: CollectionsSidebarProps) {
       <div className="hidden md:flex md:flex-col md:gap-4">
         <SelectFilter
           label="Speaker"
-          name="speakerSlug"
+          name="speaker"
           options={speakerOptions}
           placeholder="All Speakers"
         />
