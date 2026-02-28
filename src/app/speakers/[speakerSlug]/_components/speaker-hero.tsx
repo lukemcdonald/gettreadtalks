@@ -1,9 +1,9 @@
 import type { Speaker } from '@/features/speakers/types';
 import type { Talk } from '@/features/talks/types';
 
-import { SpeakerHeroBackground } from '@/app/speakers/[speakerSlug]/_components/speaker-hero-background';
 import { SpeakerHeroDetails } from '@/app/speakers/[speakerSlug]/_components/speaker-hero-details';
 import { SpeakerHeroFeaturedTalk } from '@/app/speakers/[speakerSlug]/_components/speaker-hero-featured-talk';
+import { HeroBackground } from '@/components/hero-background';
 import { getVideoThumbnail, isVideoMediaType } from '@/components/media-embed';
 import { Container, Section } from '@/components/ui';
 import { cn } from '@/utils';
@@ -19,7 +19,7 @@ export function SpeakerHero({ featuredTalk, speaker }: SpeakerHeroProps) {
 
   return (
     <Section className="dark relative overflow-hidden" spacing="3xl">
-      <SpeakerHeroBackground imageSrc={imageSrc} />
+      <HeroBackground className="blur-xl saturate-50" imageSrc={imageSrc} />
 
       <Container
         className={cn(

@@ -3,6 +3,7 @@ import type { Route } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { HeroTitle } from '@/components/hero-title';
 import { Button } from '@/components/ui';
 import { cn } from '@/utils';
 
@@ -44,9 +45,9 @@ export function HeroSection({
       </figure>
       <header className="flex w-full flex-col justify-center space-y-6 lg:w-2/5">
         <div className="relative space-y-4 rounded-xl bg-background px-2 lg:-ml-48 lg:px-10 lg:py-8">
-          <h1 className="font-bold text-4xl leading-tight tracking-tight sm:text-5xl lg:text-6xl xl:text-7xl">
+          <HeroTitle className="leading-tight" size="lg">
             {title}
-          </h1>
+          </HeroTitle>
           <p className="text-base text-muted-foreground leading-relaxed sm:text-lg lg:text-xl">
             {description}
           </p>
