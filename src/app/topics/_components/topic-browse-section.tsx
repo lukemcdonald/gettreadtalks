@@ -45,7 +45,7 @@ export function TopicBrowseSection({ talkCount, talks, topic }: TopicBrowseSecti
               <>
                 {talks.map((talk) => (
                   <div className="h-full w-[calc(50%-0.5rem)] shrink-0" key={talk._id}>
-                    <TalkCard speaker={talk.speaker ?? undefined} talk={talk} />
+                    <TalkCard speaker={talk.speaker} talk={talk} />
                   </div>
                 ))}
                 {hasMoreTalks && (

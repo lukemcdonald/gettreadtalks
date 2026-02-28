@@ -38,7 +38,7 @@ export function EditSpeakerSheet({
       imageUrl: speaker?.imageUrl ?? '',
       lastName: speaker?.lastName ?? '',
       ministry: speaker?.ministry ?? '',
-      role: speaker?.role ?? undefined,
+      role: speaker?.role ?? '',
       websiteUrl: speaker?.websiteUrl ?? '',
     },
   });

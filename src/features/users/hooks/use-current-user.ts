@@ -14,7 +14,7 @@ import { api } from '@/convex/_generated/api';
  * @param initialData - Optional SSR user data to prevent layout shift
  * @returns { data, isLoading }
  */
-export function useCurrentUser(initialData?: User) {
+export function useCurrentUser(initialData?: User | null) {
   const { isLoading: isAuthLoading } = useConvexAuth();
   const data = useQuery(api.users.getCurrentUser);
 
