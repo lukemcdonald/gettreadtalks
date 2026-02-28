@@ -6,6 +6,7 @@ import type { Topic } from '@/features/topics/types';
 
 import { TalkMetadataSidebar } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-metadata-sidebar';
 import { FeaturedGrid } from '@/components/featured-grid';
+import { CollectionMediaCard } from '@/features/collections/components/collection-media-card';
 import { getSpeakerName } from '@/features/speakers/utils';
 import { TalkCard } from '@/features/talks/components/talk-card';
 
@@ -32,6 +33,18 @@ export function TalkContentSections({
     <div className="grid grid-cols-1 gap-x-8 gap-y-12 lg:grid-cols-[1fr_280px]">
       {/* Main Content */}
       <div className="order-2 space-y-8 lg:order-1 lg:space-y-16">
+        {/* Collection */}
+        {collection && (
+          <FeaturedGrid
+            columns={{ default: 1 }}
+            description="This talk is part of a collection of related talks."
+            sticky
+            title="Collection"
+          >
+            <CollectionMediaCard collection={collection} />
+          </FeaturedGrid>
+        )}
+
         {/* Clips */}
         {clips.length > 0 && (
           <FeaturedGrid
@@ -76,16 +89,6 @@ export function TalkContentSections({
               <TalkCard key={relatedTalk._id} speaker={speaker ?? undefined} talk={relatedTalk} />
             ))}
           </FeaturedGrid>
-        )}
-
-        {/* Collection Info */}
-        {collection && (
-          <div className="space-y-4">
-            <h2 className="font-semibold text-muted-foreground text-xs uppercase tracking-wide">
-              Part of a Series
-            </h2>
-            <p className="text-muted-foreground">{collection.description}</p>
-          </div>
         )}
       </div>
 
