@@ -10,7 +10,7 @@ import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
 import { ThemeProvider } from '@/components/theme-provider';
 import { ToastProvider } from '@/components/ui/primitives/toast';
-import { SITE_URL } from '@/constants/env';
+import { site } from '@/configs/site';
 
 import '@/assets/styles.css';
 
@@ -22,7 +22,7 @@ import { cn } from '@/utils';
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
 export const metadata: Metadata = {
-  description: 'Christ centered sermons to elevate your spiritual heartbeat.',
+  description: site.description,
   icons: {
     apple: '/favicon.png',
     icon: [
@@ -30,16 +30,16 @@ export const metadata: Metadata = {
       { type: 'image/png', url: '/favicon.png' },
     ],
   },
-  metadataBase: new URL(SITE_URL),
+  metadataBase: new URL(site.url),
   openGraph: {
-    images: [{ alt: 'TREAD Talks', height: 630, url: '/default-seo-image.png', width: 1200 }],
+    images: [{ alt: site.name, height: 630, url: '/default-seo-image.png', width: 1200 }],
     locale: 'en_US',
-    siteName: 'TREAD Talks',
+    siteName: site.name,
     type: 'website',
   },
   title: {
-    default: 'TREAD Talks',
-    template: '%s | TREAD Talks',
+    default: site.name,
+    template: `%s | ${site.name}`,
   },
   twitter: {
     card: 'summary_large_image',

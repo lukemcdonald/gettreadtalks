@@ -7,7 +7,7 @@ import { SpeakerHero } from '@/app/speakers/[speakerSlug]/_components/speaker-he
 import { JsonLd } from '@/components/json-ld';
 import { EditorialProfileLayout } from '@/components/layouts';
 import { isVideoMediaType } from '@/components/media-embed';
-import { SITE_URL } from '@/constants/env';
+import { site } from '@/configs/site';
 import { getSpeakerBySlug } from '@/features/speakers/queries/get-speaker-by-slug';
 
 interface SpeakerPageProps {
@@ -64,7 +64,7 @@ export default async function SpeakerPage({ params }: SpeakerPageProps) {
     image: speaker.imageUrl,
     name,
     ...(speaker.websiteUrl && { sameAs: [speaker.websiteUrl] }),
-    url: `${SITE_URL}/speakers/${speakerSlug}`,
+    url: `${site.url}/speakers/${speakerSlug}`,
   };
 
   return (

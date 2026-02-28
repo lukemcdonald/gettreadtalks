@@ -2,10 +2,10 @@ import type { Metadata } from 'next';
 
 import { CenteredLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
+import { site } from '@/configs/site';
 
 export const metadata: Metadata = {
-  description:
-    'A brief statement of the core Christian beliefs that shape the content and mission of TREAD Talks.',
+  description: `A brief statement of the core Christian beliefs that shape the content and mission of ${site.name}.`,
   title: 'Beliefs',
 };
 

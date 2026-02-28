@@ -12,6 +12,8 @@ import {
   Text,
 } from '@react-email/components';
 
+import { site } from '../../../src/configs/site';
+
 interface EmailLayoutProps {
   children: ReactNode;
   preview?: string;
@@ -26,7 +28,7 @@ export function EmailLayout({ children, preview }: EmailLayoutProps) {
         <Container style={container}>
           <Section style={content}>
             <Section style={header}>
-              <Heading style={h1}>TREAD Talks</Heading>
+              <Heading style={h1}>{site.name}</Heading>
               <Text style={subtitle}>Christian talks and insights</Text>
             </Section>
 
@@ -38,10 +40,10 @@ export function EmailLayout({ children, preview }: EmailLayoutProps) {
 
             <Section style={footer}>
               <Text style={footerText}>
-                You received this email because you have an account with TREAD Talks.
+                You received this email because you have an account with {site.name}.
               </Text>
               <Text style={footerText}>
-                TREAD Talks • Your trusted source for Christian talks and insights
+                {site.name} • {site.description}
               </Text>
             </Section>
           </Section>
