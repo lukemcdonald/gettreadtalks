@@ -4,11 +4,11 @@ import { FolderIcon } from 'lucide-react';
 
 import { MediaCard } from '@/components/media-card';
 
-interface SpeakerCollectionCardProps {
-  collection: Pick<Collection, 'description' | 'slug' | 'title'>;
+interface CollectionMediaCardProps {
+  collection: Pick<Collection, 'slug' | 'title'>;
 }
 
-export function SpeakerCollectionCard({ collection }: SpeakerCollectionCardProps) {
+export function CollectionMediaCard({ collection }: CollectionMediaCardProps) {
   return (
     <MediaCard
       ariaLabel={collection.title}
@@ -18,7 +18,6 @@ export function SpeakerCollectionCard({ collection }: SpeakerCollectionCardProps
           <FolderIcon className="size-5" />
         </div>
       }
-      subtitle={collection.description}
       title={collection.title}
     />
   );

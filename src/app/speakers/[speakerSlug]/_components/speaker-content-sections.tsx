@@ -5,9 +5,9 @@ import type { Talk } from '@/features/talks/types';
 
 import { SpeakerMetadataSidebar } from '@/app/speakers/[speakerSlug]/_components/speaker-metadata-sidebar';
 import { FeaturedGrid } from '@/components/featured-grid';
+import { CollectionMediaCard } from '@/features/collections/components/collection-media-card';
 import { getSpeakerName } from '@/features/speakers/utils';
 import { SpeakerClipCard } from './speaker-clip-card';
-import { SpeakerCollectionCard } from './speaker-collection-card';
 import { SpeakerTalkCard } from './speaker-talk-card';
 
 const MAX_TALKS = 6;
@@ -85,14 +85,7 @@ export function SpeakerContentSections({
             title="Collections"
           >
             {collections.slice(0, MAX_COLLECTIONS).map((collection) => (
-              <SpeakerCollectionCard
-                collection={{
-                  description: collection.description,
-                  slug: collection.slug,
-                  title: collection.title,
-                }}
-                key={collection._id}
-              />
+              <CollectionMediaCard collection={collection} key={collection._id} />
             ))}
           </FeaturedGrid>
         )}
