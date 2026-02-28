@@ -35,7 +35,7 @@ export function FeaturedGrid({
   const stickyClass = sticky ? 'lg:sticky lg:top-16 lg:h-fit' : undefined;
 
   return (
-    <div className={cn('grid gap-4 lg:grid-cols-[280px_1fr] lg:gap-12', className)}>
+    <div className={cn('grid gap-4 lg:grid-cols-[280px_1fr] lg:gap-8', className)}>
       <aside className={cn(stickyClass)}>
         <div className="space-y-6">
           <header className="mt-4 space-y-3">
