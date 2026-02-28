@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { cn } from '@/utils';
 
 export type ColumnCount = 1 | 2 | 3;
-export type GapSize = 'tight' | 'normal';
+export type GapSize = 'normal' | 'relaxed';
 
 export interface GridColumns {
   default?: ColumnCount;
@@ -81,8 +81,8 @@ const CONTAINER_CLASSES = {
 } as const;
 
 const GAP_CLASSES = {
-  tight: 'gap-2 sm:gap-3 md:gap-4',
-  normal: 'gap-2 sm:gap-4 md:gap-6',
+  normal: 'gap-2 sm:gap-3 md:gap-4',
+  relaxed: 'gap-2 sm:gap-4 md:gap-6',
 } as const;
 
 export function GridList({
