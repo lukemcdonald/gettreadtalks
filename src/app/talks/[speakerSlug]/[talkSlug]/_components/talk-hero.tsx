@@ -1,9 +1,9 @@
 import type { Speaker } from '@/features/speakers/types';
 import type { Talk } from '@/features/talks/types';
 
-import { TalkHeroBackground } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-hero-background';
 import { TalkHeroDetails } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-hero-details';
 import { TalkHeroMedia } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-hero-media';
+import { HeroBackground } from '@/components/hero-background';
 import { getVideoThumbnail } from '@/components/media-embed';
 import { Container, Section } from '@/components/ui';
 
@@ -18,7 +18,7 @@ export function TalkHero({ speaker, speakerSlug, talk }: TalkHeroProps) {
 
   return (
     <Section className="dark relative overflow-hidden py-6 sm:py-8 md:py-12 lg:py-16">
-      <TalkHeroBackground imageSrc={imageSrc} />
+      <HeroBackground className="blur-md grayscale" imageSrc={imageSrc} />
 
       <Container className="relative space-y-8">
         {/* Title & Speaker - Centered */}

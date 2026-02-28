@@ -1,6 +1,7 @@
 import type { Speaker } from '@/features/speakers/types';
 import type { Talk } from '@/features/talks/types';
 
+import { HeroTitle } from '@/components/hero-title';
 import { Link } from '@/components/ui/link';
 import { getSpeakerName } from '@/features/speakers/utils';
 
@@ -14,9 +15,9 @@ export function TalkHeroDetails({ speaker, talk }: TalkHeroDetailsProps) {
 
   return (
     <div className="space-y-2 text-center">
-      <h1 className="font-semibold text-2xl text-foreground tracking-tight sm:text-3xl lg:text-4xl">
+      <HeroTitle className="text-foreground" size="sm">
         {talk.title}
-      </h1>
+      </HeroTitle>
       {speaker && (
         <p className="text-lg text-muted-foreground">
           by{' '}

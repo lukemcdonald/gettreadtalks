@@ -1,6 +1,7 @@
 import type { Speaker } from '@/features/speakers/types';
 
 import { SpeakerMinistryLink } from '@/app/speakers/[speakerSlug]/_components/speaker-ministry-link';
+import { HeroTitle } from '@/components/hero-title';
 import { SpeakerAvatar } from '@/features/speakers/components/speaker-avatar';
 import { getSpeakerName } from '@/features/speakers/utils';
 import { cn } from '@/utils';
@@ -38,9 +39,7 @@ export function SpeakerHeroDetails({ centered, showAbout, speaker }: SpeakerHero
               {speaker.role}
             </p>
           )}
-          <h1 className="font-semibold text-3xl text-foreground tracking-tight sm:text-4xl lg:text-5xl">
-            {speakerName}
-          </h1>
+          <HeroTitle className="text-foreground">{speakerName}</HeroTitle>
         </div>
 
         {showAbout && (
