@@ -2,31 +2,27 @@
 
 import type { TalkId } from '@/features/talks/types';
 
-import { useState } from 'react';
+import { useQuery } from 'convex/react';
 
 import { api } from '@/convex/_generated/api';
-import { useMutation } from '@/hooks';
+import { useMutation, useOptimisticToggle } from '@/hooks';
 import { useAnalytics } from '@/lib/analytics';
 
-export function useToggleTalkFeatured(talkId: TalkId, initialFeatured: boolean) {
-  const [optimisticState, setOptimisticState] = useState<boolean | null>(null);
+export function useToggleTalkFeatured(talkId: TalkId) {
+  const talk = useQuery(api.talks.getTalk, { id: talkId });
   const { track } = useAnalytics();
 
-  const clearOptimistic = () => setOptimisticState(null);
+  const { clearOptimistic, isActive, isLoading, toggle } = useOptimisticToggle({
+    data: talk?.featured,
+    onToggle: (next) => {
+      update.mutate({ featured: next, talkId });
+      track(next ? 'talk_featured' : 'talk_unfeatured', { talk_id: talkId });
+    },
+  });
 
   const update = useMutation(api.talks.updateTalk, {
     onError: clearOptimistic,
-    onSuccess: clearOptimistic,
   });
 
-  const isFeatured = optimisticState ?? initialFeatured;
-
-  const toggle = () => {
-    const next = !isFeatured;
-    setOptimisticState(next);
-    update.mutate({ featured: next, talkId });
-    track(next ? 'talk_featured' : 'talk_unfeatured', { talk_id: talkId });
-  };
-
-  return { isFeatured, isLoading: update.isLoading, toggle };
+  return { isFeatured: isActive, isLoading, toggle };
 }

@@ -3,9 +3,9 @@
 import type { TalkId } from '@/features/talks/types';
 
 import { Authenticated } from 'convex/react';
-import { CircleCheckIcon } from 'lucide-react';
+import { BookmarkIcon } from 'lucide-react';
 
-import { ActionIconButton } from '@/components/ui';
+import { ToggleIconButton } from '@/components/ui';
 import { useToggleTalkFinished } from '@/features/users/hooks/use-toggle-talk-finished';
 
 interface FinishTalkButtonProps {
@@ -16,13 +16,14 @@ function FinishButton({ talkId }: FinishTalkButtonProps) {
   const { isFinished, isLoading, toggle } = useToggleTalkFinished(talkId);
 
   return (
-    <ActionIconButton
+    <ToggleIconButton
+      activeLabel="Mark unfinished"
       disabled={isLoading}
-      label={isFinished ? 'Mark unfinished' : 'Mark finished'}
-      onClick={toggle}
-    >
-      <CircleCheckIcon strokeWidth={2.5} />
-    </ActionIconButton>
+      icon={BookmarkIcon}
+      inactiveLabel="Mark finished"
+      isActive={isFinished}
+      onToggle={toggle}
+    />
   );
 }
 

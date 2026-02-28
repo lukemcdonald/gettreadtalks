@@ -14,3 +14,4 @@ export * from './primitives';
 export * from './scroll-area';
 export * from './section';
 export * from './toggle-group';
+export * from './toggle-icon-button';

@@ -76,7 +76,7 @@ export function TalkMetadataSidebar({ talk, topics }: TalkMetadataSidebarProps) 
           <ShareTalkButton talkId={talk._id} talkTitle={talk.title} />
           <FavoriteTalkButton talkId={talk._id} />
           <FinishTalkButton talkId={talk._id} />
-          <FeatureTalkButton featured={talk.featured ?? false} talkId={talk._id} />
+          <FeatureTalkButton talkId={talk._id} />
         </div>
       </div>
     </div>
