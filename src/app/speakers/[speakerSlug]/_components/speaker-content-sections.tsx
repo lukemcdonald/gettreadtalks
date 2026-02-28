@@ -14,6 +14,13 @@ const MAX_TALKS = 6;
 const MAX_COLLECTIONS = 4;
 const MAX_CLIPS = 4;
 
+function viewAllLink(count: number, max: number, label: string, href: string) {
+  if (count <= max) {
+    return undefined;
+  }
+  return [{ href, label: `View all ${count} ${label}` }];
+}
+
 interface SpeakerContentSectionsProps {
   clips: Clip[];
   collections: Collection[];
@@ -31,13 +38,25 @@ export function SpeakerContentSections({
 }: SpeakerContentSectionsProps) {
   const speakerName = getSpeakerName(speaker);
   const speakerTitle = speaker.role ? `${speaker.role} ${speakerName}` : speakerName;
-  const displayedTalks = talks.slice(0, MAX_TALKS);
-  const displayedCollections = collections.slice(0, MAX_COLLECTIONS);
-  const displayedClips = clips.slice(0, MAX_CLIPS);
 
-  const hasMoreTalks = talks.length > MAX_TALKS;
-  const hasMoreCollections = collections.length > MAX_COLLECTIONS;
-  const hasMoreClips = clips.length > MAX_CLIPS;
+  const talksLinks = viewAllLink(
+    talks.length,
+    MAX_TALKS,
+    'talks',
+    `/talks?speakers=${speaker.slug}`,
+  );
+  const collectionsLinks = viewAllLink(
+    collections.length,
+    MAX_COLLECTIONS,
+    'collections',
+    `/collections?speakerSlug=${speaker.slug}`,
+  );
+  const clipsLinks = viewAllLink(
+    clips.length,
+    MAX_CLIPS,
+    'clips',
+    `/clips?speakers=${speaker.slug}`,
+  );
 
   return (
     <div className="grid grid-cols-1 gap-x-8 gap-y-12 lg:grid-cols-[1fr_280px]">
@@ -47,28 +66,12 @@ export function SpeakerContentSections({
           <FeaturedGrid
             columns={{ default: 1 }}
             description={`Enjoy more sermons by ${speakerTitle}.`}
-            // TODO: Is there a cleaner way to handle and define these quicklinks. The markup is very ugly in all cases and seems overly complex. Is ternary needed
-            quickLinks={
-              hasMoreTalks
-                ? [
-                    {
-                      label: `View all ${talks.length} talks`,
-                      href: `/talks?speakers=${speaker.slug}`,
-                    },
-                  ]
-                : undefined
-            }
+            quickLinks={talksLinks}
             sticky
             title="Talks"
           >
-            {displayedTalks.map((talk) => (
-              <SpeakerTalkCard
-                key={talk._id}
-                speaker={speaker}
-                // TODO: We should find and remove all speakerSlug props where speaker and speaker.slug can be used instead. Same with other entities like talkSlug and talk.slug etc.
-                speakerSlug={speaker.slug}
-                talk={talk}
-              />
+            {talks.slice(0, MAX_TALKS).map((talk) => (
+              <SpeakerTalkCard key={talk._id} speaker={speaker} talk={talk} />
             ))}
           </FeaturedGrid>
         )}
@@ -77,20 +80,11 @@ export function SpeakerContentSections({
           <FeaturedGrid
             columns={{ default: 1 }}
             description={`Curated series featuring ${speakerTitle}.`}
-            quickLinks={
-              hasMoreCollections
-                ? [
-                    {
-                      label: `View all ${collections.length} collections`,
-                      href: `/collections?speakerSlug=${speaker.slug}`,
-                    },
-                  ]
-                : undefined
-            }
+            quickLinks={collectionsLinks}
             sticky
             title="Collections"
           >
-            {displayedCollections.map((collection) => (
+            {collections.slice(0, MAX_COLLECTIONS).map((collection) => (
               <SpeakerCollectionCard
                 collection={{
                   description: collection.description,
@@ -107,19 +101,10 @@ export function SpeakerContentSections({
           <FeaturedGrid
             columns={{ default: 1 }}
             description={`Short, impactful moments from ${speakerTitle}.`}
-            quickLinks={
-              hasMoreClips
-                ? [
-                    {
-                      label: `View all ${clips.length} clips`,
-                      href: `/clips?speakers=${speaker.slug}`,
-                    },
-                  ]
-                : undefined
-            }
+            quickLinks={clipsLinks}
             title="Clips"
           >
-            {displayedClips.map((clip) => (
+            {clips.slice(0, MAX_CLIPS).map((clip) => (
               <SpeakerClipCard
                 clip={{
                   description: clip.description,
