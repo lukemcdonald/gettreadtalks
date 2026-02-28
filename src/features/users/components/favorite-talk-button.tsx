@@ -5,7 +5,7 @@ import type { TalkId } from '@/features/talks/types';
 import { Authenticated } from 'convex/react';
 import { HeartIcon } from 'lucide-react';
 
-import { ActionIconButton } from '@/components/ui';
+import { ToggleIconButton } from '@/components/ui';
 import { useToggleTalkFavorited } from '@/features/users/hooks/use-toggle-talk-favorited';
 
 interface FavoriteTalkButtonProps {
@@ -16,13 +16,14 @@ function FavoriteButton({ talkId }: FavoriteTalkButtonProps) {
   const { isFavorited, isLoading, toggle } = useToggleTalkFavorited(talkId);
 
   return (
-    <ActionIconButton
+    <ToggleIconButton
+      activeLabel="Unfavorite"
       disabled={isLoading}
-      label={isFavorited ? 'Unfavorite' : 'Favorite'}
-      onClick={toggle}
-    >
-      <HeartIcon strokeWidth={2.5} />
-    </ActionIconButton>
+      icon={HeartIcon}
+      inactiveLabel="Favorite"
+      isActive={isFavorited}
+      onToggle={toggle}
+    />
   );
 }
 
