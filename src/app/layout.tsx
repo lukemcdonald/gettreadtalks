@@ -10,6 +10,7 @@ import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
 import { ThemeProvider } from '@/components/theme-provider';
 import { ToastProvider } from '@/components/ui/primitives/toast';
+import { SITE_URL } from '@/constants/env';
 
 import '@/assets/styles.css';
 
@@ -29,7 +30,7 @@ export const metadata: Metadata = {
       { type: 'image/png', url: '/favicon.png' },
     ],
   },
-  metadataBase: new URL('https://gettreadtalks.com'),
+  metadataBase: new URL(SITE_URL),
   openGraph: {
     images: [{ alt: 'TREAD Talks', height: 630, url: '/default-seo-image.png', width: 1200 }],
     locale: 'en_US',

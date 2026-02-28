@@ -14,6 +14,8 @@ type DeployEnvironment = 'prod' | 'dev' | 'local';
 
 export const IS_BROWSER = typeof window !== 'undefined';
 
+export const SITE_URL = 'https://gettreadtalks.com';
+
 // NODE_ENV based constants (for debugging behavior)
 export const IS_DEV = process.env.NODE_ENV === 'development';
 export const IS_PROD = process.env.NODE_ENV === 'production';

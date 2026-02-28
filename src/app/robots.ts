@@ -1,5 +1,7 @@
 import type { MetadataRoute } from 'next';
 
+import { SITE_URL } from '@/constants/env';
+
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
@@ -16,6 +18,6 @@ export default function robots(): MetadataRoute.Robots {
       ],
       userAgent: '*',
     },
-    sitemap: 'https://gettreadtalks.com/sitemap.xml',
+    sitemap: `${SITE_URL}/sitemap.xml`,
   };
 }
