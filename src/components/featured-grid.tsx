@@ -15,7 +15,7 @@ interface FeaturedGridProps {
   children: ReactNode;
   className?: string;
   columns?: GridColumns;
-  description?: string;
+  description?: ReactNode;
   quickLinks?: NavItem[];
   sticky?: boolean;
   title?: string;
