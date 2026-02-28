@@ -2,10 +2,10 @@ import type { Metadata } from 'next';
 
 import { CenteredLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
+import { site } from '@/configs/site';
 
 export const metadata: Metadata = {
-  description:
-    'TREAD Talks began as a way to bookmark sermons listened to while walking. Now a resource for finding and sharing Christ centered talks.',
+  description: `${site.name} began as a way to bookmark sermons listened to while walking. Now a resource for finding and sharing Christ centered talks.`,
   title: 'About',
 };
 
@@ -13,7 +13,7 @@ function AboutContent() {
   return (
     <>
       <p>
-        <strong>TREAD Talks</strong> was originally created as a way to bookmark and track the many
+        <strong>{site.name}</strong> was originally created as a way to bookmark and track the many
         sermons I was listening to. Often, I would listen while walking on a treadmill or taking a
         walk outside—hence the name.
       </p>

@@ -11,6 +11,7 @@ import { Logo } from '@/components/logo';
 import { NAVIGATION_LINKS } from '@/components/site-header/constants';
 import { ModeSwitcher } from '@/components/site-header/mode-switcher';
 import { Button, Sheet, SheetClose, SheetHeader, SheetPopup, SheetTrigger } from '@/components/ui';
+import { site } from '@/configs/site';
 import { cn } from '@/utils';
 
 interface MobileNavProps {
@@ -41,7 +42,7 @@ export function MobileNav({ className }: MobileNavProps) {
         <SheetHeader className="flex flex-row items-center justify-between">
           <Link className="flex shrink-0 items-center" href="/">
             <Logo className="block h-6 w-auto" />
-            <span className="sr-only">TREAD Talks</span>
+            <span className="sr-only">{site.name}</span>
           </Link>
           <div className="flex items-center gap-2">
             <ModeSwitcher className="size-10" />

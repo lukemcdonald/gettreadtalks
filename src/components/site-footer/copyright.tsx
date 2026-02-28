@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 
+import { site } from '@/configs/site';
+
 interface CopyrightProps {
   className?: string;
 }
@@ -17,5 +19,9 @@ export function Copyright({ className }: CopyrightProps) {
     return null;
   }
 
-  return <span className={className}>© TREAD Talks {year}</span>;
+  return (
+    <span className={className}>
+      © {site.name} {year}
+    </span>
+  );
 }

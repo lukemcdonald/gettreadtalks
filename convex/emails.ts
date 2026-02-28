@@ -5,6 +5,7 @@ import { Resend, vEmailEvent, vEmailId } from '@convex-dev/resend';
 import { render } from '@react-email/render';
 import { v } from 'convex/values';
 
+import { site } from '../src/configs/site';
 import { components, internal } from './_generated/api';
 import { internalAction, internalMutation } from './_generated/server';
 import { ResetPasswordTemplate } from './emails/resetPassword';
@@ -15,8 +16,6 @@ import { throwConvexError } from './lib/errors';
 // Email constants - same across all environments
 const TEST_DOMAIN_EMAIL = 'delivered@resend.dev';
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || TEST_DOMAIN_EMAIL;
-const FROM_NAME = 'TREAD Talks';
-const REPLY_TO_EMAIL = 'hello@gettreadtalks.com';
 
 // Initialize Resend client
 export const resend: Resend = new Resend(components.resend, {
@@ -105,7 +104,7 @@ export const sendTestEmail = internalMutation({
       from: getFromAddress(),
       html: '<p>This is a test email</p>',
       replyTo: [getReplyToAddress()],
-      subject: 'Test email from TREAD Talks',
+      subject: `Test email from ${site.name}`,
       text: 'This is a test email',
       to: process.env.RESEND_TO_EMAIL || TEST_DOMAIN_EMAIL,
     });
@@ -160,7 +159,7 @@ export const sendWelcomeEmail = internalMutation({
       const template = WelcomeEmail({
         email: args.email,
         name: args.name,
-        siteUrl: process.env.SITE_URL || 'https://gettreadtalks.com',
+        siteUrl: process.env.SITE_URL || site.url,
       });
       const { html, text } = await renderEmail(template);
 
@@ -168,7 +167,7 @@ export const sendWelcomeEmail = internalMutation({
         from: getFromAddress(),
         html,
         replyTo: [getReplyToAddress()],
-        subject: 'Welcome to TREAD Talks!',
+        subject: `Welcome to ${site.name}!`,
         text,
         to: args.email,
       });
@@ -197,11 +196,11 @@ function getErrorMessage(error: unknown): string {
 }
 
 function getFromAddress() {
-  return `${FROM_NAME} <${FROM_EMAIL}>`;
+  return `${site.name} <${FROM_EMAIL}>`;
 }
 
 function getReplyToAddress() {
-  return REPLY_TO_EMAIL;
+  return site.email.reply;
 }
 
 async function renderEmail(template: ReactElement) {

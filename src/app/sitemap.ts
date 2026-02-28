@@ -2,18 +2,18 @@ import type { MetadataRoute } from 'next';
 
 import { fetchQuery } from 'convex/nextjs';
 
-import { SITE_URL } from '@/constants/env';
+import { site } from '@/configs/site';
 import { api } from '@/convex/_generated/api';
 
 const staticRoutes: MetadataRoute.Sitemap = [
-  { priority: 1, url: SITE_URL },
-  { changeFrequency: 'weekly', url: `${SITE_URL}/talks` },
-  { changeFrequency: 'monthly', url: `${SITE_URL}/speakers` },
-  { changeFrequency: 'monthly', url: `${SITE_URL}/collections` },
-  { changeFrequency: 'weekly', url: `${SITE_URL}/topics` },
-  { changeFrequency: 'weekly', url: `${SITE_URL}/clips` },
-  { changeFrequency: 'yearly', url: `${SITE_URL}/about` },
-  { changeFrequency: 'yearly', url: `${SITE_URL}/beliefs` },
+  { priority: 1, url: site.url },
+  { changeFrequency: 'weekly', url: `${site.url}/talks` },
+  { changeFrequency: 'monthly', url: `${site.url}/speakers` },
+  { changeFrequency: 'monthly', url: `${site.url}/collections` },
+  { changeFrequency: 'weekly', url: `${site.url}/topics` },
+  { changeFrequency: 'weekly', url: `${site.url}/clips` },
+  { changeFrequency: 'yearly', url: `${site.url}/about` },
+  { changeFrequency: 'yearly', url: `${site.url}/beliefs` },
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -29,32 +29,32 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ({ speakerSlug, talkSlug, updatedAt }) => ({
       changeFrequency: 'weekly',
       lastModified: new Date(updatedAt),
-      url: `${SITE_URL}/talks/${speakerSlug}/${talkSlug}`,
+      url: `${site.url}/talks/${speakerSlug}/${talkSlug}`,
     }),
   );
 
   const speakerEntries: MetadataRoute.Sitemap = speakers.map((speaker) => ({
     changeFrequency: 'monthly',
     lastModified: new Date(speaker.updatedAt ?? speaker._creationTime),
-    url: `${SITE_URL}/speakers/${speaker.slug}`,
+    url: `${site.url}/speakers/${speaker.slug}`,
   }));
 
   const collectionEntries: MetadataRoute.Sitemap = collectionSlugs.map(({ slug, updatedAt }) => ({
     changeFrequency: 'monthly',
     lastModified: new Date(updatedAt),
-    url: `${SITE_URL}/collections/${slug}`,
+    url: `${site.url}/collections/${slug}`,
   }));
 
   const topicEntries: MetadataRoute.Sitemap = topics.map((topic) => ({
     changeFrequency: 'weekly',
     lastModified: new Date(topic.updatedAt ?? topic._creationTime),
-    url: `${SITE_URL}/topics/${topic.slug}`,
+    url: `${site.url}/topics/${topic.slug}`,
   }));
 
   const clipEntries: MetadataRoute.Sitemap = clipSlugs.map(({ slug, updatedAt }) => ({
     changeFrequency: 'weekly',
     lastModified: new Date(updatedAt),
-    url: `${SITE_URL}/clips/${slug}`,
+    url: `${site.url}/clips/${slug}`,
   }));
 
   return [

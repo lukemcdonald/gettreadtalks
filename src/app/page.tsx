@@ -2,6 +2,7 @@ import { FeaturedGrid } from '@/components/featured-grid';
 import { HeroSection } from '@/components/hero-section';
 import { Main } from '@/components/main';
 import { Container, Section } from '@/components/ui';
+import { site } from '@/configs/site';
 import { SpeakerCard } from '@/features/speakers/components/speaker-card';
 import { getFeaturedSpeakers } from '@/features/speakers/queries/get-featured-speakers';
 import { TalkCard } from '@/features/talks/components/talk-card';
@@ -21,7 +22,7 @@ export default async function HomePage() {
       <Section spacing="xl">
         <Container>
           <HeroSection
-            description="Christ centered sermons to elevate your spiritual heartbeat."
+            description={site.description}
             imageAlt="Billy Graham preaching"
             imageSrc="/billy-graham-preaching-header.jpg"
             primaryAction={{ href: '/talks', label: 'Browse Talks' }}

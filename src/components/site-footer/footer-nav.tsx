@@ -1,5 +1,6 @@
 import { FooterColumn } from '@/components/site-footer/footer-column';
 import { FooterLink } from '@/components/site-footer/footer-nav-link';
+import { site } from '@/configs/site';
 
 export function FooterNav() {
   return (
@@ -14,7 +15,7 @@ export function FooterNav() {
       <FooterColumn title="General">
         <FooterLink href="/about">About</FooterLink>
         <FooterLink href="/beliefs">Beliefs</FooterLink>
-        <FooterLink href="mailto:contact@gettreadtalks.com">Contact</FooterLink>
+        <FooterLink href={`mailto:${site.email.contact}`}>Contact</FooterLink>
       </FooterColumn>
 
       <FooterColumn title="Resources">

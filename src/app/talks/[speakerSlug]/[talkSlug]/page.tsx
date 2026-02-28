@@ -7,7 +7,7 @@ import { TalkHero } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-
 import { JsonLd } from '@/components/json-ld';
 import { EditorialProfileLayout } from '@/components/layouts';
 import { isVideoMediaType } from '@/components/media-embed';
-import { SITE_URL } from '@/constants/env';
+import { site } from '@/configs/site';
 import { getRandomTalksBySpeaker } from '@/features/talks/queries/get-random-talks-by-speaker';
 import { getTalkBySlug } from '@/features/talks/queries/get-talk-by-slug';
 
@@ -60,7 +60,7 @@ export default async function TalkPage({ params }: TalkPageProps) {
     name: talk.title,
     ...(speakerName && { creator: { '@type': 'Person', name: speakerName } }),
     ...(talk.publishedAt && { uploadDate: new Date(talk.publishedAt).toISOString() }),
-    url: `${SITE_URL}/talks/${speakerSlug}/${talkSlug}`,
+    url: `${site.url}/talks/${speakerSlug}/${talkSlug}`,
   };
 
   return (
