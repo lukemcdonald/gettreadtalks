@@ -35,8 +35,12 @@ export default async function HomePage() {
         <Container>
           <FeaturedGrid
             columns={{ default: 1, sm: 1, md: 2, lg: 2, xl: 2 }}
-            // TODO: How can I make text bold, "Don't know what to listen to?"
-            description="Don't know what to listen to? Try starting with one of these favorites."
+            description={
+              <>
+                <strong>Don't know what to listen to?</strong> Try starting with one of these
+                favorites.
+              </>
+            }
             quickLinks={[
               { label: 'All Talks', href: '/talks' },
               { label: 'Featured Talks', href: '/talks?featured=true' },
