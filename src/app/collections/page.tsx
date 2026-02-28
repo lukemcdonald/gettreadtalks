@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 export interface CollectionsPageSearchParams {
   sort?: string;
-  speakerSlug?: string;
+  speaker?: string;
 }
 
 interface CollectionsPageProps {
@@ -22,7 +22,7 @@ interface CollectionsPageProps {
 }
 
 export default async function CollectionsPage({ searchParams }: CollectionsPageProps) {
-  const { sort, speakerSlug } = await searchParams;
+  const { sort, speaker: speakerSlug } = await searchParams;
 
   const { collections, speakers } = await getCollections({ sort, speakerSlug });
 

@@ -49,7 +49,7 @@ export function SpeakerContentSections({
     collections.length,
     MAX_COLLECTIONS,
     'collections',
-    `/collections?speakerSlug=${speaker.slug}`,
+    `/collections?speaker=${speaker.slug}`,
   );
   const clipsLinks = viewAllLink(
     clips.length,
