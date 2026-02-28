@@ -19,11 +19,14 @@ export function AlphabeticalGrid({ className, groups }: AlphabeticalGridProps) {
     <div className={cn('space-y-6 md:space-y-12', className)}>
       {groups.map((group) => (
         <section className="space-y-3 md:space-y-6" key={group.letter}>
-          <div className="flex items-center gap-2">
-            <h2 className="font-semibold text-2xl">{group.letter}</h2>
-            <span className="text-muted-foreground text-sm">{group.range}</span>
-          </div>
-          <GridList columns={{ default: 1, sm: 2, md: 3, lg: 3, xl: 3 }}>{group.items}</GridList>
+          <h2 className="flex items-center gap-4 text-lg">
+            <span className="font-bold">{group.letter}</span>
+            <hr className="grow border-border border-t border-dashed" />
+            <span className="text-muted-foreground text-xs uppercase tracking-wide">
+              {group.range}
+            </span>
+          </h2>
+          <GridList columns={{ default: 1, sm: 2, md: 2, lg: 3, xl: 3 }}>{group.items}</GridList>
         </section>
       ))}
     </div>
