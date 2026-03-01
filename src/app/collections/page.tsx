@@ -26,7 +26,7 @@ export default async function CollectionsPage({ searchParams }: CollectionsPageP
 
   const { collections, speakers } = await getCollections({ sort, speakerSlug });
 
-  const hasActiveFilters = Boolean(speakerSlug);
+  const hasActiveFilters = !!speakerSlug;
 
   return (
     <SidebarLayout
