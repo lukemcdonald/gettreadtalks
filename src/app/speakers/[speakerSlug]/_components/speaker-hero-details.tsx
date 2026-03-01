@@ -1,8 +1,8 @@
 import type { Speaker } from '@/features/speakers/types';
 
-import { SpeakerMinistryLink } from '@/app/speakers/[speakerSlug]/_components/speaker-ministry-link';
 import { HeroTitle } from '@/components/hero-title';
 import { SpeakerAvatar } from '@/features/speakers/components/speaker-avatar';
+import { SpeakerMinistryLink } from '@/features/speakers/components/speaker-ministry-link';
 import { getSpeakerName } from '@/features/speakers/utils';
 import { cn } from '@/utils';
 

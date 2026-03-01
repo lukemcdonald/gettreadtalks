@@ -1,7 +1,7 @@
 import type { Speaker } from '@/features/speakers/types';
 
-import { SpeakerMinistryLink } from '@/app/speakers/[speakerSlug]/_components/speaker-ministry-link';
 import { ShareSpeakerButton } from '@/features/speakers/components/share-speaker-button';
+import { SpeakerMinistryLink } from '@/features/speakers/components/speaker-ministry-link';
 import { FavoriteSpeakerButton } from '@/features/users/components/favorite-speaker-button';
 
 interface SpeakerMetadataSidebarProps {

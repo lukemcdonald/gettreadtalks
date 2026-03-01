@@ -8,7 +8,7 @@ import { detectMediaType } from '@/components/media-embed/utils';
 import { getSpeakerName } from '@/features/speakers/utils';
 import { getTalkUrl } from '@/features/talks/utils';
 
-interface SpeakerTalkCardProps {
+interface TalkMediaCardProps {
   speaker: Pick<Speaker, 'firstName' | 'lastName' | 'slug'>;
   talk: Pick<Talk, 'description' | 'mediaUrl' | 'scripture' | 'slug' | 'title'>;
 }
@@ -34,7 +34,7 @@ function TalkMediaIcon({ mediaUrl }: { mediaUrl: string }) {
   );
 }
 
-export function SpeakerTalkCard({ speaker, talk }: SpeakerTalkCardProps) {
+export function TalkMediaCard({ speaker, talk }: TalkMediaCardProps) {
   return (
     <MediaCard
       ariaLabel={talk.title}

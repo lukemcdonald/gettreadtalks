@@ -5,10 +5,10 @@ import type { Talk } from '@/features/talks/types';
 
 import { SpeakerMetadataSidebar } from '@/app/speakers/[speakerSlug]/_components/speaker-metadata-sidebar';
 import { FeaturedGrid } from '@/components/featured-grid';
+import { ClipMediaCard } from '@/features/clips/components/clip-media-card';
 import { CollectionMediaCard } from '@/features/collections/components/collection-media-card';
 import { getSpeakerName } from '@/features/speakers/utils';
-import { SpeakerClipCard } from './speaker-clip-card';
-import { SpeakerTalkCard } from './speaker-talk-card';
+import { TalkMediaCard } from '@/features/talks/components/talk-media-card';
 
 const MAX_TALKS = 6;
 const MAX_COLLECTIONS = 4;
@@ -71,7 +71,7 @@ export function SpeakerContentSections({
             title="Talks"
           >
             {talks.slice(0, MAX_TALKS).map((talk) => (
-              <SpeakerTalkCard key={talk._id} speaker={speaker} talk={talk} />
+              <TalkMediaCard key={talk._id} speaker={speaker} talk={talk} />
             ))}
           </FeaturedGrid>
         )}
@@ -98,7 +98,7 @@ export function SpeakerContentSections({
             title="Clips"
           >
             {clips.slice(0, MAX_CLIPS).map((clip) => (
-              <SpeakerClipCard
+              <ClipMediaCard
                 clip={{
                   description: clip.description,
                   slug: clip.slug,
