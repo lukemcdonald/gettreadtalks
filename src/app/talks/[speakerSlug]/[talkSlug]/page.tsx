@@ -7,6 +7,7 @@ import { TalkHero } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-
 import { JsonLd } from '@/components/json-ld';
 import { EditorialProfileLayout } from '@/components/layouts';
 import { isVideoMediaType } from '@/components/media-embed';
+import { PageBreadcrumb } from '@/components/ui';
 import { site } from '@/configs/site';
 import { getRandomTalksBySpeaker } from '@/features/talks/queries/get-random-talks-by-speaker';
 import { getTalkBySlug } from '@/features/talks/queries/get-talk-by-slug';
@@ -67,6 +68,15 @@ export default async function TalkPage({ params }: TalkPageProps) {
     <>
       <JsonLd data={jsonLd} />
       <EditorialProfileLayout
+        breadcrumb={
+          <PageBreadcrumb
+            segments={[
+              { href: '/talks', label: 'Talks' },
+              speakerName ? { href: `/speakers/${speakerSlug}`, label: speakerName } : null,
+              { label: talk.title },
+            ]}
+          />
+        }
         content={
           <TalkContentSections
             clips={clips}

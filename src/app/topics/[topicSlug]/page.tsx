@@ -6,6 +6,7 @@ import { TopicContent } from '@/app/topics/[topicSlug]/_components/topic-content
 import { TopicSidebar } from '@/app/topics/[topicSlug]/_components/topic-sidebar';
 import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
+import { PageBreadcrumb } from '@/components/ui';
 import { getTopicBySlug } from '@/features/topics/queries/get-topic-by-slug';
 import { pluralize } from '@/utils/pluralize';
 
@@ -53,6 +54,9 @@ export default async function TopicPage({ params, searchParams }: TopicPageProps
 
   return (
     <SidebarLayout
+      breadcrumb={
+        <PageBreadcrumb segments={[{ href: '/topics', label: 'Topics' }, { label: topic.title }]} />
+      }
       content={
         <TopicContent
           continueCursor={continueCursor}

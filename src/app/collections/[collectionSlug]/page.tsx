@@ -7,6 +7,7 @@ import { CollectionSidebar } from '@/app/collections/[collectionSlug]/_component
 import { JsonLd } from '@/components/json-ld';
 import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
+import { PageBreadcrumb } from '@/components/ui';
 import { site } from '@/configs/site';
 import { getCollectionBySlug } from '@/features/collections/queries/get-collection-by-slug';
 
@@ -62,6 +63,11 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
     <>
       <JsonLd data={jsonLd} />
       <SidebarLayout
+        breadcrumb={
+          <PageBreadcrumb
+            segments={[{ href: '/collections', label: 'Collections' }, { label: collection.title }]}
+          />
+        }
         content={<CollectionContent talks={talks} />}
         header={
           <PageHeader description={collection.description} title={collection.title} variant="lg" />
