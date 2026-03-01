@@ -1,7 +1,7 @@
 import type { Speaker } from '@/features/speakers/types';
 import type { Talk } from '@/features/talks/types';
 
-import { HeroTitle } from '@/components/hero-title';
+import { HeroTitle } from '@/components/hero';
 import { Link } from '@/components/ui/link';
 import { getSpeakerName } from '@/features/speakers/utils';
 

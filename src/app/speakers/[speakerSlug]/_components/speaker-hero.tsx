@@ -3,7 +3,7 @@ import type { Talk } from '@/features/talks/types';
 
 import { SpeakerHeroDetails } from '@/app/speakers/[speakerSlug]/_components/speaker-hero-details';
 import { SpeakerHeroFeaturedTalk } from '@/app/speakers/[speakerSlug]/_components/speaker-hero-featured-talk';
-import { HeroBackground } from '@/components/hero-background';
+import { HeroBackground } from '@/components/hero';
 import { getVideoThumbnail, isVideoMediaType } from '@/components/media-embed';
 import { Container, Section } from '@/components/ui';
 import { cn } from '@/utils';

@@ -1,6 +1,6 @@
 import type { Speaker } from '@/features/speakers/types';
 
-import { HeroTitle } from '@/components/hero-title';
+import { HeroTitle } from '@/components/hero';
 import { SpeakerAvatar } from '@/features/speakers/components/speaker-avatar';
 import { SpeakerMinistryLink } from '@/features/speakers/components/speaker-ministry-link';
 import { getSpeakerName } from '@/features/speakers/utils';

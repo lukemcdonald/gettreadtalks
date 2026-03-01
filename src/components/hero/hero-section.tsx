@@ -3,9 +3,9 @@ import type { Route } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { HeroTitle } from '@/components/hero-title';
 import { Button } from '@/components/ui';
 import { cn } from '@/utils';
+import { HeroTitle } from './hero-title';
 
 interface HeroAction {
   href: string;
