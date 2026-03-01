@@ -15,16 +15,16 @@ import {
   TabsList,
   TabsTab,
 } from '@/components/ui';
+import {
+  UnfavoriteClipButton,
+  UnfavoriteSpeakerButton,
+  UnfavoriteTalkButton,
+} from '@/features/users/components/unfavorite-buttons';
 import { getUserFavorites } from '@/features/users/queries/get-user-favorites';
 import { OptimisticRow } from '../_components/optimistic-row';
 import { TalkTableRow } from '../_components/talk-table-row';
 import { EntityTableRow } from './_components/entity-table-row';
 import { FavoritesTabPanel } from './_components/favorites-tab-panel';
-import {
-  UnfavoriteClipButton,
-  UnfavoriteSpeakerButton,
-  UnfavoriteTalkButton,
-} from './_components/unfavorite-buttons';
 
 interface FavoritesTabProps {
   count: number;
