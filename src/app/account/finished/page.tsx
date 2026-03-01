@@ -9,11 +9,11 @@ import {
   EmptyTitle,
   Separator,
 } from '@/components/ui';
+import { TalkTableRow } from '@/features/users/components/talk-table-row';
 import { UnfinishTalkButton } from '@/features/users/components/unfinish-talk-button';
 import { getUserFinishedTalks } from '@/features/users/queries/get-user-finished-talks';
 import { AccountTable } from '../_components/account-table';
 import { OptimisticRow } from '../_components/optimistic-row';
-import { TalkTableRow } from '../_components/talk-table-row';
 
 export default async function FinishedPage() {
   const { talks } = await getUserFinishedTalks();
