@@ -15,6 +15,7 @@ import {
   TabsList,
   TabsTab,
 } from '@/components/ui';
+import { TalkTableRow } from '@/features/users/components/talk-table-row';
 import {
   UnfavoriteClipButton,
   UnfavoriteSpeakerButton,
@@ -22,7 +23,6 @@ import {
 } from '@/features/users/components/unfavorite-buttons';
 import { getUserFavorites } from '@/features/users/queries/get-user-favorites';
 import { OptimisticRow } from '../_components/optimistic-row';
-import { TalkTableRow } from '../_components/talk-table-row';
 import { EntityTableRow } from './_components/entity-table-row';
 import { FavoritesTabPanel } from './_components/favorites-tab-panel';
 

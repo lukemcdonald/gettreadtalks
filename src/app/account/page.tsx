@@ -6,11 +6,11 @@ import {
   CardTitle,
   Separator,
 } from '@/components/ui';
+import { DeleteAccountForm } from '@/features/users/components/delete-account-form';
+import { EmailForm } from '@/features/users/components/email-form';
+import { PasswordForm } from '@/features/users/components/password-form';
+import { ProfileForm } from '@/features/users/components/profile-form';
 import { getCurrentUser } from '@/services/auth/server';
-import { DeleteAccountForm } from './_components/delete-account-form';
-import { EmailForm } from './_components/email-form';
-import { PasswordForm } from './_components/password-form';
-import { ProfileForm } from './_components/profile-form';
 
 export default async function AccountPage() {
   const user = await getCurrentUser();
