@@ -21,7 +21,7 @@ export function Copyright({ className }: CopyrightProps) {
 
   return (
     <span className={className}>
-      © {site.name} {year}
+      &copy; {site.name} {year}
     </span>
   );
 }

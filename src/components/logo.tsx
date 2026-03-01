@@ -1,7 +1,7 @@
 import { site } from '@/configs/site';
 import { cn } from '@/utils';
 
-interface Props {
+interface LogoProps {
   className?: string;
   colors?: {
     tread?: string;
@@ -14,7 +14,7 @@ const defaultColors = {
   talks: 'text-foreground',
 };
 
-function Logo({ className, colors = defaultColors }: Props) {
+export function Logo({ className, colors = defaultColors }: LogoProps) {
   return (
     <svg
       className={cn('fill-current', className)}
@@ -33,5 +33,3 @@ function Logo({ className, colors = defaultColors }: Props) {
     </svg>
   );
 }
-
-export { Logo };
