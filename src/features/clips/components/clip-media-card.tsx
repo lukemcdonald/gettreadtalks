@@ -4,11 +4,11 @@ import { FilmIcon } from 'lucide-react';
 
 import { MediaCard } from '@/components/media-card';
 
-interface SpeakerClipCardProps {
+interface ClipMediaCardProps {
   clip: Pick<Clip, 'description' | 'slug' | 'title'>;
 }
 
-export function SpeakerClipCard({ clip }: SpeakerClipCardProps) {
+export function ClipMediaCard({ clip }: ClipMediaCardProps) {
   return (
     <MediaCard
       ariaLabel={clip.title}
