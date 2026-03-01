@@ -14,7 +14,7 @@ export function EditorialProfileLayout({ breadcrumb, content, hero }: EditorialP
       {hero}
 
       {!!breadcrumb && (
-        <div className="border-border border-b bg-white px-4 py-4 sm:px-6">
+        <div className="border-border border-b bg-card px-4 py-4 sm:px-6">
           <Container>{breadcrumb}</Container>
         </div>
       )}
