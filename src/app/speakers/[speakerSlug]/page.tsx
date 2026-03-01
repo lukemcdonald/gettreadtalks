@@ -7,6 +7,7 @@ import { SpeakerHero } from '@/app/speakers/[speakerSlug]/_components/speaker-he
 import { JsonLd } from '@/components/json-ld';
 import { EditorialProfileLayout } from '@/components/layouts';
 import { isVideoMediaType } from '@/components/media-embed';
+import { PageBreadcrumb } from '@/components/ui';
 import { site } from '@/configs/site';
 import { getSpeakerBySlug } from '@/features/speakers/queries/get-speaker-by-slug';
 
@@ -71,6 +72,9 @@ export default async function SpeakerPage({ params }: SpeakerPageProps) {
     <>
       <JsonLd data={jsonLd} />
       <EditorialProfileLayout
+        breadcrumb={
+          <PageBreadcrumb segments={[{ href: '/speakers', label: 'Speakers' }, { label: name }]} />
+        }
         content={
           <SpeakerContentSections
             clips={clips}

@@ -40,7 +40,7 @@ export function getVideoThumbnail(url?: string) {
     return null;
   }
 
-  return `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`;
+  return `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
 }
 
 export function detectMediaType(url: string): MediaType {

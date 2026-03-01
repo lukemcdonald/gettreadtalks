@@ -10,6 +10,7 @@ export * from './form-sheet';
 export * from './inline-multi-filter';
 export * from './link';
 export * from './mobile-filter-sheet';
+export * from './page-breadcrumb';
 export * from './primitives';
 export * from './scroll-area';
 export * from './section';

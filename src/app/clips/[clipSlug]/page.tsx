@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 
 import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
+import { PageBreadcrumb } from '@/components/ui';
 import { getClipBySlug } from '@/features/clips/queries/get-clip-by-slug';
 import { ClipContent } from './_components/clip-content';
 import { ClipSidebar } from './_components/clip-sidebar';
@@ -41,6 +42,9 @@ export default async function ClipPage({ params }: ClipPageProps) {
 
   return (
     <SidebarLayout
+      breadcrumb={
+        <PageBreadcrumb segments={[{ href: '/clips', label: 'Clips' }, { label: clip.title }]} />
+      }
       content={<ClipContent clip={clip} />}
       header={<PageHeader title={clip.title} />}
       sidebar={<ClipSidebar speaker={speaker} talk={talk} />}
