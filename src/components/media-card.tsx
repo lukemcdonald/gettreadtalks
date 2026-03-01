@@ -23,7 +23,10 @@ export function MediaCard({
 }: MediaCardProps) {
   return (
     <Card
-      className={cn('card-interactive group relative flex-row gap-4 border-0 p-4', className)}
+      className={cn(
+        'card-interactive group relative flex-row gap-4 border-0 p-4 [contain-intrinsic-size:auto_80px] [content-visibility:auto]',
+        className,
+      )}
       {...delegated}
     >
       {media}
