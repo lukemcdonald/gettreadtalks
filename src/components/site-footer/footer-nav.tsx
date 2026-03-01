@@ -1,5 +1,5 @@
 import { FooterColumn } from '@/components/site-footer/footer-column';
-import { FooterLink } from '@/components/site-footer/footer-nav-link';
+import { FooterLink } from '@/components/site-footer/footer-link';
 import { site } from '@/configs/site';
 
 export function FooterNav() {
