@@ -34,7 +34,7 @@ export async function getTalks(args?: GetTalksProps) {
     : 'recent';
 
   const paginationOpts = {
-    cursor: cursor || null,
+    cursor: cursor ?? null,
     numItems: limit,
   };
 
