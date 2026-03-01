@@ -65,7 +65,7 @@ export default async function TopicPage({ params, searchParams }: TopicPageProps
           talks={talks}
         />
       }
-      header={<PageHeader description={description} title={topic.title} variant="lg" />}
+      header={<PageHeader description={description} size="lg" title={topic.title} />}
       sidebar={<TopicSidebar hasActiveFilters={!!search} topic={topic} />}
       sidebarSticky
     />

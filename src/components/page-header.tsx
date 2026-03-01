@@ -6,20 +6,20 @@ import { cn } from '@/utils';
 
 const titleVariants = cva('text-balance tracking-tight', {
   variants: {
-    variant: {
+    size: {
       sm: 'text-2xl',
       md: 'font-base text-4xl',
       lg: 'font-base text-6xl',
     },
   },
   defaultVariants: {
-    variant: 'md',
+    size: 'md',
   },
 });
 
 const descriptionVariants = cva('text-muted-foreground', {
   variants: {
-    variant: {
+    size: {
       sm: 'text-base',
       md: 'mt-3 text-xl',
       lg: 'mt-4 text-2xl',
@@ -30,16 +30,16 @@ const descriptionVariants = cva('text-muted-foreground', {
 interface PageHeaderProps {
   className?: string;
   description?: ReactNode;
-  variant?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg';
   title: string;
 }
 
-export function PageHeader({ className, description, title, variant = 'md' }: PageHeaderProps) {
+export function PageHeader({ className, description, size = 'md', title }: PageHeaderProps) {
   return (
     <header className={cn('flex flex-col gap-4', className)}>
       <div className="max-w-prose space-y-2">
-        <h1 className={titleVariants({ variant })}>{title}</h1>
-        {!!description && <div className={descriptionVariants({ variant })}>{description}</div>}
+        <h1 className={titleVariants({ size })}>{title}</h1>
+        {!!description && <div className={descriptionVariants({ size })}>{description}</div>}
       </div>
     </header>
   );

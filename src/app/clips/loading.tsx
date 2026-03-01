@@ -10,8 +10,8 @@ export default function ClipsLoading() {
       header={
         <PageHeader
           description="Be encouraged by these short Christ centered clips."
+          size="lg"
           title="Clips"
-          variant="lg"
         />
       }
       sidebar={<SidebarFiltersSkeleton />}

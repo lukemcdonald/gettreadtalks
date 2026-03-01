@@ -10,8 +10,8 @@ export default function TopicsLoading() {
       header={
         <PageHeader
           description="Explore talks organized by topic and theme."
+          size="lg"
           title="Topics"
-          variant="lg"
         />
       }
       sidebar={<SidebarFiltersSkeleton />}
