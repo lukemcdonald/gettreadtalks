@@ -30,7 +30,7 @@ export function TopicBrowseSection({ talkCount, talks, topic }: TopicBrowseSecti
         </p>
         {hasMoreTalks && (
           <Link className="text-primary text-sm hover:underline" href={`/topics/${topic.slug}`}>
-            View all &gt;
+            View all
           </Link>
         )}
       </div>

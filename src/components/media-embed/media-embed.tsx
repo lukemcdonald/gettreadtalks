@@ -1,4 +1,8 @@
+'use client';
+
 import type { MediaTrackingContext } from './types';
+
+import { usePathname } from 'next/navigation';
 
 import { cn } from '@/utils';
 import { AudioPlayer } from './media/audio-player';
@@ -21,11 +25,12 @@ export function MediaEmbed({
   title = 'Media player',
   trackingContext,
 }: MediaEmbedProps) {
+  const pathname = usePathname();
   const media = detectMediaType(mediaUrl);
   const isVideo = media.type === 'video' || media.type === 'vimeo' || media.type === 'youtube';
 
   return (
-    <div className={cn(isVideo && 'overflow-hidden rounded-2xl', className)}>
+    <div className={cn(isVideo && 'overflow-hidden rounded-2xl', className)} key={pathname}>
       {media.type === 'audio' && <AudioPlayer src={media.src} trackingContext={trackingContext} />}
       {media.type === 'unknown' && (
         <ExternalLinkButton className="rounded-full" href={media.href} label="Open Media" />
