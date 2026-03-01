@@ -25,8 +25,8 @@ export default async function TopicsPage() {
                 organized by theme.
               </>
             }
+            size="lg"
             title="Topics"
-            variant="lg"
           />
 
           <TopicsBrowseContent topics={topicsWithTalks} />

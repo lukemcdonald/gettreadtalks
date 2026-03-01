@@ -34,8 +34,8 @@ export default async function CollectionsPage({ searchParams }: CollectionsPageP
       header={
         <PageHeader
           description="Each series includes talks given by one or more speakers on the same topic or book of the Bible."
+          size="lg"
           title="Collections"
-          variant="lg"
         />
       }
       sidebar={<CollectionsSidebar speakers={speakers} />}

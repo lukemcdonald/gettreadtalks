@@ -10,8 +10,8 @@ export default function TalksLoading() {
       header={
         <PageHeader
           description="Elevate your spiritual heartbeat with Christ centered talks."
+          size="lg"
           title="Talks"
-          variant="lg"
         />
       }
       sidebar={<SidebarFiltersSkeleton />}

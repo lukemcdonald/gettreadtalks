@@ -10,8 +10,8 @@ export default function SpeakersLoading() {
       header={
         <PageHeader
           description="Listen to faithful ambassadors of Christ and be blessed."
+          size="lg"
           title="Speakers"
-          variant="lg"
         />
       }
       sidebar={<SidebarFiltersSkeleton />}

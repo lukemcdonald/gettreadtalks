@@ -70,7 +70,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
         }
         content={<CollectionContent talks={talks} />}
         header={
-          <PageHeader description={collection.description} title={collection.title} variant="lg" />
+          <PageHeader description={collection.description} size="lg" title={collection.title} />
         }
         sidebar={<CollectionSidebar speakers={uniqueSpeakers} />}
       />

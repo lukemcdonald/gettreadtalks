@@ -38,8 +38,8 @@ export default async function SpeakersPage({ searchParams }: SpeakersPageProps) 
       header={
         <PageHeader
           description={`Listen to ${speakers.length} faithful ambassadors of Christ and be blessed.`}
+          size="lg"
           title="Speakers"
-          variant="lg"
         />
       }
       sidebar={<SpeakersSidebar speakers={speakers} />}

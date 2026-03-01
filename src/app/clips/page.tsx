@@ -30,8 +30,8 @@ export default async function ClipsPage({ searchParams }: ClipsPageProps) {
         <Container>
           <PageHeader
             description="Be encouraged by these short Christ centered clips."
+            size="lg"
             title="Clips"
-            variant="lg"
           />
         </Container>
       </Section>

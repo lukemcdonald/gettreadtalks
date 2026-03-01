@@ -72,8 +72,8 @@ export default async function TalksPage({ searchParams }: TalksPageProps) {
       header={
         <PageHeader
           description="Elevate your spiritual heartbeat with Christ centered talks."
+          size="lg"
           title="Talks"
-          variant="lg"
         />
       }
       sidebar={<TalksSidebar speakers={sortedSpeakers} topics={topicsResult} />}
