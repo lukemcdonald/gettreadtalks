@@ -8,6 +8,7 @@ import type { SpeakerId } from '../types';
 import { updateTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
+import { stripEmptyStrings } from '@/lib/forms/schemas';
 import { mapConvexErrorToFormErrors, mapZodErrors } from '@/lib/forms/validation';
 import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
 import { updateSpeakerSchema } from '../schemas/speaker-form';
@@ -29,15 +30,8 @@ export async function updateSpeakerAction(
 
   try {
     await fetchAuthMutation(api.speakers.updateSpeaker, {
+      ...stripEmptyStrings(parsed.data),
       speakerId,
-      description: parsed.data.description || undefined,
-      featured: parsed.data.featured,
-      firstName: parsed.data.firstName,
-      imageUrl: parsed.data.imageUrl || undefined,
-      lastName: parsed.data.lastName,
-      ministry: parsed.data.ministry || undefined,
-      role: parsed.data.role || undefined,
-      websiteUrl: parsed.data.websiteUrl || undefined,
     });
 
     updateTag('speakers');

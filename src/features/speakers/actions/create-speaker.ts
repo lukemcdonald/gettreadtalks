@@ -8,6 +8,7 @@ import type { SpeakerId } from '../types';
 import { updateTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
+import { stripEmptyStrings } from '@/lib/forms/schemas';
 import { mapConvexErrorToFormErrors, mapZodErrors } from '@/lib/forms/validation';
 import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
 import { createSpeakerSchema } from '../schemas/speaker-form';
@@ -27,10 +28,10 @@ export async function createSpeakerAction(
   }
 
   try {
-    const speakerId = await fetchAuthMutation(api.speakers.createSpeaker, {
-      ...parsed.data,
-      role: parsed.data.role || undefined,
-    });
+    const speakerId = await fetchAuthMutation(
+      api.speakers.createSpeaker,
+      stripEmptyStrings(parsed.data),
+    );
 
     updateTag('speakers');
     updateTag('form-options');

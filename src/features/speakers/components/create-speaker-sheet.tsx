@@ -11,6 +11,7 @@ import { FormSheet } from '@/components/ui';
 import { createSpeakerAction } from '@/features/speakers/actions/create-speaker';
 import { createSpeakerSchema } from '@/features/speakers/schemas/speaker-form';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
+import { stripEmptyStrings } from '@/lib/forms/schemas';
 import { SpeakerFormFields } from './speaker-form-fields';
 
 type NewSpeaker = Pick<Speaker, '_id' | 'firstName' | 'lastName' | 'imageUrl' | 'role'>;
@@ -51,12 +52,13 @@ export function CreateSpeakerSheet({
         return;
       }
 
+      const cleaned = stripEmptyStrings(data);
       const newSpeaker: NewSpeaker = {
         _id: result.data.speakerId,
-        firstName: data.firstName,
-        imageUrl: data.imageUrl || undefined,
-        lastName: data.lastName,
-        role: data.role || undefined,
+        firstName: cleaned.firstName,
+        imageUrl: cleaned.imageUrl,
+        lastName: cleaned.lastName,
+        role: cleaned.role,
       };
 
       onSpeakerCreated(result.data.speakerId, newSpeaker);
