@@ -1,5 +1,5 @@
 import { FeaturedGrid } from '@/components/featured-grid';
-import { HeroSection } from '@/components/hero-section';
+import { HeroSection } from '@/components/hero';
 import { Main } from '@/components/main';
 import { Container, Section } from '@/components/ui';
 import { site } from '@/configs/site';
