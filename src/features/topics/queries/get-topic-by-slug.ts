@@ -22,7 +22,7 @@ export async function getTopicBySlug(args: GetTopicBySlugProps) {
   const { cursor, limit = 50, search, slug } = args;
 
   const paginationOpts = {
-    cursor: cursor || null,
+    cursor: cursor ?? null,
     numItems: limit,
   };
 

@@ -22,7 +22,7 @@ export async function getClips(args?: GetClipsProps) {
   const { cursor, limit = 50 } = args ?? {};
 
   const paginationOpts = {
-    cursor: cursor || null,
+    cursor: cursor ?? null,
     numItems: limit,
   };
 
