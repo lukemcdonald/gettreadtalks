@@ -36,8 +36,11 @@ export default async function TalksPage({ searchParams }: TalksPageProps) {
   const topicSlugs = topics ? topics.split(',').filter(Boolean) : undefined;
 
   // Check if any filters are active (for showing "clear filters" option)
-  const hasActiveFilters = Boolean(
-    search || speakerSlugs?.length || topicSlugs?.length || featured === 'true',
+  const hasActiveFilters = !!(
+    search ||
+    speakerSlugs?.length ||
+    topicSlugs?.length ||
+    featured === 'true'
   );
 
   const [result, speakersResult, topicsResult] = await Promise.all([

@@ -30,7 +30,7 @@ export default async function SpeakersPage({ searchParams }: SpeakersPageProps) 
     getSpeakers(),
   ]);
 
-  const hasActiveFilters = Boolean(search || role);
+  const hasActiveFilters = !!(search || role);
 
   return (
     <SidebarLayout

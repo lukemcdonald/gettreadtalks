@@ -52,7 +52,7 @@ export function HeroSection({
             {description}
           </p>
         </div>
-        {Boolean(primaryAction || secondaryAction) && (
+        {!!(primaryAction || secondaryAction) && (
           <div className="flex flex-col gap-3 sm:flex-row">
             {!!primaryAction && (
               <Button render={<Link href={primaryAction.href as Route} />} size="lg">
