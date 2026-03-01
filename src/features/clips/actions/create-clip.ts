@@ -8,6 +8,7 @@ import type { ClipId } from '../types';
 import { updateTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
+import { stripEmptyStrings } from '@/lib/forms/schemas';
 import { mapConvexErrorToFormErrors, mapZodErrors } from '@/lib/forms/validation';
 import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
 import { clipFormSchema } from '../schemas/clip-form';
@@ -25,14 +26,7 @@ export async function createClipAction(data: unknown): Promise<ActionResult<{ cl
   }
 
   try {
-    const clipId = await fetchAuthMutation(api.clips.createClip, {
-      description: parsed.data.description || undefined,
-      mediaUrl: parsed.data.mediaUrl,
-      speakerId: parsed.data.speakerId || undefined,
-      status: parsed.data.status,
-      talkId: parsed.data.talkId || undefined,
-      title: parsed.data.title,
-    });
+    const clipId = await fetchAuthMutation(api.clips.createClip, stripEmptyStrings(parsed.data));
 
     updateTag('clips');
 

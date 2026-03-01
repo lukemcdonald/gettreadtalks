@@ -8,6 +8,7 @@ import type { CollectionId } from '../types';
 import { updateTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
+import { stripEmptyStrings } from '@/lib/forms/schemas';
 import { mapConvexErrorToFormErrors, mapZodErrors } from '@/lib/forms/validation';
 import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
 import { collectionFormSchema } from '../schemas/collection-form';
@@ -27,11 +28,10 @@ export async function createCollectionAction(
   }
 
   try {
-    const collectionId = await fetchAuthMutation(api.collections.createCollection, {
-      description: parsed.data.description || undefined,
-      title: parsed.data.title,
-      url: parsed.data.url || undefined,
-    });
+    const collectionId = await fetchAuthMutation(
+      api.collections.createCollection,
+      stripEmptyStrings(parsed.data),
+    );
 
     updateTag('collections');
     updateTag('form-options');
