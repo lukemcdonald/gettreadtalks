@@ -1,5 +1,5 @@
-import { ForgotPasswordForm } from '@/app/forgot-password/_components/forgot-password-form';
 import { Card } from '@/components/ui';
+import { ForgotPasswordForm } from '@/features/users/components/forgot-password-form';
 
 export function ForgotPasswordContent() {
   return (

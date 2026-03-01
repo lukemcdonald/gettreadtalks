@@ -1,7 +1,7 @@
 import { SidebarsLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { Card } from '@/components/ui';
-import { LoginForm } from './_components/login-form';
+import { LoginForm } from '@/features/users/components/login-form';
 
 export default function LoginPage() {
   return (

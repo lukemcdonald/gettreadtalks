@@ -1,7 +1,7 @@
 import { SidebarsLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { Card } from '@/components/ui';
-import { RegisterForm } from './_components/register-form';
+import { RegisterForm } from '@/features/users/components/register-form';
 
 export default function RegisterPage() {
   return (
