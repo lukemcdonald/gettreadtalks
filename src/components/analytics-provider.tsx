@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react';
 
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import posthog from 'posthog-js';
 import { PostHogProvider, usePostHog } from 'posthog-js/react';
@@ -50,19 +50,34 @@ function PostHogIdentify() {
   return null;
 }
 
-if (typeof window !== 'undefined' && process.env.NEXT_PUBLIC_POSTHOG_KEY) {
-  posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY, {
-    api_host: '/ingest',
-    capture_pageleave: true,
-    capture_pageview: false,
-    session_recording: {
-      maskAllInputs: true,
-    },
-    ui_host: 'https://us.posthog.com',
-  });
-}
-
 export function AnalyticsProvider({ children }: { children: ReactNode }) {
+  const [isReady, setIsReady] = useState(false);
+  const initialized = useRef(false);
+
+  useEffect(() => {
+    if (initialized.current || !process.env.NEXT_PUBLIC_POSTHOG_KEY) {
+      return;
+    }
+
+    initialized.current = true;
+
+    posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY, {
+      api_host: '/ingest',
+      capture_pageleave: true,
+      capture_pageview: false,
+      session_recording: {
+        maskAllInputs: true,
+      },
+      ui_host: 'https://us.posthog.com',
+    });
+
+    setIsReady(true);
+  }, []);
+
+  if (!isReady) {
+    return children;
+  }
+
   return (
     <PostHogProvider client={posthog}>
       <Suspense fallback={null}>
