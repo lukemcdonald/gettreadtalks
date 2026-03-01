@@ -10,7 +10,7 @@ interface SiteBrandingProps {
 export function SiteBranding({ className }: SiteBrandingProps) {
   return (
     <Link className={className} href="/">
-      <Logo className="block h-5 w-auto" />
+      <Logo className="h-5 w-auto" />
       <span className="sr-only">{site.name}</span>
     </Link>
   );
