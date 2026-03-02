@@ -1,25 +1,15 @@
-'use server';
+'use cache: private';
 
-import { fetchQuery } from 'convex/nextjs';
+import { cacheLife, cacheTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
-import { getAuthToken } from '@/services/auth/server';
+import { fetchAuthQuery } from '@/services/auth/server';
 
-/**
- * Get user finished talks server-side. Returns empty result if not authenticated.
- */
 export async function getUserFinishedTalks(limit?: number) {
-  const authToken = await getAuthToken();
+  cacheLife('hours');
+  cacheTag('user-finished-talks');
 
-  if (!authToken) {
-    return {
-      continueCursor: null,
-      isDone: true,
-      talks: [],
-    };
-  }
-
-  const result = await fetchQuery(api.users.listUserFinishedTalks, { limit }, { token: authToken });
+  const result = await fetchAuthQuery(api.users.listUserFinishedTalks, { limit });
 
   return {
     continueCursor: null,

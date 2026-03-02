@@ -9,11 +9,9 @@ import {
   EmptyTitle,
   Separator,
 } from '@/components/ui';
-import { TalkTableRow } from '@/features/users/components/talk-table-row';
-import { UnfinishTalkButton } from '@/features/users/components/unfinish-talk-button';
 import { getUserFinishedTalks } from '@/features/users/queries/get-user-finished-talks';
 import { AccountTable } from '../_components/account-table';
-import { OptimisticRow } from '../_components/optimistic-row';
+import { FinishedTalkRow } from './_components/finished-talk-row';
 
 export default async function FinishedPage() {
   const { talks } = await getUserFinishedTalks();
@@ -39,18 +37,13 @@ export default async function FinishedPage() {
       ) : (
         <AccountTable label="Talk">
           {talks.map((talk) => (
-            <OptimisticRow key={talk._id}>
-              {({ onError, onMutate }) => (
-                <TalkTableRow
-                  action={
-                    <UnfinishTalkButton onError={onError} onMutate={onMutate} talkId={talk._id} />
-                  }
-                  href={`/talks/${talk.speaker?.slug}/${talk.slug}`}
-                  speaker={talk.speaker}
-                  title={talk.title}
-                />
-              )}
-            </OptimisticRow>
+            <FinishedTalkRow
+              href={`/talks/${talk.speaker?.slug}/${talk.slug}`}
+              key={talk._id}
+              speaker={talk.speaker}
+              talkId={talk._id}
+              title={talk.title}
+            />
           ))}
         </AccountTable>
       )}

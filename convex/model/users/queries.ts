@@ -153,8 +153,6 @@ export const listUserFavorites = query({
       speakers,
       talks,
     };
-
-    // return await getUserFavorites(ctx, userId, limit);
   },
   returns: v.object({
     clips: v.array(v.any()),
