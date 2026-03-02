@@ -2,10 +2,8 @@
 
 import type { StatusFilterType } from '@/lib/entities/types';
 
-import { fetchQuery } from 'convex/nextjs';
-
 import { api } from '@/convex/_generated/api';
-import { getAuthToken } from '@/services/auth/server';
+import { fetchAuthQuery } from '@/services/auth/server';
 
 interface GetAllClipsProps {
   limit?: number;
@@ -19,21 +17,15 @@ interface GetAllClipsProps {
 export async function getAllClips(args?: GetAllClipsProps) {
   const { limit, status } = args ?? {};
 
-  const token = await getAuthToken();
-
   const paginationOpts = {
     cursor: null,
     numItems: limit ?? 1000,
   };
 
-  const result = await fetchQuery(
-    api.clips.listAllClips,
-    {
-      paginationOpts,
-      status,
-    },
-    { token },
-  );
+  const result = await fetchAuthQuery(api.clips.listAllClips, {
+    paginationOpts,
+    status,
+  });
 
   return {
     clips: result.page,
