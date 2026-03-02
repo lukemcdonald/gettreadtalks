@@ -14,5 +14,6 @@ export * from './page-breadcrumb';
 export * from './primitives';
 export * from './scroll-area';
 export * from './section';
+export * from './sheet-stack';
 export * from './toggle-group';
 export * from './toggle-icon-button';
