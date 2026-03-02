@@ -2,10 +2,8 @@
 
 import type { StatusFilterType } from '@/lib/entities/types';
 
-import { fetchQuery } from 'convex/nextjs';
-
 import { api } from '@/convex/_generated/api';
-import { getAuthToken } from '@/services/auth/server';
+import { fetchAuthQuery } from '@/services/auth/server';
 
 interface GetAllTalksProps {
   cursor?: string;
@@ -19,8 +17,6 @@ interface GetAllTalksProps {
  * Use status='all' to fetch across all statuses, defaults to 'published'.
  */
 export async function getAllTalks(args: GetAllTalksProps = {}) {
-  const token = await getAuthToken();
-
   const paginationOpts = {
     cursor: args.cursor ?? null,
     numItems: args.limit ?? 50,
@@ -28,15 +24,11 @@ export async function getAllTalks(args: GetAllTalksProps = {}) {
   const search = args?.search;
   const status = args.status ?? 'published';
 
-  const result = await fetchQuery(
-    api.talks.listAllTalks,
-    {
-      paginationOpts,
-      search,
-      status,
-    },
-    { token },
-  );
+  const result = await fetchAuthQuery(api.talks.listAllTalks, {
+    paginationOpts,
+    search,
+    status,
+  });
 
   return {
     continueCursor: result.continueCursor,

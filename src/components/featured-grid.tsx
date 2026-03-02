@@ -38,7 +38,7 @@ export function FeaturedGrid({
     <div className={cn('grid gap-4 lg:grid-cols-[280px_1fr] lg:gap-8', className)}>
       <aside className={cn(stickyClass)}>
         <div className="space-y-6">
-          <header className="mt-4 space-y-3">
+          <header className="space-y-3">
             <h2 className="font-semibold text-muted-foreground text-xs uppercase tracking-wide">
               {title}
             </h2>
