@@ -20,6 +20,7 @@ import {
 } from '@/components/ui';
 import { CollectionSelectField } from '@/features/collections/components/collection-select-field';
 import { SpeakerField } from '@/features/speakers/components/speaker-field';
+import { UrlChangeDialog } from '@/features/talks/components/url-change-dialog';
 import { useTalkForm } from '@/features/talks/hooks/use-talk-form';
 
 interface TalkFormProps {
@@ -43,7 +44,18 @@ export function TalkForm({
   talkId,
   talkSlug,
 }: TalkFormProps) {
-  const { form, isBusy, onError, onSubmit, setTalkStatus, submitLabel } = useTalkForm({
+  const {
+    confirmUrlChange,
+    form,
+    isBusy,
+    onError,
+    onSubmit,
+    setTalkStatus,
+    setUrlChangeOpen,
+    submitLabel,
+    urlChange,
+    urlChangeOpen,
+  } = useTalkForm({
     collections,
     initialData,
     speakerSlug,
@@ -63,6 +75,15 @@ export function TalkForm({
         <Fieldset className="max-w-none" disabled={isBusy}>
           <div className="space-y-4">
             <TextField control={form.control} label="Title" name="title" required />
+
+            {mode === 'edit' && (
+              <TextField
+                control={form.control}
+                description="Changing this will change the talk URL"
+                label="Slug"
+                name="slug"
+              />
+            )}
 
             <SpeakerField
               control={form.control}
@@ -126,6 +147,15 @@ export function TalkForm({
           )}
         </div>
       </form>
+      {urlChange && (
+        <UrlChangeDialog
+          newUrl={urlChange.newUrl}
+          oldUrl={urlChange.oldUrl}
+          onConfirm={confirmUrlChange}
+          onOpenChange={setUrlChangeOpen}
+          open={urlChangeOpen}
+        />
+      )}
     </FormProvider>
   );
 }

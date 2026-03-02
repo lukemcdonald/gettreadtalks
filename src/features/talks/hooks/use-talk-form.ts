@@ -7,7 +7,7 @@ import type { TalkFormData } from '@/features/talks/schemas/talk-form';
 import type { TalkFormInitialData, TalkId } from '@/features/talks/types';
 import type { StatusType } from '@/lib/entities/types';
 
-import { useTransition } from 'react';
+import { useRef, useState, useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -30,22 +30,24 @@ interface UseTalkFormProps {
   talkSlug?: string;
 }
 
+interface UrlChangeInfo {
+  newUrl: string;
+  oldUrl: string;
+}
+
 interface UseTalkFormReturn {
+  confirmUrlChange: () => void;
   form: ReturnType<typeof useForm<TalkFormData>>;
   isBusy: boolean;
   onError: SubmitErrorHandler<TalkFormData>;
   onSubmit: SubmitHandler<TalkFormData>;
   setTalkStatus: (status: StatusType) => void;
+  setUrlChangeOpen: (open: boolean) => void;
   submitLabel: string;
+  urlChange: UrlChangeInfo | null;
+  urlChangeOpen: boolean;
 }
 
-/**
- * Hook to manage talk form state and operations.
- * Handles form initialization and submission.
- *
- * @param props - Form configuration and initial data
- * @returns Form instance and handlers
- */
 export function useTalkForm({
   initialData,
   speakerSlug,
@@ -61,6 +63,10 @@ export function useTalkForm({
 
   const [isPending, startTransition] = useTransition();
 
+  const [urlChangeOpen, setUrlChangeOpen] = useState(false);
+  const [urlChange, setUrlChange] = useState<UrlChangeInfo | null>(null);
+  const pendingValues = useRef<TalkFormData | null>(null);
+
   const form = useForm<TalkFormData>({
     // biome-ignore lint/suspicious/noExplicitAny: Type assertion needed for Zod 4 compatibility with zodResolver
     resolver: zodResolver(talkFormSchema as any),
@@ -72,11 +78,38 @@ export function useTalkForm({
       featured: initialData?.featured ?? false,
       mediaUrl: initialData?.mediaUrl ?? '',
       scripture: initialData?.scripture ?? '',
+      slug: initialData?.slug ?? '',
       speakerId: initialData?.speakerId,
       status: initialData?.status ?? 'backlog',
       title: initialData?.title ?? '',
     },
   });
+
+  function getUrlChangeInfo(values: TalkFormData): UrlChangeInfo | null {
+    if (!talkId || initialData?.status !== 'published') {
+      return null;
+    }
+
+    const initialSpeaker = speakers.find((s) => s._id === initialData?.speakerId);
+    const newSpeaker = speakers.find((s) => s._id === values.speakerId);
+    const oldSpeakerSlug = speakerSlug ?? initialSpeaker?.slug ?? '';
+    const newSpeakerSlug = newSpeaker?.slug ?? oldSpeakerSlug;
+
+    const oldTalkSlug = talkSlug ?? initialData?.slug ?? '';
+    const newTalkSlug = values.slug ? slugify(values.slug) : oldTalkSlug;
+
+    const slugChanged = newTalkSlug !== oldTalkSlug;
+    const speakerChanged = values.speakerId !== initialData?.speakerId;
+
+    if (!(slugChanged || speakerChanged)) {
+      return null;
+    }
+
+    return {
+      newUrl: getTalkUrl(newSpeakerSlug, newTalkSlug),
+      oldUrl: getTalkUrl(oldSpeakerSlug, oldTalkSlug),
+    };
+  }
 
   async function handleFormSubmit(values: TalkFormData) {
     setFormStatus(talkId ? 'updating' : 'creating');
@@ -100,9 +133,9 @@ export function useTalkForm({
       return;
     }
 
-    const newSlug = slugify(values.title);
-    const isEditingWithUnchangedTitle = talkId && newSlug === slugify(initialData?.title || '');
-    const finalTalkSlug = isEditingWithUnchangedTitle ? (talkSlug ?? newSlug) : newSlug;
+    const finalTalkSlug = talkId
+      ? ((values.slug ? slugify(values.slug) : talkSlug) ?? slugify(values.title))
+      : slugify(values.title);
     const finalSpeakerSlug = speakerSlug ?? selectedSpeaker.slug;
 
     setFormStatus('idle');
@@ -110,10 +143,35 @@ export function useTalkForm({
   }
 
   const onSubmit: SubmitHandler<TalkFormData> = (values) => {
+    const change = getUrlChangeInfo(values);
+
+    if (change) {
+      pendingValues.current = values;
+      setUrlChange(change);
+      setUrlChangeOpen(true);
+      return;
+    }
+
     startTransition(async () => {
       await handleFormSubmit(values);
     });
   };
+
+  function confirmUrlChange() {
+    const values = pendingValues.current;
+
+    if (!values) {
+      return;
+    }
+
+    pendingValues.current = null;
+    setUrlChangeOpen(false);
+    setUrlChange(null);
+
+    startTransition(async () => {
+      await handleFormSubmit(values);
+    });
+  }
 
   const onError: SubmitErrorHandler<TalkFormData> = () => {
     // Empty - form errors are displayed inline
@@ -123,11 +181,15 @@ export function useTalkForm({
   const submitLabel = getSubmitButtonLabel(formStatus, talkId);
 
   return {
+    confirmUrlChange,
     form,
     isBusy,
     onError,
     onSubmit,
     setTalkStatus,
+    setUrlChangeOpen,
     submitLabel,
+    urlChange,
+    urlChangeOpen,
   };
 }

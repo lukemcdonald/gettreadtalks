@@ -21,6 +21,7 @@ import { SpeakerField } from '@/features/speakers/components/speaker-field';
 interface TalkFormFieldsProps<T extends FieldValues> {
   collections: CollectionListItem[];
   control: Control<T>;
+  mode?: 'create' | 'edit';
   onSpeakerCreated?: (speakerId: SpeakerId) => void;
   onStatusChange?: (status: TalkStatus) => void;
   speakers: SpeakerListItem[];
@@ -29,6 +30,7 @@ interface TalkFormFieldsProps<T extends FieldValues> {
 export function TalkFormFields<T extends FieldValues>({
   collections,
   control,
+  mode = 'create',
   onSpeakerCreated,
   onStatusChange,
   speakers,
@@ -42,6 +44,15 @@ export function TalkFormFields<T extends FieldValues>({
         placeholder="The Gospel of Grace"
         required
       />
+
+      {mode === 'edit' && (
+        <TextField
+          control={control}
+          description="Changing this will change the talk URL"
+          label="Slug"
+          name={'slug' as Path<T>}
+        />
+      )}
 
       <SpeakerField
         control={control}
