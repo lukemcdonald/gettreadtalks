@@ -37,6 +37,7 @@ export type TalkFormInitialData = Pick<
   | 'featured'
   | 'mediaUrl'
   | 'scripture'
+  | 'slug'
   | 'speakerId'
   | 'status'
   | 'title'

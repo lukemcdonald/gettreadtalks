@@ -15,6 +15,7 @@ export const talkFormSchema = z.object({
   featured: z.boolean().default(false),
   mediaUrl: z.string().trim().url('Please enter a valid URL'),
   scripture: z.string().optional(),
+  slug: z.string().trim().optional(),
   speakerId: z
     .string()
     .min(1, 'Speaker is required')

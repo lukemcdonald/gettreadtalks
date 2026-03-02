@@ -95,33 +95,36 @@ export const updateTalk = mutation({
     featured: v.optional(v.boolean()),
     mediaUrl: v.optional(v.string()),
     scripture: v.optional(v.string()),
+    slug: v.optional(v.string()),
     speakerId: v.optional(v.id('speakers')),
     status: v.optional(statusType),
     talkId: v.id('talks'),
     title: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const { talkId, ...rest } = args;
+    const { slug: rawSlug, talkId, ...rest } = args;
 
     await requireAuth(ctx);
 
     const updates: Partial<Doc<'talks'>> = rest;
     const talk = await getOrThrow(ctx, 'talks', talkId);
+    const speakerIdToCheck = updates.speakerId || talk.speakerId;
 
-    // Regenerate slug if title changed to ensure URL consistency
-    if (updates.title !== undefined) {
-      if (!updates.title.trim()) {
-        throwValidationError('Title cannot be empty', 'title');
+    if (updates.title !== undefined && !updates.title.trim()) {
+      throwValidationError('Title cannot be empty', 'title');
+    }
+
+    // Use explicit slug if provided, otherwise keep existing slug
+    if (rawSlug !== undefined) {
+      const newSlug = slugify(rawSlug);
+
+      if (!newSlug) {
+        throwValidationError('Slug cannot be empty', 'slug');
       }
 
-      const newSlug = slugify(updates.title);
-
       if (newSlug !== talk.slug) {
-        const speakerIdToCheck = updates.speakerId || talk.speakerId;
-        const slugExists = await talkSlugExistsForSpeaker(ctx, speakerIdToCheck, newSlug, talkId);
-
-        if (slugExists) {
-          throwDuplicateSlug('Talk with this title already exists for this speaker', 'title');
+        if (await talkSlugExistsForSpeaker(ctx, speakerIdToCheck, newSlug, talkId)) {
+          throwDuplicateSlug('A talk with this slug already exists for this speaker', 'slug');
         }
 
         updates.slug = newSlug;
