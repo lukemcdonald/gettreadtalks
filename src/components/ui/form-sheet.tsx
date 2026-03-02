@@ -13,6 +13,7 @@ import {
   SheetPopup,
   SheetTitle,
 } from './primitives/sheet';
+import { SheetStack, useSheetLayer, useSheetStack } from './sheet-stack';
 
 interface FormSheetProps {
   children: ReactNode;
@@ -26,7 +27,21 @@ interface FormSheetProps {
   title: string;
 }
 
-export function FormSheet({
+export function FormSheet(props: FormSheetProps) {
+  const stack = useSheetStack();
+
+  if (stack) {
+    return <FormSheetInner {...props} />;
+  }
+
+  return (
+    <SheetStack>
+      <FormSheetInner {...props} />
+    </SheetStack>
+  );
+}
+
+function FormSheetInner({
   children,
   error,
   isPending,
@@ -37,9 +52,11 @@ export function FormSheet({
   submitLabel,
   title,
 }: FormSheetProps) {
+  const layer = useSheetLayer(open, () => onOpenChange(false));
+
   return (
     <Sheet onOpenChange={onOpenChange} open={open}>
-      <SheetPopup side="right">
+      <SheetPopup data-sheet-layer-id={layer.id} side="right">
         <SheetHeader>
           <SheetTitle>{title}</SheetTitle>
         </SheetHeader>
