@@ -5,5 +5,5 @@ export const site = {
     reply: 'hello@gettreadtalks.com',
   },
   name: 'TREAD Talks',
-  url: 'https://gettreadtalks.com',
+  url: 'https://www.gettreadtalks.com',
 } as const;
