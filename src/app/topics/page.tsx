@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 
-import { InlineTopicFilter } from '@/app/topics/_components/inline-topic-filter';
 import { TopicsBrowseContent } from '@/app/topics/_components/topics-browse-content';
+import { TopicsSidebar } from '@/app/topics/_components/topics-sidebar';
+import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
-import { Container, Section } from '@/components/ui';
 import { getTopicsWithTalks } from '@/features/topics/queries/get-topics-with-talks';
 
 export const metadata: Metadata = {
@@ -15,23 +15,17 @@ export default async function TopicsPage() {
   const topicsWithTalks = await getTopicsWithTalks();
 
   return (
-    <Section spacing="xl">
-      <Container>
-        <div className="space-y-8">
-          <PageHeader
-            description={
-              <>
-                Explore <InlineTopicFilter topics={topicsWithTalks.map((item) => item.topic)} />{' '}
-                organized by theme.
-              </>
-            }
-            size="lg"
-            title="Topics"
-          />
-
-          <TopicsBrowseContent topics={topicsWithTalks} />
-        </div>
-      </Container>
-    </Section>
+    <SidebarLayout
+      content={<TopicsBrowseContent topics={topicsWithTalks} />}
+      header={
+        <PageHeader
+          description="Browse talks organized by Bible topic or theme."
+          size="lg"
+          title="Topics"
+        />
+      }
+      sidebar={<TopicsSidebar topics={topicsWithTalks} />}
+      sidebarSticky
+    />
   );
 }
