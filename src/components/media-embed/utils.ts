@@ -34,13 +34,16 @@ export function getVideoThumbnail(url?: string) {
   }
 
   const youtubeId = parseYouTubeUrl(url);
-
-  // Vimeo requires API call for thumbnails, so we skip it
-  if (!youtubeId) {
-    return null;
+  if (youtubeId) {
+    return `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
   }
 
-  return `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
+  const vimeoId = parseVimeoUrl(url);
+  if (vimeoId) {
+    return `https://vumbnail.com/${vimeoId}.jpg`;
+  }
+
+  return null;
 }
 
 export function detectMediaType(url: string): MediaType {
