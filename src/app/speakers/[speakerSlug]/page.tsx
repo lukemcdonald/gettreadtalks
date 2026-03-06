@@ -10,6 +10,7 @@ import { isVideoMediaType } from '@/components/media-embed';
 import { PageBreadcrumb } from '@/components/ui';
 import { site } from '@/configs/site';
 import { getSpeakerBySlug } from '@/features/speakers/queries/get-speaker-by-slug';
+import { rotateContent } from '@/utils';
 
 interface SpeakerPageProps {
   params: Promise<{ speakerSlug: string }>;
@@ -45,10 +46,12 @@ export default async function SpeakerPage({ params }: SpeakerPageProps) {
 
   const { clips, collections, speaker, talks } = data;
 
-  // Find featured talk, or fall back to first talk
-  const featuredTalk = talks.find((t) => t.featured) ?? talks[0];
+  const featuredCandidates = talks.filter((t) => t.featured && isVideoMediaType(t.mediaUrl));
+  const [featuredTalk] = rotateContent(featuredCandidates.length > 0 ? featuredCandidates : talks, {
+    period: 'daily',
+    count: 1,
+  });
 
-  // Check if featured talk has video content
   const hasFeaturedVideo = featuredTalk && isVideoMediaType(featuredTalk.mediaUrl);
 
   // Exclude featured talk from regular list only if it's a video (shown in hero)
