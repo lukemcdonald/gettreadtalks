@@ -14,6 +14,6 @@ export async function getTopicsWithTalks() {
   cacheTag('topics');
 
   return await fetchQuery(api.topics.listTopicsWithTalks, {
-    talksPerTopic: 5,
+    talksPerTopic: 4,
   });
 }

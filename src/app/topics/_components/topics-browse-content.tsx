@@ -3,11 +3,8 @@
 import type { TalkWithSpeaker } from '@/features/talks/types';
 import type { Topic } from '@/features/topics/types';
 
-import { ArrowRightIcon } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 
-import { Button } from '@/components/ui';
-import { Link } from '@/components/ui/link';
 import { TopicBrowseSection } from './topic-browse-section';
 
 interface TopicWithTalks {
@@ -20,14 +17,9 @@ interface TopicsBrowseContentProps {
   topics: TopicWithTalks[];
 }
 
-/**
- * Main content for topics browse page.
- * Renders all topic sections with left column info and horizontal scrolling talks.
- * Filters topics based on URL search params when topics filter is applied.
- */
 export function TopicsBrowseContent({ topics }: TopicsBrowseContentProps) {
   const searchParams = useSearchParams();
-  const selectedTopics = searchParams.get('topics')?.split(',').filter(Boolean) || [];
+  const selectedTopics = searchParams.get('topics')?.split(',').filter(Boolean) ?? [];
 
   const filteredTopics =
     selectedTopics.length > 0
@@ -47,7 +39,7 @@ export function TopicsBrowseContent({ topics }: TopicsBrowseContentProps) {
   }
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-16">
       {filteredTopics.map((item) => (
         <TopicBrowseSection
           key={item.topic.slug}
@@ -56,17 +48,6 @@ export function TopicsBrowseContent({ topics }: TopicsBrowseContentProps) {
           topic={item.topic}
         />
       ))}
-      {selectedTopics.length > 0 && (
-        <div className="pt-4">
-          <Link
-            className="inline-flex items-center gap-1.5 font-medium text-lg text-primary hover:underline"
-            href={`/talks?topics=${selectedTopics.join(',')}`}
-          >
-            View all talks in these topics
-            <ArrowRightIcon className="size-4" />
-          </Link>
-        </div>
-      )}
     </div>
   );
 }
