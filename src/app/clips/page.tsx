@@ -25,27 +25,23 @@ export default async function ClipsPage({ searchParams }: ClipsPageProps) {
   const result = await getClips({ cursor });
 
   return (
-    <>
-      <Section>
-        <Container>
+    <Section spacing="xl">
+      <Container>
+        <div className="mb-10">
           <PageHeader
             description="Be encouraged by these short Christ centered clips."
             size="lg"
             title="Clips"
           />
-        </Container>
-      </Section>
+        </div>
 
-      <Section>
-        <Container>
-          <ClipsContent
-            clips={result.clips}
-            continueCursor={result.continueCursor}
-            hasNextPage={!result.isDone}
-            hasPrevPage={!!cursor}
-          />
-        </Container>
-      </Section>
-    </>
+        <ClipsContent
+          clips={result.clips}
+          continueCursor={result.continueCursor}
+          hasNextPage={!result.isDone}
+          hasPrevPage={!!cursor}
+        />
+      </Container>
+    </Section>
   );
 }

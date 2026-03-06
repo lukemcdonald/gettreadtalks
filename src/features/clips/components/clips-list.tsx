@@ -1,8 +1,8 @@
 import type { ClipWithSpeaker } from '../types';
 
-import { MediaEmbed } from '@/components/media-embed';
 import { rotateContent } from '@/utils';
 import { ClipCard } from './clip-card';
+import { ClipFeaturedCard } from './clip-featured-card';
 
 interface ClipsListProps {
   clips: ClipWithSpeaker[];
@@ -17,12 +17,10 @@ export function ClipsList({ clips }: ClipsListProps) {
 
   return (
     <div className="grid auto-rows-min grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-2 lg:grid-cols-3">
-      {/* Featured Video - Spans 2 columns and multiple rows */}
-      <div className="overflow-hidden rounded-2xl md:col-span-2 lg:row-span-4 xl:row-span-5">
-        <MediaEmbed mediaUrl={featuredClip.mediaUrl} title={featuredClip.title} />
+      <div className="md:col-span-2 lg:row-span-4 lg:mb-2 xl:row-span-5">
+        <ClipFeaturedCard clip={featuredClip} />
       </div>
 
-      {/* All Clips as cards - Flow naturally around the video */}
       {clips.map((clip) => (
         <ClipCard
           clip={{
