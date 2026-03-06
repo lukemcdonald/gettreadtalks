@@ -66,11 +66,13 @@ export function MediaThumbnailCard({
           <div className="flex aspect-video items-center justify-center bg-muted" />
         )}
 
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="flex h-12 w-16 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg transition-opacity group-hover:opacity-90">
-            <PlayIcon className="ml-0.5 size-5" fill="currentColor" />
-          </span>
-        </div>
+        {!!showThumbnail && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="flex h-12 w-16 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg transition-opacity group-hover:opacity-90">
+              <PlayIcon className="ml-0.5 size-5" fill="currentColor" />
+            </span>
+          </div>
+        )}
       </div>
 
       <div className="flex items-start justify-between gap-4 px-4 py-3 text-sm">
