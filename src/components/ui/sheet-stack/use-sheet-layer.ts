@@ -6,21 +6,29 @@ import { SheetStackContext } from './sheet-stack';
 
 export function useSheetLayer(open: boolean, onClose: () => void) {
   const context = useContext(SheetStackContext);
-  const id = useId();
+  const contextRef = useRef(context);
   const onCloseRef = useRef(onClose);
+  const id = useId();
+
+  contextRef.current = context;
   onCloseRef.current = onClose;
 
   useEffect(() => {
-    if (!(context && open)) {
+    const ctx = contextRef.current;
+
+    if (!(ctx && open)) {
       return;
     }
 
-    context.register({ id, onClose: () => onCloseRef.current() });
+    ctx.register({
+      id,
+      onClose: () => onCloseRef.current(),
+    });
 
     return () => {
-      context.unregister(id);
+      ctx.unregister(id);
     };
-  }, [context, id, open]);
+  }, [id, open]);
 
   return { id };
 }
