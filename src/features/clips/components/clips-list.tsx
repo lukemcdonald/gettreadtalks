@@ -20,13 +20,16 @@ export function ClipsList({ clips }: ClipsListProps) {
     count: 1,
   });
 
+  const remainingClips =
+    clips.length > 1 ? clips.filter((clip) => clip._id !== featuredClip._id) : clips;
+
   return (
     <div className="grid auto-rows-min grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-2 lg:grid-cols-3">
       <div className="md:col-span-2 lg:row-span-4 lg:mb-2 xl:row-span-5">
         <ClipFeaturedCard clip={featuredClip} />
       </div>
 
-      {clips.map((clip) => (
+      {remainingClips.map((clip) => (
         <ClipCard
           clip={{
             description: clip.description,
