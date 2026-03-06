@@ -1,6 +1,6 @@
 'use client';
 
-import type { Id } from '@/convex/_generated/dataModel';
+import type { TalkId } from '@/features/talks/types';
 
 import { CircleCheckBigIcon } from 'lucide-react';
 
@@ -11,7 +11,7 @@ import { useMutation } from '@/hooks';
 interface UnfinishTalkButtonProps {
   onError?: () => void;
   onMutate?: () => void;
-  talkId: Id<'talks'>;
+  talkId: TalkId;
 }
 
 export function UnfinishTalkButton({ onError, onMutate, talkId }: UnfinishTalkButtonProps) {
