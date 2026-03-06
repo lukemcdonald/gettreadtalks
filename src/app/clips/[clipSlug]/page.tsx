@@ -2,12 +2,12 @@ import type { Metadata } from 'next';
 
 import { notFound } from 'next/navigation';
 
-import { SidebarLayout } from '@/components/layouts';
-import { PageHeader } from '@/components/page-header';
+import { EditorialProfileLayout } from '@/components/layouts';
 import { PageBreadcrumb } from '@/components/ui';
 import { getClipBySlug } from '@/features/clips/queries/get-clip-by-slug';
+import { getSpeakerName } from '@/features/speakers/utils';
 import { ClipContent } from './_components/clip-content';
-import { ClipSidebar } from './_components/clip-sidebar';
+import { ClipHero } from './_components/clip-hero';
 
 interface ClipPageProps {
   params: Promise<{ clipSlug: string }>;
@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: ClipPageProps): Promise<Metad
   }
 
   const { clip, speaker } = data;
-  const speakerName = speaker ? `${speaker.firstName} ${speaker.lastName}` : '';
+  const speakerName = speaker ? getSpeakerName(speaker) : '';
 
   return {
     description: clip.description ?? (speakerName ? `A clip from ${speakerName}.` : undefined),
@@ -41,13 +41,12 @@ export default async function ClipPage({ params }: ClipPageProps) {
   const { clip, speaker, talk } = data;
 
   return (
-    <SidebarLayout
+    <EditorialProfileLayout
       breadcrumb={
         <PageBreadcrumb segments={[{ href: '/clips', label: 'Clips' }, { label: clip.title }]} />
       }
-      content={<ClipContent clip={clip} />}
-      header={<PageHeader title={clip.title} />}
-      sidebar={<ClipSidebar speaker={speaker} talk={talk} />}
+      content={<ClipContent clip={clip} speaker={speaker} talk={talk} />}
+      hero={<ClipHero clip={clip} speaker={speaker} />}
     />
   );
 }
