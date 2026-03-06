@@ -35,7 +35,7 @@ export function SpeakerHeroDetails({ centered, showAbout, speaker }: SpeakerHero
       <div className="flex-1 space-y-4">
         <div>
           {speaker.role && (
-            <p className="mb-2 font-semibold text-muted-foreground text-xs uppercase tracking-widest">
+            <p className="mb-2 font-semibold text-muted-foreground text-xs uppercase tracking-wide">
               {speaker.role}
             </p>
           )}
