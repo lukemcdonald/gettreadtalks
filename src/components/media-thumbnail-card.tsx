@@ -8,6 +8,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import { Card } from '@/components/ui';
+import { captureMessage } from '@/services/errors';
 
 interface MediaThumbnailCardProps {
   actionLabel?: string;
@@ -29,6 +30,16 @@ export function MediaThumbnailCard({
   const [thumbnailFailed, setThumbnailFailed] = useState(false);
   const showThumbnail = thumbnail && !thumbnailFailed;
 
+  function handleThumbnailError() {
+    setThumbnailFailed(true);
+    captureMessage('Media thumbnail failed to load', {
+      level: 'warning',
+      tags: { feature: 'media' },
+      context: { href, thumbnail, title },
+      fingerprint: ['media', thumbnail ?? 'unknown'],
+    });
+  }
+
   return (
     <Card
       className="group overflow-clip shadow-2xl"
@@ -46,7 +57,7 @@ export function MediaThumbnailCard({
               alt={title}
               className="object-cover"
               fill
-              onError={() => setThumbnailFailed(true)}
+              onError={handleThumbnailError}
               sizes={sizes}
               src={thumbnail}
             />
