@@ -85,7 +85,7 @@
   --muted: --alpha(var(--color-black) / 4%);
   --muted-foreground: color-mix(
     in srgb,
-    var(--color-neutral-500) 90%,
+    var(--color-neutral-600) 90%,
     var(--color-black)
   );
   --accent: --alpha(var(--color-black) / 4%);
@@ -137,7 +137,7 @@
   --muted: --alpha(var(--color-white) / 4%);
   --muted-foreground: color-mix(
     in srgb,
-    var(--color-neutral-500) 90%,
+    var(--color-neutral-400) 90%,
     var(--color-white)
   );
   --accent: --alpha(var(--color-white) / 4%);
