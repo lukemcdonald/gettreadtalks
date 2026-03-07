@@ -32,7 +32,7 @@ export function FeaturedGrid({
 }: FeaturedGridProps) {
   const defaultColumns: GridColumns = { default: 1, sm: 2, md: 2, lg: 3, xl: 3 };
   const gridColumns = columns || defaultColumns;
-  const stickyClass = sticky ? 'lg:sticky lg:top-16 lg:h-fit' : undefined;
+  const stickyClass = sticky ? 'lg:sticky lg:top-20 lg:h-fit' : undefined;
 
   return (
     <div className={cn('grid gap-4 lg:grid-cols-[280px_1fr] lg:gap-8', className)}>

@@ -2,10 +2,7 @@ import { Container, Section, Skeleton } from '@/components/ui';
 
 export function SpeakerHeroSkeleton() {
   return (
-    <Section className="dark relative overflow-hidden" spacing="3xl">
-      {/* Background */}
-      <div className="absolute inset-0 bg-gray-950" />
-
+    <Section className="relative overflow-hidden" spacing="3xl">
       <Container className="relative flex flex-col gap-10 lg:flex-row lg:items-center lg:gap-12">
         {/* Speaker details — left column */}
         <div className="lg:flex-1">
