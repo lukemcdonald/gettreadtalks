@@ -30,11 +30,9 @@ export function MediaCard({
       {...delegated}
     >
       {media}
-      <div className="flex-1 space-y-0.5">
-        <CardTitle className="line-clamp-2 text-base">
-          <FauxLink aria-label={ariaLabel} href={href}>
-            {title}
-          </FauxLink>
+      <div className="flex flex-1 flex-col justify-center gap-1.5">
+        <CardTitle render={<h3 aria-label={ariaLabel} className="line-clamp-2 text-base" />}>
+          <FauxLink href={href}>{title}</FauxLink>
         </CardTitle>
         {!!subtitle && <CardDescription>{subtitle}</CardDescription>}
       </div>

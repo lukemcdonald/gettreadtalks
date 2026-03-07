@@ -17,12 +17,13 @@ export function CollectionCard({ collection, speakers = [], talkCount }: Collect
 
   return (
     <Card className="card-interactive">
-      <CardHeader className="grow content-start gap-4">
-        <CardTitle>
+      <CardHeader className="grow content-start gap-1.5">
+        <CardTitle render={<h3 aria-label={collection.title} className="line-clamp-2 text-base" />}>
           <FauxLink href={`/collections/${collection.slug}`}>{collection.title}</FauxLink>
         </CardTitle>
 
         {!!collection.description && <CardDescription>{collection.description}</CardDescription>}
+
         {talkCount !== undefined && (
           <CardDescription>
             {talkCount} {talkCount === 1 ? 'Talk' : 'Talks'}
