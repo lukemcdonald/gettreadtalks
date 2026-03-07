@@ -23,7 +23,7 @@ export function TopicsSidebar({ topics }: TopicsSidebarProps) {
     <SidebarContent className="space-y-4">
       {/* Mobile: icon filter button */}
       <div className="flex items-center gap-2 md:hidden">
-        <MobileFilterSheet iconOnly>
+        <MobileFilterSheet variant="icon">
           <ComboboxMultiFilter
             label="Topics"
             name="topics"

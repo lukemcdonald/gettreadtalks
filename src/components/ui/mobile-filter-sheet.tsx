@@ -19,38 +19,39 @@ import { cn } from '@/utils';
 
 interface MobileFilterSheetProps {
   children: ReactNode;
-  iconOnly?: boolean;
   label?: string;
   onOpenChange?: (open: boolean) => void;
   open?: boolean;
   showCount?: boolean;
   title?: string;
+  variant?: 'default' | 'icon';
 }
 
 export function MobileFilterSheet({
   children,
-  iconOnly = false,
   label = 'Filters',
   onOpenChange,
   open,
   showCount = true,
   title,
+  variant = 'default',
 }: MobileFilterSheetProps) {
   const count = useActiveFilterCount();
   const sheetTitle = title ?? label;
   const isControlled = open !== undefined;
+  const isIcon = variant === 'icon';
 
   return (
     <Sheet onOpenChange={onOpenChange} open={isControlled ? open : undefined}>
       <SheetTrigger
-        className={cn(!iconOnly && 'w-full')}
-        render={<Button size={iconOnly ? 'icon-lg' : 'sm'} variant="outline" />}
+        className={cn(!isIcon && 'w-full')}
+        render={<Button size={isIcon ? 'icon-lg' : 'sm'} variant="outline" />}
       >
         <SlidersHorizontalIcon />
-        {!iconOnly && label}
+        {!isIcon && label}
         {showCount &&
           count > 0 &&
-          (iconOnly ? (
+          (isIcon ? (
             <span className="absolute -top-1.5 -right-1.5 flex size-[18px] items-center justify-center rounded-full bg-primary font-semibold text-[10px] text-primary-foreground">
               {count}
             </span>

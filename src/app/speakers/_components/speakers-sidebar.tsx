@@ -28,7 +28,7 @@ export function SpeakersSidebar({ speakers }: SpeakersSidebarProps) {
       {/* Mobile: inline search + icon filter button */}
       <div className="flex items-center gap-2 md:hidden">
         <SearchInput className="flex-1" paramName="search" placeholder="Search speakers..." />
-        <MobileFilterSheet iconOnly>
+        <MobileFilterSheet variant="icon">
           <SelectFilter label="Role" name="role" options={roleOptions} placeholder="All Roles" />
           <SortSelect label="Sort by" options={sortOptions} />
         </MobileFilterSheet>
