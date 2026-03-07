@@ -1,8 +1,8 @@
 import type { Clip } from '@/features/clips/types';
 import type { Speaker } from '@/features/speakers/types';
 
-import { HeroBackground, HeroTitle } from '@/components/hero';
-import { MediaEmbed, getVideoThumbnail } from '@/components/media-embed';
+import { HeroTitle } from '@/components/hero';
+import { MediaEmbed } from '@/components/media-embed';
 import { Container, Section } from '@/components/ui';
 import { Link } from '@/components/ui/link';
 import { getSpeakerName } from '@/features/speakers/utils';
@@ -13,13 +13,10 @@ interface ClipHeroProps {
 }
 
 export function ClipHero({ clip, speaker }: ClipHeroProps) {
-  const imageSrc = getVideoThumbnail(clip.mediaUrl);
   const speakerName = getSpeakerName(speaker);
 
   return (
-    <Section className="dark relative overflow-hidden py-6 sm:py-8 md:py-12 lg:py-16">
-      <HeroBackground className="blur-md grayscale" imageSrc={imageSrc} />
-
+    <Section className="dark relative overflow-hidden bg-gray-950 py-6 sm:py-8 md:py-12 lg:py-16">
       <Container className="relative space-y-8">
         <div className="space-y-2 text-center">
           <HeroTitle className="text-foreground" size="sm">

@@ -33,7 +33,16 @@ export async function generateMetadata({ params }: TalkPageProps): Promise<Metad
   return {
     description: talk.description ?? (speakerName ? `A talk by ${speakerName}.` : undefined),
     openGraph: speaker?.imageUrl
-      ? { images: [{ alt: speakerName, height: 630, url: speaker.imageUrl, width: 1200 }] }
+      ? {
+          images: [
+            {
+              alt: speakerName,
+              height: 630,
+              url: speaker.imageUrl,
+              width: 1200,
+            },
+          ],
+        }
       : undefined,
     title: talk.title,
   };
@@ -68,15 +77,15 @@ export default async function TalkPage({ params }: TalkPageProps) {
     <>
       <JsonLd data={jsonLd} />
       <EditorialProfileLayout
-        breadcrumb={
-          <PageBreadcrumb
-            segments={[
-              { href: '/talks', label: 'Talks' },
-              speakerName ? { href: `/speakers/${speakerSlug}`, label: speakerName } : null,
-              { label: talk.title },
-            ]}
-          />
-        }
+        // breadcrumb={
+        //   <PageBreadcrumb
+        //     segments={[
+        //       { href: '/talks', label: 'Talks' },
+        //       speakerName ? { href: `/speakers/${speakerSlug}`, label: speakerName } : null,
+        //       { label: talk.title },
+        //     ]}
+        //   />
+        // }
         content={
           <TalkContentSections
             clips={clips}

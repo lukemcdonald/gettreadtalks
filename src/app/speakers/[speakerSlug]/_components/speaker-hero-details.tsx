@@ -26,7 +26,7 @@ export function SpeakerHeroDetails({ centered, showAbout, speaker }: SpeakerHero
     >
       {hasImage && (
         <SpeakerAvatar
-          className={cn('size-20', centered ? 'size-28 md:size-32' : 'md:size-28')}
+          className={cn('size-20', centered ? 'size-28 md:size-32' : '-mt-4 md:size-24')}
           rounded="full"
           speaker={speaker}
         />

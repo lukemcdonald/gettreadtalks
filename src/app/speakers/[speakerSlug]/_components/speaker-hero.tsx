@@ -18,8 +18,8 @@ export function SpeakerHero({ featuredTalk, speaker }: SpeakerHeroProps) {
   const imageSrc = getVideoThumbnail(featuredTalk?.mediaUrl);
 
   return (
-    <Section className="dark relative overflow-hidden" spacing="3xl">
-      <HeroBackground className="blur-xl saturate-50" imageSrc={imageSrc} />
+    <Section className="relative overflow-hidden" spacing="3xl">
+      {/* <HeroBackground className="blur-xl saturate-50" imageSrc={imageSrc} /> */}
 
       <Container
         className={cn(

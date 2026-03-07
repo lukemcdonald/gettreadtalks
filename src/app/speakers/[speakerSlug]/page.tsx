@@ -75,9 +75,9 @@ export default async function SpeakerPage({ params }: SpeakerPageProps) {
     <>
       <JsonLd data={jsonLd} />
       <EditorialProfileLayout
-        breadcrumb={
-          <PageBreadcrumb segments={[{ href: '/speakers', label: 'Speakers' }, { label: name }]} />
-        }
+        // breadcrumb={
+        //   <PageBreadcrumb segments={[{ href: '/speakers', label: 'Speakers' }, { label: name }]} />
+        // }
         content={
           <SpeakerContentSections
             clips={clips}
