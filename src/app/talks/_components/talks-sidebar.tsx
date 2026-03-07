@@ -41,7 +41,7 @@ export function TalksSidebar({ speakers, topics }: TalksSidebarProps) {
       {/* Mobile: inline search + icon filter button */}
       <div className="flex items-center gap-2 md:hidden">
         <SearchInput className="flex-1" paramName="search" placeholder="Search talks..." />
-        <MobileFilterSheet iconOnly>
+        <MobileFilterSheet variant="icon">
           <ComboboxMultiFilter
             label="Speakers"
             name="speakers"
