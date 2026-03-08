@@ -4,6 +4,14 @@ import { Card, CardDescription, CardTitle } from '@/components/ui';
 import { FauxLink } from '@/components/ui/link';
 import { cn } from '@/utils';
 
+export function MediaIconFrame({ children }: { children: ReactNode }) {
+  return (
+    <div className="flex size-12 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
+      {children}
+    </div>
+  );
+}
+
 type MediaCardProps = {
   ariaLabel?: string;
   href: string;

@@ -7,26 +7,26 @@ import { getSpeakerName } from '@/features/speakers/utils';
 import { cn } from '@/utils';
 
 interface SpeakerHeroDetailsProps {
-  centered?: boolean;
-  showAbout?: boolean;
   speaker: Speaker;
+  variant?: 'centered' | 'inline';
 }
 
-export function SpeakerHeroDetails({ centered, showAbout, speaker }: SpeakerHeroDetailsProps) {
+export function SpeakerHeroDetails({ speaker, variant = 'centered' }: SpeakerHeroDetailsProps) {
   const speakerName = getSpeakerName(speaker);
   const hasImage = !!speaker.imageUrl;
   const hasMinistry = !!(speaker.ministry || speaker.websiteUrl);
+  const isInline = variant === 'inline';
 
   return (
     <header
       className={cn(
         'flex flex-col items-center gap-6 text-center',
-        !centered && hasImage && 'md:flex-row md:items-start md:gap-8 md:text-left',
+        isInline && hasImage && 'md:flex-row md:items-start md:gap-8 md:text-left',
       )}
     >
       {hasImage && (
         <SpeakerAvatar
-          className={cn('size-20', centered ? 'size-28 md:size-32' : '-mt-4 md:size-24')}
+          className={cn('size-20', isInline ? '-mt-4 md:size-24' : 'size-28 md:size-32')}
           rounded="full"
           speaker={speaker}
         />
@@ -42,7 +42,7 @@ export function SpeakerHeroDetails({ centered, showAbout, speaker }: SpeakerHero
           <HeroTitle className="text-foreground">{speakerName}</HeroTitle>
         </div>
 
-        {showAbout && (
+        {isInline && (
           <>
             {speaker.description && (
               <p className="max-w-lg text-lg text-muted-foreground leading-relaxed">
