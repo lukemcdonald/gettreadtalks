@@ -3,7 +3,7 @@ import type { Talk } from '@/features/talks/types';
 
 import { LinkIcon, MicIcon, PlayIcon } from 'lucide-react';
 
-import { MediaCard } from '@/components/media-card';
+import { MediaCard, MediaIconFrame } from '@/components/media-card';
 import { detectMediaType } from '@/components/media-embed/utils';
 import { getSpeakerName } from '@/features/speakers/utils';
 import { getTalkUrl } from '@/features/talks/utils';
@@ -28,9 +28,9 @@ function TalkMediaIcon({ mediaUrl }: { mediaUrl: string }) {
   const Icon = getMediaIcon(mediaUrl);
 
   return (
-    <div className="flex size-12 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
+    <MediaIconFrame>
       <Icon className="size-5" />
-    </div>
+    </MediaIconFrame>
   );
 }
 

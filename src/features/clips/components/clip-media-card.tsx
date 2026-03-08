@@ -2,7 +2,7 @@ import type { Clip } from '@/features/clips/types';
 
 import { FilmIcon } from 'lucide-react';
 
-import { MediaCard } from '@/components/media-card';
+import { MediaCard, MediaIconFrame } from '@/components/media-card';
 
 interface ClipMediaCardProps {
   clip: Pick<Clip, 'description' | 'slug' | 'title'>;
@@ -14,9 +14,9 @@ export function ClipMediaCard({ clip }: ClipMediaCardProps) {
       ariaLabel={clip.title}
       href={`/clips/${clip.slug}`}
       media={
-        <div className="flex size-12 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
+        <MediaIconFrame>
           <FilmIcon className="size-5" />
-        </div>
+        </MediaIconFrame>
       }
       subtitle={clip.description}
       title={clip.title}
