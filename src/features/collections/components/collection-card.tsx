@@ -18,7 +18,11 @@ export function CollectionCard({ collection, speakers = [], talkCount }: Collect
   return (
     <Card className="card-interactive">
       <CardHeader className="grow content-start gap-1.5">
-        <CardTitle render={<h3 aria-label={collection.title} className="line-clamp-2 text-base" />}>
+        <CardTitle
+          render={
+            <h3 aria-label={collection.title} className="line-clamp-2 text-balance text-base" />
+          }
+        >
           <FauxLink href={`/collections/${collection.slug}`}>{collection.title}</FauxLink>
         </CardTitle>
 
