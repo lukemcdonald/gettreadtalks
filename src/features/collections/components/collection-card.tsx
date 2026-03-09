@@ -1,7 +1,8 @@
 import type { Collection } from '@/features/collections/types';
 import type { Speaker } from '@/features/speakers/types';
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui';
+import { MediaCardTitle } from '@/components/media-card';
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui';
 import { FauxLink } from '@/components/ui/link';
 import { CollectionCardSpeaker } from '@/features/collections/components/collection-card-speaker';
 
@@ -18,13 +19,9 @@ export function CollectionCard({ collection, speakers = [], talkCount }: Collect
   return (
     <Card className="card-interactive">
       <CardHeader className="grow content-start gap-1.5">
-        <CardTitle
-          render={
-            <h3 aria-label={collection.title} className="line-clamp-2 text-balance text-base" />
-          }
-        >
+        <MediaCardTitle aria-label={collection.title}>
           <FauxLink href={`/collections/${collection.slug}`}>{collection.title}</FauxLink>
-        </CardTitle>
+        </MediaCardTitle>
 
         {!!collection.description && <CardDescription>{collection.description}</CardDescription>}
 
