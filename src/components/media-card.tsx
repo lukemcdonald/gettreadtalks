@@ -1,6 +1,6 @@
 import type { ComponentProps, ReactNode } from 'react';
 
-import { Card, CardDescription, CardTitle } from '@/components/ui';
+import { Card, CardDescription } from '@/components/ui';
 import { FauxLink } from '@/components/ui/link';
 import { cn } from '@/utils';
 
@@ -9,6 +9,15 @@ export function MediaIconFrame({ children }: { children: ReactNode }) {
     <div className="flex size-12 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
       {children}
     </div>
+  );
+}
+
+export function MediaCardTitle({ className, ...delegated }: ComponentProps<'h3'>) {
+  return (
+    <h3
+      className={cn('line-clamp-2 text-balance font-semibold text-base', className)}
+      {...delegated}
+    />
   );
 }
 
@@ -39,11 +48,9 @@ export function MediaCard({
     >
       {media}
       <div className="flex flex-1 flex-col justify-center gap-1.5">
-        <CardTitle
-          render={<h3 aria-label={ariaLabel} className="line-clamp-2 text-balance text-base" />}
-        >
+        <MediaCardTitle aria-label={ariaLabel}>
           <FauxLink href={href}>{title}</FauxLink>
-        </CardTitle>
+        </MediaCardTitle>
         {!!subtitle && <CardDescription>{subtitle}</CardDescription>}
       </div>
     </Card>
