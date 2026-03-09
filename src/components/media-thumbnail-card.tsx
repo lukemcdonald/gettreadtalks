@@ -77,7 +77,7 @@ export function MediaThumbnailCard({
 
       <div className="flex items-start justify-between gap-4 px-4 py-3 text-sm">
         <div>
-          <h2 className="font-medium text-foreground">{title}</h2>
+          <h2 className="text-pretty font-medium text-foreground">{title}</h2>
           {!!subtitle && <p className="text-muted-foreground">{subtitle}</p>}
         </div>
 
