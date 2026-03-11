@@ -53,7 +53,7 @@ export function AccountMenu({ initialUser }: AccountMenuProps) {
     );
   }
 
-  const showAdminLink = isAdmin(user);
+  const showDashboardLink = isAdmin(user);
 
   return (
     <Menu>
@@ -73,8 +73,8 @@ export function AccountMenu({ initialUser }: AccountMenuProps) {
         <AccountMenuItem href="/account/finished" icon={FinishedIcon} label="Finished" />
         <MenuSeparator />
         <AccountMenuItem href="/account" icon={SettingsIcon} label="Settings" />
-        {!!showAdminLink && (
-          <AccountMenuItem href="/account/talks" icon={DashboardIcon} label="Admin Dashboard" />
+        {!!showDashboardLink && (
+          <AccountMenuItem href="/account/talks" icon={DashboardIcon} label="Dashboard" />
         )}
         <AccountMenuItem href={'/logout' as Route} icon={SignOutIcon} label="Sign out" />
       </MenuPopup>
