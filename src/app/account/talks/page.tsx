@@ -1,20 +1,20 @@
 import type { StatusType } from '@/lib/entities/types';
 
-import { AdminTalksContent } from '@/app/account/talks/_components/talks-content';
+import { AccountTalksContent } from '@/app/account/talks/_components/talks-content';
 import { PageHeader } from '@/components/page-header';
 import { NewTalkButton } from '@/features/talks/components/new-talk-button';
 
-export interface AdminTalksSearchParams {
+export interface AccountTalksSearchParams {
   cursor?: string;
   search?: string;
   status?: StatusType | 'all';
 }
 
-interface AdminTalksPageProps {
-  searchParams: Promise<AdminTalksSearchParams>;
+interface AccountTalksPageProps {
+  searchParams: Promise<AccountTalksSearchParams>;
 }
 
-export default async function AdminTalksPage({ searchParams }: AdminTalksPageProps) {
+export default async function AccountTalksPage({ searchParams }: AccountTalksPageProps) {
   const params = await searchParams;
 
   return (
@@ -23,7 +23,7 @@ export default async function AdminTalksPage({ searchParams }: AdminTalksPagePro
         <PageHeader description="Manage all talks across all statuses" title="Manage Talks" />
         <NewTalkButton />
       </div>
-      <AdminTalksContent searchParams={params} />
+      <AccountTalksContent searchParams={params} />
     </div>
   );
 }

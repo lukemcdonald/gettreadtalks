@@ -11,11 +11,11 @@ import {
 } from '@/components/ui';
 import { TalksTableRow } from './talks-table-row';
 
-interface AdminTalksTableProps {
+interface TalksTableProps {
   talks: TalkWithSpeakerAndTopics[];
 }
 
-export function TalksTable({ talks }: AdminTalksTableProps) {
+export function TalksTable({ talks }: TalksTableProps) {
   if (talks.length === 0) {
     return (
       <Empty>

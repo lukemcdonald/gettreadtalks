@@ -1,4 +1,4 @@
-import type { AdminTalksSearchParams } from '@/app/account/talks/page';
+import type { AccountTalksSearchParams } from '@/app/account/talks/page';
 
 import { Suspense } from 'react';
 
@@ -8,11 +8,11 @@ import { Skeleton } from '@/components/ui';
 import { TalksTable } from '@/features/talks/components/talks-table/talks-table';
 import { getAllTalks } from '@/features/talks/queries/get-all-talks';
 
-interface AdminTalksContentProps {
-  searchParams: AdminTalksSearchParams;
+interface AccountTalksContentProps {
+  searchParams: AccountTalksSearchParams;
 }
 
-export async function AdminTalksContent({ searchParams }: AdminTalksContentProps) {
+export async function AccountTalksContent({ searchParams }: AccountTalksContentProps) {
   const { cursor, search, status } = searchParams;
 
   const result = await getAllTalks({

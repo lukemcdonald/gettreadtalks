@@ -51,3 +51,22 @@ import { Button } from '@/components/ui/primitives/button';
 ```
 
 **Naming:** kebab-case for all folders
+
+## Layout Data Fetching
+
+Never fetch data in `layout.tsx` on the server. Doing so forces all children into dynamic rendering, breaking static rendering for the entire subtree.
+
+```tsx
+// ❌ Never — makes all children dynamic
+export default async function Layout({ children }) {
+  const data = await fetchSomeData();
+  return <Sidebar data={data}>{children}</Sidebar>;
+}
+
+// ✅ Fetch inside the component, not the layout
+export default function Layout({ children }) {
+  return <Sidebar>{children}</Sidebar>; // Sidebar fetches its own data internally
+}
+```
+
+**Exception:** Auth guards (`requireCurrentUser`, `requireAdminUser`) are acceptable in layouts — they redirect rather than pass data to children, and protected routes are inherently dynamic.

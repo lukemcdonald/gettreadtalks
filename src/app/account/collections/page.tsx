@@ -3,7 +3,7 @@ import { PageHeader } from '@/components/page-header';
 import { NewCollectionButton } from '@/features/collections/components/new-collection-button';
 import { getAllCollections } from '@/features/collections/queries/get-all-collections';
 
-export default async function AdminCollectionsPage() {
+export default async function AccountCollectionsPage() {
   const { collections } = await getAllCollections();
 
   return (
