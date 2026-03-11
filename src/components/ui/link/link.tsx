@@ -16,10 +16,8 @@ export function Link({ prefetch, rel, target, onMouseEnter, ...delegated }: Link
 
   const isBlank = target === '_blank';
   const resolvedRel = isBlank ? (rel ?? 'noopener noreferrer') : rel;
-
   const isHoverPrefetch = prefetch === 'hover';
-  const hoverPrefetchValue = hovered ? null : false;
-  const resolvedPrefetch = isHoverPrefetch ? hoverPrefetchValue : prefetch;
+  const resolvedPrefetch = isHoverPrefetch ? hovered : prefetch;
 
   return (
     <NextLink
@@ -27,7 +25,9 @@ export function Link({ prefetch, rel, target, onMouseEnter, ...delegated }: Link
         if (isHoverPrefetch) {
           setHovered(true);
         }
-        onMouseEnter?.(e);
+        if (onMouseEnter) {
+          onMouseEnter(e);
+        }
       }}
       prefetch={resolvedPrefetch}
       rel={resolvedRel}
