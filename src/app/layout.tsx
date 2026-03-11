@@ -16,6 +16,7 @@ import '@/assets/styles.css';
 
 import type { ReactNode } from 'react';
 
+import { NavigationProgress } from '@/components/navigation-progress';
 import { SkipNavLink } from '@/components/site-header/navigation/skip-nav-link';
 import { cn } from '@/utils';
 
@@ -64,6 +65,7 @@ export default async function RootLayout({
             <AuthProvider>
               <AnalyticsProvider>
                 <ToastProvider>
+                  <NavigationProgress />
                   <SkipNavLink href="#main" />
                   <SiteHeader />
                   <div className="flex-1 py-6 sm:py-8 md:py-10 lg:py-12" id="content">
