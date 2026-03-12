@@ -23,7 +23,7 @@ export function VideoPlayer({ src, trackingContext }: VideoPlayerProps) {
     <div className="relative aspect-video w-full overflow-hidden rounded-lg">
       {/* biome-ignore lint/a11y/useMediaCaption: Caption files not available for dynamically embedded media */}
       <video
-        className="h-full w-full"
+        className="block h-full w-full"
         controls
         onEnded={handleEnded}
         onPause={handlePause}
