@@ -16,7 +16,7 @@ export function ClipHero({ clip, speaker }: ClipHeroProps) {
   const speakerName = getSpeakerName(speaker);
 
   return (
-    <Section className="dark relative overflow-hidden bg-gray-950 py-6 sm:py-8 md:py-12 lg:py-16">
+    <Section className="relative overflow-hidden bg-background py-6 sm:py-8 md:py-12 lg:py-16">
       <Container className="relative space-y-8">
         <div className="space-y-2 text-center">
           <HeroTitle className="text-foreground" size="sm">

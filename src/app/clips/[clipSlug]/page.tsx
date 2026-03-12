@@ -3,7 +3,6 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import { EditorialProfileLayout } from '@/components/layouts';
-import { PageBreadcrumb } from '@/components/ui';
 import { getClipBySlug } from '@/features/clips/queries/get-clip-by-slug';
 import { getSpeakerName } from '@/features/speakers/utils';
 import { ClipContent } from './_components/clip-content';
@@ -42,9 +41,6 @@ export default async function ClipPage({ params }: ClipPageProps) {
 
   return (
     <EditorialProfileLayout
-      breadcrumb={
-        <PageBreadcrumb segments={[{ href: '/clips', label: 'Clips' }, { label: clip.title }]} />
-      }
       content={<ClipContent clip={clip} speaker={speaker} talk={talk} />}
       hero={<ClipHero clip={clip} speaker={speaker} />}
     />
