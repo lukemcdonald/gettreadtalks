@@ -30,7 +30,7 @@ export function VimeoEmbed({ id, title }: VimeoEmbedProps) {
   return (
     <button
       aria-label={`Play ${title}`}
-      className="group relative aspect-video w-full cursor-pointer overflow-hidden rounded-lg bg-muted"
+      className="group relative block aspect-video w-full cursor-pointer overflow-hidden rounded-lg bg-muted"
       onClick={() => setIsActivated(true)}
       type="button"
     >

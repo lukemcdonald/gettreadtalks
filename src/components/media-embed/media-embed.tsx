@@ -32,7 +32,11 @@ export function MediaEmbed({
 
   return (
     <div
-      className={cn(isVideo && 'overflow-hidden rounded-2xl', hasWrapper && className)}
+      className={cn(
+        'text-center',
+        isVideo && 'overflow-hidden rounded-2xl',
+        hasWrapper && className,
+      )}
       key={pathname}
     >
       {media.type === 'audio' && <AudioPlayer src={media.src} trackingContext={trackingContext} />}
