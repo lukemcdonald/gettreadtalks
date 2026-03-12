@@ -28,9 +28,13 @@ export function MediaEmbed({
   const pathname = usePathname();
   const media = detectMediaType(mediaUrl);
   const isVideo = media.type === 'video' || media.type === 'vimeo' || media.type === 'youtube';
+  const hasWrapper = media.type !== 'unknown';
 
   return (
-    <div className={cn(isVideo && 'overflow-hidden rounded-2xl', className)} key={pathname}>
+    <div
+      className={cn(isVideo && 'overflow-hidden rounded-2xl', hasWrapper && className)}
+      key={pathname}
+    >
       {media.type === 'audio' && <AudioPlayer src={media.src} trackingContext={trackingContext} />}
       {media.type === 'unknown' && (
         <ExternalLinkButton className="rounded-full" href={media.href} label="Open Media" />
