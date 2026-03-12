@@ -49,7 +49,7 @@ export function MediaCard({
       {...delegated}
     >
       {media}
-      <div className="flex flex-1 flex-col justify-center gap-1.5">
+      <div className="flex flex-1 flex-col justify-center gap-0.5">
         <MediaCardTitle aria-label={ariaLabel}>
           <FauxLink href={href} prefetch={prefetch}>
             {title}

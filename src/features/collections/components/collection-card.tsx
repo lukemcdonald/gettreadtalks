@@ -18,7 +18,7 @@ export function CollectionCard({ collection, speakers = [], talkCount }: Collect
 
   return (
     <Card className="card-interactive">
-      <CardHeader className="grow content-start gap-1.5">
+      <CardHeader className="grow content-start gap-0.5">
         <MediaCardTitle aria-label={collection.title}>
           <FauxLink href={`/collections/${collection.slug}`}>{collection.title}</FauxLink>
         </MediaCardTitle>
