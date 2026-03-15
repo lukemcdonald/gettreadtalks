@@ -8,6 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
 import { FormSheet, TextField } from '@/components/ui';
+import { toastManager } from '@/components/ui/primitives/toast';
 import { updateTopicAction } from '@/features/topics/actions/update-topic';
 import { topicFormSchema } from '@/features/topics/schemas/topic-form';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
@@ -43,6 +44,7 @@ export function EditTopicSheet({ onOpenChange, onTopicUpdated, open, topic }: Ed
         return;
       }
 
+      toastManager.add({ title: 'Topic updated', type: 'success' });
       onTopicUpdated(topic._id);
       onOpenChange(false);
     });

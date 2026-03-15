@@ -4,6 +4,7 @@ import { mutations, queries } from './model/topics';
 export const getTopic = queries.getTopic;
 export const getTopicBySlug = queries.getTopicBySlug;
 export const getTopicWithContent = queries.getTopicWithContent;
+export const listAllTopics = queries.listAllTopics;
 export const listTopics = queries.listTopics;
 export const listTopicsWithCount = queries.listTopicsWithCount;
 export const listTopicsWithTalks = queries.listTopicsWithTalks;
