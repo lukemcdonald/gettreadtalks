@@ -30,7 +30,9 @@ export default defineSchema({
   userFavoriteClips: defineTable({
     clipId: v.id('clips'),
     userId: v.string(),
-  }).index('by_userId_and_clipId', ['userId', 'clipId']),
+  })
+    .index('by_clipId', ['clipId'])
+    .index('by_userId_and_clipId', ['userId', 'clipId']),
 
   userFavoriteSpeakers: defineTable({
     speakerId: v.id('speakers'),

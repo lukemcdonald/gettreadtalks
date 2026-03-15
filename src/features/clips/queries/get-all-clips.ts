@@ -6,6 +6,7 @@ import { api } from '@/convex/_generated/api';
 import { fetchAuthQuery } from '@/services/auth/server';
 
 interface GetAllClipsProps {
+  cursor?: string;
   limit?: number;
   status?: StatusFilterType;
 }
@@ -15,10 +16,10 @@ interface GetAllClipsProps {
  * Supports status='all' to fetch clips across all statuses.
  */
 export async function getAllClips(args?: GetAllClipsProps) {
-  const { limit, status } = args ?? {};
+  const { cursor, limit, status } = args ?? {};
 
   const paginationOpts = {
-    cursor: null,
+    cursor: cursor ?? null,
     numItems: limit ?? 1000,
   };
 

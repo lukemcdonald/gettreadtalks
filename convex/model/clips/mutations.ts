@@ -1,10 +1,17 @@
 import type { Doc } from '../../_generated/dataModel';
 
 import { v } from 'convex/values';
+import { getManyFrom } from 'convex-helpers/server/relationships';
 
 import { mutation } from '../../_generated/server';
 import { throwValidationError } from '../../lib/errors';
-import { generateSlug, getOrThrow, getPublishedAtForStatus, slugify } from '../../lib/utils';
+import {
+  deleteAll,
+  generateSlug,
+  getOrThrow,
+  getPublishedAtForStatus,
+  slugify,
+} from '../../lib/utils';
 import { requireAuth } from '../auth/utils';
 import { statusType } from './validators';
 /**
@@ -24,6 +31,31 @@ export const archiveClip = mutation({
       status: 'archived',
       updatedAt: Date.now(),
     });
+
+    return null;
+  },
+  returns: v.null(),
+});
+
+/**
+ * Destroy a clip (permanently delete from database).
+ */
+export const destroyClip = mutation({
+  args: {
+    clipId: v.id('clips'),
+  },
+  handler: async (ctx, args) => {
+    const { clipId } = args;
+
+    await requireAuth(ctx);
+
+    await getOrThrow(ctx, 'clips', clipId);
+
+    const favorites = await getManyFrom(ctx.db, 'userFavoriteClips', 'by_clipId', clipId);
+
+    await deleteAll(ctx, favorites);
+
+    await ctx.db.delete(clipId);
 
     return null;
   },

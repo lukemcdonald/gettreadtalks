@@ -11,6 +11,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
 import { FormSheet } from '@/components/ui';
+import { toastManager } from '@/components/ui/primitives/toast';
 import { updateClipAction } from '@/features/clips/actions/update-clip';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
 import { clipFormSchema } from '../schemas/clip-form';
@@ -72,6 +73,7 @@ export function EditClipSheet({
         return;
       }
 
+      toastManager.add({ title: 'Clip updated', type: 'success' });
       onClipUpdated(clip._id);
       onOpenChange(false);
     });
