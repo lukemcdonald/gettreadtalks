@@ -145,35 +145,6 @@ export const updateTalk = mutation({
 });
 
 /**
- * Update talk status.
- */
-export const updateTalkStatus = mutation({
-  args: {
-    talkId: v.id('talks'),
-    status: statusType,
-  },
-  handler: async (ctx, args) => {
-    const { talkId } = args;
-
-    await requireAuth(ctx);
-
-    const talk = await getOrThrow(ctx, 'talks', talkId);
-
-    const updates: Partial<Doc<'talks'>> = {
-      publishedAt: getPublishedAtForStatus(args.status, talk.publishedAt),
-      status: args.status,
-    };
-
-    updates.updatedAt = Date.now();
-
-    await ctx.db.patch(talkId, updates);
-
-    return talkId;
-  },
-  returns: v.id('talks'),
-});
-
-/**
  * Destroy a talk (permanently delete from database with cleanup of related records).
  */
 export const destroyTalk = mutation({

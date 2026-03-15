@@ -18,4 +18,3 @@ export const archiveTalk = mutations.archiveTalk;
 export const createTalk = mutations.createTalk;
 export const destroyTalk = mutations.destroyTalk;
 export const updateTalk = mutations.updateTalk;
-export const updateTalkStatus = mutations.updateTalkStatus;
