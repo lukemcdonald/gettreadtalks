@@ -9,11 +9,10 @@
 
 ## File Naming
 
-Convex enforces strict file naming — only alphanumeric characters, underscores, or periods allowed.
+Convex only allows alphanumeric characters, underscores, and periods in file/folder names. Kebab-case is not supported and will cause deployment errors.
 
 - Multi-word files/folders: **camelCase** (e.g., `affiliateLinks.ts`, `betterAuth/`, `rotateContent.ts`)
 - Single-word files: lowercase (e.g., `filters.ts`, `sort.ts`, `utils.ts`)
-- **Never use kebab-case/hyphens** — will cause deployment errors
 
 ## Naming Conventions
 
@@ -59,7 +58,7 @@ Actions use `updateTag` for read-your-writes semantics (user sees their change i
 ```typescript
 import { updateTag } from 'next/cache';
 
-updateTag('entities'); // Invalidate after mutation
+updateTag('entities');
 ```
 
 Use `revalidateTag()` for background/webhook invalidation where SWR behavior is preferred.

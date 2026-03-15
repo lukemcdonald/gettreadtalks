@@ -50,7 +50,7 @@ import { Button, Card, TextField } from '@/components/ui';
 import { Button } from '@/components/ui/primitives/button';
 ```
 
-**Naming:** kebab-case for all folders
+**Naming:** kebab-case for all `src/` folders
 
 ## Layout Data Fetching
 

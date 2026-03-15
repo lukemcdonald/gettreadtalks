@@ -112,7 +112,7 @@ export const updateClip = mutation({
 });
 
 /**
- * Update clip status.
+ * Update an existing clip status.
  */
 export const updateClipStatus = mutation({
   args: {
