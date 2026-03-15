@@ -8,8 +8,8 @@ const titleVariants = cva('text-balance tracking-tight', {
   variants: {
     size: {
       sm: 'text-2xl',
-      md: 'font-base text-4xl',
-      lg: 'font-base text-6xl',
+      md: 'font-base text-3xl sm:text-4xl',
+      lg: 'font-base text-4xl sm:text-5xl lg:text-6xl',
     },
   },
   defaultVariants: {
@@ -22,7 +22,7 @@ const descriptionVariants = cva('text-muted-foreground', {
     size: {
       sm: 'text-base',
       md: 'mt-3 text-xl',
-      lg: 'mt-4 text-2xl',
+      lg: 'mt-4 text-xl sm:text-2xl',
     },
   },
 });
