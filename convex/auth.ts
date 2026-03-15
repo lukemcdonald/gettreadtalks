@@ -11,7 +11,7 @@ import { admin as adminPlugin } from 'better-auth/plugins';
 import { components, internal } from './_generated/api';
 import authConfig from './auth.config';
 import authSchema from './betterAuth/schema';
-import { signInRateLimitPlugin } from './lib/plugins';
+import { authRateLimitPlugin } from './lib/plugins';
 
 /**
  * Creates a new Better Auth component client.
@@ -70,7 +70,7 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
         authConfig,
         jwksRotateOnTokenGenerationError: true,
       }),
-      signInRateLimitPlugin(ctx),
+      authRateLimitPlugin(ctx),
     ],
     secret,
     trustedOrigins: [
