@@ -3,7 +3,8 @@ import type { SpeakerSortOption } from '../../lib/sort';
 
 import { paginationOptsValidator, paginationResultValidator } from 'convex/server';
 import { v } from 'convex/values';
-import { getOneFrom } from 'convex-helpers/server/relationships';
+import { asyncMap } from 'convex-helpers';
+import { getManyFrom, getOneFrom } from 'convex-helpers/server/relationships';
 
 import { query } from '../../_generated/server';
 import { filterSpeakersWithPublishedTalks } from '../../lib/filters';
@@ -11,6 +12,7 @@ import { rotateContent } from '../../lib/rotateContent';
 import { getSpeakerComparator } from '../../lib/sort';
 import { paginateArray } from '../../lib/utils';
 import { doc, docs } from '../../lib/validators/schema';
+import { requireAuth } from '../auth/utils';
 import { speakerRoleType } from './validators';
 
 const speakerPageValidator = paginationResultValidator(doc('speakers'));
@@ -200,6 +202,40 @@ export const listSpeakers = query({
     };
   },
   returns: speakerPageValidator,
+});
+
+/**
+ * List all speakers for admin use, with total talk and clip counts (all statuses).
+ */
+export const listAllSpeakersAdmin = query({
+  args: {},
+  handler: async (ctx) => {
+    await requireAuth(ctx);
+
+    const speakers = await ctx.db.query('speakers').withIndex('by_lastName').collect();
+
+    return await asyncMap(speakers, async (speaker) => {
+      const talks = await ctx.db
+        .query('talks')
+        .withIndex('by_speakerId_and_status', (q) => q.eq('speakerId', speaker._id))
+        .collect();
+
+      const clips = await getManyFrom(ctx.db, 'clips', 'by_speakerId', speaker._id);
+
+      return {
+        clipCount: clips.length,
+        speaker,
+        talkCount: talks.length,
+      };
+    });
+  },
+  returns: v.array(
+    v.object({
+      clipCount: v.number(),
+      speaker: doc('speakers'),
+      talkCount: v.number(),
+    }),
+  ),
 });
 
 /**
