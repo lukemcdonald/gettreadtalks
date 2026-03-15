@@ -22,6 +22,8 @@ import type * as lib_errors_constants from "../lib/errors/constants.js";
 import type * as lib_errors_index from "../lib/errors/index.js";
 import type * as lib_errors_types from "../lib/errors/types.js";
 import type * as lib_filters from "../lib/filters.js";
+import type * as lib_plugins from "../lib/plugins.js";
+import type * as lib_rateLimiter from "../lib/rateLimiter.js";
 import type * as lib_rotateContent from "../lib/rotateContent.js";
 import type * as lib_sort from "../lib/sort.js";
 import type * as lib_types from "../lib/types.js";
@@ -47,6 +49,7 @@ import type * as model_affiliateLinks_mutations from "../model/affiliateLinks/mu
 import type * as model_affiliateLinks_queries from "../model/affiliateLinks/queries.js";
 import type * as model_affiliateLinks_validators from "../model/affiliateLinks/validators.js";
 import type * as model_auth_index from "../model/auth/index.js";
+import type * as model_auth_rateLimiter from "../model/auth/rateLimiter.js";
 import type * as model_auth_roles from "../model/auth/roles.js";
 import type * as model_auth_types from "../model/auth/types.js";
 import type * as model_auth_utils from "../model/auth/utils.js";
@@ -101,6 +104,8 @@ declare const fullApi: ApiFromModules<{
   "lib/errors/index": typeof lib_errors_index;
   "lib/errors/types": typeof lib_errors_types;
   "lib/filters": typeof lib_filters;
+  "lib/plugins": typeof lib_plugins;
+  "lib/rateLimiter": typeof lib_rateLimiter;
   "lib/rotateContent": typeof lib_rotateContent;
   "lib/sort": typeof lib_sort;
   "lib/types": typeof lib_types;
@@ -126,6 +131,7 @@ declare const fullApi: ApiFromModules<{
   "model/affiliateLinks/queries": typeof model_affiliateLinks_queries;
   "model/affiliateLinks/validators": typeof model_affiliateLinks_validators;
   "model/auth/index": typeof model_auth_index;
+  "model/auth/rateLimiter": typeof model_auth_rateLimiter;
   "model/auth/roles": typeof model_auth_roles;
   "model/auth/types": typeof model_auth_types;
   "model/auth/utils": typeof model_auth_utils;
@@ -1169,6 +1175,140 @@ export declare const components: {
         },
         any
       >;
+    };
+  };
+  rateLimiter: {
+    lib: {
+      checkRateLimit: FunctionReference<
+        "query",
+        "internal",
+        {
+          config:
+            | {
+                capacity?: number;
+                kind: "token bucket";
+                maxReserved?: number;
+                period: number;
+                rate: number;
+                shards?: number;
+                start?: null;
+              }
+            | {
+                capacity?: number;
+                kind: "fixed window";
+                maxReserved?: number;
+                period: number;
+                rate: number;
+                shards?: number;
+                start?: number;
+              };
+          count?: number;
+          key?: string;
+          name: string;
+          reserve?: boolean;
+          throws?: boolean;
+        },
+        { ok: true; retryAfter?: number } | { ok: false; retryAfter: number }
+      >;
+      clearAll: FunctionReference<
+        "mutation",
+        "internal",
+        { before?: number },
+        null
+      >;
+      getServerTime: FunctionReference<"mutation", "internal", {}, number>;
+      getValue: FunctionReference<
+        "query",
+        "internal",
+        {
+          config:
+            | {
+                capacity?: number;
+                kind: "token bucket";
+                maxReserved?: number;
+                period: number;
+                rate: number;
+                shards?: number;
+                start?: null;
+              }
+            | {
+                capacity?: number;
+                kind: "fixed window";
+                maxReserved?: number;
+                period: number;
+                rate: number;
+                shards?: number;
+                start?: number;
+              };
+          key?: string;
+          name: string;
+          sampleShards?: number;
+        },
+        {
+          config:
+            | {
+                capacity?: number;
+                kind: "token bucket";
+                maxReserved?: number;
+                period: number;
+                rate: number;
+                shards?: number;
+                start?: null;
+              }
+            | {
+                capacity?: number;
+                kind: "fixed window";
+                maxReserved?: number;
+                period: number;
+                rate: number;
+                shards?: number;
+                start?: number;
+              };
+          shard: number;
+          ts: number;
+          value: number;
+        }
+      >;
+      rateLimit: FunctionReference<
+        "mutation",
+        "internal",
+        {
+          config:
+            | {
+                capacity?: number;
+                kind: "token bucket";
+                maxReserved?: number;
+                period: number;
+                rate: number;
+                shards?: number;
+                start?: null;
+              }
+            | {
+                capacity?: number;
+                kind: "fixed window";
+                maxReserved?: number;
+                period: number;
+                rate: number;
+                shards?: number;
+                start?: number;
+              };
+          count?: number;
+          key?: string;
+          name: string;
+          reserve?: boolean;
+          throws?: boolean;
+        },
+        { ok: true; retryAfter?: number } | { ok: false; retryAfter: number }
+      >;
+      resetRateLimit: FunctionReference<
+        "mutation",
+        "internal",
+        { key?: string; name: string },
+        null
+      >;
+    };
+    time: {
+      getServerTime: FunctionReference<"mutation", "internal", {}, number>;
     };
   };
   resend: {
