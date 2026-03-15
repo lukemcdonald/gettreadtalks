@@ -8,6 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
 import { FeaturedField, FormSheet } from '@/components/ui';
+import { toastManager } from '@/components/ui/primitives/toast';
 import { updateSpeakerAction } from '@/features/speakers/actions/update-speaker';
 import { updateSpeakerSchema } from '@/features/speakers/schemas/speaker-form';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
@@ -56,6 +57,7 @@ export function EditSpeakerSheet({
         return;
       }
 
+      toastManager.add({ title: 'Speaker updated', type: 'success' });
       onSpeakerUpdated(speaker._id);
       onOpenChange(false);
     });
@@ -76,7 +78,9 @@ export function EditSpeakerSheet({
       title="Edit Speaker"
     >
       <SpeakerFormFields control={form.control} />
-      <FeaturedField control={form.control} name="featured" />
+      <div className="mt-4">
+        <FeaturedField control={form.control} name="featured" />
+      </div>
     </FormSheet>
   );
 }

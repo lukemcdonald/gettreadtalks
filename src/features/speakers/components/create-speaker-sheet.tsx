@@ -8,6 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
 import { FormSheet } from '@/components/ui';
+import { toastManager } from '@/components/ui/primitives/toast';
 import { createSpeakerAction } from '@/features/speakers/actions/create-speaker';
 import { createSpeakerSchema } from '@/features/speakers/schemas/speaker-form';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
@@ -61,6 +62,7 @@ export function CreateSpeakerSheet({
         role: cleaned.role,
       };
 
+      toastManager.add({ title: 'Speaker created', type: 'success' });
       onSpeakerCreated(result.data.speakerId, newSpeaker);
       onOpenChange(false);
     });
