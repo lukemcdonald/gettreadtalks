@@ -42,4 +42,3 @@ function Link({ href, target, ...props }: LinkProps) {
 }
 ```
 
-The name `delegated` communicates intent - these props are being delegated to a child component.

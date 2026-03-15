@@ -12,7 +12,6 @@ export const listUserFinishedTalks = queries.listUserFinishedTalks;
 // Mutations
 export const deleteUser = mutations.deleteUser;
 export const favoriteClip = mutations.favoriteClip;
-export const updateUserEmail = mutations.updateUserEmail;
 export const favoriteSpeaker = mutations.favoriteSpeaker;
 export const favoriteTalk = mutations.favoriteTalk;
 export const finishTalk = mutations.finishTalk;
@@ -21,5 +20,6 @@ export const unfavoriteClip = mutations.unfavoriteClip;
 export const unfavoriteSpeaker = mutations.unfavoriteSpeaker;
 export const unfavoriteTalk = mutations.unfavoriteTalk;
 export const unfinishTalk = mutations.unfinishTalk;
+export const updateUserEmail = mutations.updateUserEmail;
 export const updateUserPassword = mutations.updateUserPassword;
 export const updateUserProfile = mutations.updateUserProfile;

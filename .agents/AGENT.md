@@ -1,21 +1,27 @@
 # Agent Instructions
 
-This project is greenfield with no users. Do not worry about back compat or changing schema if needed. We want to make things right.
+Greenfield project — no users, no back-compat concerns. Make it right.
 
-The role of this file is to describe common mistakes and confusion points that agents might encounter as they work in this project. If you ever encounter something in the project that surprises you, please alert the developer working with you and indicate that this is the case in this file to help prevent future agents from having the same issue.
+## Workflow
 
-- Never use emojis for anything; e.g. code, commits, descriptions, etc.
-- Alphabetize when possible: imports, object keys, destructured props, component prop lists. Exception: group related items together if alphabetical order hurts readability.
-- Run `pnpm style` and `pnpm typecheck` before considering a task complete.
-- Code should be self-documenting. No comments that repeat what code does.
-  - **JSDoc:** Brief descriptions (1-2 lines) only when adding context beyond the function name. Skip `@param`/`@returns` unless documenting non-obvious constraints, defaults, or side effects.
-  - **Never:** commented-out code, obvious comments, redundant type documentation.
-- Do not run `pnpm dev` unless instructed
-- When testing and viewing local urls, ensure you are using `https`
+- Package manager: **pnpm**
+- Before marking any task complete: run `pnpm style` and `pnpm typecheck`
+- Never run `pnpm dev` unless instructed
+- When testing local URLs, always use `https`
 
-## Rules and Patterns
+## Conventions
 
-- [Architecture](rules/architecture.md) — Folder and component composition
+- No emojis anywhere: code, commits, descriptions, PR titles
+- Alphabetize: imports, object keys, destructured props, component prop lists
+  - Exception: group related items together if alphabetical order hurts readability
+
+## Code Comments
+
+JSDoc only when adding context beyond the function name (1–2 lines max). Skip `@param`/`@returns` unless documenting non-obvious constraints, defaults, or side effects. Never: commented-out code, obvious comments, redundant type docs.
+
+## Rules
+
+- [Architecture](rules/architecture.md) — Feature structure, component organization, layout data fetching
 - [Convex](rules/convex.md) — File naming, query/mutation conventions, caching, error handling
-- [React](rules/react.md) — Memoization, ref, types, prop delegation
+- [React](rules/react.md) — Memoization, ref pattern, types, prop delegation
 - [UI](rules/ui.md) — FieldError with RHF, context requirements

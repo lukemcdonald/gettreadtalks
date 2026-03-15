@@ -72,9 +72,9 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
     ],
     secret,
     trustedOrigins: [
-      'https://localhost:3000',
       'https://*.vercel.app',
       'https://gettreadtalks.com',
+      'https://localhost:3000',
       'https://www.gettreadtalks.com',
     ],
   } satisfies BetterAuthOptions;

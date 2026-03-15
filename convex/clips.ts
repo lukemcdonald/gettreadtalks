@@ -2,9 +2,9 @@ import { mutations, queries } from './model/clips';
 
 // Queries
 export const getClip = queries.getClip;
-export const listClipSlugsForSitemap = queries.listClipSlugsForSitemap;
 export const getClipBySlug = queries.getClipBySlug;
 export const listAllClips = queries.listAllClips;
+export const listClipSlugsForSitemap = queries.listClipSlugsForSitemap;
 export const listClips = queries.listClips;
 export const listClipsBySpeaker = queries.listClipsBySpeaker;
 
