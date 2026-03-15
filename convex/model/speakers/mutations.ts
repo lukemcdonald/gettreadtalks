@@ -104,35 +104,37 @@ export const updateSpeaker = mutation({
     lastName: v.optional(v.string()),
     ministry: v.optional(v.string()),
     role: v.optional(speakerRoleType),
+    slug: v.optional(v.string()),
     speakerId: v.id('speakers'),
     websiteUrl: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
-    const { speakerId, ...rest } = args;
+    const { slug: rawSlug, speakerId, ...rest } = args;
     const updates: Partial<Doc<'speakers'>> = rest;
 
     const speaker = await getOrThrow(ctx, 'speakers', speakerId);
 
-    // Regenerate slug if name changed to ensure URL consistency
-    if (updates.firstName !== undefined || updates.lastName !== undefined) {
-      const firstName = updates.firstName ?? speaker.firstName;
-      const lastName = updates.lastName ?? speaker.lastName;
+    if (updates.firstName !== undefined && !updates.firstName.trim()) {
+      throwValidationError('First name cannot be empty', 'firstName');
+    }
 
-      if (!firstName.trim()) {
-        throwValidationError('First name cannot be empty', 'firstName');
+    if (updates.lastName !== undefined && !updates.lastName.trim()) {
+      throwValidationError('Last name cannot be empty', 'lastName');
+    }
+
+    // Use explicit slug if provided, otherwise keep existing slug
+    if (rawSlug !== undefined) {
+      const newSlug = slugify(rawSlug);
+
+      if (!newSlug) {
+        throwValidationError('Slug cannot be empty', 'slug');
       }
-
-      if (!lastName.trim()) {
-        throwValidationError('Last name cannot be empty', 'lastName');
-      }
-
-      const newSlug = slugify(`${firstName} ${lastName}`);
 
       if (newSlug !== speaker.slug) {
         if (await slugExists(ctx, 'speakers', newSlug, speakerId)) {
-          throwDuplicateSlug('Speaker with this name already exists', 'firstName');
+          throwDuplicateSlug('A speaker with this slug already exists', 'slug');
         }
 
         updates.slug = newSlug;

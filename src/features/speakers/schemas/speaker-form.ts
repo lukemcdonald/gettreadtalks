@@ -16,6 +16,7 @@ export const createSpeakerSchema = baseSpeakerSchema;
 
 export const updateSpeakerSchema = baseSpeakerSchema.extend({
   featured: z.boolean().optional(),
+  slug: z.string().trim().optional(),
 });
 
 export type CreateSpeakerFormData = z.infer<typeof createSpeakerSchema>;
