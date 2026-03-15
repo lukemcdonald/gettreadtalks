@@ -37,7 +37,8 @@ type LoginFormData = z.infer<typeof loginFormSchema>;
 export function LoginForm(props: ComponentPropsWithoutRef<'form'>) {
   const { track } = useAnalytics();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get('redirect') || '/account';
+  const rawRedirect = searchParams.get('redirect') || '/account';
+  const redirectTo = rawRedirect.startsWith('/') ? rawRedirect : '/account';
 
   const form = useForm<LoginFormData>({
     defaultValues: {
