@@ -19,8 +19,14 @@ export async function destroyTopicAction(topicId: TopicId): Promise<ActionResult
 
     updateTag('topics');
 
-    return { success: true, data: null };
+    return {
+      data: null,
+      success: true,
+    };
   } catch (error) {
-    return { success: false, errors: mapConvexErrorToFormErrors(error) };
+    return {
+      errors: mapConvexErrorToFormErrors(error),
+      success: false,
+    };
   }
 }

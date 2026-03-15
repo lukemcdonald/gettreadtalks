@@ -19,6 +19,7 @@ import {
 } from '@/components/ui';
 import { toastManager } from '@/components/ui/primitives/toast';
 import { deleteAccount } from '@/features/users/actions/delete-account';
+import { captureException } from '@/services/errors/client';
 
 interface DeleteFormValues {
   password: string;
@@ -33,7 +34,8 @@ export function DeleteAccountForm() {
       try {
         await deleteAccount({ password: values.password });
         toastManager.add({ title: 'Account deleted', type: 'success' });
-      } catch {
+      } catch (err) {
+        captureException(err);
         form.setError('root', {
           message: 'Failed to delete account. Check your password and try again.',
         });

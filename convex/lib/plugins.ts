@@ -34,11 +34,17 @@ const RATE_LIMIT_ENDPOINTS: Record<string, { message: string; mutation: RateLimi
 };
 
 function getClientIp(request: Request): string {
-  return (
+  const ip =
     request.headers.get('cf-connecting-ip') ??
-    request.headers.get('x-forwarded-for')?.split(',')[0].trim() ??
-    'anonymous'
-  );
+    request.headers.get('x-real-ip') ??
+    request.headers.get('x-forwarded-for')?.split(',')[0].trim();
+
+  if (!ip) {
+    console.warn('[auth-rate-limit] Could not determine client IP, using anonymous key');
+    return 'anonymous';
+  }
+
+  return ip;
 }
 
 function rateLimitedResponse(message: string, retryAfter: number): Response {
@@ -67,7 +73,23 @@ export function authRateLimitPlugin(ctx: GenericCtx<DataModel>) {
       const [, { message, mutation }] = endpoint;
       const ip = getClientIp(request);
       const actionCtx = requireActionCtx(ctx);
-      const { ok, retryAfter = HOUR } = await actionCtx.runMutation(mutation, { key: ip });
+
+      let result: { ok: boolean; retryAfter?: number };
+
+      try {
+        result = await actionCtx.runMutation(mutation, { key: ip });
+      } catch (err) {
+        console.error('[auth-rate-limit] Rate limiter mutation failed, failing closed', err);
+
+        return {
+          response: rateLimitedResponse(
+            'Service temporarily unavailable. Please try again later.',
+            HOUR,
+          ),
+        };
+      }
+
+      const { ok, retryAfter = HOUR } = result;
 
       if (ok) {
         return;

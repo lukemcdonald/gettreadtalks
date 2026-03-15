@@ -35,7 +35,7 @@ const loginFormSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginFormSchema>;
 
-export function LoginForm(props: ComponentPropsWithoutRef<'form'>) {
+export function LoginForm({ ...delegated }: ComponentPropsWithoutRef<'form'>) {
   const { track } = useAnalytics();
   const searchParams = useSearchParams();
   const redirectTo = getSafeRedirect(searchParams.get('redirect'));
@@ -68,7 +68,7 @@ export function LoginForm(props: ComponentPropsWithoutRef<'form'>) {
   });
 
   return (
-    <Form className="gap-6" onSubmit={handleSubmit} {...props}>
+    <Form className="gap-6" onSubmit={handleSubmit} {...delegated}>
       {!!errors.root && (
         <Alert variant="error">
           <CircleAlertIcon />
