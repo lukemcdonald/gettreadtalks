@@ -38,7 +38,8 @@ type RegisterFormData = z.infer<typeof registerFormSchema>;
 export function RegisterForm(props: ComponentPropsWithoutRef<'form'>) {
   const { track } = useAnalytics();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get('redirect') || '/account';
+  const rawRedirect = searchParams.get('redirect') || '/account';
+  const redirectTo = rawRedirect.startsWith('/') ? rawRedirect : '/account';
 
   const form = useForm<RegisterFormData>({
     defaultValues: {
