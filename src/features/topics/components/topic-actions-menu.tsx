@@ -5,17 +5,7 @@ import type { Topic, TopicId } from '@/features/topics/types';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-import { ActionsGroup } from '@/components/actions-group';
-import { Button } from '@/components/ui';
-import {
-  AlertDialog,
-  AlertDialogClose,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/primitives/alert-dialog';
+import { ActionsGroup, DeleteGuardDialog } from '@/components/actions-group';
 import { toastManager } from '@/components/ui/primitives/toast';
 import { destroyTopicAction } from '@/features/topics/actions/destroy-topic';
 import { getErrorMessage } from '@/services/errors';
@@ -76,37 +66,15 @@ export function TopicActionsMenu({ talkCount, topic }: TopicActionsMenuProps) {
     <>
       <ActionsGroup disabled={isDeleting} menuItems={menuItems} />
 
-      <AlertDialog onOpenChange={setDeleteDialogOpen} open={deleteDialogOpen}>
-        <AlertDialogContent>
-          {talkCount > 0 ? (
-            <>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Cannot delete &quot;{topic.title}&quot;</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This topic has {talkCount} {talkCount === 1 ? 'talk' : 'talks'} associated. Remove
-                  all talks from this topic before deleting.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogClose render={<Button variant="outline" />}>Close</AlertDialogClose>
-              </AlertDialogFooter>
-            </>
-          ) : (
-            <>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Delete &quot;{topic.title}&quot;?</AlertDialogTitle>
-                <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogClose render={<Button variant="outline" />}>Cancel</AlertDialogClose>
-                <Button disabled={isDeleting} onClick={handleDelete} variant="destructive">
-                  {isDeleting ? 'Deleting...' : 'Delete'}
-                </Button>
-              </AlertDialogFooter>
-            </>
-          )}
-        </AlertDialogContent>
-      </AlertDialog>
+      <DeleteGuardDialog
+        blockReason={`This topic has ${talkCount} ${talkCount === 1 ? 'talk' : 'talks'} associated. Remove all talks from this topic before deleting.`}
+        count={talkCount}
+        isDeleting={isDeleting}
+        name={topic.title}
+        onDelete={handleDelete}
+        onOpenChange={setDeleteDialogOpen}
+        open={deleteDialogOpen}
+      />
     </>
   );
 }
