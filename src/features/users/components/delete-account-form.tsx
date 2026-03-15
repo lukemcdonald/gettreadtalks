@@ -55,7 +55,7 @@ export function DeleteAccountForm() {
           </AlertDialogDescription>
         </AlertDialogHeader>
 
-        <form className="px-6 pb-4" onSubmit={form.handleSubmit(onSubmit)}>
+        <form className="px-6 pb-4" id="delete-account-form" onSubmit={form.handleSubmit(onSubmit)}>
           <FormError error={form.formState.errors.root} />
           <Fieldset className="max-w-full" disabled={isPending}>
             <TextField
@@ -70,7 +70,12 @@ export function DeleteAccountForm() {
 
         <AlertDialogFooter>
           <AlertDialogClose render={<Button variant="outline" />}>Cancel</AlertDialogClose>
-          <Button disabled={isPending} onClick={form.handleSubmit(onSubmit)} variant="destructive">
+          <Button
+            disabled={isPending}
+            form="delete-account-form"
+            type="submit"
+            variant="destructive"
+          >
             Delete Account
           </Button>
         </AlertDialogFooter>
