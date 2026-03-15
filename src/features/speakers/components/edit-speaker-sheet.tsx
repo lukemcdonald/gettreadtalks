@@ -7,7 +7,7 @@ import { useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
-import { FeaturedField, FormSheet } from '@/components/ui';
+import { FormSheet } from '@/components/ui';
 import { toastManager } from '@/components/ui/primitives/toast';
 import { updateSpeakerAction } from '@/features/speakers/actions/update-speaker';
 import { updateSpeakerSchema } from '@/features/speakers/schemas/speaker-form';
@@ -40,6 +40,7 @@ export function EditSpeakerSheet({
       lastName: speaker?.lastName ?? '',
       ministry: speaker?.ministry ?? '',
       role: speaker?.role ?? '',
+      slug: speaker?.slug ?? '',
       websiteUrl: speaker?.websiteUrl ?? '',
     },
   });
@@ -77,10 +78,7 @@ export function EditSpeakerSheet({
       submitLabel="Save Changes"
       title="Edit Speaker"
     >
-      <SpeakerFormFields control={form.control} />
-      <div className="mt-4">
-        <FeaturedField control={form.control} name="featured" />
-      </div>
+      <SpeakerFormFields control={form.control} mode="edit" />
     </FormSheet>
   );
 }

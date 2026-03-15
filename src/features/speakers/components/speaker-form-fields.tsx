@@ -1,7 +1,7 @@
 import type { Control } from 'react-hook-form';
 import type { CreateSpeakerFormData, UpdateSpeakerFormData } from '../schemas/speaker-form';
 
-import { SelectField, TextField, TextareaField, UrlField } from '@/components/ui';
+import { FeaturedField, SelectField, TextField, TextareaField, UrlField } from '@/components/ui';
 import { speakerRoles } from '@/convex/model/speakers/validators';
 
 const roleOptions = [
@@ -11,9 +11,10 @@ const roleOptions = [
 
 interface SpeakerFormFieldsProps {
   control: Control<CreateSpeakerFormData> | Control<UpdateSpeakerFormData>;
+  mode?: 'create' | 'edit';
 }
 
-export function SpeakerFormFields({ control }: SpeakerFormFieldsProps) {
+export function SpeakerFormFields({ control, mode = 'create' }: SpeakerFormFieldsProps) {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
@@ -27,6 +28,15 @@ export function SpeakerFormFields({ control }: SpeakerFormFieldsProps) {
 
         <TextField control={control} label="Last Name" name="lastName" placeholder="Doe" required />
       </div>
+
+      {mode === 'edit' && (
+        <TextField
+          control={control as Control<UpdateSpeakerFormData>}
+          description="Changing this will change the speaker URL"
+          label="Slug"
+          name="slug"
+        />
+      )}
 
       <SelectField control={control} label="Role" name="role" options={roleOptions} />
 
@@ -59,6 +69,10 @@ export function SpeakerFormFields({ control }: SpeakerFormFieldsProps) {
         name="websiteUrl"
         placeholder="https://example.com"
       />
+
+      {mode === 'edit' && (
+        <FeaturedField control={control as Control<UpdateSpeakerFormData>} name="featured" />
+      )}
     </div>
   );
 }
