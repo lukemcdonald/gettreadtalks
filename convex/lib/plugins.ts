@@ -1,4 +1,5 @@
 import type { GenericCtx } from '@convex-dev/better-auth';
+import type { FunctionReference } from 'convex/server';
 import type { DataModel } from '../_generated/dataModel';
 
 import { requireActionCtx } from '@convex-dev/better-auth/utils';
@@ -6,41 +7,73 @@ import { HOUR } from '@convex-dev/rate-limiter';
 
 import { internal } from '../_generated/api';
 
-export function signInRateLimitPlugin(ctx: GenericCtx<DataModel>) {
+type RateLimitMutation = FunctionReference<
+  'mutation',
+  'internal',
+  { key: string },
+  { ok: boolean; retryAfter?: number }
+>;
+
+const RATE_LIMIT_ENDPOINTS: Record<string, { message: string; mutation: RateLimitMutation }> = {
+  '/change-password': {
+    message: 'Too many password change attempts. Please try again later.',
+    mutation: internal.model.auth.rateLimiter.checkChangePassword,
+  },
+  '/request-password-reset': {
+    message: 'Too many reset requests. Please try again later.',
+    mutation: internal.model.auth.rateLimiter.checkPasswordReset,
+  },
+  '/sign-in/email': {
+    message: 'Too many login attempts. Please try again later.',
+    mutation: internal.model.auth.rateLimiter.checkSignIn,
+  },
+  '/sign-up/email': {
+    message: 'Too many registration attempts. Please try again later.',
+    mutation: internal.model.auth.rateLimiter.checkSignUp,
+  },
+};
+
+function getClientIp(request: Request): string {
+  return (
+    request.headers.get('cf-connecting-ip') ??
+    request.headers.get('x-forwarded-for')?.split(',')[0].trim() ??
+    'anonymous'
+  );
+}
+
+function rateLimitedResponse(message: string, retryAfter: number): Response {
+  return new Response(message, {
+    headers: {
+      'Content-Type': 'text/plain',
+      'Retry-After': String(Math.ceil(retryAfter / 1000)),
+    },
+    status: 429,
+  });
+}
+
+export function authRateLimitPlugin(ctx: GenericCtx<DataModel>) {
   return {
-    id: 'sign-in-rate-limit',
+    id: 'auth-rate-limit',
     onRequest: async (request: Request) => {
       const url = new URL(request.url);
+      const endpoint = Object.entries(RATE_LIMIT_ENDPOINTS).find(([suffix]) =>
+        url.pathname.endsWith(suffix),
+      );
 
-      if (!url.pathname.endsWith('/sign-in/email')) {
+      if (!endpoint) {
         return;
       }
 
-      const ip =
-        request.headers.get('cf-connecting-ip') ??
-        request.headers.get('x-forwarded-for')?.split(',')[0].trim() ??
-        'anonymous';
-
+      const [, { message, mutation }] = endpoint;
+      const ip = getClientIp(request);
       const actionCtx = requireActionCtx(ctx);
-
-      const { ok, retryAfter = HOUR } = await actionCtx.runMutation(
-        internal.model.auth.rateLimiter.checkSignIn,
-        { key: ip },
-      );
+      const { ok, retryAfter = HOUR } = await actionCtx.runMutation(mutation, { key: ip });
 
       if (ok) {
         return;
       }
 
-      return {
-        response: new Response('Too many login attempts. Please try again later.', {
-          headers: {
-            'Content-Type': 'text/plain',
-            'Retry-After': String(Math.ceil(retryAfter / 1000)),
-          },
-          status: 429,
-        }),
-      };
+      return { response: rateLimitedResponse(message, retryAfter) };
     },
   };
 }
