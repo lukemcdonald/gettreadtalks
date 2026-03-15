@@ -11,17 +11,19 @@ const FILTER_OPTIONS = [
 export function TalksFilters() {
   return (
     <div className="flex gap-4">
-      <div className="flex-1">
-        <SearchInput label="Search" paramName="search" placeholder="Search talks and speakers..." />
-      </div>
-      <div className="w-48">
-        <SelectFilter
-          label="Status"
-          name="status"
-          options={FILTER_OPTIONS}
-          placeholder="All Statuses"
-        />
-      </div>
+      <SearchInput
+        className="flex-1"
+        label="Search"
+        paramName="search"
+        placeholder="Search talks and speakers..."
+      />
+      <SelectFilter
+        className="w-48"
+        label="Status"
+        name="status"
+        options={FILTER_OPTIONS}
+        placeholder="All Statuses"
+      />
     </div>
   );
 }

@@ -10,6 +10,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
 import { FormSheet } from '@/components/ui';
+import { toastManager } from '@/components/ui/primitives/toast';
 import { createClipAction } from '@/features/clips/actions/create-clip';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
 import { clipFormSchema } from '../schemas/clip-form';
@@ -55,6 +56,7 @@ export function CreateClipSheet({
         return;
       }
 
+      toastManager.add({ title: 'Clip created', type: 'success' });
       onClipCreated(result.data.clipId);
       onOpenChange(false);
     });

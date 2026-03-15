@@ -11,4 +11,5 @@ export const listClipsBySpeaker = queries.listClipsBySpeaker;
 // Mutations
 export const archiveClip = mutations.archiveClip;
 export const createClip = mutations.createClip;
+export const destroyClip = mutations.destroyClip;
 export const updateClip = mutations.updateClip;
