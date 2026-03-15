@@ -110,30 +110,3 @@ export const updateClip = mutation({
   },
   returns: v.id('clips'),
 });
-
-/**
- * Update an existing clip status.
- */
-export const updateClipStatus = mutation({
-  args: {
-    clipId: v.id('clips'),
-    status: statusType,
-  },
-  handler: async (ctx, args) => {
-    await requireAuth(ctx);
-
-    const clip = await getOrThrow(ctx, 'clips', args.clipId);
-
-    const updates: Partial<Doc<'clips'>> = {
-      publishedAt: getPublishedAtForStatus(args.status, clip.publishedAt),
-      status: args.status,
-    };
-
-    updates.updatedAt = Date.now();
-
-    await ctx.db.patch(args.clipId, updates);
-
-    return args.clipId;
-  },
-  returns: v.id('clips'),
-});
