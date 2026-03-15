@@ -8,6 +8,7 @@ import { useForm } from 'react-hook-form';
 
 import { useSheetRoute } from '@/app/@sheet/_hooks/use-sheet-route';
 import { FormSheet, TextField } from '@/components/ui';
+import { toastManager } from '@/components/ui/primitives/toast';
 import { createTopicAction } from '@/features/topics/actions/create-topic';
 import { topicFormSchema } from '@/features/topics/schemas/topic-form';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
@@ -33,6 +34,7 @@ export function CreateTopicSheet() {
         return;
       }
 
+      toastManager.add({ title: 'Topic created', type: 'success' });
       handleSuccess();
     });
   });

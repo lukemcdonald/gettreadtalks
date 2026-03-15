@@ -11,6 +11,7 @@ import { getTopicComparator } from '../../lib/sort';
 import { enrichWithSpeakers, paginateArray } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
+import { requireAuth } from '../auth/utils';
 
 /**
  * Get topic by ID.
@@ -143,6 +144,33 @@ export const getTopicBySlug = query({
 });
 
 /**
+ * List all topics for admin use, with total talk count (all statuses).
+ */
+export const listAllTopics = query({
+  args: {},
+  handler: async (ctx) => {
+    await requireAuth(ctx);
+
+    const topics = await ctx.db.query('topics').withIndex('by_title').collect();
+
+    return await asyncMap(topics, async (topic) => {
+      const talksOnTopic = await getManyFrom(ctx.db, 'talksOnTopics', 'by_topicId', topic._id);
+
+      return {
+        talkCount: talksOnTopic.length,
+        topic,
+      };
+    });
+  },
+  returns: v.array(
+    v.object({
+      talkCount: v.number(),
+      topic: doc('topics'),
+    }),
+  ),
+});
+
+/**
  * List topics that have at least one published talk.
  * Returns topics sorted alphabetically by title.
  */
@@ -173,10 +201,6 @@ export const listTopics = query({
   returns: docs('topics'),
 });
 
-const topicSortType = v.optional(
-  v.union(v.literal('alphabetical'), v.literal('least-talks'), v.literal('most-talks')),
-);
-
 /**
  * List topics with their published talk counts.
  * Supports filtering by search and sorting.
@@ -186,7 +210,9 @@ export const listTopicsWithCount = query({
   args: {
     limit: v.optional(v.number()),
     search: v.optional(v.string()),
-    sort: topicSortType,
+    sort: v.optional(
+      v.union(v.literal('alphabetical'), v.literal('least-talks'), v.literal('most-talks')),
+    ),
   },
   handler: async (ctx, args) => {
     const { limit = 100, search, sort = 'alphabetical' } = args;
@@ -247,9 +273,9 @@ export const listTopicsWithTalks = query({
     const topics = await ctx.db.query('topics').withIndex('by_title').take(limit);
 
     const topicsWithTalks = await asyncMap(topics, async (topic) => {
-      const talksOnTopics = await getManyFrom(ctx.db, 'talksOnTopics', 'by_topicId', topic._id);
+      const talksOnTopic = await getManyFrom(ctx.db, 'talksOnTopics', 'by_topicId', topic._id);
       const talks = await Promise.all(
-        talksOnTopics.map((entry) => ctx.db.get('talks', entry.talkId)),
+        talksOnTopic.map((entry) => ctx.db.get('talks', entry.talkId)),
       );
 
       const publishedTalks = talks.filter(
