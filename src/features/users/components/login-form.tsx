@@ -26,6 +26,7 @@ import { useAnalytics } from '@/lib/analytics';
 import { signIn } from '@/services/auth/client';
 import { AUTH_ERRORS } from '@/services/auth/config';
 import { captureException } from '@/services/errors/client';
+import { getSafeRedirect } from '@/utils';
 
 const loginFormSchema = z.object({
   email: z.string().min(1, 'Email is required.').email('Please enter a valid email.'),
@@ -37,8 +38,7 @@ type LoginFormData = z.infer<typeof loginFormSchema>;
 export function LoginForm(props: ComponentPropsWithoutRef<'form'>) {
   const { track } = useAnalytics();
   const searchParams = useSearchParams();
-  const rawRedirect = searchParams.get('redirect') || '/account';
-  const redirectTo = rawRedirect.startsWith('/') ? rawRedirect : '/account';
+  const redirectTo = getSafeRedirect(searchParams.get('redirect'));
 
   const form = useForm<LoginFormData>({
     defaultValues: {
