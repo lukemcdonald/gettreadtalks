@@ -52,10 +52,7 @@ export function CollectionActionsMenu({ collection, talkCount }: CollectionActio
     }
   };
 
-  const blockReason =
-    talkCount > 0
-      ? `This collection has ${talkCount} ${pluralize(talkCount, 'talk', 'talks')}. Remove all talks before deleting.`
-      : '';
+  const blockReason = `This collection has ${talkCount} ${pluralize(talkCount, 'talk', 'talks')}. Remove all talks before deleting.`;
 
   const menuItems = [
     { href: `/collections/${collection.slug}`, label: 'View' },
