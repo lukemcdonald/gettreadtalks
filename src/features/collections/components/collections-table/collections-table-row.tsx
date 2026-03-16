@@ -1,8 +1,8 @@
 import type { Collection } from '@/features/collections/types';
 
-import { Badge, TableCell, TableRow } from '@/components/ui';
+import { CountBadge } from '@/components/count-badge';
+import { TableCell, TableRow } from '@/components/ui';
 import { CollectionActionsMenu } from '@/features/collections/components/collection-actions-menu';
-import { pluralize } from '@/utils';
 
 interface CollectionsTableRowProps {
   collection: Collection;
@@ -14,9 +14,7 @@ export function CollectionsTableRow({ collection, talkCount }: CollectionsTableR
     <TableRow>
       <TableCell className="whitespace-normal font-medium">{collection.title}</TableCell>
       <TableCell className="w-[120px]">
-        <Badge variant="secondary">
-          {talkCount === 0 ? 'No talks' : `${talkCount} ${pluralize(talkCount, 'talk', 'talks')}`}
-        </Badge>
+        <CountBadge count={talkCount} label="talk" />
       </TableCell>
       <TableCell className="w-px text-right">
         <CollectionActionsMenu collection={collection} talkCount={talkCount} />

@@ -1,21 +1,13 @@
 import type { Speaker } from '@/features/speakers/types';
 
-import { Badge, TableCell, TableRow } from '@/components/ui';
+import { CountBadge } from '@/components/count-badge';
+import { TableCell, TableRow } from '@/components/ui';
 import { SpeakerActionsMenu } from '@/features/speakers/components/speaker-actions-menu';
-import { pluralize } from '@/utils';
 
 interface SpeakersTableRowProps {
   clipCount: number;
   speaker: Speaker;
   talkCount: number;
-}
-
-function CountBadge({ count, label }: { count: number; label: string }) {
-  return (
-    <Badge variant="secondary">
-      {count === 0 ? `No ${label}s` : `${count} ${pluralize(count, label, `${label}s`)}`}
-    </Badge>
-  );
 }
 
 export function SpeakersTableRow({ clipCount, speaker, talkCount }: SpeakersTableRowProps) {
