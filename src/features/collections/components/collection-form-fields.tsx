@@ -5,9 +5,10 @@ import { TextField, TextareaField, UrlField } from '@/components/ui';
 
 interface CollectionFormFieldsProps {
   control: Control<CollectionFormData>;
+  mode?: 'create' | 'edit';
 }
 
-export function CollectionFormFields({ control }: CollectionFormFieldsProps) {
+export function CollectionFormFields({ control, mode = 'create' }: CollectionFormFieldsProps) {
   return (
     <div className="space-y-4">
       <TextField
@@ -18,6 +19,15 @@ export function CollectionFormFields({ control }: CollectionFormFieldsProps) {
         placeholder="Romans Series"
         required
       />
+
+      {mode === 'edit' && (
+        <TextField
+          control={control}
+          description="Changing this will change the collection URL"
+          label="Slug"
+          name="slug"
+        />
+      )}
 
       <TextareaField
         control={control}

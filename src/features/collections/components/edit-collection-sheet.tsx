@@ -33,6 +33,7 @@ export function EditCollectionSheet({
     mode: 'onBlur',
     values: {
       description: collection?.description ?? '',
+      slug: collection?.slug ?? '',
       title: collection?.title ?? '',
       url: collection?.url ?? '',
     },
@@ -70,7 +71,7 @@ export function EditCollectionSheet({
       submitLabel="Save Changes"
       title="Edit Collection"
     >
-      <CollectionFormFields control={form.control} />
+      <CollectionFormFields control={form.control} mode="edit" />
     </FormSheet>
   );
 }

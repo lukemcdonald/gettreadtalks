@@ -4,8 +4,8 @@ import { v } from 'convex/values';
 import { getOneFrom } from 'convex-helpers/server/relationships';
 
 import { mutation } from '../../_generated/server';
-import { throwNotFound, throwValidationError } from '../../lib/errors';
-import { generateSlug } from '../../lib/utils';
+import { throwDuplicateSlug, throwNotFound, throwValidationError } from '../../lib/errors';
+import { generateSlug, slugExists, slugify } from '../../lib/utils';
 import { requireAuth } from '../auth/utils';
 
 /**
@@ -83,11 +83,12 @@ export const updateCollection = mutation({
   args: {
     collectionId: v.id('collections'),
     description: v.optional(v.string()),
+    slug: v.optional(v.string()),
     title: v.optional(v.string()),
     url: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    const { collectionId, ...rest } = args;
+    const { collectionId, slug: rawSlug, ...rest } = args;
 
     await requireAuth(ctx);
 
@@ -101,7 +102,23 @@ export const updateCollection = mutation({
       });
     }
 
-    if (updates.title !== undefined) {
+    if (rawSlug !== undefined) {
+      // Use explicit slug if provided
+      const newSlug = slugify(rawSlug);
+
+      if (!newSlug) {
+        throwValidationError('Slug cannot be empty', 'slug');
+      }
+
+      if (newSlug !== collection.slug) {
+        if (await slugExists(ctx, 'collections', newSlug, collectionId)) {
+          throwDuplicateSlug('A collection with this slug already exists', 'slug');
+        }
+
+        updates.slug = newSlug;
+      }
+    } else if (updates.title !== undefined) {
+      // Auto-generate slug from title when no explicit slug provided
       if (!updates.title.trim()) {
         throwValidationError('Title cannot be empty', 'title');
       }
