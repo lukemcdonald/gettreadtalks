@@ -27,7 +27,15 @@ export type ErrorWithEventId = Error & {
   __sentryEventId?: string;
 };
 
-type FingerprintKind = 'auth' | 'error' | 'http' | 'media' | 'mutation' | 'network' | 'validation';
+type FingerprintKind =
+  | 'auth'
+  | 'convex'
+  | 'error'
+  | 'http'
+  | 'media'
+  | 'mutation'
+  | 'network'
+  | 'validation';
 export type Fingerprint = [FingerprintKind, ...string[]];
 
 /**
