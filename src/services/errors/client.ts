@@ -24,7 +24,7 @@ import {
  *     context: { operation: 'riskyOperation' },
  *     level: 'warning',
  *     tags: { feature: 'items' },
- *     fingerprint: ['items', 'validation', 'slug'],
+ *     fingerprint: ['validation', 'slug'],
  *     transactionName: 'items:create',
  *     extras: {
  *       customData: 'value',
@@ -38,47 +38,13 @@ export function captureException(
   error: unknown,
   options: ErrorReportOptions = {},
 ): string | undefined {
-  const { context, extras, fingerprint, level = 'error', tags, transactionName, user } = options;
+  const { transactionName, level = 'error', ...scopeOptions } = options;
 
   return sentryWithScope((scope) => {
-    // Set error level
-    scope.setLevel(level);
+    applyScopeOptions(scope, { ...scopeOptions, level });
 
-    // Add context data (appears in Context section in Sentry)
-    if (context) {
-      scope.setContext('Details', context);
-    }
-
-    // Set custom fingerprint for error grouping
-    if (fingerprint) {
-      const filteredFingerprint = fingerprint.filter(Boolean);
-      scope.setFingerprint(filteredFingerprint);
-      // Also add as extra for visibility in Sentry UI
-      scope.setExtra('fingerprint', filteredFingerprint.join('|'));
-    }
-
-    // Add tags for filtering and categorization
-    if (tags) {
-      for (const [key, value] of Object.entries(tags)) {
-        scope.setTag(key, value);
-      }
-    }
-
-    // Set transaction name for better organization
     if (transactionName) {
       scope.setTransactionName(transactionName);
-    }
-
-    // Set user context
-    if (user) {
-      scope.setUser(user);
-    }
-
-    // Add extra data (appears in Extra Data section in Sentry)
-    if (extras) {
-      for (const [key, value] of Object.entries(extras)) {
-        scope.setExtra(key, value);
-      }
     }
 
     if (typeof error === 'string') {
@@ -141,12 +107,13 @@ function applyScopeOptions(
   scope.setLevel(level);
 
   if (context) {
-    scope.setContext('message_context', context);
+    scope.setContext('Details', context);
   }
 
   if (fingerprint) {
-    scope.setFingerprint(fingerprint);
-    scope.setExtra('fingerprint', fingerprint.join('|'));
+    const clean = fingerprint.filter(Boolean);
+    scope.setFingerprint(clean);
+    scope.setExtra('fingerprint', clean.join('|'));
   }
 
   if (tags) {

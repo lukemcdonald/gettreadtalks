@@ -160,11 +160,10 @@ export function getSentryConfig(error: unknown): SentryConfig {
 
   const shouldLog = statusCode ? (STATUS_TO_SHOULD_LOG[statusCode] ?? true) : false;
 
-  let fingerprint: string[] | undefined;
+  let fingerprint: Fingerprint | undefined;
 
   if (isConvexError(error)) {
-    const statusString = statusCode?.toString() ?? '';
-    fingerprint = ['convex', resource, statusString, errorCode];
+    fingerprint = ['convex', resource, statusCode?.toString() ?? '', errorCode];
   }
 
   const context: Record<string, unknown> = {
@@ -181,7 +180,7 @@ export function getSentryConfig(error: unknown): SentryConfig {
 
   return {
     context,
-    fingerprint: fingerprint?.filter(Boolean) as Fingerprint,
+    fingerprint,
     level,
     shouldLog,
     tags,

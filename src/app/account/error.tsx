@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useState } from 'react';
 
 import {
   Button,
@@ -13,6 +13,7 @@ import {
   EmptyTitle,
   Separator,
 } from '@/components/ui';
+import { captureException } from '@/services/errors';
 
 interface AccountErrorProps {
   error: Error & { digest?: string };
@@ -20,9 +21,7 @@ interface AccountErrorProps {
 }
 
 export default function AccountError({ error, reset }: AccountErrorProps) {
-  useEffect(() => {
-    console.error(error);
-  }, [error]);
+  const [eventId] = useState(() => captureException(error));
 
   return (
     <Card>
@@ -37,7 +36,7 @@ export default function AccountError({ error, reset }: AccountErrorProps) {
           <EmptyHeader>
             <EmptyTitle>Something went wrong</EmptyTitle>
             <EmptyDescription>
-              {error.digest ? `Error ID: ${error.digest}` : 'An unexpected error occurred.'}
+              {eventId ? `Event ID: ${eventId}` : 'An unexpected error occurred.'}
             </EmptyDescription>
           </EmptyHeader>
           <Button onClick={reset} variant="outline">

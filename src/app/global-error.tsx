@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
-import NextError from 'next/error';
+import { useState } from 'react';
 
 import { captureException } from '@/services/errors';
 
@@ -12,18 +11,22 @@ interface GlobalErrorProps {
 }
 
 export default function GlobalError({ error }: GlobalErrorProps) {
-  useEffect(() => {
-    captureException(error, { level: 'fatal' });
-  }, [error]);
+  const [eventId] = useState(() => captureException(error, { level: 'fatal' }));
 
   return (
     <html lang="en">
-      <body>
-        {/* `NextError` is the default Next.js error page component. Its type
-        definition requires a `statusCode` prop. However, since the App Router
-        does not expose status codes for errors, we simply pass 0 to render a
-        generic error message. */}
-        <NextError statusCode={0} />
+      <body className="flex min-h-screen items-center justify-center font-sans">
+        <div className="max-w-sm space-y-2 p-8 text-center">
+          <h1 className="font-semibold text-xl">Something went wrong</h1>
+          <p className="text-muted-foreground text-sm">
+            An unexpected error occurred. Please try refreshing the page.
+          </p>
+          {eventId && (
+            <p className="text-muted-foreground/60 text-xs">
+              Event ID: <code>{eventId}</code>
+            </p>
+          )}
+        </div>
       </body>
     </html>
   );

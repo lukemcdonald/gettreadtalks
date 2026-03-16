@@ -1,9 +1,10 @@
 import * as Sentry from '@sentry/nextjs';
 
+import { IS_DEV } from '@/constants/env';
 import { baseSentryConfig } from './index';
 
 // Expose Sentry on window for debugging (Next.js doesn't do this by default)
-if (typeof window !== 'undefined') {
+if (IS_DEV && typeof window !== 'undefined') {
   (window as unknown as { Sentry?: typeof Sentry }).Sentry = Sentry;
 }
 
@@ -26,8 +27,6 @@ Sentry.init({
     Sentry.thirdPartyErrorFilterIntegration({
       // Application key that matches the one in next.config.ts
       filterKeys: ['gettreadtalks-app'],
-      // Tag errors instead of dropping them initially - you can filter in Sentry UI
-      // Change to "drop-error-if-contains-third-party-frames" once you're satisfied
       behaviour: 'apply-tag-if-contains-third-party-frames',
     }),
   ],
