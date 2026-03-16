@@ -55,7 +55,7 @@ export function MediaCard({
             {title}
           </FauxLink>
         </MediaCardTitle>
-        {!!subtitle && <CardDescription>{subtitle}</CardDescription>}
+        {!!subtitle && <CardDescription className="text-pretty">{subtitle}</CardDescription>}
       </div>
     </Card>
   );
