@@ -5,7 +5,7 @@ import type { Topic, TopicId } from '@/features/topics/types';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-import { ActionsGroup, DeleteGuardDialog } from '@/components/actions-group';
+import { ActionsGroup, DeleteBlockedDialog, DeleteConfirmDialog } from '@/components/actions-group';
 import { toastManager } from '@/components/ui/primitives/toast';
 import { destroyTopicAction } from '@/features/topics/actions/destroy-topic';
 import { getErrorMessage } from '@/services/errors';
@@ -67,15 +67,22 @@ export function TopicActionsMenu({ talkCount, topic }: TopicActionsMenuProps) {
     <>
       <ActionsGroup disabled={isDeleting} menuItems={menuItems} />
 
-      <DeleteGuardDialog
-        blockReason={`This topic has ${talkCount} ${pluralize(talkCount, 'talk', 'talks')} associated. Remove all talks from this topic before deleting.`}
-        count={talkCount}
-        isDeleting={isDeleting}
-        name={topic.title}
-        onDelete={handleDelete}
-        onOpenChange={setDeleteDialogOpen}
-        open={deleteDialogOpen}
-      />
+      {talkCount > 0 ? (
+        <DeleteBlockedDialog
+          blockReason={`This topic has ${talkCount} ${pluralize(talkCount, 'talk', 'talks')} associated. Remove all talks from this topic before deleting.`}
+          name={topic.title}
+          onOpenChange={setDeleteDialogOpen}
+          open={deleteDialogOpen}
+        />
+      ) : (
+        <DeleteConfirmDialog
+          isDeleting={isDeleting}
+          name={topic.title}
+          onDelete={handleDelete}
+          onOpenChange={setDeleteDialogOpen}
+          open={deleteDialogOpen}
+        />
+      )}
     </>
   );
 }

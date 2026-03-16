@@ -5,7 +5,7 @@ import type { Collection, CollectionId } from '@/features/collections/types';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-import { ActionsGroup, DeleteGuardDialog } from '@/components/actions-group';
+import { ActionsGroup, DeleteBlockedDialog, DeleteConfirmDialog } from '@/components/actions-group';
 import { toastManager } from '@/components/ui/primitives/toast';
 import { destroyCollectionAction } from '@/features/collections/actions/destroy-collection';
 import { getErrorMessage } from '@/services/errors';
@@ -69,15 +69,22 @@ export function CollectionActionsMenu({ collection, talkCount }: CollectionActio
     <>
       <ActionsGroup disabled={isDeleting} menuItems={menuItems} />
 
-      <DeleteGuardDialog
-        blockReason={blockReason}
-        count={talkCount}
-        isDeleting={isDeleting}
-        name={collection.title}
-        onDelete={handleDelete}
-        onOpenChange={setDeleteDialogOpen}
-        open={deleteDialogOpen}
-      />
+      {talkCount > 0 ? (
+        <DeleteBlockedDialog
+          blockReason={blockReason}
+          name={collection.title}
+          onOpenChange={setDeleteDialogOpen}
+          open={deleteDialogOpen}
+        />
+      ) : (
+        <DeleteConfirmDialog
+          isDeleting={isDeleting}
+          name={collection.title}
+          onDelete={handleDelete}
+          onOpenChange={setDeleteDialogOpen}
+          open={deleteDialogOpen}
+        />
+      )}
     </>
   );
 }
