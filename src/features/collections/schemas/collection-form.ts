@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 export const collectionFormSchema = z.object({
   description: z.string().optional(),
+  slug: z.string().trim().optional(),
   title: z.string().trim().min(1, 'Title is required'),
   url: z.string().url('Must be a valid URL').optional().or(z.literal('')),
 });
