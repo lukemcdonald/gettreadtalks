@@ -2,6 +2,7 @@ import type { Speaker } from '@/features/speakers/types';
 
 import { Badge, TableCell, TableRow } from '@/components/ui';
 import { SpeakerActionsMenu } from '@/features/speakers/components/speaker-actions-menu';
+import { pluralize } from '@/utils';
 
 interface SpeakersTableRowProps {
   clipCount: number;
@@ -12,7 +13,7 @@ interface SpeakersTableRowProps {
 function CountBadge({ count, label }: { count: number; label: string }) {
   return (
     <Badge variant="secondary">
-      {count === 0 ? `No ${label}s` : `${count} ${count === 1 ? label : `${label}s`}`}
+      {count === 0 ? `No ${label}s` : `${count} ${pluralize(count, label, `${label}s`)}`}
     </Badge>
   );
 }

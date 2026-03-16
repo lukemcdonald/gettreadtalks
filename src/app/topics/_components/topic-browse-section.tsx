@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { GridList } from '@/components/grid-list';
 import { SectionHeading } from '@/components/section-heading';
 import { TalkCard } from '@/features/talks/components/talk-card';
+import { pluralize } from '@/utils';
 
 interface TopicBrowseSectionProps {
   talkCount: number;
@@ -16,7 +17,7 @@ interface TopicBrowseSectionProps {
 
 export function TopicBrowseSection({ talkCount, talks, topic }: TopicBrowseSectionProps) {
   const hasMoreTalks = talkCount > talks.length;
-  const countLabel = `${talkCount} ${talkCount === 1 ? 'talk' : 'talks'}`;
+  const countLabel = `${talkCount} ${pluralize(talkCount, 'talk', 'talks')}`;
 
   return (
     <section id={`topic-${topic.slug}`}>

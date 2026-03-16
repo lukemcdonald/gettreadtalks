@@ -9,6 +9,7 @@ import { ActionsGroup, DeleteGuardDialog } from '@/components/actions-group';
 import { toastManager } from '@/components/ui/primitives/toast';
 import { destroyTopicAction } from '@/features/topics/actions/destroy-topic';
 import { getErrorMessage } from '@/services/errors';
+import { pluralize } from '@/utils';
 
 interface TopicActionsMenuProps {
   talkCount: number;
@@ -67,7 +68,7 @@ export function TopicActionsMenu({ talkCount, topic }: TopicActionsMenuProps) {
       <ActionsGroup disabled={isDeleting} menuItems={menuItems} />
 
       <DeleteGuardDialog
-        blockReason={`This topic has ${talkCount} ${talkCount === 1 ? 'talk' : 'talks'} associated. Remove all talks from this topic before deleting.`}
+        blockReason={`This topic has ${talkCount} ${pluralize(talkCount, 'talk', 'talks')} associated. Remove all talks from this topic before deleting.`}
         count={talkCount}
         isDeleting={isDeleting}
         name={topic.title}
