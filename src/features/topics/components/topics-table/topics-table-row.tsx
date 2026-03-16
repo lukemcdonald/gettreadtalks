@@ -2,6 +2,7 @@ import type { Topic } from '@/features/topics/types';
 
 import { Badge, TableCell, TableRow } from '@/components/ui';
 import { TopicActionsMenu } from '@/features/topics/components/topic-actions-menu';
+import { pluralize } from '@/utils';
 
 interface TopicsTableRowProps {
   talkCount: number;
@@ -9,13 +10,9 @@ interface TopicsTableRowProps {
 }
 
 function TalkCountBadge({ count }: { count: number }) {
-  if (count === 0) {
-    return <Badge variant="secondary">No talks</Badge>;
-  }
-
   return (
     <Badge variant="secondary">
-      {count} {count === 1 ? 'talk' : 'talks'}
+      {count === 0 ? 'No talks' : `${count} ${pluralize(count, 'talk', 'talks')}`}
     </Badge>
   );
 }

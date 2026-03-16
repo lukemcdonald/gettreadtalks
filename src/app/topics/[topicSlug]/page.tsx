@@ -30,10 +30,9 @@ export async function generateMetadata({ params }: TopicPageProps): Promise<Meta
 
   const { topic, totalTalks } = topicResult;
   const count = totalTalks === 1 ? 'this' : `these ${totalTalks}`;
-  const noun = totalTalks === 1 ? 'talk' : 'talks';
 
   return {
-    description: `Elevate your spiritual heartbeat with ${count} Christ centered ${noun} on ${topic.title}.`,
+    description: `Elevate your spiritual heartbeat with ${count} Christ centered ${pluralize(totalTalks, 'talk', 'talks')} on ${topic.title}.`,
     title: topic.title,
   };
 }

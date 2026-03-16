@@ -9,6 +9,7 @@ import { ActionsGroup, DeleteGuardDialog } from '@/components/actions-group';
 import { toastManager } from '@/components/ui/primitives/toast';
 import { destroySpeakerAction } from '@/features/speakers/actions/destroy-speaker';
 import { getErrorMessage } from '@/services/errors';
+import { pluralize } from '@/utils';
 
 interface SpeakerActionsMenuProps {
   clipCount: number;
@@ -56,10 +57,10 @@ export function SpeakerActionsMenu({ clipCount, speaker, talkCount }: SpeakerAct
 
   const parts: string[] = [];
   if (talkCount > 0) {
-    parts.push(`${talkCount} ${talkCount === 1 ? 'talk' : 'talks'}`);
+    parts.push(`${talkCount} ${pluralize(talkCount, 'talk', 'talks')}`);
   }
   if (clipCount > 0) {
-    parts.push(`${clipCount} ${clipCount === 1 ? 'clip' : 'clips'}`);
+    parts.push(`${clipCount} ${pluralize(clipCount, 'clip', 'clips')}`);
   }
   const blockReason = `This speaker has ${parts.join(' and ')} associated. Remove all associated content before deleting.`;
 
