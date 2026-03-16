@@ -1,3 +1,4 @@
 export { ActionsGroup } from './actions-group';
 export { ContentActionsGroup } from './content-actions-group';
-export { DeleteGuardDialog } from './delete-guard-dialog';
+export { DeleteBlockedDialog } from './delete-blocked-dialog';
+export { DeleteConfirmDialog } from './delete-confirm-dialog';

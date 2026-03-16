@@ -5,7 +5,7 @@ import type { Speaker, SpeakerId } from '@/features/speakers/types';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-import { ActionsGroup, DeleteGuardDialog } from '@/components/actions-group';
+import { ActionsGroup, DeleteBlockedDialog, DeleteConfirmDialog } from '@/components/actions-group';
 import { toastManager } from '@/components/ui/primitives/toast';
 import { destroySpeakerAction } from '@/features/speakers/actions/destroy-speaker';
 import { getErrorMessage } from '@/services/errors';
@@ -79,15 +79,22 @@ export function SpeakerActionsMenu({ clipCount, speaker, talkCount }: SpeakerAct
     <>
       <ActionsGroup disabled={isDeleting} menuItems={menuItems} />
 
-      <DeleteGuardDialog
-        blockReason={blockReason}
-        count={contentCount}
-        isDeleting={isDeleting}
-        name={fullName}
-        onDelete={handleDelete}
-        onOpenChange={setDeleteDialogOpen}
-        open={deleteDialogOpen}
-      />
+      {contentCount > 0 ? (
+        <DeleteBlockedDialog
+          blockReason={blockReason}
+          name={fullName}
+          onOpenChange={setDeleteDialogOpen}
+          open={deleteDialogOpen}
+        />
+      ) : (
+        <DeleteConfirmDialog
+          isDeleting={isDeleting}
+          name={fullName}
+          onDelete={handleDelete}
+          onOpenChange={setDeleteDialogOpen}
+          open={deleteDialogOpen}
+        />
+      )}
     </>
   );
 }
