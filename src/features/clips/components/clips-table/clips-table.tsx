@@ -1,14 +1,7 @@
 import type { ClipWithSpeaker } from '@/features/clips/types';
 
-import {
-  Empty,
-  EmptyDescription,
-  Table,
-  TableBody,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui';
+import { ContentTable } from '@/components/content-table';
+import { Empty, EmptyDescription } from '@/components/ui';
 import { ClipsTableRow } from './clips-table-row';
 
 interface ClipsTableProps {
@@ -25,21 +18,10 @@ export function ClipsTable({ clips }: ClipsTableProps) {
   }
 
   return (
-    <div className="overflow-x-auto rounded-lg border">
-      <Table>
-        <TableHeader className="sr-only">
-          <TableRow>
-            <TableHead>Status</TableHead>
-            <TableHead>Title</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {clips.map((clip) => (
-            <ClipsTableRow clip={clip} key={clip._id} />
-          ))}
-        </TableBody>
-      </Table>
-    </div>
+    <ContentTable columns={['Status', 'Title', 'Actions']}>
+      {clips.map((clip) => (
+        <ClipsTableRow clip={clip} key={clip._id} />
+      ))}
+    </ContentTable>
   );
 }

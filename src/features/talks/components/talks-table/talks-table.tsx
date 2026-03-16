@@ -1,14 +1,7 @@
 import type { TalkWithSpeakerAndTopics } from '@/features/talks/types';
 
-import {
-  Empty,
-  EmptyDescription,
-  Table,
-  TableBody,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui';
+import { ContentTable } from '@/components/content-table';
+import { Empty, EmptyDescription } from '@/components/ui';
 import { TalksTableRow } from './talks-table-row';
 
 interface TalksTableProps {
@@ -25,21 +18,10 @@ export function TalksTable({ talks }: TalksTableProps) {
   }
 
   return (
-    <div className="overflow-x-auto rounded-lg border">
-      <Table>
-        <TableHeader className="sr-only">
-          <TableRow>
-            <TableHead>Status</TableHead>
-            <TableHead>Title</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {talks.map((talk) => (
-            <TalksTableRow key={talk._id} talk={talk} />
-          ))}
-        </TableBody>
-      </Table>
-    </div>
+    <ContentTable columns={['Status', 'Title', 'Actions']}>
+      {talks.map((talk) => (
+        <TalksTableRow key={talk._id} talk={talk} />
+      ))}
+    </ContentTable>
   );
 }
