@@ -1,37 +1,11 @@
 import type { CollectionData } from '@/features/collections/types';
-import type { TalkWithSpeaker } from '@/features/talks/types';
 
-import { GridList } from '@/components/grid-list';
-import { TalkCard } from '@/features/talks/components/talk-card';
+import { CollectionTalkList } from '@/features/collections/components/collection-talk-list';
 
 interface CollectionContentProps {
   talks: CollectionData['talks'];
 }
 
 export function CollectionContent({ talks }: CollectionContentProps) {
-  return (
-    <GridList>
-      {talks.map((talk: TalkWithSpeaker) => (
-        <TalkCard
-          key={talk._id}
-          speaker={
-            talk.speaker
-              ? {
-                  firstName: talk.speaker.firstName,
-                  imageUrl: talk.speaker.imageUrl,
-                  lastName: talk.speaker.lastName,
-                  slug: talk.speaker.slug,
-                }
-              : undefined
-          }
-          talk={{
-            description: talk.description,
-            scripture: talk.scripture,
-            slug: talk.slug,
-            title: talk.title,
-          }}
-        />
-      ))}
-    </GridList>
-  );
+  return <CollectionTalkList talks={talks} />;
 }

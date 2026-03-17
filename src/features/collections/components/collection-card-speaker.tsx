@@ -14,7 +14,7 @@ export function CollectionCardSpeaker({ speaker }: CollectionCardSpeakerProps) {
   const speakerInitials = getSpeakerInitials(speaker);
 
   return (
-    <Avatar className="size-8 border-2 border-background" key={speaker.slug}>
+    <Avatar className="size-10 border-2 border-background" key={speaker.slug}>
       {!!speaker.imageUrl && <AvatarImage alt={speakerName} src={speaker.imageUrl} />}
       <AvatarFallback className="text-xs">{speakerInitials}</AvatarFallback>
     </Avatar>

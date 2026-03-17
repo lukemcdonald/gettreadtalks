@@ -2,9 +2,10 @@ import type { Collection } from '@/features/collections/types';
 import type { Speaker } from '@/features/speakers/types';
 
 import { MediaCardTitle } from '@/components/media-card';
-import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui';
+import { Card, CardDescription } from '@/components/ui';
 import { FauxLink } from '@/components/ui/link';
 import { CollectionCardSpeaker } from '@/features/collections/components/collection-card-speaker';
+import { pluralize } from '@/utils';
 
 interface CollectionCardProps {
   collection: Pick<Collection, 'description' | 'slug' | 'title'>;
@@ -13,38 +14,32 @@ interface CollectionCardProps {
 }
 
 export function CollectionCard({ collection, speakers = [], talkCount }: CollectionCardProps) {
-  const displaySpeakers = speakers.slice(0, 3);
-  const remainingCount = speakers.length > 3 ? speakers.length - 3 : 0;
-
   return (
-    <Card className="card-interactive">
-      <CardHeader className="grow content-start gap-0.5">
-        <MediaCardTitle aria-label={collection.title}>
-          <FauxLink href={`/collections/${collection.slug}`}>{collection.title}</FauxLink>
-        </MediaCardTitle>
+    <Card className="card-interactive group relative flex flex-col gap-3 border-0 p-4">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex-1 space-y-0.5">
+          <MediaCardTitle aria-label={collection.title}>
+            <FauxLink href={`/collections/${collection.slug}`}>{collection.title}</FauxLink>
+          </MediaCardTitle>
 
-        {!!collection.description && <CardDescription>{collection.description}</CardDescription>}
+          {!!collection.description && (
+            <CardDescription className="line-clamp-2">{collection.description}</CardDescription>
+          )}
+        </div>
 
         {talkCount !== undefined && (
-          <CardDescription>
-            {talkCount} {talkCount === 1 ? 'Talk' : 'Talks'}
-          </CardDescription>
+          <span className="shrink-0 pt-0.5 text-muted-foreground text-sm">
+            {talkCount} {pluralize(talkCount, 'talk', 'talks')}
+          </span>
         )}
-      </CardHeader>
+      </div>
 
       {speakers.length > 0 && (
-        <CardContent>
-          <div className="flex items-center gap-2">
-            <div className="flex -space-x-2">
-              {displaySpeakers.map((speaker) => (
-                <CollectionCardSpeaker key={speaker.slug} speaker={speaker} />
-              ))}
-            </div>
-            {remainingCount > 0 && (
-              <span className="text-muted-foreground text-sm">+{remainingCount} more</span>
-            )}
-          </div>
-        </CardContent>
+        <div className="flex -space-x-2">
+          {speakers.map((speaker) => (
+            <CollectionCardSpeaker key={speaker.slug} speaker={speaker} />
+          ))}
+        </div>
       )}
     </Card>
   );
