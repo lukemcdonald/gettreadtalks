@@ -1,5 +1,6 @@
 import { FeaturedGrid } from '@/components/featured-grid';
 import { HeroSection } from '@/components/hero';
+import { JsonLd } from '@/components/json-ld';
 import { Main } from '@/components/main';
 import { Container, Section } from '@/components/ui';
 import { site } from '@/configs/site';
@@ -17,70 +18,89 @@ export default async function HomePage() {
   const featuredTalks = featuredTalksResult.talks;
   const featuredSpeakers = featuredSpeakersResult.speakers;
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    description: site.description,
+    name: site.name,
+    potentialAction: {
+      '@type': 'SearchAction',
+      'query-input': 'required name=search_term_string',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: `${site.url}/talks?search={search_term_string}`,
+      },
+    },
+    url: site.url,
+  };
+
   return (
-    <Main>
-      <Section spacing="xl">
-        <Container>
-          <HeroSection
-            description={site.description}
-            imageAlt="Billy Graham preaching"
-            imageSrc="/billy-graham-preaching-header.jpg"
-            primaryAction={{ href: '/talks', label: 'Browse Talks' }}
-            secondaryAction={{ href: '/speakers', label: 'Explore Speakers' }}
-            title="Workout your salvation."
-          />
-        </Container>
-      </Section>
+    <>
+      <JsonLd data={jsonLd} />
+      <Main>
+        <Section spacing="xl">
+          <Container>
+            <HeroSection
+              description={site.description}
+              imageAlt="Billy Graham preaching"
+              imageSrc="/billy-graham-preaching-header.jpg"
+              primaryAction={{ href: '/talks', label: 'Browse Talks' }}
+              secondaryAction={{ href: '/speakers', label: 'Explore Speakers' }}
+              title="Workout your salvation."
+            />
+          </Container>
+        </Section>
 
-      <Section spacing="xl">
-        <Container>
-          <FeaturedGrid
-            columns={{ default: 1, sm: 1, md: 2, lg: 2, xl: 2 }}
-            description={
-              <>
-                <strong>Don't know what to listen to?</strong> Try starting with one of these
-                favorites.
-              </>
-            }
-            quickLinks={[
-              { label: 'All Talks', href: '/talks' },
-              { label: 'Featured Talks', href: '/talks?featured=true' },
-            ]}
-            title="Featured Talks"
-          >
-            {featuredTalks.map((talk) => (
-              <TalkCard key={talk._id} speaker={talk.speaker} talk={talk} />
-            ))}
-          </FeaturedGrid>
-        </Container>
-      </Section>
+        <Section spacing="xl">
+          <Container>
+            <FeaturedGrid
+              columns={{ default: 1, sm: 1, md: 2, lg: 2, xl: 2 }}
+              description={
+                <>
+                  <strong>Don't know what to listen to?</strong> Try starting with one of these
+                  favorites.
+                </>
+              }
+              quickLinks={[
+                { label: 'All Talks', href: '/talks' },
+                { label: 'Featured Talks', href: '/talks?featured=true' },
+              ]}
+              title="Featured Talks"
+            >
+              {featuredTalks.map((talk) => (
+                <TalkCard key={talk._id} speaker={talk.speaker} talk={talk} />
+              ))}
+            </FeaturedGrid>
+          </Container>
+        </Section>
 
-      <Section spacing="xl">
-        <Container>
-          <FeaturedGrid
-            columns={{ default: 1, sm: 2, md: 3, lg: 3, xl: 3 }}
-            description="Have you listened to one of these faithful ministers of the Gospel?"
-            quickLinks={[
-              { label: 'All Speakers', href: '/speakers' },
-              { label: 'Featured Speakers', href: '/speakers?sort=featured' },
-            ]}
-            title="Featured Speakers"
-          >
-            {featuredSpeakers.map((speaker) => (
-              <SpeakerCard
-                key={speaker._id}
-                speaker={{
-                  firstName: speaker.firstName,
-                  imageUrl: speaker.imageUrl,
-                  lastName: speaker.lastName,
-                  role: speaker.role,
-                  slug: speaker.slug,
-                }}
-              />
-            ))}
-          </FeaturedGrid>
-        </Container>
-      </Section>
-    </Main>
+        <Section spacing="xl">
+          <Container>
+            <FeaturedGrid
+              columns={{ default: 1, sm: 2, md: 3, lg: 3, xl: 3 }}
+              description="Have you listened to one of these faithful ministers of the Gospel?"
+              quickLinks={[
+                { label: 'All Speakers', href: '/speakers' },
+                { label: 'Featured Speakers', href: '/speakers?sort=featured' },
+              ]}
+              title="Featured Speakers"
+            >
+              {featuredSpeakers.map((speaker) => (
+                <SpeakerCard
+                  key={speaker._id}
+                  speaker={{
+                    firstName: speaker.firstName,
+                    imageUrl: speaker.imageUrl,
+                    lastName: speaker.lastName,
+                    role: speaker.role,
+                    slug: speaker.slug,
+                  }}
+                />
+              ))}
+            </FeaturedGrid>
+          </Container>
+        </Section>
+      </Main>
+    </>
   );
 }
