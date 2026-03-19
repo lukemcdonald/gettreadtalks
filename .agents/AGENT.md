@@ -19,6 +19,10 @@ Greenfield project — no users, no back-compat concerns. Make it right.
 
 JSDoc only when adding context beyond the function name (1–2 lines max). Skip `@param`/`@returns` unless documenting non-obvious constraints, defaults, or side effects. Never: commented-out code, obvious comments, redundant type docs.
 
+## Linear
+
+Always use the **gettreadtalks.com** project (`441dc110-d73c-46cb-b395-1c762d7e2958`) when searching, creating, or updating Linear issues for this codebase.
+
 ## Rules
 
 - [Architecture](rules/architecture.md) — Feature structure, component organization, layout data fetching
