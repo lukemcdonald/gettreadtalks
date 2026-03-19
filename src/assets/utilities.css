@@ -1,7 +1,7 @@
 @utility container {
+  width: 100%;
   max-width: var(--max-width-container);
   margin-inline: auto;
-  width: 100%;
 }
 
 @utility scrollbar-hidden {

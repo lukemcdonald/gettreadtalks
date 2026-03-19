@@ -1,8 +1,8 @@
 export type RotationPeriod = 'daily' | 'weekly' | 'hourly';
 
 interface RotateContentOptions {
-  period?: RotationPeriod;
   count?: number;
+  period?: RotationPeriod;
 }
 
 function getTimeSeed(period: RotationPeriod): number {
