@@ -25,6 +25,7 @@ const nextConfig = {
   cacheComponents: true,
   experimental: {
     cachedNavigations: true,
+    prefetchInlining: true,
   },
   images: {
     remotePatterns: [
