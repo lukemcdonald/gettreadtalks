@@ -78,14 +78,14 @@ export type { SeverityLevel } from '@sentry/nextjs';
  * Configuration for Sentry error reporting derived from Convex error data.
  */
 export interface SentryConfig {
-  /** Whether the error should be logged to Sentry */
-  shouldLog: boolean;
-  /** Severity level for the error */
-  level: SeverityLevel;
-  /** Fingerprint pattern for error grouping (undefined = use Sentry defaults) */
-  fingerprint?: Fingerprint;
   /** Context data to include in Sentry report */
   context: Record<string, unknown>;
+  /** Fingerprint pattern for error grouping (undefined = use Sentry defaults) */
+  fingerprint?: Fingerprint;
+  /** Severity level for the error */
+  level: SeverityLevel;
+  /** Whether the error should be logged to Sentry */
+  shouldLog: boolean;
   /** Tags for filtering and categorization */
   tags: Record<string, string>;
 }
