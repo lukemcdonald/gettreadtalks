@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui';
 import { captureException } from '@/services/errors';
@@ -11,7 +11,11 @@ interface ErrorProps {
 }
 
 export default function AppError({ error, reset }: ErrorProps) {
-  const [eventId] = useState(() => captureException(error));
+  const [eventId, setEventId] = useState<string | undefined>();
+
+  useEffect(() => {
+    setEventId(captureException(error));
+  }, [error]);
 
   return (
     <Card className="m-auto w-full max-w-sm">
