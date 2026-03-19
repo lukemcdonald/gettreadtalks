@@ -23,6 +23,9 @@ const cspHeader = `
 
 const nextConfig = {
   cacheComponents: true,
+  experimental: {
+    cachedNavigations: true,
+  },
   images: {
     remotePatterns: [
       {
