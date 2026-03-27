@@ -71,7 +71,7 @@ export function CardFrameTitle({
   ...props
 }: useRender.ComponentProps<"div">): React.ReactElement {
   const defaultProps = {
-    className: cn("font-semibold text-sm", className),
+    className: cn("self-center font-semibold text-sm", className),
     "data-slot": "card-frame-title",
   };
 
@@ -88,7 +88,7 @@ export function CardFrameDescription({
   ...props
 }: useRender.ComponentProps<"div">): React.ReactElement {
   const defaultProps = {
-    className: cn("text-muted-foreground text-sm", className),
+    className: cn("self-center text-muted-foreground text-sm", className),
     "data-slot": "card-frame-description",
   };
 
@@ -106,7 +106,7 @@ export function CardFrameAction({
 }: useRender.ComponentProps<"div">): React.ReactElement {
   const defaultProps = {
     className: cn(
-      "col-start-2 row-span-2 row-start-1 inline-flex self-center justify-self-end",
+      "col-start-2 nth-3:row-span-2 nth-3:row-start-1 inline-flex self-center justify-self-end",
       className,
     ),
     "data-slot": "card-frame-action",
