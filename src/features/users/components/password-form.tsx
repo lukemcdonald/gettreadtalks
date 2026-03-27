@@ -69,7 +69,7 @@ export function PasswordForm() {
       </Fieldset>
       {passwordsMatch && (
         <div className="mt-4">
-          <Button disabled={isPending} size="sm" type="submit">
+          <Button loading={isPending} size="sm" type="submit">
             Update password
           </Button>
         </div>

@@ -73,8 +73,8 @@ export function DeleteAccountForm() {
         <AlertDialogFooter>
           <AlertDialogClose render={<Button variant="outline" />}>Cancel</AlertDialogClose>
           <Button
-            disabled={isPending}
             form="delete-account-form"
+            loading={isPending}
             type="submit"
             variant="destructive"
           >
