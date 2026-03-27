@@ -29,7 +29,7 @@ export function UnfinishTalkButton({ onError, onMutate, talkId }: UnfinishTalkBu
       <TooltipTrigger
         render={() => (
           <Button
-            disabled={isLoading}
+            loading={isLoading}
             onClick={handleRemove}
             size="icon-sm"
             type="button"

@@ -8,6 +8,7 @@ interface ToggleIconButtonProps {
   icon: LucideIcon;
   inactiveLabel: string;
   isActive: boolean;
+  loading?: boolean;
   onToggle: () => void;
 }
 
@@ -17,12 +18,14 @@ export function ToggleIconButton({
   icon: Icon,
   inactiveLabel,
   isActive,
+  loading,
   onToggle,
 }: ToggleIconButtonProps) {
   return (
     <ActionIconButton
       disabled={disabled}
       label={isActive ? activeLabel : inactiveLabel}
+      loading={loading}
       onClick={onToggle}
     >
       <Icon className={isActive ? 'fill-current' : undefined} strokeWidth={2.5} />

@@ -23,10 +23,10 @@ export function FeatureTalkButton({ talkId }: FeatureTalkButtonProps) {
   return (
     <ToggleIconButton
       activeLabel="Unfeature"
-      disabled={isLoading}
       icon={StarIcon}
       inactiveLabel="Feature"
       isActive={isFeatured}
+      loading={isLoading}
       onToggle={toggle}
     />
   );
