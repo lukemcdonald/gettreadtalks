@@ -18,10 +18,10 @@ function FinishButton({ talkId }: FinishTalkButtonProps) {
   return (
     <ToggleIconButton
       activeLabel="Mark unfinished"
-      disabled={isLoading}
       icon={BookmarkIcon}
       inactiveLabel="Mark finished"
       isActive={isFinished}
+      loading={isLoading}
       onToggle={toggle}
     />
   );

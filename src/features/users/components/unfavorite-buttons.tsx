@@ -17,7 +17,7 @@ interface OptimisticCallbacks {
 }
 
 interface UnfavoriteButtonProps {
-  disabled?: boolean;
+  loading?: boolean;
   onRemove: () => void;
 }
 
@@ -33,18 +33,12 @@ interface UnfavoriteTalkButtonProps extends OptimisticCallbacks {
   talkId: TalkId;
 }
 
-function UnfavoriteButton({ disabled, onRemove }: UnfavoriteButtonProps) {
+function UnfavoriteButton({ loading, onRemove }: UnfavoriteButtonProps) {
   return (
     <Tooltip>
       <TooltipTrigger
         render={() => (
-          <Button
-            disabled={disabled}
-            onClick={onRemove}
-            size="icon-sm"
-            type="button"
-            variant="ghost"
-          >
+          <Button loading={loading} onClick={onRemove} size="icon-sm" type="button" variant="ghost">
             <HeartMinusIcon />
           </Button>
         )}
@@ -66,7 +60,7 @@ export function UnfavoriteClipButton({ clipId, onError, onMutate }: UnfavoriteCl
     mutate({ clipId });
   };
 
-  return <UnfavoriteButton disabled={isLoading} onRemove={handleRemove} />;
+  return <UnfavoriteButton loading={isLoading} onRemove={handleRemove} />;
 }
 
 export function UnfavoriteSpeakerButton({
@@ -83,7 +77,7 @@ export function UnfavoriteSpeakerButton({
     mutate({ speakerId });
   };
 
-  return <UnfavoriteButton disabled={isLoading} onRemove={handleRemove} />;
+  return <UnfavoriteButton loading={isLoading} onRemove={handleRemove} />;
 }
 
 export function UnfavoriteTalkButton({ onError, onMutate, talkId }: UnfavoriteTalkButtonProps) {
@@ -96,5 +90,5 @@ export function UnfavoriteTalkButton({ onError, onMutate, talkId }: UnfavoriteTa
     mutate({ talkId });
   };
 
-  return <UnfavoriteButton disabled={isLoading} onRemove={handleRemove} />;
+  return <UnfavoriteButton loading={isLoading} onRemove={handleRemove} />;
 }

@@ -18,10 +18,10 @@ function FavoriteButton({ talkId }: FavoriteTalkButtonProps) {
   return (
     <ToggleIconButton
       activeLabel="Unfavorite"
-      disabled={isLoading}
       icon={HeartIcon}
       inactiveLabel="Favorite"
       isActive={isFavorited}
+      loading={isLoading}
       onToggle={toggle}
     />
   );

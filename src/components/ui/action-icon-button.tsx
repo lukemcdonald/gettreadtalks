@@ -6,10 +6,17 @@ interface ActionIconButtonProps {
   children: ReactNode;
   disabled?: boolean;
   label: string;
+  loading?: boolean;
   onClick: () => void;
 }
 
-export function ActionIconButton({ children, disabled, label, onClick }: ActionIconButtonProps) {
+export function ActionIconButton({
+  children,
+  disabled,
+  label,
+  loading,
+  onClick,
+}: ActionIconButtonProps) {
   return (
     <Tooltip>
       <TooltipTrigger
@@ -17,6 +24,7 @@ export function ActionIconButton({ children, disabled, label, onClick }: ActionI
           <Button
             className="rounded-full"
             disabled={disabled}
+            loading={loading}
             onClick={onClick}
             size="icon"
             variant="secondary"
