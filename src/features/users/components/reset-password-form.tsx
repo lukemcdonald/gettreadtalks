@@ -71,7 +71,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
         />
       </Fieldset>
 
-      <Button disabled={isSubmitting} type="submit">
+      <Button loading={isSubmitting} type="submit">
         Reset password
       </Button>
     </form>

@@ -75,7 +75,7 @@ export function ForgotPasswordForm() {
       </Fieldset>
 
       <div className="flex items-center gap-4">
-        <Button disabled={isSubmitting} type="submit">
+        <Button loading={isSubmitting} type="submit">
           Send reset link
         </Button>
         <Link className="text-muted-foreground text-sm hover:underline" href="/login">

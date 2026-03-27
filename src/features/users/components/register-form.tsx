@@ -114,7 +114,7 @@ export function RegisterForm({ ...delegated }: ComponentPropsWithoutRef<'form'>)
         </Field>
 
         <div className="mt-4 flex flex-col gap-3">
-          <Button disabled={isSubmitting} type="submit">
+          <Button loading={isSubmitting} type="submit">
             Create Account
           </Button>
           <p className="text-center text-muted-foreground text-sm">
