@@ -58,7 +58,7 @@ export function EmailForm({ currentEmail }: EmailFormProps) {
       </Fieldset>
       {hasChanged && (
         <div className="mt-4">
-          <Button disabled={isPending} size="sm" type="submit">
+          <Button loading={isPending} size="sm" type="submit">
             Update email
           </Button>
         </div>

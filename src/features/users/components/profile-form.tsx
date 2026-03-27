@@ -53,7 +53,7 @@ export function ProfileForm({ currentName }: ProfileFormProps) {
       </Fieldset>
       {hasChanged && (
         <div>
-          <Button disabled={isPending} size="sm" type="submit">
+          <Button loading={isPending} size="sm" type="submit">
             Save name
           </Button>
         </div>
