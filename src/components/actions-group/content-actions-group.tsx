@@ -142,8 +142,8 @@ export function ContentActionsGroup({
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogClose render={<Button variant="outline" />}>Cancel</AlertDialogClose>
-              <Button disabled={isDeleting} onClick={handleDelete} variant="destructive">
-                {isDeleting ? 'Deleting...' : 'Delete'}
+              <Button loading={isDeleting} onClick={handleDelete} variant="destructive">
+                Delete
               </Button>
             </AlertDialogFooter>
           </AlertDialogContent>

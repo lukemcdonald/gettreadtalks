@@ -47,7 +47,6 @@ export function CreateCollectionSheet() {
       onOpenChange={handleOpenChange}
       onSubmit={handleSubmit}
       open
-      pendingLabel="Creating..."
       submitLabel="Create Collection"
       title="Add New Collection"
     >

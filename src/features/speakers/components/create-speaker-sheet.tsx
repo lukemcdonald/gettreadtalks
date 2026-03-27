@@ -81,7 +81,6 @@ export function CreateSpeakerSheet({
       onOpenChange={onOpenChange}
       onSubmit={handleSubmit}
       open={open}
-      pendingLabel="Creating..."
       submitLabel="Create Speaker"
       title="Add New Speaker"
     >

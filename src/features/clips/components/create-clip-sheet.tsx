@@ -75,7 +75,6 @@ export function CreateClipSheet({
       onOpenChange={onOpenChange}
       onSubmit={handleSubmit}
       open={open}
-      pendingLabel="Creating..."
       submitLabel="Create Clip"
       title="Add New Clip"
     >

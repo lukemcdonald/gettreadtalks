@@ -22,7 +22,6 @@ interface FormSheetProps {
   onOpenChange: (open: boolean) => void;
   onSubmit: FormEventHandler<HTMLFormElement>;
   open: boolean;
-  pendingLabel?: string;
   submitLabel: string;
   title: string;
 }
@@ -48,7 +47,6 @@ function FormSheetInner({
   onOpenChange,
   onSubmit,
   open,
-  pendingLabel = 'Saving...',
   submitLabel,
   title,
 }: FormSheetProps) {
@@ -76,8 +74,8 @@ function FormSheetInner({
             >
               Cancel
             </Button>
-            <Button disabled={isPending} type="submit">
-              {isPending ? pendingLabel : submitLabel}
+            <Button loading={isPending} type="submit">
+              {submitLabel}
             </Button>
           </SheetFooter>
         </form>

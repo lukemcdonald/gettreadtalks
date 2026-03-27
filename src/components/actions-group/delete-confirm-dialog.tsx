@@ -35,8 +35,8 @@ export function DeleteConfirmDialog({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogClose render={<Button variant="outline" />}>Cancel</AlertDialogClose>
-          <Button disabled={isDeleting} onClick={onDelete} variant="destructive">
-            {isDeleting ? 'Deleting...' : 'Delete'}
+          <Button loading={isDeleting} onClick={onDelete} variant="destructive">
+            Delete
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
