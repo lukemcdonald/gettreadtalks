@@ -76,7 +76,6 @@ export function CreateTalkSheet({
       onOpenChange={onOpenChange}
       onSubmit={handleSubmit}
       open={open}
-      pendingLabel="Creating..."
       submitLabel="Create Talk"
       title="Add New Talk"
     >

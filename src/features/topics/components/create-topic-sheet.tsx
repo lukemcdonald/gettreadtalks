@@ -46,7 +46,6 @@ export function CreateTopicSheet() {
       onOpenChange={handleOpenChange}
       onSubmit={handleSubmit}
       open
-      pendingLabel="Creating..."
       submitLabel="Create Topic"
       title="Add New Topic"
     >
