@@ -50,7 +50,7 @@ export function PasswordForm() {
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)}>
-      <Fieldset className="max-w-full" disabled={isPending}>
+      <Fieldset className="flex w-full flex-col gap-6" disabled={isPending}>
         <PasswordField control={form.control} label="New password" name="newPassword" required />
         <PasswordField
           control={form.control}

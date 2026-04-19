@@ -63,7 +63,7 @@ export function ForgotPasswordForm() {
         </Alert>
       )}
 
-      <Fieldset className="max-w-full" disabled={isSubmitting}>
+      <Fieldset className="flex w-full flex-col gap-6" disabled={isSubmitting}>
         <TextField
           control={form.control}
           label="Email address"

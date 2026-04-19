@@ -9,17 +9,15 @@ interface ContentTableProps {
 
 export function ContentTable({ children, columns }: ContentTableProps) {
   return (
-    <div className="overflow-x-auto rounded-lg border">
-      <Table>
-        <TableHeader className="sr-only">
-          <TableRow>
-            {columns.map((col) => (
-              <TableHead key={col}>{col}</TableHead>
-            ))}
-          </TableRow>
-        </TableHeader>
-        <TableBody>{children}</TableBody>
-      </Table>
-    </div>
+    <Table variant="card">
+      <TableHeader className="sr-only">
+        <TableRow>
+          {columns.map((col) => (
+            <TableHead key={col}>{col}</TableHead>
+          ))}
+        </TableRow>
+      </TableHeader>
+      <TableBody>{children}</TableBody>
+    </Table>
   );
 }

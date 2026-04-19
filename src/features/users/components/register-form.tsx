@@ -70,7 +70,7 @@ export function RegisterForm({ ...delegated }: ComponentPropsWithoutRef<'form'>)
   });
 
   return (
-    <Form className="gap-6" onSubmit={handleSubmit} {...delegated}>
+    <Form className="flex w-full flex-col gap-6" onSubmit={handleSubmit} {...delegated}>
       {!!errors.root && (
         <Alert variant="error">
           <CircleAlertIcon />
@@ -79,7 +79,7 @@ export function RegisterForm({ ...delegated }: ComponentPropsWithoutRef<'form'>)
         </Alert>
       )}
 
-      <Fieldset className="max-w-full" disabled={isSubmitting}>
+      <Fieldset className="flex w-full flex-col gap-6" disabled={isSubmitting}>
         <Field>
           <FieldLabel>Name</FieldLabel>
           <Input

@@ -72,7 +72,7 @@ export function TalkForm({
       >
         <FormError error={form.formState.errors.root} />
 
-        <Fieldset className="max-w-none" disabled={isBusy}>
+        <Fieldset className="flex w-full flex-col gap-6" disabled={isBusy}>
           <div className="space-y-4">
             <TextField control={form.control} label="Title" name="title" required />
 

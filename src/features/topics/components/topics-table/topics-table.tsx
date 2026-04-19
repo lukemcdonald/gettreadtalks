@@ -25,21 +25,19 @@ export function TopicsTable({ topics }: TopicsTableProps) {
   }
 
   return (
-    <div className="overflow-x-auto rounded-lg border">
-      <Table>
-        <TableHeader className="sr-only">
-          <TableRow>
-            <TableHead>Title</TableHead>
-            <TableHead>Talks</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {topics.map(({ talkCount, topic }) => (
-            <TopicsTableRow key={topic._id} talkCount={talkCount} topic={topic} />
-          ))}
-        </TableBody>
-      </Table>
-    </div>
+    <Table variant="card">
+      <TableHeader className="sr-only">
+        <TableRow>
+          <TableHead>Title</TableHead>
+          <TableHead>Talks</TableHead>
+          <TableHead>Actions</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {topics.map(({ talkCount, topic }) => (
+          <TopicsTableRow key={topic._id} talkCount={talkCount} topic={topic} />
+        ))}
+      </TableBody>
+    </Table>
   );
 }
