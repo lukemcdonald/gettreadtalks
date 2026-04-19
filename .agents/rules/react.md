@@ -41,4 +41,3 @@ function Link({ href, target, ...props }: LinkProps) {
   return <NextLink href={href} target={target} {...props} />;
 }
 ```
-
