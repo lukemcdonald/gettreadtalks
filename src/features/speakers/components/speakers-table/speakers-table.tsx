@@ -25,27 +25,25 @@ export function SpeakersTable({ speakers }: SpeakersTableProps) {
   }
 
   return (
-    <div className="overflow-x-auto rounded-lg border">
-      <Table>
-        <TableHeader className="sr-only">
-          <TableRow>
-            <TableHead>Name</TableHead>
-            <TableHead>Talks</TableHead>
-            <TableHead>Clips</TableHead>
-            <TableHead>Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {speakers.map(({ clipCount, speaker, talkCount }) => (
-            <SpeakersTableRow
-              clipCount={clipCount}
-              key={speaker._id}
-              speaker={speaker}
-              talkCount={talkCount}
-            />
-          ))}
-        </TableBody>
-      </Table>
-    </div>
+    <Table variant="card">
+      <TableHeader className="sr-only">
+        <TableRow>
+          <TableHead>Name</TableHead>
+          <TableHead>Talks</TableHead>
+          <TableHead>Clips</TableHead>
+          <TableHead>Actions</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {speakers.map(({ clipCount, speaker, talkCount }) => (
+          <SpeakersTableRow
+            clipCount={clipCount}
+            key={speaker._id}
+            speaker={speaker}
+            talkCount={talkCount}
+          />
+        ))}
+      </TableBody>
+    </Table>
   );
 }

@@ -59,7 +59,7 @@ export function DeleteAccountForm() {
 
         <form className="px-6 pb-4" id="delete-account-form" onSubmit={form.handleSubmit(onSubmit)}>
           <FormError error={form.formState.errors.root} />
-          <Fieldset className="max-w-full" disabled={isPending}>
+          <Fieldset className="flex w-full flex-col gap-6" disabled={isPending}>
             <TextField
               control={form.control}
               label="Password"
