@@ -128,6 +128,7 @@ export function DrawerViewport({
         variant === "inset" && "px-(--inset) sm:[--inset:--spacing(4)]",
         variant === "inset" && position !== "bottom" && "pt-(--inset)",
         variant === "inset" && position !== "top" && "pb-(--inset)",
+        className,
       )}
       data-slot="drawer-viewport"
       {...props}
@@ -142,18 +143,20 @@ export function DrawerPopup({
   position: positionProp,
   variant = "default",
   showBar = false,
+  portalProps,
   ...props
 }: DrawerPrimitive.Popup.Props & {
   showCloseButton?: boolean;
   position?: DrawerPosition;
   variant?: "default" | "straight" | "inset";
   showBar?: boolean;
+  portalProps?: DrawerPrimitive.Portal.Props;
 }): React.ReactElement {
   const { position: contextPosition } = useContext(DrawerContext);
   const position = positionProp ?? contextPosition;
 
   return (
-    <DrawerPortal>
+    <DrawerPortal {...portalProps}>
       <DrawerBackdrop />
       <DrawerViewport position={position} variant={variant}>
         <DrawerPrimitive.Popup

@@ -93,6 +93,7 @@ export function AutocompletePopup({
   alignOffset,
   align = "start",
   anchor,
+  portalProps,
   ...props
 }: AutocompletePrimitive.Popup.Props & {
   align?: AutocompletePrimitive.Positioner.Props["align"];
@@ -100,9 +101,10 @@ export function AutocompletePopup({
   alignOffset?: AutocompletePrimitive.Positioner.Props["alignOffset"];
   side?: AutocompletePrimitive.Positioner.Props["side"];
   anchor?: AutocompletePrimitive.Positioner.Props["anchor"];
+  portalProps?: AutocompletePrimitive.Portal.Props;
 }): React.ReactElement {
   return (
-    <AutocompletePrimitive.Portal>
+    <AutocompletePrimitive.Portal {...portalProps}>
       <AutocompletePrimitive.Positioner
         align={align}
         alignOffset={alignOffset}

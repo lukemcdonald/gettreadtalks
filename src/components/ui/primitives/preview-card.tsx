@@ -21,14 +21,16 @@ export function PreviewCardPopup({
   align = "center",
   sideOffset = 4,
   anchor,
+  portalProps,
   ...props
 }: PreviewCardPrimitive.Popup.Props & {
   align?: PreviewCardPrimitive.Positioner.Props["align"];
   sideOffset?: PreviewCardPrimitive.Positioner.Props["sideOffset"];
   anchor?: PreviewCardPrimitive.Positioner.Props["anchor"];
+  portalProps?: PreviewCardPrimitive.Portal.Props;
 }): React.ReactElement {
   return (
-    <PreviewCardPrimitive.Portal>
+    <PreviewCardPrimitive.Portal {...portalProps}>
       <PreviewCardPrimitive.Positioner
         align={align}
         anchor={anchor}

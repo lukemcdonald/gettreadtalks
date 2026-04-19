@@ -54,7 +54,7 @@ export function ToggleGroup({
   );
 }
 
-export function Toggle({
+export function ToggleGroupItem({
   className,
   children,
   variant,
@@ -100,4 +100,4 @@ export function ToggleGroupSeparator({
   );
 }
 
-export { ToggleGroupPrimitive, Toggle as ToggleGroupItem };
+export { ToggleGroupPrimitive };
