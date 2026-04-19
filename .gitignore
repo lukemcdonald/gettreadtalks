@@ -52,16 +52,9 @@ certificates
 # Seed data (keep locally, not in repo)
 convex/migration/data/
 
-# Memory Bank - temporary ignore while testing
-.cursor/commands/van.md
-.cursor/commands/plan.md
-.cursor/commands/creative.md
-.cursor/commands/build.md
-.cursor/commands/reflect.md
-.cursor/commands/archive.md
-.cursor/rules/isolation_rules/
-memory-bank/
-
-# Claude Code - keep CLAUDE.md, ignore local settings
-.claude/settings.local.json
-.claude/plans/
+# Agents
+**/.agents/skills/**
+**/.claude/plans/
+**/.claude/settings.local.json
+**/.claude/skills/**
+**/skills-lock.json
