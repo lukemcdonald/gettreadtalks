@@ -10,7 +10,7 @@ export function Fieldset({
 }: FieldsetPrimitive.Root.Props): React.ReactElement {
   return (
     <FieldsetPrimitive.Root
-      className={cn("flex w-full max-w-64 flex-col gap-6", className)}
+      className={className}
       data-slot="fieldset"
       {...props}
     />

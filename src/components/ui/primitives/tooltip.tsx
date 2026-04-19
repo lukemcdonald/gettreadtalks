@@ -25,15 +25,17 @@ export function TooltipPopup({
   side = "top",
   anchor,
   children,
+  portalProps,
   ...props
 }: TooltipPrimitive.Popup.Props & {
   align?: TooltipPrimitive.Positioner.Props["align"];
   side?: TooltipPrimitive.Positioner.Props["side"];
   sideOffset?: TooltipPrimitive.Positioner.Props["sideOffset"];
   anchor?: TooltipPrimitive.Positioner.Props["anchor"];
+  portalProps?: TooltipPrimitive.Portal.Props;
 }): React.ReactElement {
   return (
-    <TooltipPrimitive.Portal>
+    <TooltipPrimitive.Portal {...portalProps}>
       <TooltipPrimitive.Positioner
         align={align}
         anchor={anchor}

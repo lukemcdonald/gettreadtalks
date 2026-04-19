@@ -59,6 +59,7 @@ export function SheetViewport({
         side === "left" && "flex justify-start",
         side === "right" && "flex justify-end",
         variant === "inset" && "sm:p-4",
+        className,
       )}
       data-slot="sheet-viewport"
       {...props}
@@ -73,15 +74,17 @@ export function SheetPopup({
   side = "right",
   variant = "default",
   closeProps,
+  portalProps,
   ...props
 }: SheetPrimitive.Popup.Props & {
   showCloseButton?: boolean;
   side?: "right" | "left" | "top" | "bottom";
   variant?: "default" | "inset";
   closeProps?: SheetPrimitive.Close.Props;
+  portalProps?: SheetPrimitive.Portal.Props;
 }): React.ReactElement {
   return (
-    <SheetPortal>
+    <SheetPortal {...portalProps}>
       <SheetBackdrop />
       <SheetViewport side={side} variant={variant}>
         <SheetPrimitive.Popup
