@@ -77,7 +77,7 @@ export function LoginForm({ ...delegated }: ComponentPropsWithoutRef<'form'>) {
         </Alert>
       )}
 
-      <Fieldset className="flex w-full flex-col gap-6" disabled={isSubmitting}>
+      <Fieldset disabled={isSubmitting}>
         <Field invalid={!!errors.email}>
           <FieldLabel>
             Email address <span className="text-destructive">*</span>

@@ -48,7 +48,7 @@ export function ProfileForm({ currentName }: ProfileFormProps) {
   return (
     <form className="flex flex-col gap-3" onSubmit={form.handleSubmit(onSubmit)}>
       <FormError error={form.formState.errors.root} />
-      <Fieldset className="flex w-full flex-col gap-6" disabled={isPending}>
+      <Fieldset disabled={isPending}>
         <TextField control={form.control} label="Name" name="name" required />
       </Fieldset>
       {hasChanged && (
