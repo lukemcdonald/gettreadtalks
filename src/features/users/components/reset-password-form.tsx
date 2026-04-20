@@ -61,7 +61,7 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
         </Alert>
       )}
 
-      <Fieldset className="flex w-full flex-col gap-6" disabled={isSubmitting}>
+      <Fieldset disabled={isSubmitting}>
         <PasswordField control={form.control} label="New password" name="newPassword" required />
         <PasswordField
           control={form.control}

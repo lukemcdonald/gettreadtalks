@@ -4,6 +4,7 @@
 export * from './action-icon-button';
 export * from './container';
 export * from './fields';
+export * from './fieldset';
 export * from './filter-popup';
 export * from './form';
 export * from './form-sheet';
