@@ -51,12 +51,18 @@ function upsertReplayClassName(toast: {
   return isEven ? "animate-toast-success-even" : "animate-toast-success-odd";
 }
 
-function Toasts({ position }: { position: ToastPosition }): React.ReactElement {
+function Toasts({
+  position,
+  portalProps,
+}: {
+  position: ToastPosition;
+  portalProps?: React.ComponentProps<typeof Toast.Portal>;
+}): React.ReactElement {
   const { toasts } = Toast.useToastManager();
   const swipeDirection = getSwipeDirection(position);
 
   return (
-    <Toast.Portal data-slot="toast-portal">
+    <Toast.Portal data-slot="toast-portal" {...portalProps}>
       <Toast.Viewport
         className={cn(
           "fixed z-60 mx-auto flex w-[calc(100%-var(--toast-inset)*2)] max-w-90 [--toast-inset:--spacing(4)] sm:[--toast-inset:--spacing(8)]",
@@ -164,11 +170,15 @@ function Toasts({ position }: { position: ToastPosition }): React.ReactElement {
   );
 }
 
-function AnchoredToasts(): React.ReactElement {
+function AnchoredToasts({
+  portalProps,
+}: {
+  portalProps?: React.ComponentProps<typeof Toast.Portal>;
+}): React.ReactElement {
   const { toasts } = Toast.useToastManager();
 
   return (
-    <Toast.Portal data-slot="toast-portal-anchored">
+    <Toast.Portal data-slot="toast-portal-anchored" {...portalProps}>
       <Toast.Viewport
         className="outline-none"
         data-slot="toast-viewport-anchored"
@@ -266,29 +276,36 @@ export type ToastPosition =
 
 export interface ToastProviderProps extends Toast.Provider.Props {
   position?: ToastPosition;
+  portalProps?: React.ComponentProps<typeof Toast.Portal>;
 }
 
 export function ToastProvider({
   children,
   position = "bottom-right",
+  portalProps,
   ...props
 }: ToastProviderProps): React.ReactElement {
   return (
     <Toast.Provider toastManager={toastManager} {...props}>
       {children}
-      <Toasts position={position} />
+      <Toasts portalProps={portalProps} position={position} />
     </Toast.Provider>
   );
 }
 
+export interface AnchoredToastProviderProps extends Toast.Provider.Props {
+  portalProps?: React.ComponentProps<typeof Toast.Portal>;
+}
+
 export function AnchoredToastProvider({
   children,
+  portalProps,
   ...props
-}: Toast.Provider.Props): React.ReactElement {
+}: AnchoredToastProviderProps): React.ReactElement {
   return (
     <Toast.Provider toastManager={anchoredToastManager} {...props}>
       {children}
-      <AnchoredToasts />
+      <AnchoredToasts portalProps={portalProps} />
     </Toast.Provider>
   );
 }

@@ -113,8 +113,10 @@ export function SelectPopup({
   alignOffset = 0,
   alignItemWithTrigger = true,
   anchor,
+  portalProps,
   ...props
 }: SelectPrimitive.Popup.Props & {
+  portalProps?: SelectPrimitive.Portal.Props;
   side?: SelectPrimitive.Positioner.Props["side"];
   sideOffset?: SelectPrimitive.Positioner.Props["sideOffset"];
   align?: SelectPrimitive.Positioner.Props["align"];
@@ -123,7 +125,7 @@ export function SelectPopup({
   anchor?: SelectPrimitive.Positioner.Props["anchor"];
 }): React.ReactElement {
   return (
-    <SelectPrimitive.Portal>
+    <SelectPrimitive.Portal {...portalProps}>
       <SelectPrimitive.Positioner
         align={align}
         alignItemWithTrigger={alignItemWithTrigger}
