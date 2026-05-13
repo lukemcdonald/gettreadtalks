@@ -18,6 +18,7 @@ export function Input({
   size = "default",
   unstyled = false,
   nativeInput = false,
+  style,
   ...props
 }: InputProps): React.ReactElement {
   const inputClassName = cn(
@@ -44,23 +45,19 @@ export function Input({
       data-slot="input-control"
     >
       {nativeInput ? (
-        (() => {
-          const { style, ...rest } = props;
-          return (
-            <input
-              className={inputClassName}
-              data-slot="input"
-              size={typeof size === "number" ? size : undefined}
-              style={typeof style === "function" ? undefined : style}
-              {...rest}
-            />
-          );
-        })()
+        <input
+          className={inputClassName}
+          data-slot="input"
+          size={typeof size === "number" ? size : undefined}
+          style={typeof style === "function" ? undefined : style}
+          {...props}
+        />
       ) : (
         <InputPrimitive
           className={inputClassName}
           data-slot="input"
           size={typeof size === "number" ? size : undefined}
+          style={style}
           {...props}
         />
       )}
