@@ -1,15 +1,9 @@
-import type {
-  ErrorReportOptions,
-  ErrorWithEventId,
-  SeverityLevel,
-} from './types';
+import type { ErrorReportOptions } from './types';
 import type { Scope } from '@sentry/nextjs';
 
 import {
-  addBreadcrumb as sentryAddBreadcrumb,
   captureException as sentryCaptureException,
   captureMessage as sentryCaptureMessage,
-  setUser as sentrySetUser,
   withScope as sentryWithScope,
 } from '@sentry/nextjs';
 
@@ -57,49 +51,6 @@ export function captureException(
 
     return sentryCaptureException(error);
   });
-}
-
-/**
- * Sets user context for error reporting.
- * Call this when user logs in to associate errors with users.
- *
- * @example
- * setUserContext({
- *   id: user._id,
- *   email: user.email,
- * });
- */
-export function setUserContext(user: {
-  id: string;
-  email?: string;
-  username?: string;
-}): void {
-  sentrySetUser(user);
-}
-
-/**
- * Gets the Sentry Event ID from an error object if it was captured.
- * Useful for displaying event IDs to users for support purposes.
- *
- * @example
- * const eventId = getEventIdFromError(error);
- * if (eventId) {
- *   console.log('Error reported with ID:', eventId);
- * }
- */
-export function getEventIdFromError(error: unknown): string | undefined {
-  return (error as ErrorWithEventId).__sentryEventId;
-}
-
-/**
- * Clears user context for error reporting.
- * Call this when user logs out.
- *
- * @example
- * clearUserContext();
- */
-export function clearUserContext(): void {
-  sentrySetUser(null);
 }
 
 /**
@@ -160,24 +111,4 @@ export function captureMessage(
     applyScopeOptions(scope, options);
     return sentryCaptureMessage(message, options.level ?? 'info');
   });
-}
-
-/**
- * Adds a breadcrumb for debugging context.
- * Breadcrumbs are logged events that lead up to an error.
- *
- * @example
- * addBreadcrumb({
- *   message: 'User clicked submit',
- *   category: 'user-action',
- *   level: 'info',
- * });
- */
-export function addBreadcrumb(breadcrumb: {
-  category?: string;
-  data?: Record<string, unknown>;
-  level?: SeverityLevel;
-  message: string;
-}): void {
-  sentryAddBreadcrumb(breadcrumb);
 }

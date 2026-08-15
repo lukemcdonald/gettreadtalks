@@ -17,8 +17,6 @@ export function SpeakerHero({ featuredTalk, speaker }: SpeakerHeroProps) {
 
   return (
     <Section className="relative overflow-hidden" spacing="3xl">
-      {/* <HeroBackground className="blur-xl saturate-50" imageSrc={imageSrc} /> */}
-
       <Container
         className={cn(
           'relative',

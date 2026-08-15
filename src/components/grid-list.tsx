@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { cn } from '@/utils';
 
 export type ColumnCount = 1 | 2 | 3;
-export type GapSize = 'normal' | 'relaxed';
+type GapSize = 'normal' | 'relaxed';
 
 export interface GridColumns {
   default?: ColumnCount;

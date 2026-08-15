@@ -14,7 +14,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/primitives/sheet';
-import { useActiveFilterCount } from '@/hooks/use-active-filter-count';
+import { useActiveFilterCount } from '@/hooks';
 import { cn } from '@/utils';
 
 interface MobileFilterSheetProps {

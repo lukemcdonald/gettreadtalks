@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   title: 'Clips',
 };
 
-export interface ClipsPageSearchParams {
+interface ClipsPageSearchParams {
   cursor?: string;
 }
 

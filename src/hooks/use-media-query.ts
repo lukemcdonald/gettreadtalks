@@ -122,7 +122,3 @@ export function useMediaQuery(
 
   return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
-
-export function useIsMobile(): boolean {
-  return useMediaQuery('max-md');
-}

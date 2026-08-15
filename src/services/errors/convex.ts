@@ -1,9 +1,4 @@
-import type {
-  ErrorCode,
-  ErrorContext,
-  Fingerprint,
-  SentryConfig,
-} from './types';
+import type { ErrorContext, Fingerprint, SentryConfig } from './types';
 import type { Value } from 'convex/values';
 
 import { ConvexError } from 'convex/values';
@@ -95,47 +90,6 @@ export function getErrorMessage(error: unknown): string {
 
   // Fallback for unknown error types
   return 'An unexpected error occurred';
-}
-
-/**
- * Gets the error code from a ConvexError, returns UNKNOWN_ERROR if not available.
- *
- * @example
- * const code = getErrorCode(error);
- * if (code === ErrorCodes.AUTH_REQUIRED) {
- *   redirect('/login');
- * }
- */
-export function getErrorCode(error: unknown): ErrorCode {
-  const data = getConvexErrorData(error);
-
-  return data.errorCode || ErrorCodes.UNKNOWN_ERROR;
-}
-
-/**
- * Checks if an error is a specific error code.
- *
- * @example
- * if (isErrorCode(error, ErrorCodes.DUPLICATE_SLUG)) {
- *   setError('title', { message: 'Title already exists' });
- * }
- */
-export function isErrorCode(error: unknown, code: ErrorCode): boolean {
-  return getErrorCode(error) === code;
-}
-
-/**
- * Formats error details for display or logging.
- */
-export function formatErrorDetails(error: unknown): string {
-  const data = getConvexErrorData(error);
-  const message = getErrorMessage(error);
-
-  if (Object.keys(data).length === 0) {
-    return message;
-  }
-
-  return `${message}\nDetails: ${JSON.stringify(data, null, 2)}`;
 }
 
 /**

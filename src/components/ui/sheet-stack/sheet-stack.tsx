@@ -4,12 +4,12 @@ import type { ReactNode } from 'react';
 
 import { createContext, useEffect, useState } from 'react';
 
-export interface SheetLayer {
+interface SheetLayer {
   id: string;
   onClose: () => void;
 }
 
-export interface SheetStackContextValue {
+interface SheetStackContextValue {
   layers: SheetLayer[];
   register: (layer: SheetLayer) => void;
   unregister: (id: string) => void;

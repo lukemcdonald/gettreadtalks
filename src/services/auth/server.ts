@@ -20,18 +20,11 @@ if (!(convexSiteUrl && convexUrl)) {
   );
 }
 
-const {
-  fetchAuthAction,
-  fetchAuthMutation,
-  fetchAuthQuery,
-  handler,
-  getToken,
-  isAuthenticated,
-  preloadAuthQuery,
-} = convexBetterAuthNextJs({
-  convexSiteUrl,
-  convexUrl,
-});
+const { fetchAuthMutation, fetchAuthQuery, getToken, handler } =
+  convexBetterAuthNextJs({
+    convexSiteUrl,
+    convexUrl,
+  });
 
 /**
  * Get the authentication token for the current user.
@@ -113,14 +106,11 @@ const requireAdminUser = async (
 };
 
 export {
-  fetchAuthAction,
   fetchAuthMutation,
   fetchAuthQuery,
   getAuthToken,
   getCurrentUser,
   handler,
-  isAuthenticated,
-  preloadAuthQuery,
   requireAdminUser,
   requireCurrentUser,
 };
