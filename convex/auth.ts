@@ -31,6 +31,28 @@ export const authComponent = createClient<DataModel, typeof authSchema>(
   }
 );
 
+const TRUSTED_ORIGINS = [
+  'https://*.vercel.app',
+  'https://gettreadtalks.com',
+  'https://localhost:3000',
+  'https://www.gettreadtalks.com',
+];
+
+/**
+ * Checks whether `origin` matches one of `trustedOrigins`, treating a `*` in a
+ * trusted origin as a single-segment wildcard (e.g. `https://*.vercel.app`).
+ */
+function isTrustedOrigin(origin: string, trustedOrigins: string[]): boolean {
+  return trustedOrigins.some((trustedOrigin) => {
+    if (!trustedOrigin.includes('*')) {
+      return trustedOrigin === origin;
+    }
+
+    const pattern = trustedOrigin.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '[^.]+');
+    return new RegExp(`^${pattern}$`).test(origin);
+  });
+}
+
 /**
  * Creates Better Auth options. Uses fallback values during module analysis.
  */
@@ -39,6 +61,12 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
     process.env.BETTER_AUTH_SECRET ?? 'analysis-placeholder-secret';
   const siteUrl = process.env.SITE_URL ?? 'https://localhost:3000';
   const isHttps = siteUrl.startsWith('https://');
+
+  if (!isTrustedOrigin(siteUrl, TRUSTED_ORIGINS)) {
+    console.warn(
+      `SITE_URL "${siteUrl}" is not present in trustedOrigins. Auth links and cookies will target an origin the app does not trust.`,
+    );
+  }
 
   return {
     advanced: {
@@ -71,12 +99,7 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
       authRateLimitPlugin(ctx),
     ],
     secret,
-    trustedOrigins: [
-      'https://*.vercel.app',
-      'https://gettreadtalks.com',
-      'https://localhost:3000',
-      'https://www.gettreadtalks.com',
-    ],
+    trustedOrigins: TRUSTED_ORIGINS,
     user: {
       changeEmail: {
         enabled: true,
