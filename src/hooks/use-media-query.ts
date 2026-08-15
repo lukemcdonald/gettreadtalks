@@ -16,6 +16,13 @@ type Breakpoint = keyof typeof BREAKPOINTS;
 
 type BreakpointQuery = Breakpoint | `max-${Breakpoint}` | `${Breakpoint}:max-${Breakpoint}`;
 
+export interface MediaQueryInput {
+  max?: Breakpoint | number;
+  min?: Breakpoint | number;
+  /** Touch-like input (finger). Use "fine" for mouse/trackpad. */
+  pointer?: 'coarse' | 'fine';
+}
+
 function resolveMin(value: Breakpoint | number): string {
   const px = typeof value === 'number' ? value : BREAKPOINTS[value];
   return `(min-width: ${px}px)`;
@@ -26,32 +33,39 @@ function resolveMax(value: Breakpoint | number): string {
   return `(max-width: ${px - 1}px)`;
 }
 
-function parseQuery(query: BreakpointQuery | MediaQueryInput | (string & {})): string {
-  if (typeof query !== 'string') {
-    const parts: string[] = [];
-    if (query.min != null) {
-      parts.push(resolveMin(query.min));
-    }
-    if (query.max != null) {
-      parts.push(resolveMax(query.max));
-    }
-    if (query.pointer === 'coarse') {
-      parts.push('(pointer: coarse)');
-    }
-    if (query.pointer === 'fine') {
-      parts.push('(pointer: fine)');
-    }
-    if (parts.length === 0) {
-      return '(min-width: 0px)';
-    }
-    return parts.join(' and ');
+function parseObjectQuery(query: MediaQueryInput): string {
+  const parts: string[] = [];
+
+  if (query.min != null) {
+    parts.push(resolveMin(query.min));
   }
 
+  if (query.max != null) {
+    parts.push(resolveMax(query.max));
+  }
+
+  if (query.pointer === 'coarse') {
+    parts.push('(pointer: coarse)');
+  }
+
+  if (query.pointer === 'fine') {
+    parts.push('(pointer: fine)');
+  }
+
+  if (parts.length === 0) {
+    return '(min-width: 0px)';
+  }
+
+  return parts.join(' and ');
+}
+
+function parseStringQuery(query: string): string {
   if (query.startsWith('(')) {
     return query;
   }
 
   const parts: string[] = [];
+
   for (const segment of query.split(':')) {
     if (segment.startsWith('max-')) {
       const bp = segment.slice(4);
@@ -66,16 +80,17 @@ function parseQuery(query: BreakpointQuery | MediaQueryInput | (string & {})): s
   return parts.length > 0 ? parts.join(' and ') : query;
 }
 
+function parseQuery(query: BreakpointQuery | MediaQueryInput | (string & {})): string {
+  if (typeof query !== 'string') {
+    return parseObjectQuery(query);
+  }
+
+  return parseStringQuery(query);
+}
+
 function getServerSnapshot(): boolean {
   return false;
 }
-
-export type MediaQueryInput = {
-  min?: Breakpoint | number;
-  max?: Breakpoint | number;
-  /** Touch-like input (finger). Use "fine" for mouse/trackpad. */
-  pointer?: 'coarse' | 'fine';
-};
 
 export function useMediaQuery(query: BreakpointQuery | MediaQueryInput | (string & {})): boolean {
   const mediaQuery = parseQuery(query);
@@ -83,7 +98,7 @@ export function useMediaQuery(query: BreakpointQuery | MediaQueryInput | (string
   const subscribe = useCallback(
     (callback: () => void) => {
       if (typeof window === 'undefined') {
-        return () => {};
+        return () => undefined;
       }
       const mql = window.matchMedia(mediaQuery);
       mql.addEventListener('change', callback);
