@@ -9,7 +9,7 @@ interface CopyrightProps {
 // oxlint-disable-next-line require-await -- `use cache` requires an async function
 async function getCopyrightYear() {
   'use cache';
-  cacheLife('max');
+  cacheLife('hours');
 
   return new Date().getFullYear();
 }
