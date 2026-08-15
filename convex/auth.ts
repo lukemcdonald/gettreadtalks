@@ -39,10 +39,8 @@ const TRUSTED_ORIGINS = [
 ];
 
 /**
- * Precompiled per trusted origin so `isTrustedOrigin` (called on every
- * `createAuthOptions()` invocation) doesn't rebuild a RegExp per request. A
- * `*` in a trusted origin matches a single-segment wildcard (e.g.
- * `https://*.vercel.app`).
+ * Precompiled so `isTrustedOrigin` doesn't rebuild a RegExp per request. A
+ * `*` matches a single-segment wildcard (e.g. `https://*.vercel.app`).
  */
 const TRUSTED_ORIGIN_MATCHERS: (string | RegExp)[] = TRUSTED_ORIGINS.map(
   (trustedOrigin) => {
