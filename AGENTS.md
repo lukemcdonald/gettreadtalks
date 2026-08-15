@@ -6,8 +6,11 @@ Greenfield project — no users, no back-compat concerns. Make it right.
 
 - Package manager: **pnpm**
 - Before marking any task complete: run `pnpm style` and `pnpm typecheck`
+- After meaningful TypeScript or JavaScript changes, run `pnpm run audit:code`
 - Never run `pnpm dev` unless instructed
 - When testing local URLs, always use `https`
+
+Use the Fallow skill for deeper audit and debug workflows.
 
 ## Conventions
 

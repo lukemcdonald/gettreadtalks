@@ -1,0 +1,36 @@
+{
+  "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
+  "ignoreDependencies": [
+    // Coss UI / Base UI are imported only from src/components/ui, which Fallow ignores.
+    "@base-ui/react",
+    "input-otp",
+    "react-day-picker",
+    // Resend is consumed by the Convex Resend component, not direct app imports.
+    "resend",
+    // Tailwind is imported from CSS and lives in devDependencies by convention.
+    "tailwindcss",
+  ],
+  "ignoreExports": [
+    {
+      "exports": ["useActiveFilterCount", "useFilterParam"],
+      "file": "src/hooks/index.ts",
+    },
+  ],
+  "ignorePatterns": [
+    // Tool configs are entrypoints for their own CLIs and are already covered by the toolchain.
+    "oxfmt.config.ts",
+    "oxlint.config.ts",
+    // Convex generated files reference generated JS names that do not exist as source files.
+    "convex/**/_generated/**",
+    // Better Auth CLI output. Do not edit; regenerate with the Better Auth schema command.
+    "convex/betterAuth/schema.ts",
+    // Coss UI kit. Restored by `pnpm update:ui`; treat the whole tree as vendor.
+    "src/components/ui/**",
+    // Helpers used only by the ignored Coss UI kit.
+    "src/constants/ui.ts",
+    "src/hooks/use-active-filter-count.ts",
+    "src/hooks/use-debounced-search-param.ts",
+    "src/hooks/use-filter-param.ts",
+    "src/hooks/use-media-query.ts",
+  ],
+}
