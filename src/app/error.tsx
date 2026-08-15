@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+
 import {
   Button,
   Card,
@@ -16,7 +18,8 @@ interface ErrorProps {
 }
 
 export default function AppError({ error, reset }: ErrorProps) {
-  const eventId = captureException(error);
+  // oxlint-disable-next-line react/hook-use-state -- capture once on mount
+  const [eventId] = useState(() => captureException(error));
 
   return (
     <Card className="m-auto w-full max-w-sm">

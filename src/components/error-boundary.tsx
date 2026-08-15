@@ -4,6 +4,7 @@ import type { ErrorWithEventId } from '@/services/errors/types';
 import type { ComponentType, ErrorInfo, ReactNode } from 'react';
 import type { FallbackProps } from 'react-error-boundary';
 
+import { createContext, createElement, use } from 'react';
 import { ErrorBoundary as ReactErrorBoundary } from 'react-error-boundary';
 
 import { ErrorFallback } from '@/components/error-fallback';
@@ -14,6 +15,35 @@ interface ErrorBoundaryProps {
   fallback?: ComponentType<FallbackProps & { eventId?: string }>;
   onError?: (error: Error, info: ErrorInfo) => void;
   onReset?: () => void;
+}
+
+type FallbackComponent = ComponentType<FallbackProps & { eventId?: string }>;
+
+const FallbackContext = createContext<FallbackComponent>(ErrorFallback);
+
+function getSentryEventId(error: unknown): string | undefined {
+  if (!(error instanceof Error)) {
+    return undefined;
+  }
+
+  const err = error as ErrorWithEventId;
+  if (err.__sentryEventId) {
+    return err.__sentryEventId;
+  }
+
+  const eventId = captureException(err);
+  err.__sentryEventId = eventId;
+  return eventId;
+}
+
+function BoundFallback({ error, resetErrorBoundary }: FallbackProps) {
+  const Fallback = use(FallbackContext);
+
+  return createElement(Fallback, {
+    error,
+    eventId: getSentryEventId(error),
+    resetErrorBoundary,
+  });
 }
 
 /**
@@ -47,25 +77,25 @@ interface ErrorBoundaryProps {
  */
 export function ErrorBoundary({
   children,
-  fallback: FallbackComponent = ErrorFallback,
+  fallback = ErrorFallback,
   onError,
   onReset,
 }: ErrorBoundaryProps) {
   const handleError = (error: unknown, info: ErrorInfo) => {
     const err = error instanceof Error ? error : new Error(String(error));
-    const eventId = captureException(err);
-    // Store event ID for the fallback component
-    (err as ErrorWithEventId).__sentryEventId = eventId;
+    getSentryEventId(err);
     onError?.(err, info);
   };
 
   return (
-    <ReactErrorBoundary
-      FallbackComponent={FallbackComponent}
-      onError={handleError}
-      onReset={onReset}
-    >
-      {children}
-    </ReactErrorBoundary>
+    <FallbackContext value={fallback}>
+      <ReactErrorBoundary
+        FallbackComponent={BoundFallback}
+        onError={handleError}
+        onReset={onReset}
+      >
+        {children}
+      </ReactErrorBoundary>
+    </FallbackContext>
   );
 }
