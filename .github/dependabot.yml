@@ -1,0 +1,33 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    commit-message:
+      prefix: chore
+    directory: /
+    groups:
+      actions-minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+    schedule:
+      interval: weekly
+
+  - package-ecosystem: npm
+    commit-message:
+      prefix: chore
+    directory: /
+    groups:
+      development-minor-and-patch:
+        dependency-type: development
+        update-types:
+          - minor
+          - patch
+      production-minor-and-patch:
+        dependency-type: production
+        update-types:
+          - minor
+          - patch
+    schedule:
+      interval: weekly
