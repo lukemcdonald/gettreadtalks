@@ -121,7 +121,8 @@ export function ErrorBoundary({
   onReset,
 }: ErrorBoundaryProps) {
   const handleError = (error: unknown, info: ErrorInfo) => {
-    onError?.(consumeCapturedError(error), info);
+    const captured = consumeCapturedError(error);
+    onError?.(captured, info);
   };
 
   return (
