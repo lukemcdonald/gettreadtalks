@@ -20,28 +20,55 @@ interface ErrorBoundaryProps {
 type FallbackComponent = ComponentType<FallbackProps & { eventId?: string }>;
 
 const FallbackContext = createContext<FallbackComponent>(ErrorFallback);
+const wrappedThrownObjects = new WeakMap<object, Error>();
+const wrappedThrownPrimitives = new Map<unknown, Error>();
 
-function getSentryEventId(error: unknown): string | undefined {
-  if (!(error instanceof Error)) {
-    return undefined;
+function toError(error: unknown): Error {
+  if (error instanceof Error) {
+    return error;
   }
 
-  const err = error as ErrorWithEventId;
-  if (err.__sentryEventId) {
-    return err.__sentryEventId;
+  if (
+    error !== null &&
+    (typeof error === 'object' || typeof error === 'function')
+  ) {
+    const cached = wrappedThrownObjects.get(error);
+    if (cached) {
+      return cached;
+    }
+
+    const wrapped = new Error(String(error));
+    wrappedThrownObjects.set(error, wrapped);
+    return wrapped;
   }
 
-  const eventId = captureException(err);
-  err.__sentryEventId = eventId;
-  return eventId;
+  const cached = wrappedThrownPrimitives.get(error);
+  if (cached) {
+    return cached;
+  }
+
+  const wrapped = new Error(String(error));
+  wrappedThrownPrimitives.set(error, wrapped);
+  return wrapped;
+}
+
+function getCapturedError(error: unknown): ErrorWithEventId {
+  const err = toError(error) as ErrorWithEventId;
+
+  if (!Object.hasOwn(err, '__sentryEventId')) {
+    err.__sentryEventId = captureException(err);
+  }
+
+  return err;
 }
 
 function BoundFallback({ error, resetErrorBoundary }: FallbackProps) {
   const Fallback = use(FallbackContext);
+  const captured = getCapturedError(error);
 
   return createElement(Fallback, {
     error,
-    eventId: getSentryEventId(error),
+    eventId: captured.__sentryEventId,
     resetErrorBoundary,
   });
 }
@@ -82,9 +109,7 @@ export function ErrorBoundary({
   onReset,
 }: ErrorBoundaryProps) {
   const handleError = (error: unknown, info: ErrorInfo) => {
-    const err = error instanceof Error ? error : new Error(String(error));
-    getSentryEventId(err);
-    onError?.(err, info);
+    onError?.(getCapturedError(error), info);
   };
 
   return (
