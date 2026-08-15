@@ -1,15 +1,16 @@
 'use client';
 
-import type { Collection, CollectionId } from '@/features/collections/types';
 import type { CollectionFormData } from '../schemas/collection-form';
+import type { Collection, CollectionId } from '@/features/collections/types';
 
-import { useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { FormSheet } from '@/components/ui';
 import { updateCollectionAction } from '@/features/collections/actions/update-collection';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
+
 import { collectionFormSchema } from '../schemas/collection-form';
 import { CollectionFormFields } from './collection-form-fields';
 
@@ -29,8 +30,8 @@ export function EditCollectionSheet({
   const [isPending, startTransition] = useTransition();
 
   const form = useForm<CollectionFormData>({
-    resolver: zodResolver(collectionFormSchema),
     mode: 'onBlur',
+    resolver: zodResolver(collectionFormSchema),
     values: {
       description: collection?.description ?? '',
       slug: collection?.slug ?? '',

@@ -1,37 +1,35 @@
-import * as Sentry from '@sentry/nextjs';
+import {
+  breadcrumbsIntegration,
+  browserTracingIntegration,
+  init,
+  thirdPartyErrorFilterIntegration,
+} from '@sentry/nextjs';
 
 import { IS_DEV } from '@/constants/env';
+
 import { baseSentryConfig } from './index';
 
-// Expose Sentry on window for debugging (Next.js doesn't do this by default)
 if (IS_DEV && typeof window !== 'undefined') {
-  (window as unknown as { Sentry?: typeof Sentry }).Sentry = Sentry;
+  (
+    window as unknown as {
+      Sentry?: {
+        breadcrumbsIntegration: typeof breadcrumbsIntegration;
+        browserTracingIntegration: typeof browserTracingIntegration;
+        init: typeof init;
+        thirdPartyErrorFilterIntegration: typeof thirdPartyErrorFilterIntegration;
+      };
+    }
+  ).Sentry = {
+    breadcrumbsIntegration,
+    browserTracingIntegration,
+    init,
+    thirdPartyErrorFilterIntegration,
+  };
 }
 
-Sentry.init({
+init({
   ...baseSentryConfig,
   attachStacktrace: true,
-  integrations: [
-    Sentry.browserTracingIntegration({
-      enableInp: true,
-    }),
-    // Disable all automatic breadcrumbs to reduce noise
-    Sentry.breadcrumbsIntegration({
-      console: false,
-      dom: false,
-      fetch: false,
-      history: false,
-      xhr: false,
-    }),
-    // Filter out third-party errors (browser extensions, widgets, etc.)
-    Sentry.thirdPartyErrorFilterIntegration({
-      // Application key that matches the one in next.config.ts
-      filterKeys: ['gettreadtalks-app'],
-      behaviour: 'apply-tag-if-contains-third-party-frames',
-    }),
-  ],
-
-  // Add useful debugging context
   beforeSend(event) {
     if (event.exception) {
       event.extra = {
@@ -41,4 +39,20 @@ Sentry.init({
     }
     return event;
   },
+  integrations: [
+    browserTracingIntegration({
+      enableInp: true,
+    }),
+    breadcrumbsIntegration({
+      console: false,
+      dom: false,
+      fetch: false,
+      history: false,
+      xhr: false,
+    }),
+    thirdPartyErrorFilterIntegration({
+      behaviour: 'apply-tag-if-contains-third-party-frames',
+      filterKeys: ['gettreadtalks-app'],
+    }),
+  ],
 });

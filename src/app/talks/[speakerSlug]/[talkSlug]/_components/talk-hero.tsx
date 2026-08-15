@@ -13,10 +13,12 @@ interface TalkHeroProps {
 
 export function TalkHero({ speaker, speakerSlug, talk }: TalkHeroProps) {
   return (
-    <Section className="relative overflow-hidden bg-background py-6 sm:py-8 md:py-12 lg:py-16">
+    <Section className="bg-background relative overflow-hidden py-6 sm:py-8 md:py-12 lg:py-16">
       <Container className="relative space-y-8">
         <TalkHeroDetails speaker={speaker} talk={talk} />
-        {talk.mediaUrl && <TalkHeroMedia speakerSlug={speakerSlug} talk={talk} />}
+        {talk.mediaUrl && (
+          <TalkHeroMedia speakerSlug={speakerSlug} talk={talk} />
+        )}
       </Container>
     </Section>
   );

@@ -14,7 +14,7 @@ import { api } from '@/convex/_generated/api';
 export async function getRandomTalksBySpeaker(
   speakerId: SpeakerId,
   excludeTalkId?: TalkId,
-  limit = 5,
+  limit = 5
 ) {
   cacheLife('hours');
   cacheTag('talks');

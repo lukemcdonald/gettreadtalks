@@ -19,7 +19,9 @@ export const favoriteClip = mutation({
 
     const existing = await ctx.db
       .query('userFavoriteClips')
-      .withIndex('by_userId_and_clipId', (q) => q.eq('userId', userId).eq('clipId', args.clipId))
+      .withIndex('by_userId_and_clipId', (q) =>
+        q.eq('userId', userId).eq('clipId', args.clipId)
+      )
       .first();
 
     if (existing) {
@@ -47,7 +49,7 @@ export const favoriteSpeaker = mutation({
     const existing = await ctx.db
       .query('userFavoriteSpeakers')
       .withIndex('by_userId_and_speakerId', (q) =>
-        q.eq('userId', userId).eq('speakerId', args.speakerId),
+        q.eq('userId', userId).eq('speakerId', args.speakerId)
       )
       .first();
 
@@ -75,7 +77,9 @@ export const favoriteTalk = mutation({
 
     const existing = await ctx.db
       .query('userFavoriteTalks')
-      .withIndex('by_userId_and_talkId', (q) => q.eq('userId', userId).eq('talkId', args.talkId))
+      .withIndex('by_userId_and_talkId', (q) =>
+        q.eq('userId', userId).eq('talkId', args.talkId)
+      )
       .first();
 
     if (existing) {
@@ -102,7 +106,9 @@ export const finishTalk = mutation({
 
     const existing = await ctx.db
       .query('userFinishedTalks')
-      .withIndex('by_userId_and_talkId', (q) => q.eq('userId', userId).eq('talkId', args.talkId))
+      .withIndex('by_userId_and_talkId', (q) =>
+        q.eq('userId', userId).eq('talkId', args.talkId)
+      )
       .first();
 
     if (existing) {
@@ -129,7 +135,9 @@ export const unfavoriteClip = mutation({
 
     const favorite = await ctx.db
       .query('userFavoriteClips')
-      .withIndex('by_userId_and_clipId', (q) => q.eq('userId', userId).eq('clipId', args.clipId))
+      .withIndex('by_userId_and_clipId', (q) =>
+        q.eq('userId', userId).eq('clipId', args.clipId)
+      )
       .first();
 
     if (!favorite) {
@@ -156,7 +164,7 @@ export const unfavoriteSpeaker = mutation({
     const favorite = await ctx.db
       .query('userFavoriteSpeakers')
       .withIndex('by_userId_and_speakerId', (q) =>
-        q.eq('userId', userId).eq('speakerId', args.speakerId),
+        q.eq('userId', userId).eq('speakerId', args.speakerId)
       )
       .first();
 
@@ -183,7 +191,9 @@ export const unfavoriteTalk = mutation({
 
     const favorite = await ctx.db
       .query('userFavoriteTalks')
-      .withIndex('by_userId_and_talkId', (q) => q.eq('userId', userId).eq('talkId', args.talkId))
+      .withIndex('by_userId_and_talkId', (q) =>
+        q.eq('userId', userId).eq('talkId', args.talkId)
+      )
       .first();
 
     if (!favorite) {
@@ -209,11 +219,15 @@ export const unfinishTalk = mutation({
 
     const finished = await ctx.db
       .query('userFinishedTalks')
-      .withIndex('by_userId_and_talkId', (q) => q.eq('userId', userId).eq('talkId', args.talkId))
+      .withIndex('by_userId_and_talkId', (q) =>
+        q.eq('userId', userId).eq('talkId', args.talkId)
+      )
       .first();
 
     if (!finished) {
-      throwNotFound('Finished talk not found', { resource: 'userFinishedTalks' });
+      throwNotFound('Finished talk not found', {
+        resource: 'userFinishedTalks',
+      });
     }
 
     await ctx.db.delete(finished._id);

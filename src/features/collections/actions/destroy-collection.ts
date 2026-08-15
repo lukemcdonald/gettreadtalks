@@ -1,9 +1,8 @@
 'use server';
 
 import 'server-only';
-
-import type { ActionResult } from '@/lib/forms/types';
 import type { CollectionId } from '../types';
+import type { ActionResult } from '@/lib/forms/types';
 
 import { updateTag } from 'next/cache';
 
@@ -12,17 +11,19 @@ import { mapConvexErrorToFormErrors } from '@/lib/forms/validation';
 import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
 
 export async function destroyCollectionAction(
-  collectionId: CollectionId,
+  collectionId: CollectionId
 ): Promise<ActionResult<null>> {
   await requireAdminUser();
 
   try {
-    await fetchAuthMutation(api.collections.destroyCollection, { collectionId });
+    await fetchAuthMutation(api.collections.destroyCollection, {
+      collectionId,
+    });
 
     updateTag('collections');
 
-    return { success: true, data: null };
+    return { data: null, success: true };
   } catch (error) {
-    return { success: false, errors: mapConvexErrorToFormErrors(error) };
+    return { errors: mapConvexErrorToFormErrors(error), success: false };
   }
 }

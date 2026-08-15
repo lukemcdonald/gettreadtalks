@@ -14,7 +14,10 @@ const BREAKPOINTS = {
 
 type Breakpoint = keyof typeof BREAKPOINTS;
 
-type BreakpointQuery = Breakpoint | `max-${Breakpoint}` | `${Breakpoint}:max-${Breakpoint}`;
+type BreakpointQuery =
+  | Breakpoint
+  | `max-${Breakpoint}`
+  | `${Breakpoint}:max-${Breakpoint}`;
 
 export interface MediaQueryInput {
   max?: Breakpoint | number;
@@ -36,11 +39,11 @@ function resolveMax(value: Breakpoint | number): string {
 function parseObjectQuery(query: MediaQueryInput): string {
   const parts: string[] = [];
 
-  if (query.min != null) {
+  if (query.min !== undefined) {
     parts.push(resolveMin(query.min));
   }
 
-  if (query.max != null) {
+  if (query.max !== undefined) {
     parts.push(resolveMax(query.max));
   }
 
@@ -80,7 +83,7 @@ function parseStringQuery(query: string): string {
   return parts.length > 0 ? parts.join(' and ') : query;
 }
 
-function parseQuery(query: BreakpointQuery | MediaQueryInput | (string & {})): string {
+function parseQuery(query: BreakpointQuery | MediaQueryInput | string): string {
   if (typeof query !== 'string') {
     return parseObjectQuery(query);
   }
@@ -92,19 +95,22 @@ function getServerSnapshot(): boolean {
   return false;
 }
 
-export function useMediaQuery(query: BreakpointQuery | MediaQueryInput | (string & {})): boolean {
+export function useMediaQuery(
+  query: BreakpointQuery | MediaQueryInput | string
+): boolean {
   const mediaQuery = parseQuery(query);
 
   const subscribe = useCallback(
+    // oxlint-disable-next-line promise/prefer-await-to-callbacks -- matchMedia subscribe API
     (callback: () => void) => {
       if (typeof window === 'undefined') {
-        return () => undefined;
+        return () => {};
       }
       const mql = window.matchMedia(mediaQuery);
       mql.addEventListener('change', callback);
       return () => mql.removeEventListener('change', callback);
     },
-    [mediaQuery],
+    [mediaQuery]
   );
 
   const getSnapshot = useCallback(() => {

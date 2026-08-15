@@ -10,6 +10,7 @@ import {
   Separator,
 } from '@/components/ui';
 import { getUserFinishedTalks } from '@/features/users/queries/get-user-finished-talks';
+
 import { AccountTable } from '../_components/account-table';
 import { FinishedTalkRow } from './_components/finished-talk-row';
 
@@ -20,7 +21,9 @@ export default async function FinishedPage() {
     <Card>
       <CardHeader>
         <CardTitle>Finished Talks</CardTitle>
-        {talks.length > 0 && <CardDescription>{talks.length} talks</CardDescription>}
+        {talks.length > 0 && (
+          <CardDescription>{talks.length} talks</CardDescription>
+        )}
       </CardHeader>
 
       <Separator />
@@ -30,7 +33,9 @@ export default async function FinishedPage() {
           <Empty>
             <EmptyHeader>
               <EmptyTitle>No finished talks yet</EmptyTitle>
-              <EmptyDescription>Mark talks as finished as you go!</EmptyDescription>
+              <EmptyDescription>
+                Mark talks as finished as you go!
+              </EmptyDescription>
             </EmptyHeader>
           </Empty>
         </div>

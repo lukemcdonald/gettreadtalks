@@ -3,7 +3,11 @@ import type { Doc } from '../../_generated/dataModel';
 import { v } from 'convex/values';
 
 import { mutation } from '../../_generated/server';
-import { throwDuplicateSlug, throwNotFound, throwValidationError } from '../../lib/errors';
+import {
+  throwDuplicateSlug,
+  throwNotFound,
+  throwValidationError,
+} from '../../lib/errors';
 import { slugExists, slugify } from '../../lib/utils';
 import { requireAuth } from '../auth/utils';
 import { affiliateLinkTypes } from './validators';
@@ -32,7 +36,10 @@ export const createAffiliateLink = mutation({
     const slug = slugify(args.title);
 
     if (await slugExists(ctx, 'affiliateLinks', slug)) {
-      throwDuplicateSlug('Affiliate link with this title already exists', 'title');
+      throwDuplicateSlug(
+        'Affiliate link with this title already exists',
+        'title'
+      );
     }
 
     return await ctx.db.insert('affiliateLinks', { ...args, slug });
@@ -108,7 +115,10 @@ export const updateAffiliateLink = mutation({
 
       if (newSlug !== affiliateLink.slug) {
         if (await slugExists(ctx, 'affiliateLinks', newSlug, affiliateLinkId)) {
-          throwDuplicateSlug('Affiliate link with this title already exists', 'title');
+          throwDuplicateSlug(
+            'Affiliate link with this title already exists',
+            'title'
+          );
         }
 
         updates.slug = newSlug;

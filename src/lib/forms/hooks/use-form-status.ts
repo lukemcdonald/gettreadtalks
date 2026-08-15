@@ -27,7 +27,8 @@ export function useFormStatus() {
   const [status, setStatus] = useState<FormStatus>('idle');
 
   const isBusy = status !== 'idle';
-  const isDestructive = status === 'archiving' || status === 'unarchiving' || status === 'deleting';
+  const isDestructive =
+    status === 'archiving' || status === 'unarchiving' || status === 'deleting';
 
   return {
     // Check if form is archiving a record.

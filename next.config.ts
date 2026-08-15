@@ -27,6 +27,17 @@ const nextConfig = {
     cachedNavigations: true,
     prefetchInlining: true,
   },
+  headers: () => [
+    {
+      headers: [
+        {
+          key: 'Content-Security-Policy',
+          value: cspHeader.replaceAll('\n', ''),
+        },
+      ],
+      source: '/(.*)',
+    },
+  ],
   images: {
     remotePatterns: [
       {
@@ -47,28 +58,17 @@ const nextConfig = {
       },
     ],
   },
-  typedRoutes: false,
-  rewrites: async () => [
+  rewrites: () => [
     {
-      source: '/ingest/static/:path*',
       destination: 'https://us-assets.i.posthog.com/static/:path*',
+      source: '/ingest/static/:path*',
     },
     {
-      source: '/ingest/:path*',
       destination: 'https://us.i.posthog.com/:path*',
+      source: '/ingest/:path*',
     },
   ],
-  headers: async () => [
-    {
-      headers: [
-        {
-          key: 'Content-Security-Policy',
-          value: cspHeader.replace(/\n/g, ''),
-        },
-      ],
-      source: '/(.*)',
-    },
-  ],
+  typedRoutes: false,
 } satisfies NextConfig;
 
 const config = IS_SENTRY_ENABLED
@@ -76,12 +76,12 @@ const config = IS_SENTRY_ENABLED
       authToken: process.env.SENTRY_AUTH_TOKEN,
       org: process.env.SENTRY_ORG,
       project: process.env.SENTRY_PROJECT,
+      release: {
+        create: false,
+      },
       silent: !process.env.CI,
       sourcemaps: {
         disable: true,
-      },
-      release: {
-        create: false,
       },
     })
   : nextConfig;

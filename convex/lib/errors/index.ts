@@ -1,10 +1,16 @@
 import type { ErrorData, HttpStatusCode } from './types';
+import type { Value } from 'convex/values';
 
-import { ConvexError, type Value } from 'convex/values';
+import { ConvexError } from 'convex/values';
 
 import { STATUS_TO_ERROR_CODE, STATUS_TO_LEVEL } from './constants';
 
-export type { ErrorCode, ErrorData, HttpStatusCode, SeverityLevel } from './types';
+export type {
+  ErrorCode,
+  ErrorData,
+  HttpStatusCode,
+  SeverityLevel,
+} from './types';
 
 export { ErrorCodes } from '../../../src/services/errors/constants';
 
@@ -18,7 +24,10 @@ export { ErrorCodes } from '../../../src/services/errors/constants';
  *   resourceId: userId,
  * });
  */
-export function createConvexError(message: string, data?: ErrorData): ConvexError<Value> {
+export function createConvexError(
+  message: string,
+  data?: ErrorData
+): ConvexError<Value> {
   return new ConvexError({ message, ...data });
 }
 
@@ -37,7 +46,7 @@ export function createConvexError(message: string, data?: ErrorData): ConvexErro
 export function throwConvexError(
   statusCode: HttpStatusCode,
   message: string,
-  data?: Omit<ErrorData, 'errorCode' | 'statusCode' | 'level'>,
+  data?: Omit<ErrorData, 'errorCode' | 'statusCode' | 'level'>
 ): never {
   const errorCode = STATUS_TO_ERROR_CODE[statusCode];
   const level = STATUS_TO_LEVEL[statusCode];
@@ -83,7 +92,7 @@ export function throwForbidden(message?: string): never {
  */
 export function throwNotFound(
   message?: string,
-  data?: Pick<ErrorData, 'resource' | 'resourceId'>,
+  data?: Pick<ErrorData, 'resource' | 'resourceId'>
 ): never {
   throwConvexError(404, message ?? 'Resource not found', data);
 }

@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react';
 import type { StatusType } from '@/lib/entities/types';
+import type { ReactNode } from 'react';
 
 import Link from 'next/link';
 
@@ -42,7 +42,9 @@ export function ContentTableRow({
           {title}
         </Link>
         {!!speakerName && (
-          <p className="truncate text-muted-foreground text-sm">by {speakerName}</p>
+          <p className="text-muted-foreground truncate text-sm">
+            by {speakerName}
+          </p>
         )}
       </TableCell>
       <TableCell className="w-px text-right">{actionsMenu}</TableCell>

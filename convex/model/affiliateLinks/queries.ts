@@ -1,5 +1,5 @@
-import { v } from 'convex/values';
 import { getOneFrom } from 'convex-helpers/server/relationships';
+import { v } from 'convex/values';
 
 import { query } from '../../_generated/server';
 import { doc, docs } from '../../lib/validators/schema';
@@ -12,7 +12,8 @@ export const getAffiliateLink = query({
   args: {
     affiliateLinkId: v.id('affiliateLinks'),
   },
-  handler: async (ctx, args) => await ctx.db.get('affiliateLinks', args.affiliateLinkId),
+  handler: async (ctx, args) =>
+    await ctx.db.get('affiliateLinks', args.affiliateLinkId),
   returns: doc('affiliateLinks').nullable(),
 });
 
@@ -23,7 +24,8 @@ export const getAffiliateLinkBySlug = query({
   args: {
     slug: v.string(),
   },
-  handler: async (ctx, args) => await getOneFrom(ctx.db, 'affiliateLinks', 'by_slug', args.slug),
+  handler: async (ctx, args) =>
+    await getOneFrom(ctx.db, 'affiliateLinks', 'by_slug', args.slug),
   returns: doc('affiliateLinks').nullable(),
 });
 
@@ -58,12 +60,14 @@ export const listAffiliateLinks = query({
     }
 
     if (affiliate) {
-      filteredLinks = filteredLinks.filter((link) => link.affiliate === affiliate);
+      filteredLinks = filteredLinks.filter(
+        (link) => link.affiliate === affiliate
+      );
     }
 
     // Sort by creation time (newest first) and limit
     return filteredLinks
-      .sort((a, b) => (b._creationTime || 0) - (a._creationTime || 0))
+      .toSorted((a, b) => (b._creationTime || 0) - (a._creationTime || 0))
       .slice(0, limit);
   },
   returns: docs('affiliateLinks'),

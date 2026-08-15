@@ -12,7 +12,9 @@ interface AccountClipsContentProps {
   searchParams: AccountClipsSearchParams;
 }
 
-export async function AccountClipsContent({ searchParams }: AccountClipsContentProps) {
+export async function AccountClipsContent({
+  searchParams,
+}: AccountClipsContentProps) {
   const { cursor, status } = searchParams;
 
   const result = await getAllClips({

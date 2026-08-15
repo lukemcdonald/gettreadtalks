@@ -35,17 +35,23 @@ export function UrlChangeDialog({
             <span className="mt-2 block space-y-1 text-sm">
               <span className="block">
                 <span className="text-muted-foreground">From:</span>{' '}
-                <code className="rounded bg-muted px-1.5 py-0.5 text-xs">{oldUrl}</code>
+                <code className="bg-muted rounded px-1.5 py-0.5 text-xs">
+                  {oldUrl}
+                </code>
               </span>
               <span className="block">
                 <span className="text-muted-foreground">To:</span>{' '}
-                <code className="rounded bg-muted px-1.5 py-0.5 text-xs">{newUrl}</code>
+                <code className="bg-muted rounded px-1.5 py-0.5 text-xs">
+                  {newUrl}
+                </code>
               </span>
             </span>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogClose render={<Button variant="outline" />}>Cancel</AlertDialogClose>
+          <AlertDialogClose render={<Button variant="outline" />}>
+            Cancel
+          </AlertDialogClose>
           <AlertDialogClose onClick={onConfirm} render={<Button />}>
             Save Anyway
           </AlertDialogClose>

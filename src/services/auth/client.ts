@@ -41,7 +41,10 @@ export async function signOut() {
 }
 
 export async function requestPasswordReset({ email }: { email: string }) {
-  return await authClient.requestPasswordReset({ email, redirectTo: '/reset-password' });
+  return await authClient.requestPasswordReset({
+    email,
+    redirectTo: '/reset-password',
+  });
 }
 
 export async function resetPassword({

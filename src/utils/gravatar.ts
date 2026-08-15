@@ -13,8 +13,6 @@ interface GravatarProps {
 /**
  * Generate a Gravatar URL for an email address using SHA256 hash.
  * Follows Gravatar API v3.0.0 specifications.
- *
- * @remarks
  * Defaults to '404' so Gravatar returns 404 when no avatar exists, allowing
  * the Avatar component's fallback to display.
  */

@@ -11,7 +11,7 @@ export function useActiveFilterCount(): number {
 
   for (const [key, value] of searchParams.entries()) {
     if (!EXCLUDED_PARAMS.has(key) && value) {
-      count++;
+      count += 1;
     }
   }
 

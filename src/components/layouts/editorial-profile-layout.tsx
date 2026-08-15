@@ -8,11 +8,15 @@ interface EditorialProfileLayoutProps {
   hero: ReactNode;
 }
 
-export function EditorialProfileLayout({ breadcrumb, content, hero }: EditorialProfileLayoutProps) {
+export function EditorialProfileLayout({
+  breadcrumb,
+  content,
+  hero,
+}: EditorialProfileLayoutProps) {
   return (
     <div className="-mt-6 sm:-mt-8 md:-mt-10 lg:-mt-12">
       {!!breadcrumb && (
-        <div className="dark border-border border-t border-b bg-background px-4 py-3 sm:px-6">
+        <div className="dark border-border bg-background border-t border-b px-4 py-3 sm:px-6">
           <Container className="flex justify-center">{breadcrumb}</Container>
         </div>
       )}

@@ -11,7 +11,10 @@ interface CreateClipSheetRouteProps {
   talks: TalkListItem[];
 }
 
-export function CreateClipSheetRoute({ speakers, talks }: CreateClipSheetRouteProps) {
+export function CreateClipSheetRoute({
+  speakers,
+  talks,
+}: CreateClipSheetRouteProps) {
   const { handleOpenChange, handleSuccess } = useSheetRoute();
 
   return (

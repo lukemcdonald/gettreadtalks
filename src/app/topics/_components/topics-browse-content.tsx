@@ -19,7 +19,8 @@ interface TopicsBrowseContentProps {
 
 export function TopicsBrowseContent({ topics }: TopicsBrowseContentProps) {
   const searchParams = useSearchParams();
-  const selectedTopics = searchParams.get('topics')?.split(',').filter(Boolean) ?? [];
+  const selectedTopics =
+    searchParams.get('topics')?.split(',').filter(Boolean) ?? [];
 
   const filteredTopics =
     selectedTopics.length > 0

@@ -34,10 +34,11 @@ export function DeleteAccountForm() {
       try {
         await deleteAccount({ password: values.password });
         toastManager.add({ title: 'Account deleted', type: 'success' });
-      } catch (err) {
-        captureException(err);
+      } catch (error) {
+        captureException(error);
         form.setError('root', {
-          message: 'Failed to delete account. Check your password and try again.',
+          message:
+            'Failed to delete account. Check your password and try again.',
         });
       }
     });
@@ -45,19 +46,25 @@ export function DeleteAccountForm() {
 
   return (
     <AlertDialog>
-      <AlertDialogTrigger render={<Button size="sm" variant="destructive-outline" />}>
+      <AlertDialogTrigger
+        render={<Button size="sm" variant="destructive-outline" />}
+      >
         Delete Account
       </AlertDialogTrigger>
       <AlertDialogPopup>
         <AlertDialogHeader>
           <AlertDialogTitle>Delete Account</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. Your account and all associated data will be permanently
-            deleted. Enter your password to confirm.
+            This action cannot be undone. Your account and all associated data
+            will be permanently deleted. Enter your password to confirm.
           </AlertDialogDescription>
         </AlertDialogHeader>
 
-        <form className="px-6 pb-4" id="delete-account-form" onSubmit={form.handleSubmit(onSubmit)}>
+        <form
+          className="px-6 pb-4"
+          id="delete-account-form"
+          onSubmit={form.handleSubmit(onSubmit)}
+        >
           <FormError error={form.formState.errors.root} />
           <Fieldset disabled={isPending}>
             <TextField
@@ -71,7 +78,9 @@ export function DeleteAccountForm() {
         </form>
 
         <AlertDialogFooter>
-          <AlertDialogClose render={<Button variant="outline" />}>Cancel</AlertDialogClose>
+          <AlertDialogClose render={<Button variant="outline" />}>
+            Cancel
+          </AlertDialogClose>
           <Button
             form="delete-account-form"
             loading={isPending}

@@ -15,7 +15,9 @@ export interface SheetStackContextValue {
   unregister: (id: string) => void;
 }
 
-export const SheetStackContext = createContext<SheetStackContextValue | null>(null);
+export const SheetStackContext = createContext<SheetStackContextValue | null>(
+  null
+);
 
 const TRANSITION = 'transform 300ms cubic-bezier(0.32, 0.72, 0, 1)';
 
@@ -45,26 +47,29 @@ export function SheetStack({ children }: { children: ReactNode }) {
   useEffect(() => {
     const tracked: HTMLElement[] = [];
 
-    for (let i = 0; i < layers.length; i++) {
+    for (let i = 0; i < layers.length; i += 1) {
       const layer = layers[i];
-      const marker = document.querySelector(`[data-sheet-layer-id="${layer.id}"]`);
-      const viewport = marker?.closest('[data-slot="sheet-viewport"]') as HTMLElement | null;
+      const marker = document.querySelector(
+        `[data-sheet-layer-id="${layer.id}"]`
+      );
+      const viewport = marker?.closest(
+        '[data-slot="sheet-viewport"]'
+      ) as HTMLElement | null;
       const backdrop = viewport?.previousElementSibling as HTMLElement | null;
       const depthFromTop = layers.length - 1 - i;
 
       if (viewport) {
         tracked.push(viewport);
+        viewport.style.transition = TRANSITION;
 
         if (depthFromTop > 0) {
-          viewport.style.transition = TRANSITION;
+          viewport.style.pointerEvents = 'none';
           viewport.style.transform = `scale(${1 - depthFromTop * 0.03}) translateX(-${depthFromTop * 16}px)`;
           viewport.style.transformOrigin = 'right center';
-          viewport.style.pointerEvents = 'none';
         } else {
-          viewport.style.transition = TRANSITION;
+          viewport.style.pointerEvents = '';
           viewport.style.transform = '';
           viewport.style.transformOrigin = '';
-          viewport.style.pointerEvents = '';
         }
       }
 
@@ -86,5 +91,9 @@ export function SheetStack({ children }: { children: ReactNode }) {
     };
   }, [layers]);
 
-  return <SheetStackContext value={{ layers, register, unregister }}>{children}</SheetStackContext>;
+  return (
+    <SheetStackContext value={{ layers, register, unregister }}>
+      {children}
+    </SheetStackContext>
+  );
 }

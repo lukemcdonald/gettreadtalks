@@ -13,15 +13,19 @@ interface SidebarNavItemProps {
   label: string;
 }
 
-export function SidebarNavItem({ href, label, icon: Icon }: SidebarNavItemProps) {
+export function SidebarNavItem({
+  href,
+  label,
+  icon: Icon,
+}: SidebarNavItemProps) {
   const pathname = usePathname();
   const isActive = href === pathname;
 
   return (
     <Link
       className={cn(
-        'flex items-center gap-2 font-medium hover:text-foreground',
-        isActive ? 'text-foreground' : 'text-muted-foreground',
+        'hover:text-foreground flex items-center gap-2 font-medium',
+        isActive ? 'text-foreground' : 'text-muted-foreground'
       )}
       href={href}
       key={href}

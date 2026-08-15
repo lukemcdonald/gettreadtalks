@@ -1,6 +1,11 @@
 import type { ReactNode } from 'react';
 
-import { Button, Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui';
+import {
+  Button,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui';
 
 interface ActionIconButtonProps {
   children: ReactNode;

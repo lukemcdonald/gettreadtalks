@@ -11,7 +11,10 @@ interface CreateTalkSheetRouteProps {
   speakers: SpeakerListItem[];
 }
 
-export function CreateTalkSheetRoute({ collections, speakers }: CreateTalkSheetRouteProps) {
+export function CreateTalkSheetRoute({
+  collections,
+  speakers,
+}: CreateTalkSheetRouteProps) {
   const { handleOpenChange, handleSuccess } = useSheetRoute();
 
   return (

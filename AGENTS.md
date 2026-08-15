@@ -115,13 +115,13 @@ Convex only allows alphanumeric characters, underscores, and periods in file/fol
 
 ### Naming Conventions
 
-*Queries:*
+_Queries:_
 
 - `get*` — Single document or null
 - `list*` — Filtered/public array with enrichment
 - `listAll*` — Unfiltered array for admin
 
-*Mutations:*
+_Mutations:_
 
 - `create*`, `update*`, `archive*` (soft delete), `destroy*` (hard delete)
 - `add*To*`, `remove*From*` — Associations
@@ -131,11 +131,11 @@ Convex only allows alphanumeric characters, underscores, and periods in file/fol
 
 File-level directives for single-function files:
 
-| Directive | Use Case | Location |
-| --------- | -------- | -------- |
-| `'use cache'` | Public queries (no auth) | `queries/` |
-| `'use cache: private'` | Auth-dependent queries | `queries/` |
-| `'use server'` | Server Actions (mutations) | `actions/` |
+| Directive              | Use Case                   | Location   |
+| ---------------------- | -------------------------- | ---------- |
+| `'use cache'`          | Public queries (no auth)   | `queries/` |
+| `'use cache: private'` | Auth-dependent queries     | `queries/` |
+| `'use server'`         | Server Actions (mutations) | `actions/` |
 
 Cached queries include `cacheLife()` and `cacheTag()` for invalidation:
 
@@ -246,10 +246,16 @@ Without `match`, Base UI's `FieldError` only renders when native HTML5 `Validity
 
 ```tsx
 // ✅ Correct — error message renders when fieldState.error is set
-{!!fieldState.error && <FieldError match>{fieldState.error?.message}</FieldError>}
+{
+  !!fieldState.error && (
+    <FieldError match>{fieldState.error?.message}</FieldError>
+  );
+}
 
 // ❌ Wrong — error message never renders (native ValidityState is valid)
-{!!fieldState.error && <FieldError>{fieldState.error?.message}</FieldError>}
+{
+  !!fieldState.error && <FieldError>{fieldState.error?.message}</FieldError>;
+}
 ```
 
 This applies to all field components: `TextField`, `PasswordField`, `TextareaField`, `SelectField`, `CheckboxField`, `UrlField`, `NumberField`.

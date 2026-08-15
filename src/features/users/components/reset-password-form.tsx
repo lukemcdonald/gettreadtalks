@@ -42,12 +42,17 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   const { errors, isSubmitting } = form.formState;
 
   async function onSubmit(values: ResetPasswordData) {
-    const { error: submitError } = await resetPassword({ newPassword: values.newPassword, token });
+    const { error: submitError } = await resetPassword({
+      newPassword: values.newPassword,
+      token,
+    });
 
     if (submitError) {
-      form.setError('root', { message: submitError.message ?? AUTH_ERRORS.RESET_TOKEN_INVALID });
+      form.setError('root', {
+        message: submitError.message ?? AUTH_ERRORS.RESET_TOKEN_INVALID,
+      });
     } else {
-      window.location.href = '/login';
+      window.location.assign('/login');
     }
   }
 
@@ -62,7 +67,12 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
       )}
 
       <Fieldset disabled={isSubmitting}>
-        <PasswordField control={form.control} label="New password" name="newPassword" required />
+        <PasswordField
+          control={form.control}
+          label="New password"
+          name="newPassword"
+          required
+        />
         <PasswordField
           control={form.control}
           label="Confirm new password"

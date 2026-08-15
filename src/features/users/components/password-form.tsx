@@ -1,13 +1,15 @@
 'use client';
 
-import { useTransition } from 'react';
+import type { PasswordFormData } from '@/features/users/schemas/password-form';
+
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useTransition } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 
 import { Button, Fieldset, PasswordField } from '@/components/ui';
 import { toastManager } from '@/components/ui/primitives/toast';
 import { updateUserPassword } from '@/features/users/actions/update-password';
-import { type PasswordFormData, passwordFormSchema } from '@/features/users/schemas/password-form';
+import { passwordFormSchema } from '@/features/users/schemas/password-form';
 
 export function PasswordForm() {
   const [isPending, startTransition] = useTransition();
@@ -22,8 +24,12 @@ export function PasswordForm() {
   });
 
   const newPassword = useWatch({ control: form.control, name: 'newPassword' });
-  const confirmPassword = useWatch({ control: form.control, name: 'confirmPassword' });
-  const passwordsMatch = newPassword.length > 0 && newPassword === confirmPassword;
+  const confirmPassword = useWatch({
+    control: form.control,
+    name: 'confirmPassword',
+  });
+  const passwordsMatch =
+    newPassword.length > 0 && newPassword === confirmPassword;
 
   function onSubmit(values: PasswordFormData) {
     startTransition(async () => {
@@ -33,14 +39,16 @@ export function PasswordForm() {
           newPassword: values.newPassword,
         });
         toastManager.add({
-          description: 'Your password has been changed. You are still logged in.',
+          description:
+            'Your password has been changed. You are still logged in.',
           title: 'Password updated',
           type: 'success',
         });
         form.reset();
       } catch {
         toastManager.add({
-          description: 'Check that your current password is correct and try again.',
+          description:
+            'Check that your current password is correct and try again.',
           title: 'Failed to update password',
           type: 'error',
         });
@@ -51,7 +59,12 @@ export function PasswordForm() {
   return (
     <form onSubmit={form.handleSubmit(onSubmit)}>
       <Fieldset disabled={isPending}>
-        <PasswordField control={form.control} label="New password" name="newPassword" required />
+        <PasswordField
+          control={form.control}
+          label="New password"
+          name="newPassword"
+          required
+        />
         <PasswordField
           control={form.control}
           label="Confirm new password"

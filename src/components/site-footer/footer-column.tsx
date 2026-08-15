@@ -8,10 +8,16 @@ interface FooterColumnProps {
   title: string;
 }
 
-export function FooterColumn({ children, className, title }: FooterColumnProps) {
+export function FooterColumn({
+  children,
+  className,
+  title,
+}: FooterColumnProps) {
   return (
     <div className={cn('space-y-4', className)}>
-      <h3 className="font-semibold text-foreground text-sm uppercase">{title}</h3>
+      <h3 className="text-foreground text-sm font-semibold uppercase">
+        {title}
+      </h3>
       <nav aria-label={title} className="flex flex-col space-y-2">
         {children}
       </nav>

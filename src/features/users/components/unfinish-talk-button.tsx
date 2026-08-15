@@ -4,7 +4,12 @@ import type { TalkId } from '@/features/talks/types';
 
 import { CircleCheckBigIcon } from 'lucide-react';
 
-import { Button, Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui';
+import {
+  Button,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui';
 import { api } from '@/convex/_generated/api';
 import { useMutation } from '@/hooks';
 
@@ -14,8 +19,14 @@ interface UnfinishTalkButtonProps {
   talkId: TalkId;
 }
 
-export function UnfinishTalkButton({ onError, onMutate, talkId }: UnfinishTalkButtonProps) {
-  const { isLoading, mutate } = useMutation(api.users.unfinishTalk, { onError });
+export function UnfinishTalkButton({
+  onError,
+  onMutate,
+  talkId,
+}: UnfinishTalkButtonProps) {
+  const { isLoading, mutate } = useMutation(api.users.unfinishTalk, {
+    onError,
+  });
 
   const handleRemove = () => {
     if (onMutate) {

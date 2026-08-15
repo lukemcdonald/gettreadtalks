@@ -12,7 +12,9 @@ export async function getFeaturedTalks(limit = 6) {
   cacheLife('hours');
   cacheTag('talks');
 
-  const result = await fetchQuery(api.talks.listFeaturedTalksWithSpeakers, { limit });
+  const result = await fetchQuery(api.talks.listFeaturedTalksWithSpeakers, {
+    limit,
+  });
 
   return {
     continueCursor: null,

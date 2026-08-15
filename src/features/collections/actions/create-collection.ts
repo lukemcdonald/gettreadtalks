@@ -1,20 +1,23 @@
 'use server';
 
 import 'server-only';
-
-import type { ActionResult } from '@/lib/forms/types';
 import type { CollectionId } from '../types';
+import type { ActionResult } from '@/lib/forms/types';
 
 import { updateTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
 import { stripEmptyStrings } from '@/lib/forms/schemas';
-import { mapConvexErrorToFormErrors, mapZodErrors } from '@/lib/forms/validation';
+import {
+  mapConvexErrorToFormErrors,
+  mapZodErrors,
+} from '@/lib/forms/validation';
 import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
+
 import { collectionFormSchema } from '../schemas/collection-form';
 
 export async function createCollectionAction(
-  data: unknown,
+  data: unknown
 ): Promise<ActionResult<{ collectionId: CollectionId }>> {
   await requireAdminUser();
 
@@ -22,28 +25,28 @@ export async function createCollectionAction(
 
   if (!parsed.success) {
     return {
-      success: false,
       errors: mapZodErrors(parsed.error),
+      success: false,
     };
   }
 
   try {
     const collectionId = await fetchAuthMutation(
       api.collections.createCollection,
-      stripEmptyStrings(parsed.data),
+      stripEmptyStrings(parsed.data)
     );
 
     updateTag('collections');
     updateTag('form-options');
 
     return {
-      success: true,
       data: { collectionId },
+      success: true,
     };
   } catch (error) {
     return {
-      success: false,
       errors: mapConvexErrorToFormErrors(error),
+      success: false,
     };
   }
 }

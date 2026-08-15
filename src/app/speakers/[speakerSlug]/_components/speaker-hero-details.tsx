@@ -11,7 +11,10 @@ interface SpeakerHeroDetailsProps {
   variant?: 'centered' | 'inline';
 }
 
-export function SpeakerHeroDetails({ speaker, variant = 'centered' }: SpeakerHeroDetailsProps) {
+export function SpeakerHeroDetails({
+  speaker,
+  variant = 'centered',
+}: SpeakerHeroDetailsProps) {
   const speakerName = getSpeakerName(speaker);
   const hasImage = !!speaker.imageUrl;
   const hasMinistry = !!(speaker.ministry || speaker.websiteUrl);
@@ -21,12 +24,17 @@ export function SpeakerHeroDetails({ speaker, variant = 'centered' }: SpeakerHer
     <header
       className={cn(
         'flex flex-col items-center gap-6 text-center',
-        isInline && hasImage && 'md:flex-row md:items-start md:gap-8 md:text-left',
+        isInline &&
+          hasImage &&
+          'md:flex-row md:items-start md:gap-8 md:text-left'
       )}
     >
       {hasImage && (
         <SpeakerAvatar
-          className={cn('size-20', isInline ? '-mt-4 md:size-24' : 'size-28 md:size-32')}
+          className={cn(
+            'size-20',
+            isInline ? '-mt-4 md:size-24' : 'size-28 md:size-32'
+          )}
           rounded="full"
           speaker={speaker}
         />
@@ -35,7 +43,7 @@ export function SpeakerHeroDetails({ speaker, variant = 'centered' }: SpeakerHer
       <div className="flex-1 space-y-4">
         <div>
           {speaker.role && (
-            <p className="mb-2 font-semibold text-muted-foreground text-xs uppercase tracking-wide">
+            <p className="text-muted-foreground mb-2 text-xs font-semibold tracking-wide uppercase">
               {speaker.role}
             </p>
           )}
@@ -45,7 +53,7 @@ export function SpeakerHeroDetails({ speaker, variant = 'centered' }: SpeakerHer
         {isInline && (
           <>
             {speaker.description && (
-              <p className="max-w-lg text-lg text-muted-foreground leading-relaxed">
+              <p className="text-muted-foreground max-w-lg text-lg leading-relaxed">
                 {speaker.description}
               </p>
             )}

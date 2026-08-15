@@ -9,7 +9,9 @@ interface CountBadgeProps {
 export function CountBadge({ count, label }: CountBadgeProps) {
   return (
     <Badge variant="secondary">
-      {count === 0 ? `No ${label}s` : `${count} ${pluralize(count, label, `${label}s`)}`}
+      {count === 0
+        ? `No ${label}s`
+        : `${count} ${pluralize(count, label, `${label}s`)}`}
     </Badge>
   );
 }

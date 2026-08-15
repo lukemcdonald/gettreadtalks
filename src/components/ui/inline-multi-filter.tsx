@@ -2,11 +2,18 @@
 
 import type { ReactNode } from 'react';
 
-import { useTransition } from 'react';
 import { ChevronsUpDown, X } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useTransition } from 'react';
 
-import { Badge, Button, Combobox, ComboboxTrigger, Group, GroupSeparator } from '@/components/ui';
+import {
+  Badge,
+  Button,
+  Combobox,
+  ComboboxTrigger,
+  Group,
+  GroupSeparator,
+} from '@/components/ui';
 import { FilterPopup } from '@/components/ui/filter-popup';
 
 interface FilterOption {
@@ -41,7 +48,9 @@ export function InlineMultiFilter({
 
   const searchParamValue = searchParams.get(name);
   const selectedValues = searchParamValue
-    ? searchParamValue.split(',').filter((v) => options.some((opt) => opt.value === v))
+    ? searchParamValue
+        .split(',')
+        .filter((v) => options.some((opt) => opt.value === v))
     : [];
 
   const selectedOptions = selectedValues
@@ -79,7 +88,7 @@ export function InlineMultiFilter({
     if (selectedOptions.length === 0) {
       return placeholder;
     }
-    const firstOption = selectedOptions[0];
+    const [firstOption] = selectedOptions;
     const remainingCount = selectedOptions.length - 1;
 
     return (
@@ -108,7 +117,9 @@ export function InlineMultiFilter({
           <ComboboxTrigger
             render={
               <Button
-                className={selectedOptions.length === 0 ? 'justify-between' : undefined}
+                className={
+                  selectedOptions.length === 0 ? 'justify-between' : undefined
+                }
                 size="sm"
                 variant="outline"
               />
@@ -116,7 +127,9 @@ export function InlineMultiFilter({
           >
             {startAddon}
             {renderTriggerContent()}
-            {selectedOptions.length === 0 && <ChevronsUpDown className="-me-1!" />}
+            {selectedOptions.length === 0 && (
+              <ChevronsUpDown className="-me-1!" />
+            )}
           </ComboboxTrigger>
           <FilterPopup label={label} name={name} />
         </Combobox>

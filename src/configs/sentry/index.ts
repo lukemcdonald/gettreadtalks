@@ -16,5 +16,5 @@ export const baseSentryConfig = {
       service: 'frontend',
     },
   },
-  tracesSampleRate: DEPLOY_ENV === 'prod' ? 0.1 : 1.0,
+  tracesSampleRate: DEPLOY_ENV === 'prod' ? 0.1 : 1,
 };

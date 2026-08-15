@@ -1,7 +1,16 @@
+import type {
+  CreateSpeakerFormData,
+  UpdateSpeakerFormData,
+} from '../schemas/speaker-form';
 import type { Control } from 'react-hook-form';
-import type { CreateSpeakerFormData, UpdateSpeakerFormData } from '../schemas/speaker-form';
 
-import { FeaturedField, SelectField, TextField, TextareaField, UrlField } from '@/components/ui';
+import {
+  FeaturedField,
+  SelectField,
+  TextField,
+  TextareaField,
+  UrlField,
+} from '@/components/ui';
 import { speakerRoles } from '@/convex/model/speakers/validators';
 
 const roleOptions = [
@@ -14,7 +23,10 @@ interface SpeakerFormFieldsProps {
   mode?: 'create' | 'edit';
 }
 
-export function SpeakerFormFields({ control, mode = 'create' }: SpeakerFormFieldsProps) {
+export function SpeakerFormFields({
+  control,
+  mode = 'create',
+}: SpeakerFormFieldsProps) {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
@@ -26,7 +38,13 @@ export function SpeakerFormFields({ control, mode = 'create' }: SpeakerFormField
           required
         />
 
-        <TextField control={control} label="Last Name" name="lastName" placeholder="Doe" required />
+        <TextField
+          control={control}
+          label="Last Name"
+          name="lastName"
+          placeholder="Doe"
+          required
+        />
       </div>
 
       {mode === 'edit' && (
@@ -38,7 +56,12 @@ export function SpeakerFormFields({ control, mode = 'create' }: SpeakerFormField
         />
       )}
 
-      <SelectField control={control} label="Role" name="role" options={roleOptions} />
+      <SelectField
+        control={control}
+        label="Role"
+        name="role"
+        options={roleOptions}
+      />
 
       <TextField
         control={control}
@@ -71,7 +94,10 @@ export function SpeakerFormFields({ control, mode = 'create' }: SpeakerFormField
       />
 
       {mode === 'edit' && (
-        <FeaturedField control={control as Control<UpdateSpeakerFormData>} name="featured" />
+        <FeaturedField
+          control={control as Control<UpdateSpeakerFormData>}
+          name="featured"
+        />
       )}
     </div>
   );

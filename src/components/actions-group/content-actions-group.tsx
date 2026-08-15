@@ -1,9 +1,12 @@
 'use client';
 
-import type { ActionsGroupMenuItem, ContentActionsGroupProps } from './actions-group.types';
+import type {
+  ActionsGroupMenuItem,
+  ContentActionsGroupProps,
+} from './actions-group.types';
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 import { Button } from '@/components/ui';
 import {
@@ -19,10 +22,13 @@ import { toastManager } from '@/components/ui/primitives/toast';
 import { getArchiveLabel } from '@/lib/entities/utils';
 import { getErrorMessage } from '@/services/errors';
 import { capitalize } from '@/utils';
+
 import { ActionsGroup } from './actions-group';
 
+const EMPTY_ADDITIONAL_ACTIONS: ActionsGroupMenuItem[] = [];
+
 export function ContentActionsGroup({
-  additionalActions = [],
+  additionalActions = EMPTY_ADDITIONAL_ACTIONS,
   content,
   contentType,
   disabled,
@@ -57,15 +63,15 @@ export function ContentActionsGroup({
     try {
       await onArchiveAction(content._id);
       toastManager.add({
-        type: 'success',
         title: `${capitalize(contentType)} ${isArchived ? 'unarchived' : 'archived'}`,
+        type: 'success',
       });
       router.refresh();
     } catch (error: unknown) {
       toastManager.add({
-        type: 'error',
-        title: `Failed to archive ${contentType}`,
         description: getErrorMessage(error),
+        title: `Failed to archive ${contentType}`,
+        type: 'error',
       });
     } finally {
       setIsArchiving(false);
@@ -96,9 +102,9 @@ export function ContentActionsGroup({
       }
     } catch (error: unknown) {
       toastManager.add({
-        type: 'error',
-        title: `Failed to delete ${contentType}`,
         description: getErrorMessage(error),
+        title: `Failed to delete ${contentType}`,
+        type: 'error',
       });
     } finally {
       setIsDeleting(false);
@@ -106,10 +112,17 @@ export function ContentActionsGroup({
   };
 
   const menuItems: ActionsGroupMenuItem[] = [
-    ...(viewUrl ? [{ label: 'View', href: viewUrl }] : []),
-    ...(editUrl ? [{ label: 'Edit', href: editUrl }] : []),
+    ...(viewUrl ? [{ href: viewUrl, label: 'View' }] : []),
+    ...(editUrl ? [{ href: editUrl, label: 'Edit' }] : []),
     ...(onArchiveAction
-      ? [{ label: archiveLabel, onClick: handleArchive, disabled: isArchiving, separator: true }]
+      ? [
+          {
+            disabled: isArchiving,
+            label: archiveLabel,
+            onClick: handleArchive,
+            separator: true,
+          },
+        ]
       : []),
     ...additionalActions,
     ...(onDeleteAction
@@ -117,8 +130,8 @@ export function ContentActionsGroup({
           {
             label: 'Delete',
             onClick: () => setDeleteDialogOpen(true),
-            variant: 'destructive' as const,
             separator: !onArchiveAction && additionalActions.length === 0,
+            variant: 'destructive' as const,
           },
         ]
       : []),
@@ -126,23 +139,34 @@ export function ContentActionsGroup({
 
   return (
     <>
-      <ActionsGroup disabled={isDisabled} menuItems={menuItems} primaryAction={primaryAction} />
+      <ActionsGroup
+        disabled={isDisabled}
+        menuItems={menuItems}
+        primaryAction={primaryAction}
+      />
 
       {!!onDeleteAction && (
         <AlertDialog onOpenChange={setDeleteDialogOpen} open={deleteDialogOpen}>
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>
-                Delete {content.title ? `"${content.title}"` : `this ${contentType}`}?
+                Delete{' '}
+                {content.title ? `"${content.title}"` : `this ${contentType}`}?
               </AlertDialogTitle>
               <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete the {contentType} and all
-                associated data.
+                This action cannot be undone. This will permanently delete the{' '}
+                {contentType} and all associated data.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogClose render={<Button variant="outline" />}>Cancel</AlertDialogClose>
-              <Button loading={isDeleting} onClick={handleDelete} variant="destructive">
+              <AlertDialogClose render={<Button variant="outline" />}>
+                Cancel
+              </AlertDialogClose>
+              <Button
+                loading={isDeleting}
+                onClick={handleDelete}
+                variant="destructive"
+              >
                 Delete
               </Button>
             </AlertDialogFooter>

@@ -12,7 +12,7 @@ import { api } from '@/convex/_generated/api';
  * Uses SSR data while client auth is syncing to prevent flash of incorrect state.
  *
  * @param initialData - Optional SSR user data to prevent layout shift
- * @returns { data, isLoading }
+ * @returns Current user data (`data`) and whether client auth is still resolving (`isLoading`)
  */
 export function useCurrentUser(initialData?: User | null) {
   const { isLoading: isAuthLoading } = useConvexAuth();

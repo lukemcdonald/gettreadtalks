@@ -1,6 +1,12 @@
-import type { ErrorCode, ErrorContext, Fingerprint, SentryConfig, SeverityLevel } from './types';
+import type {
+  ErrorCode,
+  ErrorContext,
+  Fingerprint,
+  SentryConfig,
+} from './types';
+import type { Value } from 'convex/values';
 
-import { ConvexError, type Value } from 'convex/values';
+import { ConvexError } from 'convex/values';
 
 import { ErrorCodes } from './constants';
 
@@ -158,7 +164,9 @@ export function getSentryConfig(error: unknown): SentryConfig {
     statusCode,
   } = data;
 
-  const shouldLog = statusCode ? (STATUS_TO_SHOULD_LOG[statusCode] ?? true) : false;
+  const shouldLog = statusCode
+    ? (STATUS_TO_SHOULD_LOG[statusCode] ?? true)
+    : false;
 
   let fingerprint: Fingerprint | undefined;
 
@@ -167,7 +175,7 @@ export function getSentryConfig(error: unknown): SentryConfig {
   }
 
   const context: Record<string, unknown> = {
-    details: { resource, resourceId, field },
+    details: { field, resource, resourceId },
   };
 
   const tags: Record<string, string> = {

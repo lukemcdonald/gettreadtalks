@@ -11,7 +11,7 @@ interface FooterLinkProps {
 export function FooterLink({ children, href }: FooterLinkProps) {
   return (
     <Link
-      className="text-muted-foreground transition-colors hover:text-foreground"
+      className="text-muted-foreground hover:text-foreground transition-colors"
       href={href as Route}
     >
       {children}

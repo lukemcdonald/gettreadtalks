@@ -4,7 +4,13 @@ import type { Control, FieldPath, FieldValues } from 'react-hook-form';
 
 import { Controller } from 'react-hook-form';
 
-import { Field, FieldDescription, FieldError, FieldLabel, Input } from '@/components/ui';
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+  Input,
+} from '@/components/ui';
 
 interface UrlFieldProps<T extends FieldValues> {
   control: Control<T>;
@@ -58,7 +64,9 @@ export function UrlField<T extends FieldValues>({
             type="url"
             {...field}
           />
-          {!!fieldState.error && <FieldError match>{fieldState.error?.message}</FieldError>}
+          {!!fieldState.error && (
+            <FieldError match>{fieldState.error?.message}</FieldError>
+          )}
         </Field>
       )}
     />

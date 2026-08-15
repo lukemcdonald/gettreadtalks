@@ -3,6 +3,7 @@ import type { CollectionId } from '@/features/collections/types';
 import { redirect } from 'next/navigation';
 
 import { getCollection } from '@/features/collections/queries/get-collection';
+
 import { EditCollectionSheetRoute } from './_components/edit-collection-sheet-route';
 
 interface PageProps {

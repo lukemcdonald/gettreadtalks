@@ -19,7 +19,7 @@ export function TalkHeroDetails({ speaker, talk }: TalkHeroDetailsProps) {
         {talk.title}
       </HeroTitle>
       {speaker && (
-        <p className="text-lg text-muted-foreground">
+        <p className="text-muted-foreground text-lg">
           by{' '}
           <Link className="hover:underline" href={`/speakers/${speaker.slug}`}>
             {speakerName}

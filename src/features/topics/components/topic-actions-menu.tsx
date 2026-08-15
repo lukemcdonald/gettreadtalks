@@ -2,10 +2,14 @@
 
 import type { Topic, TopicId } from '@/features/topics/types';
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
-import { ActionsGroup, DeleteBlockedDialog, DeleteConfirmDialog } from '@/components/actions-group';
+import {
+  ActionsGroup,
+  DeleteBlockedDialog,
+  DeleteConfirmDialog,
+} from '@/components/actions-group';
 import { toastManager } from '@/components/ui/primitives/toast';
 import { destroyTopicAction } from '@/features/topics/actions/destroy-topic';
 import { getErrorMessage } from '@/services/errors';
@@ -31,9 +35,9 @@ export function TopicActionsMenu({ talkCount, topic }: TopicActionsMenuProps) {
 
       if (!result.success) {
         toastManager.add({
-          type: 'error',
-          title: 'Failed to delete topic',
           description: result.errors?.root ?? 'An error occurred',
+          title: 'Failed to delete topic',
+          type: 'error',
         });
         return;
       }
@@ -43,9 +47,9 @@ export function TopicActionsMenu({ talkCount, topic }: TopicActionsMenuProps) {
       router.refresh();
     } catch (error: unknown) {
       toastManager.add({
-        type: 'error',
-        title: 'Failed to delete topic',
         description: getErrorMessage(error),
+        title: 'Failed to delete topic',
+        type: 'error',
       });
     } finally {
       setIsDeleting(false);

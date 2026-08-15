@@ -13,23 +13,32 @@ interface TalkMediaCardProps {
   talk: Pick<Talk, 'description' | 'mediaUrl' | 'scripture' | 'slug' | 'title'>;
 }
 
-function getMediaIcon(mediaUrl: string) {
-  const media = detectMediaType(mediaUrl);
-  if (media.type === 'video' || media.type === 'vimeo' || media.type === 'youtube') {
-    return PlayIcon;
-  }
-  if (media.type === 'audio') {
-    return MicIcon;
-  }
-  return LinkIcon;
-}
-
 function TalkMediaIcon({ mediaUrl }: { mediaUrl: string }) {
-  const Icon = getMediaIcon(mediaUrl);
+  const media = detectMediaType(mediaUrl);
+
+  if (
+    media.type === 'video' ||
+    media.type === 'vimeo' ||
+    media.type === 'youtube'
+  ) {
+    return (
+      <MediaIconFrame>
+        <PlayIcon className="size-5" />
+      </MediaIconFrame>
+    );
+  }
+
+  if (media.type === 'audio') {
+    return (
+      <MediaIconFrame>
+        <MicIcon className="size-5" />
+      </MediaIconFrame>
+    );
+  }
 
   return (
     <MediaIconFrame>
-      <Icon className="size-5" />
+      <LinkIcon className="size-5" />
     </MediaIconFrame>
   );
 }

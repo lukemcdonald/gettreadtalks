@@ -1,20 +1,25 @@
 'use server';
 
 import 'server-only';
-
 import type { ActionResult } from '@/lib/forms/types';
 
 import { updateTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
-import { mapConvexErrorToFormErrors, mapZodErrors } from '@/lib/forms/validation';
+import {
+  mapConvexErrorToFormErrors,
+  mapZodErrors,
+} from '@/lib/forms/validation';
 import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
+
 import { talkFormSchema } from '../schemas/talk-form';
 
 /**
  * Creates a new talk. Validates data on server and requires admin authorization.
  */
-export async function createTalkAction(data: unknown): Promise<ActionResult<{ talkId: string }>> {
+export async function createTalkAction(
+  data: unknown
+): Promise<ActionResult<{ talkId: string }>> {
   // Re-verify authorization on every request
   await requireAdminUser();
 
@@ -22,8 +27,8 @@ export async function createTalkAction(data: unknown): Promise<ActionResult<{ ta
 
   if (!parsed.success) {
     return {
-      success: false,
       errors: mapZodErrors(parsed.error),
+      success: false,
     };
   }
 
@@ -34,13 +39,13 @@ export async function createTalkAction(data: unknown): Promise<ActionResult<{ ta
     updateTag('form-options');
 
     return {
-      success: true,
       data: { talkId },
+      success: true,
     };
   } catch (error) {
     return {
-      success: false,
       errors: mapConvexErrorToFormErrors(error),
+      success: false,
     };
   }
 }

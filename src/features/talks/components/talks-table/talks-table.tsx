@@ -2,6 +2,7 @@ import type { TalkWithSpeakerAndTopics } from '@/features/talks/types';
 
 import { ContentTable } from '@/components/content-table';
 import { Empty, EmptyDescription } from '@/components/ui';
+
 import { TalksTableRow } from './talks-table-row';
 
 interface TalksTableProps {

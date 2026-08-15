@@ -1,16 +1,16 @@
 import { mutations, queries } from './model/speakers';
 
 // Queries
-export const getSpeaker = queries.getSpeaker;
-export const getSpeakerBySlug = queries.getSpeakerBySlug;
-export const listAllSpeakersAdmin = queries.listAllSpeakersAdmin;
-export const getSpeakersCount = queries.getSpeakersCount;
-export const listAllSpeakers = queries.listAllSpeakers;
-export const listAllSpeakersRaw = queries.listAllSpeakersRaw;
-export const listFeaturedSpeakers = queries.listFeaturedSpeakers;
-export const listSpeakers = queries.listSpeakers;
+export const {
+  getSpeaker,
+  getSpeakerBySlug,
+  getSpeakersCount,
+  listAllSpeakers,
+  listAllSpeakersAdmin,
+  listAllSpeakersRaw,
+  listFeaturedSpeakers,
+  listSpeakers,
+} = queries;
 
 // Mutations
-export const createSpeaker = mutations.createSpeaker;
-export const destroySpeaker = mutations.destroySpeaker;
-export const updateSpeaker = mutations.updateSpeaker;
+export const { createSpeaker, destroySpeaker, updateSpeaker } = mutations;

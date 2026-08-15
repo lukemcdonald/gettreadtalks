@@ -35,7 +35,9 @@ export function ClipContent({ clip, speaker, talk }: ClipContentProps) {
           <FeaturedGrid
             columns={{ default: 1 }}
             description={`Browse all talks by ${speakerName}.`}
-            quickLinks={[{ href: `/speakers/${speaker.slug}`, label: 'View all talks' }]}
+            quickLinks={[
+              { href: `/speakers/${speaker.slug}`, label: 'View all talks' },
+            ]}
             sticky
             title="Speaker"
           >
@@ -48,10 +50,12 @@ export function ClipContent({ clip, speaker, talk }: ClipContentProps) {
       <aside className="order-1 lg:sticky lg:top-20 lg:order-2 lg:h-fit">
         {!!clip.description && (
           <div className="space-y-4">
-            <h3 className="font-semibold text-muted-foreground text-xs uppercase tracking-widest">
+            <h3 className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">
               About
             </h3>
-            <p className="text-muted-foreground text-sm leading-relaxed">{clip.description}</p>
+            <p className="text-muted-foreground text-sm leading-relaxed">
+              {clip.description}
+            </p>
           </div>
         )}
       </aside>

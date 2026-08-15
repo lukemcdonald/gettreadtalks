@@ -5,5 +5,5 @@ export const affiliateLinkTypes = v.union(
   v.literal('book'),
   v.literal('movie'),
   v.literal('music'),
-  v.literal('podcast'),
+  v.literal('podcast')
 );

@@ -5,8 +5,8 @@ import type { SpeakerListItem } from '@/features/speakers/types';
 import type { TalkFormData } from '@/features/talks/schemas/talk-form';
 import type { Talk, TalkId } from '@/features/talks/types';
 
-import { useRef, useState, useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { FormSheet } from '@/components/ui';
@@ -29,6 +29,44 @@ interface EditTalkSheetProps {
 
 type UrlChange = { newUrl: string; oldUrl: string } | null;
 
+function getTalkFormValues(talk: Talk): TalkFormData {
+  return {
+    collectionId: talk.collectionId,
+    collectionOrder: talk.collectionOrder,
+    description: talk.description ?? '',
+    featured: talk.featured ?? false,
+    mediaUrl: talk.mediaUrl ?? '',
+    scripture: talk.scripture ?? '',
+    slug: talk.slug ?? '',
+    speakerId: talk.speakerId ?? '',
+    status: talk.status ?? 'backlog',
+    title: talk.title ?? '',
+  };
+}
+
+function getUrlChangeForTalk(talk: Talk, data: TalkFormData): UrlChange {
+  if (talk.status !== 'published') {
+    return null;
+  }
+
+  const oldTalkSlug = talk.slug;
+  const newTalkSlug = data.slug ? slugify(data.slug) : oldTalkSlug;
+
+  const slugChanged = newTalkSlug !== oldTalkSlug;
+  const speakerChanged = data.speakerId !== talk.speakerId;
+
+  if (!(slugChanged || speakerChanged)) {
+    return null;
+  }
+
+  const speakerSegment = speakerChanged ? '<new-speaker>' : '<speaker>';
+
+  return {
+    newUrl: getTalkUrl(speakerSegment, newTalkSlug),
+    oldUrl: getTalkUrl('<speaker>', oldTalkSlug),
+  };
+}
+
 export function EditTalkSheet({
   collections,
   onOpenChange,
@@ -38,50 +76,16 @@ export function EditTalkSheet({
   talk,
 }: EditTalkSheetProps) {
   const [isPending, startTransition] = useTransition();
+  const [pendingData, setPendingData] = useState<TalkFormData | null>(null);
   const [urlChange, setUrlChange] = useState<UrlChange>(null);
   const [urlChangeOpen, setUrlChangeOpen] = useState(false);
-  const pendingData = useRef<TalkFormData | null>(null);
 
   const form = useForm<TalkFormData>({
-    // biome-ignore lint/suspicious/noExplicitAny: Type assertion needed for Zod 4
-    resolver: zodResolver(talkFormSchema as any),
     mode: 'onBlur',
-    values: {
-      collectionId: talk?.collectionId,
-      collectionOrder: talk?.collectionOrder,
-      description: talk?.description ?? '',
-      featured: talk?.featured ?? false,
-      mediaUrl: talk?.mediaUrl ?? '',
-      scripture: talk?.scripture ?? '',
-      slug: talk?.slug ?? '',
-      speakerId: talk?.speakerId ?? '',
-      status: talk?.status ?? 'backlog',
-      title: talk?.title ?? '',
-    },
+    // oxlint-disable-next-line typescript/no-explicit-any -- Zod 4 compatibility with zodResolver
+    resolver: zodResolver(talkFormSchema as any),
+    values: getTalkFormValues(talk),
   });
-
-  function getUrlChangeForTalk(data: TalkFormData) {
-    if (talk.status !== 'published') {
-      return null;
-    }
-
-    const oldTalkSlug = talk.slug;
-    const newTalkSlug = data.slug ? slugify(data.slug) : oldTalkSlug;
-
-    const slugChanged = newTalkSlug !== oldTalkSlug;
-    const speakerChanged = data.speakerId !== talk.speakerId;
-
-    if (!(slugChanged || speakerChanged)) {
-      return null;
-    }
-
-    const speakerSegment = speakerChanged ? '<new-speaker>' : '<speaker>';
-
-    return {
-      newUrl: getTalkUrl(speakerSegment, newTalkSlug),
-      oldUrl: getTalkUrl('<speaker>', oldTalkSlug),
-    };
-  }
 
   function submitData(data: TalkFormData) {
     startTransition(async () => {
@@ -98,14 +102,10 @@ export function EditTalkSheet({
   }
 
   const handleSubmit = form.handleSubmit((data) => {
-    if (!talk) {
-      return;
-    }
-
-    const change = getUrlChangeForTalk(data);
+    const change = getUrlChangeForTalk(talk, data);
 
     if (change) {
-      pendingData.current = data;
+      setPendingData(data);
       setUrlChange(change);
       setUrlChangeOpen(true);
       return;
@@ -115,20 +115,15 @@ export function EditTalkSheet({
   });
 
   function confirmUrlChange() {
-    const data = pendingData.current;
-
-    if (!data) {
+    if (!pendingData) {
       return;
     }
 
-    pendingData.current = null;
-    setUrlChangeOpen(false);
+    const data = pendingData;
+    setPendingData(null);
     setUrlChange(null);
+    setUrlChangeOpen(false);
     submitData(data);
-  }
-
-  if (!talk) {
-    return null;
   }
 
   return (

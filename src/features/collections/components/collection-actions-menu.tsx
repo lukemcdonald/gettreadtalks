@@ -2,10 +2,14 @@
 
 import type { Collection, CollectionId } from '@/features/collections/types';
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
-import { ActionsGroup, DeleteBlockedDialog, DeleteConfirmDialog } from '@/components/actions-group';
+import {
+  ActionsGroup,
+  DeleteBlockedDialog,
+  DeleteConfirmDialog,
+} from '@/components/actions-group';
 import { toastManager } from '@/components/ui/primitives/toast';
 import { destroyCollectionAction } from '@/features/collections/actions/destroy-collection';
 import { getErrorMessage } from '@/services/errors';
@@ -16,7 +20,10 @@ interface CollectionActionsMenuProps {
   talkCount: number;
 }
 
-export function CollectionActionsMenu({ collection, talkCount }: CollectionActionsMenuProps) {
+export function CollectionActionsMenu({
+  collection,
+  talkCount,
+}: CollectionActionsMenuProps) {
   const router = useRouter();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);

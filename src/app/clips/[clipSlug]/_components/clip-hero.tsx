@@ -16,16 +16,19 @@ export function ClipHero({ clip, speaker }: ClipHeroProps) {
   const speakerName = getSpeakerName(speaker);
 
   return (
-    <Section className="relative overflow-hidden bg-background py-6 sm:py-8 md:py-12 lg:py-16">
+    <Section className="bg-background relative overflow-hidden py-6 sm:py-8 md:py-12 lg:py-16">
       <Container className="relative space-y-8">
         <div className="space-y-2 text-center">
           <HeroTitle className="text-foreground" size="sm">
             {clip.title}
           </HeroTitle>
           {speaker && (
-            <p className="text-lg text-muted-foreground">
+            <p className="text-muted-foreground text-lg">
               by{' '}
-              <Link className="hover:underline" href={`/speakers/${speaker.slug}`}>
+              <Link
+                className="hover:underline"
+                href={`/speakers/${speaker.slug}`}
+              >
                 {speakerName}
               </Link>
             </p>

@@ -7,7 +7,8 @@ import { PageHeader } from '@/components/page-header';
 import { getTopicsWithTalks } from '@/features/topics/queries/get-topics-with-talks';
 
 export const metadata: Metadata = {
-  description: 'Browse talks by Bible topic or theme and deepen your understanding of Scripture.',
+  description:
+    'Browse talks by Bible topic or theme and deepen your understanding of Scripture.',
   title: 'Topics',
 };
 

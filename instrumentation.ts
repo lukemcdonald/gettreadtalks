@@ -16,5 +16,6 @@ export async function register() {
   }
 }
 
-// biome-ignore lint/suspicious: no-op function
-export const onRequestError = IS_SENTRY_ENABLED ? captureRequestError : () => {};
+export const onRequestError = IS_SENTRY_ENABLED
+  ? captureRequestError
+  : () => {};

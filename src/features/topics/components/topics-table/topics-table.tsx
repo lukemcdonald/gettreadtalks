@@ -9,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui';
+
 import { TopicsTableRow } from './topics-table-row';
 
 interface TopicsTableProps {

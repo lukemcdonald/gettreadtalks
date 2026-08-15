@@ -9,7 +9,12 @@ interface TalkTableRowProps {
   title: string;
 }
 
-export function TalkTableRow({ action, href, speaker, title }: TalkTableRowProps) {
+export function TalkTableRow({
+  action,
+  href,
+  speaker,
+  title,
+}: TalkTableRowProps) {
   return (
     <TableRow>
       <TableCell>
@@ -19,7 +24,7 @@ export function TalkTableRow({ action, href, speaker, title }: TalkTableRowProps
               {title}
             </Link>
             {speaker && (
-              <p className="truncate text-muted-foreground text-sm">
+              <p className="text-muted-foreground truncate text-sm">
                 {speaker.firstName} {speaker.lastName}
               </p>
             )}

@@ -11,5 +11,9 @@ import { getAuthToken } from '@/services/auth/server';
 export async function updateEmail({ newEmail }: { newEmail: string }) {
   const authToken = await getAuthToken();
 
-  await fetchMutation(api.users.updateUserEmail, { newEmail }, { token: authToken });
+  await fetchMutation(
+    api.users.updateUserEmail,
+    { newEmail },
+    { token: authToken }
+  );
 }

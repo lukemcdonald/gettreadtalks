@@ -8,8 +8,10 @@ export function JsonLd({ data }: JsonLdProps) {
   // contains a closing tag sequence. Recommended by Next.js JSON-LD docs.
   return (
     <script
-      // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD structured data — `<` is escaped below
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data).replace(/</g, '\\u003c') }}
+      // oxlint-disable-next-line react/no-danger -- JSON-LD structured data; `<` is escaped below
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify(data).replaceAll('<', '\\u003c'),
+      }}
       type="application/ld+json"
     />
   );

@@ -1,15 +1,14 @@
 import { mutations, queries } from './model/clips';
 
 // Queries
-export const getClip = queries.getClip;
-export const getClipBySlug = queries.getClipBySlug;
-export const listAllClips = queries.listAllClips;
-export const listClipSlugsForSitemap = queries.listClipSlugsForSitemap;
-export const listClips = queries.listClips;
-export const listClipsBySpeaker = queries.listClipsBySpeaker;
+export const {
+  getClip,
+  getClipBySlug,
+  listAllClips,
+  listClipSlugsForSitemap,
+  listClips,
+  listClipsBySpeaker,
+} = queries;
 
 // Mutations
-export const archiveClip = mutations.archiveClip;
-export const createClip = mutations.createClip;
-export const destroyClip = mutations.destroyClip;
-export const updateClip = mutations.updateClip;
+export const { archiveClip, createClip, destroyClip, updateClip } = mutations;

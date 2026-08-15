@@ -25,15 +25,19 @@ export const IS_TEST = process.env.NODE_ENV === 'test';
 // Standardized environment constants (for Sentry integration)
 export const DEPLOY_ENV = getStandardizedEnvironment();
 export const IS_LOCAL = DEPLOY_ENV === 'local';
-export const IS_PREVIEW = DEPLOY_ENV === 'dev'; // Preview deployments are "dev"
+// Preview deployments are "dev"
+export const IS_PREVIEW = DEPLOY_ENV === 'dev';
 
 function getStandardizedEnvironment(): DeployEnvironment {
   switch (process.env.NEXT_PUBLIC_VERCEL_ENV) {
-    case 'production':
+    case 'production': {
       return 'prod';
-    case 'preview':
+    }
+    case 'preview': {
       return 'dev';
-    default:
+    }
+    default: {
       return 'local';
+    }
   }
 }

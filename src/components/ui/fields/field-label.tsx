@@ -17,7 +17,12 @@ type FieldLabelProps = ComponentProps<typeof BaseFieldLabel> & {
  * <FieldLabel required>Title</FieldLabel>
  * ```
  */
-export function FieldLabel({ className, required, children, ...delegated }: FieldLabelProps) {
+export function FieldLabel({
+  className,
+  required,
+  children,
+  ...delegated
+}: FieldLabelProps) {
   return (
     <BaseFieldLabel className={className} {...delegated}>
       {children}

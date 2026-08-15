@@ -1,7 +1,5 @@
 'use client';
 
-import { useState } from 'react';
-
 import { captureException } from '@/services/errors';
 
 interface GlobalErrorProps {
@@ -11,13 +9,13 @@ interface GlobalErrorProps {
 }
 
 export default function GlobalError({ error }: GlobalErrorProps) {
-  const [eventId] = useState(() => captureException(error, { level: 'fatal' }));
+  const eventId = captureException(error, { level: 'fatal' });
 
   return (
     <html lang="en">
       <body className="flex min-h-screen items-center justify-center font-sans">
         <div className="max-w-sm space-y-2 p-8 text-center">
-          <h1 className="font-semibold text-xl">Something went wrong</h1>
+          <h1 className="text-xl font-semibold">Something went wrong</h1>
           <p className="text-muted-foreground text-sm">
             An unexpected error occurred. Please try refreshing the page.
           </p>

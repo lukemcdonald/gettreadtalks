@@ -3,6 +3,7 @@
 import type { FieldError, FieldErrors, FieldValues } from 'react-hook-form';
 
 import { cn } from '@/utils';
+
 import { Field, FieldError as FieldErrorComponent } from '../fields';
 
 interface FormErrorProps {
@@ -16,7 +17,9 @@ function getErrorMessage(error: FormErrorProps['error']) {
   }
 
   if (Array.isArray(error)) {
-    const uniqueErrors = [...new Map(error.map((err) => [err?.message, err])).values()];
+    const uniqueErrors = [
+      ...new Map(error.map((err) => [err?.message, err])).values(),
+    ];
 
     if (uniqueErrors.length === 1) {
       return uniqueErrors[0]?.message;
@@ -24,7 +27,9 @@ function getErrorMessage(error: FormErrorProps['error']) {
 
     return (
       <ul className="ml-4 flex list-disc flex-col gap-1">
-        {uniqueErrors.map((err) => err?.message && <li key={err.message}>{err.message}</li>)}
+        {uniqueErrors.map(
+          (err) => err?.message && <li key={err.message}>{err.message}</li>
+        )}
       </ul>
     );
   }
@@ -52,7 +57,7 @@ export function FormError({ className, error }: FormErrorProps) {
 
   return (
     <Field
-      className={cn('rounded-md bg-destructive/15 p-3', className)}
+      className={cn('bg-destructive/15 rounded-md p-3', className)}
       data-slot="form-error"
       invalid
       role="alert"

@@ -5,10 +5,13 @@ import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css';
 
 import { Skeleton } from '@/components/ui/primitives/skeleton';
 
-const LiteYouTubeEmbed = dynamic(() => import('react-lite-youtube-embed').then((m) => m.default), {
-  ssr: false,
-  loading: () => <Skeleton className="aspect-video w-full" />,
-});
+const LiteYouTubeEmbed = dynamic(
+  () => import('react-lite-youtube-embed').then((m) => m.default),
+  {
+    loading: () => <Skeleton className="aspect-video w-full" />,
+    ssr: false,
+  }
+);
 
 interface YouTubeEmbedProps {
   id: string;
@@ -17,8 +20,13 @@ interface YouTubeEmbedProps {
 
 export function YouTubeEmbed({ id, title }: YouTubeEmbedProps) {
   return (
-    <div className="[&_.lty-playbtn]:rounded-xl [&_.lty-playbtn]:bg-primary/90 [&_.lty-playbtn]:transition-colors hover:[&_.lty-playbtn]:bg-primary">
-      <LiteYouTubeEmbed id={id} poster="hqdefault" title={title} wrapperClass="yt-lite" />
+    <div className="[&_.lty-playbtn]:bg-primary/90 hover:[&_.lty-playbtn]:bg-primary [&_.lty-playbtn]:rounded-xl [&_.lty-playbtn]:transition-colors">
+      <LiteYouTubeEmbed
+        id={id}
+        poster="hqdefault"
+        title={title}
+        wrapperClass="yt-lite"
+      />
     </div>
   );
 }

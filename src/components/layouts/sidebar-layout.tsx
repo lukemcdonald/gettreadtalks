@@ -32,7 +32,7 @@ export function SidebarLayout({
           <div
             className={cn(
               'space-y-6 md:col-span-3',
-              sidebarSticky && 'md:sticky md:top-20 md:h-fit',
+              sidebarSticky && 'md:sticky md:top-20 md:h-fit'
             )}
           >
             {sidebar}

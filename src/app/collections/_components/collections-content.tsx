@@ -18,7 +18,10 @@ interface CollectionsContentProps {
  * Renders collections in a grid.
  * Data is pre-filtered and sorted on the server.
  */
-export function CollectionsContent({ collections, hasActiveFilters }: CollectionsContentProps) {
+export function CollectionsContent({
+  collections,
+  hasActiveFilters,
+}: CollectionsContentProps) {
   if (collections.length === 0) {
     return (
       <ListEmpty
@@ -32,7 +35,7 @@ export function CollectionsContent({ collections, hasActiveFilters }: Collection
   }
 
   return (
-    <GridList columns={{ default: 1, sm: 2, md: 2, lg: 2, xl: 2 }}>
+    <GridList columns={{ default: 1, lg: 2, md: 2, sm: 2, xl: 2 }}>
       {collections.map((item) => (
         <CollectionCard
           collection={{

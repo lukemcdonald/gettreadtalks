@@ -9,7 +9,9 @@ interface EditCollectionSheetRouteProps {
   collection: Collection;
 }
 
-export function EditCollectionSheetRoute({ collection }: EditCollectionSheetRouteProps) {
+export function EditCollectionSheetRoute({
+  collection,
+}: EditCollectionSheetRouteProps) {
   const { handleOpenChange, handleSuccess } = useSheetRoute();
 
   return (

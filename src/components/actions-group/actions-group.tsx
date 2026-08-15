@@ -2,9 +2,9 @@
 
 import type { ActionsGroupProps } from './actions-group.types';
 
-import { Fragment } from 'react';
 import { EllipsisIcon } from 'lucide-react';
 import Link from 'next/link';
+import { Fragment } from 'react';
 
 import { Button, Group, GroupSeparator } from '@/components/ui';
 import {
@@ -15,7 +15,11 @@ import {
   MenuTrigger,
 } from '@/components/ui/primitives/menu';
 
-export function ActionsGroup({ disabled, menuItems, primaryAction }: ActionsGroupProps) {
+export function ActionsGroup({
+  disabled,
+  menuItems,
+  primaryAction,
+}: ActionsGroupProps) {
   const visibleItems = menuItems.filter((item) => !item.hidden);
   const hasItems = visibleItems.length > 0;
 
@@ -28,8 +32,11 @@ export function ActionsGroup({ disabled, menuItems, primaryAction }: ActionsGrou
       {!!primaryAction && (
         <Button
           disabled={disabled || primaryAction.disabled || primaryAction.loading}
+          // oxlint-disable-next-line react/jsx-handler-names -- public API exposes onClick
           onClick={primaryAction.onClick}
-          render={primaryAction.href ? <Link href={primaryAction.href} /> : undefined}
+          render={
+            primaryAction.href ? <Link href={primaryAction.href} /> : undefined
+          }
           type={primaryAction.type}
         >
           {primaryAction.loading
@@ -38,7 +45,9 @@ export function ActionsGroup({ disabled, menuItems, primaryAction }: ActionsGrou
         </Button>
       )}
 
-      {!!hasItems && !!primaryAction && <GroupSeparator className="bg-primary/72" />}
+      {!!hasItems && !!primaryAction && (
+        <GroupSeparator className="bg-primary/72" />
+      )}
 
       {!!hasItems && (
         <Menu>
@@ -62,8 +71,15 @@ export function ActionsGroup({ disabled, menuItems, primaryAction }: ActionsGrou
                   className="w-full"
                   disabled={item.disabled}
                   nativeButton={!item.href}
+                  // oxlint-disable-next-line react/jsx-handler-names -- public API exposes onClick
                   onClick={item.onClick}
-                  render={item.href ? <Link href={item.href} /> : <button type="button" />}
+                  render={
+                    item.href ? (
+                      <Link href={item.href} />
+                    ) : (
+                      <button aria-label={item.label} type="button" />
+                    )
+                  }
                   variant={item.variant}
                 >
                   {item.icon}

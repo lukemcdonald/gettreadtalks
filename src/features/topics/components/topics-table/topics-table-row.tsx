@@ -12,7 +12,9 @@ interface TopicsTableRowProps {
 export function TopicsTableRow({ talkCount, topic }: TopicsTableRowProps) {
   return (
     <TableRow>
-      <TableCell className="whitespace-normal font-medium">{topic.title}</TableCell>
+      <TableCell className="font-medium whitespace-normal">
+        {topic.title}
+      </TableCell>
       <TableCell className="w-[120px]">
         <CountBadge count={talkCount} label="talk" />
       </TableCell>

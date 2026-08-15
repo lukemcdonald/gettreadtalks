@@ -1,13 +1,20 @@
 'use client';
 
-import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CircleAlertIcon } from 'lucide-react';
 import Link from 'next/link';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { Alert, AlertDescription, AlertTitle, Button, Fieldset, TextField } from '@/components/ui';
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  Button,
+  Fieldset,
+  TextField,
+} from '@/components/ui';
 import { requestPasswordReset } from '@/services/auth/client';
 import { AUTH_ERRORS } from '@/services/auth/config';
 
@@ -31,10 +38,14 @@ export function ForgotPasswordForm() {
   const { errors, isSubmitting } = form.formState;
 
   async function onSubmit(values: ForgotPasswordData) {
-    const { error: submitError } = await requestPasswordReset({ email: values.email });
+    const { error: submitError } = await requestPasswordReset({
+      email: values.email,
+    });
 
     if (submitError) {
-      form.setError('root', { message: submitError.message ?? AUTH_ERRORS.RESET_EMAIL_FAILED });
+      form.setError('root', {
+        message: submitError.message ?? AUTH_ERRORS.RESET_EMAIL_FAILED,
+      });
     } else {
       setSucceeded(true);
     }
@@ -44,9 +55,13 @@ export function ForgotPasswordForm() {
     return (
       <div className="space-y-4">
         <p className="text-sm">
-          If an account exists for that email, we've sent a password reset link. Check your inbox.
+          If an account exists for that email, we&apos;ve sent a password reset
+          link. Check your inbox.
         </p>
-        <Link className="text-muted-foreground text-sm hover:underline" href="/login">
+        <Link
+          className="text-muted-foreground text-sm hover:underline"
+          href="/login"
+        >
           Back to login
         </Link>
       </div>
@@ -78,7 +93,10 @@ export function ForgotPasswordForm() {
         <Button loading={isSubmitting} type="submit">
           Send reset link
         </Button>
-        <Link className="text-muted-foreground text-sm hover:underline" href="/login">
+        <Link
+          className="text-muted-foreground text-sm hover:underline"
+          href="/login"
+        >
           Back to login
         </Link>
       </div>

@@ -1,11 +1,14 @@
 import { FeaturedGrid } from '@/components/featured-grid';
 import { EditorialProfileLayout } from '@/components/layouts';
-import { EditorialProfileHeroSkeleton, MediaCardSkeleton } from '@/components/skeletons';
+import {
+  EditorialProfileHeroSkeleton,
+  MediaCardSkeleton,
+} from '@/components/skeletons';
 import { Skeleton } from '@/components/ui';
 
 function TalkHeroMetadataSkeleton() {
   return (
-    <div className="border-white/10 border-t pt-8">
+    <div className="border-t border-white/10 pt-8">
       <div className="grid gap-8 md:grid-cols-3">
         <div className="space-y-4">
           <Skeleton className="h-3 w-16" />
@@ -33,9 +36,12 @@ function TalkHeroMetadataSkeleton() {
 
 function TalkContentSkeleton() {
   return (
-    <FeaturedGrid columns={{ default: 1, sm: 2, md: 2, lg: 2 }} title="More Talks">
+    <FeaturedGrid
+      columns={{ default: 1, lg: 2, md: 2, sm: 2 }}
+      title="More Talks"
+    >
       {Array.from({ length: 4 }).map((_, i) => (
-        // biome-ignore lint/suspicious/noArrayIndexKey: Static skeleton items never reorder
+        // oxlint-disable-next-line react/no-array-index-key -- static skeleton items never reorder
         <MediaCardSkeleton key={i} />
       ))}
     </FeaturedGrid>

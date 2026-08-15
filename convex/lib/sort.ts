@@ -18,7 +18,7 @@ export function byTitle<T extends { title: string }>(a: T, b: T): number {
 export function byPublishedAt<T extends { publishedAt?: number }>(
   a: T,
   b: T,
-  direction: SortDirection = 'desc',
+  direction: SortDirection = 'desc'
 ): number {
   const aTime = a.publishedAt || 0;
   const bTime = b.publishedAt || 0;
@@ -31,7 +31,7 @@ export function byPublishedAt<T extends { publishedAt?: number }>(
 export function byCount<T extends { count: number }>(
   a: T,
   b: T,
-  direction: SortDirection = 'desc',
+  direction: SortDirection = 'desc'
 ): number {
   return direction === 'desc' ? b.count - a.count : a.count - b.count;
 }
@@ -43,7 +43,11 @@ export function byCount<T extends { count: number }>(
  * - alphabetical: A-Z by title
  * - featured: featured first, then by recent
  */
-export type ContentSortOption = 'alphabetical' | 'featured' | 'oldest' | 'recent';
+export type ContentSortOption =
+  | 'alphabetical'
+  | 'featured'
+  | 'oldest'
+  | 'recent';
 
 /**
  * Get comparator for content (talks, clips) based on sort option.
@@ -52,9 +56,10 @@ export function getContentComparator<
   T extends { featured?: boolean; title: string; publishedAt?: number },
 >(sort: ContentSortOption = 'recent'): (a: T, b: T) => number {
   switch (sort) {
-    case 'alphabetical':
+    case 'alphabetical': {
       return byTitle;
-    case 'featured':
+    }
+    case 'featured': {
       return (a, b) => {
         if (a.featured && !b.featured) {
           return -1;
@@ -64,10 +69,13 @@ export function getContentComparator<
         }
         return byPublishedAt(a, b, 'desc');
       };
-    case 'oldest':
+    }
+    case 'oldest': {
       return (a, b) => byPublishedAt(a, b, 'asc');
-    default:
+    }
+    default: {
       return (a, b) => byPublishedAt(a, b, 'desc');
+    }
   }
 }
 
@@ -82,16 +90,19 @@ export type TopicSortOption = 'alphabetical' | 'least-talks' | 'most-talks';
 /**
  * Get comparator for topics with counts based on sort option.
  */
-export function getTopicComparator<T extends { count: number; topic: { title: string } }>(
-  sort: TopicSortOption = 'alphabetical',
-): (a: T, b: T) => number {
+export function getTopicComparator<
+  T extends { count: number; topic: { title: string } },
+>(sort: TopicSortOption = 'alphabetical'): (a: T, b: T) => number {
   switch (sort) {
-    case 'most-talks':
+    case 'most-talks': {
       return (a, b) => byCount(a, b, 'desc');
-    case 'least-talks':
+    }
+    case 'least-talks': {
       return (a, b) => byCount(a, b, 'asc');
-    default:
+    }
+    default: {
       return (a, b) => a.topic.title.localeCompare(b.topic.title);
+    }
   }
 }
 
@@ -101,7 +112,10 @@ export function getTopicComparator<T extends { count: number; topic: { title: st
  * - most-talks: highest count first
  * - least-talks: lowest count first
  */
-export type CollectionSortOption = 'alphabetical' | 'least-talks' | 'most-talks';
+export type CollectionSortOption =
+  | 'alphabetical'
+  | 'least-talks'
+  | 'most-talks';
 
 /**
  * Get comparator for collections with talk counts based on sort option.
@@ -110,12 +124,15 @@ export function getCollectionComparator<
   T extends { talkCount: number; collection: { title: string } },
 >(sort: CollectionSortOption = 'alphabetical'): (a: T, b: T) => number {
   switch (sort) {
-    case 'most-talks':
+    case 'most-talks': {
       return (a, b) => b.talkCount - a.talkCount;
-    case 'least-talks':
+    }
+    case 'least-talks': {
       return (a, b) => a.talkCount - b.talkCount;
-    default:
+    }
+    default: {
       return (a, b) => a.collection.title.localeCompare(b.collection.title);
+    }
   }
 }
 
@@ -136,11 +153,11 @@ export type SpeakerSortOption = 'alphabetical' | 'featured';
 /**
  * Get comparator for speakers based on sort option.
  */
-export function getSpeakerComparator<T extends { featured?: boolean; lastName: string }>(
-  sort: SpeakerSortOption = 'alphabetical',
-): (a: T, b: T) => number {
+export function getSpeakerComparator<
+  T extends { featured?: boolean; lastName: string },
+>(sort: SpeakerSortOption = 'alphabetical'): (a: T, b: T) => number {
   switch (sort) {
-    case 'featured':
+    case 'featured': {
       return (a, b) => {
         if (a.featured && !b.featured) {
           return -1;
@@ -150,7 +167,9 @@ export function getSpeakerComparator<T extends { featured?: boolean; lastName: s
         }
         return byLastName(a, b);
       };
-    default:
+    }
+    default: {
       return byLastName;
+    }
   }
 }

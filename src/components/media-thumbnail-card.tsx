@@ -2,10 +2,10 @@
 
 import type { ReactNode } from 'react';
 
-import { useState } from 'react';
 import { ArrowRightIcon, PlayIcon } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useState } from 'react';
 
 import { Card } from '@/components/ui';
 import { captureMessage } from '@/services/errors';
@@ -33,10 +33,10 @@ export function MediaThumbnailCard({
   function handleThumbnailError() {
     setThumbnailFailed(true);
     captureMessage('Media thumbnail failed to load', {
-      level: 'warning',
-      tags: { feature: 'media' },
       context: { href, thumbnail, title },
       fingerprint: ['media', thumbnail ?? 'unknown'],
+      level: 'warning',
+      tags: { feature: 'media' },
     });
   }
 
@@ -45,7 +45,7 @@ export function MediaThumbnailCard({
       className="group overflow-clip shadow-2xl"
       render={
         <Link
-          className="text-muted-foreground transition-colors hover:text-foreground"
+          className="text-muted-foreground hover:text-foreground transition-colors"
           href={href}
         />
       }
@@ -63,12 +63,12 @@ export function MediaThumbnailCard({
             />
           </div>
         ) : (
-          <div className="flex aspect-video items-center justify-center bg-muted" />
+          <div className="bg-muted flex aspect-video items-center justify-center" />
         )}
 
         {!!showThumbnail && (
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="flex h-12 w-16 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg transition-opacity group-hover:opacity-90">
+            <span className="bg-primary text-primary-foreground flex h-12 w-16 items-center justify-center rounded-2xl shadow-lg transition-opacity group-hover:opacity-90">
               <PlayIcon className="ml-0.5 size-5" fill="currentColor" />
             </span>
           </div>
@@ -77,7 +77,7 @@ export function MediaThumbnailCard({
 
       <div className="flex items-start justify-between gap-4 px-4 py-3 text-sm">
         <div>
-          <h2 className="text-pretty font-medium text-foreground">{title}</h2>
+          <h2 className="text-foreground font-medium text-pretty">{title}</h2>
           {!!subtitle && <p className="text-muted-foreground">{subtitle}</p>}
         </div>
 

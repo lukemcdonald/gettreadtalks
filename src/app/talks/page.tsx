@@ -10,7 +10,8 @@ import { getTalks } from '@/features/talks/queries/get-talks';
 import { getTopicsWithCounts } from '@/features/topics/queries/get-topics-with-counts';
 
 export const metadata: Metadata = {
-  description: 'Browse Christ centered talks from faithful ministers of the Gospel.',
+  description:
+    'Browse Christ centered talks from faithful ministers of the Gospel.',
   title: 'Talks',
 };
 
@@ -32,7 +33,9 @@ export default async function TalksPage({ searchParams }: TalksPageProps) {
   const { cursor, featured, search, sort, speakers, topics } = params;
 
   // Parse comma-separated values into arrays
-  const speakerSlugs = speakers ? speakers.split(',').filter(Boolean) : undefined;
+  const speakerSlugs = speakers
+    ? speakers.split(',').filter(Boolean)
+    : undefined;
   const topicSlugs = topics ? topics.split(',').filter(Boolean) : undefined;
 
   // Check if any filters are active (for showing "clear filters" option)

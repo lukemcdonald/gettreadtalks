@@ -10,7 +10,11 @@ export interface EventMap {
   signed_out: Record<string, never>;
   signed_up: Record<string, never>;
   speaker_favorited: { speaker_id: string };
-  speaker_link_clicked: { link_type: string; speaker_slug: string; url: string };
+  speaker_link_clicked: {
+    link_type: string;
+    speaker_slug: string;
+    url: string;
+  };
   speaker_shared: { method: 'clipboard' | 'share_api'; speaker_id: string };
   speaker_unfavorited: { speaker_id: string };
   talk_completed: { talk_id: string; speaker_slug: string };
@@ -18,7 +22,11 @@ export interface EventMap {
   talk_featured: { talk_id: string };
   talk_finished: { talk_id: string };
   talk_paused: { talk_id: string; speaker_slug: string; progress_pct: number };
-  talk_played: { talk_id: string; speaker_slug: string; media_type: 'audio' | 'video' };
+  talk_played: {
+    talk_id: string;
+    speaker_slug: string;
+    media_type: 'audio' | 'video';
+  };
   talk_shared: { method: 'clipboard' | 'share_api'; talk_id: string };
   talk_unfavorited: { talk_id: string };
   talk_unfeatured: { talk_id: string };

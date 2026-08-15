@@ -1,10 +1,14 @@
 'use client';
 
+import type {
+  ErrorWithEventId,
+  MutationState,
+  MutationStatus,
+} from '@/services/errors/types';
 import type { FunctionReference } from 'convex/server';
-import type { ErrorWithEventId, MutationState, MutationStatus } from '@/services/errors/types';
 
-import { useCallback, useState } from 'react';
 import { useMutation as useConvexMutation } from 'convex/react';
+import { useCallback, useState } from 'react';
 
 import { captureException } from '@/services/errors/client';
 import { getErrorMessage, getSentryConfig } from '@/services/errors/convex';
@@ -23,7 +27,7 @@ export interface UseMutationOptions {
 
 export function useMutation<Mutation extends FunctionReference<'mutation'>>(
   mutation: Mutation,
-  options: UseMutationOptions = {},
+  options: UseMutationOptions = {}
 ) {
   const convexMutation = useConvexMutation(mutation);
   const [state, setState] = useState<MutationState>(DEFAULT_STATE);
@@ -51,7 +55,8 @@ export function useMutation<Mutation extends FunctionReference<'mutation'>>(
 
         return result;
       } catch (error) {
-        const errorObj = error instanceof Error ? error : new Error(getErrorMessage(error));
+        const errorObj =
+          error instanceof Error ? error : new Error(getErrorMessage(error));
 
         setState({
           data: null,
@@ -79,7 +84,7 @@ export function useMutation<Mutation extends FunctionReference<'mutation'>>(
         throw errorObj;
       }
     },
-    [convexMutation, onSuccess, onError, reportToSentry],
+    [convexMutation, onSuccess, onError, reportToSentry]
   );
 
   const mutate = useCallback(
@@ -88,7 +93,7 @@ export function useMutation<Mutation extends FunctionReference<'mutation'>>(
         // Error already handled - stored in state and reported to Sentry
       });
     },
-    [mutateAsync],
+    [mutateAsync]
   );
 
   const reset = useCallback(() => {

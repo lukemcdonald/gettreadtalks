@@ -52,7 +52,7 @@ export function MobileFilterSheet({
         {showCount &&
           count > 0 &&
           (isIcon ? (
-            <span className="absolute -top-1.5 -right-1.5 flex size-[18px] items-center justify-center rounded-full bg-primary font-semibold text-[10px] text-primary-foreground">
+            <span className="bg-primary text-primary-foreground absolute -top-1.5 -right-1.5 flex size-[18px] items-center justify-center rounded-full text-[10px] font-semibold">
               {count}
             </span>
           ) : (

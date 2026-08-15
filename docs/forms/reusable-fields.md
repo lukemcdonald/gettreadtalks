@@ -27,10 +27,11 @@ import { TextField } from '@/components/ui';
   name="title"
   placeholder="Enter title"
   required
-/>
+/>;
 ```
 
 **Props:**
+
 - `control` - React Hook Form control object
 - `name` - Field name (must match form schema)
 - `label` - Field label text
@@ -53,10 +54,11 @@ import { TextareaField } from '@/components/ui';
   name="description"
   placeholder="Enter description"
   rows={4}
-/>
+/>;
 ```
 
 **Props:**
+
 - Same as `TextField` plus:
 - `rows` - Number of visible rows (optional, default: 3)
 
@@ -73,10 +75,11 @@ import { UrlField } from '@/components/ui';
   name="mediaUrl"
   placeholder="https://example.com/video"
   required
-/>
+/>;
 ```
 
 **Props:**
+
 - Same as `TextField`
 - Automatically uses `type="url"` for browser validation
 
@@ -92,10 +95,11 @@ import { NumberField } from '@/components/ui';
   label="Order"
   name="collectionOrder"
   placeholder="0"
-/>
+/>;
 ```
 
 **Props:**
+
 - Same as `TextField`
 - Automatically uses `type="number"` with proper number handling
 
@@ -111,10 +115,11 @@ import { CheckboxField } from '@/components/ui';
   description="Check to enable this feature"
   label="Enable Feature"
   name="enabled"
-/>
+/>;
 ```
 
 **Props:**
+
 - `control` - React Hook Form control object
 - `name` - Field name
 - `label` - Checkbox label text
@@ -128,10 +133,11 @@ Pre-configured checkbox for "featured" flag.
 ```tsx
 import { FeaturedField } from '@/components/ui';
 
-<FeaturedField control={form.control} name="featured" />
+<FeaturedField control={form.control} name="featured" />;
 ```
 
 **Props:**
+
 - `control` - React Hook Form control object
 - `name` - Field name (typically "featured")
 - Automatically uses "Featured" as label
@@ -153,10 +159,11 @@ import { SelectField } from '@/components/ui';
     { label: 'Option 2', value: '2' },
   ]}
   required
-/>
+/>;
 ```
 
 **Props:**
+
 - `control` - React Hook Form control object
 - `name` - Field name
 - `label` - Field label
@@ -171,15 +178,11 @@ Pre-configured select field for status selection (approved, archived, backlog, p
 ```tsx
 import { StatusField } from '@/components/ui';
 
-<StatusField
-  control={form.control}
-  label="Status"
-  name="status"
-  required
-/>
+<StatusField control={form.control} label="Status" name="status" required />;
 ```
 
 **Props:**
+
 - `control` - React Hook Form control object
 - `name` - Field name (typically "status")
 - `label` - Field label (optional, defaults to "Status")
@@ -224,7 +227,7 @@ type FormData = z.infer<typeof formSchema>;
 
 export function ItemForm() {
   const [isPending, startTransition] = useTransition();
-  
+
   const form = useForm<FormData>({
     defaultValues: {
       featured: false,
@@ -248,13 +251,8 @@ export function ItemForm() {
     <FormProvider {...form}>
       <Form noValidate onSubmit={handleSubmit}>
         <FormError error={form.formState.errors.root} />
-        
-        <TextField
-          control={form.control}
-          label="Title"
-          name="title"
-          required
-        />
+
+        <TextField control={form.control} label="Title" name="title" required />
 
         <TextareaField
           control={form.control}
@@ -262,17 +260,9 @@ export function ItemForm() {
           name="description"
         />
 
-        <UrlField
-          control={form.control}
-          label="Media URL"
-          name="mediaUrl"
-        />
+        <UrlField control={form.control} label="Media URL" name="mediaUrl" />
 
-        <StatusField
-          control={form.control}
-          name="status"
-          required
-        />
+        <StatusField control={form.control} name="status" required />
 
         <FeaturedField control={form.control} name="featured" />
 
@@ -299,21 +289,25 @@ All field components follow this pattern:
 ## Benefits
 
 ### Consistency
+
 - All forms use the same components
 - Consistent error display
 - Consistent styling and behavior
 
 ### Simplicity
+
 - No need to manually wrap `Controller` for each field
 - Automatic error handling
 - Less boilerplate code
 
 ### Type Safety
+
 - TypeScript generics ensure type safety
 - Form data types are inferred from schema
 - Compile-time checks for field names
 
 ### Maintainability
+
 - Single source of truth for field behavior
 - Easy to update all forms by updating components
 - Clear separation of concerns
@@ -369,12 +363,7 @@ export function SpeakerField<T extends FieldValues>({
 ### After (Reusable Component)
 
 ```tsx
-<TextField
-  control={form.control}
-  label="Title"
-  name="title"
-  required
-/>
+<TextField control={form.control} label="Title" name="title" required />
 ```
 
 ## References

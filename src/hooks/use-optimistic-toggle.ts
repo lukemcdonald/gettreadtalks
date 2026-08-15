@@ -7,7 +7,10 @@ interface UseOptimisticToggleOptions {
   onToggle: (next: boolean) => void;
 }
 
-export function useOptimisticToggle({ data, onToggle }: UseOptimisticToggleOptions) {
+export function useOptimisticToggle({
+  data,
+  onToggle,
+}: UseOptimisticToggleOptions) {
   const [optimisticState, setOptimisticState] = useState<boolean | null>(null);
 
   const isActive = optimisticState ?? data ?? false;

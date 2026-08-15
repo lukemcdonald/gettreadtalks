@@ -40,7 +40,11 @@ export function TalksSidebar({ speakers, topics }: TalksSidebarProps) {
     <SidebarContent className="space-y-4">
       {/* Mobile: inline search + icon filter button */}
       <div className="flex items-center gap-2 md:hidden">
-        <SearchInput className="flex-1" paramName="search" placeholder="Search talks..." />
+        <SearchInput
+          className="flex-1"
+          paramName="search"
+          placeholder="Search talks..."
+        />
         <MobileFilterSheet variant="icon">
           <ComboboxMultiFilter
             label="Speakers"
@@ -60,7 +64,11 @@ export function TalksSidebar({ speakers, topics }: TalksSidebarProps) {
 
       {/* Desktop: full sidebar */}
       <div className="hidden md:flex md:flex-col md:gap-4">
-        <SearchInput label="Search" paramName="search" placeholder="Search talks..." />
+        <SearchInput
+          label="Search"
+          paramName="search"
+          placeholder="Search talks..."
+        />
         <ComboboxMultiFilter
           label="Speakers"
           name="speakers"

@@ -26,7 +26,9 @@ export function ClipsContent({
     return (
       <Empty>
         <EmptyTitle>No clips found</EmptyTitle>
-        <EmptyDescription>There are no clips available at this time.</EmptyDescription>
+        <EmptyDescription>
+          There are no clips available at this time.
+        </EmptyDescription>
       </Empty>
     );
   }

@@ -36,12 +36,15 @@ export async function getSpeakersGrouped(args?: GetSpeakersGroupedProps) {
   }
 
   // Convert to array and sort by letter
-  const groups = Array.from(grouped.entries())
+  const groups = [...grouped.entries()]
     .map(([letter, items]) => {
-      const sorted = items.sort((a, b) => a.lastName.localeCompare(b.lastName));
-      const first = sorted[0];
+      const sorted = items.toSorted((a, b) =>
+        a.lastName.localeCompare(b.lastName)
+      );
+      const [first] = sorted;
       const last = sorted.at(-1);
-      const range = first && last ? `${first.lastName}—${last.lastName}` : letter;
+      const range =
+        first && last ? `${first.lastName}—${last.lastName}` : letter;
 
       return {
         items: sorted,
@@ -49,7 +52,7 @@ export async function getSpeakersGrouped(args?: GetSpeakersGroupedProps) {
         range,
       };
     })
-    .sort((a, b) => a.letter.localeCompare(b.letter));
+    .toSorted((a, b) => a.letter.localeCompare(b.letter));
 
   return groups;
 }

@@ -5,8 +5,8 @@ import type { SpeakerId, SpeakerListItem } from '@/features/speakers/types';
 import type { TalkFormData } from '@/features/talks/schemas/talk-form';
 import type { TalkId } from '@/features/talks/types';
 
-import { useEffect, useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { FormSheet } from '@/components/ui';
@@ -33,9 +33,9 @@ export function CreateTalkSheet({
   const [isPending, startTransition] = useTransition();
 
   const form = useForm<TalkFormData>({
-    // biome-ignore lint/suspicious/noExplicitAny: Type assertion needed for Zod 4 compatibility with zodResolver
-    resolver: zodResolver(talkFormSchema as any),
     mode: 'onBlur',
+    // oxlint-disable-next-line typescript/no-explicit-any -- Zod 4 compatibility with zodResolver
+    resolver: zodResolver(talkFormSchema as any),
     defaultValues: {
       collectionId: undefined,
       collectionOrder: undefined,
@@ -79,7 +79,11 @@ export function CreateTalkSheet({
       submitLabel="Create Talk"
       title="Add New Talk"
     >
-      <TalkFormFields collections={collections} control={form.control} speakers={speakers} />
+      <TalkFormFields
+        collections={collections}
+        control={form.control}
+        speakers={speakers}
+      />
     </FormSheet>
   );
 }

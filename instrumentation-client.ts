@@ -14,5 +14,6 @@ if (IS_SENTRY_ENABLED) {
 }
 
 // Export the router transition hook for Sentry navigation instrumentation
-// biome-ignore lint/suspicious: no-op function
-export const onRouterTransitionStart = IS_SENTRY_ENABLED ? captureRouterTransitionStart : () => {};
+export const onRouterTransitionStart = IS_SENTRY_ENABLED
+  ? captureRouterTransitionStart
+  : () => {};

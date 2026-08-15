@@ -7,23 +7,41 @@ export type ErrorCode = (typeof ErrorCodes)[keyof typeof ErrorCodes];
  * Used internally for mapping to Convex error codes and Sentry severity levels.
  */
 export type HttpStatusCode =
-  | 400 // Bad Request
-  | 401 // Not Authenticated
-  | 402 // Payment Failure
-  | 403 // Not Authorized
-  | 404 // Not Found
-  | 409 // Conflict (Failed to Save)
-  | 422 // Validation Failure
-  | 429 // Too Many Requests
-  | 500 // Server Error
-  | 501 // Not Implemented
-  | 502 // Bad Gateway
-  | 503; // Service Unavailable
+  // Bad Request
+  | 400
+  // Not Authenticated
+  | 401
+  // Payment Failure
+  | 402
+  // Not Authorized
+  | 403
+  // Not Found
+  | 404
+  // Conflict (Failed to Save)
+  | 409
+  // Validation Failure
+  | 422
+  // Too Many Requests
+  | 429
+  // Server Error
+  | 500
+  // Not Implemented
+  | 501
+  // Bad Gateway
+  | 502
+  // Service Unavailable
+  | 503;
 
 /**
  * Sentry severity levels for error reporting.
  */
-export type SeverityLevel = 'fatal' | 'error' | 'warning' | 'log' | 'info' | 'debug';
+export type SeverityLevel =
+  | 'fatal'
+  | 'error'
+  | 'warning'
+  | 'log'
+  | 'info'
+  | 'debug';
 
 /**
  * Additional context data for errors.

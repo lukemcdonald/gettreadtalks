@@ -3,8 +3,8 @@
 import type { TopicFormData } from '@/features/topics/schemas/topic-form';
 import type { Topic, TopicId } from '@/features/topics/types';
 
-import { useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { FormSheet, TextField } from '@/components/ui';
@@ -20,12 +20,17 @@ interface EditTopicSheetProps {
   topic: Pick<Topic, '_id' | 'title'> | null;
 }
 
-export function EditTopicSheet({ onOpenChange, onTopicUpdated, open, topic }: EditTopicSheetProps) {
+export function EditTopicSheet({
+  onOpenChange,
+  onTopicUpdated,
+  open,
+  topic,
+}: EditTopicSheetProps) {
   const [isPending, startTransition] = useTransition();
 
   const form = useForm<TopicFormData>({
-    resolver: zodResolver(topicFormSchema),
     mode: 'onBlur',
+    resolver: zodResolver(topicFormSchema),
     values: {
       title: topic?.title ?? '',
     },

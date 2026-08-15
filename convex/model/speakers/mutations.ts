@@ -1,7 +1,7 @@
 import type { Doc } from '../../_generated/dataModel';
 
-import { v } from 'convex/values';
 import { getManyFrom, getOneFrom } from 'convex-helpers/server/relationships';
+import { v } from 'convex/values';
 
 import { mutation } from '../../_generated/server';
 import { throwDuplicateSlug, throwValidationError } from '../../lib/errors';
@@ -59,7 +59,7 @@ export const destroySpeaker = mutation({
 
     await requireAuth(ctx);
 
-    const speaker = await getOrThrow(ctx, 'speakers', speakerId);
+    await getOrThrow(ctx, 'speakers', speakerId);
 
     // Prevent deletion if speaker has associated content
     const talksWithSpeaker = await getOneFrom(
@@ -67,21 +67,35 @@ export const destroySpeaker = mutation({
       'talks',
       'by_speakerId_and_status',
       speakerId,
-      'speakerId',
+      'speakerId'
     );
 
     if (talksWithSpeaker) {
-      throwValidationError('Cannot delete speaker: speaker has associated talks');
+      throwValidationError(
+        'Cannot delete speaker: speaker has associated talks'
+      );
     }
 
-    const clipsWithSpeaker = await getOneFrom(ctx.db, 'clips', 'by_speakerId', speakerId);
+    const clipsWithSpeaker = await getOneFrom(
+      ctx.db,
+      'clips',
+      'by_speakerId',
+      speakerId
+    );
 
     if (clipsWithSpeaker) {
-      throwValidationError('Cannot delete speaker: speaker has associated clips');
+      throwValidationError(
+        'Cannot delete speaker: speaker has associated clips'
+      );
     }
 
     // Clean up user favorites before deleting speaker
-    const favorites = await getManyFrom(ctx.db, 'userFavoriteSpeakers', 'by_speakerId', speakerId);
+    const favorites = await getManyFrom(
+      ctx.db,
+      'userFavoriteSpeakers',
+      'by_speakerId',
+      speakerId
+    );
 
     await deleteAll(ctx, favorites);
 

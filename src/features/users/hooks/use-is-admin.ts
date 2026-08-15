@@ -1,6 +1,7 @@
 'use client';
 
 import { isAdmin } from '@/services/auth/utils';
+
 import { useCurrentUser } from './use-current-user';
 
 /**

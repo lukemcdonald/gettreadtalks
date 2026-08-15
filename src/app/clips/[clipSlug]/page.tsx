@@ -8,6 +8,7 @@ import { isVideoMediaType } from '@/components/media-embed';
 import { site } from '@/configs/site';
 import { getClipBySlug } from '@/features/clips/queries/get-clip-by-slug';
 import { getSpeakerName } from '@/features/speakers/utils';
+
 import { ClipContent } from './_components/clip-content';
 import { ClipHero } from './_components/clip-hero';
 
@@ -15,7 +16,9 @@ interface ClipPageProps {
   params: Promise<{ clipSlug: string }>;
 }
 
-export async function generateMetadata({ params }: ClipPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: ClipPageProps): Promise<Metadata> {
   const { clipSlug } = await params;
   const data = await getClipBySlug(clipSlug);
 
@@ -27,7 +30,9 @@ export async function generateMetadata({ params }: ClipPageProps): Promise<Metad
   const speakerName = speaker ? getSpeakerName(speaker) : '';
 
   return {
-    description: clip.description ?? (speakerName ? `A clip from ${speakerName}.` : undefined),
+    description:
+      clip.description ??
+      (speakerName ? `A clip from ${speakerName}.` : undefined),
     title: clip.title,
   };
 }
@@ -51,7 +56,9 @@ export default async function ClipPage({ params }: ClipPageProps) {
     name: clip.title,
     url: `${site.url}/clips/${clip.slug}`,
     ...(speakerName && { creator: { '@type': 'Person', name: speakerName } }),
-    ...(clip.publishedAt && { uploadDate: new Date(clip.publishedAt).toISOString() }),
+    ...(clip.publishedAt && {
+      uploadDate: new Date(clip.publishedAt).toISOString(),
+    }),
     ...(talk &&
       speaker && {
         isPartOf: {

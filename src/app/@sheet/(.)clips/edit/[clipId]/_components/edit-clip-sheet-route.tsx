@@ -13,7 +13,11 @@ interface EditClipSheetRouteProps {
   talks: TalkListItem[];
 }
 
-export function EditClipSheetRoute({ clip, speakers, talks }: EditClipSheetRouteProps) {
+export function EditClipSheetRoute({
+  clip,
+  speakers,
+  talks,
+}: EditClipSheetRouteProps) {
   const { handleOpenChange, handleSuccess } = useSheetRoute();
 
   return (

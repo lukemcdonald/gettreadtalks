@@ -4,7 +4,12 @@ import type { Control, FieldPath, FieldValues } from 'react-hook-form';
 
 import { Controller } from 'react-hook-form';
 
-import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/fields';
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from '@/components/ui/fields';
 import {
   NumberFieldDecrement,
   NumberFieldGroup,
@@ -67,7 +72,9 @@ export function NumberField<T extends FieldValues>({
             touched={fieldState.isTouched}
           >
             <FieldLabel required={required}>{label}</FieldLabel>
-            {!!description && <FieldDescription>{description}</FieldDescription>}
+            {!!description && (
+              <FieldDescription>{description}</FieldDescription>
+            )}
             <NumberFieldPrimitive
               aria-invalid={fieldState.invalid}
               max={max}
@@ -89,7 +96,9 @@ export function NumberField<T extends FieldValues>({
                 <NumberFieldInput placeholder={placeholder} {...inputProps} />
               )}
             </NumberFieldPrimitive>
-            {!!fieldState.error && <FieldError match>{fieldState.error?.message}</FieldError>}
+            {!!fieldState.error && (
+              <FieldError match>{fieldState.error?.message}</FieldError>
+            )}
           </Field>
         );
       }}

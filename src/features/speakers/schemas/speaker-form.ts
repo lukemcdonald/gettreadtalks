@@ -9,7 +9,11 @@ const baseSpeakerSchema = z.object({
   lastName: z.string().trim().min(1, 'Last name is required'),
   ministry: z.string().optional(),
   role: z.enum(speakerRoles).or(z.literal('')).optional(),
-  websiteUrl: z.string().url('Must be a valid URL').optional().or(z.literal('')),
+  websiteUrl: z
+    .string()
+    .url('Must be a valid URL')
+    .optional()
+    .or(z.literal('')),
 });
 
 export const createSpeakerSchema = baseSpeakerSchema;

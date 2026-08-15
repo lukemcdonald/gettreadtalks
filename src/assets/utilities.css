@@ -17,7 +17,7 @@
   @apply isolate ring-1 ring-transparent transition duration-300;
 
   &:hover {
-    @apply shadow-md/3 ring-card;
+    @apply ring-card shadow-md/3;
 
     /* &::before {
       inset: -0.25rem;

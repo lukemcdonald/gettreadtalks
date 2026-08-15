@@ -1,9 +1,9 @@
 'use client';
 
-import type { ReactNode } from 'react';
 import type { Collection, CollectionId } from '@/features/collections/types';
-import type { Speaker, SpeakerId } from '@/features/speakers/types';
+import type { Speaker } from '@/features/speakers/types';
 import type { Talk, TalkId, TalkStatus } from '@/features/talks/types';
+import type { ReactNode } from 'react';
 
 import { Controller, FormProvider } from 'react-hook-form';
 
@@ -29,7 +29,10 @@ interface TalkFormProps {
   initialData?: Talk;
   mode?: 'create' | 'edit';
   speakerSlug?: string;
-  speakers: Pick<Speaker, '_id' | 'firstName' | 'lastName' | 'slug' | 'imageUrl' | 'role'>[];
+  speakers: Pick<
+    Speaker,
+    '_id' | 'firstName' | 'lastName' | 'slug' | 'imageUrl' | 'role'
+  >[];
   talkId?: TalkId;
   talkSlug?: string;
 }
@@ -74,7 +77,12 @@ export function TalkForm({
 
         <Fieldset disabled={isBusy}>
           <div className="space-y-4">
-            <TextField control={form.control} label="Title" name="title" required />
+            <TextField
+              control={form.control}
+              label="Title"
+              name="title"
+              required
+            />
 
             {mode === 'edit' && (
               <TextField
@@ -93,11 +101,25 @@ export function TalkForm({
               speakers={speakers}
             />
 
-            <UrlField control={form.control} label="Media URL" name="mediaUrl" required />
+            <UrlField
+              control={form.control}
+              label="Media URL"
+              name="mediaUrl"
+              required
+            />
 
-            <TextareaField control={form.control} label="Description" name="description" rows={4} />
+            <TextareaField
+              control={form.control}
+              label="Description"
+              name="description"
+              rows={4}
+            />
 
-            <TextField control={form.control} label="Scripture" name="scripture" />
+            <TextField
+              control={form.control}
+              label="Scripture"
+              name="scripture"
+            />
 
             <Controller
               control={form.control}
@@ -106,14 +128,20 @@ export function TalkForm({
                 <CollectionSelectField
                   collections={collections}
                   onValueChange={(value) => {
-                    field.onChange(value === '' ? undefined : (value as CollectionId));
+                    field.onChange(
+                      value === '' ? undefined : (value as CollectionId)
+                    );
                   }}
                   value={field.value}
                 />
               )}
             />
 
-            <NumberField control={form.control} label="Collection Order" name="collectionOrder" />
+            <NumberField
+              control={form.control}
+              label="Collection Order"
+              name="collectionOrder"
+            />
 
             <StatusField
               control={form.control}

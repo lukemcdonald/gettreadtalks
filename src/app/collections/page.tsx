@@ -21,7 +21,9 @@ interface CollectionsPageProps {
   searchParams: Promise<CollectionsPageSearchParams>;
 }
 
-export default async function CollectionsPage({ searchParams }: CollectionsPageProps) {
+export default async function CollectionsPage({
+  searchParams,
+}: CollectionsPageProps) {
   const { sort, speaker: speakerSlug } = await searchParams;
 
   const { collections, speakers } = await getCollections({ sort, speakerSlug });
@@ -30,7 +32,12 @@ export default async function CollectionsPage({ searchParams }: CollectionsPageP
 
   return (
     <SidebarLayout
-      content={<CollectionsContent collections={collections} hasActiveFilters={hasActiveFilters} />}
+      content={
+        <CollectionsContent
+          collections={collections}
+          hasActiveFilters={hasActiveFilters}
+        />
+      }
       header={
         <PageHeader
           description="Each series includes talks given by one or more speakers on the same topic or book of the Bible."

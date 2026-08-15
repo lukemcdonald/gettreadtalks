@@ -9,7 +9,9 @@ interface ResetPasswordPageProps {
   searchParams: Promise<{ token?: string }>;
 }
 
-export default async function ResetPasswordPage({ searchParams }: ResetPasswordPageProps) {
+export default async function ResetPasswordPage({
+  searchParams,
+}: ResetPasswordPageProps) {
   const { token } = await searchParams;
 
   if (!token) {
@@ -24,7 +26,10 @@ export default async function ResetPasswordPage({ searchParams }: ResetPasswordP
         </Card>
       }
       leftSidebar={
-        <PageHeader description="Choose a new password for your account." title="Reset password" />
+        <PageHeader
+          description="Choose a new password for your account."
+          title="Reset password"
+        />
       }
       rightSidebar={<slot />}
     />

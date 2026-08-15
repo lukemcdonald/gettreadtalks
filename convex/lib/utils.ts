@@ -19,13 +19,19 @@ export function slugify(text: string | undefined | null): string {
   return text
     .toLowerCase()
     .trim()
-    .replace(/[^\w\s-]/g, '')
-    .replace(/[\s_-]+/g, '-')
-    .replace(/^-+|-+$/g, '');
+    .replaceAll(/[^\w\s-]/gu, '')
+    .replaceAll(/[\s_-]+/gu, '-')
+    .replaceAll(/^-+|-+$/gu, '');
 }
 
 // Tables that have a 'by_slug' index
-type SlugTable = 'affiliateLinks' | 'clips' | 'collections' | 'speakers' | 'talks' | 'topics';
+type SlugTable =
+  | 'affiliateLinks'
+  | 'clips'
+  | 'collections'
+  | 'speakers'
+  | 'talks'
+  | 'topics';
 
 /**
  * Check if a slug already exists in a table.
@@ -35,7 +41,7 @@ export async function slugExists(
   ctx: QueryCtx | MutationCtx,
   table: SlugTable,
   slug: string,
-  excludeId?: string,
+  excludeId?: string
 ): Promise<boolean> {
   const existing = await getOneFrom(ctx.db, table, 'by_slug', slug);
 
@@ -60,7 +66,7 @@ export async function talkSlugExistsForSpeaker(
   ctx: QueryCtx | MutationCtx,
   speakerId: Id<'speakers'>,
   slug: string,
-  excludeId?: Id<'talks'>,
+  excludeId?: Id<'talks'>
 ) {
   const speakerTalks = await ctx.db
     .query('talks')
@@ -91,7 +97,7 @@ export async function generateSlug(
   ctx: QueryCtx | MutationCtx,
   table: SlugTable,
   baseText: string,
-  excludeId?: string,
+  excludeId?: string
 ) {
   const baseSlug = slugify(baseText);
   const baseSlugExists = await slugExists(ctx, table, baseSlug, excludeId);
@@ -104,6 +110,7 @@ export async function generateSlug(
   let candidateSlug = `${baseSlug}-${counter}`;
 
   // Try with numeric suffix
+  // oxlint-disable-next-line no-await-in-loop -- each candidate depends on the previous uniqueness check
   while (await slugExists(ctx, table, candidateSlug, excludeId)) {
     counter += 1;
     candidateSlug = `${baseSlug}-${counter}`;
@@ -115,7 +122,10 @@ export async function generateSlug(
 /**
  * Extract value from a Promise.allSettled result with a fallback.
  */
-export function getSettledValue<T, F = T>(result: PromiseSettledResult<T>, fallback: F): T | F {
+export function getSettledValue<T, F = T>(
+  result: PromiseSettledResult<T>,
+  fallback: F
+): T | F {
   return result.status === 'fulfilled' ? result.value : fallback;
 }
 
@@ -126,7 +136,7 @@ export function getSettledValue<T, F = T>(result: PromiseSettledResult<T>, fallb
 export async function getOrThrow<T extends TableNames>(
   ctx: QueryCtx | MutationCtx,
   table: T,
-  id: Id<T>,
+  id: Id<T>
 ): Promise<Doc<T>> {
   const entity = await ctx.db.get(table, id);
 
@@ -146,12 +156,13 @@ export async function getOrThrow<T extends TableNames>(
  */
 export function getPublishedAtForStatus(
   newStatus: StatusType,
-  currentPublishedAt?: number,
+  currentPublishedAt?: number
 ): number | undefined {
   if (newStatus === 'published') {
     return currentPublishedAt ?? Date.now();
   }
-  return;
+
+  return undefined;
 }
 
 /**
@@ -161,9 +172,9 @@ export function getPublishedAtForStatus(
 export function paginateArray<T>(
   items: T[],
   cursor: string | null,
-  numItems: number,
+  numItems: number
 ): { continueCursor: string; isDone: boolean; page: T[] } {
-  const startIndex = cursor ? Number.parseInt(cursor, 10) : 0;
+  const startIndex = cursor ? Math.trunc(Number(cursor)) : 0;
   const endIndex = startIndex + numItems;
   const page = items.slice(startIndex, endIndex);
   const hasMore = endIndex < items.length;
@@ -181,18 +192,19 @@ export function paginateArray<T>(
  */
 export async function deleteAll<T extends { _id: Id<TableNames> }>(
   ctx: MutationCtx,
-  items: T[],
+  items: T[]
 ): Promise<void> {
-  for (const item of items) {
-    await ctx.db.delete(item._id);
-  }
+  await Promise.all(items.map((item) => ctx.db.delete(item._id)));
 }
 
 /**
  * Apply text search filter to array of items with a title field.
  * Generic utility for client-side text filtering.
  */
-export function applySearchFilter<T extends { title: string }>(items: T[], search?: string): T[] {
+export function applySearchFilter<T extends { title: string }>(
+  items: T[],
+  search?: string
+): T[] {
   if (!search) {
     return items;
   }
@@ -204,10 +216,12 @@ export function applySearchFilter<T extends { title: string }>(items: T[], searc
  * Enrich items with speaker data.
  * Works with any entity that has a speakerId field (talks, clips, etc).
  */
-export async function enrichWithSpeakers<T extends { speakerId: Id<'speakers'> }>(
+export async function enrichWithSpeakers<
+  T extends { speakerId: Id<'speakers'> },
+>(
   ctx: QueryCtx,
-  items: T[],
-): Promise<Array<T & { speaker: Doc<'speakers'> | null }>> {
+  items: T[]
+): Promise<(T & { speaker: Doc<'speakers'> | null })[]> {
   return await asyncMap(items, async (item: T) => {
     const speaker = await ctx.db.get('speakers', item.speakerId);
     return { ...item, speaker };

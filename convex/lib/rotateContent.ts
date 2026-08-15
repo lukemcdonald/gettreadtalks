@@ -12,14 +12,18 @@ function getTimeSeed(period: RotationPeriod): number {
   const MS_PER_WEEK = MS_PER_DAY * 7;
 
   switch (period) {
-    case 'hourly':
+    case 'hourly': {
       return Math.floor(now / MS_PER_HOUR);
-    case 'daily':
+    }
+    case 'daily': {
       return Math.floor(now / MS_PER_DAY);
-    case 'weekly':
+    }
+    case 'weekly': {
       return Math.floor(now / MS_PER_WEEK);
-    default:
+    }
+    default: {
       throw new Error(`Invalid rotation period: ${period}`);
+    }
   }
 }
 
@@ -32,7 +36,7 @@ function seededShuffle<T>(array: T[], seed: number): T[] {
   const c = 1_013_904_223;
   const m = 2 ** 32;
 
-  for (let i = shuffled.length - 1; i > 0; i--) {
+  for (let i = shuffled.length - 1; i > 0; i -= 1) {
     currentSeed = (a * currentSeed + c) % m;
     const j = Math.floor((currentSeed / m) * (i + 1));
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
@@ -45,7 +49,10 @@ function seededShuffle<T>(array: T[], seed: number): T[] {
  * Deterministically rotate content based on time period.
  * Same results for all users within the time period.
  */
-export function rotateContent<T>(items: T[], options: RotateContentOptions = {}): T[] {
+export function rotateContent<T>(
+  items: T[],
+  options: RotateContentOptions = {}
+): T[] {
   const { period = 'daily', count = 1 } = options;
 
   if (items.length === 0 || count >= items.length) {

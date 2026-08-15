@@ -1,9 +1,12 @@
 'use client';
 
-import type { Control, FieldValues, Path } from 'react-hook-form';
-import type { CollectionId, CollectionListItem } from '@/features/collections/types';
+import type {
+  CollectionId,
+  CollectionListItem,
+} from '@/features/collections/types';
 import type { SpeakerId, SpeakerListItem } from '@/features/speakers/types';
 import type { TalkStatus } from '@/features/talks/types';
+import type { Control, FieldValues, Path } from 'react-hook-form';
 
 import { Controller } from 'react-hook-form';
 
@@ -93,14 +96,20 @@ export function TalkFormFields<T extends FieldValues>({
           <CollectionSelectField
             collections={collections}
             onValueChange={(value) => {
-              field.onChange(value === '' ? undefined : (value as CollectionId));
+              field.onChange(
+                value === '' ? undefined : (value as CollectionId)
+              );
             }}
             value={field.value as CollectionId | undefined}
           />
         )}
       />
 
-      <NumberField control={control} label="Collection Order" name={'collectionOrder' as Path<T>} />
+      <NumberField
+        control={control}
+        label="Collection Order"
+        name={'collectionOrder' as Path<T>}
+      />
 
       <StatusField
         control={control}

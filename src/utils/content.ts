@@ -1,5 +1,5 @@
-import type { ClassValue } from 'clsx';
 import type { StatusType } from '@/lib/entities/types';
+import type { ClassValue } from 'clsx';
 
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -14,16 +14,21 @@ export function cn(...inputs: ClassValue[]) {
 
 export function getStatusColor(status?: StatusType) {
   switch (status) {
-    case 'approved':
+    case 'approved': {
       return 'text-blue-500';
-    case 'archived':
+    }
+    case 'archived': {
       return 'text-gray-400';
-    case 'backlog':
+    }
+    case 'backlog': {
       return 'text-yellow-500';
-    case 'published':
+    }
+    case 'published': {
       return 'text-green-500';
-    default:
+    }
+    default: {
       return 'text-gray-400';
+    }
   }
 }
 

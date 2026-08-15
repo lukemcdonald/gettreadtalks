@@ -1,10 +1,14 @@
 import type { Doc } from '../../_generated/dataModel';
 import type { TopicSortOption } from '../../lib/sort';
 
-import { paginationOptsValidator, paginationResultValidator } from 'convex/server';
-import { v } from 'convex/values';
 import { asyncMap } from 'convex-helpers';
-import { getManyFrom, getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
+import {
+  getManyFrom,
+  getManyVia,
+  getOneFrom,
+} from 'convex-helpers/server/relationships';
+import { paginationOptsValidator } from 'convex/server';
+import { v } from 'convex/values';
 
 import { query } from '../../_generated/server';
 import { getTopicComparator } from '../../lib/sort';
@@ -47,11 +51,14 @@ export const getTopicWithContent = query({
       'talkId',
       'by_topicId',
       topic._id,
-      'topicId',
+      'topicId'
     );
 
     const talks = allTalks
-      .filter((talk): talk is Doc<'talks'> => talk !== null && talk.status === 'published')
+      .filter(
+        (talk): talk is Doc<'talks'> =>
+          talk !== null && talk.status === 'published'
+      )
       .slice(0, limit);
 
     return {
@@ -63,7 +70,7 @@ export const getTopicWithContent = query({
     v.object({
       talks: docs('talks'),
       topic: doc('topics'),
-    }),
+    })
   ),
 });
 
@@ -93,11 +100,12 @@ export const getTopicBySlug = query({
       'talkId',
       'by_topicId',
       topic._id,
-      'topicId',
+      'topicId'
     );
 
     const publishedTalks = allTalks.filter(
-      (talk): talk is Doc<'talks'> => talk !== null && talk.status === 'published',
+      (talk): talk is Doc<'talks'> =>
+        talk !== null && talk.status === 'published'
     );
 
     // Enrich with speakers before filtering so we can search by speaker name
@@ -121,7 +129,7 @@ export const getTopicBySlug = query({
     const { continueCursor, isDone, page } = paginateArray(
       filteredTalks,
       paginationOpts.cursor,
-      paginationOpts.numItems,
+      paginationOpts.numItems
     );
 
     return {
@@ -139,7 +147,7 @@ export const getTopicBySlug = query({
       page: v.array(talkWithSpeakerValidator),
       topic: doc('topics'),
       totalTalks: v.number(),
-    }),
+    })
   ),
 });
 
@@ -154,7 +162,12 @@ export const listAllTopics = query({
     const topics = await ctx.db.query('topics').withIndex('by_title').collect();
 
     return await asyncMap(topics, async (topic) => {
-      const talksOnTopic = await getManyFrom(ctx.db, 'talksOnTopics', 'by_topicId', topic._id);
+      const talksOnTopic = await getManyFrom(
+        ctx.db,
+        'talksOnTopics',
+        'by_topicId',
+        topic._id
+      );
 
       return {
         talkCount: talksOnTopic.length,
@@ -166,7 +179,7 @@ export const listAllTopics = query({
     v.object({
       talkCount: v.number(),
       topic: doc('topics'),
-    }),
+    })
   ),
 });
 
@@ -181,22 +194,33 @@ export const listTopics = query({
   handler: async (ctx, args) => {
     const { limit = 100 } = args;
 
-    const allTopics = await ctx.db.query('topics').withIndex('by_title').take(limit);
+    const allTopics = await ctx.db
+      .query('topics')
+      .withIndex('by_title')
+      .take(limit);
 
     const topicsWithTalks = await asyncMap(allTopics, async (topic) => {
-      const talksOnTopics = await getManyFrom(ctx.db, 'talksOnTopics', 'by_topicId', topic._id);
+      const talksOnTopics = await getManyFrom(
+        ctx.db,
+        'talksOnTopics',
+        'by_topicId',
+        topic._id
+      );
       const talks = await Promise.all(
-        talksOnTopics.map((entry) => ctx.db.get('talks', entry.talkId)),
+        talksOnTopics.map((entry) => ctx.db.get('talks', entry.talkId))
       );
 
       const publishedTalks = talks.filter(
-        (talk): talk is Doc<'talks'> => talk !== null && talk.status === 'published',
+        (talk): talk is Doc<'talks'> =>
+          talk !== null && talk.status === 'published'
       );
 
       return publishedTalks.length > 0 ? topic : null;
     });
 
-    return topicsWithTalks.filter((topic): topic is Doc<'topics'> => topic !== null);
+    return topicsWithTalks.filter(
+      (topic): topic is Doc<'topics'> => topic !== null
+    );
   },
   returns: docs('topics'),
 });
@@ -211,22 +235,35 @@ export const listTopicsWithCount = query({
     limit: v.optional(v.number()),
     search: v.optional(v.string()),
     sort: v.optional(
-      v.union(v.literal('alphabetical'), v.literal('least-talks'), v.literal('most-talks')),
+      v.union(
+        v.literal('alphabetical'),
+        v.literal('least-talks'),
+        v.literal('most-talks')
+      )
     ),
   },
   handler: async (ctx, args) => {
     const { limit = 100, search, sort = 'alphabetical' } = args;
 
-    const topics = await ctx.db.query('topics').withIndex('by_title').take(limit);
+    const topics = await ctx.db
+      .query('topics')
+      .withIndex('by_title')
+      .take(limit);
 
     const topicsWithCounts = await asyncMap(topics, async (topic) => {
-      const talksOnTopics = await getManyFrom(ctx.db, 'talksOnTopics', 'by_topicId', topic._id);
+      const talksOnTopics = await getManyFrom(
+        ctx.db,
+        'talksOnTopics',
+        'by_topicId',
+        topic._id
+      );
       const talks = await Promise.all(
-        talksOnTopics.map((entry) => ctx.db.get('talks', entry.talkId)),
+        talksOnTopics.map((entry) => ctx.db.get('talks', entry.talkId))
       );
 
       const publishedTalks = talks.filter(
-        (talk): talk is Doc<'talks'> => talk !== null && talk.status === 'published',
+        (talk): talk is Doc<'talks'> =>
+          talk !== null && talk.status === 'published'
       );
 
       return {
@@ -241,7 +278,9 @@ export const listTopicsWithCount = query({
     // Apply search filter
     if (search) {
       const searchLower = search.toLowerCase();
-      results = results.filter((item) => item.topic.title.toLowerCase().includes(searchLower));
+      results = results.filter((item) =>
+        item.topic.title.toLowerCase().includes(searchLower)
+      );
     }
 
     // Apply sorting
@@ -253,7 +292,7 @@ export const listTopicsWithCount = query({
     v.object({
       count: v.number(),
       topic: doc('topics'),
-    }),
+    })
   ),
 });
 
@@ -270,16 +309,25 @@ export const listTopicsWithTalks = query({
   handler: async (ctx, args) => {
     const { limit = 100, talksPerTopic = 5 } = args;
 
-    const topics = await ctx.db.query('topics').withIndex('by_title').take(limit);
+    const topics = await ctx.db
+      .query('topics')
+      .withIndex('by_title')
+      .take(limit);
 
     const topicsWithTalks = await asyncMap(topics, async (topic) => {
-      const talksOnTopic = await getManyFrom(ctx.db, 'talksOnTopics', 'by_topicId', topic._id);
+      const talksOnTopic = await getManyFrom(
+        ctx.db,
+        'talksOnTopics',
+        'by_topicId',
+        topic._id
+      );
       const talks = await Promise.all(
-        talksOnTopic.map((entry) => ctx.db.get('talks', entry.talkId)),
+        talksOnTopic.map((entry) => ctx.db.get('talks', entry.talkId))
       );
 
       const publishedTalks = talks.filter(
-        (talk): talk is Doc<'talks'> => talk !== null && talk.status === 'published',
+        (talk): talk is Doc<'talks'> =>
+          talk !== null && talk.status === 'published'
       );
 
       // Sort: featured talks first, then by creation date (newest first)
@@ -311,6 +359,6 @@ export const listTopicsWithTalks = query({
       talkCount: v.number(),
       talks: v.array(talkWithSpeakerValidator),
       topic: doc('topics'),
-    }),
+    })
   ),
 });

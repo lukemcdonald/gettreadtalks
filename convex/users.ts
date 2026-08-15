@@ -1,25 +1,29 @@
 import { mutations, queries } from './model/users';
 
 // Queries
-export const getCurrentUser = queries.getCurrentUser;
-export const isClipFavorited = queries.isClipFavorited;
-export const isSpeakerFavorited = queries.isSpeakerFavorited;
-export const isTalkFavorited = queries.isTalkFavorited;
-export const isTalkFinished = queries.isTalkFinished;
-export const listUserFavorites = queries.listUserFavorites;
-export const listUserFinishedTalks = queries.listUserFinishedTalks;
+export const {
+  getCurrentUser,
+  isClipFavorited,
+  isSpeakerFavorited,
+  isTalkFavorited,
+  isTalkFinished,
+  listUserFavorites,
+  listUserFinishedTalks,
+} = queries;
 
 // Mutations
-export const deleteUser = mutations.deleteUser;
-export const favoriteClip = mutations.favoriteClip;
-export const favoriteSpeaker = mutations.favoriteSpeaker;
-export const favoriteTalk = mutations.favoriteTalk;
-export const finishTalk = mutations.finishTalk;
-export const setUserRole = mutations.setUserRole;
-export const unfavoriteClip = mutations.unfavoriteClip;
-export const unfavoriteSpeaker = mutations.unfavoriteSpeaker;
-export const unfavoriteTalk = mutations.unfavoriteTalk;
-export const unfinishTalk = mutations.unfinishTalk;
-export const updateUserEmail = mutations.updateUserEmail;
-export const updateUserPassword = mutations.updateUserPassword;
-export const updateUserProfile = mutations.updateUserProfile;
+export const {
+  deleteUser,
+  favoriteClip,
+  favoriteSpeaker,
+  favoriteTalk,
+  finishTalk,
+  setUserRole,
+  unfavoriteClip,
+  unfavoriteSpeaker,
+  unfavoriteTalk,
+  unfinishTalk,
+  updateUserEmail,
+  updateUserPassword,
+  updateUserProfile,
+} = mutations;

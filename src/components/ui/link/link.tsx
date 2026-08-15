@@ -2,8 +2,8 @@
 
 import type { ComponentProps } from 'react';
 
-import { useState } from 'react';
 import NextLink from 'next/link';
+import { useState } from 'react';
 
 type NextLinkProps = ComponentProps<typeof NextLink>;
 
@@ -11,7 +11,13 @@ type LinkProps = Omit<NextLinkProps, 'prefetch'> & {
   prefetch?: NextLinkProps['prefetch'] | 'hover';
 };
 
-export function Link({ prefetch, rel, target, onMouseEnter, ...delegated }: LinkProps) {
+export function Link({
+  prefetch,
+  rel,
+  target,
+  onMouseEnter,
+  ...delegated
+}: LinkProps) {
   const [hovered, setHovered] = useState(false);
 
   const isBlank = target === '_blank';

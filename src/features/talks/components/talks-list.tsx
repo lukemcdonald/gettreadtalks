@@ -1,6 +1,7 @@
 import type { TalkWithSpeaker } from '@/features/talks/types';
 
 import { GridList } from '@/components/grid-list';
+
 import { TalkCard } from './talk-card';
 
 interface TalksListProps {
@@ -13,7 +14,7 @@ interface TalksListProps {
  */
 export function TalksList({ talks }: TalksListProps) {
   return (
-    <GridList columns={{ default: 1, sm: 1, md: 2, lg: 2, xl: 2 }}>
+    <GridList columns={{ default: 1, lg: 2, md: 2, sm: 1, xl: 2 }}>
       {talks.map((talk) => (
         <TalkCard
           key={talk._id}

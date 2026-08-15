@@ -17,7 +17,10 @@ import { z } from 'zod';
 
 import { api } from '@/convex/_generated/api';
 import { withConvexAuth } from '@/lib/convex/server-action';
-import { mapConvexErrorToFormErrors, mapZodErrors } from '@/lib/forms/validation';
+import {
+  mapConvexErrorToFormErrors,
+  mapZodErrors,
+} from '@/lib/forms/validation';
 import { requireAdminUser } from '@/services/auth/server';
 import type { ActionResult } from '@/lib/forms/types';
 import { formSchema, type FormData } from './schemas/form-schema';
@@ -60,10 +63,12 @@ export async function createItemAction(
 ## Key Components
 
 ### 1. Directives
+
 - `'use server'`: Marks the function as a Server Action
 - `'server-only'`: Ensures the module only runs on the server (prevents accidental client-side usage)
 
 ### 2. Authorization
+
 Always check authorization at the start of the Server Action:
 
 ```typescript
@@ -71,6 +76,7 @@ await requireAdminUser(); // or requireAuth(), etc.
 ```
 
 ### 3. Server-Side Validation
+
 Validate input with Zod (client validation can be bypassed):
 
 ```typescript
@@ -81,6 +87,7 @@ if (!parsed.success) {
 ```
 
 ### 4. Convex Mutation Call
+
 Use `withConvexAuth` wrapper to automatically handle authentication token:
 
 ```typescript
@@ -91,6 +98,7 @@ const result = await withConvexAuth(
 ```
 
 ### 5. Error Mapping
+
 Map Convex errors to form errors using the utility function:
 
 ```typescript
@@ -164,6 +172,7 @@ export async function updateItemAction(
 ## Error Mapping Details
 
 ### Zod Errors
+
 Zod validation errors are mapped to field-level errors via `mapZodErrors()`:
 
 ```typescript
@@ -172,6 +181,7 @@ Zod validation errors are mapped to field-level errors via `mapZodErrors()`:
 ```
 
 ### Convex Errors
+
 Convex errors are mapped using structured error data:
 
 ```typescript

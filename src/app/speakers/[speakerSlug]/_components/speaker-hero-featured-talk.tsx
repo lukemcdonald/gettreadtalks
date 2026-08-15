@@ -10,7 +10,10 @@ interface SpeakerHeroFeaturedTalkProps {
   talk: Talk;
 }
 
-export function SpeakerHeroFeaturedTalk({ speaker, talk }: SpeakerHeroFeaturedTalkProps) {
+export function SpeakerHeroFeaturedTalk({
+  speaker,
+  talk,
+}: SpeakerHeroFeaturedTalkProps) {
   const href = getTalkUrl(speaker.slug, talk.slug);
   const thumbnail = getVideoThumbnail(talk.mediaUrl);
 

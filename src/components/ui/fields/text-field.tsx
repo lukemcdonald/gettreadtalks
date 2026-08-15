@@ -1,10 +1,21 @@
 'use client';
 
-import type { Control, FieldPath, FieldValues, RegisterOptions } from 'react-hook-form';
+import type {
+  Control,
+  FieldPath,
+  FieldValues,
+  RegisterOptions,
+} from 'react-hook-form';
 
 import { Controller } from 'react-hook-form';
 
-import { Field, FieldDescription, FieldError, FieldLabel, Input } from '@/components/ui';
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+  Input,
+} from '@/components/ui';
 
 interface TextFieldProps<T extends FieldValues> {
   control: Control<T>;
@@ -62,7 +73,9 @@ export function TextField<T extends FieldValues>({
             type={type}
             {...field}
           />
-          {!!fieldState.error && <FieldError match>{fieldState.error?.message}</FieldError>}
+          {!!fieldState.error && (
+            <FieldError match>{fieldState.error?.message}</FieldError>
+          )}
         </Field>
       )}
       rules={rules}

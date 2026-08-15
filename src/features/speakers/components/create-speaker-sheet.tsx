@@ -3,8 +3,8 @@
 import type { CreateSpeakerFormData } from '@/features/speakers/schemas/speaker-form';
 import type { Speaker, SpeakerId } from '@/features/speakers/types';
 
-import { useEffect, useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { FormSheet } from '@/components/ui';
@@ -13,9 +13,13 @@ import { createSpeakerAction } from '@/features/speakers/actions/create-speaker'
 import { createSpeakerSchema } from '@/features/speakers/schemas/speaker-form';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
 import { stripEmptyStrings } from '@/lib/forms/schemas';
+
 import { SpeakerFormFields } from './speaker-form-fields';
 
-type NewSpeaker = Pick<Speaker, '_id' | 'firstName' | 'lastName' | 'imageUrl' | 'role'>;
+type NewSpeaker = Pick<
+  Speaker,
+  '_id' | 'firstName' | 'lastName' | 'imageUrl' | 'role'
+>;
 
 interface CreateSpeakerSheetProps {
   onOpenChange: (open: boolean) => void;

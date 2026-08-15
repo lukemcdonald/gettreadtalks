@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import type { ReactNode } from 'react';
 
 import { Analytics } from '@vercel/analytics/next';
 import { Inter } from 'next/font/google';
@@ -8,15 +9,11 @@ import { AuthProvider } from '@/components/auth-provider';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
+import { SkipNavLink } from '@/components/site-header/navigation/skip-nav-link';
 import { ThemeProvider } from '@/components/theme-provider';
+import '@/assets/styles.css';
 import { ToastProvider } from '@/components/ui/primitives/toast';
 import { site } from '@/configs/site';
-
-import '@/assets/styles.css';
-
-import type { ReactNode } from 'react';
-
-import { SkipNavLink } from '@/components/site-header/navigation/skip-nav-link';
 import { cn } from '@/utils';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
@@ -32,7 +29,14 @@ export const metadata: Metadata = {
   },
   metadataBase: new URL(site.url),
   openGraph: {
-    images: [{ alt: site.name, height: 630, url: '/default-seo-image.png', width: 1200 }],
+    images: [
+      {
+        alt: site.name,
+        height: 630,
+        url: '/default-seo-image.png',
+        width: 1200,
+      },
+    ],
     locale: 'en_US',
     siteName: site.name,
     type: 'website',
@@ -49,7 +53,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
   sheet,
 }: Readonly<{
@@ -57,8 +61,12 @@ export default async function RootLayout({
   sheet: ReactNode;
 }>) {
   return (
-    <html className={cn('h-full', inter.variable)} lang="en" suppressHydrationWarning>
-      <body className={'flex min-h-full flex-col bg-background bg-cover text-foreground'}>
+    <html
+      className={cn('h-full', inter.variable)}
+      lang="en"
+      suppressHydrationWarning
+    >
+      <body className="bg-background text-foreground flex min-h-full flex-col bg-cover">
         <ErrorBoundary>
           <ThemeProvider>
             <AuthProvider>
@@ -66,7 +74,10 @@ export default async function RootLayout({
                 <ToastProvider>
                   <SkipNavLink href="#main" />
                   <SiteHeader />
-                  <div className="flex-1 py-6 sm:py-8 md:py-10 lg:py-12" id="content">
+                  <div
+                    className="flex-1 py-6 sm:py-8 md:py-10 lg:py-12"
+                    id="content"
+                  >
                     {children}
                   </div>
                   <SiteFooter />

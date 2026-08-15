@@ -6,16 +6,19 @@ import { MediaCardSkeleton } from '@/components/skeletons';
 function SpeakerContentSkeleton() {
   return (
     <>
-      <FeaturedGrid columns={{ default: 1, sm: 2, md: 2, lg: 2 }} title="Talks">
+      <FeaturedGrid columns={{ default: 1, lg: 2, md: 2, sm: 2 }} title="Talks">
         {Array.from({ length: 4 }).map((_, i) => (
-          // biome-ignore lint/suspicious/noArrayIndexKey: Static skeleton items never reorder
+          // oxlint-disable-next-line react/no-array-index-key -- static skeleton items never reorder
           <MediaCardSkeleton key={i} />
         ))}
       </FeaturedGrid>
 
-      <FeaturedGrid columns={{ default: 1, sm: 2, md: 2, lg: 2 }} title="Collections">
+      <FeaturedGrid
+        columns={{ default: 1, lg: 2, md: 2, sm: 2 }}
+        title="Collections"
+      >
         {Array.from({ length: 2 }).map((_, i) => (
-          // biome-ignore lint/suspicious/noArrayIndexKey: Static skeleton items never reorder
+          // oxlint-disable-next-line react/no-array-index-key -- static skeleton items never reorder
           <MediaCardSkeleton key={i} />
         ))}
       </FeaturedGrid>
@@ -25,6 +28,9 @@ function SpeakerContentSkeleton() {
 
 export default function SpeakerLoading() {
   return (
-    <EditorialProfileLayout content={<SpeakerContentSkeleton />} hero={<SpeakerHeroSkeleton />} />
+    <EditorialProfileLayout
+      content={<SpeakerContentSkeleton />}
+      hero={<SpeakerHeroSkeleton />}
+    />
   );
 }

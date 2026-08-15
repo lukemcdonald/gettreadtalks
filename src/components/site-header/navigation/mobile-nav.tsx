@@ -2,15 +2,22 @@
 
 import type { Route } from 'next';
 
-import { useState } from 'react';
 import { Menu as MenuIcon, X as XIcon } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useState } from 'react';
 
 import { NAVIGATION_LINKS } from '@/components/site-header/constants';
 import { ModeSwitcher } from '@/components/site-header/mode-switcher';
 import { SiteBranding } from '@/components/site-header/site-branding';
-import { Button, Sheet, SheetClose, SheetHeader, SheetPopup, SheetTrigger } from '@/components/ui';
+import {
+  Button,
+  Sheet,
+  SheetClose,
+  SheetHeader,
+  SheetPopup,
+  SheetTrigger,
+} from '@/components/ui';
 import { cn } from '@/utils';
 
 interface MobileNavProps {
@@ -44,7 +51,11 @@ export function MobileNav({ className }: MobileNavProps) {
             <ModeSwitcher className="size-10" />
             <SheetClose
               render={
-                <Button aria-label="Close navigation menu" size="icon-lg" variant="ghost">
+                <Button
+                  aria-label="Close navigation menu"
+                  size="icon-lg"
+                  variant="ghost"
+                >
                   <XIcon className="size-6" />
                 </Button>
               }
@@ -52,13 +63,16 @@ export function MobileNav({ className }: MobileNavProps) {
           </div>
         </SheetHeader>
 
-        <nav aria-label="Mobile navigation" className="flex flex-col gap-2 px-4">
+        <nav
+          aria-label="Mobile navigation"
+          className="flex flex-col gap-2 px-4"
+        >
           {NAVIGATION_LINKS.map((link) => (
             <SheetClose key={link.href}>
               <Button
                 className={cn(
                   'w-full justify-start text-lg transition-colors',
-                  pathname === link.href ? 'text-primary' : 'text-foreground',
+                  pathname === link.href ? 'text-primary' : 'text-foreground'
                 )}
                 render={<Link href={link.href as Route} />}
                 variant="ghost"

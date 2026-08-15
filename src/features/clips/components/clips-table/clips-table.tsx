@@ -2,6 +2,7 @@ import type { ClipWithSpeaker } from '@/features/clips/types';
 
 import { ContentTable } from '@/components/content-table';
 import { Empty, EmptyDescription } from '@/components/ui';
+
 import { ClipsTableRow } from './clips-table-row';
 
 interface ClipsTableProps {

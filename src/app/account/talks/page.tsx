@@ -14,13 +14,18 @@ interface AccountTalksPageProps {
   searchParams: Promise<AccountTalksSearchParams>;
 }
 
-export default async function AccountTalksPage({ searchParams }: AccountTalksPageProps) {
+export default async function AccountTalksPage({
+  searchParams,
+}: AccountTalksPageProps) {
   const params = await searchParams;
 
   return (
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
-        <PageHeader description="Manage all talks across all statuses" title="Manage Talks" />
+        <PageHeader
+          description="Manage all talks across all statuses"
+          title="Manage Talks"
+        />
         <NewTalkButton />
       </div>
       <AccountTalksContent searchParams={params} />

@@ -6,7 +6,9 @@ interface EditorialProfileHeroSkeletonProps {
   children?: ReactNode;
 }
 
-export function EditorialProfileHeroSkeleton({ children }: EditorialProfileHeroSkeletonProps) {
+export function EditorialProfileHeroSkeleton({
+  children,
+}: EditorialProfileHeroSkeletonProps) {
   return (
     <Section className="relative overflow-hidden" spacing="3xl">
       <Container className="relative space-y-8">

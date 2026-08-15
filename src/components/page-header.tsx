@@ -4,25 +4,25 @@ import { cva } from 'class-variance-authority';
 
 import { cn } from '@/utils';
 
-const titleVariants = cva('text-balance tracking-tight', {
-  variants: {
-    size: {
-      sm: 'text-2xl',
-      md: 'font-base text-3xl sm:text-4xl',
-      lg: 'font-base text-4xl sm:text-5xl lg:text-6xl',
-    },
-  },
+const titleVariants = cva('tracking-tight text-balance', {
   defaultVariants: {
     size: 'md',
+  },
+  variants: {
+    size: {
+      lg: 'font-base text-4xl sm:text-5xl lg:text-6xl',
+      md: 'font-base text-3xl sm:text-4xl',
+      sm: 'text-2xl',
+    },
   },
 });
 
 const descriptionVariants = cva('text-muted-foreground', {
   variants: {
     size: {
-      sm: 'text-base',
-      md: 'mt-3 text-xl',
       lg: 'mt-4 text-xl sm:text-2xl',
+      md: 'mt-3 text-xl',
+      sm: 'text-base',
     },
   },
 });
@@ -34,12 +34,19 @@ interface PageHeaderProps {
   title: string;
 }
 
-export function PageHeader({ className, description, size = 'md', title }: PageHeaderProps) {
+export function PageHeader({
+  className,
+  description,
+  size = 'md',
+  title,
+}: PageHeaderProps) {
   return (
     <header className={cn('flex flex-col gap-4', className)}>
       <div className="max-w-prose space-y-2">
         <h1 className={titleVariants({ size })}>{title}</h1>
-        {!!description && <div className={descriptionVariants({ size })}>{description}</div>}
+        {!!description && (
+          <div className={descriptionVariants({ size })}>{description}</div>
+        )}
       </div>
     </header>
   );

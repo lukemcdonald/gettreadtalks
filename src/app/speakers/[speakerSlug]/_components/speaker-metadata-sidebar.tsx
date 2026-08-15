@@ -9,7 +9,10 @@ interface SpeakerMetadataSidebarProps {
   speaker: Speaker;
 }
 
-export function SpeakerMetadataSidebar({ hideAbout, speaker }: SpeakerMetadataSidebarProps) {
+export function SpeakerMetadataSidebar({
+  hideAbout,
+  speaker,
+}: SpeakerMetadataSidebarProps) {
   const speakerName = `${speaker.firstName} ${speaker.lastName}`;
 
   return (
@@ -17,17 +20,19 @@ export function SpeakerMetadataSidebar({ hideAbout, speaker }: SpeakerMetadataSi
       {/* About */}
       {!hideAbout && speaker.description && (
         <div className="space-y-4 sm:basis-full lg:basis-auto">
-          <h3 className="font-semibold text-muted-foreground text-xs uppercase tracking-widest">
+          <h3 className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">
             About
           </h3>
-          <p className="text-muted-foreground text-sm leading-relaxed">{speaker.description}</p>
+          <p className="text-muted-foreground text-sm leading-relaxed">
+            {speaker.description}
+          </p>
         </div>
       )}
 
       {/* Ministry */}
       {!hideAbout && (speaker.ministry || speaker.websiteUrl) && (
         <div className="space-y-4">
-          <h3 className="font-semibold text-muted-foreground text-xs uppercase tracking-widest">
+          <h3 className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">
             Ministry
           </h3>
           <SpeakerMinistryLink
@@ -41,11 +46,14 @@ export function SpeakerMetadataSidebar({ hideAbout, speaker }: SpeakerMetadataSi
 
       {/* Actions */}
       <div className="space-y-4">
-        <h3 className="font-semibold text-muted-foreground text-xs uppercase tracking-widest">
+        <h3 className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">
           Actions
         </h3>
         <div className="flex flex-wrap gap-2">
-          <ShareSpeakerButton speakerId={speaker._id} speakerName={speakerName} />
+          <ShareSpeakerButton
+            speakerId={speaker._id}
+            speakerName={speakerName}
+          />
           <FavoriteSpeakerButton speakerId={speaker._id} />
         </div>
       </div>

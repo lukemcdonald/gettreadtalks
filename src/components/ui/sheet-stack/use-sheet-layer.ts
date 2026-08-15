@@ -10,8 +10,10 @@ export function useSheetLayer(open: boolean, onClose: () => void) {
   const onCloseRef = useRef(onClose);
   const id = useId();
 
-  contextRef.current = context;
-  onCloseRef.current = onClose;
+  useEffect(() => {
+    contextRef.current = context;
+    onCloseRef.current = onClose;
+  });
 
   useEffect(() => {
     const ctx = contextRef.current;

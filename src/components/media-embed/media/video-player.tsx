@@ -21,7 +21,7 @@ export function VideoPlayer({ src, trackingContext }: VideoPlayerProps) {
 
   return (
     <div className="relative aspect-video w-full overflow-hidden rounded-lg">
-      {/* biome-ignore lint/a11y/useMediaCaption: Caption files not available for dynamically embedded media */}
+      {/* oxlint-disable-next-line jsx-a11y/media-has-caption -- no caption files for dynamically embedded media */}
       <video
         className="block h-full w-full"
         controls

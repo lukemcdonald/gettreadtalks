@@ -33,19 +33,21 @@ export function SidebarsLayout({
           <div
             className={cn(
               'space-y-6 md:col-span-3',
-              leftSidebarSticky && 'md:sticky md:top-20 md:h-fit',
+              leftSidebarSticky && 'md:sticky md:top-20 md:h-fit'
             )}
           >
             {leftSidebar}
           </div>
 
-          <div className="min-w-0 space-y-6 md:col-span-9 lg:col-span-6">{content}</div>
+          <div className="min-w-0 space-y-6 md:col-span-9 lg:col-span-6">
+            {content}
+          </div>
 
           {!!rightSidebar && (
             <div
               className={cn(
                 'space-y-6 md:col-span-full lg:col-span-3',
-                rightSidebarSticky && 'md:sticky md:top-20 md:h-fit',
+                rightSidebarSticky && 'md:sticky md:top-20 md:h-fit'
               )}
             >
               {rightSidebar}

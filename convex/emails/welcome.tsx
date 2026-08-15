@@ -10,21 +10,31 @@ export function WelcomeEmail({ name, siteUrl }: WelcomeEmailProps) {
     <EmailLayout preview={`Welcome to {site.name}, ${name}!`}>
       <Text style={paragraph}>Hi {name},</Text>
       <Text style={paragraph}>
-        Welcome to {site.name}! We're excited to have you join our community of believers seeking to
-        deepen their faith through inspiring talks and insights.
+        Welcome to {site.name}! We&apos;re excited to have you join our
+        community of believers seeking to deepen their faith through inspiring
+        talks and insights.
       </Text>
       <Text style={paragraph}>With your new account, you can:</Text>
-      <Text style={listItem}>• Access our growing library of Christian talks</Text>
-      <Text style={listItem}>• Save your favorite talks to personalized collections</Text>
-      <Text style={listItem}>• Get personalized recommendations based on your interests</Text>
-      <Text style={paragraph}>Get started by exploring some of our most popular talks:</Text>
+      <Text style={listItem}>
+        • Access our growing library of Christian talks
+      </Text>
+      <Text style={listItem}>
+        • Save your favorite talks to personalized collections
+      </Text>
+      <Text style={listItem}>
+        • Get personalized recommendations based on your interests
+      </Text>
+      <Text style={paragraph}>
+        Get started by exploring some of our most popular talks:
+      </Text>
       <Section style={buttonContainer}>
         <Button href={siteUrl} style={button}>
           Explore Talks
         </Button>
       </Section>
       <Text style={paragraph}>
-        If you have any questions or need help getting started, don't hesitate to reach out to us.
+        If you have any questions or need help getting started, don&apos;t
+        hesitate to reach out to us.
       </Text>
       <Text style={paragraph}>Blessings,</Text>
       <Text style={paragraph}>The {site.name} Team</Text>

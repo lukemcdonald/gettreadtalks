@@ -1,7 +1,7 @@
 'use client';
 
-import { useTransition } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useTransition } from 'react';
 
 import {
   Label,
@@ -48,11 +48,16 @@ export function SelectFilter({
   const searchParamValue = searchParams.get(name);
 
   // Only show "All" option if placeholder is provided
-  const allOption = placeholder ? { label: placeholder, value: FILTER_ALL } : null;
+  const allOption = placeholder
+    ? { label: placeholder, value: FILTER_ALL }
+    : null;
   const allOptions = allOption ? [allOption, ...options] : options;
 
   function getInitialValue(): string | null {
-    if (searchParamValue && allOptions.some((opt) => opt.value === searchParamValue)) {
+    if (
+      searchParamValue &&
+      allOptions.some((opt) => opt.value === searchParamValue)
+    ) {
       return searchParamValue;
     }
 

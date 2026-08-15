@@ -14,9 +14,16 @@ export function PrimaryNav({ className }: PrimaryNavProps) {
   const pathname = usePathname();
 
   return (
-    <nav aria-label="Primary navigation" className={cn('items-center', className)}>
+    <nav
+      aria-label="Primary navigation"
+      className={cn('items-center', className)}
+    >
       {NAVIGATION_LINKS.map((link) => (
-        <NavLink href={link.href} isActive={link.href === pathname} key={link.href}>
+        <NavLink
+          href={link.href}
+          isActive={link.href === pathname}
+          key={link.href}
+        >
           {link.label}
         </NavLink>
       ))}

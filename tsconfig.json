@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES2017",
+    "target": "ES2022",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -33,5 +33,5 @@
     "next-env.d.ts",
     "src/components/alphabetical-grid"
   ],
-  "exclude": ["node_modules", ".next"]
+  "exclude": [".claude", ".next", "node_modules"]
 }

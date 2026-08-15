@@ -1,8 +1,8 @@
 'use client';
 
+import type { ErrorWithEventId } from '@/services/errors/types';
 import type { ComponentType, ErrorInfo, ReactNode } from 'react';
 import type { FallbackProps } from 'react-error-boundary';
-import type { ErrorWithEventId } from '@/services/errors/types';
 
 import { ErrorBoundary as ReactErrorBoundary } from 'react-error-boundary';
 
@@ -61,9 +61,7 @@ export function ErrorBoundary({
 
   return (
     <ReactErrorBoundary
-      FallbackComponent={(props) => (
-        <FallbackComponent {...props} eventId={(props.error as ErrorWithEventId).__sentryEventId} />
-      )}
+      FallbackComponent={FallbackComponent}
       onError={handleError}
       onReset={onReset}
     >
