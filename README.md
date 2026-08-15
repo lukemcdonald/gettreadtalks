@@ -12,7 +12,7 @@ A modern, full-stack faith-based talks and content platform built with Next.js, 
 - **Email:** Resend + React Email
 - **Analytics:** PostHog
 - **Error Monitoring:** Sentry
-- **Linting/Formatting:** Biome
+- **Linting/Formatting:** Oxlint + Oxfmt (Ultracite)
 - **Deployment:** Vercel
 
 ## Getting Started
@@ -44,7 +44,8 @@ A modern, full-stack faith-based talks and content platform built with Next.js, 
 
 - [Base UI Documentation](https://base-ui.com/)
 - [Better Auth Documentation](https://better-auth.com/)
-- [Biome Documentation](https://biomejs.dev/)
+- [Oxlint Documentation](https://oxc.rs/docs/guide/usage/linter)
+- [Ultracite Documentation](https://www.ultracite.ai/docs/provider/oxlint)
 - [Convex Documentation](https://docs.convex.dev/)
 - [Coss UI Documentation](https://coss.com/ui)
 - [Next.js Documentation](https://nextjs.org/docs)
