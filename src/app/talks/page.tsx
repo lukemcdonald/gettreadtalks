@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   title: 'Talks',
 };
 
-export interface TalksPageSearchParams {
+interface TalksPageSearchParams {
   cursor?: string;
   featured?: string;
   search?: string;

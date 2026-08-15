@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   title: 'Collections',
 };
 
-export interface CollectionsPageSearchParams {
+interface CollectionsPageSearchParams {
   sort?: string;
   speaker?: string;
 }

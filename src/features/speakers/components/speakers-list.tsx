@@ -4,7 +4,7 @@ import { AlphabeticalGrid } from '@/components/alphabetical-grid';
 import { ListEmpty } from '@/components/list-empty';
 import { SpeakerCard } from '@/features/speakers/components/speaker-card';
 
-export interface SpeakerGroup {
+interface SpeakerGroup {
   items: Speaker[];
   letter: string;
   range: string;
