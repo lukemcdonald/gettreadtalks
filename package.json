@@ -14,7 +14,7 @@
     "format": "oxfmt --check .",
     "format:fix": "oxfmt .",
     "format:fix:yolo": "ultracite fix --unsafe",
-    "lint": "ultracite check .",
+    "lint": "oxlint .",
     "lint:fix": "ultracite fix .",
     "release": "convex deploy --yes",
     "release:full": "pnpm build && pnpm release",

@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+
 import { captureException } from '@/services/errors';
 
 interface GlobalErrorProps {
@@ -9,7 +11,8 @@ interface GlobalErrorProps {
 }
 
 export default function GlobalError({ error }: GlobalErrorProps) {
-  const eventId = captureException(error, { level: 'fatal' });
+  // oxlint-disable-next-line react/hook-use-state -- capture once on mount
+  const [eventId] = useState(() => captureException(error, { level: 'fatal' }));
 
   return (
     <html lang="en">

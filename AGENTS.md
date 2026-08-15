@@ -246,16 +246,16 @@ Without `match`, Base UI's `FieldError` only renders when native HTML5 `Validity
 
 ```tsx
 // ✅ Correct — error message renders when fieldState.error is set
-{
-  !!fieldState.error && (
+<>
+  {!!fieldState.error && (
     <FieldError match>{fieldState.error?.message}</FieldError>
-  );
-}
+  )}
+</>
 
 // ❌ Wrong — error message never renders (native ValidityState is valid)
-{
-  !!fieldState.error && <FieldError>{fieldState.error?.message}</FieldError>;
-}
+<>
+  {!!fieldState.error && <FieldError>{fieldState.error?.message}</FieldError>}
+</>
 ```
 
 This applies to all field components: `TextField`, `PasswordField`, `TextareaField`, `SelectField`, `CheckboxField`, `UrlField`, `NumberField`.

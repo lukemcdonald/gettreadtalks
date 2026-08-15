@@ -19,7 +19,11 @@ export function ErrorFallback({
   eventId: eventIdProp,
   resetErrorBoundary,
 }: FallbackProps & { eventId?: string }) {
-  const eventId = eventIdProp ?? (error as ErrorWithEventId).__sentryEventId;
+  const eventId =
+    eventIdProp ??
+    (error instanceof Error
+      ? (error as ErrorWithEventId).__sentryEventId
+      : undefined);
   const router = useRouter();
 
   return (

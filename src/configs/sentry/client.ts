@@ -1,33 +1,19 @@
 import {
   breadcrumbsIntegration,
   browserTracingIntegration,
-  init,
   thirdPartyErrorFilterIntegration,
 } from '@sentry/nextjs';
+import * as Sentry from '@sentry/nextjs';
 
 import { IS_DEV } from '@/constants/env';
 
 import { baseSentryConfig } from './index';
 
 if (IS_DEV && typeof window !== 'undefined') {
-  (
-    window as unknown as {
-      Sentry?: {
-        breadcrumbsIntegration: typeof breadcrumbsIntegration;
-        browserTracingIntegration: typeof browserTracingIntegration;
-        init: typeof init;
-        thirdPartyErrorFilterIntegration: typeof thirdPartyErrorFilterIntegration;
-      };
-    }
-  ).Sentry = {
-    breadcrumbsIntegration,
-    browserTracingIntegration,
-    init,
-    thirdPartyErrorFilterIntegration,
-  };
+  (window as unknown as { Sentry?: typeof Sentry }).Sentry = Sentry;
 }
 
-init({
+Sentry.init({
   ...baseSentryConfig,
   attachStacktrace: true,
   beforeSend(event) {
