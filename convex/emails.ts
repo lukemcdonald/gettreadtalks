@@ -31,6 +31,8 @@ const EMAIL_KINDS = [
 type EmailKind = (typeof EMAIL_KINDS)[number];
 const vEmailKind = v.union(...EMAIL_KINDS.map((kind) => v.literal(kind)));
 
+const EMAIL_ADDRESS_PATTERN = /[\w.+-]+@[\w-]+\.[\w.-]+/g;
+
 // Initialize Resend client
 export const resend: Resend = new Resend(components.resend, {
   // Note: testMode true = simulate emails (nothing sent), false = actually send emails
@@ -44,10 +46,8 @@ export const resend: Resend = new Resend(components.resend, {
 // ============================================
 
 /**
- * Scheduled after every send. `resend.sendEmail()` only enqueues the email;
- * the component's own batch action makes the real Resend API call later and,
- * on a permanent rejection, never throws or fires `onEmailEvent`. This checks
- * the email's own status after the fact to catch that failure class.
+ * Catches sends the Resend component silently drops: `sendEmail()` only
+ * enqueues, and a later permanent rejection never throws or fires `onEmailEvent`.
  */
 export const checkSendResult = internalAction({
   args: {
@@ -58,7 +58,10 @@ export const checkSendResult = internalAction({
   handler: async (ctx, args) => {
     const status = await resend.status(ctx, args.emailId);
 
-    if (status?.failed) {
+    // The component's own batch-rejection and retry-exhausted paths only ever
+    // set `status: "failed"`; the separate `failed` boolean is set exclusively
+    // by Resend's `email.failed` webhook event, which this check must not rely on.
+    if (status?.status === 'failed') {
       await reportEmailFailure({
         emailId: args.emailId,
         errorMessage: status.errorMessage,
@@ -262,9 +265,17 @@ function getReplyToAddress() {
 }
 
 /**
- * Sends an email and schedules its follow-up status check (see
- * `checkSendResult`) in one step, so every send function tracks failures the
- * same way.
+ * Resend's errorMessage often echoes back the offending email address (from
+ * the raw API response body or a bounce message). Strip it before this text
+ * reaches Sentry or the logs, since it must never carry a recipient address.
+ */
+function redactEmailAddresses(message: string): string {
+  return message.replaceAll(EMAIL_ADDRESS_PATTERN, '[redacted]');
+}
+
+/**
+ * Sends an email and schedules its follow-up status check in one step, so
+ * every send function tracks failures the same way.
  */
 async function sendTrackedEmail(
   ctx: ActionCtx | MutationCtx,
@@ -273,23 +284,31 @@ async function sendTrackedEmail(
 ): Promise<EmailId> {
   const emailId = await resend.sendEmail(ctx, emailParams);
 
-  await ctx.scheduler.runAfter(
-    CHECK_SEND_RESULT_DELAY_MS,
-    internal.emails.checkSendResult,
-    {
+  try {
+    await ctx.scheduler.runAfter(
+      CHECK_SEND_RESULT_DELAY_MS,
+      internal.emails.checkSendResult,
+      {
+        emailId,
+        kind,
+      }
+    );
+  } catch (error) {
+    // The email already sent successfully; a failure here is a scheduling
+    // problem, not a send failure, so it must not surface as one to callers.
+    console.error(
+      'Failed to schedule checkSendResult:',
       emailId,
-      kind,
-    }
-  );
+      getErrorMessage(error)
+    );
+  }
 
   return emailId;
 }
 
 /**
- * Derives the ingest envelope URL from a Sentry DSN, per
- * https://develop.sentry.dev/sdk/foundations/transport/envelopes/. The DSN
- * itself travels in the envelope header for auth, so the public key isn't
- * needed separately.
+ * Derives the ingest envelope URL from a Sentry DSN. The DSN itself travels
+ * in the envelope header for auth, so the public key isn't needed separately.
  */
 function parseSentryDsn(dsn: string): { ingestUrl: string } | null {
   try {
@@ -309,17 +328,18 @@ function parseSentryDsn(dsn: string): { ingestUrl: string } | null {
 }
 
 /**
- * Fallback path for Sentry visibility on Convex's Free plan, which has no
- * native exception reporting integration. Posts a minimal event envelope
- * directly over fetch. Never includes the raw recipient address or a reset
- * URL/token, only Resend's own error message, the email kind, and its id.
- * Fire and forget: a Sentry outage must never affect the email send path.
+ * Fallback Sentry reporting for Convex's Free plan (no native exception
+ * integration). Fire and forget: a Sentry outage must never affect sends.
  */
 async function reportEmailFailure(params: {
   emailId: EmailId;
   errorMessage: string | null;
   kind: EmailKind;
 }): Promise<void> {
+  const errorMessage = params.errorMessage
+    ? redactEmailAddresses(params.errorMessage)
+    : null;
+
   try {
     const dsn = process.env.SENTRY_DSN;
     const parsedDsn = dsn ? parseSentryDsn(dsn) : null;
@@ -329,7 +349,7 @@ async function reportEmailFailure(params: {
         'Email send failed and SENTRY_DSN is not configured or malformed:',
         params.kind,
         params.emailId,
-        params.errorMessage
+        errorMessage
       );
       return;
     }
@@ -343,7 +363,7 @@ async function reportEmailFailure(params: {
         values: [
           {
             type: 'EmailSendFailed',
-            value: `Resend permanently rejected a "${params.kind}" email (${params.emailId}): ${params.errorMessage ?? 'unknown error'}`,
+            value: `Resend permanently rejected a "${params.kind}" email (${params.emailId}): ${errorMessage ?? 'unknown error'}`,
           },
         ],
       },
@@ -364,6 +384,7 @@ async function reportEmailFailure(params: {
       body: envelope,
       headers: { 'Content-Type': 'application/x-sentry-envelope' },
       method: 'POST',
+      signal: AbortSignal.timeout(5000),
     });
 
     if (!response.ok) {
