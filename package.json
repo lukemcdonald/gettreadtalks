@@ -2,6 +2,7 @@
   "name": "treadtalks",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "next build",
     "check": "ultracite check .",
@@ -18,7 +19,7 @@
     "release": "convex deploy --yes",
     "release:full": "pnpm build && pnpm release",
     "start": "next start",
-    "style": "oxfmt . && ultracite fix .",
+    "style": "ultracite fix .",
     "typecheck": "tsc --noEmit",
     "update:ui": "pnpm dlx shadcn@latest add @coss/ui --overwrite",
     "update:ui:styles": "pnpm dlx shadcn@latest add @coss/colors-neutral --overwrite"
