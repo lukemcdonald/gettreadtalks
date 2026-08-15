@@ -1,10 +1,14 @@
 import type { Doc } from '../../_generated/dataModel';
 
-import { v } from 'convex/values';
 import { getOneFrom } from 'convex-helpers/server/relationships';
+import { v } from 'convex/values';
 
 import { mutation } from '../../_generated/server';
-import { throwDuplicateSlug, throwNotFound, throwValidationError } from '../../lib/errors';
+import {
+  throwDuplicateSlug,
+  throwNotFound,
+  throwValidationError,
+} from '../../lib/errors';
 import { generateSlug, slugExists, slugify } from '../../lib/utils';
 import { requireAuth } from '../auth/utils';
 
@@ -61,11 +65,13 @@ export const destroyCollection = mutation({
       'talks',
       'by_collectionId_and_status',
       collectionId,
-      'collectionId',
+      'collectionId'
     );
 
     if (talksWithCollection) {
-      throwValidationError('Cannot delete collection: collection has associated talks');
+      throwValidationError(
+        'Cannot delete collection: collection has associated talks'
+      );
     }
 
     // Hard delete the collection
@@ -93,7 +99,10 @@ export const updateCollection = mutation({
     await requireAuth(ctx);
 
     const updates: Partial<Doc<'collections'>> = rest;
-    const collection: Doc<'collections'> | null = await ctx.db.get('collections', collectionId);
+    const collection: Doc<'collections'> | null = await ctx.db.get(
+      'collections',
+      collectionId
+    );
 
     if (!collection) {
       throwNotFound('Collection not found', {
@@ -112,7 +121,10 @@ export const updateCollection = mutation({
 
       if (newSlug !== collection.slug) {
         if (await slugExists(ctx, 'collections', newSlug, collectionId)) {
-          throwDuplicateSlug('A collection with this slug already exists', 'slug');
+          throwDuplicateSlug(
+            'A collection with this slug already exists',
+            'slug'
+          );
         }
 
         updates.slug = newSlug;
@@ -123,7 +135,12 @@ export const updateCollection = mutation({
         throwValidationError('Title cannot be empty', 'title');
       }
 
-      const newSlug = await generateSlug(ctx, 'collections', updates.title, collectionId);
+      const newSlug = await generateSlug(
+        ctx,
+        'collections',
+        updates.title,
+        collectionId
+      );
 
       if (newSlug !== collection.slug) {
         updates.slug = newSlug;

@@ -22,9 +22,11 @@ authComponent.registerRoutes(http, createAuth);
  * @returns The response object.
  */
 http.route({
-  path: '/resend-webhook',
+  handler: httpAction(
+    async (ctx, req) => await resend.handleResendEventWebhook(ctx, req)
+  ),
   method: 'POST',
-  handler: httpAction(async (ctx, req) => await resend.handleResendEventWebhook(ctx, req)),
+  path: '/resend-webhook',
 });
 
 export default http;

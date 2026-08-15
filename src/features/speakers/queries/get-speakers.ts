@@ -7,7 +7,7 @@ import { api } from '@/convex/_generated/api';
 import { speakerRoles } from '@/convex/model/speakers/validators';
 
 type SortOption = 'alphabetical' | 'featured';
-const VALID_SORT_OPTIONS = ['alphabetical', 'featured'];
+const VALID_SORT_OPTIONS = new Set(['alphabetical', 'featured']);
 
 interface GetSpeakersProps {
   limit?: number;
@@ -26,7 +26,7 @@ export async function getSpeakers(args?: GetSpeakersProps) {
   const { limit, role, search, sort } = args ?? {};
 
   // Validate sort option from URL params (untrusted input)
-  const sortOption = VALID_SORT_OPTIONS.includes(sort as SortOption)
+  const sortOption = VALID_SORT_OPTIONS.has(sort as SortOption)
     ? (sort as SortOption)
     : 'alphabetical';
 

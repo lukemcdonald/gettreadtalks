@@ -23,14 +23,16 @@ interface PageBreadcrumbProps {
  * Falsy entries are filtered out, supporting conditional segments.
  */
 export function PageBreadcrumb({ segments }: PageBreadcrumbProps) {
-  const resolved = segments.filter((segment): segment is BreadcrumbSegment => !!segment);
+  const resolved = segments.filter(
+    (segment): segment is BreadcrumbSegment => !!segment
+  );
 
   if (resolved.length === 0) {
     return null;
   }
 
-  const [current, ...ancestors] = [...resolved].reverse();
-  const links = ancestors.reverse();
+  const [current, ...ancestors] = resolved.toReversed();
+  const links = ancestors.toReversed();
 
   return (
     <Breadcrumb>
@@ -38,7 +40,9 @@ export function PageBreadcrumb({ segments }: PageBreadcrumbProps) {
         {links.flatMap((segment) => [
           <BreadcrumbItem key={segment.href ?? segment.label}>
             {segment.href ? (
-              <BreadcrumbLink render={<Link href={segment.href} />}>{segment.label}</BreadcrumbLink>
+              <BreadcrumbLink render={<Link href={segment.href} />}>
+                {segment.label}
+              </BreadcrumbLink>
             ) : (
               <BreadcrumbPage>{segment.label}</BreadcrumbPage>
             )}

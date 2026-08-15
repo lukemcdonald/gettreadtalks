@@ -21,7 +21,9 @@ export default async function AccountPage() {
       <Card>
         <CardHeader>
           <CardTitle>Profile settings</CardTitle>
-          <CardDescription>Update the name and email associated with your account.</CardDescription>
+          <CardDescription>
+            Update the name and email associated with your account.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <ProfileForm currentName={user?.name ?? ''} />
@@ -31,7 +33,9 @@ export default async function AccountPage() {
 
         <CardHeader>
           <CardTitle>Email settings</CardTitle>
-          <CardDescription>Manage the email address associated with your account.</CardDescription>
+          <CardDescription>
+            Manage the email address associated with your account.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <EmailForm currentEmail={user?.email ?? ''} />
@@ -41,7 +45,9 @@ export default async function AccountPage() {
 
         <CardHeader>
           <CardTitle>Password settings</CardTitle>
-          <CardDescription>Update the password associated with your account.</CardDescription>
+          <CardDescription>
+            Update the password associated with your account.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <PasswordForm />
@@ -53,7 +59,8 @@ export default async function AccountPage() {
         <CardHeader>
           <CardTitle>Delete your account</CardTitle>
           <CardDescription>
-            Once you delete your account, you will lose all data associated with it.
+            Once you delete your account, you will lose all data associated with
+            it.
           </CardDescription>
         </CardHeader>
         <CardContent>

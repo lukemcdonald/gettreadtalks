@@ -1,5 +1,9 @@
+import type {
+  ErrorReportOptions,
+  ErrorWithEventId,
+  SeverityLevel,
+} from './types';
 import type { Scope } from '@sentry/nextjs';
-import type { ErrorReportOptions, ErrorWithEventId, SeverityLevel } from './types';
 
 import {
   addBreadcrumb as sentryAddBreadcrumb,
@@ -36,7 +40,7 @@ import {
  */
 export function captureException(
   error: unknown,
-  options: ErrorReportOptions = {},
+  options: ErrorReportOptions = {}
 ): string | undefined {
   const { transactionName, level = 'error', ...scopeOptions } = options;
 
@@ -65,7 +69,11 @@ export function captureException(
  *   email: user.email,
  * });
  */
-export function setUserContext(user: { id: string; email?: string; username?: string }): void {
+export function setUserContext(user: {
+  id: string;
+  email?: string;
+  username?: string;
+}): void {
   sentrySetUser(user);
 }
 
@@ -100,7 +108,7 @@ export function clearUserContext(): void {
  */
 function applyScopeOptions(
   scope: Scope,
-  options: Omit<ErrorReportOptions, 'transactionName'>,
+  options: Omit<ErrorReportOptions, 'transactionName'>
 ): void {
   const { context, extras, fingerprint, level = 'info', tags, user } = options;
 
@@ -146,7 +154,7 @@ function applyScopeOptions(
  */
 export function captureMessage(
   message: string,
-  options: Omit<ErrorReportOptions, 'transactionName'> = {},
+  options: Omit<ErrorReportOptions, 'transactionName'> = {}
 ): string | undefined {
   return sentryWithScope((scope) => {
     applyScopeOptions(scope, options);

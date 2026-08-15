@@ -8,7 +8,8 @@ import { getSpeakers } from '@/features/speakers/queries/get-speakers';
 import { getSpeakersGrouped } from '@/features/speakers/queries/get-speakers-grouped';
 
 export const metadata: Metadata = {
-  description: 'Discover faithful ministers of the Gospel and be strengthened by their teaching.',
+  description:
+    'Discover faithful ministers of the Gospel and be strengthened by their teaching.',
   title: 'Speakers',
 };
 
@@ -20,7 +21,9 @@ interface SpeakersPageProps {
   }>;
 }
 
-export default async function SpeakersPage({ searchParams }: SpeakersPageProps) {
+export default async function SpeakersPage({
+  searchParams,
+}: SpeakersPageProps) {
   const params = await searchParams;
 
   const { role, search, sort } = params;
@@ -34,7 +37,12 @@ export default async function SpeakersPage({ searchParams }: SpeakersPageProps) 
 
   return (
     <SidebarLayout
-      content={<SpeakersList groups={speakerGroups} hasActiveFilters={hasActiveFilters} />}
+      content={
+        <SpeakersList
+          groups={speakerGroups}
+          hasActiveFilters={hasActiveFilters}
+        />
+      }
       header={
         <PageHeader
           description={`Listen to ${speakers.length} faithful ambassadors of Christ and be blessed.`}

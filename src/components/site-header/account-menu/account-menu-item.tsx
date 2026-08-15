@@ -1,7 +1,12 @@
 'use client';
 
 import type { Route } from 'next';
-import type { ComponentProps, ComponentType, ReactElement, SVGProps } from 'react';
+import type {
+  ComponentProps,
+  ComponentType,
+  ReactElement,
+  SVGProps,
+} from 'react';
 
 import Link from 'next/link';
 

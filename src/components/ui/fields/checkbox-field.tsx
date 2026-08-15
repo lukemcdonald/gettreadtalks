@@ -4,7 +4,13 @@ import type { Control, FieldPath, FieldValues } from 'react-hook-form';
 
 import { Controller } from 'react-hook-form';
 
-import { Checkbox, Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui';
+import {
+  Checkbox,
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+} from '@/components/ui';
 
 interface CheckboxFieldProps<T extends FieldValues> {
   control: Control<T>;
@@ -47,7 +53,9 @@ export function CheckboxField<T extends FieldValues>({
             {label}
           </FieldLabel>
           {!!description && <FieldDescription>{description}</FieldDescription>}
-          {!!fieldState.error && <FieldError match>{fieldState.error?.message}</FieldError>}
+          {!!fieldState.error && (
+            <FieldError match>{fieldState.error?.message}</FieldError>
+          )}
         </Field>
       )}
     />

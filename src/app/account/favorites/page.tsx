@@ -16,7 +16,11 @@ import {
   TabsTab,
 } from '@/components/ui';
 import { getUserFavorites } from '@/features/users/queries/get-user-favorites';
-import { FavoriteClipRow, FavoriteSpeakerRow } from './_components/favorite-entity-row';
+
+import {
+  FavoriteClipRow,
+  FavoriteSpeakerRow,
+} from './_components/favorite-entity-row';
 import { FavoriteTalkRow } from './_components/favorite-talk-row';
 import { FavoritesTabPanel } from './_components/favorites-tab-panel';
 
@@ -30,7 +34,10 @@ function FavoritesTab({ count, label, value }: FavoritesTabProps) {
   return (
     <TabsTab value={value}>
       {label}
-      <Badge className="not-in-data-active:text-muted-foreground" variant="outline">
+      <Badge
+        className="not-in-data-active:text-muted-foreground"
+        variant="outline"
+      >
         {count}
       </Badge>
     </TabsTab>
@@ -105,7 +112,8 @@ export default async function FavoritesPage() {
         <CardTitle>Favorites</CardTitle>
         {total > 0 && (
           <CardDescription>
-            {talks.length} talks · {speakers.length} speakers · {clips.length} clips
+            {talks.length} talks · {speakers.length} speakers · {clips.length}{' '}
+            clips
           </CardDescription>
         )}
       </CardHeader>
@@ -117,7 +125,9 @@ export default async function FavoritesPage() {
           <Empty>
             <EmptyHeader>
               <EmptyTitle>No favorites yet</EmptyTitle>
-              <EmptyDescription>Start exploring to build your collection!</EmptyDescription>
+              <EmptyDescription>
+                Start exploring to build your collection!
+              </EmptyDescription>
             </EmptyHeader>
           </Empty>
         </div>

@@ -21,6 +21,10 @@ interface SelectOption {
   value: string;
 }
 
+function toSelectValue(value: string | null | undefined): string {
+  return value ?? '';
+}
+
 interface SelectFieldProps<T extends FieldValues> {
   control: Control<T>;
   description?: string;
@@ -78,16 +82,18 @@ export function SelectField<T extends FieldValues>({
             items={options}
             name={field.name}
             onValueChange={(value) => {
-              const normalizedValue = value ?? '';
-              field.onChange(normalizedValue);
-              if (onChange) {
-                onChange(normalizedValue);
-              }
+              const nextValue = toSelectValue(value);
+              field.onChange(nextValue);
+              onChange?.(nextValue);
             }}
             required={required}
             value={field.value ?? ''}
           >
-            <SelectTrigger aria-invalid={fieldState.invalid} id={field.name} size="lg">
+            <SelectTrigger
+              aria-invalid={fieldState.invalid}
+              id={field.name}
+              size="lg"
+            >
               <SelectValue />
             </SelectTrigger>
             <SelectPopup>
@@ -98,7 +104,9 @@ export function SelectField<T extends FieldValues>({
               ))}
             </SelectPopup>
           </Select>
-          {!!fieldState.error && <FieldError match>{fieldState.error?.message}</FieldError>}
+          {!!fieldState.error && (
+            <FieldError match>{fieldState.error?.message}</FieldError>
+          )}
         </Field>
       )}
     />

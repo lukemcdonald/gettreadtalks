@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
 import { TabsPanel } from '@/components/ui';
+
 import { AccountTable } from '../../_components/account-table';
 
 interface FavoritesTabPanelProps<T> {

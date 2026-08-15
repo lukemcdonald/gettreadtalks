@@ -13,7 +13,11 @@ interface EditTalkSheetRouteProps {
   talk: Talk;
 }
 
-export function EditTalkSheetRoute({ collections, speakers, talk }: EditTalkSheetRouteProps) {
+export function EditTalkSheetRoute({
+  collections,
+  speakers,
+  talk,
+}: EditTalkSheetRouteProps) {
   const { handleOpenChange, handleSuccess } = useSheetRoute();
 
   return (

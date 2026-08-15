@@ -1,6 +1,5 @@
 import { SidebarLayout } from '@/components/layouts';
 import { SidebarContent } from '@/components/sidebar-content';
-import { MediaCardSkeleton } from '@/components/skeletons';
 import { Skeleton } from '@/components/ui';
 import { TalksListSkeleton } from '@/features/talks/components/talks-list-skeleton';
 

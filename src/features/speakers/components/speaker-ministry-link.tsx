@@ -34,7 +34,7 @@ export function SpeakerMinistryLink({
       <Link
         className={cn(
           'inline-flex items-center gap-1.5 transition-colors hover:underline',
-          className,
+          className
         )}
         href={websiteUrl}
         onClick={() => handleClick(websiteUrl, 'ministry')}
@@ -55,7 +55,7 @@ export function SpeakerMinistryLink({
       <Link
         className={cn(
           'inline-flex items-center gap-1.5 transition-colors hover:text-white',
-          className,
+          className
         )}
         href={websiteUrl}
         onClick={() => handleClick(websiteUrl, 'website')}

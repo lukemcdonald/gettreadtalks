@@ -29,7 +29,10 @@ import { captureException } from '@/services/errors/client';
 import { getSafeRedirect } from '@/utils';
 
 const loginFormSchema = z.object({
-  email: z.string().min(1, 'Email is required.').email('Please enter a valid email.'),
+  email: z
+    .string()
+    .min(1, 'Email is required.')
+    .email('Please enter a valid email.'),
   password: z.string().min(1, 'Password is required.'),
 });
 
@@ -57,18 +60,24 @@ export function LoginForm({ ...delegated }: ComponentPropsWithoutRef<'form'>) {
       if (data) {
         track('signed_in');
         // Use window.location.href to force full page reload and set JWT cookie
-        window.location.href = redirectTo;
+        window.location.assign(redirectTo);
       } else {
-        form.setError('root', { message: signInError?.message ?? AUTH_ERRORS.INVALID_CREDENTIALS });
+        form.setError('root', {
+          message: signInError?.message ?? AUTH_ERRORS.INVALID_CREDENTIALS,
+        });
       }
-    } catch (err) {
-      captureException(err, { fingerprint: ['auth', 'signIn'] });
+    } catch (error) {
+      captureException(error, { fingerprint: ['auth', 'signIn'] });
       form.setError('root', { message: AUTH_ERRORS.NETWORK_ERROR });
     }
   });
 
   return (
-    <Form className="flex w-full flex-col gap-6" onSubmit={handleSubmit} {...delegated}>
+    <Form
+      className="flex w-full flex-col gap-6"
+      onSubmit={handleSubmit}
+      {...delegated}
+    >
       {!!errors.root && (
         <Alert variant="error">
           <CircleAlertIcon />
@@ -89,17 +98,27 @@ export function LoginForm({ ...delegated }: ComponentPropsWithoutRef<'form'>) {
             type="email"
             {...form.register('email')}
           />
-          {!!errors.email && <FieldError match>{errors.email.message}</FieldError>}
+          {!!errors.email && (
+            <FieldError match>{errors.email.message}</FieldError>
+          )}
         </Field>
 
         <Field invalid={!!errors.password}>
           <FieldLabel>
             Password <span className="text-destructive">*</span>
           </FieldLabel>
-          <PasswordInput autoComplete="current-password" {...form.register('password')} />
-          {!!errors.password && <FieldError match>{errors.password.message}</FieldError>}
+          <PasswordInput
+            autoComplete="current-password"
+            {...form.register('password')}
+          />
+          {!!errors.password && (
+            <FieldError match>{errors.password.message}</FieldError>
+          )}
           <div className="flex justify-end">
-            <Link className="text-muted-foreground text-sm hover:underline" href="/forgot-password">
+            <Link
+              className="text-muted-foreground text-sm hover:underline"
+              href="/forgot-password"
+            >
               Forgot password?
             </Link>
           </div>
@@ -109,8 +128,8 @@ export function LoginForm({ ...delegated }: ComponentPropsWithoutRef<'form'>) {
           <Button loading={isSubmitting} type="submit">
             Sign In
           </Button>
-          <p className="text-center text-muted-foreground text-sm">
-            Don't have an account?{' '}
+          <p className="text-muted-foreground text-center text-sm">
+            Don&apos;t have an account?{' '}
             <Link className="text-foreground hover:underline" href="/register">
               Create one
             </Link>

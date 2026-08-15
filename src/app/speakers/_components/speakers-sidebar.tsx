@@ -12,9 +12,13 @@ interface SpeakersSidebarProps {
 }
 
 export function SpeakersSidebar({ speakers }: SpeakersSidebarProps) {
-  const roles = Array.from(
-    new Set(speakers.map(({ role }) => role).filter((role): role is SpeakerRole => !!role)),
-  ).sort();
+  const roles = [
+    ...new Set(
+      speakers
+        .map(({ role }) => role)
+        .filter((role): role is SpeakerRole => !!role)
+    ),
+  ].toSorted();
 
   const roleOptions = roles.map((role) => ({ label: role, value: role }));
 
@@ -27,17 +31,35 @@ export function SpeakersSidebar({ speakers }: SpeakersSidebarProps) {
     <SidebarContent className="space-y-4">
       {/* Mobile: inline search + icon filter button */}
       <div className="flex items-center gap-2 md:hidden">
-        <SearchInput className="flex-1" paramName="search" placeholder="Search speakers..." />
+        <SearchInput
+          className="flex-1"
+          paramName="search"
+          placeholder="Search speakers..."
+        />
         <MobileFilterSheet variant="icon">
-          <SelectFilter label="Role" name="role" options={roleOptions} placeholder="All Roles" />
+          <SelectFilter
+            label="Role"
+            name="role"
+            options={roleOptions}
+            placeholder="All Roles"
+          />
           <SortSelect label="Sort by" options={sortOptions} />
         </MobileFilterSheet>
       </div>
 
       {/* Desktop: full sidebar */}
       <div className="hidden md:flex md:flex-col md:gap-4">
-        <SearchInput label="Search" paramName="search" placeholder="Search speakers..." />
-        <SelectFilter label="Role" name="role" options={roleOptions} placeholder="All Roles" />
+        <SearchInput
+          label="Search"
+          paramName="search"
+          placeholder="Search speakers..."
+        />
+        <SelectFilter
+          label="Role"
+          name="role"
+          options={roleOptions}
+          placeholder="All Roles"
+        />
         <SortSelect label="Sort by" options={sortOptions} />
       </div>
     </SidebarContent>

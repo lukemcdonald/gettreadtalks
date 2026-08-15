@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState, useTransition } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useRef, useState, useTransition } from 'react';
 
 /**
  * Custom hook for managing a debounced search parameter in the URL.
@@ -22,15 +22,17 @@ export function useDebouncedSearchParam(paramName: string, delay = 300) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [_isPending, startTransition] = useTransition();
-  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const pathnameRef = useRef(pathname);
   const searchParamsRef = useRef(searchParams);
   const routerRef = useRef(router);
 
-  pathnameRef.current = pathname;
-  searchParamsRef.current = searchParams;
-  routerRef.current = router;
+  useEffect(() => {
+    pathnameRef.current = pathname;
+    routerRef.current = router;
+    searchParamsRef.current = searchParams;
+  });
 
   const urlValue = searchParams.get(paramName) ?? '';
   const [localValue, setLocalValue] = useState(urlValue);
@@ -71,9 +73,12 @@ export function useDebouncedSearchParam(paramName: string, delay = 300) {
 
       startTransition(() => {
         const query = params.toString();
-        routerRef.current.push(query ? `${pathnameRef.current}?${query}` : pathnameRef.current, {
-          scroll: false,
-        });
+        routerRef.current.push(
+          query ? `${pathnameRef.current}?${query}` : pathnameRef.current,
+          {
+            scroll: false,
+          }
+        );
       });
     }, delay);
 

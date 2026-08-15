@@ -1,20 +1,23 @@
 'use server';
 
 import 'server-only';
-
-import type { ActionResult } from '@/lib/forms/types';
 import type { TopicId } from '../types';
+import type { ActionResult } from '@/lib/forms/types';
 
 import { updateTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
-import { mapConvexErrorToFormErrors, mapZodErrors } from '@/lib/forms/validation';
+import {
+  mapConvexErrorToFormErrors,
+  mapZodErrors,
+} from '@/lib/forms/validation';
 import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
+
 import { topicFormSchema } from '../schemas/topic-form';
 
 export async function updateTopicAction(
   data: unknown,
-  topicId: TopicId,
+  topicId: TopicId
 ): Promise<ActionResult<{ topicId: TopicId }>> {
   await requireAdminUser();
 
@@ -22,8 +25,8 @@ export async function updateTopicAction(
 
   if (!parsed.success) {
     return {
-      success: false,
       errors: mapZodErrors(parsed.error),
+      success: false,
     };
   }
 
@@ -36,13 +39,13 @@ export async function updateTopicAction(
     updateTag('topics');
 
     return {
-      success: true,
       data: { topicId },
+      success: true,
     };
   } catch (error) {
     return {
-      success: false,
       errors: mapConvexErrorToFormErrors(error),
+      success: false,
     };
   }
 }

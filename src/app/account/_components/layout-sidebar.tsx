@@ -34,7 +34,9 @@ export async function LayoutSidebar() {
 
         <p className="flex flex-col truncate">
           <span className="text-muted-foreground text-xs">Signed in as</span>
-          <span className="truncate font-semibold text-foreground text-sm">{signedInAs}</span>
+          <span className="text-foreground truncate text-sm font-semibold">
+            {signedInAs}
+          </span>
         </p>
       </div>
 
@@ -43,7 +45,7 @@ export async function LayoutSidebar() {
 
         {!!isAdminUser && (
           <div className="space-y-3">
-            <h3 className="font-semibold text-muted-foreground text-xs uppercase tracking-wider">
+            <h3 className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">
               Content Management
             </h3>
             <SidebarNav items={ADMIN_NAV_ITEMS} />

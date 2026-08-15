@@ -11,5 +11,7 @@ export async function getCollection(id: CollectionId) {
   cacheLife('hours');
   cacheTag('collections');
 
-  return await fetchAuthQuery(api.collections.getCollection, { collectionId: id });
+  return await fetchAuthQuery(api.collections.getCollection, {
+    collectionId: id,
+  });
 }

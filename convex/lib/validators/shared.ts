@@ -8,7 +8,7 @@ export const statusType = v.union(
   v.literal('approved'),
   v.literal('archived'),
   v.literal('backlog'),
-  v.literal('published'),
+  v.literal('published')
 );
 
 /**

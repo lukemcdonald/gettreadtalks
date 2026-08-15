@@ -54,16 +54,16 @@ export default async function HomePage() {
         <Section spacing="xl">
           <Container>
             <FeaturedGrid
-              columns={{ default: 1, sm: 1, md: 2, lg: 2, xl: 2 }}
+              columns={{ default: 1, lg: 2, md: 2, sm: 1, xl: 2 }}
               description={
                 <>
-                  <strong>Don't know what to listen to?</strong> Try starting with one of these
-                  favorites.
+                  <strong>Don&apos;t know what to listen to?</strong> Try
+                  starting with one of these favorites.
                 </>
               }
               quickLinks={[
-                { label: 'All Talks', href: '/talks' },
-                { label: 'Featured Talks', href: '/talks?featured=true' },
+                { href: '/talks', label: 'All Talks' },
+                { href: '/talks?featured=true', label: 'Featured Talks' },
               ]}
               title="Featured Talks"
             >
@@ -77,11 +77,11 @@ export default async function HomePage() {
         <Section spacing="xl">
           <Container>
             <FeaturedGrid
-              columns={{ default: 1, sm: 2, md: 3, lg: 3, xl: 3 }}
+              columns={{ default: 1, lg: 3, md: 3, sm: 2, xl: 3 }}
               description="Have you listened to one of these faithful ministers of the Gospel?"
               quickLinks={[
-                { label: 'All Speakers', href: '/speakers' },
-                { label: 'Featured Speakers', href: '/speakers?sort=featured' },
+                { href: '/speakers', label: 'All Speakers' },
+                { href: '/speakers?sort=featured', label: 'Featured Speakers' },
               ]}
               title="Featured Speakers"
             >

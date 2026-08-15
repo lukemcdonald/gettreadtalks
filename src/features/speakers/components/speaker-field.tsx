@@ -1,10 +1,10 @@
 'use client';
 
-import type { Control, FieldPath, FieldValues } from 'react-hook-form';
 import type { SpeakerId, SpeakerListItem } from '@/features/speakers/types';
+import type { Control, FieldPath, FieldValues } from 'react-hook-form';
 
-import { useState } from 'react';
 import { PlusIcon } from 'lucide-react';
+import { useState } from 'react';
 import { Controller } from 'react-hook-form';
 
 import {
@@ -22,6 +22,7 @@ import {
 } from '@/components/ui';
 import { SpeakerAvatar } from '@/features/speakers/components/speaker-avatar';
 import { getSpeakerName } from '@/features/speakers/utils';
+
 import { CreateSpeakerSheet } from './create-speaker-sheet';
 
 interface SpeakerFieldProps<T extends FieldValues> {
@@ -44,9 +45,10 @@ export function SpeakerField<T extends FieldValues>({
   speakers: initialSpeakers,
 }: SpeakerFieldProps<T>) {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
-  const [localSpeakers, setLocalSpeakers] = useState<SpeakerListItem[]>(initialSpeakers);
+  const [localSpeakers, setLocalSpeakers] =
+    useState<SpeakerListItem[]>(initialSpeakers);
 
-  const sortedSpeakers = [...localSpeakers].sort((a, b) => {
+  const sortedSpeakers = localSpeakers.toSorted((a, b) => {
     const nameA = getSpeakerName(a).toLowerCase();
     const nameB = getSpeakerName(b).toLowerCase();
     return nameA.localeCompare(nameB);
@@ -57,7 +59,10 @@ export function SpeakerField<T extends FieldValues>({
       control={control}
       name={name}
       render={({ field, fieldState }) => {
-        const handleSpeakerCreated = (speakerId: SpeakerId, newSpeaker: SpeakerListItem) => {
+        const handleSpeakerCreated = (
+          speakerId: SpeakerId,
+          newSpeaker: SpeakerListItem
+        ) => {
           setLocalSpeakers((prev) => [...prev, newSpeaker]);
           field.onChange(speakerId);
           if (onSpeakerCreated) {
@@ -72,11 +77,15 @@ export function SpeakerField<T extends FieldValues>({
               <FieldLabel htmlFor={field.name} required={required}>
                 {label}
               </FieldLabel>
-              {!!description && <FieldDescription>{description}</FieldDescription>}
+              {!!description && (
+                <FieldDescription>{description}</FieldDescription>
+              )}
 
               <Combobox
                 filter={(itemValue: SpeakerId, query: string) => {
-                  const speaker = sortedSpeakers.find((s) => s._id === itemValue);
+                  const speaker = sortedSpeakers.find(
+                    (s) => s._id === itemValue
+                  );
                   if (!speaker) {
                     return false;
                   }
@@ -85,7 +94,9 @@ export function SpeakerField<T extends FieldValues>({
                 }}
                 items={sortedSpeakers.map((s) => s._id)}
                 itemToStringLabel={(itemValue: SpeakerId) => {
-                  const speaker = sortedSpeakers.find((s) => s._id === itemValue);
+                  const speaker = sortedSpeakers.find(
+                    (s) => s._id === itemValue
+                  );
                   return speaker ? getSpeakerName(speaker) : '';
                 }}
                 onValueChange={(selected: SpeakerId | null) => {
@@ -114,16 +125,24 @@ export function SpeakerField<T extends FieldValues>({
                   </ComboboxEmpty>
                   <ComboboxList>
                     {(itemValue: SpeakerId) => {
-                      const speaker = sortedSpeakers.find((s) => s._id === itemValue);
+                      const speaker = sortedSpeakers.find(
+                        (s) => s._id === itemValue
+                      );
                       if (!speaker) {
                         return null;
                       }
                       return (
                         <ComboboxItem key={speaker._id} value={speaker._id}>
                           <div className="flex items-center gap-3">
-                            <SpeakerAvatar rounded="full" size="sm" speaker={speaker} />
+                            <SpeakerAvatar
+                              rounded="full"
+                              size="sm"
+                              speaker={speaker}
+                            />
                             <div className="flex flex-col">
-                              <span className="font-medium">{getSpeakerName(speaker)}</span>
+                              <span className="font-medium">
+                                {getSpeakerName(speaker)}
+                              </span>
                               {!!speaker.role && (
                                 <span className="text-muted-foreground text-xs">
                                   {speaker.role}
@@ -138,7 +157,9 @@ export function SpeakerField<T extends FieldValues>({
                 </ComboboxPopup>
               </Combobox>
 
-              {!!fieldState.error?.message && <FieldError>{fieldState.error.message}</FieldError>}
+              {!!fieldState.error?.message && (
+                <FieldError>{fieldState.error.message}</FieldError>
+              )}
             </Field>
 
             <CreateSpeakerSheet

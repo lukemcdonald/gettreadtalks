@@ -6,7 +6,8 @@ import { Container, Section } from '@/components/ui';
 import { getClips } from '@/features/clips/queries/get-clips';
 
 export const metadata: Metadata = {
-  description: 'Short Christ centered clips — quick encouragement from the best talks.',
+  description:
+    'Short Christ centered clips — quick encouragement from the best talks.',
   title: 'Clips',
 };
 

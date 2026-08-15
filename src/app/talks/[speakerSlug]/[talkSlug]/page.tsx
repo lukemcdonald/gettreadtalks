@@ -7,7 +7,6 @@ import { TalkHero } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-
 import { JsonLd } from '@/components/json-ld';
 import { EditorialProfileLayout } from '@/components/layouts';
 import { isVideoMediaType } from '@/components/media-embed';
-import { PageBreadcrumb } from '@/components/ui';
 import { site } from '@/configs/site';
 import { getRandomTalksBySpeaker } from '@/features/talks/queries/get-random-talks-by-speaker';
 import { getTalkBySlug } from '@/features/talks/queries/get-talk-by-slug';
@@ -19,7 +18,9 @@ interface TalkPageProps {
   }>;
 }
 
-export async function generateMetadata({ params }: TalkPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: TalkPageProps): Promise<Metadata> {
   const { speakerSlug, talkSlug } = await params;
   const talkResult = await getTalkBySlug(speakerSlug, talkSlug);
 
@@ -31,7 +32,9 @@ export async function generateMetadata({ params }: TalkPageProps): Promise<Metad
   const speakerName = speaker ? `${speaker.firstName} ${speaker.lastName}` : '';
 
   return {
-    description: talk.description ?? (speakerName ? `A talk by ${speakerName}.` : undefined),
+    description:
+      talk.description ??
+      (speakerName ? `A talk by ${speakerName}.` : undefined),
     openGraph: speaker?.imageUrl
       ? {
           images: [
@@ -59,9 +62,13 @@ export default async function TalkPage({ params }: TalkPageProps) {
   const { clips, collection, speaker, talk, topics } = talkResult;
 
   // Fetch related talks from same speaker
-  const relatedTalks = speaker ? await getRandomTalksBySpeaker(speaker._id, talk._id, 5) : [];
+  const relatedTalks = speaker
+    ? await getRandomTalksBySpeaker(speaker._id, talk._id, 5)
+    : [];
 
-  const speakerName = speaker ? `${speaker.firstName} ${speaker.lastName}` : undefined;
+  const speakerName = speaker
+    ? `${speaker.firstName} ${speaker.lastName}`
+    : undefined;
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': isVideoMediaType(talk.mediaUrl) ? 'VideoObject' : 'AudioObject',
@@ -69,7 +76,9 @@ export default async function TalkPage({ params }: TalkPageProps) {
     embedUrl: talk.mediaUrl,
     name: talk.title,
     ...(speakerName && { creator: { '@type': 'Person', name: speakerName } }),
-    ...(talk.publishedAt && { uploadDate: new Date(talk.publishedAt).toISOString() }),
+    ...(talk.publishedAt && {
+      uploadDate: new Date(talk.publishedAt).toISOString(),
+    }),
     url: `${site.url}/talks/${speakerSlug}/${talkSlug}`,
   };
 
@@ -96,7 +105,9 @@ export default async function TalkPage({ params }: TalkPageProps) {
             topics={topics}
           />
         }
-        hero={<TalkHero speaker={speaker} speakerSlug={speakerSlug} talk={talk} />}
+        hero={
+          <TalkHero speaker={speaker} speakerSlug={speakerSlug} talk={talk} />
+        }
       />
     </>
   );

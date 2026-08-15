@@ -26,5 +26,7 @@ export function getSpeakerInitials(speaker?: SpeakerNameFields | null): string {
  * Sort speakers by name (immutable).
  */
 export function sortSpeakersByName(speakers: Speaker[]) {
-  return speakers.toSorted((a, b) => getSpeakerName(a).localeCompare(getSpeakerName(b)));
+  return speakers.toSorted((a, b) =>
+    getSpeakerName(a).localeCompare(getSpeakerName(b))
+  );
 }

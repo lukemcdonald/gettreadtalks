@@ -13,7 +13,8 @@ interface FavoriteSpeakerButtonProps {
 }
 
 function FavoriteButton({ speakerId }: FavoriteSpeakerButtonProps) {
-  const { isFavorited, isLoading, toggle } = useToggleSpeakerFavorited(speakerId);
+  const { isFavorited, isLoading, toggle } =
+    useToggleSpeakerFavorited(speakerId);
 
   return (
     <ToggleIconButton
@@ -27,7 +28,9 @@ function FavoriteButton({ speakerId }: FavoriteSpeakerButtonProps) {
   );
 }
 
-export function FavoriteSpeakerButton({ speakerId }: FavoriteSpeakerButtonProps) {
+export function FavoriteSpeakerButton({
+  speakerId,
+}: FavoriteSpeakerButtonProps) {
   return (
     <Authenticated>
       <FavoriteButton speakerId={speakerId} />

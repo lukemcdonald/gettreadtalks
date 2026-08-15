@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
 import { PlayIcon } from 'lucide-react';
 import Image from 'next/image';
+import { useState } from 'react';
 
 interface VimeoEmbedProps {
   id: string;
@@ -16,13 +16,16 @@ export function VimeoEmbed({ id, title }: VimeoEmbedProps) {
   if (isActivated) {
     return (
       <div className="relative aspect-video w-full overflow-hidden rounded-lg">
+        {/* oxlint-disable react/iframe-missing-sandbox -- Vimeo player needs scripts and same-origin together */}
         <iframe
           allow="autoplay; fullscreen; picture-in-picture"
           allowFullScreen
           className="absolute inset-0 h-full w-full"
+          sandbox="allow-popups allow-same-origin allow-scripts"
           src={`https://player.vimeo.com/video/${id}?autoplay=1`}
           title={title}
         />
+        {/* oxlint-enable react/iframe-missing-sandbox */}
       </div>
     );
   }
@@ -30,7 +33,7 @@ export function VimeoEmbed({ id, title }: VimeoEmbedProps) {
   return (
     <button
       aria-label={`Play ${title}`}
-      className="group relative block aspect-video w-full cursor-pointer overflow-hidden rounded-lg bg-muted"
+      className="group bg-muted relative block aspect-video w-full cursor-pointer overflow-hidden rounded-lg"
       onClick={() => setIsActivated(true)}
       type="button"
     >
@@ -44,8 +47,8 @@ export function VimeoEmbed({ id, title }: VimeoEmbedProps) {
       />
 
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-primary/90 transition-colors group-hover:bg-primary">
-          <PlayIcon className="h-8 w-8 fill-primary-foreground text-primary-foreground" />
+        <div className="bg-primary/90 group-hover:bg-primary flex h-16 w-16 items-center justify-center rounded-xl transition-colors">
+          <PlayIcon className="fill-primary-foreground text-primary-foreground h-8 w-8" />
         </div>
       </div>
     </button>

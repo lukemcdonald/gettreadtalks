@@ -1,11 +1,12 @@
 import 'server-only';
-
-import type { ZodError, ZodSchema } from 'zod';
-
-import { z } from 'zod';
+import type { ZodError } from 'zod';
 
 import { ErrorCodes } from '@/services/errors/constants';
-import { getConvexErrorData, getErrorMessage, isConvexError } from '@/services/errors/convex';
+import {
+  getConvexErrorData,
+  getErrorMessage,
+  isConvexError,
+} from '@/services/errors/convex';
 
 /**
  * Maps Zod validation errors to field-level error object.
@@ -47,7 +48,9 @@ export function mapZodErrors(zodError: ZodError): Record<string, string> {
  * }
  * ```
  */
-export function mapConvexErrorToFormErrors(error: unknown): Record<string, string> {
+export function mapConvexErrorToFormErrors(
+  error: unknown
+): Record<string, string> {
   const errorMessage = getErrorMessage(error);
 
   // If it's a structured Convex error, extract field information

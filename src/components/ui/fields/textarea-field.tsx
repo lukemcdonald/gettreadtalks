@@ -4,7 +4,13 @@ import type { Control, FieldPath, FieldValues } from 'react-hook-form';
 
 import { Controller } from 'react-hook-form';
 
-import { Field, FieldDescription, FieldError, FieldLabel, Textarea } from '@/components/ui';
+import {
+  Field,
+  FieldDescription,
+  FieldError,
+  FieldLabel,
+  Textarea,
+} from '@/components/ui';
 
 interface TextareaFieldProps<T extends FieldValues> {
   control: Control<T>;
@@ -60,7 +66,9 @@ export function TextareaField<T extends FieldValues>({
             size="lg"
             {...field}
           />
-          {!!fieldState.error && <FieldError match>{fieldState.error?.message}</FieldError>}
+          {!!fieldState.error && (
+            <FieldError match>{fieldState.error?.message}</FieldError>
+          )}
         </Field>
       )}
     />

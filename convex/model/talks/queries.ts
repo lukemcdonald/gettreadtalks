@@ -1,15 +1,26 @@
 import type { Doc } from '../../_generated/dataModel';
 import type { ContentSortOption } from '../../lib/sort';
 
-import { paginationOptsValidator, paginationResultValidator } from 'convex/server';
+import {
+  getManyFrom,
+  getManyVia,
+  getOneFrom,
+} from 'convex-helpers/server/relationships';
+import {
+  paginationOptsValidator,
+  paginationResultValidator,
+} from 'convex/server';
 import { v } from 'convex/values';
-import { getManyFrom, getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
 
 import { query } from '../../_generated/server';
 import { getTalkIdsByTopicSlugs } from '../../lib/filters';
 import { rotateContent } from '../../lib/rotateContent';
 import { getContentComparator } from '../../lib/sort';
-import { applySearchFilter, enrichWithSpeakers, paginateArray } from '../../lib/utils';
+import {
+  applySearchFilter,
+  enrichWithSpeakers,
+  paginateArray,
+} from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
 import { statusFilterType } from '../../lib/validators/shared';
@@ -25,7 +36,9 @@ export const listTalkSlugsForSitemap = query({
   handler: async (ctx) => {
     const talks = await ctx.db
       .query('talks')
-      .withIndex('by_status_and_publishedAt', (q) => q.eq('status', 'published'))
+      .withIndex('by_status_and_publishedAt', (q) =>
+        q.eq('status', 'published')
+      )
       .collect();
 
     const results = await Promise.all(
@@ -39,17 +52,19 @@ export const listTalkSlugsForSitemap = query({
           talkSlug: talk.slug,
           updatedAt: talk.updatedAt ?? talk._creationTime,
         };
-      }),
+      })
     );
 
-    return results.filter((item): item is NonNullable<typeof item> => item !== null);
+    return results.filter(
+      (item): item is NonNullable<typeof item> => item !== null
+    );
   },
   returns: v.array(
     v.object({
       speakerSlug: v.string(),
       talkSlug: v.string(),
       updatedAt: v.number(),
-    }),
+    })
   ),
 });
 
@@ -77,7 +92,12 @@ export const getTalkBySlug = query({
     const user = await getCurrentUser(ctx);
 
     // First, get the speaker by slug
-    const speaker = await getOneFrom(ctx.db, 'speakers', 'by_slug', args.speakerSlug);
+    const speaker = await getOneFrom(
+      ctx.db,
+      'speakers',
+      'by_slug',
+      args.speakerSlug
+    );
 
     if (!speaker) {
       return null;
@@ -86,7 +106,9 @@ export const getTalkBySlug = query({
     // Then, find the talk with the given slug for this speaker
     const talks = await ctx.db
       .query('talks')
-      .withIndex('by_speakerId_and_status', (q) => q.eq('speakerId', speaker._id))
+      .withIndex('by_speakerId_and_status', (q) =>
+        q.eq('speakerId', speaker._id)
+      )
       .collect();
 
     const talk = talks.find((t) => t.slug === args.talkSlug);
@@ -103,11 +125,20 @@ export const getTalkBySlug = query({
       clips: ctx.db
         .query('clips')
         .withIndex('by_talkId_and_status', (q) =>
-          q.eq('talkId', talk._id).eq('status', 'published'),
+          q.eq('talkId', talk._id).eq('status', 'published')
         )
         .collect(),
-      collection: talk.collectionId ? ctx.db.get('collections', talk.collectionId) : null,
-      topics: getManyVia(ctx.db, 'talksOnTopics', 'topicId', 'by_talkId', talk._id, 'talkId'),
+      collection: talk.collectionId
+        ? ctx.db.get('collections', talk.collectionId)
+        : null,
+      topics: getManyVia(
+        ctx.db,
+        'talksOnTopics',
+        'topicId',
+        'by_talkId',
+        talk._id,
+        'talkId'
+      ),
     };
 
     const [clips, collection, topics] = await Promise.all([
@@ -133,7 +164,7 @@ export const getTalkBySlug = query({
       speaker: doc('speakers').nullable(),
       talk: doc('talks'),
       topics: docs('topics'),
-    }),
+    })
   ),
 });
 
@@ -148,7 +179,7 @@ export const getTalksCount = query({
       'talks',
       'by_status_and_publishedAt',
       'published',
-      'status',
+      'status'
     );
 
     return talks.length;
@@ -168,7 +199,9 @@ export const listFeaturedTalks = query({
 
     const talks = await ctx.db
       .query('talks')
-      .withIndex('by_featured_and_status', (q) => q.eq('featured', true).eq('status', 'published'))
+      .withIndex('by_featured_and_status', (q) =>
+        q.eq('featured', true).eq('status', 'published')
+      )
       .take(50);
 
     return rotateContent(talks, { count: limit, period: 'daily' });
@@ -188,7 +221,9 @@ export const listFeaturedTalksWithSpeakers = query({
 
     const talks = await ctx.db
       .query('talks')
-      .withIndex('by_featured_and_status', (q) => q.eq('featured', true).eq('status', 'published'))
+      .withIndex('by_featured_and_status', (q) =>
+        q.eq('featured', true).eq('status', 'published')
+      )
       .take(50);
 
     const page = rotateContent(talks, { count: limit, period: 'daily' });
@@ -213,7 +248,7 @@ export const listRandomTalksBySpeaker = query({
     const talks = await ctx.db
       .query('talks')
       .withIndex('by_speakerId_and_status', (q) =>
-        q.eq('speakerId', speakerId).eq('status', 'published'),
+        q.eq('speakerId', speakerId).eq('status', 'published')
       )
       .collect();
 
@@ -240,11 +275,13 @@ export const listTalksByCollection = query({
     const talks = await ctx.db
       .query('talks')
       .withIndex('by_collectionId_and_status', (q) =>
-        q.eq('collectionId', collectionId).eq('status', 'published'),
+        q.eq('collectionId', collectionId).eq('status', 'published')
       )
       .take(limit);
 
-    const sortedTalks = talks.sort((a, b) => (a.collectionOrder || 0) - (b.collectionOrder || 0));
+    const sortedTalks = talks.toSorted(
+      (a, b) => (a.collectionOrder || 0) - (b.collectionOrder || 0)
+    );
 
     return sortedTalks;
   },
@@ -265,7 +302,7 @@ export const listTalksBySpeaker = query({
     return await ctx.db
       .query('talks')
       .withIndex('by_speakerId_and_status', (q) =>
-        q.eq('speakerId', speakerId).eq('status', 'published'),
+        q.eq('speakerId', speakerId).eq('status', 'published')
       )
       .order('desc')
       .take(limit);
@@ -278,8 +315,8 @@ const sortType = v.optional(
     v.literal('alphabetical'),
     v.literal('featured'),
     v.literal('oldest'),
-    v.literal('recent'),
-  ),
+    v.literal('recent')
+  )
 );
 
 /**
@@ -296,7 +333,14 @@ export const listTalks = query({
     topicSlugs: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
-    const { featured, paginationOpts, search, sort = 'recent', speakerSlugs, topicSlugs } = args;
+    const {
+      featured,
+      paginationOpts,
+      search,
+      sort = 'recent',
+      speakerSlugs,
+      topicSlugs,
+    } = args;
 
     const hasSpeakerFilter = speakerSlugs && speakerSlugs.length > 0;
     const hasTopicFilter = topicSlugs && topicSlugs.length > 0;
@@ -307,7 +351,9 @@ export const listTalks = query({
     if (!(hasFilters || needsCustomSort)) {
       const result = await ctx.db
         .query('talks')
-        .withIndex('by_status_and_publishedAt', (q) => q.eq('status', 'published'))
+        .withIndex('by_status_and_publishedAt', (q) =>
+          q.eq('status', 'published')
+        )
         .order('desc')
         .paginate(paginationOpts);
 
@@ -323,7 +369,9 @@ export const listTalks = query({
     // With filters or custom sort, collect all and paginate in-memory
     let talks = await ctx.db
       .query('talks')
-      .withIndex('by_status_and_publishedAt', (q) => q.eq('status', 'published'))
+      .withIndex('by_status_and_publishedAt', (q) =>
+        q.eq('status', 'published')
+      )
       .order('desc')
       .collect();
 
@@ -335,27 +383,30 @@ export const listTalks = query({
     // Apply speaker filter (multi-select)
     if (hasSpeakerFilter) {
       const speakers = await Promise.all(
-        speakerSlugs.map((slug) => getOneFrom(ctx.db, 'speakers', 'by_slug', slug)),
+        speakerSlugs.map((slug) =>
+          getOneFrom(ctx.db, 'speakers', 'by_slug', slug)
+        )
       );
-      const validSpeakers = speakers.filter((s): s is NonNullable<typeof s> => s !== null);
+      const validSpeakers = speakers.filter(
+        (s): s is NonNullable<typeof s> => s !== null
+      );
       const speakerIds = new Set(validSpeakers.map((s) => s._id));
 
-      if (speakerIds.size > 0) {
-        talks = talks.filter((talk) => speakerIds.has(talk.speakerId));
-      } else {
-        talks = []; // No matching speakers found
-      }
+      // No matching speakers found
+      talks =
+        speakerIds.size > 0
+          ? talks.filter((talk) => speakerIds.has(talk.speakerId))
+          : [];
     }
 
     // Apply topic filter (multi-select)
     if (hasTopicFilter) {
       const topicTalkIds = await getTalkIdsByTopicSlugs(ctx, topicSlugs);
 
-      if (topicTalkIds) {
-        talks = talks.filter((talk) => topicTalkIds.has(talk._id));
-      } else {
-        talks = []; // No matching topics found
-      }
+      // No matching topics found
+      talks = topicTalkIds
+        ? talks.filter((talk) => topicTalkIds.has(talk._id))
+        : [];
     }
 
     // Apply featured filter
@@ -369,7 +420,7 @@ export const listTalks = query({
     const { continueCursor, isDone, page } = paginateArray(
       talks,
       paginationOpts.cursor,
-      paginationOpts.numItems,
+      paginationOpts.numItems
     );
 
     const talksWithSpeakers = await enrichWithSpeakers(ctx, page);
@@ -384,7 +435,7 @@ export const listTalks = query({
   returns: paginationResultValidator(
     talkWithSpeakerValidator.extend({
       topicSlugs: v.array(v.string()),
-    }),
+    })
   ),
 });
 
@@ -402,17 +453,16 @@ export const listAllTalks = query({
     const { paginationOpts, search, status = 'published' } = args;
 
     // Search requires in-memory filtering, can't use .paginate()
-    let talks: Doc<'talks'>[];
-
-    if (status === 'all') {
-      talks = await ctx.db.query('talks').order('desc').collect();
-    } else {
-      talks = await ctx.db
-        .query('talks')
-        .withIndex('by_status_and_publishedAt', (q) => q.eq('status', status))
-        .order('desc')
-        .collect();
-    }
+    let talks: Doc<'talks'>[] =
+      status === 'all'
+        ? await ctx.db.query('talks').order('desc').collect()
+        : await ctx.db
+            .query('talks')
+            .withIndex('by_status_and_publishedAt', (q) =>
+              q.eq('status', status)
+            )
+            .order('desc')
+            .collect();
 
     if (search) {
       talks = applySearchFilter(talks, search);
@@ -421,11 +471,14 @@ export const listAllTalks = query({
     const { continueCursor, isDone, page } = paginateArray(
       talks,
       paginationOpts.cursor,
-      paginationOpts.numItems,
+      paginationOpts.numItems
     );
 
     const talksWithSpeakers = await enrichWithSpeakers(ctx, page);
-    const talksWithSpeakersAndTopics = await enrichWithTopics(ctx, talksWithSpeakers);
+    const talksWithSpeakersAndTopics = await enrichWithTopics(
+      ctx,
+      talksWithSpeakers
+    );
 
     return {
       continueCursor,
@@ -438,6 +491,6 @@ export const listAllTalks = query({
       ...doc('talks').fields,
       speaker: doc('speakers').nullable(),
       topicSlugs: v.array(v.string()),
-    }),
+    })
   ),
 });

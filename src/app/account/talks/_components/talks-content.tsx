@@ -12,7 +12,9 @@ interface AccountTalksContentProps {
   searchParams: AccountTalksSearchParams;
 }
 
-export async function AccountTalksContent({ searchParams }: AccountTalksContentProps) {
+export async function AccountTalksContent({
+  searchParams,
+}: AccountTalksContentProps) {
   const { cursor, search, status } = searchParams;
 
   const result = await getAllTalks({

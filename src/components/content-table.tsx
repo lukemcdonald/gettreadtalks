@@ -1,6 +1,12 @@
 import type { ReactNode } from 'react';
 
-import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui';
+import {
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui';
 
 interface ContentTableProps {
   children: ReactNode;

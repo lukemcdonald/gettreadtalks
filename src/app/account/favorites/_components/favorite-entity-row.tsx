@@ -7,6 +7,7 @@ import {
   UnfavoriteClipButton,
   UnfavoriteSpeakerButton,
 } from '@/features/users/components/unfavorite-buttons';
+
 import { useOptimisticRow } from '../../_components/use-optimistic-row';
 import { EntityTableRow } from './entity-table-row';
 
@@ -16,7 +17,11 @@ interface FavoriteSpeakerRowProps {
   title: string;
 }
 
-export function FavoriteSpeakerRow({ href, speakerId, title }: FavoriteSpeakerRowProps) {
+export function FavoriteSpeakerRow({
+  href,
+  speakerId,
+  title,
+}: FavoriteSpeakerRowProps) {
   const { onError, onMutate, removed } = useOptimisticRow();
 
   if (removed) {
@@ -26,7 +31,11 @@ export function FavoriteSpeakerRow({ href, speakerId, title }: FavoriteSpeakerRo
   return (
     <EntityTableRow
       action={
-        <UnfavoriteSpeakerButton onError={onError} onMutate={onMutate} speakerId={speakerId} />
+        <UnfavoriteSpeakerButton
+          onError={onError}
+          onMutate={onMutate}
+          speakerId={speakerId}
+        />
       }
       href={href}
       title={title}
@@ -49,7 +58,13 @@ export function FavoriteClipRow({ clipId, href, title }: FavoriteClipRowProps) {
 
   return (
     <EntityTableRow
-      action={<UnfavoriteClipButton clipId={clipId} onError={onError} onMutate={onMutate} />}
+      action={
+        <UnfavoriteClipButton
+          clipId={clipId}
+          onError={onError}
+          onMutate={onMutate}
+        />
+      }
       href={href}
       title={title}
     />

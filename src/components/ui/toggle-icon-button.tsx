@@ -28,7 +28,10 @@ export function ToggleIconButton({
       loading={loading}
       onClick={onToggle}
     >
-      <Icon className={isActive ? 'fill-current' : undefined} strokeWidth={2.5} />
+      <Icon
+        className={isActive ? 'fill-current' : undefined}
+        strokeWidth={2.5}
+      />
     </ActionIconButton>
   );
 }

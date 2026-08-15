@@ -15,7 +15,9 @@ interface CollectionPageProps {
   params: Promise<{ collectionSlug: string }>;
 }
 
-export async function generateMetadata({ params }: CollectionPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: CollectionPageProps): Promise<Metadata> {
   const { collectionSlug } = await params;
   const data = await getCollectionBySlug(collectionSlug);
 
@@ -40,10 +42,12 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
   }
 
   const { collection, talks } = data;
-  const allSpeakers = talks.map((talk) => talk.speaker).filter((speaker) => speaker !== null);
-  const uniqueSpeakers = Array.from(
-    new Map(allSpeakers.map((speaker) => [speaker._id, speaker])).values(),
-  );
+  const allSpeakers = talks
+    .map((talk) => talk.speaker)
+    .filter((speaker) => speaker !== null);
+  const uniqueSpeakers = [
+    ...new Map(allSpeakers.map((speaker) => [speaker._id, speaker])).values(),
+  ];
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -53,7 +57,9 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
       '@type': 'ListItem',
       name: talk.title,
       position: index + 1,
-      url: talk.speaker ? `${site.url}/talks/${talk.speaker.slug}/${talk.slug}` : undefined,
+      url: talk.speaker
+        ? `${site.url}/talks/${talk.speaker.slug}/${talk.slug}`
+        : undefined,
     })),
     name: collection.title,
     url: `${site.url}/collections/${collectionSlug}`,
@@ -65,12 +71,19 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
       <SidebarLayout
         breadcrumb={
           <PageBreadcrumb
-            segments={[{ href: '/collections', label: 'Collections' }, { label: collection.title }]}
+            segments={[
+              { href: '/collections', label: 'Collections' },
+              { label: collection.title },
+            ]}
           />
         }
         content={<CollectionTalkList talks={talks} />}
         header={
-          <PageHeader description={collection.description} size="lg" title={collection.title} />
+          <PageHeader
+            description={collection.description}
+            size="lg"
+            title={collection.title}
+          />
         }
         sidebar={<CollectionSidebar speakers={uniqueSpeakers} />}
       />

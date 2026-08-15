@@ -19,7 +19,7 @@ export function CollectionSidebar({ speakers }: CollectionSidebarProps) {
         {speakers.map((speaker) => (
           <li key={speaker._id}>
             <Link
-              className="text-muted-foreground text-sm transition-colors hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground text-sm transition-colors"
               href={`/speakers/${speaker.slug}`}
             >
               {speaker.firstName} {speaker.lastName}

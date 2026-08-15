@@ -1,15 +1,18 @@
 'use server';
 
 import 'server-only';
-
-import type { ActionResult } from '@/lib/forms/types';
 import type { TalkId } from '../types';
+import type { ActionResult } from '@/lib/forms/types';
 
 import { updateTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
-import { mapConvexErrorToFormErrors, mapZodErrors } from '@/lib/forms/validation';
+import {
+  mapConvexErrorToFormErrors,
+  mapZodErrors,
+} from '@/lib/forms/validation';
 import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
+
 import { talkFormSchema } from '../schemas/talk-form';
 
 /**
@@ -17,7 +20,7 @@ import { talkFormSchema } from '../schemas/talk-form';
  */
 export async function updateTalkAction(
   data: unknown,
-  talkId: TalkId,
+  talkId: TalkId
 ): Promise<ActionResult<{ talkId: string }>> {
   // Re-verify authorization on every request
   await requireAdminUser();
@@ -26,8 +29,8 @@ export async function updateTalkAction(
 
   if (!parsed.success) {
     return {
-      success: false,
       errors: mapZodErrors(parsed.error),
+      success: false,
     };
   }
 
@@ -38,13 +41,13 @@ export async function updateTalkAction(
     updateTag('form-options');
 
     return {
-      success: true,
       data: { talkId },
+      success: true,
     };
   } catch (error) {
     return {
-      success: false,
       errors: mapConvexErrorToFormErrors(error),
+      success: false,
     };
   }
 }

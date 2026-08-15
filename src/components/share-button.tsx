@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import { CheckIcon, ShareIcon } from 'lucide-react';
+import { useState } from 'react';
 
 import { ActionIconButton } from '@/components/ui';
 
@@ -41,8 +41,15 @@ export function ShareButton({ onShare, title }: ShareButtonProps) {
   };
 
   return (
-    <ActionIconButton label={copied ? 'Link copied!' : 'Share'} onClick={handleShare}>
-      {copied ? <CheckIcon strokeWidth={2.5} /> : <ShareIcon strokeWidth={2.5} />}
+    <ActionIconButton
+      label={copied ? 'Link copied!' : 'Share'}
+      onClick={handleShare}
+    >
+      {copied ? (
+        <CheckIcon strokeWidth={2.5} />
+      ) : (
+        <ShareIcon strokeWidth={2.5} />
+      )}
     </ActionIconButton>
   );
 }

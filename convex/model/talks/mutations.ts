@@ -1,7 +1,6 @@
 import type { Doc } from '../../_generated/dataModel';
 
 import { v } from 'convex/values';
-import { getManyFrom } from 'convex-helpers/server/relationships';
 
 import { mutation } from '../../_generated/server';
 import { throwDuplicateSlug, throwValidationError } from '../../lib/errors';
@@ -68,7 +67,10 @@ export const createTalk = mutation({
     const slug = slugify(args.title);
 
     if (await talkSlugExistsForSpeaker(ctx, args.speakerId, slug)) {
-      throwDuplicateSlug('Talk with this title already exists for this speaker', 'title');
+      throwDuplicateSlug(
+        'Talk with this title already exists for this speaker',
+        'title'
+      );
     }
 
     const status = args.status || 'backlog';
@@ -123,8 +125,13 @@ export const updateTalk = mutation({
       }
 
       if (newSlug !== talk.slug) {
-        if (await talkSlugExistsForSpeaker(ctx, speakerIdToCheck, newSlug, talkId)) {
-          throwDuplicateSlug('A talk with this slug already exists for this speaker', 'slug');
+        if (
+          await talkSlugExistsForSpeaker(ctx, speakerIdToCheck, newSlug, talkId)
+        ) {
+          throwDuplicateSlug(
+            'A talk with this slug already exists for this speaker',
+            'slug'
+          );
         }
 
         updates.slug = newSlug;
@@ -132,7 +139,10 @@ export const updateTalk = mutation({
     }
 
     if (updates.status) {
-      updates.publishedAt = getPublishedAtForStatus(updates.status, talk.publishedAt);
+      updates.publishedAt = getPublishedAtForStatus(
+        updates.status,
+        talk.publishedAt
+      );
     }
 
     updates.updatedAt = Date.now();
@@ -156,7 +166,7 @@ export const destroyTalk = mutation({
 
     await requireAuth(ctx);
 
-    const talk = await getOrThrow(ctx, 'talks', talkId);
+    await getOrThrow(ctx, 'talks', talkId);
 
     const talksOnTopics = await ctx.db
       .query('talksOnTopics')

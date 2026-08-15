@@ -1,7 +1,9 @@
-import type { Context as SentryContext, User as SentryUser, SeverityLevel } from '@sentry/nextjs';
-
-// biome-ignore lint/style/useImportType: ErrorCodes is needed as a value for typeof expression
-import { ErrorCodes } from './constants';
+import type { ErrorCodes } from './constants';
+import type {
+  Context as SentryContext,
+  User as SentryUser,
+  SeverityLevel,
+} from '@sentry/nextjs';
 
 /**
  * Type representing all possible error code values.

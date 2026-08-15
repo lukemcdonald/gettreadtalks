@@ -49,7 +49,9 @@ export function ComboboxMultiFilter({
 
   const handleChange = (newValue: FilterOption[] | null) => {
     const joined =
-      newValue && newValue.length > 0 ? newValue.map((opt) => opt.value).join(',') : null;
+      newValue && newValue.length > 0
+        ? newValue.map((opt) => opt.value).join(',')
+        : null;
     update(joined);
   };
 

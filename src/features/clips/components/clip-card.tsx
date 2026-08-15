@@ -14,7 +14,9 @@ interface ClipCardProps {
 
 export function ClipCard({ clip, speaker }: ClipCardProps) {
   const speakerName = getSpeakerName(speaker);
-  const accessibleLabel = speakerName ? `${clip.title} by ${speakerName}` : clip.title;
+  const accessibleLabel = speakerName
+    ? `${clip.title} by ${speakerName}`
+    : clip.title;
 
   return (
     <MediaCard

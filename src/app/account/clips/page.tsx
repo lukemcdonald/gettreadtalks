@@ -13,13 +13,18 @@ interface AccountClipsPageProps {
   searchParams: Promise<AccountClipsSearchParams>;
 }
 
-export default async function AccountClipsPage({ searchParams }: AccountClipsPageProps) {
+export default async function AccountClipsPage({
+  searchParams,
+}: AccountClipsPageProps) {
   const params = await searchParams;
 
   return (
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
-        <PageHeader description="Manage all clips across all statuses" title="Manage Clips" />
+        <PageHeader
+          description="Manage all clips across all statuses"
+          title="Manage Clips"
+        />
         <NewClipButton />
       </div>
       <AccountClipsContent searchParams={params} />

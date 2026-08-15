@@ -25,10 +25,23 @@ export async function getTalks(args?: GetTalksProps) {
   cacheLife('hours');
   cacheTag('talks');
 
-  const { cursor, featured, limit = 50, search, sort, speakerSlugs, topicSlugs } = args ?? {};
+  const {
+    cursor,
+    featured,
+    limit = 50,
+    search,
+    sort,
+    speakerSlugs,
+    topicSlugs,
+  } = args ?? {};
 
   // Validate sort option
-  const validSorts: SortOption[] = ['alphabetical', 'featured', 'oldest', 'recent'];
+  const validSorts: SortOption[] = [
+    'alphabetical',
+    'featured',
+    'oldest',
+    'recent',
+  ];
   const sortOption: SortOption = validSorts.includes(sort as SortOption)
     ? (sort as SortOption)
     : 'recent';

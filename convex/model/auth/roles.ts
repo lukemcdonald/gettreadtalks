@@ -27,7 +27,9 @@ export function canViewContent(user: User | null, status: StatusType): boolean {
  * Require admin access and return the current user.
  * Throws error if not authenticated or not an admin.
  */
-export async function requireAdmin(ctx: QueryCtx | MutationCtx): Promise<AdminUser> {
+export async function requireAdmin(
+  ctx: QueryCtx | MutationCtx
+): Promise<AdminUser> {
   const user = await requireAuth(ctx);
 
   if (!isAdmin(user)) {

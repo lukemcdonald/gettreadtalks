@@ -2,6 +2,7 @@ import type { Collection } from '@/features/collections/types';
 
 import { ContentTable } from '@/components/content-table';
 import { Empty, EmptyDescription } from '@/components/ui';
+
 import { CollectionsTableRow } from './collections-table-row';
 
 interface CollectionsTableProps {
@@ -20,7 +21,11 @@ export function CollectionsTable({ collections }: CollectionsTableProps) {
   return (
     <ContentTable columns={['Title', 'Talks', 'Actions']}>
       {collections.map(({ collection, talkCount }) => (
-        <CollectionsTableRow collection={collection} key={collection._id} talkCount={talkCount} />
+        <CollectionsTableRow
+          collection={collection}
+          key={collection._id}
+          talkCount={talkCount}
+        />
       ))}
     </ContentTable>
   );

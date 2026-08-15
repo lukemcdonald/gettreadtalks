@@ -9,10 +9,15 @@ interface CollectionsTableRowProps {
   talkCount: number;
 }
 
-export function CollectionsTableRow({ collection, talkCount }: CollectionsTableRowProps) {
+export function CollectionsTableRow({
+  collection,
+  talkCount,
+}: CollectionsTableRowProps) {
   return (
     <TableRow>
-      <TableCell className="whitespace-normal font-medium">{collection.title}</TableCell>
+      <TableCell className="font-medium whitespace-normal">
+        {collection.title}
+      </TableCell>
       <TableCell className="w-[120px]">
         <CountBadge count={talkCount} label="talk" />
       </TableCell>

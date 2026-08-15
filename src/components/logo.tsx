@@ -10,8 +10,8 @@ interface LogoProps {
 }
 
 const defaultColors = {
-  tread: 'text-primary',
   talks: 'text-foreground',
+  tread: 'text-primary',
 };
 
 export function Logo({ className, colors = defaultColors }: LogoProps) {

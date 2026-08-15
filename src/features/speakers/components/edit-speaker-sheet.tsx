@@ -3,8 +3,8 @@
 import type { UpdateSpeakerFormData } from '@/features/speakers/schemas/speaker-form';
 import type { Speaker, SpeakerId } from '@/features/speakers/types';
 
-import { useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { FormSheet } from '@/components/ui';
@@ -12,6 +12,7 @@ import { toastManager } from '@/components/ui/primitives/toast';
 import { updateSpeakerAction } from '@/features/speakers/actions/update-speaker';
 import { updateSpeakerSchema } from '@/features/speakers/schemas/speaker-form';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
+
 import { SpeakerFormFields } from './speaker-form-fields';
 
 interface EditSpeakerSheetProps {
@@ -30,8 +31,8 @@ export function EditSpeakerSheet({
   const [isPending, startTransition] = useTransition();
 
   const form = useForm<UpdateSpeakerFormData>({
-    resolver: zodResolver(updateSpeakerSchema),
     mode: 'onBlur',
+    resolver: zodResolver(updateSpeakerSchema),
     values: {
       description: speaker?.description ?? '',
       featured: speaker?.featured ?? false,

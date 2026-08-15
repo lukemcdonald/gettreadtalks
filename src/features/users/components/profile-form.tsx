@@ -1,7 +1,7 @@
 'use client';
 
-import { useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTransition } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 
 import { Button, Fieldset, FormError, TextField } from '@/components/ui';
@@ -46,7 +46,10 @@ export function ProfileForm({ currentName }: ProfileFormProps) {
   }
 
   return (
-    <form className="flex flex-col gap-3" onSubmit={form.handleSubmit(onSubmit)}>
+    <form
+      className="flex flex-col gap-3"
+      onSubmit={form.handleSubmit(onSubmit)}
+    >
       <FormError error={form.formState.errors.root} />
       <Fieldset disabled={isPending}>
         <TextField control={form.control} label="Name" name="name" required />

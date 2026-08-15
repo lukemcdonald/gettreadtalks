@@ -9,9 +9,11 @@ Server-side errors (from Server Actions and Convex mutations) are handled differ
 ## Error Types
 
 ### Field-Level Errors
+
 Errors that relate to specific form fields (e.g., "Title is required", "Email is invalid").
 
 ### Form-Level Errors
+
 Errors that don't relate to a specific field (e.g., "Network error", "Unauthorized", "Duplicate slug").
 
 ## Server Error Format
@@ -43,12 +45,12 @@ const form = useForm<FormData>({
 
 const handleSubmit = async (values: FormData) => {
   const result = await createItemAction(values);
-  
+
   if (!result.success) {
     setServerErrors(form.setError, result.errors);
     return;
   }
-  
+
   // Handle success...
 };
 ```
@@ -56,6 +58,7 @@ const handleSubmit = async (values: FormData) => {
 ## Displaying Errors
 
 ### Field-Level Errors
+
 Reusable field components (TextField, SelectField, etc.) automatically display field-level errors. You don't need to manually handle error display when using these components.
 
 For custom Controller usage, use `FieldError` directly:
@@ -77,6 +80,7 @@ import { FieldError } from '@/components/ui/fields';
 ```
 
 ### Form-Level Errors
+
 Form-level errors are stored in React Hook Form's `root` error. Use the `FormError` component to display them:
 
 ```typescript
@@ -86,6 +90,7 @@ import { FormError } from '@/components/ui/form';
 ```
 
 The `FormError` component:
+
 - Automatically handles null/undefined errors (returns null if no error)
 - Provides consistent styling across all forms
 - Includes proper accessibility attributes (`role="alert"`)
@@ -94,6 +99,7 @@ The `FormError` component:
 ## How `setServerErrors` Works
 
 The utility function:
+
 1. Extracts form-level errors (`_form` key) and sets them via `setError('root', { type: 'server', message })`
 2. Sets all field-level errors via `setError(fieldName, { type: 'server', message })`
 
@@ -124,7 +130,7 @@ import { Button } from '@/components/ui/button';
 
 export function ItemForm() {
   const [isPending, startTransition] = useTransition();
-  
+
   const form = useForm({
     resolver: zodResolver(itemSchema),
     defaultValues: { title: '', description: '' },
@@ -132,15 +138,15 @@ export function ItemForm() {
 
   const handleSubmit = (values: z.infer<typeof itemSchema>) => {
     form.clearErrors();
-    
+
     startTransition(async () => {
       const result = await createItemAction(values);
-      
+
       if (!result.success) {
         setServerErrors(form.setError, result.errors);
         return;
       }
-      
+
       // Handle success...
     });
   };
@@ -150,7 +156,7 @@ export function ItemForm() {
       <Form noValidate onSubmit={form.handleSubmit(handleSubmit)}>
         {/* Form-level error */}
         <FormError error={form.formState.errors.root} />
-        
+
         {/* Reusable field component - errors displayed automatically */}
         <TextField
           control={form.control}
@@ -158,7 +164,7 @@ export function ItemForm() {
           name="title"
           required
         />
-        
+
         <Button type="submit" disabled={isPending}>
           Submit
         </Button>

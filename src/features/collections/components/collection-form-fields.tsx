@@ -1,5 +1,5 @@
-import type { Control } from 'react-hook-form';
 import type { CollectionFormData } from '../schemas/collection-form';
+import type { Control } from 'react-hook-form';
 
 import { TextField, TextareaField, UrlField } from '@/components/ui';
 
@@ -8,7 +8,10 @@ interface CollectionFormFieldsProps {
   mode?: 'create' | 'edit';
 }
 
-export function CollectionFormFields({ control, mode = 'create' }: CollectionFormFieldsProps) {
+export function CollectionFormFields({
+  control,
+  mode = 'create',
+}: CollectionFormFieldsProps) {
   return (
     <div className="space-y-4">
       <TextField

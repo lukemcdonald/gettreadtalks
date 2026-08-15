@@ -1,7 +1,7 @@
 'use client';
 
-import type { Route } from 'next';
 import type { User } from '@/services/auth/types';
+import type { Route } from 'next';
 
 import {
   ArrowRight as ArrowRightIcon,
@@ -17,7 +17,13 @@ import { usePathname } from 'next/navigation';
 
 import { AccountMenuItem } from '@/components/site-header/account-menu/account-menu-item';
 import { NavLink } from '@/components/site-header/navigation/nav-link';
-import { Button, Menu, MenuPopup, MenuSeparator, MenuTrigger } from '@/components/ui';
+import {
+  Button,
+  Menu,
+  MenuPopup,
+  MenuSeparator,
+  MenuTrigger,
+} from '@/components/ui';
 import { useCurrentUser } from '@/features/users/hooks/use-current-user';
 import { isAdmin } from '@/services/auth/utils';
 
@@ -66,17 +72,35 @@ export function AccountMenu({ initialUser }: AccountMenuProps) {
       <MenuPopup className="w-60">
         <div className="flex flex-col px-3 pt-2 pb-1">
           <span className="text-muted-foreground text-xs">Signed in as</span>
-          <span className="truncate font-semibold text-foreground text-sm">{user.email}</span>
+          <span className="text-foreground truncate text-sm font-semibold">
+            {user.email}
+          </span>
         </div>
         <MenuSeparator />
-        <AccountMenuItem href="/account/favorites" icon={FavoritesIcon} label="Favorites" />
-        <AccountMenuItem href="/account/finished" icon={FinishedIcon} label="Finished" />
+        <AccountMenuItem
+          href="/account/favorites"
+          icon={FavoritesIcon}
+          label="Favorites"
+        />
+        <AccountMenuItem
+          href="/account/finished"
+          icon={FinishedIcon}
+          label="Finished"
+        />
         <MenuSeparator />
         <AccountMenuItem href="/account" icon={SettingsIcon} label="Settings" />
         {!!showDashboardLink && (
-          <AccountMenuItem href="/account/talks" icon={DashboardIcon} label="Dashboard" />
+          <AccountMenuItem
+            href="/account/talks"
+            icon={DashboardIcon}
+            label="Dashboard"
+          />
         )}
-        <AccountMenuItem href={'/logout' as Route} icon={SignOutIcon} label="Sign out" />
+        <AccountMenuItem
+          href={'/logout' as Route}
+          icon={SignOutIcon}
+          label="Sign out"
+        />
       </MenuPopup>
     </Menu>
   );

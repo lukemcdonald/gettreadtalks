@@ -23,7 +23,11 @@ export async function getTopicsWithCounts(args?: GetTopicsWithCountsProps) {
   const { search, sort } = args ?? {};
 
   // Validate sort option
-  const validSorts: SortOption[] = ['alphabetical', 'least-talks', 'most-talks'];
+  const validSorts: SortOption[] = [
+    'alphabetical',
+    'least-talks',
+    'most-talks',
+  ];
   const sortOption: SortOption = validSorts.includes(sort as SortOption)
     ? (sort as SortOption)
     : 'alphabetical';

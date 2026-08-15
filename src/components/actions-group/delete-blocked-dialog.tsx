@@ -32,7 +32,9 @@ export function DeleteBlockedDialog({
           <AlertDialogDescription>{blockReason}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogClose render={<Button variant="outline" />}>Close</AlertDialogClose>
+          <AlertDialogClose render={<Button variant="outline" />}>
+            Close
+          </AlertDialogClose>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

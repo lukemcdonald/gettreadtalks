@@ -2,14 +2,15 @@
 
 import type { CollectionFormData } from '../schemas/collection-form';
 
-import { useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { useSheetRoute } from '@/app/@sheet/_hooks/use-sheet-route';
 import { FormSheet } from '@/components/ui';
 import { createCollectionAction } from '@/features/collections/actions/create-collection';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
+
 import { collectionFormSchema } from '../schemas/collection-form';
 import { CollectionFormFields } from './collection-form-fields';
 
@@ -18,13 +19,13 @@ export function CreateCollectionSheet() {
   const [isPending, startTransition] = useTransition();
 
   const form = useForm<CollectionFormData>({
-    resolver: zodResolver(collectionFormSchema),
-    mode: 'onBlur',
     defaultValues: {
       description: '',
       title: '',
       url: '',
     },
+    mode: 'onBlur',
+    resolver: zodResolver(collectionFormSchema),
   });
 
   const handleSubmit = form.handleSubmit((data) => {

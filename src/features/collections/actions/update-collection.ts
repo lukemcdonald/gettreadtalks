@@ -1,21 +1,24 @@
 'use server';
 
 import 'server-only';
-
-import type { ActionResult } from '@/lib/forms/types';
 import type { CollectionId } from '../types';
+import type { ActionResult } from '@/lib/forms/types';
 
 import { updateTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
 import { stripEmptyStrings } from '@/lib/forms/schemas';
-import { mapConvexErrorToFormErrors, mapZodErrors } from '@/lib/forms/validation';
+import {
+  mapConvexErrorToFormErrors,
+  mapZodErrors,
+} from '@/lib/forms/validation';
 import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
+
 import { collectionFormSchema } from '../schemas/collection-form';
 
 export async function updateCollectionAction(
   data: unknown,
-  collectionId: CollectionId,
+  collectionId: CollectionId
 ): Promise<ActionResult<{ collectionId: CollectionId }>> {
   await requireAdminUser();
 
@@ -23,8 +26,8 @@ export async function updateCollectionAction(
 
   if (!parsed.success) {
     return {
-      success: false,
       errors: mapZodErrors(parsed.error),
+      success: false,
     };
   }
 
@@ -38,13 +41,13 @@ export async function updateCollectionAction(
     updateTag('form-options');
 
     return {
-      success: true,
       data: { collectionId },
+      success: true,
     };
   } catch (error) {
     return {
-      success: false,
       errors: mapConvexErrorToFormErrors(error),
+      success: false,
     };
   }
 }

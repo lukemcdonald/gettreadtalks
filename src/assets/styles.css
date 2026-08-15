@@ -1,8 +1,8 @@
-@import "tailwindcss";
-@import "tw-animate-css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
 
-@import "./theme.css";
-@import "./base.css";
+@import './theme.css';
+@import './base.css';
 /* @import "./components.css"; */
-@import "./utilities.css";
-@import "./animations.css";
+@import './utilities.css';
+@import './animations.css';

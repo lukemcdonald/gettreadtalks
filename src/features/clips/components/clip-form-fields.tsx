@@ -1,6 +1,6 @@
-import type { Control, FieldValues, Path } from 'react-hook-form';
 import type { SpeakerId, SpeakerListItem } from '@/features/speakers/types';
 import type { TalkId, TalkListItem } from '@/features/talks/types';
+import type { Control, FieldValues, Path } from 'react-hook-form';
 
 import { Controller } from 'react-hook-form';
 
@@ -30,13 +30,13 @@ export function ClipFormFields<T extends FieldValues>({
   speakers,
   talks,
 }: ClipFormFieldsProps<T>) {
-  const sortedSpeakers = [...speakers].sort((a, b) => {
+  const sortedSpeakers = speakers.toSorted((a, b) => {
     const nameA = getSpeakerName(a).toLowerCase();
     const nameB = getSpeakerName(b).toLowerCase();
     return nameA.localeCompare(nameB);
   });
 
-  const sortedTalks = [...talks].sort((a, b) => a.title.localeCompare(b.title));
+  const sortedTalks = talks.toSorted((a, b) => a.title.localeCompare(b.title));
 
   return (
     <div className="space-y-4">
@@ -80,7 +80,9 @@ export function ClipFormFields<T extends FieldValues>({
                 })),
               ]}
               name="speakerId"
-              onValueChange={(v) => field.onChange(v === '' ? undefined : (v as SpeakerId))}
+              onValueChange={(v) =>
+                field.onChange(v === '' ? undefined : (v as SpeakerId))
+              }
               value={(field.value as string) || ''}
             >
               <SelectTrigger id="speakerId">
@@ -114,7 +116,9 @@ export function ClipFormFields<T extends FieldValues>({
                 })),
               ]}
               name="talkId"
-              onValueChange={(v) => field.onChange(v === '' ? undefined : (v as TalkId))}
+              onValueChange={(v) =>
+                field.onChange(v === '' ? undefined : (v as TalkId))
+              }
               value={(field.value as string) || ''}
             >
               <SelectTrigger id="talkId">

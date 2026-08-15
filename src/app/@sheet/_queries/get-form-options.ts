@@ -33,8 +33,8 @@ export async function getFormOptions() {
     speakers: speakersResult.page.map((item) => ({
       _id: item._id,
       firstName: item.firstName,
-      lastName: item.lastName,
       imageUrl: item.imageUrl,
+      lastName: item.lastName,
       role: item.role,
     })),
     talks: talksResult.page.map((item) => ({

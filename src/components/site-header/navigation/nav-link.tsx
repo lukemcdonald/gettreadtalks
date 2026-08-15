@@ -14,8 +14,8 @@ interface NavLinkProps {
 
 export function NavLink({ children, href, isActive }: NavLinkProps) {
   const classes = {
-    default: 'text-foreground dark:text-muted-foreground',
     active: 'text-primary dark:text-primary-foreground',
+    default: 'text-foreground dark:text-muted-foreground',
   };
 
   return (

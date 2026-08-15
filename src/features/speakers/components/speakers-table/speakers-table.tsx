@@ -9,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui';
+
 import { SpeakersTableRow } from './speakers-table-row';
 
 interface SpeakersTableProps {

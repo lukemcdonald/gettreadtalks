@@ -1,4 +1,3 @@
-import type { StatusType } from '@/lib/entities/types';
 import type { FormStatus } from '@/lib/forms/types';
 
 /**
@@ -14,7 +13,10 @@ export function getTalkUrl(speakerSlug: string, talkSlug: string): string {
 /**
  * Get submit button label based on form operation status.
  */
-export function getSubmitButtonLabel(formStatus: FormStatus, talkId?: string): string {
+export function getSubmitButtonLabel(
+  formStatus: FormStatus,
+  talkId?: string
+): string {
   if (formStatus === 'creating') {
     return 'Creating...';
   }

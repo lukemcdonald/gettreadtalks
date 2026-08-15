@@ -18,7 +18,9 @@ export async function getAllSpeakers(args?: GetAllSpeakersProps) {
     numItems: limit ?? 1000,
   };
 
-  const result = await fetchAuthQuery(api.speakers.listAllSpeakers, { paginationOpts });
+  const result = await fetchAuthQuery(api.speakers.listAllSpeakers, {
+    paginationOpts,
+  });
 
   return {
     continueCursor: result.continueCursor,

@@ -1,19 +1,20 @@
 'use client';
 
+import type { ClipFormData } from '../schemas/clip-form';
 import type { ClipId } from '@/features/clips/types';
 import type { SpeakerId, SpeakerListItem } from '@/features/speakers/types';
 import type { TalkId, TalkListItem } from '@/features/talks/types';
 import type { StatusType } from '@/lib/entities/types';
-import type { ClipFormData } from '../schemas/clip-form';
 
-import { useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { FormSheet } from '@/components/ui';
 import { toastManager } from '@/components/ui/primitives/toast';
 import { updateClipAction } from '@/features/clips/actions/update-clip';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
+
 import { clipFormSchema } from '../schemas/clip-form';
 import { ClipFormFields } from './clip-form-fields';
 
@@ -47,9 +48,9 @@ export function EditClipSheet({
   const [isPending, startTransition] = useTransition();
 
   const form = useForm<ClipFormData>({
-    // biome-ignore lint/suspicious/noExplicitAny: Zod 4 compatibility with zodResolver
-    resolver: zodResolver(clipFormSchema as any),
     mode: 'onBlur',
+    // oxlint-disable-next-line typescript/no-explicit-any -- Zod 4 compatibility with zodResolver
+    resolver: zodResolver(clipFormSchema as any),
     values: {
       description: clip?.description ?? '',
       mediaUrl: clip?.mediaUrl ?? '',
@@ -93,7 +94,11 @@ export function EditClipSheet({
       submitLabel="Save Changes"
       title="Edit Clip"
     >
-      <ClipFormFields control={form.control} speakers={speakers} talks={talks} />
+      <ClipFormFields
+        control={form.control}
+        speakers={speakers}
+        talks={talks}
+      />
     </FormSheet>
   );
 }

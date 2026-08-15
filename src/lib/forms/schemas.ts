@@ -10,9 +10,12 @@ type StripEmptyStrings<T> = {
  * parsed form data to Convex mutations.
  */
 export function stripEmptyStrings<T extends Record<string, unknown>>(
-  data: T,
+  data: T
 ): StripEmptyStrings<T> {
   return Object.fromEntries(
-    Object.entries(data).map(([key, value]) => [key, value === '' ? undefined : value]),
+    Object.entries(data).map(([key, value]) => [
+      key,
+      value === '' ? undefined : value,
+    ])
   ) as StripEmptyStrings<T>;
 }

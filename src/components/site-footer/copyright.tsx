@@ -1,7 +1,3 @@
-'use client';
-
-import { useEffect, useState } from 'react';
-
 import { site } from '@/configs/site';
 
 interface CopyrightProps {
@@ -9,15 +5,7 @@ interface CopyrightProps {
 }
 
 export function Copyright({ className }: CopyrightProps) {
-  const [year, setYear] = useState<number | null>(null);
-
-  useEffect(() => {
-    setYear(new Date().getFullYear());
-  }, []);
-
-  if (!year) {
-    return null;
-  }
+  const year = new Date().getFullYear();
 
   return (
     <span className={className}>

@@ -10,12 +10,18 @@ interface SpeakersTableRowProps {
   talkCount: number;
 }
 
-export function SpeakersTableRow({ clipCount, speaker, talkCount }: SpeakersTableRowProps) {
+export function SpeakersTableRow({
+  clipCount,
+  speaker,
+  talkCount,
+}: SpeakersTableRowProps) {
   const fullName = `${speaker.firstName} ${speaker.lastName}`;
 
   return (
     <TableRow>
-      <TableCell className="whitespace-normal font-medium">{fullName}</TableCell>
+      <TableCell className="font-medium whitespace-normal">
+        {fullName}
+      </TableCell>
       <TableCell className="w-[120px]">
         <CountBadge count={talkCount} label="talk" />
       </TableCell>
@@ -23,7 +29,11 @@ export function SpeakersTableRow({ clipCount, speaker, talkCount }: SpeakersTabl
         <CountBadge count={clipCount} label="clip" />
       </TableCell>
       <TableCell className="w-px text-right">
-        <SpeakerActionsMenu clipCount={clipCount} speaker={speaker} talkCount={talkCount} />
+        <SpeakerActionsMenu
+          clipCount={clipCount}
+          speaker={speaker}
+          talkCount={talkCount}
+        />
       </TableCell>
     </TableRow>
   );

@@ -2,8 +2,8 @@
 
 import type { Route } from 'next';
 
-import { useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect } from 'react';
 
 import { useAnalytics } from '@/lib/analytics';
 import { signOut } from '@/services/auth/client';

@@ -2,10 +2,14 @@
 
 import type { Speaker, SpeakerId } from '@/features/speakers/types';
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
-import { ActionsGroup, DeleteBlockedDialog, DeleteConfirmDialog } from '@/components/actions-group';
+import {
+  ActionsGroup,
+  DeleteBlockedDialog,
+  DeleteConfirmDialog,
+} from '@/components/actions-group';
 import { toastManager } from '@/components/ui/primitives/toast';
 import { destroySpeakerAction } from '@/features/speakers/actions/destroy-speaker';
 import { getErrorMessage } from '@/services/errors';
@@ -17,7 +21,11 @@ interface SpeakerActionsMenuProps {
   talkCount: number;
 }
 
-export function SpeakerActionsMenu({ clipCount, speaker, talkCount }: SpeakerActionsMenuProps) {
+export function SpeakerActionsMenu({
+  clipCount,
+  speaker,
+  talkCount,
+}: SpeakerActionsMenuProps) {
   const router = useRouter();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -34,9 +42,9 @@ export function SpeakerActionsMenu({ clipCount, speaker, talkCount }: SpeakerAct
 
       if (!result.success) {
         toastManager.add({
-          type: 'error',
-          title: 'Failed to delete speaker',
           description: result.errors?.root ?? 'An error occurred',
+          title: 'Failed to delete speaker',
+          type: 'error',
         });
         return;
       }
@@ -46,9 +54,9 @@ export function SpeakerActionsMenu({ clipCount, speaker, talkCount }: SpeakerAct
       router.refresh();
     } catch (error: unknown) {
       toastManager.add({
-        type: 'error',
-        title: 'Failed to delete speaker',
         description: getErrorMessage(error),
+        title: 'Failed to delete speaker',
+        type: 'error',
       });
     } finally {
       setIsDeleting(false);

@@ -1,6 +1,9 @@
 import { FeaturedGrid } from '@/components/featured-grid';
 import { EditorialProfileLayout } from '@/components/layouts';
-import { EditorialProfileHeroSkeleton, MediaCardSkeleton } from '@/components/skeletons';
+import {
+  EditorialProfileHeroSkeleton,
+  MediaCardSkeleton,
+} from '@/components/skeletons';
 
 function ClipContentSkeleton() {
   return (

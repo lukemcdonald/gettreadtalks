@@ -35,7 +35,9 @@ export const isClipFavorited = query({
 
     const favorite = await ctx.db
       .query('userFavoriteClips')
-      .withIndex('by_userId_and_clipId', (q) => q.eq('userId', user._id).eq('clipId', args.clipId))
+      .withIndex('by_userId_and_clipId', (q) =>
+        q.eq('userId', user._id).eq('clipId', args.clipId)
+      )
       .first();
 
     return favorite !== null;
@@ -60,7 +62,7 @@ export const isSpeakerFavorited = query({
     const favorite = await ctx.db
       .query('userFavoriteSpeakers')
       .withIndex('by_userId_and_speakerId', (q) =>
-        q.eq('userId', user._id).eq('speakerId', args.speakerId),
+        q.eq('userId', user._id).eq('speakerId', args.speakerId)
       )
       .first();
 
@@ -85,7 +87,9 @@ export const isTalkFavorited = query({
 
     const favorite = await ctx.db
       .query('userFavoriteTalks')
-      .withIndex('by_userId_and_talkId', (q) => q.eq('userId', user._id).eq('talkId', args.talkId))
+      .withIndex('by_userId_and_talkId', (q) =>
+        q.eq('userId', user._id).eq('talkId', args.talkId)
+      )
       .first();
 
     return favorite !== null;
@@ -109,7 +113,9 @@ export const isTalkFinished = query({
 
     const finished = await ctx.db
       .query('userFinishedTalks')
-      .withIndex('by_userId_and_talkId', (q) => q.eq('userId', user._id).eq('talkId', args.talkId))
+      .withIndex('by_userId_and_talkId', (q) =>
+        q.eq('userId', user._id).eq('talkId', args.talkId)
+      )
       .first();
 
     return finished !== null;
@@ -138,11 +144,13 @@ export const listUserFavorites = query({
     const userId = user._id;
     const limit = args.limit ?? 100;
 
-    const [clipsResult, speakersResult, talksResult] = await Promise.allSettled([
-      getUserFavoriteClips(ctx, userId, limit),
-      getUserFavoriteSpeakers(ctx, userId, limit),
-      getUserFavoriteTalks(ctx, userId, limit),
-    ]);
+    const [clipsResult, speakersResult, talksResult] = await Promise.allSettled(
+      [
+        getUserFavoriteClips(ctx, userId, limit),
+        getUserFavoriteSpeakers(ctx, userId, limit),
+        getUserFavoriteTalks(ctx, userId, limit),
+      ]
+    );
 
     const clips = getSettledValue(clipsResult, []);
     const speakers = getSettledValue(speakersResult, []);

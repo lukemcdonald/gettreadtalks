@@ -1,7 +1,7 @@
 import type { Doc } from '../../_generated/dataModel';
 
-import { v } from 'convex/values';
 import { getManyFrom } from 'convex-helpers/server/relationships';
+import { v } from 'convex/values';
 
 import { mutation } from '../../_generated/server';
 import { throwValidationError } from '../../lib/errors';
@@ -10,7 +10,6 @@ import {
   generateSlug,
   getOrThrow,
   getPublishedAtForStatus,
-  slugify,
 } from '../../lib/utils';
 import { requireAuth } from '../auth/utils';
 import { statusType } from './validators';
@@ -51,7 +50,12 @@ export const destroyClip = mutation({
 
     await getOrThrow(ctx, 'clips', clipId);
 
-    const favorites = await getManyFrom(ctx.db, 'userFavoriteClips', 'by_clipId', clipId);
+    const favorites = await getManyFrom(
+      ctx.db,
+      'userFavoriteClips',
+      'by_clipId',
+      clipId
+    );
 
     await deleteAll(ctx, favorites);
 
@@ -101,8 +105,8 @@ export const createClip = mutation({
  */
 export const updateClip = mutation({
   args: {
-    description: v.optional(v.string()),
     clipId: v.id('clips'),
+    description: v.optional(v.string()),
     mediaUrl: v.optional(v.string()),
     speakerId: v.optional(v.id('speakers')),
     status: v.optional(statusType),
@@ -131,7 +135,10 @@ export const updateClip = mutation({
     }
 
     if (updates.status) {
-      updates.publishedAt = getPublishedAtForStatus(updates.status, clip.publishedAt);
+      updates.publishedAt = getPublishedAtForStatus(
+        updates.status,
+        clip.publishedAt
+      );
     }
 
     updates.updatedAt = Date.now();

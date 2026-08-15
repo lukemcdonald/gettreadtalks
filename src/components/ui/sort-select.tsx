@@ -1,7 +1,7 @@
 'use client';
 
-import { useTransition } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useTransition } from 'react';
 
 import {
   Label,
@@ -25,7 +25,12 @@ interface SortSelectProps {
   paramName?: string;
 }
 
-export function SortSelect({ className, label, options, paramName = 'sort' }: SortSelectProps) {
+export function SortSelect({
+  className,
+  label,
+  options,
+  paramName = 'sort',
+}: SortSelectProps) {
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -53,7 +58,12 @@ export function SortSelect({ className, label, options, paramName = 'sort' }: So
   return (
     <div className={cn('space-y-2', className)}>
       {!!label && <Label htmlFor={paramName}>{label}</Label>}
-      <Select disabled={isPending} items={options} onValueChange={handleChange} value={value}>
+      <Select
+        disabled={isPending}
+        items={options}
+        onValueChange={handleChange}
+        value={value}
+      >
         <SelectTrigger id={paramName} size="lg">
           <SelectValue />
         </SelectTrigger>

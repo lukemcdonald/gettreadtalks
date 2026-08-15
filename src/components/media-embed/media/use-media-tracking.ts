@@ -1,7 +1,7 @@
 'use client';
 
-import type { RefObject } from 'react';
 import type { MediaTrackingContext } from '../types';
+import type { RefObject } from 'react';
 
 import { useRef } from 'react';
 

@@ -15,7 +15,11 @@ interface TopicBrowseSectionProps {
   topic: Pick<Topic, 'slug' | 'title'>;
 }
 
-export function TopicBrowseSection({ talkCount, talks, topic }: TopicBrowseSectionProps) {
+export function TopicBrowseSection({
+  talkCount,
+  talks,
+  topic,
+}: TopicBrowseSectionProps) {
   const hasMoreTalks = talkCount > talks.length;
   const countLabel = `${talkCount} ${pluralize(talkCount, 'talk', 'talks')}`;
 
@@ -31,7 +35,7 @@ export function TopicBrowseSection({ talkCount, talks, topic }: TopicBrowseSecti
         meta={
           hasMoreTalks ? (
             <Link
-              className="inline-flex items-center gap-1 hover:text-foreground"
+              className="hover:text-foreground inline-flex items-center gap-1"
               href={`/topics/${topic.slug}`}
             >
               {countLabel}

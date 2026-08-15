@@ -8,11 +8,15 @@ interface SidebarContentProps {
   title?: string;
 }
 
-export function SidebarContent({ children, className, title }: SidebarContentProps) {
+export function SidebarContent({
+  children,
+  className,
+  title,
+}: SidebarContentProps) {
   return (
     <div className={cn('space-y-2', className)}>
       {!!title && (
-        <h3 className="font-semibold text-muted-foreground text-xs uppercase tracking-wide">
+        <h3 className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
           {title}
         </h3>
       )}

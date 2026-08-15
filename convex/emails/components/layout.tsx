@@ -40,7 +40,8 @@ export function EmailLayout({ children, preview }: EmailLayoutProps) {
 
             <Section style={footer}>
               <Text style={footerText}>
-                You received this email because you have an account with {site.name}.
+                You received this email because you have an account with{' '}
+                {site.name}.
               </Text>
               <Text style={footerText}>
                 {site.name} • {site.description}
@@ -63,8 +64,8 @@ const main = {
 const container = {
   backgroundColor: '#ffffff',
   margin: '0 auto',
-  padding: '20px 0 48px',
   marginBottom: '64px',
+  padding: '20px 0 48px',
 };
 
 const content = {
@@ -76,8 +77,8 @@ const content = {
 };
 
 const header = {
-  textAlign: 'center' as const,
   marginBottom: '32px',
+  textAlign: 'center' as const,
 };
 
 const h1 = {

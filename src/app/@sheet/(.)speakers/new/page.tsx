@@ -7,6 +7,10 @@ export default function Page() {
   const { handleOpenChange, handleSuccess } = useSheetRoute();
 
   return (
-    <CreateSpeakerSheet onOpenChange={handleOpenChange} onSpeakerCreated={handleSuccess} open />
+    <CreateSpeakerSheet
+      onOpenChange={handleOpenChange}
+      onSpeakerCreated={handleSuccess}
+      open
+    />
   );
 }

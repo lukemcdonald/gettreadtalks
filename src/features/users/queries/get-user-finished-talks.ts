@@ -9,7 +9,9 @@ export async function getUserFinishedTalks(limit?: number) {
   cacheLife('hours');
   cacheTag('user-finished-talks');
 
-  const result = await fetchAuthQuery(api.users.listUserFinishedTalks, { limit });
+  const result = await fetchAuthQuery(api.users.listUserFinishedTalks, {
+    limit,
+  });
 
   return {
     continueCursor: null,

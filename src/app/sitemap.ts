@@ -17,20 +17,21 @@ const staticRoutes: MetadataRoute.Sitemap = [
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [talkSlugs, speakers, collectionSlugs, topics, clipSlugs] = await Promise.all([
-    fetchQuery(api.talks.listTalkSlugsForSitemap, {}),
-    fetchQuery(api.speakers.listAllSpeakersRaw, {}),
-    fetchQuery(api.collections.listCollectionSlugsForSitemap, {}),
-    fetchQuery(api.topics.listTopics, {}),
-    fetchQuery(api.clips.listClipSlugsForSitemap, {}),
-  ]);
+  const [talkSlugs, speakers, collectionSlugs, topics, clipSlugs] =
+    await Promise.all([
+      fetchQuery(api.talks.listTalkSlugsForSitemap, {}),
+      fetchQuery(api.speakers.listAllSpeakersRaw, {}),
+      fetchQuery(api.collections.listCollectionSlugsForSitemap, {}),
+      fetchQuery(api.topics.listTopics, {}),
+      fetchQuery(api.clips.listClipSlugsForSitemap, {}),
+    ]);
 
   const talkEntries: MetadataRoute.Sitemap = talkSlugs.map(
     ({ speakerSlug, talkSlug, updatedAt }) => ({
       changeFrequency: 'weekly',
       lastModified: new Date(updatedAt),
       url: `${site.url}/talks/${speakerSlug}/${talkSlug}`,
-    }),
+    })
   );
 
   const speakerEntries: MetadataRoute.Sitemap = speakers.map((speaker) => ({
@@ -39,11 +40,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     url: `${site.url}/speakers/${speaker.slug}`,
   }));
 
-  const collectionEntries: MetadataRoute.Sitemap = collectionSlugs.map(({ slug, updatedAt }) => ({
-    changeFrequency: 'monthly',
-    lastModified: new Date(updatedAt),
-    url: `${site.url}/collections/${slug}`,
-  }));
+  const collectionEntries: MetadataRoute.Sitemap = collectionSlugs.map(
+    ({ slug, updatedAt }) => ({
+      changeFrequency: 'monthly',
+      lastModified: new Date(updatedAt),
+      url: `${site.url}/collections/${slug}`,
+    })
+  );
 
   const topicEntries: MetadataRoute.Sitemap = topics.map((topic) => ({
     changeFrequency: 'weekly',
@@ -51,11 +54,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     url: `${site.url}/topics/${topic.slug}`,
   }));
 
-  const clipEntries: MetadataRoute.Sitemap = clipSlugs.map(({ slug, updatedAt }) => ({
-    changeFrequency: 'weekly',
-    lastModified: new Date(updatedAt),
-    url: `${site.url}/clips/${slug}`,
-  }));
+  const clipEntries: MetadataRoute.Sitemap = clipSlugs.map(
+    ({ slug, updatedAt }) => ({
+      changeFrequency: 'weekly',
+      lastModified: new Date(updatedAt),
+      url: `${site.url}/clips/${slug}`,
+    })
+  );
 
   return [
     ...staticRoutes,

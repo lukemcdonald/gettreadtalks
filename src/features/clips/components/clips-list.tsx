@@ -2,6 +2,7 @@ import type { ClipWithSpeaker } from '../types';
 
 import { getVideoThumbnail } from '@/components/media-embed';
 import { rotateContent } from '@/utils';
+
 import { ClipCard } from './clip-card';
 import { ClipFeaturedCard } from './clip-featured-card';
 
@@ -14,14 +15,21 @@ export function ClipsList({ clips }: ClipsListProps) {
     return null;
   }
 
-  const featuredCandidates = clips.filter((clip) => getVideoThumbnail(clip.mediaUrl) !== null);
-  const [featuredClip] = rotateContent(featuredCandidates.length > 0 ? featuredCandidates : clips, {
-    period: 'daily',
-    count: 1,
-  });
+  const featuredCandidates = clips.filter(
+    (clip) => getVideoThumbnail(clip.mediaUrl) !== null
+  );
+  const [featuredClip] = rotateContent(
+    featuredCandidates.length > 0 ? featuredCandidates : clips,
+    {
+      count: 1,
+      period: 'daily',
+    }
+  );
 
   const remainingClips =
-    clips.length > 1 ? clips.filter((clip) => clip._id !== featuredClip._id) : clips;
+    clips.length > 1
+      ? clips.filter((clip) => clip._id !== featuredClip._id)
+      : clips;
 
   return (
     <div className="grid auto-rows-min grid-cols-1 gap-x-6 gap-y-4 md:grid-cols-2 lg:grid-cols-3">

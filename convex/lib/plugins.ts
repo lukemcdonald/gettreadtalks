@@ -1,6 +1,6 @@
+import type { DataModel } from '../_generated/dataModel';
 import type { GenericCtx } from '@convex-dev/better-auth';
 import type { FunctionReference } from 'convex/server';
-import type { DataModel } from '../_generated/dataModel';
 
 import { requireActionCtx } from '@convex-dev/better-auth/utils';
 import { HOUR } from '@convex-dev/rate-limiter';
@@ -14,7 +14,10 @@ type RateLimitMutation = FunctionReference<
   { ok: boolean; retryAfter?: number }
 >;
 
-const RATE_LIMIT_ENDPOINTS: Record<string, { message: string; mutation: RateLimitMutation }> = {
+const RATE_LIMIT_ENDPOINTS: Record<
+  string,
+  { message: string; mutation: RateLimitMutation }
+> = {
   '/change-password': {
     message: 'Too many password change attempts. Please try again later.',
     mutation: internal.model.auth.rateLimiter.checkChangePassword,
@@ -40,7 +43,9 @@ function getClientIp(request: Request): string {
     request.headers.get('x-forwarded-for')?.split(',')[0].trim();
 
   if (!ip) {
-    console.warn('[auth-rate-limit] Could not determine client IP, using anonymous key');
+    console.warn(
+      '[auth-rate-limit] Could not determine client IP, using anonymous key'
+    );
     return 'anonymous';
   }
 
@@ -63,7 +68,7 @@ export function authRateLimitPlugin(ctx: GenericCtx<DataModel>) {
     onRequest: async (request: Request) => {
       const url = new URL(request.url);
       const endpoint = Object.entries(RATE_LIMIT_ENDPOINTS).find(([suffix]) =>
-        url.pathname.endsWith(suffix),
+        url.pathname.endsWith(suffix)
       );
 
       if (!endpoint) {
@@ -78,13 +83,16 @@ export function authRateLimitPlugin(ctx: GenericCtx<DataModel>) {
 
       try {
         result = await actionCtx.runMutation(mutation, { key: ip });
-      } catch (err) {
-        console.error('[auth-rate-limit] Rate limiter mutation failed, failing closed', err);
+      } catch (error) {
+        console.error(
+          '[auth-rate-limit] Rate limiter mutation failed, failing closed',
+          error
+        );
 
         return {
           response: rateLimitedResponse(
             'Service temporarily unavailable. Please try again later.',
-            HOUR,
+            HOUR
           ),
         };
       }

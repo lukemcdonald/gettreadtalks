@@ -3,7 +3,11 @@ import type { QueryCtx } from '../../_generated/server';
 /**
  * Get user's favorite clips with clip data.
  */
-export async function getUserFavoriteClips(ctx: QueryCtx, userId: string, limit: number) {
+export async function getUserFavoriteClips(
+  ctx: QueryCtx,
+  userId: string,
+  limit: number
+) {
   const rows = await ctx.db
     .query('userFavoriteClips')
     .withIndex('by_userId_and_clipId', (q) => q.eq('userId', userId))
@@ -15,8 +19,13 @@ export async function getUserFavoriteClips(ctx: QueryCtx, userId: string, limit:
       if (!clip) {
         return null;
       }
-      return { _id: clip._id, favoriteId: row._id, slug: clip.slug, title: clip.title };
-    }),
+      return {
+        _id: clip._id,
+        favoriteId: row._id,
+        slug: clip.slug,
+        title: clip.title,
+      };
+    })
   );
 
   return enriched.filter((x): x is NonNullable<typeof x> => x !== null);
@@ -25,7 +34,11 @@ export async function getUserFavoriteClips(ctx: QueryCtx, userId: string, limit:
 /**
  * Get user's favorite speakers with speaker data.
  */
-export async function getUserFavoriteSpeakers(ctx: QueryCtx, userId: string, limit: number) {
+export async function getUserFavoriteSpeakers(
+  ctx: QueryCtx,
+  userId: string,
+  limit: number
+) {
   const rows = await ctx.db
     .query('userFavoriteSpeakers')
     .withIndex('by_userId_and_speakerId', (q) => q.eq('userId', userId))
@@ -45,7 +58,7 @@ export async function getUserFavoriteSpeakers(ctx: QueryCtx, userId: string, lim
         lastName: speaker.lastName,
         slug: speaker.slug,
       };
-    }),
+    })
   );
 
   return enriched.filter((x): x is NonNullable<typeof x> => x !== null);
@@ -54,7 +67,11 @@ export async function getUserFavoriteSpeakers(ctx: QueryCtx, userId: string, lim
 /**
  * Get user's favorite talks with talk and speaker data.
  */
-export async function getUserFavoriteTalks(ctx: QueryCtx, userId: string, limit: number) {
+export async function getUserFavoriteTalks(
+  ctx: QueryCtx,
+  userId: string,
+  limit: number
+) {
   const rows = await ctx.db
     .query('userFavoriteTalks')
     .withIndex('by_userId_and_talkId', (q) => q.eq('userId', userId))
@@ -72,11 +89,15 @@ export async function getUserFavoriteTalks(ctx: QueryCtx, userId: string, limit:
         favoriteId: row._id,
         slug: talk.slug,
         speaker: speaker
-          ? { firstName: speaker.firstName, lastName: speaker.lastName, slug: speaker.slug }
+          ? {
+              firstName: speaker.firstName,
+              lastName: speaker.lastName,
+              slug: speaker.slug,
+            }
           : null,
         title: talk.title,
       };
-    }),
+    })
   );
 
   return enriched.filter((x): x is NonNullable<typeof x> => x !== null);
@@ -85,7 +106,11 @@ export async function getUserFavoriteTalks(ctx: QueryCtx, userId: string, limit:
 /**
  * Get user's finished talks with talk and speaker data.
  */
-export async function getUserFinishedTalks(ctx: QueryCtx, userId: string, limit: number) {
+export async function getUserFinishedTalks(
+  ctx: QueryCtx,
+  userId: string,
+  limit: number
+) {
   const rows = await ctx.db
     .query('userFinishedTalks')
     .withIndex('by_userId', (q) => q.eq('userId', userId))
@@ -104,11 +129,15 @@ export async function getUserFinishedTalks(ctx: QueryCtx, userId: string, limit:
         finishedId: row._id,
         slug: talk.slug,
         speaker: speaker
-          ? { firstName: speaker.firstName, lastName: speaker.lastName, slug: speaker.slug }
+          ? {
+              firstName: speaker.firstName,
+              lastName: speaker.lastName,
+              slug: speaker.slug,
+            }
           : null,
         title: talk.title,
       };
-    }),
+    })
   );
 
   return enriched.filter((x): x is NonNullable<typeof x> => x !== null);

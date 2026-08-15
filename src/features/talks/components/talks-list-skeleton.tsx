@@ -7,9 +7,9 @@ interface TalksListSkeletonProps {
 
 export function TalksListSkeleton({ count = 6 }: TalksListSkeletonProps) {
   return (
-    <GridList columns={{ default: 1, sm: 1, md: 2, lg: 2, xl: 2 }}>
+    <GridList columns={{ default: 1, lg: 2, md: 2, sm: 1, xl: 2 }}>
       {Array.from({ length: count }).map((_, i) => (
-        // biome-ignore lint/suspicious/noArrayIndexKey: Static skeleton items never reorder
+        // oxlint-disable-next-line react/no-array-index-key -- static skeleton items never reorder
         <MediaCardSkeleton key={i} />
       ))}
     </GridList>

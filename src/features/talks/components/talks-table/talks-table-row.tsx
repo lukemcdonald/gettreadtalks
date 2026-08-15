@@ -9,7 +9,9 @@ interface TalksTableRowProps {
 }
 
 export function TalksTableRow({ talk }: TalksTableRowProps) {
-  const talkUrl = talk.speaker ? `/talks/${talk.speaker.slug}/${talk.slug}` : '';
+  const talkUrl = talk.speaker
+    ? `/talks/${talk.speaker.slug}/${talk.slug}`
+    : '';
 
   return (
     <ContentTableRow

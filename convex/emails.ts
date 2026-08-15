@@ -1,5 +1,5 @@
-import type { ReactElement } from 'react';
 import type { MutationCtx } from './_generated/server';
+import type { ReactElement } from 'react';
 
 import { Resend, vEmailEvent, vEmailId } from '@convex-dev/resend';
 import { render } from '@react-email/render';
@@ -21,7 +21,7 @@ const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || TEST_DOMAIN_EMAIL;
 export const resend: Resend = new Resend(components.resend, {
   // Note: testMode true = simulate emails (nothing sent), false = actually send emails
   testMode: process.env.RESEND_TEST_MODE !== 'false',
-  // biome-ignore lint/suspicious/noExplicitAny: Type compatibility workaround for Convex 1.29.x
+  // oxlint-disable-next-line typescript/no-explicit-any -- Convex 1.29 Resend component type mismatch
   onEmailEvent: internal.emails.handleEmailEvent as any,
 });
 
@@ -38,25 +38,28 @@ export const handleEmailEvent = internalMutation({
     const { event, id } = args;
 
     switch (event.type) {
-      case 'email.bounced':
+      case 'email.bounced': {
         await suppressRecipients(ctx, {
+          bounceSubType: event.data.bounce.subType,
+          bounceType: event.data.bounce.type,
           emails: normalizeRecipients(event.data.to),
           reason: 'bounced',
           resendEmailId: event.data.email_id,
-          bounceType: event.data.bounce.type,
-          bounceSubType: event.data.bounce.subType,
         });
         break;
-      case 'email.complained':
+      }
+      case 'email.complained': {
         await suppressRecipients(ctx, {
           emails: normalizeRecipients(event.data.to),
           reason: 'complained',
           resendEmailId: event.data.email_id,
         });
         break;
-      default:
+      }
+      default: {
         console.log('Email event:', event.type, id);
         break;
+      }
     }
 
     return null;
@@ -70,7 +73,6 @@ export const sendPasswordResetEmail = internalAction({
     resetUrl: v.string(),
     token: v.string(),
   },
-  returns: v.null(),
   handler: async (ctx, args) => {
     try {
       const template = ResetPasswordTemplate({
@@ -96,6 +98,7 @@ export const sendPasswordResetEmail = internalAction({
       });
     }
   },
+  returns: v.null(),
 });
 
 export const sendTestEmail = internalMutation({
@@ -117,7 +120,6 @@ export const sendVerificationEmail = internalMutation({
     token: v.string(),
     verificationUrl: v.string(),
   },
-  returns: vEmailId,
   handler: async (ctx, args) => {
     try {
       const template = VerifyEmailTemplate({
@@ -145,6 +147,7 @@ export const sendVerificationEmail = internalMutation({
       });
     }
   },
+  returns: vEmailId,
 });
 
 export const sendWelcomeEmail = internalMutation({
@@ -153,7 +156,6 @@ export const sendWelcomeEmail = internalMutation({
     name: v.string(),
     userId: v.string(),
   },
-  returns: vEmailId,
   handler: async (ctx, args) => {
     try {
       const template = WelcomeEmail({
@@ -179,6 +181,7 @@ export const sendWelcomeEmail = internalMutation({
       });
     }
   },
+  returns: vEmailId,
 });
 
 // ============================================
@@ -204,7 +207,10 @@ function getReplyToAddress() {
 }
 
 async function renderEmail(template: ReactElement) {
-  const [html, text] = await Promise.all([render(template), render(template, { plainText: true })]);
+  const [html, text] = await Promise.all([
+    render(template),
+    render(template, { plainText: true }),
+  ]);
   return { html, text };
 }
 
@@ -220,27 +226,31 @@ async function suppressRecipients(
     emails: string[];
     reason: 'bounced' | 'complained';
     resendEmailId: string;
-  },
-) {
-  for (const email of params.emails) {
-    const existing = await ctx.db
-      .query('emailSuppressions')
-      .withIndex('by_email', (q) => q.eq('email', email))
-      .first();
-
-    if (existing) {
-      continue;
-    }
-
-    await ctx.db.insert('emailSuppressions', {
-      bounceSubType: params.bounceSubType,
-      bounceType: params.bounceType,
-      email,
-      reason: params.reason,
-      resendEmailId: params.resendEmailId,
-      suppressedAt: Date.now(),
-    });
-
-    console.log('Email suppressed:', email, 'reason:', params.reason);
   }
+) {
+  const uniqueEmails = [...new Set(params.emails)];
+
+  await Promise.all(
+    uniqueEmails.map(async (email) => {
+      const existing = await ctx.db
+        .query('emailSuppressions')
+        .withIndex('by_email', (q) => q.eq('email', email))
+        .first();
+
+      if (existing) {
+        return;
+      }
+
+      await ctx.db.insert('emailSuppressions', {
+        bounceSubType: params.bounceSubType,
+        bounceType: params.bounceType,
+        email,
+        reason: params.reason,
+        resendEmailId: params.resendEmailId,
+        suppressedAt: Date.now(),
+      });
+
+      console.log('Email suppressed:', email, 'reason:', params.reason);
+    })
+  );
 }

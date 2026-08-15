@@ -1,10 +1,13 @@
 import type { Doc } from '../../_generated/dataModel';
 import type { SpeakerSortOption } from '../../lib/sort';
 
-import { paginationOptsValidator, paginationResultValidator } from 'convex/server';
-import { v } from 'convex/values';
 import { asyncMap } from 'convex-helpers';
 import { getManyFrom, getOneFrom } from 'convex-helpers/server/relationships';
+import {
+  paginationOptsValidator,
+  paginationResultValidator,
+} from 'convex/server';
+import { v } from 'convex/values';
 
 import { query } from '../../_generated/server';
 import { filterSpeakersWithPublishedTalks } from '../../lib/filters';
@@ -49,26 +52,30 @@ export const getSpeakerBySlug = query({
       ctx.db
         .query('talks')
         .withIndex('by_speakerId_and_status', (q) =>
-          q.eq('speakerId', speakerId).eq('status', 'published'),
+          q.eq('speakerId', speakerId).eq('status', 'published')
         )
         .order('desc')
         .collect(),
       ctx.db
         .query('clips')
         .withIndex('by_speakerId_and_status', (q) =>
-          q.eq('speakerId', speakerId).eq('status', 'published'),
+          q.eq('speakerId', speakerId).eq('status', 'published')
         )
         .order('desc')
         .collect(),
     ]);
 
     const collectionIds = [
-      ...new Set(talks.flatMap((talk) => (talk.collectionId ? [talk.collectionId] : []))),
+      ...new Set(
+        talks.flatMap((talk) => (talk.collectionId ? [talk.collectionId] : []))
+      ),
     ];
     const collectionsData = await Promise.all(
-      collectionIds.map((id) => ctx.db.get('collections', id)),
+      collectionIds.map((id) => ctx.db.get('collections', id))
     );
-    const collections = collectionsData.filter((col): col is Doc<'collections'> => col !== null);
+    const collections = collectionsData.filter(
+      (col): col is Doc<'collections'> => col !== null
+    );
 
     return {
       clips,
@@ -83,7 +90,7 @@ export const getSpeakerBySlug = query({
       collections: docs('collections'),
       speaker: doc('speakers'),
       talks: docs('talks'),
-    }),
+    })
   ),
 });
 
@@ -165,7 +172,11 @@ export const listSpeakers = query({
     }
 
     // With filters or custom sort, collect all and paginate in-memory
-    let speakers = await ctx.db.query('speakers').withIndex('by_lastName').order('asc').collect();
+    let speakers = await ctx.db
+      .query('speakers')
+      .withIndex('by_lastName')
+      .order('asc')
+      .collect();
 
     // Filter to speakers with published content
     speakers = await filterSpeakersWithPublishedTalks(ctx, speakers);
@@ -177,7 +188,9 @@ export const listSpeakers = query({
         (speaker) =>
           speaker.firstName.toLowerCase().includes(searchLower) ||
           speaker.lastName.toLowerCase().includes(searchLower) ||
-          `${speaker.firstName} ${speaker.lastName}`.toLowerCase().includes(searchLower),
+          `${speaker.firstName} ${speaker.lastName}`
+            .toLowerCase()
+            .includes(searchLower)
       );
     }
 
@@ -192,7 +205,7 @@ export const listSpeakers = query({
     const { continueCursor, isDone, page } = paginateArray(
       speakers,
       paginationOpts.cursor,
-      paginationOpts.numItems,
+      paginationOpts.numItems
     );
 
     return {
@@ -212,15 +225,25 @@ export const listAllSpeakersAdmin = query({
   handler: async (ctx) => {
     await requireAuth(ctx);
 
-    const speakers = await ctx.db.query('speakers').withIndex('by_lastName').collect();
+    const speakers = await ctx.db
+      .query('speakers')
+      .withIndex('by_lastName')
+      .collect();
 
     return await asyncMap(speakers, async (speaker) => {
       const talks = await ctx.db
         .query('talks')
-        .withIndex('by_speakerId_and_status', (q) => q.eq('speakerId', speaker._id))
+        .withIndex('by_speakerId_and_status', (q) =>
+          q.eq('speakerId', speaker._id)
+        )
         .collect();
 
-      const clips = await getManyFrom(ctx.db, 'clips', 'by_speakerId', speaker._id);
+      const clips = await getManyFrom(
+        ctx.db,
+        'clips',
+        'by_speakerId',
+        speaker._id
+      );
 
       return {
         clipCount: clips.length,
@@ -234,7 +257,7 @@ export const listAllSpeakersAdmin = query({
       clipCount: v.number(),
       speaker: doc('speakers'),
       talkCount: v.number(),
-    }),
+    })
   ),
 });
 

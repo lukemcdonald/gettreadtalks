@@ -9,6 +9,7 @@ import {
 
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui';
 import { formatDate, getStatusColor, getStatusLabel } from '@/utils';
+
 import { StatusPopoverDetail } from './status-popover-detail';
 
 interface StatusPopoverProps {
@@ -18,7 +19,12 @@ interface StatusPopoverProps {
   updatedAt?: number;
 }
 
-export function StatusPopover({ createdAt, publishedAt, status, updatedAt }: StatusPopoverProps) {
+export function StatusPopover({
+  createdAt,
+  publishedAt,
+  status,
+  updatedAt,
+}: StatusPopoverProps) {
   const statusColor = getStatusColor(status);
 
   return (

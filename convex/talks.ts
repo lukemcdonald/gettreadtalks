@@ -1,20 +1,19 @@
 import { mutations, queries } from './model/talks';
 
 // Queries
-export const getTalk = queries.getTalk;
-export const getTalkBySlug = queries.getTalkBySlug;
-export const getTalksCount = queries.getTalksCount;
-export const listAllTalks = queries.listAllTalks;
-export const listFeaturedTalks = queries.listFeaturedTalks;
-export const listFeaturedTalksWithSpeakers = queries.listFeaturedTalksWithSpeakers;
-export const listRandomTalksBySpeaker = queries.listRandomTalksBySpeaker;
-export const listTalkSlugsForSitemap = queries.listTalkSlugsForSitemap;
-export const listTalks = queries.listTalks;
-export const listTalksByCollection = queries.listTalksByCollection;
-export const listTalksBySpeaker = queries.listTalksBySpeaker;
+export const {
+  getTalk,
+  getTalkBySlug,
+  getTalksCount,
+  listAllTalks,
+  listFeaturedTalks,
+  listFeaturedTalksWithSpeakers,
+  listRandomTalksBySpeaker,
+  listTalkSlugsForSitemap,
+  listTalks,
+  listTalksByCollection,
+  listTalksBySpeaker,
+} = queries;
 
 // Mutations
-export const archiveTalk = mutations.archiveTalk;
-export const createTalk = mutations.createTalk;
-export const destroyTalk = mutations.destroyTalk;
-export const updateTalk = mutations.updateTalk;
+export const { archiveTalk, createTalk, destroyTalk, updateTalk } = mutations;

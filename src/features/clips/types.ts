@@ -1,6 +1,6 @@
-import type { FunctionReturnType } from 'convex/server';
 import type { api } from '@/convex/_generated/api';
 import type { Doc, Id } from '@/convex/_generated/dataModel';
+import type { FunctionReturnType } from 'convex/server';
 
 export type Clip = Doc<'clips'>;
 export type ClipId = Id<'clips'>;

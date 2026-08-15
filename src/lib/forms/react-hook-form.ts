@@ -22,7 +22,7 @@ type ServerErrors = Record<string, string>;
  */
 export function setServerErrors<T extends FieldValues>(
   setError: UseFormSetError<T>,
-  errors: ServerErrors,
+  errors: ServerErrors
 ): void {
   const { _form, ...fieldErrors } = errors;
 
@@ -30,8 +30,8 @@ export function setServerErrors<T extends FieldValues>(
   // 'root' is a special field name supported by React Hook Form but not in the FieldPath type
   if (_form) {
     setError('root' as FieldPath<T>, {
-      type: 'server',
       message: _form,
+      type: 'server',
     });
   }
 
@@ -39,8 +39,8 @@ export function setServerErrors<T extends FieldValues>(
   // Field names from server may not match form fields exactly, but React Hook Form handles this gracefully
   for (const [field, message] of Object.entries(fieldErrors)) {
     setError(field as FieldPath<T>, {
-      type: 'server',
       message,
+      type: 'server',
     });
   }
 }

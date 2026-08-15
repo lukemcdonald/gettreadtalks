@@ -17,7 +17,11 @@ export function StatusPopoverDetail({
 }: ContentTableItemDetailProps) {
   return (
     <div className="flex items-start gap-2.5">
-      {!!Icon && <Icon className={cn('mt-0.5 size-4 text-muted-foreground', iconClass)} />}
+      {!!Icon && (
+        <Icon
+          className={cn('text-muted-foreground mt-0.5 size-4', iconClass)}
+        />
+      )}
       <dl className="flex flex-col gap-0.5">
         <dt className="font-medium">{title}</dt>
         <dd className="text-muted-foreground">{description}</dd>

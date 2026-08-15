@@ -12,5 +12,8 @@ export async function getTalkBySlug(speakerSlug: string, talkSlug: string) {
   cacheLife('hours');
   cacheTag('talks');
 
-  return await fetchAuthQuery(api.talks.getTalkBySlug, { speakerSlug, talkSlug });
+  return await fetchAuthQuery(api.talks.getTalkBySlug, {
+    speakerSlug,
+    talkSlug,
+  });
 }

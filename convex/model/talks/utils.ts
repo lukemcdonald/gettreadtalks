@@ -7,10 +7,10 @@ import { asyncMap } from 'convex-helpers';
  * Apply search filter with speaker data to talks+speaker array.
  */
 export function applySearchFilterWithSpeaker(
-  talks: Array<Doc<'talks'> & { speaker: Doc<'speakers'> | null }>,
+  talks: (Doc<'talks'> & { speaker: Doc<'speakers'> | null })[],
   search?: string,
-  searchType?: 'title' | 'speaker',
-): Array<Doc<'talks'> & { speaker: Doc<'speakers'> | null }> {
+  searchType?: 'title' | 'speaker'
+): (Doc<'talks'> & { speaker: Doc<'speakers'> | null })[] {
   if (!search) {
     return talks;
   }
@@ -24,7 +24,8 @@ export function applySearchFilterWithSpeaker(
     }
 
     if (type === 'speaker' && talk.speaker) {
-      const speakerName = `${talk.speaker.firstName} ${talk.speaker.lastName}`.toLowerCase();
+      const speakerName =
+        `${talk.speaker.firstName} ${talk.speaker.lastName}`.toLowerCase();
       return speakerName.includes(searchLower);
     }
 
@@ -38,15 +39,17 @@ export function applySearchFilterWithSpeaker(
  */
 export async function enrichWithTopics<T extends { _id: Id<'talks'> }>(
   ctx: QueryCtx,
-  talks: T[],
-): Promise<Array<T & { topicSlugs: string[] }>> {
+  talks: T[]
+): Promise<(T & { topicSlugs: string[] })[]> {
   return await asyncMap(talks, async (talk: T) => {
     const talksOnTopics = await ctx.db
       .query('talksOnTopics')
       .withIndex('by_talkId', (q) => q.eq('talkId', talk._id))
       .collect();
 
-    const topics = await Promise.all(talksOnTopics.map((tot) => ctx.db.get('topics', tot.topicId)));
+    const topics = await Promise.all(
+      talksOnTopics.map((tot) => ctx.db.get('topics', tot.topicId))
+    );
 
     const topicSlugs = topics
       .filter((topic): topic is Doc<'topics'> => topic !== null)

@@ -11,5 +11,7 @@ export const emailSuppressionFields = {
 };
 
 export const emailTables = {
-  emailSuppressions: defineTable(emailSuppressionFields).index('by_email', ['email']),
+  emailSuppressions: defineTable(emailSuppressionFields).index('by_email', [
+    'email',
+  ]),
 };

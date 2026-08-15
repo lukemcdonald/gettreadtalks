@@ -1,12 +1,11 @@
 import 'server-only';
-
-import type { Route } from 'next';
 import type { AdminUser } from '@/services/auth/types';
+import type { Route } from 'next';
 
-import { cache } from 'react';
 import { convexBetterAuthNextJs } from '@convex-dev/better-auth/nextjs';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { cache } from 'react';
 
 import { api } from '@/convex/_generated/api';
 import { isAdmin } from '@/services/auth/utils';
@@ -17,7 +16,7 @@ const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
 
 if (!(convexSiteUrl && convexUrl)) {
   throw new Error(
-    'Missing required environment variables: NEXT_PUBLIC_CONVEX_SITE_URL and NEXT_PUBLIC_CONVEX_URL',
+    'Missing required environment variables: NEXT_PUBLIC_CONVEX_SITE_URL and NEXT_PUBLIC_CONVEX_URL'
   );
 }
 
@@ -97,7 +96,9 @@ const requireCurrentUser = async (redirectTo: Route<string> = '/login') => {
  * @param redirectTo - URL to redirect to if not authenticated (default: '/login')
  * @returns Admin user object
  */
-const requireAdminUser = async (redirectTo: Route<string> = '/login'): Promise<AdminUser> => {
+const requireAdminUser = async (
+  redirectTo: Route<string> = '/login'
+): Promise<AdminUser> => {
   const user = await getCurrentUser();
 
   if (!user) {

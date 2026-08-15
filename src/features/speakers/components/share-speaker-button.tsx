@@ -10,12 +10,17 @@ interface ShareSpeakerButtonProps {
   speakerName: string;
 }
 
-export function ShareSpeakerButton({ speakerId, speakerName }: ShareSpeakerButtonProps) {
+export function ShareSpeakerButton({
+  speakerId,
+  speakerName,
+}: ShareSpeakerButtonProps) {
   const { track } = useAnalytics();
 
   return (
     <ShareButton
-      onShare={(method) => track('speaker_shared', { method, speaker_id: speakerId })}
+      onShare={(method) =>
+        track('speaker_shared', { method, speaker_id: speakerId })
+      }
       title={speakerName}
     />
   );

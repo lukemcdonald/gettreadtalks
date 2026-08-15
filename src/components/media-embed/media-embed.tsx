@@ -5,6 +5,7 @@ import type { MediaTrackingContext } from './types';
 import { usePathname } from 'next/navigation';
 
 import { cn } from '@/utils';
+
 import { AudioPlayer } from './media/audio-player';
 import { ExternalLinkButton } from './media/external-link-button';
 import { VideoPlayer } from './media/video-player';
@@ -27,7 +28,10 @@ export function MediaEmbed({
 }: MediaEmbedProps) {
   const pathname = usePathname();
   const media = detectMediaType(mediaUrl);
-  const isVideo = media.type === 'video' || media.type === 'vimeo' || media.type === 'youtube';
+  const isVideo =
+    media.type === 'video' ||
+    media.type === 'vimeo' ||
+    media.type === 'youtube';
   const hasWrapper = media.type !== 'unknown';
 
   return (
@@ -35,15 +39,23 @@ export function MediaEmbed({
       className={cn(
         'text-center',
         isVideo && 'overflow-hidden rounded-2xl',
-        hasWrapper && className,
+        hasWrapper && className
       )}
       key={pathname}
     >
-      {media.type === 'audio' && <AudioPlayer src={media.src} trackingContext={trackingContext} />}
-      {media.type === 'unknown' && (
-        <ExternalLinkButton className="rounded-full" href={media.href} label="Open Media" />
+      {media.type === 'audio' && (
+        <AudioPlayer src={media.src} trackingContext={trackingContext} />
       )}
-      {media.type === 'video' && <VideoPlayer src={media.src} trackingContext={trackingContext} />}
+      {media.type === 'unknown' && (
+        <ExternalLinkButton
+          className="rounded-full"
+          href={media.href}
+          label="Open Media"
+        />
+      )}
+      {media.type === 'video' && (
+        <VideoPlayer src={media.src} trackingContext={trackingContext} />
+      )}
       {media.type === 'vimeo' && <VimeoEmbed id={media.id} title={title} />}
       {media.type === 'youtube' && <YouTubeEmbed id={media.id} title={title} />}
     </div>

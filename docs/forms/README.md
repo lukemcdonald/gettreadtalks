@@ -48,9 +48,11 @@ import { FieldError } from '@/components/ui/fields';
 ## Component Features
 
 ### Form Component
+
 - Must be wrapped with `FormProvider` from React Hook Form
 - Sets `noValidate={true}` by default to prevent HTML5 validation (React Hook Form handles all validation)
 - Usage:
+
 ```typescript
 import { FormProvider } from 'react-hook-form';
 import { Form } from '@/components/ui/form';
@@ -63,19 +65,23 @@ import { Form } from '@/components/ui/form';
 ```
 
 ### FieldLabel Component
+
 - Automatically displays a red asterisk (`*`) when `required={true}` is passed
 - Usage: `<FieldLabel required>Title</FieldLabel>`
 
 ### FieldControl Component
+
 - Automatically sets `aria-invalid="true"` when `error` prop is provided
 - Usage: `<FieldControl error={fieldState.error} {...field} />`
 
 ### FieldError Component
+
 - Displays field-level validation errors
 - Used internally by reusable field components
 - For custom Controller usage: `{!!fieldState.error && <FieldError>{fieldState.error?.message}</FieldError>}`
 
 ### FormError Component
+
 - Displays form-level (non-field) errors
 - Automatically handles null/undefined (returns null if no error)
 - Usage: `<FormError error={form.formState.errors.root} />`

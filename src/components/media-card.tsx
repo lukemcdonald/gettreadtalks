@@ -6,18 +6,27 @@ import { cn } from '@/utils';
 
 export function MediaIconFrame({ children }: { children: ReactNode }) {
   return (
-    <div className="flex size-12 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
+    <div className="bg-muted text-muted-foreground flex size-12 shrink-0 items-center justify-center rounded-md">
       {children}
     </div>
   );
 }
 
-export function MediaCardTitle({ className, ...delegated }: ComponentProps<'h3'>) {
+export function MediaCardTitle({
+  children,
+  className,
+  ...delegated
+}: ComponentProps<'h3'>) {
   return (
     <h3
-      className={cn('line-clamp-2 text-balance font-semibold text-base', className)}
+      className={cn(
+        'line-clamp-2 text-base font-semibold text-balance',
+        className
+      )}
       {...delegated}
-    />
+    >
+      {children}
+    </h3>
   );
 }
 
@@ -43,8 +52,8 @@ export function MediaCard({
   return (
     <Card
       className={cn(
-        'card-interactive group relative flex-row items-center gap-3.5 border-0 p-4 [contain-intrinsic-size:auto_80px] [content-visibility:auto]',
-        className,
+        'group card-interactive relative flex-row items-center gap-3.5 border-0 p-4 [contain-intrinsic-size:auto_80px] [content-visibility:auto]',
+        className
       )}
       {...delegated}
     >
@@ -55,7 +64,9 @@ export function MediaCard({
             {title}
           </FauxLink>
         </MediaCardTitle>
-        {!!subtitle && <CardDescription className="text-pretty">{subtitle}</CardDescription>}
+        {!!subtitle && (
+          <CardDescription className="text-pretty">{subtitle}</CardDescription>
+        )}
       </div>
     </Card>
   );

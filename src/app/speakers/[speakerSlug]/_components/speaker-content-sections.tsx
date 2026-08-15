@@ -16,7 +16,7 @@ const MAX_CLIPS = 4;
 
 function viewAllLink(count: number, max: number, label: string, href: string) {
   if (count <= max) {
-    return undefined;
+    return;
   }
   return [{ href, label: `View all ${count} ${label}` }];
 }
@@ -37,25 +37,27 @@ export function SpeakerContentSections({
   talks,
 }: SpeakerContentSectionsProps) {
   const speakerName = getSpeakerName(speaker);
-  const speakerTitle = speaker.role ? `${speaker.role} ${speakerName}` : speakerName;
+  const speakerTitle = speaker.role
+    ? `${speaker.role} ${speakerName}`
+    : speakerName;
 
   const talksLinks = viewAllLink(
     talks.length,
     MAX_TALKS,
     'talks',
-    `/talks?speakers=${speaker.slug}`,
+    `/talks?speakers=${speaker.slug}`
   );
   const collectionsLinks = viewAllLink(
     collections.length,
     MAX_COLLECTIONS,
     'collections',
-    `/collections?speaker=${speaker.slug}`,
+    `/collections?speaker=${speaker.slug}`
   );
   const clipsLinks = viewAllLink(
     clips.length,
     MAX_CLIPS,
     'clips',
-    `/clips?speakers=${speaker.slug}`,
+    `/clips?speakers=${speaker.slug}`
   );
 
   return (
@@ -85,7 +87,10 @@ export function SpeakerContentSections({
             title="Collections"
           >
             {collections.slice(0, MAX_COLLECTIONS).map((collection) => (
-              <CollectionMediaCard collection={collection} key={collection._id} />
+              <CollectionMediaCard
+                collection={collection}
+                key={collection._id}
+              />
             ))}
           </FeaturedGrid>
         )}
@@ -113,7 +118,10 @@ export function SpeakerContentSections({
 
       {/* Metadata Sidebar */}
       <aside className="order-1 lg:sticky lg:top-20 lg:order-2 lg:h-fit">
-        <SpeakerMetadataSidebar hideAbout={hasFeaturedVideo} speaker={speaker} />
+        <SpeakerMetadataSidebar
+          hideAbout={hasFeaturedVideo}
+          speaker={speaker}
+        />
       </aside>
     </div>
   );

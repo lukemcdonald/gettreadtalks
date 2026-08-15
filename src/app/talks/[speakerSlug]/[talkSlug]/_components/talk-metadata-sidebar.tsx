@@ -14,29 +14,34 @@ interface TalkMetadataSidebarProps {
   topics: Topic[];
 }
 
-export function TalkMetadataSidebar({ talk, topics }: TalkMetadataSidebarProps) {
+export function TalkMetadataSidebar({
+  talk,
+  topics,
+}: TalkMetadataSidebarProps) {
   return (
     <div className="flex flex-col gap-8 sm:flex-row sm:flex-wrap sm:gap-12 lg:flex-col lg:gap-8">
       {/* About */}
       {talk.description && (
         <div className="space-y-4 sm:basis-full lg:basis-auto">
-          <h3 className="font-semibold text-muted-foreground text-xs uppercase tracking-widest">
+          <h3 className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">
             About
           </h3>
-          <p className="text-muted-foreground text-sm leading-relaxed">{talk.description}</p>
+          <p className="text-muted-foreground text-sm leading-relaxed">
+            {talk.description}
+          </p>
         </div>
       )}
 
       {/* Topics */}
       <div className="space-y-4">
-        <h3 className="font-semibold text-muted-foreground text-xs uppercase tracking-widest">
+        <h3 className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">
           Topics
         </h3>
         <div className="flex flex-wrap gap-2">
           {topics.length > 0 ? (
             topics.map((topic) => (
               <Link
-                className="inline-block rounded-full bg-muted px-3 py-1.5 text-foreground text-sm transition-colors hover:bg-muted/80"
+                className="bg-muted text-foreground hover:bg-muted/80 inline-block rounded-full px-3 py-1.5 text-sm transition-colors"
                 href={`/topics/${topic.slug}`}
                 key={topic._id}
               >
@@ -52,11 +57,11 @@ export function TalkMetadataSidebar({ talk, topics }: TalkMetadataSidebarProps) 
       {/* Scripture */}
       {talk.scripture && (
         <div className="space-y-4">
-          <h3 className="font-semibold text-muted-foreground text-xs uppercase tracking-widest">
+          <h3 className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">
             Scripture
           </h3>
           <Link
-            className="inline-flex items-center gap-2 rounded-full bg-muted px-3 py-1.5 text-foreground text-sm transition-colors hover:bg-muted/80"
+            className="bg-muted text-foreground hover:bg-muted/80 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm transition-colors"
             href={`https://www.biblegateway.com/passage/?search=${encodeURIComponent(talk.scripture)}&version=ESV`}
             rel="noopener noreferrer"
             target="_blank"
@@ -69,7 +74,7 @@ export function TalkMetadataSidebar({ talk, topics }: TalkMetadataSidebarProps) 
 
       {/* Actions */}
       <div className="space-y-4">
-        <h3 className="font-semibold text-muted-foreground text-xs uppercase tracking-widest">
+        <h3 className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">
           Actions
         </h3>
         <div className="flex flex-wrap gap-2">

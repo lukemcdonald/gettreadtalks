@@ -1,18 +1,19 @@
 'use client';
 
+import type { ClipFormData } from '../schemas/clip-form';
 import type { ClipId } from '@/features/clips/types';
 import type { SpeakerListItem } from '@/features/speakers/types';
 import type { TalkListItem } from '@/features/talks/types';
-import type { ClipFormData } from '../schemas/clip-form';
 
-import { useEffect, useTransition } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { FormSheet } from '@/components/ui';
 import { toastManager } from '@/components/ui/primitives/toast';
 import { createClipAction } from '@/features/clips/actions/create-clip';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
+
 import { clipFormSchema } from '../schemas/clip-form';
 import { ClipFormFields } from './clip-form-fields';
 
@@ -34,9 +35,9 @@ export function CreateClipSheet({
   const [isPending, startTransition] = useTransition();
 
   const form = useForm<ClipFormData>({
-    // biome-ignore lint/suspicious/noExplicitAny: Type assertion needed for Zod 4 compatibility with zodResolver
-    resolver: zodResolver(clipFormSchema as any),
     mode: 'onBlur',
+    // oxlint-disable-next-line typescript/no-explicit-any -- Zod 4 compatibility with zodResolver
+    resolver: zodResolver(clipFormSchema as any),
     defaultValues: {
       description: '',
       mediaUrl: '',
@@ -78,7 +79,11 @@ export function CreateClipSheet({
       submitLabel="Create Clip"
       title="Add New Clip"
     >
-      <ClipFormFields control={form.control} speakers={speakers} talks={talks} />
+      <ClipFormFields
+        control={form.control}
+        speakers={speakers}
+        talks={talks}
+      />
     </FormSheet>
   );
 }

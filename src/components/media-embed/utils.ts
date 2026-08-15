@@ -5,19 +5,19 @@ export type MediaType =
   | { type: 'vimeo'; id: string }
   | { type: 'youtube'; id: string };
 
-const AUDIO_REGEX = /\.(mp3|wav|ogg|m4a|aac)(\?|$)/i;
-const VIDEO_REGEX = /\.(mp4|webm|ogg|mov)(\?|$)/i;
-const VIMEO_REGEX = /(?:vimeo\.com\/|player\.vimeo\.com\/video\/)(\d+)/;
+const AUDIO_REGEX = /\.(?<format>mp3|wav|ogg|m4a|aac)(?<query>\?|$)/iu;
+const VIDEO_REGEX = /\.(?<format>mp4|webm|ogg|mov)(?<query>\?|$)/iu;
+const VIMEO_REGEX = /(?:vimeo\.com\/|player\.vimeo\.com\/video\/)(?<id>\d+)/u;
 const YOUTUBE_REGEX = [
-  /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
-  /youtube\.com\/watch\?.*v=([^&\n?#]+)/,
+  /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)(?<id>[^&\n?#]+)/u,
+  /youtube\.com\/watch\?.*v=(?<id>[^&\n?#]+)/u,
 ];
 
 function parseYouTubeUrl(url: string) {
   for (const pattern of YOUTUBE_REGEX) {
     const match = url.match(pattern);
-    if (match?.[1]) {
-      return match[1];
+    if (match?.groups?.id) {
+      return match.groups.id;
     }
   }
   return null;
@@ -25,7 +25,7 @@ function parseYouTubeUrl(url: string) {
 
 function parseVimeoUrl(url: string) {
   const match = url.match(VIMEO_REGEX);
-  return match?.[1] ?? null;
+  return match?.groups?.id ?? null;
 }
 
 export function getVideoThumbnail(url?: string) {
@@ -49,23 +49,23 @@ export function getVideoThumbnail(url?: string) {
 export function detectMediaType(url: string): MediaType {
   const youtubeId = parseYouTubeUrl(url);
   if (youtubeId) {
-    return { type: 'youtube', id: youtubeId };
+    return { id: youtubeId, type: 'youtube' };
   }
 
   const vimeoId = parseVimeoUrl(url);
   if (vimeoId) {
-    return { type: 'vimeo', id: vimeoId };
+    return { id: vimeoId, type: 'vimeo' };
   }
 
   if (VIDEO_REGEX.test(url)) {
-    return { type: 'video', src: url };
+    return { src: url, type: 'video' };
   }
 
   if (AUDIO_REGEX.test(url)) {
-    return { type: 'audio', src: url };
+    return { src: url, type: 'audio' };
   }
 
-  return { type: 'unknown', href: url };
+  return { href: url, type: 'unknown' };
 }
 
 export function isVideoMediaType(url?: string): boolean {
@@ -73,5 +73,9 @@ export function isVideoMediaType(url?: string): boolean {
     return false;
   }
   const mediaType = detectMediaType(url);
-  return mediaType.type === 'youtube' || mediaType.type === 'vimeo' || mediaType.type === 'video';
+  return (
+    mediaType.type === 'youtube' ||
+    mediaType.type === 'vimeo' ||
+    mediaType.type === 'video'
+  );
 }

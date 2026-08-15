@@ -1,6 +1,6 @@
+import type { DataModel } from './_generated/dataModel';
 import type { GenericCtx } from '@convex-dev/better-auth';
 import type { BetterAuthOptions } from 'better-auth';
-import type { DataModel } from './_generated/dataModel';
 
 import { createClient } from '@convex-dev/better-auth';
 import { convex as convexPlugin } from '@convex-dev/better-auth/plugins';
@@ -22,17 +22,21 @@ import { authRateLimitPlugin } from './lib/plugins';
  * @param ctx - The Convex context.
  * @returns The Better Auth component client.
  */
-export const authComponent = createClient<DataModel, typeof authSchema>(components.betterAuth, {
-  local: {
-    schema: authSchema,
-  },
-});
+export const authComponent = createClient<DataModel, typeof authSchema>(
+  components.betterAuth,
+  {
+    local: {
+      schema: authSchema,
+    },
+  }
+);
 
 /**
  * Creates Better Auth options. Uses fallback values during module analysis.
  */
 export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
-  const secret = process.env.BETTER_AUTH_SECRET ?? 'analysis-placeholder-secret';
+  const secret =
+    process.env.BETTER_AUTH_SECRET ?? 'analysis-placeholder-secret';
   const siteUrl = process.env.SITE_URL ?? 'https://localhost:3000';
   const isHttps = siteUrl.startsWith('https://');
 
@@ -55,12 +59,6 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
         });
       },
     },
-    user: {
-      changeEmail: {
-        enabled: true,
-        updateEmailWithoutVerification: true,
-      },
-    },
     plugins: [
       adminPlugin({
         adminRoles: ['admin'],
@@ -79,6 +77,12 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
       'https://localhost:3000',
       'https://www.gettreadtalks.com',
     ],
+    user: {
+      changeEmail: {
+        enabled: true,
+        updateEmailWithoutVerification: true,
+      },
+    },
   } satisfies BetterAuthOptions;
 };
 

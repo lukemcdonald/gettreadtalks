@@ -1,8 +1,8 @@
 'use client';
 
-import type { ReactNode } from 'react';
 import type { Speaker } from '@/features/speakers/types';
 import type { Talk } from '@/features/talks/types';
+import type { ReactNode } from 'react';
 
 import Link from 'next/link';
 
@@ -12,11 +12,20 @@ import { getSpeakerName } from '@/features/speakers/utils';
 import { getTalkUrl } from '@/features/talks/utils';
 
 interface TalkCardProps {
-  speaker?: Pick<Speaker, 'firstName' | 'imageUrl' | 'lastName' | 'slug'> | null;
+  speaker?: Pick<
+    Speaker,
+    'firstName' | 'imageUrl' | 'lastName' | 'slug'
+  > | null;
   talk: Pick<Talk, 'description' | 'scripture' | 'slug' | 'title'>;
 }
 
-function SpeakerLink({ children, slug }: { children: ReactNode; slug: string }) {
+function SpeakerLink({
+  children,
+  slug,
+}: {
+  children: ReactNode;
+  slug: string;
+}) {
   return (
     <Link className="relative z-10 hover:underline" href={`/speakers/${slug}`}>
       {children}
@@ -26,8 +35,12 @@ function SpeakerLink({ children, slug }: { children: ReactNode; slug: string }) 
 
 export function TalkCard({ speaker, talk }: TalkCardProps) {
   const speakerName = getSpeakerName(speaker);
-  const accessibleLabel = speakerName ? `${talk.title} by ${speakerName}` : talk.title;
-  const talkHref = speaker?.slug ? getTalkUrl(speaker.slug, talk.slug) : `/talks/${talk.slug}`;
+  const accessibleLabel = speakerName
+    ? `${talk.title} by ${speakerName}`
+    : talk.title;
+  const talkHref = speaker?.slug
+    ? getTalkUrl(speaker.slug, talk.slug)
+    : `/talks/${talk.slug}`;
 
   function getSubtitle() {
     if (talk.scripture) {

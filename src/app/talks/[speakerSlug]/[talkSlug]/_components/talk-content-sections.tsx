@@ -19,10 +19,12 @@ interface TalkContentSectionsProps {
   topics: Topic[];
 }
 
+const EMPTY_RELATED_TALKS: Talk[] = [];
+
 export function TalkContentSections({
   clips,
   collection,
-  relatedTalks = [],
+  relatedTalks = EMPTY_RELATED_TALKS,
   speaker,
   talk,
   topics,
@@ -86,7 +88,11 @@ export function TalkContentSections({
             title="More Talks"
           >
             {relatedTalks.map((relatedTalk) => (
-              <TalkCard key={relatedTalk._id} speaker={speaker} talk={relatedTalk} />
+              <TalkCard
+                key={relatedTalk._id}
+                speaker={speaker}
+                talk={relatedTalk}
+              />
             ))}
           </FeaturedGrid>
         )}

@@ -59,7 +59,10 @@ function FormSheetInner({
           <SheetTitle>{title}</SheetTitle>
         </SheetHeader>
 
-        <form className="grid min-h-0 flex-1 grid-rows-[1fr_auto]" onSubmit={onSubmit}>
+        <form
+          className="grid min-h-0 flex-1 grid-rows-[1fr_auto]"
+          onSubmit={onSubmit}
+        >
           <SheetPanel>
             <FormError error={error} />
             {children}

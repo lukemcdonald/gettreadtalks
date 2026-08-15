@@ -9,10 +9,9 @@ import { Container, Section } from '@/components/ui';
 export function SiteHeader() {
   return (
     <Section
-      className="sticky top-0 z-50 bg-background text-foreground dark:text-muted-foreground"
+      className="bg-background text-foreground dark:text-muted-foreground sticky top-0 z-50"
       id="header"
       render={<header />}
-      role="banner"
       spacing="sm"
     >
       <Container className="flex items-center justify-between gap-2">

@@ -1,7 +1,7 @@
 'use client';
 
-import type { Control, FieldPath, FieldValues } from 'react-hook-form';
 import type { StatusType } from '@/lib/entities/types';
+import type { Control, FieldPath, FieldValues } from 'react-hook-form';
 
 import { SelectField } from './select-field';
 
@@ -14,7 +14,7 @@ interface StatusFieldProps<T extends FieldValues> {
   required?: boolean;
 }
 
-const STATUS_OPTIONS: Array<{ label: string; value: string }> = [
+const STATUS_OPTIONS: { label: string; value: string }[] = [
   { label: 'Approved', value: 'approved' },
   { label: 'Archived', value: 'archived' },
   { label: 'Backlog', value: 'backlog' },

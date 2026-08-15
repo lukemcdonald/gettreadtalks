@@ -1,7 +1,7 @@
 import type { TableNames } from '../../_generated/dataModel';
 
-import { v } from 'convex/values';
 import { doc as convexDoc } from 'convex-helpers/validators';
+import { v } from 'convex/values';
 
 import schema from '../../schema';
 

@@ -1,14 +1,14 @@
 'use client';
 
-import { useTransition } from 'react';
 import { useRouter } from 'next/navigation';
+import { useTransition } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 
 import { Button, Fieldset, FormError, TextField } from '@/components/ui';
 import { toastManager } from '@/components/ui/primitives/toast';
 import { updateEmail } from '@/features/users/actions/update-email';
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/u;
 
 interface EmailFormValues {
   email: string;
@@ -20,7 +20,9 @@ interface EmailFormProps {
 
 export function EmailForm({ currentEmail }: EmailFormProps) {
   const [isPending, startTransition] = useTransition();
-  const form = useForm<EmailFormValues>({ defaultValues: { email: currentEmail } });
+  const form = useForm<EmailFormValues>({
+    defaultValues: { email: currentEmail },
+  });
   const router = useRouter();
 
   const watchedEmail = useWatch({ control: form.control, name: 'email' });
@@ -33,7 +35,9 @@ export function EmailForm({ currentEmail }: EmailFormProps) {
         toastManager.add({ title: 'Email updated', type: 'success' });
         router.refresh();
       } catch {
-        form.setError('root', { message: 'Failed to update email. Please try again.' });
+        form.setError('root', {
+          message: 'Failed to update email. Please try again.',
+        });
       }
     });
   }

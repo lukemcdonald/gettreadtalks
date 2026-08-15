@@ -8,12 +8,15 @@ interface UserAvatarProps {
 }
 
 export function UserAvatar({ user }: UserAvatarProps) {
-  const imageUrl = user.image ?? getGravatarUrl({ email: user.email, size: 96 });
+  const imageUrl =
+    user.image ?? getGravatarUrl({ email: user.email, size: 96 });
 
   return (
     <Avatar className="size-10 rounded-md">
       <AvatarImage src={imageUrl} />
-      <AvatarFallback className="rounded-md">{user.name?.charAt(0).toUpperCase()}</AvatarFallback>
+      <AvatarFallback className="rounded-md">
+        {user.name?.charAt(0).toUpperCase()}
+      </AvatarFallback>
     </Avatar>
   );
 }

@@ -63,7 +63,11 @@ export function Pagination({
 
   return (
     <div className="mt-8 flex justify-center gap-4">
-      <Button disabled={!hasPrevPage} onClick={handlePrevious} variant="outline">
+      <Button
+        disabled={!hasPrevPage}
+        onClick={handlePrevious}
+        variant="outline"
+      >
         Previous
       </Button>
       <Button disabled={!hasNextPage} onClick={handleNext} variant="outline">

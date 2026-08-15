@@ -2,8 +2,8 @@
 
 import type { InputProps } from '@/components/ui/primitives/input';
 
-import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
+import { useState } from 'react';
 
 import { Input } from '@/components/ui/primitives/input';
 import { cn } from '@/utils';
@@ -23,7 +23,7 @@ export function PasswordInput({ className, ...delegated }: PasswordInputProps) {
       />
       <button
         aria-label={showPassword ? 'Hide password' : 'Show password'}
-        className="absolute inset-y-0 right-0 flex items-center border-l border-l-border px-3 text-muted-foreground hover:text-foreground"
+        className="border-l-border text-muted-foreground hover:text-foreground absolute inset-y-0 right-0 flex items-center border-l px-3"
         onClick={() => setShowPassword((prev) => !prev)}
         tabIndex={-1}
         type="button"

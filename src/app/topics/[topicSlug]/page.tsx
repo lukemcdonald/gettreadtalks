@@ -22,7 +22,9 @@ interface TopicPageProps {
   }>;
 }
 
-export async function generateMetadata({ params }: TopicPageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: TopicPageProps): Promise<Metadata> {
   const { topicSlug } = await params;
   const topicResult = await getTopicBySlug({ slug: topicSlug });
 
@@ -39,7 +41,10 @@ export async function generateMetadata({ params }: TopicPageProps): Promise<Meta
   };
 }
 
-export default async function TopicPage({ params, searchParams }: TopicPageProps) {
+export default async function TopicPage({
+  params,
+  searchParams,
+}: TopicPageProps) {
   const { topicSlug } = await params;
   const { cursor, search } = await searchParams;
 
@@ -61,7 +66,9 @@ export default async function TopicPage({ params, searchParams }: TopicPageProps
       '@type': 'ListItem',
       name: talk.title,
       position: index + 1,
-      url: talk.speaker ? `${site.url}/talks/${talk.speaker.slug}/${talk.slug}` : undefined,
+      url: talk.speaker
+        ? `${site.url}/talks/${talk.speaker.slug}/${talk.slug}`
+        : undefined,
     })),
     name: topic.title,
     url: `${site.url}/topics/${topicSlug}`,
@@ -73,7 +80,10 @@ export default async function TopicPage({ params, searchParams }: TopicPageProps
       <SidebarLayout
         breadcrumb={
           <PageBreadcrumb
-            segments={[{ href: '/topics', label: 'Topics' }, { label: topic.title }]}
+            segments={[
+              { href: '/topics', label: 'Topics' },
+              { label: topic.title },
+            ]}
           />
         }
         content={
@@ -84,7 +94,9 @@ export default async function TopicPage({ params, searchParams }: TopicPageProps
             talks={talks}
           />
         }
-        header={<PageHeader description={description} size="lg" title={topic.title} />}
+        header={
+          <PageHeader description={description} size="lg" title={topic.title} />
+        }
         sidebar={<TopicSidebar hasActiveFilters={!!search} topic={topic} />}
         sidebarSticky
       />

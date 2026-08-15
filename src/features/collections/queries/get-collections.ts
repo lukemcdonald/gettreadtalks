@@ -26,18 +26,24 @@ export async function getCollections(args?: GetCollectionsProps) {
     numItems: limit ?? 1000,
   };
 
-  const result = await fetchQuery(api.collections.listCollections, { paginationOpts });
+  const result = await fetchQuery(api.collections.listCollections, {
+    paginationOpts,
+  });
 
   const allCollections = result.page;
 
   const filtered = speakerSlug
-    ? allCollections.filter((item) => item.speakers.some((s) => s.slug === speakerSlug))
+    ? allCollections.filter((item) =>
+        item.speakers.some((s) => s.slug === speakerSlug)
+      )
     : allCollections;
 
-  const collections = [...filtered].sort(getCollectionComparator(sort as CollectionSortOption));
+  const collections = filtered.toSorted(
+    getCollectionComparator(sort as CollectionSortOption)
+  );
 
   const speakersMap = new Map(
-    allCollections.flatMap((item) => item.speakers.map((s) => [s.slug, s])),
+    allCollections.flatMap((item) => item.speakers.map((s) => [s.slug, s]))
   );
   const speakers = sortSpeakersByName([...speakersMap.values()]);
 

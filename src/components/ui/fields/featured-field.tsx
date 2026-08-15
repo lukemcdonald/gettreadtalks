@@ -29,5 +29,12 @@ export function FeaturedField<T extends FieldValues>({
   label = 'Featured',
   name,
 }: FeaturedFieldProps<T>) {
-  return <CheckboxField control={control} description={description} label={label} name={name} />;
+  return (
+    <CheckboxField
+      control={control}
+      description={description}
+      label={label}
+      name={name}
+    />
+  );
 }

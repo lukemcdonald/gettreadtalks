@@ -7,7 +7,7 @@ export default function SheetLoading() {
       <div className="fixed inset-0 bg-black/32 backdrop-blur-sm" />
 
       {/* Panel */}
-      <div className="relative flex w-[calc(100%-(--spacing(12)))] max-w-md flex-col border-s bg-popover shadow-lg/5">
+      <div className="bg-popover relative flex w-[calc(100%-(--spacing(12)))] max-w-md flex-col border-s shadow-lg/5">
         {/* Header */}
         <div className="flex flex-col gap-2 p-6">
           <Skeleton className="h-6 w-40" />
@@ -34,7 +34,7 @@ export default function SheetLoading() {
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end gap-2 border-t bg-muted/72 px-6 py-4">
+        <div className="bg-muted/72 flex justify-end gap-2 border-t px-6 py-4">
           <Skeleton className="h-9 w-20 rounded-md" />
           <Skeleton className="h-9 w-24 rounded-md" />
         </div>

@@ -1,13 +1,17 @@
 'use client';
 
-import type { Id } from '@/convex/_generated/dataModel';
 import type { ClipId } from '@/features/clips/types';
 import type { SpeakerId } from '@/features/speakers/types';
 import type { TalkId } from '@/features/talks/types';
 
 import { HeartMinusIcon } from 'lucide-react';
 
-import { Button, Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui';
+import {
+  Button,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui';
 import { api } from '@/convex/_generated/api';
 import { useMutation } from '@/hooks';
 
@@ -38,7 +42,13 @@ function UnfavoriteButton({ loading, onRemove }: UnfavoriteButtonProps) {
     <Tooltip>
       <TooltipTrigger
         render={() => (
-          <Button loading={loading} onClick={onRemove} size="icon-sm" type="button" variant="ghost">
+          <Button
+            loading={loading}
+            onClick={onRemove}
+            size="icon-sm"
+            type="button"
+            variant="ghost"
+          >
             <HeartMinusIcon />
           </Button>
         )}
@@ -50,8 +60,14 @@ function UnfavoriteButton({ loading, onRemove }: UnfavoriteButtonProps) {
   );
 }
 
-export function UnfavoriteClipButton({ clipId, onError, onMutate }: UnfavoriteClipButtonProps) {
-  const { isLoading, mutate } = useMutation(api.users.unfavoriteClip, { onError });
+export function UnfavoriteClipButton({
+  clipId,
+  onError,
+  onMutate,
+}: UnfavoriteClipButtonProps) {
+  const { isLoading, mutate } = useMutation(api.users.unfavoriteClip, {
+    onError,
+  });
 
   const handleRemove = () => {
     if (onMutate) {
@@ -68,7 +84,9 @@ export function UnfavoriteSpeakerButton({
   onMutate,
   speakerId,
 }: UnfavoriteSpeakerButtonProps) {
-  const { isLoading, mutate } = useMutation(api.users.unfavoriteSpeaker, { onError });
+  const { isLoading, mutate } = useMutation(api.users.unfavoriteSpeaker, {
+    onError,
+  });
 
   const handleRemove = () => {
     if (onMutate) {
@@ -80,8 +98,14 @@ export function UnfavoriteSpeakerButton({
   return <UnfavoriteButton loading={isLoading} onRemove={handleRemove} />;
 }
 
-export function UnfavoriteTalkButton({ onError, onMutate, talkId }: UnfavoriteTalkButtonProps) {
-  const { isLoading, mutate } = useMutation(api.users.unfavoriteTalk, { onError });
+export function UnfavoriteTalkButton({
+  onError,
+  onMutate,
+  talkId,
+}: UnfavoriteTalkButtonProps) {
+  const { isLoading, mutate } = useMutation(api.users.unfavoriteTalk, {
+    onError,
+  });
 
   const handleRemove = () => {
     if (onMutate) {

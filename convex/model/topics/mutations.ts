@@ -1,7 +1,7 @@
 import type { Doc } from '../../_generated/dataModel';
 
-import { v } from 'convex/values';
 import { getOneFrom } from 'convex-helpers/server/relationships';
+import { v } from 'convex/values';
 
 import { mutation } from '../../_generated/server';
 import { throwNotFound, throwValidationError } from '../../lib/errors';
@@ -22,18 +22,24 @@ export const addTalkToTopic = mutation({
 
     const talk = await ctx.db.get('talks', args.talkId);
     if (!talk) {
-      throwNotFound('Talk not found', { resource: 'talk', resourceId: args.talkId });
+      throwNotFound('Talk not found', {
+        resource: 'talk',
+        resourceId: args.talkId,
+      });
     }
 
     const topic = await ctx.db.get('topics', args.topicId);
     if (!topic) {
-      throwNotFound('Topic not found', { resource: 'topic', resourceId: args.topicId });
+      throwNotFound('Topic not found', {
+        resource: 'topic',
+        resourceId: args.topicId,
+      });
     }
 
     const existing = await ctx.db
       .query('talksOnTopics')
       .withIndex('by_talkId_and_topicId', (q) =>
-        q.eq('talkId', args.talkId).eq('topicId', args.topicId),
+        q.eq('talkId', args.talkId).eq('topicId', args.topicId)
       )
       .unique();
 
@@ -87,11 +93,19 @@ export const destroyTopic = mutation({
     const topic = await ctx.db.get('topics', args.id);
 
     if (!topic) {
-      throwNotFound('Topic not found', { resource: 'topic', resourceId: args.id });
+      throwNotFound('Topic not found', {
+        resource: 'topic',
+        resourceId: args.id,
+      });
     }
 
     // Check if topic is referenced by any talks
-    const talksWithTopic = await getOneFrom(ctx.db, 'talksOnTopics', 'by_topicId', args.id);
+    const talksWithTopic = await getOneFrom(
+      ctx.db,
+      'talksOnTopics',
+      'by_topicId',
+      args.id
+    );
 
     if (talksWithTopic) {
       throwValidationError('Cannot delete topic: topic has associated talks');
@@ -119,7 +133,7 @@ export const removeTalkFromTopic = mutation({
     const association = await ctx.db
       .query('talksOnTopics')
       .withIndex('by_talkId_and_topicId', (q) =>
-        q.eq('talkId', args.talkId).eq('topicId', args.topicId),
+        q.eq('talkId', args.talkId).eq('topicId', args.topicId)
       )
       .first();
 
@@ -139,8 +153,8 @@ export const removeTalkFromTopic = mutation({
  */
 export const updateTopic = mutation({
   args: {
-    id: v.id('topics'),
     description: v.optional(v.string()),
+    id: v.id('topics'),
     status: v.optional(topicStatus),
     title: v.optional(v.string()),
   },

@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
 import { cn } from '@/utils';
+
 import { GridList } from './grid-list';
 import { SectionHeading } from './section-heading';
 
@@ -21,7 +22,9 @@ export function AlphabeticalGrid({ className, groups }: AlphabeticalGridProps) {
       {groups.map((group) => (
         <section className="space-y-3 md:space-y-6" key={group.letter}>
           <SectionHeading heading={group.letter} meta={group.range} />
-          <GridList columns={{ default: 1, sm: 2, md: 2, lg: 3, xl: 3 }}>{group.items}</GridList>
+          <GridList columns={{ default: 1, lg: 3, md: 2, sm: 2, xl: 3 }}>
+            {group.items}
+          </GridList>
         </section>
       ))}
     </div>

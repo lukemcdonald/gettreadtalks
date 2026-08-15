@@ -1,16 +1,17 @@
 import { mutations, queries } from './model/collections';
 
 // Queries
-export const getCollection = queries.getCollection;
-export const getCollectionBySlug = queries.getCollectionBySlug;
-export const getCollectionWithSpeakers = queries.getCollectionWithSpeakers;
-export const getCollectionWithTalks = queries.getCollectionWithTalks;
-export const listAllCollections = queries.listAllCollections;
-export const listCollectionSlugsForSitemap = queries.listCollectionSlugsForSitemap;
-export const listCollections = queries.listCollections;
-export const listCollectionsBySpeaker = queries.listCollectionsBySpeaker;
+export const {
+  getCollection,
+  getCollectionBySlug,
+  getCollectionWithSpeakers,
+  getCollectionWithTalks,
+  listAllCollections,
+  listCollectionSlugsForSitemap,
+  listCollections,
+  listCollectionsBySpeaker,
+} = queries;
 
 // Mutations
-export const createCollection = mutations.createCollection;
-export const destroyCollection = mutations.destroyCollection;
-export const updateCollection = mutations.updateCollection;
+export const { createCollection, destroyCollection, updateCollection } =
+  mutations;

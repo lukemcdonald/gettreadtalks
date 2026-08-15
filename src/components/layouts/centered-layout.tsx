@@ -30,7 +30,9 @@ export function CenteredLayout({
 }: CenteredLayoutProps) {
   return (
     <Section spacing={spacing}>
-      <Container className={cn('mx-auto', maxWidthClasses[maxWidth], className)}>
+      <Container
+        className={cn('mx-auto', maxWidthClasses[maxWidth], className)}
+      >
         {!!header && <div className="mb-10">{header}</div>}
         <div className="space-y-6">{content}</div>
       </Container>
