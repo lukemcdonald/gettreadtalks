@@ -21,6 +21,7 @@ type FallbackComponent = ComponentType<FallbackProps & { eventId?: string }>;
 
 const FallbackContext = createContext<FallbackComponent>(ErrorFallback);
 const wrappedThrown = new WeakMap<object, Error>();
+const pendingPrimitives = new Map<unknown, ErrorWithEventId>();
 
 function toError(error: unknown): Error {
   if (error instanceof Error) {
@@ -45,13 +46,32 @@ function toError(error: unknown): Error {
 }
 
 function getCapturedError(error: unknown): ErrorWithEventId {
+  const pending = pendingPrimitives.get(error);
+  if (pending) {
+    return pending;
+  }
+
   const err = toError(error) as ErrorWithEventId;
 
   if (!Object.hasOwn(err, '__sentryEventId')) {
     err.__sentryEventId = captureException(err);
   }
 
+  if (
+    !(error instanceof Error) &&
+    (error === null || typeof error !== 'object')
+  ) {
+    pendingPrimitives.set(error, err);
+  }
+
   return err;
+}
+
+function consumeCapturedError(error: unknown): ErrorWithEventId {
+  const captured = getCapturedError(error);
+  pendingPrimitives.delete(error);
+
+  return captured;
 }
 
 function BoundFallback({ error, resetErrorBoundary }: FallbackProps) {
@@ -101,7 +121,7 @@ export function ErrorBoundary({
   onReset,
 }: ErrorBoundaryProps) {
   const handleError = (error: unknown, info: ErrorInfo) => {
-    onError?.(getCapturedError(error), info);
+    onError?.(consumeCapturedError(error), info);
   };
 
   return (
