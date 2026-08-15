@@ -1,5 +1,5 @@
-import type { EmailId } from '@convex-dev/resend';
-import type { MutationCtx } from './_generated/server';
+import type { ActionCtx, MutationCtx } from './_generated/server';
+import type { EmailId, SendEmailOptions } from '@convex-dev/resend';
 import type { ReactElement } from 'react';
 
 import { Resend, vEmailEvent, vEmailId } from '@convex-dev/resend';
@@ -22,7 +22,12 @@ const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || TEST_DOMAIN_EMAIL;
 // under normal load), so its scheduled send attempt has time to complete.
 const CHECK_SEND_RESULT_DELAY_MS = 45_000;
 
-const EMAIL_KINDS = ['passwordReset', 'test', 'verification', 'welcome'] as const;
+const EMAIL_KINDS = [
+  'passwordReset',
+  'test',
+  'verification',
+  'welcome',
+] as const;
 type EmailKind = (typeof EMAIL_KINDS)[number];
 const vEmailKind = v.union(...EMAIL_KINDS.map((kind) => v.literal(kind)));
 
@@ -118,19 +123,18 @@ export const sendPasswordResetEmail = internalAction({
       });
       const { html, text } = await renderEmail(template);
 
-      const emailId = await resend.sendEmail(ctx, {
-        from: getFromAddress(),
-        html,
-        replyTo: [getReplyToAddress()],
-        subject: 'Reset your password',
-        text,
-        to: args.email,
-      });
-
-      await ctx.scheduler.runAfter(CHECK_SEND_RESULT_DELAY_MS, internal.emails.checkSendResult, {
-        emailId,
-        kind: 'passwordReset',
-      });
+      await sendTrackedEmail(
+        ctx,
+        {
+          from: getFromAddress(),
+          html,
+          replyTo: [getReplyToAddress()],
+          subject: 'Reset your password',
+          text,
+          to: args.email,
+        },
+        'passwordReset'
+      );
     } catch (error) {
       throwConvexError(500, 'Failed to send password reset email', {
         cause: getErrorMessage(error),
@@ -144,19 +148,18 @@ export const sendPasswordResetEmail = internalAction({
 
 export const sendTestEmail = internalMutation({
   handler: async (ctx) => {
-    const emailId = await resend.sendEmail(ctx, {
-      from: getFromAddress(),
-      html: '<p>This is a test email</p>',
-      replyTo: [getReplyToAddress()],
-      subject: `Test email from ${site.name}`,
-      text: 'This is a test email',
-      to: process.env.RESEND_TO_EMAIL || TEST_DOMAIN_EMAIL,
-    });
-
-    await ctx.scheduler.runAfter(CHECK_SEND_RESULT_DELAY_MS, internal.emails.checkSendResult, {
-      emailId,
-      kind: 'test',
-    });
+    await sendTrackedEmail(
+      ctx,
+      {
+        from: getFromAddress(),
+        html: '<p>This is a test email</p>',
+        replyTo: [getReplyToAddress()],
+        subject: `Test email from ${site.name}`,
+        text: 'This is a test email',
+        to: process.env.RESEND_TO_EMAIL || TEST_DOMAIN_EMAIL,
+      },
+      'test'
+    );
   },
 });
 
@@ -175,21 +178,18 @@ export const sendVerificationEmail = internalMutation({
       });
       const { html, text } = await renderEmail(template);
 
-      const emailId = await resend.sendEmail(ctx, {
-        from: getFromAddress(),
-        html,
-        replyTo: [getReplyToAddress()],
-        subject: 'Verify your email address',
-        text,
-        to: args.email,
-      });
-
-      await ctx.scheduler.runAfter(CHECK_SEND_RESULT_DELAY_MS, internal.emails.checkSendResult, {
-        emailId,
-        kind: 'verification',
-      });
-
-      return emailId;
+      return await sendTrackedEmail(
+        ctx,
+        {
+          from: getFromAddress(),
+          html,
+          replyTo: [getReplyToAddress()],
+          subject: 'Verify your email address',
+          text,
+          to: args.email,
+        },
+        'verification'
+      );
     } catch (error) {
       throwConvexError(500, 'Failed to send verification email', {
         cause: getErrorMessage(error),
@@ -216,21 +216,18 @@ export const sendWelcomeEmail = internalMutation({
       });
       const { html, text } = await renderEmail(template);
 
-      const emailId = await resend.sendEmail(ctx, {
-        from: getFromAddress(),
-        html,
-        replyTo: [getReplyToAddress()],
-        subject: `Welcome to ${site.name}!`,
-        text,
-        to: args.email,
-      });
-
-      await ctx.scheduler.runAfter(CHECK_SEND_RESULT_DELAY_MS, internal.emails.checkSendResult, {
-        emailId,
-        kind: 'welcome',
-      });
-
-      return emailId;
+      return await sendTrackedEmail(
+        ctx,
+        {
+          from: getFromAddress(),
+          html,
+          replyTo: [getReplyToAddress()],
+          subject: `Welcome to ${site.name}!`,
+          text,
+          to: args.email,
+        },
+        'welcome'
+      );
     } catch (error) {
       throwConvexError(500, 'Failed to send welcome email', {
         cause: getErrorMessage(error),
@@ -265,6 +262,30 @@ function getReplyToAddress() {
 }
 
 /**
+ * Sends an email and schedules its follow-up status check (see
+ * `checkSendResult`) in one step, so every send function tracks failures the
+ * same way.
+ */
+async function sendTrackedEmail(
+  ctx: ActionCtx | MutationCtx,
+  emailParams: SendEmailOptions,
+  kind: EmailKind
+): Promise<EmailId> {
+  const emailId = await resend.sendEmail(ctx, emailParams);
+
+  await ctx.scheduler.runAfter(
+    CHECK_SEND_RESULT_DELAY_MS,
+    internal.emails.checkSendResult,
+    {
+      emailId,
+      kind,
+    }
+  );
+
+  return emailId;
+}
+
+/**
  * Derives the ingest envelope URL from a Sentry DSN, per
  * https://develop.sentry.dev/sdk/foundations/transport/envelopes/. The DSN
  * itself travels in the envelope header for auth, so the public key isn't
@@ -279,7 +300,9 @@ function parseSentryDsn(dsn: string): { ingestUrl: string } | null {
       return null;
     }
 
-    return { ingestUrl: `${url.protocol}//${url.host}/api/${projectId}/envelope/` };
+    return {
+      ingestUrl: `${url.protocol}//${url.host}/api/${projectId}/envelope/`,
+    };
   } catch {
     return null;
   }
@@ -306,7 +329,7 @@ async function reportEmailFailure(params: {
         'Email send failed and SENTRY_DSN is not configured or malformed:',
         params.kind,
         params.emailId,
-        params.errorMessage,
+        params.errorMessage
       );
       return;
     }
@@ -344,10 +367,16 @@ async function reportEmailFailure(params: {
     });
 
     if (!response.ok) {
-      console.error('Sentry rejected the email failure envelope:', response.status);
+      console.error(
+        'Sentry rejected the email failure envelope:',
+        response.status
+      );
     }
   } catch (error) {
-    console.error('Failed to report email send failure to Sentry:', getErrorMessage(error));
+    console.error(
+      'Failed to report email send failure to Sentry:',
+      getErrorMessage(error)
+    );
   }
 }
 

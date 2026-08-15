@@ -39,18 +39,31 @@ const TRUSTED_ORIGINS = [
 ];
 
 /**
- * Checks whether `origin` matches one of `trustedOrigins`, treating a `*` in a
- * trusted origin as a single-segment wildcard (e.g. `https://*.vercel.app`).
+ * Precompiled per trusted origin so `isTrustedOrigin` (called on every
+ * `createAuthOptions()` invocation) doesn't rebuild a RegExp per request. A
+ * `*` in a trusted origin matches a single-segment wildcard (e.g.
+ * `https://*.vercel.app`).
  */
-function isTrustedOrigin(origin: string, trustedOrigins: string[]): boolean {
-  return trustedOrigins.some((trustedOrigin) => {
+const TRUSTED_ORIGIN_MATCHERS: (string | RegExp)[] = TRUSTED_ORIGINS.map(
+  (trustedOrigin) => {
     if (!trustedOrigin.includes('*')) {
-      return trustedOrigin === origin;
+      return trustedOrigin;
     }
 
-    const pattern = trustedOrigin.replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*/g, '[^.]+');
-    return new RegExp(`^${pattern}$`).test(origin);
-  });
+    const pattern = trustedOrigin
+      .replaceAll(/[.+?^${}()|[\]\\]/g, '\\$&')
+      .replaceAll('*', '[^.]+');
+    return new RegExp(`^${pattern}$`);
+  }
+);
+
+function isTrustedOrigin(
+  origin: string,
+  matchers: (string | RegExp)[]
+): boolean {
+  return matchers.some((matcher) =>
+    typeof matcher === 'string' ? matcher === origin : matcher.test(origin)
+  );
 }
 
 /**
@@ -62,9 +75,9 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
   const siteUrl = process.env.SITE_URL ?? 'https://localhost:3000';
   const isHttps = siteUrl.startsWith('https://');
 
-  if (!isTrustedOrigin(siteUrl, TRUSTED_ORIGINS)) {
+  if (!isTrustedOrigin(siteUrl, TRUSTED_ORIGIN_MATCHERS)) {
     console.warn(
-      `SITE_URL "${siteUrl}" is not present in trustedOrigins. Auth links and cookies will target an origin the app does not trust.`,
+      `SITE_URL "${siteUrl}" is not present in trustedOrigins. Auth links and cookies will target an origin the app does not trust.`
     );
   }
 
