@@ -1,8 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
   "ignoreDependencies": [
-    // Coss UI / Base UI are imported only from src/components/ui, which Fallow ignores.
-    "@base-ui/react",
+    // Coss primitives import these; that tree is ignored below.
     "input-otp",
     "react-day-picker",
     // Resend is consumed by the Convex Resend component, not direct app imports.
@@ -12,8 +11,12 @@
   ],
   "ignoreExports": [
     {
-      "exports": ["useActiveFilterCount", "useFilterParam"],
-      "file": "src/hooks/index.ts",
+      "exports": ["CheckboxField", "FieldControl", "FieldValidity"],
+      "file": "src/components/ui/fields/index.ts",
+    },
+    {
+      "exports": ["FieldsetLegend", "FieldsetPrimitive"],
+      "file": "src/components/ui/fieldset.tsx",
     },
   ],
   "ignorePatterns": [
@@ -24,13 +27,13 @@
     "convex/**/_generated/**",
     // Better Auth CLI output. Do not edit; regenerate with the Better Auth schema command.
     "convex/betterAuth/schema.ts",
-    // Coss UI kit. Restored by `pnpm update:ui`; treat the whole tree as vendor.
-    "src/components/ui/**",
-    // Helpers used only by the ignored Coss UI kit.
-    "src/constants/ui.ts",
-    "src/hooks/use-active-filter-count.ts",
-    "src/hooks/use-debounced-search-param.ts",
-    "src/hooks/use-filter-param.ts",
+    // Coss vendor primitives. Restored by `pnpm update:ui`.
+    "src/components/ui/primitives/**",
+    // Custom UI that is unused today; keep the files, skip the dead-code gate.
+    "src/components/ui/inline-multi-filter.tsx",
+    "src/components/ui/scroll-area/**",
+    "src/components/ui/toggle-group/**",
+    // Only imported from ignored Coss primitives.
     "src/hooks/use-media-query.ts",
   ],
 }
