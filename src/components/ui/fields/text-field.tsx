@@ -1,5 +1,6 @@
 'use client';
 
+import type { ComponentProps } from 'react';
 import type {
   Control,
   FieldPath,
@@ -7,78 +8,37 @@ import type {
   RegisterOptions,
 } from 'react-hook-form';
 
-import { Controller } from 'react-hook-form';
+import { Input } from '../primitives/input';
+import { FormField } from './form-field';
 
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldLabel,
-  Input,
-} from '@/components/ui';
-
-interface TextFieldProps<T extends FieldValues> {
+type TextFieldProps<T extends FieldValues> = ComponentProps<typeof Input> & {
   control: Control<T>;
   description?: string;
   label: string;
   name: FieldPath<T>;
-  placeholder?: string;
   required?: boolean;
   rules?: RegisterOptions<T, FieldPath<T>>;
-  type?: 'text' | 'email' | 'password' | 'search' | 'tel';
-}
+};
 
-/**
- * Reusable text input field component that wraps Controller + Field + Input.
- * Handles validation errors automatically via React Hook Form.
- *
- * @example
- * ```tsx
- * <TextField
- *   control={form.control}
- *   label="Title"
- *   name="title"
- *   required
- * />
- * ```
- */
 export function TextField<T extends FieldValues>({
   control,
   description,
   label,
   name,
-  placeholder,
   required,
   rules,
-  type = 'text',
+  ...delegated
 }: TextFieldProps<T>) {
   return (
-    <Controller
+    <FormField
       control={control}
+      description={description}
+      label={label}
       name={name}
-      render={({ field, fieldState }) => (
-        <Field
-          dirty={fieldState.isDirty}
-          invalid={fieldState.invalid}
-          name={field.name}
-          touched={fieldState.isTouched}
-        >
-          <FieldLabel required={required}>{label}</FieldLabel>
-          {!!description && <FieldDescription>{description}</FieldDescription>}
-          <Input
-            aria-invalid={fieldState.invalid}
-            placeholder={placeholder}
-            required={required}
-            size="lg"
-            type={type}
-            {...field}
-          />
-          {!!fieldState.error && (
-            <FieldError match>{fieldState.error?.message}</FieldError>
-          )}
-        </Field>
-      )}
+      required={required}
       rules={rules}
-    />
+    >
+      {(field) => <Input {...field} {...delegated} />}
+    </FormField>
   );
 }

@@ -1,0 +1,5 @@
+{
+  "allowComments": true,
+  "allowTrailingCommas": true,
+  "allOf": [{ "$ref": "./node_modules/fallow/schema.json" }]
+}

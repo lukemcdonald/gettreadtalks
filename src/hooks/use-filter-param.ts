@@ -28,5 +28,17 @@ export function useFilterParam(name: string) {
     });
   }
 
-  return { current, isPending, update };
+  function updateUnlessDefault(value: string | null, defaultValue: string) {
+    update(valueToKeep(value, defaultValue));
+  }
+
+  return { current, isPending, update, updateUnlessDefault };
+}
+
+function valueToKeep(value: string | null, defaultValue: string) {
+  if (value && value !== defaultValue) {
+    return value;
+  }
+
+  return null;
 }

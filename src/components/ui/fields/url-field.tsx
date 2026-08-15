@@ -1,74 +1,44 @@
 'use client';
 
-import type { Control, FieldPath, FieldValues } from 'react-hook-form';
+import type { ComponentProps } from 'react';
+import type {
+  Control,
+  FieldPath,
+  FieldValues,
+  RegisterOptions,
+} from 'react-hook-form';
 
-import { Controller } from 'react-hook-form';
+import { Input } from '../primitives/input';
+import { FormField } from './form-field';
 
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldLabel,
-  Input,
-} from '@/components/ui';
-
-interface UrlFieldProps<T extends FieldValues> {
+type UrlFieldProps<T extends FieldValues> = ComponentProps<typeof Input> & {
   control: Control<T>;
   description?: string;
   label: string;
   name: FieldPath<T>;
-  placeholder?: string;
   required?: boolean;
-}
+  rules?: RegisterOptions<T, FieldPath<T>>;
+};
 
-/**
- * Reusable URL input field component that wraps Controller + Field + Input with type="url".
- * Handles validation errors automatically via React Hook Form.
- *
- * @example
- * ```tsx
- * <UrlField
- *   control={form.control}
- *   label="Media URL"
- *   name="mediaUrl"
- *   required
- * />
- * ```
- */
 export function UrlField<T extends FieldValues>({
   control,
   description,
   label,
   name,
-  placeholder,
   required,
+  rules,
+  ...delegated
 }: UrlFieldProps<T>) {
   return (
-    <Controller
+    <FormField
       control={control}
+      description={description}
+      label={label}
       name={name}
-      render={({ field, fieldState }) => (
-        <Field
-          dirty={fieldState.isDirty}
-          invalid={fieldState.invalid}
-          name={field.name}
-          touched={fieldState.isTouched}
-        >
-          <FieldLabel required={required}>{label}</FieldLabel>
-          {!!description && <FieldDescription>{description}</FieldDescription>}
-          <Input
-            aria-invalid={fieldState.invalid}
-            placeholder={placeholder}
-            required={required}
-            size="lg"
-            type="url"
-            {...field}
-          />
-          {!!fieldState.error && (
-            <FieldError match>{fieldState.error?.message}</FieldError>
-          )}
-        </Field>
-      )}
-    />
+      required={required}
+      rules={rules}
+    >
+      {(field) => <Input type="url" {...field} {...delegated} />}
+    </FormField>
   );
 }

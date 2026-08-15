@@ -1,22 +1,20 @@
 'use client';
 
-import type { Control, FieldPath, FieldValues } from 'react-hook-form';
+import type {
+  Control,
+  ControllerRenderProps,
+  FieldPath,
+  FieldValues,
+} from 'react-hook-form';
 
-import { Controller } from 'react-hook-form';
-
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldLabel,
-} from '@/components/ui/fields';
 import {
   NumberFieldDecrement,
   NumberFieldGroup,
   NumberFieldIncrement,
   NumberFieldInput,
   NumberField as NumberFieldPrimitive,
-} from '@/components/ui/primitives/number-field';
+} from '../primitives/number-field';
+import { FormField } from './form-field';
 
 interface NumberFieldProps<T extends FieldValues> {
   control: Control<T>;
@@ -59,49 +57,71 @@ export function NumberField<T extends FieldValues>({
   step,
 }: NumberFieldProps<T>) {
   return (
-    <Controller
+    <FormField
       control={control}
+      description={description}
+      label={label}
       name={name}
-      render={({ field, fieldState }) => {
-        const { onChange, value, ...inputProps } = field;
-        return (
-          <Field
-            dirty={fieldState.isDirty}
-            invalid={fieldState.invalid}
-            name={field.name}
-            touched={fieldState.isTouched}
-          >
-            <FieldLabel required={required}>{label}</FieldLabel>
-            {!!description && (
-              <FieldDescription>{description}</FieldDescription>
-            )}
-            <NumberFieldPrimitive
-              aria-invalid={fieldState.invalid}
-              max={max}
-              min={min}
-              onValueChange={(newValue) => {
-                onChange(newValue ?? undefined);
-              }}
-              required={required}
-              step={step}
-              value={value ?? null}
-            >
-              {showButtons ? (
-                <NumberFieldGroup>
-                  <NumberFieldDecrement />
-                  <NumberFieldInput placeholder={placeholder} {...inputProps} />
-                  <NumberFieldIncrement />
-                </NumberFieldGroup>
-              ) : (
-                <NumberFieldInput placeholder={placeholder} {...inputProps} />
-              )}
-            </NumberFieldPrimitive>
-            {!!fieldState.error && (
-              <FieldError match>{fieldState.error?.message}</FieldError>
-            )}
-          </Field>
-        );
+      required={required}
+    >
+      {(field, fieldState) => (
+        <NumberFieldControl
+          field={field}
+          invalid={fieldState.invalid}
+          max={max}
+          min={min}
+          placeholder={placeholder}
+          required={required}
+          showButtons={showButtons}
+          step={step}
+        />
+      )}
+    </FormField>
+  );
+}
+
+function NumberFieldControl<T extends FieldValues>({
+  field,
+  invalid,
+  max,
+  min,
+  placeholder,
+  required,
+  showButtons,
+  step,
+}: {
+  field: ControllerRenderProps<T, FieldPath<T>>;
+  invalid: boolean;
+  max?: number;
+  min?: number;
+  placeholder?: string;
+  required?: boolean;
+  showButtons: boolean;
+  step?: number;
+}) {
+  const { onChange, value, ...inputProps } = field;
+
+  return (
+    <NumberFieldPrimitive
+      aria-invalid={invalid}
+      max={max}
+      min={min}
+      onValueChange={(newValue) => {
+        onChange(newValue ?? undefined);
       }}
-    />
+      required={required}
+      step={step}
+      value={value ?? null}
+    >
+      {showButtons ? (
+        <NumberFieldGroup>
+          <NumberFieldDecrement />
+          <NumberFieldInput placeholder={placeholder} {...inputProps} />
+          <NumberFieldIncrement />
+        </NumberFieldGroup>
+      ) : (
+        <NumberFieldInput placeholder={placeholder} {...inputProps} />
+      )}
+    </NumberFieldPrimitive>
   );
 }

@@ -6,7 +6,7 @@ import {
   ComboboxItem,
   ComboboxList,
   ComboboxPopup,
-} from '@/components/ui';
+} from './primitives/combobox';
 
 interface FilterOption {
   label: string;
@@ -20,14 +20,14 @@ interface FilterPopupProps {
 
 /**
  * Shared ComboboxPopup with search at top (industry standard UX).
- * Used by both InlineMultiFilter and ComboboxMultiFilter.
+ * Used by ComboboxMultiFilter.
  */
 export function FilterPopup({ label, name }: FilterPopupProps) {
   return (
     <ComboboxPopup aria-label={label ?? `Select ${name}`}>
       <div className="border-b p-2">
         <ComboboxInput
-          className="rounded-md before:rounded-[calc(var(--radius-md)-1px)]"
+          className="rounded-md before:rounded-md"
           placeholder={`Search ${name}...`}
           showTrigger={false}
           startAddon={<SearchIcon />}

@@ -1,8 +1,10 @@
 'use client';
 
-import { Input, Label } from '@/components/ui';
 import { useDebouncedSearchParam } from '@/hooks/use-debounced-search-param';
 import { cn } from '@/utils';
+
+import { Input } from './primitives/input';
+import { Label } from './primitives/label';
 
 interface SearchInputProps {
   className?: string;

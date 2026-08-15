@@ -2,17 +2,18 @@
 
 import type { ReactNode } from 'react';
 
+import { useFilterParam } from '@/hooks';
+import { cn } from '@/utils';
+
+import { FilterPopup } from './filter-popup';
 import {
   Combobox,
   ComboboxChip,
   ComboboxChips,
   ComboboxChipsInput,
   ComboboxValue,
-  Label,
-} from '@/components/ui';
-import { FilterPopup } from '@/components/ui/filter-popup';
-import { useFilterParam } from '@/hooks';
-import { cn } from '@/utils';
+} from './primitives/combobox';
+import { Label } from './primitives/label';
 
 interface FilterOption {
   label: string;

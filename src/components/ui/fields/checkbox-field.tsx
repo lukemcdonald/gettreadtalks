@@ -4,13 +4,9 @@ import type { Control, FieldPath, FieldValues } from 'react-hook-form';
 
 import { Controller } from 'react-hook-form';
 
-import {
-  Checkbox,
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldLabel,
-} from '@/components/ui';
+import { Checkbox } from '../primitives/checkbox';
+import { Field, FieldDescription, FieldError } from '../primitives/field';
+import { FieldLabel } from './field-label';
 
 interface CheckboxFieldProps<T extends FieldValues> {
   control: Control<T>;

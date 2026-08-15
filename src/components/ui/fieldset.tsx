@@ -18,8 +18,3 @@ export function Fieldset({
     />
   );
 }
-
-export {
-  FieldsetLegend,
-  FieldsetPrimitive,
-} from '@/components/ui/primitives/fieldset';

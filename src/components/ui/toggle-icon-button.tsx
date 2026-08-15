@@ -1,6 +1,6 @@
 import type { LucideIcon } from 'lucide-react';
 
-import { ActionIconButton } from '@/components/ui';
+import { ActionIconButton } from './action-icon-button';
 
 interface ToggleIconButtonProps {
   activeLabel: string;
