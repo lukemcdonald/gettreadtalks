@@ -29,7 +29,9 @@ export async function reportSentryException(params: {
       },
       level: 'error',
       platform: 'node',
-      tags: params.tags ?? {},
+      // Distinguishes Convex-originated events from the frontend's, since both
+      // sides can share one Sentry DSN.
+      tags: { service: 'convex', ...params.tags },
       timestamp: sentAt,
     };
 
