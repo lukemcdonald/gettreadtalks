@@ -1,17 +1,16 @@
 'use client';
 
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useTransition } from 'react';
+import { useFilterParam } from '@/hooks';
+import { cn } from '@/utils';
 
+import { Label } from './primitives/label';
 import {
-  Label,
   Select,
   SelectItem,
   SelectPopup,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui';
-import { cn } from '@/utils';
+} from './primitives/select';
 
 interface SortOption {
   label: string;
@@ -20,7 +19,7 @@ interface SortOption {
 
 interface SortSelectProps {
   className?: string;
-  label?: string;
+  label: string;
   options: SortOption[];
   paramName?: string;
 }
@@ -31,38 +30,19 @@ export function SortSelect({
   options,
   paramName = 'sort',
 }: SortSelectProps) {
-  const pathname = usePathname();
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const [isPending, startTransition] = useTransition();
-
-  const value = searchParams.get(paramName) ?? options[0]?.value ?? '';
-
-  const handleChange = (newValue: string | null) => {
-    const params = new URLSearchParams(searchParams.toString());
-
-    if (newValue && newValue !== options[0]?.value) {
-      params.set(paramName, newValue);
-    } else {
-      params.delete(paramName);
-    }
-
-    params.delete('cursor');
-
-    startTransition(() => {
-      const query = params.toString();
-      router.push(query ? `${pathname}?${query}` : pathname);
-    });
-  };
+  const { current, isPending, updateUnlessDefault } = useFilterParam(paramName);
+  const defaultSort = firstSortValue(options);
 
   return (
     <div className={cn('space-y-2', className)}>
-      {!!label && <Label htmlFor={paramName}>{label}</Label>}
+      <Label htmlFor={paramName}>{label}</Label>
       <Select
         disabled={isPending}
         items={options}
-        onValueChange={handleChange}
-        value={value}
+        onValueChange={(newValue) => {
+          updateUnlessDefault(newValue, defaultSort);
+        }}
+        value={current ?? defaultSort}
       >
         <SelectTrigger id={paramName} size="lg">
           <SelectValue />
@@ -77,4 +57,8 @@ export function SortSelect({
       </Select>
     </div>
   );
+}
+
+function firstSortValue(options: SortOption[]) {
+  return options[0]?.value ?? '';
 }

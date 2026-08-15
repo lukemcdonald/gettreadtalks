@@ -1,14 +1,7 @@
 // Re-export field primitives (FieldLabel customized below)
-export {
-  Field,
-  FieldControl,
-  FieldDescription,
-  FieldError,
-  FieldValidity,
-} from '../primitives/field';
+export { Field, FieldDescription, FieldError } from '../primitives/field';
 export * from '../primitives/number-field';
 // Export custom field components
-export { CheckboxField } from './checkbox-field';
 export { FeaturedField } from './featured-field';
 export { FieldLabel } from './field-label';
 export { NumberField } from './number-field';

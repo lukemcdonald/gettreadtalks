@@ -1,5 +1,5 @@
 {
-  "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
+  "$schema": "./fallow.schema.json",
   "ignoreDependencies": [
     // Coss primitives import these; that tree is ignored below.
     "input-otp",
@@ -8,16 +8,6 @@
     "resend",
     // Tailwind is imported from CSS and lives in devDependencies by convention.
     "tailwindcss",
-  ],
-  "ignoreExports": [
-    {
-      "exports": ["CheckboxField", "FieldControl", "FieldValidity"],
-      "file": "src/components/ui/fields/index.ts",
-    },
-    {
-      "exports": ["FieldsetLegend", "FieldsetPrimitive"],
-      "file": "src/components/ui/fieldset.tsx",
-    },
   ],
   "ignorePatterns": [
     // Tool configs are entrypoints for their own CLIs and are already covered by the toolchain.
@@ -29,10 +19,6 @@
     "convex/betterAuth/schema.ts",
     // Coss vendor primitives. Restored by `pnpm update:ui`.
     "src/components/ui/primitives/**",
-    // Custom UI that is unused today; keep the files, skip the dead-code gate.
-    "src/components/ui/inline-multi-filter.tsx",
-    "src/components/ui/scroll-area/**",
-    "src/components/ui/toggle-group/**",
     // Only imported from ignored Coss primitives.
     "src/hooks/use-media-query.ts",
   ],

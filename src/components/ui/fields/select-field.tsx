@@ -2,26 +2,21 @@
 
 import type { Control, FieldPath, FieldValues } from 'react-hook-form';
 
-import { Controller } from 'react-hook-form';
-
 import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldLabel,
   Select,
   SelectItem,
   SelectPopup,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui';
+} from '../primitives/select';
+import { FormField } from './form-field';
 
 interface SelectOption {
   label: string;
   value: string;
 }
 
-function toSelectValue(value: string | null | undefined): string {
+function toSelectValue(value: string | null | undefined) {
   return value ?? '';
 }
 
@@ -64,51 +59,41 @@ export function SelectField<T extends FieldValues>({
   required,
 }: SelectFieldProps<T>) {
   return (
-    <Controller
+    <FormField
       control={control}
+      description={description}
+      label={label}
       name={name}
-      render={({ field, fieldState }) => (
-        <Field
-          dirty={fieldState.isDirty}
-          invalid={fieldState.invalid}
+      required={required}
+    >
+      {(field, fieldState) => (
+        <Select
+          items={options}
           name={field.name}
-          touched={fieldState.isTouched}
+          onValueChange={(nextValue) => {
+            const value = toSelectValue(nextValue);
+            field.onChange(value);
+            onChange?.(value);
+          }}
+          required={required}
+          value={toSelectValue(field.value)}
         >
-          <FieldLabel htmlFor={field.name} required={required}>
-            {label}
-          </FieldLabel>
-          {!!description && <FieldDescription>{description}</FieldDescription>}
-          <Select
-            items={options}
-            name={field.name}
-            onValueChange={(value) => {
-              const nextValue = toSelectValue(value);
-              field.onChange(nextValue);
-              onChange?.(nextValue);
-            }}
-            required={required}
-            value={field.value ?? ''}
+          <SelectTrigger
+            aria-invalid={fieldState.invalid}
+            id={field.name}
+            size="lg"
           >
-            <SelectTrigger
-              aria-invalid={fieldState.invalid}
-              id={field.name}
-              size="lg"
-            >
-              <SelectValue />
-            </SelectTrigger>
-            <SelectPopup>
-              {options.map((item) => (
-                <SelectItem key={item.value} value={item.value}>
-                  {item.label}
-                </SelectItem>
-              ))}
-            </SelectPopup>
-          </Select>
-          {!!fieldState.error && (
-            <FieldError match>{fieldState.error?.message}</FieldError>
-          )}
-        </Field>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectPopup>
+            {options.map((item) => (
+              <SelectItem key={item.value} value={item.value}>
+                {item.label}
+              </SelectItem>
+            ))}
+          </SelectPopup>
+        </Select>
       )}
-    />
+    </FormField>
   );
 }

@@ -1,18 +1,17 @@
 'use client';
 
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useTransition } from 'react';
+import { FILTER_ALL } from '@/constants/ui';
+import { useFilterParam } from '@/hooks';
+import { cn } from '@/utils';
 
+import { Label } from './primitives/label';
 import {
-  Label,
   Select,
   SelectItem,
   SelectPopup,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui';
-import { FILTER_ALL } from '@/constants/ui';
-import { cn } from '@/utils';
+} from './primitives/select';
 
 interface FilterOption {
   label: string;
@@ -22,8 +21,8 @@ interface FilterOption {
 interface SelectFilterProps {
   className?: string;
   defaultValue?: string;
-  label?: string;
-  name?: string;
+  label: string;
+  name: string;
   options: FilterOption[];
   placeholder?: string;
 }
@@ -36,73 +35,32 @@ export function SelectFilter({
   options,
   placeholder,
 }: SelectFilterProps) {
-  const pathname = usePathname();
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const [isPending, startTransition] = useTransition();
-
-  if (!name) {
-    throw new Error('SelectFilter requires a name prop');
-  }
-
-  const searchParamValue = searchParams.get(name);
-
-  // Only show "All" option if placeholder is provided
-  const allOption = placeholder
-    ? { label: placeholder, value: FILTER_ALL }
-    : null;
-  const allOptions = allOption ? [allOption, ...options] : options;
-
-  function getInitialValue(): string | null {
-    if (
-      searchParamValue &&
-      allOptions.some((opt) => opt.value === searchParamValue)
-    ) {
-      return searchParamValue;
-    }
-
-    if (allOption) {
-      return FILTER_ALL;
-    }
-
-    return defaultValue ?? null;
-  }
-
-  const initialValue = getInitialValue();
-
-  const handleChange = (newValue: string | null) => {
-    const params = new URLSearchParams(searchParams.toString());
-
-    if (newValue && newValue !== FILTER_ALL) {
-      params.set(name, newValue);
-    } else {
-      params.delete(name);
-    }
-
-    params.delete('cursor');
-
-    startTransition(() => {
-      const query = params.toString();
-      router.push(query ? `${pathname}?${query}` : pathname);
-    });
-  };
+  const { current, isPending, updateUnlessDefault } = useFilterParam(name);
+  const filterOptions = getFilterOptions(options, placeholder);
+  const value = resolveSelectFilterValue(
+    current,
+    defaultValue,
+    filterOptions,
+    placeholder
+  );
 
   return (
     <div className={cn('space-y-2', className)}>
-      {!!label && <Label htmlFor={name}>{label}</Label>}
-
+      <Label htmlFor={name}>{label}</Label>
       <Select
         disabled={isPending}
-        items={allOptions}
+        items={filterOptions}
         name={name}
-        onValueChange={handleChange}
-        value={initialValue}
+        onValueChange={(newValue) => {
+          updateUnlessDefault(newValue, FILTER_ALL);
+        }}
+        value={value}
       >
         <SelectTrigger id={name} size="lg">
           <SelectValue />
         </SelectTrigger>
         <SelectPopup>
-          {allOptions.map((option) => (
+          {filterOptions.map((option) => (
             <SelectItem key={option.value} value={option.value}>
               {option.label}
             </SelectItem>
@@ -111,4 +69,40 @@ export function SelectFilter({
       </Select>
     </div>
   );
+}
+
+function getFilterOptions(options: FilterOption[], placeholder?: string) {
+  if (!placeholder) {
+    return options;
+  }
+
+  return [{ label: placeholder, value: FILTER_ALL }, ...options];
+}
+
+function resolveSelectFilterValue(
+  current: string | null,
+  defaultValue: string | undefined,
+  filterOptions: FilterOption[],
+  placeholder: string | undefined
+) {
+  if (matchesFilterOption(current, filterOptions)) {
+    return current;
+  }
+
+  if (placeholder) {
+    return FILTER_ALL;
+  }
+
+  return defaultValue ?? null;
+}
+
+function matchesFilterOption(
+  current: string | null,
+  filterOptions: FilterOption[]
+) {
+  if (!current) {
+    return false;
+  }
+
+  return filterOptions.some((option) => option.value === current);
 }

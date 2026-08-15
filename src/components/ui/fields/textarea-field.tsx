@@ -1,76 +1,46 @@
 'use client';
 
-import type { Control, FieldPath, FieldValues } from 'react-hook-form';
+import type { ComponentProps } from 'react';
+import type {
+  Control,
+  FieldPath,
+  FieldValues,
+  RegisterOptions,
+} from 'react-hook-form';
 
-import { Controller } from 'react-hook-form';
+import { Textarea } from '../primitives/textarea';
+import { FormField } from './form-field';
 
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldLabel,
-  Textarea,
-} from '@/components/ui';
-
-interface TextareaFieldProps<T extends FieldValues> {
+type TextareaFieldProps<T extends FieldValues> = ComponentProps<
+  typeof Textarea
+> & {
   control: Control<T>;
   description?: string;
   label: string;
   name: FieldPath<T>;
-  placeholder?: string;
   required?: boolean;
-  rows?: number;
-}
+  rules?: RegisterOptions<T, FieldPath<T>>;
+};
 
-/**
- * Reusable textarea field component that wraps Controller + Field + Textarea.
- * Handles validation errors automatically via React Hook Form.
- *
- * @example
- * ```tsx
- * <TextareaField
- *   control={form.control}
- *   label="Description"
- *   name="description"
- *   rows={4}
- * />
- * ```
- */
 export function TextareaField<T extends FieldValues>({
   control,
   description,
   label,
   name,
-  placeholder,
   required,
-  rows,
+  rules,
+  ...delegated
 }: TextareaFieldProps<T>) {
   return (
-    <Controller
+    <FormField
       control={control}
+      description={description}
+      label={label}
       name={name}
-      render={({ field, fieldState }) => (
-        <Field
-          dirty={fieldState.isDirty}
-          invalid={fieldState.invalid}
-          name={field.name}
-          touched={fieldState.isTouched}
-        >
-          <FieldLabel required={required}>{label}</FieldLabel>
-          {!!description && <FieldDescription>{description}</FieldDescription>}
-          <Textarea
-            aria-invalid={fieldState.invalid}
-            placeholder={placeholder}
-            required={required}
-            rows={rows}
-            size="lg"
-            {...field}
-          />
-          {!!fieldState.error && (
-            <FieldError match>{fieldState.error?.message}</FieldError>
-          )}
-        </Field>
-      )}
-    />
+      required={required}
+      rules={rules}
+    >
+      {(field) => <Textarea {...field} {...delegated} />}
+    </FormField>
   );
 }

@@ -1,5 +1,6 @@
 'use client';
 
+import type { ComponentProps } from 'react';
 import type {
   Control,
   ControllerProps,
@@ -7,61 +8,39 @@ import type {
   FieldValues,
 } from 'react-hook-form';
 
-import { Controller } from 'react-hook-form';
+import { Input } from '../primitives/input';
+import { FormField } from './form-field';
 
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldLabel,
-} from '@/components/ui';
-
-import { PasswordInput } from './password-input';
-
-interface PasswordFieldProps<T extends FieldValues> {
+type PasswordFieldProps<T extends FieldValues> = ComponentProps<
+  typeof Input
+> & {
   control: Control<T>;
   description?: string;
   label: string;
   name: FieldPath<T>;
-  placeholder?: string;
   required?: boolean;
   rules?: ControllerProps<T>['rules'];
-}
+};
 
 export function PasswordField<T extends FieldValues>({
   control,
   description,
   label,
   name,
-  placeholder,
   required,
   rules,
+  ...delegated
 }: PasswordFieldProps<T>) {
   return (
-    <Controller
+    <FormField
       control={control}
+      description={description}
+      label={label}
       name={name}
-      render={({ field, fieldState }) => (
-        <Field
-          dirty={fieldState.isDirty}
-          invalid={fieldState.invalid}
-          name={field.name}
-          touched={fieldState.isTouched}
-        >
-          <FieldLabel required={required}>{label}</FieldLabel>
-          {!!description && <FieldDescription>{description}</FieldDescription>}
-          <PasswordInput
-            aria-invalid={fieldState.invalid}
-            placeholder={placeholder}
-            required={required}
-            {...field}
-          />
-          {!!fieldState.error && (
-            <FieldError match>{fieldState.error?.message}</FieldError>
-          )}
-        </Field>
-      )}
+      required={required}
       rules={rules}
-    />
+    >
+      {(field) => <Input type="password" {...field} {...delegated} />}
+    </FormField>
   );
 }
