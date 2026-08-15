@@ -8,6 +8,19 @@ import { getOneFrom } from 'convex-helpers/server/relationships';
 import { throwNotFound } from './errors';
 
 /**
+ * Extracts a readable message from an unknown caught value.
+ */
+export function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  if (typeof error === 'string') {
+    return error;
+  }
+  return 'Unknown error';
+}
+
+/**
  * Normalizes text into a URL-friendly slug.
  * Returns empty string if input is falsy.
  */

@@ -13,14 +13,18 @@ import { ResetPasswordTemplate } from './emails/resetPassword';
 import { VerifyEmailTemplate } from './emails/verifyEmail';
 import { WelcomeEmail } from './emails/welcome';
 import { throwConvexError } from './lib/errors';
+import { reportSentryException } from './lib/sentry';
+import { getErrorMessage } from './lib/utils';
 
 // Email constants - same across all environments
 const TEST_DOMAIN_EMAIL = 'delivered@resend.dev';
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || TEST_DOMAIN_EMAIL;
 
-// Comfortably longer than the Resend component's own base batch delay (~1s
-// under normal load), so its scheduled send attempt has time to complete.
+// Comfortably longer than the component's own ~1s base batch delay.
 const CHECK_SEND_RESULT_DELAY_MS = 45_000;
+
+// Resend's own retry ladder can take up to ~15 minutes to exhaust.
+const CHECK_SEND_RESULT_MAX_BUDGET_MS = 20 * 60 * 1000;
 
 const EMAIL_KINDS = [
   'passwordReset',
@@ -53,20 +57,47 @@ export const checkSendResult = internalAction({
   args: {
     emailId: vEmailId,
     kind: vEmailKind,
+    startedAt: v.number(),
   },
   returns: v.null(),
   handler: async (ctx, args) => {
     const status = await resend.status(ctx, args.emailId);
 
-    // The component's own batch-rejection and retry-exhausted paths only ever
-    // set `status: "failed"`; the separate `failed` boolean is set exclusively
-    // by Resend's `email.failed` webhook event, which this check must not rely on.
+    // `status.failed` is set only by Resend's webhook; the batch-rejection
+    // and retry-exhausted paths this check targets only set `status.status`.
     if (status?.status === 'failed') {
       await reportEmailFailure({
         emailId: args.emailId,
         errorMessage: status.errorMessage,
         kind: args.kind,
       });
+      return null;
+    }
+
+    // Not yet attempted -- reschedule while budget remains.
+    const isPending =
+      status === null ||
+      status.status === 'waiting' ||
+      status.status === 'queued';
+
+    if (isPending) {
+      const withinBudget =
+        Date.now() - args.startedAt + CHECK_SEND_RESULT_DELAY_MS <=
+        CHECK_SEND_RESULT_MAX_BUDGET_MS;
+
+      if (withinBudget) {
+        await ctx.scheduler.runAfter(
+          CHECK_SEND_RESULT_DELAY_MS,
+          internal.emails.checkSendResult,
+          args
+        );
+      } else {
+        console.warn(
+          'checkSendResult gave up waiting for a terminal status:',
+          args.emailId,
+          args.kind
+        );
+      }
     }
 
     return null;
@@ -246,16 +277,6 @@ export const sendWelcomeEmail = internalMutation({
 // HELPERS
 // ============================================
 
-function getErrorMessage(error: unknown): string {
-  if (error instanceof Error) {
-    return error.message;
-  }
-  if (typeof error === 'string') {
-    return error;
-  }
-  return 'Unknown error';
-}
-
 function getFromAddress() {
   return `${site.name} <${FROM_EMAIL}>`;
 }
@@ -265,9 +286,8 @@ function getReplyToAddress() {
 }
 
 /**
- * Resend's errorMessage often echoes back the offending email address (from
- * the raw API response body or a bounce message). Strip it before this text
- * reaches Sentry or the logs, since it must never carry a recipient address.
+ * Resend's errorMessage can echo back the recipient's address; strip it
+ * before this text reaches Sentry or the logs.
  */
 function redactEmailAddresses(message: string): string {
   return message.replaceAll(EMAIL_ADDRESS_PATTERN, '[redacted]');
@@ -291,11 +311,11 @@ async function sendTrackedEmail(
       {
         emailId,
         kind,
+        startedAt: Date.now(),
       }
     );
   } catch (error) {
-    // The email already sent successfully; a failure here is a scheduling
-    // problem, not a send failure, so it must not surface as one to callers.
+    // Email already sent; a scheduling failure must not read as a send failure.
     console.error(
       'Failed to schedule checkSendResult:',
       emailId,
@@ -306,31 +326,6 @@ async function sendTrackedEmail(
   return emailId;
 }
 
-/**
- * Derives the ingest envelope URL from a Sentry DSN. The DSN itself travels
- * in the envelope header for auth, so the public key isn't needed separately.
- */
-function parseSentryDsn(dsn: string): { ingestUrl: string } | null {
-  try {
-    const url = new URL(dsn);
-    const projectId = url.pathname.slice(1);
-
-    if (!(url.username && projectId)) {
-      return null;
-    }
-
-    return {
-      ingestUrl: `${url.protocol}//${url.host}/api/${projectId}/envelope/`,
-    };
-  } catch {
-    return null;
-  }
-}
-
-/**
- * Fallback Sentry reporting for Convex's Free plan (no native exception
- * integration). Fire and forget: a Sentry outage must never affect sends.
- */
 async function reportEmailFailure(params: {
   emailId: EmailId;
   errorMessage: string | null;
@@ -338,67 +333,12 @@ async function reportEmailFailure(params: {
 }): Promise<void> {
   const errorMessage = params.errorMessage
     ? redactEmailAddresses(params.errorMessage)
-    : null;
+    : 'unknown error';
 
-  try {
-    const dsn = process.env.SENTRY_DSN;
-    const parsedDsn = dsn ? parseSentryDsn(dsn) : null;
-
-    if (!parsedDsn) {
-      console.error(
-        'Email send failed and SENTRY_DSN is not configured or malformed:',
-        params.kind,
-        params.emailId,
-        errorMessage
-      );
-      return;
-    }
-
-    const eventId = crypto.randomUUID().replaceAll('-', '');
-    const sentAt = new Date().toISOString();
-
-    const event = {
-      event_id: eventId,
-      exception: {
-        values: [
-          {
-            type: 'EmailSendFailed',
-            value: `Resend permanently rejected a "${params.kind}" email (${params.emailId}): ${errorMessage ?? 'unknown error'}`,
-          },
-        ],
-      },
-      level: 'error',
-      platform: 'node',
-      tags: { emailKind: params.kind },
-      timestamp: sentAt,
-    };
-
-    const envelope = [
-      JSON.stringify({ dsn, event_id: eventId, sent_at: sentAt }),
-      JSON.stringify({ type: 'event' }),
-      JSON.stringify(event),
-      '',
-    ].join('\n');
-
-    const response = await fetch(parsedDsn.ingestUrl, {
-      body: envelope,
-      headers: { 'Content-Type': 'application/x-sentry-envelope' },
-      method: 'POST',
-      signal: AbortSignal.timeout(5000),
-    });
-
-    if (!response.ok) {
-      console.error(
-        'Sentry rejected the email failure envelope:',
-        response.status
-      );
-    }
-  } catch (error) {
-    console.error(
-      'Failed to report email send failure to Sentry:',
-      getErrorMessage(error)
-    );
-  }
+  await reportSentryException({
+    message: `Resend permanently rejected a "${params.kind}" email (${params.emailId}): ${errorMessage}`,
+    tags: { emailKind: params.kind },
+  });
 }
 
 async function renderEmail(template: ReactElement) {
