@@ -1,3 +1,4 @@
+import type { EmailId } from '@convex-dev/resend';
 import type { MutationCtx } from './_generated/server';
 import type { ReactElement } from 'react';
 
@@ -17,6 +18,14 @@ import { throwConvexError } from './lib/errors';
 const TEST_DOMAIN_EMAIL = 'delivered@resend.dev';
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || TEST_DOMAIN_EMAIL;
 
+// Comfortably longer than the Resend component's own base batch delay (~1s
+// under normal load), so its scheduled send attempt has time to complete.
+const CHECK_SEND_RESULT_DELAY_MS = 45_000;
+
+const EMAIL_KINDS = ['passwordReset', 'test', 'verification', 'welcome'] as const;
+type EmailKind = (typeof EMAIL_KINDS)[number];
+const vEmailKind = v.union(...EMAIL_KINDS.map((kind) => v.literal(kind)));
+
 // Initialize Resend client
 export const resend: Resend = new Resend(components.resend, {
   // Note: testMode true = simulate emails (nothing sent), false = actually send emails
@@ -28,6 +37,33 @@ export const resend: Resend = new Resend(components.resend, {
 // ============================================
 // MUTATIONS
 // ============================================
+
+/**
+ * Scheduled after every send. `resend.sendEmail()` only enqueues the email;
+ * the component's own batch action makes the real Resend API call later and,
+ * on a permanent rejection, never throws or fires `onEmailEvent`. This checks
+ * the email's own status after the fact to catch that failure class.
+ */
+export const checkSendResult = internalAction({
+  args: {
+    emailId: vEmailId,
+    kind: vEmailKind,
+  },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const status = await resend.status(ctx, args.emailId);
+
+    if (status?.failed) {
+      await reportEmailFailure({
+        emailId: args.emailId,
+        errorMessage: status.errorMessage,
+        kind: args.kind,
+      });
+    }
+
+    return null;
+  },
+});
 
 export const handleEmailEvent = internalMutation({
   args: {
@@ -82,13 +118,18 @@ export const sendPasswordResetEmail = internalAction({
       });
       const { html, text } = await renderEmail(template);
 
-      await resend.sendEmail(ctx, {
+      const emailId = await resend.sendEmail(ctx, {
         from: getFromAddress(),
         html,
         replyTo: [getReplyToAddress()],
         subject: 'Reset your password',
         text,
         to: args.email,
+      });
+
+      await ctx.scheduler.runAfter(CHECK_SEND_RESULT_DELAY_MS, internal.emails.checkSendResult, {
+        emailId,
+        kind: 'passwordReset',
       });
     } catch (error) {
       throwConvexError(500, 'Failed to send password reset email', {
@@ -103,13 +144,18 @@ export const sendPasswordResetEmail = internalAction({
 
 export const sendTestEmail = internalMutation({
   handler: async (ctx) => {
-    await resend.sendEmail(ctx, {
+    const emailId = await resend.sendEmail(ctx, {
       from: getFromAddress(),
       html: '<p>This is a test email</p>',
       replyTo: [getReplyToAddress()],
       subject: `Test email from ${site.name}`,
       text: 'This is a test email',
       to: process.env.RESEND_TO_EMAIL || TEST_DOMAIN_EMAIL,
+    });
+
+    await ctx.scheduler.runAfter(CHECK_SEND_RESULT_DELAY_MS, internal.emails.checkSendResult, {
+      emailId,
+      kind: 'test',
     });
   },
 });
@@ -136,6 +182,11 @@ export const sendVerificationEmail = internalMutation({
         subject: 'Verify your email address',
         text,
         to: args.email,
+      });
+
+      await ctx.scheduler.runAfter(CHECK_SEND_RESULT_DELAY_MS, internal.emails.checkSendResult, {
+        emailId,
+        kind: 'verification',
       });
 
       return emailId;
@@ -165,7 +216,7 @@ export const sendWelcomeEmail = internalMutation({
       });
       const { html, text } = await renderEmail(template);
 
-      return await resend.sendEmail(ctx, {
+      const emailId = await resend.sendEmail(ctx, {
         from: getFromAddress(),
         html,
         replyTo: [getReplyToAddress()],
@@ -173,6 +224,13 @@ export const sendWelcomeEmail = internalMutation({
         text,
         to: args.email,
       });
+
+      await ctx.scheduler.runAfter(CHECK_SEND_RESULT_DELAY_MS, internal.emails.checkSendResult, {
+        emailId,
+        kind: 'welcome',
+      });
+
+      return emailId;
     } catch (error) {
       throwConvexError(500, 'Failed to send welcome email', {
         cause: getErrorMessage(error),
@@ -204,6 +262,93 @@ function getFromAddress() {
 
 function getReplyToAddress() {
   return site.email.reply;
+}
+
+/**
+ * Derives the ingest envelope URL from a Sentry DSN, per
+ * https://develop.sentry.dev/sdk/foundations/transport/envelopes/. The DSN
+ * itself travels in the envelope header for auth, so the public key isn't
+ * needed separately.
+ */
+function parseSentryDsn(dsn: string): { ingestUrl: string } | null {
+  try {
+    const url = new URL(dsn);
+    const projectId = url.pathname.slice(1);
+
+    if (!(url.username && projectId)) {
+      return null;
+    }
+
+    return { ingestUrl: `${url.protocol}//${url.host}/api/${projectId}/envelope/` };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Fallback path for Sentry visibility on Convex's Free plan, which has no
+ * native exception reporting integration. Posts a minimal event envelope
+ * directly over fetch. Never includes the raw recipient address or a reset
+ * URL/token, only Resend's own error message, the email kind, and its id.
+ * Fire and forget: a Sentry outage must never affect the email send path.
+ */
+async function reportEmailFailure(params: {
+  emailId: EmailId;
+  errorMessage: string | null;
+  kind: EmailKind;
+}): Promise<void> {
+  try {
+    const dsn = process.env.SENTRY_DSN;
+    const parsedDsn = dsn ? parseSentryDsn(dsn) : null;
+
+    if (!parsedDsn) {
+      console.error(
+        'Email send failed and SENTRY_DSN is not configured or malformed:',
+        params.kind,
+        params.emailId,
+        params.errorMessage,
+      );
+      return;
+    }
+
+    const eventId = crypto.randomUUID().replaceAll('-', '');
+    const sentAt = new Date().toISOString();
+
+    const event = {
+      event_id: eventId,
+      exception: {
+        values: [
+          {
+            type: 'EmailSendFailed',
+            value: `Resend permanently rejected a "${params.kind}" email (${params.emailId}): ${params.errorMessage ?? 'unknown error'}`,
+          },
+        ],
+      },
+      level: 'error',
+      platform: 'node',
+      tags: { emailKind: params.kind },
+      timestamp: sentAt,
+    };
+
+    const envelope = [
+      JSON.stringify({ dsn, event_id: eventId, sent_at: sentAt }),
+      JSON.stringify({ type: 'event' }),
+      JSON.stringify(event),
+      '',
+    ].join('\n');
+
+    const response = await fetch(parsedDsn.ingestUrl, {
+      body: envelope,
+      headers: { 'Content-Type': 'application/x-sentry-envelope' },
+      method: 'POST',
+    });
+
+    if (!response.ok) {
+      console.error('Sentry rejected the email failure envelope:', response.status);
+    }
+  } catch (error) {
+    console.error('Failed to report email send failure to Sentry:', getErrorMessage(error));
+  }
 }
 
 async function renderEmail(template: ReactElement) {
