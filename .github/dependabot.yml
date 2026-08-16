@@ -19,13 +19,15 @@ updates:
       prefix: chore
     directory: /
     groups:
-      development-minor-and-patch:
-        dependency-type: development
+      deps-minor-and-patch:
+        applies-to: version-updates
+        dependency-type: production
         update-types:
           - minor
           - patch
-      production-minor-and-patch:
-        dependency-type: production
+      dev-deps-minor-and-patch:
+        applies-to: version-updates
+        dependency-type: development
         update-types:
           - minor
           - patch
