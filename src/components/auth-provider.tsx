@@ -1,5 +1,6 @@
 'use client';
 
+import type { AuthClient } from '@convex-dev/better-auth/react';
 import type { ReactNode } from 'react';
 
 import { ConvexBetterAuthProvider } from '@convex-dev/better-auth/react';
@@ -19,7 +20,10 @@ const convex = new ConvexReactClient(convexUrl, {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   return (
-    <ConvexBetterAuthProvider authClient={authClient} client={convex}>
+    <ConvexBetterAuthProvider
+      authClient={authClient as unknown as AuthClient}
+      client={convex}
+    >
       {children}
     </ConvexBetterAuthProvider>
   );

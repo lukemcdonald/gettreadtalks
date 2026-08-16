@@ -2,8 +2,8 @@ import type { MutationCtx } from './_generated/server';
 import type { ReactElement } from 'react';
 
 import { Resend, vEmailEvent, vEmailId } from '@convex-dev/resend';
-import { render } from '@react-email/render';
 import { v } from 'convex/values';
+import { render } from 'react-email';
 
 import { site } from '../src/configs/site';
 import { components, internal } from './_generated/api';

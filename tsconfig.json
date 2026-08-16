@@ -13,15 +13,14 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
-    "baseUrl": ".",
     "plugins": [
       {
         "name": "next"
       }
     ],
     "paths": {
-      "@/convex/*": ["convex/*"],
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"],
+      "@/convex/*": ["./convex/*"]
     },
     "strictNullChecks": true
   },
