@@ -49,9 +49,9 @@ const TRUSTED_ORIGIN_MATCHERS: (string | RegExp)[] = TRUSTED_ORIGINS.map(
     }
 
     const pattern = trustedOrigin
-      .replaceAll(/[.+?^${}()|[\]\\]/g, '\\$&')
+      .replaceAll(/[.+?^${}()|[\]\\]/gu, '\\$&')
       .replaceAll('*', '[^.]+');
-    return new RegExp(`^${pattern}$`);
+    return new RegExp(`^${pattern}$`, 'u');
   }
 );
 

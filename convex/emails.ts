@@ -35,7 +35,7 @@ const EMAIL_KINDS = [
 type EmailKind = (typeof EMAIL_KINDS)[number];
 const vEmailKind = v.union(...EMAIL_KINDS.map((kind) => v.literal(kind)));
 
-const EMAIL_ADDRESS_PATTERN = /[\w.+-]+@[\w-]+\.[\w.-]+/g;
+const EMAIL_ADDRESS_PATTERN = /[\w.+-]+@[\w-]+\.[\w.-]+/gu;
 
 // Initialize Resend client
 export const resend: Resend = new Resend(components.resend, {
