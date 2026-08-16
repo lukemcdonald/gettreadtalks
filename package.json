@@ -35,7 +35,7 @@
     "@react-email/render": "^2.0.4",
     "@sentry/nextjs": "^10.53.1",
     "@vercel/analytics": "^2.0.1",
-    "better-auth": "1.6.11",
+    "better-auth": "1.6.22",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "convex": "^1.38.0",
