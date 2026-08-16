@@ -38,7 +38,16 @@ export function TextField<T extends FieldValues>({
       required={required}
       rules={rules}
     >
-      {(field) => <Input {...field} {...delegated} />}
+      {(field, fieldState) => (
+        <Input
+          size="lg"
+          {...delegated}
+          {...field}
+          aria-invalid={fieldState.invalid}
+          id={field.name}
+          required={required}
+        />
+      )}
     </FormField>
   );
 }

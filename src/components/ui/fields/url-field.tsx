@@ -11,7 +11,10 @@ import type {
 import { Input } from '../primitives/input';
 import { FormField } from './form-field';
 
-type UrlFieldProps<T extends FieldValues> = ComponentProps<typeof Input> & {
+type UrlFieldProps<T extends FieldValues> = Omit<
+  ComponentProps<typeof Input>,
+  'type'
+> & {
   control: Control<T>;
   description?: string;
   label: string;
@@ -38,7 +41,17 @@ export function UrlField<T extends FieldValues>({
       required={required}
       rules={rules}
     >
-      {(field) => <Input type="url" {...field} {...delegated} />}
+      {(field, fieldState) => (
+        <Input
+          size="lg"
+          {...delegated}
+          {...field}
+          aria-invalid={fieldState.invalid}
+          id={field.name}
+          required={required}
+          type="url"
+        />
+      )}
     </FormField>
   );
 }

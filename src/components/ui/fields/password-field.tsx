@@ -8,11 +8,12 @@ import type {
   FieldValues,
 } from 'react-hook-form';
 
-import { Input } from '../primitives/input';
 import { FormField } from './form-field';
+import { PasswordInput } from './password-input';
 
-type PasswordFieldProps<T extends FieldValues> = ComponentProps<
-  typeof Input
+type PasswordFieldProps<T extends FieldValues> = Omit<
+  ComponentProps<typeof PasswordInput>,
+  'type'
 > & {
   control: Control<T>;
   description?: string;
@@ -40,7 +41,15 @@ export function PasswordField<T extends FieldValues>({
       required={required}
       rules={rules}
     >
-      {(field) => <Input type="password" {...field} {...delegated} />}
+      {(field, fieldState) => (
+        <PasswordInput
+          {...delegated}
+          {...field}
+          aria-invalid={fieldState.invalid}
+          id={field.name}
+          required={required}
+        />
+      )}
     </FormField>
   );
 }

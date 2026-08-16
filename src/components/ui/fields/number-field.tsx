@@ -104,6 +104,7 @@ function NumberFieldControl<T extends FieldValues>({
   return (
     <NumberFieldPrimitive
       aria-invalid={invalid}
+      id={field.name}
       max={max}
       min={min}
       onValueChange={(newValue) => {
