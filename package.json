@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "audit:code": "fallow audit && fallow health --score --summary",
+    "audit:code": "fallow audit && fallow health --score --hotspots --summary",
     "build": "next build",
     "check": "ultracite check .",
     "clean": "rm -rf node_modules",
