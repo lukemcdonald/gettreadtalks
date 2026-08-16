@@ -16,7 +16,7 @@ updates:
 
   - package-ecosystem: npm
     commit-message:
-      prefix: chore
+      prefix: fix
     directory: /
     groups:
       deps-minor-and-patch:
