@@ -84,6 +84,13 @@ const config = IS_SENTRY_ENABLED
       sourcemaps: {
         disable: true,
       },
+      webpack: {
+        unstable_sentryWebpackPluginOptions: {
+          release: {
+            deploy: false,
+          },
+        },
+      },
     })
   : nextConfig;
 
