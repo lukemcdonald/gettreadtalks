@@ -25,6 +25,7 @@ import type * as lib_filters from "../lib/filters.js";
 import type * as lib_plugins from "../lib/plugins.js";
 import type * as lib_rateLimiter from "../lib/rateLimiter.js";
 import type * as lib_rotateContent from "../lib/rotateContent.js";
+import type * as lib_sentry from "../lib/sentry.js";
 import type * as lib_sort from "../lib/sort.js";
 import type * as lib_types from "../lib/types.js";
 import type * as lib_utils from "../lib/utils.js";
@@ -94,6 +95,7 @@ declare const fullApi: ApiFromModules<{
   "lib/plugins": typeof lib_plugins;
   "lib/rateLimiter": typeof lib_rateLimiter;
   "lib/rotateContent": typeof lib_rotateContent;
+  "lib/sentry": typeof lib_sentry;
   "lib/sort": typeof lib_sort;
   "lib/types": typeof lib_types;
   "lib/utils": typeof lib_utils;
