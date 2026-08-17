@@ -40,9 +40,9 @@ const TRUSTED_ORIGINS = [
 
 /**
  * Precompiled so `isTrustedOrigin` doesn't rebuild a RegExp per request. A
- * `*` matches any run of non-slash characters, mirroring Better Auth's own
- * wildcard semantics (e.g. `https://*.vercel.app` also matches multi-label
- * subdomains like `a.b.vercel.app`).
+ * `*` matches any run of non-slash, non-backslash characters, mirroring
+ * Better Auth's own wildcard semantics (e.g. `https://*.vercel.app` also
+ * matches multi-label subdomains like `a.b.vercel.app`).
  */
 const TRUSTED_ORIGIN_MATCHERS: (string | RegExp)[] = TRUSTED_ORIGINS.map(
   (trustedOrigin) => {
@@ -52,7 +52,7 @@ const TRUSTED_ORIGIN_MATCHERS: (string | RegExp)[] = TRUSTED_ORIGINS.map(
 
     const pattern = trustedOrigin
       .replaceAll(/[.+?^${}()|[\]\\]/gu, '\\$&')
-      .replaceAll('*', '[^/]+');
+      .replaceAll('*', '[^/\\\\]+');
     return new RegExp(`^${pattern}$`, 'u');
   }
 );
