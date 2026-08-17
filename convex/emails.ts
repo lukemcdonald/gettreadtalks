@@ -74,11 +74,14 @@ export const checkSendResult = internalAction({
       return null;
     }
 
-    // Not yet attempted -- reschedule while budget remains.
+    // Not yet in a terminal state -- reschedule while budget remains, since
+    // 'sent'/'delivery_delayed' can still transition to 'failed' later.
     const isPending =
       status === null ||
       status.status === 'waiting' ||
-      status.status === 'queued';
+      status.status === 'queued' ||
+      status.status === 'sent' ||
+      status.status === 'delivery_delayed';
 
     if (isPending) {
       const withinBudget =
