@@ -64,14 +64,16 @@ export async function reportSentryException(params: {
 function parseSentryDsn(dsn: string): { ingestUrl: string } | null {
   try {
     const url = new URL(dsn);
-    const projectId = url.pathname.slice(1);
+    const segments = url.pathname.split('/').filter(Boolean);
+    const projectId = segments.at(-1);
+    const pathPrefix = segments.slice(0, -1).join('/');
 
     if (!(url.username && projectId)) {
       return null;
     }
 
     return {
-      ingestUrl: `${url.protocol}//${url.host}/api/${projectId}/envelope/`,
+      ingestUrl: `${url.protocol}//${url.host}${pathPrefix ? `/${pathPrefix}` : ''}/api/${projectId}/envelope/`,
     };
   } catch {
     return null;
