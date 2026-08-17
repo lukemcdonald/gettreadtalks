@@ -55,6 +55,7 @@ certificates
 convex/migration/data/
 
 # Agents
+/CLAUDE.md
 **/.agents/skills/**
 **/.claude/plans/
 **/.claude/settings.local.json
