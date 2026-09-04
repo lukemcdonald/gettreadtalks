@@ -25,9 +25,9 @@ export default function LogoutPage() {
         captureException(error, {
           fingerprint: ['auth', 'signOut'],
         });
-      } finally {
-        router.push(redirectTo as Route);
       }
+
+      router.push(redirectTo as Route);
     };
 
     handleLogout();

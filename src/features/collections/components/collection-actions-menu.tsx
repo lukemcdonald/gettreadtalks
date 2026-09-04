@@ -36,27 +36,26 @@ export function CollectionActionsMenu({
     try {
       const result = await destroyCollectionAction(collectionId);
 
-      if (!result.success) {
+      if (result.success) {
+        toastManager.add({ title: 'Collection deleted', type: 'success' });
+        setDeleteDialogOpen(false);
+        router.refresh();
+      } else {
         toastManager.add({
           description: result.errors?.root ?? 'An error occurred',
           title: 'Failed to delete collection',
           type: 'error',
         });
-        return;
       }
-
-      toastManager.add({ title: 'Collection deleted', type: 'success' });
-      setDeleteDialogOpen(false);
-      router.refresh();
     } catch (error: unknown) {
       toastManager.add({
         description: getErrorMessage(error),
         title: 'Failed to delete collection',
         type: 'error',
       });
-    } finally {
-      setIsDeleting(false);
     }
+
+    setIsDeleting(false);
   };
 
   const blockReason = `This collection has ${talkCount} ${pluralize(talkCount, 'talk', 'talks')}. Remove all talks before deleting.`;

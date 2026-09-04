@@ -40,27 +40,26 @@ export function SpeakerActionsMenu({
     try {
       const result = await destroySpeakerAction(speakerId);
 
-      if (!result.success) {
+      if (result.success) {
+        toastManager.add({ title: 'Speaker deleted', type: 'success' });
+        setDeleteDialogOpen(false);
+        router.refresh();
+      } else {
         toastManager.add({
           description: result.errors?.root ?? 'An error occurred',
           title: 'Failed to delete speaker',
           type: 'error',
         });
-        return;
       }
-
-      toastManager.add({ title: 'Speaker deleted', type: 'success' });
-      setDeleteDialogOpen(false);
-      router.refresh();
     } catch (error: unknown) {
       toastManager.add({
         description: getErrorMessage(error),
         title: 'Failed to delete speaker',
         type: 'error',
       });
-    } finally {
-      setIsDeleting(false);
     }
+
+    setIsDeleting(false);
   };
 
   const parts: string[] = [];

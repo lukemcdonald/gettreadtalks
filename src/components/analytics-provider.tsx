@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react';
 
 import { usePathname, useSearchParams } from 'next/navigation';
-import posthog from 'posthog-js';
+import { posthog } from 'posthog-js';
 import { PostHogProvider, usePostHog } from 'posthog-js/react';
 import { Suspense, useEffect, useRef, useState } from 'react';
 

@@ -73,9 +73,9 @@ export function ContentActionsGroup({
         title: `Failed to archive ${contentType}`,
         type: 'error',
       });
-    } finally {
-      setIsArchiving(false);
     }
+
+    setIsArchiving(false);
   };
 
   const handleDelete = async () => {
@@ -106,9 +106,9 @@ export function ContentActionsGroup({
         title: `Failed to delete ${contentType}`,
         type: 'error',
       });
-    } finally {
-      setIsDeleting(false);
     }
+
+    setIsDeleting(false);
   };
 
   const menuItems: ActionsGroupMenuItem[] = [
