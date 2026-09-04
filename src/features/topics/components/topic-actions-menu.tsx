@@ -33,27 +33,26 @@ export function TopicActionsMenu({ talkCount, topic }: TopicActionsMenuProps) {
     try {
       const result = await destroyTopicAction(topicId);
 
-      if (!result.success) {
+      if (result.success) {
+        toastManager.add({ title: 'Topic deleted', type: 'success' });
+        setDeleteDialogOpen(false);
+        router.refresh();
+      } else {
         toastManager.add({
           description: result.errors?.root ?? 'An error occurred',
           title: 'Failed to delete topic',
           type: 'error',
         });
-        return;
       }
-
-      toastManager.add({ title: 'Topic deleted', type: 'success' });
-      setDeleteDialogOpen(false);
-      router.refresh();
     } catch (error: unknown) {
       toastManager.add({
         description: getErrorMessage(error),
         title: 'Failed to delete topic',
         type: 'error',
       });
-    } finally {
-      setIsDeleting(false);
     }
+
+    setIsDeleting(false);
   };
 
   const menuItems = [
