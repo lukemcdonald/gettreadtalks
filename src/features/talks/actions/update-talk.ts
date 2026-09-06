@@ -39,6 +39,7 @@ export async function updateTalkAction(
 
     updateTag('talks');
     updateTag('form-options');
+    updateTag('topics');
 
     return {
       data: { talkId },

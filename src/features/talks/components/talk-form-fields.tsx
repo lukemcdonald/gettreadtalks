@@ -6,6 +6,7 @@ import type {
 } from '@/features/collections/types';
 import type { SpeakerId, SpeakerListItem } from '@/features/speakers/types';
 import type { TalkStatus } from '@/features/talks/types';
+import type { TopicListItem } from '@/features/topics/types';
 import type { Control, FieldValues, Path } from 'react-hook-form';
 
 import { Controller } from 'react-hook-form';
@@ -20,6 +21,7 @@ import {
 } from '@/components/ui';
 import { CollectionSelectField } from '@/features/collections/components/collection-select-field';
 import { SpeakerField } from '@/features/speakers/components/speaker-field';
+import { TopicField } from '@/features/topics/components/topic-field';
 
 interface TalkFormFieldsProps<T extends FieldValues> {
   collections: CollectionListItem[];
@@ -28,6 +30,7 @@ interface TalkFormFieldsProps<T extends FieldValues> {
   onSpeakerCreated?: (speakerId: SpeakerId) => void;
   onStatusChange?: (status: TalkStatus) => void;
   speakers: SpeakerListItem[];
+  topics: TopicListItem[];
 }
 
 export function TalkFormFields<T extends FieldValues>({
@@ -37,6 +40,7 @@ export function TalkFormFields<T extends FieldValues>({
   onSpeakerCreated,
   onStatusChange,
   speakers,
+  topics,
 }: TalkFormFieldsProps<T>) {
   return (
     <div className="space-y-4">
@@ -87,6 +91,12 @@ export function TalkFormFields<T extends FieldValues>({
         label="Scripture"
         name={'scripture' as Path<T>}
         placeholder="Romans 8:28"
+      />
+
+      <TopicField
+        control={control}
+        name={'topicIds' as Path<T>}
+        topics={topics}
       />
 
       <Controller

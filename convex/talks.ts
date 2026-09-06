@@ -10,6 +10,7 @@ export const {
   listFeaturedTalksWithSpeakers,
   listRandomTalksBySpeaker,
   listTalkSlugsForSitemap,
+  listTalkTopics,
   listTalks,
   listTalksByCollection,
   listTalksBySpeaker,

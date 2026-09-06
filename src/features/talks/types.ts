@@ -1,5 +1,6 @@
 import type { Doc, Id } from '@/convex/_generated/dataModel';
 import type { Speaker } from '@/features/speakers/types';
+import type { TopicId } from '@/features/topics/types';
 import type { StatusType } from '@/lib/entities/types';
 
 export type Talk = Doc<'talks'>;
@@ -28,4 +29,6 @@ export type TalkFormInitialData = Pick<
   | 'speakerId'
   | 'status'
   | 'title'
->;
+> & {
+  topicIds?: TopicId[];
+};
