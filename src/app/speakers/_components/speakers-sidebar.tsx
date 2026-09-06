@@ -2,7 +2,7 @@ import type { SpeakerRole } from '@/convex/model/speakers/validators';
 import type { Speaker } from '@/features/speakers/types';
 
 import { SidebarContent } from '@/components/sidebar-content';
-import { MobileFilterSheet } from '@/components/ui/mobile-filter-sheet';
+import { MobileFilterDrawer } from '@/components/ui';
 import { SearchInput } from '@/components/ui/search-input';
 import { SelectFilter } from '@/components/ui/select-filter';
 import { SortSelect } from '@/components/ui/sort-select';
@@ -36,7 +36,7 @@ export function SpeakersSidebar({ speakers }: SpeakersSidebarProps) {
           paramName="search"
           placeholder="Search speakers..."
         />
-        <MobileFilterSheet variant="icon">
+        <MobileFilterDrawer variant="icon">
           <SelectFilter
             label="Role"
             name="role"
@@ -44,7 +44,7 @@ export function SpeakersSidebar({ speakers }: SpeakersSidebarProps) {
             placeholder="All Roles"
           />
           <SortSelect label="Sort by" options={sortOptions} />
-        </MobileFilterSheet>
+        </MobileFilterDrawer>
       </div>
 
       {/* Desktop: full sidebar */}

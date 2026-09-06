@@ -1,8 +1,8 @@
 import type { Topic } from '@/features/topics/types';
 
 import { SidebarContent } from '@/components/sidebar-content';
+import { MobileFilterDrawer } from '@/components/ui';
 import { ComboboxMultiFilter } from '@/components/ui/combobox-multi-filter';
-import { MobileFilterSheet } from '@/components/ui/mobile-filter-sheet';
 
 interface TopicWithCount {
   talkCount: number;
@@ -23,14 +23,14 @@ export function TopicsSidebar({ topics }: TopicsSidebarProps) {
     <SidebarContent className="space-y-4">
       {/* Mobile: icon filter button */}
       <div className="flex items-center gap-2 md:hidden">
-        <MobileFilterSheet variant="icon">
+        <MobileFilterDrawer variant="icon">
           <ComboboxMultiFilter
             label="Topics"
             name="topics"
             options={topicOptions}
             placeholder="All Topics"
           />
-        </MobileFilterSheet>
+        </MobileFilterDrawer>
       </div>
 
       {/* Desktop: full sidebar */}
