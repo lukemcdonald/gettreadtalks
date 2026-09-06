@@ -3,8 +3,8 @@
 import type { CollectionListItem } from '@/features/collections/types';
 import type { SpeakerListItem } from '@/features/speakers/types';
 import type { TalkFormData } from '@/features/talks/schemas/talk-form';
-import type { Talk, TalkId } from '@/features/talks/types';
-import type { TopicId, TopicListItem } from '@/features/topics/types';
+import type { Talk, TalkId, TalkWithTopicIds } from '@/features/talks/types';
+import type { TopicListItem } from '@/features/topics/types';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState, useTransition } from 'react';
@@ -25,14 +25,13 @@ interface EditTalkSheetProps {
   onTalkUpdated: (talkId: TalkId) => void;
   open: boolean;
   speakers: SpeakerListItem[];
-  talk: Talk;
-  topicIds: TopicId[];
+  talk: TalkWithTopicIds;
   topics: TopicListItem[];
 }
 
 type UrlChange = { newUrl: string; oldUrl: string } | null;
 
-function getTalkFormValues(talk: Talk, topicIds: TopicId[]): TalkFormData {
+function getTalkFormValues(talk: TalkWithTopicIds): TalkFormData {
   return {
     collectionId: talk.collectionId,
     collectionOrder: talk.collectionOrder,
@@ -44,7 +43,7 @@ function getTalkFormValues(talk: Talk, topicIds: TopicId[]): TalkFormData {
     speakerId: talk.speakerId ?? '',
     status: talk.status ?? 'backlog',
     title: talk.title ?? '',
-    topicIds,
+    topicIds: talk.topicIds,
   };
 }
 
@@ -78,7 +77,6 @@ export function EditTalkSheet({
   open,
   speakers,
   talk,
-  topicIds,
   topics,
 }: EditTalkSheetProps) {
   const [isPending, startTransition] = useTransition();
@@ -90,7 +88,7 @@ export function EditTalkSheet({
     mode: 'onBlur',
     // oxlint-disable-next-line typescript/no-explicit-any -- Zod 4 compatibility with zodResolver
     resolver: zodResolver(talkFormSchema as any),
-    values: getTalkFormValues(talk, topicIds),
+    values: getTalkFormValues(talk),
   });
 
   function submitData(data: TalkFormData) {

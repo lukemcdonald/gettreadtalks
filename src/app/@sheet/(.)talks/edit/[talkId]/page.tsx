@@ -30,8 +30,10 @@ export default async function Page({ params }: PageProps) {
     <EditTalkSheetRoute
       collections={collections}
       speakers={speakers}
-      talk={talk}
-      topicIds={talkTopics.map((topic) => topic._id)}
+      talk={{
+        ...talk,
+        topicIds: talkTopics.map((topic) => topic._id),
+      }}
       topics={topics}
     />
   );
