@@ -16,6 +16,9 @@ export type TalkWithSpeaker = Talk & {
 export type TalkWithSpeakerAndTopics = TalkWithSpeaker & {
   topicSlugs: string[];
 };
+export type TalkWithTopicIds = Talk & {
+  topicIds: TopicId[];
+};
 
 export type TalkFormInitialData = Pick<
   Talk,
