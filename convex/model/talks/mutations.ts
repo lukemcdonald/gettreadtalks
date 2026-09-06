@@ -12,6 +12,7 @@ import {
   talkSlugExistsForSpeaker,
 } from '../../lib/utils';
 import { requireAuth } from '../auth/utils';
+import { setTalkTopics } from './utils';
 import { statusType } from './validators';
 
 /**
@@ -56,32 +57,41 @@ export const createTalk = mutation({
     speakerId: v.id('speakers'),
     status: v.optional(statusType),
     title: v.string(),
+    topicIds: v.optional(v.array(v.id('topics'))),
   },
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
-    if (!args.title.trim()) {
+    const { topicIds, ...talkArgs } = args;
+
+    if (!talkArgs.title.trim()) {
       throwValidationError('Title cannot be empty', 'title');
     }
 
-    const slug = slugify(args.title);
+    const slug = slugify(talkArgs.title);
 
-    if (await talkSlugExistsForSpeaker(ctx, args.speakerId, slug)) {
+    if (await talkSlugExistsForSpeaker(ctx, talkArgs.speakerId, slug)) {
       throwDuplicateSlug(
         'Talk with this title already exists for this speaker',
         'title'
       );
     }
 
-    const status = args.status || 'backlog';
+    const status = talkArgs.status || 'backlog';
     const publishedAt = getPublishedAtForStatus(status);
 
-    return await ctx.db.insert('talks', {
-      ...args,
+    const talkId = await ctx.db.insert('talks', {
+      ...talkArgs,
       publishedAt,
       slug,
       status,
     });
+
+    if (topicIds !== undefined) {
+      await setTalkTopics(ctx, talkId, topicIds);
+    }
+
+    return talkId;
   },
   returns: v.id('talks'),
 });
@@ -102,9 +112,10 @@ export const updateTalk = mutation({
     status: v.optional(statusType),
     talkId: v.id('talks'),
     title: v.optional(v.string()),
+    topicIds: v.optional(v.array(v.id('topics'))),
   },
   handler: async (ctx, args) => {
-    const { slug: rawSlug, talkId, ...rest } = args;
+    const { slug: rawSlug, talkId, topicIds, ...rest } = args;
 
     await requireAuth(ctx);
 
@@ -148,6 +159,10 @@ export const updateTalk = mutation({
     updates.updatedAt = Date.now();
 
     await ctx.db.patch(talkId, updates);
+
+    if (topicIds !== undefined) {
+      await setTalkTopics(ctx, talkId, topicIds);
+    }
 
     return talkId;
   },

@@ -1,7 +1,9 @@
 import type { Doc, Id } from '../../_generated/dataModel';
-import type { QueryCtx } from '../../_generated/server';
+import type { MutationCtx, QueryCtx } from '../../_generated/server';
 
 import { asyncMap } from 'convex-helpers';
+
+import { getOrThrow } from '../../lib/utils';
 
 /**
  * Apply search filter with speaker data to talks+speaker array.
@@ -72,4 +74,44 @@ export async function getTalksByTopic(ctx: QueryCtx, topicId: Id<'topics'>) {
   const talks = await Promise.all(talkIds.map((id) => ctx.db.get('talks', id)));
 
   return talks.filter((talk): talk is Doc<'talks'> => talk !== null);
+}
+
+/**
+ * Replace a talk's topic associations with the given topic IDs.
+ */
+export async function setTalkTopics(
+  ctx: MutationCtx,
+  talkId: Id<'talks'>,
+  topicIds: Id<'topics'>[]
+) {
+  const uniqueTopicIds = [...new Set(topicIds)];
+
+  await Promise.all(
+    uniqueTopicIds.map((topicId) => getOrThrow(ctx, 'topics', topicId))
+  );
+
+  const existing = await ctx.db
+    .query('talksOnTopics')
+    .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
+    .collect();
+
+  const existingIds = new Set(existing.map((row) => row.topicId));
+  const nextIds = new Set(uniqueTopicIds);
+
+  await Promise.all(
+    existing
+      .filter((row) => !nextIds.has(row.topicId))
+      .map((row) => ctx.db.delete(row._id))
+  );
+
+  await Promise.all(
+    uniqueTopicIds
+      .filter((topicId) => !existingIds.has(topicId))
+      .map((topicId) =>
+        ctx.db.insert('talksOnTopics', {
+          talkId,
+          topicId,
+        })
+      )
+  );
 }

@@ -4,6 +4,7 @@ import type { CollectionListItem } from '@/features/collections/types';
 import type { SpeakerListItem } from '@/features/speakers/types';
 import type { TalkFormData } from '@/features/talks/schemas/talk-form';
 import type { Talk, TalkId } from '@/features/talks/types';
+import type { TopicId, TopicListItem } from '@/features/topics/types';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState, useTransition } from 'react';
@@ -25,11 +26,13 @@ interface EditTalkSheetProps {
   open: boolean;
   speakers: SpeakerListItem[];
   talk: Talk;
+  topicIds: TopicId[];
+  topics: TopicListItem[];
 }
 
 type UrlChange = { newUrl: string; oldUrl: string } | null;
 
-function getTalkFormValues(talk: Talk): TalkFormData {
+function getTalkFormValues(talk: Talk, topicIds: TopicId[]): TalkFormData {
   return {
     collectionId: talk.collectionId,
     collectionOrder: talk.collectionOrder,
@@ -41,6 +44,7 @@ function getTalkFormValues(talk: Talk): TalkFormData {
     speakerId: talk.speakerId ?? '',
     status: talk.status ?? 'backlog',
     title: talk.title ?? '',
+    topicIds,
   };
 }
 
@@ -74,6 +78,8 @@ export function EditTalkSheet({
   open,
   speakers,
   talk,
+  topicIds,
+  topics,
 }: EditTalkSheetProps) {
   const [isPending, startTransition] = useTransition();
   const [pendingData, setPendingData] = useState<TalkFormData | null>(null);
@@ -84,7 +90,7 @@ export function EditTalkSheet({
     mode: 'onBlur',
     // oxlint-disable-next-line typescript/no-explicit-any -- Zod 4 compatibility with zodResolver
     resolver: zodResolver(talkFormSchema as any),
-    values: getTalkFormValues(talk),
+    values: getTalkFormValues(talk, topicIds),
   });
 
   function submitData(data: TalkFormData) {
@@ -142,6 +148,7 @@ export function EditTalkSheet({
           control={form.control}
           mode="edit"
           speakers={speakers}
+          topics={topics}
         />
       </FormSheet>
 
