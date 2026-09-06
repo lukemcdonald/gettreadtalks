@@ -56,19 +56,34 @@ interface UseTalkFormReturn {
 type TalkFormSpeaker = Pick<Speaker, '_id' | 'firstName' | 'lastName' | 'slug'>;
 
 function getTalkFormDefaultValues(
-  initialData?: Partial<TalkFormInitialData>
+  initialData: Partial<TalkFormInitialData> = {}
 ): TalkFormData {
+  const {
+    collectionId,
+    collectionOrder,
+    description = '',
+    featured = false,
+    mediaUrl = '',
+    scripture = '',
+    slug = '',
+    speakerId = '' as TalkFormData['speakerId'],
+    status = 'backlog',
+    title = '',
+    topicIds = [],
+  } = initialData;
+
   return {
-    collectionId: initialData?.collectionId,
-    collectionOrder: initialData?.collectionOrder,
-    description: initialData?.description ?? '',
-    featured: initialData?.featured ?? false,
-    mediaUrl: initialData?.mediaUrl ?? '',
-    scripture: initialData?.scripture ?? '',
-    slug: initialData?.slug ?? '',
-    speakerId: initialData?.speakerId ?? ('' as TalkFormData['speakerId']),
-    status: initialData?.status ?? 'backlog',
-    title: initialData?.title ?? '',
+    collectionId,
+    collectionOrder,
+    description,
+    featured,
+    mediaUrl,
+    scripture,
+    slug,
+    speakerId,
+    status,
+    title,
+    topicIds,
   };
 }
 

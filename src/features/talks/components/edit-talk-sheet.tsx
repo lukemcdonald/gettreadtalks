@@ -3,7 +3,8 @@
 import type { CollectionListItem } from '@/features/collections/types';
 import type { SpeakerListItem } from '@/features/speakers/types';
 import type { TalkFormData } from '@/features/talks/schemas/talk-form';
-import type { Talk, TalkId } from '@/features/talks/types';
+import type { Talk, TalkId, TalkWithTopicIds } from '@/features/talks/types';
+import type { TopicListItem } from '@/features/topics/types';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState, useTransition } from 'react';
@@ -24,12 +25,13 @@ interface EditTalkSheetProps {
   onTalkUpdated: (talkId: TalkId) => void;
   open: boolean;
   speakers: SpeakerListItem[];
-  talk: Talk;
+  talk: TalkWithTopicIds;
+  topics: TopicListItem[];
 }
 
 type UrlChange = { newUrl: string; oldUrl: string } | null;
 
-function getTalkFormValues(talk: Talk): TalkFormData {
+function getTalkFormValues(talk: TalkWithTopicIds): TalkFormData {
   return {
     collectionId: talk.collectionId,
     collectionOrder: talk.collectionOrder,
@@ -41,6 +43,7 @@ function getTalkFormValues(talk: Talk): TalkFormData {
     speakerId: talk.speakerId ?? '',
     status: talk.status ?? 'backlog',
     title: talk.title ?? '',
+    topicIds: talk.topicIds,
   };
 }
 
@@ -74,6 +77,7 @@ export function EditTalkSheet({
   open,
   speakers,
   talk,
+  topics,
 }: EditTalkSheetProps) {
   const [isPending, startTransition] = useTransition();
   const [pendingData, setPendingData] = useState<TalkFormData | null>(null);
@@ -142,6 +146,7 @@ export function EditTalkSheet({
           control={form.control}
           mode="edit"
           speakers={speakers}
+          topics={topics}
         />
       </FormSheet>
 

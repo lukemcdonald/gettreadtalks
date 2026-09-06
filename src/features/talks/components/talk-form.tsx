@@ -3,6 +3,7 @@
 import type { Collection, CollectionId } from '@/features/collections/types';
 import type { Speaker } from '@/features/speakers/types';
 import type { Talk, TalkId, TalkStatus } from '@/features/talks/types';
+import type { TopicListItem } from '@/features/topics/types';
 import type { ReactNode } from 'react';
 
 import { Controller, FormProvider } from 'react-hook-form';
@@ -22,6 +23,7 @@ import { CollectionSelectField } from '@/features/collections/components/collect
 import { SpeakerField } from '@/features/speakers/components/speaker-field';
 import { UrlChangeDialog } from '@/features/talks/components/url-change-dialog';
 import { useTalkForm } from '@/features/talks/hooks/use-talk-form';
+import { TopicField } from '@/features/topics/components/topic-field';
 
 interface TalkFormProps {
   actionsMenu?: (props: { isBusy: boolean }) => ReactNode;
@@ -35,6 +37,7 @@ interface TalkFormProps {
   >[];
   talkId?: TalkId;
   talkSlug?: string;
+  topics: TopicListItem[];
 }
 
 export function TalkForm({
@@ -46,6 +49,7 @@ export function TalkForm({
   speakers,
   talkId,
   talkSlug,
+  topics,
 }: TalkFormProps) {
   const {
     confirmUrlChange,
@@ -119,6 +123,12 @@ export function TalkForm({
               control={form.control}
               label="Scripture"
               name="scripture"
+            />
+
+            <TopicField
+              control={form.control}
+              name="topicIds"
+              topics={topics}
             />
 
             <Controller

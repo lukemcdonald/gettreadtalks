@@ -25,7 +25,7 @@ import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
 import { statusFilterType } from '../../lib/validators/shared';
 import { canViewContent } from '../auth/roles';
-import { getCurrentUser } from '../auth/utils';
+import { getCurrentUser, requireAuth } from '../auth/utils';
 import { enrichWithTopics } from './utils';
 
 /**
@@ -77,6 +77,30 @@ export const getTalk = query({
   },
   handler: async (ctx, args) => await ctx.db.get('talks', args.id),
   returns: doc('talks').nullable(),
+});
+
+/**
+ * List topics assigned to a talk.
+ */
+export const listTalkTopics = query({
+  args: {
+    talkId: v.id('talks'),
+  },
+  handler: async (ctx, args) => {
+    await requireAuth(ctx);
+
+    const topics = await getManyVia(
+      ctx.db,
+      'talksOnTopics',
+      'topicId',
+      'by_talkId',
+      args.talkId,
+      'talkId'
+    );
+
+    return topics.filter((topic): topic is Doc<'topics'> => topic !== null);
+  },
+  returns: docs('topics'),
 });
 
 /**

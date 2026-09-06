@@ -25,6 +25,7 @@ export const talkFormSchema = z.object({
     .default('backlog')
     .transform((val) => val as StatusType),
   title: z.string().trim().min(2, 'Title must be at least 2 characters'),
+  topicIds: z.array(zid('topics')).default([]),
 });
 
 /**

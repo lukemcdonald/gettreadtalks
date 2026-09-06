@@ -4,6 +4,7 @@ import type { CollectionListItem } from '@/features/collections/types';
 import type { SpeakerId, SpeakerListItem } from '@/features/speakers/types';
 import type { TalkFormData } from '@/features/talks/schemas/talk-form';
 import type { TalkId } from '@/features/talks/types';
+import type { TopicListItem } from '@/features/topics/types';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useTransition } from 'react';
@@ -21,6 +22,7 @@ interface CreateTalkSheetProps {
   onTalkCreated: (talkId: TalkId) => void;
   open: boolean;
   speakers: SpeakerListItem[];
+  topics: TopicListItem[];
 }
 
 export function CreateTalkSheet({
@@ -29,6 +31,7 @@ export function CreateTalkSheet({
   onTalkCreated,
   open,
   speakers,
+  topics,
 }: CreateTalkSheetProps) {
   const [isPending, startTransition] = useTransition();
 
@@ -46,6 +49,7 @@ export function CreateTalkSheet({
       speakerId: '' as SpeakerId,
       status: 'backlog',
       title: '',
+      topicIds: [],
     },
   });
 
@@ -83,6 +87,7 @@ export function CreateTalkSheet({
         collections={collections}
         control={form.control}
         speakers={speakers}
+        topics={topics}
       />
     </FormSheet>
   );
