@@ -35,6 +35,152 @@ interface TopicFieldProps<T extends FieldValues> {
   topics: TopicListItem[];
 }
 
+function filterTopicOption(itemValue: TopicOption, query: string) {
+  return itemValue.label.toLowerCase().includes(query.toLowerCase());
+}
+
+function getSelectedTopicIds(selected: TopicOption[] | null) {
+  if (!selected) {
+    return [];
+  }
+
+  return selected.map((option) => option.value);
+}
+
+function getSelectedTopicOptions(
+  options: TopicOption[],
+  value: TopicId[] | undefined
+) {
+  const selectedIds = value ?? [];
+
+  return options.filter((option) => selectedIds.includes(option.value));
+}
+
+function getTopicOptionLabel(itemValue: TopicOption) {
+  return itemValue.label;
+}
+
+function TopicChips({
+  fieldName,
+  invalid,
+  value,
+}: {
+  fieldName: string;
+  invalid: boolean;
+  value: TopicOption[];
+}) {
+  const placeholder = value.length > 0 ? undefined : 'Search topics...';
+
+  return (
+    <>
+      {value.map((item) => (
+        <ComboboxChip aria-label={item.label} key={item.value}>
+          {item.label}
+        </ComboboxChip>
+      ))}
+      <ComboboxChipsInput
+        aria-invalid={invalid}
+        id={fieldName}
+        placeholder={placeholder}
+        size="lg"
+      />
+    </>
+  );
+}
+
+function TopicCombobox({
+  fieldName,
+  invalid,
+  onTopicIdsChange,
+  options,
+  value,
+}: {
+  fieldName: string;
+  invalid: boolean;
+  onTopicIdsChange: (value: TopicId[]) => void;
+  options: TopicOption[];
+  value: TopicId[] | undefined;
+}) {
+  const selectedOptions = getSelectedTopicOptions(options, value);
+
+  return (
+    <Combobox
+      filter={filterTopicOption}
+      itemToStringLabel={getTopicOptionLabel}
+      items={options}
+      multiple
+      onValueChange={(selected: TopicOption[] | null) => {
+        onTopicIdsChange(getSelectedTopicIds(selected));
+      }}
+      value={selectedOptions}
+    >
+      <ComboboxChips>
+        <ComboboxValue>
+          {(selected: TopicOption[]) => (
+            <TopicChips
+              fieldName={fieldName}
+              invalid={invalid}
+              value={selected}
+            />
+          )}
+        </ComboboxValue>
+      </ComboboxChips>
+
+      <ComboboxPopup>
+        <ComboboxEmpty>No topics found.</ComboboxEmpty>
+        <ComboboxList>
+          {(option: TopicOption) => (
+            <ComboboxItem key={option.value} value={option}>
+              {option.label}
+            </ComboboxItem>
+          )}
+        </ComboboxList>
+      </ComboboxPopup>
+    </Combobox>
+  );
+}
+
+function TopicFieldInput({
+  description,
+  errorMessage,
+  fieldName,
+  invalid,
+  label,
+  onTopicIdsChange,
+  options,
+  required,
+  value,
+}: {
+  description?: string;
+  errorMessage?: string;
+  fieldName: string;
+  invalid: boolean;
+  label: string;
+  onTopicIdsChange: (value: TopicId[]) => void;
+  options: TopicOption[];
+  required?: boolean;
+  value: TopicId[] | undefined;
+}) {
+  return (
+    <Field invalid={invalid} name={fieldName}>
+      <FieldLabel htmlFor={fieldName} required={required}>
+        {label}
+      </FieldLabel>
+      {!!description && <FieldDescription>{description}</FieldDescription>}
+
+      <TopicCombobox
+        fieldName={fieldName}
+        invalid={invalid}
+        onTopicIdsChange={onTopicIdsChange}
+        options={options}
+        value={value}
+      />
+
+      {!!errorMessage && <FieldError match>{errorMessage}</FieldError>}
+    </Field>
+  );
+}
+
 export function TopicField<T extends FieldValues>({
   control,
   description,
@@ -55,70 +201,22 @@ export function TopicField<T extends FieldValues>({
       control={control}
       name={name}
       render={({ field, fieldState }) => {
-        const selectedIds = (field.value ?? []) as TopicId[];
-        const selectedOptions = selectedIds
-          .map((id) => options.find((option) => option.value === id))
-          .filter((option): option is TopicOption => option !== undefined);
+        const handleTopicIdsChange = (value: TopicId[]) => {
+          field.onChange(value);
+        };
 
         return (
-          <Field invalid={fieldState.invalid} name={field.name}>
-            <FieldLabel htmlFor={field.name} required={required}>
-              {label}
-            </FieldLabel>
-            {!!description && (
-              <FieldDescription>{description}</FieldDescription>
-            )}
-
-            <Combobox
-              filter={(itemValue: TopicOption, query: string) =>
-                itemValue.label.toLowerCase().includes(query.toLowerCase())
-              }
-              itemToStringLabel={(itemValue: TopicOption) => itemValue.label}
-              items={options}
-              multiple
-              onValueChange={(selected: TopicOption[] | null) => {
-                field.onChange(selected?.map((option) => option.value) ?? []);
-              }}
-              value={selectedOptions}
-            >
-              <ComboboxChips>
-                <ComboboxValue>
-                  {(value: TopicOption[]) => (
-                    <>
-                      {value.map((item) => (
-                        <ComboboxChip aria-label={item.label} key={item.value}>
-                          {item.label}
-                        </ComboboxChip>
-                      ))}
-                      <ComboboxChipsInput
-                        aria-invalid={fieldState.invalid}
-                        id={field.name}
-                        placeholder={
-                          value.length > 0 ? undefined : 'Search topics...'
-                        }
-                        size="lg"
-                      />
-                    </>
-                  )}
-                </ComboboxValue>
-              </ComboboxChips>
-
-              <ComboboxPopup>
-                <ComboboxEmpty>No topics found.</ComboboxEmpty>
-                <ComboboxList>
-                  {(option: TopicOption) => (
-                    <ComboboxItem key={option.value} value={option}>
-                      {option.label}
-                    </ComboboxItem>
-                  )}
-                </ComboboxList>
-              </ComboboxPopup>
-            </Combobox>
-
-            {!!fieldState.error?.message && (
-              <FieldError match>{fieldState.error.message}</FieldError>
-            )}
-          </Field>
+          <TopicFieldInput
+            description={description}
+            errorMessage={fieldState.error?.message}
+            fieldName={field.name}
+            invalid={fieldState.invalid}
+            label={label}
+            onTopicIdsChange={handleTopicIdsChange}
+            options={options}
+            required={required}
+            value={field.value}
+          />
         );
       }}
     />
