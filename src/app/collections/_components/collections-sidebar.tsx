@@ -1,9 +1,7 @@
 import type { Speaker } from '@/features/speakers/types';
 
-import { SidebarContent } from '@/components/sidebar-content';
-import { MobileFilterDrawer } from '@/components/ui';
-import { SelectFilter } from '@/components/ui/select-filter';
-import { SortSelect } from '@/components/ui/sort-select';
+import { BrowseFilters } from '@/components/browse-filters';
+import { SelectFilter, SortSelect } from '@/components/ui';
 import { getSpeakerName } from '@/features/speakers/utils';
 
 interface CollectionsSidebarProps {
@@ -23,30 +21,14 @@ export function CollectionsSidebar({ speakers }: CollectionsSidebarProps) {
   ];
 
   return (
-    <SidebarContent className="space-y-4">
-      {/* Mobile: compact drawer */}
-      <div className="md:hidden">
-        <MobileFilterDrawer>
-          <SelectFilter
-            label="Speaker"
-            name="speaker"
-            options={speakerOptions}
-            placeholder="All Speakers"
-          />
-          <SortSelect label="Sort by" options={sortOptions} />
-        </MobileFilterDrawer>
-      </div>
-
-      {/* Desktop: inline sidebar */}
-      <div className="hidden md:flex md:flex-col md:gap-4">
-        <SelectFilter
-          label="Speaker"
-          name="speaker"
-          options={speakerOptions}
-          placeholder="All Speakers"
-        />
-        <SortSelect label="Sort by" options={sortOptions} />
-      </div>
-    </SidebarContent>
+    <BrowseFilters>
+      <SelectFilter
+        label="Speaker"
+        name="speaker"
+        options={speakerOptions}
+        placeholder="All Speakers"
+      />
+      <SortSelect label="Sort by" options={sortOptions} />
+    </BrowseFilters>
   );
 }
