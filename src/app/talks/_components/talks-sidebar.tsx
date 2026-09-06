@@ -1,11 +1,8 @@
 import type { Speaker } from '@/features/speakers/types';
 import type { Topic } from '@/features/topics/types';
 
-import { SidebarContent } from '@/components/sidebar-content';
-import { MobileFilterDrawer } from '@/components/ui';
-import { ComboboxMultiFilter } from '@/components/ui/combobox-multi-filter';
-import { SearchInput } from '@/components/ui/search-input';
-import { SortSelect } from '@/components/ui/sort-select';
+import { BrowseFilters } from '@/components/browse-filters';
+import { ComboboxMultiFilter, SortSelect } from '@/components/ui';
 import { getSpeakerName } from '@/features/speakers/utils';
 
 interface TopicWithCount {
@@ -37,52 +34,22 @@ export function TalksSidebar({ speakers, topics }: TalksSidebarProps) {
   ];
 
   return (
-    <SidebarContent className="space-y-4">
-      {/* Mobile: inline search + icon filter button */}
-      <div className="flex items-center gap-2 md:hidden">
-        <SearchInput
-          className="flex-1"
-          paramName="search"
-          placeholder="Search talks..."
-        />
-        <MobileFilterDrawer variant="icon">
-          <ComboboxMultiFilter
-            label="Speakers"
-            name="speakers"
-            options={speakerOptions}
-            placeholder="All Speakers"
-          />
-          <ComboboxMultiFilter
-            label="Topics"
-            name="topics"
-            options={topicOptions}
-            placeholder="All Topics"
-          />
-          <SortSelect label="Sort by" options={sortOptions} />
-        </MobileFilterDrawer>
-      </div>
-
-      {/* Desktop: full sidebar */}
-      <div className="hidden md:flex md:flex-col md:gap-4">
-        <SearchInput
-          label="Search"
-          paramName="search"
-          placeholder="Search talks..."
-        />
-        <ComboboxMultiFilter
-          label="Speakers"
-          name="speakers"
-          options={speakerOptions}
-          placeholder="All Speakers"
-        />
-        <ComboboxMultiFilter
-          label="Topics"
-          name="topics"
-          options={topicOptions}
-          placeholder="All Topics"
-        />
-        <SortSelect label="Sort by" options={sortOptions} />
-      </div>
-    </SidebarContent>
+    <BrowseFilters
+      search={{ paramName: 'search', placeholder: 'Search talks...' }}
+    >
+      <ComboboxMultiFilter
+        label="Speakers"
+        name="speakers"
+        options={speakerOptions}
+        placeholder="All Speakers"
+      />
+      <ComboboxMultiFilter
+        label="Topics"
+        name="topics"
+        options={topicOptions}
+        placeholder="All Topics"
+      />
+      <SortSelect label="Sort by" options={sortOptions} />
+    </BrowseFilters>
   );
 }

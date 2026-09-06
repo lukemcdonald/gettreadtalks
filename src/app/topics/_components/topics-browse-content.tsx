@@ -5,6 +5,8 @@ import type { Topic } from '@/features/topics/types';
 
 import { useSearchParams } from 'next/navigation';
 
+import { ListEmpty } from '@/components/list-empty';
+
 import { TopicBrowseSection } from './topic-browse-section';
 
 interface TopicWithTalks {
@@ -29,13 +31,13 @@ export function TopicsBrowseContent({ topics }: TopicsBrowseContentProps) {
 
   if (filteredTopics.length === 0) {
     return (
-      <div className="py-12 text-center">
-        <p className="text-muted-foreground">
-          {selectedTopics.length > 0
-            ? 'No topics match your filter.'
-            : 'No topics available at this time.'}
-        </p>
-      </div>
+      <ListEmpty
+        clearPath="/topics"
+        description="There are no topics available at this time."
+        filteredDescription="No topics match your current filters. Try adjusting your selection or clearing filters."
+        hasActiveFilters={selectedTopics.length > 0}
+        title="No topics found"
+      />
     );
   }
 
