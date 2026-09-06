@@ -34,9 +34,11 @@ import { FormError } from '@/components/ui/form';
 Reusable field components (TextField, SelectField, etc.) automatically display field-level errors. For custom Controller usage, use `FieldError` directly:
 
 ```typescript
-import { FieldError } from '@/components/ui/fields';
+import { FieldError } from '@/components/ui';
 
-{!!fieldState.error && <FieldError>{fieldState.error?.message}</FieldError>}
+{!!fieldState.error && (
+  <FieldError match>{fieldState.error?.message}</FieldError>
+)}
 ```
 
 ## Utilities
@@ -78,7 +80,7 @@ import { Form } from '@/components/ui/form';
 
 - Displays field-level validation errors
 - Used internally by reusable field components
-- For custom Controller usage: `{!!fieldState.error && <FieldError>{fieldState.error?.message}</FieldError>}`
+- For custom Controller usage: `{!!fieldState.error && <FieldError match>{fieldState.error?.message}</FieldError>}`
 
 ### FormError Component
 

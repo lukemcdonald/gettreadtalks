@@ -1,8 +1,7 @@
 import type { Topic } from '@/features/topics/types';
 
-import { SidebarContent } from '@/components/sidebar-content';
-import { MobileFilterDrawer } from '@/components/ui';
-import { ComboboxMultiFilter } from '@/components/ui/combobox-multi-filter';
+import { BrowseFilters } from '@/components/browse-filters';
+import { ComboboxMultiFilter } from '@/components/ui';
 
 interface TopicWithCount {
   talkCount: number;
@@ -20,28 +19,13 @@ export function TopicsSidebar({ topics }: TopicsSidebarProps) {
   }));
 
   return (
-    <SidebarContent className="space-y-4">
-      {/* Mobile: icon filter button */}
-      <div className="flex items-center gap-2 md:hidden">
-        <MobileFilterDrawer variant="icon">
-          <ComboboxMultiFilter
-            label="Topics"
-            name="topics"
-            options={topicOptions}
-            placeholder="All Topics"
-          />
-        </MobileFilterDrawer>
-      </div>
-
-      {/* Desktop: full sidebar */}
-      <div className="hidden md:flex md:flex-col md:gap-4">
-        <ComboboxMultiFilter
-          label="Topics"
-          name="topics"
-          options={topicOptions}
-          placeholder="All Topics"
-        />
-      </div>
-    </SidebarContent>
+    <BrowseFilters>
+      <ComboboxMultiFilter
+        label="Topics"
+        name="topics"
+        options={topicOptions}
+        placeholder="All Topics"
+      />
+    </BrowseFilters>
   );
 }

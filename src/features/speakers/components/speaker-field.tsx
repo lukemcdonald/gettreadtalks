@@ -158,7 +158,7 @@ export function SpeakerField<T extends FieldValues>({
               </Combobox>
 
               {!!fieldState.error?.message && (
-                <FieldError>{fieldState.error.message}</FieldError>
+                <FieldError match>{fieldState.error.message}</FieldError>
               )}
             </Field>
 

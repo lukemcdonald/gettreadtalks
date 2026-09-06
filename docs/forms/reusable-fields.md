@@ -1,6 +1,6 @@
 # Reusable Form Field Components
 
-This document describes the reusable form field components available in `src/components/ui/field/` that simplify form implementation and ensure consistency across the application.
+This document describes the reusable form field components available in `src/components/ui/fields/` that simplify form implementation and ensure consistency across the application.
 
 ## Overview
 
@@ -317,7 +317,7 @@ All field components follow this pattern:
 For domain-specific fields (e.g., `SpeakerField`, `CollectionSelectField`), create feature-specific components that follow the same pattern:
 
 ```tsx
-// src/app/talks/new/_components/speaker-field.tsx
+// src/features/speakers/components/speaker-field.tsx
 export function SpeakerField<T extends FieldValues>({
   control,
   name,
@@ -331,6 +331,9 @@ export function SpeakerField<T extends FieldValues>({
       render={({ field, fieldState }) => (
         <Field invalid={fieldState.invalid} name={name}>
           {/* Custom implementation */}
+          {!!fieldState.error && (
+            <FieldError match>{fieldState.error.message}</FieldError>
+          )}
         </Field>
       )}
     />
