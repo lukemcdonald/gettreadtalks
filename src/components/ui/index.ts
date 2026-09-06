@@ -9,7 +9,7 @@ export * from './filter-popup';
 export * from './form';
 export * from './form-sheet';
 export * from './link';
-export * from './mobile-filter-sheet';
+export * from './mobile-filter-drawer';
 export * from './page-breadcrumb';
 export * from './primitives';
 export * from './section';

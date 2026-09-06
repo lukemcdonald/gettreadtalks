@@ -1,7 +1,7 @@
 import type { Speaker } from '@/features/speakers/types';
 
 import { SidebarContent } from '@/components/sidebar-content';
-import { MobileFilterSheet } from '@/components/ui/mobile-filter-sheet';
+import { MobileFilterDrawer } from '@/components/ui';
 import { SelectFilter } from '@/components/ui/select-filter';
 import { SortSelect } from '@/components/ui/sort-select';
 import { getSpeakerName } from '@/features/speakers/utils';
@@ -24,9 +24,9 @@ export function CollectionsSidebar({ speakers }: CollectionsSidebarProps) {
 
   return (
     <SidebarContent className="space-y-4">
-      {/* Mobile: compact sheet */}
+      {/* Mobile: compact drawer */}
       <div className="md:hidden">
-        <MobileFilterSheet>
+        <MobileFilterDrawer>
           <SelectFilter
             label="Speaker"
             name="speaker"
@@ -34,7 +34,7 @@ export function CollectionsSidebar({ speakers }: CollectionsSidebarProps) {
             placeholder="All Speakers"
           />
           <SortSelect label="Sort by" options={sortOptions} />
-        </MobileFilterSheet>
+        </MobileFilterDrawer>
       </div>
 
       {/* Desktop: inline sidebar */}

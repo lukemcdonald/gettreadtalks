@@ -2,8 +2,8 @@ import type { Speaker } from '@/features/speakers/types';
 import type { Topic } from '@/features/topics/types';
 
 import { SidebarContent } from '@/components/sidebar-content';
+import { MobileFilterDrawer } from '@/components/ui';
 import { ComboboxMultiFilter } from '@/components/ui/combobox-multi-filter';
-import { MobileFilterSheet } from '@/components/ui/mobile-filter-sheet';
 import { SearchInput } from '@/components/ui/search-input';
 import { SortSelect } from '@/components/ui/sort-select';
 import { getSpeakerName } from '@/features/speakers/utils';
@@ -45,7 +45,7 @@ export function TalksSidebar({ speakers, topics }: TalksSidebarProps) {
           paramName="search"
           placeholder="Search talks..."
         />
-        <MobileFilterSheet variant="icon">
+        <MobileFilterDrawer variant="icon">
           <ComboboxMultiFilter
             label="Speakers"
             name="speakers"
@@ -59,7 +59,7 @@ export function TalksSidebar({ speakers, topics }: TalksSidebarProps) {
             placeholder="All Topics"
           />
           <SortSelect label="Sort by" options={sortOptions} />
-        </MobileFilterSheet>
+        </MobileFilterDrawer>
       </div>
 
       {/* Desktop: full sidebar */}

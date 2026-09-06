@@ -79,6 +79,13 @@ import { Button, Card, TextField } from '@/components/ui';
 import { Button } from '@/components/ui/primitives/button';
 ```
 
+**Overlays**
+
+- Dialog — centered blocking UI (confirm, alert)
+- Sheet — side/bottom panel that is a form or other controlled edit (FormSheet)
+- Drawer — edge panel where swipe-to-dismiss is the product (nav, mobile filters)
+- Never edit `src/components/ui/primitives/*`
+
 **Naming:** kebab-case for all `src/` folders
 
 ### Layout Data Fetching
