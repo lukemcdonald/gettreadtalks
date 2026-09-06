@@ -53,9 +53,11 @@ function FilterCountBadge({ count, isIcon }: FilterCountBadgeProps) {
   );
 }
 
-function IconFilterTrigger({ count, showCount }: FilterTriggerProps) {
+function IconFilterTrigger({ count, label, showCount }: FilterTriggerProps) {
   return (
-    <DrawerTrigger render={<Button size="icon-lg" variant="outline" />}>
+    <DrawerTrigger
+      render={<Button aria-label={label} size="icon-lg" variant="outline" />}
+    >
       <SlidersHorizontalIcon />
       {showCount && count > 0 && <FilterCountBadge count={count} isIcon />}
     </DrawerTrigger>
