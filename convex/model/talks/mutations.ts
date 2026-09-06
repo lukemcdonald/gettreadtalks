@@ -1,4 +1,5 @@
-import type { Doc } from '../../_generated/dataModel';
+import type { Doc, Id } from '../../_generated/dataModel';
+import type { MutationCtx } from '../../_generated/server';
 
 import { v } from 'convex/values';
 
@@ -12,8 +13,44 @@ import {
   talkSlugExistsForSpeaker,
 } from '../../lib/utils';
 import { requireAuth } from '../auth/utils';
-import { setTalkTopics } from './utils';
 import { statusType } from './validators';
+
+async function setTalkTopics(
+  ctx: MutationCtx,
+  talkId: Id<'talks'>,
+  topicIds: Id<'topics'>[]
+) {
+  const uniqueTopicIds = [...new Set(topicIds)];
+
+  await Promise.all(
+    uniqueTopicIds.map((topicId) => getOrThrow(ctx, 'topics', topicId))
+  );
+
+  const existing = await ctx.db
+    .query('talksOnTopics')
+    .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
+    .collect();
+
+  const existingIds = new Set(existing.map((row) => row.topicId));
+  const nextIds = new Set(uniqueTopicIds);
+
+  await Promise.all(
+    existing
+      .filter((row) => !nextIds.has(row.topicId))
+      .map((row) => ctx.db.delete(row._id))
+  );
+
+  await Promise.all(
+    uniqueTopicIds
+      .filter((topicId) => !existingIds.has(topicId))
+      .map((topicId) =>
+        ctx.db.insert('talksOnTopics', {
+          talkId,
+          topicId,
+        })
+      )
+  );
+}
 
 /**
  * Archive a talk (soft delete by setting status to archived).
