@@ -17,6 +17,7 @@ Use the Fallow skill for deeper audit and debug workflows.
 - No emojis anywhere: code, commits, descriptions, PR titles
 - Alphabetize: imports, object keys, destructured props, component prop lists
   - Exception: group related items together if alphabetical order hurts readability
+- Prefer shared wrappers over one-off patches so user, developer, and agent experience rise together
 
 ## Code Comments
 
@@ -85,6 +86,7 @@ import { Button } from '@/components/ui/primitives/button';
 - Sheet — side/bottom panel that is a form or other controlled edit (FormSheet)
 - Drawer — edge panel where swipe-to-dismiss is the product (nav, mobile filters)
 - Never edit `src/components/ui/primitives/*`
+- Customize Drawer in `src/components/ui/drawer/` so the opaque shell covers the iOS visual viewport. Do not add per-feature spacers.
 
 **Naming:** kebab-case for all `src/` folders
 
