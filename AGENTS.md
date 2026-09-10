@@ -40,6 +40,7 @@ Code is organized by **domain/feature**, not technical layer.
 - `convex/` - Database schema + backend functions
 - `convex/model/` - Entity-specific helpers organized by domain
 - `src/app/` - Next.js App Router pages
+- `src/assets/` - Global CSS (theme, base, utilities, overlay chrome)
 - `src/components/` - Shared UI components
 - `src/constants/` - Shared constants
 - `src/features/` - Business domains (talks, users, clips, speakers, topics, collections)
@@ -86,7 +87,7 @@ import { Button } from '@/components/ui/primitives/button';
 - Sheet — side/bottom panel that is a form or other controlled edit (FormSheet)
 - Drawer — edge panel where swipe-to-dismiss is the product (nav, mobile filters)
 - Never edit `src/components/ui/primitives/*`
-- Customize Drawer in `src/components/ui/drawer/` so the opaque shell covers the iOS visual viewport. Do not add per-feature spacers.
+- Drawer visual-viewport coverage lives in `src/assets/overlays.css`. Do not add per-feature spacers.
 
 **Naming:** kebab-case for all `src/` folders
 
