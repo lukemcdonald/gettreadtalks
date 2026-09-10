@@ -4,6 +4,7 @@
 export * from './action-icon-button';
 export * from './combobox-multi-filter';
 export * from './container';
+export * from './drawer';
 export * from './fields';
 export * from './fieldset';
 export * from './filter-popup';
