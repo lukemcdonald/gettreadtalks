@@ -1,7 +1,8 @@
 /*
   Bottom drawers are content-height inside a `fixed inset-0` viewport. On iOS
   that box is shorter than the visual viewport, and the vendor backdrop is
-  `absolute`, so page content shows through under the panel.
+  `absolute`, so page content shows through under the panel. `bg-clip-padding`
+  on the popup can also clip the vendor bleed pseudo-element.
 */
 
 [data-slot='drawer-backdrop'],
@@ -10,6 +11,7 @@
   height: 100dvh;
   min-height: 100svh;
   min-height: -webkit-fill-available;
+  overflow: visible;
 }
 
 @supports (-webkit-touch-callout: none) {
@@ -20,13 +22,19 @@
 
   [data-slot='drawer-popup'].row-start-2 {
     --bleed: max(
-      3rem,
+      8rem,
       env(safe-area-inset-bottom, 0px),
-      calc(100lvh - 100dvh + 3rem)
+      calc(100lvh - 100dvh + 8rem)
     );
+    background-clip: border-box;
+    overflow: visible;
     padding-bottom: max(
       env(safe-area-inset-bottom, 0px),
       calc(100lvh - 100dvh)
     );
+  }
+
+  [data-slot='drawer-popup'].row-start-2::after {
+    height: max(8rem, var(--bleed));
   }
 }
