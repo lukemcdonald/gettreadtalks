@@ -6,8 +6,6 @@ import { SlidersHorizontalIcon } from 'lucide-react';
 
 import { Badge } from '@/components/ui/primitives/badge';
 import { Button } from '@/components/ui/primitives/button';
-import { useActiveFilterCount } from '@/hooks';
-
 import {
   Drawer,
   DrawerHeader,
@@ -15,7 +13,8 @@ import {
   DrawerPopup,
   DrawerTitle,
   DrawerTrigger,
-} from './drawer';
+} from '@/components/ui/primitives/drawer';
+import { useActiveFilterCount } from '@/hooks';
 
 interface MobileFilterDrawerProps {
   children: ReactNode;
