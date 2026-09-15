@@ -26,10 +26,11 @@
     "update:ui:styles": "pnpm dlx shadcn@latest add @coss/colors-neutral --overwrite"
   },
   "dependencies": {
-    "@base-ui/react": "^1.7.0",
+    "@base-ui/react": "^1.8.0",
     "@convex-dev/better-auth": "0.12.5",
     "@convex-dev/rate-limiter": "^0.3.2",
     "@convex-dev/resend": "^0.2.7",
+    "@daypicker/react": "^10.0.1",
     "@hookform/resolvers": "^5.9.1",
     "@sentry/nextjs": "^10.73.0",
     "@vercel/analytics": "^2.0.1",
