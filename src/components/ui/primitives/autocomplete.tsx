@@ -236,7 +236,7 @@ export function AutocompleteList({
   ...props
 }: AutocompletePrimitive.List.Props): React.ReactElement {
   return (
-    <ScrollArea scrollbarGutter scrollFade>
+    <ScrollArea overscrollContain scrollbarGutter scrollFade>
       <AutocompletePrimitive.List
         className={cn(
           "not-empty:scroll-py-1 not-empty:p-1 in-data-has-overflow-y:pe-3",
