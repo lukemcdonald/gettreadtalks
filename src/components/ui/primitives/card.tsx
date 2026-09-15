@@ -162,7 +162,7 @@ export function CardTitle({
   ...props
 }: useRender.ComponentProps<"div">): React.ReactElement {
   const defaultProps = {
-    className: cn("font-semibold text-lg leading-none", className),
+    className: cn("font-heading font-semibold text-lg leading-none", className),
     "data-slot": "card-title",
   };
 

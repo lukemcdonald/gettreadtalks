@@ -2,8 +2,8 @@
   "$schema": "./fallow.schema.json",
   "ignoreDependencies": [
     // Coss primitives import these; that tree is ignored below.
+    "@daypicker/react",
     "input-otp",
-    "react-day-picker",
     // Resend is consumed by the Convex Resend component, not direct app imports.
     "resend",
     // Tailwind is imported from CSS and lives in devDependencies by convention.
@@ -21,5 +21,6 @@
     "src/components/ui/primitives/**",
     // Only imported from ignored Coss primitives.
     "src/hooks/use-media-query.ts",
+    "src/lib/segmented-control.ts",
   ],
 }
