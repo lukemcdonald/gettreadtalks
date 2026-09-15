@@ -72,9 +72,6 @@ importers:
       react:
         specifier: ^19.2.8
         version: 19.2.8
-      react-day-picker:
-        specifier: ^10.0.1
-        version: 10.0.1(@types/react@19.2.18)(react@19.2.8)
       react-dom:
         specifier: ^19.2.8
         version: 19.2.8(react@19.2.8)
