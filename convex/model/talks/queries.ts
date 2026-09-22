@@ -26,7 +26,7 @@ import { doc, docs } from '../../lib/validators/schema';
 import { statusFilterType } from '../../lib/validators/shared';
 import { canViewContent } from '../auth/roles';
 import { getCurrentUser, requireAuth } from '../auth/utils';
-import { applySearchFilterWithSpeaker, enrichWithTopics } from './utils';
+import { enrichWithTopics, filterTalksByTitleOrSpeaker } from './utils';
 
 /**
  * List published talk slugs with their speaker slugs for sitemap generation.
@@ -489,17 +489,21 @@ export const listAllTalks = query({
             .collect();
 
     if (search) {
-      const talksWithSpeakers = await enrichWithSpeakers(ctx, talks);
-      const matchingTalks = applySearchFilterWithSpeaker(
-        talksWithSpeakers,
-        search
+      const matchingTalks = await filterTalksByTitleOrSpeaker(
+        ctx,
+        search,
+        talks
       );
       const { continueCursor, isDone, page } = paginateArray(
         matchingTalks,
         paginationOpts.cursor,
         paginationOpts.numItems
       );
-      const talksWithSpeakersAndTopics = await enrichWithTopics(ctx, page);
+      const talksWithSpeakers = await enrichWithSpeakers(ctx, page);
+      const talksWithSpeakersAndTopics = await enrichWithTopics(
+        ctx,
+        talksWithSpeakers
+      );
 
       return {
         continueCursor,
