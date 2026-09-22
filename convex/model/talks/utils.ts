@@ -3,36 +3,62 @@ import type { QueryCtx } from '../../_generated/server';
 
 import { asyncMap } from 'convex-helpers';
 
-// fallow-ignore-next-line complexity
-function talkMatchesTitleOrSpeaker(
+function speakerNameMatches(
   searchLower: string,
-  talk: Doc<'talks'> & { speaker: Doc<'speakers'> | null }
+  speaker: Doc<'speakers'> | null
 ): boolean {
-  const titleHit = talk.title.toLowerCase().includes(searchLower);
-  const speakerHit = Boolean(
-    talk.speaker &&
-    `${talk.speaker.firstName ?? ''} ${talk.speaker.lastName ?? ''}`
-      .toLowerCase()
-      .includes(searchLower)
-  );
+  if (!speaker) {
+    return false;
+  }
 
-  return titleHit || speakerHit;
+  return `${speaker.firstName ?? ''} ${speaker.lastName ?? ''}`
+    .toLowerCase()
+    .includes(searchLower);
+}
+
+function talkTitleMatches(searchLower: string, title: string): boolean {
+  return title.toLowerCase().includes(searchLower);
 }
 
 /**
- * Match talks whose title or speaker full name contains the query.
+ * Title-match first, then load unique speakers only for remaining talks.
  */
-export function applySearchFilterWithSpeaker(
-  talks: (Doc<'talks'> & { speaker: Doc<'speakers'> | null })[],
-  search?: string
-): (Doc<'talks'> & { speaker: Doc<'speakers'> | null })[] {
-  if (!search) {
-    return talks;
+// fallow-ignore-next-line complexity
+export async function filterTalksByTitleOrSpeaker(
+  ctx: QueryCtx,
+  search: string,
+  talks: Doc<'talks'>[]
+): Promise<Doc<'talks'>[]> {
+  const searchLower = search.toLowerCase();
+  const remaining: Doc<'talks'>[] = [];
+  const titleHitIds = new Set<Id<'talks'>>();
+
+  for (const talk of talks) {
+    if (talkTitleMatches(searchLower, talk.title)) {
+      titleHitIds.add(talk._id);
+    } else {
+      remaining.push(talk);
+    }
   }
 
-  const searchLower = search.toLowerCase();
+  const speakerIds = [...new Set(remaining.map((talk) => talk.speakerId))];
+  const speakers = await Promise.all(
+    speakerIds.map((speakerId) => ctx.db.get('speakers', speakerId))
+  );
+  const matchingSpeakerIds = new Set(
+    speakerIds.filter((speakerId, index) =>
+      speakerNameMatches(searchLower, speakers[index] ?? null)
+    )
+  );
+  const matchingIds = new Set(titleHitIds);
 
-  return talks.filter((talk) => talkMatchesTitleOrSpeaker(searchLower, talk));
+  for (const talk of remaining) {
+    if (matchingSpeakerIds.has(talk.speakerId)) {
+      matchingIds.add(talk._id);
+    }
+  }
+
+  return talks.filter((talk) => matchingIds.has(talk._id));
 }
 
 /**
