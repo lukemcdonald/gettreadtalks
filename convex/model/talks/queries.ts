@@ -26,7 +26,7 @@ import { doc, docs } from '../../lib/validators/schema';
 import { statusFilterType } from '../../lib/validators/shared';
 import { canViewContent } from '../auth/roles';
 import { getCurrentUser, requireAuth } from '../auth/utils';
-import { enrichWithTopics } from './utils';
+import { applySearchFilterWithSpeaker, enrichWithTopics } from './utils';
 
 /**
  * List published talk slugs with their speaker slugs for sitemap generation.
@@ -477,7 +477,7 @@ export const listAllTalks = query({
     const { paginationOpts, search, status = 'published' } = args;
 
     // Search requires in-memory filtering, can't use .paginate()
-    let talks: Doc<'talks'>[] =
+    const talks: Doc<'talks'>[] =
       status === 'all'
         ? await ctx.db.query('talks').order('desc').collect()
         : await ctx.db
@@ -489,7 +489,23 @@ export const listAllTalks = query({
             .collect();
 
     if (search) {
-      talks = applySearchFilter(talks, search);
+      const talksWithSpeakers = await enrichWithSpeakers(ctx, talks);
+      const matchingTalks = applySearchFilterWithSpeaker(
+        talksWithSpeakers,
+        search
+      );
+      const { continueCursor, isDone, page } = paginateArray(
+        matchingTalks,
+        paginationOpts.cursor,
+        paginationOpts.numItems
+      );
+      const talksWithSpeakersAndTopics = await enrichWithTopics(ctx, page);
+
+      return {
+        continueCursor,
+        isDone,
+        page: talksWithSpeakersAndTopics,
+      };
     }
 
     const { continueCursor, isDone, page } = paginateArray(
