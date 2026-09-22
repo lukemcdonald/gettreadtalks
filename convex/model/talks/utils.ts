@@ -3,34 +3,36 @@ import type { QueryCtx } from '../../_generated/server';
 
 import { asyncMap } from 'convex-helpers';
 
+// fallow-ignore-next-line complexity
+function talkMatchesTitleOrSpeaker(
+  searchLower: string,
+  talk: Doc<'talks'> & { speaker: Doc<'speakers'> | null }
+): boolean {
+  const titleHit = talk.title.toLowerCase().includes(searchLower);
+  const speakerHit = Boolean(
+    talk.speaker &&
+    `${talk.speaker.firstName ?? ''} ${talk.speaker.lastName ?? ''}`
+      .toLowerCase()
+      .includes(searchLower)
+  );
+
+  return titleHit || speakerHit;
+}
+
 /**
- * Apply search filter with speaker data to talks+speaker array.
+ * Match talks whose title or speaker full name contains the query.
  */
 export function applySearchFilterWithSpeaker(
   talks: (Doc<'talks'> & { speaker: Doc<'speakers'> | null })[],
-  search?: string,
-  searchType?: 'title' | 'speaker'
+  search?: string
 ): (Doc<'talks'> & { speaker: Doc<'speakers'> | null })[] {
   if (!search) {
     return talks;
   }
 
   const searchLower = search.toLowerCase();
-  const type = searchType || 'title';
 
-  return talks.filter((talk) => {
-    if (type === 'title') {
-      return talk.title.toLowerCase().includes(searchLower);
-    }
-
-    if (type === 'speaker' && talk.speaker) {
-      const speakerName =
-        `${talk.speaker.firstName} ${talk.speaker.lastName}`.toLowerCase();
-      return speakerName.includes(searchLower);
-    }
-
-    return false;
-  });
+  return talks.filter((talk) => talkMatchesTitleOrSpeaker(searchLower, talk));
 }
 
 /**
