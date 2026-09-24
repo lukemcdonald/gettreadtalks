@@ -15,7 +15,10 @@
 #    Do not default SITE_URL; this script sets it per preview host.
 # 4. Vercel Deployment Protection: testers use Vercel SSO, or a shareable link.
 #
-# Preview backends start empty. They do not share production talks or users.
+# Preview backends start empty. After deploy this script seeds a few fixture
+# talks/speakers (and an admin if PREVIEW_ADMIN_EMAIL/PASSWORD are set as
+# Convex preview default env vars). That runs before `pnpm build` so homepage
+# prerender is not empty.
 
 set -euo pipefail
 
@@ -60,6 +63,15 @@ fi
 export NEXT_PUBLIC_CONVEX_SITE_URL="${NEXT_PUBLIC_CONVEX_URL%.convex.cloud}.convex.site"
 export NEXT_PUBLIC_CONVEX_URL
 
-npx convex env set SITE_URL "${preview_site_url}" --deployment "preview/${preview_name}"
+# Claimed preview name can differ from --preview-name (Convex may suffix it).
+# Env and seed must hit the same deployment Next.js will call.
+deployment_name="${NEXT_PUBLIC_CONVEX_URL#https://}"
+deployment_name="${deployment_name%.convex.cloud}"
+
+echo "Preview Convex ${deployment_name} at ${NEXT_PUBLIC_CONVEX_URL}"
+
+npx convex env set SITE_URL "${preview_site_url}" --deployment "${deployment_name}"
+
+npx convex run --deployment "${deployment_name}" internal.preview.seedPreview
 
 pnpm build

@@ -66,6 +66,7 @@ import type * as model_users_mutations from "../model/users/mutations.js";
 import type * as model_users_queries from "../model/users/queries.js";
 import type * as model_users_utils from "../model/users/utils.js";
 import type * as model_users_validators from "../model/users/validators.js";
+import type * as preview from "../preview.js";
 import type * as speakers from "../speakers.js";
 import type * as talks from "../talks.js";
 import type * as topics from "../topics.js";
@@ -136,6 +137,7 @@ declare const fullApi: ApiFromModules<{
   "model/users/queries": typeof model_users_queries;
   "model/users/utils": typeof model_users_utils;
   "model/users/validators": typeof model_users_validators;
+  preview: typeof preview;
   speakers: typeof speakers;
   talks: typeof talks;
   topics: typeof topics;
