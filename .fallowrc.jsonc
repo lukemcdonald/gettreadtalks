@@ -13,6 +13,8 @@
     // Tool configs are entrypoints for their own CLIs and are already covered by the toolchain.
     "oxfmt.config.ts",
     "oxlint.config.ts",
+    // Convex generated files reference generated JS names that do not exist as source files.
+    "convex/**/_generated/**",
     // CLI-only preview seed. Called from scripts/vercel-build.sh, not app imports.
     "convex/preview.ts",
     // Better Auth CLI output. Do not edit; regenerate with the Better Auth schema command.
