@@ -66,23 +66,6 @@ function isTrustedOrigin(
   );
 }
 
-function isVercelPreviewSiteUrl(siteUrl: string): boolean {
-  try {
-    return new URL(siteUrl).hostname.endsWith('.vercel.app');
-  } catch {
-    return false;
-  }
-}
-
-function defaultAuthRole(siteUrl: string): 'admin' | 'user' {
-  // Preview hosts are behind Vercel SSO. Registering there is enough for admin.
-  if (isVercelPreviewSiteUrl(siteUrl)) {
-    return 'admin';
-  }
-
-  return 'user';
-}
-
 /**
  * Creates Better Auth options. Uses fallback values during module analysis.
  */
@@ -120,7 +103,7 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
     plugins: [
       adminPlugin({
         adminRoles: ['admin'],
-        defaultRole: defaultAuthRole(siteUrl),
+        defaultRole: 'user',
       }),
       convexPlugin({
         authConfig,

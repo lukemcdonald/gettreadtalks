@@ -17,7 +17,8 @@
 #
 # Preview backends start empty. After deploy this script seeds a few fixture
 # talks/speakers before `pnpm build` so homepage prerender is not empty.
-# Register on the preview URL to get an admin (SITE_URL is *.vercel.app).
+# Register as a normal user, then set role to admin on that preview's Better Auth
+# user row in the Convex dashboard.
 
 set -euo pipefail
 
