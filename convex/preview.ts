@@ -1,10 +1,11 @@
 import type { Id } from './_generated/dataModel';
 import type { MutationCtx } from './_generated/server';
 
+import { hashPassword } from 'better-auth/crypto';
 import { getOneFrom } from 'convex-helpers/server/relationships';
 import { v } from 'convex/values';
 
-import { internal } from './_generated/api';
+import { components, internal } from './_generated/api';
 import { internalAction, internalMutation } from './_generated/server';
 import { throwForbidden, throwValidationError } from './lib/errors';
 import { getPublishedAtForStatus } from './lib/utils';
@@ -67,6 +68,83 @@ function assertPreviewHost() {
   if (!hostname.endsWith('.vercel.app')) {
     throwForbidden('Preview seed only runs when SITE_URL is a Vercel preview');
   }
+}
+
+function adapterRecordId(record: unknown): string | undefined {
+  if (!record || typeof record !== 'object') {
+    return undefined;
+  }
+
+  if ('id' in record && typeof record.id === 'string') {
+    return record.id;
+  }
+
+  if ('_id' in record && typeof record._id === 'string') {
+    return record._id;
+  }
+
+  return undefined;
+}
+
+async function upsertCredentialAccount(
+  ctx: MutationCtx,
+  passwordHash: string,
+  userId: string
+) {
+  const now = Date.now();
+  const existingAccount: unknown = await ctx.runQuery(
+    components.betterAuth.adapter.findOne,
+    {
+      model: 'account',
+      where: [
+        {
+          field: 'providerId',
+          value: 'credential',
+        },
+        {
+          connector: 'AND',
+          field: 'userId',
+          value: userId,
+        },
+      ],
+    }
+  );
+
+  const existingAccountId = adapterRecordId(existingAccount);
+
+  if (existingAccountId) {
+    await ctx.runMutation(components.betterAuth.adapter.updateOne, {
+      input: {
+        model: 'account',
+        update: {
+          password: passwordHash,
+          updatedAt: now,
+        },
+        where: [
+          {
+            field: '_id',
+            value: existingAccountId,
+          },
+        ],
+      },
+    });
+
+    return;
+  }
+
+  await ctx.runMutation(components.betterAuth.adapter.create, {
+    input: {
+      data: {
+        accountId: userId,
+        createdAt: now,
+        password: passwordHash,
+        providerId: 'credential',
+        updatedAt: now,
+        userId,
+      },
+      model: 'account',
+    },
+  });
 }
 
 async function upsertSpeaker(
@@ -169,23 +247,113 @@ export const seedContent = internalMutation({
   }),
 });
 
+export const seedPreviewUser = internalMutation({
+  args: {
+    email: v.string(),
+    name: v.string(),
+    passwordHash: v.string(),
+  },
+  handler: async (ctx, args) => {
+    assertPreviewHost();
+
+    const now = Date.now();
+    const existingUser: unknown = await ctx.runQuery(
+      components.betterAuth.adapter.findOne,
+      {
+        model: 'user',
+        where: [
+          {
+            field: 'email',
+            value: args.email,
+          },
+        ],
+      }
+    );
+    const existingUserId = adapterRecordId(existingUser);
+
+    if (existingUserId) {
+      await upsertCredentialAccount(ctx, args.passwordHash, existingUserId);
+
+      return 'updated';
+    }
+
+    const createdUser: unknown = await ctx.runMutation(
+      components.betterAuth.adapter.create,
+      {
+        input: {
+          data: {
+            createdAt: now,
+            email: args.email,
+            emailVerified: true,
+            name: args.name,
+            role: 'user',
+            updatedAt: now,
+          },
+          model: 'user',
+        },
+      }
+    );
+    const userId = adapterRecordId(createdUser);
+
+    if (!userId) {
+      throwValidationError('Preview user seed did not return a user id');
+    }
+
+    await upsertCredentialAccount(ctx, args.passwordHash, userId);
+
+    return 'created';
+  },
+  returns: v.union(v.literal('created'), v.literal('updated')),
+});
+
 export const seedPreview = internalAction({
   args: {},
-  handler: async (ctx) => {
+  handler: async (
+    ctx
+  ): Promise<{
+    speakerCount: number;
+    talkCount: number;
+    userSeed: 'created' | 'skipped' | 'updated';
+  }> => {
     assertPreviewHost();
 
     const content: {
       speakerCount: number;
       talkCount: number;
     } = await ctx.runMutation(internal.preview.seedContent, {});
+    const email = process.env.PREVIEW_USER_EMAIL?.trim().toLowerCase() ?? '';
+    const password = process.env.PREVIEW_USER_PASSWORD ?? '';
+
+    if (!email.includes('@') || password.length === 0) {
+      return {
+        speakerCount: content.speakerCount,
+        talkCount: content.talkCount,
+        userSeed: 'skipped' as const,
+      };
+    }
+
+    const userSeed: 'created' | 'updated' = await ctx.runMutation(
+      internal.preview.seedPreviewUser,
+      {
+        email,
+        name: 'Preview User',
+        passwordHash: await hashPassword(password),
+      }
+    );
 
     return {
       speakerCount: content.speakerCount,
       talkCount: content.talkCount,
+      userSeed,
     };
   },
   returns: v.object({
     speakerCount: v.number(),
     talkCount: v.number(),
+    userSeed: v.union(
+      v.literal('created'),
+      v.literal('skipped'),
+      v.literal('updated')
+    ),
   }),
 });

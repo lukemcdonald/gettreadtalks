@@ -11,14 +11,16 @@
 # 1. Convex project Settings: Generate Preview Deploy Key.
 # 2. Vercel env CONVEX_DEPLOY_KEY: that key, Preview only (not Production).
 # 3. Convex: `npx convex env default set --type preview NAME value` for
-#    BETTER_AUTH_SECRET, RESEND_*, SENTRY_DSN (same names as other deploys).
+#    BETTER_AUTH_SECRET, RESEND_*, SENTRY_DSN, TURNSTILE_SECRET_KEY
+#    (same names as other deploys).
+#    Optional: PREVIEW_USER_EMAIL and PREVIEW_USER_PASSWORD seed a normal user.
 #    Do not default SITE_URL; this script sets it per preview host.
 # 4. Vercel Deployment Protection: testers use Vercel SSO, or a shareable link.
 #
-# Preview backends start empty. After deploy this script seeds a few fixture
-# talks/speakers before `pnpm build` so homepage prerender is not empty.
-# Register as a normal user, then set role to admin on that preview's Better Auth
-# user row in the Convex dashboard.
+# Preview backends start empty. After deploy this script seeds fixture
+# talks/speakers (and the preview user if those env vars are set) before
+# `pnpm build` so homepage prerender is not empty. Role stays user. Set admin
+# on that preview's Better Auth user row in the Convex dashboard.
 
 set -euo pipefail
 
