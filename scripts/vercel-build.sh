@@ -16,9 +16,8 @@
 # 4. Vercel Deployment Protection: testers use Vercel SSO, or a shareable link.
 #
 # Preview backends start empty. After deploy this script seeds a few fixture
-# talks/speakers (and an admin if PREVIEW_ADMIN_EMAIL/PASSWORD are set as
-# Convex preview default env vars). That runs before `pnpm build` so homepage
-# prerender is not empty.
+# talks/speakers before `pnpm build` so homepage prerender is not empty.
+# Register on the preview URL to get an admin (SITE_URL is *.vercel.app).
 
 set -euo pipefail
 

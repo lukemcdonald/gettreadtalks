@@ -1,12 +1,11 @@
 import type { Id } from './_generated/dataModel';
-import type { ActionCtx, MutationCtx } from './_generated/server';
+import type { MutationCtx } from './_generated/server';
 
 import { getOneFrom } from 'convex-helpers/server/relationships';
 import { v } from 'convex/values';
 
 import { internal } from './_generated/api';
 import { internalAction, internalMutation } from './_generated/server';
-import { createAuth } from './auth';
 import { throwForbidden, throwValidationError } from './lib/errors';
 import { getPublishedAtForStatus } from './lib/utils';
 
@@ -133,56 +132,6 @@ async function upsertTalk(
   });
 }
 
-async function ensurePreviewAdmin(
-  ctx: ActionCtx,
-  email: string,
-  password: string
-): Promise<string> {
-  const auth = createAuth(ctx);
-
-  try {
-    const created = await auth.api.createUser({
-      body: {
-        email,
-        name: 'Preview Admin',
-        password,
-        role: 'admin',
-      },
-    });
-
-    return created.user.id;
-  } catch {
-    const listed = await auth.api.listUsers({
-      headers: {},
-      query: {
-        limit: 10,
-        searchField: 'email',
-        searchOperator: 'contains',
-        searchValue: email,
-      },
-    });
-    const match = listed.users.find(
-      (user) => user.email.toLowerCase() === email.toLowerCase()
-    );
-
-    if (!match) {
-      throwForbidden('Preview admin exists but could not be loaded');
-    }
-
-    if (match.role !== 'admin') {
-      await auth.api.setRole({
-        body: {
-          role: 'admin',
-          userId: match.id,
-        },
-        headers: {},
-      });
-    }
-
-    return match.id;
-  }
-}
-
 export const seedContent = internalMutation({
   args: {},
   handler: async (ctx) => {
@@ -230,24 +179,12 @@ export const seedPreview = internalAction({
       talkCount: number;
     } = await ctx.runMutation(internal.preview.seedContent, {});
 
-    const email = process.env.PREVIEW_ADMIN_EMAIL?.trim();
-    const password = process.env.PREVIEW_ADMIN_PASSWORD;
-
-    let adminEmail: string | null = null;
-
-    if (email && password) {
-      await ensurePreviewAdmin(ctx, email, password);
-      adminEmail = email;
-    }
-
     return {
-      adminEmail,
       speakerCount: content.speakerCount,
       talkCount: content.talkCount,
     };
   },
   returns: v.object({
-    adminEmail: v.union(v.null(), v.string()),
     speakerCount: v.number(),
     talkCount: v.number(),
   }),
