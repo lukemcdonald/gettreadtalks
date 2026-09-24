@@ -73,10 +73,10 @@ src/features/{domain}/
 
 ```typescript
 // ✅ Always use the barrel
-import { Button, Card, TextField } from "@/components/ui";
+import { Button, Card, TextField } from '@/components/ui';
 
 // ❌ Never import primitives directly in feature/page code
-import { Button } from "@/components/ui/primitives/button";
+import { Button } from '@/components/ui/primitives/button';
 ```
 
 **Overlays**
@@ -150,12 +150,12 @@ File-level directives for single-function files:
 Cached queries include `cacheLife()` and `cacheTag()` for invalidation:
 
 ```typescript
-"use cache: private";
+'use cache: private';
 // imports...
 
 export async function getEntity(id: EntityId) {
-  cacheLife("hours");
-  cacheTag("entities");
+  cacheLife('hours');
+  cacheTag('entities');
   // ...
 }
 ```
@@ -165,9 +165,9 @@ export async function getEntity(id: EntityId) {
 Actions use `updateTag` for read-your-writes semantics (user sees their change immediately):
 
 ```typescript
-import { updateTag } from "next/cache";
+import { updateTag } from 'next/cache';
 
-updateTag("entities");
+updateTag('entities');
 ```
 
 Use `revalidateTag()` for background/webhook invalidation where SWR behavior is preferred.
@@ -177,10 +177,10 @@ Use `revalidateTag()` for background/webhook invalidation where SWR behavior is 
 **Convex Mutations** — Use custom hook:
 
 ```typescript
-import { useMutation } from "@/hooks";
+import { useMutation } from '@/hooks';
 
 const { mutate, isLoading, error } = useMutation(api.talks.createTalk, {
-  onSuccess: () => toast.success("Created!"),
+  onSuccess: () => toast.success('Created!'),
   onError: (error) => toast.error(getErrorMessage(error)),
 });
 ```
@@ -188,7 +188,7 @@ const { mutate, isLoading, error } = useMutation(api.talks.createTalk, {
 **Server Actions** — Try/catch with error mapping:
 
 ```typescript
-import { mapConvexErrorToFormErrors } from "@/lib/forms/validation";
+import { mapConvexErrorToFormErrors } from '@/lib/forms/validation';
 
 try {
   const result = await fetchAuthMutation(api.talks.createTalk, data);
