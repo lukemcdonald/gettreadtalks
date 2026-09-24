@@ -6,6 +6,7 @@
   "scripts": {
     "audit:code": "fallow audit && fallow health --score --hotspots --summary",
     "build": "next build",
+    "build:vercel": "bash scripts/vercel-build.sh",
     "check": "ultracite check .",
     "clean": "rm -rf node_modules",
     "dev": "npm-run-all --parallel dev:backend dev:frontend dev:open",
