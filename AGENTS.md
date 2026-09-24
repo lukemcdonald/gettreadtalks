@@ -9,6 +9,7 @@ Greenfield project — no users, no back-compat concerns. Make it right.
 - After meaningful TypeScript or JavaScript changes, run `pnpm run audit:code`
 - Never run `pnpm dev` unless instructed
 - When testing local URLs, always use `https`
+- Vercel Git previews deploy a per-branch Convex backend (`scripts/vercel-build.sh`). Production Convex still ships with `pnpm release`. Preview backends start empty. Need CONVEX_DEPLOY_KEY (Preview Deploy Key) on Vercel Preview env, Convex preview default env vars, and Vercel Deployment Protection that testers can pass.
 
 Use the Fallow skill for deeper audit and debug workflows.
 
