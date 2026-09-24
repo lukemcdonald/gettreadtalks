@@ -6,7 +6,7 @@ import { createClient } from '@convex-dev/better-auth';
 import { convex as convexPlugin } from '@convex-dev/better-auth/plugins';
 import { requireActionCtx } from '@convex-dev/better-auth/utils';
 import { betterAuth } from 'better-auth';
-import { admin as adminPlugin } from 'better-auth/plugins';
+import { admin as adminPlugin, captcha } from 'better-auth/plugins';
 
 import { components, internal } from './_generated/api';
 import authConfig from './auth.config';
@@ -66,6 +66,20 @@ function isTrustedOrigin(
   );
 }
 
+function warnIfAuthEnvInvalid(siteUrl: string) {
+  if (!isTrustedOrigin(siteUrl, TRUSTED_ORIGIN_MATCHERS)) {
+    console.warn(
+      `SITE_URL "${siteUrl}" is not present in trustedOrigins. Auth links and cookies will target an origin the app does not trust.`
+    );
+  }
+
+  if (!process.env.TURNSTILE_SECRET_KEY) {
+    console.warn(
+      'TURNSTILE_SECRET_KEY is not set. Sign-up and password-reset requests will fail captcha verification.'
+    );
+  }
+}
+
 /**
  * Creates Better Auth options. Uses fallback values during module analysis.
  */
@@ -73,13 +87,11 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
   const secret =
     process.env.BETTER_AUTH_SECRET ?? 'analysis-placeholder-secret';
   const siteUrl = process.env.SITE_URL ?? 'https://localhost:3000';
+  const turnstileSecretKey =
+    process.env.TURNSTILE_SECRET_KEY ?? 'analysis-placeholder-secret';
   const isHttps = siteUrl.startsWith('https://');
 
-  if (!isTrustedOrigin(siteUrl, TRUSTED_ORIGIN_MATCHERS)) {
-    console.warn(
-      `SITE_URL "${siteUrl}" is not present in trustedOrigins. Auth links and cookies will target an origin the app does not trust.`
-    );
-  }
+  warnIfAuthEnvInvalid(siteUrl);
 
   return {
     advanced: {
@@ -104,6 +116,11 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
       adminPlugin({
         adminRoles: ['admin'],
         defaultRole: 'user',
+      }),
+      captcha({
+        endpoints: ['/request-password-reset', '/sign-up/email'],
+        provider: 'cloudflare-turnstile',
+        secretKey: turnstileSecretKey,
       }),
       convexPlugin({
         authConfig,
