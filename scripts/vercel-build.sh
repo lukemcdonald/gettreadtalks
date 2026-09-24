@@ -43,7 +43,12 @@ fi
 # Convex preview names cannot contain `/`. `deploy --preview-name` rewrites
 # slashes to hyphens; `env set --deployment` does not, so use the same name.
 preview_name="${VERCEL_GIT_COMMIT_REF//\//-}"
-preview_site_url="https://${VERCEL_URL}"
+# Prefer the stable git-branch URL so auth cookies match the PR link.
+if [ -n "${VERCEL_BRANCH_URL:-}" ]; then
+  preview_site_url="https://${VERCEL_BRANCH_URL}"
+else
+  preview_site_url="https://${VERCEL_URL}"
+fi
 url_file="$(mktemp)"
 
 npx convex deploy \
