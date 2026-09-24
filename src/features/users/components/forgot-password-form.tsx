@@ -15,6 +15,10 @@ import {
   Fieldset,
   TextField,
 } from '@/components/ui';
+import {
+  resetTurnstile,
+  TurnstileField,
+} from '@/features/users/components/turnstile-field';
 import { requestPasswordReset } from '@/services/auth/client';
 import { AUTH_ERRORS } from '@/services/auth/config';
 
@@ -25,6 +29,8 @@ const forgotPasswordSchema = z.object({
 type ForgotPasswordData = z.infer<typeof forgotPasswordSchema>;
 
 export function ForgotPasswordForm() {
+  const [captchaResetKey, setCaptchaResetKey] = useState(0);
+  const [captchaToken, setCaptchaToken] = useState('');
   const [succeeded, setSucceeded] = useState(false);
 
   const form = useForm<ForgotPasswordData>({
@@ -38,11 +44,18 @@ export function ForgotPasswordForm() {
   const { errors, isSubmitting } = form.formState;
 
   async function onSubmit(values: ForgotPasswordData) {
+    if (!captchaToken) {
+      form.setError('root', { message: AUTH_ERRORS.CAPTCHA_REQUIRED });
+      return;
+    }
+
     const { error: submitError } = await requestPasswordReset({
+      captchaToken,
       email: values.email,
     });
 
     if (submitError) {
+      resetTurnstile(setCaptchaResetKey, setCaptchaToken);
       form.setError('root', {
         message: submitError.message ?? AUTH_ERRORS.RESET_EMAIL_FAILED,
       });
@@ -86,6 +99,10 @@ export function ForgotPasswordForm() {
           placeholder="name@example.com"
           required
           type="email"
+        />
+        <TurnstileField
+          onTokenChange={setCaptchaToken}
+          resetKey={captchaResetKey}
         />
       </Fieldset>
 

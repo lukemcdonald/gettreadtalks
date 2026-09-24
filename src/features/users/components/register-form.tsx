@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { CircleAlertIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -22,6 +23,10 @@ import {
   Input,
   PasswordInput,
 } from '@/components/ui';
+import {
+  resetTurnstile,
+  TurnstileField,
+} from '@/features/users/components/turnstile-field';
 import { useAnalytics } from '@/lib/analytics';
 import { signUp } from '@/services/auth/client';
 import { AUTH_ERRORS } from '@/services/auth/config';
@@ -43,6 +48,8 @@ export function RegisterForm({
   ...delegated
 }: ComponentPropsWithoutRef<'form'>) {
   const { track } = useAnalytics();
+  const [captchaResetKey, setCaptchaResetKey] = useState(0);
+  const [captchaToken, setCaptchaToken] = useState('');
   const searchParams = useSearchParams();
   const redirectTo = getSafeRedirect(searchParams.get('redirect'));
 
@@ -58,26 +65,34 @@ export function RegisterForm({
   const { errors, isSubmitting } = form.formState;
 
   const handleSubmit = form.handleSubmit(async ({ email, name, password }) => {
-    try {
-      const { data, error: signUpError } = await signUp({
-        email,
-        name,
-        password,
-      });
-
-      if (data) {
-        track('signed_up');
-        // Use window.location.href to force full page reload and set JWT cookie
-        window.location.assign(redirectTo);
-      } else {
-        form.setError('root', {
-          message: signUpError?.message ?? AUTH_ERRORS.REGISTRATION_FAILED,
-        });
-      }
-    } catch (error) {
-      captureException(error, { fingerprint: ['auth', 'signUp'] });
-      form.setError('root', { message: AUTH_ERRORS.NETWORK_ERROR });
+    if (!captchaToken) {
+      form.setError('root', { message: AUTH_ERRORS.CAPTCHA_REQUIRED });
+      return;
     }
+
+    const result = await signUp({
+      captchaToken,
+      email,
+      name,
+      password,
+    }).catch((error) => {
+      captureException(error, { fingerprint: ['auth', 'signUp'] });
+      return {
+        data: null,
+        error: { message: AUTH_ERRORS.NETWORK_ERROR },
+      };
+    });
+
+    if (result.data) {
+      track('signed_up');
+      window.location.assign(redirectTo);
+      return;
+    }
+
+    resetTurnstile(setCaptchaResetKey, setCaptchaToken);
+    form.setError('root', {
+      message: result.error?.message ?? AUTH_ERRORS.REGISTRATION_FAILED,
+    });
   });
 
   return (
@@ -134,6 +149,11 @@ export function RegisterForm({
             <FieldError match>{errors.password.message}</FieldError>
           )}
         </Field>
+
+        <TurnstileField
+          onTokenChange={setCaptchaToken}
+          resetKey={captchaResetKey}
+        />
 
         <div className="mt-4 flex flex-col gap-3">
           <Button loading={isSubmitting} type="submit">

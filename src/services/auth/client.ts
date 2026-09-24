@@ -21,11 +21,27 @@ export const authClient = createAuthClient({
   plugins: [convexClient(), adminClient()],
 });
 
-export async function signUp({ email, name, password }: SignUpParams) {
+function captchaFetchOptions(captchaToken: string) {
+  return {
+    fetchOptions: {
+      headers: {
+        'x-captcha-response': captchaToken,
+      },
+    },
+  };
+}
+
+export async function signUp({
+  captchaToken,
+  email,
+  name,
+  password,
+}: SignUpParams) {
   return await authClient.signUp.email({
     email,
     name: name || email.split('@')[0],
     password,
+    ...captchaFetchOptions(captchaToken),
   });
 }
 
@@ -40,10 +56,17 @@ export async function signOut() {
   return await authClient.signOut();
 }
 
-export async function requestPasswordReset({ email }: { email: string }) {
+export async function requestPasswordReset({
+  captchaToken,
+  email,
+}: {
+  captchaToken: string;
+  email: string;
+}) {
   return await authClient.requestPasswordReset({
     email,
     redirectTo: '/reset-password',
+    ...captchaFetchOptions(captchaToken),
   });
 }
 

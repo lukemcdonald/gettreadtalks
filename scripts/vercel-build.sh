@@ -11,7 +11,8 @@
 # 1. Convex project Settings: Generate Preview Deploy Key.
 # 2. Vercel env CONVEX_DEPLOY_KEY: that key, Preview only (not Production).
 # 3. Convex: `npx convex env default set --type preview NAME value` for
-#    BETTER_AUTH_SECRET, RESEND_*, SENTRY_DSN (same names as other deploys).
+#    BETTER_AUTH_SECRET, RESEND_*, SENTRY_DSN, TURNSTILE_SECRET_KEY
+#    (same names as other deploys).
 #    Optional: PREVIEW_USER_EMAIL and PREVIEW_USER_PASSWORD seed a normal user.
 #    Do not default SITE_URL; this script sets it per preview host.
 # 4. Vercel Deployment Protection: testers use Vercel SSO, or a shareable link.
