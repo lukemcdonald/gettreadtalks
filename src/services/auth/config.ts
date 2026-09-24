@@ -1,5 +1,6 @@
 // Auth error messages
 export const AUTH_ERRORS = {
+  CAPTCHA_REQUIRED: 'Please complete the verification check.',
   INVALID_CREDENTIALS: 'Invalid email or password',
   NETWORK_ERROR:
     'Unable to connect. Please check your connection and try again.',
