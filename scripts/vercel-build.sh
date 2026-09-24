@@ -38,14 +38,16 @@ if [ -z "${VERCEL_GIT_COMMIT_REF:-}" ]; then
   exit 1
 fi
 
-preview_ref="${VERCEL_GIT_COMMIT_REF}"
+# Convex preview names cannot contain `/`. `deploy --preview-name` rewrites
+# slashes to hyphens; `env set --deployment` does not, so use the same name.
+preview_name="${VERCEL_GIT_COMMIT_REF//\//-}"
 preview_site_url="https://${VERCEL_URL}"
 url_file="$(mktemp)"
 
 npx convex deploy \
   --cmd "sh -c 'printf %s \"\$NEXT_PUBLIC_CONVEX_URL\" > \"${url_file}\"'" \
   --cmd-url-env-var-name NEXT_PUBLIC_CONVEX_URL \
-  --preview-name "${preview_ref}"
+  --preview-name "${preview_name}"
 
 NEXT_PUBLIC_CONVEX_URL="$(cat "${url_file}")"
 rm -f "${url_file}"
@@ -58,6 +60,6 @@ fi
 export NEXT_PUBLIC_CONVEX_SITE_URL="${NEXT_PUBLIC_CONVEX_URL%.convex.cloud}.convex.site"
 export NEXT_PUBLIC_CONVEX_URL
 
-npx convex env set SITE_URL "${preview_site_url}" --deployment "preview/${preview_ref}"
+npx convex env set SITE_URL "${preview_site_url}" --deployment "preview/${preview_name}"
 
 pnpm build
