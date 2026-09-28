@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { CircleAlertIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -63,6 +63,14 @@ export function RegisterForm({
   });
 
   const { errors, isSubmitting } = form.formState;
+
+  useEffect(() => {
+    if (!captchaToken) {
+      return;
+    }
+
+    form.clearErrors('root');
+  }, [captchaToken, form]);
 
   const handleSubmit = form.handleSubmit(async ({ email, name, password }) => {
     if (!captchaToken) {
