@@ -21,7 +21,11 @@ export const authClient = createAuthClient({
   plugins: [convexClient(), adminClient()],
 });
 
-function captchaFetchOptions(captchaToken: string) {
+function captchaFetchOptions(captchaToken?: string) {
+  if (!captchaToken) {
+    return {};
+  }
+
   return {
     fetchOptions: {
       headers: {
@@ -60,7 +64,7 @@ export async function requestPasswordReset({
   captchaToken,
   email,
 }: {
-  captchaToken: string;
+  captchaToken?: string;
   email: string;
 }) {
   return await authClient.requestPasswordReset({

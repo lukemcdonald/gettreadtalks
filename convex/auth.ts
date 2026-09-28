@@ -12,6 +12,7 @@ import { components, internal } from './_generated/api';
 import authConfig from './auth.config';
 import authSchema from './betterAuth/schema';
 import { authRateLimitPlugin } from './lib/plugins';
+import { isPreviewSiteUrl } from './lib/turnstile';
 
 /**
  * Creates a new Better Auth component client.
@@ -73,11 +74,38 @@ function warnIfAuthEnvInvalid(siteUrl: string) {
     );
   }
 
-  if (!process.env.TURNSTILE_SECRET_KEY) {
+  if (!isPreviewSiteUrl(siteUrl) && !process.env.TURNSTILE_SECRET_KEY) {
     console.warn(
       'TURNSTILE_SECRET_KEY is not set. Sign-up and password-reset requests will fail captcha verification.'
     );
   }
+}
+
+function createAuthPlugins(
+  ctx: GenericCtx<DataModel>,
+  siteUrl: string,
+  turnstileSecretKey: string
+) {
+  return [
+    adminPlugin({
+      adminRoles: ['admin'],
+      defaultRole: 'user',
+    }),
+    ...(isPreviewSiteUrl(siteUrl)
+      ? []
+      : [
+          captcha({
+            endpoints: ['/request-password-reset', '/sign-up/email'],
+            provider: 'cloudflare-turnstile',
+            secretKey: turnstileSecretKey,
+          }),
+        ]),
+    convexPlugin({
+      authConfig,
+      jwksRotateOnTokenGenerationError: true,
+    }),
+    authRateLimitPlugin(ctx),
+  ];
 }
 
 /**
@@ -103,7 +131,6 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
       enabled: true,
       requireEmailVerification: false,
       sendResetPassword: async ({ token, url, user }) => {
-        // console.log('[DEV] Password reset URL:', url);
         const actionCtx = requireActionCtx(ctx);
         await actionCtx.runAction(internal.emails.sendPasswordResetEmail, {
           email: user.email,
@@ -112,22 +139,7 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
         });
       },
     },
-    plugins: [
-      adminPlugin({
-        adminRoles: ['admin'],
-        defaultRole: 'user',
-      }),
-      captcha({
-        endpoints: ['/request-password-reset', '/sign-up/email'],
-        provider: 'cloudflare-turnstile',
-        secretKey: turnstileSecretKey,
-      }),
-      convexPlugin({
-        authConfig,
-        jwksRotateOnTokenGenerationError: true,
-      }),
-      authRateLimitPlugin(ctx),
-    ],
+    plugins: createAuthPlugins(ctx, siteUrl, turnstileSecretKey),
     secret,
     trustedOrigins: TRUSTED_ORIGINS,
     user: {

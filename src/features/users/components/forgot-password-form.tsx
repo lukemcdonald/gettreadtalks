@@ -16,11 +16,15 @@ import {
   TextField,
 } from '@/components/ui';
 import {
-  resetTurnstile,
+  resetCaptchaIfNeeded,
   TurnstileField,
 } from '@/features/users/components/turnstile-field';
 import { requestPasswordReset } from '@/services/auth/client';
-import { AUTH_ERRORS } from '@/services/auth/config';
+import {
+  AUTH_ERRORS,
+  hasCaptchaToken,
+  isTurnstileRequired,
+} from '@/services/auth/config';
 import { captureException } from '@/services/errors/client';
 
 const forgotPasswordSchema = z.object({
@@ -30,6 +34,7 @@ const forgotPasswordSchema = z.object({
 type ForgotPasswordData = z.infer<typeof forgotPasswordSchema>;
 
 export function ForgotPasswordForm() {
+  const captchaRequired = isTurnstileRequired();
   const [captchaResetKey, setCaptchaResetKey] = useState(0);
   const [captchaToken, setCaptchaToken] = useState('');
   const [succeeded, setSucceeded] = useState(false);
@@ -53,7 +58,7 @@ export function ForgotPasswordForm() {
   }, [captchaToken, form]);
 
   async function onSubmit(values: ForgotPasswordData) {
-    if (!captchaToken) {
+    if (!hasCaptchaToken(captchaRequired, captchaToken)) {
       form.setError('root', { message: AUTH_ERRORS.CAPTCHA_REQUIRED });
       return;
     }
@@ -70,14 +75,15 @@ export function ForgotPasswordForm() {
       };
     });
 
-    if (result.error) {
-      resetTurnstile(setCaptchaResetKey, setCaptchaToken);
-      form.setError('root', {
-        message: result.error.message ?? AUTH_ERRORS.RESET_EMAIL_FAILED,
-      });
-    } else {
+    if (!result.error) {
       setSucceeded(true);
+      return;
     }
+
+    resetCaptchaIfNeeded(captchaRequired, setCaptchaResetKey, setCaptchaToken);
+    form.setError('root', {
+      message: result.error.message ?? AUTH_ERRORS.RESET_EMAIL_FAILED,
+    });
   }
 
   if (succeeded) {

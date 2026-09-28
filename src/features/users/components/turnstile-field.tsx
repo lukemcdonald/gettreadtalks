@@ -6,7 +6,7 @@ import Script from 'next/script';
 import { useEffect, useRef, useState } from 'react';
 
 import { Button, Field, FieldError } from '@/components/ui';
-import { AUTH_ERRORS } from '@/services/auth/config';
+import { AUTH_ERRORS, isTurnstileRequired } from '@/services/auth/config';
 
 const TURNSTILE_SCRIPT_ID = 'cf-turnstile-api';
 const TURNSTILE_SCRIPT_SRC =
@@ -74,12 +74,24 @@ interface TurnstileFieldProps {
   resetKey: number;
 }
 
-export function resetTurnstile(
+function resetTurnstile(
   setCaptchaResetKey: (updater: (key: number) => number) => void,
   setCaptchaToken: (token: string) => void
 ) {
   setCaptchaResetKey((key) => key + 1);
   setCaptchaToken('');
+}
+
+export function resetCaptchaIfNeeded(
+  required: boolean,
+  setCaptchaResetKey: (updater: (key: number) => number) => void,
+  setCaptchaToken: (token: string) => void
+) {
+  if (!required) {
+    return;
+  }
+
+  resetTurnstile(setCaptchaResetKey, setCaptchaToken);
 }
 
 function startTurnstileWidget({
@@ -196,6 +208,10 @@ export function TurnstileField({
       }),
     [onTokenChange, resetKey, scriptReady, siteKey]
   );
+
+  if (!isTurnstileRequired()) {
+    return null;
+  }
 
   return (
     <Field invalid={!siteKey || scriptFailed}>
