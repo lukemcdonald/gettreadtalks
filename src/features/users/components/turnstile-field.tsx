@@ -1,9 +1,12 @@
 'use client';
 
+import type { RefObject } from 'react';
+
 import Script from 'next/script';
 import { useEffect, useRef, useState } from 'react';
 
 import { Field, FieldError } from '@/components/ui';
+import { AUTH_ERRORS } from '@/services/auth/config';
 
 const TURNSTILE_SCRIPT_ID = 'cf-turnstile-api';
 const TURNSTILE_SCRIPT_SRC =
@@ -108,12 +111,39 @@ function startTurnstileWidget({
   });
 }
 
+function TurnstileFieldStatus({
+  containerRef,
+  resetKey,
+  scriptFailed,
+  siteKey,
+}: {
+  containerRef: RefObject<HTMLDivElement | null>;
+  resetKey: number;
+  scriptFailed: boolean;
+  siteKey: string | undefined;
+}) {
+  if (!siteKey) {
+    return (
+      <FieldError match>
+        Verification is not configured. Set NEXT_PUBLIC_TURNSTILE_SITE_KEY.
+      </FieldError>
+    );
+  }
+
+  if (scriptFailed) {
+    return <FieldError match>{AUTH_ERRORS.CAPTCHA_UNAVAILABLE}</FieldError>;
+  }
+
+  return <div className="w-full" key={resetKey} ref={containerRef} />;
+}
+
 export function TurnstileField({
   onTokenChange,
   resetKey,
 }: TurnstileFieldProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+  const [scriptFailed, setScriptFailed] = useState(false);
   const [scriptReady, setScriptReady] = useState(false);
 
   useEffect(
@@ -129,22 +159,26 @@ export function TurnstileField({
   );
 
   return (
-    <Field invalid={!siteKey}>
+    <Field invalid={!siteKey || scriptFailed}>
       <Script
         id={TURNSTILE_SCRIPT_ID}
+        onError={() => {
+          setScriptFailed(true);
+          setScriptReady(false);
+        }}
         onReady={() => {
+          setScriptFailed(false);
           setScriptReady(true);
         }}
         src={TURNSTILE_SCRIPT_SRC}
         strategy="afterInteractive"
       />
-      {siteKey ? (
-        <div className="w-full" key={resetKey} ref={containerRef} />
-      ) : (
-        <FieldError match>
-          Verification is not configured. Set NEXT_PUBLIC_TURNSTILE_SITE_KEY.
-        </FieldError>
-      )}
+      <TurnstileFieldStatus
+        containerRef={containerRef}
+        resetKey={resetKey}
+        scriptFailed={scriptFailed}
+        siteKey={siteKey}
+      />
     </Field>
   );
 }

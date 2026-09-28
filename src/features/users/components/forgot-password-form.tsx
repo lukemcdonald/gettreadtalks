@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CircleAlertIcon } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -21,6 +21,7 @@ import {
 } from '@/features/users/components/turnstile-field';
 import { requestPasswordReset } from '@/services/auth/client';
 import { AUTH_ERRORS } from '@/services/auth/config';
+import { captureException } from '@/services/errors/client';
 
 const forgotPasswordSchema = z.object({
   email: z.email('Please enter a valid email address.'),
@@ -43,21 +44,36 @@ export function ForgotPasswordForm() {
 
   const { errors, isSubmitting } = form.formState;
 
+  useEffect(() => {
+    if (!captchaToken) {
+      return;
+    }
+
+    form.clearErrors('root');
+  }, [captchaToken, form]);
+
   async function onSubmit(values: ForgotPasswordData) {
     if (!captchaToken) {
       form.setError('root', { message: AUTH_ERRORS.CAPTCHA_REQUIRED });
       return;
     }
 
-    const { error: submitError } = await requestPasswordReset({
+    const result = await requestPasswordReset({
       captchaToken,
       email: values.email,
+    }).catch((error) => {
+      captureException(error, {
+        fingerprint: ['auth', 'requestPasswordReset'],
+      });
+      return {
+        error: { message: AUTH_ERRORS.NETWORK_ERROR },
+      };
     });
 
-    if (submitError) {
+    if (result.error) {
       resetTurnstile(setCaptchaResetKey, setCaptchaToken);
       form.setError('root', {
-        message: submitError.message ?? AUTH_ERRORS.RESET_EMAIL_FAILED,
+        message: result.error.message ?? AUTH_ERRORS.RESET_EMAIL_FAILED,
       });
     } else {
       setSucceeded(true);
