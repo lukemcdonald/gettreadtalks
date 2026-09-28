@@ -24,7 +24,7 @@ export type AdminUser = AuthUser & {
  * Sign up parameters
  */
 export interface SignUpParams {
-  captchaToken: string;
+  captchaToken?: string;
   email: string;
   name?: string;
   password: string;

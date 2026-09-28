@@ -24,12 +24,16 @@ import {
   PasswordInput,
 } from '@/components/ui';
 import {
-  resetTurnstile,
+  resetCaptchaIfNeeded,
   TurnstileField,
 } from '@/features/users/components/turnstile-field';
 import { useAnalytics } from '@/lib/analytics';
 import { signUp } from '@/services/auth/client';
-import { AUTH_ERRORS } from '@/services/auth/config';
+import {
+  AUTH_ERRORS,
+  hasCaptchaToken,
+  isTurnstileRequired,
+} from '@/services/auth/config';
 import { captureException } from '@/services/errors/client';
 import { getSafeRedirect } from '@/utils';
 
@@ -48,6 +52,7 @@ export function RegisterForm({
   ...delegated
 }: ComponentPropsWithoutRef<'form'>) {
   const { track } = useAnalytics();
+  const captchaRequired = isTurnstileRequired();
   const [captchaResetKey, setCaptchaResetKey] = useState(0);
   const [captchaToken, setCaptchaToken] = useState('');
   const searchParams = useSearchParams();
@@ -73,7 +78,7 @@ export function RegisterForm({
   }, [captchaToken, form]);
 
   const handleSubmit = form.handleSubmit(async ({ email, name, password }) => {
-    if (!captchaToken) {
+    if (!hasCaptchaToken(captchaRequired, captchaToken)) {
       form.setError('root', { message: AUTH_ERRORS.CAPTCHA_REQUIRED });
       return;
     }
@@ -97,7 +102,7 @@ export function RegisterForm({
       return;
     }
 
-    resetTurnstile(setCaptchaResetKey, setCaptchaToken);
+    resetCaptchaIfNeeded(captchaRequired, setCaptchaResetKey, setCaptchaToken);
     form.setError('root', {
       message: result.error?.message ?? AUTH_ERRORS.REGISTRATION_FAILED,
     });
