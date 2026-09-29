@@ -13,25 +13,10 @@ export const AUTH_ERRORS = {
   UNKNOWN_AUTH_ERROR: 'Authentication failed. Please try again.',
 } as const;
 
-const PREVIEW_HOST_SUFFIX = '.vercel.app';
-
-/** Cloudflare Turnstile cannot allowlist `*.vercel.app`. */
-function isPreviewHost(hostname: string) {
-  return hostname.endsWith(PREVIEW_HOST_SUFFIX);
-}
-
 export function hasCaptchaToken(required: boolean, token: string) {
   return !required || Boolean(token);
 }
 
 export function isTurnstileRequired() {
-  if (process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview') {
-    return false;
-  }
-
-  if (typeof window !== 'undefined') {
-    return !isPreviewHost(window.location.hostname);
-  }
-
-  return true;
+  return process.env.NEXT_PUBLIC_VERCEL_ENV !== 'preview';
 }
