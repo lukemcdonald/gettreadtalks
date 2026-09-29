@@ -81,30 +81,31 @@ function warnIfAuthEnvInvalid(siteUrl: string) {
   }
 }
 
-function createAuthPlugins(
-  ctx: GenericCtx<DataModel>,
-  siteUrl: string,
-  turnstileSecretKey: string
-) {
-  return [
+function createAuthPlugins(ctx: GenericCtx<DataModel>, siteUrl: string) {
+  const plugins = [
     adminPlugin({
       adminRoles: ['admin'],
       defaultRole: 'user',
     }),
-    ...(isPreviewSiteUrl(siteUrl)
-      ? []
-      : [
-          captcha({
-            endpoints: ['/request-password-reset', '/sign-up/email'],
-            provider: 'cloudflare-turnstile',
-            secretKey: turnstileSecretKey,
-          }),
-        ]),
     convexPlugin({
       authConfig,
       jwksRotateOnTokenGenerationError: true,
     }),
     authRateLimitPlugin(ctx),
+  ];
+
+  if (isPreviewSiteUrl(siteUrl)) {
+    return plugins;
+  }
+
+  return [
+    ...plugins,
+    captcha({
+      endpoints: ['/request-password-reset', '/sign-up/email'],
+      provider: 'cloudflare-turnstile',
+      secretKey:
+        process.env.TURNSTILE_SECRET_KEY ?? 'analysis-placeholder-secret',
+    }),
   ];
 }
 
@@ -115,8 +116,6 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
   const secret =
     process.env.BETTER_AUTH_SECRET ?? 'analysis-placeholder-secret';
   const siteUrl = process.env.SITE_URL ?? 'https://localhost:3000';
-  const turnstileSecretKey =
-    process.env.TURNSTILE_SECRET_KEY ?? 'analysis-placeholder-secret';
   const isHttps = siteUrl.startsWith('https://');
 
   warnIfAuthEnvInvalid(siteUrl);
@@ -139,7 +138,7 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
         });
       },
     },
-    plugins: createAuthPlugins(ctx, siteUrl, turnstileSecretKey),
+    plugins: createAuthPlugins(ctx, siteUrl),
     secret,
     trustedOrigins: TRUSTED_ORIGINS,
     user: {
