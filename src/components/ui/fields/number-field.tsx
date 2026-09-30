@@ -8,9 +8,7 @@ import type {
 } from 'react-hook-form';
 
 import {
-  NumberFieldDecrement,
   NumberFieldGroup,
-  NumberFieldIncrement,
   NumberFieldInput,
   NumberField as NumberFieldPrimitive,
 } from '../primitives/number-field';
@@ -25,7 +23,6 @@ interface NumberFieldProps<T extends FieldValues> {
   name: FieldPath<T>;
   placeholder?: string;
   required?: boolean;
-  showButtons?: boolean;
   step?: number;
 }
 
@@ -40,7 +37,6 @@ interface NumberFieldProps<T extends FieldValues> {
  *   label="Collection Order"
  *   name="collectionOrder"
  *   min={0}
- *   showButtons
  * />
  * ```
  */
@@ -53,7 +49,6 @@ export function NumberField<T extends FieldValues>({
   name,
   placeholder,
   required,
-  showButtons = false,
   step,
 }: NumberFieldProps<T>) {
   return (
@@ -72,12 +67,19 @@ export function NumberField<T extends FieldValues>({
           min={min}
           placeholder={placeholder}
           required={required}
-          showButtons={showButtons}
           step={step}
         />
       )}
     </FormField>
   );
+}
+
+function toOptionalNumber(value: number | null) {
+  if (value === null) {
+    return;
+  }
+
+  return value;
 }
 
 function NumberFieldControl<T extends FieldValues>({
@@ -87,7 +89,6 @@ function NumberFieldControl<T extends FieldValues>({
   min,
   placeholder,
   required,
-  showButtons,
   step,
 }: {
   field: ControllerRenderProps<T, FieldPath<T>>;
@@ -96,7 +97,6 @@ function NumberFieldControl<T extends FieldValues>({
   min?: number;
   placeholder?: string;
   required?: boolean;
-  showButtons: boolean;
   step?: number;
 }) {
   const { onChange, value, ...inputProps } = field;
@@ -108,21 +108,20 @@ function NumberFieldControl<T extends FieldValues>({
       max={max}
       min={min}
       onValueChange={(newValue) => {
-        onChange(newValue ?? undefined);
+        onChange(toOptionalNumber(newValue));
       }}
       required={required}
+      size="lg"
       step={step}
-      value={value ?? null}
+      value={typeof value === 'number' ? value : null}
     >
-      {showButtons ? (
-        <NumberFieldGroup>
-          <NumberFieldDecrement />
-          <NumberFieldInput placeholder={placeholder} {...inputProps} />
-          <NumberFieldIncrement />
-        </NumberFieldGroup>
-      ) : (
-        <NumberFieldInput placeholder={placeholder} {...inputProps} />
-      )}
+      <NumberFieldGroup>
+        <NumberFieldInput
+          className="text-start"
+          placeholder={placeholder}
+          {...inputProps}
+        />
+      </NumberFieldGroup>
     </NumberFieldPrimitive>
   );
 }
