@@ -13,7 +13,7 @@ export function talkTrackProps(
   speaker?: Pick<Speaker, 'slug'> | null
 ) {
   return {
-    speaker_slug: speaker?.slug ?? '',
+    ...(speaker?.slug ? { speaker_slug: speaker.slug } : {}),
     talk_id: talk._id,
     talk_slug: talk.slug,
   };
