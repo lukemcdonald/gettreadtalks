@@ -38,10 +38,7 @@ import { captureException } from '@/services/errors/client';
 import { getSafeRedirect } from '@/utils';
 
 const registerFormSchema = z.object({
-  email: z
-    .string()
-    .min(1, 'Email is required.')
-    .email('Please enter a valid email.'),
+  email: z.email('Please enter a valid email.'),
   name: z.string().optional(),
   password: z.string().min(8, 'Must be at least eight characters long.'),
 });

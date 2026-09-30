@@ -3,7 +3,7 @@ import { z } from 'zod';
 
 export const clipFormSchema = z.object({
   description: z.string().optional(),
-  mediaUrl: z.string().trim().url('Please enter a valid URL'),
+  mediaUrl: z.string().trim().pipe(z.url('Please enter a valid URL')),
   speakerId: zid('speakers').optional(),
   status: z
     .enum(['approved', 'archived', 'backlog', 'published'])
