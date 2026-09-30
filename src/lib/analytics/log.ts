@@ -1,5 +1,7 @@
+import { DEPLOY_ENV } from '@/constants/env';
+
 export function logAnalytics(action: string, payload?: unknown) {
-  if (process.env.NODE_ENV === 'production') {
+  if (DEPLOY_ENV === 'prod') {
     return;
   }
 
