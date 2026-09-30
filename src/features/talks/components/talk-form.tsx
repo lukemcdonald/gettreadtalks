@@ -1,26 +1,25 @@
 'use client';
 
-import type { Collection, CollectionId } from '@/features/collections/types';
+import type { Collection } from '@/features/collections/types';
 import type { Speaker } from '@/features/speakers/types';
 import type { Talk, TalkId, TalkStatus } from '@/features/talks/types';
 import type { TopicListItem } from '@/features/topics/types';
 import type { ReactNode } from 'react';
 
-import { Controller, FormProvider } from 'react-hook-form';
+import { FormProvider } from 'react-hook-form';
 
 import {
   Button,
   FeaturedField,
   Fieldset,
   FormError,
-  NumberField,
   StatusField,
   TextField,
   TextareaField,
   UrlField,
 } from '@/components/ui';
-import { CollectionSelectField } from '@/features/collections/components/collection-select-field';
 import { SpeakerField } from '@/features/speakers/components/speaker-field';
+import { TalkCollectionFields } from '@/features/talks/components/talk-form-fields';
 import { UrlChangeDialog } from '@/features/talks/components/url-change-dialog';
 import { useTalkForm } from '@/features/talks/hooks/use-talk-form';
 import { TopicField } from '@/features/topics/components/topic-field';
@@ -131,26 +130,10 @@ export function TalkForm({
               topics={topics}
             />
 
-            <Controller
+            <TalkCollectionFields
+              collections={collections}
               control={form.control}
-              name="collectionId"
-              render={({ field }) => (
-                <CollectionSelectField
-                  collections={collections}
-                  onValueChange={(value) => {
-                    field.onChange(
-                      value === '' ? undefined : (value as CollectionId)
-                    );
-                  }}
-                  value={field.value}
-                />
-              )}
-            />
-
-            <NumberField
-              control={form.control}
-              label="Collection Order"
-              name="collectionOrder"
+              setValue={form.setValue}
             />
 
             <StatusField

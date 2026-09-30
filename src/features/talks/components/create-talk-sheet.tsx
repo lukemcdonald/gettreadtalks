@@ -86,6 +86,7 @@ export function CreateTalkSheet({
       <TalkFormFields
         collections={collections}
         control={form.control}
+        setValue={form.setValue}
         speakers={speakers}
         topics={topics}
       />

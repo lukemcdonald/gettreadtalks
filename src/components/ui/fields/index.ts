@@ -5,6 +5,7 @@ export * from '../primitives/number-field';
 export { FeaturedField } from './featured-field';
 export { FieldLabel } from './field-label';
 export { NumberField } from './number-field';
+export { OptionalSelect } from './optional-select';
 export { PasswordField } from './password-field';
 export { PasswordInput } from './password-input';
 export { SelectField } from './select-field';
