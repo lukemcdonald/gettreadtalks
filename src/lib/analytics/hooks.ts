@@ -2,8 +2,6 @@
 
 import type { EventMap, NoPayloadEvents, PayloadEvents } from './events';
 
-import { usePostHog } from 'posthog-js/react';
-
 function logInDev(event: string, properties?: Record<string, unknown>) {
   if (process.env.NODE_ENV === 'production') {
     return;
@@ -11,7 +9,6 @@ function logInDev(event: string, properties?: Record<string, unknown>) {
 
   console.log(`[analytics]: ${event}`, properties);
 
-  // Warn about suspicious property values
   if (properties) {
     for (const [key, value] of Object.entries(properties)) {
       if (
@@ -29,7 +26,7 @@ function logInDev(event: string, properties?: Record<string, unknown>) {
 }
 
 export function useAnalytics() {
-  const posthog = usePostHog();
+  const log = logInDev;
 
   function track<E extends NoPayloadEvents>(event: E): void;
   function track<E extends PayloadEvents>(
@@ -37,8 +34,7 @@ export function useAnalytics() {
     properties: EventMap[E]
   ): void;
   function track<E extends keyof EventMap>(event: E, properties?: EventMap[E]) {
-    logInDev(event, properties as Record<string, unknown>);
-    posthog?.capture(event, properties as Record<string, unknown>);
+    log(event, properties as Record<string, unknown>);
   }
 
   return { track };

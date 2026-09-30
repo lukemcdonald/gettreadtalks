@@ -10,7 +10,7 @@ A modern, full-stack faith-based talks and content platform built with Next.js, 
 - **Authentication:** Better Auth
 - **Forms:** React Hook Form + Zod
 - **Email:** Resend + React Email
-- **Analytics:** PostHog
+- **Analytics:** Vercel Web Analytics (page traffic). PostHog session replay is gone and is not coming back.
 - **Error Monitoring:** Sentry
 - **Linting/Formatting:** Oxlint + Oxfmt (Ultracite)
 - **Deployment:** Vercel
@@ -49,7 +49,7 @@ A modern, full-stack faith-based talks and content platform built with Next.js, 
 - [Convex Documentation](https://docs.convex.dev/)
 - [Coss UI Documentation](https://coss.com/ui)
 - [Next.js Documentation](https://nextjs.org/docs)
-- [PostHog Documentation](https://posthog.com/docs)
+- [Vercel Web Analytics](https://vercel.com/docs/analytics)
 - [React Email Documentation](https://react.email/)
 - [React Hook Form Documentation](https://react-hook-form.com/)
 - [Resend Documentation](https://resend.com/docs)
