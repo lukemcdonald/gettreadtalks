@@ -22,7 +22,7 @@ import {
   Input,
   PasswordInput,
 } from '@/components/ui';
-import { useAnalytics } from '@/lib/analytics';
+import { track } from '@/lib/analytics';
 import { signIn } from '@/services/auth/client';
 import { AUTH_ERRORS } from '@/services/auth/config';
 import { captureException } from '@/services/errors/client';
@@ -36,7 +36,6 @@ const loginFormSchema = z.object({
 type LoginFormData = z.infer<typeof loginFormSchema>;
 
 export function LoginForm({ ...delegated }: ComponentPropsWithoutRef<'form'>) {
-  const { track } = useAnalytics();
   const searchParams = useSearchParams();
   const redirectTo = getSafeRedirect(searchParams.get('redirect'));
 

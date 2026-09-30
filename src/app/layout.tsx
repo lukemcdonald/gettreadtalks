@@ -87,7 +87,7 @@ export default function RootLayout({
             </AuthProvider>
           </ThemeProvider>
         </ErrorBoundary>
-        <Analytics />
+        <Analytics debug={false} />
       </body>
     </html>
   );

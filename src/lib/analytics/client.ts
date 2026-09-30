@@ -2,6 +2,8 @@
 
 import type { AnalyticsBrowser } from '@segment/analytics-next';
 
+import { logAnalytics } from './log';
+
 const writeKey = process.env.NEXT_PUBLIC_SEGMENT_WRITE_KEY;
 
 interface LoadedAnalytics {
@@ -79,6 +81,8 @@ export function identify(
     role?: string | null;
   }
 ) {
+  logAnalytics('identify', { traits, userId });
+
   return enqueue(() => dispatch((browser) => browser.identify(userId, traits)));
 }
 
@@ -87,10 +91,14 @@ export function loadAnalytics() {
 }
 
 export function page() {
+  logAnalytics('page');
+
   return enqueue(() => dispatch((browser) => browser.page()));
 }
 
 export function reset() {
+  logAnalytics('reset');
+
   return enqueue(() => dispatch((browser) => Promise.resolve(browser.reset())));
 }
 
@@ -98,5 +106,7 @@ export function captureEvent(
   event: string,
   properties?: Record<string, unknown>
 ) {
+  logAnalytics(event, properties);
+
   return enqueue(() => dispatch((browser) => browser.track(event, properties)));
 }
