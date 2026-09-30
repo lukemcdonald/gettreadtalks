@@ -74,7 +74,7 @@ function getTalkFormDefaultValues(
 
   return {
     collectionId,
-    collectionOrder,
+    collectionOrder: collectionId ? collectionOrder : undefined,
     description,
     featured,
     mediaUrl,
