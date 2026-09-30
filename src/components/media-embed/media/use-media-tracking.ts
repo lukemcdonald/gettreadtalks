@@ -29,7 +29,9 @@ export function useMediaTracking({
     if (trackingContext.entityType === 'talk') {
       track('talk_played', {
         media_type: mediaType,
-        speaker_slug: trackingContext.speakerSlug ?? '',
+        ...(trackingContext.speakerSlug
+          ? { speaker_slug: trackingContext.speakerSlug }
+          : {}),
         talk_id: trackingContext.entityId,
         talk_slug: trackingContext.entitySlug,
       });
@@ -52,7 +54,9 @@ export function useMediaTracking({
     if (trackingContext.entityType === 'talk') {
       track('talk_paused', {
         progress_pct,
-        speaker_slug: trackingContext.speakerSlug ?? '',
+        ...(trackingContext.speakerSlug
+          ? { speaker_slug: trackingContext.speakerSlug }
+          : {}),
         talk_id: trackingContext.entityId,
         talk_slug: trackingContext.entitySlug,
       });
@@ -72,7 +76,9 @@ export function useMediaTracking({
 
     if (trackingContext.entityType === 'talk') {
       track('talk_completed', {
-        speaker_slug: trackingContext.speakerSlug ?? '',
+        ...(trackingContext.speakerSlug
+          ? { speaker_slug: trackingContext.speakerSlug }
+          : {}),
         talk_id: trackingContext.entityId,
         talk_slug: trackingContext.entitySlug,
       });

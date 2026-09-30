@@ -20,55 +20,55 @@ export interface EventMap {
   };
   speaker_unfavorited: { speaker_id: string; speaker_slug: string };
   talk_completed: {
-    speaker_slug: string;
+    speaker_slug?: string;
     talk_id: string;
     talk_slug: string;
   };
   talk_favorited: {
-    speaker_slug: string;
+    speaker_slug?: string;
     talk_id: string;
     talk_slug: string;
   };
   talk_featured: {
-    speaker_slug: string;
+    speaker_slug?: string;
     talk_id: string;
     talk_slug: string;
   };
   talk_finished: {
-    speaker_slug: string;
+    speaker_slug?: string;
     talk_id: string;
     talk_slug: string;
   };
   talk_paused: {
     progress_pct: number;
-    speaker_slug: string;
+    speaker_slug?: string;
     talk_id: string;
     talk_slug: string;
   };
   talk_played: {
     media_type: 'audio' | 'video';
-    speaker_slug: string;
+    speaker_slug?: string;
     talk_id: string;
     talk_slug: string;
   };
   talk_shared: {
     method: 'clipboard' | 'share_api';
-    speaker_slug: string;
+    speaker_slug?: string;
     talk_id: string;
     talk_slug: string;
   };
   talk_unfavorited: {
-    speaker_slug: string;
+    speaker_slug?: string;
     talk_id: string;
     talk_slug: string;
   };
   talk_unfeatured: {
-    speaker_slug: string;
+    speaker_slug?: string;
     talk_id: string;
     talk_slug: string;
   };
   talk_unfinished: {
-    speaker_slug: string;
+    speaker_slug?: string;
     talk_id: string;
     talk_slug: string;
   };
