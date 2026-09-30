@@ -1,7 +1,15 @@
-export interface MediaTrackingContext {
+interface MediaEntity {
   entityId: string;
   entitySlug: string;
-  entityType: 'clip' | 'talk';
-  /** Required for talk events */
-  speakerSlug?: string;
 }
+
+export type MediaTrackingContext = MediaEntity &
+  (
+    | { entityType: 'clip' }
+    | {
+        entityTitle: string;
+        entityType: 'talk';
+        speakerId?: string;
+        speakerSlug?: string;
+      }
+  );

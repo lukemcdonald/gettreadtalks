@@ -27,7 +27,7 @@ import {
   resetCaptchaIfNeeded,
   TurnstileField,
 } from '@/features/users/components/turnstile-field';
-import { track } from '@/lib/analytics';
+import { track, waitForAnalytics } from '@/lib/analytics';
 import { signUp } from '@/services/auth/client';
 import {
   AUTH_ERRORS,
@@ -93,7 +93,7 @@ export function RegisterForm({
     });
 
     if (result.data) {
-      track('signed_up');
+      await waitForAnalytics(track('signed_up'));
       window.location.assign(redirectTo);
       return;
     }

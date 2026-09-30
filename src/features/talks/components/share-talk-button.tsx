@@ -7,7 +7,7 @@ import { ShareButton } from '@/components/share-button';
 import { talkTrackProps, track } from '@/lib/analytics';
 
 interface ShareTalkButtonProps {
-  speaker?: Pick<Speaker, 'slug'> | null;
+  speaker?: Pick<Speaker, '_id' | 'slug'> | null;
   talk: Pick<Talk, '_id' | 'slug' | 'title'>;
 }
 

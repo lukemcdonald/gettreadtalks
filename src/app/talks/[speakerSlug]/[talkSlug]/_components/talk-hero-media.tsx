@@ -1,13 +1,14 @@
+import type { Speaker } from '@/features/speakers/types';
 import type { Talk } from '@/features/talks/types';
 
 import { MediaEmbed } from '@/components/media-embed';
 
 interface TalkHeroMediaProps {
-  speakerSlug: string;
-  talk: Talk;
+  speaker: Pick<Speaker, '_id' | 'slug'> | null;
+  talk: Pick<Talk, '_id' | 'mediaUrl' | 'slug' | 'title'>;
 }
 
-export function TalkHeroMedia({ speakerSlug, talk }: TalkHeroMediaProps) {
+export function TalkHeroMedia({ speaker, talk }: TalkHeroMediaProps) {
   return (
     <div className="mx-auto w-full max-w-4xl">
       <MediaEmbed
@@ -17,8 +18,10 @@ export function TalkHeroMedia({ speakerSlug, talk }: TalkHeroMediaProps) {
         trackingContext={{
           entityId: talk._id,
           entitySlug: talk.slug,
+          entityTitle: talk.title,
           entityType: 'talk',
-          speakerSlug,
+          speakerId: speaker?._id,
+          speakerSlug: speaker?.slug,
         }}
       />
     </div>

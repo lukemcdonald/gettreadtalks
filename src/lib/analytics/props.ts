@@ -9,12 +9,13 @@ export function speakerTrackProps(speaker: Pick<Speaker, '_id' | 'slug'>) {
 }
 
 export function talkTrackProps(
-  talk: Pick<Talk, '_id' | 'slug'>,
-  speaker?: Pick<Speaker, 'slug'> | null
+  talk: Pick<Talk, '_id' | 'slug' | 'title'>,
+  speaker?: Pick<Speaker, '_id' | 'slug'> | null
 ) {
   return {
-    ...(speaker?.slug ? { speaker_slug: speaker.slug } : {}),
+    ...(speaker ? { speaker_id: speaker._id, speaker_slug: speaker.slug } : {}),
     talk_id: talk._id,
     talk_slug: talk.slug,
+    talk_title: talk.title,
   };
 }

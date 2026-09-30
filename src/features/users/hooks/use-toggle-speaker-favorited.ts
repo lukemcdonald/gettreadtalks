@@ -19,24 +19,22 @@ export function useToggleSpeakerFavorited({
   const { clearOptimistic, isActive, isLoading, toggle } = useOptimisticToggle({
     data,
     onToggle: (next) => {
-      const properties = speakerTrackProps(speaker);
-
       if (next) {
         favorite.mutate({ speakerId });
-        track('speaker_favorited', properties);
       } else {
         unfavorite.mutate({ speakerId });
-        track('speaker_unfavorited', properties);
       }
     },
   });
 
   const favorite = useMutation(api.users.favoriteSpeaker, {
     onError: clearOptimistic,
+    onSuccess: () => track('speaker_favorited', speakerTrackProps(speaker)),
   });
 
   const unfavorite = useMutation(api.users.unfavoriteSpeaker, {
     onError: clearOptimistic,
+    onSuccess: () => track('speaker_unfavorited', speakerTrackProps(speaker)),
   });
 
   return { isFavorited: isActive, isLoading, toggle };

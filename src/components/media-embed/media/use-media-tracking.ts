@@ -13,6 +13,29 @@ interface UseMediaTrackingOptions {
   trackingContext?: MediaTrackingContext;
 }
 
+function playbackProgress(media: HTMLMediaElement) {
+  const finite = [media.currentTime, media.duration].every(Number.isFinite);
+  if (media.ended || media.duration <= 0 || !finite) {
+    return null;
+  }
+  return Math.min(
+    100,
+    Math.max(0, Math.round((media.currentTime / media.duration) * 100))
+  );
+}
+
+function talkPlaybackProps(
+  context: Extract<MediaTrackingContext, { entityType: 'talk' }>
+) {
+  return {
+    ...(context.speakerId ? { speaker_id: context.speakerId } : {}),
+    ...(context.speakerSlug ? { speaker_slug: context.speakerSlug } : {}),
+    talk_id: context.entityId,
+    talk_slug: context.entitySlug,
+    talk_title: context.entityTitle,
+  };
+}
+
 export function useMediaTracking({
   mediaRef,
   mediaType,
@@ -29,11 +52,7 @@ export function useMediaTracking({
     if (trackingContext.entityType === 'talk') {
       track('talk_played', {
         media_type: mediaType,
-        ...(trackingContext.speakerSlug
-          ? { speaker_slug: trackingContext.speakerSlug }
-          : {}),
-        talk_id: trackingContext.entityId,
-        talk_slug: trackingContext.entitySlug,
+        ...talkPlaybackProps(trackingContext),
       });
     } else {
       track('clip_played', {
@@ -48,17 +67,15 @@ export function useMediaTracking({
       return;
     }
 
-    const el = mediaRef.current;
-    const progress_pct = Math.round((el.currentTime / el.duration) * 100);
+    const progress_pct = playbackProgress(mediaRef.current);
+    if (progress_pct === null) {
+      return;
+    }
 
     if (trackingContext.entityType === 'talk') {
       track('talk_paused', {
         progress_pct,
-        ...(trackingContext.speakerSlug
-          ? { speaker_slug: trackingContext.speakerSlug }
-          : {}),
-        talk_id: trackingContext.entityId,
-        talk_slug: trackingContext.entitySlug,
+        ...talkPlaybackProps(trackingContext),
       });
     } else {
       track('clip_paused', {
@@ -76,11 +93,7 @@ export function useMediaTracking({
 
     if (trackingContext.entityType === 'talk') {
       track('talk_completed', {
-        ...(trackingContext.speakerSlug
-          ? { speaker_slug: trackingContext.speakerSlug }
-          : {}),
-        talk_id: trackingContext.entityId,
-        talk_slug: trackingContext.entitySlug,
+        ...talkPlaybackProps(trackingContext),
       });
     } else {
       track('clip_completed', {

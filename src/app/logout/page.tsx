@@ -5,7 +5,7 @@ import type { Route } from 'next';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 
-import { track } from '@/lib/analytics';
+import { track, waitForAnalytics } from '@/lib/analytics';
 import { signOut } from '@/services/auth/client';
 import { captureException } from '@/services/errors/client';
 
@@ -19,7 +19,7 @@ export default function LogoutPage() {
     const handleLogout = async () => {
       try {
         await signOut();
-        track('signed_out');
+        await waitForAnalytics(track('signed_out'));
       } catch (error) {
         captureException(error, {
           fingerprint: ['auth', 'signOut'],

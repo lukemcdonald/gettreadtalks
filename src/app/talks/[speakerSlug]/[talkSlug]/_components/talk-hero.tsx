@@ -6,19 +6,16 @@ import { TalkHeroMedia } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/
 import { Container, Section } from '@/components/ui';
 
 interface TalkHeroProps {
-  speaker: Speaker | null;
-  speakerSlug: string;
-  talk: Talk;
+  speaker: Pick<Speaker, '_id' | 'firstName' | 'lastName' | 'slug'> | null;
+  talk: Pick<Talk, '_id' | 'mediaUrl' | 'slug' | 'title'>;
 }
 
-export function TalkHero({ speaker, speakerSlug, talk }: TalkHeroProps) {
+export function TalkHero({ speaker, talk }: TalkHeroProps) {
   return (
     <Section className="bg-background relative overflow-hidden py-6 sm:py-8 md:py-12 lg:py-16">
       <Container className="relative space-y-8">
         <TalkHeroDetails speaker={speaker} talk={talk} />
-        {talk.mediaUrl && (
-          <TalkHeroMedia speakerSlug={speakerSlug} talk={talk} />
-        )}
+        {talk.mediaUrl && <TalkHeroMedia speaker={speaker} talk={talk} />}
       </Container>
     </Section>
   );

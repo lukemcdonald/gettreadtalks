@@ -1,5 +1,7 @@
 'use client';
 
+import type { SpeakerId } from '@/features/speakers/types';
+
 import { ExternalLinkIcon } from 'lucide-react';
 
 import { Link } from '@/components/ui';
@@ -9,6 +11,7 @@ import { cn } from '@/utils';
 interface SpeakerMinistryLinkProps {
   className?: string;
   ministry?: string;
+  speakerId: SpeakerId;
   speakerSlug: string;
   websiteUrl?: string;
 }
@@ -16,12 +19,14 @@ interface SpeakerMinistryLinkProps {
 export function SpeakerMinistryLink({
   className,
   ministry,
+  speakerId,
   speakerSlug,
   websiteUrl,
 }: SpeakerMinistryLinkProps) {
   const handleClick = (url: string, linkType: string) => {
     track('speaker_link_clicked', {
       link_type: linkType,
+      speaker_id: speakerId,
       speaker_slug: speakerSlug,
       url,
     });

@@ -13,6 +13,8 @@ export function SpeakerMetadataSidebar({
   hideAbout,
   speaker,
 }: SpeakerMetadataSidebarProps) {
+  const actionSpeaker = { _id: speaker._id, slug: speaker.slug };
+
   return (
     <div className="flex flex-col gap-8 sm:flex-row sm:flex-wrap sm:gap-12 lg:flex-col lg:gap-8">
       {/* About */}
@@ -36,6 +38,7 @@ export function SpeakerMetadataSidebar({
           <SpeakerMinistryLink
             className="text-foreground text-sm"
             ministry={speaker.ministry}
+            speakerId={speaker._id}
             speakerSlug={speaker.slug}
             websiteUrl={speaker.websiteUrl}
           />
@@ -48,8 +51,14 @@ export function SpeakerMetadataSidebar({
           Actions
         </h3>
         <div className="flex flex-wrap gap-2">
-          <ShareSpeakerButton speaker={speaker} />
-          <FavoriteSpeakerButton speaker={speaker} />
+          <ShareSpeakerButton
+            speaker={{
+              ...actionSpeaker,
+              firstName: speaker.firstName,
+              lastName: speaker.lastName,
+            }}
+          />
+          <FavoriteSpeakerButton speaker={actionSpeaker} />
         </div>
       </div>
     </div>
