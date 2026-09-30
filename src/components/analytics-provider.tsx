@@ -8,25 +8,10 @@ import { Suspense, useEffect } from 'react';
 import { useCurrentUser } from '@/features/users/hooks/use-current-user';
 import { identify, loadAnalytics, page, reset } from '@/lib/analytics';
 
-function AnalyticsPageView() {
+function AnalyticsLifecycle() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
-
-  useEffect(() => {
-    if (!pathname) {
-      return;
-    }
-
-    void page({
-      path: pathname,
-      search: searchParams.toString(),
-    });
-  }, [pathname, searchParams]);
-
-  return null;
-}
-
-function AnalyticsIdentify() {
+  const locationKey = pathname ? `${pathname}?${searchParams.toString()}` : '';
   const { data: user, isLoading } = useCurrentUser();
 
   useEffect(() => {
@@ -47,6 +32,14 @@ function AnalyticsIdentify() {
     void reset();
   }, [isLoading, user]);
 
+  useEffect(() => {
+    if (isLoading || !locationKey) {
+      return;
+    }
+
+    void page();
+  }, [isLoading, locationKey]);
+
   return null;
 }
 
@@ -58,9 +51,8 @@ export function AnalyticsProvider({ children }: { children: ReactNode }) {
   return (
     <>
       <Suspense fallback={null}>
-        <AnalyticsPageView />
+        <AnalyticsLifecycle />
       </Suspense>
-      <AnalyticsIdentify />
       {children}
     </>
   );
