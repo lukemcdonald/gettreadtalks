@@ -1,6 +1,6 @@
 'use client';
 
-import type { TalkId } from '@/features/talks/types';
+import type { SpeakerTrackEntity, TalkTrackEntity } from '@/lib/analytics';
 
 import { useQuery } from 'convex/react';
 
@@ -12,8 +12,8 @@ export function useToggleTalkFeatured({
   speaker,
   talk,
 }: {
-  speaker?: { slug: string } | null;
-  talk: { _id: TalkId; slug: string };
+  speaker?: Pick<SpeakerTrackEntity, 'slug'> | null;
+  talk: TalkTrackEntity;
 }) {
   const talkId = talk._id;
   const talkDoc = useQuery(api.talks.getTalk, { id: talkId });
@@ -24,7 +24,7 @@ export function useToggleTalkFeatured({
       update.mutate({ featured: next, talkId });
       track(
         next ? 'talk_featured' : 'talk_unfeatured',
-        talkTrackProps(talk, speaker?.slug ?? '')
+        talkTrackProps(talk, speaker)
       );
     },
   });
