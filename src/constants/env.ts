@@ -1,25 +1,23 @@
 /**
- * Environment constants
+ * NODE_ENV is the Node/Next runtime mode (development, production, test).
+ * `next dev` is development. `next build`, `next start`, and every Vercel
+ * deploy (preview and production) are production.
  *
- * Standardized environment naming for Sentry integration:
- * - "prod": Production deployment on Vercel
- * - "dev": Preview deployment on Vercel
- * - "local": Local development
+ * NEXT_PUBLIC_VERCEL_ENV is the Vercel target (production, preview,
+ * development). Vercel inlines it at build time. Unset locally.
  *
- * - NODE_ENV: What operation mode Node.js is running in (development/production/test)
- * - DEPLOY_ENV: What environment the app is running in (prod/dev/local)
- *
- * Requires NEXT_PUBLIC_VERCEL_ENV set in Vercel project settings to ${VERCEL_ENV}.
- * Using NEXT_PUBLIC_* ensures the same variable works in both server and client contexts.
+ * DEPLOY_ENV is a Sentry label derived from that Vercel target:
+ * production → prod, preview → dev, anything else → local.
  */
 
 type DeployEnvironment = 'prod' | 'dev' | 'local';
 
-// NODE_ENV based constants (for debugging behavior)
+export const DEPLOY_ENV = getStandardizedEnvironment();
+
 export const IS_DEV = process.env.NODE_ENV === 'development';
 
-// Standardized environment constants (for Sentry integration)
-export const DEPLOY_ENV = getStandardizedEnvironment();
+export const LOG_ANALYTICS_TO_CONSOLE =
+  IS_DEV || process.env.NEXT_PUBLIC_VERCEL_ENV === 'preview';
 
 function getStandardizedEnvironment(): DeployEnvironment {
   switch (process.env.NEXT_PUBLIC_VERCEL_ENV) {

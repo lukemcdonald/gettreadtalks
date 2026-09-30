@@ -1,7 +1,7 @@
-import { DEPLOY_ENV } from '@/constants/env';
+import { LOG_ANALYTICS_TO_CONSOLE } from '@/constants/env';
 
 export function logAnalytics(action: string, payload?: unknown) {
-  if (DEPLOY_ENV === 'prod') {
+  if (!LOG_ANALYTICS_TO_CONSOLE) {
     return;
   }
 
