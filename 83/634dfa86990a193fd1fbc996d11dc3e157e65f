@@ -1,0 +1,21 @@
+src/constants/env.ts
+  s_21cbc4f36f873b::t_0e4bc1948014b3 2-4,6-7,9-10,15-16,19-20
+src/lib/analytics/log.ts
+  s_21cbc4f36f873b::t_ca59bbf47d7432 1,4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "83634dfa86990a193fd1fbc996d11dc3e157e65f",
+  "prompts": {},
+  "sessions": {
+    "s_21cbc4f36f873b": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "e4ca8f8e-ed5e-4956-a635-4de9078080c6",
+        "model": "grok-4.6"
+      },
+      "human_author": "Luke McDonald <thelukemcdonald@gmail.com>"
+    }
+  }
+}
