@@ -7,6 +7,7 @@ import type { TalkStatus } from '@/features/talks/types';
 import type { TopicListItem } from '@/features/topics/types';
 import type { Control, UseFormSetValue } from 'react-hook-form';
 
+import { useEffect } from 'react';
 import { Controller, useWatch } from 'react-hook-form';
 
 import {
@@ -43,10 +44,21 @@ export function TalkCollectionFields({
   control,
   setValue,
 }: TalkCollectionFieldsProps) {
-  const collectionId = useWatch({
+  const [collectionId, collectionOrder] = useWatch({
     control,
-    name: 'collectionId',
+    name: ['collectionId', 'collectionOrder'],
   });
+
+  useEffect(() => {
+    if (collectionId || collectionOrder === undefined) {
+      return;
+    }
+
+    setValue('collectionOrder', undefined, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+  }, [collectionId, collectionOrder, setValue]);
 
   return (
     <>
@@ -58,14 +70,6 @@ export function TalkCollectionFields({
             collections={collections}
             onValueChange={(value) => {
               field.onChange(value);
-              if (value) {
-                return;
-              }
-
-              setValue('collectionOrder', undefined, {
-                shouldDirty: true,
-                shouldValidate: true,
-              });
             }}
             value={field.value}
           />
