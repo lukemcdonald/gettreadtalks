@@ -70,16 +70,9 @@ export function identify(
       return;
     }
     resetUser(client, userId);
-    lastIdentifyKey = key;
     logAnalytics('identify', { userId });
-    try {
-      await client.identify(userId, traits, options);
-    } catch (error: unknown) {
-      if (lastIdentifyKey === key) {
-        lastIdentifyKey = undefined;
-      }
-      throw error;
-    }
+    await client.identify(userId, traits, options);
+    lastIdentifyKey = key;
   });
 }
 

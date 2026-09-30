@@ -335,6 +335,31 @@ test('failed identify can be retried with the same traits', async () => {
   assert.equal(attempts, 2);
 });
 
+test('talkTrackProps and speakerTrackProps emit slugs only when present', async () => {
+  const source = await loadSource('src/lib/analytics/props.ts');
+  const withoutSpeaker = source.talkTrackProps({
+    _id: 't1',
+    slug: 'talk',
+    title: 'Talk',
+  });
+  assert.equal(withoutSpeaker.talk_id, 't1');
+  assert.equal(withoutSpeaker.talk_slug, 'talk');
+  assert.equal(withoutSpeaker.talk_title, 'Talk');
+  assert.equal(withoutSpeaker.speaker_slug, undefined);
+  const withSpeaker = source.talkTrackProps(
+    { _id: 't1', slug: 'talk', title: 'Talk' },
+    { _id: 's1', slug: 'speaker' }
+  );
+  assert.equal(withSpeaker.speaker_id, 's1');
+  assert.equal(withSpeaker.speaker_slug, 'speaker');
+  const speakerProps = source.speakerTrackProps({
+    _id: 's1',
+    slug: 'speaker',
+  });
+  assert.equal(speakerProps.speaker_id, 's1');
+  assert.equal(speakerProps.speaker_slug, 'speaker');
+});
+
 test('URL policy rejects unsafe URLs and strips consecutive sensitive parameters', async () => {
   const source = await loadSource('src/lib/analytics/page-context.ts');
   const sanitize = (url) => source.sanitizePageProperties({ url }).url;
@@ -389,4 +414,32 @@ test('native media excludes invalid progress and separates completion from pause
   assert.equal(events[0].properties.speaker_id, 'speaker-1');
   assert.equal(events[0].properties.talk_title, 'Talk');
   assert.ok(!Object.hasOwn(events[0].properties, 'speaker_slug'));
+});
+
+test('native media includes speaker slug when provided', async () => {
+  const events = [];
+  const source = await loadSource(
+    'src/components/media-embed/media/use-media-tracking.ts',
+    {},
+    {
+      '@/lib/analytics': {
+        track: (event, properties) => events.push({ event, properties }),
+      },
+      react: { useRef: (current) => ({ current }) },
+    }
+  );
+  const handlers = source.useMediaTracking({
+    mediaRef: { current: { currentTime: 0, duration: 10, ended: false } },
+    mediaType: 'audio',
+    trackingContext: {
+      entityId: 'talk-1',
+      entitySlug: 'talk',
+      entityTitle: 'Talk',
+      entityType: 'talk',
+      speakerId: 'speaker-1',
+      speakerSlug: 'speaker',
+    },
+  });
+  handlers.handlePlay();
+  assert.equal(events[0].properties.speaker_slug, 'speaker');
 });
