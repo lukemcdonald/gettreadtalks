@@ -81,7 +81,7 @@ export function identify(
     role?: string | null;
   }
 ) {
-  logAnalytics('identify', { traits, userId });
+  logAnalytics('identify', { userId });
 
   return enqueue(() => dispatch((browser) => browser.identify(userId, traits)));
 }
