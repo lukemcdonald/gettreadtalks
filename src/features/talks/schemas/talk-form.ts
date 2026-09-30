@@ -13,9 +13,10 @@ export const talkFormSchema = z.object({
   mediaUrl: z.url('Please enter a valid URL'),
   scripture: z.string().optional(),
   slug: z.string().trim().optional(),
-  speakerId: zid('speakers').refine((value) => value.length > 0, {
-    error: 'Speaker is required',
-  }),
+  speakerId: z
+    .string({ error: 'Speaker is required' })
+    .min(1, 'Speaker is required')
+    .pipe(zid('speakers')),
   status: z
     .enum(['approved', 'archived', 'backlog', 'published'])
     .default('backlog'),
