@@ -145,6 +145,7 @@ export function EditTalkSheet({
           collections={collections}
           control={form.control}
           mode="edit"
+          setValue={form.setValue}
           speakers={speakers}
           topics={topics}
         />

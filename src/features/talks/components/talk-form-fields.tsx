@@ -1,15 +1,13 @@
 'use client';
 
-import type {
-  CollectionId,
-  CollectionListItem,
-} from '@/features/collections/types';
+import type { CollectionListItem } from '@/features/collections/types';
 import type { SpeakerId, SpeakerListItem } from '@/features/speakers/types';
+import type { TalkFormData } from '@/features/talks/schemas/talk-form';
 import type { TalkStatus } from '@/features/talks/types';
 import type { TopicListItem } from '@/features/topics/types';
-import type { Control, FieldValues, Path } from 'react-hook-form';
+import type { Control, UseFormSetValue } from 'react-hook-form';
 
-import { Controller } from 'react-hook-form';
+import { Controller, useWatch } from 'react-hook-form';
 
 import {
   FeaturedField,
@@ -23,31 +21,83 @@ import { CollectionSelectField } from '@/features/collections/components/collect
 import { SpeakerField } from '@/features/speakers/components/speaker-field';
 import { TopicField } from '@/features/topics/components/topic-field';
 
-interface TalkFormFieldsProps<T extends FieldValues> {
+interface TalkCollectionFieldsProps {
   collections: CollectionListItem[];
-  control: Control<T>;
+  control: Control<TalkFormData>;
+  setValue: UseFormSetValue<TalkFormData>;
+}
+
+interface TalkFormFieldsProps {
+  collections: CollectionListItem[];
+  control: Control<TalkFormData>;
   mode?: 'create' | 'edit';
   onSpeakerCreated?: (speakerId: SpeakerId) => void;
   onStatusChange?: (status: TalkStatus) => void;
+  setValue: UseFormSetValue<TalkFormData>;
   speakers: SpeakerListItem[];
   topics: TopicListItem[];
 }
 
-export function TalkFormFields<T extends FieldValues>({
+export function TalkCollectionFields({
+  collections,
+  control,
+  setValue,
+}: TalkCollectionFieldsProps) {
+  const collectionId = useWatch({
+    control,
+    name: 'collectionId',
+  });
+
+  return (
+    <>
+      <Controller
+        control={control}
+        name="collectionId"
+        render={({ field }) => (
+          <CollectionSelectField
+            collections={collections}
+            onValueChange={(value) => {
+              field.onChange(value);
+              if (value) {
+                return;
+              }
+
+              setValue('collectionOrder', undefined, {
+                shouldDirty: true,
+                shouldValidate: true,
+              });
+            }}
+            value={field.value}
+          />
+        )}
+      />
+      {collectionId ? (
+        <NumberField
+          control={control}
+          label="Collection Order"
+          name="collectionOrder"
+        />
+      ) : null}
+    </>
+  );
+}
+
+export function TalkFormFields({
   collections,
   control,
   mode = 'create',
   onSpeakerCreated,
   onStatusChange,
+  setValue,
   speakers,
   topics,
-}: TalkFormFieldsProps<T>) {
+}: TalkFormFieldsProps) {
   return (
     <div className="space-y-4">
       <TextField
         control={control}
         label="Title"
-        name={'title' as Path<T>}
+        name="title"
         placeholder="The Gospel of Grace"
         required
       />
@@ -57,14 +107,14 @@ export function TalkFormFields<T extends FieldValues>({
           control={control}
           description="Changing this will change the talk URL"
           label="Slug"
-          name={'slug' as Path<T>}
+          name="slug"
         />
       )}
 
       <SpeakerField
         control={control}
         label="Speaker"
-        name={'speakerId' as Path<T>}
+        name="speakerId"
         onSpeakerCreated={onSpeakerCreated}
         required
         speakers={speakers}
@@ -73,7 +123,7 @@ export function TalkFormFields<T extends FieldValues>({
       <UrlField
         control={control}
         label="Media URL"
-        name={'mediaUrl' as Path<T>}
+        name="mediaUrl"
         placeholder="https://example.com/audio.mp3"
         required
       />
@@ -81,7 +131,7 @@ export function TalkFormFields<T extends FieldValues>({
       <TextareaField
         control={control}
         label="Description"
-        name={'description' as Path<T>}
+        name="description"
         placeholder="A message about..."
         rows={3}
       />
@@ -89,49 +139,21 @@ export function TalkFormFields<T extends FieldValues>({
       <TextField
         control={control}
         label="Scripture"
-        name={'scripture' as Path<T>}
+        name="scripture"
         placeholder="Romans 8:28"
       />
 
-      <TopicField
+      <TopicField control={control} name="topicIds" topics={topics} />
+
+      <TalkCollectionFields
+        collections={collections}
         control={control}
-        name={'topicIds' as Path<T>}
-        topics={topics}
+        setValue={setValue}
       />
 
-      <Controller
-        control={control}
-        name={'collectionId' as Path<T>}
-        render={({ field }) => (
-          <CollectionSelectField
-            collections={collections}
-            onValueChange={(value) => {
-              field.onChange(
-                value === '' ? undefined : (value as CollectionId)
-              );
-            }}
-            value={field.value as CollectionId | undefined}
-          />
-        )}
-      />
+      <StatusField control={control} name="status" onChange={onStatusChange} />
 
-      <NumberField
-        control={control}
-        label="Collection Order"
-        name={'collectionOrder' as Path<T>}
-      />
-
-      <StatusField
-        control={control}
-        name={'status' as Path<T>}
-        onChange={(value) => {
-          if (onStatusChange) {
-            onStatusChange(value as TalkStatus);
-          }
-        }}
-      />
-
-      <FeaturedField control={control} name={'featured' as Path<T>} />
+      <FeaturedField control={control} name="featured" />
     </div>
   );
 }
