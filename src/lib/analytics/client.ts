@@ -58,12 +58,12 @@ async function dispatch(run: (client: Analytics) => unknown) {
   }
 }
 
-function resetUser(client: Analytics, nextUserId: string | null = null) {
+async function resetUser(client: Analytics, nextUserId: string | null = null) {
   const previousId = client.user().id();
 
   if (previousId && previousId !== nextUserId) {
     logAnalytics('reset');
-    client.reset();
+    await client.reset();
   }
 }
 
@@ -88,7 +88,7 @@ export function identify(
         return;
       }
 
-      resetUser(client, userId);
+      await resetUser(client, userId);
       logAnalytics('identify', { userId });
       await client.identify(userId, traits);
       lastIdentifyKey = key;
@@ -110,9 +110,9 @@ export function page() {
 
 export function reset() {
   return enqueue(() =>
-    dispatch((client) => {
+    dispatch(async (client) => {
       lastIdentifyKey = undefined;
-      resetUser(client);
+      await resetUser(client);
     })
   );
 }
