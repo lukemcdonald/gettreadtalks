@@ -1,9 +1,7 @@
-import type { Doc } from '@/convex/_generated/dataModel';
+import type { Speaker } from '@/features/speakers/types';
+import type { Talk } from '@/features/talks/types';
 
-export type SpeakerTrackEntity = Pick<Doc<'speakers'>, '_id' | 'slug'>;
-export type TalkTrackEntity = Pick<Doc<'talks'>, '_id' | 'slug'>;
-
-export function speakerTrackProps(speaker: SpeakerTrackEntity) {
+export function speakerTrackProps(speaker: Pick<Speaker, '_id' | 'slug'>) {
   return {
     speaker_id: speaker._id,
     speaker_slug: speaker.slug,
@@ -11,8 +9,8 @@ export function speakerTrackProps(speaker: SpeakerTrackEntity) {
 }
 
 export function talkTrackProps(
-  talk: TalkTrackEntity,
-  speaker?: Pick<Doc<'speakers'>, 'slug'> | null
+  talk: Pick<Talk, '_id' | 'slug'>,
+  speaker?: Pick<Speaker, 'slug'> | null
 ) {
   return {
     speaker_slug: speaker?.slug ?? '',
