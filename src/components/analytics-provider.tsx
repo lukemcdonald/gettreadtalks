@@ -11,12 +11,9 @@ import { identify, loadAnalytics, page, reset } from '@/lib/analytics';
 function AnalyticsLifecycle() {
   const pathname = usePathname();
   const search = useSearchParams().toString();
-  const { data: user, isLoading } = useCurrentUser();
   const locationKey = search ? `${pathname}?${search}` : pathname;
-  const email = user?.email;
-  const name = user?.name;
-  const role = user?.role;
-  const userId = user?._id;
+  const { data: user, isLoading } = useCurrentUser();
+  const { _id: userId, email, name, role } = user ?? {};
 
   useEffect(() => {
     if (isLoading) {
@@ -24,12 +21,7 @@ function AnalyticsLifecycle() {
     }
 
     if (userId) {
-      void identify(userId, {
-        email,
-        name,
-        role,
-      });
-
+      void identify(userId, { email, name, role });
       return;
     }
 

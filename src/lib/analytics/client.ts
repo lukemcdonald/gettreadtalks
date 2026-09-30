@@ -104,7 +104,13 @@ export function loadAnalytics() {
 }
 
 export function page() {
-  logAnalytics('page');
+  logAnalytics('page', {
+    path: window.location.pathname,
+    referrer: document.referrer,
+    search: window.location.search,
+    title: document.title,
+    url: window.location.href,
+  });
 
   return enqueue(() => dispatch((browser) => browser.page()));
 }
