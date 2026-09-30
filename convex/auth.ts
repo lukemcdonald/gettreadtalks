@@ -74,24 +74,18 @@ function warnIfAuthEnvInvalid(siteUrl: string) {
     return;
   }
 
-  let warned = false;
+  hasWarnedAuthEnv = true;
 
   if (!isTrustedOrigin(siteUrl, TRUSTED_ORIGIN_MATCHERS)) {
     console.warn(
       `SITE_URL "${siteUrl}" is not present in trustedOrigins. Auth links and cookies will target an origin the app does not trust.`
     );
-    warned = true;
   }
 
   if (!isPreviewSiteUrl(siteUrl) && !process.env.TURNSTILE_SECRET_KEY) {
     console.warn(
       'TURNSTILE_SECRET_KEY is not set. Sign-up and password-reset requests will fail captcha verification.'
     );
-    warned = true;
-  }
-
-  if (warned) {
-    hasWarnedAuthEnv = true;
   }
 }
 
