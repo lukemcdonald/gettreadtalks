@@ -1,6 +1,6 @@
 import type { NextConfig } from 'next';
 
-import { withSentryConfig } from '@sentry/nextjs';
+import { withSentryConfig } from '@sentry/nextjs/config';
 
 import { IS_SENTRY_ENABLED } from './src/configs/sentry';
 
