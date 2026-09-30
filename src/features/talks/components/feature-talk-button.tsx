@@ -1,6 +1,7 @@
 'use client';
 
-import type { SpeakerTrackEntity, TalkTrackEntity } from '@/lib/analytics';
+import type { Speaker } from '@/features/speakers/types';
+import type { Talk } from '@/features/talks/types';
 
 import { StarIcon } from 'lucide-react';
 
@@ -9,8 +10,8 @@ import { useToggleTalkFeatured } from '@/features/talks/hooks/use-toggle-talk-fe
 import { useIsAdmin } from '@/features/users/hooks/use-is-admin';
 
 interface FeatureTalkButtonProps {
-  speaker?: Pick<SpeakerTrackEntity, 'slug'> | null;
-  talk: TalkTrackEntity;
+  speaker?: Pick<Speaker, 'slug'> | null;
+  talk: Pick<Talk, '_id' | 'slug'>;
 }
 
 export function FeatureTalkButton({ speaker, talk }: FeatureTalkButtonProps) {

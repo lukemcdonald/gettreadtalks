@@ -1,6 +1,7 @@
 'use client';
 
-import type { SpeakerTrackEntity, TalkTrackEntity } from '@/lib/analytics';
+import type { Speaker } from '@/features/speakers/types';
+import type { Talk } from '@/features/talks/types';
 
 import { useQuery } from 'convex/react';
 
@@ -12,8 +13,8 @@ export function useToggleTalkFeatured({
   speaker,
   talk,
 }: {
-  speaker?: Pick<SpeakerTrackEntity, 'slug'> | null;
-  talk: TalkTrackEntity;
+  speaker?: Pick<Speaker, 'slug'> | null;
+  talk: Pick<Talk, '_id' | 'slug'>;
 }) {
   const talkId = talk._id;
   const talkDoc = useQuery(api.talks.getTalk, { id: talkId });

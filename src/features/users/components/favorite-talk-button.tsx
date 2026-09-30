@@ -1,6 +1,7 @@
 'use client';
 
-import type { SpeakerTrackEntity, TalkTrackEntity } from '@/lib/analytics';
+import type { Speaker } from '@/features/speakers/types';
+import type { Talk } from '@/features/talks/types';
 
 import { Authenticated } from 'convex/react';
 import { HeartIcon } from 'lucide-react';
@@ -9,8 +10,8 @@ import { ToggleIconButton } from '@/components/ui';
 import { useToggleTalkFavorited } from '@/features/users/hooks/use-toggle-talk-favorited';
 
 interface FavoriteTalkButtonProps {
-  speaker?: Pick<SpeakerTrackEntity, 'slug'> | null;
-  talk: TalkTrackEntity;
+  speaker?: Pick<Speaker, 'slug'> | null;
+  talk: Pick<Talk, '_id' | 'slug'>;
 }
 
 function FavoriteButton({ speaker, talk }: FavoriteTalkButtonProps) {

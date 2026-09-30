@@ -1,13 +1,13 @@
 'use client';
 
-import type { Doc } from '@/convex/_generated/dataModel';
+import type { Speaker } from '@/features/speakers/types';
 
 import { ShareButton } from '@/components/share-button';
 import { getSpeakerName } from '@/features/speakers/utils';
 import { speakerTrackProps, track } from '@/lib/analytics';
 
 interface ShareSpeakerButtonProps {
-  speaker: Pick<Doc<'speakers'>, '_id' | 'firstName' | 'lastName' | 'slug'>;
+  speaker: Pick<Speaker, '_id' | 'firstName' | 'lastName' | 'slug'>;
 }
 
 export function ShareSpeakerButton({ speaker }: ShareSpeakerButtonProps) {
