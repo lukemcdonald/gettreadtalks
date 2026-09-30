@@ -9,6 +9,7 @@ interface LoadedAnalytics {
 }
 
 let clientPromise: Promise<LoadedAnalytics | undefined> | undefined;
+let dispatchQueue: Promise<void> = Promise.resolve();
 
 async function loadClient(key: string): Promise<LoadedAnalytics | undefined> {
   try {
@@ -45,7 +46,32 @@ function getClient(): Promise<LoadedAnalytics | undefined> {
   return clientPromise;
 }
 
-export async function identify(
+function enqueue(task: () => Promise<void>): Promise<void> {
+  const run = dispatchQueue.then(task, task);
+
+  dispatchQueue = run.then(
+    () => {},
+    () => {}
+  );
+
+  return run;
+}
+
+async function dispatch(run: (browser: AnalyticsBrowser) => Promise<unknown>) {
+  try {
+    const loaded = await getClient();
+
+    if (!loaded) {
+      return;
+    }
+
+    await run(loaded.browser);
+  } catch (error: unknown) {
+    console.error('[analytics]', error);
+  }
+}
+
+export function identify(
   userId: string,
   traits: {
     email?: string | null;
@@ -53,48 +79,24 @@ export async function identify(
     role?: string | null;
   }
 ) {
-  const loaded = await getClient();
-
-  if (!loaded) {
-    return;
-  }
-
-  void loaded.browser.identify(userId, traits);
+  return enqueue(() => dispatch((browser) => browser.identify(userId, traits)));
 }
 
 export function loadAnalytics() {
   void getClient();
 }
 
-export async function page(properties: { path: string; search: string }) {
-  const loaded = await getClient();
-
-  if (!loaded) {
-    return;
-  }
-
-  void loaded.browser.page(properties);
+export function page() {
+  return enqueue(() => dispatch((browser) => browser.page()));
 }
 
-export async function reset() {
-  const loaded = await getClient();
-
-  if (!loaded) {
-    return;
-  }
-
-  void loaded.browser.reset();
+export function reset() {
+  return enqueue(() => dispatch((browser) => Promise.resolve(browser.reset())));
 }
 
-export async function captureEvent(
+export function captureEvent(
   event: string,
   properties?: Record<string, unknown>
 ) {
-  const loaded = await getClient();
-
-  if (!loaded) {
-    return;
-  }
-
-  void loaded.browser.track(event, properties);
+  return enqueue(() => dispatch((browser) => browser.track(event, properties)));
 }
