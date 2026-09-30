@@ -27,6 +27,7 @@ import type * as lib_rateLimiter from "../lib/rateLimiter.js";
 import type * as lib_rotateContent from "../lib/rotateContent.js";
 import type * as lib_sentry from "../lib/sentry.js";
 import type * as lib_sort from "../lib/sort.js";
+import type * as lib_turnstile from "../lib/turnstile.js";
 import type * as lib_types from "../lib/types.js";
 import type * as lib_utils from "../lib/utils.js";
 import type * as lib_validators_index from "../lib/validators/index.js";
@@ -98,6 +99,7 @@ declare const fullApi: ApiFromModules<{
   "lib/rotateContent": typeof lib_rotateContent;
   "lib/sentry": typeof lib_sentry;
   "lib/sort": typeof lib_sort;
+  "lib/turnstile": typeof lib_turnstile;
   "lib/types": typeof lib_types;
   "lib/utils": typeof lib_utils;
   "lib/validators/index": typeof lib_validators_index;
