@@ -59,7 +59,6 @@ const nextConfig = {
       },
     ],
   },
-  partialPrefetching: true,
   typedRoutes: false,
 } satisfies NextConfig;
 
