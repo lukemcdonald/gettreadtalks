@@ -44,7 +44,7 @@ A modern, full-stack faith-based talks and content platform built with Next.js, 
 
 Use two Segment JavaScript sources (dev and prod), each with its own write key.
 
-1. Set `NEXT_PUBLIC_SEGMENT_WRITE_KEY` to the matching source key in `.env.local` (dev) and Vercel (prod).
+1. Set `NEXT_PUBLIC_SEGMENT_WRITE_KEY` to the matching source key in `.env.local` (dev) and in Vercel on the Production environment only (do not set it on Preview, so preview builds skip Segment).
 2. Create two Mixpanel projects (dev and prod). Copy each project token from Mixpanel Project Settings.
 3. In Segment, add a Mixpanel Actions destination to each JS source. Paste the matching Mixpanel project token into the destination. Do not put a Mixpanel token in Next.js env.
 4. Keep default mappings for Page, Identify, and Track. Use cloud-mode (Actions). Do not enable classic Mixpanel device-mode.
