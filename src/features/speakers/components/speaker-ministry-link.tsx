@@ -3,7 +3,7 @@
 import { ExternalLinkIcon } from 'lucide-react';
 
 import { Link } from '@/components/ui';
-import { useAnalytics } from '@/lib/analytics';
+import { track } from '@/lib/analytics';
 import { cn } from '@/utils';
 
 interface SpeakerMinistryLinkProps {
@@ -19,8 +19,6 @@ export function SpeakerMinistryLink({
   speakerSlug,
   websiteUrl,
 }: SpeakerMinistryLinkProps) {
-  const { track } = useAnalytics();
-
   const handleClick = (url: string, linkType: string) => {
     track('speaker_link_clicked', {
       link_type: linkType,

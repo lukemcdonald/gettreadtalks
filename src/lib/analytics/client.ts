@@ -1,28 +1,100 @@
 'use client';
 
-import { AnalyticsBrowser } from '@segment/analytics-next';
+import type { AnalyticsBrowser } from '@segment/analytics-next';
 
-export const analytics = new AnalyticsBrowser();
+const writeKey = process.env.NEXT_PUBLIC_SEGMENT_WRITE_KEY;
 
-let loaded = false;
+interface LoadedAnalytics {
+  browser: AnalyticsBrowser;
+}
 
-export function isAnalyticsLoaded() {
-  return loaded;
+let clientPromise: Promise<LoadedAnalytics | undefined> | undefined;
+
+async function loadClient(key: string): Promise<LoadedAnalytics | undefined> {
+  try {
+    const { AnalyticsBrowser } = await import('@segment/analytics-next');
+    const browser = AnalyticsBrowser.load({ writeKey: key });
+
+    void (async () => {
+      try {
+        await browser;
+      } catch (error: unknown) {
+        console.error('[analytics]: failed to load', error);
+        clientPromise = undefined;
+      }
+    })();
+
+    return { browser };
+  } catch (error: unknown) {
+    console.error('[analytics]: failed to load', error);
+    clientPromise = undefined;
+  }
+}
+
+function getClient(): Promise<LoadedAnalytics | undefined> {
+  const key = writeKey;
+
+  if (!key) {
+    return Promise.resolve(undefined as LoadedAnalytics | undefined);
+  }
+
+  if (!clientPromise) {
+    clientPromise = loadClient(key);
+  }
+
+  return clientPromise;
+}
+
+export async function identify(
+  userId: string,
+  traits: {
+    email?: string | null;
+    name?: string | null;
+    role?: string | null;
+  }
+) {
+  const loaded = await getClient();
+
+  if (!loaded) {
+    return;
+  }
+
+  void loaded.browser.identify(userId, traits);
 }
 
 export function loadAnalytics() {
-  if (loaded) {
-    return true;
+  void getClient();
+}
+
+export async function page(properties: { path: string; search: string }) {
+  const loaded = await getClient();
+
+  if (!loaded) {
+    return;
   }
 
-  const writeKey = process.env.NEXT_PUBLIC_SEGMENT_WRITE_KEY;
+  void loaded.browser.page(properties);
+}
 
-  if (!writeKey) {
-    return false;
+export async function reset() {
+  const loaded = await getClient();
+
+  if (!loaded) {
+    return;
   }
 
-  analytics.load({ writeKey });
-  loaded = true;
+  void loaded.browser.reset();
+}
 
-  return true;
+export async function captureEvent(
+  event: string,
+  properties?: Record<string, unknown>
+) {
+  const loaded = await getClient();
+
+  if (!loaded) {
+    return;
+  }
+
+  void loaded.browser.track(event, properties);
 }

@@ -3,12 +3,12 @@
 import type { ReactNode } from 'react';
 
 import { usePathname, useSearchParams } from 'next/navigation';
-import { Suspense, useEffect, useRef, useState } from 'react';
+import { Suspense, useEffect } from 'react';
 
 import { useCurrentUser } from '@/features/users/hooks/use-current-user';
-import { analytics, loadAnalytics } from '@/lib/analytics/client';
+import { identify, loadAnalytics, page, reset } from '@/lib/analytics';
 
-function SegmentPageView() {
+function AnalyticsPageView() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -17,7 +17,7 @@ function SegmentPageView() {
       return;
     }
 
-    void analytics.page({
+    void page({
       path: pathname,
       search: searchParams.toString(),
     });
@@ -26,7 +26,7 @@ function SegmentPageView() {
   return null;
 }
 
-function SegmentIdentify() {
+function AnalyticsIdentify() {
   const { data: user, isLoading } = useCurrentUser();
 
   useEffect(() => {
@@ -35,7 +35,7 @@ function SegmentIdentify() {
     }
 
     if (user) {
-      void analytics.identify(user._id, {
+      void identify(user._id, {
         email: user.email,
         name: user.name,
         role: user.role,
@@ -44,35 +44,23 @@ function SegmentIdentify() {
       return;
     }
 
-    void analytics.reset();
+    void reset();
   }, [isLoading, user]);
 
   return null;
 }
 
 export function AnalyticsProvider({ children }: { children: ReactNode }) {
-  const [isEnabled, setIsEnabled] = useState(false);
-  const initialized = useRef(false);
-
   useEffect(() => {
-    if (initialized.current) {
-      return;
-    }
-
-    initialized.current = true;
-    setIsEnabled(loadAnalytics());
+    loadAnalytics();
   }, []);
-
-  if (!isEnabled) {
-    return children;
-  }
 
   return (
     <>
       <Suspense fallback={null}>
-        <SegmentPageView />
+        <AnalyticsPageView />
       </Suspense>
-      <SegmentIdentify />
+      <AnalyticsIdentify />
       {children}
     </>
   );
