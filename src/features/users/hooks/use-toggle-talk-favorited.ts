@@ -1,6 +1,6 @@
 'use client';
 
-import type { TalkId } from '@/features/talks/types';
+import type { SpeakerTrackEntity, TalkTrackEntity } from '@/lib/analytics';
 
 import { useQuery } from 'convex/react';
 
@@ -12,8 +12,8 @@ export function useToggleTalkFavorited({
   speaker,
   talk,
 }: {
-  speaker?: { slug: string } | null;
-  talk: { _id: TalkId; slug: string };
+  speaker?: Pick<SpeakerTrackEntity, 'slug'> | null;
+  talk: TalkTrackEntity;
 }) {
   const talkId = talk._id;
   const data = useQuery(api.users.isTalkFavorited, { talkId });
@@ -21,7 +21,7 @@ export function useToggleTalkFavorited({
   const { clearOptimistic, isActive, isLoading, toggle } = useOptimisticToggle({
     data,
     onToggle: (next) => {
-      const properties = talkTrackProps(talk, speaker?.slug ?? '');
+      const properties = talkTrackProps(talk, speaker);
 
       if (next) {
         favorite.mutate({ talkId });

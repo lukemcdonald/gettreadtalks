@@ -1,6 +1,6 @@
 'use client';
 
-import type { SpeakerId } from '@/features/speakers/types';
+import type { SpeakerTrackEntity } from '@/lib/analytics';
 
 import { useQuery } from 'convex/react';
 
@@ -11,7 +11,7 @@ import { speakerTrackProps, track } from '@/lib/analytics';
 export function useToggleSpeakerFavorited({
   speaker,
 }: {
-  speaker: { _id: SpeakerId; slug: string };
+  speaker: SpeakerTrackEntity;
 }) {
   const speakerId = speaker._id;
   const data = useQuery(api.users.isSpeakerFavorited, { speakerId });

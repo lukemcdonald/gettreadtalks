@@ -1,6 +1,6 @@
 'use client';
 
-import type { TalkId } from '@/features/talks/types';
+import type { SpeakerTrackEntity, TalkTrackEntity } from '@/lib/analytics';
 
 import { Authenticated } from 'convex/react';
 import { BookmarkIcon } from 'lucide-react';
@@ -9,8 +9,8 @@ import { ToggleIconButton } from '@/components/ui';
 import { useToggleTalkFinished } from '@/features/users/hooks/use-toggle-talk-finished';
 
 interface FinishTalkButtonProps {
-  speaker?: { slug: string } | null;
-  talk: { _id: TalkId; slug: string };
+  speaker?: Pick<SpeakerTrackEntity, 'slug'> | null;
+  talk: TalkTrackEntity;
 }
 
 function FinishButton({ speaker, talk }: FinishTalkButtonProps) {
