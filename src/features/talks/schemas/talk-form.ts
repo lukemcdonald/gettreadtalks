@@ -1,6 +1,3 @@
-import type { SpeakerId } from '@/features/speakers/types';
-import type { StatusType } from '@/lib/entities/types';
-
 import { zid } from 'convex-helpers/server/zod4';
 import { z } from 'zod';
 
@@ -16,14 +13,12 @@ export const talkFormSchema = z.object({
   mediaUrl: z.url('Please enter a valid URL'),
   scripture: z.string().optional(),
   slug: z.string().trim().optional(),
-  speakerId: z
-    .string()
-    .min(1, 'Speaker is required')
-    .transform((val) => val as SpeakerId),
+  speakerId: zid('speakers').refine((value) => value.length > 0, {
+    error: 'Speaker is required',
+  }),
   status: z
     .enum(['approved', 'archived', 'backlog', 'published'])
-    .default('backlog')
-    .transform((val) => val as StatusType),
+    .default('backlog'),
   title: z.string().trim().min(2, 'Title must be at least 2 characters'),
   topicIds: z.array(zid('topics')).default([]),
 });

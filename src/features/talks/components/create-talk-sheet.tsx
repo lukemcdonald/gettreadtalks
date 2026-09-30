@@ -1,7 +1,7 @@
 'use client';
 
 import type { CollectionListItem } from '@/features/collections/types';
-import type { SpeakerId, SpeakerListItem } from '@/features/speakers/types';
+import type { SpeakerListItem } from '@/features/speakers/types';
 import type { TalkFormData } from '@/features/talks/schemas/talk-form';
 import type { TalkId } from '@/features/talks/types';
 import type { TopicListItem } from '@/features/topics/types';
@@ -46,7 +46,7 @@ export function CreateTalkSheet({
       featured: false,
       mediaUrl: '',
       scripture: '',
-      speakerId: '' as SpeakerId,
+      speakerId: undefined,
       status: 'backlog',
       title: '',
       topicIds: [],
