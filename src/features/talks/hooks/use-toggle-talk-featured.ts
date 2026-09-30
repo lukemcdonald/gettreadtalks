@@ -6,16 +6,26 @@ import { useQuery } from 'convex/react';
 
 import { api } from '@/convex/_generated/api';
 import { useMutation, useOptimisticToggle } from '@/hooks';
-import { track } from '@/lib/analytics';
+import { talkTrackProps, track } from '@/lib/analytics';
 
-export function useToggleTalkFeatured(talkId: TalkId) {
-  const talk = useQuery(api.talks.getTalk, { id: talkId });
+export function useToggleTalkFeatured({
+  speaker,
+  talk,
+}: {
+  speaker?: { slug: string } | null;
+  talk: { _id: TalkId; slug: string };
+}) {
+  const talkId = talk._id;
+  const talkDoc = useQuery(api.talks.getTalk, { id: talkId });
 
   const { clearOptimistic, isActive, isLoading, toggle } = useOptimisticToggle({
-    data: talk?.featured,
+    data: talkDoc?.featured,
     onToggle: (next) => {
       update.mutate({ featured: next, talkId });
-      track(next ? 'talk_featured' : 'talk_unfeatured', { talk_id: talkId });
+      track(
+        next ? 'talk_featured' : 'talk_unfeatured',
+        talkTrackProps(talk, speaker?.slug ?? '')
+      );
     },
   });
 

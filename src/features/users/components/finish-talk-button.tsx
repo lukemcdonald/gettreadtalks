@@ -9,11 +9,15 @@ import { ToggleIconButton } from '@/components/ui';
 import { useToggleTalkFinished } from '@/features/users/hooks/use-toggle-talk-finished';
 
 interface FinishTalkButtonProps {
-  talkId: TalkId;
+  speaker?: { slug: string } | null;
+  talk: { _id: TalkId; slug: string };
 }
 
-function FinishButton({ talkId }: FinishTalkButtonProps) {
-  const { isFinished, isLoading, toggle } = useToggleTalkFinished(talkId);
+function FinishButton({ speaker, talk }: FinishTalkButtonProps) {
+  const { isFinished, isLoading, toggle } = useToggleTalkFinished({
+    speaker,
+    talk,
+  });
 
   return (
     <ToggleIconButton
@@ -27,10 +31,10 @@ function FinishButton({ talkId }: FinishTalkButtonProps) {
   );
 }
 
-export function FinishTalkButton({ talkId }: FinishTalkButtonProps) {
+export function FinishTalkButton({ speaker, talk }: FinishTalkButtonProps) {
   return (
     <Authenticated>
-      <FinishButton talkId={talkId} />
+      <FinishButton speaker={speaker} talk={talk} />
     </Authenticated>
   );
 }

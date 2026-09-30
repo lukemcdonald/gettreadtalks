@@ -3,18 +3,23 @@
 import type { TalkId } from '../types';
 
 import { ShareButton } from '@/components/share-button';
-import { track } from '@/lib/analytics';
+import { talkTrackProps, track } from '@/lib/analytics';
 
 interface ShareTalkButtonProps {
-  talkId: TalkId;
-  talkTitle: string;
+  speaker?: { slug: string } | null;
+  talk: { _id: TalkId; slug: string; title: string };
 }
 
-export function ShareTalkButton({ talkId, talkTitle }: ShareTalkButtonProps) {
+export function ShareTalkButton({ speaker, talk }: ShareTalkButtonProps) {
   return (
     <ShareButton
-      onShare={(method) => track('talk_shared', { method, talk_id: talkId })}
-      title={talkTitle}
+      onShare={(method) =>
+        track('talk_shared', {
+          method,
+          ...talkTrackProps(talk, speaker?.slug ?? ''),
+        })
+      }
+      title={talk.title}
     />
   );
 }

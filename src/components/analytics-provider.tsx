@@ -10,8 +10,7 @@ import { identify, loadAnalytics, page, reset } from '@/lib/analytics';
 
 function AnalyticsLifecycle() {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const locationKey = pathname ? `${pathname}?${searchParams.toString()}` : '';
+  const search = useSearchParams().toString();
   const { data: user, isLoading } = useCurrentUser();
 
   useEffect(() => {
@@ -33,12 +32,15 @@ function AnalyticsLifecycle() {
   }, [isLoading, user]);
 
   useEffect(() => {
-    if (isLoading || !locationKey) {
+    if (isLoading || !pathname) {
       return;
     }
 
-    void page();
-  }, [isLoading, locationKey]);
+    void page({
+      path: pathname,
+      search,
+    });
+  }, [isLoading, pathname, search]);
 
   return null;
 }
