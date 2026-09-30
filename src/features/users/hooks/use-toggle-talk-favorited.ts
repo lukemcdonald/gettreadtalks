@@ -6,11 +6,10 @@ import { useQuery } from 'convex/react';
 
 import { api } from '@/convex/_generated/api';
 import { useMutation, useOptimisticToggle } from '@/hooks';
-import { useAnalytics } from '@/lib/analytics';
+import { track } from '@/lib/analytics';
 
 export function useToggleTalkFavorited(talkId: TalkId) {
   const data = useQuery(api.users.isTalkFavorited, { talkId });
-  const { track } = useAnalytics();
 
   const { clearOptimistic, isActive, isLoading, toggle } = useOptimisticToggle({
     data,

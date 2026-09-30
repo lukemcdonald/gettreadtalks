@@ -5,12 +5,11 @@ import type { Route } from 'next';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 
-import { useAnalytics } from '@/lib/analytics';
+import { track } from '@/lib/analytics';
 import { signOut } from '@/services/auth/client';
 import { captureException } from '@/services/errors/client';
 
 export default function LogoutPage() {
-  const { track } = useAnalytics();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -31,7 +30,7 @@ export default function LogoutPage() {
     };
 
     handleLogout();
-  }, [redirectTo, router, track]);
+  }, [redirectTo, router]);
 
   return null;
 }

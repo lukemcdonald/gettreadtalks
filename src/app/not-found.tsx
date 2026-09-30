@@ -4,15 +4,14 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
 
-import { useAnalytics } from '@/lib/analytics';
+import { track } from '@/lib/analytics';
 
 export default function NotFound() {
   const pathname = usePathname();
-  const { track } = useAnalytics();
 
   useEffect(() => {
     track('not_found_hit', { path: pathname });
-  }, [pathname, track]);
+  }, [pathname]);
 
   return (
     <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 text-center">

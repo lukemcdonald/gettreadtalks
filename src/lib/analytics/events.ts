@@ -1,11 +1,9 @@
+/** Add a key here, then call `track` from `@/lib/analytics`. */
 export interface EventMap {
   clip_completed: { clip_id: string; clip_slug: string };
   clip_paused: { clip_id: string; clip_slug: string; progress_pct: number };
   clip_played: { clip_id: string; clip_slug: string };
-  collection_opened: { collection_id: string; collection_slug: string };
-  filter_applied: { filter_type: string; filter_value: string };
   not_found_hit: { path: string };
-  search_performed: { query: string; results_count?: number };
   signed_in: Record<string, never>;
   signed_out: Record<string, never>;
   signed_up: Record<string, never>;
@@ -31,13 +29,4 @@ export interface EventMap {
   talk_unfavorited: { talk_id: string };
   talk_unfeatured: { talk_id: string };
   talk_unfinished: { talk_id: string };
-  topic_clicked: { topic_id: string; topic_slug: string };
 }
-
-/** Events that carry no payload — derived automatically from EventMap. */
-export type NoPayloadEvents = {
-  [E in keyof EventMap]: EventMap[E] extends Record<string, never> ? E : never;
-}[keyof EventMap];
-
-/** Events that require a payload — everything else. */
-export type PayloadEvents = Exclude<keyof EventMap, NoPayloadEvents>;

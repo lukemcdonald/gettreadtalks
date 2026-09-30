@@ -5,7 +5,7 @@ import type { RefObject } from 'react';
 
 import { useRef } from 'react';
 
-import { useAnalytics } from '@/lib/analytics';
+import { track } from '@/lib/analytics';
 
 interface UseMediaTrackingOptions {
   mediaRef: RefObject<HTMLAudioElement | HTMLVideoElement | null>;
@@ -18,7 +18,6 @@ export function useMediaTracking({
   mediaType,
   trackingContext,
 }: UseMediaTrackingOptions) {
-  const { track } = useAnalytics();
   const hasPlayed = useRef(false);
 
   function handlePlay() {
