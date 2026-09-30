@@ -1,6 +1,6 @@
 'use client';
 
-import type { SpeakerId } from '@/features/speakers/types';
+import type { Speaker } from '@/features/speakers/types';
 
 import { ExternalLinkIcon } from 'lucide-react';
 
@@ -10,24 +10,20 @@ import { cn } from '@/utils';
 
 interface SpeakerMinistryLinkProps {
   className?: string;
-  ministry?: string;
-  speakerId: SpeakerId;
-  speakerSlug: string;
-  websiteUrl?: string;
+  speaker: Pick<Speaker, '_id' | 'ministry' | 'slug' | 'websiteUrl'>;
 }
 
 export function SpeakerMinistryLink({
   className,
-  ministry,
-  speakerId,
-  speakerSlug,
-  websiteUrl,
+  speaker,
 }: SpeakerMinistryLinkProps) {
+  const { _id, ministry, slug, websiteUrl } = speaker;
+
   const handleClick = (url: string, linkType: string) => {
     track('speaker_link_clicked', {
       link_type: linkType,
-      speaker_id: speakerId,
-      speaker_slug: speakerSlug,
+      speaker_id: _id,
+      speaker_slug: slug,
       url,
     });
   };
