@@ -10,5 +10,5 @@ export function track<E extends keyof EventMap>(
 ) {
   const [properties] = args;
 
-  return captureEvent(event, properties);
+  return captureEvent(event, properties as Record<string, unknown> | undefined);
 }

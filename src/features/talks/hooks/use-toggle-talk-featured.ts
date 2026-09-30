@@ -14,7 +14,7 @@ export function useToggleTalkFeatured({
   talk,
 }: {
   speaker?: Pick<Speaker, '_id' | 'slug'> | null;
-  talk: Pick<Talk, '_id' | 'slug' | 'title'>;
+  talk: Pick<Talk, '_id' | 'slug'>;
 }) {
   const talkId = talk._id;
   const talkDoc = useQuery(api.talks.getTalk, { id: talkId });

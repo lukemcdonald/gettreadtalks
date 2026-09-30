@@ -12,17 +12,12 @@ interface TalkActionsProps {
 }
 
 export function TalkActions({ speaker, talk }: TalkActionsProps) {
-  const actionSpeaker = speaker
-    ? { _id: speaker._id, slug: speaker.slug }
-    : null;
-  const actionTalk = { _id: talk._id, slug: talk.slug, title: talk.title };
-
   return (
     <div className="flex flex-wrap gap-2">
-      <ShareTalkButton speaker={actionSpeaker} talk={actionTalk} />
-      <FavoriteTalkButton speaker={actionSpeaker} talk={actionTalk} />
-      <FinishTalkButton speaker={actionSpeaker} talk={actionTalk} />
-      <FeatureTalkButton speaker={actionSpeaker} talk={actionTalk} />
+      <ShareTalkButton speaker={speaker} talk={talk} />
+      <FavoriteTalkButton speaker={speaker} talk={talk} />
+      <FinishTalkButton speaker={speaker} talk={talk} />
+      <FeatureTalkButton speaker={speaker} talk={talk} />
     </div>
   );
 }

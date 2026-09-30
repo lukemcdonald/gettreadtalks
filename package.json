@@ -22,7 +22,6 @@
     "release:full": "pnpm build && pnpm release",
     "start": "next start",
     "style": "ultracite fix .",
-    "test:analytics": "node --experimental-vm-modules --test tests/analytics.test.mjs",
     "typecheck": "tsc --noEmit",
     "update:ui": "pnpm dlx shadcn@latest add @coss/ui --overwrite",
     "update:ui:styles": "pnpm dlx shadcn@latest add @coss/colors-neutral --overwrite"
