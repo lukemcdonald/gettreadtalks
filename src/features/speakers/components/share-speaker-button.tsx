@@ -1,25 +1,25 @@
 'use client';
 
-import type { SpeakerId } from '../types';
+import type { Speaker } from '../types';
 
 import { ShareButton } from '@/components/share-button';
-import { track } from '@/lib/analytics';
+import { getSpeakerName } from '@/features/speakers/utils';
+import { speakerTrackProps, track } from '@/lib/analytics';
 
 interface ShareSpeakerButtonProps {
-  speakerId: SpeakerId;
-  speakerName: string;
+  speaker: Pick<Speaker, '_id' | 'firstName' | 'lastName' | 'slug'>;
 }
 
-export function ShareSpeakerButton({
-  speakerId,
-  speakerName,
-}: ShareSpeakerButtonProps) {
+export function ShareSpeakerButton({ speaker }: ShareSpeakerButtonProps) {
   return (
     <ShareButton
       onShare={(method) =>
-        track('speaker_shared', { method, speaker_id: speakerId })
+        track('speaker_shared', {
+          method,
+          ...speakerTrackProps(speaker),
+        })
       }
-      title={speakerName}
+      title={getSpeakerName(speaker)}
     />
   );
 }

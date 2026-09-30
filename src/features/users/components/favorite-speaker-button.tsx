@@ -9,12 +9,13 @@ import { ToggleIconButton } from '@/components/ui';
 import { useToggleSpeakerFavorited } from '@/features/users/hooks/use-toggle-speaker-favorited';
 
 interface FavoriteSpeakerButtonProps {
-  speakerId: SpeakerId;
+  speaker: { _id: SpeakerId; slug: string };
 }
 
-function FavoriteButton({ speakerId }: FavoriteSpeakerButtonProps) {
-  const { isFavorited, isLoading, toggle } =
-    useToggleSpeakerFavorited(speakerId);
+function FavoriteButton({ speaker }: FavoriteSpeakerButtonProps) {
+  const { isFavorited, isLoading, toggle } = useToggleSpeakerFavorited({
+    speaker,
+  });
 
   return (
     <ToggleIconButton
@@ -28,12 +29,10 @@ function FavoriteButton({ speakerId }: FavoriteSpeakerButtonProps) {
   );
 }
 
-export function FavoriteSpeakerButton({
-  speakerId,
-}: FavoriteSpeakerButtonProps) {
+export function FavoriteSpeakerButton({ speaker }: FavoriteSpeakerButtonProps) {
   return (
     <Authenticated>
-      <FavoriteButton speakerId={speakerId} />
+      <FavoriteButton speaker={speaker} />
     </Authenticated>
   );
 }

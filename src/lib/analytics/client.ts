@@ -90,10 +90,18 @@ export function loadAnalytics() {
   void getClient();
 }
 
-export function page() {
-  logAnalytics('page');
+export function page({ path, search }: { path: string; search: string }) {
+  const query = search ? `?${search}` : '';
+  const properties = {
+    path,
+    referrer: document.referrer,
+    search: query,
+    url: `${window.location.origin}${path}${query}`,
+  };
 
-  return enqueue(() => dispatch((browser) => browser.page()));
+  logAnalytics('page', properties);
+
+  return enqueue(() => dispatch((browser) => browser.page(path, properties)));
 }
 
 export function reset() {

@@ -7,26 +7,69 @@ export interface EventMap {
   signed_in: Record<string, never>;
   signed_out: Record<string, never>;
   signed_up: Record<string, never>;
-  speaker_favorited: { speaker_id: string };
+  speaker_favorited: { speaker_id: string; speaker_slug: string };
   speaker_link_clicked: {
     link_type: string;
     speaker_slug: string;
     url: string;
   };
-  speaker_shared: { method: 'clipboard' | 'share_api'; speaker_id: string };
-  speaker_unfavorited: { speaker_id: string };
-  talk_completed: { talk_id: string; speaker_slug: string };
-  talk_favorited: { talk_id: string };
-  talk_featured: { talk_id: string };
-  talk_finished: { talk_id: string };
-  talk_paused: { talk_id: string; speaker_slug: string; progress_pct: number };
-  talk_played: {
-    talk_id: string;
+  speaker_shared: {
+    method: 'clipboard' | 'share_api';
+    speaker_id: string;
     speaker_slug: string;
-    media_type: 'audio' | 'video';
   };
-  talk_shared: { method: 'clipboard' | 'share_api'; talk_id: string };
-  talk_unfavorited: { talk_id: string };
-  talk_unfeatured: { talk_id: string };
-  talk_unfinished: { talk_id: string };
+  speaker_unfavorited: { speaker_id: string; speaker_slug: string };
+  talk_completed: {
+    speaker_slug: string;
+    talk_id: string;
+    talk_slug: string;
+  };
+  talk_favorited: {
+    speaker_slug: string;
+    talk_id: string;
+    talk_slug: string;
+  };
+  talk_featured: {
+    speaker_slug: string;
+    talk_id: string;
+    talk_slug: string;
+  };
+  talk_finished: {
+    speaker_slug: string;
+    talk_id: string;
+    talk_slug: string;
+  };
+  talk_paused: {
+    progress_pct: number;
+    speaker_slug: string;
+    talk_id: string;
+    talk_slug: string;
+  };
+  talk_played: {
+    media_type: 'audio' | 'video';
+    speaker_slug: string;
+    talk_id: string;
+    talk_slug: string;
+  };
+  talk_shared: {
+    method: 'clipboard' | 'share_api';
+    speaker_slug: string;
+    talk_id: string;
+    talk_slug: string;
+  };
+  talk_unfavorited: {
+    speaker_slug: string;
+    talk_id: string;
+    talk_slug: string;
+  };
+  talk_unfeatured: {
+    speaker_slug: string;
+    talk_id: string;
+    talk_slug: string;
+  };
+  talk_unfinished: {
+    speaker_slug: string;
+    talk_id: string;
+    talk_slug: string;
+  };
 }

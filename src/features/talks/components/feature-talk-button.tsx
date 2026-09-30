@@ -9,12 +9,16 @@ import { useToggleTalkFeatured } from '@/features/talks/hooks/use-toggle-talk-fe
 import { useIsAdmin } from '@/features/users/hooks/use-is-admin';
 
 interface FeatureTalkButtonProps {
-  talkId: TalkId;
+  speaker?: { slug: string } | null;
+  talk: { _id: TalkId; slug: string };
 }
 
-export function FeatureTalkButton({ talkId }: FeatureTalkButtonProps) {
+export function FeatureTalkButton({ speaker, talk }: FeatureTalkButtonProps) {
   const isAdmin = useIsAdmin();
-  const { isFeatured, isLoading, toggle } = useToggleTalkFeatured(talkId);
+  const { isFeatured, isLoading, toggle } = useToggleTalkFeatured({
+    speaker,
+    talk,
+  });
 
   if (!isAdmin) {
     return null;

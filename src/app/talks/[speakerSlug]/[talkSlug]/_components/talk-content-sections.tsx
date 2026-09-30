@@ -100,7 +100,7 @@ export function TalkContentSections({
 
       {/* Metadata Sidebar */}
       <aside className="order-1 lg:sticky lg:top-20 lg:order-2 lg:h-fit">
-        <TalkMetadataSidebar talk={talk} topics={topics} />
+        <TalkMetadataSidebar speaker={speaker} talk={talk} topics={topics} />
       </aside>
     </div>
   );

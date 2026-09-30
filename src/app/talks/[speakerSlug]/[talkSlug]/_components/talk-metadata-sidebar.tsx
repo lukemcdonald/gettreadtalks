@@ -1,3 +1,4 @@
+import type { Speaker } from '@/features/speakers/types';
 import type { Talk } from '@/features/talks/types';
 import type { Topic } from '@/features/topics/types';
 
@@ -10,11 +11,13 @@ import { FavoriteTalkButton } from '@/features/users/components/favorite-talk-bu
 import { FinishTalkButton } from '@/features/users/components/finish-talk-button';
 
 interface TalkMetadataSidebarProps {
+  speaker: Speaker | null;
   talk: Talk;
   topics: Topic[];
 }
 
 export function TalkMetadataSidebar({
+  speaker,
   talk,
   topics,
 }: TalkMetadataSidebarProps) {
@@ -78,10 +81,10 @@ export function TalkMetadataSidebar({
           Actions
         </h3>
         <div className="flex flex-wrap gap-2">
-          <ShareTalkButton talkId={talk._id} talkTitle={talk.title} />
-          <FavoriteTalkButton talkId={talk._id} />
-          <FinishTalkButton talkId={talk._id} />
-          <FeatureTalkButton talkId={talk._id} />
+          <ShareTalkButton speaker={speaker} talk={talk} />
+          <FavoriteTalkButton speaker={speaker} talk={talk} />
+          <FinishTalkButton speaker={speaker} talk={talk} />
+          <FeatureTalkButton speaker={speaker} talk={talk} />
         </div>
       </div>
     </div>

@@ -6,20 +6,27 @@ import { useQuery } from 'convex/react';
 
 import { api } from '@/convex/_generated/api';
 import { useMutation, useOptimisticToggle } from '@/hooks';
-import { track } from '@/lib/analytics';
+import { speakerTrackProps, track } from '@/lib/analytics';
 
-export function useToggleSpeakerFavorited(speakerId: SpeakerId) {
+export function useToggleSpeakerFavorited({
+  speaker,
+}: {
+  speaker: { _id: SpeakerId; slug: string };
+}) {
+  const speakerId = speaker._id;
   const data = useQuery(api.users.isSpeakerFavorited, { speakerId });
 
   const { clearOptimistic, isActive, isLoading, toggle } = useOptimisticToggle({
     data,
     onToggle: (next) => {
+      const properties = speakerTrackProps(speaker);
+
       if (next) {
         favorite.mutate({ speakerId });
-        track('speaker_favorited', { speaker_id: speakerId });
+        track('speaker_favorited', properties);
       } else {
         unfavorite.mutate({ speakerId });
-        track('speaker_unfavorited', { speaker_id: speakerId });
+        track('speaker_unfavorited', properties);
       }
     },
   });

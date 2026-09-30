@@ -31,6 +31,7 @@ export function useMediaTracking({
         media_type: mediaType,
         speaker_slug: trackingContext.speakerSlug ?? '',
         talk_id: trackingContext.entityId,
+        talk_slug: trackingContext.entitySlug,
       });
     } else {
       track('clip_played', {
@@ -53,6 +54,7 @@ export function useMediaTracking({
         progress_pct,
         speaker_slug: trackingContext.speakerSlug ?? '',
         talk_id: trackingContext.entityId,
+        talk_slug: trackingContext.entitySlug,
       });
     } else {
       track('clip_paused', {
@@ -72,6 +74,7 @@ export function useMediaTracking({
       track('talk_completed', {
         speaker_slug: trackingContext.speakerSlug ?? '',
         talk_id: trackingContext.entityId,
+        talk_slug: trackingContext.entitySlug,
       });
     } else {
       track('clip_completed', {
