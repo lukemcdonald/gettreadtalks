@@ -13,8 +13,8 @@ export function useToggleTalkFavorited({
   speaker,
   talk,
 }: {
-  speaker?: Pick<Speaker, 'slug'> | null;
-  talk: Pick<Talk, '_id' | 'slug'>;
+  speaker?: Pick<Speaker, '_id' | 'slug'> | null;
+  talk: Pick<Talk, '_id' | 'slug' | 'title'>;
 }) {
   const talkId = talk._id;
   const data = useQuery(api.users.isTalkFavorited, { talkId });
@@ -22,24 +22,22 @@ export function useToggleTalkFavorited({
   const { clearOptimistic, isActive, isLoading, toggle } = useOptimisticToggle({
     data,
     onToggle: (next) => {
-      const properties = talkTrackProps(talk, speaker);
-
       if (next) {
         favorite.mutate({ talkId });
-        track('talk_favorited', properties);
       } else {
         unfavorite.mutate({ talkId });
-        track('talk_unfavorited', properties);
       }
     },
   });
 
   const favorite = useMutation(api.users.favoriteTalk, {
     onError: clearOptimistic,
+    onSuccess: () => track('talk_favorited', talkTrackProps(talk, speaker)),
   });
 
   const unfavorite = useMutation(api.users.unfavoriteTalk, {
     onError: clearOptimistic,
+    onSuccess: () => track('talk_unfavorited', talkTrackProps(talk, speaker)),
   });
 
   return { isFavorited: isActive, isLoading, toggle };

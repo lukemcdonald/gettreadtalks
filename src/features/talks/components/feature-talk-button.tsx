@@ -10,8 +10,8 @@ import { useToggleTalkFeatured } from '@/features/talks/hooks/use-toggle-talk-fe
 import { useIsAdmin } from '@/features/users/hooks/use-is-admin';
 
 interface FeatureTalkButtonProps {
-  speaker?: Pick<Speaker, 'slug'> | null;
-  talk: Pick<Talk, '_id' | 'slug'>;
+  speaker?: Pick<Speaker, '_id' | 'slug'> | null;
+  talk: Pick<Talk, '_id' | 'slug' | 'title'>;
 }
 
 export function FeatureTalkButton({ speaker, talk }: FeatureTalkButtonProps) {

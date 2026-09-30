@@ -6,8 +6,8 @@ import { Link } from '@/components/ui/link';
 import { getSpeakerName } from '@/features/speakers/utils';
 
 interface TalkHeroDetailsProps {
-  speaker: Speaker | null;
-  talk: Talk;
+  speaker: Pick<Speaker, 'firstName' | 'lastName' | 'slug'> | null;
+  talk: Pick<Talk, 'title'>;
 }
 
 export function TalkHeroDetails({ speaker, talk }: TalkHeroDetailsProps) {

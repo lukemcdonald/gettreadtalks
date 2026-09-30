@@ -10,8 +10,8 @@ import { ToggleIconButton } from '@/components/ui';
 import { useToggleTalkFavorited } from '@/features/users/hooks/use-toggle-talk-favorited';
 
 interface FavoriteTalkButtonProps {
-  speaker?: Pick<Speaker, 'slug'> | null;
-  talk: Pick<Talk, '_id' | 'slug'>;
+  speaker?: Pick<Speaker, '_id' | 'slug'> | null;
+  talk: Pick<Talk, '_id' | 'slug' | 'title'>;
 }
 
 function FavoriteButton({ speaker, talk }: FavoriteTalkButtonProps) {

@@ -22,7 +22,7 @@ import {
   Input,
   PasswordInput,
 } from '@/components/ui';
-import { track } from '@/lib/analytics';
+import { track, waitForAnalytics } from '@/lib/analytics';
 import { signIn } from '@/services/auth/client';
 import { AUTH_ERRORS } from '@/services/auth/config';
 import { captureException } from '@/services/errors/client';
@@ -54,7 +54,7 @@ export function LoginForm({ ...delegated }: ComponentPropsWithoutRef<'form'>) {
       const { data, error: signInError } = await signIn({ email, password });
 
       if (data) {
-        track('signed_in');
+        await waitForAnalytics(track('signed_in'));
         // Use window.location.href to force full page reload and set JWT cookie
         window.location.assign(redirectTo);
       } else {

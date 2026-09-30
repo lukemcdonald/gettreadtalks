@@ -61,6 +61,7 @@ export function SpeakerHeroDetails({
               <SpeakerMinistryLink
                 className="text-muted-foreground"
                 ministry={speaker.ministry}
+                speakerId={speaker._id}
                 speakerSlug={speaker.slug}
                 websiteUrl={speaker.websiteUrl}
               />

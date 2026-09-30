@@ -1,76 +1,54 @@
 'use client';
 
-import type { AnalyticsBrowser } from '@segment/analytics-next';
+import type { Analytics } from '@segment/analytics-next';
 
 import { logAnalytics } from './log';
+import { getPageContext, sanitizePageProperties } from './page-context';
+import { privacyPlugin } from './privacy';
 
 const writeKey = process.env.NEXT_PUBLIC_SEGMENT_WRITE_KEY;
 
-interface LoadedAnalytics {
-  browser: AnalyticsBrowser;
-}
-
-let clientPromise: Promise<LoadedAnalytics | undefined> | undefined;
-let dispatchQueue: Promise<void> = Promise.resolve();
+let clientPromise: Promise<Analytics | undefined> | undefined;
 let lastIdentifyKey: string | undefined;
 
-async function loadClient(key: string): Promise<LoadedAnalytics | undefined> {
+async function loadClient(key: string) {
   try {
     const { AnalyticsBrowser } = await import('@segment/analytics-next');
-    const browser = AnalyticsBrowser.load({ writeKey: key });
-
-    void (async () => {
-      try {
-        await browser;
-      } catch (error: unknown) {
-        console.error('[analytics]: failed to load', error);
-        clientPromise = undefined;
-      }
-    })();
-
-    return { browser };
+    const [client] = await AnalyticsBrowser.load({
+      plugins: [privacyPlugin],
+      writeKey: key,
+    });
+    return client;
   } catch (error: unknown) {
-    console.error('[analytics]: failed to load', error);
     clientPromise = undefined;
+    console.error('[analytics]: failed to load', error);
   }
 }
 
-function getClient(): Promise<LoadedAnalytics | undefined> {
-  const key = writeKey;
-
-  if (!key) {
-    return Promise.resolve(undefined as LoadedAnalytics | undefined);
+function getClient() {
+  if (!writeKey) {
+    return Promise.resolve();
   }
-
-  if (!clientPromise) {
-    clientPromise = loadClient(key);
-  }
-
+  clientPromise ??= loadClient(writeKey);
   return clientPromise;
 }
 
-function enqueue(task: () => Promise<void>): Promise<void> {
-  const run = dispatchQueue.then(task, task);
-
-  dispatchQueue = run.then(
-    () => {},
-    () => {}
-  );
-
-  return run;
-}
-
-async function dispatch(run: (browser: AnalyticsBrowser) => Promise<unknown>) {
+async function dispatch(run: (client: Analytics) => unknown) {
   try {
-    const loaded = await getClient();
-
-    if (!loaded) {
-      return;
+    const client = await getClient();
+    if (client) {
+      await run(client);
     }
-
-    await run(loaded.browser);
   } catch (error: unknown) {
     console.error('[analytics]', error);
+  }
+}
+
+function resetUser(client: Analytics, nextUserId: string | null = null) {
+  const previousId = client.user().id();
+  if (previousId && previousId !== nextUserId) {
+    logAnalytics('reset');
+    client.reset();
   }
 }
 
@@ -82,21 +60,27 @@ export function identify(
     role?: string | null;
   }
 ) {
-  const key = JSON.stringify({
-    email: traits.email ?? '',
-    name: traits.name ?? '',
-    role: traits.role ?? '',
-    userId,
+  const key = JSON.stringify({ ...traits, userId });
+  const options = {
+    context: { page: getPageContext() },
+    timestamp: new Date(),
+  };
+  return dispatch(async (client) => {
+    if (lastIdentifyKey === key) {
+      return;
+    }
+    resetUser(client, userId);
+    lastIdentifyKey = key;
+    logAnalytics('identify', { userId });
+    try {
+      await client.identify(userId, traits, options);
+    } catch (error: unknown) {
+      if (lastIdentifyKey === key) {
+        lastIdentifyKey = undefined;
+      }
+      throw error;
+    }
   });
-
-  if (lastIdentifyKey === key) {
-    return Promise.resolve();
-  }
-
-  lastIdentifyKey = key;
-  logAnalytics('identify', { userId });
-
-  return enqueue(() => dispatch((browser) => browser.identify(userId, traits)));
 }
 
 export function loadAnalytics() {
@@ -104,29 +88,40 @@ export function loadAnalytics() {
 }
 
 export function page() {
-  logAnalytics('page', {
-    path: window.location.pathname,
-    referrer: document.referrer,
-    search: window.location.search,
-    title: document.title,
-    url: window.location.href,
-  });
-
-  return enqueue(() => dispatch((browser) => browser.page()));
+  const properties = getPageContext();
+  const options = { context: { page: properties }, timestamp: new Date() };
+  logAnalytics('page', properties);
+  return dispatch((client) => client.page(properties, options));
 }
 
+/** Clear stale signed-in identity without rotating an anonymous visitor's ID. */
 export function reset() {
-  lastIdentifyKey = undefined;
-  logAnalytics('reset');
-
-  return enqueue(() => dispatch((browser) => Promise.resolve(browser.reset())));
+  return dispatch((client) => {
+    lastIdentifyKey = undefined;
+    resetUser(client);
+  });
 }
 
 export function captureEvent(
   event: string,
   properties?: Record<string, unknown>
 ) {
-  logAnalytics(event, properties);
+  const sanitized = properties ? sanitizePageProperties(properties) : undefined;
+  const options = {
+    context: { page: getPageContext() },
+    timestamp: new Date(),
+  };
+  logAnalytics(event, sanitized);
+  return dispatch((client) => client.track(event, sanitized, options));
+}
 
-  return enqueue(() => dispatch((browser) => browser.track(event, properties)));
+/** Give redirect-bound events a bounded delivery window without blocking auth. */
+export async function waitForAnalytics(event: Promise<void>) {
+  const timeout = Promise.withResolvers<null>();
+  const timer = setTimeout(() => timeout.resolve(null), 500);
+  try {
+    await Promise.race([event, timeout.promise]);
+  } finally {
+    clearTimeout(timer);
+  }
 }

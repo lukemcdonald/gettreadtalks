@@ -5,10 +5,7 @@ import type { Topic } from '@/features/topics/types';
 import { ExternalLinkIcon } from 'lucide-react';
 
 import { Link } from '@/components/ui/link';
-import { FeatureTalkButton } from '@/features/talks/components/feature-talk-button';
-import { ShareTalkButton } from '@/features/talks/components/share-talk-button';
-import { FavoriteTalkButton } from '@/features/users/components/favorite-talk-button';
-import { FinishTalkButton } from '@/features/users/components/finish-talk-button';
+import { TalkActions } from '@/features/talks/components/talk-actions';
 
 interface TalkMetadataSidebarProps {
   speaker: Speaker | null;
@@ -80,12 +77,7 @@ export function TalkMetadataSidebar({
         <h3 className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">
           Actions
         </h3>
-        <div className="flex flex-wrap gap-2">
-          <ShareTalkButton speaker={speaker} talk={talk} />
-          <FavoriteTalkButton speaker={speaker} talk={talk} />
-          <FinishTalkButton speaker={speaker} talk={talk} />
-          <FeatureTalkButton speaker={speaker} talk={talk} />
-        </div>
+        <TalkActions speaker={speaker} talk={talk} />
       </div>
     </div>
   );
