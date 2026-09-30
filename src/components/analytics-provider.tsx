@@ -12,35 +12,37 @@ function AnalyticsLifecycle() {
   const pathname = usePathname();
   const search = useSearchParams().toString();
   const { data: user, isLoading } = useCurrentUser();
+  const locationKey = search ? `${pathname}?${search}` : pathname;
+  const email = user?.email;
+  const name = user?.name;
+  const role = user?.role;
+  const userId = user?._id;
 
   useEffect(() => {
     if (isLoading) {
       return;
     }
 
-    if (user) {
-      void identify(user._id, {
-        email: user.email,
-        name: user.name,
-        role: user.role,
+    if (userId) {
+      void identify(userId, {
+        email,
+        name,
+        role,
       });
 
       return;
     }
 
     void reset();
-  }, [isLoading, user]);
+  }, [email, isLoading, name, role, userId]);
 
   useEffect(() => {
-    if (isLoading || !pathname) {
+    if (isLoading || !locationKey) {
       return;
     }
 
-    void page({
-      path: pathname,
-      search,
-    });
-  }, [isLoading, pathname, search]);
+    void page();
+  }, [isLoading, locationKey]);
 
   return null;
 }
