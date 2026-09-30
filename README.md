@@ -42,11 +42,13 @@ A modern, full-stack faith-based talks and content platform built with Next.js, 
 
 ### Product analytics (Segment and Mixpanel)
 
-1. Create a JavaScript source in Segment and set `NEXT_PUBLIC_SEGMENT_WRITE_KEY` in `.env.local` and Vercel.
-2. Add the Mixpanel Actions destination on that source. Store the Mixpanel project token in Segment, not in Next.js env.
-3. Keep default mappings for Page, Identify, and Track.
-4. Enable the destination and confirm events in Mixpanel Live View.
-5. Use Mixpanel Actions (cloud-mode). Do not enable classic Mixpanel device-mode, and do not add a PostHog destination.
+Use two Segment JavaScript sources (dev and prod), each with its own write key.
+
+1. Set `NEXT_PUBLIC_SEGMENT_WRITE_KEY` to the matching source key in `.env.local` (dev) and Vercel (prod).
+2. Create two Mixpanel projects (dev and prod). Copy each project token from Mixpanel Project Settings.
+3. In Segment, add a Mixpanel Actions destination to each JS source. Paste the matching Mixpanel project token into the destination. Do not put a Mixpanel token in Next.js env.
+4. Keep default mappings for Page, Identify, and Track. Use cloud-mode (Actions). Do not enable classic Mixpanel device-mode.
+5. Enable each destination. Confirm in Segment Debugger, then Mixpanel Live View. Do not add a PostHog destination.
 
 ## Resources
 

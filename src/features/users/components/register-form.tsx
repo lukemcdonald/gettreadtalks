@@ -27,7 +27,7 @@ import {
   resetCaptchaIfNeeded,
   TurnstileField,
 } from '@/features/users/components/turnstile-field';
-import { useAnalytics } from '@/lib/analytics';
+import { track } from '@/lib/analytics';
 import { signUp } from '@/services/auth/client';
 import {
   AUTH_ERRORS,
@@ -48,7 +48,6 @@ type RegisterFormData = z.infer<typeof registerFormSchema>;
 export function RegisterForm({
   ...delegated
 }: ComponentPropsWithoutRef<'form'>) {
-  const { track } = useAnalytics();
   const captchaRequired = isTurnstileRequired();
   const [captchaResetKey, setCaptchaResetKey] = useState(0);
   const [captchaToken, setCaptchaToken] = useState('');
