@@ -24,5 +24,7 @@
     // Only imported from ignored Coss primitives.
     "src/hooks/use-media-query.ts",
     "src/lib/segmented-control.ts",
+    // Node test files are run by pnpm scripts, not app imports.
+    "tests/**",
   ],
 }
