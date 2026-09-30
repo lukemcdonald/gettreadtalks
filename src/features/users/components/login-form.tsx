@@ -29,10 +29,7 @@ import { captureException } from '@/services/errors/client';
 import { getSafeRedirect } from '@/utils';
 
 const loginFormSchema = z.object({
-  email: z
-    .string()
-    .min(1, 'Email is required.')
-    .email('Please enter a valid email.'),
+  email: z.email('Please enter a valid email.'),
   password: z.string().min(1, 'Password is required.'),
 });
 
