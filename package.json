@@ -12,7 +12,7 @@
     "dev": "npm-run-all --parallel dev:backend dev:frontend dev:open",
     "dev:backend": "convex dev",
     "dev:frontend": "next dev --experimental-https",
-    "dev:open": "wait-on https://localhost:3000 && open https://localhost:3000",
+    "dev:open": "wait-on --interval 500 --simultaneous 1 https://localhost:3000 && open https://localhost:3000",
     "format": "oxfmt --check .",
     "format:fix": "oxfmt .",
     "format:fix:yolo": "ultracite fix --unsafe",
