@@ -13,7 +13,7 @@ export const talkFormSchema = z.object({
   collectionOrder: z.number().optional(),
   description: z.string().optional(),
   featured: z.boolean().default(false),
-  mediaUrl: z.string().trim().pipe(z.url('Please enter a valid URL')),
+  mediaUrl: z.url('Please enter a valid URL'),
   scripture: z.string().optional(),
   slug: z.string().trim().optional(),
   speakerId: z
