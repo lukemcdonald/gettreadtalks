@@ -15,9 +15,11 @@ interface UseMediaTrackingOptions {
 
 function playbackProgress(media: HTMLMediaElement) {
   const finite = [media.currentTime, media.duration].every(Number.isFinite);
+
   if (media.ended || media.duration <= 0 || !finite) {
     return null;
   }
+
   return Math.min(
     100,
     Math.max(0, Math.round((media.currentTime / media.duration) * 100))
@@ -32,7 +34,6 @@ function talkPlaybackProps(
     ...(context.speakerSlug ? { speaker_slug: context.speakerSlug } : {}),
     talk_id: context.entityId,
     talk_slug: context.entitySlug,
-    talk_title: context.entityTitle,
   };
 }
 
@@ -68,6 +69,7 @@ export function useMediaTracking({
     }
 
     const progress_pct = playbackProgress(mediaRef.current);
+
     if (progress_pct === null) {
       return;
     }
@@ -92,9 +94,7 @@ export function useMediaTracking({
     }
 
     if (trackingContext.entityType === 'talk') {
-      track('talk_completed', {
-        ...talkPlaybackProps(trackingContext),
-      });
+      track('talk_completed', talkPlaybackProps(trackingContext));
     } else {
       track('clip_completed', {
         clip_id: trackingContext.entityId,

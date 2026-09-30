@@ -1,3 +1,10 @@
+interface TalkTrackProperties {
+  speaker_id?: string;
+  speaker_slug?: string;
+  talk_id: string;
+  talk_slug: string;
+}
+
 /** Add a key here, then call `track` from `@/lib/analytics`. */
 export interface EventMap {
   clip_completed: { clip_id: string; clip_slug: string };
@@ -20,77 +27,14 @@ export interface EventMap {
     speaker_slug: string;
   };
   speaker_unfavorited: { speaker_id: string; speaker_slug: string };
-  talk_completed: {
-    speaker_id?: string;
-    speaker_slug?: string;
-    talk_id: string;
-    talk_slug: string;
-    talk_title: string;
-  };
-  talk_favorited: {
-    speaker_id?: string;
-    speaker_slug?: string;
-    talk_id: string;
-    talk_slug: string;
-    talk_title: string;
-  };
-  talk_featured: {
-    speaker_id?: string;
-    speaker_slug?: string;
-    talk_id: string;
-    talk_slug: string;
-    talk_title: string;
-  };
-  talk_finished: {
-    speaker_id?: string;
-    speaker_slug?: string;
-    talk_id: string;
-    talk_slug: string;
-    talk_title: string;
-  };
-  talk_paused: {
-    progress_pct: number;
-    speaker_id?: string;
-    speaker_slug?: string;
-    talk_id: string;
-    talk_slug: string;
-    talk_title: string;
-  };
-  talk_played: {
-    media_type: 'audio' | 'video';
-    speaker_id?: string;
-    speaker_slug?: string;
-    talk_id: string;
-    talk_slug: string;
-    talk_title: string;
-  };
-  talk_shared: {
-    method: 'clipboard' | 'share_api';
-    speaker_id?: string;
-    speaker_slug?: string;
-    talk_id: string;
-    talk_slug: string;
-    talk_title: string;
-  };
-  talk_unfavorited: {
-    speaker_id?: string;
-    speaker_slug?: string;
-    talk_id: string;
-    talk_slug: string;
-    talk_title: string;
-  };
-  talk_unfeatured: {
-    speaker_id?: string;
-    speaker_slug?: string;
-    talk_id: string;
-    talk_slug: string;
-    talk_title: string;
-  };
-  talk_unfinished: {
-    speaker_id?: string;
-    speaker_slug?: string;
-    talk_id: string;
-    talk_slug: string;
-    talk_title: string;
-  };
+  talk_completed: TalkTrackProperties;
+  talk_favorited: TalkTrackProperties;
+  talk_featured: TalkTrackProperties;
+  talk_finished: TalkTrackProperties;
+  talk_paused: TalkTrackProperties & { progress_pct: number };
+  talk_played: TalkTrackProperties & { media_type: 'audio' | 'video' };
+  talk_shared: TalkTrackProperties & { method: 'clipboard' | 'share_api' };
+  talk_unfavorited: TalkTrackProperties;
+  talk_unfeatured: TalkTrackProperties;
+  talk_unfinished: TalkTrackProperties;
 }

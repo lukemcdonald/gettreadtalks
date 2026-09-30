@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react';
 
 import { usePathname, useSearchParams } from 'next/navigation';
-import { Suspense, useEffect, useRef } from 'react';
+import { Suspense, useEffect } from 'react';
 
 import { useCurrentUser } from '@/features/users/hooks/use-current-user';
 import { identify, loadAnalytics, page, reset } from '@/lib/analytics';
@@ -12,7 +12,6 @@ function AnalyticsLifecycle() {
   const pathname = usePathname();
   const search = useSearchParams().toString();
   const locationKey = search ? `${pathname}?${search}` : pathname;
-  const lastPage = useRef<string | null>(null);
   const { data: user, isLoading } = useCurrentUser();
   const { _id: userId, email, name, role } = user ?? {};
 
@@ -23,6 +22,7 @@ function AnalyticsLifecycle() {
 
     if (userId) {
       void identify(userId, { email, name, role });
+
       return;
     }
 
@@ -30,11 +30,10 @@ function AnalyticsLifecycle() {
   }, [email, isLoading, name, role, userId]);
 
   useEffect(() => {
-    if (isLoading || !locationKey || lastPage.current === locationKey) {
+    if (isLoading || !locationKey) {
       return;
     }
 
-    lastPage.current = locationKey;
     void page();
   }, [isLoading, locationKey]);
 

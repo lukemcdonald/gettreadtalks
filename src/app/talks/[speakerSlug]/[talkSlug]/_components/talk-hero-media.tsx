@@ -18,7 +18,6 @@ export function TalkHeroMedia({ speaker, talk }: TalkHeroMediaProps) {
         trackingContext={{
           entityId: talk._id,
           entitySlug: talk.slug,
-          entityTitle: talk.title,
           entityType: 'talk',
           speakerId: speaker?._id,
           speakerSlug: speaker?.slug,

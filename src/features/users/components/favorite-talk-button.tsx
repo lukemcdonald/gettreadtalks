@@ -11,7 +11,7 @@ import { useToggleTalkFavorited } from '@/features/users/hooks/use-toggle-talk-f
 
 interface FavoriteTalkButtonProps {
   speaker?: Pick<Speaker, '_id' | 'slug'> | null;
-  talk: Pick<Talk, '_id' | 'slug' | 'title'>;
+  talk: Pick<Talk, '_id' | 'slug'>;
 }
 
 function FavoriteButton({ speaker, talk }: FavoriteTalkButtonProps) {

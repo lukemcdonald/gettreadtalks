@@ -11,7 +11,7 @@ import { useToggleTalkFinished } from '@/features/users/hooks/use-toggle-talk-fi
 
 interface FinishTalkButtonProps {
   speaker?: Pick<Speaker, '_id' | 'slug'> | null;
-  talk: Pick<Talk, '_id' | 'slug' | 'title'>;
+  talk: Pick<Talk, '_id' | 'slug'>;
 }
 
 function FinishButton({ speaker, talk }: FinishTalkButtonProps) {
