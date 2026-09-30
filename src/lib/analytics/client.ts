@@ -12,6 +12,7 @@ interface LoadedAnalytics {
 
 let clientPromise: Promise<LoadedAnalytics | undefined> | undefined;
 let dispatchQueue: Promise<void> = Promise.resolve();
+let lastIdentifyKey: string | undefined;
 
 async function loadClient(key: string): Promise<LoadedAnalytics | undefined> {
   try {
@@ -81,6 +82,18 @@ export function identify(
     role?: string | null;
   }
 ) {
+  const key = JSON.stringify({
+    email: traits.email ?? '',
+    name: traits.name ?? '',
+    role: traits.role ?? '',
+    userId,
+  });
+
+  if (lastIdentifyKey === key) {
+    return Promise.resolve();
+  }
+
+  lastIdentifyKey = key;
   logAnalytics('identify', { userId });
 
   return enqueue(() => dispatch((browser) => browser.identify(userId, traits)));
@@ -90,21 +103,14 @@ export function loadAnalytics() {
   void getClient();
 }
 
-export function page({ path, search }: { path: string; search: string }) {
-  const query = search ? `?${search}` : '';
-  const properties = {
-    path,
-    referrer: document.referrer,
-    search: query,
-    url: `${window.location.origin}${path}${query}`,
-  };
+export function page() {
+  logAnalytics('page');
 
-  logAnalytics('page', properties);
-
-  return enqueue(() => dispatch((browser) => browser.page(path, properties)));
+  return enqueue(() => dispatch((browser) => browser.page()));
 }
 
 export function reset() {
+  lastIdentifyKey = undefined;
   logAnalytics('reset');
 
   return enqueue(() => dispatch((browser) => Promise.resolve(browser.reset())));
