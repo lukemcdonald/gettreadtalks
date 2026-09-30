@@ -10,7 +10,7 @@ A modern, full-stack faith-based talks and content platform built with Next.js, 
 - **Authentication:** Better Auth
 - **Forms:** React Hook Form + Zod
 - **Email:** Resend + React Email
-- **Analytics:** Vercel Web Analytics (page traffic). PostHog session replay is gone and is not coming back.
+- **Analytics:** Vercel Web Analytics (page traffic). Product events via Segment. Mixpanel is a Segment destination. Session replay is not used.
 - **Error Monitoring:** Sentry
 - **Linting/Formatting:** Oxlint + Oxfmt (Ultracite)
 - **Deployment:** Vercel
@@ -40,6 +40,14 @@ A modern, full-stack faith-based talks and content platform built with Next.js, 
 
    This runs both Next.js and Convex dev in parallel.
 
+### Product analytics (Segment and Mixpanel)
+
+1. Create a JavaScript source in Segment and set `NEXT_PUBLIC_SEGMENT_WRITE_KEY` in `.env.local` and Vercel.
+2. Add the Mixpanel Actions destination on that source. Store the Mixpanel project token in Segment, not in Next.js env.
+3. Keep default mappings for Page, Identify, and Track.
+4. Enable the destination and confirm events in Mixpanel Live View.
+5. Use Mixpanel Actions (cloud-mode). Do not enable classic Mixpanel device-mode, and do not add a PostHog destination.
+
 ## Resources
 
 - [Base UI Documentation](https://base-ui.com/)
@@ -53,6 +61,7 @@ A modern, full-stack faith-based talks and content platform built with Next.js, 
 - [React Email Documentation](https://react.email/)
 - [React Hook Form Documentation](https://react-hook-form.com/)
 - [Resend Documentation](https://resend.com/docs)
+- [Segment Analytics.js](https://segment.com/docs/connections/sources/catalog/libraries/website/javascript/)
 - [Sentry Documentation](https://docs.sentry.io/)
 - [Tailwind CSS v4](https://tailwindcss.com/docs)
 - [Zod Documentation](https://zod.dev/)

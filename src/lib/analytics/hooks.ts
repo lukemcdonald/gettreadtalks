@@ -2,6 +2,8 @@
 
 import type { EventMap, NoPayloadEvents, PayloadEvents } from './events';
 
+import { analytics, isAnalyticsLoaded } from './client';
+
 function logInDev(event: string, properties?: Record<string, unknown>) {
   if (process.env.NODE_ENV === 'production') {
     return;
@@ -26,7 +28,7 @@ function logInDev(event: string, properties?: Record<string, unknown>) {
 }
 
 export function useAnalytics() {
-  const log = logInDev;
+  const client = analytics;
 
   function track<E extends NoPayloadEvents>(event: E): void;
   function track<E extends PayloadEvents>(
@@ -34,7 +36,13 @@ export function useAnalytics() {
     properties: EventMap[E]
   ): void;
   function track<E extends keyof EventMap>(event: E, properties?: EventMap[E]) {
-    log(event, properties as Record<string, unknown>);
+    logInDev(event, properties as Record<string, unknown>);
+
+    if (!isAnalyticsLoaded()) {
+      return;
+    }
+
+    void client.track(event, properties as Record<string, unknown> | undefined);
   }
 
   return { track };
