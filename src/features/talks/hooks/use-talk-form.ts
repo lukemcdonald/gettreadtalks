@@ -7,6 +7,7 @@ import type { TalkFormInitialData, TalkId } from '@/features/talks/types';
 import type { StatusType } from '@/lib/entities/types';
 import type { FormStatus } from '@/lib/forms/types';
 import type {
+  DefaultValues,
   SubmitErrorHandler,
   SubmitHandler,
   UseFormReturn,
@@ -57,7 +58,7 @@ type TalkFormSpeaker = Pick<Speaker, '_id' | 'firstName' | 'lastName' | 'slug'>;
 
 function getTalkFormDefaultValues(
   initialData: Partial<TalkFormInitialData> = {}
-): TalkFormData {
+): DefaultValues<TalkFormData> {
   const {
     collectionId,
     collectionOrder,
@@ -66,7 +67,7 @@ function getTalkFormDefaultValues(
     mediaUrl = '',
     scripture = '',
     slug = '',
-    speakerId = '' as TalkFormData['speakerId'],
+    speakerId,
     status = 'backlog',
     title = '',
     topicIds = [],

@@ -100,7 +100,7 @@ export function SpeakerField<T extends FieldValues>({
                   return speaker ? getSpeakerName(speaker) : '';
                 }}
                 onValueChange={(selected: SpeakerId | null) => {
-                  field.onChange(selected ?? '');
+                  field.onChange(selected ?? undefined);
                 }}
                 value={field.value || null}
               >

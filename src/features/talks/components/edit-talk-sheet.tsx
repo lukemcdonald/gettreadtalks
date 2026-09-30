@@ -40,7 +40,7 @@ function getTalkFormValues(talk: TalkWithTopicIds): TalkFormData {
     mediaUrl: talk.mediaUrl ?? '',
     scripture: talk.scripture ?? '',
     slug: talk.slug ?? '',
-    speakerId: talk.speakerId ?? '',
+    speakerId: talk.speakerId,
     status: talk.status ?? 'backlog',
     title: talk.title ?? '',
     topicIds: talk.topicIds,
