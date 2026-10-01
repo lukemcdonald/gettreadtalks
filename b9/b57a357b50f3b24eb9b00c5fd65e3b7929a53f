@@ -1,0 +1,30 @@
+convex/model/mediaHealth/oembed.test.ts
+  s_59ecc620d9567b::t_df86b2f570d07e 5-9
+  s_59ecc620d9567b::t_121d11c981d218 83,87,91
+  s_59ecc620d9567b::t_8eb1a899677f4c 65,67-68
+  s_59ecc620d9567b::t_b76310262179e6 62-64,66,69-82,84-86,88-90,92-95
+convex/model/mediaHealth/record.test.ts
+  s_59ecc620d9567b::t_9e2bc5a594545b 70-86
+convex/emails/mediaHealth.tsx
+  s_59ecc620d9567b::t_f7c30e93d4eeea 40-42
+  s_59ecc620d9567b::t_5f335bf6c62e25 6
+  s_59ecc620d9567b::t_92b6928478fcaf 26-28
+convex/model/mediaHealth/record.ts
+  s_59ecc620d9567b::t_dcd3fbf486a85a 34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "b9b57a357b50f3b24eb9b00c5fd65e3b7929a53f",
+  "prompts": {},
+  "sessions": {
+    "s_59ecc620d9567b": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "927ac779-6707-4518-862f-2a6c744f110f",
+        "model": "grok-4.6"
+      },
+      "human_author": "Luke McDonald <thelukemcdonald@gmail.com>"
+    }
+  }
+}
