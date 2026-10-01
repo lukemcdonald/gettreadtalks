@@ -10,7 +10,7 @@ import type { FunctionReference } from 'convex/server';
 import { useMutation as useConvexMutation } from 'convex/react';
 import { useCallback, useState } from 'react';
 
-import { captureException } from '@/services/errors/client';
+import { captureException } from '@/services/errors';
 import { getErrorMessage, getSentryConfig } from '@/services/errors/convex';
 
 const DEFAULT_STATE: MutationState = {

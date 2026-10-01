@@ -25,7 +25,7 @@ import {
   hasCaptchaToken,
   isTurnstileRequired,
 } from '@/services/auth/config';
-import { captureException } from '@/services/errors/client';
+import { captureException } from '@/services/errors';
 
 const forgotPasswordSchema = z.object({
   email: z.email('Please enter a valid email address.'),

@@ -19,7 +19,7 @@ import {
 } from '@/components/ui';
 import { toastManager } from '@/components/ui/primitives/toast';
 import { deleteAccount } from '@/features/users/actions/delete-account';
-import { captureException } from '@/services/errors/client';
+import { captureException } from '@/services/errors';
 
 interface DeleteFormValues {
   password: string;

@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 
 import { track, waitForAnalytics } from '@/lib/analytics';
 import { signOut } from '@/services/auth/client';
-import { captureException } from '@/services/errors/client';
+import { captureException } from '@/services/errors';
 
 export default function LogoutPage() {
   const router = useRouter();

@@ -25,7 +25,7 @@ import {
 import { track, waitForAnalytics } from '@/lib/analytics';
 import { signIn } from '@/services/auth/client';
 import { AUTH_ERRORS } from '@/services/auth/config';
-import { captureException } from '@/services/errors/client';
+import { captureException } from '@/services/errors';
 import { getSafeRedirect } from '@/utils';
 
 const loginFormSchema = z.object({

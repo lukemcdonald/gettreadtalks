@@ -8,7 +8,7 @@ import { createContext, createElement, use } from 'react';
 import { ErrorBoundary as ReactErrorBoundary } from 'react-error-boundary';
 
 import { ErrorFallback } from '@/components/error-fallback';
-import { captureException } from '@/services/errors/client';
+import { captureException } from '@/services/errors';
 
 interface ErrorBoundaryProps {
   children: ReactNode;
