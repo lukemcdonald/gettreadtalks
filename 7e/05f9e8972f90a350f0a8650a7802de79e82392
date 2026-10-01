@@ -1,0 +1,26 @@
+README.md
+  s_b65b4e49043d52::t_77c21a49a8378e 7-16,40,42-45
+  h_b34f5996212cca 41
+  s_b65b4e49043d52::t_63f0b9bb34a92a 3,5,18,20,22,28-30,36,38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7e05f9e8972f90a350f0a8650a7802de79e82392",
+  "prompts": {},
+  "humans": {
+    "h_b34f5996212cca": {
+      "author": "Luke McDonald <thelukemcdonald@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_b65b4e49043d52": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "e07e3df7-540c-4dc7-9836-949c96605a27",
+        "model": "default"
+      },
+      "human_author": "Luke McDonald <thelukemcdonald@gmail.com>"
+    }
+  }
+}
