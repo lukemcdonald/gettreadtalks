@@ -10,7 +10,9 @@ export interface EventMap {
   clip_completed: { clip_id: string; clip_slug: string };
   clip_paused: { clip_id: string; clip_slug: string; progress_pct: number };
   clip_played: { clip_id: string; clip_slug: string };
+  filter_applied: { filter: string; path: string; value: string };
   not_found_hit: { path: string };
+  search_performed: { path: string; query: string };
   signed_in: Record<string, never>;
   signed_out: Record<string, never>;
   signed_up: Record<string, never>;
