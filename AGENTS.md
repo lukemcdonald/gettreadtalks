@@ -42,11 +42,11 @@ Code is organized by **domain/feature**, not technical layer.
 - `src/components/` - Shared UI components
 - `src/constants/` - Shared constants
 - `src/features/` - Business domains (talks, users, clips, speakers, topics, collections)
-- `src/lib/` - Shared helpers with no integration boundary (forms, entities)
+- `src/lib/` - Shared helpers used across features (forms, entities)
 - `src/services/` - Integration boundaries (auth, email, errors, analytics)
 - `src/utils/` - Generic utilities
 
-`services/` wraps outside systems (vendor/client lifecycle). `lib/` is shared internal helpers only.
+`services/` wraps outside systems (vendor/client lifecycle). `lib/` is shared internal helpers. Helpers in `lib/` may call `services/`; do not put vendor clients in `lib/`.
 
 **Path Alias:** `@/*` maps to `src/*`
 

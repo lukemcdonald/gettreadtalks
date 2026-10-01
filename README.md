@@ -34,7 +34,7 @@ Faith-based talks platform. Next.js app with a Convex backend.
  pnpm dev
 ```
 
-Runs Next.js (HTTPS on `https://localhost:3000`) and Convex in parallel, then opens the browser.
+Runs Next.js (HTTPS on `https://localhost:3000`) and Convex in parallel. On macOS it also opens the browser.
 
 ### Useful scripts
 

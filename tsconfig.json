@@ -32,5 +32,5 @@
     "next-env.d.ts",
     "src/components/alphabetical-grid"
   ],
-  "exclude": [".claude", ".next", "node_modules"]
+  "exclude": [".claude", ".next", "node_modules", "**/*.test.ts"]
 }
