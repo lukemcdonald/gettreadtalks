@@ -1,35 +1,17 @@
-/** Query keys stripped from analytics page context (secrets / PII). */
-const SENSITIVE_PARAMS = new Set([
-  'api_key',
-  'apikey',
-  'email',
-  'password',
-  'token',
-]);
+/** `/reset-password` puts the reset secret in `?token=`. Do not send that to Segment. */
+function stripResetToken(search: string) {
+  const params = new URLSearchParams(search);
 
-function isSensitiveParam(key: string) {
-  const normalized = key.toLowerCase();
+  const keysToDelete: string[] = [];
 
-  if (SENSITIVE_PARAMS.has(normalized)) {
-    return true;
+  for (const key of params.keys()) {
+    if (key.toLowerCase() === 'token') {
+      keysToDelete.push(key);
+    }
   }
 
-  return (
-    normalized.endsWith('_password') ||
-    normalized.endsWith('_secret') ||
-    normalized.endsWith('_token')
-  );
-}
-
-function sanitizeSearch(search: string) {
-  const params = new URLSearchParams();
-
-  for (const [key, value] of new URLSearchParams(search)) {
-    if (isSensitiveParam(key)) {
-      continue;
-    }
-
-    params.append(key, value);
+  for (const key of keysToDelete) {
+    params.delete(key);
   }
 
   const result = params.toString();
@@ -47,7 +29,7 @@ function sanitizeUrl(value: string) {
 
     url.hash = '';
     url.password = '';
-    url.search = sanitizeSearch(url.search);
+    url.search = stripResetToken(url.search);
     url.username = '';
 
     return url.href;
@@ -59,7 +41,7 @@ function sanitizeUrl(value: string) {
 const PAGE_PROPERTY_FILTERS = {
   path: (value: string) => value.split(/[?#]/u).shift(),
   referrer: sanitizeUrl,
-  search: sanitizeSearch,
+  search: stripResetToken,
   url: sanitizeUrl,
 };
 
@@ -81,7 +63,7 @@ export function getPageContext() {
   return {
     path: window.location.pathname,
     referrer: sanitizeUrl(document.referrer),
-    search: sanitizeSearch(window.location.search),
+    search: stripResetToken(window.location.search),
     title: document.title,
     url: sanitizeUrl(window.location.href),
   };
