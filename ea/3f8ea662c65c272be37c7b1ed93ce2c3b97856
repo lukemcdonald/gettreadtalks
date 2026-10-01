@@ -1,0 +1,19 @@
+src/lib/analytics/props.ts
+  s_b65b4e49043d52::t_d85c1b9d1a6ecf 1-4,6,14-15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ea3f8ea662c65c272be37c7b1ed93ce2c3b97856",
+  "prompts": {},
+  "sessions": {
+    "s_b65b4e49043d52": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "e07e3df7-540c-4dc7-9836-949c96605a27",
+        "model": "default"
+      },
+      "human_author": "Luke McDonald <thelukemcdonald@gmail.com>"
+    }
+  }
+}
