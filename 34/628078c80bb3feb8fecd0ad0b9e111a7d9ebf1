@@ -1,0 +1,27 @@
+src/app/speakers/[speakerSlug]/page.tsx
+  s_80e7cb667886d3::t_f6ff7cfd347205 12,58
+next.config.ts
+  s_80e7cb667886d3::t_f6ff7cfd347205 62
+src/features/clips/components/clips-list.tsx
+  s_80e7cb667886d3::t_f6ff7cfd347205 4,13,21
+src/utils/rotate-cached-content.ts
+  s_80e7cb667886d3::t_ad1f00adc11560 1-36
+src/utils/index.ts
+  s_80e7cb667886d3::t_f6ff7cfd347205 6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "34628078c80bb3feb8fecd0ad0b9e111a7d9ebf1",
+  "prompts": {},
+  "sessions": {
+    "s_80e7cb667886d3": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "1ff626a1-51b0-48b9-bb9a-5316f735c685",
+        "model": "grok-4.6"
+      },
+      "human_author": "Luke McDonald <thelukemcdonald@gmail.com>"
+    }
+  }
+}
