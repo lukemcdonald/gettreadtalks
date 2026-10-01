@@ -1,0 +1,19 @@
+src/utils/rotate-content.test.ts
+  s_80e7cb667886d3::t_5ab82ae9de871a 8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f2078fc3fd367a944e454696cefc9cfd0df8ee7c",
+  "prompts": {},
+  "sessions": {
+    "s_80e7cb667886d3": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "1ff626a1-51b0-48b9-bb9a-5316f735c685",
+        "model": "grok-4.6"
+      },
+      "human_author": "Luke McDonald <thelukemcdonald@gmail.com>"
+    }
+  }
+}
