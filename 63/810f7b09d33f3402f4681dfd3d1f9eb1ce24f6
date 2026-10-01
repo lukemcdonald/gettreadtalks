@@ -1,0 +1,19 @@
+src/services/errors/client.ts
+  s_b65b4e49043d52::t_5fecc7bbf50d0a 10,15,67
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "63810f7b09d33f3402f4681dfd3d1f9eb1ce24f6",
+  "prompts": {},
+  "sessions": {
+    "s_b65b4e49043d52": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "e07e3df7-540c-4dc7-9836-949c96605a27",
+        "model": "default"
+      },
+      "human_author": "Luke McDonald <thelukemcdonald@gmail.com>"
+    }
+  }
+}
