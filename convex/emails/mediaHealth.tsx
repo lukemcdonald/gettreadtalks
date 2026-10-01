@@ -3,7 +3,7 @@ import type {
   MediaHealthEmailProps,
 } from '../../src/services/email/types';
 
-import { Button, Section, Text } from 'react-email';
+import { Button, Heading, Section, Text } from 'react-email';
 
 import { site } from '../../src/configs/site';
 import { EmailLayout } from './components/layout';
@@ -23,7 +23,9 @@ export function MediaHealthEmail({ items }: MediaHealthEmailProps) {
       </Text>
       {talks.length > 0 && (
         <>
-          <Text style={sectionHeading}>Talks</Text>
+          <Heading as="h2" style={sectionHeading}>
+            Talks
+          </Heading>
           {talks.map((item) => (
             <MediaHealthItem
               item={item}
@@ -35,7 +37,9 @@ export function MediaHealthEmail({ items }: MediaHealthEmailProps) {
       )}
       {clips.length > 0 && (
         <>
-          <Text style={sectionHeading}>Clips</Text>
+          <Heading as="h2" style={sectionHeading}>
+            Clips
+          </Heading>
           {clips.map((item) => (
             <MediaHealthItem
               item={item}
