@@ -117,7 +117,7 @@ export function reset() {
   );
 }
 
-export function captureEvent(
+export function trackEvent(
   event: string,
   properties?: Record<string, unknown>
 ) {
