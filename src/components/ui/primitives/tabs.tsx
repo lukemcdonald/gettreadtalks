@@ -7,7 +7,7 @@ import {
   segmentedControlItemLayoutClassName,
   segmentedControlItemSizeClassNames,
 } from "@/lib/segmented-control";
-import { cn } from "@/utils";
+import { cn } from "@/utils/index";
 
 type TabsVariant = "default" | "underline";
 type TabsSize = SegmentedControlSize;

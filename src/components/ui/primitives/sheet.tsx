@@ -5,7 +5,7 @@ import { mergeProps } from "@base-ui/react/merge-props";
 import { useRender } from "@base-ui/react/use-render";
 import { XIcon } from "lucide-react";
 import type React from "react";
-import { cn } from "@/utils";
+import { cn } from "@/utils/index";
 import { Button } from "@/components/ui/primitives/button";
 import { ScrollArea } from "@/components/ui/primitives/scroll-area";
 

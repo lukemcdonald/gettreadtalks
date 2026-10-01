@@ -2,7 +2,7 @@
 
 import { Checkbox as CheckboxPrimitive } from "@base-ui/react/checkbox";
 import type React from "react";
-import { cn } from "@/utils";
+import { cn } from "@/utils/index";
 
 export function Checkbox({
   className,

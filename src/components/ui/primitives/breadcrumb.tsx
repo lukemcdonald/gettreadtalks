@@ -4,7 +4,7 @@ import { mergeProps } from "@base-ui/react/merge-props";
 import { useRender } from "@base-ui/react/use-render";
 import { ChevronRight, MoreHorizontal } from "lucide-react";
 import type * as React from "react";
-import { cn } from "@/utils";
+import { cn } from "@/utils/index";
 
 export function Breadcrumb({
   ...props

@@ -3,7 +3,7 @@
 import { Dialog as CommandDialogPrimitive } from "@base-ui/react/dialog";
 import { SearchIcon } from "lucide-react";
 import type * as React from "react";
-import { cn } from "@/utils";
+import { cn } from "@/utils/index";
 import {
   Autocomplete,
   AutocompleteCollection,

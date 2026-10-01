@@ -8,7 +8,7 @@ import {
   MoreHorizontalIcon,
 } from "lucide-react";
 import type * as React from "react";
-import { cn } from "@/utils";
+import { cn } from "@/utils/index";
 import { type Button, buttonVariants } from "@/components/ui/primitives/button";
 
 export function Pagination({
