@@ -63,6 +63,19 @@ function changedEntries(previousSearch: string, nextSearch: string) {
   return entries;
 }
 
+export function getLocationIntent(
+  previous: { path: string; search: string } | null,
+  current: { path: string; search: string }
+) {
+  if (!previous || previous.path !== current.path) {
+    return { kind: 'page' as const };
+  }
+
+  const { filters, query } = getQueryChange(previous.search, current.search);
+
+  return { filters, kind: 'query' as const, query };
+}
+
 export function getQueryChange(previousSearch: string, nextSearch: string) {
   const filters: { filter: string; value: string }[] = [];
   let query: string | undefined;

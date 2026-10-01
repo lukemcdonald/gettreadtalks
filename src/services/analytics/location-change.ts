@@ -1,5 +1,5 @@
 import { page } from './client';
-import { getQueryChange } from './query-change';
+import { getLocationIntent } from './query-change';
 import { track } from './track';
 
 interface Location {
@@ -32,13 +32,13 @@ export function trackLocationChange(
   previous: Location | null,
   current: Location
 ) {
-  if (!previous || previous.path !== current.path) {
+  const intent = getLocationIntent(previous, current);
+
+  if (intent.kind === 'page') {
     void page();
     return;
   }
 
-  const { filters, query } = getQueryChange(previous.search, current.search);
-
-  trackSearch(current.path, query);
-  trackFilters(current.path, filters);
+  trackSearch(current.path, intent.query);
+  trackFilters(current.path, intent.filters);
 }

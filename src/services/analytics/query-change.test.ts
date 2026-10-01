@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
-import { getQueryChange } from './query-change.ts';
+import { getLocationIntent, getQueryChange } from './query-change.ts';
 
 test('detects a committed search query', () => {
   const result = getQueryChange('', 'search=bible');
@@ -58,4 +58,58 @@ test('ignores token and unchanged params', () => {
   );
 
   assert.deepEqual(result, { filters: [], query: undefined });
+});
+
+test('ignores a cursor-only pagination change', () => {
+  const result = getQueryChange(
+    'search=bible&cursor=abc',
+    'search=bible&cursor=def'
+  );
+
+  assert.deepEqual(result, { filters: [], query: undefined });
+});
+
+test('classifies first load and path changes as page', () => {
+  assert.deepEqual(
+    getLocationIntent(null, { path: '/talks', search: 'search=bible' }),
+    { kind: 'page' }
+  );
+  assert.deepEqual(
+    getLocationIntent(
+      { path: '/talks', search: 'search=bible' },
+      { path: '/speakers', search: 'search=bible' }
+    ),
+    { kind: 'page' }
+  );
+});
+
+test('classifies search and filter changes as query intents', () => {
+  assert.deepEqual(
+    getLocationIntent(
+      { path: '/talks', search: '' },
+      { path: '/talks', search: 'search=bible' }
+    ),
+    { filters: [], kind: 'query', query: 'bible' }
+  );
+  assert.deepEqual(
+    getLocationIntent(
+      { path: '/speakers', search: '' },
+      { path: '/speakers', search: 'role=Pastor' }
+    ),
+    {
+      filters: [{ filter: 'role', value: 'Pastor' }],
+      kind: 'query',
+      query: undefined,
+    }
+  );
+});
+
+test('classifies pagination-only changes as a query no-op', () => {
+  assert.deepEqual(
+    getLocationIntent(
+      { path: '/talks', search: 'search=bible&cursor=abc' },
+      { path: '/talks', search: 'search=bible&cursor=def' }
+    ),
+    { filters: [], kind: 'query', query: undefined }
+  );
 });
