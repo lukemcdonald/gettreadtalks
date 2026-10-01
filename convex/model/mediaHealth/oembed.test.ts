@@ -2,7 +2,11 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
 import { detectMediaType } from '../../../src/components/media-embed/utils.ts';
-import { classifyOEmbedStatus, getOEmbedRequest } from './oembed.ts';
+import {
+  checkMediaUrl,
+  classifyOEmbedStatus,
+  getOEmbedRequest,
+} from './oembed.ts';
 
 test('maps 200 to ok', () => {
   assert.equal(classifyOEmbedStatus(200), 'ok');
@@ -54,4 +58,38 @@ test('agrees with detectMediaType on which URLs are checked', () => {
 
     assert.equal(request !== null, shouldCheck, url);
   }
+});
+
+test('checkMediaUrl skips audio before fetch', async () => {
+  let called = 0;
+  const fetchImpl = (() => {
+    called += 1;
+
+    return Promise.resolve(new Response(null, { status: 200 }));
+  }) as typeof fetch;
+
+  const result = await checkMediaUrl(
+    'https://cdn.example.com/talk.mp3',
+    fetchImpl
+  );
+
+  assert.deepEqual(result, { skipped: true });
+  assert.equal(called, 0);
+});
+
+test('checkMediaUrl maps response status and fetch failure', async () => {
+  const ok = await checkMediaUrl('https://www.youtube.com/watch?v=abc', (() =>
+    Promise.resolve(new Response(null, { status: 200 }))) as typeof fetch);
+  const privateVideo = await checkMediaUrl(
+    'https://www.youtube.com/watch?v=abc',
+    (() => Promise.resolve(new Response(null, { status: 403 }))) as typeof fetch
+  );
+  const failed = await checkMediaUrl(
+    'https://www.youtube.com/watch?v=abc',
+    (() => Promise.reject(new Error('timeout'))) as typeof fetch
+  );
+
+  assert.deepEqual(ok, { skipped: false, status: 'ok' });
+  assert.deepEqual(privateVideo, { skipped: false, status: 'private' });
+  assert.deepEqual(failed, { skipped: false, status: 'unknown' });
 });

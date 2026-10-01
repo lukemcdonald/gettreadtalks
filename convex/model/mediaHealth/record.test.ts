@@ -67,3 +67,20 @@ test('keeps a prior ok when the check is unknown', () => {
     }
   );
 });
+
+test('does not notify from unknown or private into missing', () => {
+  assert.equal(
+    decideMediaCheck({
+      existingStatus: 'unknown',
+      observedStatus: 'private',
+    }).isTransition,
+    false
+  );
+  assert.equal(
+    decideMediaCheck({
+      existingStatus: 'private',
+      observedStatus: 'missing',
+    }).isTransition,
+    false
+  );
+});

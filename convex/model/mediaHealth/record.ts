@@ -31,7 +31,7 @@ function isBrokenTransition(
     return false;
   }
 
-  return isBrokenStatus(persistStatus) && persistStatus !== existingStatus;
+  return existingStatus === 'ok' && isBrokenStatus(persistStatus);
 }
 
 function persistStatusFor(args: {
