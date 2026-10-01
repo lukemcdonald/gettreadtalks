@@ -1,0 +1,28 @@
+src/services/analytics/page-context.ts
+  s_b65b4e49043d52::t_ebbea6f4415b82 1-2,8-9,11-12
+README.md
+  h_b34f5996212cca 5-6
+  s_b65b4e49043d52::t_63f0b9bb34a92a 37
+  h_b34f5996212cca 26-28,33-35
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "6d32217bd3c8a49bb3b8ebb11c3294098270abf8",
+  "prompts": {},
+  "humans": {
+    "h_b34f5996212cca": {
+      "author": "Luke McDonald <thelukemcdonald@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_b65b4e49043d52": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "e07e3df7-540c-4dc7-9836-949c96605a27",
+        "model": "default"
+      },
+      "human_author": "Luke McDonald <thelukemcdonald@gmail.com>"
+    }
+  }
+}
