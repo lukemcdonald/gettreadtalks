@@ -1,6 +1,6 @@
 import type { ClipWithSpeaker } from '../types';
 
-import { getVideoThumbnail } from '@/components/media-embed';
+import { preferItemsWithVideoThumbnails } from '@/components/media-embed';
 import { rotateCachedContent } from '@/utils';
 
 import { ClipCard } from './clip-card';
@@ -15,11 +15,8 @@ export async function ClipsList({ clips }: ClipsListProps) {
     return null;
   }
 
-  const featuredCandidates = clips.filter(
-    (clip) => getVideoThumbnail(clip.mediaUrl) !== null
-  );
   const [featuredClip] = await rotateCachedContent(
-    featuredCandidates.length > 0 ? featuredCandidates : clips,
+    preferItemsWithVideoThumbnails(clips),
     {
       count: 1,
       period: 'daily',

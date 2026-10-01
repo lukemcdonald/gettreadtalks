@@ -3,28 +3,39 @@ export type RotationPeriod = 'daily' | 'weekly' | 'hourly';
 interface RotateContentOptions {
   count?: number;
   period?: RotationPeriod;
+  seed?: number;
 }
 
-function getTimeSeed(period: RotationPeriod): number {
-  const now = Date.now();
-  const MS_PER_HOUR = 1000 * 60 * 60;
-  const MS_PER_DAY = MS_PER_HOUR * 24;
-  const MS_PER_WEEK = MS_PER_DAY * 7;
+const MS_PER_HOUR = 1000 * 60 * 60;
+const MS_PER_DAY = MS_PER_HOUR * 24;
+const MS_PER_WEEK = MS_PER_DAY * 7;
 
+export function getRotationPeriodMs(period: RotationPeriod): number {
   switch (period) {
     case 'hourly': {
-      return Math.floor(now / MS_PER_HOUR);
-    }
-    case 'daily': {
-      return Math.floor(now / MS_PER_DAY);
+      return MS_PER_HOUR;
     }
     case 'weekly': {
-      return Math.floor(now / MS_PER_WEEK);
+      return MS_PER_WEEK;
     }
     default: {
-      throw new Error(`Invalid rotation period: ${period}`);
+      return MS_PER_DAY;
     }
   }
+}
+
+export function getTimeSeed(period: RotationPeriod, now = Date.now()): number {
+  return Math.floor(now / getRotationPeriodMs(period));
+}
+
+export function secondsUntilNextRotation(
+  period: RotationPeriod,
+  now = Date.now()
+): number {
+  const interval = getRotationPeriodMs(period);
+  const remainingMs = interval - (now % interval);
+
+  return Math.max(1, Math.ceil(remainingMs / 1000));
 }
 
 function seededShuffle<T>(array: T[], seed: number): T[] {
@@ -53,14 +64,14 @@ export function rotateContent<T>(
   items: T[],
   options: RotateContentOptions = {}
 ): T[] {
-  const { period = 'daily', count = 1 } = options;
+  const { count = 1, period = 'daily', seed } = options;
 
   if (items.length === 0 || count >= items.length) {
     return items.slice(0, count);
   }
 
-  const seed = getTimeSeed(period);
-  const shuffled = seededShuffle(items, seed);
+  const resolvedSeed = seed ?? getTimeSeed(period);
+  const shuffled = seededShuffle(items, resolvedSeed);
 
   return shuffled.slice(0, count);
 }

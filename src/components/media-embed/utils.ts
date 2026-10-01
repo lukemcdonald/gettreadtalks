@@ -79,3 +79,17 @@ export function isVideoMediaType(url?: string): boolean {
     mediaType.type === 'video'
   );
 }
+
+export function preferItemsWithVideoThumbnails<T extends { mediaUrl?: string }>(
+  items: T[]
+): T[] {
+  const withThumbnails = items.filter(
+    (item) => getVideoThumbnail(item.mediaUrl) !== null
+  );
+
+  if (withThumbnails.length > 0) {
+    return withThumbnails;
+  }
+
+  return items;
+}

@@ -1,2 +1,6 @@
 export { MediaEmbed } from './media-embed';
-export { getVideoThumbnail, isVideoMediaType } from './utils';
+export {
+  getVideoThumbnail,
+  isVideoMediaType,
+  preferItemsWithVideoThumbnails,
+} from './utils';
