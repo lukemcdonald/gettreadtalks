@@ -6,7 +6,7 @@ import { useQuery } from 'convex/react';
 
 import { api } from '@/convex/_generated/api';
 import { useMutation, useOptimisticToggle } from '@/hooks';
-import { speakerTrackProps, track } from '@/lib/analytics';
+import { speakerTrackProps, track } from '@/services/analytics';
 
 export function useToggleSpeakerFavorited({
   speaker,

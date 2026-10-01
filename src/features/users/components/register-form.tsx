@@ -27,7 +27,7 @@ import {
   resetCaptchaIfNeeded,
   TurnstileField,
 } from '@/features/users/components/turnstile-field';
-import { track, waitForAnalytics } from '@/lib/analytics';
+import { track, waitForAnalytics } from '@/services/analytics';
 import { signUp } from '@/services/auth/client';
 import {
   AUTH_ERRORS,

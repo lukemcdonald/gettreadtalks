@@ -5,7 +5,7 @@ import type { Speaker } from '@/features/speakers/types';
 import { ExternalLinkIcon } from 'lucide-react';
 
 import { Link } from '@/components/ui';
-import { track } from '@/lib/analytics';
+import { track } from '@/services/analytics';
 import { cn } from '@/utils';
 
 interface SpeakerMinistryLinkProps {

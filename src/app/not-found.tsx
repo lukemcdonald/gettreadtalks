@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
 
-import { track } from '@/lib/analytics';
+import { track } from '@/services/analytics';
 
 export default function NotFound() {
   const pathname = usePathname();
