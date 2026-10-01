@@ -1,0 +1,23 @@
+src/services/analytics/page-context.test.ts
+  s_b65b4e49043d52::t_8a5e6491e42f12 6,8,11,14,16,19,22,24,27
+src/services/analytics/page-context.ts
+  s_b65b4e49043d52::t_b035eaafd1602b 5,7,9,11,13-14
+  s_b65b4e49043d52::t_aa1d40cb6a1237 1
+  s_b65b4e49043d52::t_f77c074c6dfc6b 2-3,8,32,44,66
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "5f0ac39382ed7c8cd3140ed2687854018642ed1b",
+  "prompts": {},
+  "sessions": {
+    "s_b65b4e49043d52": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "e07e3df7-540c-4dc7-9836-949c96605a27",
+        "model": "grok-4.6"
+      },
+      "human_author": "Luke McDonald <thelukemcdonald@gmail.com>"
+    }
+  }
+}
