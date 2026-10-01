@@ -34,7 +34,7 @@ import {
   hasCaptchaToken,
   isTurnstileRequired,
 } from '@/services/auth/config';
-import { captureException } from '@/services/errors/client';
+import { captureException } from '@/services/errors';
 import { getSafeRedirect } from '@/utils';
 
 const registerFormSchema = z.object({
