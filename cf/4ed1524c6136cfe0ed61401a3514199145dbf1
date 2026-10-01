@@ -13,6 +13,8 @@ convex/lib/rotateContent.ts
   s_80e7cb667886d3::t_a4ef2d0bef38b0 6,9-11,13,16,19,22,27-40,67,73-74
 src/components/media-embed/index.ts
   s_80e7cb667886d3::t_31cb8663091d80 2-6
+package.json
+  s_80e7cb667886d3::t_e208fe0a0e4687 25
 ---
 {
   "schema_version": "authorship/3.0.0",
