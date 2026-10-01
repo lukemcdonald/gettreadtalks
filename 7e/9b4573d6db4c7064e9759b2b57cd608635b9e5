@@ -1,0 +1,20 @@
+src/components/analytics-provider.tsx
+  s_42bd60310fbd2d::t_44ed0fcc5336d2 16-33,39-40,57,62-82
+  s_42bd60310fbd2d::t_26c02a0207aace 83-85
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7e9b4573d6db4c7064e9759b2b57cd608635b9e5",
+  "prompts": {},
+  "sessions": {
+    "s_42bd60310fbd2d": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "8de0365f-2a01-4c42-8c32-8a2ede1b802e",
+        "model": "cursor-grok-4.6-medium"
+      },
+      "human_author": "Luke McDonald <thelukemcdonald@gmail.com>"
+    }
+  }
+}
