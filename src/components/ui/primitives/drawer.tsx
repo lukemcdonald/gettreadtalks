@@ -9,7 +9,7 @@ import { useRender } from "@base-ui/react/use-render";
 import { ChevronRightIcon, XIcon } from "lucide-react";
 import type React from "react";
 import { createContext, useContext } from "react";
-import { cn } from "@/utils";
+import { cn } from "@/utils/index";
 import { Button } from "@/components/ui/primitives/button";
 import { ScrollArea } from "@/components/ui/primitives/scroll-area";
 
@@ -214,7 +214,7 @@ export function DrawerPopup({
           {showCloseButton && (
             <DrawerPrimitive.Close
               aria-label="Close"
-              className="absolute end-2 top-2"
+              className="absolute end-2 top-2 z-1"
               render={<Button size="icon" variant="ghost" />}
             >
               <XIcon />

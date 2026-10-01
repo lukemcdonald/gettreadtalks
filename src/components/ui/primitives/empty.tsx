@@ -1,6 +1,6 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import type React from "react";
-import { cn } from "@/utils";
+import { cn } from "@/utils/index";
 
 const emptyMediaVariants = cva(
   "flex shrink-0 items-center justify-center [&_svg]:pointer-events-none [&_svg]:shrink-0",

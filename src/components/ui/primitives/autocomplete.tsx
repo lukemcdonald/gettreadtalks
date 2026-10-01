@@ -3,7 +3,7 @@
 import { Autocomplete as AutocompletePrimitive } from "@base-ui/react/autocomplete";
 import { ChevronsUpDownIcon, XIcon } from "lucide-react";
 import type React from "react";
-import { cn } from "@/utils";
+import { cn } from "@/utils/index";
 import { Input } from "@/components/ui/primitives/input";
 import { ScrollArea } from "@/components/ui/primitives/scroll-area";
 

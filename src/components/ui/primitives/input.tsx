@@ -2,7 +2,7 @@
 
 import { Input as InputPrimitive } from "@base-ui/react/input";
 import type * as React from "react";
-import { cn } from "@/utils";
+import { cn } from "@/utils/index";
 
 export type InputProps = Omit<
   InputPrimitive.Props & React.RefAttributes<HTMLInputElement>,
