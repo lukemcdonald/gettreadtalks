@@ -1,0 +1,31 @@
+src/components/error-boundary.tsx
+  s_b65b4e49043d52::t_3618abe9366590 11
+src/features/users/components/register-form.tsx
+  s_b65b4e49043d52::t_c46807bd39eb12 37
+src/hooks/use-mutation.ts
+  s_b65b4e49043d52::t_66705465ae7ff8 13
+src/features/users/components/login-form.tsx
+  s_b65b4e49043d52::t_e146e40721b5eb 28
+src/features/users/components/delete-account-form.tsx
+  s_b65b4e49043d52::t_c9dea78f1c249c 22
+src/features/users/components/forgot-password-form.tsx
+  s_b65b4e49043d52::t_c914b09c57a2d5 28
+src/app/logout/page.tsx
+  s_b65b4e49043d52::t_c4ebdca99a01c5 10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "43f66f964c88d749724e2306d1b7b062b55c1c27",
+  "prompts": {},
+  "sessions": {
+    "s_b65b4e49043d52": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "e07e3df7-540c-4dc7-9836-949c96605a27",
+        "model": "default"
+      },
+      "human_author": "Luke McDonald <thelukemcdonald@gmail.com>"
+    }
+  }
+}
