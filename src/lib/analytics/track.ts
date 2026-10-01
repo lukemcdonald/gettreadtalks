@@ -2,7 +2,7 @@
 
 import type { EventMap } from './events';
 
-import { captureEvent } from './client';
+import { trackEvent } from './client';
 
 export function track<E extends keyof EventMap>(
   event: E,
@@ -10,5 +10,5 @@ export function track<E extends keyof EventMap>(
 ) {
   const [properties] = args;
 
-  return captureEvent(event, properties as Record<string, unknown> | undefined);
+  return trackEvent(event, properties as Record<string, unknown> | undefined);
 }
