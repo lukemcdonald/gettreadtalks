@@ -1,18 +1,15 @@
-const ATTRIBUTION_PARAMS = new Set([
-  'utm_campaign',
-  'utm_content',
-  'utm_medium',
-  'utm_source',
-  'utm_term',
-]);
+/** Query keys stripped from analytics page context (secrets / PII). */
+const SENSITIVE_PARAMS = new Set(['email', 'password', 'token']);
 
 function sanitizeSearch(search: string) {
   const params = new URLSearchParams();
 
   for (const [key, value] of new URLSearchParams(search)) {
-    if (ATTRIBUTION_PARAMS.has(key)) {
-      params.append(key, value);
+    if (SENSITIVE_PARAMS.has(key.toLowerCase())) {
+      continue;
     }
+
+    params.append(key, value);
   }
 
   const result = params.toString();
