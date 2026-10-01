@@ -5,6 +5,7 @@ import { affiliateLinkTables } from './model/affiliateLinks/schema';
 import { clipTables } from './model/clips/schema';
 import { collectionTables } from './model/collections/schema';
 import { emailTables } from './model/emails/schema';
+import { mediaHealthTables } from './model/mediaHealth/schema';
 import { speakerTables } from './model/speakers/schema';
 import { talkTables } from './model/talks/schema';
 import { topicTables } from './model/topics/schema';
@@ -14,6 +15,7 @@ export default defineSchema({
   ...clipTables,
   ...collectionTables,
   ...emailTables,
+  ...mediaHealthTables,
   ...speakerTables,
   ...talkTables,
   ...topicTables,
