@@ -1,0 +1,23 @@
+tsconfig.json
+  s_f75d16f343f229::t_e13969543e5a4d 5
+  s_f75d16f343f229::t_6736197e8c6dcf 36
+.github/workflows/ci.yml
+  s_f75d16f343f229::t_2e7371ffe6b077 18
+  s_f75d16f343f229::t_283e557b77e90b 29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "dd429f04546c6880f0b6564657c6c98df0df4202",
+  "prompts": {},
+  "sessions": {
+    "s_f75d16f343f229": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "940ca12f-1825-4622-a3a3-9554bc68b9e2",
+        "model": "grok-4.6"
+      },
+      "human_author": "Luke McDonald <thelukemcdonald@gmail.com>"
+    }
+  }
+}
