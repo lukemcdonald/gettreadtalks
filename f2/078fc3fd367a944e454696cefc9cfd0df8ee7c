@@ -1,5 +1,7 @@
 src/utils/rotate-content.test.ts
   s_80e7cb667886d3::t_5ab82ae9de871a 8
+package.json
+  s_80e7cb667886d3::t_1a9883f04252de 25
 ---
 {
   "schema_version": "authorship/3.0.0",
