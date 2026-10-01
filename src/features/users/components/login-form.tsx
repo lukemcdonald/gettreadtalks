@@ -22,7 +22,7 @@ import {
   Input,
   PasswordInput,
 } from '@/components/ui';
-import { track, waitForAnalytics } from '@/lib/analytics';
+import { track, waitForAnalytics } from '@/services/analytics';
 import { signIn } from '@/services/auth/client';
 import { AUTH_ERRORS } from '@/services/auth/config';
 import { captureException } from '@/services/errors';

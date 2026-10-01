@@ -7,7 +7,7 @@ import { useQuery } from 'convex/react';
 
 import { api } from '@/convex/_generated/api';
 import { useMutation, useOptimisticToggle } from '@/hooks';
-import { talkTrackProps, track } from '@/lib/analytics';
+import { talkTrackProps, track } from '@/services/analytics';
 
 export function useToggleTalkFeatured({
   speaker,

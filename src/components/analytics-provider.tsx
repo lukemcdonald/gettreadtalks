@@ -6,7 +6,7 @@ import { usePathname, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect } from 'react';
 
 import { useCurrentUser } from '@/features/users/hooks/use-current-user';
-import { identify, loadAnalytics, page, reset } from '@/lib/analytics';
+import { identify, loadAnalytics, page, reset } from '@/services/analytics';
 
 function AnalyticsLifecycle() {
   const pathname = usePathname();

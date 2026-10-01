@@ -5,7 +5,7 @@ import type { RefObject } from 'react';
 
 import { useRef } from 'react';
 
-import { track } from '@/lib/analytics';
+import { track } from '@/services/analytics';
 
 interface UseMediaTrackingOptions {
   mediaRef: RefObject<HTMLAudioElement | HTMLVideoElement | null>;

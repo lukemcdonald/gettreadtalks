@@ -5,7 +5,7 @@ interface TalkTrackProperties {
   talk_slug: string;
 }
 
-/** Add a key here, then call `track` from `@/lib/analytics`. */
+/** Add a key here, then call `track` from `@/services/analytics`. */
 export interface EventMap {
   clip_completed: { clip_id: string; clip_slug: string };
   clip_paused: { clip_id: string; clip_slug: string; progress_pct: number };

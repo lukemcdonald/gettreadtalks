@@ -4,7 +4,7 @@ import type { Speaker } from '@/features/speakers/types';
 import type { Talk } from '@/features/talks/types';
 
 import { ShareButton } from '@/components/share-button';
-import { talkTrackProps, track } from '@/lib/analytics';
+import { talkTrackProps, track } from '@/services/analytics';
 
 interface ShareTalkButtonProps {
   speaker?: Pick<Speaker, '_id' | 'slug'> | null;

@@ -5,7 +5,7 @@ import type { Route } from 'next';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 
-import { track, waitForAnalytics } from '@/lib/analytics';
+import { track, waitForAnalytics } from '@/services/analytics';
 import { signOut } from '@/services/auth/client';
 import { captureException } from '@/services/errors';
 
