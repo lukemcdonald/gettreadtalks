@@ -7,36 +7,12 @@ import {
   withScope as sentryWithScope,
 } from '@sentry/nextjs';
 
-/**
- * Captures an exception and reports it to Sentry with optional context.
- * Use this for manual error reporting outside of automatic captures.
- *
- * Supports fingerprinting for custom error grouping and transaction names
- * for better organization. Returns the Sentry Event ID for tracking.
- *
- * @example
- * try {
- *   await riskyOperation();
- * } catch (error) {
- *   const eventId = captureException(error, {
- *     context: { operation: 'riskyOperation' },
- *     level: 'warning',
- *     tags: { feature: 'items' },
- *     fingerprint: ['validation', 'slug'],
- *     transactionName: 'items:create',
- *     extras: {
- *       customData: 'value',
- *       attemptNumber: 3,
- *     },
- *   });
- *   // Use eventId for user support or tracking
- * }
- */
+/** Manual exception capture with optional fingerprint, tags, and context. */
 export function captureException(
   error: unknown,
   options: ErrorReportOptions = {}
 ): string | undefined {
-  const { transactionName, level = 'error', ...scopeOptions } = options;
+  const { level = 'error', transactionName, ...scopeOptions } = options;
 
   return sentryWithScope((scope) => {
     applyScopeOptions(scope, { ...scopeOptions, level });
@@ -53,10 +29,6 @@ export function captureException(
   });
 }
 
-/**
- * Applies scope options to a Sentry scope for message capture.
- * Helper function that configures level, context, fingerprint, tags, user, and extras.
- */
 function applyScopeOptions(
   scope: Scope,
   options: Omit<ErrorReportOptions, 'transactionName'>
@@ -92,17 +64,7 @@ function applyScopeOptions(
   }
 }
 
-/**
- * Captures a message and reports it to Sentry.
- * Use this for logging important events or non-error messages.
- *
- * @example
- * captureMessage('User completed checkout', {
- *   level: 'info',
- *   tags: { feature: 'checkout' },
- *   extras: { orderId: '123' },
- * });
- */
+/** Manual message capture for non-exception events. */
 export function captureMessage(
   message: string,
   options: Omit<ErrorReportOptions, 'transactionName'> = {}
