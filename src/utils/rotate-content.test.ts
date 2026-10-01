@@ -5,7 +5,7 @@ import {
   getTimeSeed,
   rotateContent,
   secondsUntilNextRotation,
-} from './rotateContent.ts';
+} from '../../convex/lib/rotateContent.ts';
 
 const MS_PER_HOUR = 1000 * 60 * 60;
 const MS_PER_DAY = MS_PER_HOUR * 24;
