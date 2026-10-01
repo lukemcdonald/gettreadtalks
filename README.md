@@ -2,6 +2,8 @@
 
 Faith-based talks platform. Next.js app with a Convex backend.
 
+[Site Documentation](https://www.cubic.dev/wikis/lukemcdonald/gettreadtalks?page=ui-components)
+
 ## Stack
 
 - **App:** [Next.js](https://nextjs.org/docs) 16, [React](https://react.dev/) 19, [Tailwind CSS](https://tailwindcss.com/docs) v4
@@ -21,19 +23,18 @@ Faith-based talks platform. Next.js app with a Convex backend.
 
 1. Clone and install:
 
-   ```bash
-   pnpm install
-   ```
+```bash
+ pnpm install
+```
 
 2. Copy `.env.example` to `.env.local` and fill in values. Convex, auth, email, Turnstile, Segment, and Sentry keys are documented there.
-
 3. Start local development:
 
-   ```bash
-   pnpm dev
-   ```
+```bash
+ pnpm dev
+```
 
-   Runs Next.js (HTTPS on `https://localhost:3000`) and Convex in parallel, then opens the browser.
+Runs Next.js (HTTPS on `https://localhost:3000`) and Convex in parallel, then opens the browser.
 
 ### Useful scripts
 
