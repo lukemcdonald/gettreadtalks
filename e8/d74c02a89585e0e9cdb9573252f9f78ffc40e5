@@ -1,0 +1,20 @@
+AGENTS.md
+  s_b65b4e49043d52::t_52436fa92b2735 45-46,49
+  s_b65b4e49043d52::t_e767464222383c 50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e8d74c02a89585e0e9cdb9573252f9f78ffc40e5",
+  "prompts": {},
+  "sessions": {
+    "s_b65b4e49043d52": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "e07e3df7-540c-4dc7-9836-949c96605a27",
+        "model": "default"
+      },
+      "human_author": "Luke McDonald <thelukemcdonald@gmail.com>"
+    }
+  }
+}
