@@ -9,12 +9,17 @@ import { render } from 'react-email';
 import { site } from '../src/configs/site';
 import { components, internal } from './_generated/api';
 import { internalAction, internalMutation } from './_generated/server';
+import { MediaHealthEmail } from './emails/mediaHealth';
 import { ResetPasswordTemplate } from './emails/resetPassword';
 import { VerifyEmailTemplate } from './emails/verifyEmail';
 import { WelcomeEmail } from './emails/welcome';
 import { throwConvexError } from './lib/errors';
 import { reportSentryException } from './lib/sentry';
 import { getErrorMessage } from './lib/utils';
+import {
+  mediaCheckEntityTable,
+  mediaCheckStatus,
+} from './model/mediaHealth/validators';
 
 // Email constants - same across all environments
 const TEST_DOMAIN_EMAIL = 'delivered@resend.dev';
@@ -27,6 +32,7 @@ const CHECK_SEND_RESULT_DELAY_MS = 45_000;
 const CHECK_SEND_RESULT_MAX_BUDGET_MS = 20 * 60 * 1000;
 
 const EMAIL_KINDS = [
+  'mediaHealth',
   'passwordReset',
   'test',
   'verification',
@@ -138,6 +144,55 @@ export const handleEmailEvent = internalMutation({
         console.log('Email event:', event.type, id);
         break;
       }
+    }
+
+    return null;
+  },
+  returns: v.null(),
+});
+
+export const sendMediaHealthEmail = internalAction({
+  args: {
+    items: v.array(
+      v.object({
+        adminPath: v.string(),
+        entityTable: mediaCheckEntityTable,
+        mediaUrl: v.string(),
+        newStatus: v.union(v.literal('missing'), v.literal('private')),
+        previousStatus: mediaCheckStatus,
+        title: v.string(),
+      })
+    ),
+  },
+  handler: async (ctx, args) => {
+    if (args.items.length === 0) {
+      return null;
+    }
+
+    try {
+      const template = MediaHealthEmail({
+        items: args.items,
+      });
+      const { html, text } = await renderEmail(template);
+
+      await sendTrackedEmail(
+        ctx,
+        {
+          from: getFromAddress(),
+          html,
+          replyTo: [getReplyToAddress()],
+          subject: `Dead media found (${args.items.length})`,
+          text,
+          to: site.email.contact,
+        },
+        'mediaHealth'
+      );
+    } catch (error) {
+      throwConvexError(500, 'Failed to send media health email', {
+        cause: getErrorMessage(error),
+        resource: 'email',
+        resourceId: 'mediaHealth',
+      });
     }
 
     return null;

@@ -1,5 +1,9 @@
 {
   "$schema": "./fallow.schema.json",
+  "entry": [
+    // Convex registers these modules as runtime functions; they are not imported from Next.js.
+    "convex/*.ts",
+  ],
   "ignoreDependencies": [
     // Coss primitives import these; that tree is ignored below.
     "@daypicker/react",
