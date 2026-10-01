@@ -1,7 +1,9 @@
-import type { Speaker } from '@/features/speakers/types';
-import type { Talk } from '@/features/talks/types';
+interface TrackEntity {
+  _id: string;
+  slug: string;
+}
 
-export function speakerTrackProps(speaker: Pick<Speaker, '_id' | 'slug'>) {
+export function speakerTrackProps(speaker: TrackEntity) {
   return {
     speaker_id: speaker._id,
     speaker_slug: speaker.slug,
@@ -9,8 +11,8 @@ export function speakerTrackProps(speaker: Pick<Speaker, '_id' | 'slug'>) {
 }
 
 export function talkTrackProps(
-  talk: Pick<Talk, '_id' | 'slug'>,
-  speaker?: Pick<Speaker, '_id' | 'slug'> | null
+  talk: TrackEntity,
+  speaker?: TrackEntity | null
 ) {
   return {
     ...(speaker ? { speaker_id: speaker._id, speaker_slug: speaker.slug } : {}),
