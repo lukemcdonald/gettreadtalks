@@ -84,6 +84,8 @@ convex/model/mediaHealth/queries.ts
   s_59ecc620d9567b::t_1e9322800df293 85,115
 convex/_generated/api.d.ts
   s_59ecc620d9567b::t_e48da834e2f252 15,18,38,55-61,97,100,120,137-143
+package.json
+  s_59ecc620d9567b::t_20f5f7d84fb258 25
 ---
 {
   "schema_version": "authorship/3.0.0",
