@@ -1,0 +1,34 @@
+src/features/clips/components/clips-list.tsx
+  s_80e7cb667886d3::t_54684d5b73247a 3
+  s_80e7cb667886d3::t_0a48f25797955e 19
+package.json
+  s_80e7cb667886d3::t_0abb89de7fa975 25
+src/utils/rotate-cached-content.ts
+  s_80e7cb667886d3::t_18e72e1a7784bf 7-11,18,23,25,27-46
+convex/lib/rotateContent.test.ts
+  s_80e7cb667886d3::t_381f14224637ac 1-46
+src/components/media-embed/utils.test.ts
+  s_80e7cb667886d3::t_67fc3104c7dfdf 1-29
+src/components/media-embed/utils.ts
+  s_80e7cb667886d3::t_277bb0a84e3504 82-95
+convex/lib/rotateContent.ts
+  s_80e7cb667886d3::t_a4ef2d0bef38b0 6,9-11,13,16,19,22,27-40,67,73-74
+src/components/media-embed/index.ts
+  s_80e7cb667886d3::t_31cb8663091d80 2-6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "8f1cea54c7800e3c2461aa46db67641448f247ef",
+  "prompts": {},
+  "sessions": {
+    "s_80e7cb667886d3": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "1ff626a1-51b0-48b9-bb9a-5316f735c685",
+        "model": "grok-4.6"
+      },
+      "human_author": "Luke McDonald <thelukemcdonald@gmail.com>"
+    }
+  }
+}
