@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   check:
-    name: Style and types
+    name: Style, types, and tests
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
@@ -26,3 +26,4 @@ jobs:
           runtime: node@24
       - run: pnpm check
       - run: pnpm typecheck
+      - run: pnpm test
