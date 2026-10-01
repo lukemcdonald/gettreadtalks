@@ -9,7 +9,7 @@ import { EditorialProfileLayout } from '@/components/layouts';
 import { isVideoMediaType } from '@/components/media-embed';
 import { site } from '@/configs/site';
 import { getSpeakerBySlug } from '@/features/speakers/queries/get-speaker-by-slug';
-import { rotateContent } from '@/utils';
+import { rotateCachedContent } from '@/utils';
 
 interface SpeakerPageProps {
   params: Promise<{ speakerSlug: string }>;
@@ -55,7 +55,7 @@ export default async function SpeakerPage({ params }: SpeakerPageProps) {
   const featuredCandidates = talks.filter(
     (t) => t.featured && isVideoMediaType(t.mediaUrl)
   );
-  const [featuredTalk] = rotateContent(
+  const [featuredTalk] = await rotateCachedContent(
     featuredCandidates.length > 0 ? featuredCandidates : talks,
     {
       count: 1,
