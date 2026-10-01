@@ -1,0 +1,30 @@
+tsconfig.json
+  s_b65b4e49043d52::t_1c4a4156fa5b48 35
+AGENTS.md
+  s_b65b4e49043d52::t_9a88d4847c76d7 45,49
+src/services/analytics/page-context.ts
+  s_b65b4e49043d52::t_691f17da555725 2-22,28
+src/services/analytics/page-context.test.ts
+  s_b65b4e49043d52::t_f52279c29e791d 1-51,53-58
+  s_b65b4e49043d52::t_60be92eb3fca2b 52
+package.json
+  s_b65b4e49043d52::t_62e731f55a935a 25
+README.md
+  s_b65b4e49043d52::t_19ac0bb8971917 37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "487500ff3218f51de48c8911d7225d0976f469dd",
+  "prompts": {},
+  "sessions": {
+    "s_b65b4e49043d52": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "e07e3df7-540c-4dc7-9836-949c96605a27",
+        "model": "grok-4.6"
+      },
+      "human_author": "Luke McDonald <thelukemcdonald@gmail.com>"
+    }
+  }
+}
