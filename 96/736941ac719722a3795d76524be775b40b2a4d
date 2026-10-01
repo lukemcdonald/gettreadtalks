@@ -1,0 +1,24 @@
+src/services/analytics/query-change.test.ts
+  s_b65b4e49043d52::t_2254d415d0a484 62-115
+  s_b65b4e49043d52::t_a6adf5f0cef77f 4
+src/services/analytics/location-change.ts
+  s_b65b4e49043d52::t_c3fe30fed46aec 2,35-37,42-43
+src/services/analytics/query-change.ts
+  s_b65b4e49043d52::t_87b0f5ba999638 66-78
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "96736941ac719722a3795d76524be775b40b2a4d",
+  "prompts": {},
+  "sessions": {
+    "s_b65b4e49043d52": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "e07e3df7-540c-4dc7-9836-949c96605a27",
+        "model": "grok-4.6"
+      },
+      "human_author": "Luke McDonald <thelukemcdonald@gmail.com>"
+    }
+  }
+}
