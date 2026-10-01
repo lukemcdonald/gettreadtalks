@@ -22,6 +22,7 @@
     "release:full": "pnpm build && pnpm release",
     "start": "next start",
     "style": "ultracite fix .",
+    "test": "node --test --experimental-strip-types src/services/analytics/page-context.test.ts",
     "typecheck": "tsc --noEmit",
     "update:ui": "pnpm dlx shadcn@latest add @coss/ui --overwrite",
     "update:ui:styles": "pnpm dlx shadcn@latest add @coss/colors-neutral --overwrite"

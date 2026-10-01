@@ -1,11 +1,31 @@
 /** Query keys stripped from analytics page context (secrets / PII). */
-const SENSITIVE_PARAMS = new Set(['email', 'password', 'token']);
+const SENSITIVE_PARAMS = new Set([
+  'api_key',
+  'apikey',
+  'email',
+  'password',
+  'token',
+]);
+
+function isSensitiveParam(key: string) {
+  const normalized = key.toLowerCase();
+
+  if (SENSITIVE_PARAMS.has(normalized)) {
+    return true;
+  }
+
+  return (
+    normalized.endsWith('_password') ||
+    normalized.endsWith('_secret') ||
+    normalized.endsWith('_token')
+  );
+}
 
 function sanitizeSearch(search: string) {
   const params = new URLSearchParams();
 
   for (const [key, value] of new URLSearchParams(search)) {
-    if (SENSITIVE_PARAMS.has(key.toLowerCase())) {
+    if (isSensitiveParam(key)) {
       continue;
     }
 
