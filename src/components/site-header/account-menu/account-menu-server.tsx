@@ -1,3 +1,5 @@
+import { navigation } from 'next/cache';
+
 import { AccountMenu } from '@/components/site-header/account-menu/account-menu';
 import { getCurrentUser } from '@/services/auth/server';
 
@@ -6,6 +8,8 @@ import { getCurrentUser } from '@/services/auth/server';
  * Isolated from the main header to enable granular Suspense boundaries.
  */
 export async function AccountMenuServer() {
+  await navigation();
   const user = await getCurrentUser();
+
   return <AccountMenu initialUser={user} />;
 }
