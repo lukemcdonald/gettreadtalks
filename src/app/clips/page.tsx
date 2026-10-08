@@ -8,6 +8,9 @@ import { PageHeader } from '@/components/page-header';
 import { Container, Section } from '@/components/ui';
 import { ClipsListSkeleton } from '@/features/clips/components/clips-list-skeleton';
 
+// fallow-ignore-next-line unused-export
+export const ensureStatic = 'shell';
+
 export const metadata: Metadata = {
   description:
     'Short Christ centered clips — quick encouragement from the best talks.',
