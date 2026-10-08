@@ -15,7 +15,6 @@ if (IS_DEV && typeof window !== 'undefined') {
 
 Sentry.init({
   ...baseSentryConfig,
-  attachStacktrace: true,
   beforeSend(event) {
     if (event.exception) {
       event.extra = {
@@ -25,17 +24,15 @@ Sentry.init({
     }
     return event;
   },
-  integrations: [
-    browserTracingIntegration({
-      enableInp: true,
-    }),
+  integrations: (integrations) => [
+    ...integrations.filter((integration) => integration.name !== 'Console'),
     breadcrumbsIntegration({
-      console: false,
       dom: false,
       fetch: false,
       history: false,
       xhr: false,
     }),
+    browserTracingIntegration(),
     thirdPartyErrorFilterIntegration({
       behaviour: 'apply-tag-if-contains-third-party-frames',
       filterKeys: ['gettreadtalks-app'],

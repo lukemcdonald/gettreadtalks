@@ -72,17 +72,11 @@ const config = IS_SENTRY_ENABLED
       project: process.env.SENTRY_PROJECT,
       release: {
         create: false,
+        deploy: false,
       },
       silent: !process.env.CI,
       sourcemaps: {
         disable: true,
-      },
-      webpack: {
-        unstable_sentryWebpackPluginOptions: {
-          release: {
-            deploy: false,
-          },
-        },
       },
     })
   : nextConfig;
