@@ -4,15 +4,6 @@
   margin-inline: auto;
 }
 
-@utility scrollbar-hidden {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
-}
-
 @utility card-interactive {
   @apply isolate ring-1 ring-transparent transition duration-300;
 
