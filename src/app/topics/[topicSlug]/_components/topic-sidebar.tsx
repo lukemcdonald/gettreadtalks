@@ -2,10 +2,10 @@
 
 import type { Topic } from '@/features/topics/types';
 
-import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
 import { SidebarContent } from '@/components/sidebar-content';
+import { Link } from '@/components/ui/link';
 import { SearchInput } from '@/components/ui/search-input';
 
 interface TopicSidebarProps {

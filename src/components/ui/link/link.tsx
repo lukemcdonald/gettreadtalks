@@ -1,44 +1,11 @@
-'use client';
-
 import type { ComponentProps } from 'react';
 
 import NextLink from 'next/link';
-import { useState } from 'react';
 
-type NextLinkProps = ComponentProps<typeof NextLink>;
+import { getRel } from './rel';
 
-type LinkProps = Omit<NextLinkProps, 'prefetch'> & {
-  prefetch?: NextLinkProps['prefetch'] | 'hover';
-};
+type LinkProps = ComponentProps<typeof NextLink>;
 
-export function Link({
-  prefetch,
-  rel,
-  target,
-  onMouseEnter,
-  ...delegated
-}: LinkProps) {
-  const [hovered, setHovered] = useState(false);
-
-  const isBlank = target === '_blank';
-  const resolvedRel = isBlank ? (rel ?? 'noopener noreferrer') : rel;
-  const isHoverPrefetch = prefetch === 'hover';
-  const resolvedPrefetch = isHoverPrefetch ? hovered : prefetch;
-
-  return (
-    <NextLink
-      onMouseEnter={(e) => {
-        if (isHoverPrefetch) {
-          setHovered(true);
-        }
-        if (onMouseEnter) {
-          onMouseEnter(e);
-        }
-      }}
-      prefetch={resolvedPrefetch}
-      rel={resolvedRel}
-      target={target}
-      {...delegated}
-    />
-  );
+export function Link({ rel, target, ...delegated }: LinkProps) {
+  return <NextLink rel={getRel(target, rel)} target={target} {...delegated} />;
 }

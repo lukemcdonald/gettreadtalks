@@ -102,7 +102,7 @@ import { Button } from '@/components/ui/primitives/button';
 
 Pages and layouts stay synchronous. Put `searchParams`, cookies, headers, and auth in small async children, each behind its own `<Suspense>` (separate boundaries for filters vs results; `fallback={null}` only for small pieces). No per-route `loading.tsx` on listings. Auth via `AdminGate` / `UserGate` — do not await `requireCurrentUser` / `requireAdminUser` in the layout.
 
-Public reads live in `src/features/*/queries` with `'use cache'`, `cacheLife()`, and `cacheTag()`. Mutations call `updateTag()` (`refresh()` only when that is not enough). Public listing pages export `ensureStatic = 'shell'`. React Compiler is on.
+Public reads live in `src/features/*/queries` with `'use cache'`, `cacheLife()`, and `cacheTag()`. Mutations call `updateTag()` (`refresh()` only when that is not enough). Public listing pages export `ensureStatic = 'shell'`. React Compiler is on. Use `Link` from `@/components/ui/link`, not `next/link` directly; default prefetch.
 
 ## Convex
 

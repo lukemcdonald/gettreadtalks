@@ -5,7 +5,7 @@ import { Link } from '@/components/ui/link';
 
 export function NewTalkButton() {
   return (
-    <Button render={<Link href="/talks/new" prefetch="hover" />} size="sm">
+    <Button render={<Link href="/talks/new" />} size="sm">
       <PlusIcon className="size-4" />
       New Talk
     </Button>

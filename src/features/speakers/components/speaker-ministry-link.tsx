@@ -4,7 +4,7 @@ import type { Speaker } from '@/features/speakers/types';
 
 import { ExternalLinkIcon } from 'lucide-react';
 
-import { Link } from '@/components/ui';
+import { Link } from '@/components/ui/link';
 import { track } from '@/services/analytics';
 import { cn } from '@/utils';
 

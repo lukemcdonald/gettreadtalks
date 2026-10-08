@@ -34,7 +34,6 @@ type MediaCardProps = {
   ariaLabel?: string;
   href: string;
   media?: ReactNode;
-  prefetch?: ComponentProps<typeof FauxLink>['prefetch'];
   subtitle?: ReactNode;
   title: ReactNode;
 } & ComponentProps<typeof Card>;
@@ -44,7 +43,6 @@ export function MediaCard({
   className,
   href,
   media,
-  prefetch = 'hover',
   subtitle,
   title,
   ...delegated
@@ -60,9 +58,7 @@ export function MediaCard({
       {media}
       <div className="flex flex-1 flex-col justify-center gap-0.5">
         <MediaCardTitle aria-label={ariaLabel}>
-          <FauxLink href={href} prefetch={prefetch}>
-            {title}
-          </FauxLink>
+          <FauxLink href={href}>{title}</FauxLink>
         </MediaCardTitle>
         {!!subtitle && (
           <CardDescription className="text-pretty">{subtitle}</CardDescription>

@@ -4,9 +4,8 @@ import type { Speaker } from '@/features/speakers/types';
 import type { Talk } from '@/features/talks/types';
 import type { ReactNode } from 'react';
 
-import Link from 'next/link';
-
 import { MediaCard } from '@/components/media-card';
+import { Link } from '@/components/ui/link';
 import { SpeakerAvatar } from '@/features/speakers/components/speaker-avatar';
 import { getSpeakerName } from '@/features/speakers/utils';
 import { getTalkUrl } from '@/features/talks/utils';

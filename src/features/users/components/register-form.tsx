@@ -4,7 +4,6 @@ import type { ComponentPropsWithoutRef } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CircleAlertIcon } from 'lucide-react';
-import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -23,6 +22,7 @@ import {
   Input,
   PasswordInput,
 } from '@/components/ui';
+import { Link } from '@/components/ui/link';
 import {
   resetCaptchaIfNeeded,
   TurnstileField,

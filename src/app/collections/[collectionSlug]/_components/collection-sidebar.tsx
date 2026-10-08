@@ -1,8 +1,7 @@
 import type { Speaker } from '@/features/speakers/types';
 
-import Link from 'next/link';
-
 import { SidebarContent } from '@/components/sidebar-content';
+import { Link } from '@/components/ui/link';
 
 interface CollectionSidebarProps {
   speakers: Speaker[];

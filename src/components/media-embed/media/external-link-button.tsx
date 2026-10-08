@@ -1,6 +1,7 @@
 import { ExternalLinkIcon } from 'lucide-react';
 
-import { Button, Link } from '@/components/ui';
+import { Button } from '@/components/ui';
+import { Link } from '@/components/ui/link';
 
 interface ExternalLinkButtonProps {
   className: string;

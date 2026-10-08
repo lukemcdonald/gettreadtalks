@@ -1,10 +1,9 @@
 import type { StatusType } from '@/lib/entities/types';
 import type { ReactNode } from 'react';
 
-import Link from 'next/link';
-
 import { StatusPopover } from '@/components/status-popover';
 import { TableCell, TableRow } from '@/components/ui';
+import { Link } from '@/components/ui/link';
 
 interface ContentTableRowProps {
   actionsMenu: ReactNode;

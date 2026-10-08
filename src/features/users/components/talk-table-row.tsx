@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
-import { Link, TableCell, TableRow } from '@/components/ui';
+import { TableCell, TableRow } from '@/components/ui';
+import { Link } from '@/components/ui/link';
 
 interface TalkTableRowProps {
   action: ReactNode;

@@ -63,7 +63,6 @@ export function TalkMetadataSidebar({
           <Link
             className="bg-muted text-foreground hover:bg-muted/80 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm transition-colors"
             href={`https://www.biblegateway.com/passage/?search=${encodeURIComponent(talk.scripture)}&version=ESV`}
-            rel="noopener noreferrer"
             target="_blank"
           >
             {talk.scripture}

@@ -8,9 +8,8 @@ import type {
   SVGProps,
 } from 'react';
 
-import Link from 'next/link';
-
 import { Button, MenuItem } from '@/components/ui';
+import { Link } from '@/components/ui/link';
 
 type AccountMenuItemProps = {
   href?: string;

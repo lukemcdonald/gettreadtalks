@@ -1,8 +1,7 @@
 import type { GridColumns } from './grid-list';
 import type { ReactNode } from 'react';
 
-import Link from 'next/link';
-
+import { Link } from '@/components/ui/link';
 import { cn } from '@/utils';
 
 import { GridList } from './grid-list';

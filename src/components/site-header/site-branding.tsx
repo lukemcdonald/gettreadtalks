@@ -1,6 +1,5 @@
-import Link from 'next/link';
-
 import { Logo } from '@/components/logo';
+import { Link } from '@/components/ui/link';
 import { site } from '@/configs/site';
 
 interface SiteBrandingProps {
