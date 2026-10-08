@@ -11,9 +11,6 @@ import { SidebarFiltersSkeleton } from '@/components/skeletons';
 import { CollectionsListSkeleton } from '@/features/collections/components/collections-list-skeleton';
 import { getCollections } from '@/features/collections/queries/get-collections';
 
-// fallow-ignore-next-line unused-export
-export const ensureStatic = 'shell';
-
 export const metadata: Metadata = {
   description:
     'Explore curated talk series — each collection covers one topic or book of the Bible.',
