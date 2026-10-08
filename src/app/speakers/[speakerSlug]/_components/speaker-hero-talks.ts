@@ -11,7 +11,11 @@ export function featuredHeroCandidates<T extends TalkForHero>(talks: T[]) {
     (talk) => talk.featured && isVideoMediaType(talk.mediaUrl)
   );
 
-  return featuredVideos.length > 0 ? featuredVideos : talks;
+  if (featuredVideos.length > 0) {
+    return featuredVideos;
+  }
+
+  return talks.filter((talk) => isVideoMediaType(talk.mediaUrl));
 }
 
 export function speakerTalkLayout<T extends TalkForHero>(

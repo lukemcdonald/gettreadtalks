@@ -6,6 +6,8 @@ export function uniqueSpeakersFromTalks<TSpeaker extends { _id: string }>(
     .filter((speaker): speaker is TSpeaker => speaker !== null);
 
   return [
-    ...new Map(speakers.map((speaker) => [speaker._id, speaker])).values(),
+    ...new Map(
+      speakers.map((speaker) => [speaker._id, speaker] as const)
+    ).values(),
   ];
 }

@@ -28,10 +28,14 @@ test('rotates featured video talks when any exist', () => {
   );
 });
 
-test('falls back to every talk when none are featured video', () => {
-  const talks = [featuredAudio, otherVideo];
+test('falls back to nonfeatured videos when none are featured video', () => {
+  assert.deepEqual(featuredHeroCandidates([featuredAudio, otherVideo]), [
+    otherVideo,
+  ]);
+});
 
-  assert.deepEqual(featuredHeroCandidates(talks), talks);
+test('returns no candidates when there are no videos', () => {
+  assert.deepEqual(featuredHeroCandidates([featuredAudio]), []);
 });
 
 test('keeps a lone featured video in the list and omits it when others exist', () => {
