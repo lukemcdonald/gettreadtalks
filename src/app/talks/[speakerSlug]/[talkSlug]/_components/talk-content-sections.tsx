@@ -5,6 +5,7 @@ import type { Talk } from '@/features/talks/types';
 import type { Topic } from '@/features/topics/types';
 import type { ReactNode } from 'react';
 
+import { talkHighlightLinks } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-highlight-links';
 import { TalkMetadataSidebar } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-metadata-sidebar';
 import { FeaturedGrid } from '@/components/featured-grid';
 import { ClipCard } from '@/features/clips/components/clip-card';
@@ -48,10 +49,11 @@ export function TalkContentSections({
             sticky
             title="Highlights"
           >
-            {clips.map((clip) => (
+            {talkHighlightLinks(clips).map((highlight) => (
               <ClipCard
-                clip={clip}
-                key={clip._id}
+                clip={highlight}
+                href={highlight.href}
+                key={highlight._id}
                 speaker={speaker ?? undefined}
               />
             ))}
