@@ -1,14 +1,17 @@
 import type { Metadata } from 'next';
 
 import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
 
-import { TopicContent } from '@/app/topics/[topicSlug]/_components/topic-content';
 import { TopicSidebar } from '@/app/topics/[topicSlug]/_components/topic-sidebar';
+import { TopicTalks } from '@/app/topics/[topicSlug]/_components/topic-talks';
 import { JsonLd } from '@/components/json-ld';
 import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
-import { PageBreadcrumb } from '@/components/ui';
+import { SidebarContent } from '@/components/sidebar-content';
+import { PageBreadcrumb, Skeleton } from '@/components/ui';
 import { site } from '@/configs/site';
+import { TalksListSkeleton } from '@/features/talks/components/talks-list-skeleton';
 import { getTopicBySlug } from '@/features/topics/queries/get-topic-by-slug';
 import { pluralize } from '@/utils/pluralize';
 
@@ -46,15 +49,13 @@ export default async function TopicPage({
   searchParams,
 }: TopicPageProps) {
   const { topicSlug } = await params;
-  const { cursor, search } = await searchParams;
-
-  const topicResult = await getTopicBySlug({ cursor, search, slug: topicSlug });
+  const topicResult = await getTopicBySlug({ slug: topicSlug });
 
   if (!topicResult) {
     notFound();
   }
 
-  const { continueCursor, isDone, talks, topic, totalTalks } = topicResult;
+  const { talks, topic, totalTalks } = topicResult;
 
   const description = `Elevate your spiritual heartbeat with ${totalTalks === 1 ? 'this' : `these ${totalTalks}`} Christ centered ${pluralize(totalTalks, 'talk', 'talks')}.`;
 
@@ -87,17 +88,27 @@ export default async function TopicPage({
           />
         }
         content={
-          <TopicContent
-            continueCursor={continueCursor}
-            hasNextPage={!isDone}
-            hasPrevPage={!!cursor}
-            talks={talks}
-          />
+          <Suspense fallback={<TalksListSkeleton />}>
+            <TopicTalks searchParams={searchParams} topicSlug={topicSlug} />
+          </Suspense>
         }
         header={
           <PageHeader description={description} size="lg" title={topic.title} />
         }
-        sidebar={<TopicSidebar hasActiveFilters={!!search} topic={topic} />}
+        sidebar={
+          <Suspense
+            fallback={
+              <SidebarContent className="space-y-4">
+                <div className="space-y-1.5">
+                  <Skeleton className="h-4 w-12" />
+                  <Skeleton className="h-9 w-full" />
+                </div>
+              </SidebarContent>
+            }
+          >
+            <TopicSidebar topic={topic} />
+          </Suspense>
+        }
         sidebarSticky
       />
     </>

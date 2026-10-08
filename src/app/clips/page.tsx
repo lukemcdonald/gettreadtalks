@@ -1,9 +1,12 @@
+import type { ClipsSearchParams } from '@/app/clips/_components/clips-results';
 import type { Metadata } from 'next';
 
-import { ClipsContent } from '@/app/clips/_components/clips-content';
+import { Suspense } from 'react';
+
+import { ClipsResults } from '@/app/clips/_components/clips-results';
 import { PageHeader } from '@/components/page-header';
 import { Container, Section } from '@/components/ui';
-import { getClips } from '@/features/clips/queries/get-clips';
+import { ClipsListSkeleton } from '@/features/clips/components/clips-list-skeleton';
 
 export const metadata: Metadata = {
   description:
@@ -11,20 +14,11 @@ export const metadata: Metadata = {
   title: 'Clips',
 };
 
-interface ClipsPageSearchParams {
-  cursor?: string;
-}
-
 interface ClipsPageProps {
-  searchParams: Promise<ClipsPageSearchParams>;
+  searchParams: Promise<ClipsSearchParams>;
 }
 
-export default async function ClipsPage({ searchParams }: ClipsPageProps) {
-  const params = await searchParams;
-  const { cursor } = params;
-
-  const result = await getClips({ cursor });
-
+export default function ClipsPage({ searchParams }: ClipsPageProps) {
   return (
     <Section spacing="xl">
       <Container>
@@ -36,12 +30,9 @@ export default async function ClipsPage({ searchParams }: ClipsPageProps) {
           />
         </div>
 
-        <ClipsContent
-          clips={result.clips}
-          continueCursor={result.continueCursor}
-          hasNextPage={!result.isDone}
-          hasPrevPage={!!cursor}
-        />
+        <Suspense fallback={<ClipsListSkeleton />}>
+          <ClipsResults searchParams={searchParams} />
+        </Suspense>
       </Container>
     </Section>
   );

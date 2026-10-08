@@ -18,6 +18,10 @@ import { cn } from '@/utils';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
+// Next.js route segment config — consumed by the compiler, not app imports.
+// fallow-ignore-next-line unused-export
+export const ensureStatic = 'prefetch';
+
 export const metadata: Metadata = {
   description: site.description,
   icons: {

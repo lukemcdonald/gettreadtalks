@@ -1,11 +1,15 @@
+import type { SpeakersSearchParams } from '@/app/speakers/_components/speakers-results';
 import type { Metadata } from 'next';
 
+import { Suspense } from 'react';
+
+import { SpeakersResults } from '@/app/speakers/_components/speakers-results';
 import { SpeakersSidebar } from '@/app/speakers/_components/speakers-sidebar';
 import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
-import { SpeakersList } from '@/features/speakers/components/speakers-list';
+import { SidebarFiltersSkeleton } from '@/components/skeletons';
+import { SpeakersListSkeleton } from '@/features/speakers/components/speakers-list-skeleton';
 import { getSpeakers } from '@/features/speakers/queries/get-speakers';
-import { getSpeakersGrouped } from '@/features/speakers/queries/get-speakers-grouped';
 
 export const metadata: Metadata = {
   description:
@@ -14,34 +18,20 @@ export const metadata: Metadata = {
 };
 
 interface SpeakersPageProps {
-  searchParams: Promise<{
-    role?: string;
-    search?: string;
-    sort?: string;
-  }>;
+  searchParams: Promise<SpeakersSearchParams>;
 }
 
 export default async function SpeakersPage({
   searchParams,
 }: SpeakersPageProps) {
-  const params = await searchParams;
-
-  const { role, search, sort } = params;
-
-  const [speakerGroups, { speakers }] = await Promise.all([
-    getSpeakersGrouped({ role, search, sort }),
-    getSpeakers(),
-  ]);
-
-  const hasActiveFilters = !!(search || role);
+  const { speakers } = await getSpeakers();
 
   return (
     <SidebarLayout
       content={
-        <SpeakersList
-          groups={speakerGroups}
-          hasActiveFilters={hasActiveFilters}
-        />
+        <Suspense fallback={<SpeakersListSkeleton />}>
+          <SpeakersResults searchParams={searchParams} />
+        </Suspense>
       }
       header={
         <PageHeader
@@ -50,7 +40,11 @@ export default async function SpeakersPage({
           title="Speakers"
         />
       }
-      sidebar={<SpeakersSidebar speakers={speakers} />}
+      sidebar={
+        <Suspense fallback={<SidebarFiltersSkeleton />}>
+          <SpeakersSidebar speakers={speakers} />
+        </Suspense>
+      }
       sidebarSticky
     />
   );

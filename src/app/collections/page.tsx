@@ -1,9 +1,14 @@
+import type { CollectionsSearchParams } from '@/app/collections/_components/collections-results';
 import type { Metadata } from 'next';
 
-import { CollectionsContent } from '@/app/collections/_components/collections-content';
+import { Suspense } from 'react';
+
+import { CollectionsResults } from '@/app/collections/_components/collections-results';
 import { CollectionsSidebar } from '@/app/collections/_components/collections-sidebar';
 import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
+import { SidebarFiltersSkeleton } from '@/components/skeletons';
+import { CollectionsListSkeleton } from '@/features/collections/components/collections-list-skeleton';
 import { getCollections } from '@/features/collections/queries/get-collections';
 
 export const metadata: Metadata = {
@@ -12,31 +17,21 @@ export const metadata: Metadata = {
   title: 'Collections',
 };
 
-interface CollectionsPageSearchParams {
-  sort?: string;
-  speaker?: string;
-}
-
 interface CollectionsPageProps {
-  searchParams: Promise<CollectionsPageSearchParams>;
+  searchParams: Promise<CollectionsSearchParams>;
 }
 
 export default async function CollectionsPage({
   searchParams,
 }: CollectionsPageProps) {
-  const { sort, speaker: speakerSlug } = await searchParams;
-
-  const { collections, speakers } = await getCollections({ sort, speakerSlug });
-
-  const hasActiveFilters = !!speakerSlug;
+  const { speakers } = await getCollections();
 
   return (
     <SidebarLayout
       content={
-        <CollectionsContent
-          collections={collections}
-          hasActiveFilters={hasActiveFilters}
-        />
+        <Suspense fallback={<CollectionsListSkeleton />}>
+          <CollectionsResults searchParams={searchParams} />
+        </Suspense>
       }
       header={
         <PageHeader
@@ -45,7 +40,11 @@ export default async function CollectionsPage({
           title="Collections"
         />
       }
-      sidebar={<CollectionsSidebar speakers={speakers} />}
+      sidebar={
+        <Suspense fallback={<SidebarFiltersSkeleton />}>
+          <CollectionsSidebar speakers={speakers} />
+        </Suspense>
+      }
       sidebarSticky
     />
   );

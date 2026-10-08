@@ -1,7 +1,4 @@
 import { GridList } from '@/components/grid-list';
-import { SidebarLayout } from '@/components/layouts';
-import { PageHeader } from '@/components/page-header';
-import { SidebarFiltersSkeleton } from '@/components/skeletons';
 import { Skeleton } from '@/components/ui';
 
 function TopicSectionSkeleton() {
@@ -22,7 +19,7 @@ function TopicSectionSkeleton() {
   );
 }
 
-function TopicsBrowseSkeleton() {
+export function TopicsBrowseSkeleton() {
   return (
     <div className="space-y-16">
       {Array.from({ length: 3 }).map((_, i) => (
@@ -30,22 +27,5 @@ function TopicsBrowseSkeleton() {
         <TopicSectionSkeleton key={i} />
       ))}
     </div>
-  );
-}
-
-export default function TopicsLoading() {
-  return (
-    <SidebarLayout
-      content={<TopicsBrowseSkeleton />}
-      header={
-        <PageHeader
-          description="Browse talks organized by Bible topic or theme."
-          size="lg"
-          title="Topics"
-        />
-      }
-      sidebar={<SidebarFiltersSkeleton />}
-      sidebarSticky
-    />
   );
 }
