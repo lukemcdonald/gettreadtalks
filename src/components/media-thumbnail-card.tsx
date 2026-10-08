@@ -4,10 +4,10 @@ import type { ReactNode } from 'react';
 
 import { ArrowRightIcon, PlayIcon } from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { useState } from 'react';
 
 import { Card } from '@/components/ui';
+import { Link } from '@/components/ui/link';
 import { captureMessage } from '@/services/errors';
 
 interface MediaThumbnailCardProps {

@@ -3,10 +3,10 @@
 import type { ActionsGroupProps } from './actions-group.types';
 
 import { EllipsisIcon } from 'lucide-react';
-import Link from 'next/link';
 import { Fragment } from 'react';
 
 import { Button, Group, GroupSeparator } from '@/components/ui';
+import { Link } from '@/components/ui/link';
 import {
   Menu,
   MenuItem,

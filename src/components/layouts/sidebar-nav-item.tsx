@@ -2,9 +2,9 @@
 
 import type { ComponentType, SVGProps } from 'react';
 
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
+import { Link } from '@/components/ui/link';
 import { cn } from '@/utils';
 
 interface SidebarNavItemProps {

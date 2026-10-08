@@ -2,10 +2,10 @@ import type { TalkWithSpeaker } from '@/features/talks/types';
 import type { Topic } from '@/features/topics/types';
 
 import { ChevronRightIcon } from 'lucide-react';
-import Link from 'next/link';
 
 import { GridList } from '@/components/grid-list';
 import { SectionHeading } from '@/components/section-heading';
+import { Link } from '@/components/ui/link';
 import { TalkCard } from '@/features/talks/components/talk-card';
 import { pluralize } from '@/utils';
 

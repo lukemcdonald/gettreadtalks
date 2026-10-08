@@ -1,9 +1,8 @@
 import type { Route } from 'next';
 import type { ReactNode } from 'react';
 
-import Link from 'next/link';
-
 import { Button } from '@/components/ui';
+import { Link } from '@/components/ui/link';
 import { cn } from '@/utils';
 
 interface NavLinkProps {

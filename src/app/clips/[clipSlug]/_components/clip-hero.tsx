@@ -1,11 +1,10 @@
 import type { Clip } from '@/features/clips/types';
 import type { Speaker } from '@/features/speakers/types';
 
-import Link from 'next/link';
-
 import { HeroTitle } from '@/components/hero';
 import { MediaEmbed } from '@/components/media-embed';
 import { Container, Section } from '@/components/ui';
+import { Link } from '@/components/ui/link';
 import { getSpeakerName } from '@/features/speakers/utils';
 
 interface ClipHeroProps {

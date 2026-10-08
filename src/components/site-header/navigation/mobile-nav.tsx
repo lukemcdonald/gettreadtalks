@@ -13,7 +13,6 @@ import {
   Settings as SettingsIcon,
   X as XIcon,
 } from 'lucide-react';
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import { NAVIGATION_LINKS } from '@/components/site-header/constants';
@@ -34,6 +33,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from '@/components/ui';
+import { Link } from '@/components/ui/link';
 import { useCurrentUser } from '@/features/users/hooks/use-current-user';
 import { isAdmin } from '@/services/auth/utils';
 import { cn } from '@/utils';

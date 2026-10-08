@@ -3,8 +3,8 @@
 import type { Speaker } from '@/features/speakers/types';
 
 import { ExternalLinkIcon } from 'lucide-react';
-import Link from 'next/link';
 
+import { Link } from '@/components/ui/link';
 import { track } from '@/services/analytics';
 import { cn } from '@/utils';
 
@@ -37,7 +37,6 @@ export function SpeakerMinistryLink({
         )}
         href={websiteUrl}
         onClick={() => handleClick(websiteUrl, 'ministry')}
-        rel="noopener noreferrer"
         target="_blank"
       >
         {ministry}
@@ -59,7 +58,6 @@ export function SpeakerMinistryLink({
         )}
         href={websiteUrl}
         onClick={() => handleClick(websiteUrl, 'website')}
-        rel="noopener noreferrer"
         target="_blank"
       >
         Website

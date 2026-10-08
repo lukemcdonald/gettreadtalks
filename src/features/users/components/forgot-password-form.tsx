@@ -2,7 +2,6 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CircleAlertIcon } from 'lucide-react';
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -15,6 +14,7 @@ import {
   Fieldset,
   TextField,
 } from '@/components/ui';
+import { Link } from '@/components/ui/link';
 import {
   resetCaptchaIfNeeded,
   TurnstileField,

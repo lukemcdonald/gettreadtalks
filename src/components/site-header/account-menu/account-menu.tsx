@@ -12,7 +12,6 @@ import {
   LogOut as SignOutIcon,
   CircleUser as UserIcon,
 } from 'lucide-react';
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 import { AccountMenuItem } from '@/components/site-header/account-menu/account-menu-item';
@@ -24,6 +23,7 @@ import {
   MenuSeparator,
   MenuTrigger,
 } from '@/components/ui';
+import { Link } from '@/components/ui/link';
 import { useCurrentUser } from '@/features/users/hooks/use-current-user';
 import { isAdmin } from '@/services/auth/utils';
 

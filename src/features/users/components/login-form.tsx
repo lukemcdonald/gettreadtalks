@@ -4,7 +4,6 @@ import type { ComponentPropsWithoutRef } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CircleAlertIcon } from 'lucide-react';
-import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -22,6 +21,7 @@ import {
   Input,
   PasswordInput,
 } from '@/components/ui';
+import { Link } from '@/components/ui/link';
 import { track, waitForAnalytics } from '@/services/analytics';
 import { signIn } from '@/services/auth/client';
 import { AUTH_ERRORS } from '@/services/auth/config';
