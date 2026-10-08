@@ -90,24 +90,11 @@ import { Button } from '@/components/ui/primitives/button';
 
 **Naming:** kebab-case for all `src/` folders
 
-### Layout Data Fetching
+### Rendering & data loading
 
-Never fetch data in `layout.tsx` on the server. Doing so forces all children into dynamic rendering, breaking static rendering for the entire subtree.
+Pages and layouts stay synchronous. Put `searchParams`, cookies, headers, and auth in small async children, each behind its own `<Suspense>` (separate boundaries for filters vs results; `fallback={null}` only for small pieces). No per-route `loading.tsx` on listings. Auth via `AdminGate` / `UserGate` — do not await `requireCurrentUser` / `requireAdminUser` in the layout.
 
-```tsx
-// ❌ Never — makes all children dynamic
-export default async function Layout({ children }) {
-  const data = await fetchSomeData();
-  return <Sidebar data={data}>{children}</Sidebar>;
-}
-
-// ✅ Fetch inside the component, not the layout
-export default function Layout({ children }) {
-  return <Sidebar>{children}</Sidebar>; // Sidebar fetches its own data internally
-}
-```
-
-**Exception:** Auth guards (`requireCurrentUser`, `requireAdminUser`) are acceptable in layouts — they redirect rather than pass data to children, and protected routes are inherently dynamic.
+Public reads live in `src/features/*/queries` with `'use cache'`, `cacheLife()`, and `cacheTag()`. Mutations call `updateTag()` (`refresh()` only when that is not enough). Public listing pages export `ensureStatic = 'shell'`. React Compiler is on.
 
 ## Convex
 
@@ -172,7 +159,7 @@ import { updateTag } from 'next/cache';
 updateTag('entities');
 ```
 
-Use `revalidateTag()` for background/webhook invalidation where SWR behavior is preferred.
+Use `revalidateTag()` for background/webhook invalidation where SWR behavior is preferred. Do not call `refresh()` unless `updateTag` cannot cover the case.
 
 ### Error Handling
 
