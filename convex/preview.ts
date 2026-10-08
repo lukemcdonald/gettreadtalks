@@ -2,116 +2,21 @@ import type { Id, TableNames } from './_generated/dataModel';
 import type { MutationCtx } from './_generated/server';
 
 import { hashPassword } from 'better-auth/crypto';
-import { getOneFrom } from 'convex-helpers/server/relationships';
+import { getManyFrom, getOneFrom } from 'convex-helpers/server/relationships';
 import { v } from 'convex/values';
 
 import { components, internal } from './_generated/api';
 import { internalAction, internalMutation } from './_generated/server';
 import { throwForbidden, throwValidationError } from './lib/errors';
-
-const PREVIEW_MEDIA_URL = 'https://www.youtube.com/watch?v=jNQXAC9IVRw';
-
-const PREVIEW_SPEAKERS = [
-  {
-    description: 'Fixture speaker for Vercel Convex previews.',
-    featured: true,
-    firstName: 'Ada',
-    lastName: 'Preview',
-    ministry: 'Preview Chapel',
-    role: 'Pastor' as const,
-    slug: 'ada-preview',
-    websiteUrl: 'https://example.com/ada-preview',
-  },
-  {
-    description: 'Second fixture speaker so admin search has a name to match.',
-    featured: false,
-    firstName: 'Theo',
-    lastName: 'Sample',
-    ministry: 'Sample Institute',
-    role: 'Theologian' as const,
-    slug: 'theo-sample',
-    websiteUrl: 'https://example.com/theo-sample',
-  },
-];
-
-const PREVIEW_TOPICS = [
-  {
-    slug: 'preview-faith',
-    title: 'Preview Faith',
-  },
-  {
-    slug: 'preview-grace',
-    title: 'Preview Grace',
-  },
-];
-
-const PREVIEW_COLLECTIONS = [
-  {
-    description: 'Fixture series with talks from both preview speakers.',
-    slug: 'preview-conference',
-    title: 'Preview Conference',
-  },
-  {
-    description: 'Fixture series of talks by Ada Preview.',
-    slug: 'preview-series',
-    title: 'Preview Series',
-  },
-];
-
-const PREVIEW_TALKS = [
-  {
-    collectionOrder: 1,
-    collectionSlug: 'preview-conference',
-    description: 'Featured fixture talk for Ada Preview.',
-    featured: true,
-    publishedAt: Date.parse('2024-06-03T12:00:00.000Z'),
-    scripture: 'Ephesians 2:8-9',
-    slug: 'preview-featured-talk',
-    speakerSlug: 'ada-preview',
-    status: 'published' as const,
-    title: 'Preview Featured Talk',
-    topicSlugs: ['preview-grace'],
-  },
-  {
-    collectionOrder: 1,
-    collectionSlug: 'preview-series',
-    description: 'Published fixture talk for Ada Preview.',
-    featured: false,
-    publishedAt: Date.parse('2024-06-02T12:00:00.000Z'),
-    scripture: 'Romans 8:28',
-    slug: 'preview-published-talk',
-    speakerSlug: 'ada-preview',
-    status: 'published' as const,
-    title: 'Preview Published Talk',
-    topicSlugs: ['preview-faith'],
-  },
-  {
-    collectionOrder: 2,
-    collectionSlug: 'preview-series',
-    description: 'Second published fixture talk for Ada Preview.',
-    featured: false,
-    publishedAt: Date.parse('2024-06-01T12:00:00.000Z'),
-    scripture: 'John 1:14',
-    slug: 'preview-evening-talk',
-    speakerSlug: 'ada-preview',
-    status: 'published' as const,
-    title: 'Preview Evening Talk',
-    topicSlugs: ['preview-faith', 'preview-grace'],
-  },
-  {
-    collectionOrder: 2,
-    collectionSlug: 'preview-conference',
-    description: 'Only published fixture talk for Theo Sample.',
-    featured: false,
-    publishedAt: Date.parse('2024-06-04T12:00:00.000Z'),
-    scripture: 'Psalm 23:1-3',
-    slug: 'preview-backlog-talk',
-    speakerSlug: 'theo-sample',
-    status: 'published' as const,
-    title: 'Preview Sample Talk',
-    topicSlugs: ['preview-faith', 'preview-grace'],
-  },
-];
+import { deleteAll } from './lib/utils';
+import {
+  PREVIEW_COLLECTIONS,
+  PREVIEW_SPEAKERS,
+  PREVIEW_TALKS,
+  PREVIEW_TOPICS,
+  RETIRED_PREVIEW_SLUGS,
+  slugsToDelete,
+} from './previewFixtures';
 
 const seedContentResultValidator = v.object({
   collectionCount: v.number(),
@@ -311,7 +216,7 @@ async function upsertTalk(
     collectionOrder: talk.collectionOrder,
     description: talk.description,
     featured: talk.featured,
-    mediaUrl: PREVIEW_MEDIA_URL,
+    mediaUrl: talk.mediaUrl,
     publishedAt,
     scripture: talk.scripture,
     speakerId,
@@ -332,6 +237,103 @@ async function upsertTalk(
     ...fields,
     slug: talk.slug,
   });
+}
+
+async function deleteStaleTalk(ctx: MutationCtx, slug: string) {
+  const existing = await getOneFrom(ctx.db, 'talks', 'by_slug', slug);
+
+  if (!existing) {
+    return;
+  }
+
+  const clips = await ctx.db
+    .query('clips')
+    .withIndex('by_talkId', (q) => q.eq('talkId', existing._id))
+    .collect();
+  const favorites = await ctx.db
+    .query('userFavoriteTalks')
+    .withIndex('by_talkId', (q) => q.eq('talkId', existing._id))
+    .collect();
+  const finished = await ctx.db
+    .query('userFinishedTalks')
+    .withIndex('by_talkId', (q) => q.eq('talkId', existing._id))
+    .collect();
+  const talksOnTopics = await ctx.db
+    .query('talksOnTopics')
+    .withIndex('by_talkId', (q) => q.eq('talkId', existing._id))
+    .collect();
+
+  await Promise.all(
+    clips.map((clip) => ctx.db.patch(clip._id, { talkId: undefined }))
+  );
+  await deleteAll(ctx, favorites);
+  await deleteAll(ctx, finished);
+  await deleteAll(ctx, talksOnTopics);
+  await ctx.db.delete(existing._id);
+}
+
+async function deleteStaleSpeaker(ctx: MutationCtx, slug: string) {
+  const existing = await getOneFrom(ctx.db, 'speakers', 'by_slug', slug);
+
+  if (!existing) {
+    return;
+  }
+
+  const remainingTalk = await ctx.db
+    .query('talks')
+    .withIndex('by_speakerId_and_status', (q) =>
+      q.eq('speakerId', existing._id)
+    )
+    .first();
+
+  if (remainingTalk) {
+    return;
+  }
+
+  const clips = await getManyFrom(
+    ctx.db,
+    'clips',
+    'by_speakerId',
+    existing._id
+  );
+  const favorites = await getManyFrom(
+    ctx.db,
+    'userFavoriteSpeakers',
+    'by_speakerId',
+    existing._id
+  );
+
+  await Promise.all(
+    clips.map((clip) => ctx.db.patch(clip._id, { speakerId: undefined }))
+  );
+  await deleteAll(ctx, favorites);
+  await ctx.db.delete(existing._id);
+}
+
+async function deleteStaleTopic(ctx: MutationCtx, slug: string) {
+  const existing = await getOneFrom(ctx.db, 'topics', 'by_slug', slug);
+
+  if (!existing) {
+    return;
+  }
+
+  const talksOnTopics = await ctx.db
+    .query('talksOnTopics')
+    .withIndex('by_topicId', (q) => q.eq('topicId', existing._id))
+    .collect();
+
+  await deleteAll(ctx, talksOnTopics);
+  await ctx.db.delete(existing._id);
+}
+
+async function deleteStaleCollection(ctx: MutationCtx, slug: string) {
+  const existing = await getOneFrom(ctx.db, 'collections', 'by_slug', slug);
+
+  if (!existing) {
+    return;
+  }
+
+  await ctx.db.delete(existing._id);
 }
 
 async function upsertTalkTopics(
@@ -422,6 +424,31 @@ export const seedContent = internalMutation({
 
         await upsertTalkTopics(ctx, talkId, topicIds);
       })
+    );
+
+    await Promise.all(
+      slugsToDelete(
+        PREVIEW_TALKS.map((talk) => talk.slug),
+        RETIRED_PREVIEW_SLUGS.talks
+      ).map((slug) => deleteStaleTalk(ctx, slug))
+    );
+    await Promise.all(
+      slugsToDelete(
+        PREVIEW_SPEAKERS.map((speaker) => speaker.slug),
+        RETIRED_PREVIEW_SLUGS.speakers
+      ).map((slug) => deleteStaleSpeaker(ctx, slug))
+    );
+    await Promise.all(
+      slugsToDelete(
+        PREVIEW_TOPICS.map((topic) => topic.slug),
+        RETIRED_PREVIEW_SLUGS.topics
+      ).map((slug) => deleteStaleTopic(ctx, slug))
+    );
+    await Promise.all(
+      slugsToDelete(
+        PREVIEW_COLLECTIONS.map((collection) => collection.slug),
+        RETIRED_PREVIEW_SLUGS.collections
+      ).map((slug) => deleteStaleCollection(ctx, slug))
     );
 
     return {
