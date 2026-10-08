@@ -4,10 +4,10 @@ import { notFound } from 'next/navigation';
 
 import { SpeakerContentSections } from '@/app/speakers/[speakerSlug]/_components/speaker-content-sections';
 import { SpeakerHero } from '@/app/speakers/[speakerSlug]/_components/speaker-hero';
+import { speakerJsonLd } from '@/app/speakers/[speakerSlug]/_components/speaker-json-ld';
 import { JsonLd } from '@/components/json-ld';
 import { EditorialProfileLayout } from '@/components/layouts';
 import { isVideoMediaType } from '@/components/media-embed';
-import { site } from '@/configs/site';
 import { getSpeakerBySlug } from '@/features/speakers/queries/get-speaker-by-slug';
 import { getSpeakerName } from '@/features/speakers/utils';
 import { rotateCachedContent } from '@/utils';
@@ -53,15 +53,13 @@ export async function SpeakerPageContent({ params }: SpeakerPageContentProps) {
   return (
     <>
       <JsonLd
-        data={{
-          '@context': 'https://schema.org',
-          '@type': 'Person',
+        data={speakerJsonLd({
           description: speaker.description,
-          image: speaker.imageUrl,
+          imageUrl: speaker.imageUrl,
           name,
-          ...(speaker.websiteUrl && { sameAs: [speaker.websiteUrl] }),
-          url: `${site.url}/speakers/${speakerSlug}`,
-        }}
+          speakerSlug,
+          websiteUrl: speaker.websiteUrl,
+        })}
       />
       <EditorialProfileLayout
         content={

@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 
 import { TalkContentSections } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-content-sections';
 import { TalkHero } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-hero';
+import { talkJsonLd } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-json-ld';
 import {
   TalkPageSkeleton,
   TalkRelatedTalksSkeleton,
@@ -10,12 +11,8 @@ import {
 import { TalkRelatedTalks } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-related-talks';
 import { JsonLd } from '@/components/json-ld';
 import { EditorialProfileLayout } from '@/components/layouts';
-import { isVideoMediaType } from '@/components/media-embed';
-import { site } from '@/configs/site';
-import { getSpeakerName } from '@/features/speakers/utils';
 import { getTalkBySlug } from '@/features/talks/queries/get-talk-by-slug';
 import { getTalkBySlugAdmin } from '@/features/talks/queries/get-talk-by-slug-admin';
-import { getTalkUrl } from '@/features/talks/utils';
 
 type TalkBySlug = NonNullable<Awaited<ReturnType<typeof getTalkBySlug>>>;
 
@@ -26,44 +23,13 @@ interface TalkPageContentProps {
   }>;
 }
 
-interface TalkDocumentProps {
+interface TalkDetailProps {
   speakerSlug: string;
   talkResult: TalkBySlug;
   talkSlug: string;
 }
 
-function talkJsonLd({
-  speaker,
-  speakerSlug,
-  talk,
-  talkSlug,
-}: {
-  speaker: TalkBySlug['speaker'];
-  speakerSlug: string;
-  talk: TalkBySlug['talk'];
-  talkSlug: string;
-}) {
-  const speakerName = getSpeakerName(speaker);
-
-  return {
-    '@context': 'https://schema.org',
-    '@type': isVideoMediaType(talk.mediaUrl) ? 'VideoObject' : 'AudioObject',
-    description: talk.description,
-    embedUrl: talk.mediaUrl,
-    name: talk.title,
-    ...(speakerName && { creator: { '@type': 'Person', name: speakerName } }),
-    ...(talk.publishedAt && {
-      uploadDate: new Date(talk.publishedAt).toISOString(),
-    }),
-    url: `${site.url}${getTalkUrl(speakerSlug, talkSlug)}`,
-  };
-}
-
-function TalkDocument({
-  speakerSlug,
-  talkResult,
-  talkSlug,
-}: TalkDocumentProps) {
+function TalkDetail({ speakerSlug, talkResult, talkSlug }: TalkDetailProps) {
   const { clips, collection, speaker, talk, topics } = talkResult;
 
   return (
@@ -109,7 +75,7 @@ async function TalkAdminDraft({
   }
 
   return (
-    <TalkDocument
+    <TalkDetail
       speakerSlug={speakerSlug}
       talkResult={talkResult}
       talkSlug={talkSlug}
@@ -130,7 +96,7 @@ export async function TalkPageContent({ params }: TalkPageContentProps) {
   }
 
   return (
-    <TalkDocument
+    <TalkDetail
       speakerSlug={speakerSlug}
       talkResult={talkResult}
       talkSlug={talkSlug}
