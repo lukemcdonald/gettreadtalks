@@ -5,13 +5,13 @@ import { topicJsonLd } from '@/app/topics/[topicSlug]/_components/topic-json-ld'
 import { TopicSidebarSkeleton } from '@/app/topics/[topicSlug]/_components/topic-page-skeleton';
 import { TopicSidebar } from '@/app/topics/[topicSlug]/_components/topic-sidebar';
 import { TopicTalks } from '@/app/topics/[topicSlug]/_components/topic-talks';
+import { topicTalkCountPhrase } from '@/app/topics/[topicSlug]/_components/topic-talks-description';
 import { JsonLd } from '@/components/json-ld';
 import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { PageBreadcrumb } from '@/components/ui';
 import { TalksListSkeleton } from '@/features/talks/components/talks-list-skeleton';
 import { getTopicBySlug } from '@/features/topics/queries/get-topic-by-slug';
-import { pluralize } from '@/utils/pluralize';
 
 interface TopicPageContentProps {
   params: Promise<{
@@ -36,7 +36,7 @@ export async function TopicPageContent({
 
   const { talks, topic, totalTalks } = topicResult;
 
-  const description = `Elevate your spiritual heartbeat with ${totalTalks === 1 ? 'this' : `these ${totalTalks}`} Christ centered ${pluralize(totalTalks, 'talk', 'talks')}.`;
+  const description = `Elevate your spiritual heartbeat with ${topicTalkCountPhrase(totalTalks)}.`;
 
   return (
     <>

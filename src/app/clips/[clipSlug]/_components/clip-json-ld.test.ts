@@ -44,6 +44,11 @@ test('links the parent talk only when both talk and speaker are present', () => 
     speaker,
     talk: null,
   });
+  const withoutSpeaker = clipJsonLd({
+    clip: { slug: 'the-cross-clip', title: 'The Cross clip' },
+    speaker: null,
+    talk: { slug: 'the-cross', title: 'The Cross' },
+  });
 
   assert.deepEqual(withTalk.isPartOf, {
     '@type': 'CreativeWork',
@@ -51,4 +56,5 @@ test('links the parent talk only when both talk and speaker are present', () => 
     url: 'https://www.gettreadtalks.com/talks/lloyd-jones/the-cross',
   });
   assert.equal('isPartOf' in withoutTalk, false);
+  assert.equal('isPartOf' in withoutSpeaker, false);
 });

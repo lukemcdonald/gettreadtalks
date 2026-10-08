@@ -4,8 +4,8 @@ import { Suspense } from 'react';
 
 import { TopicPageContent } from '@/app/topics/[topicSlug]/_components/topic-page-content';
 import { TopicPageSkeleton } from '@/app/topics/[topicSlug]/_components/topic-page-skeleton';
+import { topicTalkCountPhrase } from '@/app/topics/[topicSlug]/_components/topic-talks-description';
 import { getTopicBySlug } from '@/features/topics/queries/get-topic-by-slug';
-import { pluralize } from '@/utils/pluralize';
 
 // fallow-ignore-next-line unused-export
 export const ensureStatic = 'shell';
@@ -31,10 +31,9 @@ export async function generateMetadata({
   }
 
   const { topic, totalTalks } = topicResult;
-  const count = totalTalks === 1 ? 'this' : `these ${totalTalks}`;
 
   return {
-    description: `Elevate your spiritual heartbeat with ${count} Christ centered ${pluralize(totalTalks, 'talk', 'talks')} on ${topic.title}.`,
+    description: `Elevate your spiritual heartbeat with ${topicTalkCountPhrase(totalTalks)} on ${topic.title}.`,
     title: topic.title,
   };
 }

@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 
 import { collectionJsonLd } from '@/app/collections/[collectionSlug]/_components/collection-json-ld';
 import { CollectionSidebar } from '@/app/collections/[collectionSlug]/_components/collection-sidebar';
+import { uniqueSpeakersFromTalks } from '@/app/collections/[collectionSlug]/_components/unique-speakers';
 import { JsonLd } from '@/components/json-ld';
 import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
@@ -42,12 +43,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
   }
 
   const { collection, talks } = data;
-  const allSpeakers = talks
-    .map((talk) => talk.speaker)
-    .filter((speaker) => speaker !== null);
-  const uniqueSpeakers = [
-    ...new Map(allSpeakers.map((speaker) => [speaker._id, speaker])).values(),
-  ];
+  const uniqueSpeakers = uniqueSpeakersFromTalks(talks);
 
   return (
     <>
