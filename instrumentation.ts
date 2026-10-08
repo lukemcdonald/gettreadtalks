@@ -1,6 +1,6 @@
 import { captureRequestError } from '@sentry/nextjs';
 
-import { IS_SENTRY_ENABLED } from './src/configs/sentry';
+import { IS_SENTRY_ENABLED } from '@/configs/sentry';
 
 export async function register() {
   if (!IS_SENTRY_ENABLED) {

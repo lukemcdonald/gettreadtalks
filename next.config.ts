@@ -68,22 +68,13 @@ const nextConfig = {
 const config = IS_SENTRY_ENABLED
   ? withSentryConfig(nextConfig, {
       authToken: process.env.SENTRY_AUTH_TOKEN,
-      org: process.env.SENTRY_ORG,
-      project: process.env.SENTRY_PROJECT,
-      release: {
-        create: false,
-      },
+      org: 'lukemcdonald',
+      project: 'gettreadtalks',
       silent: !process.env.CI,
       sourcemaps: {
-        disable: true,
+        deleteSourcemapsAfterUpload: true,
       },
-      webpack: {
-        unstable_sentryWebpackPluginOptions: {
-          release: {
-            deploy: false,
-          },
-        },
-      },
+      widenClientFileUpload: true,
     })
   : nextConfig;
 

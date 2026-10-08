@@ -1,19 +1,17 @@
-// This file initializes Sentry on the client side.
-// It runs before your application becomes interactive.
-// https://nextjs.org/docs/app/building-your-application/optimizing/instrumentation
+import { captureRouterTransitionStart, init } from '@sentry/nextjs';
+import * as Sentry from '@sentry/nextjs';
 
-import { captureRouterTransitionStart } from '@sentry/nextjs';
-
-import { IS_SENTRY_ENABLED } from './src/configs/sentry';
+import { baseSentryConfig, IS_SENTRY_ENABLED } from '@/configs/sentry';
+import { IS_DEV } from '@/constants/env';
 
 if (IS_SENTRY_ENABLED) {
-  // Silently handle import failures - Sentry is non-critical
-  import('./src/configs/sentry/client').catch(() => {
-    // Ignore import errors - Sentry is optional
-  });
+  init(baseSentryConfig);
+
+  if (IS_DEV && typeof window !== 'undefined') {
+    (window as unknown as { Sentry?: typeof Sentry }).Sentry = Sentry;
+  }
 }
 
-// Export the router transition hook for Sentry navigation instrumentation
 export const onRouterTransitionStart = IS_SENTRY_ENABLED
   ? captureRouterTransitionStart
   : () => {};
