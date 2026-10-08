@@ -14,7 +14,7 @@ import { TalksListSkeleton } from '@/features/talks/components/talks-list-skelet
 import { getTopicsWithCounts } from '@/features/topics/queries/get-topics-with-counts';
 
 // fallow-ignore-next-line unused-export
-export const ensureStatic = 'prefetch';
+export const ensureStatic = 'shell';
 
 export const metadata: Metadata = {
   description:

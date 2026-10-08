@@ -12,7 +12,7 @@ import { CollectionsListSkeleton } from '@/features/collections/components/colle
 import { getCollections } from '@/features/collections/queries/get-collections';
 
 // fallow-ignore-next-line unused-export
-export const ensureStatic = 'prefetch';
+export const ensureStatic = 'shell';
 
 export const metadata: Metadata = {
   description:
