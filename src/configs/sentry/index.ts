@@ -1,10 +1,13 @@
 import { DEPLOY_ENV } from '../../constants/env';
+import { isSentryEnabled } from './enabled';
 
 const SENTRY_DEBUG = process.env.NEXT_PUBLIC_SENTRY_DEBUG === 'true';
 const SENTRY_DSN = process.env.NEXT_PUBLIC_SENTRY_DSN;
-const SENTRY_ENABLED = process.env.NEXT_PUBLIC_SENTRY_ENABLED !== 'false';
 
-export const IS_SENTRY_ENABLED = SENTRY_ENABLED && !!SENTRY_DSN;
+export const IS_SENTRY_ENABLED = isSentryEnabled(
+  SENTRY_DSN,
+  process.env.NEXT_PUBLIC_SENTRY_ENABLED
+);
 
 const SENSITIVE_KEY_DENY = ['-ip', '-user', 'forwarded', 'remote-', 'via'];
 
