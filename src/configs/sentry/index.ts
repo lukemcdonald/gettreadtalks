@@ -5,6 +5,7 @@ const SENTRY_DSN = process.env.NEXT_PUBLIC_SENTRY_DSN;
 const SENTRY_ENABLED = process.env.NEXT_PUBLIC_SENTRY_ENABLED !== 'false';
 
 export const IS_SENTRY_ENABLED = SENTRY_ENABLED && !!SENTRY_DSN;
+export const SENTRY_APPLICATION_KEY = 'gettreadtalks-app';
 
 const SENSITIVE_KEY_DENY = ['-ip', '-user', 'forwarded', 'remote-', 'via'];
 
