@@ -25,7 +25,6 @@ export const createAffiliateLink = mutation({
     url: v.string(),
   },
   handler: async (ctx, args) => {
-    // return await mutations.createAffiliateLink(ctx, args);
     await requireAuth(ctx);
 
     // Validate input early

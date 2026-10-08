@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { Input } from '@/components/ui/primitives/input';
 import { cn } from '@/utils';
 
-export type PasswordInputProps = Omit<InputProps, 'type'>;
+type PasswordInputProps = Omit<InputProps, 'type'>;
 
 export function PasswordInput({ className, ...delegated }: PasswordInputProps) {
   const [showPassword, setShowPassword] = useState(false);

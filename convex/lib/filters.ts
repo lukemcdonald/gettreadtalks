@@ -83,37 +83,6 @@ export async function filterCollectionsWithPublishedTalks(
 }
 
 /**
- * Filter topics to only those with at least one published talk.
- * Used in public-facing queries to show only active topics.
- */
-export async function filterTopicsWithPublishedTalks(
-  ctx: QueryCtx,
-  topics: Doc<'topics'>[]
-): Promise<Doc<'topics'>[]> {
-  const results = await Promise.all(
-    topics.map(async (topic) => {
-      const talksOnTopics = await ctx.db
-        .query('talksOnTopics')
-        .withIndex('by_topicId', (q) => q.eq('topicId', topic._id))
-        .collect();
-
-      const talks = await Promise.all(
-        talksOnTopics.map((entry) => ctx.db.get('talks', entry.talkId))
-      );
-
-      const hasPublishedTalks = talks.some(
-        (talk): talk is Doc<'talks'> =>
-          talk !== null && talk.status === 'published'
-      );
-
-      return hasPublishedTalks ? topic : null;
-    })
-  );
-
-  return results.filter((t): t is Doc<'topics'> => t !== null);
-}
-
-/**
  * Get talk IDs that match any of the given topic slugs.
  * Returns null if no valid topics found (to signal "no results").
  */
