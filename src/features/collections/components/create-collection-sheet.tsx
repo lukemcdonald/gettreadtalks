@@ -14,8 +14,14 @@ import { setServerErrors } from '@/lib/forms/react-hook-form';
 import { collectionFormSchema } from '../schemas/collection-form';
 import { CollectionFormFields } from './collection-form-fields';
 
-export function CreateCollectionSheet() {
-  const { handleOpenChange, handleSuccess } = useSheetRoute();
+interface CreateCollectionSheetProps {
+  closeHref?: string;
+}
+
+export function CreateCollectionSheet({
+  closeHref,
+}: CreateCollectionSheetProps) {
+  const { handleOpenChange, handleSuccess } = useSheetRoute(closeHref);
   const [isPending, startTransition] = useTransition();
 
   const form = useForm<CollectionFormData>({
@@ -38,6 +44,7 @@ export function CreateCollectionSheet() {
       }
 
       handleSuccess();
+      handleOpenChange(false);
     });
   });
 

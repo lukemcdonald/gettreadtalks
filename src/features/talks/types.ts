@@ -19,19 +19,3 @@ export type TalkWithSpeakerAndTopics = TalkWithSpeaker & {
 export type TalkWithTopicIds = Talk & {
   topicIds: TopicId[];
 };
-
-export type TalkFormInitialData = Pick<
-  Talk,
-  | 'collectionId'
-  | 'collectionOrder'
-  | 'description'
-  | 'featured'
-  | 'mediaUrl'
-  | 'scripture'
-  | 'slug'
-  | 'speakerId'
-  | 'status'
-  | 'title'
-> & {
-  topicIds?: TopicId[];
-};

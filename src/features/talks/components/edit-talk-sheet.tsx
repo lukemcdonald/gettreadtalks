@@ -5,6 +5,7 @@ import type { SpeakerListItem } from '@/features/speakers/types';
 import type { TalkFormData } from '@/features/talks/schemas/talk-form';
 import type { Talk, TalkId, TalkWithTopicIds } from '@/features/talks/types';
 import type { TopicListItem } from '@/features/topics/types';
+import type { StatusPrefill } from '@/lib/entities/status-prefill';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState, useTransition } from 'react';
@@ -25,13 +26,17 @@ interface EditTalkSheetProps {
   onTalkUpdated: (talkId: TalkId) => void;
   open: boolean;
   speakers: SpeakerListItem[];
+  statusPrefill?: StatusPrefill;
   talk: TalkWithTopicIds;
   topics: TopicListItem[];
 }
 
 type UrlChange = { newUrl: string; oldUrl: string } | null;
 
-function getTalkFormValues(talk: TalkWithTopicIds): TalkFormData {
+function getTalkFormValues(
+  talk: TalkWithTopicIds,
+  statusPrefill?: StatusPrefill
+): TalkFormData {
   return {
     collectionId: talk.collectionId,
     collectionOrder: talk.collectionId ? talk.collectionOrder : undefined,
@@ -41,7 +46,7 @@ function getTalkFormValues(talk: TalkWithTopicIds): TalkFormData {
     scripture: talk.scripture ?? '',
     slug: talk.slug ?? '',
     speakerId: talk.speakerId,
-    status: talk.status ?? 'backlog',
+    status: statusPrefill ?? talk.status ?? 'backlog',
     title: talk.title ?? '',
     topicIds: talk.topicIds,
   };
@@ -76,6 +81,7 @@ export function EditTalkSheet({
   onTalkUpdated,
   open,
   speakers,
+  statusPrefill,
   talk,
   topics,
 }: EditTalkSheetProps) {
@@ -88,7 +94,7 @@ export function EditTalkSheet({
     mode: 'onBlur',
     // oxlint-disable-next-line typescript/no-explicit-any -- Zod 4 compatibility with zodResolver
     resolver: zodResolver(talkFormSchema as any),
-    values: getTalkFormValues(talk),
+    values: getTalkFormValues(talk, statusPrefill),
   });
 
   function submitData(data: TalkFormData) {

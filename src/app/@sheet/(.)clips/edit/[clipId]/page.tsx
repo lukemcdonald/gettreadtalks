@@ -1,27 +1,12 @@
 import type { ClipId } from '@/features/clips/types';
 
-import { redirect } from 'next/navigation';
-
-import { getFormOptions } from '@/app/@sheet/_queries/get-form-options';
-import { getClip } from '@/features/clips/queries/get-clip';
-
-import { EditClipSheetRoute } from './_components/edit-clip-sheet-route';
+import { EditClipSheetPage } from '@/app/@sheet/_components/edit-clip-sheet-page';
 
 interface PageProps {
   params: Promise<{ clipId: ClipId }>;
+  searchParams: Promise<{ status?: string | string[] }>;
 }
 
-export default async function Page({ params }: PageProps) {
-  const { clipId } = await params;
-
-  const [clip, { speakers, talks }] = await Promise.all([
-    getClip(clipId),
-    getFormOptions(),
-  ]);
-
-  if (!clip) {
-    redirect('/clips');
-  }
-
-  return <EditClipSheetRoute clip={clip} speakers={speakers} talks={talks} />;
+export default function Page({ params, searchParams }: PageProps) {
+  return <EditClipSheetPage params={params} searchParams={searchParams} />;
 }
