@@ -4,6 +4,9 @@ import { CenteredLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { site } from '@/configs/site';
 
+// fallow-ignore-next-line unused-export
+export const ensureStatic = 'prefetch';
+
 export const metadata: Metadata = {
   description: `${site.name} began as a way to bookmark sermons listened to while walking. Now a resource for finding and sharing Christ centered talks.`,
   title: 'About',
