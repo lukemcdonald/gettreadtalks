@@ -14,26 +14,11 @@ Use the Fallow skill for deeper audit and debug workflows.
 
 ## Testing
 
-Test behavior, not implementation. Assert on what a user sees or what a public function returns.
-
-Use the lowest layer that proves the behavior:
-
-- Pure logic (utils, parsers, formatters): unit tests with `node:test`
-- Convex queries and mutations (auth, permissions, data rules): `convex-test` against the real functions
-- Interactive components and providers: component tests with Vitest and React Testing Library
-- Critical user journeys (sign-in, favorites, browsing and filtering, admin edits): Playwright against a seeded preview backend
-
-`node:test` is set up; `convex-test`, Vitest + RTL, and Playwright are planned.
-
-Add a test only when it would catch a real regression. A bug fix gets a test that fails without the fix, at whichever layer can reproduce it.
-
-Don't read source files or match code strings, snapshot markup, mock Convex or Next internals, test framework behavior, or duplicate coverage another layer already has.
-
-In UI tests, query by role, label, or text rather than class names.
-
-Interactive components and providers that emit analytics get a component test: render, interact by role, and assert `track` (mock `@/services/analytics`) was called the expected number of times with the event name and any custom properties. Create shared helpers for analytics and Convex mutations with the first component test, then reuse them instead of ad hoc mocks. E2E tests cover workflows and data, not events.
-
-Keep tests independent and deterministic, and seed the data each one needs.
+- Test behavior, not implementation. Add a test only if it would catch a real regression; a bug fix gets a test that fails without the fix.
+- Use the lowest layer that proves it: pure logic with `node:test`, Convex rules with `convex-test`, interactive components with Vitest + RTL, and critical journeys with Playwright on a seeded preview. Only `node:test` is set up so far.
+- Never read source or match code strings, snapshot markup, mock Convex or Next internals, test the framework, or duplicate another layer's coverage.
+- Query UI by role, label, or text. Keep tests independent and deterministic, and seed their own data.
+- Components that emit analytics get a component test that mocks `@/services/analytics` and asserts `track`'s call count, event name, and properties, using shared helpers (create them with the first test). E2E tests cover workflows and data, not events.
 
 ## Conventions
 
