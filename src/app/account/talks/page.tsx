@@ -30,7 +30,9 @@ export default function AccountTalksPage({
         />
         <NewTalkButton />
       </div>
-      <TalksFilters />
+      <Suspense fallback={<Skeleton className="h-10 w-full" />}>
+        <TalksFilters />
+      </Suspense>
       <Suspense fallback={<Skeleton className="h-96 w-full" />}>
         <AccountTalksContent searchParams={searchParams} />
       </Suspense>

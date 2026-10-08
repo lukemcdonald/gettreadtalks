@@ -29,7 +29,9 @@ export default function AccountClipsPage({
         />
         <NewClipButton />
       </div>
-      <ClipsFilters />
+      <Suspense fallback={<Skeleton className="h-10 w-full" />}>
+        <ClipsFilters />
+      </Suspense>
       <Suspense fallback={<Skeleton className="h-96 w-full" />}>
         <AccountClipsContent searchParams={searchParams} />
       </Suspense>
