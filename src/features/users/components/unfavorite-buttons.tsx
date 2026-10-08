@@ -68,7 +68,9 @@ export function UnfavoriteClipButton({
 }: UnfavoriteClipButtonProps) {
   const { isLoading, mutate } = useMutation(api.users.unfavoriteClip, {
     onError,
-    onSuccess: revalidateUserLists,
+    onSuccess: () => {
+      void revalidateUserLists({ refreshPage: true });
+    },
   });
 
   const handleRemove = () => {
@@ -88,7 +90,9 @@ export function UnfavoriteSpeakerButton({
 }: UnfavoriteSpeakerButtonProps) {
   const { isLoading, mutate } = useMutation(api.users.unfavoriteSpeaker, {
     onError,
-    onSuccess: revalidateUserLists,
+    onSuccess: () => {
+      void revalidateUserLists({ refreshPage: true });
+    },
   });
 
   const handleRemove = () => {
@@ -108,7 +112,9 @@ export function UnfavoriteTalkButton({
 }: UnfavoriteTalkButtonProps) {
   const { isLoading, mutate } = useMutation(api.users.unfavoriteTalk, {
     onError,
-    onSuccess: revalidateUserLists,
+    onSuccess: () => {
+      void revalidateUserLists({ refreshPage: true });
+    },
   });
 
   const handleRemove = () => {

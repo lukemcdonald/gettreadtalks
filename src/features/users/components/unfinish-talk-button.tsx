@@ -27,7 +27,9 @@ export function UnfinishTalkButton({
 }: UnfinishTalkButtonProps) {
   const { isLoading, mutate } = useMutation(api.users.unfinishTalk, {
     onError,
-    onSuccess: revalidateUserLists,
+    onSuccess: () => {
+      void revalidateUserLists({ refreshPage: true });
+    },
   });
 
   const handleRemove = () => {
