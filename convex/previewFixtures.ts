@@ -15,12 +15,12 @@ export const PREVIEW_SPEAKERS = [
   {
     description: PLACEHOLDER_DESCRIPTION,
     featured: false,
-    firstName: 'Jane',
-    lastName: 'Doe',
+    firstName: 'Mary',
+    lastName: 'Smith',
     ministry: 'Example Study Press',
     role: 'Author' as const,
-    slug: 'jane-doe',
-    websiteUrl: 'https://example.com/jane-doe',
+    slug: 'mary-smith',
+    websiteUrl: 'https://example.com/mary-smith',
   },
 ];
 
@@ -100,7 +100,7 @@ export const PREVIEW_TALKS = [
     publishedAt: Date.parse('2024-06-04T12:00:00.000Z'),
     scripture: 'Luke 15:11-32',
     slug: 'example-talk-the-prodigal-son',
-    speakerSlug: 'jane-doe',
+    speakerSlug: 'mary-smith',
     status: 'published' as const,
     title: 'Example Talk: The Prodigal Son',
     topicSlugs: ['grace', 'prayer'],
@@ -109,7 +109,7 @@ export const PREVIEW_TALKS = [
 
 export const RETIRED_PREVIEW_SLUGS = {
   collections: ['preview-conference', 'preview-series'],
-  speakers: ['ada-preview', 'theo-sample'],
+  speakers: ['ada-preview', 'jane-doe', 'theo-sample'],
   talks: [
     'preview-backlog-talk',
     'preview-evening-talk',
