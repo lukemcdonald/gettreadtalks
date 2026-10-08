@@ -5,21 +5,18 @@ import { Suspense } from 'react';
 import { LayoutSidebar } from '@/app/account/_components/layout-sidebar';
 import { SidebarLayout } from '@/components/layouts';
 import { Skeleton } from '@/components/ui';
-import { requireCurrentUser } from '@/services/auth/server';
-
-async function AccountContent({ children }: { children: ReactNode }) {
-  await requireCurrentUser('/login?redirect=/account');
-
-  return children;
-}
+import { UserGate } from '@/services/auth/user-gate';
 
 export default function AccountLayout({ children }: { children: ReactNode }) {
   return (
     <SidebarLayout
       content={
-        <Suspense fallback={<Skeleton className="h-96 w-full" />}>
-          <AccountContent>{children}</AccountContent>
-        </Suspense>
+        <UserGate
+          fallback={<Skeleton className="h-96 w-full" />}
+          redirect="/login?redirect=/account"
+        >
+          {children}
+        </UserGate>
       }
       sidebar={
         <Suspense fallback={<Skeleton className="h-48 w-full" />}>
