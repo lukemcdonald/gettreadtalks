@@ -1,4 +1,4 @@
-import { isVideoMediaType } from '../../../../components/media-embed/utils.ts';
+import { mediaJsonLd } from '../../../../components/media-embed/utils.ts';
 import { site } from '../../../../configs/site.ts';
 import { getSpeakerName } from '../../../../features/speakers/utils.ts';
 import { getTalkUrl } from '../../../../features/talks/utils.ts';
@@ -25,9 +25,8 @@ export function clipJsonLd({ clip, speaker, talk }: ClipJsonLdInput) {
 
   return {
     '@context': 'https://schema.org',
-    '@type': isVideoMediaType(clip.mediaUrl) ? 'VideoObject' : 'AudioObject',
+    ...mediaJsonLd(clip.mediaUrl),
     description: clip.description,
-    embedUrl: clip.mediaUrl,
     name: clip.title,
     url: `${site.url}/clips/${clip.slug}`,
     ...(speakerName && { creator: { '@type': 'Person', name: speakerName } }),

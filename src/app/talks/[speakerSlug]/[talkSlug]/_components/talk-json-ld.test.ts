@@ -5,7 +5,7 @@ import { talkJsonLd } from './talk-json-ld.ts';
 
 const speaker = { firstName: 'Martyn', lastName: 'Lloyd-Jones' };
 
-test('uses VideoObject for YouTube and AudioObject otherwise', () => {
+test('uses a YouTube player embedUrl and an audio contentUrl', () => {
   const video = talkJsonLd({
     speaker,
     speakerSlug: 'lloyd-jones',
@@ -23,7 +23,10 @@ test('uses VideoObject for YouTube and AudioObject otherwise', () => {
   });
 
   assert.equal(video['@type'], 'VideoObject');
+  assert.equal(video.embedUrl, 'https://www.youtube.com/embed/jNQXAC9IVRw');
   assert.equal(audio['@type'], 'AudioObject');
+  assert.equal(audio.contentUrl, 'https://example.com/talk.mp3');
+  assert.equal('embedUrl' in audio, false);
 });
 
 test('omits creator without a speaker and uploadDate without publishedAt', () => {
