@@ -7,6 +7,7 @@ Greenfield project — no users, no back-compat concerns. Make it right.
 - Package manager: **pnpm**
 - Before marking any task complete: run `pnpm style` and `pnpm typecheck`
 - After meaningful TypeScript or JavaScript changes, run `pnpm run audit:code`
+- Before opening a PR, run `pnpm check`, `pnpm typecheck`, `pnpm test`, and `pnpm exec fallow audit --base origin/main`
 - Never run `pnpm dev` unless instructed
 - When testing local URLs, always use `https`
 
@@ -23,6 +24,7 @@ Use the Fallow skill for deeper audit and debug workflows.
 ## Conventions
 
 - No emojis anywhere: code, commits, descriptions, PR titles
+- Conventional commit format for PR titles and commit messages (the PR title is the squash-merge commit)
 - Alphabetize: imports, object keys, destructured props, component prop lists
   - Exception: group related items together if alphabetical order hurts readability
 
