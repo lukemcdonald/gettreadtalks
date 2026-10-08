@@ -86,7 +86,6 @@ Page composition and Suspense wrappers that read `params` or `searchParams` stay
 ```typescript
 // ✅ Always use the barrel
 import { Button, Card, TextField } from '@/components/ui';
-
 // ❌ Never import primitives directly in feature/page code
 import { Button } from '@/components/ui/primitives/button';
 ```
