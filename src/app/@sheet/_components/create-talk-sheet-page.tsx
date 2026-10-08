@@ -1,4 +1,4 @@
-import { CreateTalkSheetRoute } from '@/app/@sheet/(.)talks/new/_components/create-talk-sheet-route';
+import { CreateTalkSheetRoute } from '@/app/@sheet/_components/create-talk-sheet-route';
 import { getFormOptions } from '@/app/@sheet/_queries/get-form-options';
 
 interface CreateTalkSheetPageProps {

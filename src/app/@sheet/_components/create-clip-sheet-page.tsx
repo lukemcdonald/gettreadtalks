@@ -1,4 +1,4 @@
-import { CreateClipSheetRoute } from '@/app/@sheet/(.)clips/new/_components/create-clip-sheet-route';
+import { CreateClipSheetRoute } from '@/app/@sheet/_components/create-clip-sheet-route';
 import { getFormOptions } from '@/app/@sheet/_queries/get-form-options';
 
 interface CreateClipSheetPageProps {

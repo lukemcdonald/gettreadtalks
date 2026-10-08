@@ -2,7 +2,7 @@ import type { TalkId } from '@/features/talks/types';
 
 import { redirect } from 'next/navigation';
 
-import { EditTalkSheetRoute } from '@/app/@sheet/(.)talks/edit/[talkId]/_components/edit-talk-sheet-route';
+import { EditTalkSheetRoute } from '@/app/@sheet/_components/edit-talk-sheet-route';
 import { getFormOptions } from '@/app/@sheet/_queries/get-form-options';
 import { getTalk } from '@/features/talks/queries/get-talk';
 import { getTalkTopics } from '@/features/talks/queries/get-talk-topics';

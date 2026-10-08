@@ -2,7 +2,7 @@ import type { TopicId } from '@/features/topics/types';
 
 import { redirect } from 'next/navigation';
 
-import { EditTopicSheetRoute } from '@/app/@sheet/(.)topics/edit/[topicId]/_components/edit-topic-sheet-route';
+import { EditTopicSheetRoute } from '@/app/@sheet/_components/edit-topic-sheet-route';
 import { getTopic } from '@/features/topics/queries/get-topic';
 import { ADMIN_LIST_PATHS } from '@/lib/entities/paths';
 

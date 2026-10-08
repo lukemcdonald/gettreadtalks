@@ -2,7 +2,7 @@ import type { SpeakerId } from '@/features/speakers/types';
 
 import { redirect } from 'next/navigation';
 
-import { EditSpeakerSheetRoute } from '@/app/@sheet/(.)speakers/edit/[speakerId]/_components/edit-speaker-sheet-route';
+import { EditSpeakerSheetRoute } from '@/app/@sheet/_components/edit-speaker-sheet-route';
 import { getSpeaker } from '@/features/speakers/queries/get-speaker';
 import { ADMIN_LIST_PATHS } from '@/lib/entities/paths';
 

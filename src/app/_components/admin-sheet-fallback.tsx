@@ -15,7 +15,7 @@ interface AdminSheetFallbackProps {
   sheet: ReactNode;
 }
 
-export async function AdminSheetFallback({
+async function AdminSheetFallbackContent({
   children,
   returnPath,
   sheet,
@@ -34,5 +34,19 @@ export async function AdminSheetFallback({
       />
       {sheet}
     </>
+  );
+}
+
+export function AdminSheetFallback({
+  children,
+  returnPath,
+  sheet,
+}: AdminSheetFallbackProps) {
+  return (
+    <Suspense fallback={<Skeleton className="h-96 w-full" />}>
+      <AdminSheetFallbackContent returnPath={returnPath} sheet={sheet}>
+        {children}
+      </AdminSheetFallbackContent>
+    </Suspense>
   );
 }

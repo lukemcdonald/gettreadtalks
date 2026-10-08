@@ -1,9 +1,5 @@
 import type { MediaCheckStatus } from './validators';
 
-import { getClipUrl } from '../../../src/features/clips/utils.ts';
-import { getTalkUrl } from '../../../src/features/talks/utils.ts';
-import { getMediaAdminEditPath } from '../../../src/lib/entities/paths.ts';
-
 export interface MediaHealthDigestItem {
   adminPath: string;
   entityTable: 'clips' | 'talks';
@@ -25,20 +21,21 @@ export function buildMediaHealthDigest(
   return items;
 }
 
+/** Matches getClipUrl / getTalkUrl without importing Next app modules into Convex. */
 export function getMediaPublicPath(item: {
   entityTable: 'clips' | 'talks';
   slug: string;
   speakerSlug?: string;
 }): string | null {
   if (item.entityTable === 'clips') {
-    return getClipUrl(item.slug);
+    return `/clips/${item.slug}`;
   }
 
   if (!item.speakerSlug) {
     return null;
   }
 
-  return getTalkUrl(item.speakerSlug, item.slug);
+  return `/talks/${item.speakerSlug}/${item.slug}`;
 }
 
 export function appendMediaHealthItem(
@@ -73,6 +70,13 @@ export function appendMediaHealthItem(
       title: item.title,
     },
   ];
+}
+
+function getMediaAdminEditPath(
+  entityTable: 'clips' | 'talks',
+  entityId: string
+) {
+  return `/${entityTable}/edit/${entityId}?status=archived`;
 }
 
 function isBrokenPersistStatus(

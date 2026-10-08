@@ -2,7 +2,7 @@ import type { CollectionId } from '@/features/collections/types';
 
 import { redirect } from 'next/navigation';
 
-import { EditCollectionSheetRoute } from '@/app/@sheet/(.)collections/edit/[collectionId]/_components/edit-collection-sheet-route';
+import { EditCollectionSheetRoute } from '@/app/@sheet/_components/edit-collection-sheet-route';
 import { getCollection } from '@/features/collections/queries/get-collection';
 import { ADMIN_LIST_PATHS } from '@/lib/entities/paths';
 

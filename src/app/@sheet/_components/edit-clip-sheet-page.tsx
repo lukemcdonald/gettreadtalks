@@ -2,7 +2,7 @@ import type { ClipId } from '@/features/clips/types';
 
 import { redirect } from 'next/navigation';
 
-import { EditClipSheetRoute } from '@/app/@sheet/(.)clips/edit/[clipId]/_components/edit-clip-sheet-route';
+import { EditClipSheetRoute } from '@/app/@sheet/_components/edit-clip-sheet-route';
 import { getFormOptions } from '@/app/@sheet/_queries/get-form-options';
 import { getClip } from '@/features/clips/queries/get-clip';
 import { ADMIN_LIST_PATHS } from '@/lib/entities/paths';
