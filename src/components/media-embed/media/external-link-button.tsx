@@ -1,6 +1,7 @@
 import { ExternalLinkIcon } from 'lucide-react';
+import Link from 'next/link';
 
-import { Button, Link } from '@/components/ui';
+import { Button } from '@/components/ui';
 
 interface ExternalLinkButtonProps {
   className: string;
@@ -16,7 +17,7 @@ export function ExternalLinkButton({
   const size = label ? 'xl' : 'icon-xl';
   return (
     <Button
-      render={<Link href={href} target="_blank" />}
+      render={<Link href={href} rel="noopener noreferrer" target="_blank" />}
       size={size}
       {...delegated}
     >

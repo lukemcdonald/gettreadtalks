@@ -1,11 +1,11 @@
 import { PlusIcon } from 'lucide-react';
+import Link from 'next/link';
 
 import { Button } from '@/components/ui';
-import { Link } from '@/components/ui/link';
 
 export function NewTopicButton() {
   return (
-    <Button render={<Link href="/topics/new" prefetch="hover" />} size="sm">
+    <Button render={<Link href="/topics/new" />} size="sm">
       <PlusIcon className="size-4" />
       New Topic
     </Button>

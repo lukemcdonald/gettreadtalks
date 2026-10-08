@@ -3,8 +3,8 @@ import type { Talk } from '@/features/talks/types';
 import type { Topic } from '@/features/topics/types';
 
 import { ExternalLinkIcon } from 'lucide-react';
+import Link from 'next/link';
 
-import { Link } from '@/components/ui/link';
 import { TalkActions } from '@/features/talks/components/talk-actions';
 
 interface TalkMetadataSidebarProps {

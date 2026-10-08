@@ -25,8 +25,6 @@ const nextConfig = {
   allowedDevOrigins: ['127.0.0.1'],
   cacheComponents: true,
   experimental: {
-    cachedNavigations: true,
-    prefetchInlining: true,
     turbopackRustReactCompiler: true,
   },
   headers: () => [

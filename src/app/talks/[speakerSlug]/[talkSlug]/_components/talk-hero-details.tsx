@@ -1,8 +1,9 @@
 import type { Speaker } from '@/features/speakers/types';
 import type { Talk } from '@/features/talks/types';
 
+import Link from 'next/link';
+
 import { HeroTitle } from '@/components/hero';
-import { Link } from '@/components/ui/link';
 import { getSpeakerName } from '@/features/speakers/utils';
 
 interface TalkHeroDetailsProps {

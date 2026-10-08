@@ -1,11 +1,11 @@
 import { PlusIcon } from 'lucide-react';
+import Link from 'next/link';
 
 import { Button } from '@/components/ui';
-import { Link } from '@/components/ui/link';
 
 export function NewClipButton() {
   return (
-    <Button render={<Link href="/clips/new" prefetch="hover" />} size="sm">
+    <Button render={<Link href="/clips/new" />} size="sm">
       <PlusIcon className="size-4" />
       New Clip
     </Button>
