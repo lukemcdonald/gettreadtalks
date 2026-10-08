@@ -2,7 +2,10 @@ import type { NextConfig } from 'next';
 
 import { withSentryConfig } from '@sentry/nextjs/config';
 
-import { IS_SENTRY_ENABLED } from './src/configs/sentry';
+import {
+  IS_SENTRY_ENABLED,
+  SENTRY_APPLICATION_KEY,
+} from './src/configs/sentry';
 
 const cspHeader = `
   base-uri 'self';
@@ -67,9 +70,7 @@ const nextConfig = {
 
 const config = IS_SENTRY_ENABLED
   ? withSentryConfig(nextConfig, {
-      authToken: process.env.SENTRY_AUTH_TOKEN,
-      org: process.env.SENTRY_ORG,
-      project: process.env.SENTRY_PROJECT,
+      applicationKey: SENTRY_APPLICATION_KEY,
       release: {
         create: false,
         deploy: false,
