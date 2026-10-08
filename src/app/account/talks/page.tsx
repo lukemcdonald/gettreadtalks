@@ -1,7 +1,11 @@
 import type { StatusType } from '@/lib/entities/types';
 
+import { Suspense } from 'react';
+
 import { AccountTalksContent } from '@/app/account/talks/_components/talks-content';
+import { TalksFilters } from '@/app/account/talks/_components/talks-filters';
 import { PageHeader } from '@/components/page-header';
+import { Skeleton } from '@/components/ui';
 import { NewTalkButton } from '@/features/talks/components/new-talk-button';
 
 export interface AccountTalksSearchParams {
@@ -14,11 +18,9 @@ interface AccountTalksPageProps {
   searchParams: Promise<AccountTalksSearchParams>;
 }
 
-export default async function AccountTalksPage({
+export default function AccountTalksPage({
   searchParams,
 }: AccountTalksPageProps) {
-  const params = await searchParams;
-
   return (
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
@@ -28,7 +30,10 @@ export default async function AccountTalksPage({
         />
         <NewTalkButton />
       </div>
-      <AccountTalksContent searchParams={params} />
+      <TalksFilters />
+      <Suspense fallback={<Skeleton className="h-96 w-full" />}>
+        <AccountTalksContent searchParams={searchParams} />
+      </Suspense>
     </div>
   );
 }

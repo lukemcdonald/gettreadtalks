@@ -1,12 +1,16 @@
+import type { TalksSearchParams } from '@/app/talks/_components/talks-results';
 import type { Metadata } from 'next';
 
-import { TalksContent } from '@/app/talks/_components/talks-content';
+import { Suspense } from 'react';
+
+import { TalksResults } from '@/app/talks/_components/talks-results';
 import { TalksSidebar } from '@/app/talks/_components/talks-sidebar';
 import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
+import { SidebarFiltersSkeleton } from '@/components/skeletons';
 import { getSpeakers } from '@/features/speakers/queries/get-speakers';
 import { sortSpeakersByName } from '@/features/speakers/utils';
-import { getTalks } from '@/features/talks/queries/get-talks';
+import { TalksListSkeleton } from '@/features/talks/components/talks-list-skeleton';
 import { getTopicsWithCounts } from '@/features/topics/queries/get-topics-with-counts';
 
 export const metadata: Metadata = {
@@ -15,62 +19,22 @@ export const metadata: Metadata = {
   title: 'Talks',
 };
 
-interface TalksPageSearchParams {
-  cursor?: string;
-  featured?: string;
-  search?: string;
-  sort?: string;
-  speakers?: string;
-  topics?: string;
-}
-
 interface TalksPageProps {
-  searchParams: Promise<TalksPageSearchParams>;
+  searchParams: Promise<TalksSearchParams>;
 }
 
 export default async function TalksPage({ searchParams }: TalksPageProps) {
-  const params = await searchParams;
-  const { cursor, featured, search, sort, speakers, topics } = params;
-
-  // Parse comma-separated values into arrays
-  const speakerSlugs = speakers
-    ? speakers.split(',').filter(Boolean)
-    : undefined;
-  const topicSlugs = topics ? topics.split(',').filter(Boolean) : undefined;
-
-  // Check if any filters are active (for showing "clear filters" option)
-  const hasActiveFilters = !!(
-    search ||
-    speakerSlugs?.length ||
-    topicSlugs?.length ||
-    featured === 'true'
-  );
-
-  const [result, speakersResult, topicsResult] = await Promise.all([
-    getTalks({
-      cursor,
-      featured: featured === 'true',
-      search,
-      sort,
-      speakerSlugs,
-      topicSlugs,
-    }),
+  const [speakersResult, topicsResult] = await Promise.all([
     getSpeakers(),
     getTopicsWithCounts(),
   ]);
 
-  const sortedSpeakers = sortSpeakersByName(speakersResult.speakers);
-
   return (
     <SidebarLayout
       content={
-        <TalksContent
-          continueCursor={result.continueCursor}
-          hasActiveFilters={hasActiveFilters}
-          hasNextPage={!result.isDone}
-          hasPrevPage={!!cursor}
-          talks={result.talks}
-        />
+        <Suspense fallback={<TalksListSkeleton />}>
+          <TalksResults searchParams={searchParams} />
+        </Suspense>
       }
       header={
         <PageHeader
@@ -79,7 +43,14 @@ export default async function TalksPage({ searchParams }: TalksPageProps) {
           title="Talks"
         />
       }
-      sidebar={<TalksSidebar speakers={sortedSpeakers} topics={topicsResult} />}
+      sidebar={
+        <Suspense fallback={<SidebarFiltersSkeleton />}>
+          <TalksSidebar
+            speakers={sortSpeakersByName(speakersResult.speakers)}
+            topics={topicsResult}
+          />
+        </Suspense>
+      }
       sidebarSticky
     />
   );

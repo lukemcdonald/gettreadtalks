@@ -1,16 +1,21 @@
+'use client';
+
 import type { Topic } from '@/features/topics/types';
 
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 
 import { SidebarContent } from '@/components/sidebar-content';
 import { SearchInput } from '@/components/ui/search-input';
 
 interface TopicSidebarProps {
-  hasActiveFilters: boolean;
   topic: Topic;
 }
 
-export function TopicSidebar({ hasActiveFilters, topic }: TopicSidebarProps) {
+export function TopicSidebar({ topic }: TopicSidebarProps) {
+  const searchParams = useSearchParams();
+  const hasActiveFilters = !!searchParams.get('search');
+
   return (
     <SidebarContent className="space-y-4">
       <SearchInput
