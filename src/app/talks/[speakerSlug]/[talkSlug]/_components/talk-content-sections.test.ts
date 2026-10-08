@@ -11,7 +11,6 @@ test('talk highlights link each clip to /clips/{slug}', () => {
       title: 'Sample Clip: No Condemnation',
     },
   ];
-  const speakerSlug = 'john-piper';
 
   const highlights = talkHighlightLinks(clips);
 
@@ -22,6 +21,5 @@ test('talk highlights link each clip to /clips/{slug}', () => {
 
     assert.ok(highlight);
     assert.equal(highlight.href, `/clips/${clip.slug}`);
-    assert.notEqual(highlight.href, `/talks/${speakerSlug}/${clip.slug}`);
   }
 });
