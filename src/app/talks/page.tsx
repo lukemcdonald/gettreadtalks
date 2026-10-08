@@ -13,6 +13,9 @@ import { sortSpeakersByName } from '@/features/speakers/utils';
 import { TalksListSkeleton } from '@/features/talks/components/talks-list-skeleton';
 import { getTopicsWithCounts } from '@/features/topics/queries/get-topics-with-counts';
 
+// fallow-ignore-next-line unused-export
+export const ensureStatic = 'shell';
+
 export const metadata: Metadata = {
   description:
     'Browse Christ centered talks from faithful ministers of the Gospel.',
