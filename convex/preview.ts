@@ -333,6 +333,18 @@ async function deleteStaleCollection(ctx: MutationCtx, slug: string) {
     return;
   }
 
+  const remainingTalk = await getOneFrom(
+    ctx.db,
+    'talks',
+    'by_collectionId_and_status',
+    existing._id,
+    'collectionId'
+  );
+
+  if (remainingTalk) {
+    return;
+  }
+
   await ctx.db.delete(existing._id);
 }
 
