@@ -5,6 +5,8 @@
     "convex/*.ts",
   ],
   "ignoreDependencies": [
+    // Loaded by Next.js when reactCompiler is enabled, not imported from app code.
+    "babel-plugin-react-compiler",
     // Coss primitives import these; that tree is ignored below.
     "@daypicker/react",
     "input-otp",

@@ -1,3 +1,5 @@
+import { Suspense } from 'react';
+
 import { SidebarsLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { Card } from '@/components/ui';
@@ -8,7 +10,9 @@ export default function RegisterPage() {
     <SidebarsLayout
       content={
         <Card className="m-auto w-full max-w-lg p-8">
-          <RegisterForm />
+          <Suspense>
+            <RegisterForm />
+          </Suspense>
         </Card>
       }
       leftSidebar={
