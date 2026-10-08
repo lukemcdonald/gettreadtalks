@@ -13,6 +13,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui';
 import { api } from '@/convex/_generated/api';
+import { revalidateUserLists } from '@/features/users/actions/revalidate-user-lists';
 import { useMutation } from '@/hooks';
 
 interface OptimisticCallbacks {
@@ -67,6 +68,7 @@ export function UnfavoriteClipButton({
 }: UnfavoriteClipButtonProps) {
   const { isLoading, mutate } = useMutation(api.users.unfavoriteClip, {
     onError,
+    onSuccess: revalidateUserLists,
   });
 
   const handleRemove = () => {
@@ -86,6 +88,7 @@ export function UnfavoriteSpeakerButton({
 }: UnfavoriteSpeakerButtonProps) {
   const { isLoading, mutate } = useMutation(api.users.unfavoriteSpeaker, {
     onError,
+    onSuccess: revalidateUserLists,
   });
 
   const handleRemove = () => {
@@ -105,6 +108,7 @@ export function UnfavoriteTalkButton({
 }: UnfavoriteTalkButtonProps) {
   const { isLoading, mutate } = useMutation(api.users.unfavoriteTalk, {
     onError,
+    onSuccess: revalidateUserLists,
   });
 
   const handleRemove = () => {

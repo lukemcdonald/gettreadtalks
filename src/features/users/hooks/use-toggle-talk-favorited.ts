@@ -6,6 +6,7 @@ import type { Talk } from '@/features/talks/types';
 import { useQuery } from 'convex/react';
 
 import { api } from '@/convex/_generated/api';
+import { revalidateUserLists } from '@/features/users/actions/revalidate-user-lists';
 import { useMutation, useOptimisticToggle } from '@/hooks';
 import { talkTrackProps, track } from '@/services/analytics';
 
@@ -32,12 +33,18 @@ export function useToggleTalkFavorited({
 
   const favorite = useMutation(api.users.favoriteTalk, {
     onError: clearOptimistic,
-    onSuccess: () => track('talk_favorited', talkTrackProps(talk, speaker)),
+    onSuccess: () => {
+      void revalidateUserLists();
+      track('talk_favorited', talkTrackProps(talk, speaker));
+    },
   });
 
   const unfavorite = useMutation(api.users.unfavoriteTalk, {
     onError: clearOptimistic,
-    onSuccess: () => track('talk_unfavorited', talkTrackProps(talk, speaker)),
+    onSuccess: () => {
+      void revalidateUserLists();
+      track('talk_unfavorited', talkTrackProps(talk, speaker));
+    },
   });
 
   return { isFavorited: isActive, isLoading, toggle };

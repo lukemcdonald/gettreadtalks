@@ -11,6 +11,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui';
 import { api } from '@/convex/_generated/api';
+import { revalidateUserLists } from '@/features/users/actions/revalidate-user-lists';
 import { useMutation } from '@/hooks';
 
 interface UnfinishTalkButtonProps {
@@ -26,6 +27,7 @@ export function UnfinishTalkButton({
 }: UnfinishTalkButtonProps) {
   const { isLoading, mutate } = useMutation(api.users.unfinishTalk, {
     onError,
+    onSuccess: revalidateUserLists,
   });
 
   const handleRemove = () => {
