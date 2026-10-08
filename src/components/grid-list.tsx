@@ -68,7 +68,7 @@ export function GridList({
   } = columns || {};
 
   return (
-    <div className="@container">
+    <div className="@container w-full min-w-0">
       <div
         className={cn(
           'grid',
