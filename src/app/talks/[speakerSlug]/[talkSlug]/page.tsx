@@ -1,15 +1,14 @@
 import type { Metadata } from 'next';
 
-import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
 
-import { TalkContentSections } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-content-sections';
-import { TalkHero } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-hero';
-import { JsonLd } from '@/components/json-ld';
-import { EditorialProfileLayout } from '@/components/layouts';
-import { isVideoMediaType } from '@/components/media-embed';
-import { site } from '@/configs/site';
-import { getRandomTalksBySpeaker } from '@/features/talks/queries/get-random-talks-by-speaker';
+import { TalkPageContent } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-page-content';
+import { TalkPageSkeleton } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-page-skeleton';
+import { getSpeakerName } from '@/features/speakers/utils';
 import { getTalkBySlug } from '@/features/talks/queries/get-talk-by-slug';
+
+// fallow-ignore-next-line unused-export
+export const ensureStatic = 'shell';
 
 interface TalkPageProps {
   params: Promise<{
@@ -18,6 +17,7 @@ interface TalkPageProps {
   }>;
 }
 
+// fallow-ignore-next-line complexity
 export async function generateMetadata({
   params,
 }: TalkPageProps): Promise<Metadata> {
@@ -29,7 +29,7 @@ export async function generateMetadata({
   }
 
   const { speaker, talk } = talkResult;
-  const speakerName = speaker ? `${speaker.firstName} ${speaker.lastName}` : '';
+  const speakerName = getSpeakerName(speaker);
 
   return {
     description:
@@ -51,62 +51,10 @@ export async function generateMetadata({
   };
 }
 
-export default async function TalkPage({ params }: TalkPageProps) {
-  const { speakerSlug, talkSlug } = await params;
-  const talkResult = await getTalkBySlug(speakerSlug, talkSlug);
-
-  if (!talkResult) {
-    notFound();
-  }
-
-  const { clips, collection, speaker, talk, topics } = talkResult;
-
-  // Fetch related talks from same speaker
-  const relatedTalks = speaker
-    ? await getRandomTalksBySpeaker(speaker._id, talk._id, 5)
-    : [];
-
-  const speakerName = speaker
-    ? `${speaker.firstName} ${speaker.lastName}`
-    : undefined;
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': isVideoMediaType(talk.mediaUrl) ? 'VideoObject' : 'AudioObject',
-    description: talk.description,
-    embedUrl: talk.mediaUrl,
-    name: talk.title,
-    ...(speakerName && { creator: { '@type': 'Person', name: speakerName } }),
-    ...(talk.publishedAt && {
-      uploadDate: new Date(talk.publishedAt).toISOString(),
-    }),
-    url: `${site.url}/talks/${speakerSlug}/${talkSlug}`,
-  };
-
+export default function TalkPage({ params }: TalkPageProps) {
   return (
-    <>
-      <JsonLd data={jsonLd} />
-      <EditorialProfileLayout
-        // breadcrumb={
-        //   <PageBreadcrumb
-        //     segments={[
-        //       { href: '/talks', label: 'Talks' },
-        //       speakerName ? { href: `/speakers/${speakerSlug}`, label: speakerName } : null,
-        //       { label: talk.title },
-        //     ]}
-        //   />
-        // }
-        content={
-          <TalkContentSections
-            clips={clips}
-            collection={collection}
-            relatedTalks={relatedTalks}
-            speaker={speaker}
-            talk={talk}
-            topics={topics}
-          />
-        }
-        hero={<TalkHero speaker={speaker} talk={talk} />}
-      />
-    </>
+    <Suspense fallback={<TalkPageSkeleton />}>
+      <TalkPageContent params={params} />
+    </Suspense>
   );
 }

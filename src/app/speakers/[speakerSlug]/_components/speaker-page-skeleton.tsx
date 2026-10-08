@@ -26,7 +26,7 @@ function SpeakerContentSkeleton() {
   );
 }
 
-export default function SpeakerLoading() {
+export function SpeakerPageSkeleton() {
   return (
     <EditorialProfileLayout
       content={<SpeakerContentSkeleton />}
