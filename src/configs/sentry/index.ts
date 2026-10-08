@@ -12,24 +12,16 @@ export const IS_SENTRY_ENABLED = isSentryEnabled(
 const SENSITIVE_KEY_DENY = ['-ip', '-user', 'forwarded', 'remote-', 'via'];
 
 export const baseSentryConfig = {
-  // v11 collects cookies, bodies, and user info by default. Keep the v10 baseline.
   dataCollection: {
+    // Better Auth session cookie.
     cookies: false,
-    databaseQueryData: false,
-    genAI: {
-      inputs: false,
-      outputs: false,
-    },
-    graphQL: {
-      document: false,
-      variables: false,
-    },
+    // Server action inputs/results (sign-in and account forms).
     httpBodies: [],
     httpHeaders: {
+      // x-forwarded-for and similar client IP headers.
       request: { deny: SENSITIVE_KEY_DENY },
-      response: { deny: SENSITIVE_KEY_DENY },
     },
-    urlQueryParams: { deny: SENSITIVE_KEY_DENY },
+    // User IP/id on the event.
     userInfo: false,
   },
   debug: SENTRY_DEBUG,
@@ -37,7 +29,6 @@ export const baseSentryConfig = {
   environment: DEPLOY_ENV,
   initialScope: {
     tags: {
-      platform: 'nextjs',
       service: 'frontend',
     },
   },
