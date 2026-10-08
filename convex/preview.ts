@@ -1,59 +1,29 @@
-import type { Id } from './_generated/dataModel';
+import type { Id, TableNames } from './_generated/dataModel';
 import type { MutationCtx } from './_generated/server';
 
 import { hashPassword } from 'better-auth/crypto';
-import { getOneFrom } from 'convex-helpers/server/relationships';
+import { getManyFrom, getOneFrom } from 'convex-helpers/server/relationships';
 import { v } from 'convex/values';
 
 import { components, internal } from './_generated/api';
 import { internalAction, internalMutation } from './_generated/server';
 import { throwForbidden, throwValidationError } from './lib/errors';
-import { getPublishedAtForStatus } from './lib/utils';
+import { deleteAll } from './lib/utils';
+import {
+  PREVIEW_COLLECTIONS,
+  PREVIEW_SPEAKERS,
+  PREVIEW_TALKS,
+  PREVIEW_TOPICS,
+  RETIRED_PREVIEW_SLUGS,
+  slugsToDelete,
+} from './previewFixtures';
 
-const PREVIEW_MEDIA_URL = 'https://www.youtube.com/watch?v=jNQXAC9IVRw';
-
-const PREVIEW_SPEAKERS = [
-  {
-    description: 'Fixture speaker for Vercel Convex previews.',
-    featured: true,
-    firstName: 'Ada',
-    lastName: 'Preview',
-    role: 'Pastor' as const,
-    slug: 'ada-preview',
-  },
-  {
-    description: 'Second fixture speaker so admin search has a name to match.',
-    featured: false,
-    firstName: 'Theo',
-    lastName: 'Sample',
-    role: 'Theologian' as const,
-    slug: 'theo-sample',
-  },
-];
-
-const PREVIEW_TALKS = [
-  {
-    featured: true,
-    slug: 'preview-featured-talk',
-    speakerSlug: 'ada-preview',
-    status: 'published' as const,
-    title: 'Preview Featured Talk',
-  },
-  {
-    featured: false,
-    slug: 'preview-published-talk',
-    speakerSlug: 'ada-preview',
-    status: 'published' as const,
-    title: 'Preview Published Talk',
-  },
-  {
-    featured: false,
-    slug: 'preview-backlog-talk',
-    speakerSlug: 'theo-sample',
-    status: 'backlog' as const,
-    title: 'Preview Backlog Talk',
-  },
-];
+const seedContentResultValidator = v.object({
+  collectionCount: v.number(),
+  speakerCount: v.number(),
+  talkCount: v.number(),
+  topicCount: v.number(),
+});
 
 function assertPreviewHost() {
   const siteUrl = process.env.SITE_URL ?? '';
@@ -84,6 +54,20 @@ function adapterRecordId(record: unknown): string | undefined {
   }
 
   return undefined;
+}
+
+function requireSeedId<Table extends TableNames>(
+  idsBySlug: Map<string, Id<Table>>,
+  kind: string,
+  slug: string
+): Id<Table> {
+  const id = idsBySlug.get(slug);
+
+  if (!id) {
+    throwValidationError(`Missing seed ${kind} ${slug}`);
+  }
+
+  return id;
 }
 
 async function upsertCredentialAccount(
@@ -164,8 +148,10 @@ async function upsertSpeaker(
       featured: speaker.featured,
       firstName: speaker.firstName,
       lastName: speaker.lastName,
+      ministry: speaker.ministry,
       role: speaker.role,
       updatedAt: Date.now(),
+      websiteUrl: speaker.websiteUrl,
     });
 
     return existing._id;
@@ -174,25 +160,73 @@ async function upsertSpeaker(
   return await ctx.db.insert('speakers', speaker);
 }
 
-async function upsertTalk(
+async function upsertTopic(
   ctx: MutationCtx,
-  speakerId: Id<'speakers'>,
-  talk: (typeof PREVIEW_TALKS)[number]
-): Promise<Id<'talks'>> {
-  const existing = await getOneFrom(ctx.db, 'talks', 'by_slug', talk.slug);
-  const publishedAt = getPublishedAtForStatus(
-    talk.status,
-    existing?.publishedAt
+  topic: (typeof PREVIEW_TOPICS)[number]
+): Promise<Id<'topics'>> {
+  const existing = await getOneFrom(ctx.db, 'topics', 'by_slug', topic.slug);
+
+  if (existing) {
+    await ctx.db.patch(existing._id, {
+      title: topic.title,
+      updatedAt: Date.now(),
+    });
+
+    return existing._id;
+  }
+
+  return await ctx.db.insert('topics', topic);
+}
+
+async function upsertCollection(
+  ctx: MutationCtx,
+  collection: (typeof PREVIEW_COLLECTIONS)[number]
+): Promise<Id<'collections'>> {
+  const existing = await getOneFrom(
+    ctx.db,
+    'collections',
+    'by_slug',
+    collection.slug
   );
 
   if (existing) {
     await ctx.db.patch(existing._id, {
-      featured: talk.featured,
-      mediaUrl: PREVIEW_MEDIA_URL,
-      publishedAt,
-      speakerId,
-      status: talk.status,
-      title: talk.title,
+      description: collection.description,
+      title: collection.title,
+      updatedAt: Date.now(),
+    });
+
+    return existing._id;
+  }
+
+  return await ctx.db.insert('collections', collection);
+}
+
+async function upsertTalk(
+  ctx: MutationCtx,
+  collectionId: Id<'collections'>,
+  speakerId: Id<'speakers'>,
+  talk: (typeof PREVIEW_TALKS)[number]
+): Promise<Id<'talks'>> {
+  const existing = await getOneFrom(ctx.db, 'talks', 'by_slug', talk.slug);
+  const publishedAt =
+    talk.status === 'published' ? talk.publishedAt : undefined;
+  const fields = {
+    collectionId,
+    collectionOrder: talk.collectionOrder,
+    description: talk.description,
+    featured: talk.featured,
+    mediaUrl: talk.mediaUrl,
+    publishedAt,
+    scripture: talk.scripture,
+    speakerId,
+    status: talk.status,
+    title: talk.title,
+  };
+
+  if (existing) {
+    await ctx.db.patch(existing._id, {
+      ...fields,
       updatedAt: Date.now(),
     });
 
@@ -200,14 +234,149 @@ async function upsertTalk(
   }
 
   return await ctx.db.insert('talks', {
-    featured: talk.featured,
-    mediaUrl: PREVIEW_MEDIA_URL,
-    publishedAt,
+    ...fields,
     slug: talk.slug,
-    speakerId,
-    status: talk.status,
-    title: talk.title,
   });
+}
+
+async function deleteStaleTalk(ctx: MutationCtx, slug: string) {
+  const existing = await getOneFrom(ctx.db, 'talks', 'by_slug', slug);
+
+  if (!existing) {
+    return;
+  }
+
+  const clips = await ctx.db
+    .query('clips')
+    .withIndex('by_talkId', (q) => q.eq('talkId', existing._id))
+    .collect();
+  const favorites = await ctx.db
+    .query('userFavoriteTalks')
+    .withIndex('by_talkId', (q) => q.eq('talkId', existing._id))
+    .collect();
+  const finished = await ctx.db
+    .query('userFinishedTalks')
+    .withIndex('by_talkId', (q) => q.eq('talkId', existing._id))
+    .collect();
+  const talksOnTopics = await ctx.db
+    .query('talksOnTopics')
+    .withIndex('by_talkId', (q) => q.eq('talkId', existing._id))
+    .collect();
+
+  await Promise.all(
+    clips.map((clip) => ctx.db.patch(clip._id, { talkId: undefined }))
+  );
+  await deleteAll(ctx, favorites);
+  await deleteAll(ctx, finished);
+  await deleteAll(ctx, talksOnTopics);
+  await ctx.db.delete(existing._id);
+}
+
+async function deleteStaleSpeaker(ctx: MutationCtx, slug: string) {
+  const existing = await getOneFrom(ctx.db, 'speakers', 'by_slug', slug);
+
+  if (!existing) {
+    return;
+  }
+
+  const remainingTalk = await ctx.db
+    .query('talks')
+    .withIndex('by_speakerId_and_status', (q) =>
+      q.eq('speakerId', existing._id)
+    )
+    .first();
+
+  if (remainingTalk) {
+    return;
+  }
+
+  const clips = await getManyFrom(
+    ctx.db,
+    'clips',
+    'by_speakerId',
+    existing._id
+  );
+  const favorites = await getManyFrom(
+    ctx.db,
+    'userFavoriteSpeakers',
+    'by_speakerId',
+    existing._id
+  );
+
+  await Promise.all(
+    clips.map((clip) => ctx.db.patch(clip._id, { speakerId: undefined }))
+  );
+  await deleteAll(ctx, favorites);
+  await ctx.db.delete(existing._id);
+}
+
+async function deleteStaleTopic(ctx: MutationCtx, slug: string) {
+  const existing = await getOneFrom(ctx.db, 'topics', 'by_slug', slug);
+
+  if (!existing) {
+    return;
+  }
+
+  const talksOnTopics = await ctx.db
+    .query('talksOnTopics')
+    .withIndex('by_topicId', (q) => q.eq('topicId', existing._id))
+    .collect();
+
+  await deleteAll(ctx, talksOnTopics);
+  await ctx.db.delete(existing._id);
+}
+
+async function deleteStaleCollection(ctx: MutationCtx, slug: string) {
+  const existing = await getOneFrom(ctx.db, 'collections', 'by_slug', slug);
+
+  if (!existing) {
+    return;
+  }
+
+  const remainingTalk = await getOneFrom(
+    ctx.db,
+    'talks',
+    'by_collectionId_and_status',
+    existing._id,
+    'collectionId'
+  );
+
+  if (remainingTalk) {
+    return;
+  }
+
+  await ctx.db.delete(existing._id);
+}
+
+async function upsertTalkTopics(
+  ctx: MutationCtx,
+  talkId: Id<'talks'>,
+  topicIds: Id<'topics'>[]
+) {
+  const uniqueTopicIds = [...new Set(topicIds)];
+  const existing = await ctx.db
+    .query('talksOnTopics')
+    .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
+    .collect();
+  const existingIds = new Set(existing.map((row) => row.topicId));
+  const nextIds = new Set(uniqueTopicIds);
+
+  await Promise.all(
+    existing
+      .filter((row) => !nextIds.has(row.topicId))
+      .map((row) => ctx.db.delete(row._id))
+  );
+
+  await Promise.all(
+    uniqueTopicIds
+      .filter((topicId) => !existingIds.has(topicId))
+      .map((topicId) =>
+        ctx.db.insert('talksOnTopics', {
+          talkId,
+          topicId,
+        })
+      )
+  );
 }
 
 export const seedContent = internalMutation({
@@ -215,36 +384,93 @@ export const seedContent = internalMutation({
   handler: async (ctx) => {
     assertPreviewHost();
 
+    const collectionIdsBySlug = new Map<string, Id<'collections'>>();
     const speakerIdsBySlug = new Map<string, Id<'speakers'>>();
+    const talkIdsBySlug = new Map<string, Id<'talks'>>();
+    const topicIdsBySlug = new Map<string, Id<'topics'>>();
+
+    await Promise.all([
+      Promise.all(
+        PREVIEW_SPEAKERS.map(async (speaker) => {
+          const speakerId = await upsertSpeaker(ctx, speaker);
+          speakerIdsBySlug.set(speaker.slug, speakerId);
+        })
+      ),
+      Promise.all(
+        PREVIEW_TOPICS.map(async (topic) => {
+          const topicId = await upsertTopic(ctx, topic);
+          topicIdsBySlug.set(topic.slug, topicId);
+        })
+      ),
+      Promise.all(
+        PREVIEW_COLLECTIONS.map(async (collection) => {
+          const collectionId = await upsertCollection(ctx, collection);
+          collectionIdsBySlug.set(collection.slug, collectionId);
+        })
+      ),
+    ]);
 
     await Promise.all(
-      PREVIEW_SPEAKERS.map(async (speaker) => {
-        const speakerId = await upsertSpeaker(ctx, speaker);
-        speakerIdsBySlug.set(speaker.slug, speakerId);
+      PREVIEW_TALKS.map(async (talk) => {
+        const collectionId = requireSeedId(
+          collectionIdsBySlug,
+          'collection',
+          talk.collectionSlug
+        );
+        const speakerId = requireSeedId(
+          speakerIdsBySlug,
+          'speaker',
+          talk.speakerSlug
+        );
+        const talkId = await upsertTalk(ctx, collectionId, speakerId, talk);
+        talkIdsBySlug.set(talk.slug, talkId);
       })
     );
 
     await Promise.all(
       PREVIEW_TALKS.map(async (talk) => {
-        const speakerId = speakerIdsBySlug.get(talk.speakerSlug);
+        const talkId = requireSeedId(talkIdsBySlug, 'talk', talk.slug);
+        const topicIds = talk.topicSlugs.map((topicSlug) =>
+          requireSeedId(topicIdsBySlug, 'topic', topicSlug)
+        );
 
-        if (!speakerId) {
-          throwValidationError(`Missing seed speaker ${talk.speakerSlug}`);
-        }
-
-        await upsertTalk(ctx, speakerId, talk);
+        await upsertTalkTopics(ctx, talkId, topicIds);
       })
     );
 
+    await Promise.all(
+      slugsToDelete(
+        PREVIEW_TALKS.map((talk) => talk.slug),
+        RETIRED_PREVIEW_SLUGS.talks
+      ).map((slug) => deleteStaleTalk(ctx, slug))
+    );
+    await Promise.all(
+      slugsToDelete(
+        PREVIEW_SPEAKERS.map((speaker) => speaker.slug),
+        RETIRED_PREVIEW_SLUGS.speakers
+      ).map((slug) => deleteStaleSpeaker(ctx, slug))
+    );
+    await Promise.all(
+      slugsToDelete(
+        PREVIEW_TOPICS.map((topic) => topic.slug),
+        RETIRED_PREVIEW_SLUGS.topics
+      ).map((slug) => deleteStaleTopic(ctx, slug))
+    );
+    await Promise.all(
+      slugsToDelete(
+        PREVIEW_COLLECTIONS.map((collection) => collection.slug),
+        RETIRED_PREVIEW_SLUGS.collections
+      ).map((slug) => deleteStaleCollection(ctx, slug))
+    );
+
     return {
+      collectionCount: PREVIEW_COLLECTIONS.length,
       speakerCount: PREVIEW_SPEAKERS.length,
       talkCount: PREVIEW_TALKS.length,
+      topicCount: PREVIEW_TOPICS.length,
     };
   },
-  returns: v.object({
-    speakerCount: v.number(),
-    talkCount: v.number(),
-  }),
+  returns: seedContentResultValidator,
 });
 
 export const seedPreviewUser = internalMutation({
@@ -311,23 +537,29 @@ export const seedPreview = internalAction({
   handler: async (
     ctx
   ): Promise<{
+    collectionCount: number;
     speakerCount: number;
     talkCount: number;
+    topicCount: number;
     userSeed: 'created' | 'skipped' | 'updated';
   }> => {
     assertPreviewHost();
 
     const content: {
+      collectionCount: number;
       speakerCount: number;
       talkCount: number;
+      topicCount: number;
     } = await ctx.runMutation(internal.preview.seedContent, {});
     const email = process.env.PREVIEW_USER_EMAIL?.trim().toLowerCase() ?? '';
     const password = process.env.PREVIEW_USER_PASSWORD ?? '';
 
     if (!email.includes('@') || password.length === 0) {
       return {
+        collectionCount: content.collectionCount,
         speakerCount: content.speakerCount,
         talkCount: content.talkCount,
+        topicCount: content.topicCount,
         userSeed: 'skipped' as const,
       };
     }
@@ -342,14 +574,14 @@ export const seedPreview = internalAction({
     );
 
     return {
+      collectionCount: content.collectionCount,
       speakerCount: content.speakerCount,
       talkCount: content.talkCount,
+      topicCount: content.topicCount,
       userSeed,
     };
   },
-  returns: v.object({
-    speakerCount: v.number(),
-    talkCount: v.number(),
+  returns: seedContentResultValidator.extend({
     userSeed: v.union(
       v.literal('created'),
       v.literal('skipped'),

@@ -18,9 +18,10 @@
 # 4. Vercel Deployment Protection: testers use Vercel SSO, or a shareable link.
 #
 # Preview backends start empty. After deploy this script seeds fixture
-# talks/speakers (and the preview user if those env vars are set) before
-# `pnpm build` so homepage prerender is not empty. Role stays user. Set admin
-# on that preview's Better Auth user row in the Convex dashboard.
+# speakers, talks, topics, and collections (and the preview user if those
+# env vars are set) before `pnpm build` so homepage prerender is not empty.
+# Role stays user. Set admin on that preview's Better Auth user row in the
+# Convex dashboard.
 
 set -euo pipefail
 
