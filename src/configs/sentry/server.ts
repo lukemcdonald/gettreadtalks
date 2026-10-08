@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/nextjs';
 
-import { baseSentryConfig } from '@/configs/sentry';
+import { baseSentryConfig } from './index';
 
 Sentry.init(baseSentryConfig);
