@@ -2,12 +2,13 @@ import type { Metadata } from 'next';
 
 import { notFound } from 'next/navigation';
 
+import { collectionJsonLd } from '@/app/collections/[collectionSlug]/_components/collection-json-ld';
 import { CollectionSidebar } from '@/app/collections/[collectionSlug]/_components/collection-sidebar';
+import { uniqueSpeakersFromTalks } from '@/app/collections/[collectionSlug]/_components/unique-speakers';
 import { JsonLd } from '@/components/json-ld';
 import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { PageBreadcrumb } from '@/components/ui';
-import { site } from '@/configs/site';
 import { CollectionTalkList } from '@/features/collections/components/collection-talk-list';
 import { getCollectionBySlug } from '@/features/collections/queries/get-collection-by-slug';
 
@@ -42,32 +43,18 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
   }
 
   const { collection, talks } = data;
-  const allSpeakers = talks
-    .map((talk) => talk.speaker)
-    .filter((speaker) => speaker !== null);
-  const uniqueSpeakers = [
-    ...new Map(allSpeakers.map((speaker) => [speaker._id, speaker])).values(),
-  ];
-
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'ItemList',
-    description: collection.description,
-    itemListElement: talks.map((talk, index) => ({
-      '@type': 'ListItem',
-      name: talk.title,
-      position: index + 1,
-      url: talk.speaker
-        ? `${site.url}/talks/${talk.speaker.slug}/${talk.slug}`
-        : undefined,
-    })),
-    name: collection.title,
-    url: `${site.url}/collections/${collectionSlug}`,
-  };
+  const uniqueSpeakers = uniqueSpeakersFromTalks(talks);
 
   return (
     <>
-      <JsonLd data={jsonLd} />
+      <JsonLd
+        data={collectionJsonLd({
+          collectionSlug,
+          description: collection.description,
+          talks,
+          title: collection.title,
+        })}
+      />
       <SidebarLayout
         breadcrumb={
           <PageBreadcrumb

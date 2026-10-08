@@ -22,7 +22,7 @@
     "release:full": "pnpm build && pnpm release",
     "start": "next start",
     "style": "ultracite fix .",
-    "test": "node --test --experimental-strip-types convex/model/mediaHealth/*.test.ts src/components/media-embed/utils.test.ts src/components/ui/link/rel.test.ts src/configs/sentry/*.test.ts src/services/analytics/*.test.ts src/utils/rotate-content.test.ts",
+    "test": "node --experimental-strip-types --test \"convex/model/mediaHealth/**/*.test.ts\" \"src/**/*.test.ts\"",
     "typecheck": "tsc --noEmit",
     "update:ui": "pnpm dlx shadcn@latest add @coss/ui --overwrite",
     "update:ui:styles": "pnpm dlx shadcn@latest add @coss/colors-neutral --overwrite"

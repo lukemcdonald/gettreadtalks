@@ -2,10 +2,9 @@ import type { Metadata } from 'next';
 
 import { notFound } from 'next/navigation';
 
+import { clipJsonLd } from '@/app/clips/[clipSlug]/_components/clip-json-ld';
 import { JsonLd } from '@/components/json-ld';
 import { EditorialProfileLayout } from '@/components/layouts';
-import { isVideoMediaType } from '@/components/media-embed';
-import { site } from '@/configs/site';
 import { getClipBySlug } from '@/features/clips/queries/get-clip-by-slug';
 import { getSpeakerName } from '@/features/speakers/utils';
 
@@ -16,6 +15,7 @@ interface ClipPageProps {
   params: Promise<{ clipSlug: string }>;
 }
 
+// fallow-ignore-next-line complexity
 export async function generateMetadata({
   params,
 }: ClipPageProps): Promise<Metadata> {
@@ -47,31 +47,9 @@ export default async function ClipPage({ params }: ClipPageProps) {
 
   const { clip, speaker, talk } = data;
 
-  const speakerName = speaker ? getSpeakerName(speaker) : undefined;
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': isVideoMediaType(clip.mediaUrl) ? 'VideoObject' : 'AudioObject',
-    description: clip.description,
-    embedUrl: clip.mediaUrl,
-    name: clip.title,
-    url: `${site.url}/clips/${clip.slug}`,
-    ...(speakerName && { creator: { '@type': 'Person', name: speakerName } }),
-    ...(clip.publishedAt && {
-      uploadDate: new Date(clip.publishedAt).toISOString(),
-    }),
-    ...(talk &&
-      speaker && {
-        isPartOf: {
-          '@type': 'CreativeWork',
-          name: talk.title,
-          url: `${site.url}/talks/${speaker.slug}/${talk.slug}`,
-        },
-      }),
-  };
-
   return (
     <>
-      <JsonLd data={jsonLd} />
+      <JsonLd data={clipJsonLd({ clip, speaker, talk })} />
       <EditorialProfileLayout
         content={<ClipContent clip={clip} speaker={speaker} talk={talk} />}
         hero={<ClipHero clip={clip} speaker={speaker} />}

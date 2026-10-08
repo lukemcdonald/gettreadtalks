@@ -3,7 +3,7 @@ import { SidebarContent } from '@/components/sidebar-content';
 import { Skeleton } from '@/components/ui';
 import { TalksListSkeleton } from '@/features/talks/components/talks-list-skeleton';
 
-function TopicHeaderSkeleton() {
+export function TopicHeaderSkeleton() {
   return (
     <header className="flex flex-col gap-4">
       <div className="max-w-prose space-y-2">
@@ -14,10 +14,9 @@ function TopicHeaderSkeleton() {
   );
 }
 
-function TopicSidebarSkeleton() {
+export function TopicSidebarSkeleton() {
   return (
     <SidebarContent className="space-y-4">
-      {/* Search input */}
       <div className="space-y-1.5">
         <Skeleton className="h-4 w-12" />
         <Skeleton className="h-9 w-full" />
@@ -26,7 +25,7 @@ function TopicSidebarSkeleton() {
   );
 }
 
-export default function TopicLoading() {
+export function TopicPageSkeleton() {
   return (
     <SidebarLayout
       content={<TalksListSkeleton />}

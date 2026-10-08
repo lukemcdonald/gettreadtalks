@@ -9,16 +9,8 @@ import { getFeaturedSpeakers } from '@/features/speakers/queries/get-featured-sp
 import { TalkCard } from '@/features/talks/components/talk-card';
 import { getFeaturedTalks } from '@/features/talks/queries/get-featured-talks';
 
-export default async function HomePage() {
-  const [featuredTalksResult, featuredSpeakersResult] = await Promise.all([
-    getFeaturedTalks(6),
-    getFeaturedSpeakers(6),
-  ]);
-
-  const featuredTalks = featuredTalksResult.talks;
-  const featuredSpeakers = featuredSpeakersResult.speakers;
-
-  const jsonLd = {
+function websiteJsonLd() {
+  return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     description: site.description,
@@ -33,10 +25,20 @@ export default async function HomePage() {
     },
     url: site.url,
   };
+}
+
+export default async function HomePage() {
+  const [featuredTalksResult, featuredSpeakersResult] = await Promise.all([
+    getFeaturedTalks(6),
+    getFeaturedSpeakers(6),
+  ]);
+
+  const featuredTalks = featuredTalksResult.talks;
+  const featuredSpeakers = featuredSpeakersResult.speakers;
 
   return (
     <>
-      <JsonLd data={jsonLd} />
+      <JsonLd data={websiteJsonLd()} />
       <Main>
         <Section spacing="xl">
           <Container>

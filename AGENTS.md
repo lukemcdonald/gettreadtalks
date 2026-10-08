@@ -77,6 +77,8 @@ src/features/{domain}/
 2. **Feature** — `src/features/{domain}/components/` — Feature-specific
 3. **Route** — `src/app/{route}/_components/` — Route-specific
 
+Page composition and Suspense wrappers that read `params` or `searchParams` stay in `src/app/{route}/_components`. Presentational, URL-agnostic pieces go in `src/features/{domain}/components`. Move to the feature folder only when a second route needs it.
+
 **UI Primitives:** Files in `src/components/ui/primitives/` are vendor components — never edit directly. Create wrappers in `src/components/ui/`.
 
 **UI imports** — always import from `@/components/ui`, never from primitive paths directly:
@@ -100,9 +102,9 @@ import { Button } from '@/components/ui/primitives/button';
 
 ### Rendering & data loading
 
-Pages and layouts stay synchronous. Put `searchParams`, cookies, headers, and auth in small async children, each behind its own `<Suspense>` (separate boundaries for filters vs results; `fallback={null}` only for small pieces). No per-route `loading.tsx` on listings. Auth via `AdminGate` / `UserGate` — do not await `requireCurrentUser` / `requireAdminUser` in the layout.
+Pages and layouts stay synchronous. Put `params`, `searchParams`, cookies, headers, and auth in small async children, each behind its own `<Suspense>` (separate boundaries for filters vs results; `fallback={null}` only for small pieces). No per-route `loading.tsx` on listings. Auth via `AdminGate` / `UserGate` — do not await `requireCurrentUser` / `requireAdminUser` in the layout.
 
-Public reads live in `src/features/*/queries` with `'use cache'`, `cacheLife()`, and `cacheTag()`. Mutations call `updateTag()` (`refresh()` only when that is not enough). Public listing pages export `ensureStatic = 'shell'`. React Compiler is on. Use `Link` from `@/components/ui/link`, not `next/link` directly; default prefetch.
+Public reads live in `src/features/*/queries` with `'use cache'`, `cacheLife()`, and `cacheTag()`. Mutations call `updateTag()` (`refresh()` only when that is not enough). Public listing and detail pages export `ensureStatic = 'shell'`. React Compiler is on. Use `Link` from `@/components/ui/link`, not `next/link` directly; default prefetch.
 
 ## Convex
 
@@ -242,6 +244,10 @@ function Link({ href, target, ...props }: LinkProps) {
 ## UI
 
 Project uses Coss UI components that are built on top of Base UI component library.
+
+### Forms
+
+Admin CRUD form actions return `ActionResult`: `requireAdminUser()`, Zod `safeParse` for submitted data, `fetchAuthMutation`, and `updateTag()` for affected caches. On failure, use `setServerErrors(form.setError, result.errors)`. `<FormError error={form.formState.errors.root} />` for form-level errors.
 
 ### FieldError with React Hook Form
 

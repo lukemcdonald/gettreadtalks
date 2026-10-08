@@ -80,6 +80,45 @@ export function isVideoMediaType(url?: string): boolean {
   );
 }
 
+// fallow-ignore-next-line complexity
+export function mediaJsonLd(url?: string) {
+  if (!url) {
+    return { '@type': 'MediaObject' as const };
+  }
+
+  const media = detectMediaType(url);
+
+  if (media.type === 'youtube') {
+    return {
+      '@type': 'VideoObject' as const,
+      embedUrl: `https://www.youtube.com/embed/${media.id}`,
+    };
+  }
+
+  if (media.type === 'vimeo') {
+    return {
+      '@type': 'VideoObject' as const,
+      embedUrl: `https://player.vimeo.com/video/${media.id}`,
+    };
+  }
+
+  if (media.type === 'video') {
+    return {
+      '@type': 'VideoObject' as const,
+      contentUrl: media.src,
+    };
+  }
+
+  if (media.type === 'audio') {
+    return {
+      '@type': 'AudioObject' as const,
+      contentUrl: media.src,
+    };
+  }
+
+  return { '@type': 'MediaObject' as const };
+}
+
 export function preferItemsWithVideoThumbnails<T extends { mediaUrl?: string }>(
   items: T[]
 ): T[] {
