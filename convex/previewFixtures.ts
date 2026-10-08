@@ -13,7 +13,7 @@ export const PREVIEW_SPEAKERS = [
     websiteUrl: 'https://example.com/john-doe',
   },
   {
-    description: PLACEHOLDER_DESCRIPTION,
+    description: 'Placeholder author for preview testing.',
     featured: false,
     firstName: 'Mary',
     lastName: 'Smith',
