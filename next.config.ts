@@ -27,6 +27,7 @@ const nextConfig = {
   experimental: {
     cachedNavigations: true,
     prefetchInlining: true,
+    turbopackRustReactCompiler: true,
   },
   headers: () => [
     {
@@ -60,7 +61,7 @@ const nextConfig = {
     ],
   },
   partialPrefetching: true,
-  reactCompiler: false,
+  reactCompiler: true,
   typedRoutes: false,
 } satisfies NextConfig;
 
