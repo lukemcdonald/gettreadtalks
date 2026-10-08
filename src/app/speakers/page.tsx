@@ -11,9 +11,6 @@ import { SidebarFiltersSkeleton } from '@/components/skeletons';
 import { SpeakersListSkeleton } from '@/features/speakers/components/speakers-list-skeleton';
 import { getSpeakers } from '@/features/speakers/queries/get-speakers';
 
-// fallow-ignore-next-line unused-export
-export const ensureStatic = 'shell';
-
 export const metadata: Metadata = {
   description:
     'Discover faithful ministers of the Gospel and be strengthened by their teaching.',

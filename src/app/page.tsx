@@ -9,9 +9,6 @@ import { getFeaturedSpeakers } from '@/features/speakers/queries/get-featured-sp
 import { TalkCard } from '@/features/talks/components/talk-card';
 import { getFeaturedTalks } from '@/features/talks/queries/get-featured-talks';
 
-// fallow-ignore-next-line unused-export
-export const ensureStatic = 'shell';
-
 export default async function HomePage() {
   const [featuredTalksResult, featuredSpeakersResult] = await Promise.all([
     getFeaturedTalks(6),

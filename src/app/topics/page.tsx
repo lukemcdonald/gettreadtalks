@@ -10,9 +10,6 @@ import { PageHeader } from '@/components/page-header';
 import { SidebarFiltersSkeleton } from '@/components/skeletons';
 import { getTopicsWithTalks } from '@/features/topics/queries/get-topics-with-talks';
 
-// fallow-ignore-next-line unused-export
-export const ensureStatic = 'shell';
-
 export const metadata: Metadata = {
   description:
     'Browse talks by Bible topic or theme and deepen your understanding of Scripture.',
