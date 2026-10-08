@@ -61,3 +61,4 @@ convex/migration/data/
 **/.claude/settings.local.json
 **/.claude/skills/**
 **/skills-lock.json
+**/skills-npm-lock.json
