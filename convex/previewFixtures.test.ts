@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
 import {
+  PREVIEW_CLIPS,
   PREVIEW_COLLECTIONS,
   PREVIEW_SPEAKERS,
   PREVIEW_TALKS,
@@ -11,6 +12,13 @@ import {
 } from './previewFixtures.ts';
 
 test('retired preview slugs are not reused by the current seed', () => {
+  assert.deepEqual(
+    slugsToDelete(
+      PREVIEW_CLIPS.map((clip) => clip.slug),
+      RETIRED_PREVIEW_SLUGS.clips
+    ),
+    [...RETIRED_PREVIEW_SLUGS.clips]
+  );
   assert.deepEqual(
     slugsToDelete(
       PREVIEW_COLLECTIONS.map((collection) => collection.slug),

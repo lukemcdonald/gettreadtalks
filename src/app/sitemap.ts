@@ -4,6 +4,8 @@ import { fetchQuery } from 'convex/nextjs';
 
 import { site } from '@/configs/site';
 import { api } from '@/convex/_generated/api';
+import { getClipUrl } from '@/features/clips/utils';
+import { getTalkUrl } from '@/features/talks/utils';
 
 const staticRoutes: MetadataRoute.Sitemap = [
   { priority: 1, url: site.url },
@@ -30,7 +32,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ({ speakerSlug, talkSlug, updatedAt }) => ({
       changeFrequency: 'weekly',
       lastModified: new Date(updatedAt),
-      url: `${site.url}/talks/${speakerSlug}/${talkSlug}`,
+      url: `${site.url}${getTalkUrl(speakerSlug, talkSlug)}`,
     })
   );
 
@@ -58,7 +60,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ({ slug, updatedAt }) => ({
       changeFrequency: 'weekly',
       lastModified: new Date(updatedAt),
-      url: `${site.url}/clips/${slug}`,
+      url: `${site.url}${getClipUrl(slug)}`,
     })
   );
 

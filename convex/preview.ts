@@ -10,6 +10,7 @@ import { internalAction, internalMutation } from './_generated/server';
 import { throwForbidden, throwValidationError } from './lib/errors';
 import { deleteAll } from './lib/utils';
 import {
+  PREVIEW_CLIPS,
   PREVIEW_COLLECTIONS,
   PREVIEW_SPEAKERS,
   PREVIEW_TALKS,
@@ -19,6 +20,7 @@ import {
 } from './previewFixtures';
 
 const seedContentResultValidator = v.object({
+  clipCount: v.number(),
   collectionCount: v.number(),
   speakerCount: v.number(),
   talkCount: v.number(),
@@ -239,6 +241,58 @@ async function upsertTalk(
   });
 }
 
+async function upsertClip(
+  ctx: MutationCtx,
+  speakerId: Id<'speakers'>,
+  talkId: Id<'talks'>,
+  clip: (typeof PREVIEW_CLIPS)[number]
+): Promise<Id<'clips'>> {
+  const existing = await getOneFrom(ctx.db, 'clips', 'by_slug', clip.slug);
+  const publishedAt =
+    clip.status === 'published' ? clip.publishedAt : undefined;
+  const fields = {
+    description: clip.description,
+    mediaUrl: clip.mediaUrl,
+    publishedAt,
+    speakerId,
+    status: clip.status,
+    talkId,
+    title: clip.title,
+  };
+
+  if (existing) {
+    await ctx.db.patch(existing._id, {
+      ...fields,
+      updatedAt: Date.now(),
+    });
+
+    return existing._id;
+  }
+
+  return await ctx.db.insert('clips', {
+    ...fields,
+    slug: clip.slug,
+  });
+}
+
+async function deleteStaleClip(ctx: MutationCtx, slug: string) {
+  const existing = await getOneFrom(ctx.db, 'clips', 'by_slug', slug);
+
+  if (!existing) {
+    return;
+  }
+
+  const favorites = await getManyFrom(
+    ctx.db,
+    'userFavoriteClips',
+    'by_clipId',
+    existing._id
+  );
+
+  await deleteAll(ctx, favorites);
+  await ctx.db.delete(existing._id);
+}
+
 async function deleteStaleTalk(ctx: MutationCtx, slug: string) {
   const existing = await getOneFrom(ctx.db, 'talks', 'by_slug', slug);
 
@@ -439,6 +493,25 @@ export const seedContent = internalMutation({
     );
 
     await Promise.all(
+      PREVIEW_CLIPS.map(async (clip) => {
+        const speakerId = requireSeedId(
+          speakerIdsBySlug,
+          'speaker',
+          clip.speakerSlug
+        );
+        const talkId = requireSeedId(talkIdsBySlug, 'talk', clip.talkSlug);
+
+        await upsertClip(ctx, speakerId, talkId, clip);
+      })
+    );
+
+    await Promise.all(
+      slugsToDelete(
+        PREVIEW_CLIPS.map((clip) => clip.slug),
+        RETIRED_PREVIEW_SLUGS.clips
+      ).map((slug) => deleteStaleClip(ctx, slug))
+    );
+    await Promise.all(
       slugsToDelete(
         PREVIEW_TALKS.map((talk) => talk.slug),
         RETIRED_PREVIEW_SLUGS.talks
@@ -464,6 +537,7 @@ export const seedContent = internalMutation({
     );
 
     return {
+      clipCount: PREVIEW_CLIPS.length,
       collectionCount: PREVIEW_COLLECTIONS.length,
       speakerCount: PREVIEW_SPEAKERS.length,
       talkCount: PREVIEW_TALKS.length,
@@ -537,6 +611,7 @@ export const seedPreview = internalAction({
   handler: async (
     ctx
   ): Promise<{
+    clipCount: number;
     collectionCount: number;
     speakerCount: number;
     talkCount: number;
@@ -546,6 +621,7 @@ export const seedPreview = internalAction({
     assertPreviewHost();
 
     const content: {
+      clipCount: number;
       collectionCount: number;
       speakerCount: number;
       talkCount: number;
@@ -556,6 +632,7 @@ export const seedPreview = internalAction({
 
     if (!email.includes('@') || password.length === 0) {
       return {
+        clipCount: content.clipCount,
         collectionCount: content.collectionCount,
         speakerCount: content.speakerCount,
         talkCount: content.talkCount,
@@ -574,6 +651,7 @@ export const seedPreview = internalAction({
     );
 
     return {
+      clipCount: content.clipCount,
       collectionCount: content.collectionCount,
       speakerCount: content.speakerCount,
       talkCount: content.talkCount,
