@@ -119,23 +119,3 @@ export const PREVIEW_CLIPS = [
     title: 'Sample Clip: No Condemnation',
   },
 ];
-
-export const RETIRED_PREVIEW_SLUGS = {
-  clips: ['preview-clip'],
-  collections: ['preview-conference', 'preview-series'],
-  speakers: ['ada-preview', 'jane-doe', 'theo-sample'],
-  talks: [
-    'preview-backlog-talk',
-    'preview-evening-talk',
-    'preview-featured-talk',
-    'preview-published-talk',
-  ],
-  topics: ['preview-faith', 'preview-grace'],
-} as const;
-
-export function slugsToDelete(
-  current: readonly string[],
-  retired: readonly string[]
-) {
-  return retired.filter((slug) => !current.includes(slug));
-}

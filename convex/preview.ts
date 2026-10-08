@@ -2,21 +2,18 @@ import type { Id, TableNames } from './_generated/dataModel';
 import type { MutationCtx } from './_generated/server';
 
 import { hashPassword } from 'better-auth/crypto';
-import { getManyFrom, getOneFrom } from 'convex-helpers/server/relationships';
+import { getOneFrom } from 'convex-helpers/server/relationships';
 import { v } from 'convex/values';
 
 import { components, internal } from './_generated/api';
 import { internalAction, internalMutation } from './_generated/server';
 import { throwForbidden, throwValidationError } from './lib/errors';
-import { deleteAll } from './lib/utils';
 import {
   PREVIEW_CLIPS,
   PREVIEW_COLLECTIONS,
   PREVIEW_SPEAKERS,
   PREVIEW_TALKS,
   PREVIEW_TOPICS,
-  RETIRED_PREVIEW_SLUGS,
-  slugsToDelete,
 } from './previewFixtures';
 
 const seedContentResultValidator = v.object({
@@ -275,133 +272,6 @@ async function upsertClip(
   });
 }
 
-async function deleteStaleClip(ctx: MutationCtx, slug: string) {
-  const existing = await getOneFrom(ctx.db, 'clips', 'by_slug', slug);
-
-  if (!existing) {
-    return;
-  }
-
-  const favorites = await getManyFrom(
-    ctx.db,
-    'userFavoriteClips',
-    'by_clipId',
-    existing._id
-  );
-
-  await deleteAll(ctx, favorites);
-  await ctx.db.delete(existing._id);
-}
-
-async function deleteStaleTalk(ctx: MutationCtx, slug: string) {
-  const existing = await getOneFrom(ctx.db, 'talks', 'by_slug', slug);
-
-  if (!existing) {
-    return;
-  }
-
-  const clips = await ctx.db
-    .query('clips')
-    .withIndex('by_talkId', (q) => q.eq('talkId', existing._id))
-    .collect();
-  const favorites = await ctx.db
-    .query('userFavoriteTalks')
-    .withIndex('by_talkId', (q) => q.eq('talkId', existing._id))
-    .collect();
-  const finished = await ctx.db
-    .query('userFinishedTalks')
-    .withIndex('by_talkId', (q) => q.eq('talkId', existing._id))
-    .collect();
-  const talksOnTopics = await ctx.db
-    .query('talksOnTopics')
-    .withIndex('by_talkId', (q) => q.eq('talkId', existing._id))
-    .collect();
-
-  await Promise.all(
-    clips.map((clip) => ctx.db.patch(clip._id, { talkId: undefined }))
-  );
-  await deleteAll(ctx, favorites);
-  await deleteAll(ctx, finished);
-  await deleteAll(ctx, talksOnTopics);
-  await ctx.db.delete(existing._id);
-}
-
-async function deleteStaleSpeaker(ctx: MutationCtx, slug: string) {
-  const existing = await getOneFrom(ctx.db, 'speakers', 'by_slug', slug);
-
-  if (!existing) {
-    return;
-  }
-
-  const remainingTalk = await ctx.db
-    .query('talks')
-    .withIndex('by_speakerId_and_status', (q) =>
-      q.eq('speakerId', existing._id)
-    )
-    .first();
-
-  if (remainingTalk) {
-    return;
-  }
-
-  const clips = await getManyFrom(
-    ctx.db,
-    'clips',
-    'by_speakerId',
-    existing._id
-  );
-  const favorites = await getManyFrom(
-    ctx.db,
-    'userFavoriteSpeakers',
-    'by_speakerId',
-    existing._id
-  );
-
-  await Promise.all(
-    clips.map((clip) => ctx.db.patch(clip._id, { speakerId: undefined }))
-  );
-  await deleteAll(ctx, favorites);
-  await ctx.db.delete(existing._id);
-}
-
-async function deleteStaleTopic(ctx: MutationCtx, slug: string) {
-  const existing = await getOneFrom(ctx.db, 'topics', 'by_slug', slug);
-
-  if (!existing) {
-    return;
-  }
-
-  const talksOnTopics = await ctx.db
-    .query('talksOnTopics')
-    .withIndex('by_topicId', (q) => q.eq('topicId', existing._id))
-    .collect();
-
-  await deleteAll(ctx, talksOnTopics);
-  await ctx.db.delete(existing._id);
-}
-
-async function deleteStaleCollection(ctx: MutationCtx, slug: string) {
-  const existing = await getOneFrom(ctx.db, 'collections', 'by_slug', slug);
-
-  if (!existing) {
-    return;
-  }
-
-  const remainingTalk = await getOneFrom(
-    ctx.db,
-    'talks',
-    'by_collectionId_and_status',
-    existing._id,
-    'collectionId'
-  );
-
-  if (remainingTalk) {
-    return;
-  }
-
-  await ctx.db.delete(existing._id);
-}
-
 async function upsertTalkTopics(
   ctx: MutationCtx,
   talkId: Id<'talks'>,
@@ -503,37 +373,6 @@ export const seedContent = internalMutation({
 
         await upsertClip(ctx, speakerId, talkId, clip);
       })
-    );
-
-    await Promise.all(
-      slugsToDelete(
-        PREVIEW_CLIPS.map((clip) => clip.slug),
-        RETIRED_PREVIEW_SLUGS.clips
-      ).map((slug) => deleteStaleClip(ctx, slug))
-    );
-    await Promise.all(
-      slugsToDelete(
-        PREVIEW_TALKS.map((talk) => talk.slug),
-        RETIRED_PREVIEW_SLUGS.talks
-      ).map((slug) => deleteStaleTalk(ctx, slug))
-    );
-    await Promise.all(
-      slugsToDelete(
-        PREVIEW_SPEAKERS.map((speaker) => speaker.slug),
-        RETIRED_PREVIEW_SLUGS.speakers
-      ).map((slug) => deleteStaleSpeaker(ctx, slug))
-    );
-    await Promise.all(
-      slugsToDelete(
-        PREVIEW_TOPICS.map((topic) => topic.slug),
-        RETIRED_PREVIEW_SLUGS.topics
-      ).map((slug) => deleteStaleTopic(ctx, slug))
-    );
-    await Promise.all(
-      slugsToDelete(
-        PREVIEW_COLLECTIONS.map((collection) => collection.slug),
-        RETIRED_PREVIEW_SLUGS.collections
-      ).map((slug) => deleteStaleCollection(ctx, slug))
     );
 
     return {
