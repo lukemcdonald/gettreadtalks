@@ -20,8 +20,10 @@ Use the lowest layer that proves the behavior:
 
 - Pure logic (utils, parsers, formatters): unit tests with `node:test`
 - Convex queries and mutations (auth, permissions, data rules): `convex-test` against the real functions
-- Interactive components and providers: component tests with Vitest and React Testing Library (intended; not installed yet)
+- Interactive components and providers: component tests with Vitest and React Testing Library
 - Critical user journeys (sign-in, favorites, browsing and filtering, admin edits): Playwright against a seeded preview backend
+
+`node:test` is set up; `convex-test`, Vitest + RTL, and Playwright are planned.
 
 Add a test only when it would catch a real regression. A bug fix gets a test that fails without the fix, at whichever layer can reproduce it.
 
@@ -29,7 +31,7 @@ Don't read source files or match code strings, snapshot markup, mock Convex or N
 
 In UI tests, query by role, label, or text rather than class names.
 
-Interactive components and providers that emit analytics get a component test: render, interact by role, and assert `track` (mock `@/services/analytics`) was called the expected number of times with the event name and any custom properties. Use the shared test helpers for analytics and Convex mutations rather than ad hoc mocks. E2E tests cover workflows and data, not events.
+Interactive components and providers that emit analytics get a component test: render, interact by role, and assert `track` (mock `@/services/analytics`) was called the expected number of times with the event name and any custom properties. Create shared helpers for analytics and Convex mutations with the first component test, then reuse them instead of ad hoc mocks. E2E tests cover workflows and data, not events.
 
 Keep tests independent and deterministic, and seed the data each one needs.
 
