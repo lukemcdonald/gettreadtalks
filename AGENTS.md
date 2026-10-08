@@ -247,7 +247,7 @@ Project uses Coss UI components that are built on top of Base UI component libra
 
 ### Forms
 
-Server actions return `ActionResult`: `requireAdminUser()`, Zod `safeParse`, `fetchAuthMutation`, `updateTag()`. On failure, `setServerErrors(form.setError, result.errors)`. `<FormError error={form.formState.errors.root} />` for form-level errors.
+Admin CRUD form actions return `ActionResult`: `requireAdminUser()`, Zod `safeParse` for submitted data, `fetchAuthMutation`, and `updateTag()` for affected caches. On failure, use `setServerErrors(form.setError, result.errors)`. `<FormError error={form.formState.errors.root} />` for form-level errors.
 
 ### FieldError with React Hook Form
 
