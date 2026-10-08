@@ -1,3 +1,8 @@
+import {
+  captureRouterTransitionStart,
+  init,
+  thirdPartyErrorFilterIntegration,
+} from '@sentry/nextjs';
 import * as Sentry from '@sentry/nextjs';
 
 import {
@@ -8,10 +13,10 @@ import {
 import { IS_DEV } from '@/constants/env';
 
 if (IS_SENTRY_ENABLED) {
-  Sentry.init({
+  init({
     ...baseSentryConfig,
     integrations: [
-      Sentry.thirdPartyErrorFilterIntegration({
+      thirdPartyErrorFilterIntegration({
         behaviour: 'apply-tag-if-contains-third-party-frames',
         filterKeys: [SENTRY_APPLICATION_KEY],
       }),
@@ -24,5 +29,5 @@ if (IS_SENTRY_ENABLED) {
 }
 
 export const onRouterTransitionStart = IS_SENTRY_ENABLED
-  ? Sentry.captureRouterTransitionStart
+  ? captureRouterTransitionStart
   : () => {};
