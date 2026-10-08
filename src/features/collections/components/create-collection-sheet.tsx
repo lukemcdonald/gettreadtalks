@@ -44,6 +44,7 @@ export function CreateCollectionSheet({
       }
 
       handleSuccess();
+      handleOpenChange(false);
     });
   });
 

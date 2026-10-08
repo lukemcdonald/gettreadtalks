@@ -40,6 +40,7 @@ export function CreateTopicSheet({ closeHref }: CreateTopicSheetProps) {
 
       toastManager.add({ title: 'Topic created', type: 'success' });
       handleSuccess();
+      handleOpenChange(false);
     });
   });
 
