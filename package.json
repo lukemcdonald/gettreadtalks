@@ -18,7 +18,7 @@
     "format:fix:yolo": "ultracite fix --unsafe",
     "lint": "oxlint .",
     "lint:fix": "ultracite fix .",
-    "prepare": "skills-npm --agents cursor --yes",
+    "prepare": "skills-npm --agents cursor,claude-code --yes",
     "release": "convex deploy --yes",
     "release:full": "pnpm build && pnpm release",
     "start": "next start",
