@@ -12,6 +12,24 @@ Greenfield project — no users, no back-compat concerns. Make it right.
 
 Use the Fallow skill for deeper audit and debug workflows.
 
+## Testing
+
+Test behavior, not implementation. Assert on what a user sees or what a public function returns.
+
+Use the lowest layer that proves the behavior:
+
+- Pure logic (utils, parsers, formatters): unit tests with `node:test`
+- Convex queries and mutations (auth, permissions, data rules): `convex-test` against the real functions
+- Critical user journeys (sign-in, favorites, browsing and filtering, admin edits): Playwright against a seeded preview backend
+
+Add a test only when it would catch a real regression. A bug fix gets a test that fails without the fix, at whichever layer can reproduce it.
+
+Don't read source files or match code strings, snapshot markup, mock Convex or Next internals, test framework behavior, or duplicate coverage another layer already has.
+
+In UI tests, query by role, label, or text rather than class names.
+
+Keep tests independent and deterministic, and seed the data each one needs.
+
 ## Conventions
 
 - No emojis anywhere: code, commits, descriptions, PR titles
