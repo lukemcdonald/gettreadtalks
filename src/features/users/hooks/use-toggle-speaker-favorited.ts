@@ -5,6 +5,7 @@ import type { Speaker } from '@/features/speakers/types';
 import { useQuery } from 'convex/react';
 
 import { api } from '@/convex/_generated/api';
+import { revalidateUserLists } from '@/features/users/actions/revalidate-user-lists';
 import { useMutation, useOptimisticToggle } from '@/hooks';
 import { speakerTrackProps, track } from '@/services/analytics';
 
@@ -29,12 +30,18 @@ export function useToggleSpeakerFavorited({
 
   const favorite = useMutation(api.users.favoriteSpeaker, {
     onError: clearOptimistic,
-    onSuccess: () => track('speaker_favorited', speakerTrackProps(speaker)),
+    onSuccess: () => {
+      void revalidateUserLists();
+      track('speaker_favorited', speakerTrackProps(speaker));
+    },
   });
 
   const unfavorite = useMutation(api.users.unfavoriteSpeaker, {
     onError: clearOptimistic,
-    onSuccess: () => track('speaker_unfavorited', speakerTrackProps(speaker)),
+    onSuccess: () => {
+      void revalidateUserLists();
+      track('speaker_unfavorited', speakerTrackProps(speaker));
+    },
   });
 
   return { isFavorited: isActive, isLoading, toggle };

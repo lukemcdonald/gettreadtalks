@@ -12,6 +12,14 @@ Greenfield project — no users, no back-compat concerns. Make it right.
 
 Use the Fallow skill for deeper audit and debug workflows.
 
+## Testing
+
+- Test behavior, not implementation. Add a test only if it would catch a real regression; a bug fix gets a test that fails without the fix.
+- Use the lowest layer that proves it: pure logic with `node:test`, Convex rules with `convex-test`, interactive components with Vitest + RTL, and critical journeys with Playwright on a seeded preview. Only `node:test` is set up so far.
+- Never read source or match code strings, snapshot markup, mock Convex or Next internals, test the framework, or duplicate another layer's coverage.
+- Query UI by role, label, or text. Keep tests independent and deterministic, and seed their own data.
+- Components that emit analytics get a component test that mocks `@/services/analytics` and asserts `track`'s call count, event name, and properties, using shared helpers (create them with the first test). E2E tests cover workflows and data, not events.
+
 ## Conventions
 
 - No emojis anywhere: code, commits, descriptions, PR titles
