@@ -1,5 +1,6 @@
 import { mediaJsonLd } from '../../../../components/media-embed/utils.ts';
 import { site } from '../../../../configs/site.ts';
+import { getClipUrl } from '../../../../features/clips/utils.ts';
 import { getSpeakerName } from '../../../../features/speakers/utils.ts';
 import { getTalkUrl } from '../../../../features/talks/utils.ts';
 
@@ -28,7 +29,7 @@ export function clipJsonLd({ clip, speaker, talk }: ClipJsonLdInput) {
     ...mediaJsonLd(clip.mediaUrl),
     description: clip.description,
     name: clip.title,
-    url: `${site.url}/clips/${clip.slug}`,
+    url: `${site.url}${getClipUrl(clip.slug)}`,
     ...(speakerName && { creator: { '@type': 'Person', name: speakerName } }),
     ...(clip.publishedAt && {
       uploadDate: new Date(clip.publishedAt).toISOString(),

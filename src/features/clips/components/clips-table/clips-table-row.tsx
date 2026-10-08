@@ -2,6 +2,7 @@ import type { ClipWithSpeaker } from '@/features/clips/types';
 
 import { ContentTableRow } from '@/components/content-table-row';
 import { ClipActionsMenu } from '@/features/clips/components/clip-actions-menu';
+import { getClipUrl } from '@/features/clips/utils';
 import { getSpeakerName } from '@/features/speakers/utils';
 
 interface ClipsTableRowProps {
@@ -9,7 +10,7 @@ interface ClipsTableRowProps {
 }
 
 export function ClipsTableRow({ clip }: ClipsTableRowProps) {
-  const clipUrl = `/clips/${clip.slug}`;
+  const clipUrl = getClipUrl(clip.slug);
 
   return (
     <ContentTableRow

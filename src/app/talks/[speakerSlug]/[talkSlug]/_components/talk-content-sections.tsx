@@ -7,8 +7,8 @@ import type { ReactNode } from 'react';
 
 import { TalkMetadataSidebar } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-metadata-sidebar';
 import { FeaturedGrid } from '@/components/featured-grid';
+import { ClipCard } from '@/features/clips/components/clip-card';
 import { CollectionMediaCard } from '@/features/collections/components/collection-media-card';
-import { TalkCard } from '@/features/talks/components/talk-card';
 
 interface TalkContentSectionsProps {
   clips: Clip[];
@@ -49,14 +49,10 @@ export function TalkContentSections({
             title="Highlights"
           >
             {clips.map((clip) => (
-              <TalkCard
+              <ClipCard
+                clip={clip}
                 key={clip._id}
-                speaker={speaker}
-                talk={{
-                  description: clip.description,
-                  slug: clip.slug,
-                  title: clip.title,
-                }}
+                speaker={speaker ?? undefined}
               />
             ))}
           </FeaturedGrid>

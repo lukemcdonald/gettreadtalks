@@ -107,21 +107,15 @@ export const PREVIEW_TALKS = [
   },
 ];
 
-export const RETIRED_PREVIEW_SLUGS = {
-  collections: ['preview-conference', 'preview-series'],
-  speakers: ['ada-preview', 'jane-doe', 'theo-sample'],
-  talks: [
-    'preview-backlog-talk',
-    'preview-evening-talk',
-    'preview-featured-talk',
-    'preview-published-talk',
-  ],
-  topics: ['preview-faith', 'preview-grace'],
-} as const;
-
-export function slugsToDelete(
-  current: readonly string[],
-  retired: readonly string[]
-) {
-  return retired.filter((slug) => !current.includes(slug));
-}
+export const PREVIEW_CLIPS = [
+  {
+    description: PLACEHOLDER_DESCRIPTION,
+    mediaUrl: 'https://www.youtube.com/watch?v=0SVTl4Xa5fY',
+    publishedAt: Date.parse('2024-06-03T12:30:00.000Z'),
+    slug: 'sample-clip-no-condemnation',
+    speakerSlug: 'john-doe',
+    status: 'published' as const,
+    talkSlug: 'sample-sermon-on-romans-8',
+    title: 'Sample Clip: No Condemnation',
+  },
+];

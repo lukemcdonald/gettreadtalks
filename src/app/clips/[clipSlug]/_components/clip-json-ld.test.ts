@@ -30,6 +30,7 @@ test('uses a YouTube player embedUrl and an audio contentUrl', () => {
   });
 
   assert.equal(video['@type'], 'VideoObject');
+  assert.equal(video.url, 'https://www.gettreadtalks.com/clips/the-cross-clip');
   assert.equal(video.embedUrl, 'https://www.youtube.com/embed/jNQXAC9IVRw');
   assert.deepEqual(video.creator, {
     '@type': 'Person',

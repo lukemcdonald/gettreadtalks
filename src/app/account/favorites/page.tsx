@@ -15,6 +15,8 @@ import {
   TabsList,
   TabsTab,
 } from '@/components/ui';
+import { getClipUrl } from '@/features/clips/utils';
+import { getTalkUrl } from '@/features/talks/utils';
 import { getUserFavorites } from '@/features/users/queries/get-user-favorites';
 
 import {
@@ -63,7 +65,7 @@ export default async function FavoritesPage() {
     label: 'Talk',
     renderItem: (talk) => (
       <FavoriteTalkRow
-        href={`/talks/${talk.speaker?.slug}/${talk.slug}`}
+        href={talk.speaker ? getTalkUrl(talk.speaker.slug, talk.slug) : ''}
         key={talk._id}
         speaker={talk.speaker}
         talkId={talk._id}
@@ -93,7 +95,7 @@ export default async function FavoritesPage() {
     renderItem: (clip) => (
       <FavoriteClipRow
         clipId={clip._id}
-        href={`/clips/${clip.slug}`}
+        href={getClipUrl(clip.slug)}
         key={clip._id}
         title={clip.title}
       />
