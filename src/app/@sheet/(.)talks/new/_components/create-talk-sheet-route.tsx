@@ -8,17 +8,19 @@ import { useSheetRoute } from '@/app/@sheet/_hooks/use-sheet-route';
 import { CreateTalkSheet } from '@/features/talks/components/create-talk-sheet';
 
 interface CreateTalkSheetRouteProps {
+  closeHref?: string;
   collections: CollectionListItem[];
   speakers: SpeakerListItem[];
   topics: TopicListItem[];
 }
 
 export function CreateTalkSheetRoute({
+  closeHref,
   collections,
   speakers,
   topics,
 }: CreateTalkSheetRouteProps) {
-  const { handleOpenChange, handleSuccess } = useSheetRoute();
+  const { handleOpenChange, handleSuccess } = useSheetRoute(closeHref);
 
   return (
     <CreateTalkSheet

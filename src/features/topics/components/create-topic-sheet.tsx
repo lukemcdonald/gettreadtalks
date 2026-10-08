@@ -13,8 +13,12 @@ import { createTopicAction } from '@/features/topics/actions/create-topic';
 import { topicFormSchema } from '@/features/topics/schemas/topic-form';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
 
-export function CreateTopicSheet() {
-  const { handleOpenChange, handleSuccess } = useSheetRoute();
+interface CreateTopicSheetProps {
+  closeHref?: string;
+}
+
+export function CreateTopicSheet({ closeHref }: CreateTopicSheetProps) {
+  const { handleOpenChange, handleSuccess } = useSheetRoute(closeHref);
   const [isPending, startTransition] = useTransition();
 
   const form = useForm<TopicFormData>({

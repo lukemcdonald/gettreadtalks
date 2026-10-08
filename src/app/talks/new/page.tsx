@@ -1,37 +1,15 @@
-import { CenteredLayout } from '@/components/layouts';
-import { PageHeader } from '@/components/page-header';
-import { getAllCollections } from '@/features/collections/queries/get-all-collections';
-import { getAllSpeakers } from '@/features/speakers/queries/get-all-speakers';
-import { TalkForm } from '@/features/talks/components/talk-form';
-import { getAllTopics } from '@/features/topics/queries/get-all-topics';
-import { requireAdminUser } from '@/services/auth/server';
+import { CreateTalkSheetPage } from '@/app/@sheet/_components/create-talk-sheet-page';
+import { AdminSheetFallback } from '@/app/_components/admin-sheet-fallback';
+import AccountTalksPage from '@/app/account/talks/page';
+import { ADMIN_LIST_PATHS, getEntityNewPath } from '@/lib/entities/paths';
 
-export default async function NewTalkPage() {
-  await requireAdminUser('/login?redirect=/talks/new');
-
-  const [{ collections }, { speakers }, { topics }] = await Promise.all([
-    getAllCollections(),
-    getAllSpeakers(),
-    getAllTopics(),
-  ]);
-
-  const collectionItems = collections.map((item) => item.collection);
-  const topicItems = topics.map((item) => ({
-    _id: item.topic._id,
-    slug: item.topic.slug,
-    title: item.topic.title,
-  }));
-
+export default function Page() {
   return (
-    <CenteredLayout
-      content={
-        <TalkForm
-          collections={collectionItems}
-          speakers={speakers}
-          topics={topicItems}
-        />
-      }
-      header={<PageHeader title="Create New Talk" />}
-    />
+    <AdminSheetFallback
+      returnPath={getEntityNewPath('talks')}
+      sheet={<CreateTalkSheetPage closeHref={ADMIN_LIST_PATHS.talks} />}
+    >
+      <AccountTalksPage searchParams={Promise.resolve({})} />
+    </AdminSheetFallback>
   );
 }

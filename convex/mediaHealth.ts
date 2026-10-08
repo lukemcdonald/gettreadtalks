@@ -1,5 +1,5 @@
 import type { ActionCtx } from './_generated/server';
-import type { MediaHealthTransition } from './model/mediaHealth/digest';
+import type { MediaHealthDigestItem } from './model/mediaHealth/digest';
 import type { MediaCheckStatus } from './model/mediaHealth/validators';
 
 import { v } from 'convex/values';
@@ -9,30 +9,21 @@ import { internalAction } from './_generated/server';
 import { reportSentryException } from './lib/sentry';
 import { getErrorMessage } from './lib/utils';
 import {
-  appendMediaHealthTransition,
+  appendMediaHealthItem,
   buildMediaHealthDigest,
 } from './model/mediaHealth/digest';
 import { checkMediaUrl } from './model/mediaHealth/oembed';
 import {
   mediaCheckEntityTable,
-  mediaCheckStatus,
+  mediaHealthDigestItem,
 } from './model/mediaHealth/validators';
 
 const PAGE_SIZE = 40;
 
-const mediaHealthTransition = v.object({
-  adminPath: v.string(),
-  entityTable: mediaCheckEntityTable,
-  mediaUrl: v.string(),
-  newStatus: v.union(v.literal('missing'), v.literal('private')),
-  previousStatus: mediaCheckStatus,
-  title: v.string(),
-});
-
 const continueCheckArgs = {
+  items: v.array(mediaHealthDigestItem),
   paginationCursor: v.union(v.null(), v.string()),
   source: mediaCheckEntityTable,
-  transitions: v.array(mediaHealthTransition),
 };
 
 export { upsertMediaCheck } from './model/mediaHealth/mutations';
@@ -45,9 +36,9 @@ export const checkPublishedMedia = internalAction({
   args: {},
   handler: async (ctx) => {
     await runMediaHealthPage(ctx, {
+      items: [],
       paginationCursor: null,
       source: 'talks',
-      transitions: [],
     });
 
     return null;
@@ -68,9 +59,9 @@ export const continueCheck = internalAction({
 async function runMediaHealthPage(
   ctx: ActionCtx,
   args: {
+    items: MediaHealthDigestItem[];
     paginationCursor: string | null;
     source: 'clips' | 'talks';
-    transitions: MediaHealthTransition[];
   }
 ) {
   try {
@@ -85,12 +76,8 @@ async function runMediaHealthPage(
       }
     );
 
-    const transitions = await checkMediaPageItems(
-      ctx,
-      result.page,
-      args.transitions
-    );
-    const nextPage = nextMediaHealthPage(result, args, transitions);
+    const items = await checkMediaPageItems(ctx, result.page, args.items);
+    const nextPage = nextMediaHealthPage(result, args, items);
 
     if (nextPage) {
       await ctx.scheduler.runAfter(
@@ -102,7 +89,7 @@ async function runMediaHealthPage(
       return;
     }
 
-    const digest = buildMediaHealthDigest(transitions);
+    const digest = buildMediaHealthDigest(items);
 
     if (!digest) {
       return;
@@ -124,38 +111,40 @@ interface PublishedMediaItem {
   entityId: string;
   entityTable: 'clips' | 'talks';
   mediaUrl: string;
+  slug: string;
+  speakerSlug?: string;
   title: string;
 }
 
 async function checkMediaPageItems(
   ctx: ActionCtx,
-  items: PublishedMediaItem[],
-  transitions: MediaHealthTransition[]
-): Promise<MediaHealthTransition[]> {
-  if (items.length === 0) {
-    return transitions;
+  pageItems: PublishedMediaItem[],
+  items: MediaHealthDigestItem[]
+): Promise<MediaHealthDigestItem[]> {
+  if (pageItems.length === 0) {
+    return items;
   }
 
-  const [item] = items;
+  const [item] = pageItems;
 
   if (!item) {
-    return transitions;
+    return items;
   }
 
-  const nextTransitions = await checkPublishedMediaItem(ctx, item, transitions);
+  const nextItems = await checkPublishedMediaItem(ctx, item, items);
 
-  return await checkMediaPageItems(ctx, items.slice(1), nextTransitions);
+  return await checkMediaPageItems(ctx, pageItems.slice(1), nextItems);
 }
 
 async function checkPublishedMediaItem(
   ctx: ActionCtx,
   item: PublishedMediaItem,
-  transitions: MediaHealthTransition[]
-): Promise<MediaHealthTransition[]> {
+  items: MediaHealthDigestItem[]
+): Promise<MediaHealthDigestItem[]> {
   const check = await checkMediaUrl(item.mediaUrl);
 
   if (check.skipped) {
-    return transitions;
+    return items;
   }
 
   const outcome: {
@@ -170,30 +159,29 @@ async function checkPublishedMediaItem(
     observedStatus: check.status,
   });
 
-  return appendMediaHealthTransition(item, outcome, transitions);
+  return appendMediaHealthItem(item, outcome, items);
 }
 
 function nextMediaHealthPage(
   result: { continueCursor: string; isDone: boolean },
   args: {
     source: 'clips' | 'talks';
-    transitions: MediaHealthTransition[];
   },
-  transitions: MediaHealthTransition[]
+  items: MediaHealthDigestItem[]
 ) {
   if (!result.isDone) {
     return {
+      items,
       paginationCursor: result.continueCursor,
       source: args.source,
-      transitions,
     };
   }
 
   if (args.source === 'talks') {
     return {
+      items,
       paginationCursor: null,
       source: 'clips' as const,
-      transitions,
     };
   }
 

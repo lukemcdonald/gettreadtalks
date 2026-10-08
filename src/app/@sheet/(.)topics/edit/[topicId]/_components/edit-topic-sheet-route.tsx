@@ -6,11 +6,15 @@ import { useSheetRoute } from '@/app/@sheet/_hooks/use-sheet-route';
 import { EditTopicSheet } from '@/features/topics/components/edit-topic-sheet';
 
 interface EditTopicSheetRouteProps {
+  closeHref?: string;
   topic: Topic;
 }
 
-export function EditTopicSheetRoute({ topic }: EditTopicSheetRouteProps) {
-  const { handleOpenChange, handleSuccess } = useSheetRoute();
+export function EditTopicSheetRoute({
+  closeHref,
+  topic,
+}: EditTopicSheetRouteProps) {
+  const { handleOpenChange, handleSuccess } = useSheetRoute(closeHref);
 
   return (
     <EditTopicSheet

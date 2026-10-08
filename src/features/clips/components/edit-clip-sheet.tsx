@@ -4,6 +4,7 @@ import type { ClipFormData } from '../schemas/clip-form';
 import type { ClipId } from '@/features/clips/types';
 import type { SpeakerId, SpeakerListItem } from '@/features/speakers/types';
 import type { TalkId, TalkListItem } from '@/features/talks/types';
+import type { StatusPrefill } from '@/lib/entities/status-prefill';
 import type { StatusType } from '@/lib/entities/types';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -34,6 +35,7 @@ interface EditClipSheetProps {
   onOpenChange: (open: boolean) => void;
   open: boolean;
   speakers: SpeakerListItem[];
+  statusPrefill?: StatusPrefill;
   talks: TalkListItem[];
 }
 
@@ -43,6 +45,7 @@ export function EditClipSheet({
   onOpenChange,
   open,
   speakers,
+  statusPrefill,
   talks,
 }: EditClipSheetProps) {
   const [isPending, startTransition] = useTransition();
@@ -55,7 +58,7 @@ export function EditClipSheet({
       description: clip?.description ?? '',
       mediaUrl: clip?.mediaUrl ?? '',
       speakerId: clip?.speakerId,
-      status: clip?.status ?? 'backlog',
+      status: statusPrefill ?? clip?.status ?? 'backlog',
       talkId: clip?.talkId,
       title: clip?.title ?? '',
     },

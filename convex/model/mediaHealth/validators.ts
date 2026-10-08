@@ -16,6 +16,17 @@ export const mediaCheckStatus = v.union(
   v.literal('unknown')
 );
 
+export const mediaHealthDigestItem = v.object({
+  adminPath: v.string(),
+  entityTable: mediaCheckEntityTable,
+  isNew: v.boolean(),
+  mediaUrl: v.string(),
+  newStatus: v.union(v.literal('missing'), v.literal('private')),
+  previousStatus: mediaCheckStatus,
+  publicPath: v.union(v.null(), v.string()),
+  title: v.string(),
+});
+
 export function isMediaCheckStatus(value: unknown): value is MediaCheckStatus {
   return (
     typeof value === 'string' &&

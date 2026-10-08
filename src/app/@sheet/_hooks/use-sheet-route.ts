@@ -2,13 +2,17 @@
 
 import { useRouter } from 'next/navigation';
 
-export function useSheetRoute() {
+export function useSheetRoute(closeHref?: string) {
   const router = useRouter();
 
   return {
     handleOpenChange: (open: boolean) => {
       if (!open) {
-        router.back();
+        if (closeHref) {
+          router.replace(closeHref);
+        } else {
+          router.back();
+        }
       }
     },
     handleSuccess: () => {

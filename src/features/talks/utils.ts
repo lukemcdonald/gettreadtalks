@@ -1,5 +1,3 @@
-import type { FormStatus } from '@/lib/forms/types';
-
 import { site } from '../../configs/site.ts';
 
 /**
@@ -27,26 +25,4 @@ export function talkListItemsJsonLd(
       ? `${site.url}${getTalkUrl(talk.speaker.slug, talk.slug)}`
       : undefined,
   }));
-}
-
-/**
- * Get submit button label based on form operation status.
- */
-export function getSubmitButtonLabel(
-  formStatus: FormStatus,
-  talkId?: string
-): string {
-  if (formStatus === 'creating') {
-    return 'Creating...';
-  }
-
-  if (formStatus === 'updating') {
-    return 'Updating...';
-  }
-
-  if (talkId) {
-    return 'Update Talk';
-  }
-
-  return 'Create Talk';
 }

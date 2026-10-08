@@ -7,15 +7,17 @@ import { useSheetRoute } from '@/app/@sheet/_hooks/use-sheet-route';
 import { CreateClipSheet } from '@/features/clips/components/create-clip-sheet';
 
 interface CreateClipSheetRouteProps {
+  closeHref?: string;
   speakers: SpeakerListItem[];
   talks: TalkListItem[];
 }
 
 export function CreateClipSheetRoute({
+  closeHref,
   speakers,
   talks,
 }: CreateClipSheetRouteProps) {
-  const { handleOpenChange, handleSuccess } = useSheetRoute();
+  const { handleOpenChange, handleSuccess } = useSheetRoute(closeHref);
 
   return (
     <CreateClipSheet

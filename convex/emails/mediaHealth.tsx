@@ -14,12 +14,15 @@ export function MediaHealthEmail({ items }: MediaHealthEmailProps) {
   const siteUrl = process.env.SITE_URL || site.url;
 
   return (
-    <EmailLayout preview="Newly private or missing talk and clip media needs a look.">
+    <EmailLayout preview="Private or missing talk and clip media needs a look.">
       <Text style={paragraph}>Hi,</Text>
       <Text style={paragraph}>
-        These published YouTube or Vimeo URLs newly became private or missing.
-        Archive or replace them in admin. This job does not change content for
-        you.
+        These published YouTube or Vimeo URLs are currently private or missing.
+        Items marked New broke since the last check; the rest are still broken.
+        Open in admin to review and archive — Archived is preselected, and
+        nothing is saved until you press Save. View page opens the public talk
+        or clip. Check video opens the YouTube or Vimeo page. This job does not
+        change content for you.
       </Text>
       {talks.length > 0 && (
         <>
@@ -62,18 +65,28 @@ function MediaHealthItem({
   item: MediaHealthEmailItem;
   siteUrl: string;
 }) {
-  const href = `${siteUrl}${item.adminPath}`;
+  const adminHref = `${siteUrl}${item.adminPath}`;
+  const publicHref = item.publicPath ? `${siteUrl}${item.publicPath}` : null;
 
   return (
     <Section style={itemSection}>
       <Text style={titleText}>{item.title}</Text>
       <Text style={metaText}>
+        {item.isNew ? 'New · ' : ''}
         {item.entityTable} · {item.previousStatus} to {item.newStatus}
       </Text>
       <Text style={metaText}>{item.mediaUrl}</Text>
       <Section style={buttonContainer}>
-        <Button href={href} style={button}>
+        <Button href={adminHref} style={button}>
           Open in admin
+        </Button>
+        {publicHref ? (
+          <Button href={publicHref} style={secondaryButton}>
+            View page
+          </Button>
+        ) : null}
+        <Button href={item.mediaUrl} style={secondaryButton}>
+          Check video
         </Button>
       </Section>
     </Section>
@@ -111,6 +124,14 @@ const paragraph = {
   fontSize: '16px',
   lineHeight: '26px',
   margin: '0 0 16px',
+};
+
+const secondaryButton = {
+  ...button,
+  backgroundColor: '#fff',
+  border: '1px solid #2754C5',
+  color: '#2754C5',
+  marginLeft: '8px',
 };
 
 const sectionHeading = {

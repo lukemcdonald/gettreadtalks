@@ -6,11 +6,15 @@ import { useSheetRoute } from '@/app/@sheet/_hooks/use-sheet-route';
 import { EditSpeakerSheet } from '@/features/speakers/components/edit-speaker-sheet';
 
 interface EditSpeakerSheetRouteProps {
+  closeHref?: string;
   speaker: Speaker;
 }
 
-export function EditSpeakerSheetRoute({ speaker }: EditSpeakerSheetRouteProps) {
-  const { handleOpenChange, handleSuccess } = useSheetRoute();
+export function EditSpeakerSheetRoute({
+  closeHref,
+  speaker,
+}: EditSpeakerSheetRouteProps) {
+  const { handleOpenChange, handleSuccess } = useSheetRoute(closeHref);
 
   return (
     <EditSpeakerSheet

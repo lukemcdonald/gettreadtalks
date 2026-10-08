@@ -16,10 +16,7 @@ import { WelcomeEmail } from './emails/welcome';
 import { throwConvexError } from './lib/errors';
 import { reportSentryException } from './lib/sentry';
 import { getErrorMessage } from './lib/utils';
-import {
-  mediaCheckEntityTable,
-  mediaCheckStatus,
-} from './model/mediaHealth/validators';
+import { mediaHealthDigestItem } from './model/mediaHealth/validators';
 
 // Email constants - same across all environments
 const TEST_DOMAIN_EMAIL = 'delivered@resend.dev';
@@ -153,16 +150,7 @@ export const handleEmailEvent = internalMutation({
 
 export const sendMediaHealthEmail = internalAction({
   args: {
-    items: v.array(
-      v.object({
-        adminPath: v.string(),
-        entityTable: mediaCheckEntityTable,
-        mediaUrl: v.string(),
-        newStatus: v.union(v.literal('missing'), v.literal('private')),
-        previousStatus: mediaCheckStatus,
-        title: v.string(),
-      })
-    ),
+    items: v.array(mediaHealthDigestItem),
   },
   handler: async (ctx, args) => {
     if (args.items.length === 0) {
