@@ -12,14 +12,10 @@ export function captureException(
   error: unknown,
   options: ErrorReportOptions = {}
 ): string | undefined {
-  const { level = 'error', transactionName, ...scopeOptions } = options;
+  const { level = 'error', ...scopeOptions } = options;
 
   return sentryWithScope((scope) => {
     applyScopeOptions(scope, { ...scopeOptions, level });
-
-    if (transactionName) {
-      scope.setTransactionName(transactionName);
-    }
 
     if (typeof error === 'string') {
       return sentryCaptureMessage(error);
@@ -29,11 +25,8 @@ export function captureException(
   });
 }
 
-function applyScopeOptions(
-  scope: Scope,
-  options: Omit<ErrorReportOptions, 'transactionName'>
-): void {
-  const { context, extras, fingerprint, level = 'info', tags, user } = options;
+function applyScopeOptions(scope: Scope, options: ErrorReportOptions): void {
+  const { context, fingerprint, level = 'info', tags } = options;
 
   scope.setLevel(level);
 
@@ -52,25 +45,16 @@ function applyScopeOptions(
       scope.setTag(key, value);
     }
   }
-
-  if (user) {
-    scope.setUser(user);
-  }
-
-  if (extras) {
-    for (const [key, value] of Object.entries(extras)) {
-      scope.setExtra(key, value);
-    }
-  }
 }
 
 /** Manual message capture for non-exception events. */
 export function captureMessage(
   message: string,
-  options: Omit<ErrorReportOptions, 'transactionName'> = {}
+  options: ErrorReportOptions = {}
 ): string | undefined {
   return sentryWithScope((scope) => {
     applyScopeOptions(scope, options);
+
     return sentryCaptureMessage(message, options.level ?? 'info');
   });
 }

@@ -1,9 +1,5 @@
 import type { ErrorCodes } from './constants';
-import type {
-  Context as SentryContext,
-  User as SentryUser,
-  SeverityLevel,
-} from '@sentry/nextjs';
+import type { Context as SentryContext, SeverityLevel } from '@sentry/nextjs';
 
 /**
  * Type representing all possible error code values.
@@ -40,24 +36,11 @@ type FingerprintKind =
   | 'validation';
 export type Fingerprint = [FingerprintKind, ...string[]];
 
-/**
- * Options for error reporting to Sentry.
- */
 export interface ErrorReportOptions {
-  /** Structured context data (appears in separate section in Sentry) */
   context?: ErrorContext;
-  /** Additional unstructured data (appears as Extra Data in Sentry) */
-  extras?: Record<string, unknown>;
-  /** Custom fingerprint for error grouping in Sentry */
   fingerprint?: Fingerprint;
-  /** Severity level (fatal, error, warning, log, info, debug) */
   level?: SeverityLevel;
-  /** Tags for filtering and categorization */
   tags?: Record<string, string>;
-  /** Transaction name for better error organization */
-  transactionName?: string;
-  /** User information to associate with the error */
-  user?: SentryUser;
 }
 
 /**
