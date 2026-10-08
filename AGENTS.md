@@ -21,6 +21,7 @@ Use the lowest layer that proves the behavior:
 - Pure logic (utils, parsers, formatters): unit tests with `node:test`
 - Convex queries and mutations (auth, permissions, data rules): `convex-test` against the real functions
 - Critical user journeys (sign-in, favorites, browsing and filtering, admin edits): Playwright against a seeded preview backend
+  - When a journey emits analytics, assert the event in that same test by intercepting the outgoing Segment request (event name plus key ids), not by mocking `track()`. EventMap types already cover names and property shapes.
 
 Add a test only when it would catch a real regression. A bug fix gets a test that fails without the fix, at whichever layer can reproduce it.
 
