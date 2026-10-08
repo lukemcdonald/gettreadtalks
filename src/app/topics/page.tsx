@@ -11,7 +11,7 @@ import { SidebarFiltersSkeleton } from '@/components/skeletons';
 import { getTopicsWithTalks } from '@/features/topics/queries/get-topics-with-talks';
 
 // fallow-ignore-next-line unused-export
-export const ensureStatic = 'prefetch';
+export const ensureStatic = 'shell';
 
 export const metadata: Metadata = {
   description:

@@ -12,7 +12,7 @@ import { SpeakersListSkeleton } from '@/features/speakers/components/speakers-li
 import { getSpeakers } from '@/features/speakers/queries/get-speakers';
 
 // fallow-ignore-next-line unused-export
-export const ensureStatic = 'prefetch';
+export const ensureStatic = 'shell';
 
 export const metadata: Metadata = {
   description:

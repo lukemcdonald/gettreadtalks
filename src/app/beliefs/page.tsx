@@ -5,7 +5,7 @@ import { PageHeader } from '@/components/page-header';
 import { site } from '@/configs/site';
 
 // fallow-ignore-next-line unused-export
-export const ensureStatic = 'prefetch';
+export const ensureStatic = 'shell';
 
 export const metadata: Metadata = {
   description: `A brief statement of the core Christian beliefs that shape the content and mission of ${site.name}.`,

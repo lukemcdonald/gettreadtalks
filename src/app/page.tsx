@@ -10,7 +10,7 @@ import { TalkCard } from '@/features/talks/components/talk-card';
 import { getFeaturedTalks } from '@/features/talks/queries/get-featured-talks';
 
 // fallow-ignore-next-line unused-export
-export const ensureStatic = 'prefetch';
+export const ensureStatic = 'shell';
 
 export default async function HomePage() {
   const [featuredTalksResult, featuredSpeakersResult] = await Promise.all([
