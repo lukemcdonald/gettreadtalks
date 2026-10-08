@@ -3,7 +3,7 @@ import { FeaturedGrid } from '@/components/featured-grid';
 import { EditorialProfileLayout } from '@/components/layouts';
 import { MediaCardSkeleton } from '@/components/skeletons';
 
-function SpeakerContentSkeleton() {
+export function SpeakerContentSkeleton() {
   return (
     <>
       <FeaturedGrid columns={{ default: 1, lg: 2, md: 2, sm: 2 }} title="Talks">

@@ -28,9 +28,6 @@ export function speakerTalkLayout<T extends TalkForHero>(
 
   return {
     featuredTalk,
-    remainingTalks:
-      talks.length > 1
-        ? talks.filter((talk) => talk._id !== featuredTalk._id)
-        : talks,
+    remainingTalks: talks.filter((talk) => talk._id !== featuredTalk._id),
   };
 }

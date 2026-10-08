@@ -31,9 +31,34 @@ test('uses a YouTube player embedUrl and an audio contentUrl', () => {
 
   assert.equal(video['@type'], 'VideoObject');
   assert.equal(video.embedUrl, 'https://www.youtube.com/embed/jNQXAC9IVRw');
+  assert.deepEqual(video.creator, {
+    '@type': 'Person',
+    name: 'Martyn Lloyd-Jones',
+  });
   assert.equal(audio['@type'], 'AudioObject');
   assert.equal(audio.contentUrl, 'https://example.com/clip.mp3');
   assert.equal('embedUrl' in audio, false);
+});
+
+test('adds ISO uploadDate when publishedAt is present and omits creator without a speaker', () => {
+  const withDate = clipJsonLd({
+    clip: {
+      publishedAt: Date.UTC(2024, 0, 15),
+      slug: 'the-cross-clip',
+      title: 'The Cross clip',
+    },
+    speaker,
+    talk: null,
+  });
+  const withoutSpeaker = clipJsonLd({
+    clip: { slug: 'the-cross-clip', title: 'The Cross clip' },
+    speaker: null,
+    talk: null,
+  });
+
+  assert.equal(withDate.uploadDate, '2024-01-15T00:00:00.000Z');
+  assert.equal('uploadDate' in withoutSpeaker, false);
+  assert.equal('creator' in withoutSpeaker, false);
 });
 
 test('links the parent talk only when both talk and speaker are present', () => {

@@ -3,7 +3,7 @@ import { SidebarContent } from '@/components/sidebar-content';
 import { Skeleton } from '@/components/ui';
 import { TalksListSkeleton } from '@/features/talks/components/talks-list-skeleton';
 
-function TopicHeaderSkeleton() {
+export function TopicHeaderSkeleton() {
   return (
     <header className="flex flex-col gap-4">
       <div className="max-w-prose space-y-2">

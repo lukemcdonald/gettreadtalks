@@ -38,10 +38,10 @@ test('returns no candidates when there are no videos', () => {
   assert.deepEqual(featuredHeroCandidates([featuredAudio]), []);
 });
 
-test('keeps a lone featured video in the list and omits it when others exist', () => {
+test('omits the featured video from the list even when it is the only talk', () => {
   assert.deepEqual(speakerTalkLayout([featuredVideo], featuredVideo), {
     featuredTalk: featuredVideo,
-    remainingTalks: [featuredVideo],
+    remainingTalks: [],
   });
   assert.deepEqual(
     speakerTalkLayout([featuredVideo, otherVideo], featuredVideo),
