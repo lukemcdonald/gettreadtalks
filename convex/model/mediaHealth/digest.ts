@@ -86,5 +86,5 @@ function isBrokenPersistStatus(
 }
 
 function isNewBrokenItem(previousStatus: MediaCheckStatus | null) {
-  return previousStatus !== 'missing' && previousStatus !== 'private';
+  return previousStatus === 'ok';
 }

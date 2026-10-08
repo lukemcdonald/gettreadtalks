@@ -1,4 +1,5 @@
 import type { TalkId } from '@/features/talks/types';
+import type { Route } from 'next';
 
 import { redirect } from 'next/navigation';
 
@@ -6,8 +7,13 @@ import { EditTalkSheetRoute } from '@/app/@sheet/_components/edit-talk-sheet-rou
 import { getFormOptions } from '@/app/@sheet/_queries/get-form-options';
 import { getTalk } from '@/features/talks/queries/get-talk';
 import { getTalkTopics } from '@/features/talks/queries/get-talk-topics';
-import { ADMIN_LIST_PATHS } from '@/lib/entities/paths';
+import {
+  ADMIN_LIST_PATHS,
+  getAdminLoginRedirect,
+  getEntityEditPath,
+} from '@/lib/entities/paths';
 import { parseStatusPrefill } from '@/lib/entities/status-prefill';
+import { requireAdminUser } from '@/services/auth/server';
 
 interface EditTalkSheetPageProps {
   closeHref?: string;
@@ -23,6 +29,13 @@ export async function EditTalkSheetPage({
   const { talkId } = await params;
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const status = resolvedSearchParams?.status;
+  const statusPrefill = parseStatusPrefill(status);
+
+  await requireAdminUser(
+    getAdminLoginRedirect(
+      getEntityEditPath('talks', talkId, { status: statusPrefill })
+    ) as Route
+  );
 
   const [talk, talkTopics, { collections, speakers, topics }] =
     await Promise.all([
@@ -40,7 +53,7 @@ export async function EditTalkSheetPage({
       closeHref={closeHref}
       collections={collections}
       speakers={speakers}
-      statusPrefill={parseStatusPrefill(status)}
+      statusPrefill={statusPrefill}
       talk={{
         ...talk,
         topicIds: talkTopics.map((topic) => topic._id),

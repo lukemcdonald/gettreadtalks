@@ -14,11 +14,12 @@ interface PageProps {
 export default async function Page({ params, searchParams }: PageProps) {
   const { clipId } = await params;
   const { status } = await searchParams;
+  const statusPrefill = parseStatusPrefill(status);
 
   return (
     <AdminSheetFallback
       returnPath={getEntityEditPath('clips', clipId, {
-        status: parseStatusPrefill(status),
+        status: statusPrefill,
       })}
       sheet={
         <EditClipSheetPage
@@ -28,7 +29,11 @@ export default async function Page({ params, searchParams }: PageProps) {
         />
       }
     >
-      <AccountClipsPage searchParams={Promise.resolve({})} />
+      <AccountClipsPage
+        searchParams={Promise.resolve(
+          statusPrefill ? { status: statusPrefill } : {}
+        )}
+      />
     </AdminSheetFallback>
   );
 }

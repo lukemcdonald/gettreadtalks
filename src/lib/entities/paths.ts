@@ -33,10 +33,3 @@ export function getEntityEditPath(
 export function getEntityNewPath(entity: AdminEntity) {
   return `/${entity}/new`;
 }
-
-export function getMediaAdminEditPath(
-  entityTable: 'clips' | 'talks',
-  entityId: string
-) {
-  return getEntityEditPath(entityTable, entityId, { status: 'archived' });
-}

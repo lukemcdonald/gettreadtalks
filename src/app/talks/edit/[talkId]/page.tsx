@@ -14,11 +14,12 @@ interface PageProps {
 export default async function Page({ params, searchParams }: PageProps) {
   const { talkId } = await params;
   const { status } = await searchParams;
+  const statusPrefill = parseStatusPrefill(status);
 
   return (
     <AdminSheetFallback
       returnPath={getEntityEditPath('talks', talkId, {
-        status: parseStatusPrefill(status),
+        status: statusPrefill,
       })}
       sheet={
         <EditTalkSheetPage
@@ -28,7 +29,11 @@ export default async function Page({ params, searchParams }: PageProps) {
         />
       }
     >
-      <AccountTalksPage searchParams={Promise.resolve({})} />
+      <AccountTalksPage
+        searchParams={Promise.resolve(
+          statusPrefill ? { status: statusPrefill } : {}
+        )}
+      />
     </AdminSheetFallback>
   );
 }

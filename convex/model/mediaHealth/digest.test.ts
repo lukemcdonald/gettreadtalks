@@ -3,7 +3,7 @@ import { test } from 'node:test';
 
 import { getClipUrl } from '../../../src/features/clips/utils.ts';
 import { getTalkUrl } from '../../../src/features/talks/utils.ts';
-import { getMediaAdminEditPath } from '../../../src/lib/entities/paths.ts';
+import { getEntityEditPath } from '../../../src/lib/entities/paths.ts';
 import {
   appendMediaHealthItem,
   buildMediaHealthDigest,
@@ -11,7 +11,7 @@ import {
 } from './digest.ts';
 
 const firstTalk = {
-  adminPath: getMediaAdminEditPath('talks', 'talk1'),
+  adminPath: getEntityEditPath('talks', 'talk1', { status: 'archived' }),
   entityTable: 'talks' as const,
   isNew: true,
   mediaUrl: 'https://www.youtube.com/watch?v=abc',
@@ -22,7 +22,7 @@ const firstTalk = {
 };
 
 const stillBrokenClip = {
-  adminPath: getMediaAdminEditPath('clips', 'clip1'),
+  adminPath: getEntityEditPath('clips', 'clip1', { status: 'archived' }),
   entityTable: 'clips' as const,
   isNew: false,
   mediaUrl: 'https://vimeo.com/1',
@@ -83,17 +83,6 @@ test('an empty item list does not produce a digest', () => {
   assert.equal(buildMediaHealthDigest([]), null);
 });
 
-test('admin paths open the edit sheet with archived prefilled', () => {
-  assert.equal(
-    getMediaAdminEditPath('talks', 'talk123'),
-    '/talks/edit/talk123?status=archived'
-  );
-  assert.equal(
-    getMediaAdminEditPath('clips', 'clip123'),
-    '/clips/edit/clip123?status=archived'
-  );
-});
-
 test('public paths use talk and clip page helpers', () => {
   assert.equal(
     getMediaPublicPath({
@@ -135,7 +124,10 @@ test('ok to private is included and marked new with a public path', () => {
 
   assert.equal(items.length, 1);
   assert.ok(item);
-  assert.equal(item.adminPath, getMediaAdminEditPath('talks', 'talk1'));
+  assert.equal(
+    item.adminPath,
+    getEntityEditPath('talks', 'talk1', { status: 'archived' })
+  );
   assert.equal(item.isNew, true);
   assert.equal(item.newStatus, 'private');
   assert.equal(item.publicPath, getTalkUrl('john-doe', 'first-talk'));
@@ -154,12 +146,15 @@ test('still-missing media is included and not marked new', () => {
 
   assert.equal(items.length, 1);
   assert.ok(item);
-  assert.equal(item.adminPath, getMediaAdminEditPath('clips', 'clip1'));
+  assert.equal(
+    item.adminPath,
+    getEntityEditPath('clips', 'clip1', { status: 'archived' })
+  );
   assert.equal(item.isNew, false);
   assert.equal(item.publicPath, getClipUrl('second-clip'));
 });
 
-test('a first private check is included and marked new', () => {
+test('a first private check is included and not marked new', () => {
   const items = appendMediaHealthItem(
     firstPrivateTalkInput,
     {
@@ -172,8 +167,24 @@ test('a first private check is included and marked new', () => {
 
   assert.equal(items.length, 1);
   assert.ok(item);
-  assert.equal(item.isNew, true);
+  assert.equal(item.isNew, false);
   assert.equal(item.publicPath, getTalkUrl('mary-smith', 'new-talk'));
+});
+
+test('an unknown baseline is included and not marked new', () => {
+  const items = appendMediaHealthItem(
+    firstPrivateTalkInput,
+    {
+      persistStatus: 'missing',
+      previousStatus: 'unknown',
+    },
+    []
+  );
+  const [item] = items;
+
+  assert.equal(items.length, 1);
+  assert.ok(item);
+  assert.equal(item.isNew, false);
 });
 
 test('ok media is omitted from the digest', () => {

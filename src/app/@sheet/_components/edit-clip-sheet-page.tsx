@@ -1,12 +1,18 @@
 import type { ClipId } from '@/features/clips/types';
+import type { Route } from 'next';
 
 import { redirect } from 'next/navigation';
 
 import { EditClipSheetRoute } from '@/app/@sheet/_components/edit-clip-sheet-route';
 import { getFormOptions } from '@/app/@sheet/_queries/get-form-options';
 import { getClip } from '@/features/clips/queries/get-clip';
-import { ADMIN_LIST_PATHS } from '@/lib/entities/paths';
+import {
+  ADMIN_LIST_PATHS,
+  getAdminLoginRedirect,
+  getEntityEditPath,
+} from '@/lib/entities/paths';
 import { parseStatusPrefill } from '@/lib/entities/status-prefill';
+import { requireAdminUser } from '@/services/auth/server';
 
 interface EditClipSheetPageProps {
   closeHref?: string;
@@ -22,6 +28,13 @@ export async function EditClipSheetPage({
   const { clipId } = await params;
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const status = resolvedSearchParams?.status;
+  const statusPrefill = parseStatusPrefill(status);
+
+  await requireAdminUser(
+    getAdminLoginRedirect(
+      getEntityEditPath('clips', clipId, { status: statusPrefill })
+    ) as Route
+  );
 
   const [clip, { speakers, talks }] = await Promise.all([
     getClip(clipId),
@@ -37,7 +50,7 @@ export async function EditClipSheetPage({
       clip={clip}
       closeHref={closeHref}
       speakers={speakers}
-      statusPrefill={parseStatusPrefill(status)}
+      statusPrefill={statusPrefill}
       talks={talks}
     />
   );

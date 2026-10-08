@@ -7,7 +7,6 @@ import {
   getAdminLoginRedirect,
   getEntityEditPath,
   getEntityNewPath,
-  getMediaAdminEditPath,
 } from './paths.ts';
 
 test('admin list paths stay on the account admin pages', () => {
@@ -22,7 +21,7 @@ test('edit and new paths match the intercepted admin sheet urls', () => {
 
 test('media admin links prefill archived without changing data on GET', () => {
   assert.equal(
-    getMediaAdminEditPath('talks', 'talk123'),
+    getEntityEditPath('talks', 'talk123', { status: 'archived' }),
     '/talks/edit/talk123?status=archived'
   );
   assert.equal(
