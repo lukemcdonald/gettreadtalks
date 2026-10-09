@@ -13,9 +13,10 @@ describe('talkListItemsJsonLd', () => {
       },
     ]);
 
-    assert.equal(item?.position, 1);
+    assert.ok(item);
+    assert.equal(item.position, 1);
     assert.equal(
-      item?.url,
+      item.url,
       'https://www.gettreadtalks.com/talks/lloyd-jones/the-cross'
     );
   });
@@ -25,7 +26,8 @@ describe('talkListItemsJsonLd', () => {
       { slug: 'orphan', speaker: null, title: 'Orphan talk' },
     ]);
 
-    assert.equal(item?.position, 1);
-    assert.equal(item?.url, undefined);
+    assert.ok(item);
+    assert.equal(item.position, 1);
+    assert.equal(item.url, undefined);
   });
 });

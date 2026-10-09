@@ -53,6 +53,19 @@ const healthyTalkInput = {
   title: 'Healthy Talk',
 };
 
+function firstAppendedItem(
+  input: Parameters<typeof appendMediaHealthItem>[0],
+  outcome: Parameters<typeof appendMediaHealthItem>[1]
+) {
+  const items = appendMediaHealthItem(input, outcome, []);
+  const [item] = items;
+
+  assert.equal(items.length, 1);
+  assert.ok(item);
+
+  return item;
+}
+
 describe('buildMediaHealthDigest', () => {
   test('returns the items when any exist', () => {
     const items = [digestItem];
@@ -97,54 +110,36 @@ describe('getMediaPublicPath', () => {
 
 describe('appendMediaHealthItem', () => {
   test('includes newly broken media as new', () => {
-    const items = appendMediaHealthItem(
-      firstTalkInput,
-      {
-        persistStatus: 'private',
-        previousStatus: 'ok',
-      },
-      []
-    );
-    const [item] = items;
+    const item = firstAppendedItem(firstTalkInput, {
+      persistStatus: 'private',
+      previousStatus: 'ok',
+    });
 
-    assert.equal(items.length, 1);
-    assert.equal(item?.adminPath, '/talks/edit/talk1?status=archived');
-    assert.equal(item?.isNew, true);
-    assert.equal(item?.newStatus, 'private');
-    assert.equal(item?.publicPath, '/talks/john-doe/first-talk');
+    assert.equal(item.adminPath, '/talks/edit/talk1?status=archived');
+    assert.equal(item.isNew, true);
+    assert.equal(item.newStatus, 'private');
+    assert.equal(item.publicPath, '/talks/john-doe/first-talk');
   });
 
   test('includes still-broken media as not new', () => {
-    const items = appendMediaHealthItem(
-      stillBrokenClipInput,
-      {
-        persistStatus: 'missing',
-        previousStatus: 'missing',
-      },
-      []
-    );
-    const [item] = items;
+    const item = firstAppendedItem(stillBrokenClipInput, {
+      persistStatus: 'missing',
+      previousStatus: 'missing',
+    });
 
-    assert.equal(items.length, 1);
-    assert.equal(item?.adminPath, '/clips/edit/clip1?status=archived');
-    assert.equal(item?.isNew, false);
-    assert.equal(item?.publicPath, '/clips/second-clip');
+    assert.equal(item.adminPath, '/clips/edit/clip1?status=archived');
+    assert.equal(item.isNew, false);
+    assert.equal(item.publicPath, '/clips/second-clip');
   });
 
   test('includes a first broken check as not new', () => {
-    const items = appendMediaHealthItem(
-      firstPrivateTalkInput,
-      {
-        persistStatus: 'private',
-        previousStatus: null,
-      },
-      []
-    );
-    const [item] = items;
+    const item = firstAppendedItem(firstPrivateTalkInput, {
+      persistStatus: 'private',
+      previousStatus: null,
+    });
 
-    assert.equal(items.length, 1);
-    assert.equal(item?.isNew, false);
-    assert.equal(item?.publicPath, '/talks/mary-smith/new-talk');
+    assert.equal(item.isNew, false);
+    assert.equal(item.publicPath, '/talks/mary-smith/new-talk');
   });
 
   test('omits ok media', () => {

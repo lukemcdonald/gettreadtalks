@@ -38,12 +38,14 @@ describe('getOEmbedRequest', () => {
     );
     const vimeo = getOEmbedRequest('https://vimeo.com/123456789');
 
+    assert.ok(youtube);
+    assert.ok(vimeo);
     assert.equal(
-      youtube?.href,
+      youtube.href,
       'https://www.youtube.com/oembed?format=json&url=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DLYncFGsKvCQ'
     );
     assert.equal(
-      vimeo?.href,
+      vimeo.href,
       'https://vimeo.com/api/oembed.json?url=https%3A%2F%2Fvimeo.com%2F123456789'
     );
   });
