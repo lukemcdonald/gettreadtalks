@@ -28,7 +28,11 @@ export function TopicBrowseSection({
       <SectionHeading
         className="mb-6"
         heading={
-          <Link className="hover:underline" href={`/topics/${topic.slug}`}>
+          <Link
+            className="hover:underline"
+            data-testid="topic-link"
+            href={`/topics/${topic.slug}`}
+          >
             {topic.title}
           </Link>
         }

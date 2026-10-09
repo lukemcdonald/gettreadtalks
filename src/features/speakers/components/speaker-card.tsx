@@ -18,6 +18,7 @@ export function SpeakerCard({ speaker }: SpeakerCardProps) {
 
   return (
     <MediaCard
+      data-testid="speaker-card"
       href={`/speakers/${speaker.slug}`}
       media={<SpeakerAvatar speaker={speaker} />}
       subtitle={speaker.role}

@@ -1,0 +1,43 @@
+import type { Locator, Page } from '@playwright/test';
+
+export class TalksPage {
+  readonly favorite: Locator;
+  readonly firstTalk: Locator;
+  readonly heading: Locator;
+  readonly page: Page;
+  readonly playback: Locator;
+  readonly search: Locator;
+  readonly talkHeading: Locator;
+
+  constructor(page: Page) {
+    this.page = page;
+    this.favorite = page.getByTestId('favorite-talk');
+    this.firstTalk = page
+      .getByRole('link')
+      .and(page.getByTestId('talk-card'))
+      .first();
+    this.heading = page.getByRole('heading', {
+      exact: true,
+      level: 1,
+      name: 'Talks',
+    });
+    this.playback = page
+      .getByRole('button', { name: /^(?:Play|Watch) /u })
+      .or(page.getByRole('link', { name: 'Open Media' }))
+      .or(page.locator('audio[controls], video[controls]'));
+    this.search = page.getByRole('searchbox', { name: 'Search' });
+    this.talkHeading = page.getByRole('heading', { level: 1 });
+  }
+
+  async goto() {
+    await this.page.goto('/talks');
+  }
+
+  async openFirst() {
+    await this.firstTalk.click();
+  }
+
+  async searchFor(query: string) {
+    await this.search.fill(query);
+  }
+}
