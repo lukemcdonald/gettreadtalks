@@ -19,7 +19,10 @@ export class TalksPage {
       level: 1,
       name: 'Talks',
     });
-    this.playback = page.getByRole('button', { name: /^Watch /u });
+    this.playback = page
+      .getByRole('button', { name: /^(?:Play|Watch) /u })
+      .or(page.getByRole('link', { name: 'Open Media' }))
+      .or(page.locator('audio[controls], video[controls]'));
     this.search = page.getByRole('searchbox', { name: 'Search' });
     this.talkHeading = page.getByRole('heading', { level: 1 });
   }

@@ -24,14 +24,14 @@ export function CollectionCard({
   talkCount,
 }: CollectionCardProps) {
   return (
-    <Card
-      className="group card-interactive relative flex flex-col gap-3 border-0 p-4"
-      data-testid="collection-card"
-    >
+    <Card className="group card-interactive relative flex flex-col gap-3 border-0 p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 space-y-0.5">
           <MediaCardTitle aria-label={collection.title}>
-            <FauxLink href={`/collections/${collection.slug}`}>
+            <FauxLink
+              data-testid="collection-card"
+              href={`/collections/${collection.slug}`}
+            >
               {collection.title}
             </FauxLink>
           </MediaCardTitle>
