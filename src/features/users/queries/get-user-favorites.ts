@@ -9,5 +9,15 @@ export async function getUserFavorites(limit?: number) {
   cacheLife('hours');
   cacheTag('user-favorites');
 
-  return await fetchAuthQuery(api.users.listUserFavorites, { limit });
+  const favorites = await fetchAuthQuery(api.users.listUserFavorites, {
+    limit,
+  });
+
+  return (
+    favorites ?? {
+      clips: [],
+      speakers: [],
+      talks: [],
+    }
+  );
 }
