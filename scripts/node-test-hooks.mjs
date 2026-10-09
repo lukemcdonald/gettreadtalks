@@ -5,10 +5,6 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 
 function resolveTsFile(absolutePath) {
-  if (path.extname(absolutePath)) {
-    return existsSync(absolutePath) ? absolutePath : null;
-  }
-
   const asFile = `${absolutePath}.ts`;
   if (existsSync(asFile)) {
     return asFile;
@@ -22,6 +18,28 @@ function resolveTsFile(absolutePath) {
   return null;
 }
 
+function mapAlias(specifier) {
+  if (!specifier.startsWith('@/')) {
+    return null;
+  }
+
+  return resolveTsFile(path.join(repoRoot, 'src', specifier.slice(2)));
+}
+
+function mapRelative(specifier, parentURL) {
+  if (!parentURL || path.extname(specifier)) {
+    return null;
+  }
+
+  if (!specifier.startsWith('.')) {
+    return null;
+  }
+
+  return resolveTsFile(
+    path.join(path.dirname(fileURLToPath(parentURL)), specifier)
+  );
+}
+
 export function resolve(specifier, context, nextResolve) {
   if (specifier === 'server-only') {
     return {
@@ -31,26 +49,10 @@ export function resolve(specifier, context, nextResolve) {
     };
   }
 
-  let absolutePath;
-
-  if (specifier.startsWith('@/')) {
-    absolutePath = path.join(repoRoot, 'src', specifier.slice(2));
-  } else if (
-    specifier.startsWith('.') &&
-    !path.extname(specifier) &&
-    context.parentURL
-  ) {
-    absolutePath = path.join(
-      path.dirname(fileURLToPath(context.parentURL)),
-      specifier
-    );
-  }
-
-  if (absolutePath) {
-    const resolved = resolveTsFile(absolutePath);
-    if (resolved) {
-      return nextResolve(pathToFileURL(resolved).href, context);
-    }
+  const mapped =
+    mapAlias(specifier) ?? mapRelative(specifier, context.parentURL);
+  if (mapped) {
+    return nextResolve(pathToFileURL(mapped).href, context);
   }
 
   return nextResolve(specifier, context);
