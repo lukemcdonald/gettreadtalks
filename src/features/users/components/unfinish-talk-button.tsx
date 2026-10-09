@@ -10,9 +10,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui';
-import { api } from '@/convex/_generated/api';
 import { revalidateUserLists } from '@/features/users/actions/revalidate-user-lists';
-import { useMutation } from '@/hooks';
+import { useUnfinishTalk } from '@/features/users/hooks/use-unfinish-talk';
 
 interface UnfinishTalkButtonProps {
   onError?: () => void;
@@ -25,7 +24,7 @@ export function UnfinishTalkButton({
   onMutate,
   talkId,
 }: UnfinishTalkButtonProps) {
-  const { isLoading, mutate } = useMutation(api.users.unfinishTalk, {
+  const { isLoading, mutate } = useUnfinishTalk({
     onError,
     onSuccess: () => {
       void revalidateUserLists({ refreshPage: true });
