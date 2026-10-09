@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { test } from 'node:test';
+import { describe, test } from 'node:test';
 
 import {
   featuredHeroCandidates,
@@ -21,42 +21,46 @@ const featuredAudio = {
 };
 const otherVideo = { _id: 'other-video', featured: false, mediaUrl: youtube };
 
-test('rotates featured video talks when any exist', () => {
-  assert.deepEqual(
-    featuredHeroCandidates([featuredAudio, featuredVideo, otherVideo]),
-    [featuredVideo]
-  );
-});
-
-test('falls back to nonfeatured videos when none are featured video', () => {
-  assert.deepEqual(featuredHeroCandidates([featuredAudio, otherVideo]), [
-    otherVideo,
-  ]);
-});
-
-test('returns no candidates when there are no videos', () => {
-  assert.deepEqual(featuredHeroCandidates([featuredAudio]), []);
-});
-
-test('omits the featured video from the list even when it is the only talk', () => {
-  assert.deepEqual(speakerTalkLayout([featuredVideo], featuredVideo), {
-    featuredTalk: featuredVideo,
-    remainingTalks: [],
+describe('featuredHeroCandidates', () => {
+  test('uses featured video talks when any exist', () => {
+    assert.deepEqual(
+      featuredHeroCandidates([featuredAudio, featuredVideo, otherVideo]),
+      [featuredVideo]
+    );
   });
-  assert.deepEqual(
-    speakerTalkLayout([featuredVideo, otherVideo], featuredVideo),
-    {
-      featuredTalk: featuredVideo,
-      remainingTalks: [otherVideo],
-    }
-  );
+
+  test('falls back to nonfeatured videos when none are featured video', () => {
+    assert.deepEqual(featuredHeroCandidates([featuredAudio, otherVideo]), [
+      otherVideo,
+    ]);
+  });
+
+  test('returns no candidates when there are no videos', () => {
+    assert.deepEqual(featuredHeroCandidates([featuredAudio]), []);
+  });
 });
 
-test('does not put audio in the hero or drop it from the list', () => {
-  const talks = [featuredAudio, otherVideo];
+describe('speakerTalkLayout', () => {
+  test('omits the featured video from the list', () => {
+    assert.deepEqual(speakerTalkLayout([featuredVideo], featuredVideo), {
+      featuredTalk: featuredVideo,
+      remainingTalks: [],
+    });
+    assert.deepEqual(
+      speakerTalkLayout([featuredVideo, otherVideo], featuredVideo),
+      {
+        featuredTalk: featuredVideo,
+        remainingTalks: [otherVideo],
+      }
+    );
+  });
 
-  assert.deepEqual(speakerTalkLayout(talks, featuredAudio), {
-    featuredTalk: undefined,
-    remainingTalks: talks,
+  test('does not put audio in the hero or drop it from the list', () => {
+    const talks = [featuredAudio, otherVideo];
+
+    assert.deepEqual(speakerTalkLayout(talks, featuredAudio), {
+      featuredTalk: undefined,
+      remainingTalks: talks,
+    });
   });
 });
