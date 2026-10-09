@@ -16,13 +16,12 @@ export default defineConfig({
   testDir: './e2e',
   use: {
     baseURL,
-    ignoreHTTPSErrors: true,
     trace: 'on-first-retry',
   },
   webServer: process.env.PLAYWRIGHT_BASE_URL
     ? undefined
     : {
-        command: 'pnpm start',
+        command: 'pnpm build && pnpm start',
         reuseExistingServer: !process.env.CI,
         url: baseURL,
       },

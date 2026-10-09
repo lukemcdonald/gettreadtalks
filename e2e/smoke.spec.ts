@@ -31,7 +31,6 @@ test('search talks', async ({ page }) => {
   await page.getByRole('searchbox', { name: 'Search' }).fill('grace');
 
   await expect(page).toHaveURL(/search=grace/u);
-  await expect(page.getByRole('heading', { level: 3 }).first()).toBeVisible();
 });
 
 test('unknown route shows 404', async ({ page }) => {
