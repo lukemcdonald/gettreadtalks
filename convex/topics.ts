@@ -4,7 +4,6 @@ import { mutations, queries } from './model/topics';
 export const {
   getTopic,
   getTopicBySlug,
-  getTopicWithContent,
   listAllTopics,
   listTopics,
   listTopicsWithCount,

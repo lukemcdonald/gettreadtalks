@@ -6,7 +6,6 @@ export const {
   getTalkBySlug,
   getTalksCount,
   listAllTalks,
-  listFeaturedTalks,
   listFeaturedTalksWithSpeakers,
   listRandomTalksBySpeaker,
   listTalkSlugsForSitemap,

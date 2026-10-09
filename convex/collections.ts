@@ -4,8 +4,6 @@ import { mutations, queries } from './model/collections';
 export const {
   getCollection,
   getCollectionBySlug,
-  getCollectionWithSpeakers,
-  getCollectionWithTalks,
   listAllCollections,
   listCollectionSlugsForSitemap,
   listCollections,
