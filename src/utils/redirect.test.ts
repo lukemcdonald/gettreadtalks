@@ -12,6 +12,10 @@ describe('getSafeRedirect', () => {
     assert.equal(getSafeRedirect('//evil.com'), '/account');
   });
 
+  test('rejects a backslash open-redirect path', () => {
+    assert.equal(getSafeRedirect('/\\evil.com'), '/account');
+  });
+
   test('rejects an absolute external url', () => {
     assert.equal(getSafeRedirect('https://evil.com/phish'), '/account');
   });
