@@ -16,7 +16,9 @@ export default defineConfig({
   testDir: './e2e',
   use: {
     baseURL,
-    trace: 'on-first-retry',
+    trace: process.env.VERCEL_AUTOMATION_BYPASS_SECRET
+      ? 'off'
+      : 'on-first-retry',
   },
   webServer: process.env.PLAYWRIGHT_BASE_URL
     ? undefined
