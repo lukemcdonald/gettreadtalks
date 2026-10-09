@@ -14,8 +14,23 @@ permissions:
   contents: read
 
 jobs:
-  check:
-    name: Checks
+  validate:
+    name: Validate
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install pnpm and Node.js
+        uses: pnpm/setup@v3
+        with:
+          cache: true
+          runtime: node@24
+      - run: pnpm check
+      - run: pnpm typecheck
+      - run: pnpm test
+
+  code-health:
+    name: Code health
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
@@ -26,11 +41,118 @@ jobs:
         with:
           cache: true
           runtime: node@24
-      - run: pnpm check
-      - run: pnpm typecheck
-      - run: pnpm test
       - name: Audit new issues vs PR base
-        if: github.event_name == 'pull_request'
         run: |
           git fetch --no-tags origin "${{ github.base_ref }}"
           pnpm exec fallow audit --base "origin/${{ github.base_ref }}"
+
+  e2e:
+    name: E2E
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+      deployments: read
+      pull-requests: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Detect non-docs changes
+        id: changes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          files="$(
+            gh api --paginate \
+              "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}/files" \
+              --jq '.[].filename'
+          )"
+          if [[ -z "${files}" ]]; then
+            echo "run=false" >> "${GITHUB_OUTPUT}"
+            echo "No changed files; skipping E2E"
+            exit 0
+          fi
+          if printf '%s\n' "${files}" | grep -qvE '(^docs/|\.md$)'; then
+            echo "run=true" >> "${GITHUB_OUTPUT}"
+          else
+            echo "run=false" >> "${GITHUB_OUTPUT}"
+            echo "Docs-only change; skipping E2E"
+          fi
+      - if: steps.changes.outputs.run == 'true'
+        uses: actions/checkout@v7
+      - if: steps.changes.outputs.run == 'true'
+        name: Install pnpm and Node.js
+        uses: pnpm/setup@v3
+        with:
+          cache: true
+          runtime: node@24
+      - if: steps.changes.outputs.run == 'true'
+        name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+      - if: steps.changes.outputs.run == 'true'
+        name: Wait for Vercel preview
+        id: preview
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          deadline=$((SECONDS + 900))
+          url=""
+
+          while (( SECONDS < deadline )); do
+            deployment_id="$(
+              gh api "repos/${GITHUB_REPOSITORY}/deployments?sha=${SHA}&environment=Preview&per_page=1" \
+                --jq '.[0].id // empty'
+            )"
+
+            if [[ -n "${deployment_id}" ]]; then
+              state="$(
+                gh api "repos/${GITHUB_REPOSITORY}/deployments/${deployment_id}/statuses" \
+                  --jq '.[0].state // empty'
+              )"
+              echo "Preview deployment ${deployment_id}: ${state}"
+
+              if [[ "${state}" == "success" ]]; then
+                url="$(
+                  gh api "repos/${GITHUB_REPOSITORY}/deployments/${deployment_id}/statuses" \
+                    --jq '.[0].environment_url // .[0].target_url // empty'
+                )"
+                break
+              fi
+
+              if [[ "${state}" == "failure" || "${state}" == "error" ]]; then
+                echo "Preview deployment failed"
+                exit 1
+              fi
+            else
+              echo "No Preview deployment for ${SHA} yet"
+            fi
+
+            sleep 10
+          done
+
+          if [[ -z "${url}" ]]; then
+            echo "Timed out waiting for a successful Preview deployment of ${SHA}"
+            exit 1
+          fi
+
+          url="${url%/}"
+          echo "Preview URL: ${url}"
+          echo "url=${url}" >> "${GITHUB_OUTPUT}"
+      - if: steps.changes.outputs.run == 'true'
+        name: Run Playwright
+        env:
+          E2E_USER_EMAIL: ${{ secrets.E2E_USER_EMAIL }}
+          E2E_USER_PASSWORD: ${{ secrets.E2E_USER_PASSWORD }}
+          PLAYWRIGHT_BASE_URL: ${{ steps.preview.outputs.url }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+        run: pnpm test:e2e
+      - if: ${{ !cancelled() && steps.changes.outputs.run == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          if-no-files-found: ignore
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
