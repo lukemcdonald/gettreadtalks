@@ -10,14 +10,17 @@ export class TalksPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.firstTalk = page.getByTestId('talk-card').first();
+    this.firstTalk = page
+      .getByRole('link')
+      .and(page.getByTestId('talk-card'))
+      .first();
     this.heading = page.getByRole('heading', {
       exact: true,
       level: 1,
       name: 'Talks',
     });
     this.playback = page.getByRole('button', { name: /^Watch /u });
-    this.search = page.getByRole('searchbox', { name: 'Search' });
+    this.search = page.getByRole('searchbox', { exact: true, name: 'Search' });
     this.talkHeading = page.getByRole('heading', { level: 1 });
   }
 

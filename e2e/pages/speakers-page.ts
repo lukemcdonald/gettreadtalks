@@ -8,7 +8,10 @@ export class SpeakersPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.firstSpeaker = page.getByTestId('speaker-card').first();
+    this.firstSpeaker = page
+      .getByRole('link')
+      .and(page.getByTestId('speaker-card'))
+      .first();
     this.heading = page.getByRole('heading', {
       exact: true,
       level: 1,
