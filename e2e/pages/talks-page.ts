@@ -20,7 +20,7 @@ export class TalksPage {
       name: 'Talks',
     });
     this.playback = page.getByRole('button', { name: /^Watch /u });
-    this.search = page.getByRole('searchbox', { exact: true, name: 'Search' });
+    this.search = page.getByRole('searchbox', { name: 'Search' });
     this.talkHeading = page.getByRole('heading', { level: 1 });
   }
 
