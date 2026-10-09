@@ -39,7 +39,7 @@ interface TalkFormFieldsProps {
   topics: TopicListItem[];
 }
 
-export function TalkCollectionFields({
+function TalkCollectionFields({
   collections,
   control,
   setValue,
