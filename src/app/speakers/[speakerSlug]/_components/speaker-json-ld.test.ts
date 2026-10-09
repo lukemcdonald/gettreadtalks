@@ -1,19 +1,25 @@
 import assert from 'node:assert/strict';
-import { test } from 'node:test';
+import { describe, test } from 'node:test';
 
 import { speakerJsonLd } from './speaker-json-ld.ts';
 
-test('adds sameAs only when the speaker has a website', () => {
-  const withSite = speakerJsonLd({
-    name: 'Martyn Lloyd-Jones',
-    speakerSlug: 'lloyd-jones',
-    websiteUrl: 'https://mljtrust.org',
-  });
-  const withoutSite = speakerJsonLd({
-    name: 'Martyn Lloyd-Jones',
-    speakerSlug: 'lloyd-jones',
+describe('speakerJsonLd', () => {
+  test('adds sameAs when the speaker has a website', () => {
+    const result = speakerJsonLd({
+      name: 'Martyn Lloyd-Jones',
+      speakerSlug: 'lloyd-jones',
+      websiteUrl: 'https://mljtrust.org',
+    });
+
+    assert.deepEqual(result.sameAs, ['https://mljtrust.org']);
   });
 
-  assert.deepEqual(withSite.sameAs, ['https://mljtrust.org']);
-  assert.equal('sameAs' in withoutSite, false);
+  test('omits sameAs when the speaker has no website', () => {
+    const result = speakerJsonLd({
+      name: 'Martyn Lloyd-Jones',
+      speakerSlug: 'lloyd-jones',
+    });
+
+    assert.equal('sameAs' in result, false);
+  });
 });

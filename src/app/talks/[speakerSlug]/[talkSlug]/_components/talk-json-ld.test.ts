@@ -1,61 +1,49 @@
 import assert from 'node:assert/strict';
-import { test } from 'node:test';
+import { describe, test } from 'node:test';
 
 import { talkJsonLd } from './talk-json-ld.ts';
 
 const speaker = { firstName: 'Martyn', lastName: 'Lloyd-Jones' };
 
-test('uses a YouTube player embedUrl and an audio contentUrl', () => {
-  const video = talkJsonLd({
-    speaker,
-    speakerSlug: 'lloyd-jones',
-    talk: {
-      mediaUrl: 'https://www.youtube.com/watch?v=jNQXAC9IVRw',
-      title: 'The Cross',
-    },
-    talkSlug: 'the-cross',
-  });
-  const audio = talkJsonLd({
-    speaker,
-    speakerSlug: 'lloyd-jones',
-    talk: { mediaUrl: 'https://example.com/talk.mp3', title: 'The Cross' },
-    talkSlug: 'the-cross',
-  });
+describe('talkJsonLd', () => {
+  test('uses the talk page url and speaker as creator', () => {
+    const result = talkJsonLd({
+      speaker,
+      speakerSlug: 'lloyd-jones',
+      talk: { title: 'The Cross' },
+      talkSlug: 'the-cross',
+    });
 
-  assert.equal(video['@type'], 'VideoObject');
-  assert.equal(video.embedUrl, 'https://www.youtube.com/embed/jNQXAC9IVRw');
-  assert.equal(audio['@type'], 'AudioObject');
-  assert.equal(audio.contentUrl, 'https://example.com/talk.mp3');
-  assert.equal('embedUrl' in audio, false);
-});
-
-test('omits creator without a speaker and uploadDate without publishedAt', () => {
-  const result = talkJsonLd({
-    speaker: null,
-    speakerSlug: 'lloyd-jones',
-    talk: { title: 'The Cross' },
-    talkSlug: 'the-cross',
+    assert.deepEqual(result.creator, {
+      '@type': 'Person',
+      name: 'Martyn Lloyd-Jones',
+    });
+    assert.equal(
+      result.url,
+      'https://www.gettreadtalks.com/talks/lloyd-jones/the-cross'
+    );
   });
 
-  assert.equal('creator' in result, false);
-  assert.equal('uploadDate' in result, false);
-});
+  test('adds ISO uploadDate when publishedAt is present', () => {
+    const result = talkJsonLd({
+      speaker,
+      speakerSlug: 'lloyd-jones',
+      talk: { publishedAt: Date.UTC(2020, 0, 15), title: 'The Cross' },
+      talkSlug: 'the-cross',
+    });
 
-test('adds creator and ISO uploadDate when present', () => {
-  const result = talkJsonLd({
-    speaker,
-    speakerSlug: 'lloyd-jones',
-    talk: { publishedAt: Date.UTC(2020, 0, 15), title: 'The Cross' },
-    talkSlug: 'the-cross',
+    assert.equal(result.uploadDate, '2020-01-15T00:00:00.000Z');
   });
 
-  assert.deepEqual(result.creator, {
-    '@type': 'Person',
-    name: 'Martyn Lloyd-Jones',
+  test('omits creator and uploadDate when those fields are missing', () => {
+    const result = talkJsonLd({
+      speaker: null,
+      speakerSlug: 'lloyd-jones',
+      talk: { title: 'The Cross' },
+      talkSlug: 'the-cross',
+    });
+
+    assert.equal('creator' in result, false);
+    assert.equal('uploadDate' in result, false);
   });
-  assert.equal(result.uploadDate, '2020-01-15T00:00:00.000Z');
-  assert.equal(
-    result.url,
-    'https://www.gettreadtalks.com/talks/lloyd-jones/the-cross'
-  );
 });
