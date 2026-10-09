@@ -14,8 +14,10 @@ PLAYWRIGHT_BASE_URL=https://www.gettreadtalks.com pnpm test:e2e
 
 `setup` and `chromium-user` are registered only when `E2E_USER_EMAIL` and `E2E_USER_PASSWORD` are set (the preview seeded user). Auth UI tests skip with a message when those env vars are missing, so local runs stay green. Do not log the values. Traces stay off when they or `VERCEL_AUTOMATION_BYPASS_SECRET` are set.
 
+Protected previews also need `VERCEL_AUTOMATION_BYPASS_SECRET`.
+
 ```sh
-E2E_USER_EMAIL=you@example.com E2E_USER_PASSWORD=secret PLAYWRIGHT_BASE_URL=https://preview.example pnpm test:e2e
+E2E_USER_EMAIL=you@example.com E2E_USER_PASSWORD=secret PLAYWRIGHT_BASE_URL=https://preview.example VERCEL_AUTOMATION_BYPASS_SECRET=bypass pnpm test:e2e
 ```
 
 ## Locator rule
