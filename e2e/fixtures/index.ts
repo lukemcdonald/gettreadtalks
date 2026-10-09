@@ -2,6 +2,7 @@ import { test as base } from '@playwright/test';
 
 import { AuthPage } from '../pages/auth-page.ts';
 import { CollectionsPage } from '../pages/collections-page.ts';
+import { FavoritesPage } from '../pages/favorites-page.ts';
 import { HomePage } from '../pages/home-page.ts';
 import { NotFoundPage } from '../pages/not-found-page.ts';
 import { SpeakersPage } from '../pages/speakers-page.ts';
@@ -13,6 +14,7 @@ export { expect } from '@playwright/test';
 interface Fixtures {
   authPage: AuthPage;
   collectionsPage: CollectionsPage;
+  favoritesPage: FavoritesPage;
   homePage: HomePage;
   notFoundPage: NotFoundPage;
   speakersPage: SpeakersPage;
@@ -48,6 +50,9 @@ export const test = base.extend<Fixtures>({
     }
 
     await provide(context);
+  },
+  favoritesPage: async ({ page }, provide) => {
+    await provide(new FavoritesPage(page));
   },
   homePage: async ({ page }, provide) => {
     await provide(new HomePage(page));
