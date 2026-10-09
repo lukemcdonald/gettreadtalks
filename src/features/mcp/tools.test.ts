@@ -50,13 +50,6 @@ const psalmsTalk = {
   topicSlugs: ['prayer'],
 };
 
-const unpublishedTalk = {
-  description: 'Should never appear in MCP results.',
-  slug: 'draft-talk',
-  speaker: john,
-  title: 'Draft Talk',
-};
-
 const psalmsCollection = {
   description: 'An example series.',
   slug: 'example-series-the-psalms',
@@ -94,6 +87,7 @@ function createCatalog(overrides: Partial<McpCatalog> = {}): McpCatalog {
         speaker: john,
         talk: {
           slug: romansTalk.slug,
+          status: 'published',
           title: romansTalk.title,
         },
       });
@@ -239,17 +233,6 @@ describe('searchTalks', () => {
       ['sample-sermon-on-romans-8']
     );
   });
-
-  test('does not return unpublished talks from the catalog', async () => {
-    const result = await searchTalks({}, createCatalog());
-    const body = parseToolJson(result);
-    const talks = body.talks as { slug: string }[];
-
-    assert.equal(
-      talks.some((talk) => talk.slug === unpublishedTalk.slug),
-      false
-    );
-  });
 });
 
 describe('getTalk', () => {
@@ -363,6 +346,31 @@ describe('getCollection', () => {
     assert.equal(result.isError, true);
     assert.equal(body.error, 'Collection not found.');
   });
+
+  test('returns not found when a collection has no published talks', async () => {
+    const result = await getCollection(
+      { slug: 'empty-series' },
+      createCatalog({
+        getCollectionBySlug: (slug) => {
+          if (slug !== 'empty-series') {
+            return Promise.resolve(null);
+          }
+
+          return Promise.resolve({
+            collection: {
+              slug: 'empty-series',
+              title: 'Empty Series',
+            },
+            talks: [],
+          });
+        },
+      })
+    );
+    const body = parseToolJson(result);
+
+    assert.equal(result.isError, true);
+    assert.equal(body.error, 'Collection not found.');
+  });
 });
 
 describe('listClips', () => {
@@ -403,6 +411,36 @@ describe('getClip', () => {
 
   test('returns not found for a missing clip', async () => {
     const result = await getClip({ slug: 'missing' }, createCatalog());
+    const body = parseToolJson(result);
+
+    assert.equal(result.isError, true);
+    assert.equal(body.error, 'Clip not found.');
+  });
+
+  test('returns not found when the parent talk is unpublished', async () => {
+    const result = await getClip(
+      { slug: 'draft-parent-clip' },
+      createCatalog({
+        getClipBySlug: (slug) => {
+          if (slug !== 'draft-parent-clip') {
+            return Promise.resolve(null);
+          }
+
+          return Promise.resolve({
+            clip: {
+              slug: 'draft-parent-clip',
+              title: 'Clip on a draft talk',
+            },
+            speaker: john,
+            talk: {
+              slug: 'draft-talk',
+              status: 'draft',
+              title: 'Draft Talk',
+            },
+          });
+        },
+      })
+    );
     const body = parseToolJson(result);
 
     assert.equal(result.isError, true);

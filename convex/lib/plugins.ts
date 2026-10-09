@@ -6,6 +6,7 @@ import { requireActionCtx } from '@convex-dev/better-auth/utils';
 import { HOUR } from '@convex-dev/rate-limiter';
 
 import { internal } from '../_generated/api';
+import { getClientIp } from './clientIp';
 
 type RateLimitMutation = FunctionReference<
   'mutation',
@@ -35,22 +36,6 @@ const RATE_LIMIT_ENDPOINTS: Record<
     mutation: internal.model.auth.rateLimiter.checkSignUp,
   },
 };
-
-function getClientIp(request: Request): string {
-  const ip =
-    request.headers.get('cf-connecting-ip') ??
-    request.headers.get('x-real-ip') ??
-    request.headers.get('x-forwarded-for')?.split(',')[0].trim();
-
-  if (!ip) {
-    console.warn(
-      '[auth-rate-limit] Could not determine client IP, using anonymous key'
-    );
-    return 'anonymous';
-  }
-
-  return ip;
-}
 
 function rateLimitedResponse(message: string, retryAfter: number): Response {
   return new Response(message, {

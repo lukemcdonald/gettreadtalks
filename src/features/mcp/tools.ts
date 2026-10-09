@@ -133,7 +133,7 @@ export interface McpCatalog {
   getClipBySlug: (slug: string) => Promise<{
     clip: ClipRecord;
     speaker: SpeakerRecord | null;
-    talk: { slug: string; title: string } | null;
+    talk: { slug: string; status?: string; title: string } | null;
   } | null>;
   getClips: (args?: {
     cursor?: string;
@@ -356,7 +356,7 @@ export async function getCollection(
 ) {
   const result = await catalog.getCollectionBySlug(input.slug);
 
-  if (!result) {
+  if (!result || result.talks.length === 0) {
     return toolResult({ error: 'Collection not found.' }, true);
   }
 
@@ -390,23 +390,23 @@ export async function getClip(
 ) {
   const result = await catalog.getClipBySlug(input.slug);
 
-  if (!result) {
+  if (!result?.talk || result.talk.status !== 'published') {
     return toolResult({ error: 'Clip not found.' }, true);
   }
 
   return toolResult({
     clip: formatClip(result.clip, result.speaker),
     speaker: result.speaker ? formatSpeaker(result.speaker) : null,
-    talk:
-      result.talk && result.speaker
-        ? {
-            slug: result.talk.slug,
-            title: result.talk.title,
-            url: canonicalUrl(
-              getTalkUrl(result.speaker.slug, result.talk.slug)
-            ),
-          }
-        : result.talk,
+    talk: result.speaker
+      ? {
+          slug: result.talk.slug,
+          title: result.talk.title,
+          url: canonicalUrl(getTalkUrl(result.speaker.slug, result.talk.slug)),
+        }
+      : {
+          slug: result.talk.slug,
+          title: result.talk.title,
+        },
   });
 }
 
