@@ -121,7 +121,11 @@ export function LoginForm({ ...delegated }: ComponentPropsWithoutRef<'form'>) {
         </Field>
 
         <div className="mt-4 flex flex-col gap-3">
-          <Button loading={isSubmitting} type="submit">
+          <Button
+            data-testid="sign-in-submit"
+            loading={isSubmitting}
+            type="submit"
+          >
             Sign In
           </Button>
           <p className="text-muted-foreground text-center text-sm">

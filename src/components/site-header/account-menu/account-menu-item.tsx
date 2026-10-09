@@ -12,12 +12,14 @@ import { Button, MenuItem } from '@/components/ui';
 import { Link } from '@/components/ui/link';
 
 type AccountMenuItemProps = {
+  'data-testid'?: string;
   href?: string;
   icon?: ComponentType<SVGProps<SVGSVGElement>>;
   label: string;
-} & Omit<ComponentProps<typeof MenuItem>, 'render' | 'children'>;
+} & Omit<ComponentProps<typeof MenuItem>, 'children' | 'render'>;
 
 export function AccountMenuItem({
+  'data-testid': testId,
   href,
   icon: Icon,
   label,
@@ -28,9 +30,9 @@ export function AccountMenuItem({
 
   let renderComponent: ReactElement<Record<string, unknown>> | undefined;
   if (isButton) {
-    renderComponent = <Button size="xs" variant="ghost" />;
+    renderComponent = <Button data-testid={testId} size="xs" variant="ghost" />;
   } else if (href) {
-    renderComponent = <Link href={href as Route} />;
+    renderComponent = <Link data-testid={testId} href={href as Route} />;
   }
 
   return (

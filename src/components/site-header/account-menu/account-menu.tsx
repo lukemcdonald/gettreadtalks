@@ -42,6 +42,7 @@ export function AccountMenu({ initialUser }: AccountMenuProps) {
           <Button
             aria-label="Sign In"
             className="lg:gap-2"
+            data-testid="sign-in"
             render={<Link href="/login" />}
             size="icon-lg"
             variant="ghost"
@@ -50,7 +51,11 @@ export function AccountMenu({ initialUser }: AccountMenuProps) {
           </Button>
         </div>
         <div className="hidden lg:block">
-          <NavLink href="/login" isActive={pathname === '/login'}>
+          <NavLink
+            data-testid="sign-in"
+            href="/login"
+            isActive={pathname === '/login'}
+          >
             <span>Sign In</span>
             <ArrowRightIcon className="size-4" />
           </NavLink>
@@ -65,7 +70,14 @@ export function AccountMenu({ initialUser }: AccountMenuProps) {
     <Menu>
       <MenuTrigger
         openOnHover
-        render={<Button className="size-10" size="icon-lg" variant="ghost" />}
+        render={
+          <Button
+            className="size-10"
+            data-testid="account-menu"
+            size="icon-lg"
+            variant="ghost"
+          />
+        }
       >
         <UserIcon className="size-6" />
       </MenuTrigger>
@@ -97,6 +109,7 @@ export function AccountMenu({ initialUser }: AccountMenuProps) {
           />
         )}
         <AccountMenuItem
+          data-testid="sign-out"
           href={'/logout' as Route}
           icon={SignOutIcon}
           label="Sign out"

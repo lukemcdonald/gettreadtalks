@@ -23,6 +23,7 @@ function FavoriteButton({ speaker, talk }: FavoriteTalkButtonProps) {
   return (
     <ToggleIconButton
       activeLabel="Unfavorite"
+      data-testid="favorite-talk"
       icon={HeartIcon}
       inactiveLabel="Favorite"
       isActive={isFavorited}
