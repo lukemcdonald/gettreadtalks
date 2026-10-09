@@ -8,6 +8,8 @@ import { api } from '@/convex/_generated/api';
 interface GetClipsProps {
   cursor?: string;
   limit?: number;
+  search?: string;
+  speakerSlugs?: string[];
 }
 
 /**
@@ -19,7 +21,7 @@ export async function getClips(args?: GetClipsProps) {
   cacheLife('hours');
   cacheTag('clips');
 
-  const { cursor, limit = 50 } = args ?? {};
+  const { cursor, limit = 50, search, speakerSlugs } = args ?? {};
 
   const paginationOpts = {
     cursor: cursor ?? null,
@@ -28,7 +30,9 @@ export async function getClips(args?: GetClipsProps) {
 
   const result = await fetchQuery(api.clips.listClips, {
     paginationOpts,
+    search,
     sort: 'recent',
+    speakerSlugs,
   });
 
   return {
