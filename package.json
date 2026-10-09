@@ -24,6 +24,7 @@
     "start": "next start",
     "style": "ultracite fix .",
     "test": "node --experimental-strip-types --test \"convex/**/*.test.ts\" \"src/**/*.test.ts\"",
+    "test:e2e": "playwright test",
     "typecheck": "tsc --noEmit",
     "update:ui": "pnpm dlx shadcn@latest add @coss/ui --overwrite",
     "update:ui:styles": "pnpm dlx shadcn@latest add @coss/colors-neutral --overwrite"
@@ -61,6 +62,7 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.0",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^26.6.4",
     "@types/react": "^19.3.0",

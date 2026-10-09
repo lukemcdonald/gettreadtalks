@@ -1,0 +1,40 @@
+name: E2E
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+concurrency:
+  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref }}
+
+permissions:
+  contents: read
+
+jobs:
+  playwright:
+    name: Playwright
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install pnpm and Node.js
+        uses: pnpm/setup@v3
+        with:
+          cache: true
+          runtime: node@24
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Run Playwright
+        env:
+          PLAYWRIGHT_BASE_URL: https://www.gettreadtalks.com
+        run: pnpm test:e2e
+      - if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          if-no-files-found: ignore
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
