@@ -8,7 +8,7 @@ import type {
 import type { FunctionReference } from 'convex/server';
 
 import { useMutation as useConvexMutation } from 'convex/react';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 
 import { captureException } from '@/services/errors';
 import { getErrorMessage, getSentryConfig } from '@/services/errors/convex';
@@ -34,71 +34,65 @@ export function useMutation<Mutation extends FunctionReference<'mutation'>>(
 
   const { onError, onSuccess, reportToSentry = true } = options;
 
-  const mutateAsync = useCallback(
-    async (...args: Parameters<typeof convexMutation>) => {
-      setState((prev) => ({
-        ...prev,
+  async function mutateAsync(...args: Parameters<typeof convexMutation>) {
+    setState((prev) => ({
+      ...prev,
+      error: null,
+      status: 'loading',
+    }));
+
+    try {
+      const result = await convexMutation(...args);
+
+      setState({
+        data: result,
         error: null,
-        status: 'loading',
-      }));
-
-      try {
-        const result = await convexMutation(...args);
-
-        setState({
-          data: result,
-          error: null,
-          status: 'success',
-        });
-
-        onSuccess?.(result);
-
-        return result;
-      } catch (error) {
-        const errorObj =
-          error instanceof Error ? error : new Error(getErrorMessage(error));
-
-        setState({
-          data: null,
-          error: errorObj,
-          status: 'error',
-        });
-
-        // Report to Sentry if enabled and error should be logged
-        const sentryConfig = getSentryConfig(error);
-
-        if (reportToSentry && sentryConfig.shouldLog) {
-          const eventId = captureException(errorObj, {
-            context: sentryConfig.context,
-            fingerprint: sentryConfig.fingerprint,
-            level: sentryConfig.level,
-            tags: { ...sentryConfig.tags, errorType: 'mutation' },
-          });
-
-          // Store event ID on error object for potential use
-          (errorObj as ErrorWithEventId).__sentryEventId = eventId;
-        }
-
-        onError?.(errorObj);
-
-        throw errorObj;
-      }
-    },
-    [convexMutation, onSuccess, onError, reportToSentry]
-  );
-
-  const mutate = useCallback(
-    (...args: Parameters<typeof convexMutation>) => {
-      mutateAsync(...args).catch(() => {
-        // Error already handled - stored in state and reported to Sentry
+        status: 'success',
       });
-    },
-    [mutateAsync]
-  );
 
-  const reset = useCallback(() => {
+      onSuccess?.(result);
+
+      return result;
+    } catch (error) {
+      const errorObj =
+        error instanceof Error ? error : new Error(getErrorMessage(error));
+
+      setState({
+        data: null,
+        error: errorObj,
+        status: 'error',
+      });
+
+      // Report to Sentry if enabled and error should be logged
+      const sentryConfig = getSentryConfig(error);
+
+      if (reportToSentry && sentryConfig.shouldLog) {
+        const eventId = captureException(errorObj, {
+          context: sentryConfig.context,
+          fingerprint: sentryConfig.fingerprint,
+          level: sentryConfig.level,
+          tags: { ...sentryConfig.tags, errorType: 'mutation' },
+        });
+
+        // Store event ID on error object for potential use
+        (errorObj as ErrorWithEventId).__sentryEventId = eventId;
+      }
+
+      onError?.(errorObj);
+
+      throw errorObj;
+    }
+  }
+
+  function mutate(...args: Parameters<typeof convexMutation>) {
+    mutateAsync(...args).catch(() => {
+      // Error already handled - stored in state and reported to Sentry
+    });
+  }
+
+  function reset() {
     setState(DEFAULT_STATE);
-  }, []);
+  }
 
   // Return state with derived boolean flags for convenience
   return {

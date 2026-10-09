@@ -12,9 +12,10 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui';
-import { api } from '@/convex/_generated/api';
 import { revalidateUserLists } from '@/features/users/actions/revalidate-user-lists';
-import { useMutation } from '@/hooks';
+import { useUnfavoriteClip } from '@/features/users/hooks/use-unfavorite-clip';
+import { useUnfavoriteSpeaker } from '@/features/users/hooks/use-unfavorite-speaker';
+import { useUnfavoriteTalk } from '@/features/users/hooks/use-unfavorite-talk';
 
 interface OptimisticCallbacks {
   onError?: () => void;
@@ -66,7 +67,7 @@ export function UnfavoriteClipButton({
   onError,
   onMutate,
 }: UnfavoriteClipButtonProps) {
-  const { isLoading, mutate } = useMutation(api.users.unfavoriteClip, {
+  const { isLoading, mutate } = useUnfavoriteClip({
     onError,
     onSuccess: () => {
       void revalidateUserLists({ refreshPage: true });
@@ -88,7 +89,7 @@ export function UnfavoriteSpeakerButton({
   onMutate,
   speakerId,
 }: UnfavoriteSpeakerButtonProps) {
-  const { isLoading, mutate } = useMutation(api.users.unfavoriteSpeaker, {
+  const { isLoading, mutate } = useUnfavoriteSpeaker({
     onError,
     onSuccess: () => {
       void revalidateUserLists({ refreshPage: true });
@@ -110,7 +111,7 @@ export function UnfavoriteTalkButton({
   onMutate,
   talkId,
 }: UnfavoriteTalkButtonProps) {
-  const { isLoading, mutate } = useMutation(api.users.unfavoriteTalk, {
+  const { isLoading, mutate } = useUnfavoriteTalk({
     onError,
     onSuccess: () => {
       void revalidateUserLists({ refreshPage: true });
