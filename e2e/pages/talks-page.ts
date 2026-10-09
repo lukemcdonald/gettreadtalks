@@ -1,6 +1,7 @@
 import type { Locator, Page } from '@playwright/test';
 
 export class TalksPage {
+  readonly favorite: Locator;
   readonly firstTalk: Locator;
   readonly heading: Locator;
   readonly page: Page;
@@ -10,6 +11,7 @@ export class TalksPage {
 
   constructor(page: Page) {
     this.page = page;
+    this.favorite = page.getByTestId('favorite-talk');
     this.firstTalk = page
       .getByRole('link')
       .and(page.getByTestId('talk-card'))

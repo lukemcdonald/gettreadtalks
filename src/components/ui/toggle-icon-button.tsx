@@ -4,6 +4,7 @@ import { ActionIconButton } from './action-icon-button';
 
 interface ToggleIconButtonProps {
   activeLabel: string;
+  'data-testid'?: string;
   disabled?: boolean;
   icon: LucideIcon;
   inactiveLabel: string;
@@ -14,6 +15,7 @@ interface ToggleIconButtonProps {
 
 export function ToggleIconButton({
   activeLabel,
+  'data-testid': testId,
   disabled,
   icon: Icon,
   inactiveLabel,
@@ -23,10 +25,12 @@ export function ToggleIconButton({
 }: ToggleIconButtonProps) {
   return (
     <ActionIconButton
+      data-testid={testId}
       disabled={disabled}
       label={isActive ? activeLabel : inactiveLabel}
       loading={loading}
       onClick={onToggle}
+      pressed={isActive}
     >
       <Icon
         className={isActive ? 'fill-current' : undefined}

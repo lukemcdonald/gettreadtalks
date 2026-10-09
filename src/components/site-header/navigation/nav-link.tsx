@@ -7,11 +7,17 @@ import { cn } from '@/utils';
 
 interface NavLinkProps {
   children: ReactNode;
+  'data-testid'?: string;
   href: string;
   isActive: boolean;
 }
 
-export function NavLink({ children, href, isActive }: NavLinkProps) {
+export function NavLink({
+  children,
+  'data-testid': testId,
+  href,
+  isActive,
+}: NavLinkProps) {
   const classes = {
     active: 'text-primary dark:text-primary-foreground',
     default: 'text-foreground dark:text-muted-foreground',
@@ -20,7 +26,7 @@ export function NavLink({ children, href, isActive }: NavLinkProps) {
   return (
     <Button
       className={cn('px-3', classes[isActive ? 'active' : 'default'])}
-      data-testid={`nav-${href.replace(/^\//u, '')}`}
+      data-testid={testId ?? `nav-${href.replace(/^\//u, '')}`}
       render={<Link href={href as Route} />}
       size="xl"
       variant="ghost"

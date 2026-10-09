@@ -1,5 +1,6 @@
 import { test as base } from '@playwright/test';
 
+import { AuthPage } from '../pages/auth-page.ts';
 import { CollectionsPage } from '../pages/collections-page.ts';
 import { HomePage } from '../pages/home-page.ts';
 import { NotFoundPage } from '../pages/not-found-page.ts';
@@ -10,6 +11,7 @@ import { TopicsPage } from '../pages/topics-page.ts';
 export { expect } from '@playwright/test';
 
 interface Fixtures {
+  authPage: AuthPage;
   collectionsPage: CollectionsPage;
   homePage: HomePage;
   notFoundPage: NotFoundPage;
@@ -19,6 +21,9 @@ interface Fixtures {
 }
 
 export const test = base.extend<Fixtures>({
+  authPage: async ({ page }, provide) => {
+    await provide(new AuthPage(page));
+  },
   collectionsPage: async ({ page }, provide) => {
     await provide(new CollectionsPage(page));
   },
