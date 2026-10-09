@@ -2,6 +2,8 @@ import { createHash } from 'node:crypto';
 
 import { getClientIp } from '../../../convex/lib/clientIp.ts';
 
+export { mcpLimiterToken } from '../../../convex/lib/mcpToken.ts';
+
 export interface McpRateLimitResult {
   ok: boolean;
   retryAfter: number | null;
@@ -22,14 +24,6 @@ const MCP_CORS_HEADERS = {
 
 function sha256Hex(value: string) {
   return createHash('sha256').update(value).digest('hex');
-}
-
-export function mcpLimiterToken(secret: string | undefined) {
-  if (!secret) {
-    return;
-  }
-
-  return sha256Hex(`mcp-limiter:${secret}`);
 }
 
 export function mcpRateLimitKey(request: Request, secret?: string) {
@@ -85,6 +79,12 @@ export function createMcpRateLimitedHandler(
       );
     }
 
-    return withMcpCors(await handler(request));
+    try {
+      return withMcpCors(await handler(request));
+    } catch {
+      return withMcpCors(
+        Response.json({ error: 'Internal Server Error' }, { status: 500 })
+      );
+    }
   };
 }

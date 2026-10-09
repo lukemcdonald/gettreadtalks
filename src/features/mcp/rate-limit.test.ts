@@ -53,7 +53,13 @@ describe('mcpRateLimitKey', () => {
 
 describe('createMcpRateLimitedHandler', () => {
   const passthrough = createMcpRateLimitedHandler(
-    () => Promise.resolve(Response.json({ ok: true })),
+    (request) => {
+      if (request.headers.get('x-test-handler') === 'throw') {
+        return Promise.reject(new Error('handler unavailable'));
+      }
+
+      return Promise.resolve(Response.json({ ok: true }));
+    },
     (request) => {
       const header = request.headers.get('x-test-limit');
 
@@ -92,5 +98,16 @@ describe('createMcpRateLimitedHandler', () => {
 
     assert.equal(response.status, 200);
     assert.deepEqual(body, { ok: true });
+  });
+
+  test('returns a cors-wrapped 500 when the handler throws', async () => {
+    const response = await passthrough(
+      mcpRequest({ 'x-test-handler': 'throw' })
+    );
+    const body = await response.json();
+
+    assert.equal(response.status, 500);
+    assert.equal(response.headers.get('Access-Control-Allow-Origin'), '*');
+    assert.deepEqual(body, { error: 'Internal Server Error' });
   });
 });

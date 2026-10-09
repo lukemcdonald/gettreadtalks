@@ -1,18 +1,8 @@
 import { v } from 'convex/values';
-import { sha256 } from 'js-sha256';
 
 import { internalMutation, mutation } from '../../_generated/server';
+import { authorizeMcpLimiter } from '../../lib/mcpToken';
 import { rateLimiter } from '../../lib/rateLimiter';
-
-function expectedMcpToken() {
-  const secret = process.env.BETTER_AUTH_SECRET;
-
-  if (!secret) {
-    return;
-  }
-
-  return sha256(`mcp-limiter:${secret}`);
-}
 
 export const checkChangePassword = internalMutation({
   args: { key: v.string() },
@@ -26,11 +16,13 @@ export const checkMcp = mutation({
     token: v.string(),
   },
   handler: async (ctx, { key, token }) => {
-    if (token !== expectedMcpToken()) {
-      return {
-        ok: false,
-        retryAfter: 60_000,
-      };
+    const unauthorized = authorizeMcpLimiter(
+      token,
+      process.env.BETTER_AUTH_SECRET
+    );
+
+    if (unauthorized) {
+      return unauthorized;
     }
 
     const { ok, retryAfter } = await rateLimiter.limit(ctx, 'mcp', { key });

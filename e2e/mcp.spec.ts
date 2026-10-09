@@ -1,6 +1,6 @@
 import type { APIRequestContext, APIResponse } from '@playwright/test';
 
-import { expect, test } from './fixtures.ts';
+import { expect, test } from './fixtures/index.ts';
 
 const MCP_HEADERS = {
   Accept: 'application/json, text/event-stream',
@@ -70,7 +70,7 @@ async function callTool(
   return JSON.parse(text ?? '{}') as Record<string, unknown>;
 }
 
-test('mcp initialize advertises the catalog', async ({ request }) => {
+test('MCP / Initialize advertises the catalog', async ({ request }) => {
   const initialized = await mcpRpc(request, 'initialize', {
     capabilities: {},
     clientInfo: {
@@ -99,9 +99,7 @@ test('mcp initialize advertises the catalog', async ({ request }) => {
   );
 });
 
-test('search_talks and get_talk return canonical talk urls', async ({
-  request,
-}) => {
+test('MCP / Search and get talk return canonical urls', async ({ request }) => {
   const talks = await callTool(request, 'search_talks', { query: 'Romans' });
   const talkHits = talks.talks as { url?: string }[];
   expect(talkHits[0]?.url).toContain(`${SITE}/talks/`);
@@ -116,7 +114,7 @@ test('search_talks and get_talk return canonical talk urls', async ({
   );
 });
 
-test('list_speakers and list_topics return canonical urls', async ({
+test('MCP / List speakers and topics return canonical urls', async ({
   request,
 }) => {
   const speakers = await callTool(request, 'list_speakers', { search: 'John' });
@@ -128,7 +126,7 @@ test('list_speakers and list_topics return canonical urls', async ({
   expect(topicHits[0]?.url).toContain(`${SITE}/topics/`);
 });
 
-test('list_collections and get_collection return canonical urls', async ({
+test('MCP / List and get collection return canonical urls', async ({
   request,
 }) => {
   const collections = await callTool(request, 'list_collections');
@@ -145,7 +143,7 @@ test('list_collections and get_collection return canonical urls', async ({
   expect(collectionTalks[0]?.url).toContain(`${SITE}/talks/`);
 });
 
-test('list_clips and get_clip return canonical urls', async ({ request }) => {
+test('MCP / List and get clip return canonical urls', async ({ request }) => {
   const clips = await callTool(request, 'list_clips');
   const clipHits = clips.clips as { slug?: string; url?: string }[];
   expect(clipHits[0]?.url).toContain(`${SITE}/clips/`);
