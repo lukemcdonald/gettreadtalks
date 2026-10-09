@@ -33,5 +33,5 @@ export function getStatusColor(status?: StatusType) {
 }
 
 export function getStatusLabel(status: StatusType) {
-  return status.charAt(0).toUpperCase() + status.slice(1);
+  return capitalize(status);
 }
