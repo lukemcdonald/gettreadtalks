@@ -1,7 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? 'http://127.0.0.1:3000';
-const bypassSecret = process.env.VERCEL_AUTOMATION_BYPASS_SECRET;
 
 export default defineConfig({
   forbidOnly: Boolean(process.env.CI),
@@ -17,12 +16,6 @@ export default defineConfig({
   testDir: './e2e',
   use: {
     baseURL,
-    extraHTTPHeaders: bypassSecret
-      ? {
-          'x-vercel-protection-bypass': bypassSecret,
-          'x-vercel-set-bypass-cookie': 'true',
-        }
-      : undefined,
     trace: 'on-first-retry',
   },
   webServer: process.env.PLAYWRIGHT_BASE_URL
