@@ -133,16 +133,6 @@ export async function generateSlug(
 }
 
 /**
- * Extract value from a Promise.allSettled result with a fallback.
- */
-export function getSettledValue<T, F = T>(
-  result: PromiseSettledResult<T>,
-  fallback: F
-): T | F {
-  return result.status === 'fulfilled' ? result.value : fallback;
-}
-
-/**
  * Gets an entity by ID or throws NotFound error.
  * Eliminates repetitive null checking boilerplate.
  */

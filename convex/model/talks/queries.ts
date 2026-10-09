@@ -214,28 +214,6 @@ export const getTalksCount = query({
 /**
  * Get featured talks with daily rotation.
  */
-export const listFeaturedTalks = query({
-  args: {
-    limit: v.optional(v.number()),
-  },
-  handler: async (ctx, args) => {
-    const { limit = 5 } = args;
-
-    const talks = await ctx.db
-      .query('talks')
-      .withIndex('by_featured_and_status', (q) =>
-        q.eq('featured', true).eq('status', 'published')
-      )
-      .take(50);
-
-    return rotateContent(talks, { count: limit, period: 'daily' });
-  },
-  returns: docs('talks'),
-});
-
-/**
- * Get featured talks with daily rotation.
- */
 export const listFeaturedTalksWithSpeakers = query({
   args: {
     limit: v.optional(v.number()),

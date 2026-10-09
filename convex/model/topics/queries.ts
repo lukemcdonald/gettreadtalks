@@ -29,52 +29,6 @@ export const getTopic = query({
 });
 
 /**
- * Get topic with related talks.
- */
-export const getTopicWithContent = query({
-  args: {
-    limit: v.optional(v.number()),
-    slug: v.string(),
-  },
-  handler: async (ctx, args) => {
-    const { limit = 50, slug } = args;
-
-    const topic = await getOneFrom(ctx.db, 'topics', 'by_slug', slug);
-
-    if (!topic) {
-      return null;
-    }
-
-    const allTalks = await getManyVia(
-      ctx.db,
-      'talksOnTopics',
-      'talkId',
-      'by_topicId',
-      topic._id,
-      'topicId'
-    );
-
-    const talks = allTalks
-      .filter(
-        (talk): talk is Doc<'talks'> =>
-          talk !== null && talk.status === 'published'
-      )
-      .slice(0, limit);
-
-    return {
-      talks,
-      topic,
-    };
-  },
-  returns: v.nullable(
-    v.object({
-      talks: docs('talks'),
-      topic: doc('topics'),
-    })
-  ),
-});
-
-/**
  * Get topic by slug with related data and pagination support.
  * Returns topic with related talks (each with speaker) and clips.
  * Supports search filtering on talk title and speaker name.

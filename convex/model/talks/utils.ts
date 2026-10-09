@@ -86,18 +86,3 @@ export async function enrichWithTopics<T extends { _id: Id<'talks'> }>(
     return { ...talk, topicSlugs };
   });
 }
-
-/**
- * Get talks filtered by topic from talksOnTopics join table.
- */
-export async function getTalksByTopic(ctx: QueryCtx, topicId: Id<'topics'>) {
-  const talksOnTopics = await ctx.db
-    .query('talksOnTopics')
-    .withIndex('by_topicId', (q) => q.eq('topicId', topicId))
-    .collect();
-
-  const talkIds = talksOnTopics.map((t) => t.talkId);
-  const talks = await Promise.all(talkIds.map((id) => ctx.db.get('talks', id)));
-
-  return talks.filter((talk): talk is Doc<'talks'> => talk !== null);
-}

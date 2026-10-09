@@ -55,41 +55,6 @@ export const getCollection = query({
 });
 
 /**
- * Get collection with its talks.
- */
-export const getCollectionWithTalks = query({
-  args: {
-    collectionId: v.id('collections'),
-    limit: v.optional(v.number()),
-  },
-  handler: async (ctx, args) => {
-    const { limit = 100, collectionId } = args;
-
-    const collection = await ctx.db.get('collections', collectionId);
-
-    if (!collection) {
-      return null;
-    }
-
-    const talks = await getPublishedTalks(ctx, collection._id, limit);
-
-    // Sort by collectionOrder
-    talks.sort((a, b) => (a.collectionOrder || 0) - (b.collectionOrder || 0));
-
-    return {
-      collection,
-      talks,
-    };
-  },
-  returns: v.nullable(
-    v.object({
-      collection: doc('collections'),
-      talks: docs('talks'),
-    })
-  ),
-});
-
-/**
  * Get collection by slug with related data (default for detail pages).
  * Returns collection with its talks (each with speaker).
  */
@@ -122,44 +87,6 @@ export const getCollectionBySlug = query({
     v.object({
       collection: doc('collections'),
       talks: v.array(talkWithSpeakerValidator),
-    })
-  ),
-});
-
-/**
- * Get collection with unique speakers from its talks.
- */
-export const getCollectionWithSpeakers = query({
-  args: {
-    slug: v.string(),
-  },
-  handler: async (ctx, args) => {
-    const collection = await getOneFrom(
-      ctx.db,
-      'collections',
-      'by_slug',
-      args.slug
-    );
-
-    if (!collection) {
-      return null;
-    }
-
-    const talks = await getPublishedTalks(ctx, collection._id);
-
-    const speakerIds = [...new Set(talks.map((talk) => talk.speakerId))];
-    const speakers = await getAll(ctx.db, speakerIds);
-    const validSpeakers = speakers.filter((speaker) => speaker !== null);
-
-    return {
-      collection,
-      speakers: validSpeakers,
-    };
-  },
-  returns: v.nullable(
-    v.object({
-      collection: doc('collections'),
-      speakers: docs('speakers'),
     })
   ),
 });
