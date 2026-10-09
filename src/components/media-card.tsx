@@ -32,6 +32,7 @@ export function MediaCardTitle({
 
 type MediaCardProps = {
   ariaLabel?: string;
+  'data-testid'?: string;
   href: string;
   media?: ReactNode;
   subtitle?: ReactNode;
@@ -41,6 +42,7 @@ type MediaCardProps = {
 export function MediaCard({
   ariaLabel,
   className,
+  'data-testid': testId,
   href,
   media,
   subtitle,
@@ -58,7 +60,9 @@ export function MediaCard({
       {media}
       <div className="flex flex-1 flex-col justify-center gap-0.5">
         <MediaCardTitle aria-label={ariaLabel}>
-          <FauxLink href={href}>{title}</FauxLink>
+          <FauxLink data-testid={testId} href={href}>
+            {title}
+          </FauxLink>
         </MediaCardTitle>
         {!!subtitle && (
           <CardDescription className="text-pretty">{subtitle}</CardDescription>
