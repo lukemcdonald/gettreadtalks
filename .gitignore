@@ -50,6 +50,10 @@ certificates
 
 # Playwright
 .playwright-mcp
+/blob-report/
+/playwright-report/
+/playwright/.cache/
+/test-results/
 
 # Seed data (keep locally, not in repo)
 convex/migration/data/

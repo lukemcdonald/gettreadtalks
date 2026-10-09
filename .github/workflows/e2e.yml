@@ -1,0 +1,92 @@
+name: E2E
+
+on:
+  pull_request:
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+
+concurrency:
+  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+
+permissions:
+  contents: read
+  deployments: read
+
+jobs:
+  playwright:
+    name: Playwright
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install pnpm and Node.js
+        uses: pnpm/setup@v3
+        with:
+          cache: true
+          runtime: node@24
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Wait for Vercel preview
+        id: preview
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          deadline=$((SECONDS + 900))
+          url=""
+
+          while (( SECONDS < deadline )); do
+            deployment_id="$(
+              gh api "repos/${GITHUB_REPOSITORY}/deployments?sha=${SHA}&environment=Preview&per_page=1" \
+                --jq '.[0].id // empty'
+            )"
+
+            if [[ -n "${deployment_id}" ]]; then
+              state="$(
+                gh api "repos/${GITHUB_REPOSITORY}/deployments/${deployment_id}/statuses" \
+                  --jq '.[0].state // empty'
+              )"
+              echo "Preview deployment ${deployment_id}: ${state}"
+
+              if [[ "${state}" == "success" ]]; then
+                url="$(
+                  gh api "repos/${GITHUB_REPOSITORY}/deployments/${deployment_id}/statuses" \
+                    --jq '.[0].environment_url // .[0].target_url // empty'
+                )"
+                break
+              fi
+
+              if [[ "${state}" == "failure" || "${state}" == "error" ]]; then
+                echo "Preview deployment failed"
+                exit 1
+              fi
+            else
+              echo "No Preview deployment for ${SHA} yet"
+            fi
+
+            sleep 10
+          done
+
+          if [[ -z "${url}" ]]; then
+            echo "Timed out waiting for a successful Preview deployment of ${SHA}"
+            exit 1
+          fi
+
+          url="${url%/}"
+          echo "Preview URL: ${url}"
+          echo "url=${url}" >> "${GITHUB_OUTPUT}"
+      - name: Run Playwright
+        env:
+          PLAYWRIGHT_BASE_URL: ${{ steps.preview.outputs.url }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+        run: pnpm test:e2e
+      - if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          if-no-files-found: ignore
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
