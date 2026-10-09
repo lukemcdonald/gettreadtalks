@@ -62,6 +62,7 @@ export function HeroSection({
           <div className="flex flex-col gap-3 sm:flex-row">
             {!!primaryAction && (
               <Button
+                data-testid="hero-primary"
                 render={<Link href={primaryAction.href as Route} />}
                 size="lg"
               >
@@ -70,6 +71,7 @@ export function HeroSection({
             )}
             {!!secondaryAction && (
               <Button
+                data-testid="hero-secondary"
                 render={<Link href={secondaryAction.href as Route} />}
                 size="lg"
                 variant="outline"

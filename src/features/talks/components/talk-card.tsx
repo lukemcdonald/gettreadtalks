@@ -54,6 +54,7 @@ export function TalkCard({ speaker, talk }: TalkCardProps) {
   return (
     <MediaCard
       ariaLabel={accessibleLabel}
+      data-testid="talk-card"
       href={talkHref}
       media={speaker ? <SpeakerAvatar speaker={speaker} /> : undefined}
       subtitle={getSubtitle()}
