@@ -191,7 +191,7 @@ export function HeaderSearch() {
             aria-expanded={open}
             aria-label="Search talks, speakers, topics, and clips"
             autoFocus
-            className="min-w-0 flex-1 **:data-[slot=input]:px-0"
+            className="has-focus-visible:ring-ring/24 min-w-0 flex-1 rounded-lg has-focus-visible:ring-[3px] **:data-[slot=input]:px-0"
             onChange={(event) => {
               setActiveIndex(-1);
               setValue(event.target.value);
