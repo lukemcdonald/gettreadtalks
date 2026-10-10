@@ -4,11 +4,12 @@ import type { KeyboardEvent } from 'react';
 
 import { SearchIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useId, useState } from 'react';
+import { useEffect, useId, useState, useSyncExternalStore } from 'react';
 
 import {
   Button,
   Input,
+  Kbd,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -18,9 +19,11 @@ import { SearchResultGroups } from '@/features/search/components/search-result-g
 import { useSearchSite } from '@/features/search/hooks/use-search-site';
 import {
   getNextActiveIndex,
+  getSearchHotkeyLabel,
   getSearchInputAction,
   getSearchPageHref,
   hasSearchHits,
+  isSearchHotkey,
   SEARCH_DEBOUNCE_MS,
   SEARCH_DROPDOWN_LIMIT,
   toSearchHits,
@@ -51,8 +54,42 @@ function getDropdownStatus({
   return 'empty';
 }
 
+function getClientSearchHotkeyLabel() {
+  return getSearchHotkeyLabel(navigator.userAgent);
+}
+
+function getServerSearchHotkeyLabel() {
+  return '⌘K';
+}
+
+function subscribeSearchHotkey() {
+  return () => {};
+}
+
+function HeaderSearchTrigger({ hotkey }: { hotkey: string }) {
+  return (
+    <Button
+      aria-keyshortcuts="Control+K Meta+K"
+      aria-label="Search"
+      className="md:border-input md:bg-popover md:hover:bg-accent/50 md:h-9 md:w-56 md:justify-start md:px-2.5 md:shadow-xs/5"
+      data-testid="search-cta"
+      size="icon-lg"
+      variant="ghost"
+    >
+      <SearchIcon className="size-6 md:size-4" />
+      <span className="text-muted-foreground hidden md:inline">Search…</span>
+      <Kbd className="ms-auto hidden md:inline-flex">{hotkey}</Kbd>
+    </Button>
+  );
+}
+
 // fallow-ignore-next-line complexity
 export function HeaderSearch() {
+  const hotkey = useSyncExternalStore(
+    subscribeSearchHotkey,
+    getClientSearchHotkeyLabel,
+    getServerSearchHotkeyLabel
+  );
   const listboxId = useId();
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -72,6 +109,23 @@ export function HeaderSearch() {
     hasResults: hasSearchHits(results),
     isLoading: isLoading || isPending,
   });
+
+  useEffect(() => {
+    function onWindowKeyDown(event: globalThis.KeyboardEvent) {
+      if (!isSearchHotkey(event)) {
+        return;
+      }
+
+      event.preventDefault();
+      setOpen(true);
+    }
+
+    window.addEventListener('keydown', onWindowKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', onWindowKeyDown);
+    };
+  }, []);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -152,21 +206,10 @@ export function HeaderSearch() {
 
   return (
     <Popover onOpenChange={setOpen} open={open}>
-      <PopoverTrigger
-        render={
-          <Button
-            aria-label="Search"
-            data-testid="search-cta"
-            size="icon-lg"
-            variant="ghost"
-          >
-            <SearchIcon className="size-6" />
-          </Button>
-        }
-      />
+      <PopoverTrigger render={<HeaderSearchTrigger hotkey={hotkey} />} />
       <PopoverContent
         align="end"
-        className="w-96 max-w-full p-0 [&_[data-slot=popover-viewport]]:p-0 [&_[data-slot=popover-viewport]]:[--viewport-inline-padding:0px]"
+        className="w-96 max-w-full p-0 md:w-64 [&_[data-slot=popover-viewport]]:p-0 [&_[data-slot=popover-viewport]]:[--viewport-inline-padding:0px]"
       >
         <form
           className={cn(
@@ -191,7 +234,7 @@ export function HeaderSearch() {
             aria-expanded={open}
             aria-label="Search talks, speakers, topics, and clips"
             autoFocus
-            className="has-focus-visible:ring-ring/24 min-w-0 flex-1 rounded-lg has-focus-visible:ring-[3px] **:data-[slot=input]:px-0"
+            className="min-w-0 flex-1 **:data-[slot=input]:px-0"
             onChange={(event) => {
               setActiveIndex(-1);
               setValue(event.target.value);

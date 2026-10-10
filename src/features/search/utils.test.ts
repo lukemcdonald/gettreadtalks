@@ -7,11 +7,13 @@ register(new URL('../../../scripts/node-test-hooks.mjs', import.meta.url));
 const {
   emptySiteSearch,
   getNextActiveIndex,
+  getSearchHotkeyLabel,
   getSearchInputAction,
   getSearchPageHref,
   getSearchQuery,
   groupSearchHits,
   hasSearchHits,
+  isSearchHotkey,
   toSearchHits,
 } = await import('./utils.ts');
 
@@ -146,6 +148,27 @@ describe('getNextActiveIndex', () => {
   });
 });
 
+describe('getSearchHotkeyLabel', () => {
+  test('shows the Apple glyph on Apple user agents', () => {
+    assert.equal(
+      getSearchHotkeyLabel(
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
+      ),
+      '⌘K'
+    );
+  });
+
+  test('shows Ctrl K otherwise', () => {
+    assert.equal(
+      getSearchHotkeyLabel(
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+      ),
+      'Ctrl K'
+    );
+    assert.equal(getSearchHotkeyLabel(), 'Ctrl K');
+  });
+});
+
 describe('getSearchInputAction', () => {
   test('maps keyboard keys used by the dropdown', () => {
     assert.equal(getSearchInputAction('ArrowDown', false), 'next');
@@ -153,5 +176,37 @@ describe('getSearchInputAction', () => {
     assert.equal(getSearchInputAction('Enter', true), 'select');
     assert.equal(getSearchInputAction('Enter', false), null);
     assert.equal(getSearchInputAction('Escape', false), 'close');
+  });
+});
+
+describe('isSearchHotkey', () => {
+  const base = {
+    altKey: false,
+    ctrlKey: false,
+    key: 'k',
+    metaKey: false,
+    shiftKey: false,
+  };
+
+  test('matches unmodified Cmd or Ctrl K', () => {
+    assert.equal(isSearchHotkey({ ...base, metaKey: true }), true);
+    assert.equal(isSearchHotkey({ ...base, ctrlKey: true }), true);
+  });
+
+  test('ignores other modifiers, keys, and repeats', () => {
+    assert.equal(isSearchHotkey(base), false);
+    assert.equal(isSearchHotkey({ ...base, key: 's', metaKey: true }), false);
+    assert.equal(
+      isSearchHotkey({ ...base, altKey: true, metaKey: true }),
+      false
+    );
+    assert.equal(
+      isSearchHotkey({ ...base, metaKey: true, shiftKey: true }),
+      false
+    );
+    assert.equal(
+      isSearchHotkey({ ...base, metaKey: true, repeat: true }),
+      false
+    );
   });
 });

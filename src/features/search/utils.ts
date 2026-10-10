@@ -51,6 +51,10 @@ export function getNextActiveIndex(
   return current - 1;
 }
 
+export function getSearchHotkeyLabel(userAgent = '') {
+  return /Mac|iPhone|iPad|iPod/u.test(userAgent) ? '⌘K' : 'Ctrl K';
+}
+
 export function getSearchInputAction(key: string, hasActiveHit: boolean) {
   if (key === 'ArrowDown') {
     return 'next';
@@ -69,6 +73,25 @@ export function getSearchInputAction(key: string, hasActiveHit: boolean) {
   }
 
   return null;
+}
+
+export function isSearchHotkey(event: {
+  altKey: boolean;
+  ctrlKey: boolean;
+  key: string;
+  metaKey: boolean;
+  repeat?: boolean;
+  shiftKey: boolean;
+}) {
+  if (event.altKey || event.shiftKey || event.repeat) {
+    return false;
+  }
+
+  if (!(event.metaKey || event.ctrlKey)) {
+    return false;
+  }
+
+  return event.key.toLowerCase() === 'k';
 }
 
 export function getSearchQuery(search?: string | string[]) {
