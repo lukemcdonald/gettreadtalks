@@ -22,9 +22,6 @@ export const speakerTables = {
     .index('by_featured', ['featured'])
     .index('by_lastName', ['lastName'])
     .index('by_slug', ['slug'])
-    .searchIndex('search_description', {
-      searchField: 'description',
-    })
     .searchIndex('search_firstName', {
       searchField: 'firstName',
     })

@@ -74,22 +74,12 @@ async function searchPublishedTalks(
   queryText: string,
   limit: number
 ) {
-  const [byTitle, byDescription] = await Promise.all([
-    ctx.db
-      .query('talks')
-      .withSearchIndex('search_title', (q) =>
-        q.search('title', queryText).eq('status', 'published')
-      )
-      .take(limit),
-    ctx.db
-      .query('talks')
-      .withSearchIndex('search_description', (q) =>
-        q.search('description', queryText).eq('status', 'published')
-      )
-      .take(limit),
-  ]);
-
-  const talks = uniqueById([...byTitle, ...byDescription]).slice(0, limit);
+  const talks = await ctx.db
+    .query('talks')
+    .withSearchIndex('search_title', (q) =>
+      q.search('title', queryText).eq('status', 'published')
+    )
+    .take(limit);
   const talksWithSpeakers = await enrichWithSpeakers(ctx, talks);
 
   return talksWithSpeakers.map((talk) => ({
@@ -122,12 +112,6 @@ async function searchPublishedSpeakers(
         .withSearchIndex('search_lastName', (q) => q.search('lastName', phrase))
         .take(limit)
     ),
-    ctx.db
-      .query('speakers')
-      .withSearchIndex('search_description', (q) =>
-        q.search('description', queryText)
-      )
-      .take(limit),
   ]);
 
   const speakers = await filterSpeakersWithPublishedTalks(
@@ -167,24 +151,14 @@ async function searchPublishedClips(
   queryText: string,
   limit: number
 ) {
-  const [byTitle, byDescription] = await Promise.all([
-    ctx.db
+  const clips = await filterClipsByPublishedTalks(
+    ctx,
+    await ctx.db
       .query('clips')
       .withSearchIndex('search_title', (q) =>
         q.search('title', queryText).eq('status', 'published')
       )
-      .take(limit),
-    ctx.db
-      .query('clips')
-      .withSearchIndex('search_description', (q) =>
-        q.search('description', queryText).eq('status', 'published')
-      )
-      .take(limit),
-  ]);
-
-  const clips = await filterClipsByPublishedTalks(
-    ctx,
-    uniqueById([...byTitle, ...byDescription])
+      .take(limit)
   );
   const limited = clips.slice(0, limit);
 
