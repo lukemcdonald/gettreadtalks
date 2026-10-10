@@ -12,7 +12,6 @@ const MAX_CURSOR_LENGTH = 2048;
 const MAX_LIST_LIMIT = 100;
 const MAX_SEARCH_LIMIT = 25;
 const MAX_SEARCH_TEXT = 200;
-const MAX_SLUG_LENGTH = 120;
 
 const readOnlyAnnotations = {
   idempotentHint: true,
@@ -28,7 +27,7 @@ const cursorSchema = z
 
 const searchTextSchema = z.string().max(MAX_SEARCH_TEXT);
 
-const slugSchema = z.string().min(1).max(MAX_SLUG_LENGTH);
+const slugSchema = z.string().min(1);
 
 const listLimitSchema = z
   .number()

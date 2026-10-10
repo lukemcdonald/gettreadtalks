@@ -40,11 +40,20 @@ export const metadata: Metadata = {
   description: PAGE_DESCRIPTION,
   openGraph: {
     description: PAGE_DESCRIPTION,
+    images: [
+      {
+        alt: site.name,
+        height: 630,
+        url: '/default-seo-image.png',
+        width: 1200,
+      },
+    ],
     title: PAGE_TITLE,
     url: '/ai',
   },
   title: PAGE_TITLE,
   twitter: {
+    card: 'summary_large_image',
     description: PAGE_DESCRIPTION,
     title: PAGE_TITLE,
   },
