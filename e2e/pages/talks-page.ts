@@ -40,4 +40,18 @@ export class TalksPage {
   async searchFor(query: string) {
     await this.search.fill(query);
   }
+
+  async toggleFavorite() {
+    const revalidated = this.page.waitForResponse((response) => {
+      const request = response.request();
+      const isRevalidation =
+        request.method() === 'POST' &&
+        Boolean(request.headers()['next-action']);
+
+      return isRevalidation;
+    });
+
+    await this.favorite.click();
+    await revalidated;
+  }
 }
