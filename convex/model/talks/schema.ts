@@ -28,5 +28,13 @@ export const talkTables = {
     .index('by_featured_and_status', ['featured', 'status'])
     .index('by_slug', ['slug'])
     .index('by_speakerId_and_status', ['speakerId', 'status'])
-    .index('by_status_and_publishedAt', ['status', 'publishedAt']),
+    .index('by_status_and_publishedAt', ['status', 'publishedAt'])
+    .searchIndex('search_description', {
+      filterFields: ['status'],
+      searchField: 'description',
+    })
+    .searchIndex('search_title', {
+      filterFields: ['status'],
+      searchField: 'title',
+    }),
 };

@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 import { AccountMenuServer } from '@/components/site-header/account-menu/account-menu-server';
 import { AccountMenuSkeleton } from '@/components/site-header/account-menu/account-menu-skeleton';
 import { ModeSwitcher } from '@/components/site-header/mode-switcher';
+import { HeaderSearch } from '@/features/search/components/header-search';
 import { cn } from '@/utils';
 
 interface SecondaryNavProps {
@@ -12,6 +13,7 @@ interface SecondaryNavProps {
 export function SecondaryNav({ className }: SecondaryNavProps) {
   return (
     <div className={cn('flex items-center', className)}>
+      <HeaderSearch />
       <Suspense fallback={<AccountMenuSkeleton />}>
         <AccountMenuServer />
       </Suspense>

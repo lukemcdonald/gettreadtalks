@@ -21,5 +21,14 @@ export const speakerTables = {
   speakers: defineTable(speakerFields)
     .index('by_featured', ['featured'])
     .index('by_lastName', ['lastName'])
-    .index('by_slug', ['slug']),
+    .index('by_slug', ['slug'])
+    .searchIndex('search_description', {
+      searchField: 'description',
+    })
+    .searchIndex('search_firstName', {
+      searchField: 'firstName',
+    })
+    .searchIndex('search_lastName', {
+      searchField: 'lastName',
+    }),
 };

@@ -22,5 +22,13 @@ export const clipTables = {
     .index('by_speakerId_and_status', ['speakerId', 'status'])
     .index('by_status_and_publishedAt', ['status', 'publishedAt'])
     .index('by_talkId', ['talkId'])
-    .index('by_talkId_and_status', ['talkId', 'status']),
+    .index('by_talkId_and_status', ['talkId', 'status'])
+    .searchIndex('search_description', {
+      filterFields: ['status'],
+      searchField: 'description',
+    })
+    .searchIndex('search_title', {
+      filterFields: ['status'],
+      searchField: 'title',
+    }),
 };

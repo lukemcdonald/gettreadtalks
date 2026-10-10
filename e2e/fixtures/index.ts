@@ -5,6 +5,7 @@ import { CollectionsPage } from '../pages/collections-page.ts';
 import { FavoritesPage } from '../pages/favorites-page.ts';
 import { HomePage } from '../pages/home-page.ts';
 import { NotFoundPage } from '../pages/not-found-page.ts';
+import { SearchPage } from '../pages/search-page.ts';
 import { SpeakersPage } from '../pages/speakers-page.ts';
 import { TalksPage } from '../pages/talks-page.ts';
 import { TopicsPage } from '../pages/topics-page.ts';
@@ -17,6 +18,7 @@ interface Fixtures {
   favoritesPage: FavoritesPage;
   homePage: HomePage;
   notFoundPage: NotFoundPage;
+  searchPage: SearchPage;
   speakersPage: SpeakersPage;
   talksPage: TalksPage;
   topicsPage: TopicsPage;
@@ -59,6 +61,9 @@ export const test = base.extend<Fixtures>({
   },
   notFoundPage: async ({ page }, provide) => {
     await provide(new NotFoundPage(page));
+  },
+  searchPage: async ({ page }, provide) => {
+    await provide(new SearchPage(page));
   },
   speakersPage: async ({ page }, provide) => {
     await provide(new SpeakersPage(page));
