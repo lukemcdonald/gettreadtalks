@@ -8,7 +8,7 @@ import {
   requireBearerAuth,
 } from '@modelcontextprotocol/server';
 
-export const MCP_SCOPES = [
+const MCP_SCOPES = [
   'favorites:read',
   'favorites:write',
   'offline_access',
