@@ -5,5 +5,7 @@ test('AI / Loads', async ({ aiPage }) => {
 
   await expect(aiPage.heading).toBeVisible();
   await expect(aiPage.copyUrl).toBeVisible();
-  await expect(aiPage.mcpUrl).toBeVisible();
+  await expect(aiPage.mcpUrl).toContainText(
+    'https://www.gettreadtalks.com/mcp'
+  );
 });

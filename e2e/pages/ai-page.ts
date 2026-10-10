@@ -14,9 +14,7 @@ export class AiPage {
       level: 1,
       name: 'Ask AI about TREAD talks',
     });
-    this.mcpUrl = page.getByText('https://www.gettreadtalks.com/mcp', {
-      exact: true,
-    });
+    this.mcpUrl = page.locator('pre code');
   }
 
   async goto() {
