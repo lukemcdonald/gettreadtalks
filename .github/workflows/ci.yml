@@ -80,17 +80,39 @@ jobs:
             echo "Docs-only change; skipping E2E"
           fi
       - if: steps.changes.outputs.run == 'true'
+        id: e2e-secrets
+        name: Check preview secrets
+        env:
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
+        run: |
+          set -euo pipefail
+          if [[ -n "${VERCEL_AUTOMATION_BYPASS_SECRET}" ]]; then
+            echo "available=true" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          echo "available=false" >> "${GITHUB_OUTPUT}"
+          echo "VERCEL_AUTOMATION_BYPASS_SECRET is unavailable."
+
+          if [[ "${GITHUB_ACTOR}" == "dependabot[bot]" ]]; then
+            echo "Skipping Playwright on Dependabot-triggered runs (Actions secrets are withheld)."
+            exit 0
+          fi
+
+          echo "Add VERCEL_AUTOMATION_BYPASS_SECRET as an Actions secret, or also as a Dependabot secret."
+          exit 1
+      - if: steps.changes.outputs.run == 'true' && steps.e2e-secrets.outputs.available == 'true'
         uses: actions/checkout@v7
-      - if: steps.changes.outputs.run == 'true'
+      - if: steps.changes.outputs.run == 'true' && steps.e2e-secrets.outputs.available == 'true'
         name: Install pnpm and Node.js
         uses: pnpm/setup@v3
         with:
           cache: true
           runtime: node@24
-      - if: steps.changes.outputs.run == 'true'
+      - if: steps.changes.outputs.run == 'true' && steps.e2e-secrets.outputs.available == 'true'
         name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps chromium
-      - if: steps.changes.outputs.run == 'true'
+      - if: steps.changes.outputs.run == 'true' && steps.e2e-secrets.outputs.available == 'true'
         name: Wait for Vercel preview
         id: preview
         env:
@@ -141,7 +163,7 @@ jobs:
           url="${url%/}"
           echo "Preview URL: ${url}"
           echo "url=${url}" >> "${GITHUB_OUTPUT}"
-      - if: steps.changes.outputs.run == 'true'
+      - if: steps.changes.outputs.run == 'true' && steps.e2e-secrets.outputs.available == 'true'
         name: Run Playwright
         env:
           E2E_USER_EMAIL: ${{ secrets.E2E_USER_EMAIL }}
@@ -149,7 +171,7 @@ jobs:
           PLAYWRIGHT_BASE_URL: ${{ steps.preview.outputs.url }}
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
         run: pnpm test:e2e
-      - if: ${{ !cancelled() && steps.changes.outputs.run == 'true' }}
+      - if: ${{ !cancelled() && steps.changes.outputs.run == 'true' && steps.e2e-secrets.outputs.available == 'true' }}
         uses: actions/upload-artifact@v7
         with:
           if-no-files-found: ignore
