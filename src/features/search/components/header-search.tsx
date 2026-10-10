@@ -65,16 +65,16 @@ export function HeaderSearch() {
   const hits = toSearchHits(results);
   const activeHit = hits[activeIndex];
   const hasQuery = value.trim().length > 0;
+  const isPending = value.trim() !== debouncedQuery;
   const status = getDropdownStatus({
     hasQuery,
     hasResults: hasSearchHits(results),
-    isLoading,
+    isLoading: isLoading || isPending,
   });
 
   useEffect(() => {
     const timeout = setTimeout(() => {
       setDebouncedQuery(value);
-      setActiveIndex(-1);
     }, SEARCH_DEBOUNCE_MS);
 
     return () => {
@@ -157,7 +157,10 @@ export function HeaderSearch() {
             aria-expanded={open}
             aria-label="Search talks, speakers, topics, and clips"
             autoFocus
-            onChange={(event) => setValue(event.target.value)}
+            onChange={(event) => {
+              setActiveIndex(-1);
+              setValue(event.target.value);
+            }}
             onKeyDown={onKeyDown}
             placeholder="Search talks, speakers, topics, and clips"
             size="lg"
@@ -184,6 +187,7 @@ export function HeaderSearch() {
               activeId={activeHit?.id}
               hits={hits}
               listboxId={listboxId}
+              onNavigate={close}
               variant="dropdown"
             />
           ) : null}

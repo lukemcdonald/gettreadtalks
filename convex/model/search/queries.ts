@@ -13,6 +13,7 @@ import { enrichWithSpeakers } from '../../lib/utils';
 import { normalizeSearchQuery, searchPhrases, uniqueById } from './utils';
 
 const DEFAULT_SEARCH_LIMIT = 12;
+const UNFILTERED_SEARCH_MULTIPLIER = 3;
 
 const searchSpeakerValidator = v.object({
   firstName: v.string(),
@@ -96,6 +97,7 @@ async function searchPublishedSpeakers(
   queryText: string,
   limit: number
 ) {
+  const candidateLimit = limit * UNFILTERED_SEARCH_MULTIPLIER;
   const phrases = searchPhrases(queryText);
   const matches = await Promise.all([
     ...phrases.map((phrase) =>
@@ -104,13 +106,13 @@ async function searchPublishedSpeakers(
         .withSearchIndex('search_firstName', (q) =>
           q.search('firstName', phrase)
         )
-        .take(limit)
+        .take(candidateLimit)
     ),
     ...phrases.map((phrase) =>
       ctx.db
         .query('speakers')
         .withSearchIndex('search_lastName', (q) => q.search('lastName', phrase))
-        .take(limit)
+        .take(candidateLimit)
     ),
   ]);
 
@@ -136,10 +138,10 @@ async function searchPublishedTopics(
   const topics = await ctx.db
     .query('topics')
     .withSearchIndex('search_title', (q) => q.search('title', queryText))
-    .take(limit);
+    .take(limit * UNFILTERED_SEARCH_MULTIPLIER);
   const published = await filterTopicsWithPublishedTalks(ctx, topics);
 
-  return published.map((topic) => ({
+  return published.slice(0, limit).map((topic) => ({
     _id: topic._id,
     slug: topic.slug,
     title: topic.title,

@@ -2,13 +2,14 @@ import { Empty, EmptyDescription, EmptyTitle } from '@/components/ui';
 import { SearchResultGroups } from '@/features/search/components/search-result-groups';
 import { searchSite } from '@/features/search/queries/search-site';
 import {
-  hasSearchHits,
   SEARCH_PAGE_LIMIT,
+  getSearchQuery,
+  hasSearchHits,
   toSearchHits,
 } from '@/features/search/utils';
 
 export interface SearchPageParams {
-  search?: string;
+  search?: string | string[];
 }
 
 interface SearchPageResultsProps {
@@ -19,7 +20,7 @@ export async function SearchPageResults({
   searchParams,
 }: SearchPageResultsProps) {
   const params = await searchParams;
-  const query = params.search?.trim() ?? '';
+  const query = getSearchQuery(params.search);
 
   if (!query) {
     return (

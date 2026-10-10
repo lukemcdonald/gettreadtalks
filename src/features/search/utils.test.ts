@@ -9,6 +9,7 @@ const {
   getNextActiveIndex,
   getSearchInputAction,
   getSearchPageHref,
+  getSearchQuery,
   groupSearchHits,
   hasSearchHits,
   toSearchHits,
@@ -62,6 +63,14 @@ const result = {
     },
   ],
 };
+
+describe('getSearchQuery', () => {
+  test('trims a string and uses the first repeated param', () => {
+    assert.equal(getSearchQuery('  grace  '), 'grace');
+    assert.equal(getSearchQuery(['grace', 'prayer']), 'grace');
+    assert.equal(getSearchQuery(), '');
+  });
+});
 
 describe('getSearchPageHref', () => {
   test('keeps the existing search query param', () => {

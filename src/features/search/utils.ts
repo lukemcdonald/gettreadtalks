@@ -71,6 +71,12 @@ export function getSearchInputAction(key: string, hasActiveHit: boolean) {
   return null;
 }
 
+export function getSearchQuery(search?: string | string[]) {
+  const value = Array.isArray(search) ? search[0] : search;
+
+  return value?.trim() ?? '';
+}
+
 export function getSearchPageHref(query: string) {
   const params = new URLSearchParams({ search: query });
 
