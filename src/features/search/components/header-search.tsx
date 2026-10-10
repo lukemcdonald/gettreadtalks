@@ -74,13 +74,36 @@ export function HeaderSearch() {
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      setDebouncedQuery(value);
+      setDebouncedQuery(value.trim());
     }, SEARCH_DEBOUNCE_MS);
 
     return () => {
       clearTimeout(timeout);
     };
   }, [value]);
+
+  useEffect(() => {
+    if (!open || hasQuery) {
+      return;
+    }
+
+    const openedAt = Date.now();
+
+    function onPageScroll() {
+      if (Date.now() - openedAt < SEARCH_DEBOUNCE_MS) {
+        return;
+      }
+
+      setActiveIndex(-1);
+      setOpen(false);
+    }
+
+    window.addEventListener('scroll', onPageScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', onPageScroll);
+    };
+  }, [hasQuery, open]);
 
   function close() {
     setOpen(false);
@@ -142,7 +165,7 @@ export function HeaderSearch() {
       />
       <PopoverContent align="end" className="w-96 p-0">
         <form
-          className="border-border border-b p-3"
+          className={hasQuery ? 'border-border border-b p-3' : 'p-3'}
           onSubmit={(event) => {
             event.preventDefault();
             goToResults();
@@ -168,30 +191,27 @@ export function HeaderSearch() {
             value={value}
           />
         </form>
-        <div className="max-h-80 overflow-y-auto p-3">
-          {status === 'idle' ? (
-            <p className="text-muted-foreground px-2 text-sm">
-              Search talks, speakers, topics, and clips.
-            </p>
-          ) : null}
-          {status === 'loading' ? (
-            <p className="text-muted-foreground px-2 text-sm">Searching...</p>
-          ) : null}
-          {status === 'empty' ? (
-            <p className="text-muted-foreground px-2 text-sm">
-              No results for &ldquo;{debouncedQuery}&rdquo;.
-            </p>
-          ) : null}
-          {status === 'results' ? (
-            <SearchResultGroups
-              activeId={activeHit?.id}
-              hits={hits}
-              listboxId={listboxId}
-              onNavigate={close}
-              variant="dropdown"
-            />
-          ) : null}
-        </div>
+        {status === 'idle' ? null : (
+          <div className="max-h-80 overflow-y-auto p-3">
+            {status === 'loading' ? (
+              <p className="text-muted-foreground px-2 text-sm">Searching...</p>
+            ) : null}
+            {status === 'empty' ? (
+              <p className="text-muted-foreground px-2 text-sm">
+                No results for &ldquo;{debouncedQuery}&rdquo;.
+              </p>
+            ) : null}
+            {status === 'results' ? (
+              <SearchResultGroups
+                activeId={activeHit?.id}
+                hits={hits}
+                listboxId={listboxId}
+                onNavigate={close}
+                variant="dropdown"
+              />
+            ) : null}
+          </div>
+        )}
         {hasQuery ? (
           <div className="border-border border-t p-3">
             <Link
