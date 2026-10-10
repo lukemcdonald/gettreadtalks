@@ -8,8 +8,11 @@ import { getTalkUrl } from '@/features/talks/utils';
 
 const DEFAULT_LIST_LIMIT = 50;
 const DEFAULT_SEARCH_LIMIT = 10;
+const MAX_CURSOR_LENGTH = 2048;
 const MAX_LIST_LIMIT = 100;
 const MAX_SEARCH_LIMIT = 25;
+const MAX_SEARCH_TEXT = 200;
+const MAX_SLUG_LENGTH = 120;
 
 const readOnlyAnnotations = {
   idempotentHint: true,
@@ -19,8 +22,13 @@ const readOnlyAnnotations = {
 
 const cursorSchema = z
   .string()
+  .max(MAX_CURSOR_LENGTH)
   .optional()
   .describe('Pagination cursor from a previous call.');
+
+const searchTextSchema = z.string().max(MAX_SEARCH_TEXT);
+
+const slugSchema = z.string().min(1).max(MAX_SLUG_LENGTH);
 
 const listLimitSchema = z
   .number()
@@ -45,29 +53,27 @@ const searchLimitSchema = z
 const searchTalksInputSchema = z.object({
   cursor: cursorSchema,
   limit: searchLimitSchema,
-  query: z
-    .string()
+  query: searchTextSchema
     .optional()
     .describe('Free-text search across talk titles and speaker names.'),
-  speaker: z
-    .string()
+  speaker: slugSchema
     .optional()
     .describe('Speaker URL slug from list_speakers.'),
-  topic: z.string().optional().describe('Topic URL slug from list_topics.'),
+  topic: slugSchema.optional().describe('Topic URL slug from list_topics.'),
 });
 
 const getTalkInputSchema = z.object({
-  speakerSlug: z.string().describe('Speaker URL slug from list_speakers.'),
-  talkSlug: z.string().describe('Talk URL slug from search_talks or get_talk.'),
+  speakerSlug: slugSchema.describe('Speaker URL slug from list_speakers.'),
+  talkSlug: slugSchema.describe('Talk URL slug from search_talks or get_talk.'),
 });
 
 const listSpeakersInputSchema = z.object({
   limit: listLimitSchema,
-  search: z.string().optional().describe('Filter speakers by name.'),
+  search: searchTextSchema.optional().describe('Filter speakers by name.'),
 });
 
 const listTopicsInputSchema = z.object({
-  search: z.string().optional().describe('Filter topics by title.'),
+  search: searchTextSchema.optional().describe('Filter topics by title.'),
 });
 
 const listCollectionsInputSchema = z.object({
@@ -75,21 +81,22 @@ const listCollectionsInputSchema = z.object({
 });
 
 const getCollectionInputSchema = z.object({
-  slug: z.string().describe('Collection URL slug from list_collections.'),
+  slug: slugSchema.describe('Collection URL slug from list_collections.'),
 });
 
 const listClipsInputSchema = z.object({
   cursor: cursorSchema,
   limit: searchLimitSchema,
-  query: z.string().optional().describe('Free-text search across clip titles.'),
-  speaker: z
-    .string()
+  query: searchTextSchema
+    .optional()
+    .describe('Free-text search across clip titles.'),
+  speaker: slugSchema
     .optional()
     .describe('Speaker URL slug from list_speakers.'),
 });
 
 const getClipInputSchema = z.object({
-  slug: z.string().describe('Clip URL slug from list_clips or get_talk.'),
+  slug: slugSchema.describe('Clip URL slug from list_clips or get_talk.'),
 });
 
 interface SpeakerRecord {

@@ -506,4 +506,31 @@ describe('createTreadMcpHandler', () => {
     assert.equal(body.includes('list_clips'), true);
     assert.equal(body.includes('get_clip'), true);
   });
+
+  test('rejects an oversized search query', async () => {
+    const handler = createTreadMcpHandler(createCatalog());
+    await postMcp(handler, 'initialize', {
+      capabilities: {},
+      clientInfo: { name: 'test', version: '1.0.0' },
+      protocolVersion: '2025-11-25',
+    });
+    await postMcp(handler, 'notifications/initialized', {});
+    const response = await postMcp(
+      handler,
+      'tools/call',
+      {
+        arguments: { query: 'x'.repeat(201) },
+        name: 'search_talks',
+      },
+      2
+    );
+    const body = await response.text();
+
+    assert.equal(response.ok, true);
+    assert.equal(body.includes('Sample Sermon on Romans 8'), false);
+    assert.equal(
+      body.includes('Too big: expected string to have <=200 characters'),
+      true
+    );
+  });
 });
