@@ -1,6 +1,4 @@
-import type { McpServer } from '@modelcontextprotocol/server';
-
-import { createMcpHandler } from 'mcp-handler';
+import { createMcpHandler, McpServer } from '@modelcontextprotocol/server';
 import { z } from 'zod';
 
 import { site } from '@/configs/site';
@@ -501,17 +499,22 @@ function registerMcpTools(server: McpServer, catalog: McpCatalog) {
 }
 
 export function createTreadMcpHandler(catalog: McpCatalog) {
-  return createMcpHandler(
-    (server) => {
-      registerMcpTools(server, catalog);
-    },
-    {
-      instructions:
-        'Public read-only catalog of TREAD Talks at gettreadtalks.com. Prefer search_talks, then get_talk. Always share canonical https://www.gettreadtalks.com URLs. Only published sermons, clips, speakers, topics, and collections are available.',
-      serverInfo: {
+  const mcpHandler = createMcpHandler(() => {
+    const server = new McpServer(
+      {
         name: 'gettreadtalks',
         version: '1.0.0',
       },
-    }
-  );
+      {
+        instructions:
+          'Public read-only catalog of TREAD Talks at gettreadtalks.com. Prefer search_talks, then get_talk. Always share canonical https://www.gettreadtalks.com URLs. Only published sermons, clips, speakers, topics, and collections are available.',
+      }
+    );
+
+    registerMcpTools(server, catalog);
+
+    return server;
+  });
+
+  return (request: Request) => mcpHandler.fetch(request);
 }
