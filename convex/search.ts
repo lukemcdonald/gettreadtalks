@@ -1,1 +1,3 @@
-export { searchSite } from './model/search';
+import { queries } from './model/search';
+
+export const { searchSite } = queries;

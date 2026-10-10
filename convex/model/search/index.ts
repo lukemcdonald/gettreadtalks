@@ -1,1 +1,1 @@
-export { searchSite } from './queries';
+export * as queries from './queries';

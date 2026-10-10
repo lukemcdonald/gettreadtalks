@@ -92,14 +92,16 @@ export async function filterTopicsWithPublishedTalks(
 ): Promise<Doc<'topics'>[]> {
   const results = await Promise.all(
     topics.map(async (topic) => {
-      for await (const entry of ctx.db
+      const entries = await ctx.db
         .query('talksOnTopics')
-        .withIndex('by_topicId', (q) => q.eq('topicId', topic._id))) {
-        const talk = await ctx.db.get('talks', entry.talkId);
+        .withIndex('by_topicId', (q) => q.eq('topicId', topic._id))
+        .collect();
+      const talks = await Promise.all(
+        entries.map((entry) => ctx.db.get('talks', entry.talkId))
+      );
 
-        if (talk?.status === 'published') {
-          return topic;
-        }
+      if (talks.some((talk) => talk?.status === 'published')) {
+        return topic;
       }
 
       return null;
