@@ -1,10 +1,12 @@
-import type { McpServer } from '@modelcontextprotocol/server';
-
-import { createMcpHandler } from 'mcp-handler';
+import { createMcpHandler, McpServer } from '@modelcontextprotocol/server';
 import { z } from 'zod';
 
 import { site } from '@/configs/site';
 import { getClipUrl } from '@/features/clips/utils';
+import {
+  PROTECTED_MCP_TOOL,
+  withProtectedMcpToolAuth,
+} from '@/features/mcp/oauth';
 import { getSpeakerName } from '@/features/speakers/utils';
 import { getTalkUrl } from '@/features/talks/utils';
 
@@ -498,20 +500,36 @@ function registerMcpTools(server: McpServer, catalog: McpCatalog) {
     },
     (input) => getClip(input, catalog)
   );
+
+  server.registerTool(
+    PROTECTED_MCP_TOOL,
+    {
+      annotations: readOnlyAnnotations,
+      description:
+        'Return the signed-in user. Requires an OAuth access token bound to this MCP server.',
+      inputSchema: z.object({}),
+    },
+    () => toolResult({ error: 'Authentication required.' }, true)
+  );
 }
 
 export function createTreadMcpHandler(catalog: McpCatalog) {
-  return createMcpHandler(
-    (server) => {
-      registerMcpTools(server, catalog);
-    },
-    {
-      instructions:
-        'Public read-only catalog of TREAD Talks at gettreadtalks.com. Prefer search_talks, then get_talk. Always share canonical https://www.gettreadtalks.com URLs. Only published sermons, clips, speakers, topics, and collections are available.',
-      serverInfo: {
+  const mcpHandler = createMcpHandler(() => {
+    const server = new McpServer(
+      {
         name: 'gettreadtalks',
         version: '1.0.0',
       },
-    }
-  );
+      {
+        instructions:
+          'Public read-only catalog of TREAD Talks at gettreadtalks.com. Prefer search_talks, then get_talk. Always share canonical https://www.gettreadtalks.com URLs. Only published sermons, clips, speakers, topics, and collections are available. User tools require an OAuth access token.',
+      }
+    );
+
+    registerMcpTools(server, catalog);
+
+    return server;
+  });
+
+  return withProtectedMcpToolAuth((request) => mcpHandler.fetch(request));
 }

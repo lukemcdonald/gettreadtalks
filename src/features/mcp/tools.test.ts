@@ -505,5 +505,18 @@ describe('createTreadMcpHandler', () => {
     assert.equal(body.includes('get_collection'), true);
     assert.equal(body.includes('list_clips'), true);
     assert.equal(body.includes('get_clip'), true);
+    assert.equal(body.includes('whoami'), true);
+  });
+
+  test('challenges whoami without a token', async () => {
+    const handler = createTreadMcpHandler(createCatalog());
+    const response = await postMcp(handler, 'tools/call', {
+      arguments: {},
+      name: 'whoami',
+    });
+    const challenge = response.headers.get('WWW-Authenticate') ?? '';
+
+    assert.equal(response.status, 401);
+    assert.match(challenge, /resource_metadata=/u);
   });
 });

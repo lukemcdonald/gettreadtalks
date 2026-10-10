@@ -95,8 +95,61 @@ test('MCP / Initialize advertises the catalog', async ({ request }) => {
       'list_speakers',
       'list_topics',
       'search_talks',
+      'whoami',
     ])
   );
+});
+
+test('MCP / Protected stub challenges without a token', async ({ request }) => {
+  const response = await request.post('/mcp', {
+    data: {
+      id: 1,
+      jsonrpc: '2.0',
+      method: 'tools/call',
+      params: {
+        arguments: {},
+        name: 'whoami',
+      },
+    },
+    headers: MCP_HEADERS,
+  });
+
+  expect(response.status()).toBe(401);
+  expect(response.headers()['www-authenticate'] ?? '').toContain(
+    'resource_metadata='
+  );
+});
+
+test('MCP / Discovery documents are published', async ({ request }) => {
+  const resource = await request.get('/.well-known/oauth-protected-resource');
+  const inserted = await request.get(
+    '/.well-known/oauth-protected-resource/mcp'
+  );
+  const authorizationServer = await request.get(
+    '/.well-known/oauth-authorization-server'
+  );
+
+  expect(resource.status()).toBe(200);
+  expect(inserted.status()).toBe(200);
+  expect(authorizationServer.status()).toBe(200);
+
+  const resourceBody = (await resource.json()) as {
+    authorization_servers?: string[];
+    resource?: string;
+  };
+  const authorizationBody = (await authorizationServer.json()) as {
+    authorization_endpoint?: string;
+    issuer?: string;
+    token_endpoint?: string;
+  };
+
+  expect(resourceBody.resource).toMatch(/\/mcp$/u);
+  expect(resourceBody.authorization_servers?.length).toBeGreaterThan(0);
+  expect(authorizationBody.issuer).toBeTruthy();
+  expect(authorizationBody.authorization_endpoint).toMatch(
+    /\/oauth2\/authorize$/u
+  );
+  expect(authorizationBody.token_endpoint).toMatch(/\/oauth2\/token$/u);
 });
 
 test('MCP / Search and get talk return canonical urls', async ({ request }) => {
