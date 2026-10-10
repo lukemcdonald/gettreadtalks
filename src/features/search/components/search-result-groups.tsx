@@ -32,7 +32,7 @@ function SearchHitLink({
       className={cn(
         'block rounded-md outline-none',
         isDropdown
-          ? 'hover:bg-accent focus-visible:bg-accent px-2 py-1.5'
+          ? 'hover:bg-accent focus-visible:bg-accent px-2 py-1'
           : 'py-3 hover:underline',
         isDropdown && isActive && 'bg-accent'
       )}
@@ -71,12 +71,12 @@ function SearchResultGroup({
       <h2
         className={cn(
           'text-muted-foreground font-medium tracking-wide uppercase',
-          isDropdown ? 'px-2 text-xs' : 'mb-3 text-sm'
+          isDropdown ? 'px-2 py-1 text-xs' : 'mb-3 text-sm'
         )}
       >
         {group.label}
       </h2>
-      <ul className={cn(isDropdown ? 'mt-1' : 'divide-border divide-y')}>
+      <ul className={cn(!isDropdown && 'divide-border divide-y')}>
         {group.hits.map((hit) => (
           <li key={hit.id}>
             <SearchHitLink
@@ -110,7 +110,7 @@ export function SearchResultGroups({
   return (
     <div
       aria-label={isDropdown ? 'Search results' : undefined}
-      className={cn(isDropdown ? 'space-y-3' : 'space-y-8')}
+      className={cn(isDropdown ? 'space-y-1.5' : 'space-y-8')}
       id={listboxId}
       role={isDropdown ? 'listbox' : undefined}
     >

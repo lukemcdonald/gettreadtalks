@@ -25,6 +25,7 @@ import {
   SEARCH_DROPDOWN_LIMIT,
   toSearchHits,
 } from '@/features/search/utils';
+import { cn } from '@/utils';
 
 function getDropdownStatus({
   hasQuery,
@@ -163,14 +164,24 @@ export function HeaderSearch() {
           </Button>
         }
       />
-      <PopoverContent align="end" className="w-96 p-0">
+      <PopoverContent
+        align="end"
+        className="w-96 max-w-full p-0 [&_[data-slot=popover-viewport]]:p-0 [&_[data-slot=popover-viewport]]:[--viewport-inline-padding:0px]"
+      >
         <form
-          className={hasQuery ? 'border-border border-b p-3' : 'p-3'}
+          className={cn(
+            'flex items-center gap-2 px-2 py-1.5',
+            hasQuery && 'border-border/50 border-b'
+          )}
           onSubmit={(event) => {
             event.preventDefault();
             goToResults();
           }}
         >
+          <SearchIcon
+            aria-hidden
+            className="text-muted-foreground size-4 shrink-0 opacity-80"
+          />
           <Input
             aria-activedescendant={
               activeHit ? `search-hit-${activeHit.id}` : undefined
@@ -180,6 +191,7 @@ export function HeaderSearch() {
             aria-expanded={open}
             aria-label="Search talks, speakers, topics, and clips"
             autoFocus
+            className="min-w-0 flex-1 **:data-[slot=input]:px-0"
             onChange={(event) => {
               setActiveIndex(-1);
               setValue(event.target.value);
@@ -188,16 +200,19 @@ export function HeaderSearch() {
             placeholder="Search talks, speakers, topics, and clips"
             size="lg"
             type="search"
+            unstyled
             value={value}
           />
         </form>
         {status === 'idle' ? null : (
-          <div className="max-h-80 overflow-y-auto p-3">
+          <div className="max-h-80 overflow-y-auto py-1">
             {status === 'loading' ? (
-              <p className="text-muted-foreground px-2 text-sm">Searching...</p>
+              <p className="text-muted-foreground px-2 py-1.5 text-sm">
+                Searching...
+              </p>
             ) : null}
             {status === 'empty' ? (
-              <p className="text-muted-foreground px-2 text-sm">
+              <p className="text-muted-foreground px-2 py-1.5 text-sm">
                 No results for &ldquo;{debouncedQuery}&rdquo;.
               </p>
             ) : null}
@@ -213,9 +228,9 @@ export function HeaderSearch() {
           </div>
         )}
         {hasQuery ? (
-          <div className="border-border border-t p-3">
+          <div className="border-border/50 border-t">
             <Link
-              className="text-sm font-medium hover:underline"
+              className="hover:bg-accent block px-2 py-1.5 text-sm font-medium"
               href={getSearchPageHref(value.trim())}
               onClick={close}
             >
