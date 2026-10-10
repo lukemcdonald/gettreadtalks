@@ -27,31 +27,29 @@ test('Talks / Favorite and unfavorite', async ({
     (await talksPage.favorite.getAttribute('aria-pressed')) === 'true';
 
   if (!startedPressed) {
-    await talksPage.favorite.click();
+    await talksPage.toggleFavorite();
   }
 
-  await expect(async () => {
-    await favoritesPage.goto();
-    await expect(favoritesPage.talkNamed(title)).toBeVisible();
-  }).toPass();
+  await expect(talksPage.favorite).toHaveAttribute('aria-pressed', 'true');
+
+  await favoritesPage.goto();
+  await expect(favoritesPage.talkNamed(title)).toBeVisible();
 
   await talksPage.page.goto(talkUrl);
   await expect(talksPage.favorite).toBeVisible();
-  await talksPage.favorite.click();
+  await talksPage.toggleFavorite();
+  await expect(talksPage.favorite).toHaveAttribute('aria-pressed', 'false');
 
-  await expect(async () => {
-    await favoritesPage.goto();
-    await expect(favoritesPage.talkNamed(title)).toHaveCount(0);
-  }).toPass();
+  await favoritesPage.goto();
+  await expect(favoritesPage.talkNamed(title)).toHaveCount(0);
 
   if (startedPressed) {
     await talksPage.page.goto(talkUrl);
     await expect(talksPage.favorite).toBeVisible();
-    await talksPage.favorite.click();
+    await talksPage.toggleFavorite();
+    await expect(talksPage.favorite).toHaveAttribute('aria-pressed', 'true');
 
-    await expect(async () => {
-      await favoritesPage.goto();
-      await expect(favoritesPage.talkNamed(title)).toBeVisible();
-    }).toPass();
+    await favoritesPage.goto();
+    await expect(favoritesPage.talkNamed(title)).toBeVisible();
   }
 });
