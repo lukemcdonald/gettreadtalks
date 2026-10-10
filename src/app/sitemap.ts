@@ -15,6 +15,7 @@ const staticRoutes: MetadataRoute.Sitemap = [
   { changeFrequency: 'weekly', url: `${site.url}/topics` },
   { changeFrequency: 'weekly', url: `${site.url}/clips` },
   { changeFrequency: 'yearly', url: `${site.url}/about` },
+  { changeFrequency: 'yearly', url: `${site.url}/ai` },
   { changeFrequency: 'yearly', url: `${site.url}/beliefs` },
 ];
 
