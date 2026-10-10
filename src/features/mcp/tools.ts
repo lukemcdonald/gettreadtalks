@@ -3,10 +3,6 @@ import { z } from 'zod';
 
 import { site } from '@/configs/site';
 import { getClipUrl } from '@/features/clips/utils';
-import {
-  PROTECTED_MCP_TOOL,
-  withProtectedMcpToolAuth,
-} from '@/features/mcp/oauth';
 import { getSpeakerName } from '@/features/speakers/utils';
 import { getTalkUrl } from '@/features/talks/utils';
 
@@ -500,17 +496,6 @@ function registerMcpTools(server: McpServer, catalog: McpCatalog) {
     },
     (input) => getClip(input, catalog)
   );
-
-  server.registerTool(
-    PROTECTED_MCP_TOOL,
-    {
-      annotations: readOnlyAnnotations,
-      description:
-        'Return the signed-in user. Requires an OAuth access token bound to this MCP server.',
-      inputSchema: z.object({}),
-    },
-    () => toolResult({ error: 'Authentication required.' }, true)
-  );
 }
 
 export function createTreadMcpHandler(catalog: McpCatalog) {
@@ -522,7 +507,7 @@ export function createTreadMcpHandler(catalog: McpCatalog) {
       },
       {
         instructions:
-          'Public read-only catalog of TREAD Talks at gettreadtalks.com. Prefer search_talks, then get_talk. Always share canonical https://www.gettreadtalks.com URLs. Only published sermons, clips, speakers, topics, and collections are available. User tools require an OAuth access token.',
+          'Public read-only catalog of TREAD Talks at gettreadtalks.com. Prefer search_talks, then get_talk. Always share canonical https://www.gettreadtalks.com URLs. Only published sermons, clips, speakers, topics, and collections are available.',
       }
     );
 
@@ -531,5 +516,5 @@ export function createTreadMcpHandler(catalog: McpCatalog) {
     return server;
   });
 
-  return withProtectedMcpToolAuth((request) => mcpHandler.fetch(request));
+  return (request: Request) => mcpHandler.fetch(request);
 }
