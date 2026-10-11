@@ -21,6 +21,16 @@ export interface CommandSearchGroup {
 
 export type HeaderSearchStatus = 'empty' | 'idle' | 'loading' | 'results';
 
+export interface SearchOverlayProps {
+  groups: CommandSearchGroup[];
+  onOpenChange: (open: boolean) => void;
+  onSelect: (item: CommandSearchItem) => void;
+  onValueChange: (value: string) => void;
+  open: boolean;
+  status: HeaderSearchStatus;
+  value: string;
+}
+
 export interface SearchHit {
   href: string;
   id: string;

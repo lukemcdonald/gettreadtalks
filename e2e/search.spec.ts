@@ -18,10 +18,27 @@ test('Search / Keyboard shortcut', async ({ homePage, searchPage }) => {
   await searchPage.page.keyboard.press('ControlOrMeta+K');
 
   await expect(searchPage.input).toBeVisible();
+  await expect(searchPage.dropdownResult('Talks')).toBeVisible();
 
   await searchPage.page.keyboard.press('ControlOrMeta+K');
 
   await expect(searchPage.input).toBeHidden();
+});
+
+test('Search / Mobile drawer', async ({ homePage, searchPage }) => {
+  await searchPage.page.setViewportSize({ height: 844, width: 390 });
+  await homePage.goto();
+  await searchPage.open();
+
+  await expect(searchPage.cancel).toBeVisible();
+  await expect(searchPage.dropdownResult('Talks')).toBeVisible();
+  await expect(searchPage.dropdownResult('Collections')).toBeVisible();
+
+  await searchPage.input.fill('grace');
+  await expect(searchPage.dropdownResult('Grace')).toBeVisible();
+
+  await searchPage.viewAll.click();
+  await expect(searchPage.page).toHaveURL(/\/search\?search=grace/u);
 });
 
 test('Search / Keeps query on dismiss and clears after navigate', async ({

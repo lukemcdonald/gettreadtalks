@@ -5,7 +5,10 @@ import { describe, test } from 'node:test';
 register(new URL('../../../scripts/node-test-hooks.mjs', import.meta.url));
 
 const {
+  BROWSE_SEARCH_GROUP,
   emptySiteSearch,
+  getBrowseCommandGroups,
+  getHeaderSearchGroups,
   getHeaderSearchQueryAfterClose,
   getHeaderSearchStatus,
   getSearchHotkeyLabel,
@@ -200,6 +203,49 @@ describe('getSearchHotkeyLabel', () => {
       'Ctrl K'
     );
     assert.equal(getSearchHotkeyLabel(), 'Ctrl K');
+  });
+});
+
+describe('getHeaderSearchGroups', () => {
+  test('uses browse links when idle and view all when searching', () => {
+    const idle = getHeaderSearchGroups({
+      hits: toSearchHits(result),
+      isSignedIn: false,
+      status: 'idle',
+      value: '',
+    });
+    const results = getHeaderSearchGroups({
+      hits: toSearchHits(result),
+      isSignedIn: false,
+      status: 'results',
+      value: 'grace',
+    });
+
+    assert.equal(idle[0]?.value, BROWSE_SEARCH_GROUP);
+    assert.equal(results.at(-1)?.value, VIEW_ALL_SEARCH_GROUP);
+  });
+});
+
+describe('getBrowseCommandGroups', () => {
+  test('lists browse destinations and favorites when signed in', () => {
+    const signedOut = getBrowseCommandGroups(false);
+
+    assert.equal(signedOut[0]?.value, BROWSE_SEARCH_GROUP);
+    assert.deepEqual(
+      signedOut[0]?.items.map((item) => item.label),
+      ['Talks', 'Speakers', 'Topics', 'Collections', 'Clips']
+    );
+    assert.deepEqual(
+      getBrowseCommandGroups(true)[0]?.items.map((item) => item.href),
+      [
+        '/talks',
+        '/speakers',
+        '/topics',
+        '/collections',
+        '/clips',
+        '/account/favorites',
+      ]
+    );
   });
 });
 

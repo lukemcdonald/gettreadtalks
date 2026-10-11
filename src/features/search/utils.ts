@@ -1,16 +1,20 @@
 import type {
   CommandSearchGroup,
+  CommandSearchItem,
   HeaderSearchStatus,
   SearchHit,
   SearchResultType,
   SiteSearchResult,
 } from '@/features/search/types';
 
+import { NAVIGATION_LINKS } from '@/components/site-header/constants';
 import { getClipUrl } from '@/features/clips/utils';
 import { SEARCH_RESULT_TYPES } from '@/features/search/types';
 import { getSpeakerName } from '@/features/speakers/utils';
 import { getTalkUrl } from '@/features/talks/utils';
 
+export const BROWSE_SEARCH_GROUP = 'Browse';
+const FAVORITES_SEARCH_HREF = '/account/favorites';
 export const OPEN_HEADER_SEARCH_EVENT = 'tread:open-header-search';
 export const SEARCH_DEBOUNCE_MS = 300;
 export const SEARCH_DROPDOWN_LIMIT = 4;
@@ -154,6 +158,49 @@ export function groupSearchHits(hits: SearchHit[]) {
     label: getSearchGroupLabel(type),
     type,
   })).filter((group) => group.hits.length > 0);
+}
+
+export function getBrowseCommandGroups(
+  isSignedIn: boolean
+): CommandSearchGroup[] {
+  const items: CommandSearchItem[] = NAVIGATION_LINKS.map((link) => ({
+    href: link.href,
+    label: link.label,
+    value: `browse-${link.href.slice(1)}`,
+  }));
+
+  if (isSignedIn) {
+    items.push({
+      href: FAVORITES_SEARCH_HREF,
+      label: 'Favorites',
+      value: 'browse-favorites',
+    });
+  }
+
+  return [
+    {
+      items,
+      value: BROWSE_SEARCH_GROUP,
+    },
+  ];
+}
+
+export function getHeaderSearchGroups({
+  hits,
+  isSignedIn,
+  status,
+  value,
+}: {
+  hits: SearchHit[];
+  isSignedIn: boolean;
+  status: HeaderSearchStatus;
+  value: string;
+}) {
+  if (status === 'idle') {
+    return getBrowseCommandGroups(isSignedIn);
+  }
+
+  return toCommandGroups(status === 'results' ? hits : [], value);
 }
 
 export function toCommandGroups(

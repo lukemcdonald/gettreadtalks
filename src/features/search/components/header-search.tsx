@@ -1,11 +1,8 @@
 'use client';
 
 import type { ButtonProps } from '@/components/ui';
-import type {
-  CommandSearchGroup,
-  CommandSearchItem,
-  HeaderSearchStatus,
-} from '@/features/search/types';
+import type { SearchOverlayProps } from '@/features/search/types';
+import type { CSSProperties, ReactNode } from 'react';
 
 import {
   ArrowDownIcon,
@@ -13,54 +10,27 @@ import {
   CornerDownLeftIcon,
   SearchIcon,
 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState, useSyncExternalStore } from 'react';
 
 import {
   Button,
   Command,
-  CommandCollection,
   CommandDialog,
   CommandDialogPopup,
-  CommandDialogTrigger,
   CommandFooter,
-  CommandGroup,
-  CommandGroupLabel,
   CommandInput,
-  CommandItem,
-  CommandList,
   CommandPanel,
-  CommandSeparator,
   DialogTitle,
+  Drawer,
+  DrawerClose,
+  DrawerPopup,
+  DrawerTitle,
   Kbd,
   KbdGroup,
 } from '@/components/ui';
-import { useSearchSite } from '@/features/search/hooks/use-search-site';
-import {
-  getHeaderSearchQueryAfterClose,
-  getHeaderSearchStatus,
-  getSearchHotkeyLabel,
-  isSearchHotkey,
-  OPEN_HEADER_SEARCH_EVENT,
-  SEARCH_DEBOUNCE_MS,
-  SEARCH_DROPDOWN_LIMIT,
-  toCommandGroups,
-  toSearchHits,
-  VIEW_ALL_SEARCH_GROUP,
-} from '@/features/search/utils';
+import { SearchCommandResults } from '@/features/search/components/search-command-results';
+import { useHeaderSearch } from '@/features/search/hooks/use-header-search';
+import { useVisualViewport } from '@/features/search/hooks/use-visual-viewport';
 import { cn } from '@/utils';
-
-function getClientSearchHotkeyLabel() {
-  return getSearchHotkeyLabel(navigator.userAgent);
-}
-
-function getServerSearchHotkeyLabel() {
-  return '⌘K';
-}
-
-function subscribeSearchHotkey() {
-  return () => {};
-}
 
 function HeaderSearchTrigger({
   className,
@@ -84,112 +54,9 @@ function HeaderSearchTrigger({
   );
 }
 
-function HeaderSearchItem({
-  item,
-  onSelect,
-}: {
-  item: CommandSearchItem;
-  onSelect: (item: CommandSearchItem) => void;
-}) {
-  return (
-    <CommandItem
-      onClick={() => {
-        onSelect(item);
-      }}
-      value={item.value}
-    >
-      <span className="flex min-w-0 flex-1 flex-col">
-        <span>{item.label}</span>
-        {!!item.subtitle && (
-          <span className="text-muted-foreground text-sm">{item.subtitle}</span>
-        )}
-      </span>
-    </CommandItem>
-  );
-}
-
-function HeaderSearchStatusMessage({ status }: { status: HeaderSearchStatus }) {
-  if (status === 'loading') {
-    return (
-      <p className="text-muted-foreground px-2 py-6 text-center text-sm">
-        Searching...
-      </p>
-    );
-  }
-
-  if (status === 'empty') {
-    return (
-      <p className="text-muted-foreground px-2 py-6 text-center text-sm">
-        No results
-      </p>
-    );
-  }
-
-  return null;
-}
-
-function HeaderSearchGroup({
-  group,
-  onSelect,
-}: {
-  group: CommandSearchGroup;
-  onSelect: (item: CommandSearchItem) => void;
-}) {
-  return (
-    <>
-      <CommandGroup items={group.items}>
-        {group.value === VIEW_ALL_SEARCH_GROUP ? null : (
-          <CommandGroupLabel>{group.value}</CommandGroupLabel>
-        )}
-        <CommandCollection>
-          {(item: CommandSearchItem) => (
-            <HeaderSearchItem
-              item={item}
-              key={item.value}
-              onSelect={onSelect}
-            />
-          )}
-        </CommandCollection>
-      </CommandGroup>
-      <CommandSeparator />
-    </>
-  );
-}
-
-function HeaderSearchResults({
-  groups,
-  onSelect,
-  status,
-}: {
-  groups: CommandSearchGroup[];
-  onSelect: (item: CommandSearchItem) => void;
-  status: HeaderSearchStatus;
-}) {
-  if (status === 'idle') {
-    return null;
-  }
-
-  return (
-    <CommandPanel>
-      <HeaderSearchStatusMessage status={status} />
-      {groups.length > 0 ? (
-        <CommandList>
-          {(group: CommandSearchGroup) => (
-            <HeaderSearchGroup
-              group={group}
-              key={group.value}
-              onSelect={onSelect}
-            />
-          )}
-        </CommandList>
-      ) : null}
-    </CommandPanel>
-  );
-}
-
 function HeaderSearchFooter() {
   return (
-    <CommandFooter className="hidden md:flex">
+    <CommandFooter>
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
           <KbdGroup>
@@ -217,119 +84,156 @@ function HeaderSearchFooter() {
   );
 }
 
-export function HeaderSearch() {
-  const hotkey = useSyncExternalStore(
-    subscribeSearchHotkey,
-    getClientSearchHotkeyLabel,
-    getServerSearchHotkeyLabel
-  );
-  const router = useRouter();
-  const [open, setOpen] = useState(false);
-  const [value, setValue] = useState('');
-  const [debouncedQuery, setDebouncedQuery] = useState('');
-  const { isLoading, results } = useSearchSite(
-    debouncedQuery,
-    SEARCH_DROPDOWN_LIMIT
-  );
-  const hits = toSearchHits(results);
-  const hasQuery = value.trim().length > 0;
-  const isPending = value.trim() !== debouncedQuery;
-  const status = getHeaderSearchStatus({
-    hasQuery,
-    hasResults: hits.length > 0,
-    isLoading: isLoading || isPending,
-  });
-  const groups = toCommandGroups(
-    status === 'results' ? hits : [],
-    hasQuery ? value : ''
-  );
-
-  useEffect(() => {
-    function onOpenHeaderSearch() {
-      setOpen(true);
-    }
-
-    function onWindowKeyDown(event: globalThis.KeyboardEvent) {
-      if (!isSearchHotkey(event)) {
-        return;
-      }
-
-      event.preventDefault();
-      setOpen((isOpen) => !isOpen);
-    }
-
-    window.addEventListener('keydown', onWindowKeyDown);
-    window.addEventListener(OPEN_HEADER_SEARCH_EVENT, onOpenHeaderSearch);
-
-    return () => {
-      window.removeEventListener('keydown', onWindowKeyDown);
-      window.removeEventListener(OPEN_HEADER_SEARCH_EVENT, onOpenHeaderSearch);
-    };
-  }, []);
-
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setDebouncedQuery(value.trim());
-    }, SEARCH_DEBOUNCE_MS);
-
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, [value]);
-
-  function close(didNavigate = false) {
-    setOpen(false);
-    setValue((query) => getHeaderSearchQueryAfterClose(query, didNavigate));
-
-    if (didNavigate) {
-      setDebouncedQuery('');
-    }
-  }
-
-  function onSelect(item: CommandSearchItem) {
-    router.push(item.href);
-    close(true);
-  }
-
+function SearchCommand({
+  children,
+  groups,
+  onInputValueChange,
+  value,
+}: {
+  children: ReactNode;
+  groups: SearchOverlayProps['groups'];
+  onInputValueChange: (value: string) => void;
+  value: string;
+}) {
   return (
-    <CommandDialog
-      onOpenChange={(nextOpen) => {
-        if (nextOpen) {
-          setOpen(true);
+    <Command
+      items={groups}
+      mode="none"
+      onValueChange={(nextValue, eventDetails) => {
+        if (eventDetails.reason === 'item-press') {
           return;
         }
 
-        close();
+        onInputValueChange(nextValue);
       }}
-      open={open}
+      value={value}
     >
-      <CommandDialogTrigger render={<HeaderSearchTrigger hotkey={hotkey} />} />
+      {children}
+    </Command>
+  );
+}
+
+function SearchCommandField() {
+  return (
+    <CommandInput
+      aria-label="Search talks, speakers, topics, and clips"
+      placeholder="Search talks, speakers, topics, and clips"
+    />
+  );
+}
+
+function DesktopSearchDialog({
+  groups,
+  onOpenChange,
+  onSelect,
+  onValueChange,
+  open,
+  status,
+  value,
+}: SearchOverlayProps) {
+  return (
+    <CommandDialog onOpenChange={onOpenChange} open={open}>
       <CommandDialogPopup>
         <DialogTitle className="sr-only">Search</DialogTitle>
-        <Command
-          items={groups}
-          mode="none"
-          onValueChange={(nextValue, eventDetails) => {
-            if (eventDetails.reason === 'item-press') {
-              return;
-            }
-
-            setValue(nextValue);
-          }}
+        <SearchCommand
+          groups={groups}
+          onInputValueChange={onValueChange}
           value={value}
         >
-          <CommandInput
-            aria-label="Search talks, speakers, topics, and clips"
-            placeholder="Search talks, speakers, topics, and clips"
-          />
-          <HeaderSearchResults
-            groups={groups}
-            onSelect={onSelect}
-            status={status}
-          />
+          <SearchCommandField />
+          <CommandPanel>
+            <SearchCommandResults
+              groups={groups}
+              onSelect={onSelect}
+              status={status}
+            />
+          </CommandPanel>
           <HeaderSearchFooter />
-        </Command>
+        </SearchCommand>
       </CommandDialogPopup>
     </CommandDialog>
+  );
+}
+
+function MobileSearchDrawer({
+  groups,
+  onOpenChange,
+  onSelect,
+  onValueChange,
+  open,
+  status,
+  value,
+}: SearchOverlayProps) {
+  const viewport = useVisualViewport(open);
+  const overlayStyle = {
+    height: viewport.height ? `${viewport.height}px` : '100dvh',
+    top: viewport.offsetTop ? `${viewport.offsetTop}px` : undefined,
+  } as CSSProperties;
+
+  return (
+    <Drawer onOpenChange={onOpenChange} open={open} position="bottom">
+      <DrawerPopup
+        className="fixed inset-x-0 top-0 flex min-h-0 flex-col overflow-hidden overscroll-none rounded-none border-0 pb-(--safe-area-inset-bottom,0px)"
+        style={overlayStyle}
+        variant="straight"
+      >
+        <DrawerTitle className="sr-only">Search</DrawerTitle>
+        <SearchCommand
+          groups={groups}
+          onInputValueChange={onValueChange}
+          value={value}
+        >
+          <div className="flex items-center gap-1 pe-2 pt-(--safe-area-inset-top,0px)">
+            <div className="min-w-0 flex-1">
+              <SearchCommandField />
+            </div>
+            <DrawerClose render={<Button size="sm" variant="ghost" />}>
+              Cancel
+            </DrawerClose>
+          </div>
+          <div className="min-h-0 flex-1 touch-auto overflow-hidden">
+            <SearchCommandResults
+              groups={groups}
+              onSelect={onSelect}
+              status={status}
+            />
+          </div>
+        </SearchCommand>
+      </DrawerPopup>
+    </Drawer>
+  );
+}
+
+export function HeaderSearch() {
+  const search = useHeaderSearch();
+
+  return (
+    <>
+      <HeaderSearchTrigger
+        hotkey={search.hotkey}
+        onClick={search.handleOpenSearch}
+      />
+      {search.isMobile ? (
+        <MobileSearchDrawer
+          groups={search.groups}
+          onOpenChange={search.handleOpenChange}
+          onSelect={search.handleSelect}
+          onValueChange={search.handleValueChange}
+          open={search.open}
+          status={search.status}
+          value={search.value}
+        />
+      ) : (
+        <DesktopSearchDialog
+          groups={search.groups}
+          onOpenChange={search.handleOpenChange}
+          onSelect={search.handleSelect}
+          onValueChange={search.handleValueChange}
+          open={search.open}
+          status={search.status}
+          value={search.value}
+        />
+      )}
+    </>
   );
 }
