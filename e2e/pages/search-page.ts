@@ -36,6 +36,7 @@ export class SearchPage {
 
   async open() {
     await this.cta.click();
+    await this.input.waitFor({ state: 'visible' });
   }
 
   result(name: string) {

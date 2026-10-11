@@ -1,5 +1,6 @@
 'use client';
 
+import type { ButtonProps } from '@/components/ui';
 import type { KeyboardEvent } from 'react';
 
 import { SearchIcon } from 'lucide-react';
@@ -66,15 +67,23 @@ function subscribeSearchHotkey() {
   return () => {};
 }
 
-function HeaderSearchTrigger({ hotkey }: { hotkey: string }) {
+function HeaderSearchTrigger({
+  className,
+  hotkey,
+  ...delegated
+}: ButtonProps & { hotkey: string }) {
   return (
     <Button
       aria-keyshortcuts="Control+K Meta+K"
       aria-label="Search"
-      className="md:border-input md:bg-popover md:hover:bg-accent/50 md:h-9 md:w-56 md:justify-start md:px-2.5 md:shadow-xs/5"
+      className={cn(
+        'md:border-input md:bg-popover md:hover:bg-accent/50 md:h-9 md:w-56 md:justify-start md:px-2.5 md:shadow-xs/5',
+        className
+      )}
       data-testid="search-cta"
       size="icon-lg"
       variant="ghost"
+      {...delegated}
     >
       <SearchIcon className="size-6 md:size-4" />
       <span className="text-muted-foreground hidden md:inline">Search…</span>
