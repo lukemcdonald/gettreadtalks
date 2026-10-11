@@ -30,7 +30,7 @@ test('Search / Mobile drawer', async ({ homePage, searchPage }) => {
   await homePage.goto();
   await searchPage.open();
 
-  await expect(searchPage.cancel).toBeVisible();
+  await expect(searchPage.close).toBeVisible();
   await expect(searchPage.dropdownResult('Talks')).toBeVisible();
   await expect(searchPage.dropdownResult('Collections')).toBeVisible();
 

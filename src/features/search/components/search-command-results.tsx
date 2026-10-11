@@ -39,23 +39,15 @@ function SearchCommandItem({
 }
 
 function SearchCommandStatus({ status }: { status: HeaderSearchStatus }) {
-  if (status === 'loading') {
-    return (
-      <p className="text-muted-foreground px-2 py-6 text-center text-sm">
-        Searching...
-      </p>
-    );
+  if (status !== 'empty') {
+    return null;
   }
 
-  if (status === 'empty') {
-    return (
-      <p className="text-muted-foreground px-2 py-6 text-center text-sm">
-        No results
-      </p>
-    );
-  }
-
-  return null;
+  return (
+    <p className="text-muted-foreground px-2 py-6 text-center text-sm">
+      No results
+    </p>
+  );
 }
 
 function SearchCommandGroup({

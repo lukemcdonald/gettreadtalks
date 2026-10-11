@@ -185,22 +185,58 @@ export function getBrowseCommandGroups(
   ];
 }
 
-export function getHeaderSearchGroups({
+export function getHeaderSearchState({
   hits,
+  isPending,
   isSignedIn,
-  status,
+  previousHits,
   value,
 }: {
   hits: SearchHit[];
+  isPending: boolean;
   isSignedIn: boolean;
-  status: HeaderSearchStatus;
+  previousHits: SearchHit[] | null;
   value: string;
-}) {
-  if (status === 'idle') {
-    return getBrowseCommandGroups(isSignedIn);
+}): { groups: CommandSearchGroup[]; status: HeaderSearchStatus } {
+  if (!value.trim()) {
+    return {
+      groups: getBrowseCommandGroups(isSignedIn),
+      status: 'idle',
+    };
   }
 
-  return toCommandGroups(status === 'results' ? hits : [], value);
+  if (isPending) {
+    if (previousHits === null) {
+      return {
+        groups: getBrowseCommandGroups(isSignedIn),
+        status: 'loading',
+      };
+    }
+
+    if (previousHits.length > 0) {
+      return {
+        groups: toCommandGroups(previousHits, ''),
+        status: 'loading',
+      };
+    }
+
+    return {
+      groups: [],
+      status: 'empty',
+    };
+  }
+
+  if (hits.length > 0) {
+    return {
+      groups: toCommandGroups(hits, value),
+      status: 'results',
+    };
+  }
+
+  return {
+    groups: [],
+    status: 'empty',
+  };
 }
 
 export function toCommandGroups(
@@ -218,7 +254,7 @@ export function toCommandGroups(
   }));
   const trimmedQuery = query.trim();
 
-  if (!trimmedQuery) {
+  if (!trimmedQuery || groups.length === 0) {
     return groups;
   }
 

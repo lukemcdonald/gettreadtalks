@@ -1,7 +1,7 @@
 import type { Locator, Page } from '@playwright/test';
 
 export class SearchPage {
-  readonly cancel: Locator;
+  readonly close: Locator;
   readonly cta: Locator;
   readonly heading: Locator;
   readonly input: Locator;
@@ -11,7 +11,7 @@ export class SearchPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.cancel = page.getByRole('button', { name: 'Cancel' });
+    this.close = page.getByRole('button', { name: 'Close search' });
     this.cta = page.getByTestId('search-cta');
     this.heading = page.getByRole('heading', {
       exact: true,

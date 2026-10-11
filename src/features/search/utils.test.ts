@@ -8,8 +8,8 @@ const {
   BROWSE_SEARCH_GROUP,
   emptySiteSearch,
   getBrowseCommandGroups,
-  getHeaderSearchGroups,
   getHeaderSearchQueryAfterClose,
+  getHeaderSearchState,
   getHeaderSearchStatus,
   getSearchHotkeyLabel,
   getSearchPageHref,
@@ -206,23 +206,67 @@ describe('getSearchHotkeyLabel', () => {
   });
 });
 
-describe('getHeaderSearchGroups', () => {
-  test('uses browse links when idle and view all when searching', () => {
-    const idle = getHeaderSearchGroups({
-      hits: toSearchHits(result),
+describe('getHeaderSearchState', () => {
+  const hits = toSearchHits(result);
+
+  test('keeps browse while the first query loads and view all only with results', () => {
+    const idle = getHeaderSearchState({
+      hits,
+      isPending: false,
       isSignedIn: false,
-      status: 'idle',
+      previousHits: null,
       value: '',
     });
-    const results = getHeaderSearchGroups({
-      hits: toSearchHits(result),
+    const firstLoad = getHeaderSearchState({
+      hits: [],
+      isPending: true,
       isSignedIn: false,
-      status: 'results',
+      previousHits: null,
+      value: 'grace',
+    });
+    const results = getHeaderSearchState({
+      hits,
+      isPending: false,
+      isSignedIn: false,
+      previousHits: hits,
       value: 'grace',
     });
 
-    assert.equal(idle[0]?.value, BROWSE_SEARCH_GROUP);
-    assert.equal(results.at(-1)?.value, VIEW_ALL_SEARCH_GROUP);
+    assert.equal(idle.status, 'idle');
+    assert.equal(idle.groups[0]?.value, BROWSE_SEARCH_GROUP);
+    assert.equal(firstLoad.status, 'loading');
+    assert.equal(firstLoad.groups[0]?.value, BROWSE_SEARCH_GROUP);
+    assert.equal(results.status, 'results');
+    assert.equal(results.groups.at(-1)?.value, VIEW_ALL_SEARCH_GROUP);
+  });
+
+  test('keeps previous hits while refining and hides view all until settled', () => {
+    const pending = getHeaderSearchState({
+      hits: [],
+      isPending: true,
+      isSignedIn: false,
+      previousHits: hits,
+      value: 'grace hopper',
+    });
+
+    assert.equal(pending.status, 'loading');
+    assert.deepEqual(
+      pending.groups.map((group) => group.value),
+      ['Talks', 'Speakers', 'Topics', 'Clips']
+    );
+  });
+
+  test('keeps the empty state while a later query loads', () => {
+    const pendingEmpty = getHeaderSearchState({
+      hits: [],
+      isPending: true,
+      isSignedIn: false,
+      previousHits: [],
+      value: 'zzzz',
+    });
+
+    assert.equal(pendingEmpty.status, 'empty');
+    assert.deepEqual(pendingEmpty.groups, []);
   });
 });
 
@@ -263,6 +307,10 @@ describe('toCommandGroups', () => {
 
   test('stays empty when there is no query', () => {
     assert.deepEqual(toCommandGroups([], ''), []);
+  });
+
+  test('omits view all when the query has no hits', () => {
+    assert.deepEqual(toCommandGroups([], 'zzzz'), []);
   });
 });
 

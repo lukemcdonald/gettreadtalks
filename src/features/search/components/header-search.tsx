@@ -9,15 +9,16 @@ import {
   ArrowUpIcon,
   CornerDownLeftIcon,
   SearchIcon,
+  XIcon,
 } from 'lucide-react';
 
 import {
+  AutocompleteInput,
   Button,
   Command,
   CommandDialog,
   CommandDialogPopup,
   CommandFooter,
-  CommandInput,
   CommandPanel,
   DialogTitle,
   Drawer,
@@ -26,6 +27,7 @@ import {
   DrawerTitle,
   Kbd,
   KbdGroup,
+  Spinner,
 } from '@/components/ui';
 import { SearchCommandResults } from '@/features/search/components/search-command-results';
 import { useHeaderSearch } from '@/features/search/hooks/use-header-search';
@@ -113,17 +115,39 @@ function SearchCommand({
   );
 }
 
-function SearchCommandField() {
+function SearchCommandField({
+  className,
+  inputClassName,
+  isLoading,
+}: {
+  className?: string;
+  inputClassName?: string;
+  isLoading: boolean;
+}) {
   return (
-    <CommandInput
-      aria-label="Search talks, speakers, topics, and clips"
-      placeholder="Search talks, speakers, topics, and clips"
-    />
+    <div className={cn('relative', className)}>
+      <AutocompleteInput
+        aria-label="Search talks, speakers, topics, and clips"
+        autoFocus
+        className={cn(
+          'has-focus-visible:ring-0',
+          inputClassName,
+          isLoading && '*:data-[slot=autocomplete-input]:pe-9'
+        )}
+        placeholder="Search talks, speakers, topics, and clips"
+        size="lg"
+        startAddon={<SearchIcon />}
+      />
+      {isLoading ? (
+        <Spinner className="text-muted-foreground pointer-events-none absolute end-3 top-1/2 size-4 -translate-y-1/2" />
+      ) : null}
+    </div>
   );
 }
 
 function DesktopSearchDialog({
   groups,
+  isLoading,
   onOpenChange,
   onSelect,
   onValueChange,
@@ -140,7 +164,11 @@ function DesktopSearchDialog({
           onInputValueChange={onValueChange}
           value={value}
         >
-          <SearchCommandField />
+          <SearchCommandField
+            className="px-2.5 py-1.5"
+            inputClassName="border-transparent! bg-transparent! shadow-none before:hidden"
+            isLoading={isLoading}
+          />
           <CommandPanel>
             <SearchCommandResults
               groups={groups}
@@ -157,6 +185,7 @@ function DesktopSearchDialog({
 
 function MobileSearchDrawer({
   groups,
+  isLoading,
   onOpenChange,
   onSelect,
   onValueChange,
@@ -183,12 +212,22 @@ function MobileSearchDrawer({
           onInputValueChange={onValueChange}
           value={value}
         >
-          <div className="flex items-center gap-1 pe-2 pt-(--safe-area-inset-top,0px)">
-            <div className="min-w-0 flex-1">
-              <SearchCommandField />
-            </div>
-            <DrawerClose render={<Button size="sm" variant="ghost" />}>
-              Cancel
+          <div className="flex items-center gap-2 p-3 pt-(--safe-area-inset-top,0.75rem)">
+            <SearchCommandField
+              className="min-w-0 flex-1"
+              inputClassName="has-focus-visible:border-input"
+              isLoading={isLoading}
+            />
+            <DrawerClose
+              render={
+                <Button
+                  aria-label="Close search"
+                  size="icon-lg"
+                  variant="ghost"
+                />
+              }
+            >
+              <XIcon />
             </DrawerClose>
           </div>
           <div className="min-h-0 flex-1 touch-auto overflow-hidden">
@@ -216,6 +255,7 @@ export function HeaderSearch() {
       {search.isMobile ? (
         <MobileSearchDrawer
           groups={search.groups}
+          isLoading={search.isLoading}
           onOpenChange={search.handleOpenChange}
           onSelect={search.handleSelect}
           onValueChange={search.handleValueChange}
@@ -226,6 +266,7 @@ export function HeaderSearch() {
       ) : (
         <DesktopSearchDialog
           groups={search.groups}
+          isLoading={search.isLoading}
           onOpenChange={search.handleOpenChange}
           onSelect={search.handleSelect}
           onValueChange={search.handleValueChange}

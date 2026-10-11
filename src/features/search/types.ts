@@ -23,6 +23,7 @@ export type HeaderSearchStatus = 'empty' | 'idle' | 'loading' | 'results';
 
 export interface SearchOverlayProps {
   groups: CommandSearchGroup[];
+  isLoading: boolean;
   onOpenChange: (open: boolean) => void;
   onSelect: (item: CommandSearchItem) => void;
   onValueChange: (value: string) => void;

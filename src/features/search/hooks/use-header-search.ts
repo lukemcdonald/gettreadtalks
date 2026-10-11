@@ -1,15 +1,14 @@
 'use client';
 
-import type { CommandSearchItem } from '@/features/search/types';
+import type { CommandSearchItem, SearchHit } from '@/features/search/types';
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useSyncExternalStore } from 'react';
 
 import { useSearchSite } from '@/features/search/hooks/use-search-site';
 import {
-  getHeaderSearchGroups,
   getHeaderSearchQueryAfterClose,
-  getHeaderSearchStatus,
+  getHeaderSearchState,
   getSearchHotkeyLabel,
   isSearchHotkey,
   OPEN_HEADER_SEARCH_EVENT,
@@ -50,15 +49,13 @@ export function useHeaderSearch() {
   );
   const hits = toSearchHits(results);
   const hasQuery = value.trim().length > 0;
-  const status = getHeaderSearchStatus({
-    hasQuery,
-    hasResults: hits.length > 0,
-    isLoading: isLoading || value.trim() !== debouncedQuery,
-  });
-  const groups = getHeaderSearchGroups({
+  const isPending = isLoading || value.trim() !== debouncedQuery;
+  const [previousHits, setPreviousHits] = useState<SearchHit[] | null>(null);
+  const { groups, status } = getHeaderSearchState({
     hits,
+    isPending,
     isSignedIn: Boolean(user),
-    status,
+    previousHits,
     value,
   });
 
@@ -101,7 +98,18 @@ export function useHeaderSearch() {
 
     if (didNavigate) {
       setDebouncedQuery('');
+      setPreviousHits(null);
     }
+  }
+
+  function handleValueChange(nextValue: string) {
+    if (!nextValue.trim()) {
+      setPreviousHits(null);
+    } else if (hasQuery && !isPending) {
+      setPreviousHits(hits);
+    }
+
+    setValue(nextValue);
   }
 
   function handleOpenChange(nextOpen: boolean) {
@@ -127,8 +135,9 @@ export function useHeaderSearch() {
     handleOpenChange,
     handleOpenSearch,
     handleSelect,
-    handleValueChange: setValue,
+    handleValueChange,
     hotkey,
+    isLoading: hasQuery && isPending,
     isMobile,
     open,
     status,
