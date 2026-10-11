@@ -15,6 +15,7 @@ export function FooterNav() {
       <FooterColumn title="General">
         <FooterLink href="/about">About</FooterLink>
         <FooterLink href="/beliefs">Beliefs</FooterLink>
+        <FooterLink href="/ai">Use with AI</FooterLink>
         <FooterLink href={`mailto:${site.email.contact}`}>Contact</FooterLink>
       </FooterColumn>
 

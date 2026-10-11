@@ -1,5 +1,6 @@
 import { test as base } from '@playwright/test';
 
+import { AiPage } from '../pages/ai-page.ts';
 import { AuthPage } from '../pages/auth-page.ts';
 import { CollectionsPage } from '../pages/collections-page.ts';
 import { FavoritesPage } from '../pages/favorites-page.ts';
@@ -13,6 +14,7 @@ import { TopicsPage } from '../pages/topics-page.ts';
 export { expect } from '@playwright/test';
 
 interface Fixtures {
+  aiPage: AiPage;
   authPage: AuthPage;
   collectionsPage: CollectionsPage;
   favoritesPage: FavoritesPage;
@@ -25,6 +27,9 @@ interface Fixtures {
 }
 
 export const test = base.extend<Fixtures>({
+  aiPage: async ({ page }, provide) => {
+    await provide(new AiPage(page));
+  },
   authPage: async ({ page }, provide) => {
     await provide(new AuthPage(page));
   },

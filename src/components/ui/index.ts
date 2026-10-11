@@ -2,6 +2,7 @@
 // Primitives - Vendor components from Coss UI (never edit directly)
 
 export * from './action-icon-button';
+export * from './code-block';
 export * from './combobox-multi-filter';
 export * from './container';
 export * from './fields';
