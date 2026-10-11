@@ -16,6 +16,12 @@ import { enrichWithSpeakers, paginateArray } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
 import { requireAuth } from '../auth/utils';
+import {
+  LIST_SEARCH_LIMIT,
+  searchPublishedTalksByTitleOrSpeaker,
+  searchPublishedTopics,
+} from '../search/published';
+import { normalizeSearchQuery } from '../search/utils';
 
 /**
  * Get topic by ID.
@@ -41,6 +47,7 @@ export const getTopicBySlug = query({
   },
   handler: async (ctx, args) => {
     const { paginationOpts, search, slug } = args;
+    const queryText = normalizeSearchQuery(search ?? '');
 
     const topic = await getOneFrom(ctx.db, 'topics', 'by_slug', slug);
 
@@ -57,28 +64,22 @@ export const getTopicBySlug = query({
       'topicId'
     );
 
-    const publishedTalks = allTalks.filter(
+    let publishedTalks = allTalks.filter(
       (talk): talk is Doc<'talks'> =>
         talk !== null && talk.status === 'published'
     );
 
-    // Enrich with speakers before filtering so we can search by speaker name
-    const talksWithSpeakers = await enrichWithSpeakers(ctx, publishedTalks);
-
-    // Apply search filter
-    let filteredTalks = talksWithSpeakers;
-    if (search) {
-      const searchLower = search.toLowerCase();
-      filteredTalks = talksWithSpeakers.filter((talk) => {
-        const titleMatch = talk.title.toLowerCase().includes(searchLower);
-        const speakerMatch = talk.speaker
-          ? `${talk.speaker.firstName ?? ''} ${talk.speaker.lastName ?? ''}`
-              .toLowerCase()
-              .includes(searchLower)
-          : false;
-        return titleMatch || speakerMatch;
-      });
+    if (queryText) {
+      const matches = await searchPublishedTalksByTitleOrSpeaker(
+        ctx,
+        queryText,
+        LIST_SEARCH_LIMIT
+      );
+      const matchIds = new Set(matches.map((talk) => talk._id));
+      publishedTalks = publishedTalks.filter((talk) => matchIds.has(talk._id));
     }
+
+    const filteredTalks = await enrichWithSpeakers(ctx, publishedTalks);
 
     const { continueCursor, isDone, page } = paginateArray(
       filteredTalks,
@@ -198,11 +199,11 @@ export const listTopicsWithCount = query({
   },
   handler: async (ctx, args) => {
     const { limit = 100, search, sort = 'alphabetical' } = args;
+    const queryText = normalizeSearchQuery(search ?? '');
 
-    const topics = await ctx.db
-      .query('topics')
-      .withIndex('by_title')
-      .take(limit);
+    const topics = queryText
+      ? await searchPublishedTopics(ctx, queryText, limit)
+      : await ctx.db.query('topics').withIndex('by_title').take(limit);
 
     const topicsWithCounts = await asyncMap(topics, async (topic) => {
       const talksOnTopics = await getManyFrom(
@@ -226,16 +227,7 @@ export const listTopicsWithCount = query({
       };
     });
 
-    // Filter to topics with at least one published talk
-    let results = topicsWithCounts.filter((item) => item.count > 0);
-
-    // Apply search filter
-    if (search) {
-      const searchLower = search.toLowerCase();
-      results = results.filter((item) =>
-        item.topic.title.toLowerCase().includes(searchLower)
-      );
-    }
+    const results = topicsWithCounts.filter((item) => item.count > 0);
 
     // Apply sorting
     results.sort(getTopicComparator(sort as TopicSortOption));

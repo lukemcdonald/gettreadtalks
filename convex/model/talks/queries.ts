@@ -16,16 +16,17 @@ import { query } from '../../_generated/server';
 import { getTalkIdsByTopicSlugs } from '../../lib/filters';
 import { rotateContent } from '../../lib/rotateContent';
 import { getContentComparator } from '../../lib/sort';
-import {
-  applySearchFilter,
-  enrichWithSpeakers,
-  paginateArray,
-} from '../../lib/utils';
+import { enrichWithSpeakers, paginateArray } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
 import { statusFilterType } from '../../lib/validators/shared';
 import { canViewContent } from '../auth/roles';
 import { getCurrentUser, requireAuth } from '../auth/utils';
+import {
+  LIST_SEARCH_LIMIT,
+  searchPublishedTalksByTitleOrSpeaker,
+} from '../search/published';
+import { normalizeSearchQuery } from '../search/utils';
 import { enrichWithTopics, filterTalksByTitleOrSpeaker } from './utils';
 
 /**
@@ -344,9 +345,12 @@ export const listTalks = query({
       topicSlugs,
     } = args;
 
+    const queryText = normalizeSearchQuery(search ?? '');
+    const hasSearch = queryText.length > 0;
     const hasSpeakerFilter = speakerSlugs && speakerSlugs.length > 0;
     const hasTopicFilter = topicSlugs && topicSlugs.length > 0;
-    const hasFilters = search || hasSpeakerFilter || hasTopicFilter || featured;
+    const hasFilters =
+      hasSearch || hasSpeakerFilter || hasTopicFilter || featured;
     const needsCustomSort = sort !== 'recent';
 
     // When no filters and default sort, use native Convex pagination for efficiency
@@ -368,19 +372,19 @@ export const listTalks = query({
       };
     }
 
-    // With filters or custom sort, collect all and paginate in-memory
-    let talks = await ctx.db
-      .query('talks')
-      .withIndex('by_status_and_publishedAt', (q) =>
-        q.eq('status', 'published')
-      )
-      .order('desc')
-      .collect();
-
-    // Apply search filter
-    if (search) {
-      talks = applySearchFilter(talks, search);
-    }
+    let talks = hasSearch
+      ? await searchPublishedTalksByTitleOrSpeaker(
+          ctx,
+          queryText,
+          LIST_SEARCH_LIMIT
+        )
+      : await ctx.db
+          .query('talks')
+          .withIndex('by_status_and_publishedAt', (q) =>
+            q.eq('status', 'published')
+          )
+          .order('desc')
+          .collect();
 
     // Apply speaker filter (multi-select)
     if (hasSpeakerFilter) {

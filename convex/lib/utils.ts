@@ -201,21 +201,6 @@ export async function deleteAll<T extends { _id: Id<TableNames> }>(
 }
 
 /**
- * Apply text search filter to array of items with a title field.
- * Generic utility for client-side text filtering.
- */
-export function applySearchFilter<T extends { title: string }>(
-  items: T[],
-  search?: string
-): T[] {
-  if (!search) {
-    return items;
-  }
-  const searchLower = search.toLowerCase();
-  return items.filter((item) => item.title.toLowerCase().includes(searchLower));
-}
-
-/**
  * Enrich items with speaker data.
  * Works with any entity that has a speakerId field (talks, clips, etc).
  */

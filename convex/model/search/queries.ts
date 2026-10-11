@@ -4,16 +4,15 @@ import type { QueryCtx } from '../../_generated/server';
 import { v } from 'convex/values';
 
 import { query } from '../../_generated/server';
-import {
-  filterClipsByPublishedTalks,
-  filterSpeakersWithPublishedTalks,
-  filterTopicsWithPublishedTalks,
-} from '../../lib/filters';
 import { enrichWithSpeakers } from '../../lib/utils';
-import { normalizeSearchQuery, searchPhrases, uniqueById } from './utils';
-
-const DEFAULT_SEARCH_LIMIT = 12;
-const UNFILTERED_SEARCH_MULTIPLIER = 3;
+import {
+  DEFAULT_SEARCH_LIMIT,
+  searchPublishedClips,
+  searchPublishedSpeakers,
+  searchPublishedTalks,
+  searchPublishedTopics,
+} from './published';
+import { normalizeSearchQuery } from './utils';
 
 const searchSpeakerValidator = v.object({
   firstName: v.string(),
@@ -70,17 +69,7 @@ function toSearchSpeaker(speaker: Doc<'speakers'> | null) {
   };
 }
 
-async function searchPublishedTalks(
-  ctx: QueryCtx,
-  queryText: string,
-  limit: number
-) {
-  const talks = await ctx.db
-    .query('talks')
-    .withSearchIndex('search_title', (q) =>
-      q.search('title', queryText).eq('status', 'published')
-    )
-    .take(limit);
+async function toSearchTalks(ctx: QueryCtx, talks: Doc<'talks'>[]) {
   const talksWithSpeakers = await enrichWithSpeakers(ctx, talks);
 
   return talksWithSpeakers.map((talk) => ({
@@ -92,80 +81,9 @@ async function searchPublishedTalks(
   }));
 }
 
-async function searchPublishedSpeakers(
-  ctx: QueryCtx,
-  queryText: string,
-  limit: number
-) {
-  const candidateLimit = limit * UNFILTERED_SEARCH_MULTIPLIER;
-  const phrases = searchPhrases(queryText);
-  const matches = await Promise.all([
-    ...phrases.map((phrase) =>
-      ctx.db
-        .query('speakers')
-        .withSearchIndex('search_firstName', (q) =>
-          q.search('firstName', phrase)
-        )
-        .take(candidateLimit)
-    ),
-    ...phrases.map((phrase) =>
-      ctx.db
-        .query('speakers')
-        .withSearchIndex('search_lastName', (q) => q.search('lastName', phrase))
-        .take(candidateLimit)
-    ),
-  ]);
-
-  const speakers = await filterSpeakersWithPublishedTalks(
-    ctx,
-    uniqueById(matches.flat())
-  );
-
-  return speakers.slice(0, limit).map((speaker) => ({
-    _id: speaker._id,
-    firstName: speaker.firstName,
-    lastName: speaker.lastName,
-    ministry: speaker.ministry,
-    slug: speaker.slug,
-  }));
-}
-
-async function searchPublishedTopics(
-  ctx: QueryCtx,
-  queryText: string,
-  limit: number
-) {
-  const topics = await ctx.db
-    .query('topics')
-    .withSearchIndex('search_title', (q) => q.search('title', queryText))
-    .take(limit * UNFILTERED_SEARCH_MULTIPLIER);
-  const published = await filterTopicsWithPublishedTalks(ctx, topics);
-
-  return published.slice(0, limit).map((topic) => ({
-    _id: topic._id,
-    slug: topic.slug,
-    title: topic.title,
-  }));
-}
-
-async function searchPublishedClips(
-  ctx: QueryCtx,
-  queryText: string,
-  limit: number
-) {
-  const clips = await filterClipsByPublishedTalks(
-    ctx,
-    await ctx.db
-      .query('clips')
-      .withSearchIndex('search_title', (q) =>
-        q.search('title', queryText).eq('status', 'published')
-      )
-      .take(limit)
-  );
-  const limited = clips.slice(0, limit);
-
+async function toSearchClips(ctx: QueryCtx, clips: Doc<'clips'>[]) {
   return await Promise.all(
-    limited.map(async (clip) => {
+    clips.map(async (clip) => {
       const speaker = clip.speakerId
         ? await ctx.db.get('speakers', clip.speakerId)
         : null;
@@ -202,10 +120,20 @@ export const searchSite = query({
     ]);
 
     return {
-      clips,
-      speakers,
-      talks,
-      topics,
+      clips: await toSearchClips(ctx, clips),
+      speakers: speakers.map((speaker) => ({
+        _id: speaker._id,
+        firstName: speaker.firstName,
+        lastName: speaker.lastName,
+        ministry: speaker.ministry,
+        slug: speaker.slug,
+      })),
+      talks: await toSearchTalks(ctx, talks),
+      topics: topics.map((topic) => ({
+        _id: topic._id,
+        slug: topic.slug,
+        title: topic.title,
+      })),
     };
   },
   returns: v.object({
