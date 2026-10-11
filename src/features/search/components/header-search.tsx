@@ -4,7 +4,7 @@ import type { ButtonProps } from '@/components/ui';
 import type { KeyboardEvent } from 'react';
 
 import { SearchIcon } from 'lucide-react';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect, useId, useState, useSyncExternalStore } from 'react';
 
 import {
@@ -94,14 +94,8 @@ function HeaderSearchTrigger({
   );
 }
 
-export function HeaderSearch() {
-  const pathname = usePathname();
-
-  return <HeaderSearchPanel key={pathname} />;
-}
-
 // fallow-ignore-next-line complexity
-function HeaderSearchPanel() {
+export function HeaderSearch() {
   const hotkey = useSyncExternalStore(
     subscribeSearchHotkey,
     getClientSearchHotkeyLabel,

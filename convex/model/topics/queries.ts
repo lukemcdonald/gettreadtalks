@@ -20,7 +20,7 @@ import {
   LIST_SEARCH_LIMIT,
   searchPublishedTalksByTitleOrSpeaker,
   searchPublishedTopics,
-} from '../search/published';
+} from '../search/queries';
 import { normalizeSearchQuery } from '../search/utils';
 
 /**

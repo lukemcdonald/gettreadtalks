@@ -25,7 +25,7 @@ import { getCurrentUser, requireAuth } from '../auth/utils';
 import {
   LIST_SEARCH_LIMIT,
   searchPublishedTalksByTitleOrSpeaker,
-} from '../search/published';
+} from '../search/queries';
 import { normalizeSearchQuery } from '../search/utils';
 import { enrichWithTopics, filterTalksByTitleOrSpeaker } from './utils';
 

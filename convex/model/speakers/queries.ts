@@ -16,10 +16,7 @@ import { getSpeakerComparator } from '../../lib/sort';
 import { paginateArray } from '../../lib/utils';
 import { doc, docs } from '../../lib/validators/schema';
 import { requireAuth } from '../auth/utils';
-import {
-  LIST_SEARCH_LIMIT,
-  searchPublishedSpeakers,
-} from '../search/published';
+import { LIST_SEARCH_LIMIT, searchPublishedSpeakers } from '../search/queries';
 import { normalizeSearchQuery } from '../search/utils';
 import { speakerRoleType } from './validators';
 

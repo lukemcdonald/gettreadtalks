@@ -16,7 +16,7 @@ import { doc, docs } from '../../lib/validators/schema';
 import { statusFilterType } from '../../lib/validators/shared';
 import { canViewContent } from '../auth/roles';
 import { getCurrentUser } from '../auth/utils';
-import { LIST_SEARCH_LIMIT, searchPublishedClips } from '../search/published';
+import { LIST_SEARCH_LIMIT, searchPublishedClips } from '../search/queries';
 import { normalizeSearchQuery } from '../search/utils';
 
 const clipPageWithSpeakersValidator = paginationResultValidator(
