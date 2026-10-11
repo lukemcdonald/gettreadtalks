@@ -1,4 +1,6 @@
 import type {
+  CommandSearchGroup,
+  HeaderSearchStatus,
   SearchHit,
   SearchResultType,
   SiteSearchResult,
@@ -13,6 +15,7 @@ export const OPEN_HEADER_SEARCH_EVENT = 'tread:open-header-search';
 export const SEARCH_DEBOUNCE_MS = 300;
 export const SEARCH_DROPDOWN_LIMIT = 4;
 export const SEARCH_PAGE_LIMIT = 12;
+export const VIEW_ALL_SEARCH_GROUP = 'view-all';
 
 export const emptySiteSearch: SiteSearchResult = {
   clips: [],
@@ -32,48 +35,32 @@ function getSearchGroupLabel(type: SearchResultType) {
   return SEARCH_GROUP_LABELS[type];
 }
 
-export function getNextActiveIndex(
-  current: number,
-  delta: number,
-  length: number
-) {
-  if (length === 0) {
-    return -1;
-  }
-
-  if (delta > 0) {
-    return (current + 1) % length;
-  }
-
-  if (current <= 0) {
-    return length - 1;
-  }
-
-  return current - 1;
-}
-
 export function getSearchHotkeyLabel(userAgent = '') {
   return /Mac|iPhone|iPad|iPod/u.test(userAgent) ? '⌘K' : 'Ctrl K';
 }
 
-export function getSearchInputAction(key: string, hasActiveHit: boolean) {
-  if (key === 'ArrowDown') {
-    return 'next';
+export function getHeaderSearchStatus({
+  hasQuery,
+  hasResults,
+  isLoading,
+}: {
+  hasQuery: boolean;
+  hasResults: boolean;
+  isLoading: boolean;
+}): HeaderSearchStatus {
+  if (!hasQuery) {
+    return 'idle';
   }
 
-  if (key === 'ArrowUp') {
-    return 'previous';
+  if (isLoading) {
+    return 'loading';
   }
 
-  if (key === 'Enter' && hasActiveHit) {
-    return 'select';
+  if (hasResults) {
+    return 'results';
   }
 
-  if (key === 'Escape') {
-    return 'close';
-  }
-
-  return null;
+  return 'empty';
 }
 
 export function isSearchHotkey(event: {
@@ -167,6 +154,40 @@ export function groupSearchHits(hits: SearchHit[]) {
     label: getSearchGroupLabel(type),
     type,
   })).filter((group) => group.hits.length > 0);
+}
+
+export function toCommandGroups(
+  hits: SearchHit[],
+  query: string
+): CommandSearchGroup[] {
+  const groups = groupSearchHits(hits).map((group) => ({
+    items: group.hits.map((hit) => ({
+      href: hit.href,
+      label: hit.title,
+      subtitle: hit.subtitle,
+      value: hit.id,
+    })),
+    value: group.label,
+  }));
+  const trimmedQuery = query.trim();
+
+  if (!trimmedQuery) {
+    return groups;
+  }
+
+  return [
+    ...groups,
+    {
+      items: [
+        {
+          href: getSearchPageHref(trimmedQuery),
+          label: 'View all results',
+          value: VIEW_ALL_SEARCH_GROUP,
+        },
+      ],
+      value: VIEW_ALL_SEARCH_GROUP,
+    },
+  ];
 }
 
 export function hasSearchHits(result: SiteSearchResult) {

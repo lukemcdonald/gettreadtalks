@@ -6,7 +6,7 @@ test('Search / Site-wide', async ({ homePage, searchPage }) => {
 
   await expect(searchPage.dropdownResult('Grace')).toBeVisible();
 
-  await searchPage.submit();
+  await searchPage.viewAll.click();
 
   await expect(searchPage.page).toHaveURL(/\/search\?search=grace/u);
   await expect(searchPage.heading).toBeVisible();
@@ -18,6 +18,10 @@ test('Search / Keyboard shortcut', async ({ homePage, searchPage }) => {
   await searchPage.page.keyboard.press('ControlOrMeta+K');
 
   await expect(searchPage.input).toBeVisible();
+
+  await searchPage.page.keyboard.press('ControlOrMeta+K');
+
+  await expect(searchPage.input).toBeHidden();
 });
 
 test('Search / Keeps query on dismiss and clears after navigate', async ({

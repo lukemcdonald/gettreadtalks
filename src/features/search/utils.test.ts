@@ -7,15 +7,16 @@ register(new URL('../../../scripts/node-test-hooks.mjs', import.meta.url));
 const {
   emptySiteSearch,
   getHeaderSearchQueryAfterClose,
-  getNextActiveIndex,
+  getHeaderSearchStatus,
   getSearchHotkeyLabel,
-  getSearchInputAction,
   getSearchPageHref,
   getSearchQuery,
   groupSearchHits,
   hasSearchHits,
   isSearchHotkey,
+  toCommandGroups,
   toSearchHits,
+  VIEW_ALL_SEARCH_GROUP,
 } = await import('./utils.ts');
 
 const result = {
@@ -144,15 +145,40 @@ describe('hasSearchHits', () => {
   });
 });
 
-describe('getNextActiveIndex', () => {
-  test('wraps forward and backward through hits', () => {
-    assert.equal(getNextActiveIndex(-1, 1, 3), 0);
-    assert.equal(getNextActiveIndex(2, 1, 3), 0);
-    assert.equal(getNextActiveIndex(0, -1, 3), 2);
-  });
-
-  test('stays empty when there are no hits', () => {
-    assert.equal(getNextActiveIndex(0, 1, 0), -1);
+describe('getHeaderSearchStatus', () => {
+  test('returns idle, loading, empty, or results', () => {
+    assert.equal(
+      getHeaderSearchStatus({
+        hasQuery: false,
+        hasResults: false,
+        isLoading: false,
+      }),
+      'idle'
+    );
+    assert.equal(
+      getHeaderSearchStatus({
+        hasQuery: true,
+        hasResults: false,
+        isLoading: true,
+      }),
+      'loading'
+    );
+    assert.equal(
+      getHeaderSearchStatus({
+        hasQuery: true,
+        hasResults: false,
+        isLoading: false,
+      }),
+      'empty'
+    );
+    assert.equal(
+      getHeaderSearchStatus({
+        hasQuery: true,
+        hasResults: true,
+        isLoading: false,
+      }),
+      'results'
+    );
   });
 });
 
@@ -177,13 +203,20 @@ describe('getSearchHotkeyLabel', () => {
   });
 });
 
-describe('getSearchInputAction', () => {
-  test('maps keyboard keys used by the dropdown', () => {
-    assert.equal(getSearchInputAction('ArrowDown', false), 'next');
-    assert.equal(getSearchInputAction('ArrowUp', false), 'previous');
-    assert.equal(getSearchInputAction('Enter', true), 'select');
-    assert.equal(getSearchInputAction('Enter', false), null);
-    assert.equal(getSearchInputAction('Escape', false), 'close');
+describe('toCommandGroups', () => {
+  test('keeps group order and appends view all when there is a query', () => {
+    const groups = toCommandGroups(toSearchHits(result), 'grace');
+
+    assert.deepEqual(
+      groups.map((group) => group.value),
+      ['Talks', 'Speakers', 'Topics', 'Clips', VIEW_ALL_SEARCH_GROUP]
+    );
+    assert.equal(groups.at(-1)?.items[0]?.href, '/search?search=grace');
+    assert.equal(groups.at(-1)?.items[0]?.label, 'View all results');
+  });
+
+  test('stays empty when there is no query', () => {
+    assert.deepEqual(toCommandGroups([], ''), []);
   });
 });
 

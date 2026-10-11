@@ -16,11 +16,11 @@ export class SearchPage {
       level: 1,
       name: 'Search',
     });
-    this.input = page.getByRole('searchbox', {
+    this.input = page.getByRole('combobox', {
       name: 'Search talks, speakers, topics, and clips',
     });
     this.pageSearch = page.getByRole('searchbox', { name: 'Search' });
-    this.viewAll = page.getByRole('link', { name: 'View all results' });
+    this.viewAll = page.getByRole('option', { name: 'View all results' });
   }
 
   dropdownResult(name: string) {
@@ -48,9 +48,5 @@ export class SearchPage {
   async searchFor(query: string) {
     await this.open();
     await this.input.fill(query);
-  }
-
-  async submit() {
-    await this.input.press('Enter');
   }
 }

@@ -1,61 +1,54 @@
 'use client';
 
 import type { ButtonProps } from '@/components/ui';
-import type { KeyboardEvent } from 'react';
+import type {
+  CommandSearchGroup,
+  CommandSearchItem,
+  HeaderSearchStatus,
+} from '@/features/search/types';
 
-import { SearchIcon } from 'lucide-react';
+import {
+  ArrowDownIcon,
+  ArrowUpIcon,
+  CornerDownLeftIcon,
+  SearchIcon,
+} from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useId, useState, useSyncExternalStore } from 'react';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 
 import {
   Button,
-  Input,
+  Command,
+  CommandCollection,
+  CommandDialog,
+  CommandDialogPopup,
+  CommandDialogTrigger,
+  CommandFooter,
+  CommandGroup,
+  CommandGroupLabel,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandPanel,
+  CommandSeparator,
+  DialogTitle,
   Kbd,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
+  KbdGroup,
 } from '@/components/ui';
-import { Link } from '@/components/ui/link';
-import { SearchResultGroups } from '@/features/search/components/search-result-groups';
 import { useSearchSite } from '@/features/search/hooks/use-search-site';
 import {
   getHeaderSearchQueryAfterClose,
-  getNextActiveIndex,
+  getHeaderSearchStatus,
   getSearchHotkeyLabel,
-  getSearchInputAction,
-  getSearchPageHref,
-  hasSearchHits,
   isSearchHotkey,
   OPEN_HEADER_SEARCH_EVENT,
   SEARCH_DEBOUNCE_MS,
   SEARCH_DROPDOWN_LIMIT,
+  toCommandGroups,
   toSearchHits,
+  VIEW_ALL_SEARCH_GROUP,
 } from '@/features/search/utils';
 import { cn } from '@/utils';
-
-function getDropdownStatus({
-  hasQuery,
-  hasResults,
-  isLoading,
-}: {
-  hasQuery: boolean;
-  hasResults: boolean;
-  isLoading: boolean;
-}) {
-  if (!hasQuery) {
-    return 'idle';
-  }
-
-  if (isLoading) {
-    return 'loading';
-  }
-
-  if (hasResults) {
-    return 'results';
-  }
-
-  return 'empty';
-}
 
 function getClientSearchHotkeyLabel() {
   return getSearchHotkeyLabel(navigator.userAgent);
@@ -78,48 +71,178 @@ function HeaderSearchTrigger({
     <Button
       aria-keyshortcuts="Control+K Meta+K"
       aria-label="Search"
-      className={cn(
-        'md:border-input md:bg-popover md:hover:bg-accent/50 md:h-9 md:w-56 md:justify-start md:px-2.5 md:shadow-xs/5',
-        className
-      )}
+      className={cn('md:h-9 md:w-auto md:justify-start md:px-2.5', className)}
       data-testid="search-cta"
       size="icon-lg"
       variant="ghost"
       {...delegated}
     >
       <SearchIcon className="size-6 md:size-4" />
-      <span className="text-muted-foreground hidden md:inline">Search…</span>
+      <span className="hidden md:inline">Search</span>
       <Kbd className="ms-auto hidden md:inline-flex">{hotkey}</Kbd>
     </Button>
   );
 }
 
-// fallow-ignore-next-line complexity
+function HeaderSearchItem({
+  item,
+  onSelect,
+}: {
+  item: CommandSearchItem;
+  onSelect: (item: CommandSearchItem) => void;
+}) {
+  return (
+    <CommandItem
+      onClick={() => {
+        onSelect(item);
+      }}
+      value={item.value}
+    >
+      <span className="flex min-w-0 flex-1 flex-col">
+        <span>{item.label}</span>
+        {!!item.subtitle && (
+          <span className="text-muted-foreground text-sm">{item.subtitle}</span>
+        )}
+      </span>
+    </CommandItem>
+  );
+}
+
+function HeaderSearchStatusMessage({ status }: { status: HeaderSearchStatus }) {
+  if (status === 'loading') {
+    return (
+      <p className="text-muted-foreground px-2 py-6 text-center text-sm">
+        Searching...
+      </p>
+    );
+  }
+
+  if (status === 'empty') {
+    return (
+      <p className="text-muted-foreground px-2 py-6 text-center text-sm">
+        No results
+      </p>
+    );
+  }
+
+  return null;
+}
+
+function HeaderSearchGroup({
+  group,
+  onSelect,
+}: {
+  group: CommandSearchGroup;
+  onSelect: (item: CommandSearchItem) => void;
+}) {
+  return (
+    <>
+      <CommandGroup items={group.items}>
+        {group.value === VIEW_ALL_SEARCH_GROUP ? null : (
+          <CommandGroupLabel>{group.value}</CommandGroupLabel>
+        )}
+        <CommandCollection>
+          {(item: CommandSearchItem) => (
+            <HeaderSearchItem
+              item={item}
+              key={item.value}
+              onSelect={onSelect}
+            />
+          )}
+        </CommandCollection>
+      </CommandGroup>
+      <CommandSeparator />
+    </>
+  );
+}
+
+function HeaderSearchResults({
+  groups,
+  onSelect,
+  status,
+}: {
+  groups: CommandSearchGroup[];
+  onSelect: (item: CommandSearchItem) => void;
+  status: HeaderSearchStatus;
+}) {
+  if (status === 'idle') {
+    return null;
+  }
+
+  return (
+    <CommandPanel>
+      <HeaderSearchStatusMessage status={status} />
+      {groups.length > 0 ? (
+        <CommandList>
+          {(group: CommandSearchGroup) => (
+            <HeaderSearchGroup
+              group={group}
+              key={group.value}
+              onSelect={onSelect}
+            />
+          )}
+        </CommandList>
+      ) : null}
+    </CommandPanel>
+  );
+}
+
+function HeaderSearchFooter() {
+  return (
+    <CommandFooter className="hidden md:flex">
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
+          <KbdGroup>
+            <Kbd>
+              <ArrowUpIcon />
+            </Kbd>
+            <Kbd>
+              <ArrowDownIcon />
+            </Kbd>
+          </KbdGroup>
+          <span>Navigate</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Kbd>
+            <CornerDownLeftIcon />
+          </Kbd>
+          <span>Open</span>
+        </div>
+      </div>
+      <div className="flex items-center gap-2">
+        <Kbd>Esc</Kbd>
+        <span>Close</span>
+      </div>
+    </CommandFooter>
+  );
+}
+
 export function HeaderSearch() {
   const hotkey = useSyncExternalStore(
     subscribeSearchHotkey,
     getClientSearchHotkeyLabel,
     getServerSearchHotkeyLabel
   );
-  const listboxId = useId();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
-  const [activeIndex, setActiveIndex] = useState(-1);
   const { isLoading, results } = useSearchSite(
     debouncedQuery,
     SEARCH_DROPDOWN_LIMIT
   );
   const hits = toSearchHits(results);
-  const activeHit = hits[activeIndex];
   const hasQuery = value.trim().length > 0;
   const isPending = value.trim() !== debouncedQuery;
-  const status = getDropdownStatus({
+  const status = getHeaderSearchStatus({
     hasQuery,
-    hasResults: hasSearchHits(results),
+    hasResults: hits.length > 0,
     isLoading: isLoading || isPending,
   });
+  const groups = toCommandGroups(
+    status === 'results' ? hits : [],
+    hasQuery ? value : ''
+  );
 
   useEffect(() => {
     function onOpenHeaderSearch() {
@@ -132,7 +255,7 @@ export function HeaderSearch() {
       }
 
       event.preventDefault();
-      setOpen(true);
+      setOpen((isOpen) => !isOpen);
     }
 
     window.addEventListener('keydown', onWindowKeyDown);
@@ -154,31 +277,7 @@ export function HeaderSearch() {
     };
   }, [value]);
 
-  useEffect(() => {
-    if (!open || hasQuery) {
-      return;
-    }
-
-    const openedAt = Date.now();
-
-    function onPageScroll() {
-      if (Date.now() - openedAt < SEARCH_DEBOUNCE_MS) {
-        return;
-      }
-
-      setActiveIndex(-1);
-      setOpen(false);
-    }
-
-    window.addEventListener('scroll', onPageScroll, { passive: true });
-
-    return () => {
-      window.removeEventListener('scroll', onPageScroll);
-    };
-  }, [hasQuery, open]);
-
   function close(didNavigate = false) {
-    setActiveIndex(-1);
     setOpen(false);
     setValue((query) => getHeaderSearchQueryAfterClose(query, didNavigate));
 
@@ -187,47 +286,13 @@ export function HeaderSearch() {
     }
   }
 
-  function goToResults() {
-    const query = value.trim();
-
-    if (!query) {
-      return;
-    }
-
-    router.push(getSearchPageHref(query));
+  function onSelect(item: CommandSearchItem) {
+    router.push(item.href);
     close(true);
   }
 
-  // fallow-ignore-next-line complexity
-  function onKeyDown(event: KeyboardEvent<HTMLInputElement>) {
-    const action = getSearchInputAction(event.key, Boolean(activeHit));
-
-    if (!action) {
-      return;
-    }
-
-    event.preventDefault();
-
-    if (action === 'next' || action === 'previous') {
-      setActiveIndex((index) =>
-        getNextActiveIndex(index, action === 'next' ? 1 : -1, hits.length)
-      );
-      return;
-    }
-
-    if (action === 'select' && activeHit) {
-      router.push(activeHit.href);
-      close(true);
-      return;
-    }
-
-    if (action === 'close') {
-      close();
-    }
-  }
-
   return (
-    <Popover
+    <CommandDialog
       onOpenChange={(nextOpen) => {
         if (nextOpen) {
           setOpen(true);
@@ -238,86 +303,33 @@ export function HeaderSearch() {
       }}
       open={open}
     >
-      <PopoverTrigger render={<HeaderSearchTrigger hotkey={hotkey} />} />
-      <PopoverContent
-        align="end"
-        className="w-96 max-w-full p-0 md:w-64 [&_[data-slot=popover-viewport]]:p-0 [&_[data-slot=popover-viewport]]:[--viewport-inline-padding:0px]"
-      >
-        <form
-          className={cn(
-            'flex items-center gap-2 px-2 py-1.5',
-            hasQuery && 'border-border/50 border-b'
-          )}
-          onSubmit={(event) => {
-            event.preventDefault();
-            goToResults();
-          }}
-        >
-          <SearchIcon
-            aria-hidden
-            className="text-muted-foreground size-4 shrink-0 opacity-80"
-          />
-          <Input
-            aria-activedescendant={
-              activeHit ? `search-hit-${activeHit.id}` : undefined
+      <CommandDialogTrigger render={<HeaderSearchTrigger hotkey={hotkey} />} />
+      <CommandDialogPopup>
+        <DialogTitle className="sr-only">Search</DialogTitle>
+        <Command
+          items={groups}
+          mode="none"
+          onValueChange={(nextValue, eventDetails) => {
+            if (eventDetails.reason === 'item-press') {
+              return;
             }
-            aria-autocomplete="list"
-            aria-controls={listboxId}
-            aria-expanded={open}
+
+            setValue(nextValue);
+          }}
+          value={value}
+        >
+          <CommandInput
             aria-label="Search talks, speakers, topics, and clips"
-            autoFocus
-            className="min-w-0 flex-1 **:data-[slot=input]:px-0"
-            onChange={(event) => {
-              setActiveIndex(-1);
-              setValue(event.target.value);
-            }}
-            onKeyDown={onKeyDown}
             placeholder="Search talks, speakers, topics, and clips"
-            size="lg"
-            type="search"
-            unstyled
-            value={value}
           />
-        </form>
-        {status === 'idle' ? null : (
-          <div className="max-h-80 overflow-y-auto py-1">
-            {status === 'loading' ? (
-              <p className="text-muted-foreground px-2 py-1.5 text-sm">
-                Searching...
-              </p>
-            ) : null}
-            {status === 'empty' ? (
-              <p className="text-muted-foreground px-2 py-1.5 text-sm">
-                No results for &ldquo;{debouncedQuery}&rdquo;.
-              </p>
-            ) : null}
-            {status === 'results' ? (
-              <SearchResultGroups
-                activeId={activeHit?.id}
-                hits={hits}
-                listboxId={listboxId}
-                onNavigate={() => {
-                  close(true);
-                }}
-                variant="dropdown"
-              />
-            ) : null}
-          </div>
-        )}
-        {hasQuery ? (
-          <div className="border-border/50 border-t">
-            <Link
-              className="hover:bg-accent block px-2 py-1.5 text-sm font-medium"
-              href={getSearchPageHref(value.trim())}
-              onClick={() => {
-                close(true);
-              }}
-            >
-              View all results
-            </Link>
-          </div>
-        ) : null}
-      </PopoverContent>
-    </Popover>
+          <HeaderSearchResults
+            groups={groups}
+            onSelect={onSelect}
+            status={status}
+          />
+          <HeaderSearchFooter />
+        </Command>
+      </CommandDialogPopup>
+    </CommandDialog>
   );
 }

@@ -7,6 +7,20 @@ export const SEARCH_RESULT_TYPES = [
 
 export type SearchResultType = (typeof SEARCH_RESULT_TYPES)[number];
 
+export interface CommandSearchItem {
+  href: string;
+  label: string;
+  subtitle?: string;
+  value: string;
+}
+
+export interface CommandSearchGroup {
+  items: CommandSearchItem[];
+  value: string;
+}
+
+export type HeaderSearchStatus = 'empty' | 'idle' | 'loading' | 'results';
+
 export interface SearchHit {
   href: string;
   id: string;
