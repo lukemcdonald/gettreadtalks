@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 
 import { CenteredLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
+import { Link } from '@/components/ui/link';
 import { site } from '@/configs/site';
 
 export const metadata: Metadata = {
@@ -52,6 +53,18 @@ function AboutContent() {
         hearing of God’s Word, so that we may walk as children of light, to the
         praise and glory of God.
       </p>
+
+      <section className="space-y-3">
+        <h2 className="text-lg font-semibold">Use with AI</h2>
+        <p>
+          Connect Claude, ChatGPT, or Cursor to search talks, speakers, topics,
+          collections, and clips.{' '}
+          <Link className="hover:underline" href="/ai">
+            How to set it up
+          </Link>
+          .
+        </p>
+      </section>
     </>
   );
 }
