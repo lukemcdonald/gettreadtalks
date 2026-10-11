@@ -9,6 +9,7 @@ import { SEARCH_RESULT_TYPES } from '@/features/search/types';
 import { getSpeakerName } from '@/features/speakers/utils';
 import { getTalkUrl } from '@/features/talks/utils';
 
+export const OPEN_HEADER_SEARCH_EVENT = 'tread:open-header-search';
 export const SEARCH_DEBOUNCE_MS = 300;
 export const SEARCH_DROPDOWN_LIMIT = 4;
 export const SEARCH_PAGE_LIMIT = 12;
@@ -92,6 +93,17 @@ export function isSearchHotkey(event: {
   }
 
   return event.key.toLowerCase() === 'k';
+}
+
+export function getHeaderSearchQueryAfterClose(
+  query: string,
+  didNavigate: boolean
+) {
+  return didNavigate ? '' : query;
+}
+
+export function openHeaderSearch() {
+  window.dispatchEvent(new Event(OPEN_HEADER_SEARCH_EVENT));
 }
 
 export function getSearchQuery(search?: string | string[]) {

@@ -4,7 +4,7 @@ import type { ButtonProps } from '@/components/ui';
 import type { KeyboardEvent } from 'react';
 
 import { SearchIcon } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useId, useState, useSyncExternalStore } from 'react';
 
 import {
@@ -19,12 +19,14 @@ import { Link } from '@/components/ui/link';
 import { SearchResultGroups } from '@/features/search/components/search-result-groups';
 import { useSearchSite } from '@/features/search/hooks/use-search-site';
 import {
+  getHeaderSearchQueryAfterClose,
   getNextActiveIndex,
   getSearchHotkeyLabel,
   getSearchInputAction,
   getSearchPageHref,
   hasSearchHits,
   isSearchHotkey,
+  OPEN_HEADER_SEARCH_EVENT,
   SEARCH_DEBOUNCE_MS,
   SEARCH_DROPDOWN_LIMIT,
   toSearchHits,
@@ -92,8 +94,14 @@ function HeaderSearchTrigger({
   );
 }
 
-// fallow-ignore-next-line complexity
 export function HeaderSearch() {
+  const pathname = usePathname();
+
+  return <HeaderSearchPanel key={pathname} />;
+}
+
+// fallow-ignore-next-line complexity
+function HeaderSearchPanel() {
   const hotkey = useSyncExternalStore(
     subscribeSearchHotkey,
     getClientSearchHotkeyLabel,
@@ -120,6 +128,10 @@ export function HeaderSearch() {
   });
 
   useEffect(() => {
+    function onOpenHeaderSearch() {
+      setOpen(true);
+    }
+
     function onWindowKeyDown(event: globalThis.KeyboardEvent) {
       if (!isSearchHotkey(event)) {
         return;
@@ -130,9 +142,11 @@ export function HeaderSearch() {
     }
 
     window.addEventListener('keydown', onWindowKeyDown);
+    window.addEventListener(OPEN_HEADER_SEARCH_EVENT, onOpenHeaderSearch);
 
     return () => {
       window.removeEventListener('keydown', onWindowKeyDown);
+      window.removeEventListener(OPEN_HEADER_SEARCH_EVENT, onOpenHeaderSearch);
     };
   }, []);
 
@@ -169,9 +183,14 @@ export function HeaderSearch() {
     };
   }, [hasQuery, open]);
 
-  function close() {
-    setOpen(false);
+  function close(didNavigate = false) {
     setActiveIndex(-1);
+    setOpen(false);
+    setValue((query) => getHeaderSearchQueryAfterClose(query, didNavigate));
+
+    if (didNavigate) {
+      setDebouncedQuery('');
+    }
   }
 
   function goToResults() {
@@ -182,7 +201,7 @@ export function HeaderSearch() {
     }
 
     router.push(getSearchPageHref(query));
-    close();
+    close(true);
   }
 
   // fallow-ignore-next-line complexity
@@ -204,7 +223,7 @@ export function HeaderSearch() {
 
     if (action === 'select' && activeHit) {
       router.push(activeHit.href);
-      close();
+      close(true);
       return;
     }
 
@@ -214,7 +233,17 @@ export function HeaderSearch() {
   }
 
   return (
-    <Popover onOpenChange={setOpen} open={open}>
+    <Popover
+      onOpenChange={(nextOpen) => {
+        if (nextOpen) {
+          setOpen(true);
+          return;
+        }
+
+        close();
+      }}
+      open={open}
+    >
       <PopoverTrigger render={<HeaderSearchTrigger hotkey={hotkey} />} />
       <PopoverContent
         align="end"
@@ -273,7 +302,9 @@ export function HeaderSearch() {
                 activeId={activeHit?.id}
                 hits={hits}
                 listboxId={listboxId}
-                onNavigate={close}
+                onNavigate={() => {
+                  close(true);
+                }}
                 variant="dropdown"
               />
             ) : null}
@@ -284,7 +315,9 @@ export function HeaderSearch() {
             <Link
               className="hover:bg-accent block px-2 py-1.5 text-sm font-medium"
               href={getSearchPageHref(value.trim())}
-              onClick={close}
+              onClick={() => {
+                close(true);
+              }}
             >
               View all results
             </Link>

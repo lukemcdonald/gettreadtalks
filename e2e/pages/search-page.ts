@@ -6,6 +6,7 @@ export class SearchPage {
   readonly input: Locator;
   readonly page: Page;
   readonly pageSearch: Locator;
+  readonly viewAll: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -19,6 +20,7 @@ export class SearchPage {
       name: 'Search talks, speakers, topics, and clips',
     });
     this.pageSearch = page.getByRole('searchbox', { name: 'Search' });
+    this.viewAll = page.getByRole('link', { name: 'View all results' });
   }
 
   dropdownResult(name: string) {

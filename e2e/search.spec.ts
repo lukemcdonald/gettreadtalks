@@ -19,3 +19,22 @@ test('Search / Keyboard shortcut', async ({ homePage, searchPage }) => {
 
   await expect(searchPage.input).toBeVisible();
 });
+
+test('Search / Keeps query on dismiss and clears after navigate', async ({
+  homePage,
+  searchPage,
+}) => {
+  await homePage.goto();
+  await searchPage.searchFor('grace');
+  await expect(searchPage.dropdownResult('Grace')).toBeVisible();
+
+  await searchPage.input.press('Escape');
+  await searchPage.open();
+  await expect(searchPage.input).toHaveValue('grace');
+
+  await searchPage.viewAll.click();
+  await expect(searchPage.page).toHaveURL(/\/search\?search=grace/u);
+
+  await searchPage.open();
+  await expect(searchPage.input).toHaveValue('');
+});

@@ -6,6 +6,7 @@ register(new URL('../../../scripts/node-test-hooks.mjs', import.meta.url));
 
 const {
   emptySiteSearch,
+  getHeaderSearchQueryAfterClose,
   getNextActiveIndex,
   getSearchHotkeyLabel,
   getSearchInputAction,
@@ -65,6 +66,13 @@ const result = {
     },
   ],
 };
+
+describe('getHeaderSearchQueryAfterClose', () => {
+  test('keeps the query on dismiss and clears after navigate', () => {
+    assert.equal(getHeaderSearchQueryAfterClose('grace', false), 'grace');
+    assert.equal(getHeaderSearchQueryAfterClose('grace', true), '');
+  });
+});
 
 describe('getSearchQuery', () => {
   test('trims a string and uses the first repeated param', () => {
