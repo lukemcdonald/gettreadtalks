@@ -11,7 +11,9 @@ export class AuthPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.accountMenu = page.getByTestId('account-menu');
+    this.accountMenu = page
+      .getByTestId('account-menu')
+      .filter({ visible: true });
     this.email = page.getByPlaceholder('name@example.com');
     this.password = page.locator('input[type="password"]');
     this.signIn = page.getByTestId('sign-in').filter({ visible: true });

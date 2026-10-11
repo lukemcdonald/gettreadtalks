@@ -12,5 +12,8 @@ export const topicFields = {
 export const topicTables = {
   topics: defineTable(topicFields)
     .index('by_slug', ['slug'])
-    .index('by_title', ['title']),
+    .index('by_title', ['title'])
+    .searchIndex('search_title', {
+      searchField: 'title',
+    }),
 };
