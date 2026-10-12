@@ -17,7 +17,6 @@ import {
   toSearchHits,
 } from '@/features/search/utils';
 import { useCurrentUser } from '@/features/users/hooks/use-current-user';
-import { useIsMobile } from '@/hooks/use-media-query';
 
 function getClientSearchHotkeyLabel() {
   return getSearchHotkeyLabel(navigator.userAgent);
@@ -31,13 +30,15 @@ function subscribeSearchHotkey() {
   return () => {};
 }
 
-export function useHeaderSearch() {
-  const hotkey = useSyncExternalStore(
+export function useSearchHotkeyLabel() {
+  return useSyncExternalStore(
     subscribeSearchHotkey,
     getClientSearchHotkeyLabel,
     getServerSearchHotkeyLabel
   );
-  const isMobile = useIsMobile();
+}
+
+export function useHeaderSearch() {
   const { data: user } = useCurrentUser();
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -73,12 +74,16 @@ export function useHeaderSearch() {
       setOpen((isOpen) => !isOpen);
     }
 
-    window.addEventListener('keydown', onWindowKeyDown);
-    window.addEventListener(OPEN_HEADER_SEARCH_EVENT, onOpenHeaderSearch);
+    const controller = new AbortController();
+    const { signal } = controller;
+
+    window.addEventListener('keydown', onWindowKeyDown, { signal });
+    window.addEventListener(OPEN_HEADER_SEARCH_EVENT, onOpenHeaderSearch, {
+      signal,
+    });
 
     return () => {
-      window.removeEventListener('keydown', onWindowKeyDown);
-      window.removeEventListener(OPEN_HEADER_SEARCH_EVENT, onOpenHeaderSearch);
+      controller.abort();
     };
   }, []);
 
@@ -126,19 +131,12 @@ export function useHeaderSearch() {
     close(true);
   }
 
-  function handleOpenSearch() {
-    setOpen(true);
-  }
-
   return {
     groups,
     handleOpenChange,
-    handleOpenSearch,
     handleSelect,
     handleValueChange,
-    hotkey,
     isLoading: hasQuery && isPending,
-    isMobile,
     open,
     status,
     value,

@@ -31,7 +31,11 @@ import {
   Spinner,
 } from '@/components/ui';
 import { SearchCommandResults } from '@/features/search/components/search-command-results';
-import { useHeaderSearch } from '@/features/search/hooks/use-header-search';
+import {
+  useHeaderSearch,
+  useSearchHotkeyLabel,
+} from '@/features/search/hooks/use-header-search';
+import { useIsMobile } from '@/hooks/use-media-query';
 import { cn } from '@/utils';
 
 function HeaderSearchDesktopTrigger({
@@ -43,9 +47,9 @@ function HeaderSearchDesktopTrigger({
     <Button
       aria-keyshortcuts="Control+K Meta+K"
       aria-label="Search"
-      className={cn('rounded-full', className)}
+      className={cn('rounded-full bg-transparent', className)}
       data-testid="search-cta"
-      size="lg"
+      size="sm"
       variant="outline"
       {...delegated}
     >
@@ -159,7 +163,7 @@ function SearchCommandField({
         startAddon={<SearchIcon />}
       />
       {isLoading ? (
-        <Spinner className="text-muted-foreground pointer-events-none absolute end-3 top-1/2 size-4 -translate-y-1/2" />
+        <Spinner className="text-muted-foreground pointer-events-none absolute inset-e-3 top-1/2 size-4 -translate-y-1/2" />
       ) : null}
     </div>
   );
@@ -263,19 +267,26 @@ function MobileSearchDrawer({
 }
 
 export function HeaderSearch() {
+  const hotkey = useSearchHotkeyLabel();
+  const isMobile = useIsMobile();
   const search = useHeaderSearch();
+
+  function openSearch() {
+    search.handleOpenChange(true);
+  }
 
   return (
     <>
-      {search.isMobile ? (
-        <HeaderSearchMobileTrigger onClick={search.handleOpenSearch} />
+      {isMobile ? (
+        <HeaderSearchMobileTrigger onClick={openSearch} />
       ) : (
         <HeaderSearchDesktopTrigger
-          hotkey={search.hotkey}
-          onClick={search.handleOpenSearch}
+          hotkey={hotkey}
+          onClick={openSearch}
+          className="m-1.5"
         />
       )}
-      {search.isMobile ? (
+      {isMobile ? (
         <MobileSearchDrawer
           groups={search.groups}
           isLoading={search.isLoading}

@@ -13,7 +13,7 @@ export function ModeSwitcher({ className }: { className?: string }) {
       aria-label="Toggle theme"
       className={className}
       onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
-      size="icon-lg"
+      size="icon-xl"
       title="Toggle theme"
       variant="ghost"
     >

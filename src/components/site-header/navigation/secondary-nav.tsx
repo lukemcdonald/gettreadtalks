@@ -12,7 +12,7 @@ interface SecondaryNavProps {
 
 export function SecondaryNav({ className }: SecondaryNavProps) {
   return (
-    <div className={cn('flex items-center md:gap-1', className)}>
+    <div className={cn('flex items-center', className)}>
       <HeaderSearch />
       <ModeSwitcher className="hidden size-10 md:flex" />
       <Suspense fallback={<AccountMenuSkeleton />}>
