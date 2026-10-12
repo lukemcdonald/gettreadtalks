@@ -9,7 +9,6 @@ import {
   ArrowUpIcon,
   CornerDownLeftIcon,
   SearchIcon,
-  XIcon,
 } from 'lucide-react';
 import { useRef } from 'react';
 
@@ -23,7 +22,6 @@ import {
   CommandPanel,
   DialogTitle,
   Drawer,
-  DrawerClose,
   DrawerHeader,
   DrawerPanel,
   DrawerPopup,
@@ -213,10 +211,12 @@ function MobileSearchDrawer({
 
   return (
     <Drawer
+      defaultSnapPoint={0.9}
       onOpenChange={onOpenChange}
       onOpenChangeComplete={handleOpenChangeComplete}
       open={open}
       position="bottom"
+      snapPoints={[0.9]}
     >
       <DrawerPopup showBar variant="default">
         <SearchCommand
@@ -226,33 +226,21 @@ function MobileSearchDrawer({
         >
           <DrawerHeader>
             <DrawerTitle className="sr-only">Search</DrawerTitle>
-            <div className="flex items-center gap-2">
-              <SearchCommandField
-                className="min-w-0 flex-1"
-                inputClassName="has-focus-visible:border-input"
-                isLoading={isLoading}
-                ref={inputRef}
-              />
-              <DrawerClose
-                render={
-                  <Button
-                    aria-label="Close search"
-                    size="icon-lg"
-                    variant="ghost"
-                  />
-                }
-              >
-                <XIcon />
-              </DrawerClose>
-            </div>
-          </DrawerHeader>
-          <DrawerPanel>
-            <SearchCommandResults
-              groups={groups}
-              onSelect={onSelect}
-              status={status}
+            <SearchCommandField
+              inputClassName="has-focus-visible:border-input"
+              isLoading={isLoading}
+              ref={inputRef}
             />
-          </DrawerPanel>
+          </DrawerHeader>
+          <div className="flex min-h-0 flex-1 flex-col">
+            <DrawerPanel>
+              <SearchCommandResults
+                groups={groups}
+                onSelect={onSelect}
+                status={status}
+              />
+            </DrawerPanel>
+          </div>
         </SearchCommand>
       </DrawerPopup>
     </Drawer>
