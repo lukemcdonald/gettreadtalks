@@ -34,7 +34,7 @@ import { SearchCommandResults } from '@/features/search/components/search-comman
 import { useHeaderSearch } from '@/features/search/hooks/use-header-search';
 import { cn } from '@/utils';
 
-function HeaderSearchTrigger({
+function HeaderSearchDesktopTrigger({
   className,
   hotkey,
   ...delegated
@@ -43,17 +43,30 @@ function HeaderSearchTrigger({
     <Button
       aria-keyshortcuts="Control+K Meta+K"
       aria-label="Search"
-      className={cn(
-        'md:border-input md:text-muted-foreground md:hover:border-foreground/20 md:hover:text-foreground md:h-9 md:w-auto md:gap-1 md:rounded-full md:px-2.5 md:font-normal md:before:rounded-full md:hover:bg-transparent md:data-pressed:bg-transparent',
-        className
-      )}
+      className={cn('text-muted-foreground', className)}
+      data-testid="search-cta"
+      size="sm"
+      variant="outline"
+      {...delegated}
+    >
+      <SearchIcon />
+      <span>{hotkey}</span>
+    </Button>
+  );
+}
+
+function HeaderSearchMobileTrigger({ className, ...delegated }: ButtonProps) {
+  return (
+    <Button
+      aria-keyshortcuts="Control+K Meta+K"
+      aria-label="Search"
+      className={className}
       data-testid="search-cta"
       size="icon-lg"
       variant="ghost"
       {...delegated}
     >
-      <SearchIcon className="size-6 md:size-4" />
-      <span className="hidden md:inline">{hotkey}</span>
+      <SearchIcon className="size-6" />
     </Button>
   );
 }
@@ -254,10 +267,14 @@ export function HeaderSearch() {
 
   return (
     <>
-      <HeaderSearchTrigger
-        hotkey={search.hotkey}
-        onClick={search.handleOpenSearch}
-      />
+      {search.isMobile ? (
+        <HeaderSearchMobileTrigger onClick={search.handleOpenSearch} />
+      ) : (
+        <HeaderSearchDesktopTrigger
+          hotkey={search.hotkey}
+          onClick={search.handleOpenSearch}
+        />
+      )}
       {search.isMobile ? (
         <MobileSearchDrawer
           groups={search.groups}
