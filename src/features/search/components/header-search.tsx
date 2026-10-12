@@ -43,15 +43,17 @@ function HeaderSearchTrigger({
     <Button
       aria-keyshortcuts="Control+K Meta+K"
       aria-label="Search"
-      className={cn('md:h-9 md:w-auto md:justify-start md:px-2.5', className)}
+      className={cn(
+        'md:border-input md:text-muted-foreground md:hover:border-foreground/20 md:hover:text-foreground md:h-9 md:w-auto md:gap-1 md:rounded-full md:px-2.5 md:font-normal md:before:rounded-full md:hover:bg-transparent md:data-pressed:bg-transparent',
+        className
+      )}
       data-testid="search-cta"
       size="icon-lg"
       variant="ghost"
       {...delegated}
     >
       <SearchIcon className="size-6 md:size-4" />
-      <span className="hidden md:inline">Search</span>
-      <Kbd className="ms-auto hidden md:inline-flex">{hotkey}</Kbd>
+      <span className="hidden md:inline">{hotkey}</span>
     </Button>
   );
 }
