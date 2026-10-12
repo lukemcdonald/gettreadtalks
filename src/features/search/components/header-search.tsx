@@ -2,7 +2,7 @@
 
 import type { ButtonProps } from '@/components/ui';
 import type { SearchOverlayProps } from '@/features/search/types';
-import type { CSSProperties, ReactNode } from 'react';
+import type { ReactNode, Ref } from 'react';
 
 import {
   ArrowDownIcon,
@@ -11,6 +11,7 @@ import {
   SearchIcon,
   XIcon,
 } from 'lucide-react';
+import { useRef } from 'react';
 
 import {
   AutocompleteInput,
@@ -23,6 +24,8 @@ import {
   DialogTitle,
   Drawer,
   DrawerClose,
+  DrawerHeader,
+  DrawerPanel,
   DrawerPopup,
   DrawerTitle,
   Kbd,
@@ -31,7 +34,6 @@ import {
 } from '@/components/ui';
 import { SearchCommandResults } from '@/features/search/components/search-command-results';
 import { useHeaderSearch } from '@/features/search/hooks/use-header-search';
-import { useVisualViewport } from '@/features/search/hooks/use-visual-viewport';
 import { cn } from '@/utils';
 
 function HeaderSearchTrigger({
@@ -116,25 +118,30 @@ function SearchCommand({
 }
 
 function SearchCommandField({
+  autoFocus = false,
   className,
   inputClassName,
   isLoading,
+  ref,
 }: {
+  autoFocus?: boolean;
   className?: string;
   inputClassName?: string;
   isLoading: boolean;
+  ref?: Ref<HTMLInputElement>;
 }) {
   return (
     <div className={cn('relative', className)}>
       <AutocompleteInput
         aria-label="Search talks, speakers, topics, and clips"
-        autoFocus
+        autoFocus={autoFocus}
         className={cn(
           'has-focus-visible:ring-0',
           inputClassName,
           isLoading && '*:data-[slot=autocomplete-input]:pe-9'
         )}
         placeholder="Search talks, speakers, topics, and clips"
+        ref={ref}
         size="lg"
         startAddon={<SearchIcon />}
       />
@@ -165,6 +172,7 @@ function DesktopSearchDialog({
           value={value}
         >
           <SearchCommandField
+            autoFocus
             className="px-2.5 py-1.5"
             inputClassName="border-transparent! bg-transparent! shadow-none before:hidden"
             isLoading={isLoading}
@@ -193,50 +201,58 @@ function MobileSearchDrawer({
   status,
   value,
 }: SearchOverlayProps) {
-  const viewport = useVisualViewport(open);
-  const overlayStyle = {
-    height: viewport.height ? `${viewport.height}px` : '100dvh',
-    top: viewport.offsetTop ? `${viewport.offsetTop}px` : undefined,
-  } as CSSProperties;
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  function handleOpenChangeComplete(isOpen: boolean) {
+    if (!isOpen) {
+      return;
+    }
+
+    inputRef.current?.focus({ preventScroll: true });
+  }
 
   return (
-    <Drawer onOpenChange={onOpenChange} open={open} position="bottom">
-      <DrawerPopup
-        className="fixed inset-x-0 top-0 flex min-h-0 flex-col overflow-hidden overscroll-none rounded-none border-0 pb-(--safe-area-inset-bottom,0px)"
-        style={overlayStyle}
-        variant="straight"
-      >
-        <DrawerTitle className="sr-only">Search</DrawerTitle>
+    <Drawer
+      onOpenChange={onOpenChange}
+      onOpenChangeComplete={handleOpenChangeComplete}
+      open={open}
+      position="bottom"
+    >
+      <DrawerPopup showBar variant="default">
         <SearchCommand
           groups={groups}
           onInputValueChange={onValueChange}
           value={value}
         >
-          <div className="flex items-center gap-2 p-3 pt-(--safe-area-inset-top,0.75rem)">
-            <SearchCommandField
-              className="min-w-0 flex-1"
-              inputClassName="has-focus-visible:border-input"
-              isLoading={isLoading}
-            />
-            <DrawerClose
-              render={
-                <Button
-                  aria-label="Close search"
-                  size="icon-lg"
-                  variant="ghost"
-                />
-              }
-            >
-              <XIcon />
-            </DrawerClose>
-          </div>
-          <div className="min-h-0 flex-1 touch-auto overflow-hidden">
+          <DrawerHeader>
+            <DrawerTitle className="sr-only">Search</DrawerTitle>
+            <div className="flex items-center gap-2">
+              <SearchCommandField
+                className="min-w-0 flex-1"
+                inputClassName="has-focus-visible:border-input"
+                isLoading={isLoading}
+                ref={inputRef}
+              />
+              <DrawerClose
+                render={
+                  <Button
+                    aria-label="Close search"
+                    size="icon-lg"
+                    variant="ghost"
+                  />
+                }
+              >
+                <XIcon />
+              </DrawerClose>
+            </div>
+          </DrawerHeader>
+          <DrawerPanel>
             <SearchCommandResults
               groups={groups}
               onSelect={onSelect}
               status={status}
             />
-          </div>
+          </DrawerPanel>
         </SearchCommand>
       </DrawerPopup>
     </Drawer>
