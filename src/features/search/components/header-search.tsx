@@ -43,16 +43,14 @@ function HeaderSearchDesktopTrigger({
     <Button
       aria-keyshortcuts="Control+K Meta+K"
       aria-label="Search"
-      className={cn('pe-0', className)}
+      className={className}
       data-testid="search-cta"
-      size="sm"
+      size="lg"
       variant="outline"
       {...delegated}
     >
       <SearchIcon aria-hidden="true" />
-      <span className="text-muted-foreground before:bg-input relative ms-1 px-3 text-xs font-medium before:absolute before:inset-0 before:left-0 before:w-px">
-        {hotkey}
-      </span>
+      <span className="text-muted-foreground text-xs">{hotkey}</span>
     </Button>
   );
 }
