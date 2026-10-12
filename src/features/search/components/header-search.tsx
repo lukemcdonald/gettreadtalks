@@ -43,7 +43,7 @@ function HeaderSearchDesktopTrigger({
     <Button
       aria-keyshortcuts="Control+K Meta+K"
       aria-label="Search"
-      className={className}
+      className={cn('rounded-full', className)}
       data-testid="search-cta"
       size="lg"
       variant="outline"
