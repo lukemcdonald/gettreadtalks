@@ -1,0 +1,37 @@
+src/components/site-header/mode-switcher.tsx
+  h_b34f5996212cca 16
+src/features/search/components/header-search.tsx
+  s_b7f6827e5b1377::t_e3d0bbad894f51 270-271,274-277,280-281,284-285,289
+  h_b34f5996212cca 50,52,166,286
+  s_b7f6827e5b1377::t_841e301ff3ea0b 34-38
+src/features/search/hooks/use-header-search.ts
+  s_b7f6827e5b1377::t_ab20aaf9a3d789 33-34,39-41
+  s_b7f6827e5b1377::t_239065e2d3f54b 77-83,86
+src/components/site-header/navigation/secondary-nav.tsx
+  h_b34f5996212cca 15
+convex/_generated/api.d.ts
+  h_b34f5996212cca 23,28,86,112,117,175
+pnpm-lock.yaml
+  h_b34f5996212cca 1-158
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "1b4e063c4fde209b23f65f08146af39e442c3e12",
+  "prompts": {},
+  "humans": {
+    "h_b34f5996212cca": {
+      "author": "Luke McDonald <thelukemcdonald@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_b7f6827e5b1377": {
+      "agent_id": {
+        "tool": "cursor",
+        "id": "7494fb5f-f552-40f9-8b6e-7e1a3ab15f4e",
+        "model": "grok-4.6"
+      },
+      "human_author": "Luke McDonald <thelukemcdonald@gmail.com>"
+    }
+  }
+}
