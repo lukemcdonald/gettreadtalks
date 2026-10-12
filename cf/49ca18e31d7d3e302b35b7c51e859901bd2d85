@@ -1,0 +1,16 @@
+.mcp.json
+  h_b34f5996212cca 3-5
+package.json
+  h_b34f5996212cca 83
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "cf49ca18e31d7d3e302b35b7c51e859901bd2d85",
+  "prompts": {},
+  "humans": {
+    "h_b34f5996212cca": {
+      "author": "Luke McDonald <thelukemcdonald@gmail.com>"
+    }
+  }
+}
