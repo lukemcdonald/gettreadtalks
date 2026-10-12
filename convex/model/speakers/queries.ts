@@ -16,6 +16,8 @@ import { getSpeakerComparator } from '../../lib/sort';
 import { paginateArray } from '../../lib/utils';
 import { doc, docs } from '../../lib/validators/schema';
 import { requireAuth } from '../auth/utils';
+import { LIST_SEARCH_LIMIT, searchPublishedSpeakers } from '../search/queries';
+import { normalizeSearchQuery } from '../search/utils';
 import { speakerRoleType } from './validators';
 
 const speakerPageValidator = paginationResultValidator(doc('speakers'));
@@ -152,7 +154,9 @@ export const listSpeakers = query({
   handler: async (ctx, args) => {
     const { paginationOpts, role, search, sort = 'alphabetical' } = args;
 
-    const hasFilters = search || role;
+    const queryText = normalizeSearchQuery(search ?? '');
+    const hasSearch = queryText.length > 0;
+    const hasFilters = hasSearch || role;
     const needsCustomSort = sort !== 'alphabetical';
 
     // When no filters and default sort, use native Convex pagination
@@ -171,28 +175,16 @@ export const listSpeakers = query({
       };
     }
 
-    // With filters or custom sort, collect all and paginate in-memory
-    let speakers = await ctx.db
-      .query('speakers')
-      .withIndex('by_lastName')
-      .order('asc')
-      .collect();
-
-    // Filter to speakers with published content
-    speakers = await filterSpeakersWithPublishedTalks(ctx, speakers);
-
-    // Filter by search term (firstName, lastName)
-    if (search) {
-      const searchLower = search.toLowerCase();
-      speakers = speakers.filter(
-        (speaker) =>
-          speaker.firstName.toLowerCase().includes(searchLower) ||
-          speaker.lastName.toLowerCase().includes(searchLower) ||
-          `${speaker.firstName} ${speaker.lastName}`
-            .toLowerCase()
-            .includes(searchLower)
-      );
-    }
+    let speakers = hasSearch
+      ? await searchPublishedSpeakers(ctx, queryText, LIST_SEARCH_LIMIT)
+      : await filterSpeakersWithPublishedTalks(
+          ctx,
+          await ctx.db
+            .query('speakers')
+            .withIndex('by_lastName')
+            .order('asc')
+            .collect()
+        );
 
     // Filter by role
     if (role) {

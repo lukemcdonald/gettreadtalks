@@ -13,7 +13,7 @@ test('Talks / Browse and open a talk', async ({ homePage, talksPage }) => {
   await expect(talksPage.playback).toBeVisible();
 });
 
-test('Talks / Search', async ({ talksPage }) => {
+test('Talks / Listing search', async ({ talksPage }) => {
   await talksPage.goto();
   await talksPage.searchFor('grace');
 

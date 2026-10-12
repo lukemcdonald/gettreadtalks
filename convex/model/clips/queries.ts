@@ -11,11 +11,13 @@ import { v } from 'convex/values';
 import { query } from '../../_generated/server';
 import { filterClipsByPublishedTalks } from '../../lib/filters';
 import { getContentComparator } from '../../lib/sort';
-import { applySearchFilter, paginateArray } from '../../lib/utils';
+import { paginateArray } from '../../lib/utils';
 import { doc, docs } from '../../lib/validators/schema';
 import { statusFilterType } from '../../lib/validators/shared';
 import { canViewContent } from '../auth/roles';
 import { getCurrentUser } from '../auth/utils';
+import { LIST_SEARCH_LIMIT, searchPublishedClips } from '../search/queries';
+import { normalizeSearchQuery } from '../search/utils';
 
 const clipPageWithSpeakersValidator = paginationResultValidator(
   doc('clips').extend({
@@ -115,8 +117,10 @@ export const listClips = query({
   handler: async (ctx, args) => {
     const { paginationOpts, search, sort = 'recent', speakerSlugs } = args;
 
+    const queryText = normalizeSearchQuery(search ?? '');
+    const hasSearch = queryText.length > 0;
     const hasSpeakerFilter = speakerSlugs && speakerSlugs.length > 0;
-    const hasFilters = search || hasSpeakerFilter;
+    const hasFilters = hasSearch || hasSpeakerFilter;
     const needsCustomSort = sort !== 'recent';
 
     // When no filters and default sort, use native Convex pagination
@@ -143,22 +147,18 @@ export const listClips = query({
       };
     }
 
-    // With filters or custom sort, collect all and paginate in-memory
-    let clips = await ctx.db
-      .query('clips')
-      .withIndex('by_status_and_publishedAt', (q) =>
-        q.eq('status', 'published')
-      )
-      .order('desc')
-      .collect();
-
-    // Filter to only clips with published parent talks
-    clips = await filterClipsByPublishedTalks(ctx, clips);
-
-    // Apply search filter
-    if (search) {
-      clips = applySearchFilter(clips, search);
-    }
+    let clips = hasSearch
+      ? await searchPublishedClips(ctx, queryText, LIST_SEARCH_LIMIT)
+      : await filterClipsByPublishedTalks(
+          ctx,
+          await ctx.db
+            .query('clips')
+            .withIndex('by_status_and_publishedAt', (q) =>
+              q.eq('status', 'published')
+            )
+            .order('desc')
+            .collect()
+        );
 
     // Apply speaker filter (multi-select)
     if (hasSpeakerFilter) {

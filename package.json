@@ -80,5 +80,5 @@
     "ultracite": "^7.12.3",
     "wait-on": "^9.5.1"
   },
-  "packageManager": "pnpm@11.22.0"
+  "packageManager": "pnpm@12.11.2"
 }

@@ -6,9 +6,12 @@ test('Home / Loads', async ({ homePage }) => {
   await expect(homePage.heading).toBeVisible();
 });
 
-test('Not found / Unknown route', async ({ notFoundPage }) => {
+test('Not found / Unknown route', async ({ notFoundPage, searchPage }) => {
   const response = await notFoundPage.gotoUnknown();
 
   expect(response?.status()).toBe(404);
   await expect(notFoundPage.heading).toBeVisible();
+
+  await notFoundPage.trySearching.click();
+  await expect(searchPage.input).toBeVisible();
 });
