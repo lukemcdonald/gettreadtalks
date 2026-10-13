@@ -9,17 +9,19 @@ import { v } from 'convex/values';
 
 import { query } from '../../_generated/server';
 import { getContentComparator } from '../../lib/sort';
-import { enrichWithSpeakers, paginateArray } from '../../lib/utils';
+import { paginateArray } from '../../lib/utils';
 import { doc, docs } from '../../lib/validators/schema';
 import { statusFilterType } from '../../lib/validators/shared';
 import { canViewContent } from '../auth/roles';
 import { getCurrentUser } from '../auth/utils';
-import { LIST_SEARCH_LIMIT, normalizeSearchQuery } from '../search/utils';
+import { LIST_SEARCH_LIMIT } from '../search/constants';
+import { normalizeSearchQuery } from '../search/utils';
 import {
+  enrichClipsWithSpeaker,
   listPublishedClips,
   listPublishedClipsPage,
   searchPublishedClips,
-} from '../talks/utils';
+} from './helpers';
 
 const clipPageWithSpeakersValidator = paginationResultValidator(
   doc('clips').extend({
@@ -131,7 +133,7 @@ export const listClips = query({
 
       return {
         ...clipPages,
-        page: await enrichWithSpeakers(ctx, clipPages.page),
+        page: await enrichClipsWithSpeaker(ctx, clipPages.page),
       };
     }
 
@@ -172,7 +174,7 @@ export const listClips = query({
     return {
       continueCursor,
       isDone,
-      page: await enrichWithSpeakers(ctx, page),
+      page: await enrichClipsWithSpeaker(ctx, page),
     };
   },
   returns: clipPageWithSpeakersValidator,
@@ -226,7 +228,7 @@ export const listAllClips = query({
 
     return {
       ...clipPages,
-      page: await enrichWithSpeakers(ctx, clipPages.page),
+      page: await enrichClipsWithSpeaker(ctx, clipPages.page),
     };
   },
   returns: clipPageWithSpeakersValidator,

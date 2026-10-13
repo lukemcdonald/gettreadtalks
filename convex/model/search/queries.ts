@@ -4,14 +4,13 @@ import type { QueryCtx } from '../../_generated/server';
 import { v } from 'convex/values';
 
 import { query } from '../../_generated/server';
-import { enrichWithSpeakers } from '../../lib/utils';
-import {
-  searchPublishedClips,
-  searchPublishedSpeakers,
-  searchPublishedTalks,
-  searchPublishedTopics,
-} from '../talks/utils';
-import { DEFAULT_SEARCH_LIMIT, normalizeSearchQuery } from './utils';
+import { enrichWithSpeaker } from '../../lib/utils';
+import { enrichClipsWithSpeaker, searchPublishedClips } from '../clips/helpers';
+import { searchPublishedSpeakers } from '../speakers/helpers';
+import { searchPublishedTalks } from '../talks/helpers';
+import { searchPublishedTopics } from '../topics/helpers';
+import { DEFAULT_SEARCH_LIMIT } from './constants';
+import { normalizeSearchQuery } from './utils';
 
 const searchSpeakerValidator = v.object({
   firstName: v.string(),
@@ -69,7 +68,7 @@ function toSearchSpeaker(speaker: Doc<'speakers'> | null) {
 }
 
 async function toSearchTalks(ctx: QueryCtx, talks: Doc<'talks'>[]) {
-  const talksWithSpeakers = await enrichWithSpeakers(ctx, talks);
+  const talksWithSpeakers = await enrichWithSpeaker(ctx, talks);
 
   return talksWithSpeakers.map((talk) => ({
     _id: talk._id,
@@ -81,7 +80,7 @@ async function toSearchTalks(ctx: QueryCtx, talks: Doc<'talks'>[]) {
 }
 
 async function toSearchClips(ctx: QueryCtx, clips: Doc<'clips'>[]) {
-  const clipsWithSpeakers = await enrichWithSpeakers(ctx, clips);
+  const clipsWithSpeakers = await enrichClipsWithSpeaker(ctx, clips);
 
   return clipsWithSpeakers.map((clip) => ({
     _id: clip._id,

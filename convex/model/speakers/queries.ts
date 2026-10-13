@@ -15,12 +15,13 @@ import { getSpeakerComparator } from '../../lib/sort';
 import { paginateArray } from '../../lib/utils';
 import { doc, docs } from '../../lib/validators/schema';
 import { requireAuth } from '../auth/utils';
-import { LIST_SEARCH_LIMIT, normalizeSearchQuery } from '../search/utils';
+import { LIST_SEARCH_LIMIT } from '../search/constants';
+import { normalizeSearchQuery } from '../search/utils';
 import {
   listPublishedSpeakers,
   listPublishedSpeakersPage,
   searchPublishedSpeakers,
-} from '../talks/utils';
+} from './helpers';
 import { speakerRoleType } from './validators';
 
 const speakerPageValidator = paginationResultValidator(doc('speakers'));

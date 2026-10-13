@@ -4,13 +4,11 @@ import { paginationOptsValidator } from 'convex/server';
 import { v } from 'convex/values';
 
 import { query } from '../../_generated/server';
-import { enrichWithSpeakers } from '../../lib/utils';
+import { enrichWithSpeaker } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
-import {
-  listPublishedCollections,
-  listPublishedTalksForCollection,
-} from '../talks/utils';
+import { listPublishedTalksForCollection } from '../talks/helpers';
+import { listPublishedCollections } from './helpers';
 
 /**
  * List collection slugs for sitemap generation.
@@ -65,7 +63,7 @@ export const getCollectionBySlug = query({
 
     talks.sort((a, b) => (a.collectionOrder || 0) - (b.collectionOrder || 0));
 
-    const talksWithSpeakers = await enrichWithSpeakers(ctx, talks);
+    const talksWithSpeakers = await enrichWithSpeaker(ctx, talks);
 
     return {
       collection,

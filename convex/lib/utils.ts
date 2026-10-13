@@ -201,19 +201,16 @@ export async function deleteAll<T extends { _id: Id<TableNames> }>(
 }
 
 /**
- * Enrich items with speaker data.
- * Works with any entity that has a speakerId field (talks, clips, etc).
+ * Attach the speaker for items that always have a speakerId (talks).
  */
-export async function enrichWithSpeakers<
-  T extends { speakerId?: Id<'speakers'> },
+export async function enrichWithSpeaker<
+  T extends { speakerId: Id<'speakers'> },
 >(
   ctx: QueryCtx,
   items: T[]
 ): Promise<(T & { speaker: Doc<'speakers'> | null })[]> {
   return await asyncMap(items, async (item: T) => {
-    const speaker = item.speakerId
-      ? await ctx.db.get('speakers', item.speakerId)
-      : null;
+    const speaker = await ctx.db.get('speakers', item.speakerId);
 
     return { ...item, speaker };
   });

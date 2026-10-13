@@ -7,17 +7,17 @@ import { v } from 'convex/values';
 
 import { query } from '../../_generated/server';
 import { getTopicComparator } from '../../lib/sort';
-import { enrichWithSpeakers, paginateArray } from '../../lib/utils';
+import { enrichWithSpeaker, paginateArray } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
 import { requireAuth } from '../auth/utils';
-import { LIST_SEARCH_LIMIT, normalizeSearchQuery } from '../search/utils';
+import { LIST_SEARCH_LIMIT } from '../search/constants';
+import { normalizeSearchQuery } from '../search/utils';
 import {
   listPublishedTalksForTopic,
-  listPublishedTopics,
   searchPublishedTalksByTitleOrSpeaker,
-  searchPublishedTopics,
-} from '../talks/utils';
+} from '../talks/helpers';
+import { listPublishedTopics, searchPublishedTopics } from './helpers';
 
 /**
  * Get topic by ID.
@@ -63,7 +63,7 @@ export const getTopicBySlug = query({
       publishedTalks = publishedTalks.filter((talk) => matchIds.has(talk._id));
     }
 
-    const filteredTalks = await enrichWithSpeakers(ctx, publishedTalks);
+    const filteredTalks = await enrichWithSpeaker(ctx, publishedTalks);
 
     const { continueCursor, isDone, page } = paginateArray(
       filteredTalks,
@@ -217,7 +217,7 @@ export const listTopicsWithTalks = query({
       });
 
       const limitedTalks = publishedTalks.slice(0, talksPerTopic);
-      const talksWithSpeakers = await enrichWithSpeakers(ctx, limitedTalks);
+      const talksWithSpeakers = await enrichWithSpeaker(ctx, limitedTalks);
 
       return {
         talkCount: publishedTalks.length,

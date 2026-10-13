@@ -1,6 +1,3 @@
-export const DEFAULT_SEARCH_LIMIT = 12;
-export const LIST_SEARCH_LIMIT = 100;
-
 export function normalizeSearchQuery(query: string) {
   return query.trim().replaceAll(/\s+/gu, ' ');
 }
