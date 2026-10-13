@@ -10,7 +10,7 @@ import {
   CornerDownLeftIcon,
   SearchIcon,
 } from 'lucide-react';
-import { useRef } from 'react';
+import { Suspense, useRef } from 'react';
 
 import {
   AutocompleteInput,
@@ -38,11 +38,17 @@ import {
 import { useIsMobile } from '@/hooks/use-media-query';
 import { cn } from '@/utils';
 
+function SearchHotkeyLabel() {
+  const hotkey = useSearchHotkeyLabel();
+
+  return <span className="text-muted-foreground text-xs">{hotkey}</span>;
+}
+
 function HeaderSearchDesktopTrigger({
   className,
   hotkey,
   ...delegated
-}: ButtonProps & { hotkey: string }) {
+}: ButtonProps & { hotkey: ReactNode }) {
   return (
     <Button
       aria-keyshortcuts="Control+K Meta+K"
@@ -54,7 +60,7 @@ function HeaderSearchDesktopTrigger({
       {...delegated}
     >
       <SearchIcon aria-hidden="true" />
-      <span className="text-muted-foreground text-xs">{hotkey}</span>
+      {hotkey}
     </Button>
   );
 }
@@ -266,8 +272,29 @@ function MobileSearchDrawer({
   );
 }
 
+export function HeaderSearchFallback() {
+  return (
+    <>
+      <span className="md:hidden">
+        <HeaderSearchMobileTrigger
+          aria-hidden
+          className="pointer-events-none"
+          disabled
+        />
+      </span>
+      <span className="hidden md:inline-flex">
+        <HeaderSearchDesktopTrigger
+          aria-hidden
+          className="pointer-events-none m-1.5"
+          disabled
+          hotkey={<span className="text-muted-foreground text-xs">⌘K</span>}
+        />
+      </span>
+    </>
+  );
+}
+
 export function HeaderSearch() {
-  const hotkey = useSearchHotkeyLabel();
   const isMobile = useIsMobile();
   const search = useHeaderSearch();
 
@@ -281,9 +308,17 @@ export function HeaderSearch() {
         <HeaderSearchMobileTrigger onClick={openSearch} />
       ) : (
         <HeaderSearchDesktopTrigger
-          hotkey={hotkey}
-          onClick={openSearch}
           className="m-1.5"
+          hotkey={
+            <Suspense
+              fallback={
+                <span className="text-muted-foreground text-xs">⌘K</span>
+              }
+            >
+              <SearchHotkeyLabel />
+            </Suspense>
+          }
+          onClick={openSearch}
         />
       )}
       {isMobile ? (

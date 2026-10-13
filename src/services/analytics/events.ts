@@ -1,3 +1,6 @@
+type SearchEventSource = 'header' | 'page';
+type SearchResultType = 'clip' | 'speaker' | 'talk' | 'topic' | 'view_all';
+
 interface TalkTrackProperties {
   speaker_id?: string;
   speaker_slug?: string;
@@ -12,7 +15,24 @@ export interface EventMap {
   clip_played: { clip_id: string; clip_slug: string };
   filter_applied: { filter: string; path: string; value: string };
   not_found_hit: { path: string };
-  search_performed: { path: string; query: string };
+  search_no_results: {
+    path: string;
+    query: string;
+    source: SearchEventSource;
+  };
+  search_performed: {
+    path: string;
+    query: string;
+    result_count?: number;
+    source: SearchEventSource;
+  };
+  search_result_selected: {
+    path: string;
+    position: number;
+    query: string;
+    result_type: SearchResultType;
+    source: SearchEventSource;
+  };
   signed_in: Record<string, never>;
   signed_out: Record<string, never>;
   signed_up: Record<string, never>;

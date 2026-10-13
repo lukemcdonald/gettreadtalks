@@ -14,13 +14,25 @@ const {
   getSearchHotkeyLabel,
   getSearchPageHref,
   getSearchQuery,
+  getSearchSelectionAnalytics,
   groupSearchHits,
   hasSearchHits,
   isSearchHotkey,
+  SEARCH_DROPDOWN_LIMIT,
+  shouldShowViewAllResults,
   toCommandGroups,
   toSearchHits,
   VIEW_ALL_SEARCH_GROUP,
 } = await import('./utils.ts');
+
+function cappedTalkHits() {
+  return Array.from({ length: SEARCH_DROPDOWN_LIMIT }, (_, index) => ({
+    href: `/talks/john-doe/talk-${index}`,
+    id: `talk${index}`,
+    title: `Talk ${index}`,
+    type: 'talk' as const,
+  }));
+}
 
 const result = {
   clips: [
@@ -209,7 +221,7 @@ describe('getSearchHotkeyLabel', () => {
 describe('getHeaderSearchState', () => {
   const hits = toSearchHits(result);
 
-  test('keeps browse while the first query loads and view all only with results', () => {
+  test('keeps browse while the first query loads and hides view all when every group is visible', () => {
     const idle = getHeaderSearchState({
       hits,
       isPending: false,
@@ -237,6 +249,19 @@ describe('getHeaderSearchState', () => {
     assert.equal(firstLoad.status, 'loading');
     assert.equal(firstLoad.groups[0]?.value, BROWSE_SEARCH_GROUP);
     assert.equal(results.status, 'results');
+    assert.notEqual(results.groups.at(-1)?.value, VIEW_ALL_SEARCH_GROUP);
+  });
+
+  test('appends view all when a type hits the dropdown limit', () => {
+    const cappedHits = cappedTalkHits();
+    const results = getHeaderSearchState({
+      hits: cappedHits,
+      isPending: false,
+      isSignedIn: false,
+      previousHits: cappedHits,
+      value: 'talk',
+    });
+
     assert.equal(results.groups.at(-1)?.value, VIEW_ALL_SEARCH_GROUP);
   });
 
@@ -293,15 +318,78 @@ describe('getBrowseCommandGroups', () => {
   });
 });
 
+describe('shouldShowViewAllResults', () => {
+  test('is false until a type reaches the fetch limit', () => {
+    assert.equal(shouldShowViewAllResults(toSearchHits(result)), false);
+    assert.equal(shouldShowViewAllResults(cappedTalkHits()), true);
+  });
+});
+
+describe('getSearchSelectionAnalytics', () => {
+  const hits = toSearchHits(result);
+
+  test('returns null for browse and unknown items', () => {
+    assert.equal(
+      getSearchSelectionAnalytics({
+        hits,
+        itemValue: hits[0]?.id ?? '',
+        query: '',
+      }),
+      null
+    );
+    assert.equal(
+      getSearchSelectionAnalytics({
+        hits,
+        itemValue: 'missing',
+        query: 'grace',
+      }),
+      null
+    );
+  });
+
+  test('uses a 1-based position and view_all after the last hit', () => {
+    assert.deepEqual(
+      getSearchSelectionAnalytics({
+        hits,
+        itemValue: hits[2]?.id ?? '',
+        query: '  grace  ',
+      }),
+      {
+        position: 3,
+        query: 'grace',
+        result_type: 'topic',
+      }
+    );
+    assert.deepEqual(
+      getSearchSelectionAnalytics({
+        hits,
+        itemValue: VIEW_ALL_SEARCH_GROUP,
+        query: 'grace',
+      }),
+      {
+        position: hits.length + 1,
+        query: 'grace',
+        result_type: 'view_all',
+      }
+    );
+  });
+});
+
 describe('toCommandGroups', () => {
-  test('keeps group order and appends view all when there is a query', () => {
+  test('keeps group order and omits view all when every group is visible', () => {
     const groups = toCommandGroups(toSearchHits(result), 'grace');
 
     assert.deepEqual(
       groups.map((group) => group.value),
-      ['Talks', 'Speakers', 'Topics', 'Clips', VIEW_ALL_SEARCH_GROUP]
+      ['Talks', 'Speakers', 'Topics', 'Clips']
     );
-    assert.equal(groups.at(-1)?.items[0]?.href, '/search?search=grace');
+  });
+
+  test('appends view all when a type hits the dropdown limit', () => {
+    const groups = toCommandGroups(cappedTalkHits(), 'talk');
+
+    assert.equal(groups.at(-1)?.value, VIEW_ALL_SEARCH_GROUP);
+    assert.equal(groups.at(-1)?.items[0]?.href, '/search?search=talk');
     assert.equal(groups.at(-1)?.items[0]?.label, 'View all results');
   });
 
