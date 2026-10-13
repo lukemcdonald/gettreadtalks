@@ -5,10 +5,10 @@ import { v } from 'convex/values';
 
 import { query } from '../../_generated/server';
 import { enrichWithSpeakers } from '../../lib/utils';
-import { searchPublishedClips } from '../clips/queries';
-import { searchPublishedSpeakers } from '../speakers/queries';
+import { searchPublishedClips } from '../clips/published.helpers';
+import { searchPublishedSpeakers } from '../speakers/published.helpers';
 import { searchPublishedTalks } from '../talks/utils';
-import { searchPublishedTopics } from '../topics/queries';
+import { searchPublishedTopics } from '../topics/published.helpers';
 import { DEFAULT_SEARCH_LIMIT, normalizeSearchQuery } from './utils';
 
 const searchSpeakerValidator = v.object({

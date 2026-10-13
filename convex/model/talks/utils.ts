@@ -6,7 +6,7 @@ import { asyncMap } from 'convex-helpers';
 import { getManyVia } from 'convex-helpers/server/relationships';
 
 import { DEFAULT_SEARCH_LIMIT, uniqueById } from '../search/utils';
-import { searchPublishedSpeakers } from '../speakers/queries';
+import { searchPublishedSpeakers } from '../speakers/published.helpers';
 
 function speakerNameMatches(
   searchLower: string,

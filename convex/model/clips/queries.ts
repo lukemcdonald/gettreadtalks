@@ -1,6 +1,4 @@
-import type { QueryCtx } from '../../_generated/server';
 import type { ContentSortOption } from '../../lib/sort';
-import type { PaginationOptions } from 'convex/server';
 
 import { getOneFrom } from 'convex-helpers/server/relationships';
 import {
@@ -10,7 +8,6 @@ import {
 import { v } from 'convex/values';
 
 import { query } from '../../_generated/server';
-import { filterClipsByPublishedTalks } from '../../lib/filters';
 import { getContentComparator } from '../../lib/sort';
 import { enrichWithSpeakers, paginateArray } from '../../lib/utils';
 import { doc, docs } from '../../lib/validators/schema';
@@ -18,50 +15,11 @@ import { statusFilterType } from '../../lib/validators/shared';
 import { canViewContent } from '../auth/roles';
 import { getCurrentUser } from '../auth/utils';
 import { LIST_SEARCH_LIMIT, normalizeSearchQuery } from '../search/utils';
-
-function publishedClipsQuery(ctx: QueryCtx) {
-  return ctx.db
-    .query('clips')
-    .withIndex('by_status_and_publishedAt', (q) => q.eq('status', 'published'))
-    .order('desc');
-}
-
-export async function listPublishedClips(ctx: QueryCtx) {
-  return await filterClipsByPublishedTalks(
-    ctx,
-    await publishedClipsQuery(ctx).collect()
-  );
-}
-
-export async function listPublishedClipsPage(
-  ctx: QueryCtx,
-  paginationOpts: PaginationOptions
-) {
-  const result = await publishedClipsQuery(ctx).paginate(paginationOpts);
-
-  return {
-    ...result,
-    page: await filterClipsByPublishedTalks(ctx, result.page),
-  };
-}
-
-export async function searchPublishedClips(
-  ctx: QueryCtx,
-  queryText: string,
-  limit: number
-) {
-  const clips = await filterClipsByPublishedTalks(
-    ctx,
-    await ctx.db
-      .query('clips')
-      .withSearchIndex('search_title', (q) =>
-        q.search('title', queryText).eq('status', 'published')
-      )
-      .take(limit)
-  );
-
-  return clips.slice(0, limit);
-}
+import {
+  listPublishedClips,
+  listPublishedClipsPage,
+  searchPublishedClips,
+} from './published.helpers';
 
 const clipPageWithSpeakersValidator = paginationResultValidator(
   doc('clips').extend({

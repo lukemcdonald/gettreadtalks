@@ -135,10 +135,11 @@ _Public content helpers (not registered queries):_
 
 - `listPublished*` — All publicly visible docs for browsing
 - `searchPublished*` — Publicly visible docs matching a search query
-- Colocate these helpers on the entity (`queries.ts` / `utils.ts`). Convex registers every single-dot `.ts` file under `convex/` as an API module, so do not add helper-only files such as `published.ts`
+- Colocate these helpers on the entity. Use a multi-dot file such as `published.helpers.ts` (or an existing `utils.ts` that does not export `query` / `mutation`). Convex registers every single-dot `.ts` file under `convex/` as an API module, so do not add helper-only files such as `published.ts`
+- Do not import helpers from a file that also exports registered Convex functions. That pulls those functions into another isolate and fails preview deploy
 - Registered queries call these instead of building index queries and visibility filters inline
 - Visibility filters in `convex/lib/filters.ts` are building blocks for those helpers, not for queries
-- Shared exported search limits live in `convex/model/search/utils.ts`; file-private values stay colocated. Do not add a new helper-only Convex file for them — codegen registers every single-dot `.ts` file as an API module, which breaks preview deploy
+- Shared exported search limits live in `convex/model/search/utils.ts`; file-private values stay colocated
 
 _Mutations:_
 
