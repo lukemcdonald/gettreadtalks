@@ -22,8 +22,7 @@ import { doc, docs } from '../../lib/validators/schema';
 import { statusFilterType } from '../../lib/validators/shared';
 import { canViewContent } from '../auth/roles';
 import { getCurrentUser, requireAuth } from '../auth/utils';
-import { LIST_SEARCH_LIMIT } from '../search/constants';
-import { normalizeSearchQuery } from '../search/utils';
+import { LIST_SEARCH_LIMIT, normalizeSearchQuery } from '../search/utils';
 import {
   enrichWithTopics,
   filterTalksByTitleOrSpeaker,

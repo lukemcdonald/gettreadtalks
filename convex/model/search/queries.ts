@@ -9,8 +9,7 @@ import { searchPublishedClips } from '../clips/queries';
 import { searchPublishedSpeakers } from '../speakers/queries';
 import { searchPublishedTalks } from '../talks/utils';
 import { searchPublishedTopics } from '../topics/queries';
-import { DEFAULT_SEARCH_LIMIT } from './constants';
-import { normalizeSearchQuery } from './utils';
+import { DEFAULT_SEARCH_LIMIT, normalizeSearchQuery } from './utils';
 
 const searchSpeakerValidator = v.object({
   firstName: v.string(),

@@ -18,8 +18,8 @@ import { getSpeakerComparator } from '../../lib/sort';
 import { paginateArray } from '../../lib/utils';
 import { doc, docs } from '../../lib/validators/schema';
 import { requireAuth } from '../auth/utils';
-import { LIST_SEARCH_LIMIT } from '../search/constants';
 import {
+  LIST_SEARCH_LIMIT,
   normalizeSearchQuery,
   searchPhrases,
   uniqueById,

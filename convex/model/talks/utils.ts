@@ -5,8 +5,7 @@ import type { PaginationOptions } from 'convex/server';
 import { asyncMap } from 'convex-helpers';
 import { getManyVia } from 'convex-helpers/server/relationships';
 
-import { DEFAULT_SEARCH_LIMIT } from '../search/constants';
-import { uniqueById } from '../search/utils';
+import { DEFAULT_SEARCH_LIMIT, uniqueById } from '../search/utils';
 import { searchPublishedSpeakers } from '../speakers/queries';
 
 function speakerNameMatches(

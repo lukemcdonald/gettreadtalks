@@ -13,8 +13,7 @@ import { enrichWithSpeakers, paginateArray } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
 import { requireAuth } from '../auth/utils';
-import { LIST_SEARCH_LIMIT } from '../search/constants';
-import { normalizeSearchQuery } from '../search/utils';
+import { LIST_SEARCH_LIMIT, normalizeSearchQuery } from '../search/utils';
 import {
   listPublishedTalksForTopic,
   searchPublishedTalksByTitleOrSpeaker,
