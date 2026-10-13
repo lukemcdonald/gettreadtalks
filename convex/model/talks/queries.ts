@@ -26,6 +26,7 @@ import { LIST_SEARCH_LIMIT } from '../search/constants';
 import { normalizeSearchQuery } from '../search/utils';
 import {
   listPublishedTalks,
+  listPublishedTalksPage,
   searchPublishedTalksByTitleOrSpeaker,
 } from './published';
 import { enrichWithTopics, filterTalksByTitleOrSpeaker } from './utils';
@@ -356,7 +357,7 @@ export const listTalks = query({
 
     // When no filters and default sort, use native Convex pagination for efficiency
     if (!(hasFilters || needsCustomSort)) {
-      const result = await listPublishedTalks(ctx, { paginationOpts });
+      const result = await listPublishedTalksPage(ctx, paginationOpts);
       const talksWithSpeakers = await enrichWithSpeakers(ctx, result.page);
       const enrichedTalks = await enrichWithTopics(ctx, talksWithSpeakers);
 

@@ -1,6 +1,6 @@
 import type { Doc, Id } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
-import type { PaginationOptions, PaginationResult } from 'convex/server';
+import type { PaginationOptions } from 'convex/server';
 
 import { getManyVia } from 'convex-helpers/server/relationships';
 
@@ -15,24 +15,15 @@ function publishedTalksQuery(ctx: QueryCtx) {
     .order('desc');
 }
 
-export async function listPublishedTalks(
-  ctx: QueryCtx,
-  options: { paginationOpts: PaginationOptions }
-): Promise<PaginationResult<Doc<'talks'>>>;
-export async function listPublishedTalks(
-  ctx: QueryCtx
-): Promise<Doc<'talks'>[]>;
-export async function listPublishedTalks(
-  ctx: QueryCtx,
-  options?: { paginationOpts: PaginationOptions }
-): Promise<Doc<'talks'>[] | PaginationResult<Doc<'talks'>>> {
-  const talksQuery = publishedTalksQuery(ctx);
+export async function listPublishedTalks(ctx: QueryCtx) {
+  return await publishedTalksQuery(ctx).collect();
+}
 
-  if (options?.paginationOpts) {
-    return await talksQuery.paginate(options.paginationOpts);
-  }
-
-  return await talksQuery.collect();
+export async function listPublishedTalksPage(
+  ctx: QueryCtx,
+  paginationOpts: PaginationOptions
+) {
+  return await publishedTalksQuery(ctx).paginate(paginationOpts);
 }
 
 export async function listPublishedTalksForCollection(

@@ -16,7 +16,11 @@ import { canViewContent } from '../auth/roles';
 import { getCurrentUser } from '../auth/utils';
 import { LIST_SEARCH_LIMIT } from '../search/constants';
 import { normalizeSearchQuery } from '../search/utils';
-import { listPublishedClips, searchPublishedClips } from './published';
+import {
+  listPublishedClips,
+  listPublishedClipsPage,
+  searchPublishedClips,
+} from './published';
 
 const clipPageWithSpeakersValidator = paginationResultValidator(
   doc('clips').extend({
@@ -124,7 +128,7 @@ export const listClips = query({
 
     // When no filters and default sort, use native Convex pagination
     if (!(hasFilters || needsCustomSort)) {
-      const clipPages = await listPublishedClips(ctx, { paginationOpts });
+      const clipPages = await listPublishedClipsPage(ctx, paginationOpts);
 
       return {
         ...clipPages,

@@ -119,9 +119,10 @@ export const listCollections = query({
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
-    const collectionPages = await listPublishedCollections(ctx, {
-      paginationOpts: args.paginationOpts,
-    });
+    const collectionPages = await listPublishedCollections(
+      ctx,
+      args.paginationOpts
+    );
 
     // Enrich each collection with stats
     const enrichedPage = await asyncMap(

@@ -1,6 +1,5 @@
-import type { Doc } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
-import type { PaginationOptions, PaginationResult } from 'convex/server';
+import type { PaginationOptions } from 'convex/server';
 
 import { filterSpeakersWithPublishedTalks } from '../../lib/filters';
 import { searchPhrases, uniqueById } from '../search/utils';
@@ -11,32 +10,23 @@ function publishedSpeakersQuery(ctx: QueryCtx) {
   return ctx.db.query('speakers').withIndex('by_lastName').order('asc');
 }
 
-export async function listPublishedSpeakers(
-  ctx: QueryCtx,
-  options: { paginationOpts: PaginationOptions }
-): Promise<PaginationResult<Doc<'speakers'>>>;
-export async function listPublishedSpeakers(
-  ctx: QueryCtx
-): Promise<Doc<'speakers'>[]>;
-export async function listPublishedSpeakers(
-  ctx: QueryCtx,
-  options?: { paginationOpts: PaginationOptions }
-): Promise<Doc<'speakers'>[] | PaginationResult<Doc<'speakers'>>> {
-  const speakersQuery = publishedSpeakersQuery(ctx);
-
-  if (options?.paginationOpts) {
-    const result = await speakersQuery.paginate(options.paginationOpts);
-
-    return {
-      ...result,
-      page: await filterSpeakersWithPublishedTalks(ctx, result.page),
-    };
-  }
-
+export async function listPublishedSpeakers(ctx: QueryCtx) {
   return await filterSpeakersWithPublishedTalks(
     ctx,
-    await speakersQuery.collect()
+    await publishedSpeakersQuery(ctx).collect()
   );
+}
+
+export async function listPublishedSpeakersPage(
+  ctx: QueryCtx,
+  paginationOpts: PaginationOptions
+) {
+  const result = await publishedSpeakersQuery(ctx).paginate(paginationOpts);
+
+  return {
+    ...result,
+    page: await filterSpeakersWithPublishedTalks(ctx, result.page),
+  };
 }
 
 export async function searchPublishedSpeakers(

@@ -17,7 +17,11 @@ import { doc, docs } from '../../lib/validators/schema';
 import { requireAuth } from '../auth/utils';
 import { LIST_SEARCH_LIMIT } from '../search/constants';
 import { normalizeSearchQuery } from '../search/utils';
-import { listPublishedSpeakers, searchPublishedSpeakers } from './published';
+import {
+  listPublishedSpeakers,
+  listPublishedSpeakersPage,
+  searchPublishedSpeakers,
+} from './published';
 import { speakerRoleType } from './validators';
 
 const speakerPageValidator = paginationResultValidator(doc('speakers'));
@@ -161,7 +165,7 @@ export const listSpeakers = query({
 
     // When no filters and default sort, use native Convex pagination
     if (!(hasFilters || needsCustomSort)) {
-      return await listPublishedSpeakers(ctx, { paginationOpts });
+      return await listPublishedSpeakersPage(ctx, paginationOpts);
     }
 
     let speakers = hasSearch

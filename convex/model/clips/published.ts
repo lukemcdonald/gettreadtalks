@@ -1,6 +1,5 @@
-import type { Doc } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
-import type { PaginationOptions, PaginationResult } from 'convex/server';
+import type { PaginationOptions } from 'convex/server';
 
 import { filterClipsByPublishedTalks } from '../../lib/filters';
 
@@ -11,29 +10,23 @@ function publishedClipsQuery(ctx: QueryCtx) {
     .order('desc');
 }
 
-export async function listPublishedClips(
+export async function listPublishedClips(ctx: QueryCtx) {
+  return await filterClipsByPublishedTalks(
+    ctx,
+    await publishedClipsQuery(ctx).collect()
+  );
+}
+
+export async function listPublishedClipsPage(
   ctx: QueryCtx,
-  options: { paginationOpts: PaginationOptions }
-): Promise<PaginationResult<Doc<'clips'>>>;
-export async function listPublishedClips(
-  ctx: QueryCtx
-): Promise<Doc<'clips'>[]>;
-export async function listPublishedClips(
-  ctx: QueryCtx,
-  options?: { paginationOpts: PaginationOptions }
-): Promise<Doc<'clips'>[] | PaginationResult<Doc<'clips'>>> {
-  const clipsQuery = publishedClipsQuery(ctx);
+  paginationOpts: PaginationOptions
+) {
+  const result = await publishedClipsQuery(ctx).paginate(paginationOpts);
 
-  if (options?.paginationOpts) {
-    const result = await clipsQuery.paginate(options.paginationOpts);
-
-    return {
-      ...result,
-      page: await filterClipsByPublishedTalks(ctx, result.page),
-    };
-  }
-
-  return await filterClipsByPublishedTalks(ctx, await clipsQuery.collect());
+  return {
+    ...result,
+    page: await filterClipsByPublishedTalks(ctx, result.page),
+  };
 }
 
 export async function searchPublishedClips(

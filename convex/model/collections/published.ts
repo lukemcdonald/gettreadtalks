@@ -5,12 +5,12 @@ import { filterCollectionsWithPublishedTalks } from '../../lib/filters';
 
 export async function listPublishedCollections(
   ctx: QueryCtx,
-  options: { paginationOpts: PaginationOptions }
+  paginationOpts: PaginationOptions
 ) {
   const collectionPages = await ctx.db
     .query('collections')
     .order('desc')
-    .paginate(options.paginationOpts);
+    .paginate(paginationOpts);
 
   return {
     ...collectionPages,
