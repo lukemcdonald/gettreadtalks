@@ -16,17 +16,19 @@ import { query } from '../../_generated/server';
 import { getTalkIdsByTopicSlugs } from '../../lib/filters';
 import { rotateContent } from '../../lib/rotateContent';
 import { getContentComparator } from '../../lib/sort';
-import { enrichWithSpeakers, paginateArray } from '../../lib/utils';
+import { enrichWithSpeaker, paginateArray } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
 import { statusFilterType } from '../../lib/validators/shared';
 import { canViewContent } from '../auth/roles';
 import { getCurrentUser, requireAuth } from '../auth/utils';
-import {
-  LIST_SEARCH_LIMIT,
-  searchPublishedTalksByTitleOrSpeaker,
-} from '../search/queries';
+import { LIST_SEARCH_LIMIT } from '../search/constants';
 import { normalizeSearchQuery } from '../search/utils';
+import {
+  listPublishedTalks,
+  listPublishedTalksPage,
+  searchPublishedTalksByTitleOrSpeaker,
+} from './helpers';
 import { enrichWithTopics, filterTalksByTitleOrSpeaker } from './utils';
 
 /**
@@ -231,7 +233,7 @@ export const listFeaturedTalksWithSpeakers = query({
 
     const page = rotateContent(talks, { count: limit, period: 'daily' });
 
-    return await enrichWithSpeakers(ctx, page);
+    return await enrichWithSpeaker(ctx, page);
   },
   returns: v.array(talkWithSpeakerValidator),
 });
@@ -355,15 +357,8 @@ export const listTalks = query({
 
     // When no filters and default sort, use native Convex pagination for efficiency
     if (!(hasFilters || needsCustomSort)) {
-      const result = await ctx.db
-        .query('talks')
-        .withIndex('by_status_and_publishedAt', (q) =>
-          q.eq('status', 'published')
-        )
-        .order('desc')
-        .paginate(paginationOpts);
-
-      const talksWithSpeakers = await enrichWithSpeakers(ctx, result.page);
+      const result = await listPublishedTalksPage(ctx, paginationOpts);
+      const talksWithSpeakers = await enrichWithSpeaker(ctx, result.page);
       const enrichedTalks = await enrichWithTopics(ctx, talksWithSpeakers);
 
       return {
@@ -378,13 +373,7 @@ export const listTalks = query({
           queryText,
           LIST_SEARCH_LIMIT
         )
-      : await ctx.db
-          .query('talks')
-          .withIndex('by_status_and_publishedAt', (q) =>
-            q.eq('status', 'published')
-          )
-          .order('desc')
-          .collect();
+      : await listPublishedTalks(ctx);
 
     // Apply speaker filter (multi-select)
     if (hasSpeakerFilter) {
@@ -429,7 +418,7 @@ export const listTalks = query({
       paginationOpts.numItems
     );
 
-    const talksWithSpeakers = await enrichWithSpeakers(ctx, page);
+    const talksWithSpeakers = await enrichWithSpeaker(ctx, page);
     const enrichedTalks = await enrichWithTopics(ctx, talksWithSpeakers);
 
     return {
@@ -481,7 +470,7 @@ export const listAllTalks = query({
         paginationOpts.cursor,
         paginationOpts.numItems
       );
-      const talksWithSpeakers = await enrichWithSpeakers(ctx, page);
+      const talksWithSpeakers = await enrichWithSpeaker(ctx, page);
       const talksWithSpeakersAndTopics = await enrichWithTopics(
         ctx,
         talksWithSpeakers
@@ -500,7 +489,7 @@ export const listAllTalks = query({
       paginationOpts.numItems
     );
 
-    const talksWithSpeakers = await enrichWithSpeakers(ctx, page);
+    const talksWithSpeakers = await enrichWithSpeaker(ctx, page);
     const talksWithSpeakersAndTopics = await enrichWithTopics(
       ctx,
       talksWithSpeakers
