@@ -38,11 +38,11 @@ Runs Next.js (HTTPS on `https://localhost:3000`) and Convex in parallel. On macO
 
 ### Useful scripts
 
-| Script           | What it does             |
-| ---------------- | ------------------------ |
-| `pnpm style`     | Lint + format fix        |
-| `pnpm typecheck` | TypeScript check         |
-| `pnpm build`     | Production Next.js build |
+| Script           | What it does                    |
+| ---------------- | ------------------------------- |
+| `pnpm style`     | Lint + format fix               |
+| `pnpm typecheck` | TypeScript check                |
+| `pnpm build`     | Production Next.js build        |
 | `pnpm release`   | Manual Convex deploy (fallback) |
 
 ### Deploy
