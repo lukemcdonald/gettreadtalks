@@ -43,4 +43,10 @@ Runs Next.js (HTTPS on `https://localhost:3000`) and Convex in parallel. On macO
 | `pnpm style`     | Lint + format fix        |
 | `pnpm typecheck` | TypeScript check         |
 | `pnpm build`     | Production Next.js build |
-| `pnpm release`   | Deploy Convex            |
+| `pnpm release`   | Manual Convex deploy (fallback) |
+
+### Deploy
+
+Vercel production builds run `convex deploy --cmd 'pnpm build'` from `scripts/vercel-build.sh`, so Convex functions ship with the frontend. A failed Convex push fails the build.
+
+Set `CONVEX_DEPLOY_KEY` in Vercel to the Convex **Production** Deploy Key (Production env only) and the Convex **Preview** Deploy Key (Preview env only). Same variable name, different values per environment — do not reuse one key for both. `pnpm release` remains a local fallback.
