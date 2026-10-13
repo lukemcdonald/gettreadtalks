@@ -22,14 +22,12 @@ import { doc, docs } from '../../lib/validators/schema';
 import { statusFilterType } from '../../lib/validators/shared';
 import { canViewContent } from '../auth/roles';
 import { getCurrentUser, requireAuth } from '../auth/utils';
-import { LIST_SEARCH_LIMIT, normalizeSearchQuery } from '../search/utils';
 import {
-  enrichWithTopics,
-  filterTalksByTitleOrSpeaker,
-  listPublishedTalks,
-  listPublishedTalksPage,
+  LIST_SEARCH_LIMIT,
   searchPublishedTalksByTitleOrSpeaker,
-} from './utils';
+} from '../search/queries';
+import { normalizeSearchQuery } from '../search/utils';
+import { enrichWithTopics, filterTalksByTitleOrSpeaker } from './utils';
 
 /**
  * List published talk slugs with their speaker slugs for sitemap generation.
@@ -357,7 +355,14 @@ export const listTalks = query({
 
     // When no filters and default sort, use native Convex pagination for efficiency
     if (!(hasFilters || needsCustomSort)) {
-      const result = await listPublishedTalksPage(ctx, paginationOpts);
+      const result = await ctx.db
+        .query('talks')
+        .withIndex('by_status_and_publishedAt', (q) =>
+          q.eq('status', 'published')
+        )
+        .order('desc')
+        .paginate(paginationOpts);
+
       const talksWithSpeakers = await enrichWithSpeakers(ctx, result.page);
       const enrichedTalks = await enrichWithTopics(ctx, talksWithSpeakers);
 
@@ -373,7 +378,13 @@ export const listTalks = query({
           queryText,
           LIST_SEARCH_LIMIT
         )
-      : await listPublishedTalks(ctx);
+      : await ctx.db
+          .query('talks')
+          .withIndex('by_status_and_publishedAt', (q) =>
+            q.eq('status', 'published')
+          )
+          .order('desc')
+          .collect();
 
     // Apply speaker filter (multi-select)
     if (hasSpeakerFilter) {

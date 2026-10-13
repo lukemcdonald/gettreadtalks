@@ -5,7 +5,7 @@ import { getOneFrom } from 'convex-helpers/server/relationships';
 
 /**
  * Filter speakers to only those with at least one published talk or clip.
- * Building block for listPublishedSpeakers / searchPublishedSpeakers.
+ * Used in public-facing queries to show only active speakers.
  */
 export async function filterSpeakersWithPublishedTalks(
   ctx: QueryCtx,
@@ -38,7 +38,7 @@ export async function filterSpeakersWithPublishedTalks(
 /**
  * Filter clips to only those with published parent talks.
  * Clips without a parent talk (standalone clips) are included.
- * Building block for listPublishedClips / searchPublishedClips.
+ * Used in public-facing queries to ensure content integrity.
  */
 export async function filterClipsByPublishedTalks(
   ctx: QueryCtx,
@@ -60,7 +60,7 @@ export async function filterClipsByPublishedTalks(
 
 /**
  * Filter collections to only those with at least one published talk.
- * Building block for listPublishedCollections.
+ * Used in public-facing queries to show only active collections.
  */
 export async function filterCollectionsWithPublishedTalks(
   ctx: QueryCtx,
@@ -84,7 +84,7 @@ export async function filterCollectionsWithPublishedTalks(
 
 /**
  * Filter topics to only those with at least one published talk.
- * Building block for listPublishedTopics / searchPublishedTopics.
+ * Used in public-facing search to hide unused topics.
  */
 export async function filterTopicsWithPublishedTalks(
   ctx: QueryCtx,

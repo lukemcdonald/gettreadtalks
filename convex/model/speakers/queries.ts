@@ -10,17 +10,14 @@ import {
 import { v } from 'convex/values';
 
 import { query } from '../../_generated/server';
+import { filterSpeakersWithPublishedTalks } from '../../lib/filters';
 import { rotateContent } from '../../lib/rotateContent';
 import { getSpeakerComparator } from '../../lib/sort';
 import { paginateArray } from '../../lib/utils';
 import { doc, docs } from '../../lib/validators/schema';
 import { requireAuth } from '../auth/utils';
-import { LIST_SEARCH_LIMIT, normalizeSearchQuery } from '../search/utils';
-import {
-  listPublishedSpeakers,
-  listPublishedSpeakersPage,
-  searchPublishedSpeakers,
-} from '../talks/utils';
+import { LIST_SEARCH_LIMIT, searchPublishedSpeakers } from '../search/queries';
+import { normalizeSearchQuery } from '../search/utils';
 import { speakerRoleType } from './validators';
 
 const speakerPageValidator = paginationResultValidator(doc('speakers'));
@@ -164,12 +161,30 @@ export const listSpeakers = query({
 
     // When no filters and default sort, use native Convex pagination
     if (!(hasFilters || needsCustomSort)) {
-      return await listPublishedSpeakersPage(ctx, paginationOpts);
+      const result = await ctx.db
+        .query('speakers')
+        .withIndex('by_lastName')
+        .order('asc')
+        .paginate(paginationOpts);
+
+      const filtered = await filterSpeakersWithPublishedTalks(ctx, result.page);
+
+      return {
+        ...result,
+        page: filtered,
+      };
     }
 
     let speakers = hasSearch
       ? await searchPublishedSpeakers(ctx, queryText, LIST_SEARCH_LIMIT)
-      : await listPublishedSpeakers(ctx);
+      : await filterSpeakersWithPublishedTalks(
+          ctx,
+          await ctx.db
+            .query('speakers')
+            .withIndex('by_lastName')
+            .order('asc')
+            .collect()
+        );
 
     // Filter by role
     if (role) {
