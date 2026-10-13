@@ -1,15 +1,18 @@
 #!/usr/bin/env bash
-# Vercel Git builds. Production keeps `pnpm build` (Convex prod still ships via
-# `pnpm release`). Preview creates a per-branch Convex backend so function
-# changes are actually runnable.
+# Vercel Git builds. Production runs `convex deploy --cmd 'pnpm build'` so
+# Convex ships with the frontend. Preview creates a per-branch Convex backend
+# so function changes are actually runnable. `pnpm release` is a manual fallback.
 #
 # `convex deploy --cmd` runs the frontend build *before* functions are pushed.
 # This app prerenders routes that call Convex, so a first preview would fail
 # with "Could not find public function". Push functions first, then build.
 #
 # One-time dashboard setup:
-# 1. Convex project Settings: Generate Preview Deploy Key.
-# 2. Vercel env CONVEX_DEPLOY_KEY: that key, Preview only (not Production).
+# 1. Convex production deployment Settings: Generate Production Deploy Key
+#    (`deployment:deploy`). Vercel CONVEX_DEPLOY_KEY, Production only.
+# 2. Convex project Settings: Generate Preview Deploy Key.
+#    Vercel CONVEX_DEPLOY_KEY, Preview only. Same variable name, different
+#    values per Vercel environment — do not reuse one key for both.
 # 3. Convex: `npx convex env default set --type preview NAME value` for
 #    BETTER_AUTH_SECRET, RESEND_*, SENTRY_DSN, TURNSTILE_SECRET_KEY
 #    (same names as other deploys).
@@ -24,6 +27,14 @@
 # Convex dashboard.
 
 set -euo pipefail
+
+if [ "${VERCEL_ENV:-}" = "production" ]; then
+  if [ -z "${CONVEX_DEPLOY_KEY:-}" ]; then
+    echo "Production builds need CONVEX_DEPLOY_KEY (Convex Production Deploy Key, Vercel Production env only)." >&2
+    exit 1
+  fi
+  exec npx convex deploy --cmd 'pnpm build'
+fi
 
 if [ "${VERCEL_ENV:-}" != "preview" ]; then
   exec pnpm build

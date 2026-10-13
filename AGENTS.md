@@ -9,6 +9,7 @@ Greenfield project — no users, no back-compat concerns. Make it right.
 - After meaningful TypeScript or JavaScript changes, run `pnpm run audit:code`
 - Before opening a PR, run `pnpm check`, `pnpm typecheck`, `pnpm test`, and `pnpm exec fallow audit --base origin/main`
 - Never run `pnpm dev` unless instructed
+- Never run `pnpm release` or `convex deploy` unless instructed — production Convex deploys from the Vercel production build
 - When testing local URLs, always use `https`
 
 Use the Fallow skill for deeper audit and debug workflows.
