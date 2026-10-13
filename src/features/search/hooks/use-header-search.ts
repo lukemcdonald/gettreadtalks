@@ -5,6 +5,7 @@ import type { CommandSearchItem, SearchHit } from '@/features/search/types';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useSyncExternalStore } from 'react';
 
+import { useHeaderSearchAnalytics } from '@/features/search/analytics';
 import { useSearchSite } from '@/features/search/hooks/use-search-site';
 import {
   getHeaderSearchQueryAfterClose,
@@ -58,6 +59,12 @@ export function useHeaderSearch() {
     isSignedIn: Boolean(user),
     previousHits,
     value,
+  });
+  const { trackSelection } = useHeaderSearchAnalytics({
+    debouncedQuery,
+    hitsLength: hits.length,
+    isPending,
+    open,
   });
 
   useEffect(() => {
@@ -127,6 +134,11 @@ export function useHeaderSearch() {
   }
 
   function handleSelect(item: CommandSearchItem) {
+    trackSelection({
+      hits: isPending && previousHits !== null ? previousHits : hits,
+      item,
+      query: value,
+    });
     router.push(item.href);
     close(true);
   }

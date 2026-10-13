@@ -5,10 +5,10 @@ test('Search / Site-wide', async ({ homePage, searchPage }) => {
   await searchPage.searchFor('grace');
 
   await expect(searchPage.dropdownResult('Grace')).toBeVisible();
+  await expect(searchPage.viewAll).toBeHidden();
 
-  await searchPage.viewAll.click();
+  await searchPage.goto('grace');
 
-  await expect(searchPage.page).toHaveURL(/\/search\?search=grace/u);
   await expect(searchPage.heading).toBeVisible();
   await expect(searchPage.result('Grace')).toBeVisible();
 });
@@ -38,9 +38,7 @@ test('Search / Mobile drawer', async ({ homePage, searchPage }) => {
 
   await searchPage.input.fill('grace');
   await expect(searchPage.dropdownResult('Grace')).toBeVisible();
-
-  await searchPage.viewAll.click();
-  await expect(searchPage.page).toHaveURL(/\/search\?search=grace/u);
+  await expect(searchPage.viewAll).toBeHidden();
 });
 
 test('Search / Keeps query on dismiss and clears after navigate', async ({
@@ -55,8 +53,8 @@ test('Search / Keeps query on dismiss and clears after navigate', async ({
   await searchPage.open();
   await expect(searchPage.input).toHaveValue('grace');
 
-  await searchPage.viewAll.click();
-  await expect(searchPage.page).toHaveURL(/\/search\?search=grace/u);
+  await searchPage.dropdownResult('Grace').click();
+  await expect(searchPage.page).toHaveURL(/\/topics\/grace/u);
 
   await searchPage.open();
   await expect(searchPage.input).toHaveValue('');

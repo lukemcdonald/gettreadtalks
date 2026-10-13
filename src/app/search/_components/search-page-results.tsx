@@ -1,10 +1,10 @@
 import { Empty, EmptyDescription, EmptyTitle } from '@/components/ui';
+import { SearchPageAnalytics } from '@/features/search/components/search-page-analytics';
 import { SearchResultGroups } from '@/features/search/components/search-result-groups';
 import { searchSite } from '@/features/search/queries/search-site';
 import {
   SEARCH_PAGE_LIMIT,
   getSearchQuery,
-  hasSearchHits,
   toSearchHits,
 } from '@/features/search/utils';
 
@@ -38,16 +38,21 @@ export async function SearchPageResults({
     query,
   });
 
-  if (!hasSearchHits(results)) {
-    return (
-      <Empty>
-        <EmptyTitle>No results</EmptyTitle>
-        <EmptyDescription>
-          Nothing published matches &ldquo;{query}&rdquo;. Try another search.
-        </EmptyDescription>
-      </Empty>
-    );
-  }
+  const hits = toSearchHits(results);
 
-  return <SearchResultGroups hits={toSearchHits(results)} />;
+  return (
+    <>
+      <SearchPageAnalytics query={query} resultCount={hits.length} />
+      {hits.length === 0 ? (
+        <Empty>
+          <EmptyTitle>No results</EmptyTitle>
+          <EmptyDescription>
+            Nothing published matches &ldquo;{query}&rdquo;. Try another search.
+          </EmptyDescription>
+        </Empty>
+      ) : (
+        <SearchResultGroups hits={hits} query={query} />
+      )}
+    </>
+  );
 }

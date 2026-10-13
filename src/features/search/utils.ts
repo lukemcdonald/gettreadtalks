@@ -239,6 +239,55 @@ export function getHeaderSearchState({
   };
 }
 
+export function shouldShowViewAllResults(
+  hits: SearchHit[],
+  limit = SEARCH_DROPDOWN_LIMIT
+) {
+  return groupSearchHits(hits).some((group) => group.hits.length >= limit);
+}
+
+export function getSearchSelectionAnalytics({
+  hits,
+  itemValue,
+  query,
+}: {
+  hits: SearchHit[];
+  itemValue: string;
+  query: string;
+}) {
+  const trimmedQuery = query.trim();
+
+  if (!trimmedQuery) {
+    return null;
+  }
+
+  if (itemValue === VIEW_ALL_SEARCH_GROUP) {
+    return {
+      position: hits.length + 1,
+      query: trimmedQuery,
+      result_type: 'view_all' as const,
+    };
+  }
+
+  const position = hits.findIndex((hit) => hit.id === itemValue);
+
+  if (position === -1) {
+    return null;
+  }
+
+  const hit = hits[position];
+
+  if (!hit) {
+    return null;
+  }
+
+  return {
+    position: position + 1,
+    query: trimmedQuery,
+    result_type: hit.type,
+  };
+}
+
 export function toCommandGroups(
   hits: SearchHit[],
   query: string
@@ -254,7 +303,7 @@ export function toCommandGroups(
   }));
   const trimmedQuery = query.trim();
 
-  if (!trimmedQuery || groups.length === 0) {
+  if (!trimmedQuery || groups.length === 0 || !shouldShowViewAllResults(hits)) {
     return groups;
   }
 

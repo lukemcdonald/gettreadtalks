@@ -8,11 +8,11 @@ interface Location {
 }
 
 function trackSearch(path: string, query: string | undefined) {
-  if (query === undefined) {
+  if (query === undefined || path === '/search') {
     return;
   }
 
-  void track('search_performed', { path, query });
+  void track('search_performed', { path, query, source: 'page' });
 }
 
 function trackFilters(
