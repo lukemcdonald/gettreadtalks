@@ -25,11 +25,12 @@ import { getCurrentUser, requireAuth } from '../auth/utils';
 import { LIST_SEARCH_LIMIT } from '../search/constants';
 import { normalizeSearchQuery } from '../search/utils';
 import {
+  enrichWithTopics,
+  filterTalksByTitleOrSpeaker,
   listPublishedTalks,
   listPublishedTalksPage,
   searchPublishedTalksByTitleOrSpeaker,
-} from './published';
-import { enrichWithTopics, filterTalksByTitleOrSpeaker } from './utils';
+} from './utils';
 
 /**
  * List published talk slugs with their speaker slugs for sitemap generation.

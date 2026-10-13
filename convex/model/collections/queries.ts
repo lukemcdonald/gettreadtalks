@@ -1,14 +1,32 @@
+import type { QueryCtx } from '../../_generated/server';
+import type { PaginationOptions } from 'convex/server';
+
 import { asyncMap } from 'convex-helpers';
 import { getAll, getOneFrom } from 'convex-helpers/server/relationships';
 import { paginationOptsValidator } from 'convex/server';
 import { v } from 'convex/values';
 
 import { query } from '../../_generated/server';
+import { filterCollectionsWithPublishedTalks } from '../../lib/filters';
 import { enrichWithSpeakers } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
-import { listPublishedTalksForCollection } from '../talks/published';
-import { listPublishedCollections } from './published';
+import { listPublishedTalksForCollection } from '../talks/utils';
+
+export async function listPublishedCollections(
+  ctx: QueryCtx,
+  paginationOpts: PaginationOptions
+) {
+  const collectionPages = await ctx.db
+    .query('collections')
+    .order('desc')
+    .paginate(paginationOpts);
+
+  return {
+    ...collectionPages,
+    page: await filterCollectionsWithPublishedTalks(ctx, collectionPages.page),
+  };
+}
 
 /**
  * List collection slugs for sitemap generation.

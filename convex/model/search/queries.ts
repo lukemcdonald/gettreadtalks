@@ -5,10 +5,10 @@ import { v } from 'convex/values';
 
 import { query } from '../../_generated/server';
 import { enrichWithSpeakers } from '../../lib/utils';
-import { searchPublishedClips } from '../clips/published';
-import { searchPublishedSpeakers } from '../speakers/published';
-import { searchPublishedTalks } from '../talks/published';
-import { searchPublishedTopics } from '../topics/published';
+import { searchPublishedClips } from '../clips/queries';
+import { searchPublishedSpeakers } from '../speakers/queries';
+import { searchPublishedTalks } from '../talks/utils';
+import { searchPublishedTopics } from '../topics/queries';
 import { DEFAULT_SEARCH_LIMIT } from './constants';
 import { normalizeSearchQuery } from './utils';
 
