@@ -55,10 +55,14 @@ else
 fi
 url_file="$(mktemp)"
 
+echo "Claiming Convex preview ${preview_name}"
+
+# Recreate the preview each push. Reusing a half-created preview from a
+# failed deploy makes authorize_preview fail before functions are pushed.
 npx convex deploy \
   --cmd "sh -c 'printf %s \"\$NEXT_PUBLIC_CONVEX_URL\" > \"${url_file}\"'" \
   --cmd-url-env-var-name NEXT_PUBLIC_CONVEX_URL \
-  --preview-name "${preview_name}"
+  --preview-create "${preview_name}"
 
 NEXT_PUBLIC_CONVEX_URL="$(cat "${url_file}")"
 rm -f "${url_file}"
