@@ -1,12 +1,7 @@
-import type { Doc } from '../../_generated/dataModel';
 import type { TopicSortOption } from '../../lib/sort';
 
 import { asyncMap } from 'convex-helpers';
-import {
-  getManyFrom,
-  getManyVia,
-  getOneFrom,
-} from 'convex-helpers/server/relationships';
+import { getManyFrom, getOneFrom } from 'convex-helpers/server/relationships';
 import { paginationOptsValidator } from 'convex/server';
 import { v } from 'convex/values';
 
@@ -16,12 +11,13 @@ import { enrichWithSpeakers, paginateArray } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
 import { requireAuth } from '../auth/utils';
+import { LIST_SEARCH_LIMIT, normalizeSearchQuery } from '../search/utils';
 import {
-  LIST_SEARCH_LIMIT,
+  listPublishedTalksForTopic,
+  listPublishedTopics,
   searchPublishedTalksByTitleOrSpeaker,
   searchPublishedTopics,
-} from '../search/queries';
-import { normalizeSearchQuery } from '../search/utils';
+} from '../talks/utils';
 
 /**
  * Get topic by ID.
@@ -55,19 +51,7 @@ export const getTopicBySlug = query({
       return null;
     }
 
-    const allTalks = await getManyVia(
-      ctx.db,
-      'talksOnTopics',
-      'talkId',
-      'by_topicId',
-      topic._id,
-      'topicId'
-    );
-
-    let publishedTalks = allTalks.filter(
-      (talk): talk is Doc<'talks'> =>
-        talk !== null && talk.status === 'published'
-    );
+    let publishedTalks = await listPublishedTalksForTopic(ctx, topic._id);
 
     if (queryText) {
       const matches = await searchPublishedTalksByTitleOrSpeaker(
@@ -149,33 +133,7 @@ export const listTopics = query({
   handler: async (ctx, args) => {
     const { limit = 100 } = args;
 
-    const allTopics = await ctx.db
-      .query('topics')
-      .withIndex('by_title')
-      .take(limit);
-
-    const topicsWithTalks = await asyncMap(allTopics, async (topic) => {
-      const talksOnTopics = await getManyFrom(
-        ctx.db,
-        'talksOnTopics',
-        'by_topicId',
-        topic._id
-      );
-      const talks = await Promise.all(
-        talksOnTopics.map((entry) => ctx.db.get('talks', entry.talkId))
-      );
-
-      const publishedTalks = talks.filter(
-        (talk): talk is Doc<'talks'> =>
-          talk !== null && talk.status === 'published'
-      );
-
-      return publishedTalks.length > 0 ? topic : null;
-    });
-
-    return topicsWithTalks.filter(
-      (topic): topic is Doc<'topics'> => topic !== null
-    );
+    return await listPublishedTopics(ctx, limit);
   },
   returns: docs('topics'),
 });
@@ -203,23 +161,10 @@ export const listTopicsWithCount = query({
 
     const topics = queryText
       ? await searchPublishedTopics(ctx, queryText, limit)
-      : await ctx.db.query('topics').withIndex('by_title').take(limit);
+      : await listPublishedTopics(ctx, limit);
 
     const topicsWithCounts = await asyncMap(topics, async (topic) => {
-      const talksOnTopics = await getManyFrom(
-        ctx.db,
-        'talksOnTopics',
-        'by_topicId',
-        topic._id
-      );
-      const talks = await Promise.all(
-        talksOnTopics.map((entry) => ctx.db.get('talks', entry.talkId))
-      );
-
-      const publishedTalks = talks.filter(
-        (talk): talk is Doc<'talks'> =>
-          talk !== null && talk.status === 'published'
-      );
+      const publishedTalks = await listPublishedTalksForTopic(ctx, topic._id);
 
       return {
         count: publishedTalks.length,
@@ -255,26 +200,10 @@ export const listTopicsWithTalks = query({
   handler: async (ctx, args) => {
     const { limit = 100, talksPerTopic = 5 } = args;
 
-    const topics = await ctx.db
-      .query('topics')
-      .withIndex('by_title')
-      .take(limit);
+    const topics = await listPublishedTopics(ctx, limit);
 
     const topicsWithTalks = await asyncMap(topics, async (topic) => {
-      const talksOnTopic = await getManyFrom(
-        ctx.db,
-        'talksOnTopics',
-        'by_topicId',
-        topic._id
-      );
-      const talks = await Promise.all(
-        talksOnTopic.map((entry) => ctx.db.get('talks', entry.talkId))
-      );
-
-      const publishedTalks = talks.filter(
-        (talk): talk is Doc<'talks'> =>
-          talk !== null && talk.status === 'published'
-      );
+      const publishedTalks = await listPublishedTalksForTopic(ctx, topic._id);
 
       // Sort: featured talks first, then by creation date (newest first)
       publishedTalks.sort((a, b) => {

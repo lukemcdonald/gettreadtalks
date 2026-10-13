@@ -1,31 +1,16 @@
-import type { Id } from '../../_generated/dataModel';
-import type { QueryCtx } from '../../_generated/server';
-
 import { asyncMap } from 'convex-helpers';
 import { getAll, getOneFrom } from 'convex-helpers/server/relationships';
 import { paginationOptsValidator } from 'convex/server';
 import { v } from 'convex/values';
 
 import { query } from '../../_generated/server';
-import { filterCollectionsWithPublishedTalks } from '../../lib/filters';
 import { enrichWithSpeakers } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
-
-/** Fetches published talks for a collection, with optional limit. */
-async function getPublishedTalks(
-  ctx: QueryCtx,
-  collectionId: Id<'collections'>,
-  limit?: number
-) {
-  const talksQuery = ctx.db
-    .query('talks')
-    .withIndex('by_collectionId_and_status', (q) =>
-      q.eq('collectionId', collectionId).eq('status', 'published')
-    );
-
-  return await (limit ? talksQuery.take(limit) : talksQuery.collect());
-}
+import {
+  listPublishedCollections,
+  listPublishedTalksForCollection,
+} from '../talks/utils';
 
 /**
  * List collection slugs for sitemap generation.
@@ -72,7 +57,11 @@ export const getCollectionBySlug = query({
       return null;
     }
 
-    const talks = await getPublishedTalks(ctx, collection._id, limit);
+    const talks = await listPublishedTalksForCollection(
+      ctx,
+      collection._id,
+      limit
+    );
 
     talks.sort((a, b) => (a.collectionOrder || 0) - (b.collectionOrder || 0));
 
@@ -132,21 +121,19 @@ export const listCollections = query({
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
-    const collectionPages = await ctx.db
-      .query('collections')
-      .order('desc')
-      .paginate(args.paginationOpts);
-
-    const collectionsWithTalks = await filterCollectionsWithPublishedTalks(
+    const collectionPages = await listPublishedCollections(
       ctx,
-      collectionPages.page
+      args.paginationOpts
     );
 
     // Enrich each collection with stats
     const enrichedPage = await asyncMap(
-      collectionsWithTalks,
+      collectionPages.page,
       async (collection) => {
-        const talks = await getPublishedTalks(ctx, collection._id);
+        const talks = await listPublishedTalksForCollection(
+          ctx,
+          collection._id
+        );
 
         // Get unique speaker IDs
         const speakerIds = [...new Set(talks.map((talk) => talk.speakerId))];
@@ -188,7 +175,10 @@ export const listAllCollections = query({
     const enrichedPage = await asyncMap(
       collectionPages.page,
       async (collection) => {
-        const talks = await getPublishedTalks(ctx, collection._id);
+        const talks = await listPublishedTalksForCollection(
+          ctx,
+          collection._id
+        );
 
         const speakerIds = [...new Set(talks.map((talk) => talk.speakerId))];
         const speakers = await getAll(ctx.db, speakerIds);
