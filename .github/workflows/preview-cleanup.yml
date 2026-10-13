@@ -1,0 +1,138 @@
+name: Preview / Cleanup
+
+on:
+  pull_request:
+    types:
+      - closed
+
+permissions:
+  contents: read
+
+jobs:
+  cleanup:
+    name: Preview / Cleanup
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Delete Convex preview
+        env:
+          CONVEX_MANAGEMENT_TOKEN: ${{ secrets.CONVEX_MANAGEMENT_TOKEN }}
+          CONVEX_PROJECT_ID: ${{ vars.CONVEX_PROJECT_ID }}
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          set -euo pipefail
+
+          if [[ -z "${CONVEX_MANAGEMENT_TOKEN}" ]]; then
+            echo "CONVEX_MANAGEMENT_TOKEN is unset; skipping Convex preview cleanup."
+            exit 0
+          fi
+
+          if [[ -z "${HEAD_REF}" ]]; then
+            echo "No PR head ref; skipping Convex preview cleanup."
+            exit 0
+          fi
+
+          # Same name as scripts/vercel-build.sh: VERCEL_GIT_COMMIT_REF with / -> -
+          preview_name="${HEAD_REF//\//-}"
+          echo "Looking up Convex preview ${preview_name}"
+
+          api() {
+            local method="$1"
+            local path="$2"
+            shift 2
+            curl -sS -X "${method}" \
+              -H "Accept: application/json" \
+              -H "Authorization: Bearer ${CONVEX_MANAGEMENT_TOKEN}" \
+              "$@" \
+              "https://api.convex.dev/v1${path}"
+          }
+
+          find_in_project() {
+            local project_id="$1"
+            api GET "/projects/${project_id}/list_deployments?deploymentType=preview" \
+              | jq -r --arg name "${preview_name}" \
+                '.[] | select(.previewIdentifier == $name) | .name' \
+              | head -n1
+          }
+
+          find_in_team() {
+            local team_id="$1"
+            local cursor=""
+            local page name has_more
+
+            while true; do
+              if [[ -n "${cursor}" ]]; then
+                page="$(api GET "/teams/${team_id}/list_deployments?deploymentType=preview&limit=100&cursor=${cursor}")"
+              else
+                page="$(api GET "/teams/${team_id}/list_deployments?deploymentType=preview&limit=100")"
+              fi
+
+              name="$(
+                jq -r --arg name "${preview_name}" \
+                  '.items[]? | select(.previewIdentifier == $name) | .name' \
+                  <<<"${page}" | head -n1
+              )"
+              if [[ -n "${name}" ]]; then
+                printf '%s\n' "${name}"
+                return 0
+              fi
+
+              has_more="$(jq -r '.pagination.hasMore // false' <<<"${page}")"
+              cursor="$(jq -r '.pagination.nextCursor // empty' <<<"${page}")"
+              if [[ "${has_more}" != "true" || -z "${cursor}" ]]; then
+                return 0
+              fi
+            done
+          }
+
+          deployment_name=""
+
+          if [[ -n "${CONVEX_PROJECT_ID}" ]]; then
+            deployment_name="$(find_in_project "${CONVEX_PROJECT_ID}")"
+          else
+            details="$(api GET /token_details)"
+            token_type="$(jq -r '.type // empty' <<<"${details}")"
+
+            case "${token_type}" in
+              projectToken)
+                deployment_name="$(find_in_project "$(jq -r '.projectId' <<<"${details}")")"
+                ;;
+              teamToken)
+                deployment_name="$(find_in_team "$(jq -r '.teamId' <<<"${details}")")"
+                ;;
+              *)
+                echo "CONVEX_MANAGEMENT_TOKEN did not resolve a team or project. Set CONVEX_PROJECT_ID or skip."
+                exit 0
+                ;;
+            esac
+          fi
+
+          if [[ -z "${deployment_name}" ]]; then
+            echo "No Convex preview named ${preview_name}; skipping delete."
+            exit 0
+          fi
+
+          echo "Deleting Convex deployment ${deployment_name}"
+          body="$(mktemp)"
+          http_code="$(
+            curl -sS -o "${body}" -w '%{http_code}' -X POST \
+              -H "Accept: application/json" \
+              -H "Authorization: Bearer ${CONVEX_MANAGEMENT_TOKEN}" \
+              "https://api.convex.dev/v1/deployments/${deployment_name}/delete"
+          )"
+
+          if [[ "${http_code}" == "200" ]]; then
+            echo "Deleted Convex preview ${preview_name} (${deployment_name})"
+            rm -f "${body}"
+            exit 0
+          fi
+
+          if [[ "${http_code}" == "404" ]]; then
+            echo "Convex preview ${preview_name} (${deployment_name}) already gone"
+            rm -f "${body}"
+            exit 0
+          fi
+
+          echo "Failed to delete ${deployment_name}: HTTP ${http_code}" >&2
+          cat "${body}" >&2
+          rm -f "${body}"
+          exit 1

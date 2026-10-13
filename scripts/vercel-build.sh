@@ -46,11 +46,7 @@ fi
 
 # Convex preview names cannot contain `/`. `deploy --preview-name` rewrites
 # slashes to hyphens; `env set --deployment` does not, so use the same name.
-#
-# New per-branch preview names fail authorize_preview in ~15s once the
-# project is at its preview-deployment cap. Reuse the last healthy preview
-# so Vercel can push functions instead of minting another backend.
-preview_name="cursor-volta-334-site-wide-search-74a2"
+preview_name="${VERCEL_GIT_COMMIT_REF//\//-}"
 # Prefer the stable git-branch URL so auth cookies match the PR link.
 if [ -n "${VERCEL_BRANCH_URL:-}" ]; then
   preview_site_url="https://${VERCEL_BRANCH_URL}"
