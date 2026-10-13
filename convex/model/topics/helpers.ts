@@ -4,8 +4,12 @@ import { filterTopicsWithPublishedTalks } from '../../lib/filters';
 
 const UNFILTERED_SEARCH_MULTIPLIER = 3;
 
+function publishedTopicsQuery(ctx: QueryCtx) {
+  return ctx.db.query('topics').withIndex('by_title');
+}
+
 export async function listPublishedTopics(ctx: QueryCtx, limit = 100) {
-  const topics = await ctx.db.query('topics').withIndex('by_title').take(limit);
+  const topics = await publishedTopicsQuery(ctx).take(limit);
 
   return await filterTopicsWithPublishedTalks(ctx, topics);
 }

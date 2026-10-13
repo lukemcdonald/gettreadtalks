@@ -3,14 +3,16 @@ import type { PaginationOptions } from 'convex/server';
 
 import { filterCollectionsWithPublishedTalks } from '../../lib/filters';
 
-export async function listPublishedCollections(
+function publishedCollectionsQuery(ctx: QueryCtx) {
+  return ctx.db.query('collections').order('desc');
+}
+
+export async function listPublishedCollectionsPage(
   ctx: QueryCtx,
   paginationOpts: PaginationOptions
 ) {
-  const collectionPages = await ctx.db
-    .query('collections')
-    .order('desc')
-    .paginate(paginationOpts);
+  const collectionPages =
+    await publishedCollectionsQuery(ctx).paginate(paginationOpts);
 
   return {
     ...collectionPages,

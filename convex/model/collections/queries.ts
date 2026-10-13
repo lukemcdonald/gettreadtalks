@@ -8,7 +8,7 @@ import { enrichWithSpeaker } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
 import { listPublishedTalksForCollection } from '../talks/helpers';
-import { listPublishedCollections } from './helpers';
+import { listPublishedCollectionsPage } from './helpers';
 
 /**
  * List collection slugs for sitemap generation.
@@ -119,7 +119,7 @@ export const listCollections = query({
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
-    const collectionPages = await listPublishedCollections(
+    const collectionPages = await listPublishedCollectionsPage(
       ctx,
       args.paginationOpts
     );

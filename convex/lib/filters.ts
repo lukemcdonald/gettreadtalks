@@ -60,7 +60,7 @@ export async function filterClipsByPublishedTalks(
 
 /**
  * Filter collections to only those with at least one published talk.
- * Building block for listPublishedCollections.
+ * Building block for listPublishedCollectionsPage.
  */
 export async function filterCollectionsWithPublishedTalks(
   ctx: QueryCtx,

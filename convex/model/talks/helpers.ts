@@ -26,18 +26,25 @@ export async function listPublishedTalksPage(
   return await publishedTalksQuery(ctx).paginate(paginationOpts);
 }
 
+function publishedTalksForCollectionQuery(
+  ctx: QueryCtx,
+  collectionId: Id<'collections'>
+) {
+  return ctx.db
+    .query('talks')
+    .withIndex('by_collectionId_and_status', (q) =>
+      q.eq('collectionId', collectionId).eq('status', 'published')
+    );
+}
+
 export async function listPublishedTalksForCollection(
   ctx: QueryCtx,
   collectionId: Id<'collections'>,
   limit?: number
 ) {
-  const talksQuery = ctx.db
-    .query('talks')
-    .withIndex('by_collectionId_and_status', (q) =>
-      q.eq('collectionId', collectionId).eq('status', 'published')
-    );
+  const talks = publishedTalksForCollectionQuery(ctx, collectionId);
 
-  return await (limit ? talksQuery.take(limit) : talksQuery.collect());
+  return await (limit ? talks.take(limit) : talks.collect());
 }
 
 export async function listPublishedTalksForTopic(
