@@ -1,22 +1,21 @@
-import type { AdminEntity } from '@/lib/entities/paths';
+'use client';
 
-import { Suspense } from 'react';
+import type { AdminEntity } from '@/lib/entities/paths';
 
 import { Button } from '@/components/ui';
 import { Link } from '@/components/ui/link';
+import { useIsAdmin } from '@/features/users/hooks/use-is-admin';
 import { getEntityEditPath } from '@/lib/entities/paths';
-import { getCurrentUser } from '@/services/auth/server';
-import { isAdmin } from '@/services/auth/utils';
 
 interface AdminEditButtonProps {
   entity: AdminEntity;
   id: string;
 }
 
-async function AdminEditLink({ entity, id }: AdminEditButtonProps) {
-  const user = await getCurrentUser();
+export function AdminEditButton({ entity, id }: AdminEditButtonProps) {
+  const isAdminUser = useIsAdmin();
 
-  if (!isAdmin(user)) {
+  if (!isAdminUser) {
     return null;
   }
 
@@ -29,13 +28,5 @@ async function AdminEditLink({ entity, id }: AdminEditButtonProps) {
     >
       Edit
     </Button>
-  );
-}
-
-export function AdminEditButton({ entity, id }: AdminEditButtonProps) {
-  return (
-    <Suspense fallback={null}>
-      <AdminEditLink entity={entity} id={id} />
-    </Suspense>
   );
 }
