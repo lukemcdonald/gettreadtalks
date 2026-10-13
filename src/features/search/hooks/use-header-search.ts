@@ -20,6 +20,10 @@ import {
 import { useCurrentUser } from '@/features/users/hooks/use-current-user';
 
 function getClientSearchHotkeyLabel() {
+  if (typeof window === 'undefined') {
+    return getServerSearchHotkeyLabel();
+  }
+
   return getSearchHotkeyLabel(navigator.userAgent);
 }
 
