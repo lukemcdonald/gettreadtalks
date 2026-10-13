@@ -1,6 +1,7 @@
 import type { Locator, Page } from '@playwright/test';
 
 export class CollectionsPage {
+  readonly adminEdit: Locator;
   readonly collectionHeading: Locator;
   readonly firstCollection: Locator;
   readonly heading: Locator;
@@ -8,6 +9,7 @@ export class CollectionsPage {
 
   constructor(page: Page) {
     this.page = page;
+    this.adminEdit = page.getByTestId('admin-edit');
     this.collectionHeading = page.getByRole('heading', { level: 1 });
     this.firstCollection = page
       .getByRole('link')

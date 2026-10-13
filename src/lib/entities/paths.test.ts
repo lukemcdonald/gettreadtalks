@@ -6,6 +6,7 @@ import {
   getAdminLoginRedirect,
   getEntityEditPath,
   getEntityNewPath,
+  getPublicEditPath,
 } from './paths.ts';
 
 describe('getAdminListPath', () => {
@@ -30,6 +31,15 @@ describe('getEntityEditPath', () => {
 describe('getEntityNewPath', () => {
   test('matches the intercepted admin sheet url', () => {
     assert.equal(getEntityNewPath('clips'), '/clips/new');
+  });
+});
+
+describe('getPublicEditPath', () => {
+  test('appends /edit to a public detail path', () => {
+    assert.equal(
+      getPublicEditPath('/talks/john-piper/justification'),
+      '/talks/john-piper/justification/edit'
+    );
   });
 });
 

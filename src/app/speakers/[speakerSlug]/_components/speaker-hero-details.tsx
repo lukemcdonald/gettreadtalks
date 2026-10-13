@@ -1,5 +1,6 @@
 import type { Speaker } from '@/features/speakers/types';
 
+import { AdminEditButton } from '@/components/admin-edit-button';
 import { HeroTitle } from '@/components/hero';
 import { SpeakerAvatar } from '@/features/speakers/components/speaker-avatar';
 import { SpeakerMinistryLink } from '@/features/speakers/components/speaker-ministry-link';
@@ -47,7 +48,17 @@ export function SpeakerHeroDetails({
               {speaker.role}
             </p>
           )}
-          <HeroTitle className="text-foreground">{speakerName}</HeroTitle>
+          <div
+            className={cn(
+              'flex flex-wrap items-center gap-3',
+              isInline ? 'justify-center md:justify-start' : 'justify-center'
+            )}
+          >
+            <HeroTitle className="text-foreground min-w-0">
+              {speakerName}
+            </HeroTitle>
+            <AdminEditButton entity="speakers" id={speaker._id} />
+          </div>
         </div>
 
         {isInline && (

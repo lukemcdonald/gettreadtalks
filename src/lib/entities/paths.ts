@@ -33,3 +33,7 @@ export function getEntityEditPath(
 export function getEntityNewPath(entity: AdminEntity) {
   return `/${entity}/new`;
 }
+
+export function getPublicEditPath(publicPath: string) {
+  return `${publicPath}/edit`;
+}
