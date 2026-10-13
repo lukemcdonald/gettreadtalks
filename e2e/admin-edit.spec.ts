@@ -17,6 +17,9 @@ test('Admin edit / Visitor /edit redirects to the public page', async ({
   await talksPage.goto();
   await talksPage.openFirst();
 
+  await expect(talksPage.talkHeading).toBeVisible();
+  await expect(talksPage.page).toHaveURL(/\/talks\/[^/]+\/[^/]+$/u);
+
   const publicPath = new URL(talksPage.page.url()).pathname;
 
   await talksPage.gotoPublicEdit();

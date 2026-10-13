@@ -38,6 +38,7 @@ export class TalksPage {
   }
 
   async gotoPublicEdit() {
+    await this.page.waitForURL(/\/talks\/[^/]+\/[^/]+$/u);
     const url = new URL(this.page.url());
     await this.page.goto(`${url.pathname}/edit`);
   }
@@ -48,6 +49,7 @@ export class TalksPage {
 
   async openFirst() {
     await this.firstTalk.click();
+    await this.page.waitForURL(/\/talks\/[^/]+\/[^/]+$/u);
   }
 
   async searchFor(query: string) {
