@@ -12,7 +12,7 @@ PLAYWRIGHT_BASE_URL=https://www.gettreadtalks.com pnpm test:e2e
 - `setup` — `auth.setup.ts` signs in through the UI and writes `playwright/.auth/user.json` (gitignored)
 - `chromium-user` — signed-in flows that reuse that `storageState`
 
-`setup` and `chromium-user` are registered only when `E2E_USER_EMAIL` and `E2E_USER_PASSWORD` are set (the preview seeded user). Auth UI tests skip with a message when those env vars are missing, so local runs stay green. Do not log the values. Traces stay off when they or `VERCEL_AUTOMATION_BYPASS_SECRET` are set.
+`setup` and `chromium-user` are registered only when `E2E_USER_EMAIL` and `E2E_USER_PASSWORD` are set (the preview seeded admin user). Auth UI tests skip with a message when those env vars are missing, so local runs stay green. Do not log the values. Traces stay off when they or `VERCEL_AUTOMATION_BYPASS_SECRET` are set.
 
 Protected previews also need `VERCEL_AUTOMATION_BYPASS_SECRET`.
 

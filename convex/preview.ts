@@ -411,6 +411,21 @@ export const seedPreviewUser = internalMutation({
     const existingUserId = adapterRecordId(existingUser);
 
     if (existingUserId) {
+      await ctx.runMutation(components.betterAuth.adapter.updateOne, {
+        input: {
+          model: 'user',
+          update: {
+            role: 'admin',
+            updatedAt: now,
+          },
+          where: [
+            {
+              field: '_id',
+              value: existingUserId,
+            },
+          ],
+        },
+      });
       await upsertCredentialAccount(ctx, args.passwordHash, existingUserId);
 
       return 'updated';
@@ -425,7 +440,7 @@ export const seedPreviewUser = internalMutation({
             email: args.email,
             emailVerified: true,
             name: args.name,
-            role: 'user',
+            role: 'admin',
             updatedAt: now,
           },
           model: 'user',
