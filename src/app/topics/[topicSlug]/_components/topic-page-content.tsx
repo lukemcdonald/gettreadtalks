@@ -9,6 +9,7 @@ import {
 import { TopicSidebar } from '@/app/topics/[topicSlug]/_components/topic-sidebar';
 import { TopicTalks } from '@/app/topics/[topicSlug]/_components/topic-talks';
 import { topicTalkCountPhrase } from '@/app/topics/[topicSlug]/_components/topic-talks-description';
+import { AdminEditButton } from '@/components/admin-edit-button';
 import { JsonLd } from '@/components/json-ld';
 import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
@@ -46,7 +47,12 @@ async function TopicHeader({ topicSlug }: { topicSlug: string }) {
           topicSlug,
         })}
       />
-      <PageHeader description={description} size="lg" title={topic.title} />
+      <PageHeader
+        actions={<AdminEditButton entity="topics" id={topic._id} />}
+        description={description}
+        size="lg"
+        title={topic.title}
+      />
     </>
   );
 }

@@ -1,6 +1,7 @@
 import type { Clip } from '@/features/clips/types';
 import type { Speaker } from '@/features/speakers/types';
 
+import { AdminEditButton } from '@/components/admin-edit-button';
 import { HeroTitle } from '@/components/hero';
 import { MediaEmbed } from '@/components/media-embed';
 import { Container, Section } from '@/components/ui';
@@ -19,9 +20,12 @@ export function ClipHero({ clip, speaker }: ClipHeroProps) {
     <Section className="bg-background relative overflow-hidden py-6 sm:py-8 md:py-12 lg:py-16">
       <Container className="relative space-y-8">
         <div className="space-y-2 text-center">
-          <HeroTitle className="text-foreground" size="sm">
-            {clip.title}
-          </HeroTitle>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <HeroTitle className="text-foreground min-w-0" size="sm">
+              {clip.title}
+            </HeroTitle>
+            <AdminEditButton entity="clips" id={clip._id} />
+          </div>
           {speaker && (
             <p className="text-muted-foreground text-lg">
               by{' '}

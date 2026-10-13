@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import { collectionJsonLd } from '@/app/collections/[collectionSlug]/_components/collection-json-ld';
 import { CollectionSidebar } from '@/app/collections/[collectionSlug]/_components/collection-sidebar';
 import { uniqueSpeakersFromTalks } from '@/app/collections/[collectionSlug]/_components/unique-speakers';
+import { AdminEditButton } from '@/components/admin-edit-button';
 import { JsonLd } from '@/components/json-ld';
 import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
@@ -67,6 +68,9 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
         content={<CollectionTalkList talks={talks} />}
         header={
           <PageHeader
+            actions={
+              <AdminEditButton entity="collections" id={collection._id} />
+            }
             description={collection.description}
             size="lg"
             title={collection.title}

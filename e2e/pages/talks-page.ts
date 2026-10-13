@@ -1,6 +1,8 @@
 import type { Locator, Page } from '@playwright/test';
 
 export class TalksPage {
+  readonly adminEdit: Locator;
+  readonly editSheet: Locator;
   readonly favorite: Locator;
   readonly firstTalk: Locator;
   readonly heading: Locator;
@@ -11,6 +13,8 @@ export class TalksPage {
 
   constructor(page: Page) {
     this.page = page;
+    this.adminEdit = page.getByTestId('admin-edit');
+    this.editSheet = page.getByRole('heading', { name: 'Edit Talk' });
     this.favorite = page.getByTestId('favorite-talk');
     this.firstTalk = page
       .getByRole('link')
@@ -31,6 +35,15 @@ export class TalksPage {
 
   async goto() {
     await this.page.goto('/talks');
+  }
+
+  async gotoPublicEdit() {
+    const url = new URL(this.page.url());
+    await this.page.goto(`${url.pathname}/edit`);
+  }
+
+  async openAdminEdit() {
+    await this.adminEdit.click();
   }
 
   async openFirst() {

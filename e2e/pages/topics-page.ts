@@ -1,6 +1,7 @@
 import type { Locator, Page } from '@playwright/test';
 
 export class TopicsPage {
+  readonly adminEdit: Locator;
   readonly firstTopic: Locator;
   readonly heading: Locator;
   readonly page: Page;
@@ -8,6 +9,7 @@ export class TopicsPage {
 
   constructor(page: Page) {
     this.page = page;
+    this.adminEdit = page.getByTestId('admin-edit');
     this.firstTopic = page.getByTestId('topic-link').first();
     this.heading = page.getByRole('heading', {
       exact: true,
