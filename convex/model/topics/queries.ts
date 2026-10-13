@@ -14,12 +14,10 @@ import { requireAuth } from '../auth/utils';
 import { LIST_SEARCH_LIMIT, normalizeSearchQuery } from '../search/utils';
 import {
   listPublishedTalksForTopic,
-  searchPublishedTalksByTitleOrSpeaker,
-} from '../talks/utils';
-import {
   listPublishedTopics,
+  searchPublishedTalksByTitleOrSpeaker,
   searchPublishedTopics,
-} from './published.helpers';
+} from '../talks/utils';
 
 /**
  * Get topic by ID.

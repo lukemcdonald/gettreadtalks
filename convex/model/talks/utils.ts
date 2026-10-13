@@ -5,8 +5,19 @@ import type { PaginationOptions } from 'convex/server';
 import { asyncMap } from 'convex-helpers';
 import { getManyVia } from 'convex-helpers/server/relationships';
 
-import { DEFAULT_SEARCH_LIMIT, uniqueById } from '../search/utils';
-import { searchPublishedSpeakers } from '../speakers/published.helpers';
+import {
+  filterClipsByPublishedTalks,
+  filterCollectionsWithPublishedTalks,
+  filterSpeakersWithPublishedTalks,
+  filterTopicsWithPublishedTalks,
+} from '../../lib/filters';
+import {
+  DEFAULT_SEARCH_LIMIT,
+  searchPhrases,
+  uniqueById,
+} from '../search/utils';
+
+const UNFILTERED_SEARCH_MULTIPLIER = 3;
 
 function speakerNameMatches(
   searchLower: string,
@@ -185,4 +196,138 @@ export async function searchPublishedTalksByTitleOrSpeaker(
     ...titleHits,
     ...speakerTalkPages.flat(),
   ]).slice(0, limit);
+}
+
+function publishedSpeakersQuery(ctx: QueryCtx) {
+  return ctx.db.query('speakers').withIndex('by_lastName').order('asc');
+}
+
+export async function listPublishedSpeakers(ctx: QueryCtx) {
+  return await filterSpeakersWithPublishedTalks(
+    ctx,
+    await publishedSpeakersQuery(ctx).collect()
+  );
+}
+
+export async function listPublishedSpeakersPage(
+  ctx: QueryCtx,
+  paginationOpts: PaginationOptions
+) {
+  const result = await publishedSpeakersQuery(ctx).paginate(paginationOpts);
+
+  return {
+    ...result,
+    page: await filterSpeakersWithPublishedTalks(ctx, result.page),
+  };
+}
+
+export async function searchPublishedSpeakers(
+  ctx: QueryCtx,
+  queryText: string,
+  limit: number
+) {
+  const candidateLimit = limit * UNFILTERED_SEARCH_MULTIPLIER;
+  const phrases = searchPhrases(queryText);
+  const matches = await Promise.all([
+    ...phrases.map((phrase) =>
+      ctx.db
+        .query('speakers')
+        .withSearchIndex('search_firstName', (q) =>
+          q.search('firstName', phrase)
+        )
+        .take(candidateLimit)
+    ),
+    ...phrases.map((phrase) =>
+      ctx.db
+        .query('speakers')
+        .withSearchIndex('search_lastName', (q) => q.search('lastName', phrase))
+        .take(candidateLimit)
+    ),
+  ]);
+
+  const speakers = await filterSpeakersWithPublishedTalks(
+    ctx,
+    uniqueById(matches.flat())
+  );
+
+  return speakers.slice(0, limit);
+}
+
+function publishedClipsQuery(ctx: QueryCtx) {
+  return ctx.db
+    .query('clips')
+    .withIndex('by_status_and_publishedAt', (q) => q.eq('status', 'published'))
+    .order('desc');
+}
+
+export async function listPublishedClips(ctx: QueryCtx) {
+  return await filterClipsByPublishedTalks(
+    ctx,
+    await publishedClipsQuery(ctx).collect()
+  );
+}
+
+export async function listPublishedClipsPage(
+  ctx: QueryCtx,
+  paginationOpts: PaginationOptions
+) {
+  const result = await publishedClipsQuery(ctx).paginate(paginationOpts);
+
+  return {
+    ...result,
+    page: await filterClipsByPublishedTalks(ctx, result.page),
+  };
+}
+
+export async function searchPublishedClips(
+  ctx: QueryCtx,
+  queryText: string,
+  limit: number
+) {
+  const clips = await filterClipsByPublishedTalks(
+    ctx,
+    await ctx.db
+      .query('clips')
+      .withSearchIndex('search_title', (q) =>
+        q.search('title', queryText).eq('status', 'published')
+      )
+      .take(limit)
+  );
+
+  return clips.slice(0, limit);
+}
+
+export async function listPublishedTopics(ctx: QueryCtx, limit = 100) {
+  const topics = await ctx.db.query('topics').withIndex('by_title').take(limit);
+
+  return await filterTopicsWithPublishedTalks(ctx, topics);
+}
+
+export async function searchPublishedTopics(
+  ctx: QueryCtx,
+  queryText: string,
+  limit: number
+) {
+  const topics = await ctx.db
+    .query('topics')
+    .withSearchIndex('search_title', (q) => q.search('title', queryText))
+    .take(limit * UNFILTERED_SEARCH_MULTIPLIER);
+  const published = await filterTopicsWithPublishedTalks(ctx, topics);
+
+  return published.slice(0, limit);
+}
+
+export async function listPublishedCollections(
+  ctx: QueryCtx,
+  paginationOpts: PaginationOptions
+) {
+  const collectionPages = await ctx.db
+    .query('collections')
+    .order('desc')
+    .paginate(paginationOpts);
+
+  return {
+    ...collectionPages,
+    page: await filterCollectionsWithPublishedTalks(ctx, collectionPages.page),
+  };
 }

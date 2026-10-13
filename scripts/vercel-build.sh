@@ -44,12 +44,9 @@ if [ -z "${VERCEL_GIT_COMMIT_REF:-}" ]; then
   exit 1
 fi
 
-# Convex preview names cannot contain `/`. Keep them short: long hyphenated
-# branch names have failed authorize_preview in ~15s on this project even
-# though docs allow 100 characters. Hash stays stable per git ref.
-preview_name="$(
-  printf '%s' "${VERCEL_GIT_COMMIT_REF}" | sha256sum | awk '{ print substr($1, 1, 12) }'
-)"
+# Convex preview names cannot contain `/`. `deploy --preview-name` rewrites
+# slashes to hyphens; `env set --deployment` does not, so use the same name.
+preview_name="${VERCEL_GIT_COMMIT_REF//\//-}"
 # Prefer the stable git-branch URL so auth cookies match the PR link.
 if [ -n "${VERCEL_BRANCH_URL:-}" ]; then
   preview_site_url="https://${VERCEL_BRANCH_URL}"
@@ -57,8 +54,6 @@ else
   preview_site_url="https://${VERCEL_URL}"
 fi
 url_file="$(mktemp)"
-
-echo "Claiming Convex preview ${preview_name} (from ${VERCEL_GIT_COMMIT_REF})"
 
 npx convex deploy \
   --cmd "sh -c 'printf %s \"\$NEXT_PUBLIC_CONVEX_URL\" > \"${url_file}\"'" \

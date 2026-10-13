@@ -19,7 +19,7 @@ import {
   listPublishedClips,
   listPublishedClipsPage,
   searchPublishedClips,
-} from './published.helpers';
+} from '../talks/utils';
 
 const clipPageWithSpeakersValidator = paginationResultValidator(
   doc('clips').extend({

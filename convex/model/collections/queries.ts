@@ -7,8 +7,10 @@ import { query } from '../../_generated/server';
 import { enrichWithSpeakers } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
-import { listPublishedTalksForCollection } from '../talks/utils';
-import { listPublishedCollections } from './published.helpers';
+import {
+  listPublishedCollections,
+  listPublishedTalksForCollection,
+} from '../talks/utils';
 
 /**
  * List collection slugs for sitemap generation.

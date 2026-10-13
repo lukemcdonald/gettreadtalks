@@ -20,7 +20,7 @@ import {
   listPublishedSpeakers,
   listPublishedSpeakersPage,
   searchPublishedSpeakers,
-} from './published.helpers';
+} from '../talks/utils';
 import { speakerRoleType } from './validators';
 
 const speakerPageValidator = paginationResultValidator(doc('speakers'));
