@@ -205,13 +205,16 @@ export async function deleteAll<T extends { _id: Id<TableNames> }>(
  * Works with any entity that has a speakerId field (talks, clips, etc).
  */
 export async function enrichWithSpeakers<
-  T extends { speakerId: Id<'speakers'> },
+  T extends { speakerId?: Id<'speakers'> },
 >(
   ctx: QueryCtx,
   items: T[]
 ): Promise<(T & { speaker: Doc<'speakers'> | null })[]> {
   return await asyncMap(items, async (item: T) => {
-    const speaker = await ctx.db.get('speakers', item.speakerId);
+    const speaker = item.speakerId
+      ? await ctx.db.get('speakers', item.speakerId)
+      : null;
+
     return { ...item, speaker };
   });
 }

@@ -112,7 +112,7 @@ Public reads live in `src/features/*/queries` with `'use cache'`, `cacheLife()`,
 ### File Structure
 
 - `convex/{domain}.ts` - Public API exports
-- `convex/model/{domain}/` - Entity helpers (queries.ts, mutations.ts, schema.ts, validators.ts)
+- `convex/model/{domain}/` - Entity helpers (queries.ts, mutations.ts, schema.ts, validators.ts, published.ts)
 - `convex/model/auth/` - Authentication helpers
 - `convex/lib/` - Shared utilities
 
@@ -130,6 +130,14 @@ _Queries:_
 - `get*` — Single document or null
 - `list*` — Filtered/public array with enrichment
 - `listAll*` — Unfiltered array for admin
+
+_Public content helpers (not registered queries):_
+
+- `listPublished*` — All publicly visible docs for browsing
+- `searchPublished*` — Publicly visible docs matching a search query
+- Registered queries call these instead of building index queries and visibility filters inline
+- Visibility filters in `convex/lib/filters.ts` are building blocks for those helpers, not for queries
+- Shared exported search limits live in `convex/model/search/constants.ts`; file-private values stay colocated
 
 _Mutations:_
 

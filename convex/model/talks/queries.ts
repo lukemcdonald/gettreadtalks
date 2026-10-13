@@ -22,11 +22,12 @@ import { doc, docs } from '../../lib/validators/schema';
 import { statusFilterType } from '../../lib/validators/shared';
 import { canViewContent } from '../auth/roles';
 import { getCurrentUser, requireAuth } from '../auth/utils';
-import {
-  LIST_SEARCH_LIMIT,
-  searchPublishedTalksByTitleOrSpeaker,
-} from '../search/queries';
+import { LIST_SEARCH_LIMIT } from '../search/constants';
 import { normalizeSearchQuery } from '../search/utils';
+import {
+  listPublishedTalks,
+  searchPublishedTalksByTitleOrSpeaker,
+} from './published';
 import { enrichWithTopics, filterTalksByTitleOrSpeaker } from './utils';
 
 /**
@@ -355,14 +356,7 @@ export const listTalks = query({
 
     // When no filters and default sort, use native Convex pagination for efficiency
     if (!(hasFilters || needsCustomSort)) {
-      const result = await ctx.db
-        .query('talks')
-        .withIndex('by_status_and_publishedAt', (q) =>
-          q.eq('status', 'published')
-        )
-        .order('desc')
-        .paginate(paginationOpts);
-
+      const result = await listPublishedTalks(ctx, { paginationOpts });
       const talksWithSpeakers = await enrichWithSpeakers(ctx, result.page);
       const enrichedTalks = await enrichWithTopics(ctx, talksWithSpeakers);
 
@@ -378,13 +372,7 @@ export const listTalks = query({
           queryText,
           LIST_SEARCH_LIMIT
         )
-      : await ctx.db
-          .query('talks')
-          .withIndex('by_status_and_publishedAt', (q) =>
-            q.eq('status', 'published')
-          )
-          .order('desc')
-          .collect();
+      : await listPublishedTalks(ctx);
 
     // Apply speaker filter (multi-select)
     if (hasSpeakerFilter) {
