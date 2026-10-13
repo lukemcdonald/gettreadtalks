@@ -50,8 +50,7 @@ jobs:
             local project_id="$1"
             api GET "/projects/${project_id}/list_deployments?deploymentType=preview" \
               | jq -r --arg name "${preview_name}" \
-                '.[] | select(.previewIdentifier == $name) | .name' \
-              | head -n1
+                '[.[] | select(.previewIdentifier == $name) | .name] | first // empty'
           }
 
           find_in_team() {
@@ -68,8 +67,8 @@ jobs:
 
               name="$(
                 jq -r --arg name "${preview_name}" \
-                  '.items[]? | select(.previewIdentifier == $name) | .name' \
-                  <<<"${page}" | head -n1
+                  '[.items[]? | select(.previewIdentifier == $name) | .name] | first // empty' \
+                  <<<"${page}"
               )"
               if [[ -n "${name}" ]]; then
                 printf '%s\n' "${name}"
