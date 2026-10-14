@@ -1,7 +1,6 @@
-import assert from 'node:assert/strict';
-import { describe, test } from 'node:test';
+import { describe, expect, test } from 'vitest';
 
-import { sanitizePageProperties } from './page-context.ts';
+import { sanitizePageProperties } from './page-context';
 
 describe('sanitizePageProperties', () => {
   test('strips reset-password token and keeps other params', () => {
@@ -9,7 +8,7 @@ describe('sanitizePageProperties', () => {
       search: '?TOKEN=abc&search=bible&email=a@b.c',
     });
 
-    assert.equal(result.search, '?search=bible&email=a%40b.c');
+    expect(result.search).toBe('?search=bible&email=a%40b.c');
   });
 
   test('keeps product search params', () => {
@@ -17,7 +16,7 @@ describe('sanitizePageProperties', () => {
       search: '?search=bible&sort=recent&speakers=jonny',
     });
 
-    assert.equal(result.search, '?search=bible&sort=recent&speakers=jonny');
+    expect(result.search).toBe('?search=bible&sort=recent&speakers=jonny');
   });
 
   test('drops url credentials, hash, and token', () => {
@@ -25,7 +24,7 @@ describe('sanitizePageProperties', () => {
       url: 'https://user:pass@example.com/reset-password?token=abc#hash',
     });
 
-    assert.equal(result.url, 'https://example.com/reset-password');
+    expect(result.url).toBe('https://example.com/reset-password');
   });
 
   test('strips query and hash from path', () => {
@@ -33,7 +32,7 @@ describe('sanitizePageProperties', () => {
       path: '/talks?search=bible#top',
     });
 
-    assert.equal(result.path, '/talks');
+    expect(result.path).toBe('/talks');
   });
 
   test('drops non-http urls', () => {
@@ -42,7 +41,7 @@ describe('sanitizePageProperties', () => {
       url: 'ftp://example.com/talks',
     });
 
-    assert.equal(result.referrer, '');
-    assert.equal(result.url, '');
+    expect(result.referrer).toBe('');
+    expect(result.url).toBe('');
   });
 });

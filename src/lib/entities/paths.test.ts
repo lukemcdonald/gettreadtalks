@@ -1,5 +1,4 @@
-import assert from 'node:assert/strict';
-import { describe, test } from 'node:test';
+import { describe, expect, test } from 'vitest';
 
 import {
   getAdminListPath,
@@ -7,22 +6,21 @@ import {
   getEntityEditPath,
   getEntityNewPath,
   getPublicEditPath,
-} from './paths.ts';
+} from './paths';
 
 describe('getAdminListPath', () => {
   test('returns the account admin page', () => {
-    assert.equal(getAdminListPath('talks'), '/account/talks');
+    expect(getAdminListPath('talks')).toBe('/account/talks');
   });
 });
 
 describe('getEntityEditPath', () => {
   test('matches the intercepted admin sheet url', () => {
-    assert.equal(getEntityEditPath('talks', 'talk123'), '/talks/edit/talk123');
+    expect(getEntityEditPath('talks', 'talk123')).toBe('/talks/edit/talk123');
   });
 
   test('prefills archived status', () => {
-    assert.equal(
-      getEntityEditPath('talks', 'talk123', { status: 'archived' }),
+    expect(getEntityEditPath('talks', 'talk123', { status: 'archived' })).toBe(
       '/talks/edit/talk123?status=archived'
     );
   });
@@ -30,14 +28,13 @@ describe('getEntityEditPath', () => {
 
 describe('getEntityNewPath', () => {
   test('matches the intercepted admin sheet url', () => {
-    assert.equal(getEntityNewPath('clips'), '/clips/new');
+    expect(getEntityNewPath('clips')).toBe('/clips/new');
   });
 });
 
 describe('getPublicEditPath', () => {
   test('appends /edit to a public detail path', () => {
-    assert.equal(
-      getPublicEditPath('/talks/john-piper/justification'),
+    expect(getPublicEditPath('/talks/john-piper/justification')).toBe(
       '/talks/john-piper/justification/edit'
     );
   });
@@ -45,8 +42,7 @@ describe('getPublicEditPath', () => {
 
 describe('getAdminLoginRedirect', () => {
   test('keeps nested query params on the original url', () => {
-    assert.equal(
-      getAdminLoginRedirect('/talks/edit/talk123?status=archived'),
+    expect(getAdminLoginRedirect('/talks/edit/talk123?status=archived')).toBe(
       '/login?redirect=%2Ftalks%2Fedit%2Ftalk123%3Fstatus%3Darchived'
     );
   });

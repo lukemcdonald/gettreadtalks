@@ -1,19 +1,18 @@
-import assert from 'node:assert/strict';
-import { describe, test } from 'node:test';
+import { describe, expect, test } from 'vitest';
 
-import { getRel } from './rel.ts';
+import { getRel } from './rel';
 
 describe('getRel', () => {
   test('defaults rel for a blank target when none is passed', () => {
-    assert.equal(getRel('_blank'), 'noopener noreferrer');
+    expect(getRel('_blank')).toBe('noopener noreferrer');
   });
 
   test('keeps an explicit rel on a blank target', () => {
-    assert.equal(getRel('_blank', 'noreferrer'), 'noreferrer');
+    expect(getRel('_blank', 'noreferrer')).toBe('noreferrer');
   });
 
   test('does not default rel when the target is not blank', () => {
-    assert.equal(getRel('_self'), undefined);
-    assert.equal(getRel(), undefined);
+    expect(getRel('_self')).toBe(undefined);
+    expect(getRel()).toBe(undefined);
   });
 });

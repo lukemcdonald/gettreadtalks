@@ -1,11 +1,10 @@
-import assert from 'node:assert/strict';
-import { describe, test } from 'node:test';
+import { describe, expect, test } from 'vitest';
 
 import {
   appendMediaHealthItem,
   buildMediaHealthDigest,
   getMediaPublicPath,
-} from './digest.ts';
+} from './digest';
 
 const digestItem = {
   adminPath: '/talks/edit/talk1?status=archived',
@@ -60,8 +59,10 @@ function firstAppendedItem(
   const items = appendMediaHealthItem(input, outcome, []);
   const [item] = items;
 
-  assert.equal(items.length, 1);
-  assert.ok(item);
+  expect(items.length).toBe(1);
+  if (!item) {
+    throw new Error('expected digest item');
+  }
 
   return item;
 }
@@ -70,41 +71,38 @@ describe('buildMediaHealthDigest', () => {
   test('returns the items when any exist', () => {
     const items = [digestItem];
 
-    assert.deepEqual(buildMediaHealthDigest(items), items);
+    expect(buildMediaHealthDigest(items)).toEqual(items);
   });
 
   test('returns null when empty', () => {
-    assert.equal(buildMediaHealthDigest([]), null);
+    expect(buildMediaHealthDigest([])).toBe(null);
   });
 });
 
 describe('getMediaPublicPath', () => {
   test('builds talk and clip page paths', () => {
-    assert.equal(
+    expect(
       getMediaPublicPath({
         entityTable: 'talks',
         slug: 'sample-sermon-on-romans-8',
         speakerSlug: 'john-doe',
-      }),
-      '/talks/john-doe/sample-sermon-on-romans-8'
-    );
-    assert.equal(
+      })
+    ).toBe('/talks/john-doe/sample-sermon-on-romans-8');
+    expect(
       getMediaPublicPath({
         entityTable: 'clips',
         slug: 'sample-clip-romans-8',
-      }),
-      '/clips/sample-clip-romans-8'
-    );
+      })
+    ).toBe('/clips/sample-clip-romans-8');
   });
 
   test('returns null for a talk without a speaker slug', () => {
-    assert.equal(
+    expect(
       getMediaPublicPath({
         entityTable: 'talks',
         slug: 'orphan-talk',
-      }),
-      null
-    );
+      })
+    ).toBe(null);
   });
 });
 
@@ -115,10 +113,10 @@ describe('appendMediaHealthItem', () => {
       previousStatus: 'ok',
     });
 
-    assert.equal(item.adminPath, '/talks/edit/talk1?status=archived');
-    assert.equal(item.isNew, true);
-    assert.equal(item.newStatus, 'private');
-    assert.equal(item.publicPath, '/talks/john-doe/first-talk');
+    expect(item.adminPath).toBe('/talks/edit/talk1?status=archived');
+    expect(item.isNew).toBe(true);
+    expect(item.newStatus).toBe('private');
+    expect(item.publicPath).toBe('/talks/john-doe/first-talk');
   });
 
   test('includes still-broken media as not new', () => {
@@ -127,9 +125,9 @@ describe('appendMediaHealthItem', () => {
       previousStatus: 'missing',
     });
 
-    assert.equal(item.adminPath, '/clips/edit/clip1?status=archived');
-    assert.equal(item.isNew, false);
-    assert.equal(item.publicPath, '/clips/second-clip');
+    expect(item.adminPath).toBe('/clips/edit/clip1?status=archived');
+    expect(item.isNew).toBe(false);
+    expect(item.publicPath).toBe('/clips/second-clip');
   });
 
   test('includes a first broken check as not new', () => {
@@ -138,12 +136,12 @@ describe('appendMediaHealthItem', () => {
       previousStatus: null,
     });
 
-    assert.equal(item.isNew, false);
-    assert.equal(item.publicPath, '/talks/mary-smith/new-talk');
+    expect(item.isNew).toBe(false);
+    expect(item.publicPath).toBe('/talks/mary-smith/new-talk');
   });
 
   test('omits ok media', () => {
-    assert.deepEqual(
+    expect(
       appendMediaHealthItem(
         healthyTalkInput,
         {
@@ -151,8 +149,7 @@ describe('appendMediaHealthItem', () => {
           previousStatus: 'ok',
         },
         []
-      ),
-      []
-    );
+      )
+    ).toEqual([]);
   });
 });

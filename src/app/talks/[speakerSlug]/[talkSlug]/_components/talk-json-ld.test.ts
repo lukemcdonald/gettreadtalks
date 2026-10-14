@@ -1,7 +1,6 @@
-import assert from 'node:assert/strict';
-import { describe, test } from 'node:test';
+import { describe, expect, test } from 'vitest';
 
-import { talkJsonLd } from './talk-json-ld.ts';
+import { talkJsonLd } from './talk-json-ld';
 
 const speaker = { firstName: 'Martyn', lastName: 'Lloyd-Jones' };
 
@@ -14,12 +13,11 @@ describe('talkJsonLd', () => {
       talkSlug: 'the-cross',
     });
 
-    assert.deepEqual(result.creator, {
+    expect(result.creator).toEqual({
       '@type': 'Person',
       name: 'Martyn Lloyd-Jones',
     });
-    assert.equal(
-      result.url,
+    expect(result.url).toBe(
       'https://www.gettreadtalks.com/talks/lloyd-jones/the-cross'
     );
   });
@@ -32,7 +30,7 @@ describe('talkJsonLd', () => {
       talkSlug: 'the-cross',
     });
 
-    assert.equal(result.uploadDate, '2020-01-15T00:00:00.000Z');
+    expect(result.uploadDate).toBe('2020-01-15T00:00:00.000Z');
   });
 
   test('omits creator and uploadDate when those fields are missing', () => {
@@ -43,7 +41,7 @@ describe('talkJsonLd', () => {
       talkSlug: 'the-cross',
     });
 
-    assert.equal('creator' in result, false);
-    assert.equal('uploadDate' in result, false);
+    expect('creator' in result).toBe(false);
+    expect('uploadDate' in result).toBe(false);
   });
 });

@@ -1,10 +1,9 @@
-import assert from 'node:assert/strict';
-import { describe, test } from 'node:test';
+import { describe, expect, test } from 'vitest';
 
 import {
   featuredHeroCandidates,
   speakerTalkLayout,
-} from './speaker-hero-talks.ts';
+} from './speaker-hero-talks';
 
 const youtube = 'https://www.youtube.com/watch?v=jNQXAC9IVRw';
 const audio = 'https://example.com/talk.mp3';
@@ -23,42 +22,40 @@ const otherVideo = { _id: 'other-video', featured: false, mediaUrl: youtube };
 
 describe('featuredHeroCandidates', () => {
   test('uses featured video talks when any exist', () => {
-    assert.deepEqual(
-      featuredHeroCandidates([featuredAudio, featuredVideo, otherVideo]),
-      [featuredVideo]
-    );
+    expect(
+      featuredHeroCandidates([featuredAudio, featuredVideo, otherVideo])
+    ).toEqual([featuredVideo]);
   });
 
   test('falls back to nonfeatured videos when none are featured video', () => {
-    assert.deepEqual(featuredHeroCandidates([featuredAudio, otherVideo]), [
+    expect(featuredHeroCandidates([featuredAudio, otherVideo])).toEqual([
       otherVideo,
     ]);
   });
 
   test('returns no candidates when there are no videos', () => {
-    assert.deepEqual(featuredHeroCandidates([featuredAudio]), []);
+    expect(featuredHeroCandidates([featuredAudio])).toEqual([]);
   });
 });
 
 describe('speakerTalkLayout', () => {
   test('omits the featured video from the list', () => {
-    assert.deepEqual(speakerTalkLayout([featuredVideo], featuredVideo), {
+    expect(speakerTalkLayout([featuredVideo], featuredVideo)).toEqual({
       featuredTalk: featuredVideo,
       remainingTalks: [],
     });
-    assert.deepEqual(
-      speakerTalkLayout([featuredVideo, otherVideo], featuredVideo),
-      {
-        featuredTalk: featuredVideo,
-        remainingTalks: [otherVideo],
-      }
-    );
+    expect(
+      speakerTalkLayout([featuredVideo, otherVideo], featuredVideo)
+    ).toEqual({
+      featuredTalk: featuredVideo,
+      remainingTalks: [otherVideo],
+    });
   });
 
   test('does not put audio in the hero or drop it from the list', () => {
     const talks = [featuredAudio, otherVideo];
 
-    assert.deepEqual(speakerTalkLayout(talks, featuredAudio), {
+    expect(speakerTalkLayout(talks, featuredAudio)).toEqual({
       featuredTalk: undefined,
       remainingTalks: talks,
     });

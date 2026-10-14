@@ -17,7 +17,7 @@ Use the Fallow skill for deeper audit and debug workflows.
 
 ## Testing
 
-Test behavior, not implementation. Add a test only if it would catch a real regression. Unit tests use `node:test` (`pnpm test`); do not add Vitest. Never read source, match code strings, snapshot markup, mock Convex or Next internals, or test the framework.
+Test behavior, not implementation. Add a test only if it would catch a real regression. Unit tests use Vitest (`pnpm test`). Never read source, match code strings, snapshot markup, mock Convex or Next internals, or test the framework.
 
 ## Conventions
 

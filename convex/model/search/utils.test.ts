@@ -1,29 +1,28 @@
-import assert from 'node:assert/strict';
-import { describe, test } from 'node:test';
+import { describe, expect, test } from 'vitest';
 
-import { normalizeSearchQuery, searchPhrases, uniqueById } from './utils.ts';
+import { normalizeSearchQuery, searchPhrases, uniqueById } from './utils';
 
 describe('normalizeSearchQuery', () => {
   test('trims and collapses whitespace', () => {
-    assert.equal(normalizeSearchQuery('  John   Piper  '), 'John Piper');
+    expect(normalizeSearchQuery('  John   Piper  ')).toBe('John Piper');
   });
 
   test('returns empty for blank input', () => {
-    assert.equal(normalizeSearchQuery('   '), '');
+    expect(normalizeSearchQuery('   ')).toBe('');
   });
 });
 
 describe('searchPhrases', () => {
   test('returns nothing for a blank query', () => {
-    assert.deepEqual(searchPhrases('   '), []);
+    expect(searchPhrases('   ')).toEqual([]);
   });
 
   test('keeps a single token as-is', () => {
-    assert.deepEqual(searchPhrases('grace'), ['grace']);
+    expect(searchPhrases('grace')).toEqual(['grace']);
   });
 
   test('searches the full name and each token', () => {
-    assert.deepEqual(searchPhrases('John Piper'), [
+    expect(searchPhrases('John Piper')).toEqual([
       'John Piper',
       'John',
       'Piper',
@@ -33,16 +32,15 @@ describe('searchPhrases', () => {
 
 describe('uniqueById', () => {
   test('keeps first-seen order and drops duplicates', () => {
-    assert.deepEqual(
+    expect(
       uniqueById([
         { _id: 'a', title: 'first' },
         { _id: 'b', title: 'second' },
         { _id: 'a', title: 'duplicate' },
-      ]),
-      [
-        { _id: 'a', title: 'first' },
-        { _id: 'b', title: 'second' },
-      ]
-    );
+      ])
+    ).toEqual([
+      { _id: 'a', title: 'first' },
+      { _id: 'b', title: 'second' },
+    ]);
   });
 });

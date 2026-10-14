@@ -1,12 +1,8 @@
-import type { McpCatalog } from './tools.ts';
+import type { McpCatalog } from './tools';
 
-import assert from 'node:assert/strict';
-import { register } from 'node:module';
-import { describe, test } from 'node:test';
+import { describe, expect, test } from 'vitest';
 
-register(new URL('../../../scripts/node-test-hooks.mjs', import.meta.url));
-
-const {
+import {
   createTreadMcpHandler,
   getClip,
   getCollection,
@@ -16,7 +12,7 @@ const {
   listSpeakers,
   listTopics,
   searchTalks,
-} = await import('./tools.ts');
+} from './tools';
 
 const john = {
   firstName: 'John',
@@ -69,7 +65,10 @@ function parseToolJson(result: {
   isError?: boolean;
 }) {
   const [part] = result.content;
-  assert.ok(part);
+  if (!part) {
+    throw new Error('expected tool content');
+  }
+
   return JSON.parse(part.text) as Record<string, unknown>;
 }
 
@@ -211,11 +210,10 @@ describe('searchTalks', () => {
     const body = parseToolJson(result);
     const talks = body.talks as { title: string; url: string }[];
 
-    assert.equal(result.isError, false);
-    assert.equal(talks.length, 1);
-    assert.equal(talks[0]?.title, 'Sample Sermon on Romans 8');
-    assert.equal(
-      talks[0]?.url,
+    expect(result.isError).toBe(false);
+    expect(talks.length).toBe(1);
+    expect(talks[0]?.title).toBe('Sample Sermon on Romans 8');
+    expect(talks[0]?.url).toBe(
       'https://www.gettreadtalks.com/talks/john-doe/sample-sermon-on-romans-8'
     );
   });
@@ -228,10 +226,9 @@ describe('searchTalks', () => {
     const body = parseToolJson(result);
     const talks = body.talks as { slug: string }[];
 
-    assert.deepEqual(
-      talks.map((talk) => talk.slug),
-      ['sample-sermon-on-romans-8']
-    );
+    expect(talks.map((talk) => talk.slug)).toEqual([
+      'sample-sermon-on-romans-8',
+    ]);
   });
 });
 
@@ -249,17 +246,12 @@ describe('getTalk', () => {
     const speaker = body.speaker as { url: string };
     const clips = body.clips as { url: string }[];
 
-    assert.equal(result.isError, false);
-    assert.equal(
-      talk.url,
+    expect(result.isError).toBe(false);
+    expect(talk.url).toBe(
       'https://www.gettreadtalks.com/talks/john-doe/sample-sermon-on-romans-8'
     );
-    assert.equal(
-      speaker.url,
-      'https://www.gettreadtalks.com/speakers/john-doe'
-    );
-    assert.equal(
-      clips[0]?.url,
+    expect(speaker.url).toBe('https://www.gettreadtalks.com/speakers/john-doe');
+    expect(clips[0]?.url).toBe(
       'https://www.gettreadtalks.com/clips/sample-clip-no-condemnation'
     );
   });
@@ -271,8 +263,8 @@ describe('getTalk', () => {
     );
     const body = parseToolJson(result);
 
-    assert.equal(result.isError, true);
-    assert.equal(body.error, 'Talk not found.');
+    expect(result.isError).toBe(true);
+    expect(body.error).toBe('Talk not found.');
   });
 });
 
@@ -282,9 +274,8 @@ describe('listSpeakers', () => {
     const body = parseToolJson(result);
     const speakers = body.speakers as { name: string; url: string }[];
 
-    assert.equal(speakers[0]?.name, 'John Doe');
-    assert.equal(
-      speakers[0]?.url,
+    expect(speakers[0]?.name).toBe('John Doe');
+    expect(speakers[0]?.url).toBe(
       'https://www.gettreadtalks.com/speakers/john-doe'
     );
   });
@@ -300,9 +291,9 @@ describe('listTopics', () => {
       url: string;
     }[];
 
-    assert.equal(topics[0]?.title, 'Grace');
-    assert.equal(topics[0]?.talkCount, 2);
-    assert.equal(topics[0]?.url, 'https://www.gettreadtalks.com/topics/grace');
+    expect(topics[0]?.title).toBe('Grace');
+    expect(topics[0]?.talkCount).toBe(2);
+    expect(topics[0]?.url).toBe('https://www.gettreadtalks.com/topics/grace');
   });
 });
 
@@ -315,9 +306,8 @@ describe('listCollections', () => {
       url: string;
     }[];
 
-    assert.equal(collections[0]?.talkCount, 1);
-    assert.equal(
-      collections[0]?.url,
+    expect(collections[0]?.talkCount).toBe(1);
+    expect(collections[0]?.url).toBe(
       'https://www.gettreadtalks.com/collections/example-series-the-psalms'
     );
   });
@@ -332,9 +322,8 @@ describe('getCollection', () => {
     const body = parseToolJson(result);
     const talks = body.talks as { url: string }[];
 
-    assert.equal(result.isError, false);
-    assert.equal(
-      talks[0]?.url,
+    expect(result.isError).toBe(false);
+    expect(talks[0]?.url).toBe(
       'https://www.gettreadtalks.com/talks/john-doe/sample-talk-the-lord-is-my-shepherd'
     );
   });
@@ -343,8 +332,8 @@ describe('getCollection', () => {
     const result = await getCollection({ slug: 'missing' }, createCatalog());
     const body = parseToolJson(result);
 
-    assert.equal(result.isError, true);
-    assert.equal(body.error, 'Collection not found.');
+    expect(result.isError).toBe(true);
+    expect(body.error).toBe('Collection not found.');
   });
 
   test('returns not found when a collection has no published talks', async () => {
@@ -368,8 +357,8 @@ describe('getCollection', () => {
     );
     const body = parseToolJson(result);
 
-    assert.equal(result.isError, true);
-    assert.equal(body.error, 'Collection not found.');
+    expect(result.isError).toBe(true);
+    expect(body.error).toBe('Collection not found.');
   });
 });
 
@@ -379,10 +368,9 @@ describe('listClips', () => {
     const body = parseToolJson(result);
     const clips = body.clips as { title: string; url: string }[];
 
-    assert.equal(clips.length, 1);
-    assert.equal(clips[0]?.title, 'Sample Clip: No Condemnation');
-    assert.equal(
-      clips[0]?.url,
+    expect(clips.length).toBe(1);
+    expect(clips[0]?.title).toBe('Sample Clip: No Condemnation');
+    expect(clips[0]?.url).toBe(
       'https://www.gettreadtalks.com/clips/sample-clip-no-condemnation'
     );
   });
@@ -398,13 +386,11 @@ describe('getClip', () => {
     const clip = body.clip as { url: string };
     const talk = body.talk as { url: string };
 
-    assert.equal(result.isError, false);
-    assert.equal(
-      clip.url,
+    expect(result.isError).toBe(false);
+    expect(clip.url).toBe(
       'https://www.gettreadtalks.com/clips/sample-clip-no-condemnation'
     );
-    assert.equal(
-      talk.url,
+    expect(talk.url).toBe(
       'https://www.gettreadtalks.com/talks/john-doe/sample-sermon-on-romans-8'
     );
   });
@@ -413,8 +399,8 @@ describe('getClip', () => {
     const result = await getClip({ slug: 'missing' }, createCatalog());
     const body = parseToolJson(result);
 
-    assert.equal(result.isError, true);
-    assert.equal(body.error, 'Clip not found.');
+    expect(result.isError).toBe(true);
+    expect(body.error).toBe('Clip not found.');
   });
 
   test('returns not found when the parent talk is unpublished', async () => {
@@ -443,8 +429,8 @@ describe('getClip', () => {
     );
     const body = parseToolJson(result);
 
-    assert.equal(result.isError, true);
-    assert.equal(body.error, 'Clip not found.');
+    expect(result.isError).toBe(true);
+    expect(body.error).toBe('Clip not found.');
   });
 });
 
@@ -481,8 +467,8 @@ describe('createTreadMcpHandler', () => {
     });
     const body = await response.text();
 
-    assert.equal(response.ok, true);
-    assert.equal(body.includes('gettreadtalks'), true);
+    expect(response.ok).toBe(true);
+    expect(body.includes('gettreadtalks')).toBe(true);
   });
 
   test('lists the read-only catalog tools', async () => {
@@ -496,15 +482,15 @@ describe('createTreadMcpHandler', () => {
     const response = await postMcp(handler, 'tools/list', {}, 2);
     const body = await response.text();
 
-    assert.equal(response.ok, true);
-    assert.equal(body.includes('search_talks'), true);
-    assert.equal(body.includes('get_talk'), true);
-    assert.equal(body.includes('list_speakers'), true);
-    assert.equal(body.includes('list_topics'), true);
-    assert.equal(body.includes('list_collections'), true);
-    assert.equal(body.includes('get_collection'), true);
-    assert.equal(body.includes('list_clips'), true);
-    assert.equal(body.includes('get_clip'), true);
+    expect(response.ok).toBe(true);
+    expect(body.includes('search_talks')).toBe(true);
+    expect(body.includes('get_talk')).toBe(true);
+    expect(body.includes('list_speakers')).toBe(true);
+    expect(body.includes('list_topics')).toBe(true);
+    expect(body.includes('list_collections')).toBe(true);
+    expect(body.includes('get_collection')).toBe(true);
+    expect(body.includes('list_clips')).toBe(true);
+    expect(body.includes('get_clip')).toBe(true);
   });
 
   test('rejects an oversized search query', async () => {
@@ -526,11 +512,10 @@ describe('createTreadMcpHandler', () => {
     );
     const body = await response.text();
 
-    assert.equal(response.ok, true);
-    assert.equal(body.includes('Sample Sermon on Romans 8'), false);
-    assert.equal(
-      body.includes('Too big: expected string to have <=200 characters'),
-      true
-    );
+    expect(response.ok).toBe(true);
+    expect(body.includes('Sample Sermon on Romans 8')).toBe(false);
+    expect(
+      body.includes('Too big: expected string to have <=200 characters')
+    ).toBe(true);
   });
 });
