@@ -49,6 +49,14 @@ export function resolve(specifier, context, nextResolve) {
     };
   }
 
+  if (specifier === '@sentry/nextjs') {
+    return {
+      format: 'module',
+      shortCircuit: true,
+      url: 'data:text/javascript,export function captureException() { return undefined; } export function captureMessage() { return undefined; } export function withScope(fn) { return fn({ setContext() {}, setExtra() {}, setFingerprint() {}, setLevel() {}, setTag() {} }); }',
+    };
+  }
+
   const mapped =
     mapAlias(specifier) ?? mapRelative(specifier, context.parentURL);
   if (mapped) {

@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { Button, Field, FieldError } from '@/components/ui';
 import { AUTH_ERRORS, isTurnstileRequired } from '@/services/auth/config';
+import { reportUnexpectedError } from '@/services/errors';
 
 const TURNSTILE_SCRIPT_ID = 'cf-turnstile-api';
 const TURNSTILE_SCRIPT_SRC =
@@ -162,9 +163,7 @@ function TurnstileFieldStatus({
 }) {
   if (!siteKey) {
     return (
-      <FieldError match>
-        Verification is not configured. Set NEXT_PUBLIC_TURNSTILE_SITE_KEY.
-      </FieldError>
+      <FieldError match>{AUTH_ERRORS.VERIFICATION_UNAVAILABLE}</FieldError>
     );
   }
 
@@ -208,6 +207,21 @@ export function TurnstileField({
       }),
     [onTokenChange, resetKey, scriptReady, siteKey]
   );
+
+  useEffect(() => {
+    if (siteKey || !isTurnstileRequired()) {
+      return;
+    }
+
+    reportUnexpectedError(
+      new Error(
+        'Verification is not configured. Set NEXT_PUBLIC_TURNSTILE_SITE_KEY.'
+      ),
+      {
+        fingerprint: ['config', 'turnstile-site-key'],
+      }
+    );
+  }, [siteKey]);
 
   if (!isTurnstileRequired()) {
     return null;

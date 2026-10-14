@@ -8,6 +8,8 @@ import { ErrorCodes } from '../../services/errors/constants.ts';
 register(new URL('../../../scripts/node-test-hooks.mjs', import.meta.url));
 
 const { mapConvexErrorToFormErrors } = await import('./validation.ts');
+const { USER_ERROR_MESSAGE } =
+  await import('../../services/errors/user-facing.ts');
 
 describe('mapConvexErrorToFormErrors', () => {
   test('maps a field error onto that field', () => {
@@ -32,9 +34,9 @@ describe('mapConvexErrorToFormErrors', () => {
     });
   });
 
-  test('maps an unknown error onto the form', () => {
+  test('maps an unknown error onto a friendly form message', () => {
     assert.deepEqual(mapConvexErrorToFormErrors(new Error('Something broke')), {
-      _form: 'Something broke',
+      _form: USER_ERROR_MESSAGE,
     });
   });
 });
