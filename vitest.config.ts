@@ -38,6 +38,15 @@ export default defineConfig({
           name: 'node',
         },
       },
+      {
+        extends: true,
+        test: {
+          environment: 'happy-dom',
+          include: ['src/**/*.test.tsx'],
+          name: 'components',
+          setupFiles: ['src/test/setup.ts'],
+        },
+      },
     ],
   },
 });

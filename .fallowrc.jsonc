@@ -3,6 +3,9 @@
   "entry": [
     // Convex registers these modules as runtime functions; they are not imported from Next.js.
     "convex/*.ts",
+    // Vitest component setup and shared RTL entry. Loaded via vitest.config.ts / test imports.
+    "src/test/render.tsx",
+    "src/test/setup.ts",
   ],
   "ignoreDependencies": [
     // Loaded by Next.js when reactCompiler is enabled, not imported from app code.
@@ -14,6 +17,8 @@
     "resend",
     // Loaded by Vitest's edge-runtime environment, not imported from app code.
     "@edge-runtime/vm",
+    // Loaded by Vitest's happy-dom environment, not imported from app code.
+    "happy-dom",
     // Imported from ignored convex-test files (`convex/test.setup.ts`).
     "convex-test",
     // Types for import.meta.glob in convex-test setup; Vitest loads Vite.
