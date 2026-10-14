@@ -41,6 +41,8 @@ Always use the **gettreadtalks.com** project (`441dc110-d73c-46cb-b395-1c762d7e2
 
 Never show env var names, stack traces, raw internal `error.message`, or config details in user-facing UI. Report those to Sentry with `reportUnexpectedError` and show a plain, friendly message. Keep the details in development/console.
 
+Track one async lifecycle with a single status union (`'loading' | 'ready' | 'error'`; add `'idle'` only when the work does not start on mount). Leave independent booleans and framework status (React Query, Convex `useQuery`, `useActionState`) alone.
+
 ## Architecture
 
 ### Feature-Based Organization
