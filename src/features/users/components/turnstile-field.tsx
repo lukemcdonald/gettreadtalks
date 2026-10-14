@@ -70,6 +70,8 @@ function bindTurnstile({
   };
 }
 
+type ScriptStatus = 'error' | 'loading' | 'ready';
+
 interface TurnstileFieldProps {
   onTokenChange: (token: string) => void;
   resetKey: number;
@@ -99,17 +101,19 @@ function startTurnstileWidget({
   container,
   onTokenChange,
   resetKey,
-  scriptReady,
+  scriptStatus,
   siteKey,
 }: {
   container: HTMLDivElement | null;
   onTokenChange: (token: string) => void;
   resetKey: number;
-  scriptReady: boolean;
+  scriptStatus: ScriptStatus;
   siteKey: string | undefined;
 }) {
   const turnstile = getTurnstile();
-  const ready = [container, scriptReady, siteKey, turnstile].every(Boolean);
+  const ready = [container, scriptStatus === 'ready', siteKey, turnstile].every(
+    Boolean
+  );
 
   if (!ready) {
     return;
@@ -130,21 +134,18 @@ function turnstileScriptId(retryKey: number) {
 
 function retryTurnstileScript({
   retryKey,
-  setScriptFailed,
-  setScriptReady,
   setScriptRetryKey,
+  setScriptStatus,
 }: {
   retryKey: number;
-  setScriptFailed: (failed: boolean) => void;
-  setScriptReady: (ready: boolean) => void;
   setScriptRetryKey: (updater: (key: number) => number) => void;
+  setScriptStatus: (status: ScriptStatus) => void;
 }) {
   document
     .querySelector(`#${CSS.escape(turnstileScriptId(retryKey))}`)
     ?.remove();
   delete (window as Window & { turnstile?: TurnstileApi }).turnstile;
-  setScriptFailed(false);
-  setScriptReady(false);
+  setScriptStatus('loading');
   setScriptRetryKey((key) => key + 1);
 }
 
@@ -152,13 +153,13 @@ function TurnstileFieldStatus({
   containerRef,
   onRetryScript,
   resetKey,
-  scriptFailed,
+  scriptStatus,
   siteKey,
 }: {
   containerRef: RefObject<HTMLDivElement | null>;
   onRetryScript: () => void;
   resetKey: number;
-  scriptFailed: boolean;
+  scriptStatus: ScriptStatus;
   siteKey: string | undefined;
 }) {
   if (!siteKey) {
@@ -167,7 +168,7 @@ function TurnstileFieldStatus({
     );
   }
 
-  if (scriptFailed) {
+  if (scriptStatus === 'error') {
     return (
       <div className="space-y-2">
         <FieldError match>{AUTH_ERRORS.CAPTCHA_UNAVAILABLE}</FieldError>
@@ -192,9 +193,8 @@ export function TurnstileField({
 }: TurnstileFieldProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
-  const [scriptFailed, setScriptFailed] = useState(false);
-  const [scriptReady, setScriptReady] = useState(false);
   const [scriptRetryKey, setScriptRetryKey] = useState(0);
+  const [scriptStatus, setScriptStatus] = useState<ScriptStatus>('loading');
 
   useEffect(
     () =>
@@ -202,10 +202,10 @@ export function TurnstileField({
         container: containerRef.current,
         onTokenChange,
         resetKey,
-        scriptReady,
+        scriptStatus,
         siteKey,
       }),
-    [onTokenChange, resetKey, scriptReady, siteKey]
+    [onTokenChange, resetKey, scriptStatus, siteKey]
   );
 
   useEffect(() => {
@@ -228,17 +228,15 @@ export function TurnstileField({
   }
 
   return (
-    <Field invalid={!siteKey || scriptFailed}>
+    <Field invalid={!siteKey || scriptStatus === 'error'}>
       <Script
         id={turnstileScriptId(scriptRetryKey)}
         key={scriptRetryKey}
         onError={() => {
-          setScriptFailed(true);
-          setScriptReady(false);
+          setScriptStatus('error');
         }}
         onReady={() => {
-          setScriptFailed(false);
-          setScriptReady(true);
+          setScriptStatus('ready');
         }}
         src={TURNSTILE_SCRIPT_SRC}
         strategy="afterInteractive"
@@ -248,13 +246,12 @@ export function TurnstileField({
         onRetryScript={() => {
           retryTurnstileScript({
             retryKey: scriptRetryKey,
-            setScriptFailed,
-            setScriptReady,
             setScriptRetryKey,
+            setScriptStatus,
           });
         }}
         resetKey={resetKey}
-        scriptFailed={scriptFailed}
+        scriptStatus={scriptStatus}
         siteKey={siteKey}
       />
     </Field>
