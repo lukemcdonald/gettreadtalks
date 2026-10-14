@@ -102,6 +102,18 @@ import { Button } from '@/components/ui/primitives/button';
 
 **Naming:** kebab-case for all `src/` folders
 
+**Colocation:** One responsibility per file. Simple components stay as `component-name.tsx`. When a component has multiple pieces (subcomponents, hooks, utils, types), colocate them in a directory:
+
+```
+component-name/
+├─ index.ts              # public exports
+├─ component-name.tsx    # main component
+├─ piece.tsx
+└─ utils.ts
+```
+
+Do not split a simple component just to match the directory shape.
+
 ### Rendering & data loading
 
 Pages and layouts stay synchronous. Put `params`, `searchParams`, cookies, headers, and auth in small async children, each behind its own `<Suspense>` (separate boundaries for filters vs results; `fallback={null}` only for small pieces). No per-route `loading.tsx` on listings. Auth via `AdminGate` / `UserGate` — do not await `requireCurrentUser` / `requireAdminUser` in the layout.
