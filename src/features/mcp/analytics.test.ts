@@ -11,8 +11,6 @@ const { mcpToolCallProperties } = await import('./analytics.ts');
 describe('mcpToolCallProperties', () => {
   test('builds the MCP tool event payload', () => {
     const properties: EventMap['mcp_tool_called'] = mcpToolCallProperties({
-      clientName: 'claude-code',
-      clientVersion: '2.0.0',
       durationMs: 42,
       query: 'Romans 8',
       resultCount: 3,
@@ -22,8 +20,6 @@ describe('mcpToolCallProperties', () => {
     });
 
     assert.deepEqual(properties, {
-      client_name: 'claude-code',
-      client_version: '2.0.0',
       duration_ms: 42,
       error: undefined,
       query: 'Romans 8',

@@ -15,8 +15,6 @@ export interface EventMap {
   clip_played: { clip_id: string; clip_slug: string };
   filter_applied: { filter: string; path: string; value: string };
   mcp_tool_called: {
-    client_name?: string;
-    client_version?: string;
     duration_ms: number;
     error?: string;
     query?: string;

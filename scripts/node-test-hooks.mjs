@@ -49,6 +49,14 @@ export function resolve(specifier, context, nextResolve) {
     };
   }
 
+  if (specifier === 'next/server') {
+    return {
+      format: 'module',
+      shortCircuit: true,
+      url: 'data:text/javascript,export function after(task) { void Promise.resolve().then(task); }',
+    };
+  }
+
   const mapped =
     mapAlias(specifier) ?? mapRelative(specifier, context.parentURL);
   if (mapped) {
