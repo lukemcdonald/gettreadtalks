@@ -1,6 +1,6 @@
 import { TURNSTILE_SCRIPT_ID } from './constants';
 
-export interface TurnstileApi {
+interface TurnstileApi {
   remove: (widgetId: string) => void;
   render: (
     container: HTMLElement,
