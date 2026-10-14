@@ -16,10 +16,5 @@
     "strictNullChecks": true
   },
   "include": ["./**/*"],
-  "exclude": [
-    "./_generated",
-    "./**/*.spec.ts",
-    "./**/*.test.ts",
-    "./test.setup.ts"
-  ]
+  "exclude": ["./_generated", "./**/*.test.ts", "./test.setup.ts"]
 }

@@ -30,7 +30,6 @@
     // Convex generated files reference generated JS names that do not exist as source files.
     "convex/**/_generated/**",
     // convex-test harness. Not a Convex function module.
-    "convex/**/*.spec.ts",
     "convex/test.setup.ts",
     // CLI-only preview seed. Called from scripts/vercel-build.sh, not app imports.
     "convex/preview.ts",

@@ -42,6 +42,8 @@ Runs Next.js (HTTPS on `https://localhost:3000`) and Convex in parallel. On macO
 | ---------------- | ------------------------------- |
 | `pnpm style`     | Lint + format fix               |
 | `pnpm typecheck` | TypeScript check                |
+| `pnpm test`      | Vitest (`*.test.ts`)            |
+| `pnpm test:e2e`  | Playwright (`e2e/*.spec.ts`)    |
 | `pnpm build`     | Production Next.js build        |
 | `pnpm release`   | Manual Convex deploy (fallback) |
 

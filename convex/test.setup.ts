@@ -7,7 +7,6 @@ import schema from './schema';
 const modules = import.meta.glob([
   './**/*.{js,ts}',
   '!./**/*.d.ts',
-  '!./**/*.spec.ts',
   '!./**/*.test.ts',
   '!./betterAuth/**',
 ]);

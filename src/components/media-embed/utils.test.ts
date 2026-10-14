@@ -1,34 +1,30 @@
-import assert from 'node:assert/strict';
-import { describe, test } from 'node:test';
+import { describe, expect, test } from 'vitest';
 
-import { mediaJsonLd, preferItemsWithVideoThumbnails } from './utils.ts';
+import { mediaJsonLd, preferItemsWithVideoThumbnails } from './utils';
 
 describe('mediaJsonLd', () => {
   test('maps watch pages to player embedUrl and files to contentUrl', () => {
-    assert.deepEqual(
-      mediaJsonLd('https://www.youtube.com/watch?v=jNQXAC9IVRw'),
-      {
-        '@type': 'VideoObject',
-        embedUrl: 'https://www.youtube.com/embed/jNQXAC9IVRw',
-      }
-    );
-    assert.deepEqual(mediaJsonLd('https://vimeo.com/123456789'), {
+    expect(mediaJsonLd('https://www.youtube.com/watch?v=jNQXAC9IVRw')).toEqual({
+      '@type': 'VideoObject',
+      embedUrl: 'https://www.youtube.com/embed/jNQXAC9IVRw',
+    });
+    expect(mediaJsonLd('https://vimeo.com/123456789')).toEqual({
       '@type': 'VideoObject',
       embedUrl: 'https://player.vimeo.com/video/123456789',
     });
-    assert.deepEqual(mediaJsonLd('https://example.com/talk.mp4'), {
+    expect(mediaJsonLd('https://example.com/talk.mp4')).toEqual({
       '@type': 'VideoObject',
       contentUrl: 'https://example.com/talk.mp4',
     });
-    assert.deepEqual(mediaJsonLd('https://example.com/talk.mp3'), {
+    expect(mediaJsonLd('https://example.com/talk.mp3')).toEqual({
       '@type': 'AudioObject',
       contentUrl: 'https://example.com/talk.mp3',
     });
   });
 
   test('uses MediaObject when the URL is missing or not playable media', () => {
-    assert.deepEqual(mediaJsonLd(), { '@type': 'MediaObject' });
-    assert.deepEqual(mediaJsonLd('https://example.com/notes'), {
+    expect(mediaJsonLd()).toEqual({ '@type': 'MediaObject' });
+    expect(mediaJsonLd('https://example.com/notes')).toEqual({
       '@type': 'MediaObject',
     });
   });
@@ -44,7 +40,7 @@ describe('preferItemsWithVideoThumbnails', () => {
       },
     ];
 
-    assert.deepEqual(preferItemsWithVideoThumbnails(items), [items[1]]);
+    expect(preferItemsWithVideoThumbnails(items)).toEqual([items[1]]);
   });
 
   test('falls back to the full list when nothing has a thumbnail', () => {
@@ -53,6 +49,6 @@ describe('preferItemsWithVideoThumbnails', () => {
       { mediaUrl: 'https://example.com/talk-2.mp3', title: 'audio-b' },
     ];
 
-    assert.deepEqual(preferItemsWithVideoThumbnails(items), items);
+    expect(preferItemsWithVideoThumbnails(items)).toEqual(items);
   });
 });
