@@ -1,13 +1,8 @@
 import { ConvexError } from 'convex/values';
-import assert from 'node:assert/strict';
-import { register } from 'node:module';
-import { describe, test } from 'node:test';
+import { describe, expect, test } from 'vitest';
 
-import { ErrorCodes } from '../../services/errors/constants.ts';
-
-register(new URL('../../../scripts/node-test-hooks.mjs', import.meta.url));
-
-const { mapConvexErrorToFormErrors } = await import('./validation.ts');
+import { ErrorCodes } from '../../services/errors/constants';
+import { mapConvexErrorToFormErrors } from './validation';
 
 describe('mapConvexErrorToFormErrors', () => {
   test('maps a field error onto that field', () => {
@@ -16,7 +11,7 @@ describe('mapConvexErrorToFormErrors', () => {
       message: 'Already taken',
     });
 
-    assert.deepEqual(mapConvexErrorToFormErrors(error), {
+    expect(mapConvexErrorToFormErrors(error)).toEqual({
       slug: 'Already taken',
     });
   });
@@ -27,13 +22,13 @@ describe('mapConvexErrorToFormErrors', () => {
       message: 'That title is already in use',
     });
 
-    assert.deepEqual(mapConvexErrorToFormErrors(error), {
+    expect(mapConvexErrorToFormErrors(error)).toEqual({
       title: 'That title is already in use',
     });
   });
 
   test('maps an unknown error onto the form', () => {
-    assert.deepEqual(mapConvexErrorToFormErrors(new Error('Something broke')), {
+    expect(mapConvexErrorToFormErrors(new Error('Something broke'))).toEqual({
       _form: 'Something broke',
     });
   });

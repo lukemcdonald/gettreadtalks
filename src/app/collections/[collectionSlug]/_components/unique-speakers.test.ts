@@ -1,7 +1,6 @@
-import assert from 'node:assert/strict';
-import { describe, test } from 'node:test';
+import { describe, expect, test } from 'vitest';
 
-import { uniqueSpeakersFromTalks } from './unique-speakers.ts';
+import { uniqueSpeakersFromTalks } from './unique-speakers';
 
 describe('uniqueSpeakersFromTalks', () => {
   test('skips missing speakers and keeps one entry per id', () => {
@@ -9,14 +8,13 @@ describe('uniqueSpeakersFromTalks', () => {
     const lloydJonesAgain = { _id: 'mlj', slug: 'mlj-trust' };
     const bunyan = { _id: 'jb', slug: 'bunyan' };
 
-    assert.deepEqual(
+    expect(
       uniqueSpeakersFromTalks([
         { speaker: lloydJones },
         { speaker: null },
         { speaker: bunyan },
         { speaker: lloydJonesAgain },
-      ]).map((speaker) => speaker._id),
-      ['mlj', 'jb']
-    );
+      ]).map((speaker) => speaker._id)
+    ).toEqual(['mlj', 'jb']);
   });
 });

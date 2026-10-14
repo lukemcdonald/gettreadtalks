@@ -1,10 +1,9 @@
-import assert from 'node:assert/strict';
-import { describe, test } from 'node:test';
+import { describe, expect, test } from 'vitest';
 
-import { getClipUrl } from './utils.ts';
+import { getClipUrl } from './utils';
 
 describe('getClipUrl', () => {
   test('links to /clips/{slug}', () => {
-    assert.equal(getClipUrl('you-will-suffer'), '/clips/you-will-suffer');
+    expect(getClipUrl('you-will-suffer')).toBe('/clips/you-will-suffer');
   });
 });

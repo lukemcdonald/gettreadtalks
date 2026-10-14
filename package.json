@@ -23,7 +23,7 @@
     "release:full": "pnpm build && pnpm release",
     "start": "next start",
     "style": "ultracite fix .",
-    "test": "node --experimental-strip-types --test \"convex/**/*.test.ts\" \"src/**/*.test.ts\" && vitest run",
+    "test": "vitest run",
     "test:e2e": "playwright test",
     "typecheck": "tsc --noEmit",
     "update:ui": "pnpm dlx shadcn@latest add @coss/ui --overwrite",

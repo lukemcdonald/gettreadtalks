@@ -1,7 +1,6 @@
-import assert from 'node:assert/strict';
-import { describe, test } from 'node:test';
+import { describe, expect, test } from 'vitest';
 
-import { clipJsonLd } from './clip-json-ld.ts';
+import { clipJsonLd } from './clip-json-ld';
 
 const speaker = {
   firstName: 'Martyn',
@@ -17,12 +16,11 @@ describe('clipJsonLd', () => {
       talk: null,
     });
 
-    assert.deepEqual(result.creator, {
+    expect(result.creator).toEqual({
       '@type': 'Person',
       name: 'Martyn Lloyd-Jones',
     });
-    assert.equal(
-      result.url,
+    expect(result.url).toBe(
       'https://www.gettreadtalks.com/clips/the-cross-clip'
     );
   });
@@ -38,7 +36,7 @@ describe('clipJsonLd', () => {
       talk: null,
     });
 
-    assert.equal(result.uploadDate, '2024-01-15T00:00:00.000Z');
+    expect(result.uploadDate).toBe('2024-01-15T00:00:00.000Z');
   });
 
   test('omits creator and uploadDate when those fields are missing', () => {
@@ -48,8 +46,8 @@ describe('clipJsonLd', () => {
       talk: null,
     });
 
-    assert.equal('creator' in result, false);
-    assert.equal('uploadDate' in result, false);
+    expect('creator' in result).toBe(false);
+    expect('uploadDate' in result).toBe(false);
   });
 
   test('links the parent talk only when both talk and speaker are present', () => {
@@ -69,12 +67,12 @@ describe('clipJsonLd', () => {
       talk: { slug: 'the-cross', title: 'The Cross' },
     });
 
-    assert.deepEqual(withTalk.isPartOf, {
+    expect(withTalk.isPartOf).toEqual({
       '@type': 'CreativeWork',
       name: 'The Cross',
       url: 'https://www.gettreadtalks.com/talks/lloyd-jones/the-cross',
     });
-    assert.equal('isPartOf' in withoutTalk, false);
-    assert.equal('isPartOf' in withoutSpeaker, false);
+    expect('isPartOf' in withoutTalk).toBe(false);
+    expect('isPartOf' in withoutSpeaker).toBe(false);
   });
 });

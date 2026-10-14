@@ -1,78 +1,71 @@
-import assert from 'node:assert/strict';
-import { describe, test } from 'node:test';
+import { describe, expect, test } from 'vitest';
 
-import { decideMediaCheck } from './record.ts';
+import { decideMediaCheck } from './record';
 
 describe('decideMediaCheck', () => {
   test('persists a first observation without a transition', () => {
-    assert.deepEqual(
+    expect(
       decideMediaCheck({
         existingStatus: null,
         observedStatus: 'ok',
-      }),
-      {
-        isTransition: false,
-        persistStatus: 'ok',
-      }
-    );
-    assert.deepEqual(
+      })
+    ).toEqual({
+      isTransition: false,
+      persistStatus: 'ok',
+    });
+    expect(
       decideMediaCheck({
         existingStatus: null,
         observedStatus: 'private',
-      }),
-      {
-        isTransition: false,
-        persistStatus: 'private',
-      }
-    );
+      })
+    ).toEqual({
+      isTransition: false,
+      persistStatus: 'private',
+    });
   });
 
   test('notifies when ok becomes private', () => {
-    assert.deepEqual(
+    expect(
       decideMediaCheck({
         existingStatus: 'ok',
         observedStatus: 'private',
-      }),
-      {
-        isTransition: true,
-        persistStatus: 'private',
-      }
-    );
+      })
+    ).toEqual({
+      isTransition: true,
+      persistStatus: 'private',
+    });
   });
 
   test('keeps a prior ok when the check is unknown', () => {
-    assert.deepEqual(
+    expect(
       decideMediaCheck({
         existingStatus: 'ok',
         observedStatus: 'unknown',
-      }),
-      {
-        isTransition: false,
-        persistStatus: 'ok',
-      }
-    );
+      })
+    ).toEqual({
+      isTransition: false,
+      persistStatus: 'ok',
+    });
   });
 
   test('does not notify when already broken', () => {
-    assert.deepEqual(
+    expect(
       decideMediaCheck({
         existingStatus: 'unknown',
         observedStatus: 'private',
-      }),
-      {
-        isTransition: false,
-        persistStatus: 'private',
-      }
-    );
-    assert.deepEqual(
+      })
+    ).toEqual({
+      isTransition: false,
+      persistStatus: 'private',
+    });
+    expect(
       decideMediaCheck({
         existingStatus: 'private',
         observedStatus: 'missing',
-      }),
-      {
-        isTransition: false,
-        persistStatus: 'missing',
-      }
-    );
+      })
+    ).toEqual({
+      isTransition: false,
+      persistStatus: 'missing',
+    });
   });
 });

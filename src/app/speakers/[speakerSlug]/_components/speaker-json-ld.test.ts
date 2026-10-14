@@ -1,7 +1,6 @@
-import assert from 'node:assert/strict';
-import { describe, test } from 'node:test';
+import { describe, expect, test } from 'vitest';
 
-import { speakerJsonLd } from './speaker-json-ld.ts';
+import { speakerJsonLd } from './speaker-json-ld';
 
 describe('speakerJsonLd', () => {
   test('adds sameAs when the speaker has a website', () => {
@@ -11,7 +10,7 @@ describe('speakerJsonLd', () => {
       websiteUrl: 'https://mljtrust.org',
     });
 
-    assert.deepEqual(result.sameAs, ['https://mljtrust.org']);
+    expect(result.sameAs).toEqual(['https://mljtrust.org']);
   });
 
   test('omits sameAs when the speaker has no website', () => {
@@ -20,6 +19,6 @@ describe('speakerJsonLd', () => {
       speakerSlug: 'lloyd-jones',
     });
 
-    assert.equal('sameAs' in result, false);
+    expect('sameAs' in result).toBe(false);
   });
 });

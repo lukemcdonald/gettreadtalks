@@ -1,18 +1,17 @@
-import assert from 'node:assert/strict';
-import { describe, test } from 'node:test';
+import { describe, expect, test } from 'vitest';
 
-import { isMediaCheckStatus } from './validators.ts';
+import { isMediaCheckStatus } from './validators';
 
 describe('isMediaCheckStatus', () => {
   test('accepts stored media check statuses', () => {
-    assert.equal(isMediaCheckStatus('ok'), true);
-    assert.equal(isMediaCheckStatus('private'), true);
-    assert.equal(isMediaCheckStatus('missing'), true);
-    assert.equal(isMediaCheckStatus('unknown'), true);
+    expect(isMediaCheckStatus('ok')).toBe(true);
+    expect(isMediaCheckStatus('private')).toBe(true);
+    expect(isMediaCheckStatus('missing')).toBe(true);
+    expect(isMediaCheckStatus('unknown')).toBe(true);
   });
 
   test('rejects an invalid status value', () => {
-    assert.equal(isMediaCheckStatus('dead'), false);
-    assert.equal(isMediaCheckStatus(200), false);
+    expect(isMediaCheckStatus('dead')).toBe(false);
+    expect(isMediaCheckStatus(200)).toBe(false);
   });
 });
