@@ -4,6 +4,7 @@ import { api } from '@/convex/_generated/api';
 import { getClips } from '@/features/clips/queries/get-clips';
 import { getCollectionBySlug } from '@/features/collections/queries/get-collection-by-slug';
 import { getCollections } from '@/features/collections/queries/get-collections';
+import { createMcpAnalyticsHandler } from '@/features/mcp/analytics';
 import {
   createMcpRateLimitedHandler,
   mcpLimiterToken,
@@ -15,6 +16,7 @@ import { getSpeakers } from '@/features/speakers/queries/get-speakers';
 import { getTalkBySlug } from '@/features/talks/queries/get-talk-by-slug';
 import { getTalks } from '@/features/talks/queries/get-talks';
 import { getTopicsWithCounts } from '@/features/topics/queries/get-topics-with-counts';
+import { scheduleServerTrack } from '@/services/analytics/server';
 
 export const maxDuration = 60;
 
@@ -48,7 +50,7 @@ async function consumeMcpRateLimit(request: Request) {
 }
 
 const handleMcpRequest = createMcpRateLimitedHandler(
-  mcpHandler,
+  createMcpAnalyticsHandler(mcpHandler, scheduleServerTrack),
   consumeMcpRateLimit
 );
 
