@@ -12,6 +12,12 @@
     "input-otp",
     // Resend is consumed by the Convex Resend component, not direct app imports.
     "resend",
+    // Loaded by Vitest's edge-runtime environment, not imported from app code.
+    "@edge-runtime/vm",
+    // Imported from ignored convex-test files (`convex/test.setup.ts`).
+    "convex-test",
+    // Types for import.meta.glob in convex-test setup; Vitest loads Vite.
+    "vite",
     // Tailwind is imported from CSS and lives in devDependencies by convention.
     "tailwindcss",
   ],
@@ -20,8 +26,11 @@
     "oxfmt.config.ts",
     "oxlint.config.ts",
     "playwright.config.ts",
+    "vitest.config.ts",
     // Convex generated files reference generated JS names that do not exist as source files.
     "convex/**/_generated/**",
+    // convex-test harness. Not a Convex function module.
+    "convex/test.setup.ts",
     // CLI-only preview seed. Called from scripts/vercel-build.sh, not app imports.
     "convex/preview.ts",
     // Better Auth CLI output. Do not edit; regenerate with the Better Auth schema command.

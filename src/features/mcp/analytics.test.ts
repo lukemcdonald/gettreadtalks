@@ -1,12 +1,8 @@
 import type { EventMap } from '@/services/analytics/events';
 
-import assert from 'node:assert/strict';
-import { register } from 'node:module';
-import { describe, test } from 'node:test';
+import { describe, expect, test } from 'vitest';
 
-register(new URL('../../../scripts/node-test-hooks.mjs', import.meta.url));
-
-const { mcpToolCallProperties } = await import('./analytics.ts');
+import { mcpToolCallProperties } from './analytics';
 
 describe('mcpToolCallProperties', () => {
   test('builds the MCP tool event payload', () => {
@@ -19,7 +15,7 @@ describe('mcpToolCallProperties', () => {
       userAgent: 'Claude-User/1.0',
     });
 
-    assert.deepEqual(properties, {
+    expect(properties).toEqual({
       duration_ms: 42,
       error: undefined,
       query: 'Romans 8',

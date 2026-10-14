@@ -1,18 +1,17 @@
-import assert from 'node:assert/strict';
-import { describe, test } from 'node:test';
+import { describe, expect, test } from 'vitest';
 
-import { authorizeMcpLimiter, mcpLimiterToken } from './mcpToken.ts';
+import { authorizeMcpLimiter, mcpLimiterToken } from './mcpToken';
 
 describe('authorizeMcpLimiter', () => {
   test('rejects an invalid token', () => {
-    assert.deepEqual(authorizeMcpLimiter('nope', 'server-secret'), {
+    expect(authorizeMcpLimiter('nope', 'server-secret')).toEqual({
       ok: false,
       retryAfter: 60_000,
     });
   });
 
   test('rejects when the secret is missing', () => {
-    assert.deepEqual(authorizeMcpLimiter('any-token'), {
+    expect(authorizeMcpLimiter('any-token')).toEqual({
       ok: false,
       retryAfter: 60_000,
     });
@@ -22,7 +21,10 @@ describe('authorizeMcpLimiter', () => {
     const secret = 'server-secret';
     const token = mcpLimiterToken(secret);
 
-    assert.ok(token);
-    assert.equal(authorizeMcpLimiter(token, secret), undefined);
+    if (!token) {
+      throw new Error('expected limiter token');
+    }
+
+    expect(authorizeMcpLimiter(token, secret)).toBeUndefined();
   });
 });

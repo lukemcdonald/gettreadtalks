@@ -4,31 +4,7 @@ import { Card, CardDescription } from '@/components/ui';
 import { FauxLink } from '@/components/ui/link';
 import { cn } from '@/utils';
 
-export function MediaIconFrame({ children }: { children: ReactNode }) {
-  return (
-    <div className="bg-muted text-muted-foreground flex size-12 shrink-0 items-center justify-center rounded-md">
-      {children}
-    </div>
-  );
-}
-
-export function MediaCardTitle({
-  children,
-  className,
-  ...delegated
-}: ComponentProps<'h3'>) {
-  return (
-    <h3
-      className={cn(
-        'line-clamp-2 text-base font-semibold text-balance',
-        className
-      )}
-      {...delegated}
-    >
-      {children}
-    </h3>
-  );
-}
+import { MediaCardTitle } from './media-card-title';
 
 type MediaCardProps = {
   ariaLabel?: string;

@@ -1,7 +1,6 @@
-import assert from 'node:assert/strict';
-import { describe, test } from 'node:test';
+import { describe, expect, test } from 'vitest';
 
-import { talkListItemsJsonLd } from './utils.ts';
+import { talkListItemsJsonLd } from './utils';
 
 describe('talkListItemsJsonLd', () => {
   test('uses a talk url when the speaker is present', () => {
@@ -13,10 +12,12 @@ describe('talkListItemsJsonLd', () => {
       },
     ]);
 
-    assert.ok(item);
-    assert.equal(item.position, 1);
-    assert.equal(
-      item.url,
+    if (!item) {
+      throw new Error('expected list item');
+    }
+
+    expect(item.position).toBe(1);
+    expect(item.url).toBe(
       'https://www.gettreadtalks.com/talks/lloyd-jones/the-cross'
     );
   });
@@ -26,8 +27,11 @@ describe('talkListItemsJsonLd', () => {
       { slug: 'orphan', speaker: null, title: 'Orphan talk' },
     ]);
 
-    assert.ok(item);
-    assert.equal(item.position, 1);
-    assert.equal(item.url, undefined);
+    if (!item) {
+      throw new Error('expected list item');
+    }
+
+    expect(item.position).toBe(1);
+    expect(item.url).toBeUndefined();
   });
 });

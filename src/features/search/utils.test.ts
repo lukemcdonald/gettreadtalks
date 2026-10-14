@@ -1,10 +1,6 @@
-import assert from 'node:assert/strict';
-import { register } from 'node:module';
-import { describe, test } from 'node:test';
+import { describe, expect, test } from 'vitest';
 
-register(new URL('../../../scripts/node-test-hooks.mjs', import.meta.url));
-
-const {
+import {
   BROWSE_SEARCH_GROUP,
   emptySiteSearch,
   getBrowseCommandGroups,
@@ -23,7 +19,7 @@ const {
   toCommandGroups,
   toSearchHits,
   VIEW_ALL_SEARCH_GROUP,
-} = await import('./utils.ts');
+} from './utils';
 
 function cappedTalkHits() {
   return Array.from({ length: SEARCH_DROPDOWN_LIMIT }, (_, index) => ({
@@ -85,28 +81,28 @@ const result = {
 
 describe('getHeaderSearchQueryAfterClose', () => {
   test('keeps the query on dismiss and clears after navigate', () => {
-    assert.equal(getHeaderSearchQueryAfterClose('grace', false), 'grace');
-    assert.equal(getHeaderSearchQueryAfterClose('grace', true), '');
+    expect(getHeaderSearchQueryAfterClose('grace', false)).toBe('grace');
+    expect(getHeaderSearchQueryAfterClose('grace', true)).toBe('');
   });
 });
 
 describe('getSearchQuery', () => {
   test('trims a string and uses the first repeated param', () => {
-    assert.equal(getSearchQuery('  grace  '), 'grace');
-    assert.equal(getSearchQuery(['grace', 'prayer']), 'grace');
-    assert.equal(getSearchQuery(), '');
+    expect(getSearchQuery('  grace  ')).toBe('grace');
+    expect(getSearchQuery(['grace', 'prayer'])).toBe('grace');
+    expect(getSearchQuery()).toBe('');
   });
 });
 
 describe('getSearchPageHref', () => {
   test('keeps the existing search query param', () => {
-    assert.equal(getSearchPageHref('John Piper'), '/search?search=John+Piper');
+    expect(getSearchPageHref('John Piper')).toBe('/search?search=John+Piper');
   });
 });
 
 describe('toSearchHits', () => {
   test('maps published results to canonical links and skips talks without speakers', () => {
-    assert.deepEqual(toSearchHits(result), [
+    expect(toSearchHits(result)).toEqual([
       {
         href: '/talks/john-doe/sample-sermon-on-romans-8',
         id: 'talk1',
@@ -142,79 +138,75 @@ describe('groupSearchHits', () => {
   test('groups hits by type in nav order', () => {
     const groups = groupSearchHits(toSearchHits(result));
 
-    assert.deepEqual(
-      groups.map((group) => group.label),
-      ['Talks', 'Speakers', 'Topics', 'Clips']
-    );
-    assert.equal(groups[2]?.hits[0]?.href, '/topics/grace');
+    expect(groups.map((group) => group.label)).toEqual([
+      'Talks',
+      'Speakers',
+      'Topics',
+      'Clips',
+    ]);
+    expect(groups[2]?.hits[0]?.href).toBe('/topics/grace');
   });
 });
 
 describe('hasSearchHits', () => {
   test('is false for an empty result', () => {
-    assert.equal(hasSearchHits(emptySiteSearch), false);
+    expect(hasSearchHits(emptySiteSearch)).toBe(false);
   });
 
   test('is true when any type has a published hit', () => {
-    assert.equal(hasSearchHits(result), true);
+    expect(hasSearchHits(result)).toBe(true);
   });
 });
 
 describe('getHeaderSearchStatus', () => {
   test('returns idle, loading, empty, or results', () => {
-    assert.equal(
+    expect(
       getHeaderSearchStatus({
         hasQuery: false,
         hasResults: false,
         isLoading: false,
-      }),
-      'idle'
-    );
-    assert.equal(
+      })
+    ).toBe('idle');
+    expect(
       getHeaderSearchStatus({
         hasQuery: true,
         hasResults: false,
         isLoading: true,
-      }),
-      'loading'
-    );
-    assert.equal(
+      })
+    ).toBe('loading');
+    expect(
       getHeaderSearchStatus({
         hasQuery: true,
         hasResults: false,
         isLoading: false,
-      }),
-      'empty'
-    );
-    assert.equal(
+      })
+    ).toBe('empty');
+    expect(
       getHeaderSearchStatus({
         hasQuery: true,
         hasResults: true,
         isLoading: false,
-      }),
-      'results'
-    );
+      })
+    ).toBe('results');
   });
 });
 
 describe('getSearchHotkeyLabel', () => {
   test('shows the Apple glyph on Apple user agents', () => {
-    assert.equal(
+    expect(
       getSearchHotkeyLabel(
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
-      ),
-      '⌘K'
-    );
+      )
+    ).toBe('⌘K');
   });
 
   test('shows Ctrl K otherwise', () => {
-    assert.equal(
+    expect(
       getSearchHotkeyLabel(
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-      ),
-      'Ctrl K'
-    );
-    assert.equal(getSearchHotkeyLabel(), 'Ctrl K');
+      )
+    ).toBe('Ctrl K');
+    expect(getSearchHotkeyLabel()).toBe('Ctrl K');
   });
 });
 
@@ -244,12 +236,12 @@ describe('getHeaderSearchState', () => {
       value: 'grace',
     });
 
-    assert.equal(idle.status, 'idle');
-    assert.equal(idle.groups[0]?.value, BROWSE_SEARCH_GROUP);
-    assert.equal(firstLoad.status, 'loading');
-    assert.equal(firstLoad.groups[0]?.value, BROWSE_SEARCH_GROUP);
-    assert.equal(results.status, 'results');
-    assert.notEqual(results.groups.at(-1)?.value, VIEW_ALL_SEARCH_GROUP);
+    expect(idle.status).toBe('idle');
+    expect(idle.groups[0]?.value).toBe(BROWSE_SEARCH_GROUP);
+    expect(firstLoad.status).toBe('loading');
+    expect(firstLoad.groups[0]?.value).toBe(BROWSE_SEARCH_GROUP);
+    expect(results.status).toBe('results');
+    expect(results.groups.at(-1)?.value).not.toBe(VIEW_ALL_SEARCH_GROUP);
   });
 
   test('appends view all when a type hits the dropdown limit', () => {
@@ -262,7 +254,7 @@ describe('getHeaderSearchState', () => {
       value: 'talk',
     });
 
-    assert.equal(results.groups.at(-1)?.value, VIEW_ALL_SEARCH_GROUP);
+    expect(results.groups.at(-1)?.value).toBe(VIEW_ALL_SEARCH_GROUP);
   });
 
   test('keeps previous hits while refining and hides view all until settled', () => {
@@ -274,11 +266,13 @@ describe('getHeaderSearchState', () => {
       value: 'grace hopper',
     });
 
-    assert.equal(pending.status, 'loading');
-    assert.deepEqual(
-      pending.groups.map((group) => group.value),
-      ['Talks', 'Speakers', 'Topics', 'Clips']
-    );
+    expect(pending.status).toBe('loading');
+    expect(pending.groups.map((group) => group.value)).toEqual([
+      'Talks',
+      'Speakers',
+      'Topics',
+      'Clips',
+    ]);
   });
 
   test('keeps the empty state while a later query loads', () => {
@@ -290,8 +284,8 @@ describe('getHeaderSearchState', () => {
       value: 'zzzz',
     });
 
-    assert.equal(pendingEmpty.status, 'empty');
-    assert.deepEqual(pendingEmpty.groups, []);
+    expect(pendingEmpty.status).toBe('empty');
+    expect(pendingEmpty.groups).toEqual([]);
   });
 });
 
@@ -299,29 +293,31 @@ describe('getBrowseCommandGroups', () => {
   test('lists browse destinations and favorites when signed in', () => {
     const signedOut = getBrowseCommandGroups(false);
 
-    assert.equal(signedOut[0]?.value, BROWSE_SEARCH_GROUP);
-    assert.deepEqual(
-      signedOut[0]?.items.map((item) => item.label),
-      ['Talks', 'Speakers', 'Topics', 'Collections', 'Clips']
-    );
-    assert.deepEqual(
-      getBrowseCommandGroups(true)[0]?.items.map((item) => item.href),
-      [
-        '/talks',
-        '/speakers',
-        '/topics',
-        '/collections',
-        '/clips',
-        '/account/favorites',
-      ]
-    );
+    expect(signedOut[0]?.value).toBe(BROWSE_SEARCH_GROUP);
+    expect(signedOut[0]?.items.map((item) => item.label)).toEqual([
+      'Talks',
+      'Speakers',
+      'Topics',
+      'Collections',
+      'Clips',
+    ]);
+    expect(
+      getBrowseCommandGroups(true)[0]?.items.map((item) => item.href)
+    ).toEqual([
+      '/talks',
+      '/speakers',
+      '/topics',
+      '/collections',
+      '/clips',
+      '/account/favorites',
+    ]);
   });
 });
 
 describe('shouldShowViewAllResults', () => {
   test('is false until a type reaches the fetch limit', () => {
-    assert.equal(shouldShowViewAllResults(toSearchHits(result)), false);
-    assert.equal(shouldShowViewAllResults(cappedTalkHits()), true);
+    expect(shouldShowViewAllResults(toSearchHits(result))).toBe(false);
+    expect(shouldShowViewAllResults(cappedTalkHits())).toBe(true);
   });
 });
 
@@ -329,49 +325,45 @@ describe('getSearchSelectionAnalytics', () => {
   const hits = toSearchHits(result);
 
   test('returns null for browse and unknown items', () => {
-    assert.equal(
+    expect(
       getSearchSelectionAnalytics({
         hits,
         itemValue: hits[0]?.id ?? '',
         query: '',
-      }),
-      null
-    );
-    assert.equal(
+      })
+    ).toBe(null);
+    expect(
       getSearchSelectionAnalytics({
         hits,
         itemValue: 'missing',
         query: 'grace',
-      }),
-      null
-    );
+      })
+    ).toBe(null);
   });
 
   test('uses a 1-based position and view_all after the last hit', () => {
-    assert.deepEqual(
+    expect(
       getSearchSelectionAnalytics({
         hits,
         itemValue: hits[2]?.id ?? '',
         query: '  grace  ',
-      }),
-      {
-        position: 3,
-        query: 'grace',
-        result_type: 'topic',
-      }
-    );
-    assert.deepEqual(
+      })
+    ).toEqual({
+      position: 3,
+      query: 'grace',
+      result_type: 'topic',
+    });
+    expect(
       getSearchSelectionAnalytics({
         hits,
         itemValue: VIEW_ALL_SEARCH_GROUP,
         query: 'grace',
-      }),
-      {
-        position: hits.length + 1,
-        query: 'grace',
-        result_type: 'view_all',
-      }
-    );
+      })
+    ).toEqual({
+      position: hits.length + 1,
+      query: 'grace',
+      result_type: 'view_all',
+    });
   });
 });
 
@@ -379,26 +371,28 @@ describe('toCommandGroups', () => {
   test('keeps group order and omits view all when every group is visible', () => {
     const groups = toCommandGroups(toSearchHits(result), 'grace');
 
-    assert.deepEqual(
-      groups.map((group) => group.value),
-      ['Talks', 'Speakers', 'Topics', 'Clips']
-    );
+    expect(groups.map((group) => group.value)).toEqual([
+      'Talks',
+      'Speakers',
+      'Topics',
+      'Clips',
+    ]);
   });
 
   test('appends view all when a type hits the dropdown limit', () => {
     const groups = toCommandGroups(cappedTalkHits(), 'talk');
 
-    assert.equal(groups.at(-1)?.value, VIEW_ALL_SEARCH_GROUP);
-    assert.equal(groups.at(-1)?.items[0]?.href, '/search?search=talk');
-    assert.equal(groups.at(-1)?.items[0]?.label, 'View all results');
+    expect(groups.at(-1)?.value).toBe(VIEW_ALL_SEARCH_GROUP);
+    expect(groups.at(-1)?.items[0]?.href).toBe('/search?search=talk');
+    expect(groups.at(-1)?.items[0]?.label).toBe('View all results');
   });
 
   test('stays empty when there is no query', () => {
-    assert.deepEqual(toCommandGroups([], ''), []);
+    expect(toCommandGroups([], '')).toEqual([]);
   });
 
   test('omits view all when the query has no hits', () => {
-    assert.deepEqual(toCommandGroups([], 'zzzz'), []);
+    expect(toCommandGroups([], 'zzzz')).toEqual([]);
   });
 });
 
@@ -412,23 +406,20 @@ describe('isSearchHotkey', () => {
   };
 
   test('matches unmodified Cmd or Ctrl K', () => {
-    assert.equal(isSearchHotkey({ ...base, metaKey: true }), true);
-    assert.equal(isSearchHotkey({ ...base, ctrlKey: true }), true);
+    expect(isSearchHotkey({ ...base, metaKey: true })).toBe(true);
+    expect(isSearchHotkey({ ...base, ctrlKey: true })).toBe(true);
   });
 
   test('ignores other modifiers, keys, and repeats', () => {
-    assert.equal(isSearchHotkey(base), false);
-    assert.equal(isSearchHotkey({ ...base, key: 's', metaKey: true }), false);
-    assert.equal(
-      isSearchHotkey({ ...base, altKey: true, metaKey: true }),
+    expect(isSearchHotkey(base)).toBe(false);
+    expect(isSearchHotkey({ ...base, key: 's', metaKey: true })).toBe(false);
+    expect(isSearchHotkey({ ...base, altKey: true, metaKey: true })).toBe(
       false
     );
-    assert.equal(
-      isSearchHotkey({ ...base, metaKey: true, shiftKey: true }),
+    expect(isSearchHotkey({ ...base, metaKey: true, shiftKey: true })).toBe(
       false
     );
-    assert.equal(
-      isSearchHotkey({ ...base, metaKey: true, repeat: true }),
+    expect(isSearchHotkey({ ...base, metaKey: true, repeat: true })).toBe(
       false
     );
   });

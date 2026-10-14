@@ -1,20 +1,19 @@
-import assert from 'node:assert/strict';
-import { describe, test } from 'node:test';
+import { describe, expect, test } from 'vitest';
 
-import { isSentryEnabled } from './enabled.ts';
+import { isSentryEnabled } from './enabled';
 
 describe('isSentryEnabled', () => {
   test('enables when a DSN is set and the flag is not false', () => {
-    assert.equal(isSentryEnabled('https://dsn.example/1'), true);
-    assert.equal(isSentryEnabled('https://dsn.example/1', 'true'), true);
+    expect(isSentryEnabled('https://dsn.example/1')).toBe(true);
+    expect(isSentryEnabled('https://dsn.example/1', 'true')).toBe(true);
   });
 
   test('stays off without a DSN', () => {
-    assert.equal(isSentryEnabled(), false);
-    assert.equal(isSentryEnabled('', 'true'), false);
+    expect(isSentryEnabled()).toBe(false);
+    expect(isSentryEnabled('', 'true')).toBe(false);
   });
 
   test('stays off when the enabled flag is false', () => {
-    assert.equal(isSentryEnabled('https://dsn.example/1', 'false'), false);
+    expect(isSentryEnabled('https://dsn.example/1', 'false')).toBe(false);
   });
 });

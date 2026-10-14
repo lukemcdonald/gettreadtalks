@@ -1,20 +1,19 @@
-import assert from 'node:assert/strict';
-import { describe, test } from 'node:test';
+import { describe, expect, test } from 'vitest';
 
-import { parseStatusPrefill } from './status-prefill.ts';
+import { parseStatusPrefill } from './status-prefill';
 
 describe('parseStatusPrefill', () => {
   test('accepts archived', () => {
-    assert.equal(parseStatusPrefill('archived'), 'archived');
+    expect(parseStatusPrefill('archived')).toBe('archived');
   });
 
   test('ignores missing or other values', () => {
-    assert.equal(parseStatusPrefill(), undefined);
-    assert.equal(parseStatusPrefill(''), undefined);
-    assert.equal(parseStatusPrefill('published'), undefined);
+    expect(parseStatusPrefill()).toBe(undefined);
+    expect(parseStatusPrefill('')).toBe(undefined);
+    expect(parseStatusPrefill('published')).toBe(undefined);
   });
 
   test('uses the first query value', () => {
-    assert.equal(parseStatusPrefill(['archived', 'published']), 'archived');
+    expect(parseStatusPrefill(['archived', 'published'])).toBe('archived');
   });
 });
