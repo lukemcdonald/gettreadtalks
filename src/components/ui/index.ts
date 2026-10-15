@@ -17,6 +17,5 @@ export * from './primitives';
 export * from './search-input';
 export * from './section';
 export * from './select-filter';
-export * from './sheet-stack';
 export * from './sort-select';
 export * from './toggle-icon-button';
