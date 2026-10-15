@@ -1,17 +1,8 @@
 import type { Speaker } from '@/features/speakers/types';
 
-import dynamic from 'next/dynamic';
-
 import { ShareSpeakerButton } from '@/features/speakers/components/share-speaker-button';
 import { SpeakerMinistryLink } from '@/features/speakers/components/speaker-ministry-link';
-
-const SpeakerUserActions = dynamic(
-  () =>
-    import('@/features/users/components/speaker-user-actions').then(
-      (mod) => mod.SpeakerUserActions
-    ),
-  { ssr: false }
-);
+import { SpeakerUserActionsIsland } from '@/features/users/components/speaker-user-actions-island';
 
 interface SpeakerMetadataSidebarProps {
   hideAbout?: boolean;
@@ -56,7 +47,7 @@ export function SpeakerMetadataSidebar({
         </h3>
         <div className="flex flex-wrap gap-2">
           <ShareSpeakerButton speaker={speaker} />
-          <SpeakerUserActions speaker={speaker} />
+          <SpeakerUserActionsIsland speaker={speaker} />
         </div>
       </div>
     </div>

@@ -5,7 +5,7 @@ import type { Speaker } from '@/features/speakers/types';
 import { AuthProvider } from '@/components/auth-provider';
 import { FavoriteSpeakerButton } from '@/features/users/components/favorite-speaker-button';
 
-interface SpeakerUserActionsProps {
+export interface SpeakerUserActionsProps {
   speaker: Pick<Speaker, '_id' | 'slug'>;
 }
 

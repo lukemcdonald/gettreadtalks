@@ -8,7 +8,7 @@ import { FeatureTalkButton } from '@/features/talks/components/feature-talk-butt
 import { FavoriteTalkButton } from '@/features/users/components/favorite-talk-button';
 import { FinishTalkButton } from '@/features/users/components/finish-talk-button';
 
-interface TalkUserActionsProps {
+export interface TalkUserActionsProps {
   speaker: Pick<Speaker, '_id' | 'slug'> | null;
   talk: Pick<Talk, '_id' | 'slug' | 'title'>;
 }
