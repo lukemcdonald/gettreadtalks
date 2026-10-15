@@ -1,11 +1,17 @@
 import type { SearchHit } from '@/features/search/types';
-import type { RenderOptions } from '@/test/render';
+import type { RenderOptions } from '@/test';
 import type { ComponentProps } from 'react';
 
-import { describe, expect, it } from 'vitest';
-
-import { expectTracked, expectTrackedTimes } from '@/test/analytics';
-import { render, screen, userEvent } from '@/test/render';
+import {
+  describe,
+  expect,
+  expectTracked,
+  expectTrackedTimes,
+  it,
+  render,
+  screen,
+  userEvent,
+} from '@/test';
 
 import { SearchResultGroups } from './search-result-groups';
 

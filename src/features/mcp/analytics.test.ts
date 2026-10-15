@@ -1,6 +1,6 @@
 import type { EventMap } from '@/services/analytics/events';
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from '@/test';
 
 import { mcpToolCallProperties } from './analytics';
 

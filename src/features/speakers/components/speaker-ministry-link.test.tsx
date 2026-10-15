@@ -1,11 +1,17 @@
 import type { Speaker } from '@/features/speakers/types';
-import type { RenderOptions } from '@/test/render';
+import type { RenderOptions } from '@/test';
 import type { ComponentProps } from 'react';
 
-import { describe, expect, it } from 'vitest';
-
-import { expectTracked, expectTrackedTimes } from '@/test/analytics';
-import { render, screen, userEvent } from '@/test/render';
+import {
+  describe,
+  expect,
+  expectTracked,
+  expectTrackedTimes,
+  it,
+  render,
+  screen,
+  userEvent,
+} from '@/test';
 
 import { SpeakerMinistryLink } from './speaker-ministry-link';
 

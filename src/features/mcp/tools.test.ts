@@ -1,6 +1,6 @@
 import type { McpCatalog } from './tools';
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from '@/test';
 
 import {
   createTreadMcpHandler,

@@ -1,12 +1,18 @@
 import type { Speaker } from '@/features/speakers/types';
 import type { Talk } from '@/features/talks/types';
-import type { RenderOptions } from '@/test/render';
+import type { RenderOptions } from '@/test';
 import type { ComponentProps } from 'react';
 
-import { describe, it, vi } from 'vitest';
-
-import { expectTracked, expectTrackedTimes } from '@/test/analytics';
-import { render, screen, userEvent } from '@/test/render';
+import {
+  describe,
+  expectTracked,
+  expectTrackedTimes,
+  it,
+  render,
+  screen,
+  userEvent,
+  vi,
+} from '@/test';
 
 import { ShareTalkButton } from './share-talk-button';
 

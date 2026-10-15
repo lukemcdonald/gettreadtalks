@@ -1,9 +1,15 @@
-import type { RenderOptions } from '@/test/render';
+import type { RenderOptions } from '@/test';
 import type { ComponentProps } from 'react';
 
-import { describe, expect, it } from 'vitest';
-
-import { expectSpreadProps, render, screen, SPREAD_PROPS } from '@/test/render';
+import {
+  SPREAD_PROPS,
+  describe,
+  expect,
+  expectSpreadProps,
+  it,
+  render,
+  screen,
+} from '@/test';
 
 import { HeaderSearchDesktopTrigger } from './header-search-triggers';
 

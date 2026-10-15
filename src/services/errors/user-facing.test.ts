@@ -1,5 +1,6 @@
 import { ConvexError } from 'convex/values';
-import { describe, expect, it } from 'vitest';
+
+import { describe, expect, it } from '@/test';
 
 import { getErrorMessage } from './convex';
 import {

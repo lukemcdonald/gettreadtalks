@@ -4,8 +4,20 @@ import type { ReactElement, ReactNode } from 'react';
 import { render as rtlRender } from '@testing-library/react';
 import { expect } from 'vitest';
 
+export { expectTracked, expectTrackedTimes, mockedTrack } from './analytics';
 export * from '@testing-library/react';
 export { default as userEvent } from '@testing-library/user-event';
+export {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  test,
+  vi,
+} from 'vitest';
 
 export const SPREAD_PROPS = {
   'data-spread': 'forwarded',

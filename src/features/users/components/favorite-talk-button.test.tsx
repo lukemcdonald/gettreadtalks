@@ -1,11 +1,11 @@
+/// <reference types="vitest/globals" />
+
 import type { Talk } from '@/features/talks/types';
-import type { RenderOptions } from '@/test/render';
+import type { RenderOptions } from '@/test';
 import type { ComponentProps, ReactNode } from 'react';
 
-import { describe, expect, it, vi } from 'vitest';
-
 import { useToggleTalkFavorited } from '@/features/users/hooks/use-toggle-talk-favorited';
-import { render, screen, userEvent } from '@/test/render';
+import { describe, expect, it, render, screen, userEvent } from '@/test';
 
 import { FavoriteTalkButton } from './favorite-talk-button';
 

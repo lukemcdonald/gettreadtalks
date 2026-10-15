@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from '@/test';
 
 import {
   BROWSE_SEARCH_GROUP,

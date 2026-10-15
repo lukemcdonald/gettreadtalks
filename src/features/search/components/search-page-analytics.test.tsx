@@ -1,14 +1,14 @@
-import type { RenderOptions } from '@/test/render';
+import type { RenderOptions } from '@/test';
 import type { ComponentProps } from 'react';
 
-import { describe, it } from 'vitest';
-
 import {
+  describe,
   expectTracked,
   expectTrackedTimes,
+  it,
   mockedTrack,
-} from '@/test/analytics';
-import { render } from '@/test/render';
+  render,
+} from '@/test';
 
 import { SearchPageAnalytics } from './search-page-analytics';
 

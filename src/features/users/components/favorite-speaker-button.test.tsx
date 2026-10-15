@@ -1,11 +1,11 @@
+/// <reference types="vitest/globals" />
+
 import type { Speaker } from '@/features/speakers/types';
-import type { RenderOptions } from '@/test/render';
+import type { RenderOptions } from '@/test';
 import type { ComponentProps, ReactNode } from 'react';
 
-import { describe, expect, it, vi } from 'vitest';
-
 import { useToggleSpeakerFavorited } from '@/features/users/hooks/use-toggle-speaker-favorited';
-import { render, screen, userEvent } from '@/test/render';
+import { describe, expect, it, render, screen, userEvent } from '@/test';
 
 import { FavoriteSpeakerButton } from './favorite-speaker-button';
 

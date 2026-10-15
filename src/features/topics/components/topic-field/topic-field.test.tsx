@@ -1,11 +1,10 @@
 import type { TopicId, TopicListItem } from '@/features/topics/types';
-import type { RenderOptions } from '@/test/render';
+import type { RenderOptions } from '@/test';
 import type { ComponentProps } from 'react';
 
 import { useForm } from 'react-hook-form';
-import { describe, expect, it, vi } from 'vitest';
 
-import { render, screen, userEvent } from '@/test/render';
+import { describe, expect, it, render, screen, userEvent, vi } from '@/test';
 
 import { TopicField } from './topic-field';
 import { TopicFieldInput } from './topic-field-input';

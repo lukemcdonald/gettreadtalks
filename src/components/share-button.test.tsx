@@ -1,9 +1,16 @@
-import type { RenderOptions } from '@/test/render';
+import type { RenderOptions } from '@/test';
 import type { ComponentProps } from 'react';
 
-import { afterEach, describe, expect, it, vi } from 'vitest';
-
-import { render, screen, userEvent } from '@/test/render';
+import {
+  afterEach,
+  describe,
+  expect,
+  it,
+  render,
+  screen,
+  userEvent,
+  vi,
+} from '@/test';
 
 import { ShareButton } from './share-button';
 

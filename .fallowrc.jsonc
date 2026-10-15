@@ -3,8 +3,8 @@
   "entry": [
     // Convex registers these modules as runtime functions; they are not imported from Next.js.
     "convex/*.ts",
-    // Vitest component setup and shared RTL entry. Loaded via vitest.config.ts / test imports.
-    "src/test/render.tsx",
+    // Vitest shared test entry and component setup. Loaded via test imports / vitest.config.ts.
+    "src/test/index.ts",
     "src/test/setup.ts",
   ],
   "ignoreDependencies": [

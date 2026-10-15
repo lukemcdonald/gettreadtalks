@@ -2,13 +2,11 @@ import type {
   CommandSearchGroup,
   HeaderSearchStatus,
 } from '@/features/search/types';
-import type { RenderOptions } from '@/test/render';
+import type { RenderOptions } from '@/test';
 import type { ComponentProps } from 'react';
 
-import { describe, expect, it, vi } from 'vitest';
-
 import { VIEW_ALL_SEARCH_GROUP } from '@/features/search/utils';
-import { render, screen, userEvent } from '@/test/render';
+import { describe, expect, it, render, screen, userEvent, vi } from '@/test';
 
 import { SearchCommand } from './search-command';
 import { SearchCommandResults } from './search-command-results';
