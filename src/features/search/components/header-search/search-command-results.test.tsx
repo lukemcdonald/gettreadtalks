@@ -6,7 +6,7 @@ import type { RenderOptions } from '@/test';
 import type { ComponentProps } from 'react';
 
 import { VIEW_ALL_SEARCH_GROUP } from '@/features/search/utils';
-import { describe, expect, it, render, screen, userEvent, vi } from '@/test';
+import { describe, expect, it, render, vi } from '@/test';
 
 import { SearchCommand } from './search-command';
 import { SearchCommandResults } from './search-command-results';
@@ -46,7 +46,6 @@ describe('SearchCommandResults', () => {
 
     return {
       onSelect,
-      user: userEvent.setup(),
       ...render(
         <SearchCommand
           groups={resultGroups}
@@ -65,12 +64,12 @@ describe('SearchCommandResults', () => {
   }
 
   it('shows an empty message only when the status is empty', () => {
-    const { rerender } = setup({
+    const { getByText, queryByText, rerender } = setup({
       groups: [],
       status: 'empty',
     });
 
-    expect(screen.getByText('No results')).toBeInTheDocument();
+    expect(getByText('No results')).toBeInTheDocument();
 
     rerender(
       <SearchCommand groups={[]} onInputValueChange={vi.fn()} value="">
@@ -78,29 +77,29 @@ describe('SearchCommandResults', () => {
       </SearchCommand>
     );
 
-    expect(screen.queryByText('No results')).not.toBeInTheDocument();
+    expect(queryByText('No results')).not.toBeInTheDocument();
   });
 
   it('omits a group label for view all and selects a result', async () => {
-    const { onSelect, user } = setup();
+    const { getByRole, getByText, onSelect, queryByText, user } = setup();
 
-    expect(screen.getByText('Talks')).toBeInTheDocument();
-    expect(screen.getByText('John Doe')).toBeInTheDocument();
-    expect(screen.queryByText(VIEW_ALL_SEARCH_GROUP)).not.toBeInTheDocument();
+    expect(getByText('Talks')).toBeInTheDocument();
+    expect(getByText('John Doe')).toBeInTheDocument();
+    expect(queryByText(VIEW_ALL_SEARCH_GROUP)).not.toBeInTheDocument();
     expect(
-      screen.getByRole('option', { name: 'View all results' })
+      getByRole('option', { name: 'View all results' })
     ).toBeInTheDocument();
 
-    await user.click(screen.getByRole('option', { name: /romans 8/iu }));
+    await user.click(getByRole('option', { name: /romans 8/iu }));
 
     expect(onSelect).toHaveBeenCalledTimes(1);
     expect(onSelect).toHaveBeenCalledWith(MOCK_GROUPS[0]?.items[0]);
   });
 
   it('selects view all results', async () => {
-    const { onSelect, user } = setup();
+    const { getByRole, onSelect, user } = setup();
 
-    await user.click(screen.getByRole('option', { name: 'View all results' }));
+    await user.click(getByRole('option', { name: 'View all results' }));
 
     expect(onSelect).toHaveBeenCalledWith(MOCK_GROUPS[1]?.items[0]);
   });

@@ -1,7 +1,9 @@
-import type { RenderOptions } from '@testing-library/react';
+import type { RenderOptions as RtlRenderOptions } from '@testing-library/react';
+import type { Options as UserEventOptions } from '@testing-library/user-event';
 import type { ReactElement, ReactNode } from 'react';
 
 import { render as rtlRender } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { expect } from 'vitest';
 
 export { expectTracked, expectTrackedTimes, mockedTrack } from './analytics';
@@ -23,15 +25,22 @@ export const SPREAD_PROPS = {
   'data-spread': 'forwarded',
 } as const;
 
+export type RenderOptions = Omit<RtlRenderOptions, 'wrapper'> & {
+  userEvent?: UserEventOptions;
+};
+
 function Providers({ children }: { children: ReactNode }) {
   return children;
 }
 
 export function render(
   ui: ReactElement,
-  options?: Omit<RenderOptions, 'wrapper'>
+  { userEvent: userEventOptions, ...options }: RenderOptions = {}
 ) {
-  return rtlRender(ui, { ...options, wrapper: Providers });
+  return {
+    ...rtlRender(ui, { ...options, wrapper: Providers }),
+    user: userEvent.setup(userEventOptions),
+  };
 }
 
 export function expectSpreadProps(element: HTMLElement) {

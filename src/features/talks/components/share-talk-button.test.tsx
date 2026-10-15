@@ -9,8 +9,6 @@ import {
   expectTrackedTimes,
   it,
   render,
-  screen,
-  userEvent,
   vi,
 } from '@/test';
 
@@ -31,13 +29,10 @@ describe('ShareTalkButton', () => {
     props: Partial<ComponentProps<typeof ShareTalkButton>> = {},
     options?: RenderOptions
   ) {
-    return {
-      user: userEvent.setup(),
-      ...render(
-        <ShareTalkButton speaker={MOCK_SPEAKER} talk={MOCK_TALK} {...props} />,
-        options
-      ),
-    };
+    return render(
+      <ShareTalkButton speaker={MOCK_SPEAKER} talk={MOCK_TALK} {...props} />,
+      options
+    );
   }
 
   it('tracks talk_shared with the share method and talk props', async () => {
@@ -48,9 +43,9 @@ describe('ShareTalkButton', () => {
       writable: true,
     });
 
-    const { user } = setup();
+    const { getByRole, user } = setup();
 
-    await user.click(screen.getByRole('button'));
+    await user.click(getByRole('button'));
 
     expectTrackedTimes(1);
     expectTracked('talk_shared', {

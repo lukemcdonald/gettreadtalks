@@ -4,7 +4,7 @@ import type { ComponentProps } from 'react';
 
 import { useForm } from 'react-hook-form';
 
-import { describe, expect, it, render, screen, userEvent, vi } from '@/test';
+import { describe, expect, it, render, vi } from '@/test';
 
 import { TopicField } from './topic-field';
 import { TopicFieldInput } from './topic-field-input';
@@ -35,31 +35,29 @@ describe('TopicFieldInput', () => {
   }
 
   it('renders the label, description, and required marker', () => {
-    setup({
+    const { getByLabelText, getByPlaceholderText, getByText } = setup({
       description: 'Pick the themes this talk covers.',
       required: true,
     });
 
-    expect(screen.getByLabelText(/topics/iu)).toBeInTheDocument();
+    expect(getByLabelText(/topics/iu)).toBeInTheDocument();
     expect(
-      screen.getByText('Pick the themes this talk covers.')
+      getByText('Pick the themes this talk covers.')
     ).toBeInTheDocument();
-    expect(screen.getByText('*')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Search topics...')).toBeInTheDocument();
+    expect(getByText('*')).toBeInTheDocument();
+    expect(getByPlaceholderText('Search topics...')).toBeInTheDocument();
   });
 
   it('shows a field error and selected topic chips', () => {
-    setup({
+    const { getByLabelText, getByText, queryByPlaceholderText } = setup({
       errorMessage: 'Select at least one topic',
       invalid: true,
       value: [MOCK_GRACE_ID],
     });
 
-    expect(screen.getByText('Select at least one topic')).toBeInTheDocument();
-    expect(screen.getByLabelText('Grace')).toBeInTheDocument();
-    expect(
-      screen.queryByPlaceholderText('Search topics...')
-    ).not.toBeInTheDocument();
+    expect(getByText('Select at least one topic')).toBeInTheDocument();
+    expect(getByLabelText('Grace')).toBeInTheDocument();
+    expect(queryByPlaceholderText('Search topics...')).not.toBeInTheDocument();
   });
 });
 
@@ -103,32 +101,33 @@ describe('TopicField', () => {
       );
     }
 
-    return {
-      user: userEvent.setup(),
-      ...render(<TopicFieldForm />, options),
-    };
+    return render(<TopicFieldForm />, options);
   }
 
   it('sorts topics alphabetically in the combobox', async () => {
-    const { user } = setup();
-    const input = screen.getByPlaceholderText('Search topics...');
+    const { findAllByRole, getByPlaceholderText, user } = setup();
+    const input = getByPlaceholderText('Search topics...');
 
     await user.click(input);
 
-    const items = await screen.findAllByRole('option');
+    const items = await findAllByRole('option');
 
     expect(items.map((item) => item.textContent)).toEqual(['Grace', 'Zion']);
   });
 
   it('selects a topic and updates the chips', async () => {
-    const { user } = setup();
+    const {
+      findByRole,
+      getByLabelText,
+      getByPlaceholderText,
+      queryByPlaceholderText,
+      user,
+    } = setup();
 
-    await user.click(screen.getByPlaceholderText('Search topics...'));
-    await user.click(await screen.findByRole('option', { name: 'Grace' }));
+    await user.click(getByPlaceholderText('Search topics...'));
+    await user.click(await findByRole('option', { name: 'Grace' }));
 
-    expect(screen.getByLabelText('Grace')).toBeInTheDocument();
-    expect(
-      screen.queryByPlaceholderText('Search topics...')
-    ).not.toBeInTheDocument();
+    expect(getByLabelText('Grace')).toBeInTheDocument();
+    expect(queryByPlaceholderText('Search topics...')).not.toBeInTheDocument();
   });
 });

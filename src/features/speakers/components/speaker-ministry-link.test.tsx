@@ -9,8 +9,6 @@ import {
   expectTrackedTimes,
   it,
   render,
-  screen,
-  userEvent,
 } from '@/test';
 
 import { SpeakerMinistryLink } from './speaker-ministry-link';
@@ -30,18 +28,15 @@ describe('SpeakerMinistryLink', () => {
     props: Partial<ComponentProps<typeof SpeakerMinistryLink>> = {},
     options?: RenderOptions
   ) {
-    return {
-      user: userEvent.setup(),
-      ...render(
-        <SpeakerMinistryLink speaker={MOCK_SPEAKER} {...props} />,
-        options
-      ),
-    };
+    return render(
+      <SpeakerMinistryLink speaker={MOCK_SPEAKER} {...props} />,
+      options
+    );
   }
 
   it('links ministry to the website and tracks the click', async () => {
-    const { user } = setup();
-    const link = screen.getByRole('link', { name: /sample chapel/iu });
+    const { getByRole, user } = setup();
+    const link = getByRole('link', { name: /sample chapel/iu });
 
     expect(link).toHaveAttribute('href', MOCK_SPEAKER.websiteUrl);
 
@@ -57,17 +52,19 @@ describe('SpeakerMinistryLink', () => {
   });
 
   it('renders ministry as text when there is no website', () => {
-    setup({ speaker: { ...MOCK_SPEAKER, websiteUrl: undefined } });
+    const { getByText, queryByRole } = setup({
+      speaker: { ...MOCK_SPEAKER, websiteUrl: undefined },
+    });
 
-    expect(screen.getByText('Sample Chapel')).toBeInTheDocument();
-    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    expect(getByText('Sample Chapel')).toBeInTheDocument();
+    expect(queryByRole('link')).not.toBeInTheDocument();
   });
 
   it('tracks a website link when ministry is missing', async () => {
-    const { user } = setup({
+    const { getByRole, user } = setup({
       speaker: { ...MOCK_SPEAKER, ministry: undefined },
     });
-    const link = screen.getByRole('link', { name: /website/iu });
+    const link = getByRole('link', { name: /website/iu });
 
     await user.click(link);
 

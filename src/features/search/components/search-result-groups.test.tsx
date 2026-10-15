@@ -9,8 +9,6 @@ import {
   expectTrackedTimes,
   it,
   render,
-  screen,
-  userEvent,
 } from '@/test';
 
 import { SearchResultGroups } from './search-result-groups';
@@ -37,13 +35,10 @@ describe('SearchResultGroups', () => {
     props: Partial<ComponentProps<typeof SearchResultGroups>> = {},
     options?: RenderOptions
   ) {
-    return {
-      user: userEvent.setup(),
-      ...render(
-        <SearchResultGroups hits={MOCK_HITS} query={MOCK_QUERY} {...props} />,
-        options
-      ),
-    };
+    return render(
+      <SearchResultGroups hits={MOCK_HITS} query={MOCK_QUERY} {...props} />,
+      options
+    );
   }
 
   it('renders nothing when there are no hits', () => {
@@ -53,14 +48,14 @@ describe('SearchResultGroups', () => {
   });
 
   it('groups hits and tracks a page result click with its list position', async () => {
-    const { user } = setup();
+    const { getByRole, getByText, user } = setup();
 
-    expect(screen.getByRole('heading', { name: 'Talks' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Topics' })).toBeInTheDocument();
-    expect(screen.getByText('John Doe')).toBeInTheDocument();
+    expect(getByRole('heading', { name: 'Talks' })).toBeInTheDocument();
+    expect(getByRole('heading', { name: 'Topics' })).toBeInTheDocument();
+    expect(getByText('John Doe')).toBeInTheDocument();
 
-    await user.click(screen.getByRole('link', { name: /romans 8/iu }));
-    await user.click(screen.getByRole('link', { name: 'Grace' }));
+    await user.click(getByRole('link', { name: /romans 8/iu }));
+    await user.click(getByRole('link', { name: 'Grace' }));
 
     expectTrackedTimes(2);
     expectTracked('search_result_selected', {

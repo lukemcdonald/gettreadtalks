@@ -5,7 +5,7 @@ import type { RenderOptions } from '@/test';
 import type { ComponentProps, ReactNode } from 'react';
 
 import { useToggleTalkFavorited } from '@/features/users/hooks/use-toggle-talk-favorited';
-import { describe, expect, it, render, screen, userEvent } from '@/test';
+import { describe, expect, it, render } from '@/test';
 
 import { FavoriteTalkButton } from './favorite-talk-button';
 
@@ -27,10 +27,7 @@ describe('FavoriteTalkButton', () => {
     props: Partial<ComponentProps<typeof FavoriteTalkButton>> = {},
     options?: RenderOptions
   ) {
-    return {
-      user: userEvent.setup(),
-      ...render(<FavoriteTalkButton talk={MOCK_TALK} {...props} />, options),
-    };
+    return render(<FavoriteTalkButton talk={MOCK_TALK} {...props} />, options);
   }
 
   function mockToggle(value: {
@@ -51,8 +48,8 @@ describe('FavoriteTalkButton', () => {
 
   it('favorites a talk that is not saved yet', async () => {
     const toggle = mockToggle({ isFavorited: false });
-    const { user } = setup();
-    const button = screen.getByTestId('favorite-talk');
+    const { getByTestId, user } = setup();
+    const button = getByTestId('favorite-talk');
 
     expect(button).toHaveAttribute('aria-pressed', 'false');
 
@@ -63,8 +60,8 @@ describe('FavoriteTalkButton', () => {
 
   it('unfavorites a saved talk and disables while loading', () => {
     mockToggle({ isFavorited: true, isLoading: true });
-    setup();
-    const button = screen.getByTestId('favorite-talk');
+    const { getByTestId } = setup();
+    const button = getByTestId('favorite-talk');
 
     expect(button).toHaveAttribute('aria-pressed', 'true');
     expect(button).toBeDisabled();
