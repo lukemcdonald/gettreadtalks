@@ -7,7 +7,8 @@ import { useQuery } from 'convex/react';
 
 import { api } from '@/convex/_generated/api';
 import { revalidateUserLists } from '@/features/users/actions/revalidate-user-lists';
-import { useMutation, useOptimisticToggle } from '@/hooks';
+import { useMutation } from '@/hooks/use-mutation';
+import { useOptimisticToggle } from '@/hooks/use-optimistic-toggle';
 import { talkTrackProps, track } from '@/services/analytics';
 
 export function useToggleTalkFavorited({

@@ -1,5 +1,6 @@
 'use client';
 
+import type { User } from '@/services/auth/types';
 import type { Route } from 'next';
 import type { ComponentType, SVGProps } from 'react';
 
@@ -34,7 +35,6 @@ import {
   DrawerTrigger,
 } from '@/components/ui';
 import { Link } from '@/components/ui/link';
-import { useCurrentUser } from '@/features/users/hooks/use-current-user';
 import { ACCOUNT_PATH, MANAGE_PATH } from '@/lib/entities/paths';
 import { isAdmin } from '@/services/auth/utils';
 import { cn } from '@/utils';
@@ -46,6 +46,7 @@ const ACCOUNT_LINKS = [
 
 interface MobileNavProps {
   className?: string;
+  initialUser?: User | null;
 }
 
 interface MobileNavMenuLinkProps {
@@ -79,9 +80,9 @@ function MobileNavMenuLink({
   );
 }
 
-export function MobileNav({ className }: MobileNavProps) {
-  const { data: user, isLoading } = useCurrentUser();
+export function MobileNav({ className, initialUser }: MobileNavProps) {
   const pathname = usePathname();
+  const user = initialUser ?? null;
   const showManageLink = isAdmin(user);
 
   return (
@@ -131,62 +132,58 @@ export function MobileNav({ className }: MobileNavProps) {
                 />
               ))}
             </DrawerMenuGroup>
-            {!isLoading && (
-              <>
-                <DrawerMenuSeparator />
-                <DrawerMenuGroup>
-                  <DrawerMenuGroupLabel>Account</DrawerMenuGroupLabel>
-                  {user ? (
-                    <>
-                      <div className="flex flex-col px-2 py-1.5">
-                        <span className="text-muted-foreground text-xs">
-                          Signed in as
-                        </span>
-                        <span className="text-foreground truncate text-sm font-semibold">
-                          {user.email}
-                        </span>
-                      </div>
-                      {ACCOUNT_LINKS.map((link) => (
-                        <MobileNavMenuLink
-                          href={link.href}
-                          icon={link.icon}
-                          isActive={pathname === link.href}
-                          key={link.href}
-                          label={link.label}
-                        />
-                      ))}
-                      <DrawerMenuSeparator />
-                      <MobileNavMenuLink
-                        href={ACCOUNT_PATH}
-                        icon={SettingsIcon}
-                        isActive={pathname === ACCOUNT_PATH}
-                        label="Settings"
-                      />
-                      {!!showManageLink && (
-                        <MobileNavMenuLink
-                          href={MANAGE_PATH}
-                          icon={ManageIcon}
-                          isActive={pathname.startsWith(MANAGE_PATH)}
-                          label="Manage"
-                        />
-                      )}
-                      <MobileNavMenuLink
-                        href={'/logout' as Route}
-                        icon={SignOutIcon}
-                        label="Sign out"
-                      />
-                    </>
-                  ) : (
+            <DrawerMenuSeparator />
+            <DrawerMenuGroup>
+              <DrawerMenuGroupLabel>Account</DrawerMenuGroupLabel>
+              {user ? (
+                <>
+                  <div className="flex flex-col px-2 py-1.5">
+                    <span className="text-muted-foreground text-xs">
+                      Signed in as
+                    </span>
+                    <span className="text-foreground truncate text-sm font-semibold">
+                      {user.email}
+                    </span>
+                  </div>
+                  {ACCOUNT_LINKS.map((link) => (
                     <MobileNavMenuLink
-                      href="/login"
-                      icon={SignInIcon}
-                      isActive={pathname === '/login'}
-                      label="Sign In"
+                      href={link.href}
+                      icon={link.icon}
+                      isActive={pathname === link.href}
+                      key={link.href}
+                      label={link.label}
+                    />
+                  ))}
+                  <DrawerMenuSeparator />
+                  <MobileNavMenuLink
+                    href={ACCOUNT_PATH}
+                    icon={SettingsIcon}
+                    isActive={pathname === ACCOUNT_PATH}
+                    label="Settings"
+                  />
+                  {!!showManageLink && (
+                    <MobileNavMenuLink
+                      href={MANAGE_PATH}
+                      icon={ManageIcon}
+                      isActive={pathname.startsWith(MANAGE_PATH)}
+                      label="Manage"
                     />
                   )}
-                </DrawerMenuGroup>
-              </>
-            )}
+                  <MobileNavMenuLink
+                    href={'/logout' as Route}
+                    icon={SignOutIcon}
+                    label="Sign out"
+                  />
+                </>
+              ) : (
+                <MobileNavMenuLink
+                  href="/login"
+                  icon={SignInIcon}
+                  isActive={pathname === '/login'}
+                  label="Sign In"
+                />
+              )}
+            </DrawerMenuGroup>
           </DrawerMenu>
         </DrawerPanel>
       </DrawerPopup>

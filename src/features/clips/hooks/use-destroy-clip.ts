@@ -3,7 +3,7 @@
 import type { UseMutationOptions } from '@/hooks/use-mutation';
 
 import { api } from '@/convex/_generated/api';
-import { useMutation } from '@/hooks';
+import { useMutation } from '@/hooks/use-mutation';
 
 export function useDestroyClip(options?: UseMutationOptions) {
   return useMutation(api.clips.destroyClip, options);

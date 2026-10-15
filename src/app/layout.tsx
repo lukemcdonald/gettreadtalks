@@ -3,9 +3,10 @@ import type { ReactNode } from 'react';
 
 import { Analytics } from '@vercel/analytics/next';
 import { Inter } from 'next/font/google';
+import { Suspense } from 'react';
 
+import { AnalyticsIdentity } from '@/components/analytics-identity';
 import { AnalyticsProvider } from '@/components/analytics-provider';
-import { AuthProvider } from '@/components/auth-provider';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
@@ -72,22 +73,23 @@ export default function RootLayout({
       <body className="bg-background text-foreground flex min-h-full flex-col bg-cover">
         <ErrorBoundary>
           <ThemeProvider>
-            <AuthProvider>
-              <AnalyticsProvider>
-                <ToastProvider>
-                  <SkipNavLink href="#main" />
-                  <SiteHeader />
-                  <div
-                    className="flex-1 py-6 sm:py-8 md:py-10 lg:py-12"
-                    id="content"
-                  >
-                    {children}
-                  </div>
-                  <SiteFooter />
-                  {sheet}
-                </ToastProvider>
-              </AnalyticsProvider>
-            </AuthProvider>
+            <AnalyticsProvider>
+              <ToastProvider>
+                <Suspense fallback={null}>
+                  <AnalyticsIdentity />
+                </Suspense>
+                <SkipNavLink href="#main" />
+                <SiteHeader />
+                <div
+                  className="flex-1 py-6 sm:py-8 md:py-10 lg:py-12"
+                  id="content"
+                >
+                  {children}
+                </div>
+                <SiteFooter />
+                {sheet}
+              </ToastProvider>
+            </AnalyticsProvider>
           </ThemeProvider>
         </ErrorBoundary>
         <Analytics debug={false} />

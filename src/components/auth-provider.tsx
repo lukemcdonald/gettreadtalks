@@ -13,8 +13,8 @@ const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
 invariant(convexUrl, 'NEXT_PUBLIC_CONVEX_URL is not set');
 
 const convex = new ConvexReactClient(convexUrl, {
-  // Global provider wraps both public and authenticated routes - keep false to avoid
-  // auth errors on public pages. Authenticated routes handle their own auth requirements.
+  // Shared by account/manage layouts and public auth islands. Keep false so
+  // signed-in islands can mount before client auth finishes syncing.
   expectAuth: false,
 });
 

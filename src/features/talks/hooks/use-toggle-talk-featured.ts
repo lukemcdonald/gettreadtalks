@@ -6,7 +6,8 @@ import type { Talk } from '@/features/talks/types';
 import { useQuery } from 'convex/react';
 
 import { api } from '@/convex/_generated/api';
-import { useMutation, useOptimisticToggle } from '@/hooks';
+import { useMutation } from '@/hooks/use-mutation';
+import { useOptimisticToggle } from '@/hooks/use-optimistic-toggle';
 import { talkTrackProps, track } from '@/services/analytics';
 
 export function useToggleTalkFeatured({

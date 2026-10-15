@@ -24,7 +24,6 @@ import {
   MenuTrigger,
 } from '@/components/ui';
 import { Link } from '@/components/ui/link';
-import { useCurrentUser } from '@/features/users/hooks/use-current-user';
 import { ACCOUNT_PATH, MANAGE_PATH } from '@/lib/entities/paths';
 import { isAdmin } from '@/services/auth/utils';
 
@@ -33,8 +32,8 @@ interface AccountMenuProps {
 }
 
 export function AccountMenu({ initialUser }: AccountMenuProps) {
-  const { data: user } = useCurrentUser(initialUser);
   const pathname = usePathname();
+  const user = initialUser ?? null;
 
   if (!user) {
     return (

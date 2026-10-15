@@ -3,14 +3,9 @@
 import type { AuthUser } from '@/services/auth/types';
 import type { RenderOptions } from '@/test';
 
-import { useCurrentUser } from '@/features/users/hooks/use-current-user';
 import { describe, expect, it, render, screen } from '@/test';
 
 import { MobileNav } from './mobile-nav';
-
-vi.mock('@/features/users/hooks/use-current-user', () => ({
-  useCurrentUser: vi.fn(),
-}));
 
 vi.mock('next/navigation', () => ({
   usePathname: vi.fn(() => '/'),
@@ -27,12 +22,7 @@ describe('MobileNav', () => {
   }
 
   function setup(user: AuthUser, options?: RenderOptions) {
-    vi.mocked(useCurrentUser).mockReturnValue({
-      data: user,
-      isLoading: false,
-    });
-
-    return render(<MobileNav />, options);
+    return render(<MobileNav initialUser={user} />, options);
   }
 
   it('shows account destinations for signed-in users', async () => {

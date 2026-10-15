@@ -1,8 +1,6 @@
 'use client';
 
-import type { Route } from 'next';
-
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 
 import { track, waitForAnalytics } from '@/services/analytics';
@@ -11,7 +9,6 @@ import { captureException } from '@/services/errors';
 import { getSafeRedirect } from '@/utils';
 
 export function LogoutContent() {
-  const router = useRouter();
   const searchParams = useSearchParams();
 
   const redirectTo = getSafeRedirect(searchParams.get('redirect'), '/');
@@ -27,11 +24,11 @@ export function LogoutContent() {
         });
       }
 
-      router.push(redirectTo as Route);
+      window.location.replace(redirectTo);
     };
 
     handleLogout();
-  }, [redirectTo, router]);
+  }, [redirectTo]);
 
   return null;
 }

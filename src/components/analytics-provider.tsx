@@ -1,11 +1,11 @@
 'use client';
 
+import type { User } from '@/services/auth/types';
 import type { ReactNode } from 'react';
 
 import { usePathname, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useRef } from 'react';
 
-import { useCurrentUser } from '@/features/users/hooks/use-current-user';
 import {
   identify,
   loadAnalytics,
@@ -13,31 +13,15 @@ import {
   trackLocationChange,
 } from '@/services/analytics';
 
-function AnalyticsLifecycle() {
+function AnalyticsPageViews() {
   const pathname = usePathname();
   const search = useSearchParams().toString();
-  const { data: user, isLoading } = useCurrentUser();
-  const { _id: userId, email, name, role } = user ?? {};
   const previousLocationRef = useRef<{ path: string; search: string } | null>(
     null
   );
 
   useEffect(() => {
-    if (isLoading) {
-      return;
-    }
-
-    if (userId) {
-      void identify(userId, { email, name, role });
-
-      return;
-    }
-
-    void reset();
-  }, [email, isLoading, name, role, userId]);
-
-  useEffect(() => {
-    if (isLoading || !pathname) {
+    if (!pathname) {
       return;
     }
 
@@ -45,7 +29,23 @@ function AnalyticsLifecycle() {
     const previous = previousLocationRef.current;
     previousLocationRef.current = current;
     trackLocationChange(previous, current);
-  }, [isLoading, pathname, search]);
+  }, [pathname, search]);
+
+  return null;
+}
+
+export function AnalyticsIdentifyUser({ user }: { user: User | null }) {
+  const { _id: userId, email, name, role } = user ?? {};
+
+  useEffect(() => {
+    if (userId) {
+      void identify(userId, { email, name, role });
+
+      return;
+    }
+
+    void reset();
+  }, [email, name, role, userId]);
 
   return null;
 }
@@ -58,7 +58,7 @@ export function AnalyticsProvider({ children }: { children: ReactNode }) {
   return (
     <>
       <Suspense fallback={null}>
-        <AnalyticsLifecycle />
+        <AnalyticsPageViews />
       </Suspense>
       {children}
     </>

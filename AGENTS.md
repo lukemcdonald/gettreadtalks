@@ -121,6 +121,7 @@ Public reads live in `src/features/*/queries` with `'use cache'`, `cacheLife()`,
 - `convex/model/{domain}/` - Entity helpers (queries.ts, mutations.ts, schema.ts, validators.ts)
 - `convex/model/auth/` - Authentication helpers
 - `convex/lib/` - Shared utilities
+- Client provider: mount `AuthProvider` only in layouts that need the Convex client (`/account`, `/manage`) and in lazy islands for favorite/finished actions.
 
 ### File Naming
 
@@ -166,7 +167,7 @@ Actions use `updateTag()` for read-your-writes. Use `revalidateTag()` for backgr
 
 ### Error Handling
 
-**Convex Mutations** — `useMutation` from `@/hooks`; map failures with `getErrorMessage`.
+**Convex Mutations** — `useMutation` from `@/hooks/use-mutation`; map failures with `getErrorMessage`.
 
 **Server Actions** — try/catch and return `mapConvexErrorToFormErrors(error)`.
 

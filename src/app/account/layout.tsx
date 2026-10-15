@@ -1,19 +1,22 @@
 import type { ReactNode } from 'react';
 
 import { ACCOUNT_NAV } from '@/app/account/nav';
+import { AuthProviderLoader } from '@/components/auth-provider-loader';
 import { AreaLayout } from '@/components/layouts';
 import { Skeleton } from '@/components/ui';
 import { UserGate } from '@/services/auth/user-gate';
 
 export default function AccountLayout({ children }: { children: ReactNode }) {
   return (
-    <UserGate
-      fallback={<Skeleton className="h-96 w-full" />}
-      redirect="/login?redirect=/account"
-    >
-      <AreaLayout items={ACCOUNT_NAV} label="Account">
-        {children}
-      </AreaLayout>
-    </UserGate>
+    <AuthProviderLoader>
+      <UserGate
+        fallback={<Skeleton className="h-96 w-full" />}
+        redirect="/login?redirect=/account"
+      >
+        <AreaLayout items={ACCOUNT_NAV} label="Account">
+          {children}
+        </AreaLayout>
+      </UserGate>
+    </AuthProviderLoader>
   );
 }
