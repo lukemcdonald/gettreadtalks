@@ -91,6 +91,11 @@ function parseQuery(query: BreakpointQuery | MediaQueryInput | string): string {
   return parseStringQuery(query);
 }
 
+/** False so SSR/hydration never read `window`; the client snapshot updates after mount. */
+function getServerSnapshot(): boolean {
+  return false;
+}
+
 export function useMediaQuery(
   query: BreakpointQuery | MediaQueryInput | string
 ): boolean {
@@ -117,7 +122,7 @@ export function useMediaQuery(
     return window.matchMedia(mediaQuery).matches;
   }, [mediaQuery]);
 
-  return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
 
 export function useIsMobile(): boolean {
