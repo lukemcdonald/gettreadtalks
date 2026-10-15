@@ -1,14 +1,11 @@
+import { PageHeader } from '@/components/page-header';
 import {
   Badge,
   Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
   Empty,
   EmptyDescription,
   EmptyHeader,
   EmptyTitle,
-  Separator,
   Tabs,
   TabsList,
   TabsTab,
@@ -142,24 +139,18 @@ export default async function FavoritesPage() {
   const total = clips.length + speakers.length + talks.length;
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Favorites</CardTitle>
-        {total > 0 && (
-          <CardDescription>
-            {talks.length} talks · {speakers.length} speakers · {clips.length}{' '}
-            clips
-          </CardDescription>
+    <>
+      <PageHeader
+        description="Talks, speakers, and clips you've saved."
+        title="Favorites"
+      />
+      <Card>
+        {total === 0 ? (
+          <FavoritesEmpty />
+        ) : (
+          <FavoritesTabs clips={clips} speakers={speakers} talks={talks} />
         )}
-      </CardHeader>
-
-      <Separator />
-
-      {total === 0 ? (
-        <FavoritesEmpty />
-      ) : (
-        <FavoritesTabs clips={clips} speakers={speakers} talks={talks} />
-      )}
-    </Card>
+      </Card>
+    </>
   );
 }

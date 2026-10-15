@@ -1,16 +1,16 @@
-import type { AccountTalksSearchParams } from '@/app/account/talks/page';
+import type { ManageTalksSearchParams } from '@/app/manage/talks/page';
 
 import { Pagination } from '@/components/pagination';
 import { TalksTable } from '@/features/talks/components/talks-table/talks-table';
 import { getAllTalks } from '@/features/talks/queries/get-all-talks';
 
-interface AccountTalksContentProps {
-  searchParams: Promise<AccountTalksSearchParams>;
+interface ManageTalksContentProps {
+  searchParams: Promise<ManageTalksSearchParams>;
 }
 
-export async function AccountTalksContent({
+export async function ManageTalksContent({
   searchParams,
-}: AccountTalksContentProps) {
+}: ManageTalksContentProps) {
   const { cursor, search, status } = await searchParams;
 
   const result = await getAllTalks({

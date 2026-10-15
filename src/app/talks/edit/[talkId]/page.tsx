@@ -2,7 +2,7 @@ import type { TalkId } from '@/features/talks/types';
 
 import { EditTalkSheetPage } from '@/app/@sheet/_components/edit-talk-sheet-page';
 import { AdminSheetFallback } from '@/app/_components/admin-sheet-fallback';
-import AccountTalksPage from '@/app/account/talks/page';
+import ManageTalksPage from '@/app/manage/talks/page';
 import { ADMIN_LIST_PATHS, getEntityEditPath } from '@/lib/entities/paths';
 import { parseStatusPrefill } from '@/lib/entities/status-prefill';
 
@@ -29,7 +29,7 @@ export default async function Page({ params, searchParams }: PageProps) {
         />
       }
     >
-      <AccountTalksPage
+      <ManageTalksPage
         searchParams={Promise.resolve(
           statusPrefill ? { status: statusPrefill } : {}
         )}

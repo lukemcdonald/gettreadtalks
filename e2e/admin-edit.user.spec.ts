@@ -10,8 +10,9 @@ test('Admin edit / Signed-in shortcut', async ({ page, talksPage }) => {
   await page.goto('/account');
   await expect(page.getByText('Profile settings')).toBeVisible();
 
+  await page.getByTestId('account-menu').click();
   const isAdmin = await page
-    .getByRole('heading', { name: 'Content Management' })
+    .getByRole('menuitem', { name: 'Manage' })
     .isVisible();
 
   await talksPage.goto();

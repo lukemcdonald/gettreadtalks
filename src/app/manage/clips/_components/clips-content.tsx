@@ -1,16 +1,16 @@
-import type { AccountClipsSearchParams } from '@/app/account/clips/page';
+import type { ManageClipsSearchParams } from '@/app/manage/clips/page';
 
 import { Pagination } from '@/components/pagination';
 import { ClipsTable } from '@/features/clips/components/clips-table/clips-table';
 import { getAllClips } from '@/features/clips/queries/get-all-clips';
 
-interface AccountClipsContentProps {
-  searchParams: Promise<AccountClipsSearchParams>;
+interface ManageClipsContentProps {
+  searchParams: Promise<ManageClipsSearchParams>;
 }
 
-export async function AccountClipsContent({
+export async function ManageClipsContent({
   searchParams,
-}: AccountClipsContentProps) {
+}: ManageClipsContentProps) {
   const { cursor, status } = await searchParams;
 
   const result = await getAllClips({

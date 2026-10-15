@@ -9,8 +9,8 @@ import {
 } from './paths';
 
 describe('getAdminListPath', () => {
-  it('returns the account admin page', () => {
-    expect(getAdminListPath('talks')).toBe('/account/talks');
+  it('returns the manage admin page', () => {
+    expect(getAdminListPath('talks')).toBe('/manage/talks');
   });
 });
 

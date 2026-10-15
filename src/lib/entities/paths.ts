@@ -1,9 +1,12 @@
+export const ACCOUNT_PATH = '/account';
+export const MANAGE_PATH = '/manage';
+
 export const ADMIN_LIST_PATHS = {
-  clips: '/account/clips',
-  collections: '/account/collections',
-  speakers: '/account/speakers',
-  talks: '/account/talks',
-  topics: '/account/topics',
+  clips: '/manage/clips',
+  collections: '/manage/collections',
+  speakers: '/manage/speakers',
+  talks: '/manage/talks',
+  topics: '/manage/topics',
 } as const;
 
 export type AdminEntity = keyof typeof ADMIN_LIST_PATHS;

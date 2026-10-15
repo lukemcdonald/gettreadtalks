@@ -5,12 +5,12 @@ import type { Route } from 'next';
 
 import {
   ArrowRight as ArrowRightIcon,
-  LayoutDashboard as DashboardIcon,
-  Heart as FavoritesIcon,
   CheckCircle2 as FinishedIcon,
-  Settings as SettingsIcon,
-  LogOut as SignOutIcon,
   CircleUser as UserIcon,
+  Heart as FavoritesIcon,
+  LayoutDashboard as ManageIcon,
+  LogOut as SignOutIcon,
+  Settings as SettingsIcon,
 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
@@ -25,6 +25,7 @@ import {
 } from '@/components/ui';
 import { Link } from '@/components/ui/link';
 import { useCurrentUser } from '@/features/users/hooks/use-current-user';
+import { ACCOUNT_PATH, MANAGE_PATH } from '@/lib/entities/paths';
 import { isAdmin } from '@/services/auth/utils';
 
 interface AccountMenuProps {
@@ -64,7 +65,7 @@ export function AccountMenu({ initialUser }: AccountMenuProps) {
     );
   }
 
-  const showDashboardLink = isAdmin(user);
+  const showManageLink = isAdmin(user);
 
   return (
     <Menu>
@@ -100,12 +101,16 @@ export function AccountMenu({ initialUser }: AccountMenuProps) {
           label="Finished"
         />
         <MenuSeparator />
-        <AccountMenuItem href="/account" icon={SettingsIcon} label="Settings" />
-        {!!showDashboardLink && (
+        <AccountMenuItem
+          href={ACCOUNT_PATH}
+          icon={SettingsIcon}
+          label="Settings"
+        />
+        {!!showManageLink && (
           <AccountMenuItem
-            href="/account/talks"
-            icon={DashboardIcon}
-            label="Dashboard"
+            href={MANAGE_PATH}
+            icon={ManageIcon}
+            label="Manage"
           />
         )}
         <AccountMenuItem

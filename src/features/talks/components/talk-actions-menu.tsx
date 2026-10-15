@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { ContentActionsGroup } from '@/components/actions-group';
 import { useArchiveTalk } from '@/features/talks/hooks/use-archive-talk';
 import { useDestroyTalk } from '@/features/talks/hooks/use-destroy-talk';
+import { getAdminListPath } from '@/lib/entities/paths';
 
 interface TalkActionsMenuProps {
   talk: TalkWithSpeakerAndTopics;
@@ -37,7 +38,7 @@ export function TalkActionsMenu({ talk, talkUrl }: TalkActionsMenuProps) {
       content={talk}
       contentType="talk"
       editUrl={`/talks/edit/${talkId}`}
-      listUrl="/account/talks"
+      listUrl={getAdminListPath('talks')}
       onArchiveAction={handleArchive}
       onDeleteAction={handleDelete}
       viewUrl={talkUrl}

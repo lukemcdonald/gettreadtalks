@@ -2,7 +2,7 @@ import type { ClipId } from '@/features/clips/types';
 
 import { EditClipSheetPage } from '@/app/@sheet/_components/edit-clip-sheet-page';
 import { AdminSheetFallback } from '@/app/_components/admin-sheet-fallback';
-import AccountClipsPage from '@/app/account/clips/page';
+import ManageClipsPage from '@/app/manage/clips/page';
 import { ADMIN_LIST_PATHS, getEntityEditPath } from '@/lib/entities/paths';
 import { parseStatusPrefill } from '@/lib/entities/status-prefill';
 
@@ -29,7 +29,7 @@ export default async function Page({ params, searchParams }: PageProps) {
         />
       }
     >
-      <AccountClipsPage
+      <ManageClipsPage
         searchParams={Promise.resolve(
           statusPrefill ? { status: statusPrefill } : {}
         )}

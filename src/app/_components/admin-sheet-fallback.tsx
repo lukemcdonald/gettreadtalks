@@ -3,8 +3,8 @@ import type { ReactNode } from 'react';
 
 import { Suspense } from 'react';
 
-import { LayoutSidebar } from '@/app/account/_components/layout-sidebar';
-import { SidebarLayout } from '@/components/layouts';
+import { MANAGE_NAV } from '@/app/manage/nav';
+import { AreaLayout } from '@/components/layouts';
 import { Skeleton } from '@/components/ui';
 import { getAdminLoginRedirect } from '@/lib/entities/paths';
 import { requireAdminUser } from '@/services/auth/server';
@@ -24,14 +24,9 @@ async function AdminSheetFallbackContent({
 
   return (
     <>
-      <SidebarLayout
-        content={children}
-        sidebar={
-          <Suspense fallback={<Skeleton className="h-48 w-full" />}>
-            <LayoutSidebar />
-          </Suspense>
-        }
-      />
+      <AreaLayout items={MANAGE_NAV} label="Manage">
+        {children}
+      </AreaLayout>
       {sheet}
     </>
   );
