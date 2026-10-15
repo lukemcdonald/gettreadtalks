@@ -21,20 +21,20 @@ const speaker: Pick<Speaker, '_id' | 'slug'> = {
   slug: 'john-doe',
 };
 
-function setup(
-  props: Partial<ComponentProps<typeof ShareTalkButton>> = {},
-  options?: RenderOptions
-) {
-  return {
-    user: userEvent.setup(),
-    ...render(
-      <ShareTalkButton speaker={speaker} talk={talk} {...props} />,
-      options
-    ),
-  };
-}
-
 describe('ShareTalkButton', () => {
+  function setup(
+    props: Partial<ComponentProps<typeof ShareTalkButton>> = {},
+    options?: RenderOptions
+  ) {
+    return {
+      user: userEvent.setup(),
+      ...render(
+        <ShareTalkButton speaker={speaker} talk={talk} {...props} />,
+        options
+      ),
+    };
+  }
+
   test('tracks talk_shared with the share method and talk props', async () => {
     const share = vi.fn(() => Promise.resolve());
     Object.defineProperty(navigator, 'share', {

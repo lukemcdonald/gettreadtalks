@@ -15,20 +15,20 @@ function stubShare(share?: () => Promise<void>) {
   });
 }
 
-function setup(
-  props: Partial<ComponentProps<typeof ShareButton>> = {},
-  options?: RenderOptions
-) {
-  return {
-    user: userEvent.setup(),
-    ...render(<ShareButton title="Romans 8" {...props} />, options),
-  };
-}
-
 describe('ShareButton', () => {
   afterEach(() => {
     Reflect.deleteProperty(navigator, 'share');
   });
+
+  function setup(
+    props: Partial<ComponentProps<typeof ShareButton>> = {},
+    options?: RenderOptions
+  ) {
+    return {
+      user: userEvent.setup(),
+      ...render(<ShareButton title="Romans 8" {...props} />, options),
+    };
+  }
 
   test('uses the share API when it is available', async () => {
     const onShare = vi.fn();

@@ -25,20 +25,20 @@ const hits: SearchHit[] = [
   },
 ];
 
-function setup(
-  props: Partial<ComponentProps<typeof SearchResultGroups>> = {},
-  options?: RenderOptions
-) {
-  return {
-    user: userEvent.setup(),
-    ...render(
-      <SearchResultGroups hits={hits} query="grace" {...props} />,
-      options
-    ),
-  };
-}
-
 describe('SearchResultGroups', () => {
+  function setup(
+    props: Partial<ComponentProps<typeof SearchResultGroups>> = {},
+    options?: RenderOptions
+  ) {
+    return {
+      user: userEvent.setup(),
+      ...render(
+        <SearchResultGroups hits={hits} query="grace" {...props} />,
+        options
+      ),
+    };
+  }
+
   test('renders nothing when there are no hits', () => {
     const { container } = setup({ hits: [], query: 'zzzz' });
 

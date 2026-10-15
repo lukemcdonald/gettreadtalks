@@ -38,17 +38,17 @@ function mockToggle(value: {
   return toggle;
 }
 
-function setup(
-  props: Partial<ComponentProps<typeof FavoriteTalkButton>> = {},
-  options?: RenderOptions
-) {
-  return {
-    user: userEvent.setup(),
-    ...render(<FavoriteTalkButton talk={talk} {...props} />, options),
-  };
-}
-
 describe('FavoriteTalkButton', () => {
+  function setup(
+    props: Partial<ComponentProps<typeof FavoriteTalkButton>> = {},
+    options?: RenderOptions
+  ) {
+    return {
+      user: userEvent.setup(),
+      ...render(<FavoriteTalkButton talk={talk} {...props} />, options),
+    };
+  }
+
   test('favorites a talk that is not saved yet', async () => {
     const toggle = mockToggle({ isFavorited: false });
     const { user } = setup();

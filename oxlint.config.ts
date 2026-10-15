@@ -13,6 +13,14 @@ export default defineConfig({
     'convex/betterAuth/schema.ts',
     'src/components/ui/primitives/**',
   ],
+  overrides: [
+    {
+      files: ['**/*.test.ts', '**/*.test.tsx'],
+      rules: {
+        'unicorn/consistent-function-scoping': 'off',
+      },
+    },
+  ],
   rules: {
     'func-style': 'off',
     'import/no-cycle': 'off',

@@ -38,17 +38,20 @@ function mockToggle(value: {
   return toggle;
 }
 
-function setup(
-  props: Partial<ComponentProps<typeof FavoriteSpeakerButton>> = {},
-  options?: RenderOptions
-) {
-  return {
-    user: userEvent.setup(),
-    ...render(<FavoriteSpeakerButton speaker={speaker} {...props} />, options),
-  };
-}
-
 describe('FavoriteSpeakerButton', () => {
+  function setup(
+    props: Partial<ComponentProps<typeof FavoriteSpeakerButton>> = {},
+    options?: RenderOptions
+  ) {
+    return {
+      user: userEvent.setup(),
+      ...render(
+        <FavoriteSpeakerButton speaker={speaker} {...props} />,
+        options
+      ),
+    };
+  }
+
   test('favorites a speaker that is not saved yet', async () => {
     const toggle = mockToggle({ isFavorited: false });
     const { user } = setup();

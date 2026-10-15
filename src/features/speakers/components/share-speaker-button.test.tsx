@@ -16,17 +16,17 @@ const speaker: Pick<Speaker, '_id' | 'firstName' | 'lastName' | 'slug'> = {
   slug: 'john-doe',
 };
 
-function setup(
-  props: Partial<ComponentProps<typeof ShareSpeakerButton>> = {},
-  options?: RenderOptions
-) {
-  return {
-    user: userEvent.setup(),
-    ...render(<ShareSpeakerButton speaker={speaker} {...props} />, options),
-  };
-}
-
 describe('ShareSpeakerButton', () => {
+  function setup(
+    props: Partial<ComponentProps<typeof ShareSpeakerButton>> = {},
+    options?: RenderOptions
+  ) {
+    return {
+      user: userEvent.setup(),
+      ...render(<ShareSpeakerButton speaker={speaker} {...props} />, options),
+    };
+  }
+
   test('tracks speaker_shared with the share method and speaker props', async () => {
     const share = vi.fn(() => Promise.resolve());
     Object.defineProperty(navigator, 'share', {

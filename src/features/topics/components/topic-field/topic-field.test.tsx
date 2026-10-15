@@ -31,57 +31,25 @@ const topicOptions = [
   { label: 'Zion', value: zionId },
 ];
 
-function setup(
-  props: Partial<ComponentProps<typeof TopicFieldInput>> = {},
-  options?: RenderOptions
-) {
-  return render(
-    <TopicFieldInput
-      fieldName="topicIds"
-      invalid={false}
-      label="Topics"
-      onTopicIdsChange={vi.fn()}
-      options={topicOptions}
-      value={undefined}
-      {...props}
-    />,
-    options
-  );
-}
-
-function setupField(
-  props: {
-    description?: string;
-    label?: string;
-    required?: boolean;
-    topics?: TopicListItem[];
-  } = {},
-  options?: RenderOptions
-) {
-  function TopicFieldForm() {
-    const form = useForm<{ topicIds: TopicId[] }>({
-      defaultValues: { topicIds: [] },
-    });
-
-    return (
-      <form>
-        <TopicField
-          control={form.control}
-          name="topicIds"
-          topics={topics}
-          {...props}
-        />
-      </form>
+describe('TopicFieldInput', () => {
+  function setup(
+    props: Partial<ComponentProps<typeof TopicFieldInput>> = {},
+    options?: RenderOptions
+  ) {
+    return render(
+      <TopicFieldInput
+        fieldName="topicIds"
+        invalid={false}
+        label="Topics"
+        onTopicIdsChange={vi.fn()}
+        options={topicOptions}
+        value={undefined}
+        {...props}
+      />,
+      options
     );
   }
 
-  return {
-    user: userEvent.setup(),
-    ...render(<TopicFieldForm />, options),
-  };
-}
-
-describe('TopicFieldInput', () => {
   test('renders the label, description, and required marker', () => {
     setup({
       description: 'Pick the themes this talk covers.',
@@ -112,8 +80,40 @@ describe('TopicFieldInput', () => {
 });
 
 describe('TopicField', () => {
+  function setup(
+    props: {
+      description?: string;
+      label?: string;
+      required?: boolean;
+      topics?: TopicListItem[];
+    } = {},
+    options?: RenderOptions
+  ) {
+    function TopicFieldForm() {
+      const form = useForm<{ topicIds: TopicId[] }>({
+        defaultValues: { topicIds: [] },
+      });
+
+      return (
+        <form>
+          <TopicField
+            control={form.control}
+            name="topicIds"
+            topics={topics}
+            {...props}
+          />
+        </form>
+      );
+    }
+
+    return {
+      user: userEvent.setup(),
+      ...render(<TopicFieldForm />, options),
+    };
+  }
+
   test('sorts topics alphabetically in the combobox', async () => {
-    const { user } = setupField();
+    const { user } = setup();
     const input = screen.getByPlaceholderText('Search topics...');
 
     await user.click(input);
@@ -124,7 +124,7 @@ describe('TopicField', () => {
   });
 
   test('selects a topic and updates the chips', async () => {
-    const { user } = setupField();
+    const { user } = setup();
 
     await user.click(screen.getByPlaceholderText('Search topics...'));
     await user.click(await screen.findByRole('option', { name: 'Grace' }));

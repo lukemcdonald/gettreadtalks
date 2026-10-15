@@ -37,35 +37,35 @@ const groups: CommandSearchGroup[] = [
   },
 ];
 
-function setup(
-  props: Partial<ComponentProps<typeof SearchCommandResults>> = {},
-  options?: RenderOptions
-) {
-  const onSelect = props.onSelect ?? vi.fn();
-  const resultGroups = props.groups ?? groups;
-  const status: HeaderSearchStatus = props.status ?? 'results';
-
-  return {
-    onSelect,
-    user: userEvent.setup(),
-    ...render(
-      <SearchCommand
-        groups={resultGroups}
-        onInputValueChange={vi.fn()}
-        value=""
-      >
-        <SearchCommandResults
-          groups={resultGroups}
-          onSelect={onSelect}
-          status={status}
-        />
-      </SearchCommand>,
-      options
-    ),
-  };
-}
-
 describe('SearchCommandResults', () => {
+  function setup(
+    props: Partial<ComponentProps<typeof SearchCommandResults>> = {},
+    options?: RenderOptions
+  ) {
+    const onSelect = props.onSelect ?? vi.fn();
+    const resultGroups = props.groups ?? groups;
+    const status: HeaderSearchStatus = props.status ?? 'results';
+
+    return {
+      onSelect,
+      user: userEvent.setup(),
+      ...render(
+        <SearchCommand
+          groups={resultGroups}
+          onInputValueChange={vi.fn()}
+          value=""
+        >
+          <SearchCommandResults
+            groups={resultGroups}
+            onSelect={onSelect}
+            status={status}
+          />
+        </SearchCommand>,
+        options
+      ),
+    };
+  }
+
   test('shows an empty message only when the status is empty', () => {
     const { rerender } = setup({
       groups: [],

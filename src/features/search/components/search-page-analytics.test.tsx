@@ -12,17 +12,17 @@ import { render } from '@/test/render';
 
 import { SearchPageAnalytics } from './search-page-analytics';
 
-function setup(
-  props: Partial<ComponentProps<typeof SearchPageAnalytics>> = {},
-  options?: RenderOptions
-) {
-  return render(
-    <SearchPageAnalytics query="grace" resultCount={4} {...props} />,
-    options
-  );
-}
-
 describe('SearchPageAnalytics', () => {
+  function setup(
+    props: Partial<ComponentProps<typeof SearchPageAnalytics>> = {},
+    options?: RenderOptions
+  ) {
+    return render(
+      <SearchPageAnalytics query="grace" resultCount={4} {...props} />,
+      options
+    );
+  }
+
   test('tracks a settled search on the results page', () => {
     setup();
 

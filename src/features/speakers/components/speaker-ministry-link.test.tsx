@@ -16,17 +16,17 @@ const speaker: Pick<Speaker, '_id' | 'ministry' | 'slug' | 'websiteUrl'> = {
   websiteUrl: 'https://example.com',
 };
 
-function setup(
-  props: Partial<ComponentProps<typeof SpeakerMinistryLink>> = {},
-  options?: RenderOptions
-) {
-  return {
-    user: userEvent.setup(),
-    ...render(<SpeakerMinistryLink speaker={speaker} {...props} />, options),
-  };
-}
-
 describe('SpeakerMinistryLink', () => {
+  function setup(
+    props: Partial<ComponentProps<typeof SpeakerMinistryLink>> = {},
+    options?: RenderOptions
+  ) {
+    return {
+      user: userEvent.setup(),
+      ...render(<SpeakerMinistryLink speaker={speaker} {...props} />, options),
+    };
+  }
+
   test('links ministry to the website and tracks the click', async () => {
     const { user } = setup();
     const link = screen.getByRole('link', { name: /sample chapel/iu });
