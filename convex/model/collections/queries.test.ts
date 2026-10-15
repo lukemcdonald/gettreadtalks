@@ -7,13 +7,13 @@ import {
   visibilitySlugs,
 } from '../../test.setup';
 
-describe('listPublishedCollections', () => {
+describe('listAllPublishedCollections', () => {
   it('omits empty collections and collections with only unpublished talks', async () => {
     const t = createConvexTest();
     await seedVisibilityCatalog(t);
 
     const collections = await t.query(
-      api.collections.listPublishedCollections,
+      api.collections.listAllPublishedCollections,
       {}
     );
     const slugs = collections.map((collection) => collection.slug);

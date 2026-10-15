@@ -18,7 +18,7 @@ import { LIST_SEARCH_LIMIT } from '../search/constants';
 import { normalizeSearchQuery } from '../search/utils';
 import {
   enrichClipsWithSpeaker,
-  listPublishedClips as publishedClips,
+  listPublishedClips,
   listPublishedClipsPage,
   searchPublishedClips,
 } from './helpers';
@@ -29,9 +29,12 @@ const clipPageWithSpeakersValidator = paginationResultValidator(
   })
 );
 
-export const listPublishedClips = query({
+/**
+ * List all published clips without pagination.
+ */
+export const listAllPublishedClips = query({
   args: {},
-  handler: async (ctx) => await publishedClips(ctx),
+  handler: async (ctx) => await listPublishedClips(ctx),
   returns: docs('clips'),
 });
 
@@ -125,7 +128,7 @@ export const listClips = query({
 
     let clips = hasSearch
       ? await searchPublishedClips(ctx, queryText, LIST_SEARCH_LIMIT)
-      : await publishedClips(ctx);
+      : await listPublishedClips(ctx);
 
     // Apply speaker filter (multi-select)
     if (hasSpeakerFilter) {

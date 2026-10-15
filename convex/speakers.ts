@@ -5,11 +5,11 @@ export const {
   getSpeaker,
   getSpeakerBySlug,
   getSpeakersCount,
+  listAllPublishedSpeakers,
   listAllSpeakers,
   listAllSpeakersAdmin,
   listAllSpeakersRaw,
   listFeaturedSpeakers,
-  listPublishedSpeakers,
   listSpeakers,
 } = queries;
 

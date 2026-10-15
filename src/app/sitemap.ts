@@ -25,11 +25,11 @@ function lastModified(timestamp: number | undefined, createdAt: number) {
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [talks, speakers, collections, topics, clips] = await Promise.all([
-    fetchQuery(api.talks.listPublishedTalks, {}),
-    fetchQuery(api.speakers.listPublishedSpeakers, {}),
-    fetchQuery(api.collections.listPublishedCollections, {}),
+    fetchQuery(api.talks.listAllPublishedTalks, {}),
+    fetchQuery(api.speakers.listAllPublishedSpeakers, {}),
+    fetchQuery(api.collections.listAllPublishedCollections, {}),
     fetchQuery(api.topics.listTopics, {}),
-    fetchQuery(api.clips.listPublishedClips, {}),
+    fetchQuery(api.clips.listAllPublishedClips, {}),
   ]);
 
   const speakerById = new Map(

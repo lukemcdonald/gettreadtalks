@@ -9,13 +9,16 @@ import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
 import { listPublishedTalksForCollection } from '../talks/helpers';
 import {
-  listPublishedCollections as publishedCollections,
+  listPublishedCollections,
   listPublishedCollectionsPage,
 } from './helpers';
 
-export const listPublishedCollections = query({
+/**
+ * List all collections with published talks, without pagination.
+ */
+export const listAllPublishedCollections = query({
   args: {},
-  handler: async (ctx) => await publishedCollections(ctx),
+  handler: async (ctx) => await listPublishedCollections(ctx),
   returns: docs('collections'),
 });
 

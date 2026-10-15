@@ -25,15 +25,18 @@ import { getCurrentUser, requireAuth } from '../auth/utils';
 import { LIST_SEARCH_LIMIT } from '../search/constants';
 import { normalizeSearchQuery } from '../search/utils';
 import {
-  listPublishedTalks as publishedTalks,
+  listPublishedTalks,
   listPublishedTalksPage,
   searchPublishedTalksByTitleOrSpeaker,
 } from './helpers';
 import { enrichWithTopics, filterTalksByTitleOrSpeaker } from './utils';
 
-export const listPublishedTalks = query({
+/**
+ * List all published talks without pagination.
+ */
+export const listAllPublishedTalks = query({
   args: {},
-  handler: async (ctx) => await publishedTalks(ctx),
+  handler: async (ctx) => await listPublishedTalks(ctx),
   returns: docs('talks'),
 });
 
@@ -339,7 +342,7 @@ export const listTalks = query({
           queryText,
           LIST_SEARCH_LIMIT
         )
-      : await publishedTalks(ctx);
+      : await listPublishedTalks(ctx);
 
     // Apply speaker filter (multi-select)
     if (hasSpeakerFilter) {

@@ -5,9 +5,9 @@ export const {
   getClip,
   getClipBySlug,
   listAllClips,
+  listAllPublishedClips,
   listClips,
   listClipsBySpeaker,
-  listPublishedClips,
 } = queries;
 
 // Mutations

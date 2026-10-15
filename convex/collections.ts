@@ -5,9 +5,9 @@ export const {
   getCollection,
   getCollectionBySlug,
   listAllCollections,
+  listAllPublishedCollections,
   listCollections,
   listCollectionsBySpeaker,
-  listPublishedCollections,
 } = queries;
 
 // Mutations

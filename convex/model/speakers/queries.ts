@@ -18,7 +18,7 @@ import { requireAuth } from '../auth/utils';
 import { LIST_SEARCH_LIMIT } from '../search/constants';
 import { normalizeSearchQuery } from '../search/utils';
 import {
-  listPublishedSpeakers as publishedSpeakers,
+  listPublishedSpeakers,
   listPublishedSpeakersPage,
   searchPublishedSpeakers,
 } from './helpers';
@@ -100,9 +100,12 @@ export const getSpeakerBySlug = query({
   ),
 });
 
-export const listPublishedSpeakers = query({
+/**
+ * List all speakers with published talks or clips, without pagination.
+ */
+export const listAllPublishedSpeakers = query({
   args: {},
-  handler: async (ctx) => await publishedSpeakers(ctx),
+  handler: async (ctx) => await listPublishedSpeakers(ctx),
   returns: docs('speakers'),
 });
 
@@ -176,7 +179,7 @@ export const listSpeakers = query({
 
     let speakers = hasSearch
       ? await searchPublishedSpeakers(ctx, queryText, LIST_SEARCH_LIMIT)
-      : await publishedSpeakers(ctx);
+      : await listPublishedSpeakers(ctx);
 
     // Filter by role
     if (role) {
