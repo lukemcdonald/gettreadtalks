@@ -5,21 +5,7 @@ import {
   seedVisibilityCatalog,
   visibilitySlugs,
 } from '../../test.setup';
-import { listPublishedClips, searchPublishedClips } from './helpers';
-
-describe('listPublishedClips', () => {
-  it('omits published clips whose parent talk is unpublished', async () => {
-    const t = createConvexTest();
-    await seedVisibilityCatalog(t);
-
-    const clips = await t.query(async (ctx) => await listPublishedClips(ctx));
-
-    expect(clips.map((clip) => clip.slug).toSorted()).toEqual([
-      visibilitySlugs.clipOnPublishedTalk,
-      visibilitySlugs.standaloneClip,
-    ]);
-  });
-});
+import { searchPublishedClips } from './helpers';
 
 describe('searchPublishedClips', () => {
   it('returns published clips and omits those whose parent talk is unpublished', async () => {

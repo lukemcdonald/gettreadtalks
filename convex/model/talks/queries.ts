@@ -32,35 +32,26 @@ import {
 import { enrichWithTopics, filterTalksByTitleOrSpeaker } from './utils';
 
 /**
- * List published talk slugs with their speaker slugs for sitemap generation.
+ * List slugs for published talks with their speaker slugs.
  */
-export const listTalkSlugsForSitemap = query({
+export const listTalkSlugs = query({
   args: {},
   handler: async (ctx) => {
-    const talks = await ctx.db
-      .query('talks')
-      .withIndex('by_status_and_publishedAt', (q) =>
-        q.eq('status', 'published')
-      )
-      .collect();
+    const talks = await enrichWithSpeaker(ctx, await listPublishedTalks(ctx));
 
-    const results = await Promise.all(
-      talks.map(async (talk) => {
-        const speaker = await ctx.db.get('speakers', talk.speakerId);
-        if (!speaker) {
-          return null;
-        }
-        return {
-          speakerSlug: speaker.slug,
+    return talks.flatMap((talk) => {
+      if (!talk.speaker) {
+        return [];
+      }
+
+      return [
+        {
+          speakerSlug: talk.speaker.slug,
           talkSlug: talk.slug,
           updatedAt: talk.updatedAt ?? talk._creationTime,
-        };
-      })
-    );
-
-    return results.filter(
-      (item): item is NonNullable<typeof item> => item !== null
-    );
+        },
+      ];
+    });
   },
   returns: v.array(
     v.object({

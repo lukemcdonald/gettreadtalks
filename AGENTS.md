@@ -136,6 +136,7 @@ _Queries:_
 - `get*` — Single document or null
 - `list*` — Filtered/public array with enrichment
 - `listAll*` — Unfiltered array for admin
+- `listAll*` is admin-only; registered queries are named for what they return
 - `search*` — Search results
 - Internal visibility helpers live in `convex/model/{entity}/helpers.ts` as `listPublished*` / `searchPublished*` and are not registered
 - `list*`/`get*`/`search*` return data; `*Query` is a file-private unexecuted query builder (e.g. `publishedTalksQuery`); `enrich*`/`filter*`/`normalize*` transform already-fetched data

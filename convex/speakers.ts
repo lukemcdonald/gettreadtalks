@@ -9,6 +9,7 @@ export const {
   listAllSpeakersAdmin,
   listAllSpeakersRaw,
   listFeaturedSpeakers,
+  listSpeakerSlugs,
   listSpeakers,
 } = queries;
 

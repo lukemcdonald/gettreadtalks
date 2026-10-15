@@ -30,23 +30,24 @@ const clipPageWithSpeakersValidator = paginationResultValidator(
 );
 
 /**
- * List published clip slugs for sitemap generation.
+ * List slugs for published clips.
  */
-export const listClipSlugsForSitemap = query({
+export const listClipSlugs = query({
   args: {},
   handler: async (ctx) => {
-    const clips = await ctx.db
-      .query('clips')
-      .withIndex('by_status_and_publishedAt', (q) =>
-        q.eq('status', 'published')
-      )
-      .collect();
-    return clips.map((c) => ({
-      slug: c.slug,
-      updatedAt: c.updatedAt ?? c._creationTime,
+    const clips = await listPublishedClips(ctx);
+
+    return clips.map((clip) => ({
+      slug: clip.slug,
+      updatedAt: clip.updatedAt ?? clip._creationTime,
     }));
   },
-  returns: v.array(v.object({ slug: v.string(), updatedAt: v.number() })),
+  returns: v.array(
+    v.object({
+      slug: v.string(),
+      updatedAt: v.number(),
+    })
+  ),
 });
 
 /**

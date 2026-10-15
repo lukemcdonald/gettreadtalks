@@ -5,7 +5,7 @@ export const {
   getClip,
   getClipBySlug,
   listAllClips,
-  listClipSlugsForSitemap,
+  listClipSlugs,
   listClips,
   listClipsBySpeaker,
 } = queries;

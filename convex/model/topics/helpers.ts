@@ -8,8 +8,12 @@ function publishedTopicsQuery(ctx: QueryCtx) {
   return ctx.db.query('topics').withIndex('by_title');
 }
 
-export async function listPublishedTopics(ctx: QueryCtx, limit = 100) {
-  const topics = await publishedTopicsQuery(ctx).take(limit);
+export async function listPublishedTopics(ctx: QueryCtx, limit?: number) {
+  const topicsQuery = publishedTopicsQuery(ctx);
+  const topics =
+    limit === undefined
+      ? await topicsQuery.collect()
+      : await topicsQuery.take(limit);
 
   return await filterTopicsWithPublishedTalks(ctx, topics);
 }

@@ -20,50 +20,45 @@ const staticRoutes: MetadataRoute.Sitemap = [
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [talkSlugs, speakers, collectionSlugs, topics, clipSlugs] =
-    await Promise.all([
-      fetchQuery(api.talks.listTalkSlugsForSitemap, {}),
-      fetchQuery(api.speakers.listAllSpeakersRaw, {}),
-      fetchQuery(api.collections.listCollectionSlugsForSitemap, {}),
-      fetchQuery(api.topics.listTopics, {}),
-      fetchQuery(api.clips.listClipSlugsForSitemap, {}),
-    ]);
+  const [talks, speakers, collections, topics, clips] = await Promise.all([
+    fetchQuery(api.talks.listTalkSlugs, {}),
+    fetchQuery(api.speakers.listSpeakerSlugs, {}),
+    fetchQuery(api.collections.listCollectionSlugs, {}),
+    fetchQuery(api.topics.listTopicSlugs, {}),
+    fetchQuery(api.clips.listClipSlugs, {}),
+  ]);
 
-  const talkEntries: MetadataRoute.Sitemap = talkSlugs.map(
-    ({ speakerSlug, talkSlug, updatedAt }) => ({
-      changeFrequency: 'weekly',
-      lastModified: new Date(updatedAt),
-      url: `${site.url}${getTalkUrl(speakerSlug, talkSlug)}`,
-    })
-  );
+  const talkEntries: MetadataRoute.Sitemap = talks.map((talk) => ({
+    changeFrequency: 'weekly',
+    lastModified: new Date(talk.updatedAt),
+    url: `${site.url}${getTalkUrl(talk.speakerSlug, talk.talkSlug)}`,
+  }));
 
   const speakerEntries: MetadataRoute.Sitemap = speakers.map((speaker) => ({
     changeFrequency: 'monthly',
-    lastModified: new Date(speaker.updatedAt ?? speaker._creationTime),
+    lastModified: new Date(speaker.updatedAt),
     url: `${site.url}/speakers/${speaker.slug}`,
   }));
 
-  const collectionEntries: MetadataRoute.Sitemap = collectionSlugs.map(
-    ({ slug, updatedAt }) => ({
+  const collectionEntries: MetadataRoute.Sitemap = collections.map(
+    (collection) => ({
       changeFrequency: 'monthly',
-      lastModified: new Date(updatedAt),
-      url: `${site.url}/collections/${slug}`,
+      lastModified: new Date(collection.updatedAt),
+      url: `${site.url}/collections/${collection.slug}`,
     })
   );
 
   const topicEntries: MetadataRoute.Sitemap = topics.map((topic) => ({
     changeFrequency: 'weekly',
-    lastModified: new Date(topic.updatedAt ?? topic._creationTime),
+    lastModified: new Date(topic.updatedAt),
     url: `${site.url}/topics/${topic.slug}`,
   }));
 
-  const clipEntries: MetadataRoute.Sitemap = clipSlugs.map(
-    ({ slug, updatedAt }) => ({
-      changeFrequency: 'weekly',
-      lastModified: new Date(updatedAt),
-      url: `${site.url}${getClipUrl(slug)}`,
-    })
-  );
+  const clipEntries: MetadataRoute.Sitemap = clips.map((clip) => ({
+    changeFrequency: 'weekly',
+    lastModified: new Date(clip.updatedAt),
+    url: `${site.url}${getClipUrl(clip.slug)}`,
+  }));
 
   return [
     ...staticRoutes,

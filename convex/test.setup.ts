@@ -22,9 +22,15 @@ export const visibilitySlugs = {
   clipOnPublishedTalk: 'clip-on-published-talk',
   draftSpeaker: 'draft-only-speaker',
   draftTalk: 'grace-draft',
+  emptyCollection: 'empty-collection',
+  emptyTopic: 'empty-topic',
+  publishedCollection: 'published-collection',
   publishedSpeaker: 'john-bunyan',
   publishedTalk: 'grace-abounding',
+  publishedTopic: 'published-topic',
   standaloneClip: 'standalone-grace-clip',
+  unpublishedOnlyCollection: 'unpublished-only-collection',
+  unpublishedOnlyTopic: 'unpublished-only-topic',
 };
 
 export async function seedVisibilityCatalog(
@@ -42,7 +48,34 @@ export async function seedVisibilityCatalog(
       slug: visibilitySlugs.publishedSpeaker,
     });
 
+    await ctx.db.insert('collections', {
+      slug: visibilitySlugs.emptyCollection,
+      title: 'Empty Collection',
+    });
+    const publishedCollectionId = await ctx.db.insert('collections', {
+      slug: visibilitySlugs.publishedCollection,
+      title: 'Published Collection',
+    });
+    const unpublishedOnlyCollectionId = await ctx.db.insert('collections', {
+      slug: visibilitySlugs.unpublishedOnlyCollection,
+      title: 'Unpublished Collection',
+    });
+
+    await ctx.db.insert('topics', {
+      slug: visibilitySlugs.emptyTopic,
+      title: 'Empty Topic',
+    });
+    const publishedTopicId = await ctx.db.insert('topics', {
+      slug: visibilitySlugs.publishedTopic,
+      title: 'Published Topic',
+    });
+    const unpublishedOnlyTopicId = await ctx.db.insert('topics', {
+      slug: visibilitySlugs.unpublishedOnlyTopic,
+      title: 'Unpublished Topic',
+    });
+
     const draftTalkId = await ctx.db.insert('talks', {
+      collectionId: unpublishedOnlyCollectionId,
       mediaUrl: MEDIA_URL,
       slug: visibilitySlugs.draftTalk,
       speakerId: publishedSpeakerId,
@@ -50,6 +83,7 @@ export async function seedVisibilityCatalog(
       title: 'Grace Draft',
     });
     const publishedTalkId = await ctx.db.insert('talks', {
+      collectionId: publishedCollectionId,
       mediaUrl: MEDIA_URL,
       publishedAt: Date.parse('2024-06-01T12:00:00.000Z'),
       slug: visibilitySlugs.publishedTalk,
@@ -91,6 +125,15 @@ export async function seedVisibilityCatalog(
       speakerId: publishedSpeakerId,
       status: 'published',
       title: 'Standalone Grace Clip',
+    });
+
+    await ctx.db.insert('talksOnTopics', {
+      talkId: publishedTalkId,
+      topicId: publishedTopicId,
+    });
+    await ctx.db.insert('talksOnTopics', {
+      talkId: draftTalkId,
+      topicId: unpublishedOnlyTopicId,
     });
   });
 }

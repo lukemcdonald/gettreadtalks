@@ -8,7 +8,7 @@ export const {
   listAllTalks,
   listFeaturedTalksWithSpeakers,
   listRandomTalksBySpeaker,
-  listTalkSlugsForSitemap,
+  listTalkSlugs,
   listTalkTopics,
   listTalks,
   listTalksByCollection,

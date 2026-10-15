@@ -8,21 +8,30 @@ import { enrichWithSpeaker } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
 import { listPublishedTalksForCollection } from '../talks/helpers';
-import { listPublishedCollectionsPage } from './helpers';
+import {
+  listPublishedCollections,
+  listPublishedCollectionsPage,
+} from './helpers';
 
 /**
- * List collection slugs for sitemap generation.
+ * List slugs for collections with published talks.
  */
-export const listCollectionSlugsForSitemap = query({
+export const listCollectionSlugs = query({
   args: {},
   handler: async (ctx) => {
-    const collections = await ctx.db.query('collections').collect();
-    return collections.map((c) => ({
-      slug: c.slug,
-      updatedAt: c.updatedAt ?? c._creationTime,
+    const collections = await listPublishedCollections(ctx);
+
+    return collections.map((collection) => ({
+      slug: collection.slug,
+      updatedAt: collection.updatedAt ?? collection._creationTime,
     }));
   },
-  returns: v.array(v.object({ slug: v.string(), updatedAt: v.number() })),
+  returns: v.array(
+    v.object({
+      slug: v.string(),
+      updatedAt: v.number(),
+    })
+  ),
 });
 
 /**

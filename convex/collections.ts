@@ -5,7 +5,7 @@ export const {
   getCollection,
   getCollectionBySlug,
   listAllCollections,
-  listCollectionSlugsForSitemap,
+  listCollectionSlugs,
   listCollections,
   listCollectionsBySpeaker,
 } = queries;
