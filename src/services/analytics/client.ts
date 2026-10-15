@@ -5,11 +5,36 @@ import type { Analytics } from '@segment/analytics-next';
 import { logAnalytics } from './log';
 import { getPageContext, sanitizePageProperties } from './page-context';
 
+const IDLE_LOAD_TIMEOUT_MS = 2000;
 const writeKey = process.env.NEXT_PUBLIC_SEGMENT_WRITE_KEY;
 
 let clientPromise: Promise<Analytics | undefined> | undefined;
 let dispatchQueue: Promise<void> = Promise.resolve();
+let idleLoad: Promise<null> | undefined;
 let lastIdentifyKey: string | undefined;
+
+function scheduleIdleLoad() {
+  if (idleLoad) {
+    return idleLoad;
+  }
+
+  const idle = Promise.withResolvers<null>();
+  idleLoad = idle.promise;
+
+  const start = () => {
+    idle.resolve(null);
+  };
+
+  if (typeof requestIdleCallback === 'function') {
+    requestIdleCallback(start, { timeout: IDLE_LOAD_TIMEOUT_MS });
+
+    return idleLoad;
+  }
+
+  setTimeout(start, 1);
+
+  return idleLoad;
+}
 
 async function loadClient(key: string) {
   try {
@@ -29,7 +54,7 @@ function getClient() {
   }
 
   if (!clientPromise) {
-    clientPromise = loadClient(writeKey);
+    clientPromise = scheduleIdleLoad().then(() => loadClient(writeKey));
   }
 
   return clientPromise;
