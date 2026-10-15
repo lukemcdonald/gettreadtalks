@@ -1,4 +1,4 @@
-import { describe, expect, it } from '@/test';
+import { describe, expect, it } from 'vitest';
 
 import { decideMediaCheck } from './record';
 
