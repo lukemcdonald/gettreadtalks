@@ -20,6 +20,7 @@ export function HeaderSearchFallback() {
         <HeaderSearchMobileTrigger
           aria-hidden
           className="pointer-events-none"
+          data-testid={undefined}
           disabled
         />
       </span>
@@ -27,6 +28,7 @@ export function HeaderSearchFallback() {
         <HeaderSearchDesktopTrigger
           aria-hidden
           className="pointer-events-none m-1.5"
+          data-testid={undefined}
           disabled
           hotkey={<span className="text-muted-foreground text-xs">⌘K</span>}
         />
