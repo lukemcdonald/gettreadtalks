@@ -43,9 +43,10 @@ export function HeroSection({
         <Image
           alt={imageAlt}
           className="object-cover"
+          fetchPriority="high"
           fill
-          priority
-          sizes="(max-width: 1024px) 100vw, 60vw"
+          preload
+          sizes="(max-width: 1023px) 90vw, 768px"
           src={imageSrc}
         />
       </figure>
