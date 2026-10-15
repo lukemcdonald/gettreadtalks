@@ -1,6 +1,7 @@
 import type { Speaker } from '@/features/speakers/types';
 
 import { cva } from 'class-variance-authority';
+import Image from 'next/image';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui';
 import { getSpeakerInitials, getSpeakerName } from '@/features/speakers/utils';
@@ -26,17 +27,27 @@ const sizeClasses = cva('shrink-0', {
   },
   variants: {
     size: {
+      '2xl': 'size-28 md:size-32',
       lg: 'size-14',
       md: 'size-12',
       sm: 'size-10',
+      xl: 'size-20 md:size-24',
     },
   },
 });
 
+const avatarPixelSize = {
+  '2xl': 128,
+  lg: 56,
+  md: 48,
+  sm: 40,
+  xl: 96,
+} as const;
+
 interface SpeakerAvatarProps {
   className?: string;
   rounded?: 'sm' | 'md' | 'lg' | 'full';
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
   speaker: Pick<Speaker, 'firstName' | 'lastName' | 'imageUrl'>;
 }
 
@@ -47,6 +58,8 @@ export function SpeakerAvatar({
   speaker,
 }: SpeakerAvatarProps) {
   const { imageUrl } = speaker;
+  const speakerName = getSpeakerName(speaker);
+  const pixelSize = avatarPixelSize[size ?? 'md'];
 
   return (
     <Avatar
@@ -57,7 +70,6 @@ export function SpeakerAvatar({
       )}
       render={<figure />}
     >
-      <AvatarImage alt={getSpeakerName(speaker)} src={imageUrl} />
       <AvatarFallback
         className={cn(
           roundedClasses({ rounded }),
@@ -66,6 +78,21 @@ export function SpeakerAvatar({
       >
         {getSpeakerInitials(speaker)}
       </AvatarFallback>
+      {!!imageUrl && (
+        <AvatarImage
+          alt={speakerName}
+          keepMounted
+          render={
+            <Image
+              alt={speakerName}
+              height={pixelSize}
+              src={imageUrl}
+              width={pixelSize}
+            />
+          }
+          src={imageUrl}
+        />
+      )}
     </Avatar>
   );
 }

@@ -32,11 +32,9 @@ export function SpeakerHeroDetails({
     >
       {hasImage && (
         <SpeakerAvatar
-          className={cn(
-            'size-20',
-            isInline ? '-mt-4 md:size-24' : 'size-28 md:size-32'
-          )}
+          className={isInline ? '-mt-4' : undefined}
           rounded="full"
+          size={isInline ? 'xl' : '2xl'}
           speaker={speaker}
         />
       )}
