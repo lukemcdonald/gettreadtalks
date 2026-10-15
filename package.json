@@ -87,11 +87,5 @@
     "vitest": "^4.1.11",
     "wait-on": "^9.5.1"
   },
-  "browserslist": [
-    "chrome 111",
-    "edge 111",
-    "firefox 111",
-    "safari 16.4"
-  ],
   "packageManager": "pnpm@12.11.2"
 }

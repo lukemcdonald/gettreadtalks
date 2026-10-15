@@ -60,21 +60,7 @@ const nextConfig = {
   },
   partialPrefetching: true,
   reactCompiler: true,
-  turbopack: {
-    resolveAlias: {
-      'next/dist/build/polyfills/polyfill-module.js': false,
-    },
-  },
   typedRoutes: false,
-  webpack: (config) => {
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      'next/dist/build/polyfills/polyfill-module': false,
-      'next/dist/build/polyfills/polyfill-module.js': false,
-    };
-
-    return config;
-  },
 } satisfies NextConfig;
 
 const config = IS_SENTRY_ENABLED
