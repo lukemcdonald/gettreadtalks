@@ -8,10 +8,23 @@ import { describe, expect, it, render, screen, vi, within } from '@/test';
 import { FormSheet } from './form-sheet';
 
 describe('FormSheet', () => {
+  function stubLgMediaQuery(matches: boolean) {
+    vi.stubGlobal('matchMedia', (query: string) => ({
+      addEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+      matches,
+      media: query,
+      onchange: null,
+      removeEventListener: vi.fn(),
+    }));
+  }
+
   function setup(
     props: Partial<ComponentProps<typeof FormSheet>> = {},
     options?: RenderOptions
   ) {
+    stubLgMediaQuery(false);
+
     const {
       children = <p>Talk fields</p>,
       onSubmit = vi.fn(),
@@ -39,7 +52,9 @@ describe('FormSheet', () => {
     );
   }
 
-  function setupNested() {
+  function setupNested(matchesLg = false) {
+    stubLgMediaQuery(matchesLg);
+
     function NestedForms() {
       const [innerOpen, setInnerOpen] = useState(true);
       const [outerOpen, setOuterOpen] = useState(true);
@@ -98,22 +113,30 @@ describe('FormSheet', () => {
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 
-  it('keeps the outer form open when a nested form is cancelled', async () => {
-    const { click } = setupNested();
-    const nestedForm = screen.getByRole('dialog', { name: 'Add New Speaker' });
+  it.each([
+    { label: 'on mobile', matchesLg: false },
+    { label: 'on desktop', matchesLg: true },
+  ] as const)(
+    'keeps the outer form open when a nested form is cancelled $label',
+    async ({ matchesLg }) => {
+      const { click } = setupNested(matchesLg);
+      const nestedForm = screen.getByRole('dialog', {
+        name: 'Add New Speaker',
+      });
 
-    expect(
-      screen.getByRole('dialog', { hidden: true, name: 'Add New Talk' })
-    ).toBeInTheDocument();
-    expect(nestedForm).toBeInTheDocument();
+      expect(
+        screen.getByRole('dialog', { hidden: true, name: 'Add New Talk' })
+      ).toBeInTheDocument();
+      expect(nestedForm).toBeInTheDocument();
 
-    await click(within(nestedForm).getByRole('button', { name: 'Cancel' }));
+      await click(within(nestedForm).getByRole('button', { name: 'Cancel' }));
 
-    expect(
-      await screen.findByRole('heading', { name: 'Add New Talk' })
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByRole('heading', { name: 'Add New Speaker' })
-    ).not.toBeInTheDocument();
-  });
+      expect(
+        await screen.findByRole('heading', { name: 'Add New Talk' })
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole('heading', { name: 'Add New Speaker' })
+      ).not.toBeInTheDocument();
+    }
+  );
 });
