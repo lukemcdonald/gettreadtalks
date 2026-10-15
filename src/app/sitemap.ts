@@ -20,12 +20,12 @@ const staticRoutes: MetadataRoute.Sitemap = [
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [talkSlugs, speakers, collectionSlugs, topics, clipSlugs] =
+  const [talkSlugs, speakerSlugs, collectionSlugs, topicSlugs, clipSlugs] =
     await Promise.all([
       fetchQuery(api.talks.listTalkSlugsForSitemap, {}),
-      fetchQuery(api.speakers.listAllSpeakersRaw, {}),
+      fetchQuery(api.speakers.listSpeakerSlugsForSitemap, {}),
       fetchQuery(api.collections.listCollectionSlugsForSitemap, {}),
-      fetchQuery(api.topics.listTopics, {}),
+      fetchQuery(api.topics.listTopicSlugsForSitemap, {}),
       fetchQuery(api.clips.listClipSlugsForSitemap, {}),
     ]);
 
@@ -37,11 +37,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })
   );
 
-  const speakerEntries: MetadataRoute.Sitemap = speakers.map((speaker) => ({
-    changeFrequency: 'monthly',
-    lastModified: new Date(speaker.updatedAt ?? speaker._creationTime),
-    url: `${site.url}/speakers/${speaker.slug}`,
-  }));
+  const speakerEntries: MetadataRoute.Sitemap = speakerSlugs.map(
+    ({ slug, updatedAt }) => ({
+      changeFrequency: 'monthly',
+      lastModified: new Date(updatedAt),
+      url: `${site.url}/speakers/${slug}`,
+    })
+  );
 
   const collectionEntries: MetadataRoute.Sitemap = collectionSlugs.map(
     ({ slug, updatedAt }) => ({
@@ -51,11 +53,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })
   );
 
-  const topicEntries: MetadataRoute.Sitemap = topics.map((topic) => ({
-    changeFrequency: 'weekly',
-    lastModified: new Date(topic.updatedAt ?? topic._creationTime),
-    url: `${site.url}/topics/${topic.slug}`,
-  }));
+  const topicEntries: MetadataRoute.Sitemap = topicSlugs.map(
+    ({ slug, updatedAt }) => ({
+      changeFrequency: 'weekly',
+      lastModified: new Date(updatedAt),
+      url: `${site.url}/topics/${slug}`,
+    })
+  );
 
   const clipEntries: MetadataRoute.Sitemap = clipSlugs.map(
     ({ slug, updatedAt }) => ({

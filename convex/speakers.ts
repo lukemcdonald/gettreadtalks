@@ -9,6 +9,7 @@ export const {
   listAllSpeakersAdmin,
   listAllSpeakersRaw,
   listFeaturedSpeakers,
+  listSpeakerSlugsForSitemap,
   listSpeakers,
 } = queries;
 

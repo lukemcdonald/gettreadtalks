@@ -4,6 +4,7 @@ import { paginationOptsValidator } from 'convex/server';
 import { v } from 'convex/values';
 
 import { query } from '../../_generated/server';
+import { filterCollectionsWithPublishedTalks } from '../../lib/filters';
 import { enrichWithSpeaker } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
@@ -11,15 +12,19 @@ import { listPublishedTalksForCollection } from '../talks/helpers';
 import { listPublishedCollectionsPage } from './helpers';
 
 /**
- * List collection slugs for sitemap generation.
+ * List slugs for collections that have at least one published talk.
  */
 export const listCollectionSlugsForSitemap = query({
   args: {},
   handler: async (ctx) => {
-    const collections = await ctx.db.query('collections').collect();
-    return collections.map((c) => ({
-      slug: c.slug,
-      updatedAt: c.updatedAt ?? c._creationTime,
+    const collections = await filterCollectionsWithPublishedTalks(
+      ctx,
+      await ctx.db.query('collections').collect()
+    );
+
+    return collections.map((collection) => ({
+      slug: collection.slug,
+      updatedAt: collection.updatedAt ?? collection._creationTime,
     }));
   },
   returns: v.array(v.object({ slug: v.string(), updatedAt: v.number() })),

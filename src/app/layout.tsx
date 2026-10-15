@@ -19,6 +19,9 @@ import { cn } from '@/utils';
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
 export const metadata: Metadata = {
+  alternates: {
+    canonical: './',
+  },
   description: site.description,
   icons: {
     apple: '/favicon.png',
