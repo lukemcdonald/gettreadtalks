@@ -24,6 +24,8 @@ export type RenderOptions = Omit<RtlRenderOptions, 'wrapper'> & {
   userEvent?: UserEventOptions;
 };
 
+export type TestProps<T> = Partial<T> & Record<`data-${string}`, string>;
+
 function Providers({ children }: { children: ReactNode }) {
   return children;
 }

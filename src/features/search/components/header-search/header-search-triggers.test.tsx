@@ -1,4 +1,4 @@
-import type { RenderOptions } from '@/test';
+import type { RenderOptions, TestProps } from '@/test';
 import type { ComponentProps } from 'react';
 
 import { describe, expect, it, render, screen } from '@/test';
@@ -9,7 +9,7 @@ describe('HeaderSearchDesktopTrigger', () => {
   const MOCK_HOTKEY = '⌘K';
 
   function setup(
-    props: Partial<ComponentProps<typeof HeaderSearchDesktopTrigger>> = {},
+    props: TestProps<ComponentProps<typeof HeaderSearchDesktopTrigger>> = {},
     options?: RenderOptions
   ) {
     return render(
@@ -27,11 +27,11 @@ describe('HeaderSearchDesktopTrigger', () => {
   });
 
   it('spreads props onto the root element', () => {
-    setup({ title: 'custom' });
+    setup({ 'data-testid': 'custom' });
 
-    expect(screen.getByRole('button', { name: 'Search' })).toHaveAttribute(
-      'title',
-      'custom'
-    );
+    const root = screen.getByTestId('custom');
+
+    expect(root).toBeInTheDocument();
+    expect(root).toBe(screen.getByRole('button', { name: 'Search' }));
   });
 });
