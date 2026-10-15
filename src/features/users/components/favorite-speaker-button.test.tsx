@@ -9,36 +9,20 @@ import { render, screen, userEvent } from '@/test/render';
 
 import { FavoriteSpeakerButton } from './favorite-speaker-button';
 
-vi.mock('convex/react', () => ({
-  Authenticated: ({ children }: { children: ReactNode }) => children,
-}));
-
 vi.mock('@/features/users/hooks/use-toggle-speaker-favorited', () => ({
   useToggleSpeakerFavorited: vi.fn(),
 }));
 
-const speaker: Pick<Speaker, '_id' | 'slug'> = {
-  _id: 'speakers:john-doe' as Speaker['_id'],
-  slug: 'john-doe',
-};
-
-function mockToggle(value: {
-  isFavorited: boolean;
-  isLoading?: boolean;
-  toggle?: () => void;
-}) {
-  const toggle = value.toggle ?? vi.fn();
-
-  vi.mocked(useToggleSpeakerFavorited).mockReturnValue({
-    isFavorited: value.isFavorited,
-    isLoading: value.isLoading ?? false,
-    toggle,
-  });
-
-  return toggle;
-}
+vi.mock('convex/react', () => ({
+  Authenticated: ({ children }: { children: ReactNode }) => children,
+}));
 
 describe('FavoriteSpeakerButton', () => {
+  const MOCK_SPEAKER: Pick<Speaker, '_id' | 'slug'> = {
+    _id: 'speakers:john-doe' as Speaker['_id'],
+    slug: 'john-doe',
+  };
+
   function setup(
     props: Partial<ComponentProps<typeof FavoriteSpeakerButton>> = {},
     options?: RenderOptions
@@ -46,10 +30,26 @@ describe('FavoriteSpeakerButton', () => {
     return {
       user: userEvent.setup(),
       ...render(
-        <FavoriteSpeakerButton speaker={speaker} {...props} />,
+        <FavoriteSpeakerButton speaker={MOCK_SPEAKER} {...props} />,
         options
       ),
     };
+  }
+
+  function mockToggle(value: {
+    isFavorited: boolean;
+    isLoading?: boolean;
+    toggle?: () => void;
+  }) {
+    const toggle = value.toggle ?? vi.fn();
+
+    vi.mocked(useToggleSpeakerFavorited).mockReturnValue({
+      isFavorited: value.isFavorited,
+      isLoading: value.isLoading ?? false,
+      toggle,
+    });
+
+    return toggle;
   }
 
   test('favorites a speaker that is not saved yet', async () => {

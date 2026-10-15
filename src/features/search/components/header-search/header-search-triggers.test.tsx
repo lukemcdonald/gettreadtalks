@@ -8,6 +8,8 @@ import { expectSpreadProps, render, screen, SPREAD_PROPS } from '@/test/render';
 import { HeaderSearchDesktopTrigger } from './header-search-triggers';
 
 describe('HeaderSearchDesktopTrigger', () => {
+  const MOCK_HOTKEY = '⌘K';
+
   function setup(
     props: Partial<ComponentProps<typeof HeaderSearchDesktopTrigger>> & {
       'data-spread'?: string;
@@ -15,7 +17,7 @@ describe('HeaderSearchDesktopTrigger', () => {
     options?: RenderOptions
   ) {
     return render(
-      <HeaderSearchDesktopTrigger hotkey="⌘K" {...props} />,
+      <HeaderSearchDesktopTrigger hotkey={MOCK_HOTKEY} {...props} />,
       options
     );
   }
@@ -25,7 +27,7 @@ describe('HeaderSearchDesktopTrigger', () => {
 
     const trigger = screen.getByRole('button', { name: 'Search' });
 
-    expect(trigger).toHaveTextContent('⌘K');
+    expect(trigger).toHaveTextContent(MOCK_HOTKEY);
     expectSpreadProps(trigger);
   });
 });

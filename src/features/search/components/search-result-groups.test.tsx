@@ -9,23 +9,24 @@ import { render, screen, userEvent } from '@/test/render';
 
 import { SearchResultGroups } from './search-result-groups';
 
-const hits: SearchHit[] = [
-  {
-    href: '/talks/john-doe/romans-8',
-    id: 'talk1',
-    subtitle: 'John Doe',
-    title: 'Romans 8',
-    type: 'talk',
-  },
-  {
-    href: '/topics/grace',
-    id: 'topic1',
-    title: 'Grace',
-    type: 'topic',
-  },
-];
-
 describe('SearchResultGroups', () => {
+  const MOCK_HITS: SearchHit[] = [
+    {
+      href: '/talks/john-doe/romans-8',
+      id: 'talk1',
+      subtitle: 'John Doe',
+      title: 'Romans 8',
+      type: 'talk',
+    },
+    {
+      href: '/topics/grace',
+      id: 'topic1',
+      title: 'Grace',
+      type: 'topic',
+    },
+  ];
+  const MOCK_QUERY = 'grace';
+
   function setup(
     props: Partial<ComponentProps<typeof SearchResultGroups>> = {},
     options?: RenderOptions
@@ -33,7 +34,7 @@ describe('SearchResultGroups', () => {
     return {
       user: userEvent.setup(),
       ...render(
-        <SearchResultGroups hits={hits} query="grace" {...props} />,
+        <SearchResultGroups hits={MOCK_HITS} query={MOCK_QUERY} {...props} />,
         options
       ),
     };
@@ -59,14 +60,14 @@ describe('SearchResultGroups', () => {
     expectTracked('search_result_selected', {
       path: '/search',
       position: 1,
-      query: 'grace',
+      query: MOCK_QUERY,
       result_type: 'talk',
       source: 'page',
     });
     expectTracked('search_result_selected', {
       path: '/search',
       position: 2,
-      query: 'grace',
+      query: MOCK_QUERY,
       result_type: 'topic',
       source: 'page',
     });

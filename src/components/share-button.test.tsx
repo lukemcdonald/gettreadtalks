@@ -7,15 +7,9 @@ import { render, screen, userEvent } from '@/test/render';
 
 import { ShareButton } from './share-button';
 
-function stubShare(share?: () => Promise<void>) {
-  Object.defineProperty(navigator, 'share', {
-    configurable: true,
-    value: share,
-    writable: true,
-  });
-}
-
 describe('ShareButton', () => {
+  const MOCK_TITLE = 'Romans 8';
+
   afterEach(() => {
     Reflect.deleteProperty(navigator, 'share');
   });
@@ -26,8 +20,16 @@ describe('ShareButton', () => {
   ) {
     return {
       user: userEvent.setup(),
-      ...render(<ShareButton title="Romans 8" {...props} />, options),
+      ...render(<ShareButton title={MOCK_TITLE} {...props} />, options),
     };
+  }
+
+  function stubShare(share?: () => Promise<void>) {
+    Object.defineProperty(navigator, 'share', {
+      configurable: true,
+      value: share,
+      writable: true,
+    });
   }
 
   test('uses the share API when it is available', async () => {
@@ -40,7 +42,7 @@ describe('ShareButton', () => {
     await user.click(screen.getByRole('button'));
 
     expect(share).toHaveBeenCalledWith({
-      title: 'Romans 8',
+      title: MOCK_TITLE,
       url: window.location.href,
     });
     expect(onShare).toHaveBeenCalledTimes(1);

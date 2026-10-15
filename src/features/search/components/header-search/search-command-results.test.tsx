@@ -13,37 +13,37 @@ import { render, screen, userEvent } from '@/test/render';
 import { SearchCommand } from './search-command';
 import { SearchCommandResults } from './search-command-results';
 
-const groups: CommandSearchGroup[] = [
-  {
-    items: [
-      {
-        href: '/talks/john-doe/romans-8',
-        label: 'Romans 8',
-        subtitle: 'John Doe',
-        value: 'talk1',
-      },
-    ],
-    value: 'Talks',
-  },
-  {
-    items: [
-      {
-        href: '/search?search=grace',
-        label: 'View all results',
-        value: VIEW_ALL_SEARCH_GROUP,
-      },
-    ],
-    value: VIEW_ALL_SEARCH_GROUP,
-  },
-];
-
 describe('SearchCommandResults', () => {
+  const MOCK_GROUPS: CommandSearchGroup[] = [
+    {
+      items: [
+        {
+          href: '/talks/john-doe/romans-8',
+          label: 'Romans 8',
+          subtitle: 'John Doe',
+          value: 'talk1',
+        },
+      ],
+      value: 'Talks',
+    },
+    {
+      items: [
+        {
+          href: '/search?search=grace',
+          label: 'View all results',
+          value: VIEW_ALL_SEARCH_GROUP,
+        },
+      ],
+      value: VIEW_ALL_SEARCH_GROUP,
+    },
+  ];
+
   function setup(
     props: Partial<ComponentProps<typeof SearchCommandResults>> = {},
     options?: RenderOptions
   ) {
     const onSelect = props.onSelect ?? vi.fn();
-    const resultGroups = props.groups ?? groups;
+    const resultGroups = props.groups ?? MOCK_GROUPS;
     const status: HeaderSearchStatus = props.status ?? 'results';
 
     return {
@@ -96,7 +96,7 @@ describe('SearchCommandResults', () => {
     await user.click(screen.getByRole('option', { name: /romans 8/iu }));
 
     expect(onSelect).toHaveBeenCalledTimes(1);
-    expect(onSelect).toHaveBeenCalledWith(groups[0]?.items[0]);
+    expect(onSelect).toHaveBeenCalledWith(MOCK_GROUPS[0]?.items[0]);
   });
 
   test('selects view all results', async () => {
@@ -104,6 +104,6 @@ describe('SearchCommandResults', () => {
 
     await user.click(screen.getByRole('option', { name: 'View all results' }));
 
-    expect(onSelect).toHaveBeenCalledWith(groups[1]?.items[0]);
+    expect(onSelect).toHaveBeenCalledWith(MOCK_GROUPS[1]?.items[0]);
   });
 });

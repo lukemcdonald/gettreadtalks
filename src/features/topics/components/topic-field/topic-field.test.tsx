@@ -10,28 +10,13 @@ import { render, screen, userEvent } from '@/test/render';
 import { TopicField } from './topic-field';
 import { TopicFieldInput } from './topic-field-input';
 
-const graceId = 'topics:grace' as TopicId;
-const zionId = 'topics:zion' as TopicId;
-
-const topics: TopicListItem[] = [
-  {
-    _id: zionId,
-    slug: 'zion',
-    title: 'Zion',
-  },
-  {
-    _id: graceId,
-    slug: 'grace',
-    title: 'Grace',
-  },
-];
-
-const topicOptions = [
-  { label: 'Grace', value: graceId },
-  { label: 'Zion', value: zionId },
-];
-
 describe('TopicFieldInput', () => {
+  const MOCK_GRACE_ID = 'topics:grace' as TopicId;
+  const MOCK_TOPIC_OPTIONS = [
+    { label: 'Grace', value: MOCK_GRACE_ID },
+    { label: 'Zion', value: 'topics:zion' as TopicId },
+  ];
+
   function setup(
     props: Partial<ComponentProps<typeof TopicFieldInput>> = {},
     options?: RenderOptions
@@ -42,7 +27,7 @@ describe('TopicFieldInput', () => {
         invalid={false}
         label="Topics"
         onTopicIdsChange={vi.fn()}
-        options={topicOptions}
+        options={MOCK_TOPIC_OPTIONS}
         value={undefined}
         {...props}
       />,
@@ -68,7 +53,7 @@ describe('TopicFieldInput', () => {
     setup({
       errorMessage: 'Select at least one topic',
       invalid: true,
-      value: [graceId],
+      value: [MOCK_GRACE_ID],
     });
 
     expect(screen.getByText('Select at least one topic')).toBeInTheDocument();
@@ -80,6 +65,19 @@ describe('TopicFieldInput', () => {
 });
 
 describe('TopicField', () => {
+  const MOCK_TOPICS: TopicListItem[] = [
+    {
+      _id: 'topics:zion' as TopicId,
+      slug: 'zion',
+      title: 'Zion',
+    },
+    {
+      _id: 'topics:grace' as TopicId,
+      slug: 'grace',
+      title: 'Grace',
+    },
+  ];
+
   function setup(
     props: {
       description?: string;
@@ -99,7 +97,7 @@ describe('TopicField', () => {
           <TopicField
             control={form.control}
             name="topicIds"
-            topics={topics}
+            topics={MOCK_TOPICS}
             {...props}
           />
         </form>

@@ -9,21 +9,25 @@ import { render, screen, userEvent } from '@/test/render';
 
 import { ShareSpeakerButton } from './share-speaker-button';
 
-const speaker: Pick<Speaker, '_id' | 'firstName' | 'lastName' | 'slug'> = {
-  _id: 'speakers:john-doe' as Speaker['_id'],
-  firstName: 'John',
-  lastName: 'Doe',
-  slug: 'john-doe',
-};
-
 describe('ShareSpeakerButton', () => {
+  const MOCK_SPEAKER: Pick<Speaker, '_id' | 'firstName' | 'lastName' | 'slug'> =
+    {
+      _id: 'speakers:john-doe' as Speaker['_id'],
+      firstName: 'John',
+      lastName: 'Doe',
+      slug: 'john-doe',
+    };
+
   function setup(
     props: Partial<ComponentProps<typeof ShareSpeakerButton>> = {},
     options?: RenderOptions
   ) {
     return {
       user: userEvent.setup(),
-      ...render(<ShareSpeakerButton speaker={speaker} {...props} />, options),
+      ...render(
+        <ShareSpeakerButton speaker={MOCK_SPEAKER} {...props} />,
+        options
+      ),
     };
   }
 
@@ -42,8 +46,8 @@ describe('ShareSpeakerButton', () => {
     expectTrackedTimes(1);
     expectTracked('speaker_shared', {
       method: 'share_api',
-      speaker_id: speaker._id,
-      speaker_slug: speaker.slug,
+      speaker_id: MOCK_SPEAKER._id,
+      speaker_slug: MOCK_SPEAKER.slug,
     });
   });
 });

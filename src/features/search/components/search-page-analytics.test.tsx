@@ -13,12 +13,19 @@ import { render } from '@/test/render';
 import { SearchPageAnalytics } from './search-page-analytics';
 
 describe('SearchPageAnalytics', () => {
+  const MOCK_QUERY = 'grace';
+  const MOCK_RESULT_COUNT = 4;
+
   function setup(
     props: Partial<ComponentProps<typeof SearchPageAnalytics>> = {},
     options?: RenderOptions
   ) {
     return render(
-      <SearchPageAnalytics query="grace" resultCount={4} {...props} />,
+      <SearchPageAnalytics
+        query={MOCK_QUERY}
+        resultCount={MOCK_RESULT_COUNT}
+        {...props}
+      />,
       options
     );
   }
@@ -29,8 +36,8 @@ describe('SearchPageAnalytics', () => {
     expectTrackedTimes(1);
     expectTracked('search_performed', {
       path: '/search',
-      query: 'grace',
-      result_count: 4,
+      query: MOCK_QUERY,
+      result_count: MOCK_RESULT_COUNT,
       source: 'page',
     });
   });
@@ -56,7 +63,9 @@ describe('SearchPageAnalytics', () => {
     const { rerender } = setup();
 
     mockedTrack().mockClear();
-    rerender(<SearchPageAnalytics query="grace" resultCount={4} />);
+    rerender(
+      <SearchPageAnalytics query={MOCK_QUERY} resultCount={MOCK_RESULT_COUNT} />
+    );
 
     expectTrackedTimes(0);
   });

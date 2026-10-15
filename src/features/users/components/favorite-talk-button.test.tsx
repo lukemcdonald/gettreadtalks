@@ -9,44 +9,44 @@ import { render, screen, userEvent } from '@/test/render';
 
 import { FavoriteTalkButton } from './favorite-talk-button';
 
-vi.mock('convex/react', () => ({
-  Authenticated: ({ children }: { children: ReactNode }) => children,
-}));
-
 vi.mock('@/features/users/hooks/use-toggle-talk-favorited', () => ({
   useToggleTalkFavorited: vi.fn(),
 }));
 
-const talk: Pick<Talk, '_id' | 'slug'> = {
-  _id: 'talks:romans-8' as Talk['_id'],
-  slug: 'romans-8',
-};
-
-function mockToggle(value: {
-  isFavorited: boolean;
-  isLoading?: boolean;
-  toggle?: () => void;
-}) {
-  const toggle = value.toggle ?? vi.fn();
-
-  vi.mocked(useToggleTalkFavorited).mockReturnValue({
-    isFavorited: value.isFavorited,
-    isLoading: value.isLoading ?? false,
-    toggle,
-  });
-
-  return toggle;
-}
+vi.mock('convex/react', () => ({
+  Authenticated: ({ children }: { children: ReactNode }) => children,
+}));
 
 describe('FavoriteTalkButton', () => {
+  const MOCK_TALK: Pick<Talk, '_id' | 'slug'> = {
+    _id: 'talks:romans-8' as Talk['_id'],
+    slug: 'romans-8',
+  };
+
   function setup(
     props: Partial<ComponentProps<typeof FavoriteTalkButton>> = {},
     options?: RenderOptions
   ) {
     return {
       user: userEvent.setup(),
-      ...render(<FavoriteTalkButton talk={talk} {...props} />, options),
+      ...render(<FavoriteTalkButton talk={MOCK_TALK} {...props} />, options),
     };
+  }
+
+  function mockToggle(value: {
+    isFavorited: boolean;
+    isLoading?: boolean;
+    toggle?: () => void;
+  }) {
+    const toggle = value.toggle ?? vi.fn();
+
+    vi.mocked(useToggleTalkFavorited).mockReturnValue({
+      isFavorited: value.isFavorited,
+      isLoading: value.isLoading ?? false,
+      toggle,
+    });
+
+    return toggle;
   }
 
   test('favorites a talk that is not saved yet', async () => {

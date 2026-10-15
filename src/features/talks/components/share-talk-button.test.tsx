@@ -10,18 +10,17 @@ import { render, screen, userEvent } from '@/test/render';
 
 import { ShareTalkButton } from './share-talk-button';
 
-const talk: Pick<Talk, '_id' | 'slug' | 'title'> = {
-  _id: 'talks:romans-8' as Talk['_id'],
-  slug: 'romans-8',
-  title: 'Romans 8',
-};
-
-const speaker: Pick<Speaker, '_id' | 'slug'> = {
-  _id: 'speakers:john-doe' as Speaker['_id'],
-  slug: 'john-doe',
-};
-
 describe('ShareTalkButton', () => {
+  const MOCK_SPEAKER: Pick<Speaker, '_id' | 'slug'> = {
+    _id: 'speakers:john-doe' as Speaker['_id'],
+    slug: 'john-doe',
+  };
+  const MOCK_TALK: Pick<Talk, '_id' | 'slug' | 'title'> = {
+    _id: 'talks:romans-8' as Talk['_id'],
+    slug: 'romans-8',
+    title: 'Romans 8',
+  };
+
   function setup(
     props: Partial<ComponentProps<typeof ShareTalkButton>> = {},
     options?: RenderOptions
@@ -29,7 +28,7 @@ describe('ShareTalkButton', () => {
     return {
       user: userEvent.setup(),
       ...render(
-        <ShareTalkButton speaker={speaker} talk={talk} {...props} />,
+        <ShareTalkButton speaker={MOCK_SPEAKER} talk={MOCK_TALK} {...props} />,
         options
       ),
     };
@@ -50,10 +49,10 @@ describe('ShareTalkButton', () => {
     expectTrackedTimes(1);
     expectTracked('talk_shared', {
       method: 'share_api',
-      speaker_id: speaker._id,
-      speaker_slug: speaker.slug,
-      talk_id: talk._id,
-      talk_slug: talk.slug,
+      speaker_id: MOCK_SPEAKER._id,
+      speaker_slug: MOCK_SPEAKER.slug,
+      talk_id: MOCK_TALK._id,
+      talk_slug: MOCK_TALK.slug,
     });
   });
 });
