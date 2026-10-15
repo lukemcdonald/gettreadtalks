@@ -3,6 +3,8 @@
 import type { FormEventHandler, ReactNode } from 'react';
 import type { FieldError, FieldErrors, FieldValues } from 'react-hook-form';
 
+import { useMediaQuery } from '@/hooks/use-media-query';
+
 import { FormError } from './form/form-error';
 import { Button } from './primitives/button';
 import {
@@ -35,8 +37,14 @@ export function FormSheet({
   submitLabel,
   title,
 }: FormSheetProps) {
+  const isDesktop = useMediaQuery('lg');
+
   return (
-    <Drawer onOpenChange={onOpenChange} open={open} position="bottom">
+    <Drawer
+      onOpenChange={onOpenChange}
+      open={open}
+      position={isDesktop ? 'right' : 'bottom'}
+    >
       <DrawerPopup showBar showCloseButton variant="default">
         <DrawerHeader>
           <DrawerTitle>{title}</DrawerTitle>

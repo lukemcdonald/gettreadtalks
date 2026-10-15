@@ -91,10 +91,6 @@ function parseQuery(query: BreakpointQuery | MediaQueryInput | string): string {
   return parseStringQuery(query);
 }
 
-function getServerSnapshot(): boolean {
-  return false;
-}
-
 export function useMediaQuery(
   query: BreakpointQuery | MediaQueryInput | string
 ): boolean {
@@ -117,10 +113,11 @@ export function useMediaQuery(
     if (typeof window === 'undefined') {
       return false;
     }
+
     return window.matchMedia(mediaQuery).matches;
   }, [mediaQuery]);
 
-  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  return useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
 }
 
 export function useIsMobile(): boolean {
