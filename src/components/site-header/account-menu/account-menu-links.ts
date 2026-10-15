@@ -10,19 +10,19 @@ import {
 
 import { ACCOUNT_PATH, MANAGE_PATH } from '@/lib/entities/paths';
 
-export interface AccountMenuLink {
+interface AccountMenuLink {
   href: Route;
   icon: ComponentType<SVGProps<SVGSVGElement>>;
   label: string;
 }
 
-export const ACCOUNT_MENU_LINKS = [
+const ACCOUNT_MENU_LINKS = [
   { href: '/account/favorites', icon: FavoritesIcon, label: 'Favorites' },
   { href: '/account/finished', icon: FinishedIcon, label: 'Finished' },
   { href: ACCOUNT_PATH, icon: SettingsIcon, label: 'Settings' },
 ] as const satisfies readonly AccountMenuLink[];
 
-export const ACCOUNT_MENU_ADMIN_LINK = {
+const ACCOUNT_MENU_ADMIN_LINK = {
   href: MANAGE_PATH,
   icon: ManageIcon,
   label: 'Manage',
