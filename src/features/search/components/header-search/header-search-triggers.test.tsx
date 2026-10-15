@@ -27,10 +27,10 @@ describe('HeaderSearchDesktopTrigger', () => {
   });
 
   it('spreads props onto the root element', () => {
-    setup({ 'data-testid': 'custom' });
+    setup({ title: 'custom' });
 
     expect(screen.getByRole('button', { name: 'Search' })).toHaveAttribute(
-      'data-testid',
+      'title',
       'custom'
     );
   });
