@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import {
   createConvexTest,
@@ -8,7 +8,7 @@ import {
 import { listPublishedSpeakers } from './helpers';
 
 describe('listPublishedSpeakers', () => {
-  test('omits speakers who have no published talks or clips', async () => {
+  it('omits speakers who have no published talks or clips', async () => {
     const t = createConvexTest();
     await seedVisibilityCatalog(t);
 

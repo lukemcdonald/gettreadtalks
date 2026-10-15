@@ -1,9 +1,9 @@
-import { describe, expect, test } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { sanitizePageProperties } from './page-context';
 
 describe('sanitizePageProperties', () => {
-  test('strips reset-password token and keeps other params', () => {
+  it('strips reset-password token and keeps other params', () => {
     const result = sanitizePageProperties({
       search: '?TOKEN=abc&search=bible&email=a@b.c',
     });
@@ -11,7 +11,7 @@ describe('sanitizePageProperties', () => {
     expect(result.search).toBe('?search=bible&email=a%40b.c');
   });
 
-  test('keeps product search params', () => {
+  it('keeps product search params', () => {
     const result = sanitizePageProperties({
       search: '?search=bible&sort=recent&speakers=jonny',
     });
@@ -19,7 +19,7 @@ describe('sanitizePageProperties', () => {
     expect(result.search).toBe('?search=bible&sort=recent&speakers=jonny');
   });
 
-  test('drops url credentials, hash, and token', () => {
+  it('drops url credentials, hash, and token', () => {
     const result = sanitizePageProperties({
       url: 'https://user:pass@example.com/reset-password?token=abc#hash',
     });
@@ -27,7 +27,7 @@ describe('sanitizePageProperties', () => {
     expect(result.url).toBe('https://example.com/reset-password');
   });
 
-  test('strips query and hash from path', () => {
+  it('strips query and hash from path', () => {
     const result = sanitizePageProperties({
       path: '/talks?search=bible#top',
     });
@@ -35,7 +35,7 @@ describe('sanitizePageProperties', () => {
     expect(result.path).toBe('/talks');
   });
 
-  test('drops non-http urls', () => {
+  it('drops non-http urls', () => {
     const result = sanitizePageProperties({
       referrer: 'data:text/plain,hi',
       url: 'ftp://example.com/talks',

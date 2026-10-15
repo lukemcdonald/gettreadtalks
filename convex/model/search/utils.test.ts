@@ -1,27 +1,27 @@
-import { describe, expect, test } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { normalizeSearchQuery, searchPhrases, uniqueById } from './utils';
 
 describe('normalizeSearchQuery', () => {
-  test('trims and collapses whitespace', () => {
+  it('trims and collapses whitespace', () => {
     expect(normalizeSearchQuery('  John   Piper  ')).toBe('John Piper');
   });
 
-  test('returns empty for blank input', () => {
+  it('returns empty for blank input', () => {
     expect(normalizeSearchQuery('   ')).toBe('');
   });
 });
 
 describe('searchPhrases', () => {
-  test('returns nothing for a blank query', () => {
+  it('returns nothing for a blank query', () => {
     expect(searchPhrases('   ')).toEqual([]);
   });
 
-  test('keeps a single token as-is', () => {
+  it('keeps a single token as-is', () => {
     expect(searchPhrases('grace')).toEqual(['grace']);
   });
 
-  test('searches the full name and each token', () => {
+  it('searches the full name and each token', () => {
     expect(searchPhrases('John Piper')).toEqual([
       'John Piper',
       'John',
@@ -31,7 +31,7 @@ describe('searchPhrases', () => {
 });
 
 describe('uniqueById', () => {
-  test('keeps first-seen order and drops duplicates', () => {
+  it('keeps first-seen order and drops duplicates', () => {
     expect(
       uniqueById([
         { _id: 'a', title: 'first' },

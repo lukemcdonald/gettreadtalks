@@ -1,23 +1,23 @@
-import { describe, expect, test } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { authorizeMcpLimiter, mcpLimiterToken } from './mcpToken';
 
 describe('authorizeMcpLimiter', () => {
-  test('rejects an invalid token', () => {
+  it('rejects an invalid token', () => {
     expect(authorizeMcpLimiter('nope', 'server-secret')).toEqual({
       ok: false,
       retryAfter: 60_000,
     });
   });
 
-  test('rejects when the secret is missing', () => {
+  it('rejects when the secret is missing', () => {
     expect(authorizeMcpLimiter('any-token')).toEqual({
       ok: false,
       retryAfter: 60_000,
     });
   });
 
-  test('allows a token derived from the secret', () => {
+  it('allows a token derived from the secret', () => {
     const secret = 'server-secret';
     const token = mcpLimiterToken(secret);
 

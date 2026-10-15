@@ -2,7 +2,7 @@ import type { Speaker } from '@/features/speakers/types';
 import type { RenderOptions } from '@/test/render';
 import type { ComponentProps } from 'react';
 
-import { describe, expect, test } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { expectTracked, expectTrackedTimes } from '@/test/analytics';
 import { render, screen, userEvent } from '@/test/render';
@@ -33,7 +33,7 @@ describe('SpeakerMinistryLink', () => {
     };
   }
 
-  test('links ministry to the website and tracks the click', async () => {
+  it('links ministry to the website and tracks the click', async () => {
     const { user } = setup();
     const link = screen.getByRole('link', { name: /sample chapel/iu });
 
@@ -50,14 +50,14 @@ describe('SpeakerMinistryLink', () => {
     });
   });
 
-  test('renders ministry as text when there is no website', () => {
+  it('renders ministry as text when there is no website', () => {
     setup({ speaker: { ...MOCK_SPEAKER, websiteUrl: undefined } });
 
     expect(screen.getByText('Sample Chapel')).toBeInTheDocument();
     expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 
-  test('tracks a website link when ministry is missing', async () => {
+  it('tracks a website link when ministry is missing', async () => {
     const { user } = setup({
       speaker: { ...MOCK_SPEAKER, ministry: undefined },
     });
@@ -73,7 +73,7 @@ describe('SpeakerMinistryLink', () => {
     });
   });
 
-  test('renders nothing when ministry and website are both missing', () => {
+  it('renders nothing when ministry and website are both missing', () => {
     const { container } = setup({
       speaker: {
         ...MOCK_SPEAKER,

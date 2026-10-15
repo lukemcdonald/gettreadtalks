@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import {
   appendMediaHealthItem,
@@ -68,19 +68,19 @@ function firstAppendedItem(
 }
 
 describe('buildMediaHealthDigest', () => {
-  test('returns the items when any exist', () => {
+  it('returns the items when any exist', () => {
     const items = [digestItem];
 
     expect(buildMediaHealthDigest(items)).toEqual(items);
   });
 
-  test('returns null when empty', () => {
+  it('returns null when empty', () => {
     expect(buildMediaHealthDigest([])).toBe(null);
   });
 });
 
 describe('getMediaPublicPath', () => {
-  test('builds talk and clip page paths', () => {
+  it('builds talk and clip page paths', () => {
     expect(
       getMediaPublicPath({
         entityTable: 'talks',
@@ -96,7 +96,7 @@ describe('getMediaPublicPath', () => {
     ).toBe('/clips/sample-clip-romans-8');
   });
 
-  test('returns null for a talk without a speaker slug', () => {
+  it('returns null for a talk without a speaker slug', () => {
     expect(
       getMediaPublicPath({
         entityTable: 'talks',
@@ -107,7 +107,7 @@ describe('getMediaPublicPath', () => {
 });
 
 describe('appendMediaHealthItem', () => {
-  test('includes newly broken media as new', () => {
+  it('includes newly broken media as new', () => {
     const item = firstAppendedItem(firstTalkInput, {
       persistStatus: 'private',
       previousStatus: 'ok',
@@ -119,7 +119,7 @@ describe('appendMediaHealthItem', () => {
     expect(item.publicPath).toBe('/talks/john-doe/first-talk');
   });
 
-  test('includes still-broken media as not new', () => {
+  it('includes still-broken media as not new', () => {
     const item = firstAppendedItem(stillBrokenClipInput, {
       persistStatus: 'missing',
       previousStatus: 'missing',
@@ -130,7 +130,7 @@ describe('appendMediaHealthItem', () => {
     expect(item.publicPath).toBe('/clips/second-clip');
   });
 
-  test('includes a first broken check as not new', () => {
+  it('includes a first broken check as not new', () => {
     const item = firstAppendedItem(firstPrivateTalkInput, {
       persistStatus: 'private',
       previousStatus: null,
@@ -140,7 +140,7 @@ describe('appendMediaHealthItem', () => {
     expect(item.publicPath).toBe('/talks/mary-smith/new-talk');
   });
 
-  test('omits ok media', () => {
+  it('omits ok media', () => {
     expect(
       appendMediaHealthItem(
         healthyTalkInput,

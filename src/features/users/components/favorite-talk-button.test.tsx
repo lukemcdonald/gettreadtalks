@@ -2,7 +2,7 @@ import type { Talk } from '@/features/talks/types';
 import type { RenderOptions } from '@/test/render';
 import type { ComponentProps, ReactNode } from 'react';
 
-import { describe, expect, test, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { useToggleTalkFavorited } from '@/features/users/hooks/use-toggle-talk-favorited';
 import { render, screen, userEvent } from '@/test/render';
@@ -49,7 +49,7 @@ describe('FavoriteTalkButton', () => {
     return toggle;
   }
 
-  test('favorites a talk that is not saved yet', async () => {
+  it('favorites a talk that is not saved yet', async () => {
     const toggle = mockToggle({ isFavorited: false });
     const { user } = setup();
     const button = screen.getByTestId('favorite-talk');
@@ -61,7 +61,7 @@ describe('FavoriteTalkButton', () => {
     expect(toggle).toHaveBeenCalledTimes(1);
   });
 
-  test('unfavorites a saved talk and disables while loading', () => {
+  it('unfavorites a saved talk and disables while loading', () => {
     mockToggle({ isFavorited: true, isLoading: true });
     setup();
     const button = screen.getByTestId('favorite-talk');

@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import {
   featuredHeroCandidates,
@@ -21,25 +21,25 @@ const featuredAudio = {
 const otherVideo = { _id: 'other-video', featured: false, mediaUrl: youtube };
 
 describe('featuredHeroCandidates', () => {
-  test('uses featured video talks when any exist', () => {
+  it('uses featured video talks when any exist', () => {
     expect(
       featuredHeroCandidates([featuredAudio, featuredVideo, otherVideo])
     ).toEqual([featuredVideo]);
   });
 
-  test('falls back to nonfeatured videos when none are featured video', () => {
+  it('falls back to nonfeatured videos when none are featured video', () => {
     expect(featuredHeroCandidates([featuredAudio, otherVideo])).toEqual([
       otherVideo,
     ]);
   });
 
-  test('returns no candidates when there are no videos', () => {
+  it('returns no candidates when there are no videos', () => {
     expect(featuredHeroCandidates([featuredAudio])).toEqual([]);
   });
 });
 
 describe('speakerTalkLayout', () => {
-  test('omits the featured video from the list', () => {
+  it('omits the featured video from the list', () => {
     expect(speakerTalkLayout([featuredVideo], featuredVideo)).toEqual({
       featuredTalk: featuredVideo,
       remainingTalks: [],
@@ -52,7 +52,7 @@ describe('speakerTalkLayout', () => {
     });
   });
 
-  test('does not put audio in the hero or drop it from the list', () => {
+  it('does not put audio in the hero or drop it from the list', () => {
     const talks = [featuredAudio, otherVideo];
 
     expect(speakerTalkLayout(talks, featuredAudio)).toEqual({

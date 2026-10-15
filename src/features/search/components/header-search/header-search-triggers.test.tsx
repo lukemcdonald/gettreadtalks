@@ -1,7 +1,7 @@
 import type { RenderOptions } from '@/test/render';
 import type { ComponentProps } from 'react';
 
-import { describe, expect, test } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { expectSpreadProps, render, screen, SPREAD_PROPS } from '@/test/render';
 
@@ -22,7 +22,7 @@ describe('HeaderSearchDesktopTrigger', () => {
     );
   }
 
-  test('forwards extra button props onto the trigger', () => {
+  it('forwards extra button props onto the trigger', () => {
     setup(SPREAD_PROPS);
 
     const trigger = screen.getByRole('button', { name: 'Search' });

@@ -1,11 +1,11 @@
 import type { EventMap } from '@/services/analytics/events';
 
-import { describe, expect, test } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { mcpToolCallProperties } from './analytics';
 
 describe('mcpToolCallProperties', () => {
-  test('builds the MCP tool event payload', () => {
+  it('builds the MCP tool event payload', () => {
     const properties: EventMap['mcp_tool_called'] = mcpToolCallProperties({
       durationMs: 42,
       query: 'Romans 8',

@@ -1,7 +1,7 @@
 import type { RenderOptions } from '@/test/render';
 import type { ComponentProps } from 'react';
 
-import { describe, test } from 'vitest';
+import { describe, it } from 'vitest';
 
 import {
   expectTracked,
@@ -30,7 +30,7 @@ describe('SearchPageAnalytics', () => {
     );
   }
 
-  test('tracks a settled search on the results page', () => {
+  it('tracks a settled search on the results page', () => {
     setup();
 
     expectTrackedTimes(1);
@@ -42,7 +42,7 @@ describe('SearchPageAnalytics', () => {
     });
   });
 
-  test('also tracks no-results when the query has zero hits', () => {
+  it('also tracks no-results when the query has zero hits', () => {
     setup({ query: 'zzzz', resultCount: 0 });
 
     expectTrackedTimes(2);
@@ -59,7 +59,7 @@ describe('SearchPageAnalytics', () => {
     });
   });
 
-  test('does not track an empty query change as a new search when counts stay the same', () => {
+  it('does not track an empty query change as a new search when counts stay the same', () => {
     const { rerender } = setup();
 
     mockedTrack().mockClear();

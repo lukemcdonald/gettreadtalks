@@ -1,11 +1,11 @@
-import { describe, expect, test } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { talkJsonLd } from './talk-json-ld';
 
 const speaker = { firstName: 'Martyn', lastName: 'Lloyd-Jones' };
 
 describe('talkJsonLd', () => {
-  test('uses the talk page url and speaker as creator', () => {
+  it('uses the talk page url and speaker as creator', () => {
     const result = talkJsonLd({
       speaker,
       speakerSlug: 'lloyd-jones',
@@ -22,7 +22,7 @@ describe('talkJsonLd', () => {
     );
   });
 
-  test('adds ISO uploadDate when publishedAt is present', () => {
+  it('adds ISO uploadDate when publishedAt is present', () => {
     const result = talkJsonLd({
       speaker,
       speakerSlug: 'lloyd-jones',
@@ -33,7 +33,7 @@ describe('talkJsonLd', () => {
     expect(result.uploadDate).toBe('2020-01-15T00:00:00.000Z');
   });
 
-  test('omits creator and uploadDate when those fields are missing', () => {
+  it('omits creator and uploadDate when those fields are missing', () => {
     const result = talkJsonLd({
       speaker: null,
       speakerSlug: 'lloyd-jones',

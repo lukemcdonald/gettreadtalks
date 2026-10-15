@@ -3,7 +3,7 @@ import type { Talk } from '@/features/talks/types';
 import type { RenderOptions } from '@/test/render';
 import type { ComponentProps } from 'react';
 
-import { describe, test, vi } from 'vitest';
+import { describe, it, vi } from 'vitest';
 
 import { expectTracked, expectTrackedTimes } from '@/test/analytics';
 import { render, screen, userEvent } from '@/test/render';
@@ -34,7 +34,7 @@ describe('ShareTalkButton', () => {
     };
   }
 
-  test('tracks talk_shared with the share method and talk props', async () => {
+  it('tracks talk_shared with the share method and talk props', async () => {
     const share = vi.fn(() => Promise.resolve());
     Object.defineProperty(navigator, 'share', {
       configurable: true,

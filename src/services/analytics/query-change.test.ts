@@ -1,23 +1,23 @@
-import { describe, expect, test } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { getLocationIntent, getQueryChange } from './query-change';
 
 describe('getQueryChange', () => {
-  test('detects a committed search query', () => {
+  it('detects a committed search query', () => {
     expect(getQueryChange('', 'search=bible')).toEqual({
       filters: [],
       query: 'bible',
     });
   });
 
-  test('detects a cleared search query', () => {
+  it('detects a cleared search query', () => {
     expect(getQueryChange('search=bible', '')).toEqual({
       filters: [],
       query: '',
     });
   });
 
-  test('detects filter changes and ignores pagination', () => {
+  it('detects filter changes and ignores pagination', () => {
     expect(
       getQueryChange(
         'role=Pastor&cursor=abc',
@@ -29,14 +29,14 @@ describe('getQueryChange', () => {
     });
   });
 
-  test('detects a removed filter as an empty value', () => {
+  it('detects a removed filter as an empty value', () => {
     expect(getQueryChange('topics=grace', '')).toEqual({
       filters: [{ filter: 'topics', value: '' }],
       query: undefined,
     });
   });
 
-  test('returns both search and filters when they change together', () => {
+  it('returns both search and filters when they change together', () => {
     expect(
       getQueryChange(
         'search=bible&sort=recent',
@@ -51,13 +51,13 @@ describe('getQueryChange', () => {
     });
   });
 
-  test('ignores token and unchanged params', () => {
+  it('ignores token and unchanged params', () => {
     expect(
       getQueryChange('search=bible&token=secret', 'search=bible&token=other')
     ).toEqual({ filters: [], query: undefined });
   });
 
-  test('ignores a cursor-only pagination change', () => {
+  it('ignores a cursor-only pagination change', () => {
     expect(
       getQueryChange('search=bible&cursor=abc', 'search=bible&cursor=def')
     ).toEqual({ filters: [], query: undefined });
@@ -65,7 +65,7 @@ describe('getQueryChange', () => {
 });
 
 describe('getLocationIntent', () => {
-  test('classifies first load and path changes as page', () => {
+  it('classifies first load and path changes as page', () => {
     expect(
       getLocationIntent(null, { path: '/talks', search: 'search=bible' })
     ).toEqual({ kind: 'page' });
@@ -77,7 +77,7 @@ describe('getLocationIntent', () => {
     ).toEqual({ kind: 'page' });
   });
 
-  test('classifies search and filter changes as query intents', () => {
+  it('classifies search and filter changes as query intents', () => {
     expect(
       getLocationIntent(
         { path: '/talks', search: '' },
@@ -96,7 +96,7 @@ describe('getLocationIntent', () => {
     });
   });
 
-  test('classifies pagination-only changes as a query no-op', () => {
+  it('classifies pagination-only changes as a query no-op', () => {
     expect(
       getLocationIntent(
         { path: '/talks', search: 'search=bible&cursor=abc' },

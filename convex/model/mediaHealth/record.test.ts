@@ -1,9 +1,9 @@
-import { describe, expect, test } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { decideMediaCheck } from './record';
 
 describe('decideMediaCheck', () => {
-  test('persists a first observation without a transition', () => {
+  it('persists a first observation without a transition', () => {
     expect(
       decideMediaCheck({
         existingStatus: null,
@@ -24,7 +24,7 @@ describe('decideMediaCheck', () => {
     });
   });
 
-  test('notifies when ok becomes private', () => {
+  it('notifies when ok becomes private', () => {
     expect(
       decideMediaCheck({
         existingStatus: 'ok',
@@ -36,7 +36,7 @@ describe('decideMediaCheck', () => {
     });
   });
 
-  test('keeps a prior ok when the check is unknown', () => {
+  it('keeps a prior ok when the check is unknown', () => {
     expect(
       decideMediaCheck({
         existingStatus: 'ok',
@@ -48,7 +48,7 @@ describe('decideMediaCheck', () => {
     });
   });
 
-  test('does not notify when already broken', () => {
+  it('does not notify when already broken', () => {
     expect(
       decideMediaCheck({
         existingStatus: 'unknown',

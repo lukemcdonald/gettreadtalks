@@ -1,6 +1,6 @@
 import type { McpCatalog } from './tools';
 
-import { describe, expect, test } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import {
   createTreadMcpHandler,
@@ -205,7 +205,7 @@ function createCatalog(overrides: Partial<McpCatalog> = {}): McpCatalog {
 }
 
 describe('searchTalks', () => {
-  test('returns canonical talk urls for published talks', async () => {
+  it('returns canonical talk urls for published talks', async () => {
     const result = await searchTalks({ query: 'Romans' }, createCatalog());
     const body = parseToolJson(result);
     const talks = body.talks as { title: string; url: string }[];
@@ -218,7 +218,7 @@ describe('searchTalks', () => {
     );
   });
 
-  test('filters published talks by speaker and topic slugs', async () => {
+  it('filters published talks by speaker and topic slugs', async () => {
     const result = await searchTalks(
       { speaker: 'john-doe', topic: 'grace' },
       createCatalog()
@@ -233,7 +233,7 @@ describe('searchTalks', () => {
 });
 
 describe('getTalk', () => {
-  test('returns the talk with canonical urls', async () => {
+  it('returns the talk with canonical urls', async () => {
     const result = await getTalk(
       {
         speakerSlug: 'john-doe',
@@ -256,7 +256,7 @@ describe('getTalk', () => {
     );
   });
 
-  test('returns not found for missing or unpublished talks', async () => {
+  it('returns not found for missing or unpublished talks', async () => {
     const result = await getTalk(
       { speakerSlug: 'john-doe', talkSlug: 'draft-talk' },
       createCatalog()
@@ -269,7 +269,7 @@ describe('getTalk', () => {
 });
 
 describe('listSpeakers', () => {
-  test('returns canonical speaker urls', async () => {
+  it('returns canonical speaker urls', async () => {
     const result = await listSpeakers({}, createCatalog());
     const body = parseToolJson(result);
     const speakers = body.speakers as { name: string; url: string }[];
@@ -282,7 +282,7 @@ describe('listSpeakers', () => {
 });
 
 describe('listTopics', () => {
-  test('returns canonical topic urls and talk counts', async () => {
+  it('returns canonical topic urls and talk counts', async () => {
     const result = await listTopics({}, createCatalog());
     const body = parseToolJson(result);
     const topics = body.topics as {
@@ -298,7 +298,7 @@ describe('listTopics', () => {
 });
 
 describe('listCollections', () => {
-  test('returns canonical collection urls', async () => {
+  it('returns canonical collection urls', async () => {
     const result = await listCollections({}, createCatalog());
     const body = parseToolJson(result);
     const collections = body.collections as {
@@ -314,7 +314,7 @@ describe('listCollections', () => {
 });
 
 describe('getCollection', () => {
-  test('returns the collection talks with canonical urls', async () => {
+  it('returns the collection talks with canonical urls', async () => {
     const result = await getCollection(
       { slug: 'example-series-the-psalms' },
       createCatalog()
@@ -328,7 +328,7 @@ describe('getCollection', () => {
     );
   });
 
-  test('returns not found for an unknown collection', async () => {
+  it('returns not found for an unknown collection', async () => {
     const result = await getCollection({ slug: 'missing' }, createCatalog());
     const body = parseToolJson(result);
 
@@ -336,7 +336,7 @@ describe('getCollection', () => {
     expect(body.error).toBe('Collection not found.');
   });
 
-  test('returns not found when a collection has no published talks', async () => {
+  it('returns not found when a collection has no published talks', async () => {
     const result = await getCollection(
       { slug: 'empty-series' },
       createCatalog({
@@ -363,7 +363,7 @@ describe('getCollection', () => {
 });
 
 describe('listClips', () => {
-  test('returns canonical clip urls', async () => {
+  it('returns canonical clip urls', async () => {
     const result = await listClips({ query: 'condemnation' }, createCatalog());
     const body = parseToolJson(result);
     const clips = body.clips as { title: string; url: string }[];
@@ -377,7 +377,7 @@ describe('listClips', () => {
 });
 
 describe('getClip', () => {
-  test('returns the clip with canonical urls', async () => {
+  it('returns the clip with canonical urls', async () => {
     const result = await getClip(
       { slug: 'sample-clip-no-condemnation' },
       createCatalog()
@@ -395,7 +395,7 @@ describe('getClip', () => {
     );
   });
 
-  test('returns not found for a missing clip', async () => {
+  it('returns not found for a missing clip', async () => {
     const result = await getClip({ slug: 'missing' }, createCatalog());
     const body = parseToolJson(result);
 
@@ -403,7 +403,7 @@ describe('getClip', () => {
     expect(body.error).toBe('Clip not found.');
   });
 
-  test('returns not found when the parent talk is unpublished', async () => {
+  it('returns not found when the parent talk is unpublished', async () => {
     const result = await getClip(
       { slug: 'draft-parent-clip' },
       createCatalog({
@@ -458,7 +458,7 @@ async function postMcp(
 }
 
 describe('createTreadMcpHandler', () => {
-  test('initialize names the public catalog', async () => {
+  it('initialize names the public catalog', async () => {
     const handler = createTreadMcpHandler(createCatalog());
     const response = await postMcp(handler, 'initialize', {
       capabilities: {},
@@ -471,7 +471,7 @@ describe('createTreadMcpHandler', () => {
     expect(body.includes('gettreadtalks')).toBe(true);
   });
 
-  test('lists the read-only catalog tools', async () => {
+  it('lists the read-only catalog tools', async () => {
     const handler = createTreadMcpHandler(createCatalog());
     await postMcp(handler, 'initialize', {
       capabilities: {},
@@ -493,7 +493,7 @@ describe('createTreadMcpHandler', () => {
     expect(body.includes('get_clip')).toBe(true);
   });
 
-  test('rejects an oversized search query', async () => {
+  it('rejects an oversized search query', async () => {
     const handler = createTreadMcpHandler(createCatalog());
     await postMcp(handler, 'initialize', {
       capabilities: {},

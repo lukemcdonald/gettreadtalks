@@ -5,7 +5,7 @@ import type {
 import type { RenderOptions } from '@/test/render';
 import type { ComponentProps } from 'react';
 
-import { describe, expect, test, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { VIEW_ALL_SEARCH_GROUP } from '@/features/search/utils';
 import { render, screen, userEvent } from '@/test/render';
@@ -66,7 +66,7 @@ describe('SearchCommandResults', () => {
     };
   }
 
-  test('shows an empty message only when the status is empty', () => {
+  it('shows an empty message only when the status is empty', () => {
     const { rerender } = setup({
       groups: [],
       status: 'empty',
@@ -83,7 +83,7 @@ describe('SearchCommandResults', () => {
     expect(screen.queryByText('No results')).not.toBeInTheDocument();
   });
 
-  test('omits a group label for view all and selects a result', async () => {
+  it('omits a group label for view all and selects a result', async () => {
     const { onSelect, user } = setup();
 
     expect(screen.getByText('Talks')).toBeInTheDocument();
@@ -99,7 +99,7 @@ describe('SearchCommandResults', () => {
     expect(onSelect).toHaveBeenCalledWith(MOCK_GROUPS[0]?.items[0]);
   });
 
-  test('selects view all results', async () => {
+  it('selects view all results', async () => {
     const { onSelect, user } = setup();
 
     await user.click(screen.getByRole('option', { name: 'View all results' }));

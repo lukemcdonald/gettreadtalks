@@ -1,7 +1,7 @@
 import type { RenderOptions } from '@/test/render';
 import type { ComponentProps } from 'react';
 
-import { afterEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { render, screen, userEvent } from '@/test/render';
 
@@ -9,10 +9,6 @@ import { ShareButton } from './share-button';
 
 describe('ShareButton', () => {
   const MOCK_TITLE = 'Romans 8';
-
-  afterEach(() => {
-    Reflect.deleteProperty(navigator, 'share');
-  });
 
   function setup(
     props: Partial<ComponentProps<typeof ShareButton>> = {},
@@ -32,7 +28,11 @@ describe('ShareButton', () => {
     });
   }
 
-  test('uses the share API when it is available', async () => {
+  afterEach(() => {
+    Reflect.deleteProperty(navigator, 'share');
+  });
+
+  it('uses the share API when it is available', async () => {
     const onShare = vi.fn();
     const share = vi.fn(() => Promise.resolve());
     stubShare(share);
@@ -49,7 +49,7 @@ describe('ShareButton', () => {
     expect(onShare).toHaveBeenCalledWith('share_api');
   });
 
-  test('copies the URL when share is unavailable', async () => {
+  it('copies the URL when share is unavailable', async () => {
     const onShare = vi.fn();
     const writeText = vi
       .spyOn(navigator.clipboard, 'writeText')
@@ -63,7 +63,7 @@ describe('ShareButton', () => {
     expect(onShare).toHaveBeenCalledWith('clipboard');
   });
 
-  test('does not copy when the share sheet is dismissed', async () => {
+  it('does not copy when the share sheet is dismissed', async () => {
     const onShare = vi.fn();
     const writeText = vi
       .spyOn(navigator.clipboard, 'writeText')

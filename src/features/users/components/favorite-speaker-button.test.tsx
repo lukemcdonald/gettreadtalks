@@ -2,7 +2,7 @@ import type { Speaker } from '@/features/speakers/types';
 import type { RenderOptions } from '@/test/render';
 import type { ComponentProps, ReactNode } from 'react';
 
-import { describe, expect, test, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { useToggleSpeakerFavorited } from '@/features/users/hooks/use-toggle-speaker-favorited';
 import { render, screen, userEvent } from '@/test/render';
@@ -52,7 +52,7 @@ describe('FavoriteSpeakerButton', () => {
     return toggle;
   }
 
-  test('favorites a speaker that is not saved yet', async () => {
+  it('favorites a speaker that is not saved yet', async () => {
     const toggle = mockToggle({ isFavorited: false });
     const { user } = setup();
     const button = screen.getByRole('button');
@@ -64,7 +64,7 @@ describe('FavoriteSpeakerButton', () => {
     expect(toggle).toHaveBeenCalledTimes(1);
   });
 
-  test('unfavorites a saved speaker', async () => {
+  it('unfavorites a saved speaker', async () => {
     const toggle = mockToggle({ isFavorited: true });
     const { user } = setup();
     const button = screen.getByRole('button');

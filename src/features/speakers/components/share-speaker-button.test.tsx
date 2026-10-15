@@ -2,7 +2,7 @@ import type { Speaker } from '@/features/speakers/types';
 import type { RenderOptions } from '@/test/render';
 import type { ComponentProps } from 'react';
 
-import { describe, test, vi } from 'vitest';
+import { describe, it, vi } from 'vitest';
 
 import { expectTracked, expectTrackedTimes } from '@/test/analytics';
 import { render, screen, userEvent } from '@/test/render';
@@ -31,7 +31,7 @@ describe('ShareSpeakerButton', () => {
     };
   }
 
-  test('tracks speaker_shared with the share method and speaker props', async () => {
+  it('tracks speaker_shared with the share method and speaker props', async () => {
     const share = vi.fn(() => Promise.resolve());
     Object.defineProperty(navigator, 'share', {
       configurable: true,

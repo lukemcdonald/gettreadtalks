@@ -2,7 +2,7 @@ import type { SearchHit } from '@/features/search/types';
 import type { RenderOptions } from '@/test/render';
 import type { ComponentProps } from 'react';
 
-import { describe, expect, test } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { expectTracked, expectTrackedTimes } from '@/test/analytics';
 import { render, screen, userEvent } from '@/test/render';
@@ -40,13 +40,13 @@ describe('SearchResultGroups', () => {
     };
   }
 
-  test('renders nothing when there are no hits', () => {
+  it('renders nothing when there are no hits', () => {
     const { container } = setup({ hits: [], query: 'zzzz' });
 
     expect(container).toBeEmptyDOMElement();
   });
 
-  test('groups hits and tracks a page result click with its list position', async () => {
+  it('groups hits and tracks a page result click with its list position', async () => {
     const { user } = setup();
 
     expect(screen.getByRole('heading', { name: 'Talks' })).toBeInTheDocument();

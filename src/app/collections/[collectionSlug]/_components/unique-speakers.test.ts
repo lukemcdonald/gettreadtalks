@@ -1,9 +1,9 @@
-import { describe, expect, test } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { uniqueSpeakersFromTalks } from './unique-speakers';
 
 describe('uniqueSpeakersFromTalks', () => {
-  test('skips missing speakers and keeps one entry per id', () => {
+  it('skips missing speakers and keeps one entry per id', () => {
     const lloydJones = { _id: 'mlj', slug: 'lloyd-jones' };
     const lloydJonesAgain = { _id: 'mlj', slug: 'mlj-trust' };
     const bunyan = { _id: 'jb', slug: 'bunyan' };

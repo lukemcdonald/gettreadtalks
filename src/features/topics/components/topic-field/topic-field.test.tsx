@@ -3,7 +3,7 @@ import type { RenderOptions } from '@/test/render';
 import type { ComponentProps } from 'react';
 
 import { useForm } from 'react-hook-form';
-import { describe, expect, test, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { render, screen, userEvent } from '@/test/render';
 
@@ -35,7 +35,7 @@ describe('TopicFieldInput', () => {
     );
   }
 
-  test('renders the label, description, and required marker', () => {
+  it('renders the label, description, and required marker', () => {
     setup({
       description: 'Pick the themes this talk covers.',
       required: true,
@@ -49,7 +49,7 @@ describe('TopicFieldInput', () => {
     expect(screen.getByPlaceholderText('Search topics...')).toBeInTheDocument();
   });
 
-  test('shows a field error and selected topic chips', () => {
+  it('shows a field error and selected topic chips', () => {
     setup({
       errorMessage: 'Select at least one topic',
       invalid: true,
@@ -110,7 +110,7 @@ describe('TopicField', () => {
     };
   }
 
-  test('sorts topics alphabetically in the combobox', async () => {
+  it('sorts topics alphabetically in the combobox', async () => {
     const { user } = setup();
     const input = screen.getByPlaceholderText('Search topics...');
 
@@ -121,7 +121,7 @@ describe('TopicField', () => {
     expect(items.map((item) => item.textContent)).toEqual(['Grace', 'Zion']);
   });
 
-  test('selects a topic and updates the chips', async () => {
+  it('selects a topic and updates the chips', async () => {
     const { user } = setup();
 
     await user.click(screen.getByPlaceholderText('Search topics...'));
