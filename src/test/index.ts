@@ -4,7 +4,6 @@ import type { ReactElement, ReactNode } from 'react';
 
 import { render as rtlRender } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { expect } from 'vitest';
 
 export { expectTracked, expectTrackedTimes, mockedTrack } from './analytics';
 export * from '@testing-library/react';
@@ -20,10 +19,6 @@ export {
   test,
   vi,
 } from 'vitest';
-
-export const SPREAD_PROPS = {
-  'data-spread': 'forwarded',
-} as const;
 
 export type RenderOptions = Omit<RtlRenderOptions, 'wrapper'> & {
   userEvent?: UserEventOptions;
@@ -41,8 +36,4 @@ export function render(
   const user = userEvent.setup(userEventOptions);
 
   return { ...result, ...user };
-}
-
-export function expectSpreadProps(element: HTMLElement) {
-  expect(element).toHaveAttribute('data-spread', 'forwarded');
 }

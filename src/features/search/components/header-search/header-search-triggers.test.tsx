@@ -1,15 +1,7 @@
 import type { RenderOptions } from '@/test';
 import type { ComponentProps } from 'react';
 
-import {
-  SPREAD_PROPS,
-  describe,
-  expect,
-  expectSpreadProps,
-  it,
-  render,
-  screen,
-} from '@/test';
+import { describe, expect, it, render, screen } from '@/test';
 
 import { HeaderSearchDesktopTrigger } from './header-search-triggers';
 
@@ -17,9 +9,7 @@ describe('HeaderSearchDesktopTrigger', () => {
   const MOCK_HOTKEY = '⌘K';
 
   function setup(
-    props: Partial<ComponentProps<typeof HeaderSearchDesktopTrigger>> & {
-      'data-spread'?: string;
-    } = {},
+    props: Partial<ComponentProps<typeof HeaderSearchDesktopTrigger>> = {},
     options?: RenderOptions
   ) {
     return render(
@@ -28,12 +18,20 @@ describe('HeaderSearchDesktopTrigger', () => {
     );
   }
 
-  it('forwards extra button props onto the trigger', () => {
-    setup(SPREAD_PROPS);
+  it('renders the search hotkey', () => {
+    setup();
 
-    const trigger = screen.getByRole('button', { name: 'Search' });
+    expect(screen.getByRole('button', { name: 'Search' })).toHaveTextContent(
+      MOCK_HOTKEY
+    );
+  });
 
-    expect(trigger).toHaveTextContent(MOCK_HOTKEY);
-    expectSpreadProps(trigger);
+  it('spreads props onto the root element', () => {
+    setup({ 'data-testid': 'custom' });
+
+    expect(screen.getByRole('button', { name: 'Search' })).toHaveAttribute(
+      'data-testid',
+      'custom'
+    );
   });
 });
