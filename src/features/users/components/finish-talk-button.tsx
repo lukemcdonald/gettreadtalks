@@ -3,10 +3,10 @@
 import type { Speaker } from '@/features/speakers/types';
 import type { Talk } from '@/features/talks/types';
 
-import { Authenticated } from 'convex/react';
 import { BookmarkIcon } from 'lucide-react';
 
 import { ToggleIconButton } from '@/components/ui';
+import { useCurrentUser } from '@/features/users/hooks/use-current-user';
 import { useToggleTalkFinished } from '@/features/users/hooks/use-toggle-talk-finished';
 
 interface FinishTalkButtonProps {
@@ -33,9 +33,11 @@ function FinishButton({ speaker, talk }: FinishTalkButtonProps) {
 }
 
 export function FinishTalkButton({ speaker, talk }: FinishTalkButtonProps) {
-  return (
-    <Authenticated>
-      <FinishButton speaker={speaker} talk={talk} />
-    </Authenticated>
-  );
+  const { data: user } = useCurrentUser();
+
+  if (!user) {
+    return null;
+  }
+
+  return <FinishButton speaker={speaker} talk={talk} />;
 }

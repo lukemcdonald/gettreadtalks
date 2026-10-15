@@ -6,20 +6,28 @@ import { convexClient } from '@convex-dev/better-auth/client/plugins';
 import { adminClient } from 'better-auth/client/plugins';
 import { createAuthClient } from 'better-auth/react';
 
-/**
- * Create a Better Auth client instance for interacting with Better Auth server from the client.
- *
- * The convexClient() plugin automatically routes auth requests to the Convex deployment.
- * baseURL is optional - if not provided, it uses relative URLs which work with the Next.js proxy.
- *
- * @returns The Better Auth client instance.
- */
-export const authClient = createAuthClient({
-  // baseURL is optional - convexClient() plugin handles routing to Convex
-  // If you need to specify it, use the Next.js site URL (not Convex site URL)
-  // since requests go through /api/auth/[...all] which proxies to Convex
-  plugins: [convexClient(), adminClient()],
-});
+const AUTH_CLIENT_KEY = '__treadTalksAuthClient__';
+
+type AuthClientInstance = ReturnType<typeof createAuthClient>;
+type AuthGlobal = typeof globalThis & {
+  [AUTH_CLIENT_KEY]?: AuthClientInstance;
+};
+
+function getAuthClient() {
+  const global = globalThis as AuthGlobal;
+
+  if (!global[AUTH_CLIENT_KEY]) {
+    // baseURL is optional - convexClient() plugin handles routing to Convex
+    // through /api/auth/[...all]. Requests must not target the Convex site URL.
+    global[AUTH_CLIENT_KEY] = createAuthClient({
+      plugins: [convexClient(), adminClient()],
+    });
+  }
+
+  return global[AUTH_CLIENT_KEY];
+}
+
+export const authClient = getAuthClient();
 
 function captchaFetchOptions(captchaToken?: string) {
   if (!captchaToken) {

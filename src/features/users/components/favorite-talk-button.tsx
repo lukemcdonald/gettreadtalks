@@ -3,10 +3,10 @@
 import type { Speaker } from '@/features/speakers/types';
 import type { Talk } from '@/features/talks/types';
 
-import { Authenticated } from 'convex/react';
 import { HeartIcon } from 'lucide-react';
 
 import { ToggleIconButton } from '@/components/ui';
+import { useCurrentUser } from '@/features/users/hooks/use-current-user';
 import { useToggleTalkFavorited } from '@/features/users/hooks/use-toggle-talk-favorited';
 
 interface FavoriteTalkButtonProps {
@@ -34,9 +34,11 @@ function FavoriteButton({ speaker, talk }: FavoriteTalkButtonProps) {
 }
 
 export function FavoriteTalkButton({ speaker, talk }: FavoriteTalkButtonProps) {
-  return (
-    <Authenticated>
-      <FavoriteButton speaker={speaker} talk={talk} />
-    </Authenticated>
-  );
+  const { data: user } = useCurrentUser();
+
+  if (!user) {
+    return null;
+  }
+
+  return <FavoriteButton speaker={speaker} talk={talk} />;
 }

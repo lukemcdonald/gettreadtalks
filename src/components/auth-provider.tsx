@@ -4,27 +4,58 @@ import type { AuthClient } from '@convex-dev/better-auth/react';
 import type { ReactNode } from 'react';
 
 import { ConvexBetterAuthProvider } from '@convex-dev/better-auth/react';
-import { ConvexReactClient } from 'convex/react';
-import invariant from 'tiny-invariant';
+import { ConvexProvider, useConvex } from 'convex/react';
+import { useEffect, useState } from 'react';
 
 import { authClient } from '@/services/auth/client';
+import { getConvexClient } from '@/services/convex/client';
 
-const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL;
-invariant(convexUrl, 'NEXT_PUBLIC_CONVEX_URL is not set');
-
-const convex = new ConvexReactClient(convexUrl, {
-  // Shared by account/manage layouts and public auth islands. Keep false so
-  // signed-in islands can mount before client auth finishes syncing.
-  expectAuth: false,
-});
+let hasAuthSessionOwner = false;
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  return (
-    <ConvexBetterAuthProvider
-      authClient={authClient as unknown as AuthClient}
-      client={convex}
-    >
-      {children}
-    </ConvexBetterAuthProvider>
+  const existingClient = useConvex();
+
+  if (existingClient) {
+    return children;
+  }
+
+  return <SharedConvexTree>{children}</SharedConvexTree>;
+}
+
+function SharedConvexTree({ children }: { children: ReactNode }) {
+  const convexClient = getConvexClient();
+  const [ownsAuthSession, setOwnsAuthSession] = useState(() => {
+    if (hasAuthSessionOwner) {
+      return false;
+    }
+
+    hasAuthSessionOwner = true;
+
+    return true;
+  });
+
+  useEffect(
+    () => () => {
+      if (!ownsAuthSession) {
+        return;
+      }
+
+      hasAuthSessionOwner = false;
+      setOwnsAuthSession(false);
+    },
+    [ownsAuthSession]
   );
+
+  if (ownsAuthSession) {
+    return (
+      <ConvexBetterAuthProvider
+        authClient={authClient as unknown as AuthClient}
+        client={convexClient}
+      >
+        {children}
+      </ConvexBetterAuthProvider>
+    );
+  }
+
+  return <ConvexProvider client={convexClient}>{children}</ConvexProvider>;
 }

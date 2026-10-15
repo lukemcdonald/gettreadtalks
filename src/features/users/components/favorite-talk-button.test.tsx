@@ -2,19 +2,22 @@
 
 import type { Talk } from '@/features/talks/types';
 import type { RenderOptions } from '@/test';
-import type { ComponentProps, ReactNode } from 'react';
+import type { ComponentProps } from 'react';
 
 import { useToggleTalkFavorited } from '@/features/users/hooks/use-toggle-talk-favorited';
 import { describe, expect, it, render, screen } from '@/test';
 
 import { FavoriteTalkButton } from './favorite-talk-button';
 
-vi.mock('@/features/users/hooks/use-toggle-talk-favorited', () => ({
-  useToggleTalkFavorited: vi.fn(),
+vi.mock('@/features/users/hooks/use-current-user', () => ({
+  useCurrentUser: vi.fn(() => ({
+    data: { email: 'user@example.com' },
+    isLoading: false,
+  })),
 }));
 
-vi.mock('convex/react', () => ({
-  Authenticated: ({ children }: { children: ReactNode }) => children,
+vi.mock('@/features/users/hooks/use-toggle-talk-favorited', () => ({
+  useToggleTalkFavorited: vi.fn(),
 }));
 
 describe('FavoriteTalkButton', () => {

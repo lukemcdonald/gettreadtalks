@@ -2,19 +2,22 @@
 
 import type { Speaker } from '@/features/speakers/types';
 import type { RenderOptions } from '@/test';
-import type { ComponentProps, ReactNode } from 'react';
+import type { ComponentProps } from 'react';
 
 import { useToggleSpeakerFavorited } from '@/features/users/hooks/use-toggle-speaker-favorited';
 import { describe, expect, it, render, screen } from '@/test';
 
 import { FavoriteSpeakerButton } from './favorite-speaker-button';
 
-vi.mock('@/features/users/hooks/use-toggle-speaker-favorited', () => ({
-  useToggleSpeakerFavorited: vi.fn(),
+vi.mock('@/features/users/hooks/use-current-user', () => ({
+  useCurrentUser: vi.fn(() => ({
+    data: { email: 'user@example.com' },
+    isLoading: false,
+  })),
 }));
 
-vi.mock('convex/react', () => ({
-  Authenticated: ({ children }: { children: ReactNode }) => children,
+vi.mock('@/features/users/hooks/use-toggle-speaker-favorited', () => ({
+  useToggleSpeakerFavorited: vi.fn(),
 }));
 
 describe('FavoriteSpeakerButton', () => {

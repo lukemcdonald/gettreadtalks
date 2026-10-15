@@ -121,7 +121,7 @@ Public reads live in `src/features/*/queries` with `'use cache'`, `cacheLife()`,
 - `convex/model/{domain}/` - Entity helpers (queries.ts, mutations.ts, schema.ts, validators.ts)
 - `convex/model/auth/` - Authentication helpers
 - `convex/lib/` - Shared utilities
-- Client provider: mount `AuthProvider` only in layouts that need the Convex client (`/account`, `/manage`, auth routes) and in lazy islands for favorite/finished actions.
+- Client provider: mount `AuthProvider` only in layouts that need the Convex client (`/account`, `/manage`, auth routes) and in lazy islands for favorite/finished actions. Layouts and islands reuse one module-level `ConvexReactClient`.
 
 ### File Naming
 
