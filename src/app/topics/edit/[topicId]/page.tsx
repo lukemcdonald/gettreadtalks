@@ -2,7 +2,7 @@ import type { TopicId } from '@/features/topics/types';
 
 import { EditTopicSheetPage } from '@/app/@sheet/_components/edit-topic-sheet-page';
 import { AdminSheetFallback } from '@/app/_components/admin-sheet-fallback';
-import AccountTopicsPage from '@/app/account/topics/page';
+import ManageTopicsPage from '@/app/manage/topics/page';
 import { ADMIN_LIST_PATHS, getEntityEditPath } from '@/lib/entities/paths';
 
 interface PageProps {
@@ -22,7 +22,7 @@ export default async function Page({ params }: PageProps) {
         />
       }
     >
-      <AccountTopicsPage />
+      <ManageTopicsPage />
     </AdminSheetFallback>
   );
 }

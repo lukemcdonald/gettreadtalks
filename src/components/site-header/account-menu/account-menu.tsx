@@ -5,12 +5,9 @@ import type { Route } from 'next';
 
 import {
   ArrowRight as ArrowRightIcon,
-  LayoutDashboard as DashboardIcon,
-  Heart as FavoritesIcon,
-  CheckCircle2 as FinishedIcon,
-  Settings as SettingsIcon,
-  LogOut as SignOutIcon,
   CircleUser as UserIcon,
+  LayoutDashboard as ManageIcon,
+  LogOut as SignOutIcon,
 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
@@ -19,12 +16,15 @@ import { NavLink } from '@/components/site-header/navigation/nav-link';
 import {
   Button,
   Menu,
+  MenuItem,
   MenuPopup,
   MenuSeparator,
   MenuTrigger,
 } from '@/components/ui';
 import { Link } from '@/components/ui/link';
+import { UserAvatar } from '@/components/user-avatar';
 import { useCurrentUser } from '@/features/users/hooks/use-current-user';
+import { ACCOUNT_PATH, MANAGE_PATH } from '@/lib/entities/paths';
 import { isAdmin } from '@/services/auth/utils';
 
 interface AccountMenuProps {
@@ -64,7 +64,8 @@ export function AccountMenu({ initialUser }: AccountMenuProps) {
     );
   }
 
-  const showDashboardLink = isAdmin(user);
+  const showManageLink = isAdmin(user);
+  const displayName = user.name ?? user.email;
 
   return (
     <Menu>
@@ -82,32 +83,23 @@ export function AccountMenu({ initialUser }: AccountMenuProps) {
         <UserIcon className="size-6" />
       </MenuTrigger>
       <MenuPopup className="w-60">
-        <div className="flex flex-col px-3 pt-2 pb-1">
-          <span className="text-muted-foreground text-xs">Signed in as</span>
-          <span className="text-foreground truncate text-sm font-semibold">
-            {user.email}
+        <MenuItem
+          className="min-h-10 w-full items-center justify-start gap-3 px-3 py-2"
+          render={<Link href={ACCOUNT_PATH} />}
+        >
+          <span aria-hidden="true">
+            <UserAvatar className="size-8" user={user} />
           </span>
-        </div>
-        <MenuSeparator />
-        <AccountMenuItem
-          href="/account/favorites"
-          icon={FavoritesIcon}
-          label="Favorites"
-        />
-        <AccountMenuItem
-          href="/account/finished"
-          icon={FinishedIcon}
-          label="Finished"
-        />
-        <MenuSeparator />
-        <AccountMenuItem href="/account" icon={SettingsIcon} label="Settings" />
-        {!!showDashboardLink && (
+          <span className="truncate text-sm font-semibold">{displayName}</span>
+        </MenuItem>
+        {!!showManageLink && (
           <AccountMenuItem
-            href="/account/talks"
-            icon={DashboardIcon}
-            label="Dashboard"
+            href={MANAGE_PATH}
+            icon={ManageIcon}
+            label="Manage"
           />
         )}
+        <MenuSeparator />
         <AccountMenuItem
           data-testid="sign-out"
           href={'/logout' as Route}

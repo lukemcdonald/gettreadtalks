@@ -1,8 +1,8 @@
-import { AccountCollectionsContent } from '@/app/account/collections/_components/collections-content';
+import { ManageCollectionsContent } from '@/app/manage/collections/_components/collections-content';
 import { PageHeader } from '@/components/page-header';
 import { NewCollectionButton } from '@/features/collections/components/new-collection-button';
 
-export default function AccountCollectionsPage() {
+export default function ManageCollectionsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
@@ -12,7 +12,7 @@ export default function AccountCollectionsPage() {
         />
         <NewCollectionButton />
       </div>
-      <AccountCollectionsContent />
+      <ManageCollectionsContent />
     </div>
   );
 }

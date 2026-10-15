@@ -60,6 +60,33 @@ const nextConfig = {
   },
   partialPrefetching: true,
   reactCompiler: true,
+  redirects: () => [
+    {
+      destination: '/manage/clips',
+      permanent: true,
+      source: '/account/clips',
+    },
+    {
+      destination: '/manage/collections',
+      permanent: true,
+      source: '/account/collections',
+    },
+    {
+      destination: '/manage/speakers',
+      permanent: true,
+      source: '/account/speakers',
+    },
+    {
+      destination: '/manage/talks',
+      permanent: true,
+      source: '/account/talks',
+    },
+    {
+      destination: '/manage/topics',
+      permanent: true,
+      source: '/account/topics',
+    },
+  ],
   typedRoutes: false,
 } satisfies NextConfig;
 

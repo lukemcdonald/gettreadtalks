@@ -2,24 +2,24 @@ import type { StatusType } from '@/lib/entities/types';
 
 import { Suspense } from 'react';
 
-import { AccountClipsContent } from '@/app/account/clips/_components/clips-content';
-import { ClipsFilters } from '@/app/account/clips/_components/clips-filters';
+import { ManageClipsContent } from '@/app/manage/clips/_components/clips-content';
+import { ClipsFilters } from '@/app/manage/clips/_components/clips-filters';
 import { PageHeader } from '@/components/page-header';
 import { Skeleton } from '@/components/ui';
 import { NewClipButton } from '@/features/clips/components/new-clip-button';
 
-export interface AccountClipsSearchParams {
+export interface ManageClipsSearchParams {
   cursor?: string;
   status?: StatusType | 'all';
 }
 
-interface AccountClipsPageProps {
-  searchParams: Promise<AccountClipsSearchParams>;
+interface ManageClipsPageProps {
+  searchParams: Promise<ManageClipsSearchParams>;
 }
 
-export default function AccountClipsPage({
+export default function ManageClipsPage({
   searchParams,
-}: AccountClipsPageProps) {
+}: ManageClipsPageProps) {
   return (
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
@@ -33,7 +33,7 @@ export default function AccountClipsPage({
         <ClipsFilters />
       </Suspense>
       <Suspense fallback={<Skeleton className="h-96 w-full" />}>
-        <AccountClipsContent searchParams={searchParams} />
+        <ManageClipsContent searchParams={searchParams} />
       </Suspense>
     </div>
   );
