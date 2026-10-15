@@ -14,6 +14,15 @@ export interface EventMap {
   clip_paused: { clip_id: string; clip_slug: string; progress_pct: number };
   clip_played: { clip_id: string; clip_slug: string };
   filter_applied: { filter: string; path: string; value: string };
+  mcp_tool_called: {
+    duration_ms: number;
+    error?: string;
+    query?: string;
+    result_count?: number;
+    success: boolean;
+    tool_name: string;
+    user_agent?: string;
+  };
   not_found_hit: { path: string };
   search_no_results: {
     path: string;

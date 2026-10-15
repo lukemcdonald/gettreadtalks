@@ -4,6 +4,7 @@ import type { Value } from 'convex/values';
 import { ConvexError } from 'convex/values';
 
 import { ErrorCodes } from './constants';
+import { reportUnexpectedError, toUserErrorMessage } from './user-facing';
 
 /**
  * Maps HTTP status codes to whether errors should be logged to Sentry.
@@ -57,39 +58,21 @@ export function getConvexErrorData(error: unknown): ErrorContext {
 }
 
 /**
- * Gets a user-friendly error message from any error type.
- * Handles ConvexError, standard Error, and unknown errors.
- *
- * @example
- * const message = getErrorMessage(error);
- * toast.error(message);
+ * User-facing message for toasts and forms. Convex `data.message` is shown when
+ * it is not a config/internal leak; everything else is reported and replaced.
  */
 export function getErrorMessage(error: unknown): string {
-  // Handle ConvexError with custom messages
   if (isConvexError(error)) {
     const data = error.data as ErrorContext;
 
-    // Use custom message from error data if available
     if (data.message && typeof data.message === 'string') {
-      return data.message;
+      return toUserErrorMessage(data.message);
     }
 
-    // ConvexError doesn't have a message property, use data.message or fallback
     return 'An error occurred';
   }
 
-  // Handle standard Error objects
-  if (error instanceof Error) {
-    return error.message;
-  }
-
-  // Handle string errors
-  if (typeof error === 'string') {
-    return error;
-  }
-
-  // Fallback for unknown error types
-  return 'An unexpected error occurred';
+  return reportUnexpectedError(error);
 }
 
 /**

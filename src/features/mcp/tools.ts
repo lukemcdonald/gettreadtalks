@@ -6,6 +6,8 @@ import { getClipUrl } from '@/features/clips/utils';
 import { getSpeakerName } from '@/features/speakers/utils';
 import { getTalkUrl } from '@/features/talks/utils';
 
+import { withToolTracking } from './analytics';
+
 const DEFAULT_LIST_LIMIT = 50;
 const DEFAULT_SEARCH_LIMIT = 10;
 const MAX_CURSOR_LENGTH = 2048;
@@ -423,7 +425,7 @@ function registerMcpTools(server: McpServer, catalog: McpCatalog) {
         'Search published TREAD talks by text, speaker slug, and/or topic slug. Use list_speakers and list_topics to resolve slugs. Returns canonical gettreadtalks.com URLs.',
       inputSchema: searchTalksInputSchema,
     },
-    (input) => searchTalks(input, catalog)
+    withToolTracking('search_talks', (input) => searchTalks(input, catalog))
   );
 
   server.registerTool(
@@ -434,7 +436,7 @@ function registerMcpTools(server: McpServer, catalog: McpCatalog) {
         'Get one published talk by speaker slug and talk slug. Returns the talk, speaker, topics, collection, and clips with canonical URLs.',
       inputSchema: getTalkInputSchema,
     },
-    (input) => getTalk(input, catalog)
+    withToolTracking('get_talk', (input) => getTalk(input, catalog))
   );
 
   server.registerTool(
@@ -445,7 +447,7 @@ function registerMcpTools(server: McpServer, catalog: McpCatalog) {
         'List speakers who have published talks or clips. Optional name search. Returns canonical speaker URLs.',
       inputSchema: listSpeakersInputSchema,
     },
-    (input) => listSpeakers(input, catalog)
+    withToolTracking('list_speakers', (input) => listSpeakers(input, catalog))
   );
 
   server.registerTool(
@@ -456,7 +458,7 @@ function registerMcpTools(server: McpServer, catalog: McpCatalog) {
         'List topics that have published talks, with talk counts and canonical topic URLs.',
       inputSchema: listTopicsInputSchema,
     },
-    (input) => listTopics(input, catalog)
+    withToolTracking('list_topics', (input) => listTopics(input, catalog))
   );
 
   server.registerTool(
@@ -467,7 +469,9 @@ function registerMcpTools(server: McpServer, catalog: McpCatalog) {
         'List sermon collections that contain published talks. Returns canonical collection URLs.',
       inputSchema: listCollectionsInputSchema,
     },
-    (input) => listCollections(input, catalog)
+    withToolTracking('list_collections', (input) =>
+      listCollections(input, catalog)
+    )
   );
 
   server.registerTool(
@@ -478,7 +482,7 @@ function registerMcpTools(server: McpServer, catalog: McpCatalog) {
         'Get one collection by slug, including its published talks and canonical URLs.',
       inputSchema: getCollectionInputSchema,
     },
-    (input) => getCollection(input, catalog)
+    withToolTracking('get_collection', (input) => getCollection(input, catalog))
   );
 
   server.registerTool(
@@ -489,7 +493,7 @@ function registerMcpTools(server: McpServer, catalog: McpCatalog) {
         'List published talk clips, optionally filtered by text or speaker slug. Returns canonical clip URLs.',
       inputSchema: listClipsInputSchema,
     },
-    (input) => listClips(input, catalog)
+    withToolTracking('list_clips', (input) => listClips(input, catalog))
   );
 
   server.registerTool(
@@ -500,7 +504,7 @@ function registerMcpTools(server: McpServer, catalog: McpCatalog) {
         'Get one published clip by slug, with its speaker, parent talk, and canonical URL.',
       inputSchema: getClipInputSchema,
     },
-    (input) => getClip(input, catalog)
+    withToolTracking('get_clip', (input) => getClip(input, catalog))
   );
 }
 

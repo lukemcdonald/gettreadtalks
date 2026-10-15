@@ -15,6 +15,7 @@ import {
 } from '@/components/ui';
 import { resetPassword } from '@/services/auth/client';
 import { AUTH_ERRORS } from '@/services/auth/config';
+import { toUserErrorMessage } from '@/services/errors';
 
 const resetPasswordSchema = z
   .object({
@@ -49,7 +50,10 @@ export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
 
     if (submitError) {
       form.setError('root', {
-        message: submitError.message ?? AUTH_ERRORS.RESET_TOKEN_INVALID,
+        message: toUserErrorMessage(
+          submitError.message,
+          AUTH_ERRORS.RESET_TOKEN_INVALID
+        ),
       });
     } else {
       window.location.assign('/login');

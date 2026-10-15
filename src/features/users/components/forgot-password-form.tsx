@@ -25,7 +25,7 @@ import {
   hasCaptchaToken,
   isTurnstileRequired,
 } from '@/services/auth/config';
-import { captureException } from '@/services/errors';
+import { captureException, toUserErrorMessage } from '@/services/errors';
 
 const forgotPasswordSchema = z.object({
   email: z.email('Please enter a valid email address.'),
@@ -82,7 +82,10 @@ export function ForgotPasswordForm() {
 
     resetCaptchaIfNeeded(captchaRequired, setCaptchaResetKey, setCaptchaToken);
     form.setError('root', {
-      message: result.error.message ?? AUTH_ERRORS.RESET_EMAIL_FAILED,
+      message: toUserErrorMessage(
+        result.error.message,
+        AUTH_ERRORS.RESET_EMAIL_FAILED
+      ),
     });
   }
 

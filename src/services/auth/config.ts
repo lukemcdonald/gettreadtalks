@@ -11,6 +11,8 @@ export const AUTH_ERRORS = {
   RESET_TOKEN_INVALID:
     'This reset link is invalid or has expired. Please request a new one.',
   UNKNOWN_AUTH_ERROR: 'Authentication failed. Please try again.',
+  VERIFICATION_UNAVAILABLE:
+    'Verification is unavailable. Please try again later.',
 } as const;
 
 export function hasCaptchaToken(required: boolean, token: string) {

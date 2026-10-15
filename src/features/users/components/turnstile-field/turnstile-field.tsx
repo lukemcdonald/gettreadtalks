@@ -1,10 +1,13 @@
 'use client';
 
+import type { ScriptStatus } from './turnstile-api';
+
 import Script from 'next/script';
 import { useEffect, useRef, useState } from 'react';
 
 import { Field } from '@/components/ui';
 import { isTurnstileRequired } from '@/services/auth/config';
+import { reportUnexpectedError } from '@/services/errors';
 
 import { TURNSTILE_SCRIPT_SRC } from './constants';
 import {
@@ -25,9 +28,8 @@ export function TurnstileField({
 }: TurnstileFieldProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
-  const [scriptFailed, setScriptFailed] = useState(false);
-  const [scriptReady, setScriptReady] = useState(false);
   const [scriptRetryKey, setScriptRetryKey] = useState(0);
+  const [scriptStatus, setScriptStatus] = useState<ScriptStatus>('loading');
 
   useEffect(
     () =>
@@ -35,28 +37,41 @@ export function TurnstileField({
         container: containerRef.current,
         onTokenChange,
         resetKey,
-        scriptReady,
+        scriptStatus,
         siteKey,
       }),
-    [onTokenChange, resetKey, scriptReady, siteKey]
+    [onTokenChange, resetKey, scriptStatus, siteKey]
   );
+
+  useEffect(() => {
+    if (siteKey || !isTurnstileRequired()) {
+      return;
+    }
+
+    reportUnexpectedError(
+      new Error(
+        'Verification is not configured. Set NEXT_PUBLIC_TURNSTILE_SITE_KEY.'
+      ),
+      {
+        fingerprint: ['config', 'turnstile-site-key'],
+      }
+    );
+  }, [siteKey]);
 
   if (!isTurnstileRequired()) {
     return null;
   }
 
   return (
-    <Field invalid={!siteKey || scriptFailed}>
+    <Field invalid={!siteKey || scriptStatus === 'error'}>
       <Script
         id={turnstileScriptId(scriptRetryKey)}
         key={scriptRetryKey}
         onError={() => {
-          setScriptFailed(true);
-          setScriptReady(false);
+          setScriptStatus('error');
         }}
         onReady={() => {
-          setScriptFailed(false);
-          setScriptReady(true);
+          setScriptStatus('ready');
         }}
         src={TURNSTILE_SCRIPT_SRC}
         strategy="afterInteractive"
@@ -66,13 +81,12 @@ export function TurnstileField({
         onRetryScript={() => {
           retryTurnstileScript({
             retryKey: scriptRetryKey,
-            setScriptFailed,
-            setScriptReady,
             setScriptRetryKey,
+            setScriptStatus,
           });
         }}
         resetKey={resetKey}
-        scriptFailed={scriptFailed}
+        scriptStatus={scriptStatus}
         siteKey={siteKey}
       />
     </Field>

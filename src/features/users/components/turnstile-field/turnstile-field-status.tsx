@@ -1,3 +1,4 @@
+import type { ScriptStatus } from './turnstile-api';
 import type { RefObject } from 'react';
 
 import { Button, FieldError } from '@/components/ui';
@@ -7,24 +8,22 @@ export function TurnstileFieldStatus({
   containerRef,
   onRetryScript,
   resetKey,
-  scriptFailed,
+  scriptStatus,
   siteKey,
 }: {
   containerRef: RefObject<HTMLDivElement | null>;
   onRetryScript: () => void;
   resetKey: number;
-  scriptFailed: boolean;
+  scriptStatus: ScriptStatus;
   siteKey: string | undefined;
 }) {
   if (!siteKey) {
     return (
-      <FieldError match>
-        Verification is not configured. Set NEXT_PUBLIC_TURNSTILE_SITE_KEY.
-      </FieldError>
+      <FieldError match>{AUTH_ERRORS.VERIFICATION_UNAVAILABLE}</FieldError>
     );
   }
 
-  if (scriptFailed) {
+  if (scriptStatus === 'error') {
     return (
       <div className="space-y-2">
         <FieldError match>{AUTH_ERRORS.CAPTCHA_UNAVAILABLE}</FieldError>

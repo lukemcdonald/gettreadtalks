@@ -25,7 +25,7 @@ import { Link } from '@/components/ui/link';
 import { track, waitForAnalytics } from '@/services/analytics';
 import { signIn } from '@/services/auth/client';
 import { AUTH_ERRORS } from '@/services/auth/config';
-import { captureException } from '@/services/errors';
+import { captureException, toUserErrorMessage } from '@/services/errors';
 import { getSafeRedirect } from '@/utils';
 
 const loginFormSchema = z.object({
@@ -59,7 +59,10 @@ export function LoginForm({ ...delegated }: ComponentPropsWithoutRef<'form'>) {
         window.location.assign(redirectTo);
       } else {
         form.setError('root', {
-          message: signInError?.message ?? AUTH_ERRORS.INVALID_CREDENTIALS,
+          message: toUserErrorMessage(
+            signInError?.message,
+            AUTH_ERRORS.INVALID_CREDENTIALS
+          ),
         });
       }
     } catch (error) {

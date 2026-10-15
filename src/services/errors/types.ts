@@ -27,6 +27,7 @@ export type ErrorWithEventId = Error & {
 
 type FingerprintKind =
   | 'auth'
+  | 'config'
   | 'convex'
   | 'error'
   | 'http'

@@ -1,5 +1,7 @@
 import { TURNSTILE_SCRIPT_ID } from './constants';
 
+export type ScriptStatus = 'error' | 'loading' | 'ready';
+
 interface TurnstileApi {
   remove: (widgetId: string) => void;
   render: (
@@ -61,17 +63,19 @@ export function startTurnstileWidget({
   container,
   onTokenChange,
   resetKey,
-  scriptReady,
+  scriptStatus,
   siteKey,
 }: {
   container: HTMLDivElement | null;
   onTokenChange: (token: string) => void;
   resetKey: number;
-  scriptReady: boolean;
+  scriptStatus: ScriptStatus;
   siteKey: string | undefined;
 }) {
   const turnstile = getTurnstile();
-  const ready = [container, scriptReady, siteKey, turnstile].every(Boolean);
+  const ready = [container, scriptStatus === 'ready', siteKey, turnstile].every(
+    Boolean
+  );
 
   if (!ready) {
     return;
@@ -92,20 +96,17 @@ export function turnstileScriptId(retryKey: number) {
 
 export function retryTurnstileScript({
   retryKey,
-  setScriptFailed,
-  setScriptReady,
   setScriptRetryKey,
+  setScriptStatus,
 }: {
   retryKey: number;
-  setScriptFailed: (failed: boolean) => void;
-  setScriptReady: (ready: boolean) => void;
   setScriptRetryKey: (updater: (key: number) => number) => void;
+  setScriptStatus: (status: ScriptStatus) => void;
 }) {
   document
     .querySelector(`#${CSS.escape(turnstileScriptId(retryKey))}`)
     ?.remove();
   delete (window as Window & { turnstile?: TurnstileApi }).turnstile;
-  setScriptFailed(false);
-  setScriptReady(false);
+  setScriptStatus('loading');
   setScriptRetryKey((key) => key + 1);
 }

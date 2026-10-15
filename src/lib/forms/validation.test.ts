@@ -2,6 +2,7 @@ import { ConvexError } from 'convex/values';
 import { describe, expect, test } from 'vitest';
 
 import { ErrorCodes } from '../../services/errors/constants';
+import { USER_ERROR_MESSAGE } from '../../services/errors/user-facing';
 import { mapConvexErrorToFormErrors } from './validation';
 
 describe('mapConvexErrorToFormErrors', () => {
@@ -27,9 +28,9 @@ describe('mapConvexErrorToFormErrors', () => {
     });
   });
 
-  test('maps an unknown error onto the form', () => {
+  test('maps an unknown error onto a friendly form message', () => {
     expect(mapConvexErrorToFormErrors(new Error('Something broke'))).toEqual({
-      _form: 'Something broke',
+      _form: USER_ERROR_MESSAGE,
     });
   });
 });
