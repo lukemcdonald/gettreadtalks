@@ -7,6 +7,19 @@ import {
   visibilitySlugs,
 } from '../../test.setup';
 
+describe('listPublishedTalks', () => {
+  it('lists only published talks', async () => {
+    const t = createConvexTest();
+    await seedVisibilityCatalog(t);
+
+    const talks = await t.query(api.talks.listPublishedTalks, {});
+
+    expect(talks.map((talk) => talk.slug)).toEqual([
+      visibilitySlugs.publishedTalk,
+    ]);
+  });
+});
+
 describe('getTalkBySlug', () => {
   it('returns a published talk and hides an unpublished one', async () => {
     const t = createConvexTest();

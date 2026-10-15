@@ -25,50 +25,16 @@ import { getCurrentUser, requireAuth } from '../auth/utils';
 import { LIST_SEARCH_LIMIT } from '../search/constants';
 import { normalizeSearchQuery } from '../search/utils';
 import {
-  listPublishedTalks,
+  listPublishedTalks as publishedTalks,
   listPublishedTalksPage,
   searchPublishedTalksByTitleOrSpeaker,
 } from './helpers';
 import { enrichWithTopics, filterTalksByTitleOrSpeaker } from './utils';
 
-/**
- * List published talk slugs with their speaker slugs for sitemap generation.
- */
-export const listTalkSlugsForSitemap = query({
+export const listPublishedTalks = query({
   args: {},
-  handler: async (ctx) => {
-    const talks = await ctx.db
-      .query('talks')
-      .withIndex('by_status_and_publishedAt', (q) =>
-        q.eq('status', 'published')
-      )
-      .collect();
-
-    const results = await Promise.all(
-      talks.map(async (talk) => {
-        const speaker = await ctx.db.get('speakers', talk.speakerId);
-        if (!speaker) {
-          return null;
-        }
-        return {
-          speakerSlug: speaker.slug,
-          talkSlug: talk.slug,
-          updatedAt: talk.updatedAt ?? talk._creationTime,
-        };
-      })
-    );
-
-    return results.filter(
-      (item): item is NonNullable<typeof item> => item !== null
-    );
-  },
-  returns: v.array(
-    v.object({
-      speakerSlug: v.string(),
-      talkSlug: v.string(),
-      updatedAt: v.number(),
-    })
-  ),
+  handler: async (ctx) => await publishedTalks(ctx),
+  returns: docs('talks'),
 });
 
 /**
@@ -373,7 +339,7 @@ export const listTalks = query({
           queryText,
           LIST_SEARCH_LIMIT
         )
-      : await listPublishedTalks(ctx);
+      : await publishedTalks(ctx);
 
     // Apply speaker filter (multi-select)
     if (hasSpeakerFilter) {

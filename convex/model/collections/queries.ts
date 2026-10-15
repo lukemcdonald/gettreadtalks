@@ -4,30 +4,19 @@ import { paginationOptsValidator } from 'convex/server';
 import { v } from 'convex/values';
 
 import { query } from '../../_generated/server';
-import { filterCollectionsWithPublishedTalks } from '../../lib/filters';
 import { enrichWithSpeaker } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
 import { listPublishedTalksForCollection } from '../talks/helpers';
-import { listPublishedCollectionsPage } from './helpers';
+import {
+  listPublishedCollections as publishedCollections,
+  listPublishedCollectionsPage,
+} from './helpers';
 
-/**
- * List slugs for collections that have at least one published talk.
- */
-export const listCollectionSlugsForSitemap = query({
+export const listPublishedCollections = query({
   args: {},
-  handler: async (ctx) => {
-    const collections = await filterCollectionsWithPublishedTalks(
-      ctx,
-      await ctx.db.query('collections').collect()
-    );
-
-    return collections.map((collection) => ({
-      slug: collection.slug,
-      updatedAt: collection.updatedAt ?? collection._creationTime,
-    }));
-  },
-  returns: v.array(v.object({ slug: v.string(), updatedAt: v.number() })),
+  handler: async (ctx) => await publishedCollections(ctx),
+  returns: docs('collections'),
 });
 
 /**

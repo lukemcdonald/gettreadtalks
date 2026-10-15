@@ -6,7 +6,6 @@ import { paginationOptsValidator } from 'convex/server';
 import { v } from 'convex/values';
 
 import { query } from '../../_generated/server';
-import { filterTopicsWithPublishedTalks } from '../../lib/filters';
 import { getTopicComparator } from '../../lib/sort';
 import { enrichWithSpeaker, paginateArray } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
@@ -124,37 +123,12 @@ export const listAllTopics = query({
 });
 
 /**
- * List slugs for topics that have at least one published talk.
- */
-export const listTopicSlugsForSitemap = query({
-  args: {},
-  handler: async (ctx) => {
-    const topics = await filterTopicsWithPublishedTalks(
-      ctx,
-      await ctx.db.query('topics').withIndex('by_title').collect()
-    );
-
-    return topics.map((topic) => ({
-      slug: topic.slug,
-      updatedAt: topic.updatedAt ?? topic._creationTime,
-    }));
-  },
-  returns: v.array(v.object({ slug: v.string(), updatedAt: v.number() })),
-});
-
-/**
  * List topics that have at least one published talk.
  * Returns topics sorted alphabetically by title.
  */
 export const listTopics = query({
-  args: {
-    limit: v.optional(v.number()),
-  },
-  handler: async (ctx, args) => {
-    const { limit = 100 } = args;
-
-    return await listPublishedTopics(ctx, limit);
-  },
+  args: {},
+  handler: async (ctx) => await listPublishedTopics(ctx),
   returns: docs('topics'),
 });
 

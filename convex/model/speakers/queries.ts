@@ -18,7 +18,7 @@ import { requireAuth } from '../auth/utils';
 import { LIST_SEARCH_LIMIT } from '../search/constants';
 import { normalizeSearchQuery } from '../search/utils';
 import {
-  listPublishedSpeakers,
+  listPublishedSpeakers as publishedSpeakers,
   listPublishedSpeakersPage,
   searchPublishedSpeakers,
 } from './helpers';
@@ -100,20 +100,10 @@ export const getSpeakerBySlug = query({
   ),
 });
 
-/**
- * List slugs for speakers who have at least one published talk or clip.
- */
-export const listSpeakerSlugsForSitemap = query({
+export const listPublishedSpeakers = query({
   args: {},
-  handler: async (ctx) => {
-    const speakers = await listPublishedSpeakers(ctx);
-
-    return speakers.map((speaker) => ({
-      slug: speaker.slug,
-      updatedAt: speaker.updatedAt ?? speaker._creationTime,
-    }));
-  },
-  returns: v.array(v.object({ slug: v.string(), updatedAt: v.number() })),
+  handler: async (ctx) => await publishedSpeakers(ctx),
+  returns: docs('speakers'),
 });
 
 /**
@@ -186,7 +176,7 @@ export const listSpeakers = query({
 
     let speakers = hasSearch
       ? await searchPublishedSpeakers(ctx, queryText, LIST_SEARCH_LIMIT)
-      : await listPublishedSpeakers(ctx);
+      : await publishedSpeakers(ctx);
 
     // Filter by role
     if (role) {

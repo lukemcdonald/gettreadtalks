@@ -18,7 +18,7 @@ import { LIST_SEARCH_LIMIT } from '../search/constants';
 import { normalizeSearchQuery } from '../search/utils';
 import {
   enrichClipsWithSpeaker,
-  listPublishedClips,
+  listPublishedClips as publishedClips,
   listPublishedClipsPage,
   searchPublishedClips,
 } from './helpers';
@@ -29,20 +29,10 @@ const clipPageWithSpeakersValidator = paginationResultValidator(
   })
 );
 
-/**
- * List slugs for published clips whose parent talk is published or standalone.
- */
-export const listClipSlugsForSitemap = query({
+export const listPublishedClips = query({
   args: {},
-  handler: async (ctx) => {
-    const clips = await listPublishedClips(ctx);
-
-    return clips.map((clip) => ({
-      slug: clip.slug,
-      updatedAt: clip.updatedAt ?? clip._creationTime,
-    }));
-  },
-  returns: v.array(v.object({ slug: v.string(), updatedAt: v.number() })),
+  handler: async (ctx) => await publishedClips(ctx),
+  returns: docs('clips'),
 });
 
 /**
@@ -135,7 +125,7 @@ export const listClips = query({
 
     let clips = hasSearch
       ? await searchPublishedClips(ctx, queryText, LIST_SEARCH_LIMIT)
-      : await listPublishedClips(ctx);
+      : await publishedClips(ctx);
 
     // Apply speaker filter (multi-select)
     if (hasSpeakerFilter) {
