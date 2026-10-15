@@ -42,27 +42,15 @@ export function PageHeader({
   size = 'md',
   title,
 }: PageHeaderProps) {
-  const heading = (
-    <h1 className={cn(titleVariants({ size }), !!actions && 'min-w-0')}>
-      {title}
-    </h1>
-  );
-
   return (
-    <header className={cn('flex flex-col gap-4', className)}>
-      <div className="max-w-prose space-y-2">
-        {actions ? (
-          <div className="flex flex-wrap items-center gap-3">
-            {heading}
-            {actions}
-          </div>
-        ) : (
-          heading
-        )}
+    <header className={cn('flex items-start justify-between gap-4', className)}>
+      <div className="max-w-prose min-w-0 space-y-2">
+        <h1 className={titleVariants({ size })}>{title}</h1>
         {!!description && (
           <div className={descriptionVariants({ size })}>{description}</div>
         )}
       </div>
+      {!!actions && <div className="shrink-0">{actions}</div>}
     </header>
   );
 }

@@ -1,3 +1,5 @@
+import { PageContainer } from '@/components/page-container';
+import { PageHeader } from '@/components/page-header';
 import {
   Card,
   CardContent,
@@ -16,57 +18,63 @@ export default async function AccountPage() {
   const user = await getCurrentUser();
 
   return (
-    <div className="space-y-4">
-      {/* Profile + Email + Password settings */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Profile settings</CardTitle>
-          <CardDescription>
-            Update the name and email associated with your account.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ProfileForm currentName={user?.name ?? ''} />
-        </CardContent>
+    <>
+      <PageHeader
+        description="Update your profile, email, and password."
+        title="Settings"
+      />
+      <PageContainer width="narrow">
+        <div className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Profile settings</CardTitle>
+              <CardDescription>
+                Update the name and email associated with your account.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ProfileForm currentName={user?.name ?? ''} />
+            </CardContent>
 
-        <Separator />
+            <Separator />
 
-        <CardHeader>
-          <CardTitle>Email settings</CardTitle>
-          <CardDescription>
-            Manage the email address associated with your account.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <EmailForm currentEmail={user?.email ?? ''} />
-        </CardContent>
+            <CardHeader>
+              <CardTitle>Email settings</CardTitle>
+              <CardDescription>
+                Manage the email address associated with your account.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <EmailForm currentEmail={user?.email ?? ''} />
+            </CardContent>
 
-        <Separator />
+            <Separator />
 
-        <CardHeader>
-          <CardTitle>Password settings</CardTitle>
-          <CardDescription>
-            Update the password associated with your account.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <PasswordForm />
-        </CardContent>
-      </Card>
+            <CardHeader>
+              <CardTitle>Password settings</CardTitle>
+              <CardDescription>
+                Update the password associated with your account.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <PasswordForm />
+            </CardContent>
+          </Card>
 
-      {/* Delete account */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Delete your account</CardTitle>
-          <CardDescription>
-            Once you delete your account, you will lose all data associated with
-            it.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <DeleteAccountForm />
-        </CardContent>
-      </Card>
-    </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>Delete your account</CardTitle>
+              <CardDescription>
+                Once you delete your account, you will lose all data associated
+                with it.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <DeleteAccountForm />
+            </CardContent>
+          </Card>
+        </div>
+      </PageContainer>
+    </>
   );
 }

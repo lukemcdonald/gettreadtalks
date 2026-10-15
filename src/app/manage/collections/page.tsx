@@ -4,15 +4,13 @@ import { NewCollectionButton } from '@/features/collections/components/new-colle
 
 export default function ManageCollectionsPage() {
   return (
-    <div className="space-y-6">
-      <div className="flex items-start justify-between gap-4">
-        <PageHeader
-          description="Manage all collections"
-          title="Manage Collections"
-        />
-        <NewCollectionButton />
-      </div>
+    <>
+      <PageHeader
+        actions={<NewCollectionButton />}
+        description="Manage all collections"
+        title="Manage Collections"
+      />
       <ManageCollectionsContent />
-    </div>
+    </>
   );
 }

@@ -38,7 +38,7 @@ export function TabNav({ items, label }: TabNavProps) {
 
   return (
     <nav aria-label={label} className="overflow-x-auto">
-      <ul className="flex w-max gap-1 border-b">
+      <ul className="flex w-full min-w-max gap-1 border-b">
         {items.map((item) => {
           const isActive = item.href === pathname;
 

@@ -22,20 +22,18 @@ export default function ManageTalksPage({
   searchParams,
 }: ManageTalksPageProps) {
   return (
-    <div className="space-y-6">
-      <div className="flex items-start justify-between gap-4">
-        <PageHeader
-          description="Manage all talks across all statuses"
-          title="Manage Talks"
-        />
-        <NewTalkButton />
-      </div>
+    <>
+      <PageHeader
+        actions={<NewTalkButton />}
+        description="Manage all talks across all statuses"
+        title="Manage Talks"
+      />
       <Suspense fallback={<Skeleton className="h-10 w-full" />}>
         <TalksFilters />
       </Suspense>
       <Suspense fallback={<Skeleton className="h-96 w-full" />}>
         <ManageTalksContent searchParams={searchParams} />
       </Suspense>
-    </div>
+    </>
   );
 }

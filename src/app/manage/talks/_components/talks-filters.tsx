@@ -19,7 +19,7 @@ export function TalksFilters() {
         placeholder="All Statuses"
       />
       <SearchInput
-        className="flex-1"
+        className="max-w-96 min-w-0 flex-1"
         label="Search"
         paramName="search"
         placeholder="Search talks and speakers..."
