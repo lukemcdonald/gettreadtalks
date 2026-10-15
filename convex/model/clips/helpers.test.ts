@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import {
   createConvexTest,
@@ -8,7 +8,7 @@ import {
 import { listPublishedClips, searchPublishedClips } from './helpers';
 
 describe('listPublishedClips', () => {
-  test('omits published clips whose parent talk is unpublished', async () => {
+  it('omits published clips whose parent talk is unpublished', async () => {
     const t = createConvexTest();
     await seedVisibilityCatalog(t);
 
@@ -22,7 +22,7 @@ describe('listPublishedClips', () => {
 });
 
 describe('searchPublishedClips', () => {
-  test('returns published clips and omits those whose parent talk is unpublished', async () => {
+  it('returns published clips and omits those whose parent talk is unpublished', async () => {
     const t = createConvexTest();
     await seedVisibilityCatalog(t);
 

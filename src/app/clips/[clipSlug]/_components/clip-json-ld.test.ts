@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest';
+import { describe, expect, it } from '@/test';
 
 import { clipJsonLd } from './clip-json-ld';
 
@@ -9,7 +9,7 @@ const speaker = {
 };
 
 describe('clipJsonLd', () => {
-  test('uses the clip page url and speaker as creator', () => {
+  it('uses the clip page url and speaker as creator', () => {
     const result = clipJsonLd({
       clip: { slug: 'the-cross-clip', title: 'The Cross clip' },
       speaker,
@@ -25,7 +25,7 @@ describe('clipJsonLd', () => {
     );
   });
 
-  test('adds ISO uploadDate when publishedAt is present', () => {
+  it('adds ISO uploadDate when publishedAt is present', () => {
     const result = clipJsonLd({
       clip: {
         publishedAt: Date.UTC(2024, 0, 15),
@@ -39,7 +39,7 @@ describe('clipJsonLd', () => {
     expect(result.uploadDate).toBe('2024-01-15T00:00:00.000Z');
   });
 
-  test('omits creator and uploadDate when those fields are missing', () => {
+  it('omits creator and uploadDate when those fields are missing', () => {
     const result = clipJsonLd({
       clip: { slug: 'the-cross-clip', title: 'The Cross clip' },
       speaker: null,
@@ -50,7 +50,7 @@ describe('clipJsonLd', () => {
     expect('uploadDate' in result).toBe(false);
   });
 
-  test('links the parent talk only when both talk and speaker are present', () => {
+  it('links the parent talk only when both talk and speaker are present', () => {
     const withTalk = clipJsonLd({
       clip: { slug: 'the-cross-clip', title: 'The Cross clip' },
       speaker,

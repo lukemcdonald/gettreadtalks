@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { api } from '../../_generated/api';
 import {
@@ -8,7 +8,7 @@ import {
 } from '../../test.setup';
 
 describe('getTalkBySlug', () => {
-  test('returns a published talk and hides an unpublished one', async () => {
+  it('returns a published talk and hides an unpublished one', async () => {
     const t = createConvexTest();
     await seedVisibilityCatalog(t);
 

@@ -21,6 +21,7 @@ export default defineConfig({
     ],
   },
   test: {
+    globals: true,
     projects: [
       {
         extends: true,
@@ -36,6 +37,15 @@ export default defineConfig({
           environment: 'node',
           include: ['src/**/*.test.ts'],
           name: 'node',
+        },
+      },
+      {
+        extends: true,
+        test: {
+          environment: 'happy-dom',
+          include: ['src/**/*.test.tsx'],
+          name: 'components',
+          setupFiles: ['src/test/setup.ts'],
         },
       },
     ],

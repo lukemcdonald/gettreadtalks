@@ -1,5 +1,6 @@
 import { ConvexError } from 'convex/values';
-import { describe, expect, test } from 'vitest';
+
+import { describe, expect, it } from '@/test';
 
 import { getErrorMessage } from './convex';
 import {
@@ -10,7 +11,7 @@ import {
 } from './user-facing';
 
 describe('looksLikeDeveloperError', () => {
-  test('flags env vars, config hints, and stacks', () => {
+  it('flags env vars, config hints, and stacks', () => {
     expect(looksLikeDeveloperError('Set NEXT_PUBLIC_TURNSTILE_SITE_KEY')).toBe(
       true
     );
@@ -25,7 +26,7 @@ describe('looksLikeDeveloperError', () => {
     );
   });
 
-  test('allows normal user messages', () => {
+  it('allows normal user messages', () => {
     expect(looksLikeDeveloperError('Invalid email or password')).toBe(false);
     expect(looksLikeDeveloperError('Already taken')).toBe(false);
     expect(looksLikeDeveloperError('Resource not found')).toBe(false);
@@ -33,14 +34,14 @@ describe('looksLikeDeveloperError', () => {
 });
 
 describe('toUserErrorMessage', () => {
-  test('keeps safe auth copy and uses the fallback when empty', () => {
+  it('keeps safe auth copy and uses the fallback when empty', () => {
     expect(toUserErrorMessage('Invalid email or password', 'Fallback')).toBe(
       'Invalid email or password'
     );
     expect(toUserErrorMessage(undefined, 'Fallback')).toBe('Fallback');
   });
 
-  test('replaces config leaks with the fallback', () => {
+  it('replaces config leaks with the fallback', () => {
     expect(
       toUserErrorMessage(
         'Verification is not configured. Set NEXT_PUBLIC_TURNSTILE_SITE_KEY.',
@@ -51,7 +52,7 @@ describe('toUserErrorMessage', () => {
 });
 
 describe('getErrorMessage', () => {
-  test('keeps structured Convex user messages', () => {
+  it('keeps structured Convex user messages', () => {
     const error = new ConvexError({
       message: 'Already taken',
     });
@@ -59,7 +60,7 @@ describe('getErrorMessage', () => {
     expect(getErrorMessage(error)).toBe('Already taken');
   });
 
-  test('hides raw Error messages and config leaks', () => {
+  it('hides raw Error messages and config leaks', () => {
     expect(getErrorMessage(new Error('Something broke'))).toBe(
       USER_ERROR_MESSAGE
     );
@@ -77,7 +78,7 @@ describe('getErrorMessage', () => {
 });
 
 describe('reportUnexpectedError', () => {
-  test('returns the friendly user message', () => {
+  it('returns the friendly user message', () => {
     expect(
       reportUnexpectedError(new Error('TURNSTILE_SECRET_KEY is not set'), {
         fingerprint: ['config', 'turnstile-secret-key'],

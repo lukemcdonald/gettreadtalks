@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest';
+import { describe, expect, it } from '@/test';
 
 import {
   BROWSE_SEARCH_GROUP,
@@ -80,14 +80,14 @@ const result = {
 };
 
 describe('getHeaderSearchQueryAfterClose', () => {
-  test('keeps the query on dismiss and clears after navigate', () => {
+  it('keeps the query on dismiss and clears after navigate', () => {
     expect(getHeaderSearchQueryAfterClose('grace', false)).toBe('grace');
     expect(getHeaderSearchQueryAfterClose('grace', true)).toBe('');
   });
 });
 
 describe('getSearchQuery', () => {
-  test('trims a string and uses the first repeated param', () => {
+  it('trims a string and uses the first repeated param', () => {
     expect(getSearchQuery('  grace  ')).toBe('grace');
     expect(getSearchQuery(['grace', 'prayer'])).toBe('grace');
     expect(getSearchQuery()).toBe('');
@@ -95,13 +95,13 @@ describe('getSearchQuery', () => {
 });
 
 describe('getSearchPageHref', () => {
-  test('keeps the existing search query param', () => {
+  it('keeps the existing search query param', () => {
     expect(getSearchPageHref('John Piper')).toBe('/search?search=John+Piper');
   });
 });
 
 describe('toSearchHits', () => {
-  test('maps published results to canonical links and skips talks without speakers', () => {
+  it('maps published results to canonical links and skips talks without speakers', () => {
     expect(toSearchHits(result)).toEqual([
       {
         href: '/talks/john-doe/sample-sermon-on-romans-8',
@@ -135,7 +135,7 @@ describe('toSearchHits', () => {
 });
 
 describe('groupSearchHits', () => {
-  test('groups hits by type in nav order', () => {
+  it('groups hits by type in nav order', () => {
     const groups = groupSearchHits(toSearchHits(result));
 
     expect(groups.map((group) => group.label)).toEqual([
@@ -149,17 +149,17 @@ describe('groupSearchHits', () => {
 });
 
 describe('hasSearchHits', () => {
-  test('is false for an empty result', () => {
+  it('is false for an empty result', () => {
     expect(hasSearchHits(emptySiteSearch)).toBe(false);
   });
 
-  test('is true when any type has a published hit', () => {
+  it('is true when any type has a published hit', () => {
     expect(hasSearchHits(result)).toBe(true);
   });
 });
 
 describe('getHeaderSearchStatus', () => {
-  test('returns idle, loading, empty, or results', () => {
+  it('returns idle, loading, empty, or results', () => {
     expect(
       getHeaderSearchStatus({
         hasQuery: false,
@@ -192,7 +192,7 @@ describe('getHeaderSearchStatus', () => {
 });
 
 describe('getSearchHotkeyLabel', () => {
-  test('shows the Apple glyph on Apple user agents', () => {
+  it('shows the Apple glyph on Apple user agents', () => {
     expect(
       getSearchHotkeyLabel(
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
@@ -200,7 +200,7 @@ describe('getSearchHotkeyLabel', () => {
     ).toBe('⌘K');
   });
 
-  test('shows Ctrl K otherwise', () => {
+  it('shows Ctrl K otherwise', () => {
     expect(
       getSearchHotkeyLabel(
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
@@ -213,7 +213,7 @@ describe('getSearchHotkeyLabel', () => {
 describe('getHeaderSearchState', () => {
   const hits = toSearchHits(result);
 
-  test('keeps browse while the first query loads and hides view all when every group is visible', () => {
+  it('keeps browse while the first query loads and hides view all when every group is visible', () => {
     const idle = getHeaderSearchState({
       hits,
       isPending: false,
@@ -244,7 +244,7 @@ describe('getHeaderSearchState', () => {
     expect(results.groups.at(-1)?.value).not.toBe(VIEW_ALL_SEARCH_GROUP);
   });
 
-  test('appends view all when a type hits the dropdown limit', () => {
+  it('appends view all when a type hits the dropdown limit', () => {
     const cappedHits = cappedTalkHits();
     const results = getHeaderSearchState({
       hits: cappedHits,
@@ -257,7 +257,7 @@ describe('getHeaderSearchState', () => {
     expect(results.groups.at(-1)?.value).toBe(VIEW_ALL_SEARCH_GROUP);
   });
 
-  test('keeps previous hits while refining and hides view all until settled', () => {
+  it('keeps previous hits while refining and hides view all until settled', () => {
     const pending = getHeaderSearchState({
       hits: [],
       isPending: true,
@@ -275,7 +275,7 @@ describe('getHeaderSearchState', () => {
     ]);
   });
 
-  test('keeps the empty state while a later query loads', () => {
+  it('keeps the empty state while a later query loads', () => {
     const pendingEmpty = getHeaderSearchState({
       hits: [],
       isPending: true,
@@ -290,7 +290,7 @@ describe('getHeaderSearchState', () => {
 });
 
 describe('getBrowseCommandGroups', () => {
-  test('lists browse destinations and favorites when signed in', () => {
+  it('lists browse destinations and favorites when signed in', () => {
     const signedOut = getBrowseCommandGroups(false);
 
     expect(signedOut[0]?.value).toBe(BROWSE_SEARCH_GROUP);
@@ -315,7 +315,7 @@ describe('getBrowseCommandGroups', () => {
 });
 
 describe('shouldShowViewAllResults', () => {
-  test('is false until a type reaches the fetch limit', () => {
+  it('is false until a type reaches the fetch limit', () => {
     expect(shouldShowViewAllResults(toSearchHits(result))).toBe(false);
     expect(shouldShowViewAllResults(cappedTalkHits())).toBe(true);
   });
@@ -324,7 +324,7 @@ describe('shouldShowViewAllResults', () => {
 describe('getSearchSelectionAnalytics', () => {
   const hits = toSearchHits(result);
 
-  test('returns null for browse and unknown items', () => {
+  it('returns null for browse and unknown items', () => {
     expect(
       getSearchSelectionAnalytics({
         hits,
@@ -341,7 +341,7 @@ describe('getSearchSelectionAnalytics', () => {
     ).toBe(null);
   });
 
-  test('uses a 1-based position and view_all after the last hit', () => {
+  it('uses a 1-based position and view_all after the last hit', () => {
     expect(
       getSearchSelectionAnalytics({
         hits,
@@ -368,7 +368,7 @@ describe('getSearchSelectionAnalytics', () => {
 });
 
 describe('toCommandGroups', () => {
-  test('keeps group order and omits view all when every group is visible', () => {
+  it('keeps group order and omits view all when every group is visible', () => {
     const groups = toCommandGroups(toSearchHits(result), 'grace');
 
     expect(groups.map((group) => group.value)).toEqual([
@@ -379,7 +379,7 @@ describe('toCommandGroups', () => {
     ]);
   });
 
-  test('appends view all when a type hits the dropdown limit', () => {
+  it('appends view all when a type hits the dropdown limit', () => {
     const groups = toCommandGroups(cappedTalkHits(), 'talk');
 
     expect(groups.at(-1)?.value).toBe(VIEW_ALL_SEARCH_GROUP);
@@ -387,11 +387,11 @@ describe('toCommandGroups', () => {
     expect(groups.at(-1)?.items[0]?.label).toBe('View all results');
   });
 
-  test('stays empty when there is no query', () => {
+  it('stays empty when there is no query', () => {
     expect(toCommandGroups([], '')).toEqual([]);
   });
 
-  test('omits view all when the query has no hits', () => {
+  it('omits view all when the query has no hits', () => {
     expect(toCommandGroups([], 'zzzz')).toEqual([]);
   });
 });
@@ -405,12 +405,12 @@ describe('isSearchHotkey', () => {
     shiftKey: false,
   };
 
-  test('matches unmodified Cmd or Ctrl K', () => {
+  it('matches unmodified Cmd or Ctrl K', () => {
     expect(isSearchHotkey({ ...base, metaKey: true })).toBe(true);
     expect(isSearchHotkey({ ...base, ctrlKey: true })).toBe(true);
   });
 
-  test('ignores other modifiers, keys, and repeats', () => {
+  it('ignores other modifiers, keys, and repeats', () => {
     expect(isSearchHotkey(base)).toBe(false);
     expect(isSearchHotkey({ ...base, key: 's', metaKey: true })).toBe(false);
     expect(isSearchHotkey({ ...base, altKey: true, metaKey: true })).toBe(

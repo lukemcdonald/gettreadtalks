@@ -1,9 +1,9 @@
-import { describe, expect, test } from 'vitest';
+import { describe, expect, it } from '@/test';
 
 import { talkListItemsJsonLd } from './utils';
 
 describe('talkListItemsJsonLd', () => {
-  test('uses a talk url when the speaker is present', () => {
+  it('uses a talk url when the speaker is present', () => {
     const [item] = talkListItemsJsonLd([
       {
         slug: 'the-cross',
@@ -22,7 +22,7 @@ describe('talkListItemsJsonLd', () => {
     );
   });
 
-  test('omits the talk url when the speaker is missing', () => {
+  it('omits the talk url when the speaker is missing', () => {
     const [item] = talkListItemsJsonLd([
       { slug: 'orphan', speaker: null, title: 'Orphan talk' },
     ]);

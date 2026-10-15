@@ -1,9 +1,9 @@
-import { describe, expect, test } from 'vitest';
+import { describe, expect, it } from '@/test';
 
 import { mediaJsonLd, preferItemsWithVideoThumbnails } from './utils';
 
 describe('mediaJsonLd', () => {
-  test('maps watch pages to player embedUrl and files to contentUrl', () => {
+  it('maps watch pages to player embedUrl and files to contentUrl', () => {
     expect(mediaJsonLd('https://www.youtube.com/watch?v=jNQXAC9IVRw')).toEqual({
       '@type': 'VideoObject',
       embedUrl: 'https://www.youtube.com/embed/jNQXAC9IVRw',
@@ -22,7 +22,7 @@ describe('mediaJsonLd', () => {
     });
   });
 
-  test('uses MediaObject when the URL is missing or not playable media', () => {
+  it('uses MediaObject when the URL is missing or not playable media', () => {
     expect(mediaJsonLd()).toEqual({ '@type': 'MediaObject' });
     expect(mediaJsonLd('https://example.com/notes')).toEqual({
       '@type': 'MediaObject',
@@ -31,7 +31,7 @@ describe('mediaJsonLd', () => {
 });
 
 describe('preferItemsWithVideoThumbnails', () => {
-  test('prefers items that have a video thumbnail', () => {
+  it('prefers items that have a video thumbnail', () => {
     const items = [
       { mediaUrl: 'https://example.com/talk.mp3', title: 'audio' },
       {
@@ -43,7 +43,7 @@ describe('preferItemsWithVideoThumbnails', () => {
     expect(preferItemsWithVideoThumbnails(items)).toEqual([items[1]]);
   });
 
-  test('falls back to the full list when nothing has a thumbnail', () => {
+  it('falls back to the full list when nothing has a thumbnail', () => {
     const items = [
       { mediaUrl: 'https://example.com/talk.mp3', title: 'audio-a' },
       { mediaUrl: 'https://example.com/talk-2.mp3', title: 'audio-b' },

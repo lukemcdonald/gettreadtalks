@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import {
   checkMediaUrl,
@@ -7,31 +7,31 @@ import {
 } from './oembed';
 
 describe('classifyOEmbedStatus', () => {
-  test('maps 200 to ok', () => {
+  it('maps 200 to ok', () => {
     expect(classifyOEmbedStatus(200)).toBe('ok');
   });
 
-  test('maps YouTube 401 and 403 to private', () => {
+  it('maps YouTube 401 and 403 to private', () => {
     expect(classifyOEmbedStatus(401)).toBe('private');
     expect(classifyOEmbedStatus(403)).toBe('private');
   });
 
-  test('maps 404 to missing', () => {
+  it('maps 404 to missing', () => {
     expect(classifyOEmbedStatus(404)).toBe('missing');
   });
 
-  test('maps other statuses to unknown', () => {
+  it('maps other statuses to unknown', () => {
     expect(classifyOEmbedStatus(503)).toBe('unknown');
     expect(classifyOEmbedStatus()).toBe('unknown');
   });
 });
 
 describe('getOEmbedRequest', () => {
-  test('skips non-oEmbed URLs', () => {
+  it('skips non-oEmbed URLs', () => {
     expect(getOEmbedRequest('https://cdn.example.com/talk.mp3')).toBe(null);
   });
 
-  test('builds YouTube and Vimeo oEmbed URLs', () => {
+  it('builds YouTube and Vimeo oEmbed URLs', () => {
     const youtube = getOEmbedRequest(
       'https://www.youtube.com/watch?v=LYncFGsKvCQ'
     );
@@ -51,7 +51,7 @@ describe('getOEmbedRequest', () => {
 });
 
 describe('checkMediaUrl', () => {
-  test('skips audio', async () => {
+  it('skips audio', async () => {
     const result = await checkMediaUrl(
       'https://cdn.example.com/talk.mp3',
       (() => Promise.reject(new Error('should not fetch'))) as typeof fetch
@@ -60,7 +60,7 @@ describe('checkMediaUrl', () => {
     expect(result).toEqual({ skipped: true });
   });
 
-  test('maps response status and fetch failure', async () => {
+  it('maps response status and fetch failure', async () => {
     const ok = await checkMediaUrl('https://www.youtube.com/watch?v=abc', (() =>
       Promise.resolve(new Response(null, { status: 200 }))) as typeof fetch);
     const privateVideo = await checkMediaUrl(

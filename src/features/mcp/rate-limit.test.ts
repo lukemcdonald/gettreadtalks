@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest';
+import { describe, expect, it } from '@/test';
 
 import { createMcpRateLimitedHandler, mcpRateLimitKey } from './rate-limit';
 
@@ -10,7 +10,7 @@ function mcpRequest(headers: Record<string, string>) {
 }
 
 describe('mcpRateLimitKey', () => {
-  test('prefers cf-connecting-ip over x-forwarded-for', () => {
+  it('prefers cf-connecting-ip over x-forwarded-for', () => {
     const key = mcpRateLimitKey(
       mcpRequest({
         'cf-connecting-ip': '1.1.1.1',
@@ -21,7 +21,7 @@ describe('mcpRateLimitKey', () => {
     expect(key).toBe('1.1.1.1');
   });
 
-  test('prefers x-real-ip over x-forwarded-for', () => {
+  it('prefers x-real-ip over x-forwarded-for', () => {
     const key = mcpRateLimitKey(
       mcpRequest({
         'x-forwarded-for': '8.8.8.8',
@@ -32,7 +32,7 @@ describe('mcpRateLimitKey', () => {
     expect(key).toBe('9.9.9.9');
   });
 
-  test('hashes the trusted ip when a server secret is set', () => {
+  it('hashes the trusted ip when a server secret is set', () => {
     const spoofed = mcpRateLimitKey(
       mcpRequest({
         'x-forwarded-for': '8.8.8.8',
@@ -74,7 +74,7 @@ describe('createMcpRateLimitedHandler', () => {
     }
   );
 
-  test('allows a request when the limiter grants a token', async () => {
+  it('allows a request when the limiter grants a token', async () => {
     const response = await passthrough(mcpRequest({}));
     const body = await response.json();
 
@@ -82,7 +82,7 @@ describe('createMcpRateLimitedHandler', () => {
     expect(body).toEqual({ ok: true });
   });
 
-  test('returns 429 with retry-after when the limiter denies', async () => {
+  it('returns 429 with retry-after when the limiter denies', async () => {
     const response = await passthrough(mcpRequest({ 'x-test-limit': 'deny' }));
     const body = await response.json();
 
@@ -91,7 +91,7 @@ describe('createMcpRateLimitedHandler', () => {
     expect(body).toEqual({ error: 'Rate limit exceeded' });
   });
 
-  test('fails open when the limiter throws', async () => {
+  it('fails open when the limiter throws', async () => {
     const response = await passthrough(mcpRequest({ 'x-test-limit': 'throw' }));
     const body = await response.json();
 
@@ -99,7 +99,7 @@ describe('createMcpRateLimitedHandler', () => {
     expect(body).toEqual({ ok: true });
   });
 
-  test('returns a cors-wrapped 500 when the handler throws', async () => {
+  it('returns a cors-wrapped 500 when the handler throws', async () => {
     const response = await passthrough(
       mcpRequest({ 'x-test-handler': 'throw' })
     );

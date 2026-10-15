@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import {
   getTimeSeed,
@@ -10,18 +10,18 @@ const MS_PER_HOUR = 1000 * 60 * 60;
 const MS_PER_DAY = MS_PER_HOUR * 24;
 
 describe('rotateContent', () => {
-  test('returns empty when there are no items', () => {
+  it('returns empty when there are no items', () => {
     expect(rotateContent([], { count: 1, period: 'daily' })).toEqual([]);
   });
 
-  test('returns a slice when count covers the list', () => {
+  it('returns a slice when count covers the list', () => {
     expect(rotateContent(['a', 'b'], { count: 2, period: 'daily' })).toEqual([
       'a',
       'b',
     ]);
   });
 
-  test('same seed yields the same featured item', () => {
+  it('same seed yields the same featured item', () => {
     const items = ['a', 'b', 'c', 'd', 'e'];
 
     expect(rotateContent(items, { count: 1, seed: 10 })).toEqual(
@@ -31,7 +31,7 @@ describe('rotateContent', () => {
 });
 
 describe('getTimeSeed', () => {
-  test('is the unix-period bucket', () => {
+  it('is the unix-period bucket', () => {
     const now = MS_PER_DAY * 20_000 + 1234;
 
     expect(getTimeSeed('daily', now)).toBe(20_000);
@@ -41,7 +41,7 @@ describe('getTimeSeed', () => {
 });
 
 describe('secondsUntilNextRotation', () => {
-  test('expires at the period boundary', () => {
+  it('expires at the period boundary', () => {
     const now = MS_PER_DAY * 20_000 + 1000;
 
     expect(secondsUntilNextRotation('daily', now)).toBe(
