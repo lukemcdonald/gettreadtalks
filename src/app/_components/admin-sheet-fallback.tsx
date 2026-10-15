@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 
 import { Suspense } from 'react';
 
-import { MANAGE_TABS } from '@/app/manage/tabs';
+import { MANAGE_NAV } from '@/app/manage/nav';
 import { AreaLayout } from '@/components/layouts';
 import { Skeleton } from '@/components/ui';
 import { getAdminLoginRedirect } from '@/lib/entities/paths';
@@ -24,7 +24,7 @@ async function AdminSheetFallbackContent({
 
   return (
     <>
-      <AreaLayout items={MANAGE_TABS} label="Manage">
+      <AreaLayout items={MANAGE_NAV} label="Manage">
         {children}
       </AreaLayout>
       {sheet}
