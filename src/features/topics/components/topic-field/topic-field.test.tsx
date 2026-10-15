@@ -41,9 +41,7 @@ describe('TopicFieldInput', () => {
     });
 
     expect(getByLabelText(/topics/iu)).toBeInTheDocument();
-    expect(
-      getByText('Pick the themes this talk covers.')
-    ).toBeInTheDocument();
+    expect(getByText('Pick the themes this talk covers.')).toBeInTheDocument();
     expect(getByText('*')).toBeInTheDocument();
     expect(getByPlaceholderText('Search topics...')).toBeInTheDocument();
   });
