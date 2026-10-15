@@ -1,6 +1,9 @@
+import type { RenderOptions } from '@/test/render';
+import type { ComponentProps } from 'react';
+
 import { afterEach, describe, expect, test, vi } from 'vitest';
 
-import { render, screen } from '@/test/render';
+import { render, screen, userEvent } from '@/test/render';
 
 import { ShareButton } from './share-button';
 
@@ -10,6 +13,16 @@ function stubShare(share?: () => Promise<void>) {
     value: share,
     writable: true,
   });
+}
+
+function setup(
+  props: Partial<ComponentProps<typeof ShareButton>> = {},
+  options?: RenderOptions
+) {
+  return {
+    user: userEvent.setup(),
+    ...render(<ShareButton title="Romans 8" {...props} />, options),
+  };
 }
 
 describe('ShareButton', () => {
@@ -22,7 +35,7 @@ describe('ShareButton', () => {
     const share = vi.fn(() => Promise.resolve());
     stubShare(share);
 
-    const { user } = render(<ShareButton onShare={onShare} title="Romans 8" />);
+    const { user } = setup({ onShare });
 
     await user.click(screen.getByRole('button'));
 
@@ -40,7 +53,7 @@ describe('ShareButton', () => {
       .spyOn(navigator.clipboard, 'writeText')
       .mockImplementation(() => Promise.resolve());
 
-    const { user } = render(<ShareButton onShare={onShare} title="Romans 8" />);
+    const { user } = setup({ onShare });
 
     await user.click(screen.getByRole('button'));
 
@@ -57,7 +70,7 @@ describe('ShareButton', () => {
     abortError.name = 'AbortError';
     stubShare(vi.fn().mockRejectedValue(abortError));
 
-    const { user } = render(<ShareButton onShare={onShare} title="Romans 8" />);
+    const { user } = setup({ onShare });
 
     await user.click(screen.getByRole('button'));
 

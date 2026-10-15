@@ -1,9 +1,14 @@
-import type { CommandSearchGroup } from '@/features/search/types';
+import type {
+  CommandSearchGroup,
+  HeaderSearchStatus,
+} from '@/features/search/types';
+import type { RenderOptions } from '@/test/render';
+import type { ComponentProps } from 'react';
 
 import { describe, expect, test, vi } from 'vitest';
 
 import { VIEW_ALL_SEARCH_GROUP } from '@/features/search/utils';
-import { render, screen } from '@/test/render';
+import { render, screen, userEvent } from '@/test/render';
 
 import { SearchCommand } from './search-command';
 import { SearchCommandResults } from './search-command-results';
@@ -32,31 +37,38 @@ const groups: CommandSearchGroup[] = [
   },
 ];
 
-function renderResults({
-  resultGroups = groups,
-  status = 'results' as const,
-}: {
-  resultGroups?: CommandSearchGroup[];
-  status?: 'empty' | 'idle' | 'loading' | 'results';
-} = {}) {
-  const onSelect = vi.fn();
-  const view = render(
-    <SearchCommand groups={resultGroups} onInputValueChange={vi.fn()} value="">
-      <SearchCommandResults
-        groups={resultGroups}
-        onSelect={onSelect}
-        status={status}
-      />
-    </SearchCommand>
-  );
+function setup(
+  props: Partial<ComponentProps<typeof SearchCommandResults>> = {},
+  options?: RenderOptions
+) {
+  const onSelect = props.onSelect ?? vi.fn();
+  const resultGroups = props.groups ?? groups;
+  const status: HeaderSearchStatus = props.status ?? 'results';
 
-  return { ...view, onSelect };
+  return {
+    onSelect,
+    user: userEvent.setup(),
+    ...render(
+      <SearchCommand
+        groups={resultGroups}
+        onInputValueChange={vi.fn()}
+        value=""
+      >
+        <SearchCommandResults
+          groups={resultGroups}
+          onSelect={onSelect}
+          status={status}
+        />
+      </SearchCommand>,
+      options
+    ),
+  };
 }
 
 describe('SearchCommandResults', () => {
   test('shows an empty message only when the status is empty', () => {
-    const { rerender } = renderResults({
-      resultGroups: [],
+    const { rerender } = setup({
+      groups: [],
       status: 'empty',
     });
 
@@ -72,7 +84,7 @@ describe('SearchCommandResults', () => {
   });
 
   test('omits a group label for view all and selects a result', async () => {
-    const { onSelect, user } = renderResults();
+    const { onSelect, user } = setup();
 
     expect(screen.getByText('Talks')).toBeInTheDocument();
     expect(screen.getByText('John Doe')).toBeInTheDocument();
@@ -88,7 +100,7 @@ describe('SearchCommandResults', () => {
   });
 
   test('selects view all results', async () => {
-    const { onSelect, user } = renderResults();
+    const { onSelect, user } = setup();
 
     await user.click(screen.getByRole('option', { name: 'View all results' }));
 

@@ -1,9 +1,11 @@
 import type { Speaker } from '@/features/speakers/types';
+import type { RenderOptions } from '@/test/render';
+import type { ComponentProps } from 'react';
 
 import { describe, test, vi } from 'vitest';
 
 import { expectTracked, expectTrackedTimes } from '@/test/analytics';
-import { render, screen } from '@/test/render';
+import { render, screen, userEvent } from '@/test/render';
 
 import { ShareSpeakerButton } from './share-speaker-button';
 
@@ -14,6 +16,16 @@ const speaker: Pick<Speaker, '_id' | 'firstName' | 'lastName' | 'slug'> = {
   slug: 'john-doe',
 };
 
+function setup(
+  props: Partial<ComponentProps<typeof ShareSpeakerButton>> = {},
+  options?: RenderOptions
+) {
+  return {
+    user: userEvent.setup(),
+    ...render(<ShareSpeakerButton speaker={speaker} {...props} />, options),
+  };
+}
+
 describe('ShareSpeakerButton', () => {
   test('tracks speaker_shared with the share method and speaker props', async () => {
     const share = vi.fn(() => Promise.resolve());
@@ -23,7 +35,7 @@ describe('ShareSpeakerButton', () => {
       writable: true,
     });
 
-    const { user } = render(<ShareSpeakerButton speaker={speaker} />);
+    const { user } = setup();
 
     await user.click(screen.getByRole('button'));
 

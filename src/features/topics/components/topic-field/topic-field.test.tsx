@@ -1,9 +1,11 @@
 import type { TopicId, TopicListItem } from '@/features/topics/types';
+import type { RenderOptions } from '@/test/render';
+import type { ComponentProps } from 'react';
 
 import { useForm } from 'react-hook-form';
 import { describe, expect, test, vi } from 'vitest';
 
-import { render, screen } from '@/test/render';
+import { render, screen, userEvent } from '@/test/render';
 
 import { TopicField } from './topic-field';
 import { TopicFieldInput } from './topic-field-input';
@@ -24,37 +26,67 @@ const topics: TopicListItem[] = [
   },
 ];
 
-const options = [
+const topicOptions = [
   { label: 'Grace', value: graceId },
   { label: 'Zion', value: zionId },
 ];
 
-function TopicFieldForm() {
-  const form = useForm<{ topicIds: TopicId[] }>({
-    defaultValues: { topicIds: [] },
-  });
-
-  return (
-    <form>
-      <TopicField control={form.control} name="topicIds" topics={topics} />
-    </form>
+function setup(
+  props: Partial<ComponentProps<typeof TopicFieldInput>> = {},
+  options?: RenderOptions
+) {
+  return render(
+    <TopicFieldInput
+      fieldName="topicIds"
+      invalid={false}
+      label="Topics"
+      onTopicIdsChange={vi.fn()}
+      options={topicOptions}
+      value={undefined}
+      {...props}
+    />,
+    options
   );
+}
+
+function setupField(
+  props: {
+    description?: string;
+    label?: string;
+    required?: boolean;
+    topics?: TopicListItem[];
+  } = {},
+  options?: RenderOptions
+) {
+  function TopicFieldForm() {
+    const form = useForm<{ topicIds: TopicId[] }>({
+      defaultValues: { topicIds: [] },
+    });
+
+    return (
+      <form>
+        <TopicField
+          control={form.control}
+          name="topicIds"
+          topics={topics}
+          {...props}
+        />
+      </form>
+    );
+  }
+
+  return {
+    user: userEvent.setup(),
+    ...render(<TopicFieldForm />, options),
+  };
 }
 
 describe('TopicFieldInput', () => {
   test('renders the label, description, and required marker', () => {
-    render(
-      <TopicFieldInput
-        description="Pick the themes this talk covers."
-        fieldName="topicIds"
-        invalid={false}
-        label="Topics"
-        onTopicIdsChange={vi.fn()}
-        options={options}
-        required
-        value={undefined}
-      />
-    );
+    setup({
+      description: 'Pick the themes this talk covers.',
+      required: true,
+    });
 
     expect(screen.getByLabelText(/topics/iu)).toBeInTheDocument();
     expect(
@@ -65,17 +97,11 @@ describe('TopicFieldInput', () => {
   });
 
   test('shows a field error and selected topic chips', () => {
-    render(
-      <TopicFieldInput
-        errorMessage="Select at least one topic"
-        fieldName="topicIds"
-        invalid
-        label="Topics"
-        onTopicIdsChange={vi.fn()}
-        options={options}
-        value={[graceId]}
-      />
-    );
+    setup({
+      errorMessage: 'Select at least one topic',
+      invalid: true,
+      value: [graceId],
+    });
 
     expect(screen.getByText('Select at least one topic')).toBeInTheDocument();
     expect(screen.getByLabelText('Grace')).toBeInTheDocument();
@@ -87,7 +113,7 @@ describe('TopicFieldInput', () => {
 
 describe('TopicField', () => {
   test('sorts topics alphabetically in the combobox', async () => {
-    const { user } = render(<TopicFieldForm />);
+    const { user } = setupField();
     const input = screen.getByPlaceholderText('Search topics...');
 
     await user.click(input);
@@ -98,7 +124,7 @@ describe('TopicField', () => {
   });
 
   test('selects a topic and updates the chips', async () => {
-    const { user } = render(<TopicFieldForm />);
+    const { user } = setupField();
 
     await user.click(screen.getByPlaceholderText('Search topics...'));
     await user.click(await screen.findByRole('option', { name: 'Grace' }));

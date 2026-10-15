@@ -1,3 +1,6 @@
+import type { RenderOptions } from '@/test/render';
+import type { ComponentProps } from 'react';
+
 import { describe, test } from 'vitest';
 
 import {
@@ -9,9 +12,19 @@ import { render } from '@/test/render';
 
 import { SearchPageAnalytics } from './search-page-analytics';
 
+function setup(
+  props: Partial<ComponentProps<typeof SearchPageAnalytics>> = {},
+  options?: RenderOptions
+) {
+  return render(
+    <SearchPageAnalytics query="grace" resultCount={4} {...props} />,
+    options
+  );
+}
+
 describe('SearchPageAnalytics', () => {
   test('tracks a settled search on the results page', () => {
-    render(<SearchPageAnalytics query="grace" resultCount={4} />);
+    setup();
 
     expectTrackedTimes(1);
     expectTracked('search_performed', {
@@ -23,7 +36,7 @@ describe('SearchPageAnalytics', () => {
   });
 
   test('also tracks no-results when the query has zero hits', () => {
-    render(<SearchPageAnalytics query="zzzz" resultCount={0} />);
+    setup({ query: 'zzzz', resultCount: 0 });
 
     expectTrackedTimes(2);
     expectTracked('search_performed', {
@@ -40,9 +53,7 @@ describe('SearchPageAnalytics', () => {
   });
 
   test('does not track an empty query change as a new search when counts stay the same', () => {
-    const { rerender } = render(
-      <SearchPageAnalytics query="grace" resultCount={4} />
-    );
+    const { rerender } = setup();
 
     mockedTrack().mockClear();
     rerender(<SearchPageAnalytics query="grace" resultCount={4} />);
