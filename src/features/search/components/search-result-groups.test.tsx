@@ -9,6 +9,7 @@ import {
   expectTrackedTimes,
   it,
   render,
+  screen,
 } from '@/test';
 
 import { SearchResultGroups } from './search-result-groups';
@@ -48,14 +49,14 @@ describe('SearchResultGroups', () => {
   });
 
   it('groups hits and tracks a page result click with its list position', async () => {
-    const { getByRole, getByText, user } = setup();
+    const { user } = setup();
 
-    expect(getByRole('heading', { name: 'Talks' })).toBeInTheDocument();
-    expect(getByRole('heading', { name: 'Topics' })).toBeInTheDocument();
-    expect(getByText('John Doe')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Talks' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Topics' })).toBeInTheDocument();
+    expect(screen.getByText('John Doe')).toBeInTheDocument();
 
-    await user.click(getByRole('link', { name: /romans 8/iu }));
-    await user.click(getByRole('link', { name: 'Grace' }));
+    await user.click(screen.getByRole('link', { name: /romans 8/iu }));
+    await user.click(screen.getByRole('link', { name: 'Grace' }));
 
     expectTrackedTimes(2);
     expectTracked('search_result_selected', {

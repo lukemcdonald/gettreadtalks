@@ -1,7 +1,7 @@
 import type { RenderOptions } from '@/test';
 import type { ComponentProps } from 'react';
 
-import { afterEach, describe, expect, it, render, vi } from '@/test';
+import { afterEach, describe, expect, it, render, screen, vi } from '@/test';
 
 import { ShareButton } from './share-button';
 
@@ -32,9 +32,9 @@ describe('ShareButton', () => {
     const share = vi.fn(() => Promise.resolve());
     stubShare(share);
 
-    const { getByRole, user } = setup({ onShare });
+    const { user } = setup({ onShare });
 
-    await user.click(getByRole('button'));
+    await user.click(screen.getByRole('button'));
 
     expect(share).toHaveBeenCalledWith({
       title: MOCK_TITLE,
@@ -50,9 +50,9 @@ describe('ShareButton', () => {
       .spyOn(navigator.clipboard, 'writeText')
       .mockImplementation(() => Promise.resolve());
 
-    const { getByRole, user } = setup({ onShare });
+    const { user } = setup({ onShare });
 
-    await user.click(getByRole('button'));
+    await user.click(screen.getByRole('button'));
 
     expect(writeText).toHaveBeenCalledWith(window.location.href);
     expect(onShare).toHaveBeenCalledWith('clipboard');
@@ -67,9 +67,9 @@ describe('ShareButton', () => {
     abortError.name = 'AbortError';
     stubShare(vi.fn().mockRejectedValue(abortError));
 
-    const { getByRole, user } = setup({ onShare });
+    const { user } = setup({ onShare });
 
-    await user.click(getByRole('button'));
+    await user.click(screen.getByRole('button'));
 
     expect(onShare).not.toHaveBeenCalled();
     expect(writeText).not.toHaveBeenCalled();

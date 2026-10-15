@@ -5,7 +5,7 @@ import type { RenderOptions } from '@/test';
 import type { ComponentProps, ReactNode } from 'react';
 
 import { useToggleSpeakerFavorited } from '@/features/users/hooks/use-toggle-speaker-favorited';
-import { describe, expect, it, render } from '@/test';
+import { describe, expect, it, render, screen } from '@/test';
 
 import { FavoriteSpeakerButton } from './favorite-speaker-button';
 
@@ -51,8 +51,8 @@ describe('FavoriteSpeakerButton', () => {
 
   it('favorites a speaker that is not saved yet', async () => {
     const toggle = mockToggle({ isFavorited: false });
-    const { getByRole, user } = setup();
-    const button = getByRole('button');
+    const { user } = setup();
+    const button = screen.getByRole('button');
 
     expect(button).toHaveAttribute('aria-pressed', 'false');
 
@@ -63,8 +63,8 @@ describe('FavoriteSpeakerButton', () => {
 
   it('unfavorites a saved speaker', async () => {
     const toggle = mockToggle({ isFavorited: true });
-    const { getByRole, user } = setup();
-    const button = getByRole('button');
+    const { user } = setup();
+    const button = screen.getByRole('button');
 
     expect(button).toHaveAttribute('aria-pressed', 'true');
 

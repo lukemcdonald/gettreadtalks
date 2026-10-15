@@ -9,6 +9,7 @@ import {
   expectTrackedTimes,
   it,
   render,
+  screen,
 } from '@/test';
 
 import { SpeakerMinistryLink } from './speaker-ministry-link';
@@ -35,8 +36,8 @@ describe('SpeakerMinistryLink', () => {
   }
 
   it('links ministry to the website and tracks the click', async () => {
-    const { getByRole, user } = setup();
-    const link = getByRole('link', { name: /sample chapel/iu });
+    const { user } = setup();
+    const link = screen.getByRole('link', { name: /sample chapel/iu });
 
     expect(link).toHaveAttribute('href', MOCK_SPEAKER.websiteUrl);
 
@@ -52,19 +53,17 @@ describe('SpeakerMinistryLink', () => {
   });
 
   it('renders ministry as text when there is no website', () => {
-    const { getByText, queryByRole } = setup({
-      speaker: { ...MOCK_SPEAKER, websiteUrl: undefined },
-    });
+    setup({ speaker: { ...MOCK_SPEAKER, websiteUrl: undefined } });
 
-    expect(getByText('Sample Chapel')).toBeInTheDocument();
-    expect(queryByRole('link')).not.toBeInTheDocument();
+    expect(screen.getByText('Sample Chapel')).toBeInTheDocument();
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 
   it('tracks a website link when ministry is missing', async () => {
-    const { getByRole, user } = setup({
+    const { user } = setup({
       speaker: { ...MOCK_SPEAKER, ministry: undefined },
     });
-    const link = getByRole('link', { name: /website/iu });
+    const link = screen.getByRole('link', { name: /website/iu });
 
     await user.click(link);
 

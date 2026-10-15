@@ -8,6 +8,7 @@ import {
   expectSpreadProps,
   it,
   render,
+  screen,
 } from '@/test';
 
 import { HeaderSearchDesktopTrigger } from './header-search-triggers';
@@ -28,8 +29,9 @@ describe('HeaderSearchDesktopTrigger', () => {
   }
 
   it('forwards extra button props onto the trigger', () => {
-    const { getByRole } = setup(SPREAD_PROPS);
-    const trigger = getByRole('button', { name: 'Search' });
+    setup(SPREAD_PROPS);
+
+    const trigger = screen.getByRole('button', { name: 'Search' });
 
     expect(trigger).toHaveTextContent(MOCK_HOTKEY);
     expectSpreadProps(trigger);

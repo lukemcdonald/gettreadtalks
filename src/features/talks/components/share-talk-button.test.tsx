@@ -9,6 +9,7 @@ import {
   expectTrackedTimes,
   it,
   render,
+  screen,
   vi,
 } from '@/test';
 
@@ -43,9 +44,9 @@ describe('ShareTalkButton', () => {
       writable: true,
     });
 
-    const { getByRole, user } = setup();
+    const { user } = setup();
 
-    await user.click(getByRole('button'));
+    await user.click(screen.getByRole('button'));
 
     expectTrackedTimes(1);
     expectTracked('talk_shared', {
