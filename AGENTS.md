@@ -90,8 +90,8 @@ Page composition and Suspense wrappers that read `params` or `searchParams` stay
 **Overlays**
 
 - Dialog — centered blocking UI (confirm, alert)
-- Sheet — side/bottom panel that is a form or other controlled edit (FormSheet)
-- Drawer — edge panel where swipe-to-dismiss is the product (nav, mobile filters)
+- Sheet — side/bottom panel that is a non-nested modal overlay
+- Drawer — edge panel where swipe-to-dismiss is the product (nav, mobile filters, nested FormSheet)
 
 **Naming:** kebab-case for all `src/` folders
 

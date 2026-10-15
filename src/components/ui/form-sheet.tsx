@@ -3,17 +3,18 @@
 import type { FormEventHandler, ReactNode } from 'react';
 import type { FieldError, FieldErrors, FieldValues } from 'react-hook-form';
 
+import { useMediaQuery } from '@/hooks/use-media-query';
+
 import { FormError } from './form/form-error';
 import { Button } from './primitives/button';
 import {
-  Sheet,
-  SheetFooter,
-  SheetHeader,
-  SheetPanel,
-  SheetPopup,
-  SheetTitle,
-} from './primitives/sheet';
-import { SheetStack, useSheetLayer, useSheetStack } from './sheet-stack';
+  Drawer,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerPanel,
+  DrawerPopup,
+  DrawerTitle,
+} from './primitives/drawer';
 
 interface FormSheetProps {
   children: ReactNode;
@@ -26,21 +27,7 @@ interface FormSheetProps {
   title: string;
 }
 
-export function FormSheet(props: FormSheetProps) {
-  const stack = useSheetStack();
-
-  if (stack) {
-    return <FormSheetInner {...props} />;
-  }
-
-  return (
-    <SheetStack>
-      <FormSheetInner {...props} />
-    </SheetStack>
-  );
-}
-
-function FormSheetInner({
+export function FormSheet({
   children,
   error,
   isPending,
@@ -50,25 +37,29 @@ function FormSheetInner({
   submitLabel,
   title,
 }: FormSheetProps) {
-  const layer = useSheetLayer(open, () => onOpenChange(false));
+  const isDesktop = useMediaQuery('lg');
 
   return (
-    <Sheet onOpenChange={onOpenChange} open={open}>
-      <SheetPopup data-sheet-layer-id={layer.id} side="right">
-        <SheetHeader>
-          <SheetTitle>{title}</SheetTitle>
-        </SheetHeader>
+    <Drawer
+      onOpenChange={onOpenChange}
+      open={open}
+      position={isDesktop ? 'right' : 'bottom'}
+    >
+      <DrawerPopup showBar showCloseButton variant="default">
+        <DrawerHeader>
+          <DrawerTitle>{title}</DrawerTitle>
+        </DrawerHeader>
 
         <form
           className="grid min-h-0 flex-1 grid-rows-[1fr_auto]"
           onSubmit={onSubmit}
         >
-          <SheetPanel>
+          <DrawerPanel>
             <FormError error={error} />
             {children}
-          </SheetPanel>
+          </DrawerPanel>
 
-          <SheetFooter>
+          <DrawerFooter>
             <Button
               disabled={isPending}
               onClick={() => onOpenChange(false)}
@@ -80,9 +71,9 @@ function FormSheetInner({
             <Button loading={isPending} type="submit">
               {submitLabel}
             </Button>
-          </SheetFooter>
+          </DrawerFooter>
         </form>
-      </SheetPopup>
-    </Sheet>
+      </DrawerPopup>
+    </Drawer>
   );
 }
