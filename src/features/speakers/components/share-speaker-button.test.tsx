@@ -41,9 +41,9 @@ describe('ShareSpeakerButton', () => {
       writable: true,
     });
 
-    const { user } = setup();
+    const { click } = setup();
 
-    await user.click(screen.getByRole('button'));
+    await click(screen.getByRole('button'));
 
     expectTrackedTimes(1);
     expectTracked('speaker_shared', {

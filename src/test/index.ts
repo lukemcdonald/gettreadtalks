@@ -37,10 +37,10 @@ export function render(
   ui: ReactElement,
   { userEvent: userEventOptions, ...options }: RenderOptions = {}
 ) {
-  return {
-    ...rtlRender(ui, { ...options, wrapper: Providers }),
-    user: userEvent.setup(userEventOptions),
-  };
+  const result = rtlRender(ui, { ...options, wrapper: Providers });
+  const user = userEvent.setup(userEventOptions);
+
+  return { ...result, ...user };
 }
 
 export function expectSpreadProps(element: HTMLElement) {

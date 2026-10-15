@@ -32,9 +32,9 @@ describe('ShareButton', () => {
     const share = vi.fn(() => Promise.resolve());
     stubShare(share);
 
-    const { user } = setup({ onShare });
+    const { click } = setup({ onShare });
 
-    await user.click(screen.getByRole('button'));
+    await click(screen.getByRole('button'));
 
     expect(share).toHaveBeenCalledWith({
       title: MOCK_TITLE,
@@ -50,9 +50,9 @@ describe('ShareButton', () => {
       .spyOn(navigator.clipboard, 'writeText')
       .mockImplementation(() => Promise.resolve());
 
-    const { user } = setup({ onShare });
+    const { click } = setup({ onShare });
 
-    await user.click(screen.getByRole('button'));
+    await click(screen.getByRole('button'));
 
     expect(writeText).toHaveBeenCalledWith(window.location.href);
     expect(onShare).toHaveBeenCalledWith('clipboard');
@@ -67,9 +67,9 @@ describe('ShareButton', () => {
     abortError.name = 'AbortError';
     stubShare(vi.fn().mockRejectedValue(abortError));
 
-    const { user } = setup({ onShare });
+    const { click } = setup({ onShare });
 
-    await user.click(screen.getByRole('button'));
+    await click(screen.getByRole('button'));
 
     expect(onShare).not.toHaveBeenCalled();
     expect(writeText).not.toHaveBeenCalled();

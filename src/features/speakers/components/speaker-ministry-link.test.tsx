@@ -36,12 +36,12 @@ describe('SpeakerMinistryLink', () => {
   }
 
   it('links ministry to the website and tracks the click', async () => {
-    const { user } = setup();
+    const { click } = setup();
     const link = screen.getByRole('link', { name: /sample chapel/iu });
 
     expect(link).toHaveAttribute('href', MOCK_SPEAKER.websiteUrl);
 
-    await user.click(link);
+    await click(link);
 
     expectTrackedTimes(1);
     expectTracked('speaker_link_clicked', {
@@ -60,12 +60,12 @@ describe('SpeakerMinistryLink', () => {
   });
 
   it('tracks a website link when ministry is missing', async () => {
-    const { user } = setup({
+    const { click } = setup({
       speaker: { ...MOCK_SPEAKER, ministry: undefined },
     });
     const link = screen.getByRole('link', { name: /website/iu });
 
-    await user.click(link);
+    await click(link);
 
     expectTracked('speaker_link_clicked', {
       link_type: 'website',

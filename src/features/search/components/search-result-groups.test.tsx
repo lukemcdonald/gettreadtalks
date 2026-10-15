@@ -49,14 +49,14 @@ describe('SearchResultGroups', () => {
   });
 
   it('groups hits and tracks a page result click with its list position', async () => {
-    const { user } = setup();
+    const { click } = setup();
 
     expect(screen.getByRole('heading', { name: 'Talks' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Topics' })).toBeInTheDocument();
     expect(screen.getByText('John Doe')).toBeInTheDocument();
 
-    await user.click(screen.getByRole('link', { name: /romans 8/iu }));
-    await user.click(screen.getByRole('link', { name: 'Grace' }));
+    await click(screen.getByRole('link', { name: /romans 8/iu }));
+    await click(screen.getByRole('link', { name: 'Grace' }));
 
     expectTrackedTimes(2);
     expectTracked('search_result_selected', {

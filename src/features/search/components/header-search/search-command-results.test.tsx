@@ -81,7 +81,7 @@ describe('SearchCommandResults', () => {
   });
 
   it('omits a group label for view all and selects a result', async () => {
-    const { onSelect, user } = setup();
+    const { click, onSelect } = setup();
 
     expect(screen.getByText('Talks')).toBeInTheDocument();
     expect(screen.getByText('John Doe')).toBeInTheDocument();
@@ -90,16 +90,16 @@ describe('SearchCommandResults', () => {
       screen.getByRole('option', { name: 'View all results' })
     ).toBeInTheDocument();
 
-    await user.click(screen.getByRole('option', { name: /romans 8/iu }));
+    await click(screen.getByRole('option', { name: /romans 8/iu }));
 
     expect(onSelect).toHaveBeenCalledTimes(1);
     expect(onSelect).toHaveBeenCalledWith(MOCK_GROUPS[0]?.items[0]);
   });
 
   it('selects view all results', async () => {
-    const { onSelect, user } = setup();
+    const { click, onSelect } = setup();
 
-    await user.click(screen.getByRole('option', { name: 'View all results' }));
+    await click(screen.getByRole('option', { name: 'View all results' }));
 
     expect(onSelect).toHaveBeenCalledWith(MOCK_GROUPS[1]?.items[0]);
   });

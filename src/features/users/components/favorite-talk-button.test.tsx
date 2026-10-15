@@ -48,12 +48,12 @@ describe('FavoriteTalkButton', () => {
 
   it('favorites a talk that is not saved yet', async () => {
     const toggle = mockToggle({ isFavorited: false });
-    const { user } = setup();
+    const { click } = setup();
     const button = screen.getByTestId('favorite-talk');
 
     expect(button).toHaveAttribute('aria-pressed', 'false');
 
-    await user.click(button);
+    await click(button);
 
     expect(toggle).toHaveBeenCalledTimes(1);
   });

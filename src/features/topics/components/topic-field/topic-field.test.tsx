@@ -107,10 +107,10 @@ describe('TopicField', () => {
   }
 
   it('sorts topics alphabetically in the combobox', async () => {
-    const { user } = setup();
+    const { click } = setup();
     const input = screen.getByPlaceholderText('Search topics...');
 
-    await user.click(input);
+    await click(input);
 
     const items = await screen.findAllByRole('option');
 
@@ -118,10 +118,10 @@ describe('TopicField', () => {
   });
 
   it('selects a topic and updates the chips', async () => {
-    const { user } = setup();
+    const { click } = setup();
 
-    await user.click(screen.getByPlaceholderText('Search topics...'));
-    await user.click(await screen.findByRole('option', { name: 'Grace' }));
+    await click(screen.getByPlaceholderText('Search topics...'));
+    await click(await screen.findByRole('option', { name: 'Grace' }));
 
     expect(screen.getByLabelText('Grace')).toBeInTheDocument();
     expect(
