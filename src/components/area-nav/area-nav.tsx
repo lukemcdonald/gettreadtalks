@@ -1,15 +1,40 @@
 'use client';
 
+import type { LucideIcon } from 'lucide-react';
 import type { Route } from 'next';
 
+import {
+  CheckCircle2Icon,
+  FilmIcon,
+  FolderIcon,
+  HeartIcon,
+  MicIcon,
+  SettingsIcon,
+  TagIcon,
+  UsersIcon,
+} from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 
 import { Link } from '@/components/ui/link';
 import { cn } from '@/utils';
 
+const AREA_NAV_ICONS = {
+  clips: FilmIcon,
+  collections: FolderIcon,
+  favorites: HeartIcon,
+  finished: CheckCircle2Icon,
+  settings: SettingsIcon,
+  speakers: UsersIcon,
+  talks: MicIcon,
+  topics: TagIcon,
+} as const satisfies Record<string, LucideIcon>;
+
+export type AreaNavIcon = keyof typeof AREA_NAV_ICONS;
+
 export interface AreaNavItem {
   href: Route;
+  icon: AreaNavIcon;
   label: string;
 }
 
@@ -17,6 +42,17 @@ interface AreaNavProps {
   items: AreaNavItem[];
   label: string;
   variant: 'sidebar' | 'tabs';
+}
+
+function AreaNavGlyph({ name }: { name: AreaNavIcon }) {
+  const Icon = AREA_NAV_ICONS[name];
+
+  return (
+    <Icon
+      aria-hidden="true"
+      className="text-muted-foreground size-4 shrink-0"
+    />
+  );
 }
 
 export function AreaNav({ items, label, variant }: AreaNavProps) {
@@ -47,7 +83,7 @@ export function AreaNav({ items, label, variant }: AreaNavProps) {
         <h2 className="text-muted-foreground mb-3 text-xs font-semibold tracking-wider uppercase">
           {label}
         </h2>
-        <ul className="flex flex-col gap-1">
+        <ul className="-mx-3 flex flex-col gap-1">
           {items.map((item) => {
             const isActive = item.href === pathname;
 
@@ -56,7 +92,7 @@ export function AreaNav({ items, label, variant }: AreaNavProps) {
                 <Link
                   aria-current={isActive ? 'page' : undefined}
                   className={cn(
-                    'block rounded-md px-3 py-1.5 text-sm font-medium outline-none',
+                    'flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium outline-none',
                     'focus-visible:ring-ring focus-visible:ring-offset-background focus-visible:ring-2 focus-visible:ring-offset-1',
                     isActive
                       ? 'bg-muted text-foreground'
@@ -64,6 +100,7 @@ export function AreaNav({ items, label, variant }: AreaNavProps) {
                   )}
                   href={item.href}
                 >
+                  <AreaNavGlyph name={item.icon} />
                   {item.label}
                 </Link>
               </li>
@@ -85,7 +122,7 @@ export function AreaNav({ items, label, variant }: AreaNavProps) {
               <Link
                 aria-current={isActive ? 'page' : undefined}
                 className={cn(
-                  'relative inline-flex items-center px-3 py-2 text-sm font-medium whitespace-nowrap',
+                  'relative inline-flex items-center gap-2 px-3 py-2 text-sm font-medium whitespace-nowrap',
                   isActive
                     ? 'text-foreground after:bg-primary after:absolute after:inset-x-0 after:bottom-0 after:h-0.5'
                     : 'text-muted-foreground hover:text-foreground'
@@ -93,6 +130,7 @@ export function AreaNav({ items, label, variant }: AreaNavProps) {
                 href={item.href}
                 ref={isActive ? activeRef : undefined}
               >
+                <AreaNavGlyph name={item.icon} />
                 {item.label}
               </Link>
             </li>

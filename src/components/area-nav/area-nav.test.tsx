@@ -1,5 +1,6 @@
 /// <reference types="vitest/globals" />
 
+import type { AreaNavItem } from './area-nav';
 import type { RenderOptions } from '@/test';
 
 import { describe, expect, it, render, screen } from '@/test';
@@ -15,10 +16,10 @@ vi.mock('next/navigation', () => ({
 }));
 
 describe('AreaNav', () => {
-  const ITEMS = [
-    { href: '/account', label: 'Settings' },
-    { href: '/account/favorites', label: 'Favorites' },
-    { href: '/account/finished', label: 'Finished' },
+  const ITEMS: AreaNavItem[] = [
+    { href: '/account', icon: 'settings', label: 'Settings' },
+    { href: '/account/favorites', icon: 'favorites', label: 'Favorites' },
+    { href: '/account/finished', icon: 'finished', label: 'Finished' },
   ];
 
   function setup(
@@ -39,7 +40,7 @@ describe('AreaNav', () => {
       setup('/account', variant);
 
       expect(
-        screen.getAllByRole('link').map((link) => link.textContent)
+        screen.getAllByRole('link').map((link) => link.textContent?.trim())
       ).toEqual(['Settings', 'Favorites', 'Finished']);
     });
 
