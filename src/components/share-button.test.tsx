@@ -12,11 +12,11 @@ function stubShare(share?: () => Promise<void>) {
   });
 }
 
-afterEach(() => {
-  Reflect.deleteProperty(navigator, 'share');
-});
-
 describe('ShareButton', () => {
+  afterEach(() => {
+    Reflect.deleteProperty(navigator, 'share');
+  });
+
   test('uses the share API when it is available', async () => {
     const onShare = vi.fn();
     const share = vi.fn(() => Promise.resolve());
