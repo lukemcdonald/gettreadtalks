@@ -7,7 +7,7 @@ import { describe, expect, it, render, screen } from '@/test';
 import { AreaNav } from './area-nav';
 
 const { usePathname } = vi.hoisted(() => ({
-  usePathname: vi.fn(() => '/account/favorites'),
+  usePathname: vi.fn(() => '/account'),
 }));
 
 vi.mock('next/navigation', () => ({
@@ -16,13 +16,13 @@ vi.mock('next/navigation', () => ({
 
 describe('AreaNav', () => {
   const ITEMS = [
+    { href: '/account', label: 'Settings' },
     { href: '/account/favorites', label: 'Favorites' },
     { href: '/account/finished', label: 'Finished' },
-    { href: '/account', label: 'Settings' },
   ];
 
   function setup(
-    pathname = '/account/favorites',
+    pathname = '/account',
     variant: 'sidebar' | 'tabs' = 'tabs',
     options?: RenderOptions
   ) {
@@ -35,6 +35,14 @@ describe('AreaNav', () => {
   }
 
   describe.each(['sidebar', 'tabs'] as const)('variant %s', (variant) => {
+    it('renders items in the given order', () => {
+      setup('/account', variant);
+
+      expect(
+        screen.getAllByRole('link').map((link) => link.textContent)
+      ).toEqual(['Settings', 'Favorites', 'Finished']);
+    });
+
     it('marks the matching item as the current page', () => {
       setup('/account/finished', variant);
 
@@ -61,5 +69,13 @@ describe('AreaNav', () => {
         screen.getByRole('link', { name: 'Settings' })
       ).not.toHaveAttribute('aria-current');
     });
+  });
+
+  it('shows the area heading in the sidebar', () => {
+    setup('/account', 'sidebar');
+
+    expect(
+      screen.getByRole('heading', { name: 'Account' })
+    ).toBeInTheDocument();
   });
 });

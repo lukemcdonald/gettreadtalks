@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 
 import { AreaNav } from '@/components/area-nav';
 import { PageContainer } from '@/components/page-container';
-import { Container, Section } from '@/components/ui';
+import { Section } from '@/components/ui';
 
 interface AreaLayoutProps {
   children: ReactNode;
@@ -14,21 +14,19 @@ interface AreaLayoutProps {
 export function AreaLayout({ children, items, label }: AreaLayoutProps) {
   return (
     <Section spacing="lg">
-      <Container>
-        <div className="grid grid-cols-1 gap-x-8 gap-y-6 lg:grid-cols-12">
-          <aside className="hidden lg:sticky lg:top-20 lg:col-span-3 lg:block lg:h-fit">
-            <AreaNav items={items} label={label} variant="sidebar" />
-          </aside>
-          <div className="min-w-0 lg:col-span-9">
-            <PageContainer>
-              <div className="mb-6 lg:hidden">
-                <AreaNav items={items} label={label} variant="tabs" />
-              </div>
-              <div className="space-y-6">{children}</div>
-            </PageContainer>
+      <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 lg:flex-row lg:gap-8">
+        <aside className="hidden w-52 shrink-0 lg:sticky lg:top-20 lg:block lg:h-fit">
+          <AreaNav items={items} label={label} variant="sidebar" />
+        </aside>
+        <div className="min-w-0 flex-1">
+          <div className="mb-6 lg:hidden">
+            <AreaNav items={items} label={label} variant="tabs" />
           </div>
+          <PageContainer>
+            <div className="space-y-6">{children}</div>
+          </PageContainer>
         </div>
-      </Container>
+      </div>
     </Section>
   );
 }

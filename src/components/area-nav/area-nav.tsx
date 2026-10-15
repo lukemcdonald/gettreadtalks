@@ -43,24 +43,33 @@ export function AreaNav({ items, label, variant }: AreaNavProps) {
 
   if (variant === 'sidebar') {
     return (
-      <nav aria-label={label} className="flex flex-col gap-2">
-        {items.map((item) => {
-          const isActive = item.href === pathname;
+      <nav aria-label={label} className="flex flex-col">
+        <h2 className="text-muted-foreground mb-3 text-xs font-semibold tracking-wider uppercase">
+          {label}
+        </h2>
+        <ul className="flex flex-col gap-1">
+          {items.map((item) => {
+            const isActive = item.href === pathname;
 
-          return (
-            <Link
-              aria-current={isActive ? 'page' : undefined}
-              className={cn(
-                'hover:text-foreground flex items-center gap-2 font-medium',
-                isActive ? 'text-foreground' : 'text-muted-foreground'
-              )}
-              href={item.href}
-              key={item.href}
-            >
-              {item.label}
-            </Link>
-          );
-        })}
+            return (
+              <li key={item.href}>
+                <Link
+                  aria-current={isActive ? 'page' : undefined}
+                  className={cn(
+                    'block rounded-md px-3 py-1.5 text-sm font-medium outline-none',
+                    'focus-visible:ring-ring focus-visible:ring-offset-background focus-visible:ring-2 focus-visible:ring-offset-1',
+                    isActive
+                      ? 'bg-muted text-foreground'
+                      : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground'
+                  )}
+                  href={item.href}
+                >
+                  {item.label}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
       </nav>
     );
   }
