@@ -1,17 +1,18 @@
-import { captureRouterTransitionStart, init } from '@sentry/nextjs';
-import * as Sentry from '@sentry/nextjs';
-
-import { baseSentryConfig, IS_SENTRY_ENABLED } from '@/configs/sentry';
-import { IS_DEV } from '@/constants/env';
+import { IS_SENTRY_ENABLED } from '@/configs/sentry';
+import {
+  getClientSentry,
+  installClientSentryBuffer,
+  scheduleClientSentryLoad,
+} from '@/configs/sentry/load-client';
 
 if (IS_SENTRY_ENABLED) {
-  init(baseSentryConfig);
-
-  if (IS_DEV && typeof window !== 'undefined') {
-    (window as unknown as { Sentry?: typeof Sentry }).Sentry = Sentry;
-  }
+  installClientSentryBuffer();
+  scheduleClientSentryLoad();
 }
 
-export const onRouterTransitionStart = IS_SENTRY_ENABLED
-  ? captureRouterTransitionStart
-  : () => {};
+export function onRouterTransitionStart(
+  url: string,
+  navigationType: string
+): void {
+  getClientSentry()?.captureRouterTransitionStart(url, navigationType);
+}
