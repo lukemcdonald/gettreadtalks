@@ -35,6 +35,31 @@ describe('MobileNav', () => {
     return render(<MobileNav />, options);
   }
 
+  it('shows account destinations for signed-in users', async () => {
+    const { click } = setup(createUser('user'));
+
+    await click(screen.getByRole('button', { name: 'Open navigation menu' }));
+
+    expect(screen.getByText('Signed in as')).toBeInTheDocument();
+    expect(screen.getByText('user@example.com')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Favorites' })).toHaveAttribute(
+      'href',
+      '/account/favorites'
+    );
+    expect(screen.getByRole('button', { name: 'Finished' })).toHaveAttribute(
+      'href',
+      '/account/finished'
+    );
+    expect(screen.getByRole('button', { name: 'Settings' })).toHaveAttribute(
+      'href',
+      '/account'
+    );
+    expect(screen.getByRole('button', { name: 'Sign out' })).toHaveAttribute(
+      'href',
+      '/logout'
+    );
+  });
+
   it('shows Manage for admins', async () => {
     const { click } = setup(createUser('admin'));
 
@@ -54,9 +79,5 @@ describe('MobileNav', () => {
     expect(
       screen.queryByRole('button', { name: 'Manage' })
     ).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Test User' })).toHaveAttribute(
-      'href',
-      '/account'
-    );
   });
 });

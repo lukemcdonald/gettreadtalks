@@ -4,10 +4,13 @@ import type { Route } from 'next';
 import type { ComponentType, SVGProps } from 'react';
 
 import {
+  CheckCircle2 as FinishedIcon,
+  Heart as FavoritesIcon,
   LayoutDashboard as ManageIcon,
   LogIn as SignInIcon,
   LogOut as SignOutIcon,
   Menu as MenuIcon,
+  Settings as SettingsIcon,
   X as XIcon,
 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
@@ -31,11 +34,15 @@ import {
   DrawerTrigger,
 } from '@/components/ui';
 import { Link } from '@/components/ui/link';
-import { UserAvatar } from '@/components/user-avatar';
 import { useCurrentUser } from '@/features/users/hooks/use-current-user';
 import { ACCOUNT_PATH, MANAGE_PATH } from '@/lib/entities/paths';
 import { isAdmin } from '@/services/auth/utils';
 import { cn } from '@/utils';
+
+const ACCOUNT_LINKS = [
+  { href: '/account/favorites', icon: FavoritesIcon, label: 'Favorites' },
+  { href: '/account/finished', icon: FinishedIcon, label: 'Finished' },
+] as const;
 
 interface MobileNavProps {
   className?: string;
@@ -76,7 +83,6 @@ export function MobileNav({ className }: MobileNavProps) {
   const { data: user, isLoading } = useCurrentUser();
   const pathname = usePathname();
   const showManageLink = isAdmin(user);
-  const displayName = user?.name ?? user?.email;
 
   return (
     <Drawer position="right">
@@ -132,29 +138,30 @@ export function MobileNav({ className }: MobileNavProps) {
                   <DrawerMenuGroupLabel>Account</DrawerMenuGroupLabel>
                   {user ? (
                     <>
-                      <DrawerClose
-                        nativeButton={false}
-                        render={
-                          <DrawerMenuItem
-                            className={cn(
-                              pathname === ACCOUNT_PATH && 'text-primary'
-                            )}
-                            render={
-                              <Link
-                                aria-current={
-                                  pathname === ACCOUNT_PATH ? 'page' : undefined
-                                }
-                                href={ACCOUNT_PATH}
-                              />
-                            }
-                          />
-                        }
-                      >
-                        <span aria-hidden="true">
-                          <UserAvatar className="size-8" user={user} />
+                      <div className="flex flex-col px-2 py-1.5">
+                        <span className="text-muted-foreground text-xs">
+                          Signed in as
                         </span>
-                        {displayName}
-                      </DrawerClose>
+                        <span className="text-foreground truncate text-sm font-semibold">
+                          {user.email}
+                        </span>
+                      </div>
+                      {ACCOUNT_LINKS.map((link) => (
+                        <MobileNavMenuLink
+                          href={link.href}
+                          icon={link.icon}
+                          isActive={pathname === link.href}
+                          key={link.href}
+                          label={link.label}
+                        />
+                      ))}
+                      <DrawerMenuSeparator />
+                      <MobileNavMenuLink
+                        href={ACCOUNT_PATH}
+                        icon={SettingsIcon}
+                        isActive={pathname === ACCOUNT_PATH}
+                        label="Settings"
+                      />
                       {!!showManageLink && (
                         <MobileNavMenuLink
                           href={MANAGE_PATH}

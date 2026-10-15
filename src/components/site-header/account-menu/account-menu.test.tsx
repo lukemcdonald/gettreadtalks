@@ -35,6 +35,31 @@ describe('AccountMenu', () => {
     return render(<AccountMenu initialUser={user} />, options);
   }
 
+  it('shows account destinations for signed-in users', async () => {
+    const { click } = setup(createUser('user'));
+
+    await click(screen.getByTestId('account-menu'));
+
+    expect(screen.getByText('Signed in as')).toBeInTheDocument();
+    expect(screen.getByText('user@example.com')).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'Favorites' })).toHaveAttribute(
+      'href',
+      '/account/favorites'
+    );
+    expect(screen.getByRole('menuitem', { name: 'Finished' })).toHaveAttribute(
+      'href',
+      '/account/finished'
+    );
+    expect(screen.getByRole('menuitem', { name: 'Settings' })).toHaveAttribute(
+      'href',
+      '/account'
+    );
+    expect(screen.getByRole('menuitem', { name: 'Sign out' })).toHaveAttribute(
+      'href',
+      '/logout'
+    );
+  });
+
   it('shows Manage for admins', async () => {
     const { click } = setup(createUser('admin'));
 
@@ -54,9 +79,5 @@ describe('AccountMenu', () => {
     expect(
       screen.queryByRole('menuitem', { name: 'Manage' })
     ).not.toBeInTheDocument();
-    expect(screen.getByRole('menuitem', { name: 'Test User' })).toHaveAttribute(
-      'href',
-      '/account'
-    );
   });
 });
