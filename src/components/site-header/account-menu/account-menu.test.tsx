@@ -40,7 +40,7 @@ describe('AccountMenu', () => {
 
     await click(screen.getByTestId('account-menu'));
 
-    expect(screen.getByText('Signed in as')).toBeInTheDocument();
+    expect(screen.queryByText('Signed in as')).not.toBeInTheDocument();
     expect(screen.getByText('user@example.com')).toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: 'Favorites' })).toHaveAttribute(
       'href',

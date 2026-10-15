@@ -1,20 +1,21 @@
 'use client';
 
 import type { User } from '@/services/auth/types';
-import type { Route } from 'next';
 
 import {
   ArrowRight as ArrowRightIcon,
-  CheckCircle2 as FinishedIcon,
   CircleUser as UserIcon,
-  Heart as FavoritesIcon,
-  LayoutDashboard as ManageIcon,
   LogOut as SignOutIcon,
-  Settings as SettingsIcon,
 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
+import { AccountAvatar } from '@/components/site-header/account-menu/account-avatar';
+import { AccountIdentity } from '@/components/site-header/account-menu/account-identity';
 import { AccountMenuItem } from '@/components/site-header/account-menu/account-menu-item';
+import {
+  ACCOUNT_MENU_SIGN_OUT_HREF,
+  getAccountMenuLinks,
+} from '@/components/site-header/account-menu/account-menu-links';
 import { NavLink } from '@/components/site-header/navigation/nav-link';
 import {
   Button,
@@ -25,7 +26,6 @@ import {
 } from '@/components/ui';
 import { Link } from '@/components/ui/link';
 import { useCurrentUser } from '@/features/users/hooks/use-current-user';
-import { ACCOUNT_PATH, MANAGE_PATH } from '@/lib/entities/paths';
 import { isAdmin } from '@/services/auth/utils';
 
 interface AccountMenuProps {
@@ -80,42 +80,23 @@ export function AccountMenu({ initialUser }: AccountMenuProps) {
           />
         }
       >
-        <UserIcon className="size-6" />
+        <AccountAvatar user={user} />
       </MenuTrigger>
       <MenuPopup className="w-60">
-        <div className="flex flex-col px-3 pt-2 pb-1">
-          <span className="text-muted-foreground text-xs">Signed in as</span>
-          <span className="text-foreground truncate text-sm font-semibold">
-            {user.email}
-          </span>
-        </div>
+        <AccountIdentity className="px-3" user={user} />
         <MenuSeparator />
-        <AccountMenuItem
-          href="/account/favorites"
-          icon={FavoritesIcon}
-          label="Favorites"
-        />
-        <AccountMenuItem
-          href="/account/finished"
-          icon={FinishedIcon}
-          label="Finished"
-        />
-        <MenuSeparator />
-        <AccountMenuItem
-          href={ACCOUNT_PATH}
-          icon={SettingsIcon}
-          label="Settings"
-        />
-        {!!showManageLink && (
+        {getAccountMenuLinks(showManageLink).map((link) => (
           <AccountMenuItem
-            href={MANAGE_PATH}
-            icon={ManageIcon}
-            label="Manage"
+            href={link.href}
+            icon={link.icon}
+            key={link.href}
+            label={link.label}
           />
-        )}
+        ))}
         <AccountMenuItem
+          className="text-muted-foreground"
           data-testid="sign-out"
-          href={'/logout' as Route}
+          href={ACCOUNT_MENU_SIGN_OUT_HREF}
           icon={SignOutIcon}
           label="Sign out"
         />
