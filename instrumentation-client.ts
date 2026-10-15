@@ -1,13 +1,8 @@
 import { IS_SENTRY_ENABLED } from '@/configs/sentry';
-import {
-  getClientSentry,
-  installClientSentryBuffer,
-  scheduleClientSentryLoad,
-} from '@/configs/sentry/load-client';
+import { getClientSentry, startClientSentry } from '@/configs/sentry/client';
 
 if (IS_SENTRY_ENABLED) {
-  installClientSentryBuffer();
-  scheduleClientSentryLoad();
+  startClientSentry();
 }
 
 export function onRouterTransitionStart(
