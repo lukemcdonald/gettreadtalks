@@ -11,13 +11,21 @@ import { useMutation as useConvexMutation } from 'convex/react';
 import { useState } from 'react';
 
 import { captureException } from '@/services/errors';
-import { getErrorMessage, getSentryConfig } from '@/services/errors/convex';
+import { getSentryConfig } from '@/services/errors/convex';
 
 const DEFAULT_STATE: MutationState = {
   data: null,
   error: null,
   status: 'idle' as MutationStatus,
 };
+
+function toError(error: unknown): Error {
+  if (typeof error === 'string') {
+    return new Error(error);
+  }
+
+  return new Error('Unknown error');
+}
 
 export interface UseMutationOptions {
   onError?: (error: Error) => void;
@@ -54,8 +62,7 @@ export function useMutation<Mutation extends FunctionReference<'mutation'>>(
 
       return result;
     } catch (error) {
-      const errorObj =
-        error instanceof Error ? error : new Error(getErrorMessage(error));
+      const errorObj = error instanceof Error ? error : toError(error);
 
       setState({
         data: null,

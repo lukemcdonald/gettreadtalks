@@ -34,7 +34,7 @@ import {
   hasCaptchaToken,
   isTurnstileRequired,
 } from '@/services/auth/config';
-import { captureException } from '@/services/errors';
+import { captureException, toUserErrorMessage } from '@/services/errors';
 import { getSafeRedirect } from '@/utils';
 
 const registerFormSchema = z.object({
@@ -100,7 +100,10 @@ export function RegisterForm({
 
     resetCaptchaIfNeeded(captchaRequired, setCaptchaResetKey, setCaptchaToken);
     form.setError('root', {
-      message: result.error?.message ?? AUTH_ERRORS.REGISTRATION_FAILED,
+      message: toUserErrorMessage(
+        result.error?.message,
+        AUTH_ERRORS.REGISTRATION_FAILED
+      ),
     });
   });
 

@@ -8,6 +8,7 @@ Greenfield project — no users, no back-compat concerns. Make it right.
 - Before marking any task complete: run `pnpm style` and `pnpm typecheck`
 - After meaningful TypeScript or JavaScript changes, run `pnpm run audit:code`
 - Before opening a PR, run `pnpm check`, `pnpm typecheck`, `pnpm test`, and `pnpm exec fallow audit --base origin/main`
+- Never push to `main`
 - Never run `pnpm dev` unless instructed
 - Never run `pnpm release` or `convex deploy` unless instructed — production Convex deploys from the Vercel production build
 - When testing local URLs, always use `https`
@@ -17,7 +18,7 @@ Use the Fallow skill for deeper audit and debug workflows.
 ## Testing
 
 - Test behavior, not implementation. Add a test only if it would catch a real regression; a bug fix gets a test that fails without the fix.
-- Use the lowest layer that proves it: pure logic with Vitest (`*.test.ts`), Convex functions with `convex-test` (`convex/**/*.test.ts` under edge-runtime), interactive components with Vitest + RTL, and critical journeys with Playwright (`e2e/*.spec.ts`) on a seeded preview. `pnpm test` runs Vitest.
+- Use the lowest layer that proves it: pure logic with Vitest (`*.test.ts`), Convex functions with `convex-test` (`convex/**/*.test.ts` under edge-runtime), interactive components with Vitest + RTL (happy-dom), and critical journeys with Playwright (`e2e/*.spec.ts`) on a seeded preview. `pnpm test` runs Vitest.
 - Never read source or match code strings, snapshot markup, mock Convex or Next internals, test the framework, or duplicate another layer's coverage.
 - Query UI by role, label, or text. Keep tests independent and deterministic, and seed their own data.
 - Components that emit analytics get a component test that mocks `@/services/analytics` and asserts `track`'s call count, event name, and properties, using shared helpers (create them with the first test). E2E tests cover workflows and data, not events.
@@ -38,6 +39,8 @@ JSDoc only when adding context beyond the function name (1–2 lines max). Skip 
 Always use the **gettreadtalks.com** project (`441dc110-d73c-46cb-b395-1c762d7e2958`) when searching, creating, or updating Linear issues for this codebase.
 
 ## Rules
+
+Never show env var names, stack traces, raw internal `error.message`, or config details in user-facing UI. Report those to Sentry with `reportUnexpectedError` and show a plain, friendly message. Keep the details in development/console.
 
 ## Architecture
 
@@ -82,23 +85,13 @@ src/features/{domain}/
 
 Page composition and Suspense wrappers that read `params` or `searchParams` stay in `src/app/{route}/_components`. Presentational, URL-agnostic pieces go in `src/features/{domain}/components`. Move to the feature folder only when a second route needs it.
 
-**UI Primitives:** Files in `src/components/ui/primitives/` are vendor components — never edit directly. Create wrappers in `src/components/ui/`.
-
-**UI imports** — always import from `@/components/ui`, never from primitive paths directly:
-
-```typescript
-// ✅ Always use the barrel
-import { Button, Card, TextField } from '@/components/ui';
-// ❌ Never import primitives directly in feature/page code
-import { Button } from '@/components/ui/primitives/button';
-```
+**UI Primitives:** Files in `src/components/ui/primitives/` are vendor components — never edit directly. Create wrappers in `src/components/ui/`. Always import from `@/components/ui`, never from `@/components/ui/primitives/*` in feature or page code.
 
 **Overlays**
 
 - Dialog — centered blocking UI (confirm, alert)
 - Sheet — side/bottom panel that is a form or other controlled edit (FormSheet)
 - Drawer — edge panel where swipe-to-dismiss is the product (nav, mobile filters)
-- Never edit `src/components/ui/primitives/*`
 
 **Naming:** kebab-case for all `src/` folders
 
@@ -129,7 +122,7 @@ Public reads live in `src/features/*/queries` with `'use cache'`, `cacheLife()`,
 - `convex/model/auth/` - Authentication helpers
 - `convex/lib/` - Shared utilities
 
-## File Naming
+### File Naming
 
 Convex only allows alphanumeric characters, underscores, and periods in file/folder names. Kebab-case is not supported and will cause deployment errors.
 
@@ -164,68 +157,23 @@ File-level directives for single-function files:
 | `'use cache: private'` | Auth-dependent queries     | `queries/` |
 | `'use server'`         | Server Actions (mutations) | `actions/` |
 
-Cached queries include `cacheLife()` and `cacheTag()` for invalidation:
-
-```typescript
-'use cache: private';
-// imports...
-
-export async function getEntity(id: EntityId) {
-  cacheLife('hours');
-  cacheTag('entities');
-  // ...
-}
-```
+Cached queries include `cacheLife()` and `cacheTag()`.
 
 ### Cache Invalidation
 
-Actions use `updateTag` for read-your-writes semantics (user sees their change immediately):
-
-```typescript
-import { updateTag } from 'next/cache';
-
-updateTag('entities');
-```
-
-Use `revalidateTag()` for background/webhook invalidation where SWR behavior is preferred. Do not call `refresh()` unless `updateTag` cannot cover the case.
+Actions use `updateTag()` for read-your-writes. Use `revalidateTag()` for background/webhook invalidation where SWR is preferred. Do not call `refresh()` unless `updateTag` cannot cover the case.
 
 ### Error Handling
 
-**Convex Mutations** — Use custom hook:
+**Convex Mutations** — `useMutation` from `@/hooks`; map failures with `getErrorMessage`.
 
-```typescript
-import { useMutation } from '@/hooks';
-
-const { mutate, isLoading, error } = useMutation(api.talks.createTalk, {
-  onSuccess: () => toast.success('Created!'),
-  onError: (error) => toast.error(getErrorMessage(error)),
-});
-```
-
-**Server Actions** — Try/catch with error mapping:
-
-```typescript
-import { mapConvexErrorToFormErrors } from '@/lib/forms/validation';
-
-try {
-  const result = await fetchAuthMutation(api.talks.createTalk, data);
-  return { success: true, data: result };
-} catch (error) {
-  return { success: false, errors: mapConvexErrorToFormErrors(error) };
-}
-```
+**Server Actions** — try/catch and return `mapConvexErrorToFormErrors(error)`.
 
 ## React
 
 ### No Manual Memoization
 
-React 19's compiler auto-optimizes. **Do not use:**
-
-- `React.memo()`
-- `useMemo()`
-- `useCallback()`
-
-Write normal functions and components. Only consider memoization for genuinely expensive operations (1000+ items, crypto), and prefer moving those server-side.
+React 19's compiler auto-optimizes. Do not use `React.memo()`, `useMemo()`, or `useCallback()`. Write normal functions and components. Only consider memoization for genuinely expensive operations (1000+ items, crypto), and prefer moving those server-side.
 
 ### Forward Ref
 
@@ -233,35 +181,15 @@ Use `ref` as a prop, not `React.forwardRef`.
 
 ### Types
 
-Explicitly import types from React instead of importing off global React.
-
-```ts
-✅ import type { ReactNode } from 'react';
-type ExampleProps = { children: ReactNode };
-
-❌ import * from 'react'
-type ExampleProps = { children: React.ReactNode };
-```
+Import types from `react` (`import type { ReactNode } from 'react'`), not `React.ReactNode` off the default namespace.
 
 ### Prop Delegation Naming
 
-When spreading props onto a child element, use `delegated` instead of `props` or `rest`:
-
-```ts
-// ✅ Good
-function Link({ href, target, ...delegated }: LinkProps) {
-  return <NextLink href={href} target={target} {...delegated} />;
-}
-
-// ❌ Bad
-function Link({ href, target, ...props }: LinkProps) {
-  return <NextLink href={href} target={target} {...props} />;
-}
-```
+When spreading leftover props onto a child, name the rest `delegated`, not `props` or `rest`.
 
 ## UI
 
-Project uses Coss UI components that are built on top of Base UI component library.
+Project uses Coss UI components built on Base UI.
 
 ### Forms
 
@@ -269,43 +197,11 @@ Admin CRUD form actions return `ActionResult`: `requireAdminUser()`, Zod `safePa
 
 ### FieldError with React Hook Form
 
-Always pass `match` prop to `FieldError` when using React Hook Form validation.
-
-Without `match`, Base UI's `FieldError` only renders when native HTML5 `ValidityState` fails (e.g., empty `required` field). RHF validation errors won't show even though the red border appears via `aria-invalid`.
-
-**`match={true}`** tells Base UI that an external library controls visibility — the component renders whenever it's mounted, so conditional rendering via `{!!fieldState.error && ...}` works as expected.
-
-```tsx
-// ✅ Correct — error message renders when fieldState.error is set
-<>
-  {!!fieldState.error && (
-    <FieldError match>{fieldState.error?.message}</FieldError>
-  )}
-</>
-
-// ❌ Wrong — error message never renders (native ValidityState is valid)
-<>
-  {!!fieldState.error && <FieldError>{fieldState.error?.message}</FieldError>}
-</>
-```
-
-This applies to all field components: `TextField`, `PasswordField`, `TextareaField`, `SelectField`, `CheckboxField`, `UrlField`, `NumberField`.
+Always pass `match` on `FieldError` when using React Hook Form. Without it, Base UI only shows native ValidityState errors, so RHF messages never render. Applies to `TextField`, `PasswordField`, `TextareaField`, `SelectField`, `CheckboxField`, `UrlField`, and `NumberField`.
 
 ### FieldError Outside Field.Root
 
-`FieldError` (Base UI's `FieldPrimitive.Error`) requires a `<Field.Root>` ancestor. It calls `useFieldRootContext(false)` which throws "FieldRootContext is missing" if no context is present.
-
-When `FieldError` must be used outside a natural `<Field.Root>` (e.g., in `FormError`), wrap it in a `<Field className="contents">`. The `contents` class removes the wrapper div from layout while still providing the React context:
-
-```tsx
-// ✅ Correct — Field provides context, contents removes it from layout
-<Field className="contents" invalid>
-  <FieldError match>{message}</FieldError>
-</Field>
-
-// ❌ Wrong — throws "FieldRootContext is missing"
-<FieldError>{message}</FieldError>
-```
+`FieldError` requires a `<Field>` ancestor. Outside a natural field (e.g. `FormError`), wrap it in `<Field className="contents">`.
 
 <!-- convex-ai-start -->
 
