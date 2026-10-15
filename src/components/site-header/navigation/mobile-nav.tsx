@@ -18,6 +18,7 @@ import {
   Button,
   Drawer,
   DrawerClose,
+  DrawerFooter,
   DrawerHeader,
   DrawerMenu,
   DrawerMenuGroup,
@@ -26,8 +27,6 @@ import {
   DrawerPopup,
   DrawerTitle,
   DrawerTrigger,
-  Frame,
-  FramePanel,
 } from '@/components/ui';
 import { Link } from '@/components/ui/link';
 import { useCurrentUser } from '@/features/users/hooks/use-current-user';
@@ -108,7 +107,7 @@ export function MobileNav({ className }: MobileNavProps) {
           </div>
         </DrawerHeader>
 
-        <DrawerPanel>
+        <DrawerPanel scrollable={false}>
           <DrawerMenu aria-label="Mobile navigation">
             <DrawerMenuGroup>
               {NAVIGATION_LINKS.map((link) => (
@@ -120,45 +119,43 @@ export function MobileNav({ className }: MobileNavProps) {
                 />
               ))}
             </DrawerMenuGroup>
-            {!isLoading && (
-              <Frame className="mx-2 mt-2">
-                <FramePanel className="p-1">
-                  {user ? (
-                    <>
-                      <AccountIdentity user={user} />
-                      <DrawerMenuGroup>
-                        {getAccountMenuLinks(showManageLink).map((link) => (
-                          <MobileNavMenuLink
-                            href={link.href}
-                            isActive={isAccountMenuLinkActive(
-                              link.href,
-                              pathname
-                            )}
-                            key={link.href}
-                            label={link.label}
-                          />
-                        ))}
-                      </DrawerMenuGroup>
-                      <MobileNavMenuLink
-                        className="text-muted-foreground"
-                        href={ACCOUNT_MENU_SIGN_OUT_HREF}
-                        label="Sign out"
-                      />
-                    </>
-                  ) : (
-                    <DrawerMenuGroup>
-                      <MobileNavMenuLink
-                        href="/login"
-                        isActive={pathname === '/login'}
-                        label="Sign In"
-                      />
-                    </DrawerMenuGroup>
-                  )}
-                </FramePanel>
-              </Frame>
-            )}
           </DrawerMenu>
         </DrawerPanel>
+
+        {!isLoading && (
+          <DrawerFooter className="flex-1 flex-col justify-start sm:flex-col sm:justify-start">
+            <DrawerMenu>
+              {user ? (
+                <>
+                  <AccountIdentity user={user} />
+                  <DrawerMenuGroup>
+                    {getAccountMenuLinks(showManageLink).map((link) => (
+                      <MobileNavMenuLink
+                        href={link.href}
+                        isActive={isAccountMenuLinkActive(link.href, pathname)}
+                        key={link.href}
+                        label={link.label}
+                      />
+                    ))}
+                  </DrawerMenuGroup>
+                  <MobileNavMenuLink
+                    className="text-muted-foreground"
+                    href={ACCOUNT_MENU_SIGN_OUT_HREF}
+                    label="Sign out"
+                  />
+                </>
+              ) : (
+                <DrawerMenuGroup>
+                  <MobileNavMenuLink
+                    href="/login"
+                    isActive={pathname === '/login'}
+                    label="Sign In"
+                  />
+                </DrawerMenuGroup>
+              )}
+            </DrawerMenu>
+          </DrawerFooter>
+        )}
       </DrawerPopup>
     </Drawer>
   );
