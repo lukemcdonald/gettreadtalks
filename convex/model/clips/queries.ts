@@ -30,12 +30,24 @@ const clipPageWithSpeakersValidator = paginationResultValidator(
 );
 
 /**
- * List all published clips without pagination.
+ * List slugs for published clips.
  */
-export const listAllPublishedClips = query({
+export const listClipSlugs = query({
   args: {},
-  handler: async (ctx) => await listPublishedClips(ctx),
-  returns: docs('clips'),
+  handler: async (ctx) => {
+    const clips = await listPublishedClips(ctx);
+
+    return clips.map((clip) => ({
+      slug: clip.slug,
+      updatedAt: clip.updatedAt ?? clip._creationTime,
+    }));
+  },
+  returns: v.array(
+    v.object({
+      slug: v.string(),
+      updatedAt: v.number(),
+    })
+  ),
 });
 
 /**

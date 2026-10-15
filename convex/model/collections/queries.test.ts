@@ -7,15 +7,12 @@ import {
   visibilitySlugs,
 } from '../../test.setup';
 
-describe('listAllPublishedCollections', () => {
+describe('listCollectionSlugs', () => {
   it('omits empty collections and collections with only unpublished talks', async () => {
     const t = createConvexTest();
     await seedVisibilityCatalog(t);
 
-    const collections = await t.query(
-      api.collections.listAllPublishedCollections,
-      {}
-    );
+    const collections = await t.query(api.collections.listCollectionSlugs, {});
     const slugs = collections.map((collection) => collection.slug);
 
     expect(slugs).toEqual([visibilitySlugs.publishedCollection]);

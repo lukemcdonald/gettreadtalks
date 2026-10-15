@@ -7,12 +7,12 @@ import {
   visibilitySlugs,
 } from '../../test.setup';
 
-describe('listAllPublishedClips', () => {
+describe('listClipSlugs', () => {
   it('omits published clips whose parent talk is unpublished', async () => {
     const t = createConvexTest();
     await seedVisibilityCatalog(t);
 
-    const clips = await t.query(api.clips.listAllPublishedClips, {});
+    const clips = await t.query(api.clips.listClipSlugs, {});
     const slugs = clips.map((clip) => clip.slug).toSorted();
 
     expect(slugs).toEqual([

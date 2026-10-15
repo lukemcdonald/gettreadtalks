@@ -32,12 +32,34 @@ import {
 import { enrichWithTopics, filterTalksByTitleOrSpeaker } from './utils';
 
 /**
- * List all published talks without pagination.
+ * List slugs for published talks with their speaker slugs.
  */
-export const listAllPublishedTalks = query({
+export const listTalkSlugs = query({
   args: {},
-  handler: async (ctx) => await listPublishedTalks(ctx),
-  returns: docs('talks'),
+  handler: async (ctx) => {
+    const talks = await enrichWithSpeaker(ctx, await listPublishedTalks(ctx));
+
+    return talks.flatMap((talk) => {
+      if (!talk.speaker) {
+        return [];
+      }
+
+      return [
+        {
+          speakerSlug: talk.speaker.slug,
+          talkSlug: talk.slug,
+          updatedAt: talk.updatedAt ?? talk._creationTime,
+        },
+      ];
+    });
+  },
+  returns: v.array(
+    v.object({
+      speakerSlug: v.string(),
+      talkSlug: v.string(),
+      updatedAt: v.number(),
+    })
+  ),
 });
 
 /**

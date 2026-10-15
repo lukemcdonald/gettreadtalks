@@ -7,18 +7,15 @@ import {
   visibilitySlugs,
 } from '../../test.setup';
 
-describe('listAllPublishedSpeakers', () => {
+describe('listSpeakerSlugs', () => {
   it('lists only speakers with published talks or clips', async () => {
     const t = createConvexTest();
     await seedVisibilityCatalog(t);
 
-    const speakers = await t.query(api.speakers.listAllPublishedSpeakers, {});
+    const speakers = await t.query(api.speakers.listSpeakerSlugs, {});
+    const slugs = speakers.map((speaker) => speaker.slug);
 
-    expect(speakers.map((speaker) => speaker.slug)).toEqual([
-      visibilitySlugs.publishedSpeaker,
-    ]);
-    expect(speakers.map((speaker) => speaker.slug)).not.toContain(
-      visibilitySlugs.draftSpeaker
-    );
+    expect(slugs).toEqual([visibilitySlugs.publishedSpeaker]);
+    expect(slugs).not.toContain(visibilitySlugs.draftSpeaker);
   });
 });

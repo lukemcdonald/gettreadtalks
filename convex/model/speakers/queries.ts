@@ -101,12 +101,24 @@ export const getSpeakerBySlug = query({
 });
 
 /**
- * List all speakers with published talks or clips, without pagination.
+ * List slugs for speakers with published talks or clips.
  */
-export const listAllPublishedSpeakers = query({
+export const listSpeakerSlugs = query({
   args: {},
-  handler: async (ctx) => await listPublishedSpeakers(ctx),
-  returns: docs('speakers'),
+  handler: async (ctx) => {
+    const speakers = await listPublishedSpeakers(ctx);
+
+    return speakers.map((speaker) => ({
+      slug: speaker.slug,
+      updatedAt: speaker.updatedAt ?? speaker._creationTime,
+    }));
+  },
+  returns: v.array(
+    v.object({
+      slug: v.string(),
+      updatedAt: v.number(),
+    })
+  ),
 });
 
 /**

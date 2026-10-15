@@ -5,6 +5,7 @@ export const {
   getTopic,
   getTopicBySlug,
   listAllTopics,
+  listTopicSlugs,
   listTopics,
   listTopicsWithCount,
   listTopicsWithTalks,

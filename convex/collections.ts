@@ -5,7 +5,7 @@ export const {
   getCollection,
   getCollectionBySlug,
   listAllCollections,
-  listAllPublishedCollections,
+  listCollectionSlugs,
   listCollections,
   listCollectionsBySpeaker,
 } = queries;

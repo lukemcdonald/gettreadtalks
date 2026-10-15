@@ -123,6 +123,27 @@ export const listAllTopics = query({
 });
 
 /**
+ * List slugs for topics with published talks.
+ */
+export const listTopicSlugs = query({
+  args: {},
+  handler: async (ctx) => {
+    const topics = await listPublishedTopics(ctx);
+
+    return topics.map((topic) => ({
+      slug: topic.slug,
+      updatedAt: topic.updatedAt ?? topic._creationTime,
+    }));
+  },
+  returns: v.array(
+    v.object({
+      slug: v.string(),
+      updatedAt: v.number(),
+    })
+  ),
+});
+
+/**
  * List topics that have at least one published talk.
  * Returns topics sorted alphabetically by title.
  */

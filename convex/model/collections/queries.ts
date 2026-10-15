@@ -14,12 +14,24 @@ import {
 } from './helpers';
 
 /**
- * List all collections with published talks, without pagination.
+ * List slugs for collections with published talks.
  */
-export const listAllPublishedCollections = query({
+export const listCollectionSlugs = query({
   args: {},
-  handler: async (ctx) => await listPublishedCollections(ctx),
-  returns: docs('collections'),
+  handler: async (ctx) => {
+    const collections = await listPublishedCollections(ctx);
+
+    return collections.map((collection) => ({
+      slug: collection.slug,
+      updatedAt: collection.updatedAt ?? collection._creationTime,
+    }));
+  },
+  returns: v.array(
+    v.object({
+      slug: v.string(),
+      updatedAt: v.number(),
+    })
+  ),
 });
 
 /**
