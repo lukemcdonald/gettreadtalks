@@ -1,35 +1,31 @@
 import type * as AnalyticsClient from './client';
 
-import { AnalyticsBrowser } from '@segment/analytics-next';
-import { vi } from 'vitest';
-
-import { afterEach, beforeEach, describe, expect, it } from '@/test';
-
-vi.mock('@segment/analytics-next', () => ({
-  AnalyticsBrowser: {
-    load: vi.fn(),
-  },
-}));
+import { afterEach, beforeEach, describe, expect, it, vi } from '@/test';
 
 describe('analytics client', () => {
-  const WRITE_KEY = 'test-write-key';
+  const MOCK_IDLE_TIMEOUT_MS = 2000;
+  const MOCK_WRITE_KEY = 'test-write-key';
+  const segmentLoad = vi.fn();
+  const segmentTrack = vi.fn();
 
   let analytics: typeof AnalyticsClient;
-  const segmentTrack = vi.fn();
 
   async function loadClientModule() {
     vi.resetModules();
+    vi.doMock('@segment/analytics-next', () => ({
+      AnalyticsBrowser: {
+        load: segmentLoad,
+      },
+    }));
     analytics = await import('./client');
   }
 
   beforeEach(async () => {
     vi.useFakeTimers();
+    segmentLoad.mockReset();
     segmentTrack.mockReset();
-    vi.mocked(AnalyticsBrowser.load).mockReset();
-    vi.mocked(AnalyticsBrowser.load).mockResolvedValue([
-      { track: segmentTrack },
-    ] as never);
-    vi.stubEnv('NEXT_PUBLIC_SEGMENT_WRITE_KEY', WRITE_KEY);
+    segmentLoad.mockResolvedValue([{ track: segmentTrack }]);
+    vi.stubEnv('NEXT_PUBLIC_SEGMENT_WRITE_KEY', MOCK_WRITE_KEY);
     await loadClientModule();
   });
 
@@ -41,12 +37,12 @@ describe('analytics client', () => {
   it('does not load Segment until the browser is idle', async () => {
     analytics.loadAnalytics();
 
-    expect(AnalyticsBrowser.load).not.toHaveBeenCalled();
+    expect(segmentLoad).not.toHaveBeenCalled();
 
-    await vi.advanceTimersByTimeAsync(1);
+    await vi.advanceTimersByTimeAsync(MOCK_IDLE_TIMEOUT_MS);
 
-    expect(AnalyticsBrowser.load).toHaveBeenCalledTimes(1);
-    expect(AnalyticsBrowser.load).toHaveBeenCalledWith({ writeKey: WRITE_KEY });
+    expect(segmentLoad).toHaveBeenCalledTimes(1);
+    expect(segmentLoad).toHaveBeenCalledWith({ writeKey: MOCK_WRITE_KEY });
   });
 
   it('queues track calls and flushes them after idle load', async () => {
@@ -63,13 +59,13 @@ describe('analytics client', () => {
       talk_slug: 'romans-8',
     });
 
-    expect(AnalyticsBrowser.load).not.toHaveBeenCalled();
+    expect(segmentLoad).not.toHaveBeenCalled();
     expect(segmentTrack).not.toHaveBeenCalled();
 
-    await vi.advanceTimersByTimeAsync(1);
+    await vi.advanceTimersByTimeAsync(MOCK_IDLE_TIMEOUT_MS);
     await Promise.all([first, second]);
 
-    expect(AnalyticsBrowser.load).toHaveBeenCalledTimes(1);
+    expect(segmentLoad).toHaveBeenCalledTimes(1);
     expect(segmentTrack).toHaveBeenNthCalledWith(1, 'talk_played', {
       media_type: 'audio',
       talk_id: 'talks:romans-8',

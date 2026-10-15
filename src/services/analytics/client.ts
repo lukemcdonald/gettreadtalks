@@ -21,17 +21,13 @@ function scheduleIdleLoad() {
   const idle = Promise.withResolvers<null>();
   idleLoad = idle.promise;
 
-  const start = () => {
-    idle.resolve(null);
-  };
-
   if (typeof requestIdleCallback === 'function') {
-    requestIdleCallback(start, { timeout: IDLE_LOAD_TIMEOUT_MS });
-
-    return idleLoad;
+    requestIdleCallback(() => idle.resolve(null), {
+      timeout: IDLE_LOAD_TIMEOUT_MS,
+    });
+  } else {
+    setTimeout(() => idle.resolve(null), IDLE_LOAD_TIMEOUT_MS);
   }
-
-  setTimeout(start, 1);
 
   return idleLoad;
 }
