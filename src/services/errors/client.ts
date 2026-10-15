@@ -1,27 +1,25 @@
 import type { ErrorReportOptions } from './types';
 import type { Scope } from '@sentry/nextjs';
 
-import {
-  captureException as sentryCaptureException,
-  captureMessage as sentryCaptureMessage,
-  withScope as sentryWithScope,
-} from '@sentry/nextjs';
+import { enqueueSentryCapture } from '@/configs/sentry/client';
 
 /** Manual exception capture with optional fingerprint, tags, and context. */
 export function captureException(
   error: unknown,
   options: ErrorReportOptions = {}
 ): string | undefined {
-  const { level = 'error', ...scopeOptions } = options;
+  return enqueueSentryCapture((sentry) => {
+    const { level = 'error', ...scopeOptions } = options;
 
-  return sentryWithScope((scope) => {
-    applyScopeOptions(scope, { ...scopeOptions, level });
+    return sentry.withScope((scope) => {
+      applyScopeOptions(scope, { ...scopeOptions, level });
 
-    if (typeof error === 'string') {
-      return sentryCaptureMessage(error);
-    }
+      if (typeof error === 'string') {
+        return sentry.captureMessage(error);
+      }
 
-    return sentryCaptureException(error);
+      return sentry.captureException(error);
+    });
   });
 }
 
@@ -52,9 +50,11 @@ export function captureMessage(
   message: string,
   options: ErrorReportOptions = {}
 ): string | undefined {
-  return sentryWithScope((scope) => {
-    applyScopeOptions(scope, options);
+  return enqueueSentryCapture((sentry) =>
+    sentry.withScope((scope) => {
+      applyScopeOptions(scope, options);
 
-    return sentryCaptureMessage(message, options.level ?? 'info');
-  });
+      return sentry.captureMessage(message, options.level ?? 'info');
+    })
+  );
 }
