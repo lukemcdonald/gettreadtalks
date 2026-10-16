@@ -10,7 +10,6 @@ import { ArchiveBackLink } from '@/components/archive-back-link';
 import { JsonLd } from '@/components/json-ld';
 import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
-import { PageBreadcrumb } from '@/components/ui';
 import { CollectionTalkList } from '@/features/collections/components/collection-talk-list';
 import { getCollectionBySlug } from '@/features/collections/queries/get-collection-by-slug';
 import {
@@ -70,13 +69,10 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
         })}
       />
       <SidebarLayout
-        breadcrumb={<PageBreadcrumb segments={segments} />}
         content={<CollectionTalkList talks={talks} />}
         header={
-          <ArchiveBackLink
-            href={getCollectionsPath()}
-            label="Back to Collections"
-          >
+          <>
+            <ArchiveBackLink href={getCollectionsPath()} label="Collections" />
             <PageHeader
               actions={
                 <AdminEditButton entity="collections" id={collection._id} />
@@ -85,7 +81,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
               size="lg"
               title={collection.title}
             />
-          </ArchiveBackLink>
+          </>
         }
         sidebar={<CollectionSidebar speakers={uniqueSpeakers} />}
       />

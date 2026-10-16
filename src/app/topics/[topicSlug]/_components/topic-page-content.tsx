@@ -14,7 +14,6 @@ import { ArchiveBackLink } from '@/components/archive-back-link';
 import { JsonLd } from '@/components/json-ld';
 import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
-import { PageBreadcrumb } from '@/components/ui';
 import { TalksListSkeleton } from '@/features/talks/components/talks-list-skeleton';
 import { getTopicBySlug } from '@/features/topics/queries/get-topic-by-slug';
 import { getTopicUrl, getTopicsPath } from '@/features/topics/utils';
@@ -39,9 +38,14 @@ async function TopicHeader({ topicSlug }: { topicSlug: string }) {
 
   const { talks, topic, totalTalks } = topicResult;
   const description = `Elevate your spiritual heartbeat with ${topicTalkCountPhrase(totalTalks)}.`;
+  const segments = [
+    { href: getTopicsPath(), label: 'Topics' },
+    { href: getTopicUrl(topicSlug), label: topic.title },
+  ];
 
   return (
     <>
+      <JsonLd data={buildBreadcrumbJsonLd(segments)} />
       <JsonLd
         data={topicJsonLd({
           description,
@@ -50,34 +54,13 @@ async function TopicHeader({ topicSlug }: { topicSlug: string }) {
           topicSlug,
         })}
       />
-      <ArchiveBackLink href={getTopicsPath()} label="Back to Topics">
-        <PageHeader
-          actions={<AdminEditButton entity="topics" id={topic._id} />}
-          description={description}
-          size="lg"
-          title={topic.title}
-        />
-      </ArchiveBackLink>
-    </>
-  );
-}
-
-async function TopicBreadcrumb({ topicSlug }: { topicSlug: string }) {
-  const topicResult = await getTopicBySlug({ slug: topicSlug });
-
-  if (!topicResult) {
-    notFound();
-  }
-
-  const segments = [
-    { href: getTopicsPath(), label: 'Topics' },
-    { href: getTopicUrl(topicSlug), label: topicResult.topic.title },
-  ];
-
-  return (
-    <>
-      <JsonLd data={buildBreadcrumbJsonLd(segments)} />
-      <PageBreadcrumb segments={segments} />
+      <ArchiveBackLink href={getTopicsPath()} label="Topics" />
+      <PageHeader
+        actions={<AdminEditButton entity="topics" id={topic._id} />}
+        description={description}
+        size="lg"
+        title={topic.title}
+      />
     </>
   );
 }
@@ -90,11 +73,6 @@ export async function TopicPageContent({
 
   return (
     <SidebarLayout
-      breadcrumb={
-        <Suspense>
-          <TopicBreadcrumb topicSlug={topicSlug} />
-        </Suspense>
-      }
       content={
         <Suspense fallback={<TalksListSkeleton />}>
           <TopicTalks searchParams={searchParams} topicSlug={topicSlug} />

@@ -42,24 +42,18 @@ export function SpeakerHeroDetails({
 
       <div className="flex-1 space-y-4">
         <div>
-          {speaker.role && (
-            <p className="text-muted-foreground mb-2 text-xs font-semibold tracking-wide uppercase">
-              {speaker.role}
-            </p>
-          )}
-          <ArchiveBackLink href={getSpeakersPath()} label="Back to Speakers">
-            <div
-              className={cn(
-                'flex flex-wrap items-center gap-3',
-                isInline ? 'justify-center md:justify-start' : 'justify-center'
-              )}
-            >
-              <HeroTitle className="text-foreground min-w-0">
-                {speakerName}
-              </HeroTitle>
-              <AdminEditButton entity="speakers" id={speaker._id} />
-            </div>
-          </ArchiveBackLink>
+          <ArchiveBackLink href={getSpeakersPath()} label="Speakers" />
+          <div
+            className={cn(
+              'flex flex-wrap items-center gap-3',
+              isInline ? 'justify-center md:justify-start' : 'justify-center'
+            )}
+          >
+            <HeroTitle className="text-foreground min-w-0">
+              {speakerName}
+            </HeroTitle>
+            <AdminEditButton entity="speakers" id={speaker._id} />
+          </div>
         </div>
 
         {isInline && (

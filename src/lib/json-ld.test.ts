@@ -3,7 +3,7 @@ import { describe, expect, it } from '@/test';
 import { buildBreadcrumbJsonLd } from './json-ld';
 
 describe('buildBreadcrumbJsonLd', () => {
-  it('matches visible breadcrumb items, names, order, and absolute urls', () => {
+  it('matches breadcrumb items, names, order, and absolute urls', () => {
     expect(
       buildBreadcrumbJsonLd([
         { href: '/talks', label: 'Talks' },

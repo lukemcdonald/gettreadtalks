@@ -4,7 +4,6 @@ import { Container, Section } from '@/components/ui';
 import { cn } from '@/utils';
 
 interface SidebarLayoutProps {
-  breadcrumb?: ReactNode;
   className?: string;
   content: ReactNode;
   header?: ReactNode;
@@ -14,7 +13,6 @@ interface SidebarLayoutProps {
 }
 
 export function SidebarLayout({
-  breadcrumb,
   className,
   content,
   header,
@@ -25,7 +23,6 @@ export function SidebarLayout({
   return (
     <Section spacing={spacing}>
       <Container className={className}>
-        {!!breadcrumb && <div className="mb-4">{breadcrumb}</div>}
         {!!header && <div className="mb-10">{header}</div>}
 
         <div className="grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-12">
