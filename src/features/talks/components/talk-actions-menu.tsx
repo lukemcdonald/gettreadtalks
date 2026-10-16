@@ -7,20 +7,18 @@ import { useRouter } from 'next/navigation';
 import { ContentActionsGroup } from '@/components/actions-group';
 import { useArchiveTalk } from '@/features/talks/hooks/use-archive-talk';
 import { useDestroyTalk } from '@/features/talks/hooks/use-destroy-talk';
-import { getAdminListPath } from '@/lib/entities/paths';
+import { getAdminListPath, getEntityEditPath } from '@/lib/entities/paths';
 
 interface TalkActionsMenuProps {
   talk: TalkWithSpeakerAndTopics;
-  talkUrl: string;
+  talkUrl?: string;
 }
 
 export function TalkActionsMenu({ talk, talkUrl }: TalkActionsMenuProps) {
   const talkId = talk._id;
   const router = useRouter();
 
-  const { mutateAsync: archiveTalk } = useArchiveTalk({
-    onSuccess: () => router.push('/talks'),
-  });
+  const { mutateAsync: archiveTalk } = useArchiveTalk();
   const { mutateAsync: destroyTalk } = useDestroyTalk({
     onSuccess: () => router.push('/talks'),
   });
@@ -37,7 +35,7 @@ export function TalkActionsMenu({ talk, talkUrl }: TalkActionsMenuProps) {
     <ContentActionsGroup
       content={talk}
       contentType="talk"
-      editUrl={`/talks/edit/${talkId}`}
+      editUrl={getEntityEditPath('talks', talkId)}
       listUrl={getAdminListPath('talks')}
       onArchiveAction={handleArchive}
       onDeleteAction={handleDelete}

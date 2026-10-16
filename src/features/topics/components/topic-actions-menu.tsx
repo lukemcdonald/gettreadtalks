@@ -12,6 +12,8 @@ import {
 } from '@/components/actions-group';
 import { toastManager } from '@/components/ui/primitives/toast';
 import { destroyTopicAction } from '@/features/topics/actions/destroy-topic';
+import { getTopicUrl } from '@/features/topics/utils';
+import { getEntityEditPath } from '@/lib/entities/paths';
 import { getErrorMessage } from '@/services/errors';
 import { pluralize } from '@/utils';
 
@@ -56,8 +58,12 @@ export function TopicActionsMenu({ talkCount, topic }: TopicActionsMenuProps) {
   };
 
   const menuItems = [
-    { hidden: talkCount === 0, href: `/topics/${topic.slug}`, label: 'View' },
-    { href: `/topics/edit/${topicId}`, label: 'Edit' },
+    {
+      hidden: talkCount === 0,
+      href: getTopicUrl(topic.slug),
+      label: 'View',
+    },
+    { href: getEntityEditPath('topics', topicId), label: 'Edit' },
     {
       label: 'Delete',
       onClick: () => setDeleteDialogOpen(true),

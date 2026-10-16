@@ -12,6 +12,8 @@ import {
 } from '@/components/actions-group';
 import { toastManager } from '@/components/ui/primitives/toast';
 import { destroyCollectionAction } from '@/features/collections/actions/destroy-collection';
+import { getCollectionUrl } from '@/features/collections/utils';
+import { getEntityEditPath } from '@/lib/entities/paths';
 import { getErrorMessage } from '@/services/errors';
 import { pluralize } from '@/utils';
 
@@ -61,8 +63,12 @@ export function CollectionActionsMenu({
   const blockReason = `This collection has ${talkCount} ${pluralize(talkCount, 'talk', 'talks')}. Remove all talks before deleting.`;
 
   const menuItems = [
-    { href: `/collections/${collection.slug}`, label: 'View' },
-    { href: `/collections/edit/${collectionId}`, label: 'Edit' },
+    {
+      hidden: talkCount === 0,
+      href: getCollectionUrl(collection.slug),
+      label: 'View',
+    },
+    { href: getEntityEditPath('collections', collectionId), label: 'Edit' },
     {
       label: 'Delete',
       onClick: () => setDeleteDialogOpen(true),

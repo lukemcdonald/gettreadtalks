@@ -12,6 +12,8 @@ import {
 } from '@/components/actions-group';
 import { toastManager } from '@/components/ui/primitives/toast';
 import { destroySpeakerAction } from '@/features/speakers/actions/destroy-speaker';
+import { getSpeakerUrl } from '@/features/speakers/utils';
+import { getEntityEditPath } from '@/lib/entities/paths';
 import { getErrorMessage } from '@/services/errors';
 import { pluralize } from '@/utils';
 
@@ -72,8 +74,12 @@ export function SpeakerActionsMenu({
   const blockReason = `This speaker has ${parts.join(' and ')} associated. Remove all associated content before deleting.`;
 
   const menuItems = [
-    { href: `/speakers/${speaker.slug}`, label: 'View' },
-    { href: `/speakers/edit/${speakerId}`, label: 'Edit' },
+    {
+      hidden: talkCount === 0 && clipCount === 0,
+      href: getSpeakerUrl(speaker.slug),
+      label: 'View',
+    },
+    { href: getEntityEditPath('speakers', speakerId), label: 'Edit' },
     {
       label: 'Delete',
       onClick: () => setDeleteDialogOpen(true),
