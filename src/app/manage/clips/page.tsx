@@ -1,17 +1,13 @@
-import type { StatusType } from '@/lib/entities/types';
+import type { ManageClipsSearchParams } from '@/app/manage/clips/_components/clips-content';
 
 import { Suspense } from 'react';
 
+import { ManageTableSkeleton } from '@/app/manage/_components/manage-table';
 import { ManageClipsContent } from '@/app/manage/clips/_components/clips-content';
 import { ClipsFilters } from '@/app/manage/clips/_components/clips-filters';
 import { PageHeader } from '@/components/page-header';
 import { Skeleton } from '@/components/ui';
 import { NewClipButton } from '@/features/clips/components/new-clip-button';
-
-export interface ManageClipsSearchParams {
-  cursor?: string;
-  status?: StatusType | 'all';
-}
 
 interface ManageClipsPageProps {
   searchParams: Promise<ManageClipsSearchParams>;
@@ -30,7 +26,7 @@ export default function ManageClipsPage({
       <Suspense fallback={<Skeleton className="h-10 w-full" />}>
         <ClipsFilters />
       </Suspense>
-      <Suspense fallback={<Skeleton className="h-96 w-full" />}>
+      <Suspense fallback={<ManageTableSkeleton resource="clips" />}>
         <ManageClipsContent searchParams={searchParams} />
       </Suspense>
     </>

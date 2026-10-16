@@ -1,8 +1,16 @@
-import type { ManageTalksSearchParams } from '@/app/manage/talks/page';
+import type { StatusType } from '@/lib/entities/types';
 
+import { ManageTable } from '@/app/manage/_components/manage-table';
 import { Pagination } from '@/components/pagination';
-import { TalksTable } from '@/features/talks/components/talks-table/talks-table';
+import { NewTalkButton } from '@/features/talks/components/new-talk-button';
+import { TalksTableRow } from '@/features/talks/components/talks-table/talks-table-row';
 import { getAllTalks } from '@/features/talks/queries/get-all-talks';
+
+export interface ManageTalksSearchParams {
+  cursor?: string;
+  search?: string;
+  status?: StatusType | 'all';
+}
 
 interface ManageTalksContentProps {
   searchParams: Promise<ManageTalksSearchParams>;
@@ -12,7 +20,6 @@ export async function ManageTalksContent({
   searchParams,
 }: ManageTalksContentProps) {
   const { cursor, search, status } = await searchParams;
-
   const result = await getAllTalks({
     cursor,
     limit: 50,
@@ -22,7 +29,18 @@ export async function ManageTalksContent({
 
   return (
     <div className="space-y-6">
-      <TalksTable talks={result.talks} />
+      <ManageTable
+        emptyAction={<NewTalkButton />}
+        isEmpty={result.talks.length === 0}
+        isFiltered={
+          Boolean(search?.trim()) || (Boolean(status) && status !== 'all')
+        }
+        resource="talks"
+      >
+        {result.talks.map((talk) => (
+          <TalksTableRow key={talk._id} talk={talk} />
+        ))}
+      </ManageTable>
       <Pagination
         continueCursor={result.continueCursor}
         hasNextPage={!result.isDone}
