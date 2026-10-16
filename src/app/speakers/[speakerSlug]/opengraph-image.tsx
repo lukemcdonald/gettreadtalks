@@ -1,8 +1,7 @@
 import { notFound } from 'next/navigation';
 
 import { getSpeakerBySlug } from '@/features/speakers/queries/get-speaker-by-slug';
-import { getSpeakerName } from '@/features/speakers/utils';
-import { shareImage, toShareSpeaker } from '@/lib/og/share-image';
+import { shareImage, sharePropsForSpeaker } from '@/lib/og/share-image';
 
 export { alt, contentType, size } from '@/lib/og/share-image';
 
@@ -18,17 +17,5 @@ export default async function Image({ params }: SpeakerShareImageProps) {
     notFound();
   }
 
-  const { speaker } = data;
-  const name = getSpeakerName(speaker);
-
-  return shareImage({
-    speaker: toShareSpeaker({
-      imageUrl: speaker.imageUrl,
-      ministry: speaker.ministry,
-      name,
-      role: speaker.role,
-    }),
-    speakerPlacement: 'title',
-    title: name,
-  });
+  return shareImage(sharePropsForSpeaker(data.speaker));
 }

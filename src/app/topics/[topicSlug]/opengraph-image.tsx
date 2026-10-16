@@ -1,8 +1,7 @@
 import { notFound } from 'next/navigation';
 
 import { getTopicBySlug } from '@/features/topics/queries/get-topic-by-slug';
-import { shareImage } from '@/lib/og/share-image';
-import { pluralize } from '@/utils';
+import { shareImage, sharePropsForTopic } from '@/lib/og/share-image';
 
 export { alt, contentType, size } from '@/lib/og/share-image';
 
@@ -20,8 +19,10 @@ export default async function Image({ params }: TopicShareImageProps) {
 
   const { topic, totalTalks } = topicResult;
 
-  return shareImage({
-    subtitle: `${totalTalks} ${pluralize(totalTalks, 'talk', 'talks')}`,
-    title: topic.title,
-  });
+  return shareImage(
+    sharePropsForTopic({
+      talkCount: totalTalks,
+      title: topic.title,
+    })
+  );
 }

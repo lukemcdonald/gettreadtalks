@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
 import { site } from '@/configs/site';
+import { pluralize } from '@/utils';
 
 export const alt = site.name;
 export const contentType = 'image/png';
@@ -26,10 +27,18 @@ const assets = Promise.all([
   readFile(path.join(process.cwd(), 'public/logo.png')),
 ]);
 
-export interface ShareSpeaker {
+interface ShareSpeaker {
   detail?: string;
   imageUrl?: string;
   name: string;
+}
+
+interface ShareSpeakerSource {
+  firstName?: string;
+  imageUrl?: string;
+  lastName?: string;
+  ministry?: string;
+  role?: string;
 }
 
 interface ShareImageInput {
@@ -39,20 +48,78 @@ interface ShareImageInput {
   title: string;
 }
 
-export function toShareSpeaker({
-  imageUrl,
-  ministry,
-  name,
-  role,
-}: {
-  imageUrl?: string;
-  ministry?: string;
-  name: string;
-  role?: string;
-}): ShareSpeaker {
+interface ShareMediaInput {
+  speaker?: ShareSpeakerSource | null;
+  title: string;
+}
+
+interface ShareCountedInput {
+  talkCount: number;
+  title: string;
+}
+
+export function sharePropsForClip(input: ShareMediaInput) {
+  return sharePropsForMedia(input);
+}
+
+export function sharePropsForCollection(input: ShareCountedInput) {
+  return sharePropsForCounted(input);
+}
+
+export function sharePropsForSpeaker(speaker: ShareSpeakerSource) {
+  const mapped = toShareSpeaker(speaker);
+
   return {
-    detail: ministry || role,
-    imageUrl,
+    speaker: mapped,
+    speakerPlacement: 'title' as const,
+    title: mapped?.name ?? '',
+  };
+}
+
+export function sharePropsForTalk(input: ShareMediaInput) {
+  return sharePropsForMedia(input);
+}
+
+export function sharePropsForTopic(input: ShareCountedInput) {
+  return sharePropsForCounted(input);
+}
+
+function sharePropsForMedia({
+  speaker,
+  title,
+}: ShareMediaInput): ShareImageInput {
+  return {
+    speaker: toShareSpeaker(speaker),
+    title,
+  };
+}
+
+function sharePropsForCounted({
+  talkCount,
+  title,
+}: ShareCountedInput): ShareImageInput {
+  return {
+    subtitle: `${talkCount} ${pluralize(talkCount, 'talk', 'talks')}`,
+    title,
+  };
+}
+
+function toShareSpeaker(
+  speaker?: ShareSpeakerSource | null
+): ShareSpeaker | undefined {
+  if (!speaker) {
+    return;
+  }
+
+  const name = `${speaker.firstName ?? ''} ${speaker.lastName ?? ''}`.trim();
+
+  if (!name) {
+    return;
+  }
+
+  return {
+    detail: speaker.ministry || speaker.role,
+    imageUrl: speaker.imageUrl,
     name,
   };
 }

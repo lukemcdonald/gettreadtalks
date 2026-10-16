@@ -1,8 +1,7 @@
 import { notFound } from 'next/navigation';
 
-import { getSpeakerName } from '@/features/speakers/utils';
 import { getTalkBySlug } from '@/features/talks/queries/get-talk-by-slug';
-import { shareImage, toShareSpeaker } from '@/lib/og/share-image';
+import { shareImage, sharePropsForTalk } from '@/lib/og/share-image';
 
 export { alt, contentType, size } from '@/lib/og/share-image';
 
@@ -23,17 +22,10 @@ export default async function Image({ params }: TalkShareImageProps) {
 
   const { speaker, talk } = talkResult;
 
-  if (!speaker) {
-    return shareImage({ title: talk.title });
-  }
-
-  return shareImage({
-    speaker: toShareSpeaker({
-      imageUrl: speaker.imageUrl,
-      ministry: speaker.ministry,
-      name: getSpeakerName(speaker),
-      role: speaker.role,
-    }),
-    title: talk.title,
-  });
+  return shareImage(
+    sharePropsForTalk({
+      speaker,
+      title: talk.title,
+    })
+  );
 }

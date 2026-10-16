@@ -1,8 +1,7 @@
 import { notFound } from 'next/navigation';
 
 import { getCollectionBySlug } from '@/features/collections/queries/get-collection-by-slug';
-import { shareImage } from '@/lib/og/share-image';
-import { pluralize } from '@/utils';
+import { shareImage, sharePropsForCollection } from '@/lib/og/share-image';
 
 export { alt, contentType, size } from '@/lib/og/share-image';
 
@@ -20,8 +19,10 @@ export default async function Image({ params }: CollectionShareImageProps) {
 
   const { collection, talks } = data;
 
-  return shareImage({
-    subtitle: `${talks.length} ${pluralize(talks.length, 'talk', 'talks')}`,
-    title: collection.title,
-  });
+  return shareImage(
+    sharePropsForCollection({
+      talkCount: talks.length,
+      title: collection.title,
+    })
+  );
 }
