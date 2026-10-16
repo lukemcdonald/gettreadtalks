@@ -44,14 +44,19 @@ export function SpeakerHeroDetails({
           isInline && 'md:items-start md:text-left'
         )}
       >
-        <div className="max-w-full">
-          <ArchiveBackLink href={getSpeakersPath()} label="Speakers" />
-          <div className="flex flex-wrap items-center gap-3">
-            <HeroTitle className="text-foreground min-w-0">
-              {speakerName}
-            </HeroTitle>
-            <AdminEditButton entity="speakers" id={speaker._id} />
+        <div className="max-w-full space-y-2">
+          <div>
+            <ArchiveBackLink href={getSpeakersPath()} label="Speakers" />
+            <div className="flex flex-wrap items-center gap-3">
+              <HeroTitle className="text-foreground min-w-0">
+                {speakerName}
+              </HeroTitle>
+              <AdminEditButton entity="speakers" id={speaker._id} />
+            </div>
           </div>
+          {speaker.role && (
+            <p className="text-muted-foreground text-sm">{speaker.role}</p>
+          )}
         </div>
 
         {isInline && (
