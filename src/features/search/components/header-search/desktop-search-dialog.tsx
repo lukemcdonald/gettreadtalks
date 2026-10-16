@@ -30,12 +30,7 @@ export function DesktopSearchDialog({
           onInputValueChange={onValueChange}
           value={value}
         >
-          <SearchCommandField
-            autoFocus
-            className="px-2.5 py-1.5"
-            inputClassName="border-transparent! bg-transparent! shadow-none before:hidden"
-            isLoading={isLoading}
-          />
+          <SearchCommandField autoFocus isLoading={isLoading} />
           <CommandPanel>
             <SearchCommandResults
               groups={groups}
