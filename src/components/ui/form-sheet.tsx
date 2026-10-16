@@ -15,8 +15,9 @@ import {
   DrawerPopup,
   DrawerTitle,
 } from './primitives/drawer';
+import { Skeleton } from './primitives/skeleton';
 
-interface FormSheetProps {
+export interface FormSheetProps {
   children: ReactNode;
   error?: FieldError | FieldError[] | FieldErrors<FieldValues>['root'];
   isPending: boolean;
@@ -27,17 +28,68 @@ interface FormSheetProps {
   title: string;
 }
 
-export function FormSheet({
-  children,
-  error,
-  isPending,
-  onOpenChange,
-  onSubmit,
-  open,
-  submitLabel,
-  title,
-}: FormSheetProps) {
+interface FormSheetLoadingProps {
+  children: ReactNode;
+  loading: true;
+  onOpenChange?: (open: boolean) => void;
+  open?: boolean;
+}
+
+function ignoreOpenChange(_open: boolean) {}
+
+function isLoadingProps(
+  props: FormSheetLoadingProps | FormSheetProps
+): props is FormSheetLoadingProps {
+  return 'loading' in props;
+}
+
+export function FormSheet(props: FormSheetLoadingProps | FormSheetProps) {
   const isDesktop = useMediaQuery('lg');
+  const isLoading = isLoadingProps(props);
+  const onOpenChange = props.onOpenChange ?? ignoreOpenChange;
+  const open = props.open ?? true;
+
+  const footer = isLoading ? (
+    <>
+      <Skeleton className="h-9 w-20 rounded-lg sm:h-8" />
+      <Skeleton className="h-9 w-24 rounded-lg sm:h-8" />
+    </>
+  ) : (
+    <>
+      <Button
+        disabled={props.isPending}
+        onClick={() => {
+          onOpenChange(false);
+        }}
+        type="button"
+        variant="outline"
+      >
+        Cancel
+      </Button>
+      <Button loading={props.isPending} type="submit">
+        {props.submitLabel}
+      </Button>
+    </>
+  );
+
+  const panel = isLoading ? (
+    props.children
+  ) : (
+    <>
+      <FormError error={props.error} />
+      {props.children}
+    </>
+  );
+
+  const panelAndFooter = (
+    <>
+      <div className="flex min-h-0 flex-1 flex-col">
+        <DrawerPanel>{panel}</DrawerPanel>
+      </div>
+
+      <DrawerFooter className="overflow-hidden">{footer}</DrawerFooter>
+    </>
+  );
 
   return (
     <Drawer
@@ -52,31 +104,25 @@ export function FormSheet({
         variant="default"
       >
         <DrawerHeader>
-          <DrawerTitle>{title}</DrawerTitle>
+          <DrawerTitle>
+            {isLoading ? (
+              <>
+                <span className="sr-only">Loading</span>
+                <Skeleton aria-hidden className="h-5 w-40" />
+              </>
+            ) : (
+              props.title
+            )}
+          </DrawerTitle>
         </DrawerHeader>
 
-        <form className="contents" onSubmit={onSubmit}>
-          <div className="flex min-h-0 flex-1 flex-col">
-            <DrawerPanel>
-              <FormError error={error} />
-              {children}
-            </DrawerPanel>
-          </div>
-
-          <DrawerFooter className="overflow-hidden">
-            <Button
-              disabled={isPending}
-              onClick={() => onOpenChange(false)}
-              type="button"
-              variant="outline"
-            >
-              Cancel
-            </Button>
-            <Button loading={isPending} type="submit">
-              {submitLabel}
-            </Button>
-          </DrawerFooter>
-        </form>
+        {isLoading ? (
+          panelAndFooter
+        ) : (
+          <form className="contents" onSubmit={props.onSubmit}>
+            {panelAndFooter}
+          </form>
+        )}
       </DrawerPopup>
     </Drawer>
   );

@@ -1,5 +1,6 @@
+import type { FormSheetProps } from './form-sheet';
 import type { RenderOptions } from '@/test';
-import type { ComponentProps, FormEvent } from 'react';
+import type { FormEvent } from 'react';
 
 import { useState } from 'react';
 
@@ -20,7 +21,7 @@ describe('FormSheet', () => {
   }
 
   function setup(
-    props: Partial<ComponentProps<typeof FormSheet>> = {},
+    props: Partial<FormSheetProps> = {},
     options?: RenderOptions,
     matchesLg = false
   ) {
