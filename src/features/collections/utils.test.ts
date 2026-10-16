@@ -1,17 +1,17 @@
 import { describe, expect, it } from '@/test';
 
-import { getCollectionUrl, getCollectionsPath } from './utils';
+import { buildCollectionUrl, buildCollectionsPath } from './utils';
 
-describe('getCollectionUrl', () => {
+describe('buildCollectionUrl', () => {
   it('links to /collections/{slug}', () => {
-    expect(getCollectionUrl('on-death-and-dying')).toBe(
+    expect(buildCollectionUrl('on-death-and-dying')).toBe(
       '/collections/on-death-and-dying'
     );
   });
 });
 
-describe('getCollectionsPath', () => {
+describe('buildCollectionsPath', () => {
   it('links to /collections', () => {
-    expect(getCollectionsPath()).toBe('/collections');
+    expect(buildCollectionsPath()).toBe('/collections');
   });
 });

@@ -4,7 +4,7 @@ import type { Speaker } from '@/features/speakers/types';
 import type { TalkWithSpeakerAndTopics } from '@/features/talks/types';
 
 import { Table, TableBody } from '@/components/ui';
-import { getEntityEditPath } from '@/lib/entities/paths';
+import { buildEntityEditPath } from '@/lib/entities/paths';
 import { describe, expect, it, render, screen } from '@/test';
 
 import { TalksTableRow } from './talks-table-row';
@@ -57,7 +57,7 @@ describe('TalksTableRow', () => {
 
     expect(titleLink).toHaveAttribute(
       'href',
-      getEntityEditPath('talks', talk._id)
+      buildEntityEditPath('talks', talk._id)
     );
     expect(titleLink).not.toHaveAttribute('href', '');
     expect(
@@ -85,7 +85,7 @@ describe('TalksTableRow', () => {
 
     expect(screen.getByRole('link', { name: talk.title })).toHaveAttribute(
       'href',
-      getEntityEditPath('talks', talk._id)
+      buildEntityEditPath('talks', talk._id)
     );
   });
 });

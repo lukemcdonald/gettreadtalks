@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { ContentActionsGroup } from '@/components/actions-group';
 import { useArchiveClip } from '@/features/clips/hooks/use-archive-clip';
 import { useDestroyClip } from '@/features/clips/hooks/use-destroy-clip';
-import { getAdminListPath } from '@/lib/entities/paths';
+import { buildAdminListPath } from '@/lib/entities/paths';
 
 interface ClipActionsMenuProps {
   clip: AdminClip;
@@ -20,7 +20,7 @@ export function ClipActionsMenu({ clip, clipUrl }: ClipActionsMenuProps) {
 
   const { mutateAsync: archiveClip } = useArchiveClip();
   const { mutateAsync: destroyClip } = useDestroyClip({
-    onSuccess: () => router.push(getAdminListPath('clips')),
+    onSuccess: () => router.push(buildAdminListPath('clips')),
   });
 
   const handleArchive = async () => {
@@ -35,7 +35,7 @@ export function ClipActionsMenu({ clip, clipUrl }: ClipActionsMenuProps) {
     <ContentActionsGroup
       content={clip}
       contentType="clip"
-      listUrl={getAdminListPath('clips')}
+      listUrl={buildAdminListPath('clips')}
       onArchiveAction={handleArchive}
       onDeleteAction={handleDelete}
       viewUrl={clipUrl}

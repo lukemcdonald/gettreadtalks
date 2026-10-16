@@ -1,7 +1,7 @@
-export function getTopicUrl(topicSlug: string) {
+export function buildTopicUrl(topicSlug: string) {
   return `/topics/${topicSlug}`;
 }
 
-export function getTopicsPath() {
+export function buildTopicsPath() {
   return '/topics';
 }

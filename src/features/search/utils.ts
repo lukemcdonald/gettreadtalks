@@ -8,10 +8,10 @@ import type {
 } from '@/features/search/types';
 
 import { NAVIGATION_LINKS } from '@/components/site-header/constants';
-import { getClipUrl } from '@/features/clips/utils';
+import { buildClipUrl } from '@/features/clips/utils';
 import { SEARCH_RESULT_TYPES } from '@/features/search/types';
 import { getSpeakerName } from '@/features/speakers/utils';
-import { getTalkUrl } from '@/features/talks/utils';
+import { buildTalkUrl } from '@/features/talks/utils';
 
 export const BROWSE_SEARCH_GROUP = 'Browse';
 const FAVORITES_SEARCH_HREF = '/account/favorites';
@@ -103,7 +103,7 @@ export function getSearchQuery(search?: string | string[]) {
   return value?.trim() ?? '';
 }
 
-export function getSearchPageHref(query: string) {
+export function buildSearchPageHref(query: string) {
   const params = new URLSearchParams({ search: query });
 
   return `/search?${params.toString()}`;
@@ -117,7 +117,7 @@ export function toSearchHits(result: SiteSearchResult): SearchHit[] {
 
     return [
       {
-        href: getTalkUrl(talk.speaker.slug, talk.slug),
+        href: buildTalkUrl(talk.speaker.slug, talk.slug),
         id: talk._id,
         subtitle: getSpeakerName(talk.speaker),
         title: talk.title,
@@ -142,7 +142,7 @@ export function toSearchHits(result: SiteSearchResult): SearchHit[] {
   }));
 
   const clips = result.clips.map((clip) => ({
-    href: getClipUrl(clip.slug),
+    href: buildClipUrl(clip.slug),
     id: clip._id,
     subtitle: getSpeakerName(clip.speaker),
     title: clip.title,
@@ -312,7 +312,7 @@ export function toCommandGroups(
     {
       items: [
         {
-          href: getSearchPageHref(trimmedQuery),
+          href: buildSearchPageHref(trimmedQuery),
           label: 'View all results',
           value: VIEW_ALL_SEARCH_GROUP,
         },

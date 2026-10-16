@@ -2,13 +2,13 @@ import { describe, expect, it } from '@/test';
 
 import {
   BROWSE_SEARCH_GROUP,
+  buildSearchPageHref,
   emptySiteSearch,
   getBrowseCommandGroups,
   getHeaderSearchQueryAfterClose,
   getHeaderSearchState,
   getHeaderSearchStatus,
   getSearchHotkeyLabel,
-  getSearchPageHref,
   getSearchQuery,
   getSearchSelectionAnalytics,
   groupSearchHits,
@@ -94,9 +94,9 @@ describe('getSearchQuery', () => {
   });
 });
 
-describe('getSearchPageHref', () => {
+describe('buildSearchPageHref', () => {
   it('keeps the existing search query param', () => {
-    expect(getSearchPageHref('John Piper')).toBe('/search?search=John+Piper');
+    expect(buildSearchPageHref('John Piper')).toBe('/search?search=John+Piper');
   });
 });
 

@@ -8,8 +8,8 @@ import {
 } from '@/app/manage/_components/manage-table';
 import { SpeakerActionsMenu } from '@/features/speakers/components/speaker-actions-menu';
 import { SpeakerAvatar } from '@/features/speakers/components/speaker-avatar';
-import { getSpeakerName, getSpeakerUrl } from '@/features/speakers/utils';
-import { getEntityEditPath } from '@/lib/entities/paths';
+import { buildSpeakerUrl, getSpeakerName } from '@/features/speakers/utils';
+import { buildEntityEditPath } from '@/lib/entities/paths';
 
 interface SpeakersTableRowProps {
   clipCount: number;
@@ -24,10 +24,10 @@ export function SpeakersTableRow({
   status,
   talkCount,
 }: SpeakersTableRowProps) {
-  const editPath = getEntityEditPath('speakers', speaker._id);
+  const editPath = buildEntityEditPath('speakers', speaker._id);
   const fullName = getSpeakerName(speaker);
   const publicPath =
-    status === 'published' ? getSpeakerUrl(speaker.slug) : undefined;
+    status === 'published' ? buildSpeakerUrl(speaker.slug) : undefined;
 
   return (
     <ManageRow

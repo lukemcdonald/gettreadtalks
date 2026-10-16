@@ -8,7 +8,7 @@ import { getTopic } from '@/features/topics/queries/get-topic';
 import {
   ADMIN_LIST_PATHS,
   getAdminLoginRedirect,
-  getEntityEditPath,
+  buildEntityEditPath,
 } from '@/lib/entities/paths';
 import { requireAdminUser } from '@/services/auth/server';
 
@@ -24,7 +24,7 @@ export async function EditTopicSheetPage({
   const { topicId } = await params;
 
   await requireAdminUser(
-    getAdminLoginRedirect(getEntityEditPath('topics', topicId)) as Route
+    getAdminLoginRedirect(buildEntityEditPath('topics', topicId)) as Route
   );
 
   const topic = await getTopic(topicId);

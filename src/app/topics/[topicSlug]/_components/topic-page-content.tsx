@@ -16,7 +16,7 @@ import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { TalksListSkeleton } from '@/features/talks/components/talks-list-skeleton';
 import { getTopicBySlug } from '@/features/topics/queries/get-topic-by-slug';
-import { getTopicUrl, getTopicsPath } from '@/features/topics/utils';
+import { buildTopicUrl, buildTopicsPath } from '@/features/topics/utils';
 import { buildBreadcrumbJsonLd } from '@/lib/json-ld';
 
 interface TopicPageContentProps {
@@ -39,8 +39,8 @@ async function TopicHeader({ topicSlug }: { topicSlug: string }) {
   const { talks, topic, totalTalks } = topicResult;
   const description = `Elevate your spiritual heartbeat with ${topicTalkCountPhrase(totalTalks)}.`;
   const segments = [
-    { href: getTopicsPath(), label: 'Topics' },
-    { href: getTopicUrl(topicSlug), label: topic.title },
+    { href: buildTopicsPath(), label: 'Topics' },
+    { href: buildTopicUrl(topicSlug), label: topic.title },
   ];
 
   return (
@@ -54,7 +54,7 @@ async function TopicHeader({ topicSlug }: { topicSlug: string }) {
           topicSlug,
         })}
       />
-      <ArchiveBackLink href={getTopicsPath()} label="Topics" />
+      <ArchiveBackLink href={buildTopicsPath()} label="Topics" />
       <PageHeader
         actions={<AdminEditButton entity="topics" id={topic._id} />}
         description={description}

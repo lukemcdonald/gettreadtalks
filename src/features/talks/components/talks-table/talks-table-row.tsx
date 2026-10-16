@@ -6,18 +6,18 @@ import {
 } from '@/app/manage/_components/manage-table';
 import { getSpeakerName } from '@/features/speakers/utils';
 import { TalkActionsMenu } from '@/features/talks/components/talk-actions-menu';
-import { getTalkUrl } from '@/features/talks/utils';
-import { getEntityEditPath } from '@/lib/entities/paths';
+import { buildTalkUrl } from '@/features/talks/utils';
+import { buildEntityEditPath } from '@/lib/entities/paths';
 
 interface TalksTableRowProps {
   talk: TalkWithSpeakerAndTopics;
 }
 
 export function TalksTableRow({ talk }: TalksTableRowProps) {
-  const editPath = getEntityEditPath('talks', talk._id);
+  const editPath = buildEntityEditPath('talks', talk._id);
   const publicPath =
     talk.status === 'published' && talk.speaker
-      ? getTalkUrl(talk.speaker.slug, talk.slug)
+      ? buildTalkUrl(talk.speaker.slug, talk.slug)
       : undefined;
 
   return (

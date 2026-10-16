@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 
 import { getClipBySlug } from '@/features/clips/queries/get-clip-by-slug';
-import { getClipUrl } from '@/features/clips/utils';
+import { buildClipUrl } from '@/features/clips/utils';
 import { redirectPublicEdit } from '@/lib/entities/redirect-public-edit';
 
 interface PageProps {
@@ -19,6 +19,6 @@ export default async function Page({ params }: PageProps) {
   await redirectPublicEdit({
     entity: 'clips',
     id: data.clip._id,
-    publicPath: getClipUrl(clipSlug),
+    publicPath: buildClipUrl(clipSlug),
   });
 }

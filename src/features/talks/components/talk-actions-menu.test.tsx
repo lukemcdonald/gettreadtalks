@@ -2,7 +2,7 @@
 
 import type { TalkWithSpeakerAndTopics } from '@/features/talks/types';
 
-import { getTalkUrl } from '@/features/talks/utils';
+import { buildTalkUrl } from '@/features/talks/utils';
 import { describe, expect, it, render, screen } from '@/test';
 
 import { TalkActionsMenu } from './talk-actions-menu';
@@ -45,7 +45,7 @@ describe('TalkActionsMenu', () => {
     status: 'published',
     title: 'Justification',
   } as TalkWithSpeakerAndTopics;
-  const talkUrl = getTalkUrl('john-piper', talk.slug);
+  const talkUrl = buildTalkUrl('john-piper', talk.slug);
 
   async function openMenu(viewUrl?: string) {
     const { click } = render(<TalkActionsMenu talk={talk} talkUrl={viewUrl} />);

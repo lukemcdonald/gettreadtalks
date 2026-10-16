@@ -1,6 +1,6 @@
 import { site } from '@/configs/site';
 import { talkListItemsJsonLd } from '@/features/talks/utils';
-import { getTopicUrl } from '@/features/topics/utils';
+import { buildTopicUrl } from '@/features/topics/utils';
 
 interface TopicJsonLdInput {
   description: string;
@@ -21,6 +21,6 @@ export function topicJsonLd({
     description,
     itemListElement: talkListItemsJsonLd(talks),
     name: title,
-    url: `${site.url}${getTopicUrl(topicSlug)}`,
+    url: `${site.url}${buildTopicUrl(topicSlug)}`,
   };
 }

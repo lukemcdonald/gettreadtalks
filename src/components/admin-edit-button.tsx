@@ -4,7 +4,7 @@ import { Suspense } from 'react';
 
 import { Button } from '@/components/ui';
 import { Link } from '@/components/ui/link';
-import { getEntityEditPath } from '@/lib/entities/paths';
+import { buildEntityEditPath } from '@/lib/entities/paths';
 import { getCurrentUser } from '@/services/auth/server';
 import { isAdmin } from '@/services/auth/utils';
 
@@ -23,7 +23,7 @@ async function AdminEditLink({ entity, id }: AdminEditButtonProps) {
   return (
     <Button
       data-testid="admin-edit"
-      render={<Link href={getEntityEditPath(entity, id)} />}
+      render={<Link href={buildEntityEditPath(entity, id)} />}
       size="sm"
       variant="outline"
     >

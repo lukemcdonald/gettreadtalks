@@ -1,15 +1,15 @@
 import { describe, expect, it } from '@/test';
 
-import { getSpeakerUrl, getSpeakersPath } from './utils';
+import { buildSpeakerUrl, buildSpeakersPath } from './utils';
 
-describe('getSpeakerUrl', () => {
+describe('buildSpeakerUrl', () => {
   it('links to /speakers/{slug}', () => {
-    expect(getSpeakerUrl('lloyd-jones')).toBe('/speakers/lloyd-jones');
+    expect(buildSpeakerUrl('lloyd-jones')).toBe('/speakers/lloyd-jones');
   });
 });
 
-describe('getSpeakersPath', () => {
+describe('buildSpeakersPath', () => {
   it('links to /speakers', () => {
-    expect(getSpeakersPath()).toBe('/speakers');
+    expect(buildSpeakersPath()).toBe('/speakers');
   });
 });

@@ -1,15 +1,15 @@
 import { describe, expect, it } from '@/test';
 
-import { getTopicUrl, getTopicsPath } from './utils';
+import { buildTopicUrl, buildTopicsPath } from './utils';
 
-describe('getTopicUrl', () => {
+describe('buildTopicUrl', () => {
   it('links to /topics/{slug}', () => {
-    expect(getTopicUrl('justification')).toBe('/topics/justification');
+    expect(buildTopicUrl('justification')).toBe('/topics/justification');
   });
 });
 
-describe('getTopicsPath', () => {
+describe('buildTopicsPath', () => {
   it('links to /topics', () => {
-    expect(getTopicsPath()).toBe('/topics');
+    expect(buildTopicsPath()).toBe('/topics');
   });
 });

@@ -1,5 +1,5 @@
 import { site } from '@/configs/site';
-import { getCollectionUrl } from '@/features/collections/utils';
+import { buildCollectionUrl } from '@/features/collections/utils';
 import { talkListItemsJsonLd } from '@/features/talks/utils';
 
 interface CollectionJsonLdInput {
@@ -21,6 +21,6 @@ export function collectionJsonLd({
     description,
     itemListElement: talkListItemsJsonLd(talks),
     name: title,
-    url: `${site.url}${getCollectionUrl(collectionSlug)}`,
+    url: `${site.url}${buildCollectionUrl(collectionSlug)}`,
   };
 }

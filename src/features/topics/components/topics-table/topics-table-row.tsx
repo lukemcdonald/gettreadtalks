@@ -5,8 +5,8 @@ import {
   ManageRow,
 } from '@/app/manage/_components/manage-table';
 import { TopicActionsMenu } from '@/features/topics/components/topic-actions-menu';
-import { getTopicUrl } from '@/features/topics/utils';
-import { getEntityEditPath } from '@/lib/entities/paths';
+import { buildTopicUrl } from '@/features/topics/utils';
+import { buildEntityEditPath } from '@/lib/entities/paths';
 
 interface TopicsTableRowProps {
   talkCount: number;
@@ -14,8 +14,8 @@ interface TopicsTableRowProps {
 }
 
 export function TopicsTableRow({ talkCount, topic }: TopicsTableRowProps) {
-  const editPath = getEntityEditPath('topics', topic._id);
-  const viewUrl = talkCount > 0 ? getTopicUrl(topic.slug) : undefined;
+  const editPath = buildEntityEditPath('topics', topic._id);
+  const viewUrl = talkCount > 0 ? buildTopicUrl(topic.slug) : undefined;
 
   return (
     <ManageRow

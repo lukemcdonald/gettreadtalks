@@ -17,7 +17,7 @@ import { updateTalkAction } from '@/features/talks/actions/update-talk';
 import { TalkFormFields } from '@/features/talks/components/talk-form-fields';
 import { UrlChangeDialog } from '@/features/talks/components/url-change-dialog';
 import { talkFormSchema } from '@/features/talks/schemas/talk-form';
-import { getTalkUrl } from '@/features/talks/utils';
+import { buildTalkUrl } from '@/features/talks/utils';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
 
 interface EditTalkSheetProps {
@@ -70,8 +70,8 @@ function getUrlChangeForTalk(talk: Talk, data: TalkFormData): UrlChange {
   const speakerSegment = speakerChanged ? '<new-speaker>' : '<speaker>';
 
   return {
-    newUrl: getTalkUrl(speakerSegment, newTalkSlug),
-    oldUrl: getTalkUrl('<speaker>', oldTalkSlug),
+    newUrl: buildTalkUrl(speakerSegment, newTalkSlug),
+    oldUrl: buildTalkUrl('<speaker>', oldTalkSlug),
   };
 }
 

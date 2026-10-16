@@ -2,11 +2,11 @@ import { createMcpHandler, McpServer } from '@modelcontextprotocol/server';
 import { z } from 'zod';
 
 import { site } from '@/configs/site';
-import { getClipUrl } from '@/features/clips/utils';
-import { getCollectionUrl } from '@/features/collections/utils';
-import { getSpeakerName, getSpeakerUrl } from '@/features/speakers/utils';
-import { getTalkUrl } from '@/features/talks/utils';
-import { getTopicUrl } from '@/features/topics/utils';
+import { buildClipUrl } from '@/features/clips/utils';
+import { buildCollectionUrl } from '@/features/collections/utils';
+import { buildSpeakerUrl, getSpeakerName } from '@/features/speakers/utils';
+import { buildTalkUrl } from '@/features/talks/utils';
+import { buildTopicUrl } from '@/features/topics/utils';
 
 import { withToolTracking } from './analytics';
 
@@ -220,7 +220,7 @@ function formatSpeaker(speaker: SpeakerRecord) {
     ministry: speaker.ministry,
     name: getSpeakerName(speaker),
     slug: speaker.slug,
-    url: canonicalUrl(getSpeakerUrl(speaker.slug)),
+    url: canonicalUrl(buildSpeakerUrl(speaker.slug)),
   };
 }
 
@@ -234,7 +234,7 @@ function formatTalk(talk: TalkRecord, speaker: SpeakerRecord | null) {
     title: talk.title,
     topics: talk.topicSlugs,
     url: speaker
-      ? canonicalUrl(getTalkUrl(speaker.slug, talk.slug))
+      ? canonicalUrl(buildTalkUrl(speaker.slug, talk.slug))
       : undefined,
   };
 }
@@ -246,7 +246,7 @@ function formatClip(clip: ClipRecord, speaker: SpeakerRecord | null) {
     slug: clip.slug,
     speaker: speaker ? formatSpeaker(speaker) : null,
     title: clip.title,
-    url: canonicalUrl(getClipUrl(clip.slug)),
+    url: canonicalUrl(buildClipUrl(clip.slug)),
   };
 }
 
@@ -255,7 +255,7 @@ function formatCollection(collection: CollectionRecord) {
     description: collection.description,
     slug: collection.slug,
     title: collection.title,
-    url: canonicalUrl(getCollectionUrl(collection.slug)),
+    url: canonicalUrl(buildCollectionUrl(collection.slug)),
   };
 }
 
@@ -264,7 +264,7 @@ function formatTopic(topic: TopicRecord, talkCount?: number) {
     slug: topic.slug,
     talkCount,
     title: topic.title,
-    url: canonicalUrl(getTopicUrl(topic.slug)),
+    url: canonicalUrl(buildTopicUrl(topic.slug)),
   };
 }
 
@@ -409,7 +409,7 @@ export async function getClip(
       ? {
           slug: result.talk.slug,
           title: result.talk.title,
-          url: canonicalUrl(getTalkUrl(result.speaker.slug, result.talk.slug)),
+          url: canonicalUrl(buildTalkUrl(result.speaker.slug, result.talk.slug)),
         }
       : {
           slug: result.talk.slug,
