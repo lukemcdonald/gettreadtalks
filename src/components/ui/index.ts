@@ -13,7 +13,6 @@ export * from './form-sheet';
 export * from './form-sheet-skeleton';
 export * from './link';
 export * from './mobile-filter-drawer';
-export * from './page-breadcrumb';
 export * from './primitives';
 export * from './search-input';
 export * from './section';

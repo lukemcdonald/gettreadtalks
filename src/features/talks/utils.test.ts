@@ -1,6 +1,16 @@
 import { describe, expect, it } from '@/test';
 
-import { talkListItemsJsonLd, talkMetaDescription } from './utils';
+import {
+  getTalksPath,
+  talkListItemsJsonLd,
+  talkMetaDescription,
+} from './utils';
+
+describe('getTalksPath', () => {
+  it('links to /talks', () => {
+    expect(getTalksPath()).toBe('/talks');
+  });
+});
 
 describe('talkListItemsJsonLd', () => {
   it('uses a talk url when the speaker is present', () => {

@@ -2,9 +2,11 @@ import type { Speaker } from '@/features/speakers/types';
 import type { Talk } from '@/features/talks/types';
 
 import { AdminEditButton } from '@/components/admin-edit-button';
+import { ArchiveBackLink } from '@/components/archive-back-link';
 import { HeroTitle } from '@/components/hero';
 import { Link } from '@/components/ui/link';
-import { getSpeakerName } from '@/features/speakers/utils';
+import { getSpeakerName, getSpeakerUrl } from '@/features/speakers/utils';
+import { getTalksPath } from '@/features/talks/utils';
 
 interface TalkHeroDetailsProps {
   speaker: Pick<Speaker, 'firstName' | 'lastName' | 'slug'> | null;
@@ -16,16 +18,19 @@ export function TalkHeroDetails({ speaker, talk }: TalkHeroDetailsProps) {
 
   return (
     <div className="space-y-2 text-center">
-      <div className="flex flex-wrap items-center justify-center gap-3">
-        <HeroTitle className="text-foreground min-w-0" size="sm">
-          {talk.title}
-        </HeroTitle>
-        <AdminEditButton entity="talks" id={talk._id} />
+      <div>
+        <ArchiveBackLink href={getTalksPath()} label="Talks" />
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <HeroTitle className="text-foreground min-w-0" size="sm">
+            {talk.title}
+          </HeroTitle>
+          <AdminEditButton entity="talks" id={talk._id} />
+        </div>
       </div>
       {speaker && (
         <p className="text-muted-foreground text-lg">
           by{' '}
-          <Link className="hover:underline" href={`/speakers/${speaker.slug}`}>
+          <Link className="hover:underline" href={getSpeakerUrl(speaker.slug)}>
             {speakerName}
           </Link>
         </p>

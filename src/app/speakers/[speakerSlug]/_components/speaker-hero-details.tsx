@@ -1,10 +1,11 @@
 import type { Speaker } from '@/features/speakers/types';
 
 import { AdminEditButton } from '@/components/admin-edit-button';
+import { ArchiveBackLink } from '@/components/archive-back-link';
 import { HeroTitle } from '@/components/hero';
 import { SpeakerAvatar } from '@/features/speakers/components/speaker-avatar';
 import { SpeakerMinistryLink } from '@/features/speakers/components/speaker-ministry-link';
-import { getSpeakerName } from '@/features/speakers/utils';
+import { getSpeakerName, getSpeakersPath } from '@/features/speakers/utils';
 import { cn } from '@/utils';
 
 interface SpeakerHeroDetailsProps {
@@ -24,10 +25,8 @@ export function SpeakerHeroDetails({
   return (
     <header
       className={cn(
-        'flex flex-col items-center gap-6 text-center',
-        isInline &&
-          hasImage &&
-          'md:flex-row md:items-start md:gap-8 md:text-left'
+        'flex w-full flex-col items-center gap-6',
+        isInline && hasImage && 'md:flex-row md:items-start md:gap-8'
       )}
     >
       {hasImage && (
@@ -39,19 +38,15 @@ export function SpeakerHeroDetails({
         />
       )}
 
-      <div className="flex-1 space-y-4">
-        <div>
-          {speaker.role && (
-            <p className="text-muted-foreground mb-2 text-xs font-semibold tracking-wide uppercase">
-              {speaker.role}
-            </p>
-          )}
-          <div
-            className={cn(
-              'flex flex-wrap items-center gap-3',
-              isInline ? 'justify-center md:justify-start' : 'justify-center'
-            )}
-          >
+      <div
+        className={cn(
+          'flex w-full min-w-0 flex-1 flex-col items-center gap-4 text-center',
+          isInline && 'md:items-start md:text-left'
+        )}
+      >
+        <div className="max-w-full">
+          <ArchiveBackLink href={getSpeakersPath()} label="Speakers" />
+          <div className="flex flex-wrap items-center gap-3">
             <HeroTitle className="text-foreground min-w-0">
               {speakerName}
             </HeroTitle>

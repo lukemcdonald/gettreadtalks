@@ -1,3 +1,5 @@
+import { getTalkUrl, getTalksPath } from '@/features/talks/utils';
+import { buildBreadcrumbJsonLd } from '@/lib/json-ld';
 import { describe, expect, it } from '@/test';
 
 import { talkJsonLd } from './talk-json-ld';
@@ -27,6 +29,32 @@ describe('talkJsonLd', () => {
       speaker,
       speakerSlug: 'lloyd-jones',
       talk: { publishedAt: Date.UTC(2020, 0, 15), title: 'The Cross' },
+      talkSlug: 'the-cross',
+    });
+
+    expect(result.uploadDate).toBe('2020-01-15T00:00:00.000Z');
+  });
+
+  it('uses _creationTime for uploadDate when publishedAt is missing', () => {
+    const result = talkJsonLd({
+      speaker,
+      speakerSlug: 'lloyd-jones',
+      talk: { _creationTime: Date.UTC(2019, 5, 1), title: 'The Cross' },
+      talkSlug: 'the-cross',
+    });
+
+    expect(result.uploadDate).toBe('2019-06-01T00:00:00.000Z');
+  });
+
+  it('prefers publishedAt over _creationTime for uploadDate', () => {
+    const result = talkJsonLd({
+      speaker,
+      speakerSlug: 'lloyd-jones',
+      talk: {
+        _creationTime: Date.UTC(2019, 5, 1),
+        publishedAt: Date.UTC(2020, 0, 15),
+        title: 'The Cross',
+      },
       talkSlug: 'the-cross',
     });
 
@@ -88,5 +116,36 @@ describe('talkJsonLd', () => {
     });
 
     expect(result.description).toBe('A sermon on justification.');
+  });
+});
+
+describe('talk page BreadcrumbList', () => {
+  it('matches the visible Talks / title trail with absolute urls', () => {
+    expect(
+      buildBreadcrumbJsonLd([
+        { href: getTalksPath(), label: 'Talks' },
+        {
+          href: getTalkUrl('lloyd-jones', 'the-cross'),
+          label: 'The Cross',
+        },
+      ])
+    ).toEqual({
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          item: 'https://www.gettreadtalks.com/talks',
+          name: 'Talks',
+          position: 1,
+        },
+        {
+          '@type': 'ListItem',
+          item: 'https://www.gettreadtalks.com/talks/lloyd-jones/the-cross',
+          name: 'The Cross',
+          position: 2,
+        },
+      ],
+    });
   });
 });

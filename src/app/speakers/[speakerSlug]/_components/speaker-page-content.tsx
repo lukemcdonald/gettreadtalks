@@ -15,7 +15,12 @@ import { SpeakerContentSkeleton } from '@/app/speakers/[speakerSlug]/_components
 import { JsonLd } from '@/components/json-ld';
 import { EditorialProfileLayout } from '@/components/layouts';
 import { getSpeakerBySlug } from '@/features/speakers/queries/get-speaker-by-slug';
-import { getSpeakerName } from '@/features/speakers/utils';
+import {
+  getSpeakerName,
+  getSpeakerUrl,
+  getSpeakersPath,
+} from '@/features/speakers/utils';
+import { buildBreadcrumbJsonLd } from '@/lib/json-ld';
 import { rotateCachedContent } from '@/utils';
 
 interface SpeakerPageContentProps {
@@ -47,9 +52,14 @@ async function SpeakerHeroSection({ speakerSlug }: { speakerSlug: string }) {
     await featuredTalkForHero(talks)
   );
   const name = getSpeakerName(speaker);
+  const segments = [
+    { href: getSpeakersPath(), label: 'Speakers' },
+    { href: getSpeakerUrl(speakerSlug), label: name },
+  ];
 
   return (
     <>
+      <JsonLd data={buildBreadcrumbJsonLd(segments)} />
       <JsonLd
         data={speakerJsonLd({
           description: speaker.description,

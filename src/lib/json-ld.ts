@@ -1,0 +1,25 @@
+import { site } from '@/configs/site';
+
+interface BreadcrumbSegment {
+  href?: string;
+  label: string;
+}
+
+export function buildBreadcrumbJsonLd(
+  segments: (BreadcrumbSegment | false | null | undefined)[]
+) {
+  const items = segments.filter(
+    (segment): segment is BreadcrumbSegment => !!segment
+  );
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((segment, index) => ({
+      '@type': 'ListItem' as const,
+      ...(segment.href && { item: `${site.url}${segment.href}` }),
+      name: segment.label,
+      position: index + 1,
+    })),
+  };
+}

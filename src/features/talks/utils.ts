@@ -10,6 +10,10 @@ export function getTalkUrl(speakerSlug: string, talkSlug: string): string {
   return `/talks/${speakerSlug}/${talkSlug}`;
 }
 
+export function getTalksPath() {
+  return '/talks';
+}
+
 export function talkMetaDescription({
   description,
   scripture,
