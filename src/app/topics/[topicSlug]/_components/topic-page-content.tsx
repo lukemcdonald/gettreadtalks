@@ -16,6 +16,8 @@ import { PageHeader } from '@/components/page-header';
 import { PageBreadcrumb } from '@/components/ui';
 import { TalksListSkeleton } from '@/features/talks/components/talks-list-skeleton';
 import { getTopicBySlug } from '@/features/topics/queries/get-topic-by-slug';
+import { getTopicUrl } from '@/features/topics/utils';
+import { buildBreadcrumbJsonLd } from '@/lib/json-ld';
 
 interface TopicPageContentProps {
   params: Promise<{
@@ -64,13 +66,16 @@ async function TopicBreadcrumb({ topicSlug }: { topicSlug: string }) {
     notFound();
   }
 
+  const segments = [
+    { href: '/topics', label: 'Topics' },
+    { href: getTopicUrl(topicSlug), label: topicResult.topic.title },
+  ];
+
   return (
-    <PageBreadcrumb
-      segments={[
-        { href: '/topics', label: 'Topics' },
-        { label: topicResult.topic.title },
-      ]}
-    />
+    <>
+      <JsonLd data={buildBreadcrumbJsonLd(segments)} />
+      <PageBreadcrumb segments={segments} />
+    </>
   );
 }
 

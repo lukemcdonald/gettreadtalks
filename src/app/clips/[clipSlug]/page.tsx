@@ -5,9 +5,11 @@ import { notFound } from 'next/navigation';
 import { clipJsonLd } from '@/app/clips/[clipSlug]/_components/clip-json-ld';
 import { JsonLd } from '@/components/json-ld';
 import { EditorialProfileLayout } from '@/components/layouts';
+import { PageBreadcrumb } from '@/components/ui';
 import { getClipBySlug } from '@/features/clips/queries/get-clip-by-slug';
 import { getClipUrl } from '@/features/clips/utils';
 import { getSpeakerName } from '@/features/speakers/utils';
+import { buildBreadcrumbJsonLd } from '@/lib/json-ld';
 import { pageMetadata } from '@/lib/metadata';
 
 import { ClipContent } from './_components/clip-content';
@@ -48,11 +50,17 @@ export default async function ClipPage({ params }: ClipPageProps) {
   }
 
   const { clip, speaker, talk } = data;
+  const segments = [
+    { href: '/clips', label: 'Clips' },
+    { href: getClipUrl(clip.slug), label: clip.title },
+  ];
 
   return (
     <>
+      <JsonLd data={buildBreadcrumbJsonLd(segments)} />
       <JsonLd data={clipJsonLd({ clip, speaker, talk })} />
       <EditorialProfileLayout
+        breadcrumb={<PageBreadcrumb segments={segments} />}
         content={<ClipContent clip={clip} speaker={speaker} talk={talk} />}
         hero={<ClipHero clip={clip} speaker={speaker} />}
       />

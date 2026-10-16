@@ -7,6 +7,7 @@ interface TalkJsonLdInput {
   speaker: Parameters<typeof getSpeakerName>[0];
   speakerSlug: string;
   talk: {
+    _creationTime?: number;
     description?: string;
     mediaUrl?: string;
     publishedAt?: number;
@@ -49,6 +50,7 @@ export function talkJsonLd({
   talkSlug,
 }: TalkJsonLdInput) {
   const speakerName = getSpeakerName(speaker);
+  const uploadedAt = talk.publishedAt ?? talk._creationTime;
 
   return {
     '@context': 'https://schema.org',
@@ -61,8 +63,8 @@ export function talkJsonLd({
     }),
     name: talk.title,
     ...(speakerName && { creator: { '@type': 'Person', name: speakerName } }),
-    ...(talk.publishedAt && {
-      uploadDate: new Date(talk.publishedAt).toISOString(),
+    ...(uploadedAt && {
+      uploadDate: new Date(uploadedAt).toISOString(),
     }),
     url: `${site.url}${getTalkUrl(speakerSlug, talkSlug)}`,
   };

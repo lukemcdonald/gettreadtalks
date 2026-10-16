@@ -14,8 +14,10 @@ import { speakerJsonLd } from '@/app/speakers/[speakerSlug]/_components/speaker-
 import { SpeakerContentSkeleton } from '@/app/speakers/[speakerSlug]/_components/speaker-page-skeleton';
 import { JsonLd } from '@/components/json-ld';
 import { EditorialProfileLayout } from '@/components/layouts';
+import { PageBreadcrumb } from '@/components/ui';
 import { getSpeakerBySlug } from '@/features/speakers/queries/get-speaker-by-slug';
-import { getSpeakerName } from '@/features/speakers/utils';
+import { getSpeakerName, getSpeakerUrl } from '@/features/speakers/utils';
+import { buildBreadcrumbJsonLd } from '@/lib/json-ld';
 import { rotateCachedContent } from '@/utils';
 
 interface SpeakerPageContentProps {
@@ -32,6 +34,29 @@ async function featuredTalkForHero(talks: Talk[]) {
   );
 
   return featuredTalk;
+}
+
+async function SpeakerBreadcrumb({ speakerSlug }: { speakerSlug: string }) {
+  const data = await getSpeakerBySlug(speakerSlug);
+
+  if (!data) {
+    notFound();
+  }
+
+  const segments = [
+    { href: '/speakers', label: 'Speakers' },
+    {
+      href: getSpeakerUrl(speakerSlug),
+      label: getSpeakerName(data.speaker),
+    },
+  ];
+
+  return (
+    <>
+      <JsonLd data={buildBreadcrumbJsonLd(segments)} />
+      <PageBreadcrumb segments={segments} />
+    </>
+  );
 }
 
 async function SpeakerHeroSection({ speakerSlug }: { speakerSlug: string }) {
@@ -93,6 +118,11 @@ export async function SpeakerPageContent({ params }: SpeakerPageContentProps) {
 
   return (
     <EditorialProfileLayout
+      breadcrumb={
+        <Suspense>
+          <SpeakerBreadcrumb speakerSlug={speakerSlug} />
+        </Suspense>
+      }
       content={
         <Suspense fallback={<SpeakerContentSkeleton />}>
           <SpeakerRelatedContent speakerSlug={speakerSlug} />

@@ -13,6 +13,7 @@ import { PageBreadcrumb } from '@/components/ui';
 import { CollectionTalkList } from '@/features/collections/components/collection-talk-list';
 import { getCollectionBySlug } from '@/features/collections/queries/get-collection-by-slug';
 import { getCollectionUrl } from '@/features/collections/utils';
+import { buildBreadcrumbJsonLd } from '@/lib/json-ld';
 import { pageMetadata } from '@/lib/metadata';
 
 interface CollectionPageProps {
@@ -48,9 +49,14 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
 
   const { collection, talks } = data;
   const uniqueSpeakers = uniqueSpeakersFromTalks(talks);
+  const segments = [
+    { href: '/collections', label: 'Collections' },
+    { href: getCollectionUrl(collectionSlug), label: collection.title },
+  ];
 
   return (
     <>
+      <JsonLd data={buildBreadcrumbJsonLd(segments)} />
       <JsonLd
         data={collectionJsonLd({
           collectionSlug,
@@ -60,14 +66,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
         })}
       />
       <SidebarLayout
-        breadcrumb={
-          <PageBreadcrumb
-            segments={[
-              { href: '/collections', label: 'Collections' },
-              { label: collection.title },
-            ]}
-          />
-        }
+        breadcrumb={<PageBreadcrumb segments={segments} />}
         content={<CollectionTalkList talks={talks} />}
         header={
           <PageHeader
