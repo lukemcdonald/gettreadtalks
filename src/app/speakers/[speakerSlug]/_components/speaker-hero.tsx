@@ -20,15 +20,14 @@ export function SpeakerHero({ featuredTalk, speaker }: SpeakerHeroProps) {
       <Container
         className={cn(
           'relative',
-          hasVideo
-            ? 'flex flex-col gap-10 lg:flex-row lg:items-center lg:gap-12'
-            : 'flex items-center justify-center'
+          hasVideo &&
+            'flex flex-col gap-10 lg:flex-row lg:items-center lg:gap-12'
         )}
       >
         {/* Speaker details - 50% width when video present, centered when not */}
         <div
           className={cn(
-            hasVideo ? 'lg:flex-1' : 'w-full max-w-2xl text-center'
+            hasVideo ? 'lg:flex-1' : 'mx-auto w-full max-w-2xl text-center'
           )}
         >
           <SpeakerHeroDetails
