@@ -72,7 +72,10 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
         content={<CollectionTalkList talks={talks} />}
         header={
           <>
-            <ArchiveBackLink href={buildCollectionsPath()} label="Collections" />
+            <ArchiveBackLink
+              href={buildCollectionsPath()}
+              label="Collections"
+            />
             <PageHeader
               actions={
                 <AdminEditButton entity="collections" id={collection._id} />

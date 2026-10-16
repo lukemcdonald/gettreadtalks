@@ -409,7 +409,9 @@ export async function getClip(
       ? {
           slug: result.talk.slug,
           title: result.talk.title,
-          url: canonicalUrl(buildTalkUrl(result.speaker.slug, result.talk.slug)),
+          url: canonicalUrl(
+            buildTalkUrl(result.speaker.slug, result.talk.slug)
+          ),
         }
       : {
           slug: result.talk.slug,

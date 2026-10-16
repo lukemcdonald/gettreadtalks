@@ -20,9 +20,9 @@ describe('buildEntityEditPath', () => {
   });
 
   it('prefills archived status', () => {
-    expect(buildEntityEditPath('talks', 'talk123', { status: 'archived' })).toBe(
-      '/talks/edit/talk123?status=archived'
-    );
+    expect(
+      buildEntityEditPath('talks', 'talk123', { status: 'archived' })
+    ).toBe('/talks/edit/talk123?status=archived');
   });
 });
 

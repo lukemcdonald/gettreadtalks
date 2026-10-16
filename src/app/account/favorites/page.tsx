@@ -69,7 +69,9 @@ function FavoritesTabPanels({ clips, speakers, talks }: UserFavorites) {
         label="Talk"
         renderItem={(talk) => (
           <FavoriteTalkRow
-            href={talk.speaker ? buildTalkUrl(talk.speaker.slug, talk.slug) : ''}
+            href={
+              talk.speaker ? buildTalkUrl(talk.speaker.slug, talk.slug) : ''
+            }
             key={talk._id}
             speaker={talk.speaker}
             talkId={talk._id}
