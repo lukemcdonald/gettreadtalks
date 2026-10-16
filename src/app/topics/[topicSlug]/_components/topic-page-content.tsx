@@ -10,13 +10,14 @@ import { TopicSidebar } from '@/app/topics/[topicSlug]/_components/topic-sidebar
 import { TopicTalks } from '@/app/topics/[topicSlug]/_components/topic-talks';
 import { topicTalkCountPhrase } from '@/app/topics/[topicSlug]/_components/topic-talks-description';
 import { AdminEditButton } from '@/components/admin-edit-button';
+import { ArchiveBackLink } from '@/components/archive-back-link';
 import { JsonLd } from '@/components/json-ld';
 import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { PageBreadcrumb } from '@/components/ui';
 import { TalksListSkeleton } from '@/features/talks/components/talks-list-skeleton';
 import { getTopicBySlug } from '@/features/topics/queries/get-topic-by-slug';
-import { getTopicUrl } from '@/features/topics/utils';
+import { getTopicUrl, getTopicsPath } from '@/features/topics/utils';
 import { buildBreadcrumbJsonLd } from '@/lib/json-ld';
 
 interface TopicPageContentProps {
@@ -49,12 +50,14 @@ async function TopicHeader({ topicSlug }: { topicSlug: string }) {
           topicSlug,
         })}
       />
-      <PageHeader
-        actions={<AdminEditButton entity="topics" id={topic._id} />}
-        description={description}
-        size="lg"
-        title={topic.title}
-      />
+      <ArchiveBackLink href={getTopicsPath()} label="Back to Topics">
+        <PageHeader
+          actions={<AdminEditButton entity="topics" id={topic._id} />}
+          description={description}
+          size="lg"
+          title={topic.title}
+        />
+      </ArchiveBackLink>
     </>
   );
 }
@@ -67,7 +70,7 @@ async function TopicBreadcrumb({ topicSlug }: { topicSlug: string }) {
   }
 
   const segments = [
-    { href: '/topics', label: 'Topics' },
+    { href: getTopicsPath(), label: 'Topics' },
     { href: getTopicUrl(topicSlug), label: topicResult.topic.title },
   ];
 

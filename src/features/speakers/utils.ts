@@ -26,6 +26,10 @@ export function getSpeakerUrl(speakerSlug: string) {
   return `/speakers/${speakerSlug}`;
 }
 
+export function getSpeakersPath() {
+  return '/speakers';
+}
+
 /**
  * Sort speakers by name (immutable).
  */

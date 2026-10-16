@@ -11,10 +11,9 @@ import {
 import { TalkRelatedTalks } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-related-talks';
 import { JsonLd } from '@/components/json-ld';
 import { EditorialProfileLayout } from '@/components/layouts';
-import { PageBreadcrumb } from '@/components/ui';
 import { getTalkBySlug } from '@/features/talks/queries/get-talk-by-slug';
 import { getTalkBySlugAdmin } from '@/features/talks/queries/get-talk-by-slug-admin';
-import { getTalkUrl } from '@/features/talks/utils';
+import { getTalkUrl, getTalksPath } from '@/features/talks/utils';
 import { buildBreadcrumbJsonLd } from '@/lib/json-ld';
 
 type TalkBySlug = NonNullable<Awaited<ReturnType<typeof getTalkBySlug>>>;
@@ -35,7 +34,7 @@ interface TalkDetailProps {
 function TalkDetail({ speakerSlug, talkResult, talkSlug }: TalkDetailProps) {
   const { clips, collection, speaker, talk, topics } = talkResult;
   const segments = [
-    { href: '/talks', label: 'Talks' },
+    { href: getTalksPath(), label: 'Talks' },
     { href: getTalkUrl(speakerSlug, talkSlug), label: talk.title },
   ];
 
@@ -44,7 +43,6 @@ function TalkDetail({ speakerSlug, talkResult, talkSlug }: TalkDetailProps) {
       <JsonLd data={buildBreadcrumbJsonLd(segments)} />
       <JsonLd data={talkJsonLd({ speaker, speakerSlug, talk, talkSlug })} />
       <EditorialProfileLayout
-        breadcrumb={<PageBreadcrumb segments={segments} />}
         content={
           <TalkContentSections
             clips={clips}

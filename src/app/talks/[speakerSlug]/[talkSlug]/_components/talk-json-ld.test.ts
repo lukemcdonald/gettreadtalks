@@ -1,4 +1,4 @@
-import { getTalkUrl } from '@/features/talks/utils';
+import { getTalkUrl, getTalksPath } from '@/features/talks/utils';
 import { buildBreadcrumbJsonLd } from '@/lib/json-ld';
 import { describe, expect, it } from '@/test';
 
@@ -123,7 +123,7 @@ describe('talk page BreadcrumbList', () => {
   it('matches the visible Talks / title trail with absolute urls', () => {
     expect(
       buildBreadcrumbJsonLd([
-        { href: '/talks', label: 'Talks' },
+        { href: getTalksPath(), label: 'Talks' },
         {
           href: getTalkUrl('lloyd-jones', 'the-cross'),
           label: 'The Cross',

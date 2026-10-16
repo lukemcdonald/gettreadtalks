@@ -4,3 +4,7 @@
 export function getClipUrl(clipSlug: string): string {
   return `/clips/${clipSlug}`;
 }
+
+export function getClipsPath() {
+  return '/clips';
+}
