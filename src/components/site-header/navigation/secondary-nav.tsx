@@ -20,9 +20,11 @@ export function SecondaryNav({ className }: SecondaryNavProps) {
         <HeaderSearch />
       </Suspense>
       <ModeSwitcher className="hidden size-10 md:flex" />
-      <Suspense fallback={<AccountMenuSkeleton />}>
-        <AccountMenuServer />
-      </Suspense>
+      <div className="hidden md:flex">
+        <Suspense fallback={<AccountMenuSkeleton />}>
+          <AccountMenuServer />
+        </Suspense>
+      </div>
     </div>
   );
 }
