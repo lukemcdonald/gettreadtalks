@@ -1,8 +1,8 @@
 import type { Speaker } from '@/features/speakers/types';
 import type { Talk } from '@/features/talks/types';
 
+import { FeaturedVideoCard } from '@/components/featured-video-card';
 import { getVideoThumbnail } from '@/components/media-embed';
-import { MediaThumbnailCard } from '@/components/media-thumbnail-card';
 import { getTalkUrl } from '@/features/talks/utils';
 
 interface SpeakerHeroFeaturedTalkProps {
@@ -18,7 +18,7 @@ export function SpeakerHeroFeaturedTalk({
   const thumbnail = getVideoThumbnail(talk.mediaUrl);
 
   return (
-    <MediaThumbnailCard
+    <FeaturedVideoCard
       actionLabel="View details"
       href={href}
       thumbnail={thumbnail}

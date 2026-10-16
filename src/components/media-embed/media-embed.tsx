@@ -12,6 +12,7 @@ import { VideoPlayer } from './media/video-player';
 import { VimeoEmbed } from './media/vimeo-embed';
 import { YouTubeEmbed } from './media/youtube-embed';
 import { detectMediaType } from './utils';
+import { VideoFrame } from './video-frame';
 
 interface MediaEmbedProps {
   className?: string;
@@ -33,16 +34,8 @@ export function MediaEmbed({
     media.type === 'vimeo' ||
     media.type === 'youtube';
   const hasWrapper = media.type !== 'unknown';
-
-  return (
-    <div
-      className={cn(
-        'text-center',
-        isVideo && 'overflow-hidden rounded-2xl',
-        hasWrapper && className
-      )}
-      key={pathname}
-    >
+  const content = (
+    <>
       {media.type === 'audio' && (
         <AudioPlayer src={media.src} trackingContext={trackingContext} />
       )}
@@ -58,6 +51,24 @@ export function MediaEmbed({
       )}
       {media.type === 'vimeo' && <VimeoEmbed id={media.id} title={title} />}
       {media.type === 'youtube' && <YouTubeEmbed id={media.id} title={title} />}
+    </>
+  );
+  const wrapperClassName = cn(
+    !isVideo && 'text-center',
+    hasWrapper && className
+  );
+
+  if (isVideo) {
+    return (
+      <VideoFrame className={wrapperClassName} key={pathname}>
+        {content}
+      </VideoFrame>
+    );
+  }
+
+  return (
+    <div className={wrapperClassName} key={pathname}>
+      {content}
     </div>
   );
 }

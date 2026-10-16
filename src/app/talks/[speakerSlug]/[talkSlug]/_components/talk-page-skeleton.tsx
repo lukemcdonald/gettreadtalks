@@ -1,5 +1,6 @@
 import { FeaturedGrid } from '@/components/featured-grid';
 import { EditorialProfileLayout } from '@/components/layouts';
+import { VideoFrameSkeleton } from '@/components/media-embed';
 import { MediaCardSkeleton } from '@/components/skeletons';
 import { Container, Section, Skeleton } from '@/components/ui';
 
@@ -12,7 +13,7 @@ function TalkHeroSkeleton() {
           <Skeleton className="mx-auto h-6 w-40" />
         </div>
         <div className="mx-auto w-full max-w-4xl">
-          <Skeleton className="aspect-video w-full rounded-2xl" />
+          <VideoFrameSkeleton />
         </div>
       </Container>
     </Section>

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 
+import { VideoFrameSkeleton } from '@/components/media-embed';
 import { Container, Section, Skeleton } from '@/components/ui';
 
 interface EditorialProfileHeroSkeletonProps {
@@ -17,7 +18,7 @@ export function EditorialProfileHeroSkeleton({
           <Skeleton className="mx-auto h-5 w-40" />
         </div>
 
-        <Skeleton className="aspect-video w-full rounded-2xl" />
+        <VideoFrameSkeleton />
 
         {children}
       </Container>

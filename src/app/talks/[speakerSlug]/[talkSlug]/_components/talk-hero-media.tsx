@@ -12,7 +12,6 @@ export function TalkHeroMedia({ speaker, talk }: TalkHeroMediaProps) {
   return (
     <div className="mx-auto w-full max-w-4xl">
       <MediaEmbed
-        className="shadow-2xl"
         mediaUrl={talk.mediaUrl}
         title={talk.title}
         trackingContext={{
