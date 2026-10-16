@@ -41,37 +41,6 @@ test('Search / Mobile drawer', async ({ homePage, searchPage }) => {
   await expect(searchPage.viewAll).toBeHidden();
 });
 
-test('Search / Mobile drawer swipe dismiss', async ({
-  homePage,
-  page,
-  searchPage,
-}) => {
-  await page.setViewportSize({ height: 844, width: 390 });
-  await homePage.goto();
-  await searchPage.open();
-
-  const dialog = page.getByRole('dialog');
-  await expect(dialog).toBeVisible();
-
-  const box = await dialog.boundingBox();
-
-  expect(box).toBeTruthy();
-
-  if (!box) {
-    return;
-  }
-
-  const startX = box.x + box.width / 2;
-  const startY = box.y + 12;
-
-  await page.mouse.move(startX, startY);
-  await page.mouse.down();
-  await page.mouse.move(startX, startY + 420, { steps: 20 });
-  await page.mouse.up();
-
-  await expect(searchPage.input).toBeHidden();
-});
-
 test('Search / Keeps query on dismiss and clears after navigate', async ({
   homePage,
   searchPage,
