@@ -75,6 +75,22 @@ describe('MobileNav', () => {
     ).not.toBeInTheDocument();
   });
 
+  it('shows Sign In when signed out', async () => {
+    vi.mocked(useCurrentUser).mockReturnValue({
+      data: null,
+      isLoading: false,
+    });
+
+    const { click } = render(<MobileNav />);
+
+    await click(screen.getByRole('button', { name: 'Open navigation menu' }));
+
+    expect(screen.getByRole('button', { name: 'Sign In' })).toHaveAttribute(
+      'href',
+      '/login'
+    );
+  });
+
   it('hides Content for non-admins', async () => {
     const { click } = setup(createUser('user'));
 

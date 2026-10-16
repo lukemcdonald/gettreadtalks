@@ -5,8 +5,8 @@ import type { SearchOverlayProps } from '@/features/search/types';
 import { useRef } from 'react';
 
 import {
+  CommandPanel,
   Drawer,
-  DrawerHeader,
   DrawerPanel,
   DrawerPopup,
   DrawerTitle,
@@ -37,36 +37,32 @@ export function MobileSearchDrawer({
 
   return (
     <Drawer
-      defaultSnapPoint={0.9}
       onOpenChange={onOpenChange}
       onOpenChangeComplete={handleOpenChangeComplete}
       open={open}
       position="bottom"
-      snapPoints={[0.9]}
     >
-      <DrawerPopup showBar variant="default">
+      <DrawerPopup
+        className="[--drawer-height:90dvh]"
+        showBar
+        variant="default"
+      >
         <SearchCommand
           groups={groups}
           onInputValueChange={onValueChange}
           value={value}
         >
-          <DrawerHeader>
-            <DrawerTitle className="sr-only">Search</DrawerTitle>
-            <SearchCommandField
-              inputClassName="has-focus-visible:border-input"
-              isLoading={isLoading}
-              ref={inputRef}
-            />
-          </DrawerHeader>
-          <div className="flex min-h-0 flex-1 flex-col">
-            <DrawerPanel>
+          <DrawerTitle className="sr-only">Search</DrawerTitle>
+          <SearchCommandField isLoading={isLoading} ref={inputRef} />
+          <DrawerPanel className="min-h-0 flex-1 p-0" scrollable={false}>
+            <CommandPanel className="h-full min-h-0">
               <SearchCommandResults
                 groups={groups}
                 onSelect={onSelect}
                 status={status}
               />
-            </DrawerPanel>
-          </div>
+            </CommandPanel>
+          </DrawerPanel>
         </SearchCommand>
       </DrawerPopup>
     </Drawer>
