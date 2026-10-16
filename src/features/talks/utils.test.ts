@@ -1,6 +1,6 @@
 import { describe, expect, it } from '@/test';
 
-import { talkListItemsJsonLd } from './utils';
+import { talkListItemsJsonLd, talkMetaDescription } from './utils';
 
 describe('talkListItemsJsonLd', () => {
   it('uses a talk url when the speaker is present', () => {
@@ -33,5 +33,37 @@ describe('talkListItemsJsonLd', () => {
 
     expect(item.position).toBe(1);
     expect(item.url).toBeUndefined();
+  });
+});
+
+describe('talkMetaDescription', () => {
+  it('includes scripture and topics when they are present', () => {
+    expect(
+      talkMetaDescription({
+        description: 'A sermon on justification.',
+        scripture: 'Romans 3:21-26',
+        speakerName: 'Martyn Lloyd-Jones',
+        topicTitles: ['Justification', 'The Gospel'],
+      })
+    ).toBe(
+      'A sermon on justification. Romans 3:21-26 Topics: Justification, The Gospel.'
+    );
+  });
+
+  it('falls back to the speaker when the talk has no description', () => {
+    expect(
+      talkMetaDescription({
+        speakerName: 'Martyn Lloyd-Jones',
+      })
+    ).toBe('A talk by Martyn Lloyd-Jones.');
+  });
+
+  it('omits scripture and topics when they are missing', () => {
+    expect(
+      talkMetaDescription({
+        description: 'A sermon on justification.',
+        speakerName: 'Martyn Lloyd-Jones',
+      })
+    ).toBe('A sermon on justification.');
   });
 });

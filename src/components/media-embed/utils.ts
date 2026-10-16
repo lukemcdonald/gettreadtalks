@@ -92,6 +92,7 @@ export function mediaJsonLd(url?: string) {
     return {
       '@type': 'VideoObject' as const,
       embedUrl: `https://www.youtube.com/embed/${media.id}`,
+      thumbnailUrl: `https://img.youtube.com/vi/${media.id}/hqdefault.jpg`,
     };
   }
 

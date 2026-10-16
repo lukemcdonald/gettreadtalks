@@ -4,6 +4,7 @@ export const site = {
     contact: 'contact@gettreadtalks.com',
     reply: 'hello@gettreadtalks.com',
   },
+  locale: 'en_US',
   name: 'TREAD Talks',
   url: 'https://www.gettreadtalks.com',
 } as const;

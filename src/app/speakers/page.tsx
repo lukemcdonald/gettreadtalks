@@ -10,15 +10,17 @@ import { PageHeader } from '@/components/page-header';
 import { SidebarFiltersSkeleton } from '@/components/skeletons';
 import { SpeakersListSkeleton } from '@/features/speakers/components/speakers-list-skeleton';
 import { getSpeakers } from '@/features/speakers/queries/get-speakers';
+import { pageMetadata } from '@/lib/metadata';
 
 // fallow-ignore-next-line unused-export
 export const ensureStatic = 'shell';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
+  canonical: '/speakers',
   description:
     'Discover faithful ministers of the Gospel and be strengthened by their teaching.',
   title: 'Speakers',
-};
+});
 
 interface SpeakersPageProps {
   searchParams: Promise<SpeakersSearchParams>;

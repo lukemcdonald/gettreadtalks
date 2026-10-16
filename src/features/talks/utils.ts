@@ -10,6 +10,34 @@ export function getTalkUrl(speakerSlug: string, talkSlug: string): string {
   return `/talks/${speakerSlug}/${talkSlug}`;
 }
 
+export function talkMetaDescription({
+  description,
+  scripture,
+  speakerName,
+  topicTitles = [],
+}: {
+  description?: string;
+  scripture?: string;
+  speakerName?: string;
+  topicTitles?: string[];
+}) {
+  const summary =
+    description?.trim() ||
+    (speakerName ? `A talk by ${speakerName}.` : undefined);
+  const topics = topicTitles.length
+    ? `Topics: ${topicTitles.join(', ')}.`
+    : undefined;
+  const parts = [summary, scripture, topics].filter((part): part is string =>
+    Boolean(part)
+  );
+
+  if (parts.length === 0) {
+    return;
+  }
+
+  return parts.join(' ');
+}
+
 export function talkListItemsJsonLd(
   talks: {
     speaker: { slug: string } | null;

@@ -3,8 +3,10 @@ import { z } from 'zod';
 
 import { site } from '@/configs/site';
 import { getClipUrl } from '@/features/clips/utils';
-import { getSpeakerName } from '@/features/speakers/utils';
+import { getCollectionUrl } from '@/features/collections/utils';
+import { getSpeakerName, getSpeakerUrl } from '@/features/speakers/utils';
 import { getTalkUrl } from '@/features/talks/utils';
+import { getTopicUrl } from '@/features/topics/utils';
 
 import { withToolTracking } from './analytics';
 
@@ -218,7 +220,7 @@ function formatSpeaker(speaker: SpeakerRecord) {
     ministry: speaker.ministry,
     name: getSpeakerName(speaker),
     slug: speaker.slug,
-    url: canonicalUrl(`/speakers/${speaker.slug}`),
+    url: canonicalUrl(getSpeakerUrl(speaker.slug)),
   };
 }
 
@@ -253,7 +255,7 @@ function formatCollection(collection: CollectionRecord) {
     description: collection.description,
     slug: collection.slug,
     title: collection.title,
-    url: canonicalUrl(`/collections/${collection.slug}`),
+    url: canonicalUrl(getCollectionUrl(collection.slug)),
   };
 }
 
@@ -262,7 +264,7 @@ function formatTopic(topic: TopicRecord, talkCount?: number) {
     slug: topic.slug,
     talkCount,
     title: topic.title,
-    url: canonicalUrl(`/topics/${topic.slug}`),
+    url: canonicalUrl(getTopicUrl(topic.slug)),
   };
 }
 
