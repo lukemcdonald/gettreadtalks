@@ -90,8 +90,8 @@ Page composition and Suspense wrappers that read `params` or `searchParams` stay
 **Overlays**
 
 - Dialog — centered blocking UI (confirm, alert)
-- Sheet — side/bottom panel that is a non-nested modal overlay
-- Drawer — edge panel where swipe-to-dismiss is the product (nav, mobile filters, nested FormSheet)
+- Drawer — the single app-level overlay (nav, mobile filters, nested FormSheet). Right on desktop, bottom on small screens; stacking is supported
+- Sheet — COSS primitive only. Do not import in feature or page code
 
 **Naming:** kebab-case for all `src/` folders
 
