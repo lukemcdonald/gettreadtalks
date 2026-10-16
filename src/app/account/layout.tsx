@@ -11,7 +11,7 @@ export default function AccountLayout({ children }: { children: ReactNode }) {
       fallback={<Skeleton className="h-96 w-full" />}
       redirect="/login?redirect=/account"
     >
-      <AreaLayout items={ACCOUNT_NAV} label="Account">
+      <AreaLayout label="Account" sections={ACCOUNT_NAV}>
         {children}
       </AreaLayout>
     </UserGate>

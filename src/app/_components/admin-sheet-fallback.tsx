@@ -24,7 +24,7 @@ async function AdminSheetFallbackContent({
 
   return (
     <>
-      <AreaLayout items={MANAGE_NAV} label="Manage">
+      <AreaLayout label="Manage" sections={MANAGE_NAV}>
         {children}
       </AreaLayout>
       {sheet}

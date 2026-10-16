@@ -11,7 +11,7 @@ export default function ManageLayout({ children }: { children: ReactNode }) {
       fallback={<Skeleton className="h-96 w-full" />}
       redirect="/login?redirect=/manage"
     >
-      <AreaLayout items={MANAGE_NAV} label="Manage">
+      <AreaLayout label="Manage" sections={MANAGE_NAV}>
         {children}
       </AreaLayout>
     </AdminGate>

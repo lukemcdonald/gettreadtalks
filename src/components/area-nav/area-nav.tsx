@@ -38,6 +38,14 @@ export interface AreaNavItem {
   label: string;
 }
 
+export interface AreaNavSection {
+  href: Route;
+  items: AreaNavItem[];
+  label: string;
+}
+
+export type AreaNavSections = [AreaNavSection, ...AreaNavSection[]];
+
 interface AreaNavProps {
   items: AreaNavItem[];
   label: string;
