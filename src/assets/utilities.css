@@ -4,10 +4,6 @@
   margin-inline: auto;
 }
 
-@utility video-frame {
-  @apply overflow-hidden rounded-2xl shadow-2xl;
-}
-
 @utility card-interactive {
   @apply isolate ring-1 ring-transparent transition duration-300;
 

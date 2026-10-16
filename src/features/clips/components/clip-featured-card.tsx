@@ -1,7 +1,7 @@
 import type { ClipWithSpeaker } from '@/features/clips/types';
 
+import { FeaturedVideoCard } from '@/components/featured-video-card';
 import { getVideoThumbnail } from '@/components/media-embed';
-import { MediaThumbnailCard } from '@/components/media-thumbnail-card';
 import { getClipUrl } from '@/features/clips/utils';
 import { getSpeakerName } from '@/features/speakers/utils';
 
@@ -15,7 +15,7 @@ export function ClipFeaturedCard({ clip }: ClipFeaturedCardProps) {
   const speakerName = clip.speaker ? getSpeakerName(clip.speaker) : undefined;
 
   return (
-    <MediaThumbnailCard
+    <FeaturedVideoCard
       actionLabel="Watch clip"
       href={href}
       sizes="(max-width: 768px) 100vw, 66vw"

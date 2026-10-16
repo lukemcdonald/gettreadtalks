@@ -10,7 +10,12 @@ interface VideoFrameProps {
 
 export function VideoFrame({ children, className }: VideoFrameProps) {
   return (
-    <div className={cn('video-frame relative aspect-video w-full', className)}>
+    <div
+      className={cn(
+        'relative aspect-video w-full overflow-hidden rounded-2xl shadow-2xl',
+        className
+      )}
+    >
       {children}
     </div>
   );
