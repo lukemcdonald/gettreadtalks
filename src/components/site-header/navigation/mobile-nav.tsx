@@ -127,7 +127,7 @@ export function MobileNav({ className }: MobileNavProps) {
         </DrawerPanel>
 
         {!isLoading && (
-          <CommandPanel className="flex-1 rounded-b-none px-6 pt-6 pb-6 [clip-path:inset(0_1px)]">
+          <CommandPanel className="flex-1 rounded-b-none px-6 pt-6 pb-6 [clip-path:inset(0_1px)] not-has-[+[data-slot=command-footer]]:rounded-b-none not-has-[+[data-slot=command-footer]]:[clip-path:inset(0_1px)]">
             <DrawerMenu>
               {user ? (
                 <>
