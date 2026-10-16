@@ -17,17 +17,18 @@ export function ArchiveBackLink({
   label,
 }: ArchiveBackLinkProps) {
   return (
-    <div className="relative">
+    <div className="flex items-center">
       <Button
         aria-label={label}
-        className="absolute top-0 left-0"
+        className="shrink-0"
         render={<Link href={href} />}
         size="icon-sm"
         variant="ghost"
       >
         <ChevronLeftIcon />
       </Button>
-      <div className="px-8">{children}</div>
+      <div className="min-w-0 flex-1">{children}</div>
+      <div aria-hidden className="size-8 shrink-0 sm:size-7" />
     </div>
   );
 }
