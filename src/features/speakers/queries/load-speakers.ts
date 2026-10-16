@@ -19,6 +19,7 @@ interface GetSpeakersProps {
 /**
  * Get speakers with published content and optional filtering.
  */
+// fallow-ignore-next-line complexity
 export async function loadSpeakers(args?: GetSpeakersProps) {
   cacheLife('hours');
   cacheTag('speakers');

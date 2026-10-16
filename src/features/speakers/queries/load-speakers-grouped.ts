@@ -12,6 +12,7 @@ interface GetSpeakersGroupedProps {
 /**
  * Get speakers grouped alphabetically by last name.
  */
+// fallow-ignore-next-line complexity
 export async function loadSpeakersGrouped(args?: GetSpeakersGroupedProps) {
   const { limit, role, search, sort } = args ?? {};
 

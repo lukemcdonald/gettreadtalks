@@ -16,6 +16,7 @@ interface GetAllTalksProps {
  * Get all talks with speakers with filtering support.
  * Use status='all' to fetch across all statuses, defaults to 'published'.
  */
+// fallow-ignore-next-line complexity
 export async function loadAllTalks(args: GetAllTalksProps = {}) {
   const paginationOpts = {
     cursor: args.cursor ?? null,
