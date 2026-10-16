@@ -2,7 +2,6 @@ import type { ReactNode } from 'react';
 
 import {
   Empty,
-  EmptyContent,
   EmptyDescription,
   EmptyTitle,
   Skeleton,
@@ -14,7 +13,7 @@ import {
   TableRow,
 } from '@/components/ui';
 
-const MANAGE_COLUMNS = {
+const COLUMNS = {
   clips: ['Status', 'Title', 'Actions'],
   collections: ['Title', 'Talks', 'Actions'],
   speakers: ['Name', 'Talks', 'Clips', 'Actions'],
@@ -22,15 +21,7 @@ const MANAGE_COLUMNS = {
   topics: ['Title', 'Talks', 'Actions'],
 } as const;
 
-export type ManageResource = keyof typeof MANAGE_COLUMNS;
-
-interface ManageTableProps {
-  children?: ReactNode;
-  emptyAction?: ReactNode;
-  isEmpty: boolean;
-  isFiltered?: boolean;
-  resource: ManageResource;
-}
+type ManageResource = keyof typeof COLUMNS;
 
 export function ManageTable({
   children,
@@ -38,28 +29,31 @@ export function ManageTable({
   isEmpty,
   isFiltered = false,
   resource,
-}: ManageTableProps) {
+}: {
+  children?: ReactNode;
+  emptyAction?: ReactNode;
+  isEmpty: boolean;
+  isFiltered?: boolean;
+  resource: ManageResource;
+}) {
   if (isEmpty) {
-    if (isFiltered) {
-      return (
-        <Empty>
-          <EmptyTitle>No {resource} found</EmptyTitle>
-          <EmptyDescription>Try a different search or filter.</EmptyDescription>
-        </Empty>
-      );
-    }
-
     return (
       <Empty>
-        <EmptyTitle>No {resource} yet</EmptyTitle>
-        {!!emptyAction && <EmptyContent>{emptyAction}</EmptyContent>}
+        <EmptyTitle>
+          {`No ${resource} ${isFiltered ? 'found' : 'yet'}`}
+        </EmptyTitle>
+        {isFiltered ? (
+          <EmptyDescription>Try a different search or filter.</EmptyDescription>
+        ) : (
+          emptyAction
+        )}
       </Empty>
     );
   }
 
   return (
     <Table variant="card">
-      <ManageTableHeader resource={resource} />
+      <Header resource={resource} />
       <TableBody>{children}</TableBody>
     </Table>
   );
@@ -70,15 +64,13 @@ export function ManageTableSkeleton({
 }: {
   resource: ManageResource;
 }) {
-  const columns = MANAGE_COLUMNS[resource];
-
   return (
     <Table variant="card">
-      <ManageTableHeader resource={resource} />
+      <Header resource={resource} />
       <TableBody>
         {Array.from({ length: 6 }, (_, row) => (
           <TableRow key={row}>
-            {columns.map((column) => (
+            {COLUMNS[resource].map((column) => (
               <TableCell key={column}>
                 <Skeleton className="h-4 w-full" />
               </TableCell>
@@ -90,11 +82,11 @@ export function ManageTableSkeleton({
   );
 }
 
-function ManageTableHeader({ resource }: { resource: ManageResource }) {
+function Header({ resource }: { resource: ManageResource }) {
   return (
     <TableHeader>
       <TableRow>
-        {MANAGE_COLUMNS[resource].map((column) => (
+        {COLUMNS[resource].map((column) => (
           <TableHead key={column}>{column}</TableHead>
         ))}
       </TableRow>

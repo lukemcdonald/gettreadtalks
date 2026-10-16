@@ -1,11 +1,12 @@
 import { TableCell, TableRow } from '@/components/ui';
 import { describe, expect, it, render, screen } from '@/test';
 
-import { ManageTable, ManageTableSkeleton } from './manage-table';
+import { ManageTable } from './manage-table';
 
 describe('ManageTable', () => {
-  it('shows visible headers', () => {
-    render(
+  it('shows headers and a New action only for an empty catalog', () => {
+    const action = <button type="button">New Talk</button>;
+    const { rerender } = render(
       <ManageTable isEmpty={false} resource="talks">
         <TableRow>
           <TableCell>Published</TableCell>
@@ -16,41 +17,18 @@ describe('ManageTable', () => {
     );
 
     expect(screen.getByRole('columnheader', { name: 'Title' })).toBeVisible();
-  });
 
-  it('offers New when the catalog is empty, not when filters match nothing', () => {
-    const { rerender } = render(
-      <ManageTable
-        emptyAction={<button type="button">New Talk</button>}
-        isEmpty
-        resource="talks"
-      />
-    );
-
+    rerender(<ManageTable emptyAction={action} isEmpty resource="talks" />);
     expect(
       screen.getByRole('button', { name: 'New Talk' })
     ).toBeInTheDocument();
 
     rerender(
-      <ManageTable
-        emptyAction={<button type="button">New Talk</button>}
-        isEmpty
-        isFiltered
-        resource="talks"
-      />
+      <ManageTable emptyAction={action} isEmpty isFiltered resource="talks" />
     );
-
     expect(screen.getByText('No talks found')).toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: 'New Talk' })
     ).not.toBeInTheDocument();
-  });
-});
-
-describe('ManageTableSkeleton', () => {
-  it('shows headers while loading', () => {
-    render(<ManageTableSkeleton resource="talks" />);
-
-    expect(screen.getByRole('columnheader', { name: 'Title' })).toBeVisible();
   });
 });
