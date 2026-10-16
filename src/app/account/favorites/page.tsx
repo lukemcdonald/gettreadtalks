@@ -10,9 +10,9 @@ import {
   TabsList,
   TabsTab,
 } from '@/components/ui';
-import { getClipUrl } from '@/features/clips/utils';
+import { buildClipUrl } from '@/features/clips/utils';
 import { getSpeakerName } from '@/features/speakers/utils';
-import { getTalkUrl } from '@/features/talks/utils';
+import { buildTalkUrl } from '@/features/talks/utils';
 import { getUserFavorites } from '@/features/users/queries/get-user-favorites';
 
 import {
@@ -69,7 +69,9 @@ function FavoritesTabPanels({ clips, speakers, talks }: UserFavorites) {
         label="Talk"
         renderItem={(talk) => (
           <FavoriteTalkRow
-            href={talk.speaker ? getTalkUrl(talk.speaker.slug, talk.slug) : ''}
+            href={
+              talk.speaker ? buildTalkUrl(talk.speaker.slug, talk.slug) : ''
+            }
             key={talk._id}
             speaker={talk.speaker}
             talkId={talk._id}
@@ -97,7 +99,7 @@ function FavoritesTabPanels({ clips, speakers, talks }: UserFavorites) {
         renderItem={(clip) => (
           <FavoriteClipRow
             clipId={clip._id}
-            href={getClipUrl(clip.slug)}
+            href={buildClipUrl(clip.slug)}
             key={clip._id}
             title={clip.title}
           />

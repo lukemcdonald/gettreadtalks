@@ -6,7 +6,7 @@ import { TopicPageContent } from '@/app/topics/[topicSlug]/_components/topic-pag
 import { TopicPageSkeleton } from '@/app/topics/[topicSlug]/_components/topic-page-skeleton';
 import { topicTalkCountPhrase } from '@/app/topics/[topicSlug]/_components/topic-talks-description';
 import { getTopicBySlug } from '@/features/topics/queries/get-topic-by-slug';
-import { getTopicUrl } from '@/features/topics/utils';
+import { buildTopicUrl } from '@/features/topics/utils';
 import { pageMetadata } from '@/lib/metadata';
 
 // fallow-ignore-next-line unused-export
@@ -35,7 +35,7 @@ export async function generateMetadata({
   const { topic, totalTalks } = topicResult;
 
   return pageMetadata({
-    canonical: getTopicUrl(topicSlug),
+    canonical: buildTopicUrl(topicSlug),
     description: `Elevate your spiritual heartbeat with ${topicTalkCountPhrase(totalTalks)} on ${topic.title}.`,
     title: topic.title,
   });

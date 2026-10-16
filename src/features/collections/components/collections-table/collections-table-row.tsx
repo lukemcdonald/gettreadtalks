@@ -6,8 +6,8 @@ import {
   ManageRow,
 } from '@/app/manage/_components/manage-table';
 import { CollectionActionsMenu } from '@/features/collections/components/collection-actions-menu';
-import { getCollectionUrl } from '@/features/collections/utils';
-import { getEntityEditPath } from '@/lib/entities/paths';
+import { buildCollectionUrl } from '@/features/collections/utils';
+import { buildEntityEditPath } from '@/lib/entities/paths';
 
 interface CollectionsTableRowProps {
   collection: Collection;
@@ -20,9 +20,9 @@ export function CollectionsTableRow({
   status,
   talkCount,
 }: CollectionsTableRowProps) {
-  const editPath = getEntityEditPath('collections', collection._id);
+  const editPath = buildEntityEditPath('collections', collection._id);
   const viewUrl =
-    status === 'published' ? getCollectionUrl(collection.slug) : undefined;
+    status === 'published' ? buildCollectionUrl(collection.slug) : undefined;
 
   return (
     <ManageRow

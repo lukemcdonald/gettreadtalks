@@ -8,7 +8,7 @@ import { getCollection } from '@/features/collections/queries/get-collection';
 import {
   ADMIN_LIST_PATHS,
   getAdminLoginRedirect,
-  getEntityEditPath,
+  buildEntityEditPath,
 } from '@/lib/entities/paths';
 import { requireAdminUser } from '@/services/auth/server';
 
@@ -25,7 +25,7 @@ export async function EditCollectionSheetPage({
 
   await requireAdminUser(
     getAdminLoginRedirect(
-      getEntityEditPath('collections', collectionId)
+      buildEntityEditPath('collections', collectionId)
     ) as Route
   );
 

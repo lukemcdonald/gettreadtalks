@@ -11,7 +11,7 @@ export const ADMIN_LIST_PATHS = {
 
 export type AdminEntity = keyof typeof ADMIN_LIST_PATHS;
 
-export function getAdminListPath(entity: AdminEntity) {
+export function buildAdminListPath(entity: AdminEntity) {
   return ADMIN_LIST_PATHS[entity];
 }
 
@@ -19,7 +19,7 @@ export function getAdminLoginRedirect(path: string) {
   return `/login?redirect=${encodeURIComponent(path)}`;
 }
 
-export function getEntityEditPath(
+export function buildEntityEditPath(
   entity: AdminEntity,
   id: string,
   query?: { status?: 'archived' }
@@ -33,10 +33,10 @@ export function getEntityEditPath(
   return path;
 }
 
-export function getEntityNewPath(entity: AdminEntity) {
+export function buildEntityNewPath(entity: AdminEntity) {
   return `/${entity}/new`;
 }
 
-export function getPublicEditPath(publicPath: string) {
+export function buildPublicEditPath(publicPath: string) {
   return `${publicPath}/edit`;
 }

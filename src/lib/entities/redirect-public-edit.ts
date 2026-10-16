@@ -3,7 +3,7 @@ import type { AdminEntity } from '@/lib/entities/paths';
 
 import { redirect } from 'next/navigation';
 
-import { getEntityEditPath } from '@/lib/entities/paths';
+import { buildEntityEditPath } from '@/lib/entities/paths';
 import { getCurrentUser } from '@/services/auth/server';
 import { isAdmin } from '@/services/auth/utils';
 
@@ -19,7 +19,7 @@ export async function redirectPublicEdit({
   const user = await getCurrentUser();
 
   if (isAdmin(user)) {
-    redirect(getEntityEditPath(entity, id));
+    redirect(buildEntityEditPath(entity, id));
   }
 
   redirect(publicPath);

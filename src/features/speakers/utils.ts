@@ -22,11 +22,11 @@ export function getSpeakerInitials(speaker?: SpeakerNameFields | null): string {
   return speaker ? `${speaker.firstName?.[0]}${speaker.lastName?.[0]}` : '';
 }
 
-export function getSpeakerUrl(speakerSlug: string) {
+export function buildSpeakerUrl(speakerSlug: string) {
   return `/speakers/${speakerSlug}`;
 }
 
-export function getSpeakersPath() {
+export function buildSpeakersPath() {
   return '/speakers';
 }
 

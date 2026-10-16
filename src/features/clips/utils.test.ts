@@ -1,15 +1,15 @@
 import { describe, expect, it } from '@/test';
 
-import { getClipUrl, getClipsPath } from './utils';
+import { buildClipUrl, buildClipsPath } from './utils';
 
-describe('getClipUrl', () => {
+describe('buildClipUrl', () => {
   it('links to /clips/{slug}', () => {
-    expect(getClipUrl('you-will-suffer')).toBe('/clips/you-will-suffer');
+    expect(buildClipUrl('you-will-suffer')).toBe('/clips/you-will-suffer');
   });
 });
 
-describe('getClipsPath', () => {
+describe('buildClipsPath', () => {
   it('links to /clips', () => {
-    expect(getClipsPath()).toBe('/clips');
+    expect(buildClipsPath()).toBe('/clips');
   });
 });

@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 
 import { getTalkBySlug } from '@/features/talks/queries/get-talk-by-slug';
 import { getTalkBySlugAdmin } from '@/features/talks/queries/get-talk-by-slug-admin';
-import { getTalkUrl } from '@/features/talks/utils';
+import { buildTalkUrl } from '@/features/talks/utils';
 import { redirectPublicEdit } from '@/lib/entities/redirect-public-edit';
 
 interface PageProps {
@@ -25,6 +25,6 @@ export default async function Page({ params }: PageProps) {
   await redirectPublicEdit({
     entity: 'talks',
     id: talkResult.talk._id,
-    publicPath: getTalkUrl(speakerSlug, talkSlug),
+    publicPath: buildTalkUrl(speakerSlug, talkSlug),
   });
 }

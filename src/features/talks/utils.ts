@@ -6,11 +6,11 @@ import { site } from '../../configs/site.ts';
  * @param talkSlug - Talk slug identifier
  * @returns URL path for the talk
  */
-export function getTalkUrl(speakerSlug: string, talkSlug: string): string {
+export function buildTalkUrl(speakerSlug: string, talkSlug: string): string {
   return `/talks/${speakerSlug}/${talkSlug}`;
 }
 
-export function getTalksPath() {
+export function buildTalksPath() {
   return '/talks';
 }
 
@@ -54,7 +54,7 @@ export function talkListItemsJsonLd(
     name: talk.title,
     position: index + 1,
     url: talk.speaker
-      ? `${site.url}${getTalkUrl(talk.speaker.slug, talk.slug)}`
+      ? `${site.url}${buildTalkUrl(talk.speaker.slug, talk.slug)}`
       : undefined,
   }));
 }

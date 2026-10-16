@@ -1,7 +1,7 @@
-export function getCollectionUrl(collectionSlug: string) {
+export function buildCollectionUrl(collectionSlug: string) {
   return `/collections/${collectionSlug}`;
 }
 
-export function getCollectionsPath() {
+export function buildCollectionsPath() {
   return '/collections';
 }

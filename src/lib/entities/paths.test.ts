@@ -1,40 +1,40 @@
 import { describe, expect, it } from '@/test';
 
 import {
-  getAdminListPath,
+  buildAdminListPath,
+  buildEntityEditPath,
+  buildEntityNewPath,
+  buildPublicEditPath,
   getAdminLoginRedirect,
-  getEntityEditPath,
-  getEntityNewPath,
-  getPublicEditPath,
 } from './paths';
 
-describe('getAdminListPath', () => {
+describe('buildAdminListPath', () => {
   it('returns the manage admin page', () => {
-    expect(getAdminListPath('talks')).toBe('/manage/talks');
+    expect(buildAdminListPath('talks')).toBe('/manage/talks');
   });
 });
 
-describe('getEntityEditPath', () => {
+describe('buildEntityEditPath', () => {
   it('matches the intercepted admin sheet url', () => {
-    expect(getEntityEditPath('talks', 'talk123')).toBe('/talks/edit/talk123');
+    expect(buildEntityEditPath('talks', 'talk123')).toBe('/talks/edit/talk123');
   });
 
   it('prefills archived status', () => {
-    expect(getEntityEditPath('talks', 'talk123', { status: 'archived' })).toBe(
-      '/talks/edit/talk123?status=archived'
-    );
+    expect(
+      buildEntityEditPath('talks', 'talk123', { status: 'archived' })
+    ).toBe('/talks/edit/talk123?status=archived');
   });
 });
 
-describe('getEntityNewPath', () => {
+describe('buildEntityNewPath', () => {
   it('matches the intercepted admin sheet url', () => {
-    expect(getEntityNewPath('clips')).toBe('/clips/new');
+    expect(buildEntityNewPath('clips')).toBe('/clips/new');
   });
 });
 
-describe('getPublicEditPath', () => {
+describe('buildPublicEditPath', () => {
   it('appends /edit to a public detail path', () => {
-    expect(getPublicEditPath('/talks/john-piper/justification')).toBe(
+    expect(buildPublicEditPath('/talks/john-piper/justification')).toBe(
       '/talks/john-piper/justification/edit'
     );
   });

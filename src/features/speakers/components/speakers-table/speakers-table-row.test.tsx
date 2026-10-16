@@ -3,7 +3,7 @@
 import type { Speaker } from '@/features/speakers/types';
 
 import { Table, TableBody } from '@/components/ui';
-import { getEntityEditPath } from '@/lib/entities/paths';
+import { buildEntityEditPath } from '@/lib/entities/paths';
 import { describe, expect, it, render, screen } from '@/test';
 
 import { SpeakersTableRow } from './speakers-table-row';
@@ -52,7 +52,7 @@ describe('SpeakersTableRow', () => {
 
     expect(titleLink).toHaveAttribute(
       'href',
-      getEntityEditPath('speakers', speaker._id)
+      buildEntityEditPath('speakers', speaker._id)
     );
     expect(titleLink).not.toHaveAttribute('href', '');
     expect(
@@ -68,7 +68,7 @@ describe('SpeakersTableRow', () => {
 
     expect(titleLink).toHaveAttribute(
       'href',
-      getEntityEditPath('speakers', speaker._id)
+      buildEntityEditPath('speakers', speaker._id)
     );
   });
 });

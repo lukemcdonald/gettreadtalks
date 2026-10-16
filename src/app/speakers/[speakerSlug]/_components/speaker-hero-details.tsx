@@ -5,7 +5,7 @@ import { ArchiveBackLink } from '@/components/archive-back-link';
 import { HeroTitle } from '@/components/hero';
 import { SpeakerAvatar } from '@/features/speakers/components/speaker-avatar';
 import { SpeakerMinistryLink } from '@/features/speakers/components/speaker-ministry-link';
-import { getSpeakerName, getSpeakersPath } from '@/features/speakers/utils';
+import { buildSpeakersPath, getSpeakerName } from '@/features/speakers/utils';
 import { cn } from '@/utils';
 
 interface SpeakerHeroDetailsProps {
@@ -46,7 +46,7 @@ export function SpeakerHeroDetails({
       >
         <div className="max-w-full space-y-2">
           <div>
-            <ArchiveBackLink href={getSpeakersPath()} label="Speakers" />
+            <ArchiveBackLink href={buildSpeakersPath()} label="Speakers" />
             <div className="flex flex-wrap items-center gap-3">
               <HeroTitle className="text-foreground min-w-0">
                 {speakerName}

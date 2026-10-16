@@ -9,7 +9,7 @@ import { getClip } from '@/features/clips/queries/get-clip';
 import {
   ADMIN_LIST_PATHS,
   getAdminLoginRedirect,
-  getEntityEditPath,
+  buildEntityEditPath,
 } from '@/lib/entities/paths';
 import { parseStatusPrefill } from '@/lib/entities/status-prefill';
 import { requireAdminUser } from '@/services/auth/server';
@@ -32,7 +32,7 @@ export async function EditClipSheetPage({
 
   await requireAdminUser(
     getAdminLoginRedirect(
-      getEntityEditPath('clips', clipId, { status: statusPrefill })
+      buildEntityEditPath('clips', clipId, { status: statusPrefill })
     ) as Route
   );
 

@@ -13,8 +13,8 @@ import { PageHeader } from '@/components/page-header';
 import { CollectionTalkList } from '@/features/collections/components/collection-talk-list';
 import { getCollectionBySlug } from '@/features/collections/queries/get-collection-by-slug';
 import {
-  getCollectionUrl,
-  getCollectionsPath,
+  buildCollectionUrl,
+  buildCollectionsPath,
 } from '@/features/collections/utils';
 import { buildBreadcrumbJsonLd } from '@/lib/json-ld';
 import { pageMetadata } from '@/lib/metadata';
@@ -36,7 +36,7 @@ export async function generateMetadata({
   const { collection } = data;
 
   return pageMetadata({
-    canonical: getCollectionUrl(collectionSlug),
+    canonical: buildCollectionUrl(collectionSlug),
     description: collection.description,
     title: collection.title,
   });
@@ -53,8 +53,8 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
   const { collection, talks } = data;
   const uniqueSpeakers = uniqueSpeakersFromTalks(talks);
   const segments = [
-    { href: getCollectionsPath(), label: 'Collections' },
-    { href: getCollectionUrl(collectionSlug), label: collection.title },
+    { href: buildCollectionsPath(), label: 'Collections' },
+    { href: buildCollectionUrl(collectionSlug), label: collection.title },
   ];
 
   return (
@@ -72,7 +72,10 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
         content={<CollectionTalkList talks={talks} />}
         header={
           <>
-            <ArchiveBackLink href={getCollectionsPath()} label="Collections" />
+            <ArchiveBackLink
+              href={buildCollectionsPath()}
+              label="Collections"
+            />
             <PageHeader
               actions={
                 <AdminEditButton entity="collections" id={collection._id} />

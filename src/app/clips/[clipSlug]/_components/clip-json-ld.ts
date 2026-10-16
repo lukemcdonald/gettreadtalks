@@ -1,8 +1,8 @@
 import { mediaJsonLd } from '../../../../components/media-embed/utils.ts';
 import { site } from '../../../../configs/site.ts';
-import { getClipUrl } from '../../../../features/clips/utils.ts';
+import { buildClipUrl } from '../../../../features/clips/utils.ts';
 import { getSpeakerName } from '../../../../features/speakers/utils.ts';
-import { getTalkUrl } from '../../../../features/talks/utils.ts';
+import { buildTalkUrl } from '../../../../features/talks/utils.ts';
 
 interface ClipJsonLdInput {
   clip: {
@@ -29,7 +29,7 @@ export function clipJsonLd({ clip, speaker, talk }: ClipJsonLdInput) {
     ...mediaJsonLd(clip.mediaUrl),
     description: clip.description,
     name: clip.title,
-    url: `${site.url}${getClipUrl(clip.slug)}`,
+    url: `${site.url}${buildClipUrl(clip.slug)}`,
     ...(speakerName && { creator: { '@type': 'Person', name: speakerName } }),
     ...(clip.publishedAt && {
       uploadDate: new Date(clip.publishedAt).toISOString(),
@@ -39,7 +39,7 @@ export function clipJsonLd({ clip, speaker, talk }: ClipJsonLdInput) {
         isPartOf: {
           '@type': 'CreativeWork',
           name: talk.title,
-          url: `${site.url}${getTalkUrl(speaker.slug, talk.slug)}`,
+          url: `${site.url}${buildTalkUrl(speaker.slug, talk.slug)}`,
         },
       }),
   };

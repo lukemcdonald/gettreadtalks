@@ -7,8 +7,8 @@ import { HeroTitle } from '@/components/hero';
 import { MediaEmbed } from '@/components/media-embed';
 import { Container, Section } from '@/components/ui';
 import { Link } from '@/components/ui/link';
-import { getClipsPath } from '@/features/clips/utils';
-import { getSpeakerName, getSpeakerUrl } from '@/features/speakers/utils';
+import { buildClipsPath } from '@/features/clips/utils';
+import { buildSpeakerUrl, getSpeakerName } from '@/features/speakers/utils';
 
 interface ClipHeroProps {
   clip: Clip;
@@ -23,7 +23,7 @@ export function ClipHero({ clip, speaker }: ClipHeroProps) {
       <Container className="relative space-y-8">
         <div className="space-y-2 text-center">
           <div>
-            <ArchiveBackLink href={getClipsPath()} label="Clips" />
+            <ArchiveBackLink href={buildClipsPath()} label="Clips" />
             <div className="flex flex-wrap items-center justify-center gap-3">
               <HeroTitle className="text-foreground min-w-0" size="sm">
                 {clip.title}
@@ -36,7 +36,7 @@ export function ClipHero({ clip, speaker }: ClipHeroProps) {
               by{' '}
               <Link
                 className="hover:underline"
-                href={getSpeakerUrl(speaker.slug)}
+                href={buildSpeakerUrl(speaker.slug)}
               >
                 {speakerName}
               </Link>

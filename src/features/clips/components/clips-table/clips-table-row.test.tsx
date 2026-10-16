@@ -3,7 +3,7 @@
 import type { AdminClip } from '@/features/clips/types';
 
 import { Table, TableBody } from '@/components/ui';
-import { getEntityEditPath } from '@/lib/entities/paths';
+import { buildEntityEditPath } from '@/lib/entities/paths';
 import { describe, expect, it, render, screen } from '@/test';
 
 import { ClipsTableRow } from './clips-table-row';
@@ -49,7 +49,7 @@ describe('ClipsTableRow', () => {
 
     expect(screen.getByRole('link', { name: clip.title })).toHaveAttribute(
       'href',
-      getEntityEditPath('clips', clip._id)
+      buildEntityEditPath('clips', clip._id)
     );
     expect(screen.getByText('Grace Abounding')).toBeVisible();
     expect(

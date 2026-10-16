@@ -8,7 +8,7 @@ import { MediaCard } from '@/components/media-card';
 import { Link } from '@/components/ui/link';
 import { SpeakerAvatar } from '@/features/speakers/components/speaker-avatar';
 import { getSpeakerName } from '@/features/speakers/utils';
-import { getTalkUrl } from '@/features/talks/utils';
+import { buildTalkUrl } from '@/features/talks/utils';
 
 interface TalkCardProps {
   speaker?: Pick<
@@ -38,7 +38,7 @@ export function TalkCard({ speaker, talk }: TalkCardProps) {
     ? `${talk.title} by ${speakerName}`
     : talk.title;
   const talkHref = speaker?.slug
-    ? getTalkUrl(speaker.slug, talk.slug)
+    ? buildTalkUrl(speaker.slug, talk.slug)
     : `/talks/${talk.slug}`;
 
   function getSubtitle() {

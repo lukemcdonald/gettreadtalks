@@ -1,14 +1,14 @@
 import { describe, expect, it } from '@/test';
 
 import {
-  getTalksPath,
+  buildTalksPath,
   talkListItemsJsonLd,
   talkMetaDescription,
 } from './utils';
 
-describe('getTalksPath', () => {
+describe('buildTalksPath', () => {
   it('links to /talks', () => {
-    expect(getTalksPath()).toBe('/talks');
+    expect(buildTalksPath()).toBe('/talks');
   });
 });
 

@@ -21,7 +21,7 @@ export function buildMediaHealthDigest(
   return items;
 }
 
-/** Matches getClipUrl / getTalkUrl without importing Next app modules into Convex. */
+/** Matches buildClipUrl / buildTalkUrl without importing Next app modules into Convex. */
 export function getMediaPublicPath(item: {
   entityTable: 'clips' | 'talks';
   slug: string;

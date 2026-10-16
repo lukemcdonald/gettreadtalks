@@ -1,10 +1,10 @@
 /**
  * Generate a clip URL from its slug.
  */
-export function getClipUrl(clipSlug: string): string {
+export function buildClipUrl(clipSlug: string): string {
   return `/clips/${clipSlug}`;
 }
 
-export function getClipsPath() {
+export function buildClipsPath() {
   return '/clips';
 }

@@ -3,7 +3,7 @@ import type { CollectionId } from '@/features/collections/types';
 import { EditCollectionSheetPage } from '@/app/@sheet/_components/edit-collection-sheet-page';
 import { AdminSheetFallback } from '@/app/_components/admin-sheet-fallback';
 import ManageCollectionsPage from '@/app/manage/collections/page';
-import { ADMIN_LIST_PATHS, getEntityEditPath } from '@/lib/entities/paths';
+import { ADMIN_LIST_PATHS, buildEntityEditPath } from '@/lib/entities/paths';
 
 interface PageProps {
   params: Promise<{ collectionId: CollectionId }>;
@@ -14,7 +14,7 @@ export default async function Page({ params }: PageProps) {
 
   return (
     <AdminSheetFallback
-      returnPath={getEntityEditPath('collections', collectionId)}
+      returnPath={buildEntityEditPath('collections', collectionId)}
       sheet={
         <EditCollectionSheetPage
           closeHref={ADMIN_LIST_PATHS.collections}
