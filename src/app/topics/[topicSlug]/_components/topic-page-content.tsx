@@ -54,13 +54,14 @@ async function TopicHeader({ topicSlug }: { topicSlug: string }) {
           topicSlug,
         })}
       />
-      <ArchiveBackLink href={getTopicsPath()} label="Topics" />
-      <PageHeader
-        actions={<AdminEditButton entity="topics" id={topic._id} />}
-        description={description}
-        size="lg"
-        title={topic.title}
-      />
+      <ArchiveBackLink href={getTopicsPath()} label="Back to Topics">
+        <PageHeader
+          actions={<AdminEditButton entity="topics" id={topic._id} />}
+          description={description}
+          size="lg"
+          title={topic.title}
+        />
+      </ArchiveBackLink>
     </>
   );
 }

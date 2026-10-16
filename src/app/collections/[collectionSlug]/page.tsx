@@ -71,8 +71,10 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
       <SidebarLayout
         content={<CollectionTalkList talks={talks} />}
         header={
-          <>
-            <ArchiveBackLink href={getCollectionsPath()} label="Collections" />
+          <ArchiveBackLink
+            href={getCollectionsPath()}
+            label="Back to Collections"
+          >
             <PageHeader
               actions={
                 <AdminEditButton entity="collections" id={collection._id} />
@@ -81,7 +83,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
               size="lg"
               title={collection.title}
             />
-          </>
+          </ArchiveBackLink>
         }
         sidebar={<CollectionSidebar speakers={uniqueSpeakers} />}
       />

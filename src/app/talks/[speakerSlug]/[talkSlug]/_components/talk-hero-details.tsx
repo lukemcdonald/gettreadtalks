@@ -18,15 +18,14 @@ export function TalkHeroDetails({ speaker, talk }: TalkHeroDetailsProps) {
 
   return (
     <div className="space-y-2 text-center">
-      <div>
-        <ArchiveBackLink href={getTalksPath()} label="Talks" />
+      <ArchiveBackLink href={getTalksPath()} label="Back to Talks">
         <div className="flex flex-wrap items-center justify-center gap-3">
           <HeroTitle className="text-foreground min-w-0" size="sm">
             {talk.title}
           </HeroTitle>
           <AdminEditButton entity="talks" id={talk._id} />
         </div>
-      </div>
+      </ArchiveBackLink>
       {speaker && (
         <p className="text-muted-foreground text-lg">
           by{' '}
