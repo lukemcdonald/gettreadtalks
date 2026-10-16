@@ -26,7 +26,11 @@ export function SpeakerHero({ featuredTalk, speaker }: SpeakerHeroProps) {
         )}
       >
         {/* Speaker details - 50% width when video present, centered when not */}
-        <div className={cn(hasVideo ? 'lg:flex-1' : 'max-w-2xl text-center')}>
+        <div
+          className={cn(
+            hasVideo ? 'lg:flex-1' : 'w-full max-w-2xl text-center'
+          )}
+        >
           <SpeakerHeroDetails
             speaker={speaker}
             variant={hasVideo ? 'inline' : undefined}
