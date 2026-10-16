@@ -2,6 +2,7 @@ import type { StatusType } from '@/lib/entities/types';
 
 import { Suspense } from 'react';
 
+import { ManageTableSkeleton } from '@/app/manage/_components/manage-table';
 import { ManageClipsContent } from '@/app/manage/clips/_components/clips-content';
 import { ClipsFilters } from '@/app/manage/clips/_components/clips-filters';
 import { PageHeader } from '@/components/page-header';
@@ -30,7 +31,7 @@ export default function ManageClipsPage({
       <Suspense fallback={<Skeleton className="h-10 w-full" />}>
         <ClipsFilters />
       </Suspense>
-      <Suspense fallback={<Skeleton className="h-96 w-full" />}>
+      <Suspense fallback={<ManageTableSkeleton resource="clips" />}>
         <ManageClipsContent searchParams={searchParams} />
       </Suspense>
     </>

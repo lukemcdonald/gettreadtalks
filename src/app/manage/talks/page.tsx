@@ -2,6 +2,7 @@ import type { StatusType } from '@/lib/entities/types';
 
 import { Suspense } from 'react';
 
+import { ManageTableSkeleton } from '@/app/manage/_components/manage-table';
 import { ManageTalksContent } from '@/app/manage/talks/_components/talks-content';
 import { TalksFilters } from '@/app/manage/talks/_components/talks-filters';
 import { PageHeader } from '@/components/page-header';
@@ -31,7 +32,7 @@ export default function ManageTalksPage({
       <Suspense fallback={<Skeleton className="h-10 w-full" />}>
         <TalksFilters />
       </Suspense>
-      <Suspense fallback={<Skeleton className="h-96 w-full" />}>
+      <Suspense fallback={<ManageTableSkeleton resource="talks" />}>
         <ManageTalksContent searchParams={searchParams} />
       </Suspense>
     </>
