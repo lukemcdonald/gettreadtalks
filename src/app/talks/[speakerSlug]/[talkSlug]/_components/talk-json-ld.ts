@@ -1,7 +1,7 @@
-import { mediaJsonLd } from '../../../../../components/media-embed/utils.ts';
-import { site } from '../../../../../configs/site.ts';
-import { getSpeakerName } from '../../../../../features/speakers/utils.ts';
-import { getTalkUrl } from '../../../../../features/talks/utils.ts';
+import { mediaJsonLd } from '@/components/media-embed/utils';
+import { site } from '@/configs/site';
+import { getSpeakerName } from '@/features/speakers/utils';
+import { getTalkUrl } from '@/features/talks/utils';
 
 interface TalkJsonLdInput {
   speaker: Parameters<typeof getSpeakerName>[0];
@@ -10,9 +10,36 @@ interface TalkJsonLdInput {
     description?: string;
     mediaUrl?: string;
     publishedAt?: number;
+    scripture?: string;
     title: string;
   };
   talkSlug: string;
+}
+
+function talkJsonLdDescription({
+  description,
+  scripture,
+  speakerName,
+  title,
+}: {
+  description?: string;
+  scripture?: string;
+  speakerName: string;
+  title: string;
+}) {
+  const explicit = description?.trim();
+
+  if (explicit) {
+    return explicit;
+  }
+
+  return [
+    title,
+    speakerName && `by ${speakerName}`,
+    scripture && `on ${scripture}`,
+  ]
+    .filter(Boolean)
+    .join(' ');
 }
 
 export function talkJsonLd({
@@ -26,7 +53,12 @@ export function talkJsonLd({
   return {
     '@context': 'https://schema.org',
     ...mediaJsonLd(talk.mediaUrl),
-    description: talk.description,
+    description: talkJsonLdDescription({
+      description: talk.description,
+      scripture: talk.scripture,
+      speakerName,
+      title: talk.title,
+    }),
     name: talk.title,
     ...(speakerName && { creator: { '@type': 'Person', name: speakerName } }),
     ...(talk.publishedAt && {

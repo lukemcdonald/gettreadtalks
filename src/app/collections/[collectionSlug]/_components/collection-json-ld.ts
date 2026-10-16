@@ -1,5 +1,6 @@
-import { site } from '../../../../configs/site.ts';
-import { talkListItemsJsonLd } from '../../../../features/talks/utils.ts';
+import { site } from '@/configs/site';
+import { getCollectionUrl } from '@/features/collections/utils';
+import { talkListItemsJsonLd } from '@/features/talks/utils';
 
 interface CollectionJsonLdInput {
   collectionSlug: string;
@@ -20,6 +21,6 @@ export function collectionJsonLd({
     description,
     itemListElement: talkListItemsJsonLd(talks),
     name: title,
-    url: `${site.url}/collections/${collectionSlug}`,
+    url: `${site.url}${getCollectionUrl(collectionSlug)}`,
   };
 }

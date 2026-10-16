@@ -6,6 +6,8 @@ import { TalkPageContent } from '@/app/talks/[speakerSlug]/[talkSlug]/_component
 import { TalkPageSkeleton } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-page-skeleton';
 import { getSpeakerName } from '@/features/speakers/utils';
 import { getTalkBySlug } from '@/features/talks/queries/get-talk-by-slug';
+import { getTalkUrl, talkMetaDescription } from '@/features/talks/utils';
+import { pageMetadata } from '@/lib/metadata';
 
 // fallow-ignore-next-line unused-export
 export const ensureStatic = 'shell';
@@ -17,7 +19,6 @@ interface TalkPageProps {
   }>;
 }
 
-// fallow-ignore-next-line complexity
 export async function generateMetadata({
   params,
 }: TalkPageProps): Promise<Metadata> {
@@ -28,15 +29,19 @@ export async function generateMetadata({
     return {};
   }
 
-  const { speaker, talk } = talkResult;
-  const speakerName = getSpeakerName(speaker);
+  const { speaker, talk, topics } = talkResult;
 
-  return {
-    description:
-      talk.description ??
-      (speakerName ? `A talk by ${speakerName}.` : undefined),
+  return pageMetadata({
+    canonical: getTalkUrl(speakerSlug, talkSlug),
+    description: talkMetaDescription({
+      description: talk.description,
+      scripture: talk.scripture,
+      speakerName: getSpeakerName(speaker),
+      topicTitles: topics.map((topic) => topic.title),
+    }),
+    openGraphType: 'video.other',
     title: talk.title,
-  };
+  });
 }
 
 export default function TalkPage({ params }: TalkPageProps) {

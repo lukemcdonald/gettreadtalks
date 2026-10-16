@@ -40,7 +40,7 @@ export const metadata: Metadata = {
         width: 1200,
       },
     ],
-    locale: 'en_US',
+    locale: site.locale,
     siteName: site.name,
     type: 'website',
   },

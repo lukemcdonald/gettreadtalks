@@ -5,7 +5,10 @@ import { fetchQuery } from 'convex/nextjs';
 import { site } from '@/configs/site';
 import { api } from '@/convex/_generated/api';
 import { getClipUrl } from '@/features/clips/utils';
+import { getCollectionUrl } from '@/features/collections/utils';
+import { getSpeakerUrl } from '@/features/speakers/utils';
 import { getTalkUrl } from '@/features/talks/utils';
+import { getTopicUrl } from '@/features/topics/utils';
 
 const staticRoutes: MetadataRoute.Sitemap = [
   { priority: 1, url: site.url },
@@ -37,21 +40,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const speakerEntries: MetadataRoute.Sitemap = speakers.map((speaker) => ({
     changeFrequency: 'monthly',
     lastModified: new Date(speaker.updatedAt),
-    url: `${site.url}/speakers/${speaker.slug}`,
+    url: `${site.url}${getSpeakerUrl(speaker.slug)}`,
   }));
 
   const collectionEntries: MetadataRoute.Sitemap = collections.map(
     (collection) => ({
       changeFrequency: 'monthly',
       lastModified: new Date(collection.updatedAt),
-      url: `${site.url}/collections/${collection.slug}`,
+      url: `${site.url}${getCollectionUrl(collection.slug)}`,
     })
   );
 
   const topicEntries: MetadataRoute.Sitemap = topics.map((topic) => ({
     changeFrequency: 'weekly',
     lastModified: new Date(topic.updatedAt),
-    url: `${site.url}/topics/${topic.slug}`,
+    url: `${site.url}${getTopicUrl(topic.slug)}`,
   }));
 
   const clipEntries: MetadataRoute.Sitemap = clips.map((clip) => ({

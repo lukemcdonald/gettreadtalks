@@ -22,6 +22,10 @@ export function getSpeakerInitials(speaker?: SpeakerNameFields | null): string {
   return speaker ? `${speaker.firstName?.[0]}${speaker.lastName?.[0]}` : '';
 }
 
+export function getSpeakerUrl(speakerSlug: string) {
+  return `/speakers/${speakerSlug}`;
+}
+
 /**
  * Sort speakers by name (immutable).
  */

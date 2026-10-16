@@ -5,6 +5,8 @@ import { Suspense } from 'react';
 import { SpeakerPageContent } from '@/app/speakers/[speakerSlug]/_components/speaker-page-content';
 import { SpeakerPageSkeleton } from '@/app/speakers/[speakerSlug]/_components/speaker-page-skeleton';
 import { getSpeakerBySlug } from '@/features/speakers/queries/get-speaker-by-slug';
+import { getSpeakerName, getSpeakerUrl } from '@/features/speakers/utils';
+import { pageMetadata } from '@/lib/metadata';
 
 // fallow-ignore-next-line unused-export
 export const ensureStatic = 'shell';
@@ -24,13 +26,15 @@ export async function generateMetadata({
   }
 
   const { speaker } = data;
-  const name = `${speaker.firstName} ${speaker.lastName}`;
+  const name = getSpeakerName(speaker);
 
-  return {
+  return pageMetadata({
+    canonical: getSpeakerUrl(speakerSlug),
     description:
       speaker.description ?? `${name} — faithful minister of the Gospel.`,
+    openGraphType: 'profile',
     title: name,
-  };
+  });
 }
 
 export default function SpeakerPage({ params }: SpeakerPageProps) {

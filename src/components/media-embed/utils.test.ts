@@ -7,6 +7,7 @@ describe('mediaJsonLd', () => {
     expect(mediaJsonLd('https://www.youtube.com/watch?v=jNQXAC9IVRw')).toEqual({
       '@type': 'VideoObject',
       embedUrl: 'https://www.youtube.com/embed/jNQXAC9IVRw',
+      thumbnailUrl: 'https://img.youtube.com/vi/jNQXAC9IVRw/hqdefault.jpg',
     });
     expect(mediaJsonLd('https://vimeo.com/123456789')).toEqual({
       '@type': 'VideoObject',

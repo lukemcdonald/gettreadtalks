@@ -12,6 +12,8 @@ import { PageHeader } from '@/components/page-header';
 import { PageBreadcrumb } from '@/components/ui';
 import { CollectionTalkList } from '@/features/collections/components/collection-talk-list';
 import { getCollectionBySlug } from '@/features/collections/queries/get-collection-by-slug';
+import { getCollectionUrl } from '@/features/collections/utils';
+import { pageMetadata } from '@/lib/metadata';
 
 interface CollectionPageProps {
   params: Promise<{ collectionSlug: string }>;
@@ -29,10 +31,11 @@ export async function generateMetadata({
 
   const { collection } = data;
 
-  return {
+  return pageMetadata({
+    canonical: getCollectionUrl(collectionSlug),
     description: collection.description,
     title: collection.title,
-  };
+  });
 }
 
 export default async function CollectionPage({ params }: CollectionPageProps) {
