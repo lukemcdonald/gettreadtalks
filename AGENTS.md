@@ -30,6 +30,26 @@ Use the Fallow skill for deeper audit and debug workflows.
 - Alphabetize: imports, object keys, destructured props, component prop lists
   - Exception: group related items together if alphabetical order hurts readability
 
+## Naming
+
+Applies to `src/` and Convex internal helpers. Convex registered query/mutation names (`get`, `list`, `listAll`, `search`, and the mutation verbs below) stay as framework API names.
+
+- `get*`: cheap sync read or computed value; never async or side effects
+- `load*` / `fetch*`: async I/O reading content (`fetch*` for network)
+- `resolve*`: returns a location, not contents
+- `to*`: pure conversion (one thing reshaped)
+- `build*`: assemble URL/path/id/config from parts
+- `format*`: human-readable output
+- `create*`: construct objects/handlers
+- `is*` / `has*` / `can*`: booleans
+- `normalize*` / `parse*`: clean or validate input
+- `handle*` / `on*`: handlers
+- Constants `SCREAMING_CASE`; types and components PascalCase; spell out abbreviations except `id`/`url`
+- Framework names stay (`generateMetadata`, `GET`, Convex registered `get*`/`list*`/`search*`)
+- No aliases for old names
+
+Quick test: a person reads it = `format*`; assembled from parts = `build*`; one thing reshaped = `to*`.
+
 ## Code Comments
 
 JSDoc only when adding context beyond the function name (1–2 lines max). Skip `@param`/`@returns` unless documenting non-obvious constraints, defaults, or side effects. Never: commented-out code, obvious comments, redundant type docs.
@@ -130,6 +150,8 @@ Convex only allows alphanumeric characters, underscores, and periods in file/fol
 - Single-word files: lowercase (e.g., `filters.ts`, `sort.ts`, `utils.ts`)
 
 ### Naming Conventions
+
+Registered query/mutation names stay as framework API names (see Naming). Internal helpers follow Naming.
 
 _Queries:_
 
