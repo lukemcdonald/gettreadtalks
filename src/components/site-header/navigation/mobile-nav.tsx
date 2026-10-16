@@ -73,7 +73,7 @@ export function MobileNav({ className }: MobileNavProps) {
   const showManageLink = isAdmin(user);
 
   return (
-    <Drawer position="right">
+    <Drawer position="bottom">
       <DrawerTrigger
         render={
           <Button
@@ -88,9 +88,10 @@ export function MobileNav({ className }: MobileNavProps) {
       />
 
       <DrawerPopup
-        className="before:bg-muted/72 border border-t-0"
+        className="before:bg-muted/72"
+        showBar
         showCloseButton={false}
-        variant="straight"
+        variant="default"
       >
         <DrawerHeader className="flex-row items-center justify-between">
           <DrawerTitle className="sr-only">Navigation menu</DrawerTitle>
@@ -127,7 +128,7 @@ export function MobileNav({ className }: MobileNavProps) {
         </DrawerPanel>
 
         {!isLoading && (
-          <CommandPanel className="flex-1 rounded-b-none px-6 pt-6 pb-6 [clip-path:inset(0_1px)] not-has-[+[data-slot=command-footer]]:rounded-b-none not-has-[+[data-slot=command-footer]]:[clip-path:inset(0_1px)]">
+          <CommandPanel className="rounded-b-none p-6 [clip-path:inset(0_1px)] not-has-[+[data-slot=command-footer]]:rounded-b-none not-has-[+[data-slot=command-footer]]:[clip-path:inset(0_1px)]">
             <DrawerMenu>
               {user ? (
                 <>
