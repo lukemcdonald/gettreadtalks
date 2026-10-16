@@ -291,7 +291,10 @@ export async function loadTalk(
   input: z.infer<typeof getTalkInputSchema>,
   catalog: McpCatalog
 ) {
-  const result = await catalog.loadTalkBySlug(input.speakerSlug, input.talkSlug);
+  const result = await catalog.loadTalkBySlug(
+    input.speakerSlug,
+    input.talkSlug
+  );
 
   if (!result) {
     return toolResult({ error: 'Talk not found.' }, true);
@@ -486,7 +489,9 @@ function registerMcpTools(server: McpServer, catalog: McpCatalog) {
         'Get one collection by slug, including its published talks and canonical URLs.',
       inputSchema: getCollectionInputSchema,
     },
-    withToolTracking('get_collection', (input) => loadCollection(input, catalog))
+    withToolTracking('get_collection', (input) =>
+      loadCollection(input, catalog)
+    )
   );
 
   server.registerTool(
