@@ -18,15 +18,15 @@ import {
   Button,
   Drawer,
   DrawerClose,
+  DrawerFooter,
   DrawerHeader,
   DrawerMenu,
   DrawerMenuGroup,
   DrawerMenuItem,
+  DrawerPanel,
   DrawerPopup,
   DrawerTitle,
   DrawerTrigger,
-  Frame,
-  FramePanel,
 } from '@/components/ui';
 import { Link } from '@/components/ui/link';
 import { useCurrentUser } from '@/features/users/hooks/use-current-user';
@@ -107,24 +107,24 @@ export function MobileNav({ className }: MobileNavProps) {
           </div>
         </DrawerHeader>
 
-        <Frame className="min-h-0 flex-1 rounded-none">
-          <FramePanel className="bg-popover p-1">
-            <DrawerMenu aria-label="Mobile navigation">
-              <DrawerMenuGroup>
-                {NAVIGATION_LINKS.map((link) => (
-                  <MobileNavMenuLink
-                    href={link.href}
-                    isActive={pathname === link.href}
-                    key={link.href}
-                    label={link.label}
-                  />
-                ))}
-              </DrawerMenuGroup>
-            </DrawerMenu>
-          </FramePanel>
+        <DrawerPanel scrollable={false}>
+          <DrawerMenu aria-label="Mobile navigation">
+            <DrawerMenuGroup>
+              {NAVIGATION_LINKS.map((link) => (
+                <MobileNavMenuLink
+                  href={link.href}
+                  isActive={pathname === link.href}
+                  key={link.href}
+                  label={link.label}
+                />
+              ))}
+            </DrawerMenuGroup>
+          </DrawerMenu>
+        </DrawerPanel>
 
-          {!isLoading && (
-            <DrawerMenu className="mt-2 px-1">
+        {!isLoading && (
+          <DrawerFooter className="border-t-0 flex-1 flex-col justify-start rounded-t-xl sm:flex-col sm:justify-start">
+            <DrawerMenu>
               {user ? (
                 <>
                   <AccountIdentity user={user} />
@@ -154,8 +154,8 @@ export function MobileNav({ className }: MobileNavProps) {
                 </DrawerMenuGroup>
               )}
             </DrawerMenu>
-          )}
-        </Frame>
+          </DrawerFooter>
+        )}
       </DrawerPopup>
     </Drawer>
   );
