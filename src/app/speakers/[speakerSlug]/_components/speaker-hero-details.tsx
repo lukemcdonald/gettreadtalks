@@ -25,10 +25,8 @@ export function SpeakerHeroDetails({
   return (
     <header
       className={cn(
-        'flex w-full flex-col items-center gap-6 text-center',
-        isInline &&
-          hasImage &&
-          'md:flex-row md:items-start md:gap-8 md:text-left'
+        'flex w-full flex-col items-center gap-6',
+        isInline && hasImage && 'md:flex-row md:items-start md:gap-8'
       )}
     >
       {hasImage && (
@@ -40,15 +38,15 @@ export function SpeakerHeroDetails({
         />
       )}
 
-      <div className="w-full min-w-0 flex-1 space-y-4">
-        <div className="w-full">
+      <div
+        className={cn(
+          'flex w-full min-w-0 flex-1 flex-col items-center gap-4 text-center',
+          isInline && 'md:items-start md:text-left'
+        )}
+      >
+        <div className="max-w-full">
           <ArchiveBackLink href={getSpeakersPath()} label="Speakers" />
-          <div
-            className={cn(
-              'mx-auto flex w-full flex-wrap items-center justify-center gap-3 text-center',
-              isInline && 'md:justify-start md:text-left'
-            )}
-          >
+          <div className="flex flex-wrap items-center gap-3">
             <HeroTitle className="text-foreground min-w-0">
               {speakerName}
             </HeroTitle>
