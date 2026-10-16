@@ -123,7 +123,7 @@ export function MobileNav({ className }: MobileNavProps) {
         </DrawerPanel>
 
         {!isLoading && (
-          <DrawerFooter className="border-t-0 flex-1 flex-col justify-start rounded-t-xl sm:flex-col sm:justify-start">
+          <DrawerFooter className="flex-1 flex-col justify-start rounded-t-xl border-t-0 sm:flex-col sm:justify-start">
             <DrawerMenu>
               {user ? (
                 <>
