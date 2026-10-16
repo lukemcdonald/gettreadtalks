@@ -18,15 +18,15 @@ import {
   Button,
   Drawer,
   DrawerClose,
-  DrawerFooter,
   DrawerHeader,
   DrawerMenu,
   DrawerMenuGroup,
   DrawerMenuItem,
-  DrawerPanel,
   DrawerPopup,
   DrawerTitle,
   DrawerTrigger,
+  Frame,
+  FramePanel,
 } from '@/components/ui';
 import { Link } from '@/components/ui/link';
 import { useCurrentUser } from '@/features/users/hooks/use-current-user';
@@ -107,24 +107,24 @@ export function MobileNav({ className }: MobileNavProps) {
           </div>
         </DrawerHeader>
 
-        <DrawerPanel scrollable={false}>
-          <DrawerMenu aria-label="Mobile navigation">
-            <DrawerMenuGroup>
-              {NAVIGATION_LINKS.map((link) => (
-                <MobileNavMenuLink
-                  href={link.href}
-                  isActive={pathname === link.href}
-                  key={link.href}
-                  label={link.label}
-                />
-              ))}
-            </DrawerMenuGroup>
-          </DrawerMenu>
-        </DrawerPanel>
+        <Frame className="flex-1 min-h-0 rounded-none">
+          <FramePanel className="bg-popover p-1">
+            <DrawerMenu aria-label="Mobile navigation">
+              <DrawerMenuGroup>
+                {NAVIGATION_LINKS.map((link) => (
+                  <MobileNavMenuLink
+                    href={link.href}
+                    isActive={pathname === link.href}
+                    key={link.href}
+                    label={link.label}
+                  />
+                ))}
+              </DrawerMenuGroup>
+            </DrawerMenu>
+          </FramePanel>
 
-        {!isLoading && (
-          <DrawerFooter className="flex-1 flex-col justify-start sm:flex-col sm:justify-start">
-            <DrawerMenu>
+          {!isLoading && (
+            <DrawerMenu className="px-1">
               {user ? (
                 <>
                   <AccountIdentity user={user} />
@@ -154,8 +154,8 @@ export function MobileNav({ className }: MobileNavProps) {
                 </DrawerMenuGroup>
               )}
             </DrawerMenu>
-          </DrawerFooter>
-        )}
+          )}
+        </Frame>
       </DrawerPopup>
     </Drawer>
   );
