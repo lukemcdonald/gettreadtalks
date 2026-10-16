@@ -16,9 +16,9 @@ import { ModeSwitcher } from '@/components/site-header/mode-switcher';
 import { SiteBranding } from '@/components/site-header/site-branding';
 import {
   Button,
+  CommandPanel,
   Drawer,
   DrawerClose,
-  DrawerFooter,
   DrawerHeader,
   DrawerMenu,
   DrawerMenuGroup,
@@ -87,7 +87,11 @@ export function MobileNav({ className }: MobileNavProps) {
         }
       />
 
-      <DrawerPopup showCloseButton={false} variant="straight">
+      <DrawerPopup
+        className="before:bg-muted/72 border"
+        showCloseButton={false}
+        variant="straight"
+      >
         <DrawerHeader className="flex-row items-center justify-between">
           <DrawerTitle className="sr-only">Navigation menu</DrawerTitle>
           <SiteBranding />
@@ -123,7 +127,7 @@ export function MobileNav({ className }: MobileNavProps) {
         </DrawerPanel>
 
         {!isLoading && (
-          <DrawerFooter className="flex-1 flex-col justify-start rounded-t-xl border-t-0 sm:flex-col sm:justify-start">
+          <CommandPanel className="flex-1 rounded-b-none px-6 pb-6 pt-8 [clip-path:inset(0_1px)]">
             <DrawerMenu>
               {user ? (
                 <>
@@ -154,7 +158,7 @@ export function MobileNav({ className }: MobileNavProps) {
                 </DrawerMenuGroup>
               )}
             </DrawerMenu>
-          </DrawerFooter>
+          </CommandPanel>
         )}
       </DrawerPopup>
     </Drawer>
