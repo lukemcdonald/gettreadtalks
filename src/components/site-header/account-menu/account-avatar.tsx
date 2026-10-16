@@ -15,7 +15,7 @@ export function AccountAvatar({ className, user }: AccountAvatarProps) {
     <Avatar className={cn('size-6', className)}>
       {!!user.image && <AvatarImage alt="" src={user.image} />}
       <AvatarFallback className="bg-transparent">
-        <UserIcon className="size-5" />
+        <UserIcon className="size-6" />
       </AvatarFallback>
     </Avatar>
   );

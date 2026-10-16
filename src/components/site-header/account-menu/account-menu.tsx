@@ -75,7 +75,7 @@ export function AccountMenu({ initialUser }: AccountMenuProps) {
           <Button
             className="size-10"
             data-testid="account-menu"
-            size="icon-lg"
+            size="icon-xl"
             variant="ghost"
           />
         }
