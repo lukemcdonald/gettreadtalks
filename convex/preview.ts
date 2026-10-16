@@ -411,8 +411,6 @@ export const seedPreviewUser = internalMutation({
     const existingUserId = adapterRecordId(existingUser);
 
     if (existingUserId) {
-      await upsertCredentialAccount(ctx, args.passwordHash, existingUserId);
-
       return 'updated';
     }
 
@@ -425,7 +423,7 @@ export const seedPreviewUser = internalMutation({
             email: args.email,
             emailVerified: true,
             name: args.name,
-            role: 'user',
+            role: 'admin',
             updatedAt: now,
           },
           model: 'user',
