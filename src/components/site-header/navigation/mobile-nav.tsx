@@ -70,7 +70,7 @@ function MobileNavMenuLink({
 export function MobileNav({ className }: MobileNavProps) {
   const { data: user, isLoading } = useCurrentUser();
   const pathname = usePathname();
-  const showManageLink = isAdmin(user);
+  const showContentLink = isAdmin(user);
 
   return (
     <Drawer position="bottom">
@@ -134,7 +134,7 @@ export function MobileNav({ className }: MobileNavProps) {
                 <>
                   <AccountIdentity user={user} />
                   <DrawerMenuGroup>
-                    {getAccountMenuLinks(showManageLink).map((link) => (
+                    {getAccountMenuLinks(showContentLink).map((link) => (
                       <MobileNavMenuLink
                         href={link.href}
                         isActive={isAccountMenuLinkActive(link.href, pathname)}

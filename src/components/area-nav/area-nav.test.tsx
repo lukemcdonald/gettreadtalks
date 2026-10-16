@@ -72,11 +72,12 @@ describe('AreaNav', () => {
     });
   });
 
-  it('shows the area heading in the sidebar', () => {
+  it('does not render a heading in the sidebar', () => {
     setup('/account', 'sidebar');
 
+    expect(screen.queryByRole('heading')).not.toBeInTheDocument();
     expect(
-      screen.getByRole('heading', { name: 'Account' })
+      screen.getByRole('navigation', { name: 'Account' })
     ).toBeInTheDocument();
   });
 });

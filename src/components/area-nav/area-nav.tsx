@@ -19,7 +19,7 @@ import { useEffect, useRef } from 'react';
 import { Link } from '@/components/ui/link';
 import { cn } from '@/utils';
 
-const AREA_NAV_ICONS = {
+export const AREA_NAV_ICONS = {
   clips: FilmIcon,
   collections: FolderIcon,
   favorites: HeartIcon,
@@ -35,6 +35,12 @@ export type AreaNavIcon = keyof typeof AREA_NAV_ICONS;
 export interface AreaNavItem {
   href: Route;
   icon: AreaNavIcon;
+  label: string;
+}
+
+export interface AreaNavSection {
+  href: Route;
+  items: AreaNavItem[];
   label: string;
 }
 
@@ -80,9 +86,6 @@ export function AreaNav({ items, label, variant }: AreaNavProps) {
   if (variant === 'sidebar') {
     return (
       <nav aria-label={label} className="flex flex-col">
-        <h2 className="text-muted-foreground mb-3 text-xs font-semibold tracking-wider uppercase">
-          {label}
-        </h2>
         <ul className="-mx-3 flex flex-col gap-1">
           {items.map((item) => {
             const isActive = item.href === pathname;

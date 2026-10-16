@@ -1,2 +1,2 @@
 export { AreaNav } from './area-nav';
-export type { AreaNavItem } from './area-nav';
+export { getActiveSection, getVisibleSections, isManagePath } from './sections';

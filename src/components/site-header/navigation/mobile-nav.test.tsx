@@ -61,15 +61,18 @@ describe('MobileNav', () => {
     );
   });
 
-  it('shows Manage for admins', async () => {
+  it('shows Content for admins', async () => {
     const { click } = setup(createUser('admin'));
 
     await click(screen.getByRole('button', { name: 'Open navigation menu' }));
 
-    expect(screen.getByRole('button', { name: 'Manage' })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: 'Content' })).toHaveAttribute(
       'href',
-      '/manage'
+      '/manage/talks'
     );
+    expect(
+      screen.queryByRole('button', { name: 'Manage' })
+    ).not.toBeInTheDocument();
   });
 
   it('shows Sign In when signed out', async () => {
@@ -88,13 +91,13 @@ describe('MobileNav', () => {
     );
   });
 
-  it('hides Manage for non-admins', async () => {
+  it('hides Content for non-admins', async () => {
     const { click } = setup(createUser('user'));
 
     await click(screen.getByRole('button', { name: 'Open navigation menu' }));
 
     expect(
-      screen.queryByRole('button', { name: 'Manage' })
+      screen.queryByRole('button', { name: 'Content' })
     ).not.toBeInTheDocument();
   });
 });
