@@ -2,6 +2,7 @@
 
 import type { TalkWithSpeakerAndTopics } from '@/features/talks/types';
 
+import { getTalkUrl } from '@/features/talks/utils';
 import { describe, expect, it, render, screen } from '@/test';
 
 import { TalkActionsMenu } from './talk-actions-menu';
@@ -44,13 +45,44 @@ describe('TalkActionsMenu', () => {
     status: 'published',
     title: 'Justification',
   } as TalkWithSpeakerAndTopics;
+  const talkUrl = getTalkUrl('john-piper', talk.slug);
+
+  async function openMenu(viewUrl?: string) {
+    const { click } = render(<TalkActionsMenu talk={talk} talkUrl={viewUrl} />);
+
+    await click(screen.getByRole('button', { name: 'More actions' }));
+
+    return click;
+  }
+
+  it('shows View, Archive, and Delete without Edit', async () => {
+    await openMenu(talkUrl);
+
+    expect(screen.getByRole('menuitem', { name: 'View' })).toHaveAttribute(
+      'href',
+      talkUrl
+    );
+    expect(screen.getByRole('menuitem', { name: 'Archive' })).toBeVisible();
+    expect(screen.getByRole('menuitem', { name: 'Delete' })).toBeVisible();
+    expect(
+      screen.queryByRole('menuitem', { name: 'Edit' })
+    ).not.toBeInTheDocument();
+  });
+
+  it('hides View when the talk is not published', async () => {
+    await openMenu();
+
+    expect(
+      screen.queryByRole('menuitem', { name: 'View' })
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'Archive' })).toBeVisible();
+    expect(screen.getByRole('menuitem', { name: 'Delete' })).toBeVisible();
+  });
 
   it('archives without leaving the manage list', async () => {
     archiveTalk.mockImplementation(async () => {});
 
-    const { click } = render(<TalkActionsMenu talk={talk} />);
-
-    await click(screen.getByRole('button', { name: 'More actions' }));
+    const click = await openMenu(talkUrl);
     await click(screen.getByRole('menuitem', { name: 'Archive' }));
 
     expect(archiveTalk).toHaveBeenCalledWith({ talkId: talk._id });

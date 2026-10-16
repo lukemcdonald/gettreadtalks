@@ -7,6 +7,26 @@ import {
   visibilitySlugs,
 } from '../../test.setup';
 
+describe('listAllClips', () => {
+  it('includes the parent talk title for manage lists', async () => {
+    const t = createConvexTest();
+    await seedVisibilityCatalog(t);
+
+    const result = await t.query(api.clips.listAllClips, {
+      paginationOpts: {
+        cursor: null,
+        numItems: 20,
+      },
+      status: 'all',
+    });
+    const clip = result.page.find(
+      (item) => item.slug === visibilitySlugs.clipOnPublishedTalk
+    );
+
+    expect(clip?.talkTitle).toBe('Grace Abounding');
+  });
+});
+
 describe('listClipSlugs', () => {
   it('omits published clips whose parent talk is unpublished', async () => {
     const t = createConvexTest();

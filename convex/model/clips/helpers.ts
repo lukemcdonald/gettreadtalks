@@ -64,3 +64,19 @@ export async function enrichClipsWithSpeaker<
     return { ...item, speaker };
   });
 }
+
+export async function enrichClipsForAdmin(
+  ctx: QueryCtx,
+  clips: Doc<'clips'>[]
+) {
+  const clipsWithSpeakers = await enrichClipsWithSpeaker(ctx, clips);
+
+  return await asyncMap(clipsWithSpeakers, async (clip) => {
+    const talk = clip.talkId ? await ctx.db.get('talks', clip.talkId) : null;
+
+    return {
+      ...clip,
+      talkTitle: talk?.title ?? null,
+    };
+  });
+}

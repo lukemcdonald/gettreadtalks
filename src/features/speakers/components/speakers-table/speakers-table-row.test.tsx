@@ -3,7 +3,6 @@
 import type { Speaker } from '@/features/speakers/types';
 
 import { Table, TableBody } from '@/components/ui';
-import { getSpeakerUrl } from '@/features/speakers/utils';
 import { getEntityEditPath } from '@/lib/entities/paths';
 import { describe, expect, it, render, screen } from '@/test';
 
@@ -15,6 +14,7 @@ vi.mock('@/features/speakers/components/speaker-actions-menu', () => ({
 
 describe('SpeakersTableRow', () => {
   const speaker = {
+    _creationTime: 1,
     _id: 'speakers:john-piper' as Speaker['_id'],
     firstName: 'John',
     lastName: 'Piper',
@@ -23,9 +23,11 @@ describe('SpeakersTableRow', () => {
 
   function setup({
     clipCount = 0,
+    status = 'published',
     talkCount = 0,
   }: {
     clipCount?: number;
+    status?: 'draft' | 'published';
     talkCount?: number;
   } = {}) {
     return render(
@@ -34,6 +36,7 @@ describe('SpeakersTableRow', () => {
           <SpeakersTableRow
             clipCount={clipCount}
             speaker={speaker}
+            status={status}
             talkCount={talkCount}
           />
         </TableBody>
@@ -41,20 +44,8 @@ describe('SpeakersTableRow', () => {
     );
   }
 
-  it('links a published speaker to the public page', () => {
+  it('opens the edit drawer from the name and has no pencil control', () => {
     setup({ talkCount: 1 });
-
-    expect(screen.getByRole('link', { name: 'John Piper' })).toHaveAttribute(
-      'href',
-      getSpeakerUrl(speaker.slug)
-    );
-    expect(
-      screen.getByRole('link', { name: 'Edit John Piper' })
-    ).toHaveAttribute('href', getEntityEditPath('speakers', speaker._id));
-  });
-
-  it('opens the edit drawer from a speaker with no public content', () => {
-    setup();
     const titleLink = screen.getByRole('link', { name: 'John Piper' });
 
     expect(titleLink).toHaveAttribute(
@@ -62,5 +53,18 @@ describe('SpeakersTableRow', () => {
       getEntityEditPath('speakers', speaker._id)
     );
     expect(titleLink).not.toHaveAttribute('href', '');
+    expect(
+      screen.queryByRole('link', { name: 'Edit John Piper' })
+    ).not.toBeInTheDocument();
+  });
+
+  it('opens the edit drawer from a speaker with no public content', () => {
+    setup({ status: 'draft' });
+    const titleLink = screen.getByRole('link', { name: 'John Piper' });
+
+    expect(titleLink).toHaveAttribute(
+      'href',
+      getEntityEditPath('speakers', speaker._id)
+    );
   });
 });

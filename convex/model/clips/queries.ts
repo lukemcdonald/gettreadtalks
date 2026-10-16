@@ -17,6 +17,7 @@ import { getCurrentUser } from '../auth/utils';
 import { LIST_SEARCH_LIMIT } from '../search/constants';
 import { normalizeSearchQuery } from '../search/utils';
 import {
+  enrichClipsForAdmin,
   enrichClipsWithSpeaker,
   listPublishedClips,
   listPublishedClipsPage,
@@ -26,6 +27,13 @@ import {
 const clipPageWithSpeakersValidator = paginationResultValidator(
   doc('clips').extend({
     speaker: doc('speakers').nullable(),
+  })
+);
+
+const clipAdminPageValidator = paginationResultValidator(
+  doc('clips').extend({
+    speaker: doc('speakers').nullable(),
+    talkTitle: v.union(v.null(), v.string()),
   })
 );
 
@@ -229,8 +237,8 @@ export const listAllClips = query({
 
     return {
       ...clipPages,
-      page: await enrichClipsWithSpeaker(ctx, clipPages.page),
+      page: await enrichClipsForAdmin(ctx, clipPages.page),
     };
   },
-  returns: clipPageWithSpeakersValidator,
+  returns: clipAdminPageValidator,
 });

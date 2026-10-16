@@ -46,7 +46,6 @@ export interface ContentActionsGroupProps {
   };
   contentType: ContentType;
   disabled?: boolean;
-  editUrl?: string;
   listUrl?: string;
   onArchiveAction?: (id: ContentId) => Promise<void>;
   onDeleteAction?: (id: ContentId) => Promise<void>;

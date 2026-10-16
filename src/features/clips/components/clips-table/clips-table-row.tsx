@@ -1,13 +1,13 @@
-import type { ClipWithSpeaker } from '@/features/clips/types';
+import type { AdminClip } from '@/features/clips/types';
 
-import { ContentTableRow } from '@/components/content-table-row';
+import { ManageRow } from '@/app/manage/_components/manage-table';
 import { ClipActionsMenu } from '@/features/clips/components/clip-actions-menu';
 import { getClipUrl } from '@/features/clips/utils';
 import { getSpeakerName } from '@/features/speakers/utils';
-import { getEntityEditPath, getManageTitleHref } from '@/lib/entities/paths';
+import { getEntityEditPath } from '@/lib/entities/paths';
 
 interface ClipsTableRowProps {
-  clip: ClipWithSpeaker;
+  clip: AdminClip;
 }
 
 export function ClipsTableRow({ clip }: ClipsTableRowProps) {
@@ -16,17 +16,13 @@ export function ClipsTableRow({ clip }: ClipsTableRowProps) {
     clip.status === 'published' ? getClipUrl(clip.slug) : undefined;
 
   return (
-    <ContentTableRow
-      actionsMenu={<ClipActionsMenu clip={clip} clipUrl={publicPath} />}
-      createdAt={clip._creationTime}
-      entity="clips"
-      href={getManageTitleHref({ editPath, publicPath })}
-      id={clip._id}
-      publishedAt={clip.publishedAt}
-      speakerName={clip.speaker ? getSpeakerName(clip.speaker) : undefined}
+    <ManageRow
+      actions={<ClipActionsMenu clip={clip} clipUrl={publicPath} />}
+      editHref={editPath}
       status={clip.status}
+      subtitle={clip.talkTitle || getSpeakerName(clip.speaker) || undefined}
       title={clip.title}
-      updatedAt={clip.updatedAt}
+      updatedAt={clip.updatedAt ?? clip._creationTime}
     />
   );
 }

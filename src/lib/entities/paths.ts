@@ -37,20 +37,6 @@ export function getEntityNewPath(entity: AdminEntity) {
   return `/${entity}/new`;
 }
 
-export function getManageTitleHref({
-  editPath,
-  publicPath,
-}: {
-  editPath: string;
-  publicPath?: string;
-}) {
-  if (publicPath) {
-    return publicPath;
-  }
-
-  return editPath;
-}
-
 export function getPublicEditPath(publicPath: string) {
   return `${publicPath}/edit`;
 }

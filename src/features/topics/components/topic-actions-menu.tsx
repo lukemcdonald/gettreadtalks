@@ -9,20 +9,24 @@ import {
   ActionsGroup,
   DeleteBlockedDialog,
   DeleteConfirmDialog,
+  getEntityMenuItems,
 } from '@/components/actions-group';
 import { toastManager } from '@/components/ui/primitives/toast';
 import { destroyTopicAction } from '@/features/topics/actions/destroy-topic';
-import { getTopicUrl } from '@/features/topics/utils';
-import { getEntityEditPath } from '@/lib/entities/paths';
 import { getErrorMessage } from '@/services/errors';
 import { pluralize } from '@/utils';
 
 interface TopicActionsMenuProps {
   talkCount: number;
   topic: Pick<Topic, '_id' | 'slug' | 'title'>;
+  viewUrl?: string;
 }
 
-export function TopicActionsMenu({ talkCount, topic }: TopicActionsMenuProps) {
+export function TopicActionsMenu({
+  talkCount,
+  topic,
+  viewUrl,
+}: TopicActionsMenuProps) {
   const router = useRouter();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -57,20 +61,10 @@ export function TopicActionsMenu({ talkCount, topic }: TopicActionsMenuProps) {
     setIsDeleting(false);
   };
 
-  const menuItems = [
-    {
-      hidden: talkCount === 0,
-      href: getTopicUrl(topic.slug),
-      label: 'View',
-    },
-    { href: getEntityEditPath('topics', topicId), label: 'Edit' },
-    {
-      label: 'Delete',
-      onClick: () => setDeleteDialogOpen(true),
-      separator: true,
-      variant: 'destructive' as const,
-    },
-  ];
+  const menuItems = getEntityMenuItems({
+    onDelete: () => setDeleteDialogOpen(true),
+    viewUrl,
+  });
 
   return (
     <>

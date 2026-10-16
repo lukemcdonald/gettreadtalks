@@ -4,7 +4,6 @@ import type { Speaker } from '@/features/speakers/types';
 import type { TalkWithSpeakerAndTopics } from '@/features/talks/types';
 
 import { Table, TableBody } from '@/components/ui';
-import { getTalkUrl } from '@/features/talks/utils';
 import { getEntityEditPath } from '@/lib/entities/paths';
 import { describe, expect, it, render, screen } from '@/test';
 
@@ -47,31 +46,8 @@ describe('TalksTableRow', () => {
     );
   }
 
-  it('links a published title to the public page', () => {
+  it('opens the edit drawer from the title and has no pencil control', () => {
     const talk = createTalk();
-    setup(talk);
-
-    expect(screen.getByRole('link', { name: talk.title })).toHaveAttribute(
-      'href',
-      getTalkUrl(speaker.slug, talk.slug)
-    );
-    expect(
-      screen.getByRole('link', { name: `Edit ${talk.title}` })
-    ).toHaveAttribute('href', getEntityEditPath('talks', talk._id));
-  });
-
-  it('opens the edit drawer from an unpublished title', () => {
-    const talk = createTalk({ status: 'backlog' });
-    setup(talk);
-
-    expect(screen.getByRole('link', { name: talk.title })).toHaveAttribute(
-      'href',
-      getEntityEditPath('talks', talk._id)
-    );
-  });
-
-  it('does not use an empty href when the talk has no speaker', () => {
-    const talk = createTalk({ speaker: null, status: 'published' });
     setup(talk);
     const titleLink = screen.getByRole('link', { name: talk.title });
 
@@ -80,5 +56,19 @@ describe('TalksTableRow', () => {
       getEntityEditPath('talks', talk._id)
     );
     expect(titleLink).not.toHaveAttribute('href', '');
+    expect(
+      screen.queryByRole('link', { name: `Edit ${talk.title}` })
+    ).not.toBeInTheDocument();
+    expect(screen.getByText('John Piper')).toBeVisible();
+  });
+
+  it('still opens the edit drawer from an unpublished title', () => {
+    const talk = createTalk({ status: 'backlog' });
+    setup(talk);
+
+    expect(screen.getByRole('link', { name: talk.title })).toHaveAttribute(
+      'href',
+      getEntityEditPath('talks', talk._id)
+    );
   });
 });

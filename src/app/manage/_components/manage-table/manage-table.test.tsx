@@ -9,14 +9,17 @@ describe('ManageTable', () => {
     const { rerender } = render(
       <ManageTable isEmpty={false} resource="talks">
         <TableRow>
-          <TableCell>Published</TableCell>
           <TableCell>A talk</TableCell>
+          <TableCell>Published</TableCell>
+          <TableCell>3d ago</TableCell>
           <TableCell>Menu</TableCell>
         </TableRow>
       </ManageTable>
     );
 
     expect(screen.getByRole('columnheader', { name: 'Title' })).toBeVisible();
+    expect(screen.getByRole('columnheader', { name: 'Status' })).toBeVisible();
+    expect(screen.getByRole('columnheader', { name: 'Updated' })).toBeVisible();
 
     rerender(<ManageTable emptyAction={action} isEmpty resource="talks" />);
     expect(

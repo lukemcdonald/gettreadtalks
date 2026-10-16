@@ -32,6 +32,7 @@ const sizeClasses = cva('shrink-0', {
       md: 'size-12',
       sm: 'size-10',
       xl: 'size-20 md:size-24',
+      xs: 'size-6',
     },
   },
 });
@@ -42,12 +43,13 @@ const avatarPixelSize = {
   md: 48,
   sm: 40,
   xl: 96,
+  xs: 24,
 } as const;
 
 interface SpeakerAvatarProps {
   className?: string;
   rounded?: 'sm' | 'md' | 'lg' | 'full';
-  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+  size?: '2xl' | 'lg' | 'md' | 'sm' | 'xl' | 'xs';
   speaker: Pick<Speaker, 'firstName' | 'lastName' | 'imageUrl'>;
 }
 

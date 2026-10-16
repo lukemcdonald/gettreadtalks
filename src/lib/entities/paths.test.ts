@@ -5,7 +5,6 @@ import {
   getAdminLoginRedirect,
   getEntityEditPath,
   getEntityNewPath,
-  getManageTitleHref,
   getPublicEditPath,
 } from './paths';
 
@@ -30,24 +29,6 @@ describe('getEntityEditPath', () => {
 describe('getEntityNewPath', () => {
   it('matches the intercepted admin sheet url', () => {
     expect(getEntityNewPath('clips')).toBe('/clips/new');
-  });
-});
-
-describe('getManageTitleHref', () => {
-  const editPath = getEntityEditPath('talks', 'talk123');
-
-  it('uses the public path when it is present', () => {
-    expect(
-      getManageTitleHref({
-        editPath,
-        publicPath: '/talks/john-piper/justification',
-      })
-    ).toBe('/talks/john-piper/justification');
-  });
-
-  it('uses the edit path when the public path is missing or empty', () => {
-    expect(getManageTitleHref({ editPath })).toBe(editPath);
-    expect(getManageTitleHref({ editPath, publicPath: '' })).toBe(editPath);
   });
 });
 

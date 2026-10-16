@@ -12,10 +12,11 @@ export async function ManageCollectionsContent() {
       isEmpty={collections.length === 0}
       resource="collections"
     >
-      {collections.map(({ collection, talkCount }) => (
+      {collections.map(({ collection, status, talkCount }) => (
         <CollectionsTableRow
           collection={collection}
           key={collection._id}
+          status={status}
           talkCount={talkCount}
         />
       ))}

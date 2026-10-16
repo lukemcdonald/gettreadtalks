@@ -12,11 +12,12 @@ export async function ManageSpeakersContent() {
       isEmpty={speakers.length === 0}
       resource="speakers"
     >
-      {speakers.map(({ clipCount, speaker, talkCount }) => (
+      {speakers.map(({ clipCount, speaker, status, talkCount }) => (
         <SpeakersTableRow
           clipCount={clipCount}
           key={speaker._id}
           speaker={speaker}
+          status={status}
           talkCount={talkCount}
         />
       ))}

@@ -9,24 +9,25 @@ import {
   ActionsGroup,
   DeleteBlockedDialog,
   DeleteConfirmDialog,
+  getEntityMenuItems,
 } from '@/components/actions-group';
 import { toastManager } from '@/components/ui/primitives/toast';
 import { destroySpeakerAction } from '@/features/speakers/actions/destroy-speaker';
-import { getSpeakerUrl } from '@/features/speakers/utils';
-import { getEntityEditPath } from '@/lib/entities/paths';
 import { getErrorMessage } from '@/services/errors';
 import { pluralize } from '@/utils';
 
 interface SpeakerActionsMenuProps {
   clipCount: number;
-  speaker: Pick<Speaker, '_id' | 'firstName' | 'lastName' | 'slug'>;
+  speaker: Pick<Speaker, '_id' | 'firstName' | 'lastName'>;
   talkCount: number;
+  viewUrl?: string;
 }
 
 export function SpeakerActionsMenu({
   clipCount,
   speaker,
   talkCount,
+  viewUrl,
 }: SpeakerActionsMenuProps) {
   const router = useRouter();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -73,20 +74,10 @@ export function SpeakerActionsMenu({
   }
   const blockReason = `This speaker has ${parts.join(' and ')} associated. Remove all associated content before deleting.`;
 
-  const menuItems = [
-    {
-      hidden: talkCount === 0 && clipCount === 0,
-      href: getSpeakerUrl(speaker.slug),
-      label: 'View',
-    },
-    { href: getEntityEditPath('speakers', speakerId), label: 'Edit' },
-    {
-      label: 'Delete',
-      onClick: () => setDeleteDialogOpen(true),
-      separator: true,
-      variant: 'destructive' as const,
-    },
-  ];
+  const menuItems = getEntityMenuItems({
+    onDelete: () => setDeleteDialogOpen(true),
+    viewUrl,
+  });
 
   return (
     <>

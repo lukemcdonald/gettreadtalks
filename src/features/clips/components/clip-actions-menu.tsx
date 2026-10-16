@@ -1,16 +1,16 @@
 'use client';
 
-import type { ClipWithSpeaker } from '@/features/clips/types';
+import type { AdminClip } from '@/features/clips/types';
 
 import { useRouter } from 'next/navigation';
 
 import { ContentActionsGroup } from '@/components/actions-group';
 import { useArchiveClip } from '@/features/clips/hooks/use-archive-clip';
 import { useDestroyClip } from '@/features/clips/hooks/use-destroy-clip';
-import { getAdminListPath, getEntityEditPath } from '@/lib/entities/paths';
+import { getAdminListPath } from '@/lib/entities/paths';
 
 interface ClipActionsMenuProps {
-  clip: ClipWithSpeaker;
+  clip: AdminClip;
   clipUrl?: string;
 }
 
@@ -35,7 +35,6 @@ export function ClipActionsMenu({ clip, clipUrl }: ClipActionsMenuProps) {
     <ContentActionsGroup
       content={clip}
       contentType="clip"
-      editUrl={getEntityEditPath('clips', clipId)}
       listUrl={getAdminListPath('clips')}
       onArchiveAction={handleArchive}
       onDeleteAction={handleDelete}

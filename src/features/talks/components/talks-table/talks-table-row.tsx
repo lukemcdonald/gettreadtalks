@@ -1,10 +1,10 @@
 import type { TalkWithSpeakerAndTopics } from '@/features/talks/types';
 
-import { ContentTableRow } from '@/components/content-table-row';
+import { ManageRow } from '@/app/manage/_components/manage-table';
 import { getSpeakerName } from '@/features/speakers/utils';
 import { TalkActionsMenu } from '@/features/talks/components/talk-actions-menu';
 import { getTalkUrl } from '@/features/talks/utils';
-import { getEntityEditPath, getManageTitleHref } from '@/lib/entities/paths';
+import { getEntityEditPath } from '@/lib/entities/paths';
 
 interface TalksTableRowProps {
   talk: TalkWithSpeakerAndTopics;
@@ -18,17 +18,13 @@ export function TalksTableRow({ talk }: TalksTableRowProps) {
       : undefined;
 
   return (
-    <ContentTableRow
-      actionsMenu={<TalkActionsMenu talk={talk} talkUrl={publicPath} />}
-      createdAt={talk._creationTime}
-      entity="talks"
-      href={getManageTitleHref({ editPath, publicPath })}
-      id={talk._id}
-      publishedAt={talk.publishedAt}
-      speakerName={talk.speaker ? getSpeakerName(talk.speaker) : undefined}
+    <ManageRow
+      actions={<TalkActionsMenu talk={talk} talkUrl={publicPath} />}
+      editHref={editPath}
       status={talk.status}
+      subtitle={talk.speaker ? getSpeakerName(talk.speaker) : undefined}
       title={talk.title}
-      updatedAt={talk.updatedAt}
+      updatedAt={talk.updatedAt ?? talk._creationTime}
     />
   );
 }
