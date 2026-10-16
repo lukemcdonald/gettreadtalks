@@ -10,6 +10,7 @@ import type {
 
 import { Button, MenuItem } from '@/components/ui';
 import { Link } from '@/components/ui/link';
+import { cn } from '@/utils';
 
 type AccountMenuItemProps = {
   'data-testid'?: string;
@@ -19,6 +20,7 @@ type AccountMenuItemProps = {
 } & Omit<ComponentProps<typeof MenuItem>, 'children' | 'render'>;
 
 export function AccountMenuItem({
+  className,
   'data-testid': testId,
   href,
   icon: Icon,
@@ -37,7 +39,10 @@ export function AccountMenuItem({
 
   return (
     <MenuItem
-      className="min-h-10 w-full items-center justify-start px-3 py-2"
+      className={cn(
+        'min-h-10 w-full items-center justify-start px-3 py-2',
+        className
+      )}
       render={renderComponent}
       {...delegated}
       nativeButton={isButton}
