@@ -6,6 +6,7 @@ import { ArrowRightIcon, PlayIcon } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
 
+import { VideoFrame } from '@/components/media-embed';
 import { Link } from '@/components/ui/link';
 import { captureMessage } from '@/services/errors';
 
@@ -44,20 +45,18 @@ export function MediaThumbnailCard({
       className="group text-muted-foreground hover:text-foreground flex flex-col gap-3 transition-colors"
       href={href}
     >
-      <div className="video-frame relative">
+      <VideoFrame>
         {showThumbnail ? (
-          <div className="relative aspect-video">
-            <Image
-              alt={title}
-              className="object-cover"
-              fill
-              onError={handleThumbnailError}
-              sizes={sizes}
-              src={thumbnail}
-            />
-          </div>
+          <Image
+            alt={title}
+            className="object-cover"
+            fill
+            onError={handleThumbnailError}
+            sizes={sizes}
+            src={thumbnail}
+          />
         ) : (
-          <div className="bg-muted flex aspect-video items-center justify-center" />
+          <div className="bg-muted size-full" />
         )}
 
         {!!showThumbnail && (
@@ -67,7 +66,7 @@ export function MediaThumbnailCard({
             </span>
           </div>
         )}
-      </div>
+      </VideoFrame>
 
       <div className="flex items-start justify-between gap-4 text-sm">
         <div>

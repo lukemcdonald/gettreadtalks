@@ -20,10 +20,10 @@ export function VideoPlayer({ src, trackingContext }: VideoPlayerProps) {
   });
 
   return (
-    <div className="relative aspect-video w-full">
+    <div className="size-full">
       {/* oxlint-disable-next-line jsx-a11y/media-has-caption -- no caption files for dynamically embedded media */}
       <video
-        className="block h-full w-full"
+        className="block size-full"
         controls
         onEnded={handleEnded}
         onPause={handlePause}

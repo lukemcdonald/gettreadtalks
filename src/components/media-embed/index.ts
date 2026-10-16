@@ -4,3 +4,4 @@ export {
   isVideoMediaType,
   preferItemsWithVideoThumbnails,
 } from './utils';
+export { VideoFrame, VideoFrameSkeleton } from './video-frame';
