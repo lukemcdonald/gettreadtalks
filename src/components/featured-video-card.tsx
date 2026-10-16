@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { useState } from 'react';
 
 import { VideoFrame, VideoFrameSkeleton } from '@/components/media-embed';
-import { FramePanel, Skeleton } from '@/components/ui';
+import { Skeleton } from '@/components/ui';
 import { Link } from '@/components/ui/link';
 import { captureMessage } from '@/services/errors';
 import { cn } from '@/utils';
@@ -26,8 +26,8 @@ const shellClassName =
 
 function CaptionCard({ children }: { children: ReactNode }) {
   return (
-    <div className="px-3 pb-3">
-      <FramePanel className="bg-card z-10 -mt-3 p-4">{children}</FramePanel>
+    <div className="bg-card relative z-10 -mt-3 rounded-t-xl rounded-b-2xl border-t p-4 shadow-xs/5">
+      {children}
     </div>
   );
 }
