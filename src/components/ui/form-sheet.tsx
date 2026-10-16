@@ -45,21 +45,25 @@ export function FormSheet({
       open={open}
       position={isDesktop ? 'right' : 'bottom'}
     >
-      <DrawerPopup showBar showCloseButton variant="default">
+      <DrawerPopup
+        className="has-data-[slot=drawer-bar]:ps-0 has-data-[slot=drawer-bar]:pt-0"
+        showBar
+        showCloseButton
+        variant="default"
+      >
         <DrawerHeader>
           <DrawerTitle>{title}</DrawerTitle>
         </DrawerHeader>
 
-        <form
-          className="grid min-h-0 flex-1 grid-rows-[1fr_auto]"
-          onSubmit={onSubmit}
-        >
-          <DrawerPanel>
-            <FormError error={error} />
-            {children}
-          </DrawerPanel>
+        <form className="contents" onSubmit={onSubmit}>
+          <div className="flex min-h-0 flex-1 flex-col">
+            <DrawerPanel>
+              <FormError error={error} />
+              {children}
+            </DrawerPanel>
+          </div>
 
-          <DrawerFooter>
+          <DrawerFooter className="overflow-hidden">
             <Button
               disabled={isPending}
               onClick={() => onOpenChange(false)}
