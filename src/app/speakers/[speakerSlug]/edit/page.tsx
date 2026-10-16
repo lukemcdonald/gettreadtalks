@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 
-import { getSpeakerBySlug } from '@/features/speakers/queries/get-speaker-by-slug';
+import { loadSpeakerBySlug } from '@/features/speakers/queries/load-speaker-by-slug';
 import { redirectPublicEdit } from '@/lib/entities/redirect-public-edit';
 
 interface PageProps {
@@ -9,7 +9,7 @@ interface PageProps {
 
 export default async function Page({ params }: PageProps) {
   const { speakerSlug } = await params;
-  const data = await getSpeakerBySlug(speakerSlug);
+  const data = await loadSpeakerBySlug(speakerSlug);
 
   if (!data) {
     notFound();

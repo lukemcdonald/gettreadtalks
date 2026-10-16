@@ -1,5 +1,5 @@
 import { CollectionsContent } from '@/app/collections/_components/collections-content';
-import { getCollections } from '@/features/collections/queries/get-collections';
+import { loadCollections } from '@/features/collections/queries/load-collections';
 
 export interface CollectionsSearchParams {
   sort?: string;
@@ -14,7 +14,7 @@ export async function CollectionsResults({
   searchParams,
 }: CollectionsResultsProps) {
   const { sort, speaker: speakerSlug } = await searchParams;
-  const { collections } = await getCollections({ sort, speakerSlug });
+  const { collections } = await loadCollections({ sort, speakerSlug });
 
   return (
     <CollectionsContent

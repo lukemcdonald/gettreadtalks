@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 
-import { getCollectionBySlug } from '@/features/collections/queries/get-collection-by-slug';
+import { loadCollectionBySlug } from '@/features/collections/queries/load-collection-by-slug';
 import { redirectPublicEdit } from '@/lib/entities/redirect-public-edit';
 
 interface PageProps {
@@ -9,7 +9,7 @@ interface PageProps {
 
 export default async function Page({ params }: PageProps) {
   const { collectionSlug } = await params;
-  const data = await getCollectionBySlug(collectionSlug);
+  const data = await loadCollectionBySlug(collectionSlug);
 
   if (!data) {
     notFound();

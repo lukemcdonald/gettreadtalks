@@ -21,7 +21,7 @@ interface GetTalksProps {
  * Get published talks with speakers and optional filtering.
  * Defaults to 50 items per page, sorted by most recent.
  */
-export async function getTalks(args?: GetTalksProps) {
+export async function loadTalks(args?: GetTalksProps) {
   cacheLife('hours');
   cacheTag('talks');
 

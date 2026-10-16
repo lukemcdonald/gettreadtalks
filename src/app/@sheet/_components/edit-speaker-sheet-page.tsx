@@ -4,7 +4,7 @@ import type { Route } from 'next';
 import { redirect } from 'next/navigation';
 
 import { EditSpeakerSheetRoute } from '@/app/@sheet/_components/edit-speaker-sheet-route';
-import { getSpeaker } from '@/features/speakers/queries/get-speaker';
+import { loadSpeaker } from '@/features/speakers/queries/load-speaker';
 import {
   ADMIN_LIST_PATHS,
   getAdminLoginRedirect,
@@ -27,7 +27,7 @@ export async function EditSpeakerSheetPage({
     getAdminLoginRedirect(buildEntityEditPath('speakers', speakerId)) as Route
   );
 
-  const speaker = await getSpeaker(speakerId);
+  const speaker = await loadSpeaker(speakerId);
 
   if (!speaker) {
     redirect(ADMIN_LIST_PATHS.speakers);

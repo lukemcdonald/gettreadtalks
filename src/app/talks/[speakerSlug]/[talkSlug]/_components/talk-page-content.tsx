@@ -11,12 +11,12 @@ import {
 import { TalkRelatedTalks } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-related-talks';
 import { JsonLd } from '@/components/json-ld';
 import { EditorialProfileLayout } from '@/components/layouts';
-import { getTalkBySlug } from '@/features/talks/queries/get-talk-by-slug';
-import { getTalkBySlugAdmin } from '@/features/talks/queries/get-talk-by-slug-admin';
+import { loadTalkBySlug } from '@/features/talks/queries/load-talk-by-slug';
+import { loadTalkBySlugAdmin } from '@/features/talks/queries/load-talk-by-slug-admin';
 import { buildTalkUrl, buildTalksPath } from '@/features/talks/utils';
 import { buildBreadcrumbJsonLd } from '@/lib/json-ld';
 
-type TalkBySlug = NonNullable<Awaited<ReturnType<typeof getTalkBySlug>>>;
+type TalkBySlug = NonNullable<Awaited<ReturnType<typeof loadTalkBySlug>>>;
 
 interface TalkPageContentProps {
   params: Promise<{
@@ -75,7 +75,7 @@ async function TalkAdminDraft({
   speakerSlug: string;
   talkSlug: string;
 }) {
-  const talkResult = await getTalkBySlugAdmin(speakerSlug, talkSlug);
+  const talkResult = await loadTalkBySlugAdmin(speakerSlug, talkSlug);
 
   if (!talkResult) {
     notFound();
@@ -92,7 +92,7 @@ async function TalkAdminDraft({
 
 export async function TalkPageContent({ params }: TalkPageContentProps) {
   const { speakerSlug, talkSlug } = await params;
-  const talkResult = await getTalkBySlug(speakerSlug, talkSlug);
+  const talkResult = await loadTalkBySlug(speakerSlug, talkSlug);
 
   if (!talkResult) {
     return (

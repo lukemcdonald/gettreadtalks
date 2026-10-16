@@ -5,12 +5,11 @@ import { cacheLife, cacheTag } from 'next/cache';
 import { api } from '@/convex/_generated/api';
 import { fetchAuthQuery } from '@/services/auth/server';
 
-/**
- * Get clip by slug with speaker and talk.
- */
-export async function getClipBySlug(slug: string) {
+export async function loadSpeakersAdmin() {
   cacheLife('hours');
-  cacheTag('clips');
+  cacheTag('speakers');
 
-  return await fetchAuthQuery(api.clips.getClipBySlug, { slug });
+  const speakers = await fetchAuthQuery(api.speakers.listAllSpeakersAdmin, {});
+
+  return { speakers };
 }

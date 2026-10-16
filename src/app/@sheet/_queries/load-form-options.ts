@@ -9,7 +9,7 @@ import { fetchAuthQuery } from '@/services/auth/server';
  * Fetches form options for admin forms (collections, speakers, talks, topics).
  * Cached per-user since fetchAuthQuery reads cookies.
  */
-export async function getFormOptions() {
+export async function loadFormOptions() {
   cacheLife('hours');
   cacheTag('form-options');
 

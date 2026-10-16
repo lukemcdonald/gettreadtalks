@@ -8,7 +8,7 @@ import { api } from '@/convex/_generated/api';
 /**
  * Get featured speakers for homepage.
  */
-export async function getFeaturedSpeakers(limit = 6) {
+export async function loadFeaturedSpeakers(limit = 6) {
   cacheLife('hours');
   cacheTag('speakers');
 

@@ -8,7 +8,7 @@ import { api } from '@/convex/_generated/api';
 /**
  * Get speaker by slug with related talks, collections, and clips.
  */
-export async function getSpeakerBySlug(slug: string) {
+export async function loadSpeakerBySlug(slug: string) {
   cacheLife('hours');
   cacheTag('speakers');
 

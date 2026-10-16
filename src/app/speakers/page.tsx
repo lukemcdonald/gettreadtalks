@@ -9,7 +9,7 @@ import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { SidebarFiltersSkeleton } from '@/components/skeletons';
 import { SpeakersListSkeleton } from '@/features/speakers/components/speakers-list-skeleton';
-import { getSpeakers } from '@/features/speakers/queries/get-speakers';
+import { loadSpeakers } from '@/features/speakers/queries/load-speakers';
 import { pageMetadata } from '@/lib/metadata';
 
 // fallow-ignore-next-line unused-export
@@ -29,7 +29,7 @@ interface SpeakersPageProps {
 export default async function SpeakersPage({
   searchParams,
 }: SpeakersPageProps) {
-  const { speakers } = await getSpeakers();
+  const { speakers } = await loadSpeakers();
 
   return (
     <SidebarLayout

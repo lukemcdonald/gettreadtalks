@@ -4,7 +4,7 @@ import type { Route } from 'next';
 import { redirect } from 'next/navigation';
 
 import { EditCollectionSheetRoute } from '@/app/@sheet/_components/edit-collection-sheet-route';
-import { getCollection } from '@/features/collections/queries/get-collection';
+import { loadCollection } from '@/features/collections/queries/load-collection';
 import {
   ADMIN_LIST_PATHS,
   getAdminLoginRedirect,
@@ -29,7 +29,7 @@ export async function EditCollectionSheetPage({
     ) as Route
   );
 
-  const collection = await getCollection(collectionId);
+  const collection = await loadCollection(collectionId);
 
   if (!collection) {
     redirect(ADMIN_LIST_PATHS.collections);

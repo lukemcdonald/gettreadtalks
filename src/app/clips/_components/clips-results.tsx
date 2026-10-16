@@ -1,5 +1,5 @@
 import { ClipsContent } from '@/app/clips/_components/clips-content';
-import { getClips } from '@/features/clips/queries/get-clips';
+import { loadClips } from '@/features/clips/queries/load-clips';
 
 export interface ClipsSearchParams {
   cursor?: string;
@@ -11,7 +11,7 @@ interface ClipsResultsProps {
 
 export async function ClipsResults({ searchParams }: ClipsResultsProps) {
   const { cursor } = await searchParams;
-  const result = await getClips({ cursor });
+  const result = await loadClips({ cursor });
 
   return (
     <ClipsContent

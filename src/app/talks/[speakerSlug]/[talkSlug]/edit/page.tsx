@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 
-import { getTalkBySlug } from '@/features/talks/queries/get-talk-by-slug';
-import { getTalkBySlugAdmin } from '@/features/talks/queries/get-talk-by-slug-admin';
+import { loadTalkBySlug } from '@/features/talks/queries/load-talk-by-slug';
+import { loadTalkBySlugAdmin } from '@/features/talks/queries/load-talk-by-slug-admin';
 import { buildTalkUrl } from '@/features/talks/utils';
 import { redirectPublicEdit } from '@/lib/entities/redirect-public-edit';
 
@@ -15,8 +15,8 @@ interface PageProps {
 export default async function Page({ params }: PageProps) {
   const { speakerSlug, talkSlug } = await params;
   const talkResult =
-    (await getTalkBySlug(speakerSlug, talkSlug)) ??
-    (await getTalkBySlugAdmin(speakerSlug, talkSlug));
+    (await loadTalkBySlug(speakerSlug, talkSlug)) ??
+    (await loadTalkBySlugAdmin(speakerSlug, talkSlug));
 
   if (!talkResult) {
     notFound();

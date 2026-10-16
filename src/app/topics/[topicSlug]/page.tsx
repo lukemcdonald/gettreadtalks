@@ -5,7 +5,7 @@ import { Suspense } from 'react';
 import { TopicPageContent } from '@/app/topics/[topicSlug]/_components/topic-page-content';
 import { TopicPageSkeleton } from '@/app/topics/[topicSlug]/_components/topic-page-skeleton';
 import { topicTalkCountPhrase } from '@/app/topics/[topicSlug]/_components/topic-talks-description';
-import { getTopicBySlug } from '@/features/topics/queries/get-topic-by-slug';
+import { loadTopicBySlug } from '@/features/topics/queries/load-topic-by-slug';
 import { buildTopicUrl } from '@/features/topics/utils';
 import { pageMetadata } from '@/lib/metadata';
 
@@ -26,7 +26,7 @@ export async function generateMetadata({
   params,
 }: TopicPageProps): Promise<Metadata> {
   const { topicSlug } = await params;
-  const topicResult = await getTopicBySlug({ slug: topicSlug });
+  const topicResult = await loadTopicBySlug({ slug: topicSlug });
 
   if (!topicResult) {
     return {};

@@ -15,7 +15,7 @@ interface GetCollectionsProps {
   speakerSlug?: string;
 }
 
-export async function getCollections(args?: GetCollectionsProps) {
+export async function loadCollections(args?: GetCollectionsProps) {
   cacheLife('hours');
   cacheTag('collections');
 

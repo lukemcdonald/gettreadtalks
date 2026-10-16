@@ -4,7 +4,7 @@ import { ManageTable } from '@/app/manage/_components/manage-table';
 import { Pagination } from '@/components/pagination';
 import { ClipsTableRow } from '@/features/clips/components/clips-table/clips-table-row';
 import { NewClipButton } from '@/features/clips/components/new-clip-button';
-import { getAllClips } from '@/features/clips/queries/get-all-clips';
+import { loadAllClips } from '@/features/clips/queries/load-all-clips';
 
 export interface ManageClipsSearchParams {
   cursor?: string;
@@ -19,7 +19,7 @@ export async function ManageClipsContent({
   searchParams,
 }: ManageClipsContentProps) {
   const { cursor, status } = await searchParams;
-  const result = await getAllClips({
+  const result = await loadAllClips({
     cursor,
     limit: 50,
     status: status || 'all',

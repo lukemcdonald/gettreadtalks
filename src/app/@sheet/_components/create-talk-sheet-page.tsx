@@ -1,5 +1,5 @@
 import { CreateTalkSheetRoute } from '@/app/@sheet/_components/create-talk-sheet-route';
-import { getFormOptions } from '@/app/@sheet/_queries/get-form-options';
+import { loadFormOptions } from '@/app/@sheet/_queries/load-form-options';
 
 interface CreateTalkSheetPageProps {
   closeHref?: string;
@@ -8,7 +8,7 @@ interface CreateTalkSheetPageProps {
 export async function CreateTalkSheetPage({
   closeHref,
 }: CreateTalkSheetPageProps = {}) {
-  const { collections, speakers, topics } = await getFormOptions();
+  const { collections, speakers, topics } = await loadFormOptions();
 
   return (
     <CreateTalkSheetRoute

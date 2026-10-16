@@ -7,7 +7,7 @@ interface GetAllCollectionsProps {
   limit?: number;
 }
 
-export async function getAllCollections(args?: GetAllCollectionsProps) {
+export async function loadAllCollections(args?: GetAllCollectionsProps) {
   const { limit } = args ?? {};
 
   const paginationOpts = {

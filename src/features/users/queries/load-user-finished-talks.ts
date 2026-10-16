@@ -5,7 +5,7 @@ import { cacheLife, cacheTag } from 'next/cache';
 import { api } from '@/convex/_generated/api';
 import { fetchAuthQuery } from '@/services/auth/server';
 
-export async function getUserFinishedTalks(limit?: number) {
+export async function loadUserFinishedTalks(limit?: number) {
   cacheLife('hours');
   cacheTag('user-finished-talks');
 

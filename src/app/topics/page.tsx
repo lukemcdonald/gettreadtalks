@@ -8,7 +8,7 @@ import { TopicsSidebar } from '@/app/topics/_components/topics-sidebar';
 import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { SidebarFiltersSkeleton } from '@/components/skeletons';
-import { getTopicsWithTalks } from '@/features/topics/queries/get-topics-with-talks';
+import { loadTopicsWithTalks } from '@/features/topics/queries/load-topics-with-talks';
 import { pageMetadata } from '@/lib/metadata';
 
 // fallow-ignore-next-line unused-export
@@ -22,7 +22,7 @@ export const metadata: Metadata = pageMetadata({
 });
 
 export default async function TopicsPage() {
-  const topicsWithTalks = await getTopicsWithTalks();
+  const topicsWithTalks = await loadTopicsWithTalks();
 
   return (
     <SidebarLayout

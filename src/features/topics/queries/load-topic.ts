@@ -1,15 +1,15 @@
 'use cache: private';
 
+import type { TopicId } from '../types';
+
 import { cacheLife, cacheTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
 import { fetchAuthQuery } from '@/services/auth/server';
 
-export async function getSpeakersAdmin() {
+export async function loadTopic(id: TopicId) {
   cacheLife('hours');
-  cacheTag('speakers');
+  cacheTag('topics');
 
-  const speakers = await fetchAuthQuery(api.speakers.listAllSpeakersAdmin, {});
-
-  return { speakers };
+  return await fetchAuthQuery(api.topics.getTopic, { id });
 }

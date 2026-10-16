@@ -7,7 +7,7 @@ interface CopyrightProps {
 }
 
 // oxlint-disable-next-line require-await -- `use cache` requires an async function
-async function getCopyrightYear() {
+async function loadCopyrightYear() {
   'use cache';
   cacheLife('hours');
 
@@ -15,7 +15,7 @@ async function getCopyrightYear() {
 }
 
 export async function Copyright({ className }: CopyrightProps) {
-  const year = await getCopyrightYear();
+  const year = await loadCopyrightYear();
 
   return (
     <span className={className}>

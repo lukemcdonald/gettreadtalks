@@ -4,7 +4,7 @@ import { ManageTable } from '@/app/manage/_components/manage-table';
 import { Pagination } from '@/components/pagination';
 import { NewTalkButton } from '@/features/talks/components/new-talk-button';
 import { TalksTableRow } from '@/features/talks/components/talks-table/talks-table-row';
-import { getAllTalks } from '@/features/talks/queries/get-all-talks';
+import { loadAllTalks } from '@/features/talks/queries/load-all-talks';
 
 export interface ManageTalksSearchParams {
   cursor?: string;
@@ -20,7 +20,7 @@ export async function ManageTalksContent({
   searchParams,
 }: ManageTalksContentProps) {
   const { cursor, search, status } = await searchParams;
-  const result = await getAllTalks({
+  const result = await loadAllTalks({
     cursor,
     limit: 50,
     search,

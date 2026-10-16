@@ -1,10 +1,10 @@
 import { ManageTable } from '@/app/manage/_components/manage-table';
 import { NewSpeakerButton } from '@/features/speakers/components/new-speaker-button';
 import { SpeakersTableRow } from '@/features/speakers/components/speakers-table/speakers-table-row';
-import { getSpeakersAdmin } from '@/features/speakers/queries/get-speakers-admin';
+import { loadSpeakersAdmin } from '@/features/speakers/queries/load-speakers-admin';
 
 export async function ManageSpeakersContent() {
-  const { speakers } = await getSpeakersAdmin();
+  const { speakers } = await loadSpeakersAdmin();
 
   return (
     <ManageTable

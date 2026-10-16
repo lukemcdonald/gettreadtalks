@@ -4,7 +4,7 @@ import type { TalkId } from '@/features/talks/types';
 import { FeaturedGrid } from '@/components/featured-grid';
 import { getSpeakerName } from '@/features/speakers/utils';
 import { TalkCard } from '@/features/talks/components/talk-card';
-import { getRandomTalksBySpeaker } from '@/features/talks/queries/get-random-talks-by-speaker';
+import { loadRandomTalksBySpeaker } from '@/features/talks/queries/load-random-talks-by-speaker';
 
 interface TalkRelatedTalksProps {
   excludeTalkId: TalkId;
@@ -15,7 +15,7 @@ export async function TalkRelatedTalks({
   excludeTalkId,
   speaker,
 }: TalkRelatedTalksProps) {
-  const relatedTalks = await getRandomTalksBySpeaker(
+  const relatedTalks = await loadRandomTalksBySpeaker(
     speaker._id,
     excludeTalkId,
     5

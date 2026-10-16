@@ -11,7 +11,7 @@ import { JsonLd } from '@/components/json-ld';
 import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { CollectionTalkList } from '@/features/collections/components/collection-talk-list';
-import { getCollectionBySlug } from '@/features/collections/queries/get-collection-by-slug';
+import { loadCollectionBySlug } from '@/features/collections/queries/load-collection-by-slug';
 import {
   buildCollectionUrl,
   buildCollectionsPath,
@@ -27,7 +27,7 @@ export async function generateMetadata({
   params,
 }: CollectionPageProps): Promise<Metadata> {
   const { collectionSlug } = await params;
-  const data = await getCollectionBySlug(collectionSlug);
+  const data = await loadCollectionBySlug(collectionSlug);
 
   if (!data) {
     return {};
@@ -44,7 +44,7 @@ export async function generateMetadata({
 
 export default async function CollectionPage({ params }: CollectionPageProps) {
   const { collectionSlug } = await params;
-  const data = await getCollectionBySlug(collectionSlug);
+  const data = await loadCollectionBySlug(collectionSlug);
 
   if (!data) {
     notFound();

@@ -4,13 +4,13 @@ import { describe, expect, it } from '@/test';
 
 import {
   createTreadMcpHandler,
-  getClip,
-  getCollection,
-  getTalk,
   listClips,
   listCollections,
   listSpeakers,
   listTopics,
+  loadClip,
+  loadCollection,
+  loadTalk,
   searchTalks,
 } from './tools';
 
@@ -76,7 +76,7 @@ function createCatalog(overrides: Partial<McpCatalog> = {}): McpCatalog {
   const publishedTalks = [romansTalk, psalmsTalk];
 
   return {
-    getClipBySlug: (slug) => {
+    loadClipBySlug: (slug) => {
       if (slug !== noCondemnationClip.slug) {
         return Promise.resolve(null);
       }
@@ -91,7 +91,7 @@ function createCatalog(overrides: Partial<McpCatalog> = {}): McpCatalog {
         },
       });
     },
-    getClips: ({ search, speakerSlugs } = {}) => {
+    loadClips: ({ search, speakerSlugs } = {}) => {
       let clips = [noCondemnationClip];
 
       if (search) {
@@ -112,7 +112,7 @@ function createCatalog(overrides: Partial<McpCatalog> = {}): McpCatalog {
         isDone: true,
       });
     },
-    getCollectionBySlug: (slug) => {
+    loadCollectionBySlug: (slug) => {
       if (slug !== psalmsCollection.slug) {
         return Promise.resolve(null);
       }
@@ -122,7 +122,7 @@ function createCatalog(overrides: Partial<McpCatalog> = {}): McpCatalog {
         talks: [psalmsTalk],
       });
     },
-    getCollections: () =>
+    loadCollections: () =>
       Promise.resolve({
         collections: [
           {
@@ -132,7 +132,7 @@ function createCatalog(overrides: Partial<McpCatalog> = {}): McpCatalog {
           },
         ],
       }),
-    getSpeakers: ({ search } = {}) => {
+    loadSpeakers: ({ search } = {}) => {
       const speakers = search
         ? [john].filter((speaker) =>
             `${speaker.firstName} ${speaker.lastName}`
@@ -143,7 +143,7 @@ function createCatalog(overrides: Partial<McpCatalog> = {}): McpCatalog {
 
       return Promise.resolve({ speakers });
     },
-    getTalkBySlug: (speakerSlug, talkSlug) => {
+    loadTalkBySlug: (speakerSlug, talkSlug) => {
       const talk = publishedTalks.find(
         (item) => item.speaker.slug === speakerSlug && item.slug === talkSlug
       );
@@ -160,7 +160,7 @@ function createCatalog(overrides: Partial<McpCatalog> = {}): McpCatalog {
         topics: talk.topicSlugs.includes('grace') ? [graceTopic] : [],
       });
     },
-    getTalks: ({ search, speakerSlugs, topicSlugs } = {}) => {
+    loadTalks: ({ search, speakerSlugs, topicSlugs } = {}) => {
       let talks = publishedTalks;
 
       if (search) {
@@ -187,7 +187,7 @@ function createCatalog(overrides: Partial<McpCatalog> = {}): McpCatalog {
         talks,
       });
     },
-    getTopicsWithCounts: ({ search } = {}) => {
+    loadTopicsWithCounts: ({ search } = {}) => {
       const topics = [{ count: 2, topic: graceTopic }];
 
       if (!search) {
@@ -232,9 +232,9 @@ describe('searchTalks', () => {
   });
 });
 
-describe('getTalk', () => {
+describe('loadTalk', () => {
   it('returns the talk with canonical urls', async () => {
-    const result = await getTalk(
+    const result = await loadTalk(
       {
         speakerSlug: 'john-doe',
         talkSlug: 'sample-sermon-on-romans-8',
@@ -257,7 +257,7 @@ describe('getTalk', () => {
   });
 
   it('returns not found for missing or unpublished talks', async () => {
-    const result = await getTalk(
+    const result = await loadTalk(
       { speakerSlug: 'john-doe', talkSlug: 'draft-talk' },
       createCatalog()
     );
@@ -313,9 +313,9 @@ describe('listCollections', () => {
   });
 });
 
-describe('getCollection', () => {
+describe('loadCollection', () => {
   it('returns the collection talks with canonical urls', async () => {
-    const result = await getCollection(
+    const result = await loadCollection(
       { slug: 'example-series-the-psalms' },
       createCatalog()
     );
@@ -329,7 +329,7 @@ describe('getCollection', () => {
   });
 
   it('returns not found for an unknown collection', async () => {
-    const result = await getCollection({ slug: 'missing' }, createCatalog());
+    const result = await loadCollection({ slug: 'missing' }, createCatalog());
     const body = parseToolJson(result);
 
     expect(result.isError).toBe(true);
@@ -337,10 +337,10 @@ describe('getCollection', () => {
   });
 
   it('returns not found when a collection has no published talks', async () => {
-    const result = await getCollection(
+    const result = await loadCollection(
       { slug: 'empty-series' },
       createCatalog({
-        getCollectionBySlug: (slug) => {
+        loadCollectionBySlug: (slug) => {
           if (slug !== 'empty-series') {
             return Promise.resolve(null);
           }
@@ -376,9 +376,9 @@ describe('listClips', () => {
   });
 });
 
-describe('getClip', () => {
+describe('loadClip', () => {
   it('returns the clip with canonical urls', async () => {
-    const result = await getClip(
+    const result = await loadClip(
       { slug: 'sample-clip-no-condemnation' },
       createCatalog()
     );
@@ -396,7 +396,7 @@ describe('getClip', () => {
   });
 
   it('returns not found for a missing clip', async () => {
-    const result = await getClip({ slug: 'missing' }, createCatalog());
+    const result = await loadClip({ slug: 'missing' }, createCatalog());
     const body = parseToolJson(result);
 
     expect(result.isError).toBe(true);
@@ -404,10 +404,10 @@ describe('getClip', () => {
   });
 
   it('returns not found when the parent talk is unpublished', async () => {
-    const result = await getClip(
+    const result = await loadClip(
       { slug: 'draft-parent-clip' },
       createCatalog({
-        getClipBySlug: (slug) => {
+        loadClipBySlug: (slug) => {
           if (slug !== 'draft-parent-clip') {
             return Promise.resolve(null);
           }

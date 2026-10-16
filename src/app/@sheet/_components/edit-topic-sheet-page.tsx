@@ -4,7 +4,7 @@ import type { Route } from 'next';
 import { redirect } from 'next/navigation';
 
 import { EditTopicSheetRoute } from '@/app/@sheet/_components/edit-topic-sheet-route';
-import { getTopic } from '@/features/topics/queries/get-topic';
+import { loadTopic } from '@/features/topics/queries/load-topic';
 import {
   ADMIN_LIST_PATHS,
   getAdminLoginRedirect,
@@ -27,7 +27,7 @@ export async function EditTopicSheetPage({
     getAdminLoginRedirect(buildEntityEditPath('topics', topicId)) as Route
   );
 
-  const topic = await getTopic(topicId);
+  const topic = await loadTopic(topicId);
 
   if (!topic) {
     redirect(ADMIN_LIST_PATHS.topics);
