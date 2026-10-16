@@ -40,13 +40,13 @@ export function SpeakerHeroDetails({
         />
       )}
 
-      <div className="flex-1 space-y-4">
-        <div>
+      <div className="w-full flex-1 space-y-4">
+        <div className="w-full">
           <ArchiveBackLink href={getSpeakersPath()} label="Speakers" />
           <div
             className={cn(
-              'flex flex-wrap items-center gap-3',
-              isInline ? 'justify-center md:justify-start' : 'justify-center'
+              'flex w-full flex-wrap items-center justify-center gap-3 text-center',
+              isInline && 'md:justify-start md:text-left'
             )}
           >
             <HeroTitle className="text-foreground min-w-0">
