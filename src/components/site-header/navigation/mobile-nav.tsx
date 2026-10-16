@@ -88,7 +88,7 @@ export function MobileNav({ className }: MobileNavProps) {
       />
 
       <DrawerPopup
-        className="before:bg-muted/72 border"
+        className="before:bg-muted/72 border border-t-0"
         showCloseButton={false}
         variant="straight"
       >
