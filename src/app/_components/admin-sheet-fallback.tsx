@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { Suspense } from 'react';
 
 import { AreaLayout } from '@/components/layouts';
-import { Skeleton } from '@/components/ui';
+import { FormSheetSkeleton } from '@/components/ui';
 import { getAdminLoginRedirect } from '@/lib/entities/paths';
 import { requireAdminUser } from '@/services/auth/server';
 
@@ -35,7 +35,7 @@ export function AdminSheetFallback({
   sheet,
 }: AdminSheetFallbackProps) {
   return (
-    <Suspense fallback={<Skeleton className="h-96 w-full" />}>
+    <Suspense fallback={<FormSheetSkeleton />}>
       <AdminSheetFallbackContent returnPath={returnPath} sheet={sheet}>
         {children}
       </AdminSheetFallbackContent>

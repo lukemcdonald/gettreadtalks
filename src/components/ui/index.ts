@@ -10,6 +10,7 @@ export * from './fieldset';
 export * from './filter-popup';
 export * from './form';
 export * from './form-sheet';
+export * from './form-sheet-skeleton';
 export * from './link';
 export * from './mobile-filter-drawer';
 export * from './page-breadcrumb';
