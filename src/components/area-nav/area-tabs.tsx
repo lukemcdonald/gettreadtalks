@@ -32,6 +32,7 @@ export function AreaTabs({ activeHref, label, sections }: AreaTabsProps) {
         >
           {sections.map((section) => (
             <TabsTab
+              className="grow-0"
               key={section.href}
               nativeButton={false}
               render={<Link href={section.href} />}
