@@ -31,7 +31,7 @@ export function SpeakerHeroSkeleton() {
         {/* Featured video — right column */}
         <div className="lg:flex-1">
           <div className="flex flex-col gap-4">
-            <Skeleton className="aspect-video w-full rounded-2xl" />
+            <Skeleton className="video-frame aspect-video w-full" />
             <div className="flex items-center justify-between gap-4">
               <Skeleton className="h-4 w-2/3" />
               <Skeleton className="h-4 w-20 shrink-0" />

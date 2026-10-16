@@ -12,7 +12,7 @@ function TalkHeroSkeleton() {
           <Skeleton className="mx-auto h-6 w-40" />
         </div>
         <div className="mx-auto w-full max-w-4xl">
-          <Skeleton className="aspect-video w-full rounded-2xl" />
+          <Skeleton className="video-frame aspect-video w-full" />
         </div>
       </Container>
     </Section>

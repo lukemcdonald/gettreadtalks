@@ -38,7 +38,7 @@ export function MediaEmbed({
     <div
       className={cn(
         'text-center',
-        isVideo && 'overflow-hidden rounded-2xl',
+        isVideo && 'video-frame',
         hasWrapper && className
       )}
       key={pathname}

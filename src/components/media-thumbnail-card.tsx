@@ -6,7 +6,6 @@ import { ArrowRightIcon, PlayIcon } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
 
-import { Card } from '@/components/ui';
 import { Link } from '@/components/ui/link';
 import { captureMessage } from '@/services/errors';
 
@@ -41,16 +40,11 @@ export function MediaThumbnailCard({
   }
 
   return (
-    <Card
-      className="group overflow-clip shadow-2xl"
-      render={
-        <Link
-          className="text-muted-foreground hover:text-foreground transition-colors"
-          href={href}
-        />
-      }
+    <Link
+      className="group text-muted-foreground hover:text-foreground flex flex-col gap-3 transition-colors"
+      href={href}
     >
-      <div className="relative">
+      <div className="video-frame relative">
         {showThumbnail ? (
           <div className="relative aspect-video">
             <Image
@@ -75,7 +69,7 @@ export function MediaThumbnailCard({
         )}
       </div>
 
-      <div className="flex items-start justify-between gap-4 px-4 py-3 text-sm">
+      <div className="flex items-start justify-between gap-4 text-sm">
         <div>
           <h2 className="text-foreground font-medium text-pretty">{title}</h2>
           {!!subtitle && <p className="text-muted-foreground">{subtitle}</p>}
@@ -85,6 +79,6 @@ export function MediaThumbnailCard({
           {actionLabel} <ArrowRightIcon className="size-3.5" />
         </span>
       </div>
-    </Card>
+    </Link>
   );
 }

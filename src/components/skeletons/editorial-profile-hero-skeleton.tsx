@@ -17,7 +17,7 @@ export function EditorialProfileHeroSkeleton({
           <Skeleton className="mx-auto h-5 w-40" />
         </div>
 
-        <Skeleton className="aspect-video w-full rounded-2xl" />
+        <Skeleton className="video-frame aspect-video w-full" />
 
         {children}
       </Container>
