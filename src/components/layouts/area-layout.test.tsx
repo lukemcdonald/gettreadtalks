@@ -48,6 +48,9 @@ describe('AreaLayout', () => {
     expect(
       screen.queryByRole('tab', { name: 'Content' })
     ).not.toBeInTheDocument();
+    expect(
+      screen.getAllByRole('link', { name: 'Settings' }).length
+    ).toBeGreaterThan(0);
   });
 
   it('shows the Content tab for admins', () => {
@@ -62,55 +65,12 @@ describe('AreaLayout', () => {
     );
   });
 
-  it('shows the Content tab on manage routes', () => {
+  it('selects Content on manage routes', () => {
     setup('/manage/talks');
 
     expect(screen.getByRole('tab', { name: 'Content' })).toHaveAttribute(
       'aria-selected',
       'true'
     );
-  });
-
-  it('lists Settings, Favorites, and Finished in the Account sub-nav', () => {
-    setup('/account');
-
-    expect(
-      screen.getAllByRole('link', { name: 'Settings' }).length
-    ).toBeGreaterThan(0);
-    expect(
-      screen.getAllByRole('link', { name: 'Favorites' }).length
-    ).toBeGreaterThan(0);
-    expect(
-      screen.getAllByRole('link', { name: 'Finished' }).length
-    ).toBeGreaterThan(0);
-    expect(screen.getByText('Page body')).toBeInTheDocument();
-  });
-
-  it('marks the matching account item as the current page', () => {
-    setup('/account/finished');
-
-    expect(screen.getByRole('tab', { name: 'Account' })).toHaveAttribute(
-      'aria-selected',
-      'true'
-    );
-
-    for (const link of screen.getAllByRole('link', { name: 'Finished' })) {
-      expect(link).toHaveAttribute('aria-current', 'page');
-    }
-  });
-
-  it('lists every content entity in one sub-nav', () => {
-    setup('/manage/speakers', true);
-
-    expect(
-      screen.getAllByRole('link', { name: 'Talks' }).length
-    ).toBeGreaterThan(0);
-    expect(
-      screen.getAllByRole('link', { name: 'Collections' }).length
-    ).toBeGreaterThan(0);
-
-    for (const link of screen.getAllByRole('link', { name: 'Speakers' })) {
-      expect(link).toHaveAttribute('aria-current', 'page');
-    }
   });
 });

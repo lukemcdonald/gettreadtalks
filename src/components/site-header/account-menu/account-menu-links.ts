@@ -3,7 +3,7 @@ import type { ComponentType, SVGProps } from 'react';
 
 import { LayoutDashboardIcon } from 'lucide-react';
 
-import { AREA_NAV_ICONS } from '@/components/area-nav/icons';
+import { AREA_NAV_ICONS } from '@/components/area-nav/area-nav';
 import {
   getVisibleSections,
   isManagePath,

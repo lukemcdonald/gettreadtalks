@@ -34,11 +34,23 @@ export const AREA_NAV: AreaNavSection[] = [
 ];
 
 export function getVisibleSections(showContent: boolean) {
-  if (showContent) {
-    return AREA_NAV;
+  return AREA_NAV.filter(
+    (section) => showContent || !isManagePath(section.href)
+  );
+}
+
+export function getActiveSection(sections: AreaNavSection[], pathname: string) {
+  const [fallback] = sections;
+
+  if (!fallback) {
+    throw new Error('Area layout requires at least one section');
   }
 
-  return AREA_NAV.filter((section) => !isManagePath(section.href));
+  return (
+    sections.find(
+      (section) => isManagePath(section.href) === isManagePath(pathname)
+    ) ?? fallback
+  );
 }
 
 export function isManagePath(pathname: string) {
