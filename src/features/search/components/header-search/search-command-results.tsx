@@ -23,6 +23,7 @@ function SearchCommandItem({
 }) {
   return (
     <CommandItem
+      className="-mx-2 px-4"
       onClick={() => {
         onSelect(item);
       }}
