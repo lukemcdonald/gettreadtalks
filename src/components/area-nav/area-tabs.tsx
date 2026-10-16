@@ -1,6 +1,6 @@
 'use client';
 
-import type { AreaNavSections } from './area-nav';
+import type { AreaNavSection } from './area-nav';
 import type { Route } from 'next';
 
 import { useRouter } from 'next/navigation';
@@ -10,7 +10,7 @@ import { Link, Tabs, TabsList, TabsTab } from '@/components/ui';
 interface AreaTabsProps {
   activeHref: string;
   label: string;
-  sections: AreaNavSections;
+  sections: AreaNavSection[];
 }
 
 export function AreaTabs({ activeHref, label, sections }: AreaTabsProps) {

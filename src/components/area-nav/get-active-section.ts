@@ -1,4 +1,6 @@
-import type { AreaNavSection, AreaNavSections } from './area-nav';
+import type { AreaNavSection } from './area-nav';
+
+import { isManagePath } from './sections';
 
 function itemMatches(href: string, pathname: string) {
   if (href === pathname) {
@@ -8,7 +10,7 @@ function itemMatches(href: string, pathname: string) {
   return pathname.startsWith(`${href}/`);
 }
 
-export function getActiveSection(sections: AreaNavSections, pathname: string) {
+export function getActiveSection(sections: AreaNavSection[], pathname: string) {
   let match: AreaNavSection | undefined;
   let matchLength = -1;
 
@@ -27,5 +29,15 @@ export function getActiveSection(sections: AreaNavSections, pathname: string) {
     }
   }
 
-  return match ?? sections[0];
+  const [fallback] = sections;
+
+  if (!fallback) {
+    throw new Error('Area layout requires at least one section');
+  }
+
+  if (!match && isManagePath(pathname)) {
+    return sections.find((section) => isManagePath(section.href)) ?? fallback;
+  }
+
+  return match ?? fallback;
 }

@@ -44,8 +44,6 @@ export interface AreaNavSection {
   label: string;
 }
 
-export type AreaNavSections = [AreaNavSection, ...AreaNavSection[]];
-
 interface AreaNavProps {
   items: AreaNavItem[];
   label: string;
