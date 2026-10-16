@@ -20,6 +20,6 @@ describe('ManageStatusDot', () => {
   it('exposes the status name for assistive tech', () => {
     render(<ManageStatusDot status="published" />);
 
-    expect(screen.getByText('Published')).toBeInTheDocument();
+    expect(screen.getByLabelText('Published')).toBeInTheDocument();
   });
 });

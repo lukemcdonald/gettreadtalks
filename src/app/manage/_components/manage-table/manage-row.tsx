@@ -3,10 +3,10 @@ import type { StatusType } from '@/lib/entities/types';
 import type { ReactNode } from 'react';
 
 import { TableCell, TableRow } from '@/components/ui';
-import { Link } from '@/components/ui/link';
-import { formatRelativeUpdated } from '@/utils';
 
+import { ManageHoverDetails } from './manage-hover-details';
 import { ManageStatusBadge, ManageStatusDot } from './manage-status-badge';
+import { ManageTitleLink } from './manage-title-link';
 
 export function ManageCountCell({ children }: { children: ReactNode }) {
   return (
@@ -20,36 +20,39 @@ export function ManageRow({
   actions,
   children,
   editHref,
+  hoverItems,
   leading,
   status,
   subtitle,
   title,
-  updatedAt,
 }: {
   actions: ReactNode;
   children?: ReactNode;
   editHref: string;
+  hoverItems?: readonly { label: string; value: string }[];
   leading?: ReactNode;
   status?: ManageStatus | StatusType;
   subtitle?: string;
   title: string;
-  updatedAt: number;
 }) {
+  const hover =
+    hoverItems && hoverItems.length > 0 ? (
+      <ManageHoverDetails items={hoverItems} />
+    ) : undefined;
+
   return (
-    <TableRow className="relative h-11">
+    <TableRow className="relative min-h-11">
       <TableCell className="whitespace-normal">
         <div className="flex items-center gap-2">
           {leading}
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
-              <Link
-                className="block truncate font-medium after:absolute after:inset-0"
-                href={editHref}
-              >
-                {title}
-              </Link>
+              <ManageTitleLink hover={hover} href={editHref} title={title} />
               {!!status && (
-                <ManageStatusDot className="md:hidden" status={status} />
+                <ManageStatusDot
+                  className="relative z-10 md:hidden"
+                  status={status}
+                />
               )}
             </div>
             {!!subtitle && (
@@ -66,9 +69,6 @@ export function ManageRow({
           <ManageStatusBadge status={status} />
         </TableCell>
       )}
-      <TableCell className="text-muted-foreground hidden tabular-nums md:table-cell">
-        {formatRelativeUpdated(updatedAt)}
-      </TableCell>
       <TableCell className="relative z-10 w-px">{actions}</TableCell>
     </TableRow>
   );

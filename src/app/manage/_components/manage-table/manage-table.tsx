@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react';
 
 import {
-  CardFrame,
   Empty,
   EmptyDescription,
   EmptyTitle,
@@ -26,33 +25,28 @@ const COLUMNS = {
   clips: [
     { key: 'Title' },
     { className: HIDDEN_MD, key: 'Status' },
-    { className: HIDDEN_MD, key: 'Updated' },
     { className: 'w-px', key: 'Actions', srOnly: true },
   ],
   collections: [
     { key: 'Title' },
     { className: `${HIDDEN_MD} text-right`, key: 'Talks' },
     { className: HIDDEN_MD, key: 'Status' },
-    { className: HIDDEN_MD, key: 'Updated' },
     { className: 'w-px', key: 'Actions', srOnly: true },
   ],
   speakers: [
     { key: 'Name' },
     { className: `${HIDDEN_MD} text-right`, key: 'Talks' },
     { className: HIDDEN_MD, key: 'Status' },
-    { className: HIDDEN_MD, key: 'Updated' },
     { className: 'w-px', key: 'Actions', srOnly: true },
   ],
   talks: [
     { key: 'Title' },
     { className: HIDDEN_MD, key: 'Status' },
-    { className: HIDDEN_MD, key: 'Updated' },
     { className: 'w-px', key: 'Actions', srOnly: true },
   ],
   topics: [
     { key: 'Name' },
     { className: `${HIDDEN_MD} text-right`, key: 'Talks' },
-    { className: HIDDEN_MD, key: 'Updated' },
     { className: 'w-px', key: 'Actions', srOnly: true },
   ],
 } satisfies Record<string, readonly ManageColumn[]>;
@@ -88,12 +82,10 @@ export function ManageTable({
   }
 
   return (
-    <CardFrame>
-      <Table variant="card">
-        <Header resource={resource} />
-        <TableBody>{children}</TableBody>
-      </Table>
-    </CardFrame>
+    <Table variant="card">
+      <Header resource={resource} />
+      <TableBody>{children}</TableBody>
+    </Table>
   );
 }
 
@@ -103,22 +95,20 @@ export function ManageTableSkeleton({
   resource: ManageResource;
 }) {
   return (
-    <CardFrame>
-      <Table variant="card">
-        <Header resource={resource} />
-        <TableBody>
-          {Array.from({ length: 6 }, (_, row) => (
-            <TableRow className="h-11" key={row}>
-              {COLUMNS[resource].map((column) => (
-                <TableCell className={column.className} key={column.key}>
-                  <Skeleton className="h-4 w-full" />
-                </TableCell>
-              ))}
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </CardFrame>
+    <Table variant="card">
+      <Header resource={resource} />
+      <TableBody>
+        {Array.from({ length: 6 }, (_, row) => (
+          <TableRow className="h-11" key={row}>
+            {COLUMNS[resource].map((column) => (
+              <TableCell className={column.className} key={column.key}>
+                <Skeleton className="h-4 w-full" />
+              </TableCell>
+            ))}
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
   );
 }
 

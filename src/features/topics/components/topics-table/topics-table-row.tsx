@@ -28,7 +28,6 @@ export function TopicsTableRow({ talkCount, topic }: TopicsTableRowProps) {
       }
       editHref={editPath}
       title={topic.title}
-      updatedAt={topic.updatedAt ?? topic._creationTime}
     >
       <ManageCountCell>{talkCount}</ManageCountCell>
     </ManageRow>

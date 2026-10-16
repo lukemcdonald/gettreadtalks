@@ -22,7 +22,6 @@ export function ClipsTableRow({ clip }: ClipsTableRowProps) {
       status={clip.status}
       subtitle={clip.talkTitle || getSpeakerName(clip.speaker) || undefined}
       title={clip.title}
-      updatedAt={clip.updatedAt ?? clip._creationTime}
     />
   );
 }

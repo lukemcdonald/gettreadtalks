@@ -11,7 +11,6 @@ describe('ManageTable', () => {
         <TableRow>
           <TableCell>A talk</TableCell>
           <TableCell>Published</TableCell>
-          <TableCell>3d ago</TableCell>
           <TableCell>Menu</TableCell>
         </TableRow>
       </ManageTable>
@@ -19,7 +18,9 @@ describe('ManageTable', () => {
 
     expect(screen.getByRole('columnheader', { name: 'Title' })).toBeVisible();
     expect(screen.getByRole('columnheader', { name: 'Status' })).toBeVisible();
-    expect(screen.getByRole('columnheader', { name: 'Updated' })).toBeVisible();
+    expect(
+      screen.queryByRole('columnheader', { name: 'Updated' })
+    ).not.toBeInTheDocument();
 
     rerender(<ManageTable emptyAction={action} isEmpty resource="talks" />);
     expect(

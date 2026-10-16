@@ -34,12 +34,13 @@ export function ManageStatusDot({
   const { dotClass, label } = getManageStatus(status);
 
   return (
-    <span className={cn('inline-flex items-center', className)}>
-      <span
-        aria-hidden="true"
-        className={cn('size-1.5 rounded-full', dotClass)}
-      />
-      <span className="sr-only">{label}</span>
-    </span>
+    <span
+      aria-label={label}
+      className={cn(
+        'inline-block size-1.5 shrink-0 rounded-full',
+        dotClass,
+        className
+      )}
+    />
   );
 }

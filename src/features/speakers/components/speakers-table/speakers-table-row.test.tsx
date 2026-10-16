@@ -16,8 +16,10 @@ describe('SpeakersTableRow', () => {
   const speaker = {
     _creationTime: 1,
     _id: 'speakers:john-piper' as Speaker['_id'],
+    featured: true,
     firstName: 'John',
     lastName: 'Piper',
+    ministry: 'Desiring God',
     slug: 'john-piper',
   } as Speaker;
 
@@ -56,6 +58,8 @@ describe('SpeakersTableRow', () => {
     expect(
       screen.queryByRole('link', { name: 'Edit John Piper' })
     ).not.toBeInTheDocument();
+    expect(screen.getByText('Desiring God')).toBeVisible();
+    expect(screen.getByText('1')).toBeVisible();
   });
 
   it('opens the edit drawer from a speaker with no public content', () => {

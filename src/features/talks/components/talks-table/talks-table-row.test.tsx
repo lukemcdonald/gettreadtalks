@@ -27,11 +27,15 @@ describe('TalksTableRow', () => {
     return {
       _creationTime: 1,
       _id: 'talks:justification' as TalkWithSpeakerAndTopics['_id'],
+      collectionTitle: 'Romans',
+      featured: true,
+      featuredClipTitle: 'Grace Clip',
+      scripture: 'Romans 3:21-26',
       slug: 'justification',
       speaker,
       status: 'published',
       title: 'Justification',
-      topicSlugs: [],
+      topicSlugs: ['justification', 'grace'],
       ...overrides,
     } as TalkWithSpeakerAndTopics;
   }
@@ -60,6 +64,19 @@ describe('TalksTableRow', () => {
       screen.queryByRole('link', { name: `Edit ${talk.title}` })
     ).not.toBeInTheDocument();
     expect(screen.getByText('John Piper')).toBeVisible();
+    expect(screen.queryByText('Romans 3:21-26')).not.toBeInTheDocument();
+  });
+
+  it('shows extra talk details on title hover', async () => {
+    const talk = createTalk();
+    const { hover } = setup(talk);
+
+    await hover(screen.getByRole('link', { name: talk.title }));
+
+    expect(await screen.findByText('Romans 3:21-26')).toBeVisible();
+    expect(screen.getByText('justification, grace')).toBeVisible();
+    expect(screen.getByText('Romans')).toBeVisible();
+    expect(screen.getByText('Grace Clip')).toBeVisible();
   });
 
   it('still opens the edit drawer from an unpublished title', () => {

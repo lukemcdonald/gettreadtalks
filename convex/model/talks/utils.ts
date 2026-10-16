@@ -3,6 +3,8 @@ import type { QueryCtx } from '../../_generated/server';
 
 import { asyncMap } from 'convex-helpers';
 
+import { enrichWithSpeaker } from '../../lib/utils';
+
 function speakerNameMatches(
   searchLower: string,
   speaker: Doc<'speakers'> | null
@@ -85,4 +87,61 @@ export async function enrichWithTopics<T extends { _id: Id<'talks'> }>(
 
     return { ...talk, topicSlugs };
   });
+}
+
+function collectionTitleForTalk(
+  collectionId: Id<'collections'> | undefined,
+  titlesByCollectionId: Map<Id<'collections'>, string>
+) {
+  if (!collectionId) {
+    return null;
+  }
+
+  return titlesByCollectionId.get(collectionId) ?? null;
+}
+
+async function featuredClipTitleForTalk(ctx: QueryCtx, talkId: Id<'talks'>) {
+  const clip = await ctx.db
+    .query('clips')
+    .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
+    .first();
+
+  return clip?.title ?? null;
+}
+
+async function loadCollectionTitles(
+  ctx: QueryCtx,
+  talks: { collectionId?: Id<'collections'> }[]
+) {
+  const collectionIds = [
+    ...new Set(
+      talks.flatMap((talk) => (talk.collectionId ? [talk.collectionId] : []))
+    ),
+  ];
+  const collections = await Promise.all(
+    collectionIds.map((collectionId) => ctx.db.get('collections', collectionId))
+  );
+
+  return new Map(
+    collections.flatMap((collection) =>
+      collection ? [[collection._id, collection.title] as const] : []
+    )
+  );
+}
+
+export async function enrichAdminTalks(ctx: QueryCtx, talks: Doc<'talks'>[]) {
+  const talksWithTopics = await enrichWithTopics(
+    ctx,
+    await enrichWithSpeaker(ctx, talks)
+  );
+  const titlesByCollectionId = await loadCollectionTitles(ctx, talksWithTopics);
+
+  return await asyncMap(talksWithTopics, async (talk) => ({
+    ...talk,
+    collectionTitle: collectionTitleForTalk(
+      talk.collectionId,
+      titlesByCollectionId
+    ),
+    featuredClipTitle: await featuredClipTitleForTalk(ctx, talk._id),
+  }));
 }

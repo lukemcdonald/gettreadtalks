@@ -29,7 +29,11 @@ import {
   listPublishedTalksPage,
   searchPublishedTalksByTitleOrSpeaker,
 } from './helpers';
-import { enrichWithTopics, filterTalksByTitleOrSpeaker } from './utils';
+import {
+  enrichAdminTalks,
+  enrichWithTopics,
+  filterTalksByTitleOrSpeaker,
+} from './utils';
 
 /**
  * List slugs for published talks with their speaker slugs.
@@ -461,16 +465,10 @@ export const listAllTalks = query({
         paginationOpts.cursor,
         paginationOpts.numItems
       );
-      const talksWithSpeakers = await enrichWithSpeaker(ctx, page);
-      const talksWithSpeakersAndTopics = await enrichWithTopics(
-        ctx,
-        talksWithSpeakers
-      );
-
       return {
         continueCursor,
         isDone,
-        page: talksWithSpeakersAndTopics,
+        page: await enrichAdminTalks(ctx, page),
       };
     }
 
@@ -480,21 +478,17 @@ export const listAllTalks = query({
       paginationOpts.numItems
     );
 
-    const talksWithSpeakers = await enrichWithSpeaker(ctx, page);
-    const talksWithSpeakersAndTopics = await enrichWithTopics(
-      ctx,
-      talksWithSpeakers
-    );
-
     return {
       continueCursor,
       isDone,
-      page: talksWithSpeakersAndTopics,
+      page: await enrichAdminTalks(ctx, page),
     };
   },
   returns: paginationResultValidator(
     v.object({
       ...doc('talks').fields,
+      collectionTitle: v.union(v.null(), v.string()),
+      featuredClipTitle: v.union(v.null(), v.string()),
       speaker: doc('speakers').nullable(),
       topicSlugs: v.array(v.string()),
     })

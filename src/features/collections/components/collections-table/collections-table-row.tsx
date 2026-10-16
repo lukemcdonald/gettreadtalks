@@ -36,7 +36,6 @@ export function CollectionsTableRow({
       editHref={editPath}
       status={status}
       title={collection.title}
-      updatedAt={collection.updatedAt ?? collection._creationTime}
     >
       <ManageCountCell>{talkCount}</ManageCountCell>
     </ManageRow>

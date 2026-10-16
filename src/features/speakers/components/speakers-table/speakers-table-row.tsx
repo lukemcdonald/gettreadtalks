@@ -2,6 +2,7 @@ import type { ManageStatus } from '@/app/manage/_components/manage-table';
 import type { Speaker } from '@/features/speakers/types';
 
 import {
+  getHoverItems,
   ManageCountCell,
   ManageRow,
 } from '@/app/manage/_components/manage-table';
@@ -39,10 +40,14 @@ export function SpeakersTableRow({
         />
       }
       editHref={editPath}
+      hoverItems={getHoverItems([
+        { label: 'Talks', value: talkCount },
+        { label: 'Featured', value: speaker.featured },
+      ])}
       leading={<SpeakerAvatar size="xs" speaker={speaker} />}
       status={status}
+      subtitle={speaker.ministry}
       title={fullName}
-      updatedAt={speaker.updatedAt ?? speaker._creationTime}
     >
       <ManageCountCell>{talkCount}</ManageCountCell>
     </ManageRow>
