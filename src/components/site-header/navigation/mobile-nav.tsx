@@ -107,7 +107,7 @@ export function MobileNav({ className }: MobileNavProps) {
           </div>
         </DrawerHeader>
 
-        <Frame className="flex-1 min-h-0 rounded-none">
+        <Frame className="min-h-0 flex-1 rounded-none">
           <FramePanel className="bg-popover p-1">
             <DrawerMenu aria-label="Mobile navigation">
               <DrawerMenuGroup>
@@ -124,7 +124,7 @@ export function MobileNav({ className }: MobileNavProps) {
           </FramePanel>
 
           {!isLoading && (
-            <DrawerMenu className="px-1">
+            <DrawerMenu className="mt-2 px-1">
               {user ? (
                 <>
                   <AccountIdentity user={user} />
