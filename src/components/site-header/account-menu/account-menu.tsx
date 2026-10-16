@@ -65,7 +65,7 @@ export function AccountMenu({ initialUser }: AccountMenuProps) {
     );
   }
 
-  const showManageLink = isAdmin(user);
+  const showContentLink = isAdmin(user);
 
   return (
     <Menu>
@@ -85,7 +85,7 @@ export function AccountMenu({ initialUser }: AccountMenuProps) {
       <MenuPopup className="w-60">
         <AccountIdentity className="px-3" user={user} />
         <MenuSeparator />
-        {getAccountMenuLinks(showManageLink).map((link) => (
+        {getAccountMenuLinks(showContentLink).map((link) => (
           <AccountMenuItem
             href={link.href}
             icon={link.icon}

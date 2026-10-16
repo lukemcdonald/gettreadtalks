@@ -60,24 +60,27 @@ describe('AccountMenu', () => {
     );
   });
 
-  it('shows Manage for admins', async () => {
+  it('shows Content for admins', async () => {
     const { click } = setup(createUser('admin'));
 
     await click(screen.getByTestId('account-menu'));
 
-    expect(screen.getByRole('menuitem', { name: 'Manage' })).toHaveAttribute(
+    expect(screen.getByRole('menuitem', { name: 'Content' })).toHaveAttribute(
       'href',
-      '/manage'
+      '/manage/talks'
     );
+    expect(
+      screen.queryByRole('menuitem', { name: 'Manage' })
+    ).not.toBeInTheDocument();
   });
 
-  it('hides Manage for non-admins', async () => {
+  it('hides Content for non-admins', async () => {
     const { click } = setup(createUser('user'));
 
     await click(screen.getByTestId('account-menu'));
 
     expect(
-      screen.queryByRole('menuitem', { name: 'Manage' })
+      screen.queryByRole('menuitem', { name: 'Content' })
     ).not.toBeInTheDocument();
   });
 });

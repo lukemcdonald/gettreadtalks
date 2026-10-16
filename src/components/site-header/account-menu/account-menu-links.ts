@@ -1,14 +1,13 @@
 import type { Route } from 'next';
 import type { ComponentType, SVGProps } from 'react';
 
-import {
-  CheckCircle2 as FinishedIcon,
-  Heart as FavoritesIcon,
-  LayoutDashboard as ManageIcon,
-  Settings as SettingsIcon,
-} from 'lucide-react';
+import { LayoutDashboardIcon } from 'lucide-react';
 
-import { ACCOUNT_PATH, MANAGE_PATH } from '@/lib/entities/paths';
+import { AREA_NAV_ICONS } from '@/components/area-nav/icons';
+import {
+  getVisibleSections,
+  isManagePath,
+} from '@/components/area-nav/sections';
 
 interface AccountMenuLink {
   href: Route;
@@ -16,31 +15,34 @@ interface AccountMenuLink {
   label: string;
 }
 
-const ACCOUNT_MENU_LINKS = [
-  { href: '/account/favorites', icon: FavoritesIcon, label: 'Favorites' },
-  { href: '/account/finished', icon: FinishedIcon, label: 'Finished' },
-  { href: ACCOUNT_PATH, icon: SettingsIcon, label: 'Settings' },
-] as const satisfies readonly AccountMenuLink[];
-
-const ACCOUNT_MENU_ADMIN_LINK = {
-  href: MANAGE_PATH,
-  icon: ManageIcon,
-  label: 'Manage',
-} as const satisfies AccountMenuLink;
-
 export const ACCOUNT_MENU_SIGN_OUT_HREF = '/logout' as Route;
 
-export function getAccountMenuLinks(showManage: boolean) {
-  if (!showManage) {
-    return ACCOUNT_MENU_LINKS;
-  }
+export function getAccountMenuLinks(showContent: boolean) {
+  return getVisibleSections(showContent).flatMap((section) => {
+    if (isManagePath(section.href)) {
+      return [
+        {
+          href: section.href,
+          icon: LayoutDashboardIcon,
+          label: section.label,
+        } satisfies AccountMenuLink,
+      ];
+    }
 
-  return [...ACCOUNT_MENU_LINKS, ACCOUNT_MENU_ADMIN_LINK];
+    return section.items.map(
+      (item) =>
+        ({
+          href: item.href,
+          icon: AREA_NAV_ICONS[item.icon],
+          label: item.label,
+        }) satisfies AccountMenuLink
+    );
+  });
 }
 
 export function isAccountMenuLinkActive(href: string, pathname: string) {
-  if (href === MANAGE_PATH) {
-    return pathname.startsWith(MANAGE_PATH);
+  if (isManagePath(href)) {
+    return isManagePath(pathname);
   }
 
   return pathname === href;
