@@ -15,7 +15,7 @@ export function VimeoEmbed({ id, title }: VimeoEmbedProps) {
 
   if (isActivated) {
     return (
-      <div className="relative aspect-video w-full overflow-hidden rounded-lg">
+      <div className="relative aspect-video w-full">
         {/* oxlint-disable react/iframe-missing-sandbox -- Vimeo player needs scripts and same-origin together */}
         <iframe
           allow="autoplay; fullscreen; picture-in-picture"
@@ -33,7 +33,7 @@ export function VimeoEmbed({ id, title }: VimeoEmbedProps) {
   return (
     <button
       aria-label={`Play ${title}`}
-      className="group bg-muted relative block aspect-video w-full cursor-pointer overflow-hidden rounded-lg"
+      className="group bg-muted relative block aspect-video w-full cursor-pointer"
       onClick={() => setIsActivated(true)}
       type="button"
     >
