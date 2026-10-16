@@ -11,16 +11,14 @@ import { getAdminListPath } from '@/lib/entities/paths';
 
 interface TalkActionsMenuProps {
   talk: TalkWithSpeakerAndTopics;
-  talkUrl: string;
+  talkUrl?: string;
 }
 
 export function TalkActionsMenu({ talk, talkUrl }: TalkActionsMenuProps) {
   const talkId = talk._id;
   const router = useRouter();
 
-  const { mutateAsync: archiveTalk } = useArchiveTalk({
-    onSuccess: () => router.push('/talks'),
-  });
+  const { mutateAsync: archiveTalk } = useArchiveTalk();
   const { mutateAsync: destroyTalk } = useDestroyTalk({
     onSuccess: () => router.push('/talks'),
   });
@@ -37,7 +35,6 @@ export function TalkActionsMenu({ talk, talkUrl }: TalkActionsMenuProps) {
     <ContentActionsGroup
       content={talk}
       contentType="talk"
-      editUrl={`/talks/edit/${talkId}`}
       listUrl={getAdminListPath('talks')}
       onArchiveAction={handleArchive}
       onDeleteAction={handleDelete}

@@ -1,8 +1,12 @@
 import type { Topic } from '@/features/topics/types';
 
-import { CountBadge } from '@/components/count-badge';
-import { TableCell, TableRow } from '@/components/ui';
+import {
+  ManageCountCell,
+  ManageRow,
+} from '@/app/manage/_components/manage-table';
 import { TopicActionsMenu } from '@/features/topics/components/topic-actions-menu';
+import { getTopicUrl } from '@/features/topics/utils';
+import { getEntityEditPath } from '@/lib/entities/paths';
 
 interface TopicsTableRowProps {
   talkCount: number;
@@ -10,17 +14,22 @@ interface TopicsTableRowProps {
 }
 
 export function TopicsTableRow({ talkCount, topic }: TopicsTableRowProps) {
+  const editPath = getEntityEditPath('topics', topic._id);
+  const viewUrl = talkCount > 0 ? getTopicUrl(topic.slug) : undefined;
+
   return (
-    <TableRow>
-      <TableCell className="font-medium whitespace-normal">
-        {topic.title}
-      </TableCell>
-      <TableCell className="w-[120px]">
-        <CountBadge count={talkCount} label="talk" />
-      </TableCell>
-      <TableCell className="w-px text-right">
-        <TopicActionsMenu talkCount={talkCount} topic={topic} />
-      </TableCell>
-    </TableRow>
+    <ManageRow
+      actions={
+        <TopicActionsMenu
+          talkCount={talkCount}
+          topic={topic}
+          viewUrl={viewUrl}
+        />
+      }
+      editHref={editPath}
+      title={topic.title}
+    >
+      <ManageCountCell>{talkCount}</ManageCountCell>
+    </ManageRow>
   );
 }

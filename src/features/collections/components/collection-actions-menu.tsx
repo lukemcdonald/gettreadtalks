@@ -9,6 +9,7 @@ import {
   ActionsGroup,
   DeleteBlockedDialog,
   DeleteConfirmDialog,
+  getEntityMenuItems,
 } from '@/components/actions-group';
 import { toastManager } from '@/components/ui/primitives/toast';
 import { destroyCollectionAction } from '@/features/collections/actions/destroy-collection';
@@ -18,11 +19,13 @@ import { pluralize } from '@/utils';
 interface CollectionActionsMenuProps {
   collection: Pick<Collection, '_id' | 'slug' | 'title'>;
   talkCount: number;
+  viewUrl?: string;
 }
 
 export function CollectionActionsMenu({
   collection,
   talkCount,
+  viewUrl,
 }: CollectionActionsMenuProps) {
   const router = useRouter();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -60,16 +63,10 @@ export function CollectionActionsMenu({
 
   const blockReason = `This collection has ${talkCount} ${pluralize(talkCount, 'talk', 'talks')}. Remove all talks before deleting.`;
 
-  const menuItems = [
-    { href: `/collections/${collection.slug}`, label: 'View' },
-    { href: `/collections/edit/${collectionId}`, label: 'Edit' },
-    {
-      label: 'Delete',
-      onClick: () => setDeleteDialogOpen(true),
-      separator: true,
-      variant: 'destructive' as const,
-    },
-  ];
+  const menuItems = getEntityMenuItems({
+    onDelete: () => setDeleteDialogOpen(true),
+    viewUrl,
+  });
 
   return (
     <>

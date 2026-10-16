@@ -1,27 +1,27 @@
-import type { ClipWithSpeaker } from '@/features/clips/types';
+import type { AdminClip } from '@/features/clips/types';
 
-import { ContentTableRow } from '@/components/content-table-row';
+import { ManageRow } from '@/app/manage/_components/manage-table';
 import { ClipActionsMenu } from '@/features/clips/components/clip-actions-menu';
 import { getClipUrl } from '@/features/clips/utils';
 import { getSpeakerName } from '@/features/speakers/utils';
+import { getEntityEditPath } from '@/lib/entities/paths';
 
 interface ClipsTableRowProps {
-  clip: ClipWithSpeaker;
+  clip: AdminClip;
 }
 
 export function ClipsTableRow({ clip }: ClipsTableRowProps) {
-  const clipUrl = getClipUrl(clip.slug);
+  const editPath = getEntityEditPath('clips', clip._id);
+  const publicPath =
+    clip.status === 'published' ? getClipUrl(clip.slug) : undefined;
 
   return (
-    <ContentTableRow
-      actionsMenu={<ClipActionsMenu clip={clip} clipUrl={clipUrl} />}
-      createdAt={clip._creationTime}
-      href={clipUrl}
-      publishedAt={clip.publishedAt}
-      speakerName={clip.speaker ? getSpeakerName(clip.speaker) : undefined}
+    <ManageRow
+      actions={<ClipActionsMenu clip={clip} clipUrl={publicPath} />}
+      editHref={editPath}
       status={clip.status}
+      subtitle={clip.talkTitle || getSpeakerName(clip.speaker) || undefined}
       title={clip.title}
-      updatedAt={clip.updatedAt}
     />
   );
 }

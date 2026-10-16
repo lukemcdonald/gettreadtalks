@@ -13,13 +13,43 @@ import {
   TableRow,
 } from '@/components/ui';
 
+const HIDDEN_MD = 'hidden md:table-cell';
+
+interface ManageColumn {
+  className?: string;
+  key: string;
+  srOnly?: boolean;
+}
+
 const COLUMNS = {
-  clips: ['Status', 'Title', 'Actions'],
-  collections: ['Title', 'Talks', 'Actions'],
-  speakers: ['Name', 'Talks', 'Clips', 'Actions'],
-  talks: ['Status', 'Title', 'Actions'],
-  topics: ['Title', 'Talks', 'Actions'],
-} as const;
+  clips: [
+    { key: 'Title' },
+    { className: HIDDEN_MD, key: 'Status' },
+    { className: 'w-px', key: 'Actions', srOnly: true },
+  ],
+  collections: [
+    { key: 'Title' },
+    { className: `${HIDDEN_MD} text-right`, key: 'Talks' },
+    { className: HIDDEN_MD, key: 'Status' },
+    { className: 'w-px', key: 'Actions', srOnly: true },
+  ],
+  speakers: [
+    { key: 'Name' },
+    { className: `${HIDDEN_MD} text-right`, key: 'Talks' },
+    { className: HIDDEN_MD, key: 'Status' },
+    { className: 'w-px', key: 'Actions', srOnly: true },
+  ],
+  talks: [
+    { key: 'Title' },
+    { className: HIDDEN_MD, key: 'Status' },
+    { className: 'w-px', key: 'Actions', srOnly: true },
+  ],
+  topics: [
+    { key: 'Name' },
+    { className: `${HIDDEN_MD} text-right`, key: 'Talks' },
+    { className: 'w-px', key: 'Actions', srOnly: true },
+  ],
+} satisfies Record<string, readonly ManageColumn[]>;
 
 type ManageResource = keyof typeof COLUMNS;
 
@@ -69,9 +99,9 @@ export function ManageTableSkeleton({
       <Header resource={resource} />
       <TableBody>
         {Array.from({ length: 6 }, (_, row) => (
-          <TableRow key={row}>
+          <TableRow className="h-11" key={row}>
             {COLUMNS[resource].map((column) => (
-              <TableCell key={column}>
+              <TableCell className={column.className} key={column.key}>
                 <Skeleton className="h-4 w-full" />
               </TableCell>
             ))}
@@ -87,7 +117,13 @@ function Header({ resource }: { resource: ManageResource }) {
     <TableHeader>
       <TableRow>
         {COLUMNS[resource].map((column) => (
-          <TableHead key={column}>{column}</TableHead>
+          <TableHead className={column.className} key={column.key}>
+            {column.srOnly ? (
+              <span className="sr-only">{column.key}</span>
+            ) : (
+              column.key
+            )}
+          </TableHead>
         ))}
       </TableRow>
     </TableHeader>

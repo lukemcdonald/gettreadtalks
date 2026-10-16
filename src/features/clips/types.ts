@@ -10,3 +10,7 @@ type ClipsListItem = ClipsListResult['page'][number];
 export type ClipWithSpeaker = Omit<ClipsListItem, 'speaker'> & {
   speaker?: ClipsListItem['speaker'];
 };
+
+export type AdminClip = FunctionReturnType<
+  typeof api.clips.listAllClips
+>['page'][number];

@@ -14,6 +14,8 @@ export type TalkWithSpeaker = Talk & {
   speaker: Speaker | null;
 };
 export type TalkWithSpeakerAndTopics = TalkWithSpeaker & {
+  collectionTitle?: string | null;
+  featuredClipTitle?: string | null;
   topicSlugs: string[];
 };
 export type TalkWithTopicIds = Talk & {

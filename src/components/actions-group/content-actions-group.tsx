@@ -8,22 +8,14 @@ import type {
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-import { Button } from '@/components/ui';
-import {
-  AlertDialog,
-  AlertDialogClose,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/primitives/alert-dialog';
 import { toastManager } from '@/components/ui/primitives/toast';
 import { getArchiveLabel } from '@/lib/entities/utils';
 import { getErrorMessage } from '@/services/errors';
 import { capitalize } from '@/utils';
 
 import { ActionsGroup } from './actions-group';
+import { ContentDeleteDialog } from './content-delete-dialog';
+import { getContentMenuItems } from './get-content-menu-items';
 
 const EMPTY_ADDITIONAL_ACTIONS: ActionsGroupMenuItem[] = [];
 
@@ -32,7 +24,6 @@ export function ContentActionsGroup({
   content,
   contentType,
   disabled,
-  editUrl,
   listUrl,
   onArchiveAction,
   onDeleteAction,
@@ -111,31 +102,18 @@ export function ContentActionsGroup({
     setIsDeleting(false);
   };
 
-  const menuItems: ActionsGroupMenuItem[] = [
-    ...(viewUrl ? [{ href: viewUrl, label: 'View' }] : []),
-    ...(editUrl ? [{ href: editUrl, label: 'Edit' }] : []),
-    ...(onArchiveAction
-      ? [
-          {
-            disabled: isArchiving,
-            label: archiveLabel,
-            onClick: handleArchive,
-            separator: true,
-          },
-        ]
-      : []),
-    ...additionalActions,
-    ...(onDeleteAction
-      ? [
-          {
-            label: 'Delete',
-            onClick: () => setDeleteDialogOpen(true),
-            separator: !onArchiveAction && additionalActions.length === 0,
-            variant: 'destructive' as const,
-          },
-        ]
-      : []),
-  ];
+  const menuItems = getContentMenuItems({
+    additionalActions,
+    archive: onArchiveAction
+      ? {
+          disabled: isArchiving,
+          label: archiveLabel,
+          onClick: handleArchive,
+        }
+      : undefined,
+    onDelete: onDeleteAction ? () => setDeleteDialogOpen(true) : undefined,
+    viewUrl,
+  });
 
   return (
     <>
@@ -144,34 +122,15 @@ export function ContentActionsGroup({
         menuItems={menuItems}
         primaryAction={primaryAction}
       />
-
       {!!onDeleteAction && (
-        <AlertDialog onOpenChange={setDeleteDialogOpen} open={deleteDialogOpen}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>
-                Delete{' '}
-                {content.title ? `"${content.title}"` : `this ${contentType}`}?
-              </AlertDialogTitle>
-              <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete the{' '}
-                {contentType} and all associated data.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogClose render={<Button variant="outline" />}>
-                Cancel
-              </AlertDialogClose>
-              <Button
-                loading={isDeleting}
-                onClick={handleDelete}
-                variant="destructive"
-              >
-                Delete
-              </Button>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        <ContentDeleteDialog
+          contentTitle={content.title}
+          contentType={contentType}
+          isDeleting={isDeleting}
+          onDelete={handleDelete}
+          onOpenChange={setDeleteDialogOpen}
+          open={deleteDialogOpen}
+        />
       )}
     </>
   );

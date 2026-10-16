@@ -1,40 +1,55 @@
+import type { ManageStatus } from '@/app/manage/_components/manage-table';
 import type { Speaker } from '@/features/speakers/types';
 
-import { CountBadge } from '@/components/count-badge';
-import { TableCell, TableRow } from '@/components/ui';
+import {
+  getHoverItems,
+  ManageCountCell,
+  ManageRow,
+} from '@/app/manage/_components/manage-table';
 import { SpeakerActionsMenu } from '@/features/speakers/components/speaker-actions-menu';
+import { SpeakerAvatar } from '@/features/speakers/components/speaker-avatar';
+import { getSpeakerName, getSpeakerUrl } from '@/features/speakers/utils';
+import { getEntityEditPath } from '@/lib/entities/paths';
 
 interface SpeakersTableRowProps {
   clipCount: number;
   speaker: Speaker;
+  status: ManageStatus;
   talkCount: number;
 }
 
 export function SpeakersTableRow({
   clipCount,
   speaker,
+  status,
   talkCount,
 }: SpeakersTableRowProps) {
-  const fullName = `${speaker.firstName} ${speaker.lastName}`;
+  const editPath = getEntityEditPath('speakers', speaker._id);
+  const fullName = getSpeakerName(speaker);
+  const publicPath =
+    status === 'published' ? getSpeakerUrl(speaker.slug) : undefined;
 
   return (
-    <TableRow>
-      <TableCell className="font-medium whitespace-normal">
-        {fullName}
-      </TableCell>
-      <TableCell className="w-[120px]">
-        <CountBadge count={talkCount} label="talk" />
-      </TableCell>
-      <TableCell className="w-[120px]">
-        <CountBadge count={clipCount} label="clip" />
-      </TableCell>
-      <TableCell className="w-px text-right">
+    <ManageRow
+      actions={
         <SpeakerActionsMenu
           clipCount={clipCount}
           speaker={speaker}
           talkCount={talkCount}
+          viewUrl={publicPath}
         />
-      </TableCell>
-    </TableRow>
+      }
+      editHref={editPath}
+      hoverItems={getHoverItems([
+        { label: 'Talks', value: talkCount },
+        { label: 'Featured', value: speaker.featured },
+      ])}
+      leading={<SpeakerAvatar size="xs" speaker={speaker} />}
+      status={status}
+      subtitle={speaker.ministry}
+      title={fullName}
+    >
+      <ManageCountCell>{talkCount}</ManageCountCell>
+    </ManageRow>
   );
 }

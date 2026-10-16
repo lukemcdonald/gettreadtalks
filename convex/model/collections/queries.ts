@@ -194,6 +194,8 @@ export const listAllCollections = query({
         return {
           collection,
           speakers: validSpeakers,
+          status:
+            talks.length > 0 ? ('published' as const) : ('draft' as const),
           talkCount: talks.length,
         };
       }

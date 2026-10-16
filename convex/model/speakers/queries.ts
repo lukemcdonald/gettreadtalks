@@ -244,9 +244,16 @@ export const listAllSpeakersAdmin = query({
         speaker._id
       );
 
+      const hasPublishedContent =
+        talks.some((talk) => talk.status === 'published') ||
+        clips.some((clip) => clip.status === 'published');
+
       return {
         clipCount: clips.length,
         speaker,
+        status: hasPublishedContent
+          ? ('published' as const)
+          : ('draft' as const),
         talkCount: talks.length,
       };
     });
@@ -255,6 +262,7 @@ export const listAllSpeakersAdmin = query({
     v.object({
       clipCount: v.number(),
       speaker: doc('speakers'),
+      status: v.union(v.literal('draft'), v.literal('published')),
       talkCount: v.number(),
     })
   ),

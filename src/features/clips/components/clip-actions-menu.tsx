@@ -1,6 +1,6 @@
 'use client';
 
-import type { ClipWithSpeaker } from '@/features/clips/types';
+import type { AdminClip } from '@/features/clips/types';
 
 import { useRouter } from 'next/navigation';
 
@@ -10,17 +10,15 @@ import { useDestroyClip } from '@/features/clips/hooks/use-destroy-clip';
 import { getAdminListPath } from '@/lib/entities/paths';
 
 interface ClipActionsMenuProps {
-  clip: ClipWithSpeaker;
-  clipUrl: string;
+  clip: AdminClip;
+  clipUrl?: string;
 }
 
 export function ClipActionsMenu({ clip, clipUrl }: ClipActionsMenuProps) {
   const clipId = clip._id;
   const router = useRouter();
 
-  const { mutateAsync: archiveClip } = useArchiveClip({
-    onSuccess: () => router.push('/clips'),
-  });
+  const { mutateAsync: archiveClip } = useArchiveClip();
   const { mutateAsync: destroyClip } = useDestroyClip({
     onSuccess: () => router.push(getAdminListPath('clips')),
   });
@@ -37,7 +35,6 @@ export function ClipActionsMenu({ clip, clipUrl }: ClipActionsMenuProps) {
     <ContentActionsGroup
       content={clip}
       contentType="clip"
-      editUrl={`/clips/edit/${clipId}`}
       listUrl={getAdminListPath('clips')}
       onArchiveAction={handleArchive}
       onDeleteAction={handleDelete}
