@@ -2,7 +2,7 @@
 
 import type { Route } from 'next';
 
-import { Menu as MenuIcon } from 'lucide-react';
+import { Menu as MenuIcon, X as XIcon } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 import { AccountIdentity } from '@/components/site-header/account-menu/account-identity';
@@ -16,13 +16,13 @@ import { ModeSwitcher } from '@/components/site-header/mode-switcher';
 import { SiteBranding } from '@/components/site-header/site-branding';
 import {
   Button,
+  CommandPanel,
   Drawer,
   DrawerClose,
   DrawerHeader,
   DrawerMenu,
   DrawerMenuGroup,
   DrawerMenuItem,
-  DrawerMenuSeparator,
   DrawerPanel,
   DrawerPopup,
   DrawerTitle,
@@ -87,11 +87,28 @@ export function MobileNav({ className }: MobileNavProps) {
         }
       />
 
-      <DrawerPopup showBar showCloseButton variant="default">
-        <DrawerHeader className="flex-row items-center justify-between pe-12">
+      <DrawerPopup
+        className="before:bg-muted/72 border border-t-0"
+        showCloseButton={false}
+        variant="straight"
+      >
+        <DrawerHeader className="flex-row items-center justify-between">
           <DrawerTitle className="sr-only">Navigation menu</DrawerTitle>
           <SiteBranding />
-          <ModeSwitcher className="size-10" />
+          <div className="flex items-center gap-2">
+            <ModeSwitcher className="size-10" />
+            <DrawerClose
+              render={
+                <Button
+                  aria-label="Close navigation menu"
+                  size="icon-lg"
+                  variant="ghost"
+                >
+                  <XIcon className="size-6" />
+                </Button>
+              }
+            />
+          </div>
         </DrawerHeader>
 
         <DrawerPanel scrollable={false}>
@@ -106,44 +123,43 @@ export function MobileNav({ className }: MobileNavProps) {
                 />
               ))}
             </DrawerMenuGroup>
-            {isLoading ? null : (
-              <>
-                <DrawerMenuSeparator />
-                {user ? (
-                  <>
-                    <AccountIdentity user={user} />
-                    <DrawerMenuGroup>
-                      {getAccountMenuLinks(showManageLink).map((link) => (
-                        <MobileNavMenuLink
-                          href={link.href}
-                          isActive={isAccountMenuLinkActive(
-                            link.href,
-                            pathname
-                          )}
-                          key={link.href}
-                          label={link.label}
-                        />
-                      ))}
-                    </DrawerMenuGroup>
-                    <MobileNavMenuLink
-                      className="text-muted-foreground"
-                      href={ACCOUNT_MENU_SIGN_OUT_HREF}
-                      label="Sign out"
-                    />
-                  </>
-                ) : (
-                  <DrawerMenuGroup>
-                    <MobileNavMenuLink
-                      href="/login"
-                      isActive={pathname === '/login'}
-                      label="Sign In"
-                    />
-                  </DrawerMenuGroup>
-                )}
-              </>
-            )}
           </DrawerMenu>
         </DrawerPanel>
+
+        {!isLoading && (
+          <CommandPanel className="flex-1 rounded-b-none p-6 [clip-path:inset(0_1px)] not-has-[+[data-slot=command-footer]]:rounded-b-none not-has-[+[data-slot=command-footer]]:[clip-path:inset(0_1px)]">
+            <DrawerMenu>
+              {user ? (
+                <>
+                  <AccountIdentity user={user} />
+                  <DrawerMenuGroup>
+                    {getAccountMenuLinks(showManageLink).map((link) => (
+                      <MobileNavMenuLink
+                        href={link.href}
+                        isActive={isAccountMenuLinkActive(link.href, pathname)}
+                        key={link.href}
+                        label={link.label}
+                      />
+                    ))}
+                  </DrawerMenuGroup>
+                  <MobileNavMenuLink
+                    className="text-muted-foreground"
+                    href={ACCOUNT_MENU_SIGN_OUT_HREF}
+                    label="Sign out"
+                  />
+                </>
+              ) : (
+                <DrawerMenuGroup>
+                  <MobileNavMenuLink
+                    href="/login"
+                    isActive={pathname === '/login'}
+                    label="Sign In"
+                  />
+                </DrawerMenuGroup>
+              )}
+            </DrawerMenu>
+          </CommandPanel>
+        )}
       </DrawerPopup>
     </Drawer>
   );
