@@ -12,7 +12,7 @@ test('Admin edit / Signed-in shortcut', async ({ page, talksPage }) => {
 
   await page.getByTestId('account-menu').click();
   const isAdmin = await page
-    .getByRole('menuitem', { name: 'Manage' })
+    .getByRole('menuitem', { name: 'Content' })
     .isVisible();
 
   await talksPage.goto();
