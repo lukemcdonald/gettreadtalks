@@ -9,16 +9,12 @@ import {
 export const AREA_NAV: AreaNavSection[] = [
   {
     href: ACCOUNT_PATH,
-    items: [{ href: ACCOUNT_PATH, icon: 'settings', label: 'Settings' }],
-    label: 'Settings',
-  },
-  {
-    href: '/account/favorites',
     items: [
+      { href: ACCOUNT_PATH, icon: 'settings', label: 'Settings' },
       { href: '/account/favorites', icon: 'favorites', label: 'Favorites' },
       { href: '/account/finished', icon: 'finished', label: 'Finished' },
     ],
-    label: 'Content',
+    label: 'Account',
   },
   {
     href: ADMIN_LIST_PATHS.talks,
@@ -33,12 +29,12 @@ export const AREA_NAV: AreaNavSection[] = [
         label: 'Collections',
       },
     ],
-    label: 'Manage',
+    label: 'Content',
   },
 ];
 
-export function getVisibleSections(showManage: boolean) {
-  if (showManage) {
+export function getVisibleSections(showContent: boolean) {
+  if (showContent) {
     return AREA_NAV;
   }
 

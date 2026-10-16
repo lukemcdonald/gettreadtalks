@@ -86,9 +86,6 @@ export function AreaNav({ items, label, variant }: AreaNavProps) {
   if (variant === 'sidebar') {
     return (
       <nav aria-label={label} className="flex flex-col">
-        <h2 className="text-muted-foreground mb-3 text-xs font-semibold tracking-wider uppercase">
-          {label}
-        </h2>
         <ul className="-mx-3 flex flex-col gap-1">
           {items.map((item) => {
             const isActive = item.href === pathname;

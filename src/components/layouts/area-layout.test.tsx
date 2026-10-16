@@ -39,54 +39,57 @@ describe('AreaLayout', () => {
     );
   }
 
-  it('renders Settings and Content tabs for members', () => {
+  it('renders the Account tab for members', () => {
     setup();
 
     expect(
       screen.getAllByRole('tab').map((tab) => tab.textContent?.trim())
-    ).toEqual(['Settings', 'Content']);
+    ).toEqual(['Account']);
     expect(
-      screen.queryByRole('tab', { name: 'Manage' })
+      screen.queryByRole('tab', { name: 'Content' })
     ).not.toBeInTheDocument();
   });
 
-  it('shows the Manage tab for admins', () => {
+  it('shows the Content tab for admins', () => {
     setup('/account', true);
 
     expect(
       screen.getAllByRole('tab').map((tab) => tab.textContent?.trim())
-    ).toEqual(['Settings', 'Content', 'Manage']);
-    expect(screen.getByRole('tab', { name: 'Manage' })).toHaveAttribute(
+    ).toEqual(['Account', 'Content']);
+    expect(screen.getByRole('tab', { name: 'Content' })).toHaveAttribute(
       'href',
       '/manage/talks'
     );
   });
 
-  it('shows the Manage tab on manage routes', () => {
+  it('shows the Content tab on manage routes', () => {
     setup('/manage/talks');
 
-    expect(screen.getByRole('tab', { name: 'Manage' })).toHaveAttribute(
+    expect(screen.getByRole('tab', { name: 'Content' })).toHaveAttribute(
       'aria-selected',
       'true'
     );
   });
 
-  it('keeps the Settings sub-nav so the content column stays put', () => {
+  it('lists Settings, Favorites, and Finished in the Account sub-nav', () => {
     setup('/account');
 
-    const settingsLinks = screen.getAllByRole('link', { name: 'Settings' });
-
-    expect(settingsLinks.length).toBeGreaterThan(0);
     expect(
-      screen.getAllByRole('navigation', { name: 'Settings' }).length
+      screen.getAllByRole('link', { name: 'Settings' }).length
+    ).toBeGreaterThan(0);
+    expect(
+      screen.getAllByRole('link', { name: 'Favorites' }).length
+    ).toBeGreaterThan(0);
+    expect(
+      screen.getAllByRole('link', { name: 'Finished' }).length
     ).toBeGreaterThan(0);
     expect(screen.getByText('Page body')).toBeInTheDocument();
   });
 
-  it('marks the matching content item as the current page', () => {
+  it('marks the matching account item as the current page', () => {
     setup('/account/finished');
 
-    expect(screen.getByRole('tab', { name: 'Content' })).toHaveAttribute(
+    expect(screen.getByRole('tab', { name: 'Account' })).toHaveAttribute(
       'aria-selected',
       'true'
     );
@@ -96,7 +99,7 @@ describe('AreaLayout', () => {
     }
   });
 
-  it('lists every manage entity in one sub-nav', () => {
+  it('lists every content entity in one sub-nav', () => {
     setup('/manage/speakers', true);
 
     expect(
