@@ -1,13 +1,9 @@
 import { Suspense } from 'react';
 
-import {
-  ManageTable,
-  ManageTableSkeleton,
-} from '@/app/manage/_components/manage-table';
+import { ManageTableSkeleton } from '@/app/manage/_components/manage-table';
+import { ManageTopicsContent } from '@/app/manage/topics/_components/topics-content';
 import { PageHeader } from '@/components/page-header';
 import { NewTopicButton } from '@/features/topics/components/new-topic-button';
-import { TopicsTableRow } from '@/features/topics/components/topics-table/topics-table-row';
-import { getAllTopics } from '@/features/topics/queries/get-all-topics';
 
 export default function ManageTopicsPage() {
   return (
@@ -18,24 +14,8 @@ export default function ManageTopicsPage() {
         title="Manage Topics"
       />
       <Suspense fallback={<ManageTableSkeleton resource="topics" />}>
-        <TopicsContent />
+        <ManageTopicsContent />
       </Suspense>
     </>
-  );
-}
-
-async function TopicsContent() {
-  const { topics } = await getAllTopics();
-
-  return (
-    <ManageTable
-      emptyAction={<NewTopicButton />}
-      isEmpty={topics.length === 0}
-      resource="topics"
-    >
-      {topics.map(({ talkCount, topic }) => (
-        <TopicsTableRow key={topic._id} talkCount={talkCount} topic={topic} />
-      ))}
-    </ManageTable>
   );
 }
