@@ -15,6 +15,29 @@ export default defineConfig({
   ],
   overrides: [
     {
+      files: ['src/**'],
+      rules: {
+        'no-restricted-imports': [
+          'error',
+          {
+            patterns: [
+              {
+                group: ['../../**', '../../*'],
+                message:
+                  'Use the @/ alias instead of climbing two or more directories.',
+              },
+            ],
+          },
+        ],
+      },
+    },
+    {
+      files: ['src/configs/sentry/index.ts'],
+      rules: {
+        'no-restricted-imports': 'off',
+      },
+    },
+    {
       files: ['**/*.test.ts', '**/*.test.tsx'],
       rules: {
         'unicorn/consistent-function-scoping': 'off',

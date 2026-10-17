@@ -1,3 +1,4 @@
+// next.config.ts loads this module; Next rewrites @/ relative to the config root.
 import { DEPLOY_ENV } from '../../constants/env';
 import { isSentryEnabled } from './enabled';
 

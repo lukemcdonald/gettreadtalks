@@ -1,8 +1,8 @@
 import { createHash } from 'node:crypto';
 
-import { getClientIp } from '../../../convex/lib/clientIp.ts';
+import { getClientIp } from '@/convex/lib/clientIp';
 
-export { mcpLimiterToken } from '../../../convex/lib/mcpToken.ts';
+export { mcpLimiterToken } from '@/convex/lib/mcpToken';
 
 export interface McpRateLimitResult {
   ok: boolean;

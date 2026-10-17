@@ -1,5 +1,5 @@
-import { CreateTopicSheet } from '@/features/topics/components/create-topic-sheet';
+import { CreateTopicSheetRoute } from '@/app/@sheet/_components/create-topic-sheet-route';
 
 export default function Page() {
-  return <CreateTopicSheet />;
+  return <CreateTopicSheetRoute />;
 }

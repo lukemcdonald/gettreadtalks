@@ -1,9 +1,6 @@
 import type { Topic } from '@/features/topics/types';
 
-import {
-  ManageCountCell,
-  ManageRow,
-} from '@/app/manage/_components/manage-table';
+import { ManageCountCell, ManageRow } from '@/components/manage-table';
 import { TopicActionsMenu } from '@/features/topics/components/topic-actions-menu';
 import { buildTopicUrl } from '@/features/topics/utils';
 import { buildEntityEditPath } from '@/lib/entities/paths';

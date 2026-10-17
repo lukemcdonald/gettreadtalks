@@ -1,6 +1,7 @@
 import type * as SentrySdk from '@sentry/nextjs';
 
-import { IS_DEV } from '../../constants/env';
+import { IS_DEV } from '@/constants/env';
+
 import { baseSentryConfig, IS_SENTRY_ENABLED } from './index';
 
 export const SENTRY_BUFFER_LIMIT = 64;

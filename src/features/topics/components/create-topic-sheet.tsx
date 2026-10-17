@@ -1,12 +1,12 @@
 'use client';
 
 import type { TopicFormData } from '@/features/topics/schemas/topic-form';
+import type { TopicId } from '@/features/topics/types';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useTransition } from 'react';
+import { useEffect, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 
-import { useSheetRoute } from '@/app/@sheet/_hooks/use-sheet-route';
 import { FormSheet, TextField } from '@/components/ui';
 import { toastManager } from '@/components/ui/primitives/toast';
 import { createTopicAction } from '@/features/topics/actions/create-topic';
@@ -14,11 +14,16 @@ import { topicFormSchema } from '@/features/topics/schemas/topic-form';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
 
 interface CreateTopicSheetProps {
-  closeHref?: string;
+  onOpenChange: (open: boolean) => void;
+  onTopicCreated: (topicId: TopicId) => void;
+  open: boolean;
 }
 
-export function CreateTopicSheet({ closeHref }: CreateTopicSheetProps) {
-  const { handleOpenChange, handleSuccess } = useSheetRoute(closeHref);
+export function CreateTopicSheet({
+  onOpenChange,
+  onTopicCreated,
+  open,
+}: CreateTopicSheetProps) {
   const [isPending, startTransition] = useTransition();
 
   const form = useForm<TopicFormData>({
@@ -39,18 +44,24 @@ export function CreateTopicSheet({ closeHref }: CreateTopicSheetProps) {
       }
 
       toastManager.add({ title: 'Topic created', type: 'success' });
-      handleSuccess();
-      handleOpenChange(false);
+      onTopicCreated(result.data.topicId);
+      onOpenChange(false);
     });
   });
+
+  useEffect(() => {
+    if (!open) {
+      form.reset();
+    }
+  }, [form, open]);
 
   return (
     <FormSheet
       error={form.formState.errors.root}
       isPending={isPending}
-      onOpenChange={handleOpenChange}
+      onOpenChange={onOpenChange}
       onSubmit={handleSubmit}
-      open
+      open={open}
       submitLabel="Create Topic"
       title="Add New Topic"
     >

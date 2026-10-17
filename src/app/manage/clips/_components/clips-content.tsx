@@ -1,6 +1,6 @@
 import type { StatusType } from '@/lib/entities/types';
 
-import { ManageTable } from '@/app/manage/_components/manage-table';
+import { ManageTable } from '@/components/manage-table';
 import { Pagination } from '@/components/pagination';
 import { ClipsTableRow } from '@/features/clips/components/clips-table/clips-table-row';
 import { NewClipButton } from '@/features/clips/components/new-clip-button';

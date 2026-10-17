@@ -1,11 +1,11 @@
-import type { ManageStatus } from '@/app/manage/_components/manage-table';
+import type { ManageStatus } from '@/components/manage-table';
 import type { Speaker } from '@/features/speakers/types';
 
 import {
   getHoverItems,
   ManageCountCell,
   ManageRow,
-} from '@/app/manage/_components/manage-table';
+} from '@/components/manage-table';
 import { SpeakerActionsMenu } from '@/features/speakers/components/speaker-actions-menu';
 import { SpeakerAvatar } from '@/features/speakers/components/speaker-avatar';
 import { buildSpeakerUrl, getSpeakerName } from '@/features/speakers/utils';

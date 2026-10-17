@@ -1,12 +1,12 @@
 'use client';
 
 import type { CollectionFormData } from '../schemas/collection-form';
+import type { CollectionId } from '@/features/collections/types';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useTransition } from 'react';
+import { useEffect, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 
-import { useSheetRoute } from '@/app/@sheet/_hooks/use-sheet-route';
 import { FormSheet } from '@/components/ui';
 import { createCollectionAction } from '@/features/collections/actions/create-collection';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
@@ -15,13 +15,16 @@ import { collectionFormSchema } from '../schemas/collection-form';
 import { CollectionFormFields } from './collection-form-fields';
 
 interface CreateCollectionSheetProps {
-  closeHref?: string;
+  onCollectionCreated: (collectionId: CollectionId) => void;
+  onOpenChange: (open: boolean) => void;
+  open: boolean;
 }
 
 export function CreateCollectionSheet({
-  closeHref,
+  onCollectionCreated,
+  onOpenChange,
+  open,
 }: CreateCollectionSheetProps) {
-  const { handleOpenChange, handleSuccess } = useSheetRoute(closeHref);
   const [isPending, startTransition] = useTransition();
 
   const form = useForm<CollectionFormData>({
@@ -43,18 +46,24 @@ export function CreateCollectionSheet({
         return;
       }
 
-      handleSuccess();
-      handleOpenChange(false);
+      onCollectionCreated(result.data.collectionId);
+      onOpenChange(false);
     });
   });
+
+  useEffect(() => {
+    if (!open) {
+      form.reset();
+    }
+  }, [form, open]);
 
   return (
     <FormSheet
       error={form.formState.errors.root}
       isPending={isPending}
-      onOpenChange={handleOpenChange}
+      onOpenChange={onOpenChange}
       onSubmit={handleSubmit}
-      open
+      open={open}
       submitLabel="Create Collection"
       title="Add New Collection"
     >

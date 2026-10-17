@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 
-import { ManageTableSkeleton } from '@/app/manage/_components/manage-table';
 import { ManageTopicsContent } from '@/app/manage/topics/_components/topics-content';
+import { ManageTableSkeleton } from '@/components/manage-table';
 import { PageHeader } from '@/components/page-header';
 import { NewTopicButton } from '@/features/topics/components/new-topic-button';
 

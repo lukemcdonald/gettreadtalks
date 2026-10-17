@@ -7,8 +7,8 @@ import {
   UnfavoriteClipButton,
   UnfavoriteSpeakerButton,
 } from '@/features/users/components/unfavorite-buttons';
+import { useOptimisticRow } from '@/hooks/use-optimistic-row';
 
-import { useOptimisticRow } from '../../_components/use-optimistic-row';
 import { EntityTableRow } from './entity-table-row';
 
 interface FavoriteSpeakerRowProps {

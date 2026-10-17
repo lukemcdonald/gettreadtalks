@@ -1,9 +1,6 @@
 import type { TalkWithSpeakerAndTopics } from '@/features/talks/types';
 
-import {
-  getHoverItems,
-  ManageRow,
-} from '@/app/manage/_components/manage-table';
+import { getHoverItems, ManageRow } from '@/components/manage-table';
 import { getSpeakerName } from '@/features/speakers/utils';
 import { TalkActionsMenu } from '@/features/talks/components/talk-actions-menu';
 import { buildTalkUrl } from '@/features/talks/utils';

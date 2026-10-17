@@ -5,8 +5,7 @@ import type { TalkId } from '@/features/talks/types';
 
 import { TalkTableRow } from '@/features/users/components/talk-table-row';
 import { UnfavoriteTalkButton } from '@/features/users/components/unfavorite-buttons';
-
-import { useOptimisticRow } from '../../_components/use-optimistic-row';
+import { useOptimisticRow } from '@/hooks/use-optimistic-row';
 
 interface FavoriteTalkRowProps {
   href: string;
