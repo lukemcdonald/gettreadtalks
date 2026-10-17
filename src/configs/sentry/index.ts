@@ -1,5 +1,5 @@
-import { DEPLOY_ENV } from '@/constants/env';
-
+// next.config.ts loads this module; Next rewrites @/ relative to the config root.
+import { DEPLOY_ENV } from '../../constants/env';
 import { isSentryEnabled } from './enabled';
 
 const SENTRY_DEBUG = process.env.NEXT_PUBLIC_SENTRY_DEBUG === 'true';
