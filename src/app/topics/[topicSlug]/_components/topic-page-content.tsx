@@ -1,14 +1,14 @@
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
-import { topicJsonLd } from '@/app/topics/[topicSlug]/_components/topic-json-ld';
+import { buildTopicJsonLd } from '@/app/topics/[topicSlug]/_components/topic-json-ld';
 import {
   TopicHeaderSkeleton,
   TopicSidebarSkeleton,
 } from '@/app/topics/[topicSlug]/_components/topic-page-skeleton';
 import { TopicSidebar } from '@/app/topics/[topicSlug]/_components/topic-sidebar';
 import { TopicTalks } from '@/app/topics/[topicSlug]/_components/topic-talks';
-import { topicTalkCountPhrase } from '@/app/topics/[topicSlug]/_components/topic-talks-description';
+import { formatTopicTalkCountPhrase } from '@/app/topics/[topicSlug]/_components/topic-talks-description';
 import { AdminEditButton } from '@/components/admin-edit-button';
 import { ArchiveBackLink } from '@/components/archive-back-link';
 import { JsonLd } from '@/components/json-ld';
@@ -37,7 +37,7 @@ async function TopicHeader({ topicSlug }: { topicSlug: string }) {
   }
 
   const { talks, topic, totalTalks } = topicResult;
-  const description = `Elevate your spiritual heartbeat with ${topicTalkCountPhrase(totalTalks)}.`;
+  const description = `Elevate your spiritual heartbeat with ${formatTopicTalkCountPhrase(totalTalks)}.`;
   const segments = [
     { href: buildTopicsPath(), label: 'Topics' },
     { href: buildTopicUrl(topicSlug), label: topic.title },
@@ -47,7 +47,7 @@ async function TopicHeader({ topicSlug }: { topicSlug: string }) {
     <>
       <JsonLd data={buildBreadcrumbJsonLd(segments)} />
       <JsonLd
-        data={topicJsonLd({
+        data={buildTopicJsonLd({
           description,
           talks,
           title: topic.title,

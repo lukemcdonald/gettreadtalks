@@ -9,7 +9,7 @@ interface SpeakerJsonLdInput {
   websiteUrl?: string;
 }
 
-export function speakerJsonLd({
+export function buildSpeakerJsonLd({
   description,
   imageUrl,
   name,

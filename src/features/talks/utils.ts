@@ -14,7 +14,7 @@ export function buildTalksPath() {
   return '/talks';
 }
 
-export function talkMetaDescription({
+export function formatTalkMetaDescription({
   description,
   scripture,
   speakerName,
@@ -42,7 +42,7 @@ export function talkMetaDescription({
   return parts.join(' ');
 }
 
-export function talkListItemsJsonLd(
+export function buildTalkListItemsJsonLd(
   talks: {
     speaker: { slug: string } | null;
     slug: string;

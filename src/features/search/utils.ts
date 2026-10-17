@@ -35,11 +35,11 @@ const SEARCH_GROUP_LABELS: Record<SearchResultType, string> = {
   topic: 'Topics',
 };
 
-function getSearchGroupLabel(type: SearchResultType) {
+function formatSearchGroupLabel(type: SearchResultType) {
   return SEARCH_GROUP_LABELS[type];
 }
 
-export function getSearchHotkeyLabel(userAgent = '') {
+export function formatSearchHotkeyLabel(userAgent = '') {
   return /Mac|iPhone|iPad|iPod/u.test(userAgent) ? '⌘K' : 'Ctrl K';
 }
 
@@ -155,7 +155,7 @@ export function toSearchHits(result: SiteSearchResult): SearchHit[] {
 export function groupSearchHits(hits: SearchHit[]) {
   return SEARCH_RESULT_TYPES.map((type) => ({
     hits: hits.filter((hit) => hit.type === type),
-    label: getSearchGroupLabel(type),
+    label: formatSearchGroupLabel(type),
     type,
   })).filter((group) => group.hits.length > 0);
 }

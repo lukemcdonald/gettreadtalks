@@ -1,11 +1,11 @@
 import { describe, expect, it } from '@/test';
 
 import {
-  sharePropsForClip,
-  sharePropsForCollection,
-  sharePropsForSpeaker,
-  sharePropsForTalk,
-  sharePropsForTopic,
+  buildSharePropsForClip,
+  buildSharePropsForCollection,
+  buildSharePropsForSpeaker,
+  buildSharePropsForTalk,
+  buildSharePropsForTopic,
 } from './share-image';
 
 const speaker = {
@@ -16,10 +16,10 @@ const speaker = {
   role: 'Pastor',
 };
 
-describe('sharePropsForTalk', () => {
+describe('buildSharePropsForTalk', () => {
   it('uses the talk title and a speaker byline', () => {
     expect(
-      sharePropsForTalk({
+      buildSharePropsForTalk({
         speaker,
         title: 'Does the Bible Permit A Woman to Preach?',
       })
@@ -35,7 +35,7 @@ describe('sharePropsForTalk', () => {
 
   it('omits the avatar when the speaker has no photo', () => {
     expect(
-      sharePropsForTalk({
+      buildSharePropsForTalk({
         speaker: { ...speaker, imageUrl: undefined },
         title: 'A Talk',
       }).speaker?.imageUrl
@@ -44,7 +44,7 @@ describe('sharePropsForTalk', () => {
 
   it('uses role when ministry is missing', () => {
     expect(
-      sharePropsForTalk({
+      buildSharePropsForTalk({
         speaker: { ...speaker, ministry: undefined },
         title: 'A Talk',
       }).speaker?.detail
@@ -52,17 +52,17 @@ describe('sharePropsForTalk', () => {
   });
 
   it('omits speaker fields when there is no speaker', () => {
-    expect(sharePropsForTalk({ title: 'A Talk' })).toEqual({
+    expect(buildSharePropsForTalk({ title: 'A Talk' })).toEqual({
       speaker: undefined,
       title: 'A Talk',
     });
   });
 });
 
-describe('sharePropsForClip', () => {
+describe('buildSharePropsForClip', () => {
   it('uses the clip title and a speaker byline', () => {
     expect(
-      sharePropsForClip({
+      buildSharePropsForClip({
         speaker: {
           firstName: 'Tony',
           lastName: 'Payne',
@@ -81,10 +81,10 @@ describe('sharePropsForClip', () => {
   });
 });
 
-describe('sharePropsForSpeaker', () => {
+describe('buildSharePropsForSpeaker', () => {
   it('uses the name as the title', () => {
     expect(
-      sharePropsForSpeaker({
+      buildSharePropsForSpeaker({
         firstName: 'Alistair',
         imageUrl: '/images/speakers/alistair-begg.jpg',
         lastName: 'Begg',
@@ -104,7 +104,7 @@ describe('sharePropsForSpeaker', () => {
 
   it('omits the avatar when the speaker has no photo', () => {
     expect(
-      sharePropsForSpeaker({
+      buildSharePropsForSpeaker({
         firstName: 'Alistair',
         lastName: 'Begg',
         ministry: 'Truth For Life',
@@ -114,7 +114,7 @@ describe('sharePropsForSpeaker', () => {
 
   it('uses role when ministry is missing', () => {
     expect(
-      sharePropsForSpeaker({
+      buildSharePropsForSpeaker({
         firstName: 'Alistair',
         lastName: 'Begg',
         role: 'Pastor',
@@ -123,10 +123,10 @@ describe('sharePropsForSpeaker', () => {
   });
 });
 
-describe('sharePropsForTopic', () => {
+describe('buildSharePropsForTopic', () => {
   it('uses the topic title and pluralized talk count', () => {
     expect(
-      sharePropsForTopic({
+      buildSharePropsForTopic({
         talkCount: 6,
         title: 'Anxiety',
       })
@@ -138,7 +138,7 @@ describe('sharePropsForTopic', () => {
 
   it('uses the singular form for one talk', () => {
     expect(
-      sharePropsForTopic({
+      buildSharePropsForTopic({
         talkCount: 1,
         title: 'Grace',
       }).subtitle
@@ -146,10 +146,10 @@ describe('sharePropsForTopic', () => {
   });
 });
 
-describe('sharePropsForCollection', () => {
+describe('buildSharePropsForCollection', () => {
   it('uses the collection title and pluralized talk count', () => {
     expect(
-      sharePropsForCollection({
+      buildSharePropsForCollection({
         talkCount: 8,
         title: 'The Place and Posture of Christian Woman',
       })

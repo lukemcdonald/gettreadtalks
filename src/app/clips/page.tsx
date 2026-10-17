@@ -7,12 +7,12 @@ import { ClipsResults } from '@/app/clips/_components/clips-results';
 import { PageHeader } from '@/components/page-header';
 import { Container, Section } from '@/components/ui';
 import { ClipsListSkeleton } from '@/features/clips/components/clips-list-skeleton';
-import { pageMetadata } from '@/lib/metadata';
+import { buildPageMetadata } from '@/lib/metadata';
 
 // fallow-ignore-next-line unused-export
 export const ensureStatic = 'shell';
 
-export const metadata: Metadata = pageMetadata({
+export const metadata: Metadata = buildPageMetadata({
   canonical: '/clips',
   description:
     'Short Christ centered clips — quick encouragement from the best talks.',

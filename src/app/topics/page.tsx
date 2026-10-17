@@ -9,12 +9,12 @@ import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { SidebarFiltersSkeleton } from '@/components/skeletons';
 import { loadTopicsWithTalks } from '@/features/topics/queries/load-topics-with-talks';
-import { pageMetadata } from '@/lib/metadata';
+import { buildPageMetadata } from '@/lib/metadata';
 
 // fallow-ignore-next-line unused-export
 export const ensureStatic = 'shell';
 
-export const metadata: Metadata = pageMetadata({
+export const metadata: Metadata = buildPageMetadata({
   canonical: '/topics',
   description:
     'Browse talks by Bible topic or theme and deepen your understanding of Scripture.',

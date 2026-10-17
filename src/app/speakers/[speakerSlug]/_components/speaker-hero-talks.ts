@@ -6,7 +6,7 @@ interface TalkForHero {
   mediaUrl?: string;
 }
 
-export function featuredHeroCandidates<T extends TalkForHero>(talks: T[]) {
+export function getFeaturedHeroCandidates<T extends TalkForHero>(talks: T[]) {
   const featuredVideos = talks.filter(
     (talk) => talk.featured && isVideoMediaType(talk.mediaUrl)
   );
@@ -18,7 +18,7 @@ export function featuredHeroCandidates<T extends TalkForHero>(talks: T[]) {
   return talks.filter((talk) => isVideoMediaType(talk.mediaUrl));
 }
 
-export function speakerTalkLayout<T extends TalkForHero>(
+export function getSpeakerTalkLayout<T extends TalkForHero>(
   talks: T[],
   featuredTalk: T | undefined
 ) {

@@ -12,12 +12,12 @@ import { loadSpeakers } from '@/features/speakers/queries/load-speakers';
 import { sortSpeakersByName } from '@/features/speakers/utils';
 import { TalksListSkeleton } from '@/features/talks/components/talks-list-skeleton';
 import { loadTopicsWithCounts } from '@/features/topics/queries/load-topics-with-counts';
-import { pageMetadata } from '@/lib/metadata';
+import { buildPageMetadata } from '@/lib/metadata';
 
 // fallow-ignore-next-line unused-export
 export const ensureStatic = 'shell';
 
-export const metadata: Metadata = pageMetadata({
+export const metadata: Metadata = buildPageMetadata({
   canonical: '/talks',
   description:
     'Browse Christ centered talks from faithful ministers of the Gospel.',

@@ -1,4 +1,4 @@
-import { mediaJsonLd } from '../../../../components/media-embed/utils.ts';
+import { buildMediaJsonLd } from '../../../../components/media-embed/utils.ts';
 import { site } from '../../../../configs/site.ts';
 import { buildClipUrl } from '../../../../features/clips/utils.ts';
 import { getSpeakerName } from '../../../../features/speakers/utils.ts';
@@ -21,12 +21,12 @@ interface ClipJsonLdInput {
 }
 
 // fallow-ignore-next-line complexity
-export function clipJsonLd({ clip, speaker, talk }: ClipJsonLdInput) {
+export function buildClipJsonLd({ clip, speaker, talk }: ClipJsonLdInput) {
   const speakerName = getSpeakerName(speaker);
 
   return {
     '@context': 'https://schema.org',
-    ...mediaJsonLd(clip.mediaUrl),
+    ...buildMediaJsonLd(clip.mediaUrl),
     description: clip.description,
     name: clip.title,
     url: `${site.url}${buildClipUrl(clip.slug)}`,

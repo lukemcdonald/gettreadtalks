@@ -58,15 +58,15 @@ interface ShareCountedInput {
   title: string;
 }
 
-export function sharePropsForClip(input: ShareMediaInput) {
-  return sharePropsForMedia(input);
+export function buildSharePropsForClip(input: ShareMediaInput) {
+  return buildSharePropsForMedia(input);
 }
 
-export function sharePropsForCollection(input: ShareCountedInput) {
-  return sharePropsForCounted(input);
+export function buildSharePropsForCollection(input: ShareCountedInput) {
+  return buildSharePropsForCounted(input);
 }
 
-export function sharePropsForSpeaker(speaker: ShareSpeakerSource) {
+export function buildSharePropsForSpeaker(speaker: ShareSpeakerSource) {
   const mapped = toShareSpeaker(speaker);
 
   return {
@@ -76,15 +76,15 @@ export function sharePropsForSpeaker(speaker: ShareSpeakerSource) {
   };
 }
 
-export function sharePropsForTalk(input: ShareMediaInput) {
-  return sharePropsForMedia(input);
+export function buildSharePropsForTalk(input: ShareMediaInput) {
+  return buildSharePropsForMedia(input);
 }
 
-export function sharePropsForTopic(input: ShareCountedInput) {
-  return sharePropsForCounted(input);
+export function buildSharePropsForTopic(input: ShareCountedInput) {
+  return buildSharePropsForCounted(input);
 }
 
-function sharePropsForMedia({
+function buildSharePropsForMedia({
   speaker,
   title,
 }: ShareMediaInput): ShareImageInput {
@@ -94,7 +94,7 @@ function sharePropsForMedia({
   };
 }
 
-function sharePropsForCounted({
+function buildSharePropsForCounted({
   talkCount,
   title,
 }: ShareCountedInput): ShareImageInput {

@@ -1,8 +1,8 @@
 import { describe, expect, it } from '@/test';
 
 import {
-  featuredHeroCandidates,
-  speakerTalkLayout,
+  getFeaturedHeroCandidates,
+  getSpeakerTalkLayout,
 } from './speaker-hero-talks';
 
 const youtube = 'https://www.youtube.com/watch?v=jNQXAC9IVRw';
@@ -20,32 +20,32 @@ const featuredAudio = {
 };
 const otherVideo = { _id: 'other-video', featured: false, mediaUrl: youtube };
 
-describe('featuredHeroCandidates', () => {
+describe('getFeaturedHeroCandidates', () => {
   it('uses featured video talks when any exist', () => {
     expect(
-      featuredHeroCandidates([featuredAudio, featuredVideo, otherVideo])
+      getFeaturedHeroCandidates([featuredAudio, featuredVideo, otherVideo])
     ).toEqual([featuredVideo]);
   });
 
   it('falls back to nonfeatured videos when none are featured video', () => {
-    expect(featuredHeroCandidates([featuredAudio, otherVideo])).toEqual([
+    expect(getFeaturedHeroCandidates([featuredAudio, otherVideo])).toEqual([
       otherVideo,
     ]);
   });
 
   it('returns no candidates when there are no videos', () => {
-    expect(featuredHeroCandidates([featuredAudio])).toEqual([]);
+    expect(getFeaturedHeroCandidates([featuredAudio])).toEqual([]);
   });
 });
 
-describe('speakerTalkLayout', () => {
+describe('getSpeakerTalkLayout', () => {
   it('omits the featured video from the list', () => {
-    expect(speakerTalkLayout([featuredVideo], featuredVideo)).toEqual({
+    expect(getSpeakerTalkLayout([featuredVideo], featuredVideo)).toEqual({
       featuredTalk: featuredVideo,
       remainingTalks: [],
     });
     expect(
-      speakerTalkLayout([featuredVideo, otherVideo], featuredVideo)
+      getSpeakerTalkLayout([featuredVideo, otherVideo], featuredVideo)
     ).toEqual({
       featuredTalk: featuredVideo,
       remainingTalks: [otherVideo],
@@ -55,7 +55,7 @@ describe('speakerTalkLayout', () => {
   it('does not put audio in the hero or drop it from the list', () => {
     const talks = [featuredAudio, otherVideo];
 
-    expect(speakerTalkLayout(talks, featuredAudio)).toEqual({
+    expect(getSpeakerTalkLayout(talks, featuredAudio)).toEqual({
       featuredTalk: undefined,
       remainingTalks: talks,
     });

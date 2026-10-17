@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 
 import { loadClipBySlug } from '@/features/clips/queries/load-clip-by-slug';
-import { shareImage, sharePropsForClip } from '@/lib/og/share-image';
+import { shareImage, buildSharePropsForClip } from '@/lib/og/share-image';
 
 export { alt, contentType, size } from '@/lib/og/share-image';
 
@@ -20,7 +20,7 @@ export default async function Image({ params }: ClipShareImageProps) {
   const { clip, speaker } = data;
 
   return shareImage(
-    sharePropsForClip({
+    buildSharePropsForClip({
       speaker,
       title: clip.title,
     })

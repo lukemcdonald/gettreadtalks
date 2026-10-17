@@ -81,7 +81,7 @@ export function isVideoMediaType(url?: string): boolean {
 }
 
 // fallow-ignore-next-line complexity
-export function mediaJsonLd(url?: string) {
+export function buildMediaJsonLd(url?: string) {
   if (!url) {
     return { '@type': 'MediaObject' as const };
   }

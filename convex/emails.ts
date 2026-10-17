@@ -15,7 +15,7 @@ import { VerifyEmailTemplate } from './emails/verifyEmail';
 import { WelcomeEmail } from './emails/welcome';
 import { throwConvexError } from './lib/errors';
 import { reportSentryException } from './lib/sentry';
-import { getErrorMessage } from './lib/utils';
+import { formatErrorMessage } from './lib/utils';
 import { mediaHealthDigestItem } from './model/mediaHealth/validators';
 
 // Email constants - same across all environments
@@ -177,7 +177,7 @@ export const sendMediaHealthEmail = internalAction({
       );
     } catch (error) {
       throwConvexError(500, 'Failed to send media health email', {
-        cause: getErrorMessage(error),
+        cause: formatErrorMessage(error),
         resource: 'email',
         resourceId: 'mediaHealth',
       });
@@ -217,7 +217,7 @@ export const sendPasswordResetEmail = internalAction({
       );
     } catch (error) {
       throwConvexError(500, 'Failed to send password reset email', {
-        cause: getErrorMessage(error),
+        cause: formatErrorMessage(error),
         resource: 'email',
         resourceId: args.email,
       });
@@ -272,7 +272,7 @@ export const sendVerificationEmail = internalMutation({
       );
     } catch (error) {
       throwConvexError(500, 'Failed to send verification email', {
-        cause: getErrorMessage(error),
+        cause: formatErrorMessage(error),
         resource: 'email',
         resourceId: args.email,
       });
@@ -310,7 +310,7 @@ export const sendWelcomeEmail = internalMutation({
       );
     } catch (error) {
       throwConvexError(500, 'Failed to send welcome email', {
-        cause: getErrorMessage(error),
+        cause: formatErrorMessage(error),
         resource: 'email',
         resourceId: args.email,
       });
@@ -365,7 +365,7 @@ async function sendTrackedEmail(
     console.error(
       'Failed to schedule checkSendResult:',
       emailId,
-      getErrorMessage(error)
+      formatErrorMessage(error)
     );
   }
 

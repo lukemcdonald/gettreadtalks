@@ -10,12 +10,12 @@ import { PageHeader } from '@/components/page-header';
 import { SidebarFiltersSkeleton } from '@/components/skeletons';
 import { SpeakersListSkeleton } from '@/features/speakers/components/speakers-list-skeleton';
 import { loadSpeakers } from '@/features/speakers/queries/load-speakers';
-import { pageMetadata } from '@/lib/metadata';
+import { buildPageMetadata } from '@/lib/metadata';
 
 // fallow-ignore-next-line unused-export
 export const ensureStatic = 'shell';
 
-export const metadata: Metadata = pageMetadata({
+export const metadata: Metadata = buildPageMetadata({
   canonical: '/speakers',
   description:
     'Discover faithful ministers of the Gospel and be strengthened by their teaching.',

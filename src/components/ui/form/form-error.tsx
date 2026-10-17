@@ -11,13 +11,13 @@ interface FormErrorProps {
   error?: FieldError | FieldError[] | FieldErrors<FieldValues>['root'];
 }
 
-function uniqueErrorMessages(errors: FieldError[]) {
+function getUniqueErrorMessages(errors: FieldError[]) {
   return [...new Map(errors.map((err) => [err.message, err])).values()]
     .map((err) => err.message)
     .filter((message): message is string => Boolean(message));
 }
 
-function getErrorMessage(error: FormErrorProps['error']) {
+function formatErrorMessage(error: FormErrorProps['error']) {
   if (!error) {
     return null;
   }
@@ -26,7 +26,7 @@ function getErrorMessage(error: FormErrorProps['error']) {
     return error.message;
   }
 
-  return formatErrorMessages(uniqueErrorMessages(error));
+  return formatErrorMessages(getUniqueErrorMessages(error));
 }
 
 function formatErrorMessages(messages: string[]) {
@@ -55,7 +55,7 @@ function formatErrorMessages(messages: string[]) {
  * ```
  */
 export function FormError({ className, error }: FormErrorProps) {
-  const errorMessage = getErrorMessage(error);
+  const errorMessage = formatErrorMessage(error);
 
   if (!errorMessage) {
     return null;

@@ -7,7 +7,7 @@ import { v } from 'convex/values';
 import { internal } from './_generated/api';
 import { internalAction } from './_generated/server';
 import { reportSentryException } from './lib/sentry';
-import { getErrorMessage } from './lib/utils';
+import { formatErrorMessage } from './lib/utils';
 import {
   appendMediaHealthItem,
   buildMediaHealthDigest,
@@ -100,7 +100,7 @@ async function runMediaHealthPage(
     });
   } catch (error) {
     await reportSentryException({
-      message: `Media health check failed: ${getErrorMessage(error)}`,
+      message: `Media health check failed: ${formatErrorMessage(error)}`,
       tags: { job: 'mediaHealth' },
     });
     throw error;

@@ -4,7 +4,7 @@ import type { Speaker } from '@/features/speakers/types';
 import type { Talk } from '@/features/talks/types';
 
 import { ShareButton } from '@/components/share-button';
-import { talkTrackProps, track } from '@/services/analytics';
+import { buildTalkTrackProps, track } from '@/services/analytics';
 
 interface ShareTalkButtonProps {
   speaker?: Pick<Speaker, '_id' | 'slug'> | null;
@@ -17,7 +17,7 @@ export function ShareTalkButton({ speaker, talk }: ShareTalkButtonProps) {
       onShare={(method) =>
         track('talk_shared', {
           method,
-          ...talkTrackProps(talk, speaker),
+          ...buildTalkTrackProps(talk, speaker),
         })
       }
       title={talk.title}

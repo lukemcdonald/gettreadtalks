@@ -4,10 +4,10 @@ import { Suspense } from 'react';
 
 import { TopicPageContent } from '@/app/topics/[topicSlug]/_components/topic-page-content';
 import { TopicPageSkeleton } from '@/app/topics/[topicSlug]/_components/topic-page-skeleton';
-import { topicTalkCountPhrase } from '@/app/topics/[topicSlug]/_components/topic-talks-description';
+import { formatTopicTalkCountPhrase } from '@/app/topics/[topicSlug]/_components/topic-talks-description';
 import { loadTopicBySlug } from '@/features/topics/queries/load-topic-by-slug';
 import { buildTopicUrl } from '@/features/topics/utils';
-import { pageMetadata } from '@/lib/metadata';
+import { buildPageMetadata } from '@/lib/metadata';
 
 // fallow-ignore-next-line unused-export
 export const ensureStatic = 'shell';
@@ -34,9 +34,9 @@ export async function generateMetadata({
 
   const { topic, totalTalks } = topicResult;
 
-  return pageMetadata({
+  return buildPageMetadata({
     canonical: buildTopicUrl(topicSlug),
-    description: `Elevate your spiritual heartbeat with ${topicTalkCountPhrase(totalTalks)} on ${topic.title}.`,
+    description: `Elevate your spiritual heartbeat with ${formatTopicTalkCountPhrase(totalTalks)} on ${topic.title}.`,
     title: topic.title,
   });
 }

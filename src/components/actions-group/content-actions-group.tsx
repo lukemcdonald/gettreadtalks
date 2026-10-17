@@ -9,8 +9,8 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import { toastManager } from '@/components/ui/primitives/toast';
-import { getArchiveLabel } from '@/lib/entities/utils';
-import { getErrorMessage } from '@/services/errors';
+import { formatArchiveLabel } from '@/lib/entities/utils';
+import { formatErrorMessage } from '@/services/errors';
 import { capitalize } from '@/utils';
 
 import { ActionsGroup } from './actions-group';
@@ -39,7 +39,7 @@ export function ContentActionsGroup({
   const isLoading = isArchiving || isDeleting;
   const isDisabled = disabled || isLoading;
 
-  const archiveLabel = getArchiveLabel({
+  const archiveLabel = formatArchiveLabel({
     isLoading: isArchiving,
     status: content.status,
   });
@@ -60,7 +60,7 @@ export function ContentActionsGroup({
       router.refresh();
     } catch (error: unknown) {
       toastManager.add({
-        description: getErrorMessage(error),
+        description: formatErrorMessage(error),
         title: `Failed to archive ${contentType}`,
         type: 'error',
       });
@@ -93,7 +93,7 @@ export function ContentActionsGroup({
       }
     } catch (error: unknown) {
       toastManager.add({
-        description: getErrorMessage(error),
+        description: formatErrorMessage(error),
         title: `Failed to delete ${contentType}`,
         type: 'error',
       });

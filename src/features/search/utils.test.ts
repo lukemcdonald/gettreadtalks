@@ -8,7 +8,7 @@ import {
   getHeaderSearchQueryAfterClose,
   getHeaderSearchState,
   getHeaderSearchStatus,
-  getSearchHotkeyLabel,
+  formatSearchHotkeyLabel,
   getSearchQuery,
   getSearchSelectionAnalytics,
   groupSearchHits,
@@ -191,10 +191,10 @@ describe('getHeaderSearchStatus', () => {
   });
 });
 
-describe('getSearchHotkeyLabel', () => {
+describe('formatSearchHotkeyLabel', () => {
   it('shows the Apple glyph on Apple user agents', () => {
     expect(
-      getSearchHotkeyLabel(
+      formatSearchHotkeyLabel(
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
       )
     ).toBe('⌘K');
@@ -202,11 +202,11 @@ describe('getSearchHotkeyLabel', () => {
 
   it('shows Ctrl K otherwise', () => {
     expect(
-      getSearchHotkeyLabel(
+      formatSearchHotkeyLabel(
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
       )
     ).toBe('Ctrl K');
-    expect(getSearchHotkeyLabel()).toBe('Ctrl K');
+    expect(formatSearchHotkeyLabel()).toBe('Ctrl K');
   });
 });
 

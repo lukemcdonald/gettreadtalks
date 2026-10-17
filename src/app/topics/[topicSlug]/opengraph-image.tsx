@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 
 import { loadTopicBySlug } from '@/features/topics/queries/load-topic-by-slug';
-import { shareImage, sharePropsForTopic } from '@/lib/og/share-image';
+import { shareImage, buildSharePropsForTopic } from '@/lib/og/share-image';
 
 export { alt, contentType, size } from '@/lib/og/share-image';
 
@@ -20,7 +20,7 @@ export default async function Image({ params }: TopicShareImageProps) {
   const { topic, totalTalks } = topicResult;
 
   return shareImage(
-    sharePropsForTopic({
+    buildSharePropsForTopic({
       talkCount: totalTalks,
       title: topic.title,
     })

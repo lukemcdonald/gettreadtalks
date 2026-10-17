@@ -1,6 +1,6 @@
 import { describe, expect, it } from '@/test';
 
-import { clipJsonLd } from './clip-json-ld';
+import { buildClipJsonLd } from './clip-json-ld';
 
 const speaker = {
   firstName: 'Martyn',
@@ -8,9 +8,9 @@ const speaker = {
   slug: 'lloyd-jones',
 };
 
-describe('clipJsonLd', () => {
+describe('buildClipJsonLd', () => {
   it('uses the clip page url and speaker as creator', () => {
-    const result = clipJsonLd({
+    const result = buildClipJsonLd({
       clip: { slug: 'the-cross-clip', title: 'The Cross clip' },
       speaker,
       talk: null,
@@ -26,7 +26,7 @@ describe('clipJsonLd', () => {
   });
 
   it('adds ISO uploadDate when publishedAt is present', () => {
-    const result = clipJsonLd({
+    const result = buildClipJsonLd({
       clip: {
         publishedAt: Date.UTC(2024, 0, 15),
         slug: 'the-cross-clip',
@@ -40,7 +40,7 @@ describe('clipJsonLd', () => {
   });
 
   it('omits creator and uploadDate when those fields are missing', () => {
-    const result = clipJsonLd({
+    const result = buildClipJsonLd({
       clip: { slug: 'the-cross-clip', title: 'The Cross clip' },
       speaker: null,
       talk: null,
@@ -51,17 +51,17 @@ describe('clipJsonLd', () => {
   });
 
   it('links the parent talk only when both talk and speaker are present', () => {
-    const withTalk = clipJsonLd({
+    const withTalk = buildClipJsonLd({
       clip: { slug: 'the-cross-clip', title: 'The Cross clip' },
       speaker,
       talk: { slug: 'the-cross', title: 'The Cross' },
     });
-    const withoutTalk = clipJsonLd({
+    const withoutTalk = buildClipJsonLd({
       clip: { slug: 'the-cross-clip', title: 'The Cross clip' },
       speaker,
       talk: null,
     });
-    const withoutSpeaker = clipJsonLd({
+    const withoutSpeaker = buildClipJsonLd({
       clip: { slug: 'the-cross-clip', title: 'The Cross clip' },
       speaker: null,
       talk: { slug: 'the-cross', title: 'The Cross' },

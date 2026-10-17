@@ -8,10 +8,7 @@ import { updateTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
 import { stripEmptyStrings } from '@/lib/forms/schemas';
-import {
-  mapConvexErrorToFormErrors,
-  mapZodErrors,
-} from '@/lib/forms/validation';
+import { toConvexFormErrors, toZodFormErrors } from '@/lib/forms/validation';
 import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
 
 import { clipFormSchema } from '../schemas/clip-form';
@@ -26,7 +23,7 @@ export async function updateClipAction(
 
   if (!parsed.success) {
     return {
-      errors: mapZodErrors(parsed.error),
+      errors: toZodFormErrors(parsed.error),
       success: false,
     };
   }
@@ -45,7 +42,7 @@ export async function updateClipAction(
     };
   } catch (error) {
     return {
-      errors: mapConvexErrorToFormErrors(error),
+      errors: toConvexFormErrors(error),
       success: false,
     };
   }

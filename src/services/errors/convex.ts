@@ -61,7 +61,7 @@ export function getConvexErrorData(error: unknown): ErrorContext {
  * User-facing message for toasts and forms. Convex `data.message` is shown when
  * it is not a config/internal leak; everything else is reported and replaced.
  */
-export function getErrorMessage(error: unknown): string {
+export function formatErrorMessage(error: unknown): string {
   if (isConvexError(error)) {
     const data = error.data as ErrorContext;
 
