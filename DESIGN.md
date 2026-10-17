@@ -1,6 +1,6 @@
 # TREAD Talks
 
-Quiet zinc editorial on [COSS UI](https://coss.com/ui) `base-nova`. Inter is the only face. Rose is the only brand chroma. Video is framed, never free-floating. Prefer stock COSS components and variants over custom styling.
+Quiet zinc editorial on [COSS UI](https://coss.com/ui) `base-nova`. Inter is the only face. Red is the only brand chroma. Video is framed, never free-floating. Prefer stock COSS components and variants over custom styling.
 
 Source of truth: `src/assets/theme.css`. Primitives live in `src/components/ui/primitives/` — never edit them. Import from `@/components/ui`. Icons: `lucide-react`.
 
@@ -13,7 +13,7 @@ Neutrals alias Tailwind zinc (`--color-neutral-*` → `--color-zinc-*`). Semanti
 | `--background` | `--color-neutral-100` | `color-mix(in srgb, --color-neutral-950 98%, white)` |
 | `--foreground` | `--color-neutral-800` | `--color-neutral-100` |
 | `--card` / `--popover` | `--color-white` | card `97%` mix, popover `96%` mix on background |
-| `--primary` | `oklch(50.5% 0.213 27.518)` | `oklch(57.7% 0.245 27.325)` |
+| `--primary` | `oklch(50.5% 0.213 27.518)` (`--color-red-700`) | `oklch(57.7% 0.245 27.325)` (`--color-red-600`) |
 | `--primary-foreground` | `--color-neutral-50` | `--color-neutral-100` |
 | `--secondary` / `--muted` / `--accent` | `--alpha(black / 4%)` | `--alpha(white / 4%)` |
 | `--muted-foreground` | `neutral-600` 90% + black | `neutral-400` 90% + white |
@@ -54,11 +54,13 @@ Tailwind default 4px scale. No custom spacing tokens.
 | Surface | Classes |
 | --- | --- |
 | Root content | `py-6 sm:py-8 md:py-10 lg:py-12` |
-| `Section` | `gap-6 px-4 sm:px-6` plus `spacing`: `xs` `py-2`; `sm` `py-3`; `md` `py-4`; `lg` `py-4 sm:py-6`; `xl` `py-4 sm:py-6 md:py-12`; `2xl` `py-4 sm:py-6 md:py-12 lg:py-16`; `3xl` `xl:20 py-4 sm:py-6 md:py-12 lg:py-16` |
+| `Section` | `gap-6 px-4 sm:px-6` plus `spacing`: `xs` `py-2`; `sm` `py-3`; `md` `py-4`; `lg` `py-4 sm:py-6`; `xl` `py-4 sm:py-6 md:py-12`; `2xl` `py-4 sm:py-6 md:py-12 lg:py-16`; `3xl` `xl:py-20 py-4 sm:py-6 md:py-12 lg:py-16` |
 | `Container` | same `spacing` scale; width `container` → `--max-width-container: var(--breakpoint-xl)` |
 | Stacks | `space-y-6`, `gap-6`, `lg:gap-8` |
 | `GridList` | `normal` `gap-2 @sm:gap-3 @md:gap-4`; `relaxed` `gap-2 @sm:gap-4 @md:gap-6` |
 | Card padding | `p-4` (`MediaCard`, featured caption) |
+
+`Section` `3xl` is stored as `xl:20` in `src/components/ui/section.tsx` (invalid class). Documented value is the intended `xl:py-20`.
 
 ## Radius
 
