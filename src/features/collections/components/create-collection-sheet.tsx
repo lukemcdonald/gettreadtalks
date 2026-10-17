@@ -6,9 +6,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 
-import { useSheetRoute } from '@/app/@sheet/_hooks/use-sheet-route';
 import { FormSheet } from '@/components/ui';
 import { createCollectionAction } from '@/features/collections/actions/create-collection';
+import { useSheetRoute } from '@/hooks/use-sheet-route';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
 
 import { collectionFormSchema } from '../schemas/collection-form';

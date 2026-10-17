@@ -2,9 +2,9 @@ import type { ManageClipsSearchParams } from '@/app/manage/clips/_components/cli
 
 import { Suspense } from 'react';
 
-import { ManageTableSkeleton } from '@/app/manage/_components/manage-table';
 import { ManageClipsContent } from '@/app/manage/clips/_components/clips-content';
 import { ClipsFilters } from '@/app/manage/clips/_components/clips-filters';
+import { ManageTableSkeleton } from '@/components/manage-table';
 import { PageHeader } from '@/components/page-header';
 import { Skeleton } from '@/components/ui';
 import { NewClipButton } from '@/features/clips/components/new-clip-button';

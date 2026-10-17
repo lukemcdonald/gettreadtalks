@@ -4,8 +4,8 @@ import type { CollectionListItem } from '@/features/collections/types';
 import type { SpeakerListItem } from '@/features/speakers/types';
 import type { TopicListItem } from '@/features/topics/types';
 
-import { useSheetRoute } from '@/app/@sheet/_hooks/use-sheet-route';
 import { CreateTalkSheet } from '@/features/talks/components/create-talk-sheet';
+import { useSheetRoute } from '@/hooks/use-sheet-route';
 
 interface CreateTalkSheetRouteProps {
   closeHref?: string;

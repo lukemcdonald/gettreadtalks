@@ -1,4 +1,4 @@
-import { ManageTable } from '@/app/manage/_components/manage-table';
+import { ManageTable } from '@/components/manage-table';
 import { CollectionsTableRow } from '@/features/collections/components/collections-table/collections-table-row';
 import { NewCollectionButton } from '@/features/collections/components/new-collection-button';
 import { loadAllCollections } from '@/features/collections/queries/load-all-collections';

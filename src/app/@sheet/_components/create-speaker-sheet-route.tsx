@@ -1,7 +1,7 @@
 'use client';
 
-import { useSheetRoute } from '@/app/@sheet/_hooks/use-sheet-route';
 import { CreateSpeakerSheet } from '@/features/speakers/components/create-speaker-sheet';
+import { useSheetRoute } from '@/hooks/use-sheet-route';
 
 interface CreateSpeakerSheetRouteProps {
   closeHref?: string;

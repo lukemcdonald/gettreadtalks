@@ -1,4 +1,4 @@
-import { ManageTable } from '@/app/manage/_components/manage-table';
+import { ManageTable } from '@/components/manage-table';
 import { NewSpeakerButton } from '@/features/speakers/components/new-speaker-button';
 import { SpeakersTableRow } from '@/features/speakers/components/speakers-table/speakers-table-row';
 import { loadSpeakersAdmin } from '@/features/speakers/queries/load-speakers-admin';

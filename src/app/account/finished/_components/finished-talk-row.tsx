@@ -3,9 +3,9 @@
 import type { Speaker } from '@/features/speakers/types';
 import type { TalkId } from '@/features/talks/types';
 
-import { useOptimisticRow } from '@/app/account/_components/use-optimistic-row';
 import { TalkTableRow } from '@/features/users/components/talk-table-row';
 import { UnfinishTalkButton } from '@/features/users/components/unfinish-talk-button';
+import { useOptimisticRow } from '@/hooks/use-optimistic-row';
 
 interface FinishedTalkRowProps {
   href: string;

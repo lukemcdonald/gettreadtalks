@@ -6,11 +6,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 
-import { useSheetRoute } from '@/app/@sheet/_hooks/use-sheet-route';
 import { FormSheet, TextField } from '@/components/ui';
 import { toastManager } from '@/components/ui/primitives/toast';
 import { createTopicAction } from '@/features/topics/actions/create-topic';
 import { topicFormSchema } from '@/features/topics/schemas/topic-form';
+import { useSheetRoute } from '@/hooks/use-sheet-route';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
 
 interface CreateTopicSheetProps {

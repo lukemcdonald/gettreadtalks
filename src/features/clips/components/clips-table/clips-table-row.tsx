@@ -1,6 +1,6 @@
 import type { AdminClip } from '@/features/clips/types';
 
-import { ManageRow } from '@/app/manage/_components/manage-table';
+import { ManageRow } from '@/components/manage-table';
 import { ClipActionsMenu } from '@/features/clips/components/clip-actions-menu';
 import { buildClipUrl } from '@/features/clips/utils';
 import { getSpeakerName } from '@/features/speakers/utils';

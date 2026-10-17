@@ -1,6 +1,6 @@
 import type { StatusType } from '@/lib/entities/types';
 
-import { ManageTable } from '@/app/manage/_components/manage-table';
+import { ManageTable } from '@/components/manage-table';
 import { Pagination } from '@/components/pagination';
 import { NewTalkButton } from '@/features/talks/components/new-talk-button';
 import { TalksTableRow } from '@/features/talks/components/talks-table/talks-table-row';

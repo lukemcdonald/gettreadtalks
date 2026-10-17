@@ -1,10 +1,7 @@
-import type { ManageStatus } from '@/app/manage/_components/manage-table';
+import type { ManageStatus } from '@/components/manage-table';
 import type { Collection } from '@/features/collections/types';
 
-import {
-  ManageCountCell,
-  ManageRow,
-} from '@/app/manage/_components/manage-table';
+import { ManageCountCell, ManageRow } from '@/components/manage-table';
 import { CollectionActionsMenu } from '@/features/collections/components/collection-actions-menu';
 import { buildCollectionUrl } from '@/features/collections/utils';
 import { buildEntityEditPath } from '@/lib/entities/paths';

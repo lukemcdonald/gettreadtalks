@@ -3,8 +3,8 @@
 import type { SpeakerListItem } from '@/features/speakers/types';
 import type { TalkListItem } from '@/features/talks/types';
 
-import { useSheetRoute } from '@/app/@sheet/_hooks/use-sheet-route';
 import { CreateClipSheet } from '@/features/clips/components/create-clip-sheet';
+import { useSheetRoute } from '@/hooks/use-sheet-route';
 
 interface CreateClipSheetRouteProps {
   closeHref?: string;
