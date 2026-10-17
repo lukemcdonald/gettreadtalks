@@ -5,9 +5,9 @@ import { Main } from '@/components/main';
 import { Container, Section } from '@/components/ui';
 import { site } from '@/configs/site';
 import { SpeakerCard } from '@/features/speakers/components/speaker-card';
-import { getFeaturedSpeakers } from '@/features/speakers/queries/get-featured-speakers';
+import { loadFeaturedSpeakers } from '@/features/speakers/queries/load-featured-speakers';
 import { TalkCard } from '@/features/talks/components/talk-card';
-import { getFeaturedTalks } from '@/features/talks/queries/get-featured-talks';
+import { loadFeaturedTalks } from '@/features/talks/queries/load-featured-talks';
 
 function websiteJsonLd() {
   return {
@@ -29,8 +29,8 @@ function websiteJsonLd() {
 
 export default async function HomePage() {
   const [featuredTalksResult, featuredSpeakersResult] = await Promise.all([
-    getFeaturedTalks(6),
-    getFeaturedSpeakers(6),
+    loadFeaturedTalks(6),
+    loadFeaturedSpeakers(6),
   ]);
 
   const featuredTalks = featuredTalksResult.talks;

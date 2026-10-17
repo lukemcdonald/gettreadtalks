@@ -6,13 +6,13 @@ import {
   EmptyHeader,
   EmptyTitle,
 } from '@/components/ui';
-import { getUserFinishedTalks } from '@/features/users/queries/get-user-finished-talks';
+import { loadUserFinishedTalks } from '@/features/users/queries/load-user-finished-talks';
 
 import { AccountTable } from '../_components/account-table';
 import { FinishedTalkRow } from './_components/finished-talk-row';
 
 export default async function FinishedPage() {
-  const { talks } = await getUserFinishedTalks();
+  const { talks } = await loadUserFinishedTalks();
 
   return (
     <>

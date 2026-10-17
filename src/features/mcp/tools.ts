@@ -138,12 +138,12 @@ interface TopicRecord {
 }
 
 export interface McpCatalog {
-  getClipBySlug: (slug: string) => Promise<{
+  loadClipBySlug: (slug: string) => Promise<{
     clip: ClipRecord;
     speaker: SpeakerRecord | null;
     talk: { slug: string; status?: string; title: string } | null;
   } | null>;
-  getClips: (args?: {
+  loadClips: (args?: {
     cursor?: string;
     limit?: number;
     search?: string;
@@ -153,21 +153,21 @@ export interface McpCatalog {
     continueCursor: string;
     isDone: boolean;
   }>;
-  getCollectionBySlug: (slug: string) => Promise<{
+  loadCollectionBySlug: (slug: string) => Promise<{
     collection: CollectionRecord;
     talks: (TalkRecord & { speaker: SpeakerRecord | null })[];
   } | null>;
-  getCollections: (args?: { limit?: number }) => Promise<{
+  loadCollections: (args?: { limit?: number }) => Promise<{
     collections: {
       collection: CollectionRecord;
       speakers: SpeakerRecord[];
       talkCount: number;
     }[];
   }>;
-  getSpeakers: (args?: { limit?: number; search?: string }) => Promise<{
+  loadSpeakers: (args?: { limit?: number; search?: string }) => Promise<{
     speakers: SpeakerRecord[];
   }>;
-  getTalkBySlug: (
+  loadTalkBySlug: (
     speakerSlug: string,
     talkSlug: string
   ) => Promise<{
@@ -177,7 +177,7 @@ export interface McpCatalog {
     talk: TalkRecord;
     topics: TopicRecord[];
   } | null>;
-  getTalks: (args?: {
+  loadTalks: (args?: {
     cursor?: string;
     limit?: number;
     search?: string;
@@ -188,7 +188,7 @@ export interface McpCatalog {
     isDone: boolean;
     talks: (TalkRecord & { speaker: SpeakerRecord | null })[];
   }>;
-  getTopicsWithCounts: (args?: { search?: string }) => Promise<
+  loadTopicsWithCounts: (args?: { search?: string }) => Promise<
     {
       count: number;
       topic: TopicRecord;
@@ -272,7 +272,7 @@ export async function searchTalks(
   input: z.infer<typeof searchTalksInputSchema>,
   catalog: McpCatalog
 ) {
-  const result = await catalog.getTalks({
+  const result = await catalog.loadTalks({
     cursor: input.cursor,
     limit: input.limit ?? DEFAULT_SEARCH_LIMIT,
     search: input.query,
@@ -287,11 +287,14 @@ export async function searchTalks(
   });
 }
 
-export async function getTalk(
+export async function loadTalk(
   input: z.infer<typeof getTalkInputSchema>,
   catalog: McpCatalog
 ) {
-  const result = await catalog.getTalkBySlug(input.speakerSlug, input.talkSlug);
+  const result = await catalog.loadTalkBySlug(
+    input.speakerSlug,
+    input.talkSlug
+  );
 
   if (!result) {
     return toolResult({ error: 'Talk not found.' }, true);
@@ -316,7 +319,7 @@ export async function listSpeakers(
   input: z.infer<typeof listSpeakersInputSchema>,
   catalog: McpCatalog
 ) {
-  const result = await catalog.getSpeakers({
+  const result = await catalog.loadSpeakers({
     limit: input.limit ?? DEFAULT_LIST_LIMIT,
     search: input.search,
   });
@@ -330,7 +333,7 @@ export async function listTopics(
   input: z.infer<typeof listTopicsInputSchema>,
   catalog: McpCatalog
 ) {
-  const topics = await catalog.getTopicsWithCounts({
+  const topics = await catalog.loadTopicsWithCounts({
     search: input.search,
   });
 
@@ -343,7 +346,7 @@ export async function listCollections(
   input: z.infer<typeof listCollectionsInputSchema>,
   catalog: McpCatalog
 ) {
-  const result = await catalog.getCollections({
+  const result = await catalog.loadCollections({
     limit: input.limit ?? DEFAULT_LIST_LIMIT,
   });
 
@@ -358,11 +361,11 @@ export async function listCollections(
   });
 }
 
-export async function getCollection(
+export async function loadCollection(
   input: z.infer<typeof getCollectionInputSchema>,
   catalog: McpCatalog
 ) {
-  const result = await catalog.getCollectionBySlug(input.slug);
+  const result = await catalog.loadCollectionBySlug(input.slug);
 
   if (!result || result.talks.length === 0) {
     return toolResult({ error: 'Collection not found.' }, true);
@@ -378,7 +381,7 @@ export async function listClips(
   input: z.infer<typeof listClipsInputSchema>,
   catalog: McpCatalog
 ) {
-  const result = await catalog.getClips({
+  const result = await catalog.loadClips({
     cursor: input.cursor,
     limit: input.limit ?? DEFAULT_SEARCH_LIMIT,
     search: input.query,
@@ -392,11 +395,11 @@ export async function listClips(
   });
 }
 
-export async function getClip(
+export async function loadClip(
   input: z.infer<typeof getClipInputSchema>,
   catalog: McpCatalog
 ) {
-  const result = await catalog.getClipBySlug(input.slug);
+  const result = await catalog.loadClipBySlug(input.slug);
 
   if (!result?.talk || result.talk.status !== 'published') {
     return toolResult({ error: 'Clip not found.' }, true);
@@ -440,7 +443,7 @@ function registerMcpTools(server: McpServer, catalog: McpCatalog) {
         'Get one published talk by speaker slug and talk slug. Returns the talk, speaker, topics, collection, and clips with canonical URLs.',
       inputSchema: getTalkInputSchema,
     },
-    withToolTracking('get_talk', (input) => getTalk(input, catalog))
+    withToolTracking('get_talk', (input) => loadTalk(input, catalog))
   );
 
   server.registerTool(
@@ -486,7 +489,9 @@ function registerMcpTools(server: McpServer, catalog: McpCatalog) {
         'Get one collection by slug, including its published talks and canonical URLs.',
       inputSchema: getCollectionInputSchema,
     },
-    withToolTracking('get_collection', (input) => getCollection(input, catalog))
+    withToolTracking('get_collection', (input) =>
+      loadCollection(input, catalog)
+    )
   );
 
   server.registerTool(
@@ -508,7 +513,7 @@ function registerMcpTools(server: McpServer, catalog: McpCatalog) {
         'Get one published clip by slug, with its speaker, parent talk, and canonical URL.',
       inputSchema: getClipInputSchema,
     },
-    withToolTracking('get_clip', (input) => getClip(input, catalog))
+    withToolTracking('get_clip', (input) => loadClip(input, catalog))
   );
 }
 

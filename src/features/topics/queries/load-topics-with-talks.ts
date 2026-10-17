@@ -9,7 +9,7 @@ import { api } from '@/convex/_generated/api';
  * Get topics with their talks for browsing (featured talks first).
  * Used for the topics browse page with horizontal scroll sections.
  */
-export async function getTopicsWithTalks() {
+export async function loadTopicsWithTalks() {
   cacheLife('hours');
   cacheTag('topics');
 

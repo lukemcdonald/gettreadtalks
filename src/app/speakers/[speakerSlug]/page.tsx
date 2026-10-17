@@ -4,7 +4,7 @@ import { Suspense } from 'react';
 
 import { SpeakerPageContent } from '@/app/speakers/[speakerSlug]/_components/speaker-page-content';
 import { SpeakerPageSkeleton } from '@/app/speakers/[speakerSlug]/_components/speaker-page-skeleton';
-import { getSpeakerBySlug } from '@/features/speakers/queries/get-speaker-by-slug';
+import { loadSpeakerBySlug } from '@/features/speakers/queries/load-speaker-by-slug';
 import { buildSpeakerUrl, getSpeakerName } from '@/features/speakers/utils';
 import { pageMetadata } from '@/lib/metadata';
 
@@ -19,7 +19,7 @@ export async function generateMetadata({
   params,
 }: SpeakerPageProps): Promise<Metadata> {
   const { speakerSlug } = await params;
-  const data = await getSpeakerBySlug(speakerSlug);
+  const data = await loadSpeakerBySlug(speakerSlug);
 
   if (!data) {
     return {};

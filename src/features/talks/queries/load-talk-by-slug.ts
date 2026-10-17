@@ -8,7 +8,7 @@ import { api } from '@/convex/_generated/api';
 /**
  * Public talk detail. Unpublished talks are omitted so this cache is shared.
  */
-export async function getTalkBySlug(speakerSlug: string, talkSlug: string) {
+export async function loadTalkBySlug(speakerSlug: string, talkSlug: string) {
   cacheLife('hours');
   cacheTag('talks');
 

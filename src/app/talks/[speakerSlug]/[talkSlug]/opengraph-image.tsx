@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 
-import { getTalkBySlug } from '@/features/talks/queries/get-talk-by-slug';
+import { loadTalkBySlug } from '@/features/talks/queries/load-talk-by-slug';
 import { shareImage, sharePropsForTalk } from '@/lib/og/share-image';
 
 export { alt, contentType, size } from '@/lib/og/share-image';
@@ -14,7 +14,7 @@ interface TalkShareImageProps {
 
 export default async function Image({ params }: TalkShareImageProps) {
   const { speakerSlug, talkSlug } = await params;
-  const talkResult = await getTalkBySlug(speakerSlug, talkSlug);
+  const talkResult = await loadTalkBySlug(speakerSlug, talkSlug);
 
   if (!talkResult) {
     notFound();

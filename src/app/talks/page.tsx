@@ -8,10 +8,10 @@ import { TalksSidebar } from '@/app/talks/_components/talks-sidebar';
 import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { SidebarFiltersSkeleton } from '@/components/skeletons';
-import { getSpeakers } from '@/features/speakers/queries/get-speakers';
+import { loadSpeakers } from '@/features/speakers/queries/load-speakers';
 import { sortSpeakersByName } from '@/features/speakers/utils';
 import { TalksListSkeleton } from '@/features/talks/components/talks-list-skeleton';
-import { getTopicsWithCounts } from '@/features/topics/queries/get-topics-with-counts';
+import { loadTopicsWithCounts } from '@/features/topics/queries/load-topics-with-counts';
 import { pageMetadata } from '@/lib/metadata';
 
 // fallow-ignore-next-line unused-export
@@ -30,8 +30,8 @@ interface TalksPageProps {
 
 export default async function TalksPage({ searchParams }: TalksPageProps) {
   const [speakersResult, topicsResult] = await Promise.all([
-    getSpeakers(),
-    getTopicsWithCounts(),
+    loadSpeakers(),
+    loadTopicsWithCounts(),
   ]);
 
   return (

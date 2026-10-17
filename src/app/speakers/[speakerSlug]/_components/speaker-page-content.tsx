@@ -14,7 +14,7 @@ import { speakerJsonLd } from '@/app/speakers/[speakerSlug]/_components/speaker-
 import { SpeakerContentSkeleton } from '@/app/speakers/[speakerSlug]/_components/speaker-page-skeleton';
 import { JsonLd } from '@/components/json-ld';
 import { EditorialProfileLayout } from '@/components/layouts';
-import { getSpeakerBySlug } from '@/features/speakers/queries/get-speaker-by-slug';
+import { loadSpeakerBySlug } from '@/features/speakers/queries/load-speaker-by-slug';
 import {
   buildSpeakerUrl,
   buildSpeakersPath,
@@ -40,7 +40,7 @@ async function featuredTalkForHero(talks: Talk[]) {
 }
 
 async function SpeakerHeroSection({ speakerSlug }: { speakerSlug: string }) {
-  const data = await getSpeakerBySlug(speakerSlug);
+  const data = await loadSpeakerBySlug(speakerSlug);
 
   if (!data) {
     notFound();
@@ -75,7 +75,7 @@ async function SpeakerHeroSection({ speakerSlug }: { speakerSlug: string }) {
 }
 
 async function SpeakerRelatedContent({ speakerSlug }: { speakerSlug: string }) {
-  const data = await getSpeakerBySlug(speakerSlug);
+  const data = await loadSpeakerBySlug(speakerSlug);
 
   if (!data) {
     notFound();

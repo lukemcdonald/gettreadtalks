@@ -9,7 +9,7 @@ import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { SidebarFiltersSkeleton } from '@/components/skeletons';
 import { CollectionsListSkeleton } from '@/features/collections/components/collections-list-skeleton';
-import { getCollections } from '@/features/collections/queries/get-collections';
+import { loadCollections } from '@/features/collections/queries/load-collections';
 import { pageMetadata } from '@/lib/metadata';
 
 // fallow-ignore-next-line unused-export
@@ -29,7 +29,7 @@ interface CollectionsPageProps {
 export default async function CollectionsPage({
   searchParams,
 }: CollectionsPageProps) {
-  const { speakers } = await getCollections();
+  const { speakers } = await loadCollections();
 
   return (
     <SidebarLayout

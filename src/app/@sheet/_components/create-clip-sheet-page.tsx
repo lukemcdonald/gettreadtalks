@@ -1,5 +1,5 @@
 import { CreateClipSheetRoute } from '@/app/@sheet/_components/create-clip-sheet-route';
-import { getFormOptions } from '@/app/@sheet/_queries/get-form-options';
+import { loadFormOptions } from '@/app/@sheet/_queries/load-form-options';
 
 interface CreateClipSheetPageProps {
   closeHref?: string;
@@ -8,7 +8,7 @@ interface CreateClipSheetPageProps {
 export async function CreateClipSheetPage({
   closeHref,
 }: CreateClipSheetPageProps = {}) {
-  const { speakers, talks } = await getFormOptions();
+  const { speakers, talks } = await loadFormOptions();
 
   return (
     <CreateClipSheetRoute

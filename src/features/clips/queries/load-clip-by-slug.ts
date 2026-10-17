@@ -1,15 +1,16 @@
 'use cache: private';
 
-import type { ClipId } from '../types';
-
 import { cacheLife, cacheTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
 import { fetchAuthQuery } from '@/services/auth/server';
 
-export async function getClip(id: ClipId) {
+/**
+ * Get clip by slug with speaker and talk.
+ */
+export async function loadClipBySlug(slug: string) {
   cacheLife('hours');
   cacheTag('clips');
 
-  return await fetchAuthQuery(api.clips.getClip, { id });
+  return await fetchAuthQuery(api.clips.getClipBySlug, { slug });
 }

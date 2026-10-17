@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 
-import { getClipBySlug } from '@/features/clips/queries/get-clip-by-slug';
+import { loadClipBySlug } from '@/features/clips/queries/load-clip-by-slug';
 import { buildClipUrl } from '@/features/clips/utils';
 import { redirectPublicEdit } from '@/lib/entities/redirect-public-edit';
 
@@ -10,7 +10,7 @@ interface PageProps {
 
 export default async function Page({ params }: PageProps) {
   const { clipSlug } = await params;
-  const data = await getClipBySlug(clipSlug);
+  const data = await loadClipBySlug(clipSlug);
 
   if (!data) {
     notFound();

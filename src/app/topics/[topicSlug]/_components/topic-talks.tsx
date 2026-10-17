@@ -1,5 +1,5 @@
 import { TopicContent } from '@/app/topics/[topicSlug]/_components/topic-content';
-import { getTopicBySlug } from '@/features/topics/queries/get-topic-by-slug';
+import { loadTopicBySlug } from '@/features/topics/queries/load-topic-by-slug';
 
 interface TopicTalksSearchParams {
   cursor?: string;
@@ -13,7 +13,7 @@ interface TopicTalksProps {
 
 export async function TopicTalks({ searchParams, topicSlug }: TopicTalksProps) {
   const { cursor, search } = await searchParams;
-  const topicResult = await getTopicBySlug({
+  const topicResult = await loadTopicBySlug({
     cursor,
     search,
     slug: topicSlug,

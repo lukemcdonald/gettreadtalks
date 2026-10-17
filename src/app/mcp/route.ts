@@ -1,9 +1,9 @@
 import { fetchMutation, fetchQuery } from 'convex/nextjs';
 
 import { api } from '@/convex/_generated/api';
-import { getClips } from '@/features/clips/queries/get-clips';
-import { getCollectionBySlug } from '@/features/collections/queries/get-collection-by-slug';
-import { getCollections } from '@/features/collections/queries/get-collections';
+import { loadClips } from '@/features/clips/queries/load-clips';
+import { loadCollectionBySlug } from '@/features/collections/queries/load-collection-by-slug';
+import { loadCollections } from '@/features/collections/queries/load-collections';
 import {
   createMcpRateLimitedHandler,
   mcpLimiterToken,
@@ -11,22 +11,22 @@ import {
   withMcpCors,
 } from '@/features/mcp/rate-limit';
 import { createTreadMcpHandler } from '@/features/mcp/tools';
-import { getSpeakers } from '@/features/speakers/queries/get-speakers';
-import { getTalkBySlug } from '@/features/talks/queries/get-talk-by-slug';
-import { getTalks } from '@/features/talks/queries/get-talks';
-import { getTopicsWithCounts } from '@/features/topics/queries/get-topics-with-counts';
+import { loadSpeakers } from '@/features/speakers/queries/load-speakers';
+import { loadTalkBySlug } from '@/features/talks/queries/load-talk-by-slug';
+import { loadTalks } from '@/features/talks/queries/load-talks';
+import { loadTopicsWithCounts } from '@/features/topics/queries/load-topics-with-counts';
 
 export const maxDuration = 60;
 
 const mcpHandler = createTreadMcpHandler({
-  getClipBySlug: (slug) => fetchQuery(api.clips.getClipBySlug, { slug }),
-  getClips,
-  getCollectionBySlug,
-  getCollections,
-  getSpeakers,
-  getTalkBySlug,
-  getTalks,
-  getTopicsWithCounts,
+  loadClipBySlug: (slug) => fetchQuery(api.clips.getClipBySlug, { slug }),
+  loadClips,
+  loadCollectionBySlug,
+  loadCollections,
+  loadSpeakers,
+  loadTalkBySlug,
+  loadTalks,
+  loadTopicsWithCounts,
 });
 
 async function consumeMcpRateLimit(request: Request) {

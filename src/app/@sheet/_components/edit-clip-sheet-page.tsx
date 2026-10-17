@@ -4,8 +4,8 @@ import type { Route } from 'next';
 import { redirect } from 'next/navigation';
 
 import { EditClipSheetRoute } from '@/app/@sheet/_components/edit-clip-sheet-route';
-import { getFormOptions } from '@/app/@sheet/_queries/get-form-options';
-import { getClip } from '@/features/clips/queries/get-clip';
+import { loadFormOptions } from '@/app/@sheet/_queries/load-form-options';
+import { loadClip } from '@/features/clips/queries/load-clip';
 import {
   ADMIN_LIST_PATHS,
   getAdminLoginRedirect,
@@ -37,8 +37,8 @@ export async function EditClipSheetPage({
   );
 
   const [clip, { speakers, talks }] = await Promise.all([
-    getClip(clipId),
-    getFormOptions(),
+    loadClip(clipId),
+    loadFormOptions(),
   ]);
 
   if (!clip) {

@@ -1,6 +1,6 @@
 'use server';
 
-import { getSpeakers } from '@/features/speakers/queries/get-speakers';
+import { loadSpeakers } from '@/features/speakers/queries/load-speakers';
 
 interface GetSpeakersGroupedProps {
   limit?: number;
@@ -12,10 +12,11 @@ interface GetSpeakersGroupedProps {
 /**
  * Get speakers grouped alphabetically by last name.
  */
-export async function getSpeakersGrouped(args?: GetSpeakersGroupedProps) {
+// fallow-ignore-next-line complexity
+export async function loadSpeakersGrouped(args?: GetSpeakersGroupedProps) {
   const { limit, role, search, sort } = args ?? {};
 
-  const { speakers } = await getSpeakers({
+  const { speakers } = await loadSpeakers({
     limit,
     role,
     search,

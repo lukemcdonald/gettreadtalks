@@ -8,7 +8,7 @@ import { api } from '@/convex/_generated/api';
 /**
  * Get featured talks for homepage.
  */
-export async function getFeaturedTalks(limit = 6) {
+export async function loadFeaturedTalks(limit = 6) {
   cacheLife('hours');
   cacheTag('talks');
 

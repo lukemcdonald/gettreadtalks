@@ -11,7 +11,7 @@ import { api } from '@/convex/_generated/api';
 /**
  * Get random talks by speaker (excluding specified talk).
  */
-export async function getRandomTalksBySpeaker(
+export async function loadRandomTalksBySpeaker(
   speakerId: SpeakerId,
   excludeTalkId?: TalkId,
   limit = 5

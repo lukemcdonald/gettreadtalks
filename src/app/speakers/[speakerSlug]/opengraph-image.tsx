@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 
-import { getSpeakerBySlug } from '@/features/speakers/queries/get-speaker-by-slug';
+import { loadSpeakerBySlug } from '@/features/speakers/queries/load-speaker-by-slug';
 import { shareImage, sharePropsForSpeaker } from '@/lib/og/share-image';
 
 export { alt, contentType, size } from '@/lib/og/share-image';
@@ -11,7 +11,7 @@ interface SpeakerShareImageProps {
 
 export default async function Image({ params }: SpeakerShareImageProps) {
   const { speakerSlug } = await params;
-  const data = await getSpeakerBySlug(speakerSlug);
+  const data = await loadSpeakerBySlug(speakerSlug);
 
   if (!data) {
     notFound();

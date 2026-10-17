@@ -1,15 +1,15 @@
 'use cache: private';
 
-import type { TalkId } from '../types';
+import type { SpeakerId } from '../types';
 
 import { cacheLife, cacheTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
 import { fetchAuthQuery } from '@/services/auth/server';
 
-export async function getTalk(id: TalkId) {
+export async function loadSpeaker(id: SpeakerId) {
   cacheLife('hours');
-  cacheTag('talks');
+  cacheTag('speakers');
 
-  return await fetchAuthQuery(api.talks.getTalk, { id });
+  return await fetchAuthQuery(api.speakers.getSpeaker, { speakerId: id });
 }

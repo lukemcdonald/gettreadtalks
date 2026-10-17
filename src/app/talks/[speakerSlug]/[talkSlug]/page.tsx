@@ -5,7 +5,7 @@ import { Suspense } from 'react';
 import { TalkPageContent } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-page-content';
 import { TalkPageSkeleton } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-page-skeleton';
 import { getSpeakerName } from '@/features/speakers/utils';
-import { getTalkBySlug } from '@/features/talks/queries/get-talk-by-slug';
+import { loadTalkBySlug } from '@/features/talks/queries/load-talk-by-slug';
 import { buildTalkUrl, talkMetaDescription } from '@/features/talks/utils';
 import { pageMetadata } from '@/lib/metadata';
 
@@ -23,7 +23,7 @@ export async function generateMetadata({
   params,
 }: TalkPageProps): Promise<Metadata> {
   const { speakerSlug, talkSlug } = await params;
-  const talkResult = await getTalkBySlug(speakerSlug, talkSlug);
+  const talkResult = await loadTalkBySlug(speakerSlug, talkSlug);
 
   if (!talkResult) {
     return {};

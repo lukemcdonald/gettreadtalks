@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 
-import { getTopicBySlug } from '@/features/topics/queries/get-topic-by-slug';
+import { loadTopicBySlug } from '@/features/topics/queries/load-topic-by-slug';
 import { redirectPublicEdit } from '@/lib/entities/redirect-public-edit';
 
 interface PageProps {
@@ -9,7 +9,7 @@ interface PageProps {
 
 export default async function Page({ params }: PageProps) {
   const { topicSlug } = await params;
-  const data = await getTopicBySlug({ slug: topicSlug });
+  const data = await loadTopicBySlug({ slug: topicSlug });
 
   if (!data) {
     notFound();

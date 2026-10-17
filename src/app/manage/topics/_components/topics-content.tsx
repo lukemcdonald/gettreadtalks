@@ -1,10 +1,10 @@
 import { ManageTable } from '@/app/manage/_components/manage-table';
 import { NewTopicButton } from '@/features/topics/components/new-topic-button';
 import { TopicsTableRow } from '@/features/topics/components/topics-table/topics-table-row';
-import { getAllTopics } from '@/features/topics/queries/get-all-topics';
+import { loadAllTopics } from '@/features/topics/queries/load-all-topics';
 
 export async function ManageTopicsContent() {
-  const { topics } = await getAllTopics();
+  const { topics } = await loadAllTopics();
 
   return (
     <ManageTable

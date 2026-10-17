@@ -8,7 +8,7 @@ import { fetchAuthQuery } from '@/services/auth/server';
 /**
  * Admin draft preview. Per-user because it reads the auth token.
  */
-export async function getTalkBySlugAdmin(
+export async function loadTalkBySlugAdmin(
   speakerSlug: string,
   talkSlug: string
 ) {

@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 
-import { getCollectionBySlug } from '@/features/collections/queries/get-collection-by-slug';
+import { loadCollectionBySlug } from '@/features/collections/queries/load-collection-by-slug';
 import { shareImage, sharePropsForCollection } from '@/lib/og/share-image';
 
 export { alt, contentType, size } from '@/lib/og/share-image';
@@ -11,7 +11,7 @@ interface CollectionShareImageProps {
 
 export default async function Image({ params }: CollectionShareImageProps) {
   const { collectionSlug } = await params;
-  const data = await getCollectionBySlug(collectionSlug);
+  const data = await loadCollectionBySlug(collectionSlug);
 
   if (!data) {
     notFound();

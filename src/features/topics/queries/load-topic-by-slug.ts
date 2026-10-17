@@ -15,7 +15,7 @@ interface GetTopicBySlugProps {
 /**
  * Get topic by slug with associated talks (paginated).
  */
-export async function getTopicBySlug(args: GetTopicBySlugProps) {
+export async function loadTopicBySlug(args: GetTopicBySlugProps) {
   cacheLife('hours');
   cacheTag('topics');
 

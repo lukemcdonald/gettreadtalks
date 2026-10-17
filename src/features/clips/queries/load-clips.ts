@@ -17,7 +17,7 @@ interface GetClipsProps {
  * Returns only published clips with published parent talks.
  * Defaults to 50 items per page, sorted by most recent.
  */
-export async function getClips(args?: GetClipsProps) {
+export async function loadClips(args?: GetClipsProps) {
   cacheLife('hours');
   cacheTag('clips');
 

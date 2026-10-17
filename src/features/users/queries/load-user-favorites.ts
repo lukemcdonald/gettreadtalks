@@ -5,7 +5,7 @@ import { cacheLife, cacheTag } from 'next/cache';
 import { api } from '@/convex/_generated/api';
 import { fetchAuthQuery } from '@/services/auth/server';
 
-export async function getUserFavorites(limit?: number) {
+export async function loadUserFavorites(limit?: number) {
   cacheLife('hours');
   cacheTag('user-favorites');
 

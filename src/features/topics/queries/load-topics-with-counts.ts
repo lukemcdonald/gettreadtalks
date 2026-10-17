@@ -16,7 +16,7 @@ interface GetTopicsWithCountsProps {
  * Get topics with their associated talk counts.
  * Supports optional search and sort filtering.
  */
-export async function getTopicsWithCounts(args?: GetTopicsWithCountsProps) {
+export async function loadTopicsWithCounts(args?: GetTopicsWithCountsProps) {
   cacheLife('hours');
   cacheTag('topics');
 

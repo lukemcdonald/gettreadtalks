@@ -1,5 +1,5 @@
 import { TalksContent } from '@/app/talks/_components/talks-content';
-import { getTalks } from '@/features/talks/queries/get-talks';
+import { loadTalks } from '@/features/talks/queries/load-talks';
 
 export interface TalksSearchParams {
   cursor?: string;
@@ -23,7 +23,7 @@ export async function TalksResults({ searchParams }: TalksResultsProps) {
   const params = await searchParams;
   const speakerSlugs = splitSlugs(params.speakers);
   const topicSlugs = splitSlugs(params.topics);
-  const result = await getTalks({
+  const result = await loadTalks({
     cursor: params.cursor,
     featured: params.featured === 'true',
     search: params.search,

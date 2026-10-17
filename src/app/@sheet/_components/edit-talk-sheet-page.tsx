@@ -4,9 +4,9 @@ import type { Route } from 'next';
 import { redirect } from 'next/navigation';
 
 import { EditTalkSheetRoute } from '@/app/@sheet/_components/edit-talk-sheet-route';
-import { getFormOptions } from '@/app/@sheet/_queries/get-form-options';
-import { getTalk } from '@/features/talks/queries/get-talk';
-import { getTalkTopics } from '@/features/talks/queries/get-talk-topics';
+import { loadFormOptions } from '@/app/@sheet/_queries/load-form-options';
+import { loadTalk } from '@/features/talks/queries/load-talk';
+import { loadTalkTopics } from '@/features/talks/queries/load-talk-topics';
 import {
   ADMIN_LIST_PATHS,
   getAdminLoginRedirect,
@@ -39,9 +39,9 @@ export async function EditTalkSheetPage({
 
   const [talk, talkTopics, { collections, speakers, topics }] =
     await Promise.all([
-      getTalk(talkId),
-      getTalkTopics(talkId),
-      getFormOptions(),
+      loadTalk(talkId),
+      loadTalkTopics(talkId),
+      loadFormOptions(),
     ]);
 
   if (!talk) {

@@ -15,7 +15,7 @@ import { JsonLd } from '@/components/json-ld';
 import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { TalksListSkeleton } from '@/features/talks/components/talks-list-skeleton';
-import { getTopicBySlug } from '@/features/topics/queries/get-topic-by-slug';
+import { loadTopicBySlug } from '@/features/topics/queries/load-topic-by-slug';
 import { buildTopicUrl, buildTopicsPath } from '@/features/topics/utils';
 import { buildBreadcrumbJsonLd } from '@/lib/json-ld';
 
@@ -30,7 +30,7 @@ interface TopicPageContentProps {
 }
 
 async function TopicHeader({ topicSlug }: { topicSlug: string }) {
-  const topicResult = await getTopicBySlug({ slug: topicSlug });
+  const topicResult = await loadTopicBySlug({ slug: topicSlug });
 
   if (!topicResult) {
     notFound();

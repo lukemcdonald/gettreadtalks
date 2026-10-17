@@ -13,7 +13,7 @@ import {
 import { buildClipUrl } from '@/features/clips/utils';
 import { getSpeakerName } from '@/features/speakers/utils';
 import { buildTalkUrl } from '@/features/talks/utils';
-import { getUserFavorites } from '@/features/users/queries/get-user-favorites';
+import { loadUserFavorites } from '@/features/users/queries/load-user-favorites';
 
 import {
   FavoriteClipRow,
@@ -22,7 +22,7 @@ import {
 import { FavoriteTalkRow } from './_components/favorite-talk-row';
 import { FavoritesTabPanel } from './_components/favorites-tab-panel';
 
-type UserFavorites = Awaited<ReturnType<typeof getUserFavorites>>;
+type UserFavorites = Awaited<ReturnType<typeof loadUserFavorites>>;
 
 function FavoritesTab({
   count,
@@ -137,7 +137,7 @@ function FavoritesTabs({ clips, speakers, talks }: UserFavorites) {
 }
 
 export default async function FavoritesPage() {
-  const { clips, speakers, talks } = await getUserFavorites();
+  const { clips, speakers, talks } = await loadUserFavorites();
   const total = clips.length + speakers.length + talks.length;
 
   return (

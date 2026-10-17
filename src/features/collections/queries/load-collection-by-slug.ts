@@ -5,7 +5,7 @@ import { cacheLife, cacheTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
 
-export async function getCollectionBySlug(slug: string) {
+export async function loadCollectionBySlug(slug: string) {
   cacheLife('hours');
   cacheTag('collections');
 
