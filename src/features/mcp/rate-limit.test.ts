@@ -1,6 +1,9 @@
 import { describe, expect, it } from '@/test';
 
-import { createMcpRateLimitedHandler, mcpRateLimitKey } from './rate-limit';
+import {
+  createMcpRateLimitedHandler,
+  buildMcpRateLimitKey,
+} from './rate-limit';
 
 function mcpRequest(headers: Record<string, string>) {
   return new Request('https://www.gettreadtalks.com/mcp', {
@@ -9,9 +12,9 @@ function mcpRequest(headers: Record<string, string>) {
   });
 }
 
-describe('mcpRateLimitKey', () => {
+describe('buildMcpRateLimitKey', () => {
   it('prefers cf-connecting-ip over x-forwarded-for', () => {
-    const key = mcpRateLimitKey(
+    const key = buildMcpRateLimitKey(
       mcpRequest({
         'cf-connecting-ip': '1.1.1.1',
         'x-forwarded-for': '8.8.8.8',
@@ -22,7 +25,7 @@ describe('mcpRateLimitKey', () => {
   });
 
   it('prefers x-real-ip over x-forwarded-for', () => {
-    const key = mcpRateLimitKey(
+    const key = buildMcpRateLimitKey(
       mcpRequest({
         'x-forwarded-for': '8.8.8.8',
         'x-real-ip': '9.9.9.9',
@@ -33,14 +36,14 @@ describe('mcpRateLimitKey', () => {
   });
 
   it('hashes the trusted ip when a server secret is set', () => {
-    const spoofed = mcpRateLimitKey(
+    const spoofed = buildMcpRateLimitKey(
       mcpRequest({
         'x-forwarded-for': '8.8.8.8',
         'x-real-ip': '9.9.9.9',
       }),
       'server-secret'
     );
-    const trusted = mcpRateLimitKey(
+    const trusted = buildMcpRateLimitKey(
       mcpRequest({ 'x-real-ip': '9.9.9.9' }),
       'server-secret'
     );

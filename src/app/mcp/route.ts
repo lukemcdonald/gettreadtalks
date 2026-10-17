@@ -7,7 +7,7 @@ import { loadCollections } from '@/features/collections/queries/load-collections
 import {
   createMcpRateLimitedHandler,
   mcpLimiterToken,
-  mcpRateLimitKey,
+  buildMcpRateLimitKey,
   withMcpCors,
 } from '@/features/mcp/rate-limit';
 import { createTreadMcpHandler } from '@/features/mcp/tools';
@@ -39,7 +39,7 @@ async function consumeMcpRateLimit(request: Request) {
 
   try {
     return await fetchMutation(api.model.auth.rateLimiter.checkMcp, {
-      key: mcpRateLimitKey(request, secret),
+      key: buildMcpRateLimitKey(request, secret),
       token,
     });
   } catch {

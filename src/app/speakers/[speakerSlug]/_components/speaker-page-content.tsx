@@ -7,10 +7,10 @@ import { SpeakerContentSections } from '@/app/speakers/[speakerSlug]/_components
 import { SpeakerHero } from '@/app/speakers/[speakerSlug]/_components/speaker-hero';
 import { SpeakerHeroSkeleton } from '@/app/speakers/[speakerSlug]/_components/speaker-hero-skeleton';
 import {
-  featuredHeroCandidates,
-  speakerTalkLayout,
+  getFeaturedHeroCandidates,
+  getSpeakerTalkLayout,
 } from '@/app/speakers/[speakerSlug]/_components/speaker-hero-talks';
-import { speakerJsonLd } from '@/app/speakers/[speakerSlug]/_components/speaker-json-ld';
+import { buildSpeakerJsonLd } from '@/app/speakers/[speakerSlug]/_components/speaker-json-ld';
 import { SpeakerContentSkeleton } from '@/app/speakers/[speakerSlug]/_components/speaker-page-skeleton';
 import { JsonLd } from '@/components/json-ld';
 import { EditorialProfileLayout } from '@/components/layouts';
@@ -27,9 +27,9 @@ interface SpeakerPageContentProps {
   params: Promise<{ speakerSlug: string }>;
 }
 
-async function featuredTalkForHero(talks: Talk[]) {
+async function loadFeaturedTalkForHero(talks: Talk[]) {
   const [featuredTalk] = await rotateCachedContent(
-    featuredHeroCandidates(talks),
+    getFeaturedHeroCandidates(talks),
     {
       count: 1,
       period: 'daily',
@@ -47,9 +47,9 @@ async function SpeakerHeroSection({ speakerSlug }: { speakerSlug: string }) {
   }
 
   const { speaker, talks } = data;
-  const { featuredTalk } = speakerTalkLayout(
+  const { featuredTalk } = getSpeakerTalkLayout(
     talks,
-    await featuredTalkForHero(talks)
+    await loadFeaturedTalkForHero(talks)
   );
   const name = getSpeakerName(speaker);
   const segments = [
@@ -61,7 +61,7 @@ async function SpeakerHeroSection({ speakerSlug }: { speakerSlug: string }) {
     <>
       <JsonLd data={buildBreadcrumbJsonLd(segments)} />
       <JsonLd
-        data={speakerJsonLd({
+        data={buildSpeakerJsonLd({
           description: speaker.description,
           imageUrl: speaker.imageUrl,
           name,
@@ -82,9 +82,9 @@ async function SpeakerRelatedContent({ speakerSlug }: { speakerSlug: string }) {
   }
 
   const { clips, collections, speaker, talks } = data;
-  const { featuredTalk, remainingTalks } = speakerTalkLayout(
+  const { featuredTalk, remainingTalks } = getSpeakerTalkLayout(
     talks,
-    await featuredTalkForHero(talks)
+    await loadFeaturedTalkForHero(talks)
   );
 
   return (

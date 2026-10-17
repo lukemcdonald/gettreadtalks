@@ -12,8 +12,8 @@ import {
   getEntityMenuItems,
 } from '@/components/actions-group';
 import { toastManager } from '@/components/ui/primitives/toast';
-import { destroySpeakerAction } from '@/features/speakers/actions/destroy-speaker';
-import { getErrorMessage } from '@/services/errors';
+import { deleteSpeakerAction } from '@/features/speakers/actions/delete-speaker';
+import { formatErrorMessage } from '@/services/errors';
 import { pluralize } from '@/utils';
 
 interface SpeakerActionsMenuProps {
@@ -41,7 +41,7 @@ export function SpeakerActionsMenu({
     setIsDeleting(true);
 
     try {
-      const result = await destroySpeakerAction(speakerId);
+      const result = await deleteSpeakerAction(speakerId);
 
       if (result.success) {
         toastManager.add({ title: 'Speaker deleted', type: 'success' });
@@ -56,7 +56,7 @@ export function SpeakerActionsMenu({
       }
     } catch (error: unknown) {
       toastManager.add({
-        description: getErrorMessage(error),
+        description: formatErrorMessage(error),
         title: 'Failed to delete speaker',
         type: 'error',
       });

@@ -1,4 +1,4 @@
-import { getErrorMessage } from './utils';
+import { formatErrorMessage } from './utils';
 
 /**
  * Fallback Sentry reporting for environments with no native exception
@@ -53,7 +53,10 @@ export async function reportSentryException(params: {
       console.error('Sentry rejected the event envelope:', response.status);
     }
   } catch (error) {
-    console.error('Failed to report event to Sentry:', getErrorMessage(error));
+    console.error(
+      'Failed to report event to Sentry:',
+      formatErrorMessage(error)
+    );
   }
 }
 

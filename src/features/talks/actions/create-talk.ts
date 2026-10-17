@@ -6,10 +6,7 @@ import type { ActionResult } from '@/lib/forms/types';
 import { updateTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
-import {
-  mapConvexErrorToFormErrors,
-  mapZodErrors,
-} from '@/lib/forms/validation';
+import { toConvexFormErrors, toZodFormErrors } from '@/lib/forms/validation';
 import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
 
 import { talkFormSchema } from '../schemas/talk-form';
@@ -27,7 +24,7 @@ export async function createTalkAction(
 
   if (!parsed.success) {
     return {
-      errors: mapZodErrors(parsed.error),
+      errors: toZodFormErrors(parsed.error),
       success: false,
     };
   }
@@ -45,7 +42,7 @@ export async function createTalkAction(
     };
   } catch (error) {
     return {
-      errors: mapConvexErrorToFormErrors(error),
+      errors: toConvexFormErrors(error),
       success: false,
     };
   }

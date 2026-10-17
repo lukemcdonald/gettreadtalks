@@ -1,17 +1,17 @@
 import { site } from '@/configs/site';
 import { describe, expect, it } from '@/test';
 
-import { pageMetadata } from './metadata';
+import { buildPageMetadata } from './metadata';
 
-describe('pageMetadata', () => {
+describe('buildPageMetadata', () => {
   it('keeps siteName and locale when a page sets an openGraph type', () => {
-    const talk = pageMetadata({
+    const talk = buildPageMetadata({
       canonical: '/talks/lloyd-jones/the-cross',
       description: 'A talk by Martyn Lloyd-Jones. Romans 3:21-26',
       openGraphType: 'video.other',
       title: 'The Cross',
     });
-    const speaker = pageMetadata({
+    const speaker = buildPageMetadata({
       canonical: '/speakers/lloyd-jones',
       description: 'Martyn Lloyd-Jones — faithful minister of the Gospel.',
       openGraphType: 'profile',
@@ -34,7 +34,7 @@ describe('pageMetadata', () => {
   });
 
   it('omits openGraph so pages inherit siteName and locale from the root', () => {
-    const topic = pageMetadata({
+    const topic = buildPageMetadata({
       canonical: '/topics/justification',
       description: 'Talks on justification.',
       title: 'Justification',

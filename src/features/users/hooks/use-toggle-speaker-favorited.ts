@@ -7,7 +7,7 @@ import { useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { revalidateUserLists } from '@/features/users/actions/revalidate-user-lists';
 import { useMutation, useOptimisticToggle } from '@/hooks';
-import { speakerTrackProps, track } from '@/services/analytics';
+import { buildSpeakerTrackProps, track } from '@/services/analytics';
 
 export function useToggleSpeakerFavorited({
   speaker,
@@ -32,7 +32,7 @@ export function useToggleSpeakerFavorited({
     onError: clearOptimistic,
     onSuccess: () => {
       void revalidateUserLists();
-      track('speaker_favorited', speakerTrackProps(speaker));
+      track('speaker_favorited', buildSpeakerTrackProps(speaker));
     },
   });
 
@@ -40,7 +40,7 @@ export function useToggleSpeakerFavorited({
     onError: clearOptimistic,
     onSuccess: () => {
       void revalidateUserLists();
-      track('speaker_unfavorited', speakerTrackProps(speaker));
+      track('speaker_unfavorited', buildSpeakerTrackProps(speaker));
     },
   });
 

@@ -2,7 +2,7 @@ import { ConvexError } from 'convex/values';
 
 import { describe, expect, it } from '@/test';
 
-import { getErrorMessage } from './convex';
+import { formatErrorMessage } from './convex';
 import {
   looksLikeDeveloperError,
   reportUnexpectedError,
@@ -51,24 +51,24 @@ describe('toUserErrorMessage', () => {
   });
 });
 
-describe('getErrorMessage', () => {
+describe('formatErrorMessage', () => {
   it('keeps structured Convex user messages', () => {
     const error = new ConvexError({
       message: 'Already taken',
     });
 
-    expect(getErrorMessage(error)).toBe('Already taken');
+    expect(formatErrorMessage(error)).toBe('Already taken');
   });
 
   it('hides raw Error messages and config leaks', () => {
-    expect(getErrorMessage(new Error('Something broke'))).toBe(
+    expect(formatErrorMessage(new Error('Something broke'))).toBe(
       USER_ERROR_MESSAGE
     );
-    expect(getErrorMessage(new Error('Set NEXT_PUBLIC_CONVEX_URL'))).toBe(
+    expect(formatErrorMessage(new Error('Set NEXT_PUBLIC_CONVEX_URL'))).toBe(
       USER_ERROR_MESSAGE
     );
     expect(
-      getErrorMessage(
+      formatErrorMessage(
         new ConvexError({
           message: 'NEXT_PUBLIC_CONVEX_URL is not set',
         })

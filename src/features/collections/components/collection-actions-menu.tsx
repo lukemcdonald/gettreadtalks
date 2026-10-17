@@ -12,8 +12,8 @@ import {
   getEntityMenuItems,
 } from '@/components/actions-group';
 import { toastManager } from '@/components/ui/primitives/toast';
-import { destroyCollectionAction } from '@/features/collections/actions/destroy-collection';
-import { getErrorMessage } from '@/services/errors';
+import { deleteCollectionAction } from '@/features/collections/actions/delete-collection';
+import { formatErrorMessage } from '@/services/errors';
 import { pluralize } from '@/utils';
 
 interface CollectionActionsMenuProps {
@@ -37,7 +37,7 @@ export function CollectionActionsMenu({
     setIsDeleting(true);
 
     try {
-      const result = await destroyCollectionAction(collectionId);
+      const result = await deleteCollectionAction(collectionId);
 
       if (result.success) {
         toastManager.add({ title: 'Collection deleted', type: 'success' });
@@ -52,7 +52,7 @@ export function CollectionActionsMenu({
       }
     } catch (error: unknown) {
       toastManager.add({
-        description: getErrorMessage(error),
+        description: formatErrorMessage(error),
         title: 'Failed to delete collection',
         type: 'error',
       });

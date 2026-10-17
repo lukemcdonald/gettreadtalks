@@ -1,15 +1,15 @@
 import { site } from '@/configs/site';
-import { talkListItemsJsonLd } from '@/features/talks/utils';
+import { buildTalkListItemsJsonLd } from '@/features/talks/utils';
 import { buildTopicUrl } from '@/features/topics/utils';
 
 interface TopicJsonLdInput {
   description: string;
-  talks: Parameters<typeof talkListItemsJsonLd>[0];
+  talks: Parameters<typeof buildTalkListItemsJsonLd>[0];
   title: string;
   topicSlug: string;
 }
 
-export function topicJsonLd({
+export function buildTopicJsonLd({
   description,
   talks,
   title,
@@ -19,7 +19,7 @@ export function topicJsonLd({
     '@context': 'https://schema.org',
     '@type': 'ItemList',
     description,
-    itemListElement: talkListItemsJsonLd(talks),
+    itemListElement: buildTalkListItemsJsonLd(talks),
     name: title,
     url: `${site.url}${buildTopicUrl(topicSlug)}`,
   };

@@ -3,7 +3,7 @@ import { Suspense } from 'react';
 
 import { TalkContentSections } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-content-sections';
 import { TalkHero } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-hero';
-import { talkJsonLd } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-json-ld';
+import { buildTalkJsonLd } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-json-ld';
 import {
   TalkPageSkeleton,
   TalkRelatedTalksSkeleton,
@@ -41,7 +41,9 @@ function TalkDetail({ speakerSlug, talkResult, talkSlug }: TalkDetailProps) {
   return (
     <>
       <JsonLd data={buildBreadcrumbJsonLd(segments)} />
-      <JsonLd data={talkJsonLd({ speaker, speakerSlug, talk, talkSlug })} />
+      <JsonLd
+        data={buildTalkJsonLd({ speaker, speakerSlug, talk, talkSlug })}
+      />
       <EditorialProfileLayout
         content={
           <TalkContentSections

@@ -18,7 +18,7 @@ function text(value: unknown) {
   return typeof value === 'string' && value.trim() ? value.trim() : undefined;
 }
 
-export function mcpToolCallProperties({
+export function buildMcpToolCallProperties({
   durationMs: duration_ms,
   error,
   query,
@@ -54,7 +54,7 @@ export function withToolTracking<H>(toolName: string, handler: H): H {
         Promise.resolve({
           anonymousId: extra.sessionId ?? randomUUID(),
           event: 'mcp_tool_called',
-          properties: mcpToolCallProperties({
+          properties: buildMcpToolCallProperties({
             durationMs: Math.round(performance.now() - startedAt),
             error,
             query: text(args.query) ?? text(args.search),

@@ -7,7 +7,7 @@ import { useQuery } from 'convex/react';
 
 import { api } from '@/convex/_generated/api';
 import { useMutation, useOptimisticToggle } from '@/hooks';
-import { talkTrackProps, track } from '@/services/analytics';
+import { buildTalkTrackProps, track } from '@/services/analytics';
 
 export function useToggleTalkFeatured({
   speaker,
@@ -29,7 +29,7 @@ export function useToggleTalkFeatured({
       }
       track(
         next ? 'talk_featured' : 'talk_unfeatured',
-        talkTrackProps(talk, speaker)
+        buildTalkTrackProps(talk, speaker)
       );
     },
   });

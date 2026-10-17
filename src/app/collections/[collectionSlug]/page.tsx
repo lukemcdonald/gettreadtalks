@@ -2,9 +2,9 @@ import type { Metadata } from 'next';
 
 import { notFound } from 'next/navigation';
 
-import { collectionJsonLd } from '@/app/collections/[collectionSlug]/_components/collection-json-ld';
+import { buildCollectionJsonLd } from '@/app/collections/[collectionSlug]/_components/collection-json-ld';
 import { CollectionSidebar } from '@/app/collections/[collectionSlug]/_components/collection-sidebar';
-import { uniqueSpeakersFromTalks } from '@/app/collections/[collectionSlug]/_components/unique-speakers';
+import { getUniqueSpeakersFromTalks } from '@/app/collections/[collectionSlug]/_components/unique-speakers';
 import { AdminEditButton } from '@/components/admin-edit-button';
 import { ArchiveBackLink } from '@/components/archive-back-link';
 import { JsonLd } from '@/components/json-ld';
@@ -17,7 +17,7 @@ import {
   buildCollectionsPath,
 } from '@/features/collections/utils';
 import { buildBreadcrumbJsonLd } from '@/lib/json-ld';
-import { pageMetadata } from '@/lib/metadata';
+import { buildPageMetadata } from '@/lib/metadata';
 
 interface CollectionPageProps {
   params: Promise<{ collectionSlug: string }>;
@@ -35,7 +35,7 @@ export async function generateMetadata({
 
   const { collection } = data;
 
-  return pageMetadata({
+  return buildPageMetadata({
     canonical: buildCollectionUrl(collectionSlug),
     description: collection.description,
     title: collection.title,
@@ -51,7 +51,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
   }
 
   const { collection, talks } = data;
-  const uniqueSpeakers = uniqueSpeakersFromTalks(talks);
+  const uniqueSpeakers = getUniqueSpeakersFromTalks(talks);
   const segments = [
     { href: buildCollectionsPath(), label: 'Collections' },
     { href: buildCollectionUrl(collectionSlug), label: collection.title },
@@ -61,7 +61,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
     <>
       <JsonLd data={buildBreadcrumbJsonLd(segments)} />
       <JsonLd
-        data={collectionJsonLd({
+        data={buildCollectionJsonLd({
           collectionSlug,
           description: collection.description,
           talks,

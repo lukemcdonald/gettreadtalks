@@ -3,14 +3,14 @@ interface TrackEntity {
   slug: string;
 }
 
-export function speakerTrackProps(speaker: TrackEntity) {
+export function buildSpeakerTrackProps(speaker: TrackEntity) {
   return {
     speaker_id: speaker._id,
     speaker_slug: speaker.slug,
   };
 }
 
-export function talkTrackProps(
+export function buildTalkTrackProps(
   talk: TrackEntity,
   speaker?: TrackEntity | null
 ) {

@@ -10,7 +10,7 @@ import { useSearchSite } from '@/features/search/hooks/use-search-site';
 import {
   getHeaderSearchQueryAfterClose,
   getHeaderSearchState,
-  getSearchHotkeyLabel,
+  formatSearchHotkeyLabel,
   isSearchHotkey,
   OPEN_HEADER_SEARCH_EVENT,
   SEARCH_DEBOUNCE_MS,
@@ -19,15 +19,15 @@ import {
 } from '@/features/search/utils';
 import { useCurrentUser } from '@/features/users/hooks/use-current-user';
 
-function getClientSearchHotkeyLabel() {
+function formatClientSearchHotkeyLabel() {
   if (typeof window === 'undefined') {
-    return getServerSearchHotkeyLabel();
+    return formatServerSearchHotkeyLabel();
   }
 
-  return getSearchHotkeyLabel(navigator.userAgent);
+  return formatSearchHotkeyLabel(navigator.userAgent);
 }
 
-function getServerSearchHotkeyLabel() {
+function formatServerSearchHotkeyLabel() {
   return '⌘K';
 }
 
@@ -38,8 +38,8 @@ function subscribeSearchHotkey() {
 export function useSearchHotkeyLabel() {
   return useSyncExternalStore(
     subscribeSearchHotkey,
-    getClientSearchHotkeyLabel,
-    getServerSearchHotkeyLabel
+    formatClientSearchHotkeyLabel,
+    formatServerSearchHotkeyLabel
   );
 }
 

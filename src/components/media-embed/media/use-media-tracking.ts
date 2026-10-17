@@ -26,7 +26,7 @@ function playbackProgress(media: HTMLMediaElement) {
   );
 }
 
-function talkPlaybackProps(
+function buildTalkPlaybackProps(
   context: Extract<MediaTrackingContext, { entityType: 'talk' }>
 ) {
   return {
@@ -53,7 +53,7 @@ export function useMediaTracking({
     if (trackingContext.entityType === 'talk') {
       track('talk_played', {
         media_type: mediaType,
-        ...talkPlaybackProps(trackingContext),
+        ...buildTalkPlaybackProps(trackingContext),
       });
     } else {
       track('clip_played', {
@@ -77,7 +77,7 @@ export function useMediaTracking({
     if (trackingContext.entityType === 'talk') {
       track('talk_paused', {
         progress_pct,
-        ...talkPlaybackProps(trackingContext),
+        ...buildTalkPlaybackProps(trackingContext),
       });
     } else {
       track('clip_paused', {
@@ -94,7 +94,7 @@ export function useMediaTracking({
     }
 
     if (trackingContext.entityType === 'talk') {
-      track('talk_completed', talkPlaybackProps(trackingContext));
+      track('talk_completed', buildTalkPlaybackProps(trackingContext));
     } else {
       track('clip_completed', {
         clip_id: trackingContext.entityId,

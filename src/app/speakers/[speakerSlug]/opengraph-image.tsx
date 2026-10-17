@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 
 import { loadSpeakerBySlug } from '@/features/speakers/queries/load-speaker-by-slug';
-import { shareImage, sharePropsForSpeaker } from '@/lib/og/share-image';
+import { shareImage, buildSharePropsForSpeaker } from '@/lib/og/share-image';
 
 export { alt, contentType, size } from '@/lib/og/share-image';
 
@@ -17,5 +17,5 @@ export default async function Image({ params }: SpeakerShareImageProps) {
     notFound();
   }
 
-  return shareImage(sharePropsForSpeaker(data.speaker));
+  return shareImage(buildSharePropsForSpeaker(data.speaker));
 }

@@ -14,8 +14,8 @@ vi.mock('next/navigation', () => ({
   }),
 }));
 
-vi.mock('@/features/speakers/actions/destroy-speaker', () => ({
-  destroySpeakerAction: vi.fn(),
+vi.mock('@/features/speakers/actions/delete-speaker', () => ({
+  deleteSpeakerAction: vi.fn(),
 }));
 
 vi.mock('@/components/ui/primitives/toast', () => ({

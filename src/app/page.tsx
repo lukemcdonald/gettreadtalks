@@ -9,7 +9,7 @@ import { loadFeaturedSpeakers } from '@/features/speakers/queries/load-featured-
 import { TalkCard } from '@/features/talks/components/talk-card';
 import { loadFeaturedTalks } from '@/features/talks/queries/load-featured-talks';
 
-function websiteJsonLd() {
+function buildWebsiteJsonLd() {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
@@ -38,7 +38,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <JsonLd data={websiteJsonLd()} />
+      <JsonLd data={buildWebsiteJsonLd()} />
       <Main>
         <Section spacing="xl">
           <Container>

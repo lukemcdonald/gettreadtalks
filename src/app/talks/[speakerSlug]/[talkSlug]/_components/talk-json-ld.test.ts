@@ -2,13 +2,13 @@ import { buildTalkUrl, buildTalksPath } from '@/features/talks/utils';
 import { buildBreadcrumbJsonLd } from '@/lib/json-ld';
 import { describe, expect, it } from '@/test';
 
-import { talkJsonLd } from './talk-json-ld';
+import { buildTalkJsonLd } from './talk-json-ld';
 
 const speaker = { firstName: 'Martyn', lastName: 'Lloyd-Jones' };
 
-describe('talkJsonLd', () => {
+describe('buildTalkJsonLd', () => {
   it('uses the talk page url and speaker as creator', () => {
-    const result = talkJsonLd({
+    const result = buildTalkJsonLd({
       speaker,
       speakerSlug: 'lloyd-jones',
       talk: { title: 'The Cross' },
@@ -25,7 +25,7 @@ describe('talkJsonLd', () => {
   });
 
   it('adds ISO uploadDate when publishedAt is present', () => {
-    const result = talkJsonLd({
+    const result = buildTalkJsonLd({
       speaker,
       speakerSlug: 'lloyd-jones',
       talk: { publishedAt: Date.UTC(2020, 0, 15), title: 'The Cross' },
@@ -36,7 +36,7 @@ describe('talkJsonLd', () => {
   });
 
   it('uses _creationTime for uploadDate when publishedAt is missing', () => {
-    const result = talkJsonLd({
+    const result = buildTalkJsonLd({
       speaker,
       speakerSlug: 'lloyd-jones',
       talk: { _creationTime: Date.UTC(2019, 5, 1), title: 'The Cross' },
@@ -47,7 +47,7 @@ describe('talkJsonLd', () => {
   });
 
   it('prefers publishedAt over _creationTime for uploadDate', () => {
-    const result = talkJsonLd({
+    const result = buildTalkJsonLd({
       speaker,
       speakerSlug: 'lloyd-jones',
       talk: {
@@ -62,7 +62,7 @@ describe('talkJsonLd', () => {
   });
 
   it('omits creator and uploadDate when those fields are missing', () => {
-    const result = talkJsonLd({
+    const result = buildTalkJsonLd({
       speaker: null,
       speakerSlug: 'lloyd-jones',
       talk: { title: 'The Cross' },
@@ -74,7 +74,7 @@ describe('talkJsonLd', () => {
   });
 
   it('sets thumbnailUrl from the YouTube id', () => {
-    const result = talkJsonLd({
+    const result = buildTalkJsonLd({
       speaker,
       speakerSlug: 'lloyd-jones',
       talk: {
@@ -91,7 +91,7 @@ describe('talkJsonLd', () => {
   });
 
   it('falls back to title, speaker, and scripture when description is missing', () => {
-    const result = talkJsonLd({
+    const result = buildTalkJsonLd({
       speaker,
       speakerSlug: 'lloyd-jones',
       talk: { scripture: 'Romans 3:21-26', title: 'The Cross' },
@@ -104,7 +104,7 @@ describe('talkJsonLd', () => {
   });
 
   it('uses the talk description when it is present', () => {
-    const result = talkJsonLd({
+    const result = buildTalkJsonLd({
       speaker,
       speakerSlug: 'lloyd-jones',
       talk: {

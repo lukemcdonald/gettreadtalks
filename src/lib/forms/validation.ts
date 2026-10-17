@@ -3,8 +3,8 @@ import type { ZodError } from 'zod';
 
 import { ErrorCodes } from '@/services/errors/constants';
 import {
+  formatErrorMessage,
   getConvexErrorData,
-  getErrorMessage,
   isConvexError,
 } from '@/services/errors/convex';
 
@@ -19,11 +19,11 @@ import {
  * ```ts
  * const parsed = schema.safeParse(data);
  * if (!parsed.success) {
- *   return { success: false, errors: mapZodErrors(parsed.error) };
+ *   return { success: false, errors: toZodFormErrors(parsed.error) };
  * }
  * ```
  */
-export function mapZodErrors(zodError: ZodError): Record<string, string> {
+export function toZodFormErrors(zodError: ZodError): Record<string, string> {
   const errors: Record<string, string> = {};
   for (const err of zodError.issues) {
     const field = err.path[0] as string;
@@ -44,14 +44,12 @@ export function mapZodErrors(zodError: ZodError): Record<string, string> {
  * @example
  * ```ts
  * catch (error) {
- *   return { success: false, errors: mapConvexErrorToFormErrors(error) };
+ *   return { success: false, errors: toConvexFormErrors(error) };
  * }
  * ```
  */
-export function mapConvexErrorToFormErrors(
-  error: unknown
-): Record<string, string> {
-  const errorMessage = getErrorMessage(error);
+export function toConvexFormErrors(error: unknown): Record<string, string> {
+  const errorMessage = formatErrorMessage(error);
 
   // If it's a structured Convex error, extract field information
   if (isConvexError(error)) {

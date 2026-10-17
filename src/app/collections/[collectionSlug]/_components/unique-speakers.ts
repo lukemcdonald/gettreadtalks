@@ -1,4 +1,4 @@
-export function uniqueSpeakersFromTalks<TSpeaker extends { _id: string }>(
+export function getUniqueSpeakersFromTalks<TSpeaker extends { _id: string }>(
   talks: { speaker: TSpeaker | null }[]
 ) {
   const speakers = talks

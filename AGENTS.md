@@ -188,9 +188,9 @@ Actions use `updateTag()` for read-your-writes. Use `revalidateTag()` for backgr
 
 ### Error Handling
 
-**Convex Mutations** — `useMutation` from `@/hooks`; map failures with `getErrorMessage`.
+**Convex Mutations** — `useMutation` from `@/hooks`; map failures with `formatErrorMessage`.
 
-**Server Actions** — try/catch and return `mapConvexErrorToFormErrors(error)`.
+**Server Actions** — try/catch and return `toConvexFormErrors(error)`.
 
 ## React
 

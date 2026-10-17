@@ -26,7 +26,7 @@ function sha256Hex(value: string) {
   return createHash('sha256').update(value).digest('hex');
 }
 
-export function mcpRateLimitKey(request: Request, secret?: string) {
+export function buildMcpRateLimitKey(request: Request, secret?: string) {
   const ip = getClientIp(request);
 
   if (!secret) {

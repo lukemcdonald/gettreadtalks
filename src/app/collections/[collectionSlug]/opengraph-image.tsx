@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 
 import { loadCollectionBySlug } from '@/features/collections/queries/load-collection-by-slug';
-import { shareImage, sharePropsForCollection } from '@/lib/og/share-image';
+import { shareImage, buildSharePropsForCollection } from '@/lib/og/share-image';
 
 export { alt, contentType, size } from '@/lib/og/share-image';
 
@@ -20,7 +20,7 @@ export default async function Image({ params }: CollectionShareImageProps) {
   const { collection, talks } = data;
 
   return shareImage(
-    sharePropsForCollection({
+    buildSharePropsForCollection({
       talkCount: talks.length,
       title: collection.title,
     })

@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 
 import { loadTalkBySlug } from '@/features/talks/queries/load-talk-by-slug';
-import { shareImage, sharePropsForTalk } from '@/lib/og/share-image';
+import { shareImage, buildSharePropsForTalk } from '@/lib/og/share-image';
 
 export { alt, contentType, size } from '@/lib/og/share-image';
 
@@ -23,7 +23,7 @@ export default async function Image({ params }: TalkShareImageProps) {
   const { speaker, talk } = talkResult;
 
   return shareImage(
-    sharePropsForTalk({
+    buildSharePropsForTalk({
       speaker,
       title: talk.title,
     })

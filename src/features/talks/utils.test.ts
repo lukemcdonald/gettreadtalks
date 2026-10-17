@@ -2,8 +2,8 @@ import { describe, expect, it } from '@/test';
 
 import {
   buildTalksPath,
-  talkListItemsJsonLd,
-  talkMetaDescription,
+  buildTalkListItemsJsonLd,
+  formatTalkMetaDescription,
 } from './utils';
 
 describe('buildTalksPath', () => {
@@ -12,9 +12,9 @@ describe('buildTalksPath', () => {
   });
 });
 
-describe('talkListItemsJsonLd', () => {
+describe('buildTalkListItemsJsonLd', () => {
   it('uses a talk url when the speaker is present', () => {
-    const [item] = talkListItemsJsonLd([
+    const [item] = buildTalkListItemsJsonLd([
       {
         slug: 'the-cross',
         speaker: { slug: 'lloyd-jones' },
@@ -33,7 +33,7 @@ describe('talkListItemsJsonLd', () => {
   });
 
   it('omits the talk url when the speaker is missing', () => {
-    const [item] = talkListItemsJsonLd([
+    const [item] = buildTalkListItemsJsonLd([
       { slug: 'orphan', speaker: null, title: 'Orphan talk' },
     ]);
 
@@ -46,10 +46,10 @@ describe('talkListItemsJsonLd', () => {
   });
 });
 
-describe('talkMetaDescription', () => {
+describe('formatTalkMetaDescription', () => {
   it('includes scripture and topics when they are present', () => {
     expect(
-      talkMetaDescription({
+      formatTalkMetaDescription({
         description: 'A sermon on justification.',
         scripture: 'Romans 3:21-26',
         speakerName: 'Martyn Lloyd-Jones',
@@ -62,7 +62,7 @@ describe('talkMetaDescription', () => {
 
   it('falls back to the speaker when the talk has no description', () => {
     expect(
-      talkMetaDescription({
+      formatTalkMetaDescription({
         speakerName: 'Martyn Lloyd-Jones',
       })
     ).toBe('A talk by Martyn Lloyd-Jones.');
@@ -70,7 +70,7 @@ describe('talkMetaDescription', () => {
 
   it('omits scripture and topics when they are missing', () => {
     expect(
-      talkMetaDescription({
+      formatTalkMetaDescription({
         description: 'A sermon on justification.',
         speakerName: 'Martyn Lloyd-Jones',
       })

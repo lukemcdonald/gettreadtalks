@@ -1,4 +1,4 @@
-import { mediaJsonLd } from '@/components/media-embed/utils';
+import { buildMediaJsonLd } from '@/components/media-embed/utils';
 import { site } from '@/configs/site';
 import { getSpeakerName } from '@/features/speakers/utils';
 import { buildTalkUrl } from '@/features/talks/utils';
@@ -17,7 +17,7 @@ interface TalkJsonLdInput {
   talkSlug: string;
 }
 
-function talkJsonLdDescription({
+function formatTalkJsonLdDescription({
   description,
   scripture,
   speakerName,
@@ -43,7 +43,7 @@ function talkJsonLdDescription({
     .join(' ');
 }
 
-export function talkJsonLd({
+export function buildTalkJsonLd({
   speaker,
   speakerSlug,
   talk,
@@ -54,8 +54,8 @@ export function talkJsonLd({
 
   return {
     '@context': 'https://schema.org',
-    ...mediaJsonLd(talk.mediaUrl),
-    description: talkJsonLdDescription({
+    ...buildMediaJsonLd(talk.mediaUrl),
+    description: formatTalkJsonLdDescription({
       description: talk.description,
       scripture: talk.scripture,
       speakerName,

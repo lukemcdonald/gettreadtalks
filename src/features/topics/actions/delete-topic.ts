@@ -7,10 +7,10 @@ import type { ActionResult } from '@/lib/forms/types';
 import { updateTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
-import { mapConvexErrorToFormErrors } from '@/lib/forms/validation';
+import { toConvexFormErrors } from '@/lib/forms/validation';
 import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
 
-export async function destroyTopicAction(
+export async function deleteTopicAction(
   topicId: TopicId
 ): Promise<ActionResult<null>> {
   await requireAdminUser();
@@ -26,7 +26,7 @@ export async function destroyTopicAction(
     };
   } catch (error) {
     return {
-      errors: mapConvexErrorToFormErrors(error),
+      errors: toConvexFormErrors(error),
       success: false,
     };
   }

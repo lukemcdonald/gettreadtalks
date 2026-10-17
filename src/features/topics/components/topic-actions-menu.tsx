@@ -12,8 +12,8 @@ import {
   getEntityMenuItems,
 } from '@/components/actions-group';
 import { toastManager } from '@/components/ui/primitives/toast';
-import { destroyTopicAction } from '@/features/topics/actions/destroy-topic';
-import { getErrorMessage } from '@/services/errors';
+import { deleteTopicAction } from '@/features/topics/actions/delete-topic';
+import { formatErrorMessage } from '@/services/errors';
 import { pluralize } from '@/utils';
 
 interface TopicActionsMenuProps {
@@ -37,7 +37,7 @@ export function TopicActionsMenu({
     setIsDeleting(true);
 
     try {
-      const result = await destroyTopicAction(topicId);
+      const result = await deleteTopicAction(topicId);
 
       if (result.success) {
         toastManager.add({ title: 'Topic deleted', type: 'success' });
@@ -52,7 +52,7 @@ export function TopicActionsMenu({
       }
     } catch (error: unknown) {
       toastManager.add({
-        description: getErrorMessage(error),
+        description: formatErrorMessage(error),
         title: 'Failed to delete topic',
         type: 'error',
       });

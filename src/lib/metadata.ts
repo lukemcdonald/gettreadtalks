@@ -7,7 +7,7 @@ const openGraphDefaults = {
   siteName: site.name,
 } as const;
 
-export function pageMetadata({
+export function buildPageMetadata({
   canonical,
   description,
   openGraphType,

@@ -8,10 +8,7 @@ import { updateTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
 import { stripEmptyStrings } from '@/lib/forms/schemas';
-import {
-  mapConvexErrorToFormErrors,
-  mapZodErrors,
-} from '@/lib/forms/validation';
+import { toConvexFormErrors, toZodFormErrors } from '@/lib/forms/validation';
 import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
 
 import { collectionFormSchema } from '../schemas/collection-form';
@@ -26,7 +23,7 @@ export async function updateCollectionAction(
 
   if (!parsed.success) {
     return {
-      errors: mapZodErrors(parsed.error),
+      errors: toZodFormErrors(parsed.error),
       success: false,
     };
   }
@@ -46,7 +43,7 @@ export async function updateCollectionAction(
     };
   } catch (error) {
     return {
-      errors: mapConvexErrorToFormErrors(error),
+      errors: toConvexFormErrors(error),
       success: false,
     };
   }

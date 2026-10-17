@@ -6,7 +6,7 @@ import { SpeakerPageContent } from '@/app/speakers/[speakerSlug]/_components/spe
 import { SpeakerPageSkeleton } from '@/app/speakers/[speakerSlug]/_components/speaker-page-skeleton';
 import { loadSpeakerBySlug } from '@/features/speakers/queries/load-speaker-by-slug';
 import { buildSpeakerUrl, getSpeakerName } from '@/features/speakers/utils';
-import { pageMetadata } from '@/lib/metadata';
+import { buildPageMetadata } from '@/lib/metadata';
 
 // fallow-ignore-next-line unused-export
 export const ensureStatic = 'shell';
@@ -28,7 +28,7 @@ export async function generateMetadata({
   const { speaker } = data;
   const name = getSpeakerName(speaker);
 
-  return pageMetadata({
+  return buildPageMetadata({
     canonical: buildSpeakerUrl(speakerSlug),
     description:
       speaker.description ?? `${name} — faithful minister of the Gospel.`,
