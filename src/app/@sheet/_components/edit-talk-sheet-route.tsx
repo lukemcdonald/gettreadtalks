@@ -6,8 +6,8 @@ import type { TalkWithTopicIds } from '@/features/talks/types';
 import type { TopicListItem } from '@/features/topics/types';
 import type { StatusPrefill } from '@/lib/entities/status-prefill';
 
+import { useSheetRoute } from '@/app/@sheet/_hooks/use-sheet-route';
 import { EditTalkSheet } from '@/features/talks/components/edit-talk-sheet';
-import { useSheetRoute } from '@/hooks/use-sheet-route';
 
 interface EditTalkSheetRouteProps {
   closeHref?: string;
