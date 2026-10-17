@@ -212,8 +212,7 @@ When spreading leftover props onto a child, name the rest `delegated`, not `prop
 
 ## UI
 
-Project uses Coss UI components built on Base UI.
-For visual language, tokens, and component rules, follow `DESIGN.md`.
+Project uses Coss UI components built on Base UI. For visual language, tokens, and component rules, follow `DESIGN.md`.
 
 ### Forms
 

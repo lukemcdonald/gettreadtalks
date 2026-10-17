@@ -40,9 +40,9 @@ One family. `Inter` from `next/font/google` as `--font-sans`. `--font-heading: v
 | Page / hero title | `HeroTitle`: `font-semibold tracking-tight` | `sm` `text-2xl sm:text-3xl lg:text-4xl`; `md` `text-3xl sm:text-4xl lg:text-5xl`; `lg` `text-4xl sm:text-5xl lg:text-6xl xl:text-7xl` |
 | Page header | `PageHeader` `font-base tracking-tight text-balance` | `sm` `text-2xl`; `md` `text-3xl sm:text-4xl`; `lg` `text-4xl sm:text-5xl lg:text-6xl` |
 | Card title | `font-heading font-semibold text-lg leading-none` | COSS `CardTitle` |
-| Media card title | `text-base font-semibold text-balance line-clamp-2` | |
-| Dialog / drawer title | `font-heading font-semibold text-xl leading-none` | |
-| Body | inherited `text-foreground` | |
+| Media card title | `text-base font-semibold text-balance line-clamp-2` |  |
+| Dialog / drawer title | `font-heading font-semibold text-xl leading-none` |  |
+| Body | inherited `text-foreground` |  |
 | Muted / meta | `text-muted-foreground` | Role, subtitle, captions, descriptions |
 | Eyebrow | `text-xs font-semibold tracking-wide uppercase` | `ArchiveBackLink`, featured-grid aside |
 | Prose measure | `--max-width-prose: 70ch` | `max-w-prose` |
@@ -64,13 +64,13 @@ Tailwind default 4px scale. No custom spacing tokens.
 
 `--radius: 0.625rem`. Theme scale:
 
-| Token | Value |
-| --- | --- |
-| `--radius-sm` | `calc(var(--radius) - 4px)` → `0.375rem` |
-| `--radius-md` | `calc(var(--radius) - 2px)` → `0.5rem` |
-| `--radius-lg` | `var(--radius)` → `0.625rem` |
-| `--radius-xl` | `calc(var(--radius) + 4px)` → `0.875rem` |
-| `--radius-2xl` | `calc(var(--radius) + 8px)` → `1.125rem` |
+| Token          | Value                                     |
+| -------------- | ----------------------------------------- |
+| `--radius-sm`  | `calc(var(--radius) - 4px)` → `0.375rem`  |
+| `--radius-md`  | `calc(var(--radius) - 2px)` → `0.5rem`    |
+| `--radius-lg`  | `var(--radius)` → `0.625rem`              |
+| `--radius-xl`  | `calc(var(--radius) + 4px)` → `0.875rem`  |
+| `--radius-2xl` | `calc(var(--radius) + 8px)` → `1.125rem`  |
 | `--radius-3xl` | `calc(var(--radius) + 12px)` → `1.375rem` |
 | `--radius-4xl` | `calc(var(--radius) + 16px)` → `1.625rem` |
 
