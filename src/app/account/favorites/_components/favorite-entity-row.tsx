@@ -3,12 +3,12 @@
 import type { ClipId } from '@/features/clips/types';
 import type { SpeakerId } from '@/features/speakers/types';
 
+import { useOptimisticRow } from '@/app/account/_components/use-optimistic-row';
 import {
   UnfavoriteClipButton,
   UnfavoriteSpeakerButton,
 } from '@/features/users/components/unfavorite-buttons';
 
-import { useOptimisticRow } from '../../_components/use-optimistic-row';
 import { EntityTableRow } from './entity-table-row';
 
 interface FavoriteSpeakerRowProps {

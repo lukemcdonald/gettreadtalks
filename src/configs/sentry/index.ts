@@ -1,4 +1,5 @@
-import { DEPLOY_ENV } from '../../constants/env';
+import { DEPLOY_ENV } from '@/constants/env';
+
 import { isSentryEnabled } from './enabled';
 
 const SENTRY_DEBUG = process.env.NEXT_PUBLIC_SENTRY_DEBUG === 'true';

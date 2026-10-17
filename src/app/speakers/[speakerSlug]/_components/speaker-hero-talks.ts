@@ -1,4 +1,4 @@
-import { isVideoMediaType } from '../../../../components/media-embed/utils.ts';
+import { isVideoMediaType } from '@/components/media-embed/utils';
 
 interface TalkForHero {
   _id: string;

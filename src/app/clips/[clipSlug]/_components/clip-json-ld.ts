@@ -1,8 +1,8 @@
-import { buildMediaJsonLd } from '../../../../components/media-embed/utils.ts';
-import { site } from '../../../../configs/site.ts';
-import { buildClipUrl } from '../../../../features/clips/utils.ts';
-import { getSpeakerName } from '../../../../features/speakers/utils.ts';
-import { buildTalkUrl } from '../../../../features/talks/utils.ts';
+import { buildMediaJsonLd } from '@/components/media-embed/utils';
+import { site } from '@/configs/site';
+import { buildClipUrl } from '@/features/clips/utils';
+import { getSpeakerName } from '@/features/speakers/utils';
+import { buildTalkUrl } from '@/features/talks/utils';
 
 interface ClipJsonLdInput {
   clip: {

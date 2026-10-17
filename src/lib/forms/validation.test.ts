@@ -1,9 +1,9 @@
 import { ConvexError } from 'convex/values';
 
+import { ErrorCodes } from '@/services/errors/constants';
+import { USER_ERROR_MESSAGE } from '@/services/errors/user-facing';
 import { describe, expect, it } from '@/test';
 
-import { ErrorCodes } from '../../services/errors/constants';
-import { USER_ERROR_MESSAGE } from '../../services/errors/user-facing';
 import { toConvexFormErrors } from './validation';
 
 describe('toConvexFormErrors', () => {

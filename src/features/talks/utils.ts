@@ -1,4 +1,4 @@
-import { site } from '../../configs/site.ts';
+import { site } from '@/configs/site';
 
 /**
  * Generate a talk URL with speaker and talk slugs.
