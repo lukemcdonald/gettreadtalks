@@ -7,6 +7,12 @@ description: Quiet zinc editorial on COSS UI. Brand red primary, Inter only, fra
 
 Tokens and values live in `src/assets/theme.css` (`@theme`, `:root`, `.dark`). This file is the look, the shared components, and the rules. Read the CSS when you need a number.
 
+## Keeping this file current
+
+- Add or update this file when a pattern is shared or settled, when a shared component is added, moved, or renamed, or when a rule is corrected in review.
+- Don't add token values, one-off page styling, or anything the code already makes obvious.
+- Remove a rule once its component is gone. Keep it short: point to files instead of copying classes.
+
 ## Overview
 
 Quiet zinc editorial on [COSS UI](https://coss.com/ui) `base-nova`. Neutral surfaces, brand-red primary, Inter only. Video is framed, never free-floating. Light and dark share the same semantic tokens. Prefer stock COSS variants over custom styling.
