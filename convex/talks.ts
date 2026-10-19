@@ -13,6 +13,7 @@ export const {
   listTalks,
   listTalksByCollection,
   listTalksBySpeaker,
+  listTalksByTopics,
 } = queries;
 
 // Mutations

@@ -6,6 +6,7 @@ import { ExternalLinkIcon } from 'lucide-react';
 
 import { Link } from '@/components/ui/link';
 import { TalkActions } from '@/features/talks/components/talk-actions';
+import { TopicLinks } from '@/features/topics/components/topic-links';
 
 interface TalkMetadataSidebarProps {
   speaker: Speaker | null;
@@ -37,21 +38,11 @@ export function TalkMetadataSidebar({
         <h3 className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">
           Topics
         </h3>
-        <div className="flex flex-wrap gap-2">
-          {topics.length > 0 ? (
-            topics.map((topic) => (
-              <Link
-                className="bg-muted text-foreground hover:bg-muted/80 inline-block rounded-full px-3 py-1.5 text-sm transition-colors"
-                href={`/topics/${topic.slug}`}
-                key={topic._id}
-              >
-                {topic.title}
-              </Link>
-            ))
-          ) : (
-            <span className="text-muted-foreground text-sm">No topics</span>
-          )}
-        </div>
+        {topics.length > 0 ? (
+          <TopicLinks topics={topics} />
+        ) : (
+          <span className="text-muted-foreground text-sm">No topics</span>
+        )}
       </div>
 
       {/* Scripture */}

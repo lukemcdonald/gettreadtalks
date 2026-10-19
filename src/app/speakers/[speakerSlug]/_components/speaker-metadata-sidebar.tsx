@@ -1,17 +1,21 @@
 import type { Speaker } from '@/features/speakers/types';
+import type { Topic } from '@/features/topics/types';
 
 import { ShareSpeakerButton } from '@/features/speakers/components/share-speaker-button';
 import { SpeakerMinistryLink } from '@/features/speakers/components/speaker-ministry-link';
+import { TopicLinks } from '@/features/topics/components/topic-links';
 import { FavoriteSpeakerButton } from '@/features/users/components/favorite-speaker-button';
 
 interface SpeakerMetadataSidebarProps {
   hideAbout?: boolean;
   speaker: Speaker;
+  topics: Topic[];
 }
 
 export function SpeakerMetadataSidebar({
   hideAbout,
   speaker,
+  topics,
 }: SpeakerMetadataSidebarProps) {
   return (
     <div className="flex flex-col gap-8 sm:flex-row sm:flex-wrap sm:gap-12 lg:flex-col lg:gap-8">
@@ -37,6 +41,16 @@ export function SpeakerMetadataSidebar({
             className="text-foreground text-sm"
             speaker={speaker}
           />
+        </div>
+      )}
+
+      {/* Topics */}
+      {topics.length > 0 && (
+        <div className="space-y-4">
+          <h3 className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">
+            Topics
+          </h3>
+          <TopicLinks topics={topics} />
         </div>
       )}
 

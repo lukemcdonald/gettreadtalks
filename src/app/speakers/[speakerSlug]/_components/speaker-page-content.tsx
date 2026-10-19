@@ -81,7 +81,7 @@ async function SpeakerRelatedContent({ speakerSlug }: { speakerSlug: string }) {
     notFound();
   }
 
-  const { clips, collections, speaker, talks } = data;
+  const { clips, collections, speaker, talks, topics } = data;
   const { featuredTalk, remainingTalks } = getSpeakerTalkLayout(
     talks,
     await loadFeaturedTalkForHero(talks)
@@ -94,6 +94,7 @@ async function SpeakerRelatedContent({ speakerSlug }: { speakerSlug: string }) {
       hasFeaturedVideo={Boolean(featuredTalk)}
       speaker={speaker}
       talks={remainingTalks}
+      topics={topics}
     />
   );
 }

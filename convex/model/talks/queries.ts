@@ -26,6 +26,7 @@ import { LIST_SEARCH_LIMIT } from '../search/constants';
 import { normalizeSearchQuery } from '../search/utils';
 import {
   listPublishedTalks,
+  listPublishedTalksForTopics,
   listPublishedTalksPage,
   searchPublishedTalksByTitleOrSpeaker,
 } from './helpers';
@@ -308,6 +309,27 @@ export const listTalksBySpeaker = query({
       .take(limit);
   },
   returns: docs('talks'),
+});
+
+/**
+ * List published talks that share any of the given topics.
+ */
+export const listTalksByTopics = query({
+  args: {
+    excludeTalkIds: v.optional(v.array(v.id('talks'))),
+    limit: v.optional(v.number()),
+    topicIds: v.array(v.id('topics')),
+  },
+  handler: async (ctx, args) => {
+    const { excludeTalkIds = [], limit = 4, topicIds } = args;
+    const talks = await listPublishedTalksForTopics(ctx, topicIds, {
+      excludeTalkIds,
+    });
+    const page = rotateContent(talks, { count: limit, period: 'daily' });
+
+    return await enrichWithSpeaker(ctx, page);
+  },
+  returns: v.array(talkWithSpeakerValidator),
 });
 
 const sortType = v.optional(
