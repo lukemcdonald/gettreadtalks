@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 
+import { SignedOutAccountMenu } from '@/components/site-header/account-menu/account-menu';
 import { AccountMenuServer } from '@/components/site-header/account-menu/account-menu-server';
-import { AccountMenuSkeleton } from '@/components/site-header/account-menu/account-menu-skeleton';
 import { ModeSwitcher } from '@/components/site-header/mode-switcher';
 import {
   HeaderSearch,
@@ -21,7 +21,7 @@ export function SecondaryNav({ className }: SecondaryNavProps) {
       </Suspense>
       <ModeSwitcher className="hidden size-10 md:flex" />
       <div className="hidden md:flex">
-        <Suspense fallback={<AccountMenuSkeleton />}>
+        <Suspense fallback={<SignedOutAccountMenu />}>
           <AccountMenuServer />
         </Suspense>
       </div>
