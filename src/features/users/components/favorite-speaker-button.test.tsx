@@ -49,27 +49,27 @@ describe('FavoriteSpeakerButton', () => {
     return toggle;
   }
 
-  it('toggles a speaker favorite', async () => {
-    const favorite = mockToggle({ isFavorited: false });
-    const unsaved = setup();
-    const unsavedButton = screen.getByRole('button');
+  it('favorites a speaker that is not saved yet', async () => {
+    const toggle = mockToggle({ isFavorited: false });
+    const { click } = setup();
+    const button = screen.getByRole('button');
 
-    expect(unsavedButton).toHaveAttribute('aria-pressed', 'false');
+    expect(button).toHaveAttribute('aria-pressed', 'false');
 
-    await unsaved.click(unsavedButton);
+    await click(button);
 
-    expect(favorite).toHaveBeenCalledTimes(1);
+    expect(toggle).toHaveBeenCalledTimes(1);
+  });
 
-    unsaved.unmount();
+  it('unfavorites a saved speaker', async () => {
+    const toggle = mockToggle({ isFavorited: true });
+    const { click } = setup();
+    const button = screen.getByRole('button');
 
-    const unfavorite = mockToggle({ isFavorited: true });
-    const saved = setup();
-    const savedButton = screen.getByRole('button');
+    expect(button).toHaveAttribute('aria-pressed', 'true');
 
-    expect(savedButton).toHaveAttribute('aria-pressed', 'true');
+    await click(button);
 
-    await saved.click(savedButton);
-
-    expect(unfavorite).toHaveBeenCalledTimes(1);
+    expect(toggle).toHaveBeenCalledTimes(1);
   });
 });

@@ -466,8 +466,6 @@ describe('createTreadMcpHandler', () => {
 
     expect(response.ok).toBe(true);
     expect(body.includes('Sample Sermon on Romans 8')).toBe(false);
-    expect(body.includes('"isError":true') || body.includes('"error"')).toBe(
-      true
-    );
+    expect(body).toMatch(/200.{0,20}character/iu);
   });
 });
