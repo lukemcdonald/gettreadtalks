@@ -103,6 +103,8 @@ Page composition and Suspense wrappers that read `params` or `searchParams` stay
 
 **UI Primitives:** Files in `src/components/ui/primitives/` are vendor components — never edit directly. Create wrappers in `src/components/ui/`. Always import from `@/components/ui`, never from `@/components/ui/primitives/*` in feature or page code.
 
+- Unused COSS primitives are excluded from Tailwind with `@source not` in `src/assets/styles.css`; delete a primitive's line there when you start using it, or its styles won't generate.
+
 **Overlays**
 
 - Dialog — centered blocking UI (confirm, alert)
