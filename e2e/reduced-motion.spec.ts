@@ -36,8 +36,8 @@ function getCardMotion(talkLink: Locator) {
     const durations = style.transitionDuration
       .split(',')
       .map((part) => Number(part.trim()) || 0);
-    const { transform } = style;
-    const scale = transform === 'none' ? 1 : new DOMMatrix(transform).a;
+    const rawScale = style.scale;
+    const scale = rawScale === 'none' || rawScale === '' ? 1 : Number(rawScale);
 
     return {
       boxShadow: style.boxShadow,
