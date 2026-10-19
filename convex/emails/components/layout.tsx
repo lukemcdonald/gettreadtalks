@@ -26,27 +26,25 @@ export function EmailLayout({ children, preview }: EmailLayoutProps) {
       {!!preview && <Preview>{preview}</Preview>}
       <Body style={main}>
         <Container style={container}>
-          <Section style={content}>
-            <Section style={header}>
-              <Heading style={h1}>{site.name}</Heading>
-              <Text style={subtitle}>Christian talks and insights</Text>
-            </Section>
+          <Section style={header}>
+            <Heading style={h1}>{site.name}</Heading>
+            <Text style={subtitle}>Christian talks and insights</Text>
+          </Section>
 
-            <Hr style={hr} />
+          <Hr style={hr} />
 
-            {children}
+          {children}
 
-            <Hr style={hr} />
+          <Hr style={hr} />
 
-            <Section style={footer}>
-              <Text style={footerText}>
-                You received this email because you have an account with{' '}
-                {site.name}.
-              </Text>
-              <Text style={footerText}>
-                {site.name} • {site.description}
-              </Text>
-            </Section>
+          <Section style={footer}>
+            <Text style={footerText}>
+              You received this email because you have an account with{' '}
+              {site.name}.
+            </Text>
+            <Text style={footerText}>
+              {site.name} • {site.description}
+            </Text>
           </Section>
         </Container>
       </Body>
@@ -54,62 +52,57 @@ export function EmailLayout({ children, preview }: EmailLayoutProps) {
   );
 }
 
-// Styles
-const main = {
-  backgroundColor: '#f6f9fc',
-  fontFamily:
-    '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Ubuntu,sans-serif',
-};
-
 const container = {
   backgroundColor: '#ffffff',
   margin: '0 auto',
-  marginBottom: '64px',
-  padding: '20px 0 48px',
-};
-
-const content = {
-  border: '1px solid #eaeaea',
-  borderRadius: '5px',
-  margin: '40px auto',
   maxWidth: '600px',
-  padding: '20px',
+  padding: '24px 20px 32px',
+  width: '100%',
 };
 
-const header = {
-  marginBottom: '32px',
+const footer = {
+  paddingTop: '8px',
   textAlign: 'center' as const,
+};
+
+const footerText = {
+  color: '#666',
+  fontSize: '13px',
+  lineHeight: '20px',
+  margin: '0 0 8px',
 };
 
 const h1 = {
   color: '#333',
   fontSize: '24px',
   fontWeight: 'bold',
-  lineHeight: '40px',
-  margin: '30px 0',
+  lineHeight: '32px',
+  margin: '0 0 8px',
   padding: '0',
+};
+
+const header = {
+  marginBottom: '8px',
+  textAlign: 'center' as const,
+};
+
+const hr = {
+  borderColor: '#eaeaea',
+  margin: '24px 0',
+};
+
+const main = {
+  backgroundColor: '#f6f9fc',
+  fontFamily:
+    '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Ubuntu,sans-serif',
+  margin: '0',
+  padding: '16px 0',
+  width: '100%',
 };
 
 const subtitle = {
   color: '#666',
   fontSize: '14px',
-  margin: '0 0 20px',
-};
-
-const hr = {
-  borderColor: '#eaeaea',
-  margin: '20px 0',
-};
-
-const footer = {
-  borderTop: '1px solid #eaeaea',
-  paddingTop: '20px',
-  textAlign: 'center' as const,
-};
-
-const footerText = {
-  color: '#666',
-  fontSize: '12px',
-  lineHeight: '16px',
-  margin: '0 0 8px',
+  lineHeight: '22px',
+  margin: '0',
 };
