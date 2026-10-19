@@ -1,36 +1,33 @@
 import type { Route } from 'next';
 import type { ReactNode } from 'react';
 
+import { headers } from 'next/headers';
 import { Suspense } from 'react';
 
+import { ACCOUNT_PATH, getAdminLoginRedirect } from '@/lib/entities/paths';
 import { requireCurrentUser } from '@/services/auth/server';
+import { getSafeRedirect } from '@/utils';
 
 interface UserGateProps {
   children: ReactNode;
   fallback?: ReactNode;
-  redirect?: Route<string>;
 }
 
-async function UserGateContent({
-  children,
-  redirect,
-}: {
-  children: ReactNode;
-  redirect?: Route<string>;
-}) {
-  await requireCurrentUser(redirect);
+async function UserGateContent({ children }: { children: ReactNode }) {
+  const headerList = await headers();
+  const pathname = headerList.get('x-pathname');
+
+  await requireCurrentUser(
+    getAdminLoginRedirect(getSafeRedirect(pathname, ACCOUNT_PATH)) as Route
+  );
 
   return children;
 }
 
-export function UserGate({
-  children,
-  fallback = null,
-  redirect,
-}: UserGateProps) {
+export function UserGate({ children, fallback = null }: UserGateProps) {
   return (
     <Suspense fallback={fallback}>
-      <UserGateContent redirect={redirect}>{children}</UserGateContent>
+      <UserGateContent>{children}</UserGateContent>
     </Suspense>
   );
 }

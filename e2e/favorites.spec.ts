@@ -22,10 +22,6 @@ test('Favorites / Sign in returns to favorites', async ({
     return;
   }
 
-  // Account layout hardcodes /login?redirect=/account, so this lands on
-  // /account instead of /account/favorites.
-  test.fail();
-
   await favoritesPage.goto();
   await expect(authPage.page).toHaveURL(/\/login\?redirect=/u);
   await authPage.submit(user.email, user.password);
