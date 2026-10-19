@@ -10,8 +10,9 @@ import type {
 import { NAVIGATION_LINKS } from '@/components/site-header/constants';
 import { buildClipUrl } from '@/features/clips/utils';
 import { SEARCH_RESULT_TYPES } from '@/features/search/types';
-import { getSpeakerName } from '@/features/speakers/utils';
+import { buildSpeakerUrl, getSpeakerName } from '@/features/speakers/utils';
 import { buildTalkUrl } from '@/features/talks/utils';
+import { buildTopicUrl } from '@/features/topics/utils';
 
 export const BROWSE_SEARCH_GROUP = 'Browse';
 const FAVORITES_SEARCH_HREF = '/account/favorites';
@@ -127,7 +128,7 @@ export function toSearchHits(result: SiteSearchResult): SearchHit[] {
   });
 
   const speakers = result.speakers.map((speaker) => ({
-    href: `/speakers/${speaker.slug}`,
+    href: buildSpeakerUrl(speaker.slug),
     id: speaker._id,
     subtitle: speaker.ministry,
     title: getSpeakerName(speaker),
@@ -135,7 +136,7 @@ export function toSearchHits(result: SiteSearchResult): SearchHit[] {
   }));
 
   const topics = result.topics.map((topic) => ({
-    href: `/topics/${topic.slug}`,
+    href: buildTopicUrl(topic.slug),
     id: topic._id,
     title: topic.title,
     type: 'topic' as const,

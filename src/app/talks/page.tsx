@@ -11,6 +11,7 @@ import { SidebarFiltersSkeleton } from '@/components/skeletons';
 import { loadSpeakers } from '@/features/speakers/queries/load-speakers';
 import { sortSpeakersByName } from '@/features/speakers/utils';
 import { TalksListSkeleton } from '@/features/talks/components/talks-list-skeleton';
+import { buildTalksPath } from '@/features/talks/utils';
 import { loadTopicsWithCounts } from '@/features/topics/queries/load-topics-with-counts';
 import { buildPageMetadata } from '@/lib/metadata';
 
@@ -18,7 +19,7 @@ import { buildPageMetadata } from '@/lib/metadata';
 export const ensureStatic = 'shell';
 
 export const metadata: Metadata = buildPageMetadata({
-  canonical: '/talks',
+  canonical: buildTalksPath(),
   description:
     'Browse Christ centered talks from faithful ministers of the Gospel.',
   title: 'Talks',

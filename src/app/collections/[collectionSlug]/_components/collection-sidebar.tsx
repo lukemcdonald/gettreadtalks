@@ -2,6 +2,7 @@ import type { Speaker } from '@/features/speakers/types';
 
 import { SidebarContent } from '@/components/sidebar-content';
 import { Link } from '@/components/ui/link';
+import { buildSpeakerUrl } from '@/features/speakers/utils';
 
 interface CollectionSidebarProps {
   speakers: Speaker[];
@@ -19,7 +20,7 @@ export function CollectionSidebar({ speakers }: CollectionSidebarProps) {
           <li key={speaker._id}>
             <Link
               className="text-muted-foreground hover:text-foreground text-sm transition-colors"
-              href={`/speakers/${speaker.slug}`}
+              href={buildSpeakerUrl(speaker.slug)}
             >
               {speaker.firstName} {speaker.lastName}
             </Link>

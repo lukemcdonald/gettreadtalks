@@ -10,13 +10,14 @@ import { PageHeader } from '@/components/page-header';
 import { SidebarFiltersSkeleton } from '@/components/skeletons';
 import { CollectionsListSkeleton } from '@/features/collections/components/collections-list-skeleton';
 import { loadCollections } from '@/features/collections/queries/load-collections';
+import { buildCollectionsPath } from '@/features/collections/utils';
 import { buildPageMetadata } from '@/lib/metadata';
 
 // fallow-ignore-next-line unused-export
 export const ensureStatic = 'shell';
 
 export const metadata: Metadata = buildPageMetadata({
-  canonical: '/collections',
+  canonical: buildCollectionsPath(),
   description:
     'Explore curated talk series — each collection covers one topic or book of the Bible.',
   title: 'Collections',

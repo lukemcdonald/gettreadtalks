@@ -11,7 +11,7 @@ import {
   TabsTab,
 } from '@/components/ui';
 import { buildClipUrl } from '@/features/clips/utils';
-import { getSpeakerName } from '@/features/speakers/utils';
+import { buildSpeakerUrl, getSpeakerName } from '@/features/speakers/utils';
 import { buildTalkUrl } from '@/features/talks/utils';
 import { loadUserFavorites } from '@/features/users/queries/load-user-favorites';
 
@@ -85,7 +85,7 @@ function FavoritesTabPanels({ clips, speakers, talks }: UserFavorites) {
         label="Speaker"
         renderItem={(speaker) => (
           <FavoriteSpeakerRow
-            href={`/speakers/${speaker.slug}`}
+            href={buildSpeakerUrl(speaker.slug)}
             key={speaker._id}
             speakerId={speaker._id}
             title={getSpeakerName(speaker)}

@@ -3,6 +3,7 @@ import type { Speaker } from '@/features/speakers/types';
 import { AlphabeticalGrid } from '@/components/alphabetical-grid';
 import { ListEmpty } from '@/components/list-empty';
 import { SpeakerCard } from '@/features/speakers/components/speaker-card';
+import { buildSpeakersPath } from '@/features/speakers/utils';
 
 interface SpeakerGroup {
   items: Speaker[];
@@ -23,7 +24,7 @@ export function SpeakersList({ groups, hasActiveFilters }: SpeakersListProps) {
   if (groups.length === 0) {
     return (
       <ListEmpty
-        clearPath="/speakers"
+        clearPath={buildSpeakersPath()}
         description="Check back later for more speakers."
         filteredDescription="Try adjusting your filters."
         hasActiveFilters={hasActiveFilters}

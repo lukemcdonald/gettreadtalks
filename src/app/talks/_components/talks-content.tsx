@@ -3,6 +3,7 @@ import type { TalkWithSpeaker } from '@/features/talks/types';
 import { ListEmpty } from '@/components/list-empty';
 import { Pagination } from '@/components/pagination';
 import { TalksList } from '@/features/talks/components/talks-list';
+import { buildTalksPath } from '@/features/talks/utils';
 
 interface TalksContentProps {
   continueCursor: string;
@@ -22,7 +23,7 @@ export function TalksContent({
   if (talks.length === 0) {
     return (
       <ListEmpty
-        clearPath="/talks"
+        clearPath={buildTalksPath()}
         description="There are no talks available at this time."
         filteredDescription="No talks match your current filters. Try adjusting your search or clearing filters."
         hasActiveFilters={hasActiveFilters}

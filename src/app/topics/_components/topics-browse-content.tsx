@@ -6,6 +6,7 @@ import type { Topic } from '@/features/topics/types';
 import { useSearchParams } from 'next/navigation';
 
 import { ListEmpty } from '@/components/list-empty';
+import { buildTopicsPath } from '@/features/topics/utils';
 
 import { TopicBrowseSection } from './topic-browse-section';
 
@@ -32,7 +33,7 @@ export function TopicsBrowseContent({ topics }: TopicsBrowseContentProps) {
   if (filteredTopics.length === 0) {
     return (
       <ListEmpty
-        clearPath="/topics"
+        clearPath={buildTopicsPath()}
         description="There are no topics available at this time."
         filteredDescription="No topics match your current filters. Try adjusting your selection or clearing filters."
         hasActiveFilters={selectedTopics.length > 0}
