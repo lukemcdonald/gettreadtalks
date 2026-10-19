@@ -3,3 +3,27 @@
 @import './theme.css';
 @import './base.css';
 @import './utilities.css';
+
+/* Unused COSS primitives: remove a line when you start using that primitive. */
+@source not '../components/ui/primitives/accordion.tsx';
+@source not '../components/ui/primitives/breadcrumb.tsx';
+@source not '../components/ui/primitives/calendar.tsx';
+@source not '../components/ui/primitives/checkbox-group.tsx';
+@source not '../components/ui/primitives/collapsible.tsx';
+@source not '../components/ui/primitives/context-menu.tsx';
+@source not '../components/ui/primitives/frame.tsx';
+@source not '../components/ui/primitives/input-group.tsx';
+@source not '../components/ui/primitives/input-otp.tsx';
+@source not '../components/ui/primitives/meter.tsx';
+@source not '../components/ui/primitives/otp-field.tsx';
+@source not '../components/ui/primitives/pagination.tsx';
+@source not '../components/ui/primitives/popover.tsx';
+@source not '../components/ui/primitives/progress.tsx';
+@source not '../components/ui/primitives/radio-group.tsx';
+@source not '../components/ui/primitives/sheet.tsx';
+@source not '../components/ui/primitives/sidebar.tsx';
+@source not '../components/ui/primitives/slider.tsx';
+@source not '../components/ui/primitives/switch.tsx';
+@source not '../components/ui/primitives/toggle.tsx';
+@source not '../components/ui/primitives/toggle-group.tsx';
+@source not '../components/ui/primitives/toolbar.tsx';
