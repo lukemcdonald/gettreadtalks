@@ -71,8 +71,8 @@ export function DeleteAccountForm() {
           id="delete-account-form"
           onSubmit={form.handleSubmit(onSubmit)}
         >
-          <FormError error={form.formState.errors.root} />
           <Fieldset disabled={isPending}>
+            <FormError error={form.formState.errors.root} />
             <PasswordField
               control={form.control}
               label="Password"
