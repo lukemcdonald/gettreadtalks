@@ -1,6 +1,6 @@
 'use client';
 
-import type { TopicFormData } from '../schemas/topic-form';
+import type { TopicFormData } from '@/features/topics/schemas/topic-form';
 import type { TopicId } from '@/features/topics/types';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -10,10 +10,9 @@ import { useForm } from 'react-hook-form';
 import { FormSheet } from '@/components/ui';
 import { toastManager } from '@/components/ui/primitives/toast';
 import { createTopicAction } from '@/features/topics/actions/create-topic';
+import { TopicFormFields } from '@/features/topics/components/topic-form-fields';
+import { topicFormSchema } from '@/features/topics/schemas/topic-form';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
-
-import { topicFormSchema } from '../schemas/topic-form';
-import { TopicFormFields } from './topic-form-fields';
 
 interface CreateTopicSheetProps {
   onOpenChange: (open: boolean) => void;

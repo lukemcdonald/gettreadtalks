@@ -1,4 +1,4 @@
-import type { TopicFormData } from '../schemas/topic-form';
+import type { TopicFormData } from '@/features/topics/schemas/topic-form';
 import type { Control } from 'react-hook-form';
 
 import { TextField, TextareaField } from '@/components/ui';
