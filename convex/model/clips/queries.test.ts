@@ -50,7 +50,7 @@ describe('listClipSlugs', () => {
 });
 
 describe('getClipBySlug', () => {
-  it.fails('returns a published clip on a published talk and hides a clip whose parent talk is unpublished', async () => {
+  it('returns a published clip on a published talk and hides a clip whose parent talk is unpublished', async () => {
     const t = createConvexTest();
     await seedVisibilityCatalog(t);
 

@@ -74,6 +74,10 @@ export const getCollectionBySlug = query({
       limit
     );
 
+    if (talks.length === 0) {
+      return null;
+    }
+
     talks.sort((a, b) => (a.collectionOrder || 0) - (b.collectionOrder || 0));
 
     const talksWithSpeakers = await enrichWithSpeaker(ctx, talks);

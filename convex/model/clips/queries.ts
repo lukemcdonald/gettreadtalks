@@ -8,6 +8,7 @@ import {
 import { v } from 'convex/values';
 
 import { query } from '../../_generated/server';
+import { filterClipsByPublishedTalks } from '../../lib/filters';
 import { getContentComparator } from '../../lib/sort';
 import { paginateArray } from '../../lib/utils';
 import { doc, docs } from '../../lib/validators/schema';
@@ -81,6 +82,7 @@ export const getClipBySlug = query({
   args: {
     slug: v.string(),
   },
+  // fallow-ignore-next-line complexity
   handler: async (ctx, args) => {
     const clip = await getOneFrom(ctx.db, 'clips', 'by_slug', args.slug);
 
@@ -92,6 +94,12 @@ export const getClipBySlug = query({
 
     // Non-admin users can only view published clips
     if (!canViewContent(user, clip.status)) {
+      return null;
+    }
+
+    const publishedClips = await filterClipsByPublishedTalks(ctx, [clip]);
+
+    if (publishedClips.length === 0) {
       return null;
     }
 
