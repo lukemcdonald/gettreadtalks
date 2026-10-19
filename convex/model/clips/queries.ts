@@ -12,7 +12,7 @@ import { getContentComparator } from '../../lib/sort';
 import { paginateArray } from '../../lib/utils';
 import { doc, docs } from '../../lib/validators/schema';
 import { statusFilterType } from '../../lib/validators/shared';
-import { canViewContent } from '../auth/roles';
+import { canViewContent, requireAdmin } from '../auth/roles';
 import { getCurrentUser } from '../auth/utils';
 import { LIST_SEARCH_LIMIT } from '../search/constants';
 import { normalizeSearchQuery } from '../search/utils';
@@ -65,7 +65,11 @@ export const getClip = query({
   args: {
     id: v.id('clips'),
   },
-  handler: async (ctx, args) => await ctx.db.get('clips', args.id),
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+
+    return await ctx.db.get('clips', args.id);
+  },
   returns: doc('clips').nullable(),
 });
 
@@ -222,6 +226,8 @@ export const listAllClips = query({
     status: v.optional(statusFilterType),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+
     const { paginationOpts, status } = args;
 
     const clipPages =

@@ -7,6 +7,7 @@ import { query } from '../../_generated/server';
 import { enrichWithSpeaker } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
+import { requireAdmin } from '../auth/roles';
 import { listPublishedTalksForCollection } from '../talks/helpers';
 import {
   listPublishedCollections,
@@ -41,8 +42,11 @@ export const getCollection = query({
   args: {
     collectionId: v.id('collections'),
   },
-  handler: async (ctx, args) =>
-    await ctx.db.get('collections', args.collectionId),
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+
+    return await ctx.db.get('collections', args.collectionId);
+  },
   returns: doc('collections').nullable(),
 });
 
@@ -173,6 +177,8 @@ export const listAllCollections = query({
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+
     const collectionPages = await ctx.db
       .query('collections')
       .order('desc')

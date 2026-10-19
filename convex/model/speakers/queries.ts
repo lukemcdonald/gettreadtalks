@@ -14,7 +14,7 @@ import { rotateContent } from '../../lib/rotateContent';
 import { getSpeakerComparator } from '../../lib/sort';
 import { paginateArray } from '../../lib/utils';
 import { doc, docs } from '../../lib/validators/schema';
-import { requireAuth } from '../auth/utils';
+import { requireAdmin } from '../auth/roles';
 import { LIST_SEARCH_LIMIT } from '../search/constants';
 import { normalizeSearchQuery } from '../search/utils';
 import { listPublishedTopicsForTalks } from '../topics/helpers';
@@ -34,7 +34,11 @@ export const getSpeaker = query({
   args: {
     speakerId: v.id('speakers'),
   },
-  handler: async (ctx, args) => await ctx.db.get('speakers', args.speakerId),
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+
+    return await ctx.db.get('speakers', args.speakerId);
+  },
   returns: doc('speakers').nullable(),
 });
 
@@ -133,7 +137,11 @@ export const listSpeakerSlugs = query({
  */
 export const listAllSpeakersRaw = query({
   args: {},
-  handler: async (ctx) => await ctx.db.query('speakers').collect(),
+  handler: async (ctx) => {
+    await requireAdmin(ctx);
+
+    return await ctx.db.query('speakers').collect();
+  },
   returns: docs('speakers'),
 });
 
@@ -143,6 +151,8 @@ export const listAllSpeakersRaw = query({
 export const getSpeakersCount = query({
   args: {},
   handler: async (ctx) => {
+    await requireAdmin(ctx);
+
     const speakers = await ctx.db.query('speakers').collect();
 
     return speakers.length;
@@ -229,7 +239,7 @@ export const listSpeakers = query({
 export const listAllSpeakersAdmin = query({
   args: {},
   handler: async (ctx) => {
-    await requireAuth(ctx);
+    await requireAdmin(ctx);
 
     const speakers = await ctx.db
       .query('speakers')
@@ -284,6 +294,8 @@ export const listAllSpeakers = query({
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+
     const speakerPages = await ctx.db
       .query('speakers')
       .withIndex('by_lastName')

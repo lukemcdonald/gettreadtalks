@@ -4,6 +4,7 @@ import { api } from '../../_generated/api';
 import {
   createConvexTest,
   seedVisibilityCatalog,
+  signInAs,
   visibilitySlugs,
 } from '../../test.setup';
 
@@ -11,8 +12,13 @@ describe('listAllClips', () => {
   it('includes the parent talk title for manage lists', async () => {
     const t = createConvexTest();
     await seedVisibilityCatalog(t);
+    const { asUser } = await signInAs(t, {
+      email: 'admin@example.test',
+      name: 'Admin',
+      role: 'admin',
+    });
 
-    const result = await t.query(api.clips.listAllClips, {
+    const result = await asUser.query(api.clips.listAllClips, {
       paginationOpts: {
         cursor: null,
         numItems: 20,

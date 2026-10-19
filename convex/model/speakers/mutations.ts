@@ -6,7 +6,7 @@ import { v } from 'convex/values';
 import { mutation } from '../../_generated/server';
 import { throwDuplicateSlug, throwValidationError } from '../../lib/errors';
 import { deleteAll, getOrThrow, slugExists, slugify } from '../../lib/utils';
-import { requireAuth } from '../auth/utils';
+import { requireAdmin } from '../auth/roles';
 import { speakerRoleType } from './validators';
 
 /**
@@ -23,7 +23,7 @@ export const createSpeaker = mutation({
     websiteUrl: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    await requireAuth(ctx);
+    await requireAdmin(ctx);
 
     if (!args.firstName.trim()) {
       throwValidationError('First name cannot be empty', 'firstName');
@@ -57,7 +57,7 @@ export const destroySpeaker = mutation({
   handler: async (ctx, args) => {
     const { speakerId } = args;
 
-    await requireAuth(ctx);
+    await requireAdmin(ctx);
 
     await getOrThrow(ctx, 'speakers', speakerId);
 
@@ -123,7 +123,7 @@ export const updateSpeaker = mutation({
     websiteUrl: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    await requireAuth(ctx);
+    await requireAdmin(ctx);
 
     const { slug: rawSlug, speakerId, ...rest } = args;
     const updates: Partial<Doc<'speakers'>> = rest;

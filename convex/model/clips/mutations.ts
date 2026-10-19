@@ -11,7 +11,7 @@ import {
   getOrThrow,
   getPublishedAtForStatus,
 } from '../../lib/utils';
-import { requireAuth } from '../auth/utils';
+import { requireAdmin } from '../auth/roles';
 import { statusType } from './validators';
 /**
  * Archive a clip (soft delete by setting status to archived).
@@ -21,7 +21,7 @@ export const archiveClip = mutation({
     clipId: v.id('clips'),
   },
   handler: async (ctx, args) => {
-    await requireAuth(ctx);
+    await requireAdmin(ctx);
 
     await getOrThrow(ctx, 'clips', args.clipId);
 
@@ -46,7 +46,7 @@ export const destroyClip = mutation({
   handler: async (ctx, args) => {
     const { clipId } = args;
 
-    await requireAuth(ctx);
+    await requireAdmin(ctx);
 
     await getOrThrow(ctx, 'clips', clipId);
 
@@ -79,7 +79,7 @@ export const createClip = mutation({
     title: v.string(),
   },
   handler: async (ctx, args) => {
-    await requireAuth(ctx);
+    await requireAdmin(ctx);
 
     if (!args.title.trim()) {
       throwValidationError('Title cannot be empty', 'title');
@@ -114,7 +114,7 @@ export const updateClip = mutation({
     title: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    await requireAuth(ctx);
+    await requireAdmin(ctx);
 
     const { clipId, ...rest } = args;
     const updates: Partial<Doc<'clips'>> = rest;

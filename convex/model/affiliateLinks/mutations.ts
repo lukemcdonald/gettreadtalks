@@ -9,7 +9,7 @@ import {
   throwValidationError,
 } from '../../lib/errors';
 import { slugExists, slugify } from '../../lib/utils';
-import { requireAuth } from '../auth/utils';
+import { requireAdmin } from '../auth/roles';
 import { affiliateLinkTypes } from './validators';
 
 /**
@@ -25,7 +25,7 @@ export const createAffiliateLink = mutation({
     url: v.string(),
   },
   handler: async (ctx, args) => {
-    await requireAuth(ctx);
+    await requireAdmin(ctx);
 
     // Validate input early
     if (!args.title.trim()) {
@@ -56,7 +56,7 @@ export const destroyAffiliateLink = mutation({
   handler: async (ctx, args) => {
     const { affiliateLinkId } = args;
 
-    await requireAuth(ctx);
+    await requireAdmin(ctx);
 
     const affiliateLink = await ctx.db.get('affiliateLinks', affiliateLinkId);
 
@@ -90,7 +90,7 @@ export const updateAffiliateLink = mutation({
   handler: async (ctx, args) => {
     const { affiliateLinkId, ...rest } = args;
 
-    await requireAuth(ctx);
+    await requireAdmin(ctx);
 
     const updates: Partial<Doc<'affiliateLinks'>> = rest;
 

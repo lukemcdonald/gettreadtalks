@@ -12,7 +12,7 @@ import {
   slugify,
   talkSlugExistsForSpeaker,
 } from '../../lib/utils';
-import { requireAuth } from '../auth/utils';
+import { requireAdmin } from '../auth/roles';
 import { statusType } from './validators';
 
 async function setTalkTopics(
@@ -62,7 +62,7 @@ export const archiveTalk = mutation({
   handler: async (ctx, args) => {
     const { talkId } = args;
 
-    await requireAuth(ctx);
+    await requireAdmin(ctx);
 
     const talk = await getOrThrow(ctx, 'talks', talkId);
 
@@ -97,7 +97,7 @@ export const createTalk = mutation({
     topicIds: v.optional(v.array(v.id('topics'))),
   },
   handler: async (ctx, args) => {
-    await requireAuth(ctx);
+    await requireAdmin(ctx);
 
     const { topicIds, ...talkArgs } = args;
 
@@ -154,7 +154,7 @@ export const updateTalk = mutation({
   handler: async (ctx, args) => {
     const { slug: rawSlug, talkId, topicIds, ...rest } = args;
 
-    await requireAuth(ctx);
+    await requireAdmin(ctx);
 
     const updates: Partial<Doc<'talks'>> = rest;
     const talk = await getOrThrow(ctx, 'talks', talkId);
@@ -216,7 +216,7 @@ export const destroyTalk = mutation({
   handler: async (ctx, args) => {
     const { talkId } = args;
 
-    await requireAuth(ctx);
+    await requireAdmin(ctx);
 
     await getOrThrow(ctx, 'talks', talkId);
 
