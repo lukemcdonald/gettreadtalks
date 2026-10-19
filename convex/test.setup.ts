@@ -87,6 +87,42 @@ export async function signInAs(
   };
 }
 
+export async function signInAsPasswordUser(
+  t: ConvexTest,
+  params: {
+    email: string;
+    name: string;
+    password: string;
+    role: 'admin' | 'user';
+  }
+) {
+  const { hashPassword } = await import('better-auth/crypto');
+  const passwordHash = await hashPassword(params.password);
+  const signedIn = await signInAs(t, {
+    email: params.email,
+    name: params.name,
+    role: params.role,
+  });
+
+  await t.run(async (ctx) => {
+    await ctx.runMutation(components.betterAuth.adapter.create, {
+      input: {
+        data: {
+          accountId: signedIn.userId,
+          createdAt: Date.now(),
+          password: passwordHash,
+          providerId: 'credential',
+          updatedAt: Date.now(),
+          userId: signedIn.userId,
+        },
+        model: 'account',
+      },
+    });
+  });
+
+  return signedIn;
+}
+
 const MEDIA_URL = 'https://www.youtube.com/watch?v=0SVTl4Xa5fY';
 
 export const visibilitySlugs = {

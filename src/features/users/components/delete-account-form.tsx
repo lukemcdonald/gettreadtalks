@@ -15,11 +15,12 @@ import {
   Button,
   Fieldset,
   FormError,
-  TextField,
+  PasswordField,
 } from '@/components/ui';
 import { toastManager } from '@/components/ui/primitives/toast';
 import { deleteAccount } from '@/features/users/actions/delete-account';
-import { captureException } from '@/services/errors';
+import { setServerErrors } from '@/lib/forms/react-hook-form';
+import { captureException, formatErrorMessage } from '@/services/errors';
 
 interface DeleteFormValues {
   password: string;
@@ -32,20 +33,32 @@ export function DeleteAccountForm() {
   function onSubmit(values: DeleteFormValues) {
     startTransition(async () => {
       try {
-        await deleteAccount({ password: values.password });
+        const result = await deleteAccount({ password: values.password });
+
+        if (!result.success) {
+          setServerErrors(form.setError, result.errors);
+          return;
+        }
+
         toastManager.add({ title: 'Account deleted', type: 'success' });
+        window.location.assign('/');
       } catch (error) {
-        captureException(error);
+        captureException(error, { fingerprint: ['auth', 'deleteAccount'] });
         form.setError('root', {
-          message:
-            'Failed to delete account. Check your password and try again.',
+          message: formatErrorMessage(error),
         });
       }
     });
   }
 
   return (
-    <AlertDialog>
+    <AlertDialog
+      onOpenChangeComplete={(open) => {
+        if (!open) {
+          form.reset();
+        }
+      }}
+    >
       <AlertDialogTrigger
         render={<Button size="sm" variant="destructive-outline" />}
       >
@@ -65,14 +78,13 @@ export function DeleteAccountForm() {
           id="delete-account-form"
           onSubmit={form.handleSubmit(onSubmit)}
         >
-          <FormError error={form.formState.errors.root} />
           <Fieldset disabled={isPending}>
-            <TextField
+            <FormError error={form.formState.errors.root} />
+            <PasswordField
               control={form.control}
               label="Password"
               name="password"
               required
-              type="password"
             />
           </Fieldset>
         </form>
