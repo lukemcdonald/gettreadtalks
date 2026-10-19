@@ -38,6 +38,8 @@
     "convex/test.setup.ts",
     // CLI-only preview seed. Called from scripts/vercel-build.sh, not app imports.
     "convex/preview.ts",
+    // Turbopack loader referenced by string path from next.config.ts.
+    "scripts/sentry-client-exclude-tracing.cjs",
     // Better Auth CLI output. Do not edit; regenerate with the Better Auth schema command.
     "convex/betterAuth/schema.ts",
     // Coss vendor primitives. Restored by `pnpm update:ui`.

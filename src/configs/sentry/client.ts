@@ -48,10 +48,6 @@ export function flushSentryQueue(client: SentryClient): void {
   }
 }
 
-export function getClientSentry(): SentryClient | null {
-  return sentry;
-}
-
 export function startClientSentry(): void {
   if (!IS_SENTRY_ENABLED || typeof window === 'undefined') {
     return;
@@ -80,8 +76,11 @@ async function initClientSentry(): Promise<SentryClient | null> {
     started = true;
 
     if (typeof window !== 'undefined') {
+      const { tracesSampleRate: _tracesSampleRate, ...clientSentryConfig } =
+        baseSentryConfig;
+
       Sentry.init({
-        ...baseSentryConfig,
+        ...clientSentryConfig,
         replaysOnErrorSampleRate: 0,
         replaysSessionSampleRate: 0,
       });
