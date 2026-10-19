@@ -4,7 +4,7 @@ import { Copyright } from '@/components/site-footer/copyright';
 
 export function FooterInfo() {
   return (
-    <div className="border-border flex flex-col items-center justify-between gap-4 border-t pt-6 sm:flex-row">
+    <div className="border-input flex flex-col items-center justify-between gap-4 border-t pt-6 sm:flex-row">
       <p className="text-muted-foreground text-sm">
         <Copyright />
       </p>

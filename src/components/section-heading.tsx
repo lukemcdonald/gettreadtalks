@@ -8,7 +8,7 @@ interface SectionHeadingProps extends ComponentProps<'h2'> {
 }
 
 /**
- * Section heading with a dashed rule divider between heading and meta.
+ * Section heading with a solid rule between heading and meta.
  * Heading and meta accept ReactNode — callers control links, icons, hover styles.
  */
 export function SectionHeading({
@@ -23,7 +23,7 @@ export function SectionHeading({
       {...delegated}
     >
       <span className="shrink-0 font-bold">{heading}</span>
-      <hr className="border-border grow border-t border-dashed" />
+      <hr className="bg-input h-px grow border-none" />
       {!!meta && (
         <span className="text-muted-foreground shrink-0 text-xs tracking-wide uppercase">
           {meta}

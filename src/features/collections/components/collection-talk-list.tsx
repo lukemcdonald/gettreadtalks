@@ -11,7 +11,7 @@ export function CollectionTalkList({ talks }: CollectionTalkListProps) {
   return (
     <ol className="relative flex flex-col gap-3">
       {talks.length > 1 && (
-        <div className="bg-border absolute top-6 bottom-6 left-4 w-px -translate-x-1/2" />
+        <div className="bg-input absolute top-6 bottom-6 left-4 w-px -translate-x-1/2" />
       )}
 
       {talks.map((talk: TalkWithSpeaker, index) => (

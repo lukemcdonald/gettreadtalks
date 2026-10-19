@@ -6,7 +6,7 @@ function TopicSectionSkeleton() {
     <div className="space-y-6">
       <div className="flex items-center gap-4">
         <Skeleton className="h-7 w-36 shrink-0" />
-        <div className="bg-border h-px flex-1" />
+        <div className="bg-input h-px flex-1" />
         <Skeleton className="h-4 w-14 shrink-0" />
       </div>
       <GridList columns={{ default: 1, md: 2 }}>
