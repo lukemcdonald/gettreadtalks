@@ -11,6 +11,7 @@ import {
   MicIcon,
   SettingsIcon,
   TagIcon,
+  UnplugIcon,
   UsersIcon,
 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
@@ -24,6 +25,7 @@ export const AREA_NAV_ICONS = {
   collections: FolderIcon,
   favorites: HeartIcon,
   finished: CheckCircle2Icon,
+  media: UnplugIcon,
   settings: SettingsIcon,
   speakers: UsersIcon,
   talks: MicIcon,

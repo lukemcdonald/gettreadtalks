@@ -33,6 +33,10 @@ const COLUMNS = {
     { className: HIDDEN_MD, key: 'Status' },
     { className: 'w-px', key: 'Actions', srOnly: true },
   ],
+  media: [
+    { key: 'Title' },
+    { className: 'w-px', key: 'Actions', srOnly: true },
+  ],
   speakers: [
     { key: 'Name' },
     { className: `${HIDDEN_MD} text-right`, key: 'Talks' },

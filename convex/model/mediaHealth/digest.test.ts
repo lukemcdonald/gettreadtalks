@@ -1,64 +1,42 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  appendMediaHealthItem,
   buildMediaHealthDigest,
+  getMediaAdminEditPath,
   getMediaPublicPath,
+  isUnnotifiedOpenCheck,
 } from './digest';
 
-const firstTalkInput = {
-  entityId: 'talk1',
+const newTalk = {
+  adminPath: '/talks/edit/talk1?status=archived',
   entityTable: 'talks' as const,
+  firstBrokenAt: 1_700_000_000_000,
   mediaUrl: 'https://www.youtube.com/watch?v=abc',
-  slug: 'first-talk',
-  speakerSlug: 'john-doe',
+  newStatus: 'private' as const,
+  publicPath: '/talks/john-doe/first-talk',
   title: 'First Talk',
 };
 
-const stillBrokenClipInput = {
-  entityId: 'clip1',
-  entityTable: 'clips' as const,
-  mediaUrl: 'https://vimeo.com/1',
-  slug: 'second-clip',
-  title: 'Second Clip',
-};
-
-const firstPrivateTalkInput = {
-  entityId: 'talk2',
-  entityTable: 'talks' as const,
-  mediaUrl: 'https://www.youtube.com/watch?v=def',
-  slug: 'new-talk',
-  speakerSlug: 'mary-smith',
-  title: 'New Talk',
-};
-
-const healthyTalkInput = {
-  entityId: 'talk3',
-  entityTable: 'talks' as const,
-  mediaUrl: 'https://www.youtube.com/watch?v=ghi',
-  slug: 'healthy-talk',
-  speakerSlug: 'john-doe',
-  title: 'Healthy Talk',
-};
-
-function firstAppendedItem(
-  input: Parameters<typeof appendMediaHealthItem>[0],
-  outcome: Parameters<typeof appendMediaHealthItem>[1]
-) {
-  const items = appendMediaHealthItem(input, outcome, []);
-  const [item] = items;
-
-  expect(items.length).toBe(1);
-  if (!item) {
-    throw new Error('expected digest item');
-  }
-
-  return item;
-}
-
 describe('buildMediaHealthDigest', () => {
-  it('returns null when empty', () => {
-    expect(buildMediaHealthDigest([])).toBe(null);
+  it('returns null when nothing is new', () => {
+    expect(
+      buildMediaHealthDigest({
+        newItems: [],
+        stillOpenCount: 4,
+      })
+    ).toBe(null);
+  });
+
+  it('keeps new items and the still-open count', () => {
+    expect(
+      buildMediaHealthDigest({
+        newItems: [newTalk],
+        stillOpenCount: 2,
+      })
+    ).toEqual({
+      newItems: [newTalk],
+      stillOpenCount: 2,
+    });
   });
 });
 
@@ -71,52 +49,59 @@ describe('getMediaPublicPath', () => {
       })
     ).toBe(null);
   });
+
+  it('builds clip and talk paths', () => {
+    expect(
+      getMediaPublicPath({
+        entityTable: 'clips',
+        slug: 'second-clip',
+      })
+    ).toBe('/clips/second-clip');
+    expect(
+      getMediaPublicPath({
+        entityTable: 'talks',
+        slug: 'first-talk',
+        speakerSlug: 'john-doe',
+      })
+    ).toBe('/talks/john-doe/first-talk');
+  });
 });
 
-describe('appendMediaHealthItem', () => {
-  it('includes newly broken media as new', () => {
-    const item = firstAppendedItem(firstTalkInput, {
-      persistStatus: 'private',
-      previousStatus: 'ok',
-    });
-
-    expect(item.adminPath).toBe('/talks/edit/talk1?status=archived');
-    expect(item.isNew).toBe(true);
-    expect(item.newStatus).toBe('private');
-    expect(item.publicPath).toBe('/talks/john-doe/first-talk');
+describe('getMediaAdminEditPath', () => {
+  it('prefills archived on the edit path', () => {
+    expect(getMediaAdminEditPath('talks', 'talk1')).toBe(
+      '/talks/edit/talk1?status=archived'
+    );
   });
+});
 
-  it('includes still-broken media as not new', () => {
-    const item = firstAppendedItem(stillBrokenClipInput, {
-      persistStatus: 'missing',
-      previousStatus: 'missing',
-    });
-
-    expect(item.adminPath).toBe('/clips/edit/clip1?status=archived');
-    expect(item.isNew).toBe(false);
-    expect(item.publicPath).toBe('/clips/second-clip');
-  });
-
-  it('includes a first broken check as not new', () => {
-    const item = firstAppendedItem(firstPrivateTalkInput, {
-      persistStatus: 'private',
-      previousStatus: null,
-    });
-
-    expect(item.isNew).toBe(false);
-    expect(item.publicPath).toBe('/talks/mary-smith/new-talk');
-  });
-
-  it('omits ok media', () => {
+describe('isUnnotifiedOpenCheck', () => {
+  it('treats a first open break as new', () => {
     expect(
-      appendMediaHealthItem(
-        healthyTalkInput,
-        {
-          persistStatus: 'ok',
-          previousStatus: 'ok',
-        },
-        []
-      )
-    ).toEqual([]);
+      isUnnotifiedOpenCheck({
+        firstBrokenAt: 10,
+        state: 'open',
+        status: 'private',
+      })
+    ).toBe(true);
+  });
+
+  it('is quiet after a successful notify until it reopens', () => {
+    expect(
+      isUnnotifiedOpenCheck({
+        firstBrokenAt: 10,
+        lastNotifiedAt: 20,
+        state: 'open',
+        status: 'missing',
+      })
+    ).toBe(false);
+    expect(
+      isUnnotifiedOpenCheck({
+        firstBrokenAt: 30,
+        lastNotifiedAt: 20,
+        state: 'open',
+        status: 'missing',
+      })
+    ).toBe(true);
   });
 });

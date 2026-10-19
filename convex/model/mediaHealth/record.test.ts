@@ -2,70 +2,113 @@ import { describe, expect, it } from 'vitest';
 
 import { decideMediaCheck } from './record';
 
+const CHECKED_AT = 1_700_000_000_000;
+const FIRST_BROKEN_AT = 1_699_000_000_000;
+const LAST_NOTIFIED_AT = 1_699_500_000_000;
+
 describe('decideMediaCheck', () => {
-  it('persists a first observation without a transition', () => {
+  it('opens a first broken observation as new', () => {
     expect(
       decideMediaCheck({
-        existingStatus: null,
-        observedStatus: 'ok',
-      })
-    ).toEqual({
-      isTransition: false,
-      persistStatus: 'ok',
-    });
-    expect(
-      decideMediaCheck({
-        existingStatus: null,
+        checkedAt: CHECKED_AT,
+        existing: null,
         observedStatus: 'private',
       })
     ).toEqual({
-      isTransition: false,
+      firstBrokenAt: CHECKED_AT,
       persistStatus: 'private',
+      state: 'open',
     });
   });
 
-  it('notifies when ok becomes private', () => {
+  it('keeps an already open item open', () => {
     expect(
       decideMediaCheck({
-        existingStatus: 'ok',
+        checkedAt: CHECKED_AT,
+        existing: {
+          firstBrokenAt: FIRST_BROKEN_AT,
+          lastNotifiedAt: LAST_NOTIFIED_AT,
+          state: 'open',
+          status: 'private',
+        },
+        observedStatus: 'missing',
+      })
+    ).toEqual({
+      firstBrokenAt: FIRST_BROKEN_AT,
+      lastNotifiedAt: LAST_NOTIFIED_AT,
+      persistStatus: 'missing',
+      state: 'open',
+    });
+  });
+
+  it('reopens a resolved item as new when it breaks again', () => {
+    expect(
+      decideMediaCheck({
+        checkedAt: CHECKED_AT,
+        existing: {
+          state: 'resolved',
+          status: 'ok',
+        },
         observedStatus: 'private',
       })
     ).toEqual({
-      isTransition: true,
+      firstBrokenAt: CHECKED_AT,
       persistStatus: 'private',
+      state: 'open',
+    });
+  });
+
+  it('resolves an open item that is healthy again', () => {
+    expect(
+      decideMediaCheck({
+        checkedAt: CHECKED_AT,
+        existing: {
+          firstBrokenAt: FIRST_BROKEN_AT,
+          lastNotifiedAt: LAST_NOTIFIED_AT,
+          state: 'open',
+          status: 'private',
+        },
+        observedStatus: 'ok',
+      })
+    ).toEqual({
+      persistStatus: 'ok',
+      state: 'resolved',
+    });
+  });
+
+  it('leaves ignored items quiet even when they stay broken', () => {
+    expect(
+      decideMediaCheck({
+        checkedAt: CHECKED_AT,
+        existing: {
+          firstBrokenAt: FIRST_BROKEN_AT,
+          lastNotifiedAt: LAST_NOTIFIED_AT,
+          state: 'ignored',
+          status: 'private',
+        },
+        observedStatus: 'missing',
+      })
+    ).toEqual({
+      firstBrokenAt: FIRST_BROKEN_AT,
+      lastNotifiedAt: LAST_NOTIFIED_AT,
+      persistStatus: 'missing',
+      state: 'ignored',
     });
   });
 
   it('keeps a prior ok when the check is unknown', () => {
     expect(
       decideMediaCheck({
-        existingStatus: 'ok',
+        checkedAt: CHECKED_AT,
+        existing: {
+          state: 'resolved',
+          status: 'ok',
+        },
         observedStatus: 'unknown',
       })
     ).toEqual({
-      isTransition: false,
       persistStatus: 'ok',
-    });
-  });
-
-  it('does not notify when already broken', () => {
-    expect(
-      decideMediaCheck({
-        existingStatus: 'unknown',
-        observedStatus: 'private',
-      })
-    ).toEqual({
-      isTransition: false,
-      persistStatus: 'private',
-    });
-    expect(
-      decideMediaCheck({
-        existingStatus: 'private',
-        observedStatus: 'missing',
-      })
-    ).toEqual({
-      isTransition: false,
-      persistStatus: 'missing',
+      state: 'resolved',
     });
   });
 });

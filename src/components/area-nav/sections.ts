@@ -4,6 +4,7 @@ import {
   ACCOUNT_PATH,
   ADMIN_LIST_PATHS,
   MANAGE_PATH,
+  MEDIA_HEALTH_PATH,
 } from '@/lib/entities/paths';
 
 export const AREA_NAV: AreaNavSection[] = [
@@ -27,6 +28,11 @@ export const AREA_NAV: AreaNavSection[] = [
         href: ADMIN_LIST_PATHS.collections,
         icon: 'collections',
         label: 'Collections',
+      },
+      {
+        href: MEDIA_HEALTH_PATH,
+        icon: 'media',
+        label: 'Media health',
       },
     ],
     label: 'Content',
