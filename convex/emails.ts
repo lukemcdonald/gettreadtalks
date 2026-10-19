@@ -15,6 +15,7 @@ import { VerifyEmailTemplate } from './emails/verifyEmail';
 import { WelcomeEmail } from './emails/welcome';
 import { throwConvexError } from './lib/errors';
 import { reportSentryException } from './lib/sentry';
+import { getSiteUrl } from './lib/siteUrl';
 import { formatErrorMessage } from './lib/utils';
 import { mediaHealthDigestItem } from './model/mediaHealth/validators';
 
@@ -153,7 +154,7 @@ export const sendMediaHealthEmail = internalAction({
     items: v.array(mediaHealthDigestItem),
   },
   handler: async (ctx, args) => {
-    if (args.items.length === 0) {
+    if (args.items.length === 0 || shouldSkipTestModeSend(site.email.contact)) {
       return null;
     }
 
@@ -176,6 +177,7 @@ export const sendMediaHealthEmail = internalAction({
         'mediaHealth'
       );
     } catch (error) {
+      await reportEmailSendFailure('mediaHealth', error);
       throwConvexError(500, 'Failed to send media health email', {
         cause: formatErrorMessage(error),
         resource: 'email',
@@ -195,6 +197,11 @@ export const sendPasswordResetEmail = internalAction({
     token: v.string(),
   },
   handler: async (ctx, args) => {
+    if (shouldSkipTestModeSend(args.email)) {
+      console.log('Skipping passwordReset email in Resend test mode');
+      return null;
+    }
+
     try {
       const template = ResetPasswordTemplate({
         email: args.email,
@@ -216,10 +223,11 @@ export const sendPasswordResetEmail = internalAction({
         'passwordReset'
       );
     } catch (error) {
+      await reportEmailSendFailure('passwordReset', error);
       throwConvexError(500, 'Failed to send password reset email', {
         cause: formatErrorMessage(error),
         resource: 'email',
-        resourceId: args.email,
+        resourceId: 'passwordReset',
       });
     }
   },
@@ -243,13 +251,18 @@ export const sendTestEmail = internalMutation({
   },
 });
 
-export const sendVerificationEmail = internalMutation({
+export const sendVerificationEmail = internalAction({
   args: {
     email: v.string(),
     token: v.string(),
     verificationUrl: v.string(),
   },
   handler: async (ctx, args) => {
+    if (shouldSkipTestModeSend(args.email)) {
+      console.log('Skipping verification email in Resend test mode');
+      return null;
+    }
+
     try {
       const template = VerifyEmailTemplate({
         email: args.email,
@@ -258,7 +271,7 @@ export const sendVerificationEmail = internalMutation({
       });
       const { html, text } = await renderEmail(template);
 
-      return await sendTrackedEmail(
+      await sendTrackedEmail(
         ctx,
         {
           from: getFromAddress(),
@@ -271,32 +284,38 @@ export const sendVerificationEmail = internalMutation({
         'verification'
       );
     } catch (error) {
+      await reportEmailSendFailure('verification', error);
       throwConvexError(500, 'Failed to send verification email', {
         cause: formatErrorMessage(error),
         resource: 'email',
-        resourceId: args.email,
+        resourceId: 'verification',
       });
     }
   },
-  returns: vEmailId,
+  returns: v.null(),
 });
 
-export const sendWelcomeEmail = internalMutation({
+export const sendWelcomeEmail = internalAction({
   args: {
     email: v.string(),
     name: v.string(),
     userId: v.string(),
   },
   handler: async (ctx, args) => {
+    if (shouldSkipTestModeSend(args.email)) {
+      console.log('Skipping welcome email in Resend test mode');
+      return null;
+    }
+
     try {
       const template = WelcomeEmail({
         email: args.email,
         name: args.name,
-        siteUrl: process.env.SITE_URL || site.url,
+        siteUrl: getSiteUrl(),
       });
       const { html, text } = await renderEmail(template);
 
-      return await sendTrackedEmail(
+      await sendTrackedEmail(
         ctx,
         {
           from: getFromAddress(),
@@ -308,20 +327,29 @@ export const sendWelcomeEmail = internalMutation({
         },
         'welcome'
       );
+      console.log('Welcome email sent');
     } catch (error) {
+      await reportEmailSendFailure('welcome', error);
       throwConvexError(500, 'Failed to send welcome email', {
         cause: formatErrorMessage(error),
         resource: 'email',
-        resourceId: args.email,
+        resourceId: 'welcome',
       });
     }
   },
-  returns: vEmailId,
+  returns: v.null(),
 });
 
 // ============================================
 // HELPERS
 // ============================================
+
+function shouldSkipTestModeSend(to: string) {
+  return (
+    process.env.RESEND_TEST_MODE !== 'false' &&
+    !to.toLowerCase().endsWith('@resend.dev')
+  );
+}
 
 function getFromAddress() {
   return `${site.name} <${FROM_EMAIL}>`;
@@ -384,6 +412,13 @@ async function reportEmailFailure(params: {
   await reportSentryException({
     message: `Resend permanently rejected a "${params.kind}" email (${params.emailId}): ${errorMessage}`,
     tags: { emailKind: params.kind },
+  });
+}
+
+async function reportEmailSendFailure(kind: EmailKind, error: unknown) {
+  await reportSentryException({
+    message: `Failed to send "${kind}" email: ${formatErrorMessage(error)}`,
+    tags: { emailKind: kind },
   });
 }
 
