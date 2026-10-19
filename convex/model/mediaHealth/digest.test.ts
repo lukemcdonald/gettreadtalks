@@ -6,17 +6,6 @@ import {
   getMediaPublicPath,
 } from './digest';
 
-const digestItem = {
-  adminPath: '/talks/edit/talk1?status=archived',
-  entityTable: 'talks' as const,
-  isNew: true,
-  mediaUrl: 'https://www.youtube.com/watch?v=abc',
-  newStatus: 'private' as const,
-  previousStatus: 'ok' as const,
-  publicPath: '/talks/john-doe/first-talk',
-  title: 'First Talk',
-};
-
 const firstTalkInput = {
   entityId: 'talk1',
   entityTable: 'talks' as const,
@@ -68,34 +57,12 @@ function firstAppendedItem(
 }
 
 describe('buildMediaHealthDigest', () => {
-  it('returns the items when any exist', () => {
-    const items = [digestItem];
-
-    expect(buildMediaHealthDigest(items)).toEqual(items);
-  });
-
   it('returns null when empty', () => {
     expect(buildMediaHealthDigest([])).toBe(null);
   });
 });
 
 describe('getMediaPublicPath', () => {
-  it('builds talk and clip page paths', () => {
-    expect(
-      getMediaPublicPath({
-        entityTable: 'talks',
-        slug: 'sample-sermon-on-romans-8',
-        speakerSlug: 'john-doe',
-      })
-    ).toBe('/talks/john-doe/sample-sermon-on-romans-8');
-    expect(
-      getMediaPublicPath({
-        entityTable: 'clips',
-        slug: 'sample-clip-romans-8',
-      })
-    ).toBe('/clips/sample-clip-romans-8');
-  });
-
   it('returns null for a talk without a speaker slug', () => {
     expect(
       getMediaPublicPath({

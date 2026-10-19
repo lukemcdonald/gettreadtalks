@@ -8,7 +8,7 @@ const user = getE2eUser();
 
 test.skip(!user, E2E_USER_SKIP_REASON);
 
-test('Auth / Log in', async ({ authPage, homePage }) => {
+test('Auth / Log out', async ({ authPage, homePage }) => {
   if (!user) {
     return;
   }
@@ -20,17 +20,6 @@ test('Auth / Log in', async ({ authPage, homePage }) => {
   await expect(authPage.page).toHaveURL(/\/account\/?$/u);
   await expect(authPage.accountMenu).toBeVisible();
   await expect(authPage.signIn).toHaveCount(0);
-});
-
-test('Auth / Log out', async ({ authPage, homePage }) => {
-  if (!user) {
-    return;
-  }
-
-  await homePage.goto();
-  await authPage.signIn.click();
-  await authPage.submit(user.email, user.password);
-  await expect(authPage.accountMenu).toBeVisible();
 
   await authPage.logOut();
 

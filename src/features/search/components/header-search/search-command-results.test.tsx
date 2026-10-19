@@ -92,15 +92,11 @@ describe('SearchCommandResults', () => {
 
     await click(screen.getByRole('option', { name: /romans 8/iu }));
 
-    expect(onSelect).toHaveBeenCalledTimes(1);
     expect(onSelect).toHaveBeenCalledWith(MOCK_GROUPS[0]?.items[0]);
-  });
-
-  it('selects view all results', async () => {
-    const { click, onSelect } = setup();
 
     await click(screen.getByRole('option', { name: 'View all results' }));
 
     expect(onSelect).toHaveBeenCalledWith(MOCK_GROUPS[1]?.items[0]);
+    expect(onSelect).toHaveBeenCalledTimes(2);
   });
 });

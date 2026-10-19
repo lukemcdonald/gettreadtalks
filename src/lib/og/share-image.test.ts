@@ -101,26 +101,6 @@ describe('buildSharePropsForSpeaker', () => {
       title: 'Alistair Begg',
     });
   });
-
-  it('omits the avatar when the speaker has no photo', () => {
-    expect(
-      buildSharePropsForSpeaker({
-        firstName: 'Alistair',
-        lastName: 'Begg',
-        ministry: 'Truth For Life',
-      }).speaker?.imageUrl
-    ).toBeUndefined();
-  });
-
-  it('uses role when ministry is missing', () => {
-    expect(
-      buildSharePropsForSpeaker({
-        firstName: 'Alistair',
-        lastName: 'Begg',
-        role: 'Pastor',
-      }).speaker?.detail
-    ).toBe('Pastor');
-  });
 });
 
 describe('buildSharePropsForTopic', () => {

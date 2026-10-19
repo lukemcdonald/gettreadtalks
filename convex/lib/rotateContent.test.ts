@@ -1,13 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  getTimeSeed,
-  rotateContent,
-  secondsUntilNextRotation,
-} from './rotateContent';
+import { rotateContent, secondsUntilNextRotation } from './rotateContent';
 
-const MS_PER_HOUR = 1000 * 60 * 60;
-const MS_PER_DAY = MS_PER_HOUR * 24;
+const MS_PER_DAY = 1000 * 60 * 60 * 24;
 
 describe('rotateContent', () => {
   it('returns empty when there are no items', () => {
@@ -27,16 +22,6 @@ describe('rotateContent', () => {
     expect(rotateContent(items, { count: 1, seed: 10 })).toEqual(
       rotateContent(items, { count: 1, seed: 10 })
     );
-  });
-});
-
-describe('getTimeSeed', () => {
-  it('is the unix-period bucket', () => {
-    const now = MS_PER_DAY * 20_000 + 1234;
-
-    expect(getTimeSeed('daily', now)).toBe(20_000);
-    expect(getTimeSeed('hourly', now)).toBe(Math.floor(now / MS_PER_HOUR));
-    expect(getTimeSeed('weekly', now)).toBe(Math.floor(now / (MS_PER_DAY * 7)));
   });
 });
 

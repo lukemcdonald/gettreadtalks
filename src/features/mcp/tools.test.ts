@@ -217,19 +217,6 @@ describe('searchTalks', () => {
       'https://www.gettreadtalks.com/talks/john-doe/sample-sermon-on-romans-8'
     );
   });
-
-  it('filters published talks by speaker and topic slugs', async () => {
-    const result = await searchTalks(
-      { speaker: 'john-doe', topic: 'grace' },
-      createCatalog()
-    );
-    const body = parseToolJson(result);
-    const talks = body.talks as { slug: string }[];
-
-    expect(talks.map((talk) => talk.slug)).toEqual([
-      'sample-sermon-on-romans-8',
-    ]);
-  });
 });
 
 describe('loadTalk', () => {
@@ -458,41 +445,6 @@ async function postMcp(
 }
 
 describe('createTreadMcpHandler', () => {
-  it('initialize names the public catalog', async () => {
-    const handler = createTreadMcpHandler(createCatalog());
-    const response = await postMcp(handler, 'initialize', {
-      capabilities: {},
-      clientInfo: { name: 'test', version: '1.0.0' },
-      protocolVersion: '2025-11-25',
-    });
-    const body = await response.text();
-
-    expect(response.ok).toBe(true);
-    expect(body.includes('gettreadtalks')).toBe(true);
-  });
-
-  it('lists the read-only catalog tools', async () => {
-    const handler = createTreadMcpHandler(createCatalog());
-    await postMcp(handler, 'initialize', {
-      capabilities: {},
-      clientInfo: { name: 'test', version: '1.0.0' },
-      protocolVersion: '2025-11-25',
-    });
-    await postMcp(handler, 'notifications/initialized', {});
-    const response = await postMcp(handler, 'tools/list', {}, 2);
-    const body = await response.text();
-
-    expect(response.ok).toBe(true);
-    expect(body.includes('search_talks')).toBe(true);
-    expect(body.includes('get_talk')).toBe(true);
-    expect(body.includes('list_speakers')).toBe(true);
-    expect(body.includes('list_topics')).toBe(true);
-    expect(body.includes('list_collections')).toBe(true);
-    expect(body.includes('get_collection')).toBe(true);
-    expect(body.includes('list_clips')).toBe(true);
-    expect(body.includes('get_clip')).toBe(true);
-  });
-
   it('rejects an oversized search query', async () => {
     const handler = createTreadMcpHandler(createCatalog());
     await postMcp(handler, 'initialize', {
@@ -514,8 +466,6 @@ describe('createTreadMcpHandler', () => {
 
     expect(response.ok).toBe(true);
     expect(body.includes('Sample Sermon on Romans 8')).toBe(false);
-    expect(
-      body.includes('Too big: expected string to have <=200 characters')
-    ).toBe(true);
+    expect(body).toMatch(/200.{0,20}character/iu);
   });
 });

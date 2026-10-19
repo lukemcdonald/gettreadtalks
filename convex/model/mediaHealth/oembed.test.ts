@@ -1,30 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  checkMediaUrl,
-  classifyOEmbedStatus,
-  getOEmbedRequest,
-} from './oembed';
-
-describe('classifyOEmbedStatus', () => {
-  it('maps 200 to ok', () => {
-    expect(classifyOEmbedStatus(200)).toBe('ok');
-  });
-
-  it('maps YouTube 401 and 403 to private', () => {
-    expect(classifyOEmbedStatus(401)).toBe('private');
-    expect(classifyOEmbedStatus(403)).toBe('private');
-  });
-
-  it('maps 404 to missing', () => {
-    expect(classifyOEmbedStatus(404)).toBe('missing');
-  });
-
-  it('maps other statuses to unknown', () => {
-    expect(classifyOEmbedStatus(503)).toBe('unknown');
-    expect(classifyOEmbedStatus()).toBe('unknown');
-  });
-});
+import { checkMediaUrl, getOEmbedRequest } from './oembed';
 
 describe('getOEmbedRequest', () => {
   it('skips non-oEmbed URLs', () => {
@@ -61,20 +37,30 @@ describe('checkMediaUrl', () => {
   });
 
   it('maps response status and fetch failure', async () => {
-    const ok = await checkMediaUrl('https://www.youtube.com/watch?v=abc', (() =>
-      Promise.resolve(new Response(null, { status: 200 }))) as typeof fetch);
-    const privateVideo = await checkMediaUrl(
-      'https://www.youtube.com/watch?v=abc',
-      (() =>
-        Promise.resolve(new Response(null, { status: 403 }))) as typeof fetch
+    const cases = [
+      { expected: 'ok', status: 200 },
+      { expected: 'private', status: 401 },
+      { expected: 'private', status: 403 },
+      { expected: 'missing', status: 404 },
+      { expected: 'unknown', status: 503 },
+    ] as const;
+
+    const results = await Promise.all(
+      cases.map(({ status }) =>
+        checkMediaUrl('https://www.youtube.com/watch?v=abc', (() =>
+          Promise.resolve(new Response(null, { status }))) as typeof fetch)
+      )
     );
+
+    expect(results).toEqual(
+      cases.map(({ expected }) => ({ skipped: false, status: expected }))
+    );
+
     const failed = await checkMediaUrl(
       'https://www.youtube.com/watch?v=abc',
       (() => Promise.reject(new Error('timeout'))) as typeof fetch
     );
 
-    expect(ok).toEqual({ skipped: false, status: 'ok' });
-    expect(privateVideo).toEqual({ skipped: false, status: 'private' });
     expect(failed).toEqual({ skipped: false, status: 'unknown' });
   });
 });

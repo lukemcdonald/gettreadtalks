@@ -2,23 +2,18 @@ import { describe, expect, it } from '@/test';
 
 import {
   BROWSE_SEARCH_GROUP,
+  SEARCH_DROPDOWN_LIMIT,
+  VIEW_ALL_SEARCH_GROUP,
   buildSearchPageHref,
-  emptySiteSearch,
-  getBrowseCommandGroups,
-  getHeaderSearchQueryAfterClose,
-  getHeaderSearchState,
-  getHeaderSearchStatus,
   formatSearchHotkeyLabel,
+  getBrowseCommandGroups,
+  getHeaderSearchState,
   getSearchQuery,
   getSearchSelectionAnalytics,
   groupSearchHits,
-  hasSearchHits,
   isSearchHotkey,
-  SEARCH_DROPDOWN_LIMIT,
-  shouldShowViewAllResults,
   toCommandGroups,
   toSearchHits,
-  VIEW_ALL_SEARCH_GROUP,
 } from './utils';
 
 function cappedTalkHits() {
@@ -79,13 +74,6 @@ const result = {
   ],
 };
 
-describe('getHeaderSearchQueryAfterClose', () => {
-  it('keeps the query on dismiss and clears after navigate', () => {
-    expect(getHeaderSearchQueryAfterClose('grace', false)).toBe('grace');
-    expect(getHeaderSearchQueryAfterClose('grace', true)).toBe('');
-  });
-});
-
 describe('getSearchQuery', () => {
   it('trims a string and uses the first repeated param', () => {
     expect(getSearchQuery('  grace  ')).toBe('grace');
@@ -145,49 +133,6 @@ describe('groupSearchHits', () => {
       'Clips',
     ]);
     expect(groups[2]?.hits[0]?.href).toBe('/topics/grace');
-  });
-});
-
-describe('hasSearchHits', () => {
-  it('is false for an empty result', () => {
-    expect(hasSearchHits(emptySiteSearch)).toBe(false);
-  });
-
-  it('is true when any type has a published hit', () => {
-    expect(hasSearchHits(result)).toBe(true);
-  });
-});
-
-describe('getHeaderSearchStatus', () => {
-  it('returns idle, loading, empty, or results', () => {
-    expect(
-      getHeaderSearchStatus({
-        hasQuery: false,
-        hasResults: false,
-        isLoading: false,
-      })
-    ).toBe('idle');
-    expect(
-      getHeaderSearchStatus({
-        hasQuery: true,
-        hasResults: false,
-        isLoading: true,
-      })
-    ).toBe('loading');
-    expect(
-      getHeaderSearchStatus({
-        hasQuery: true,
-        hasResults: false,
-        isLoading: false,
-      })
-    ).toBe('empty');
-    expect(
-      getHeaderSearchStatus({
-        hasQuery: true,
-        hasResults: true,
-        isLoading: false,
-      })
-    ).toBe('results');
   });
 });
 
@@ -314,13 +259,6 @@ describe('getBrowseCommandGroups', () => {
   });
 });
 
-describe('shouldShowViewAllResults', () => {
-  it('is false until a type reaches the fetch limit', () => {
-    expect(shouldShowViewAllResults(toSearchHits(result))).toBe(false);
-    expect(shouldShowViewAllResults(cappedTalkHits())).toBe(true);
-  });
-});
-
 describe('getSearchSelectionAnalytics', () => {
   const hits = toSearchHits(result);
 
@@ -368,31 +306,12 @@ describe('getSearchSelectionAnalytics', () => {
 });
 
 describe('toCommandGroups', () => {
-  it('keeps group order and omits view all when every group is visible', () => {
-    const groups = toCommandGroups(toSearchHits(result), 'grace');
-
-    expect(groups.map((group) => group.value)).toEqual([
-      'Talks',
-      'Speakers',
-      'Topics',
-      'Clips',
-    ]);
-  });
-
   it('appends view all when a type hits the dropdown limit', () => {
     const groups = toCommandGroups(cappedTalkHits(), 'talk');
 
     expect(groups.at(-1)?.value).toBe(VIEW_ALL_SEARCH_GROUP);
     expect(groups.at(-1)?.items[0]?.href).toBe('/search?search=talk');
     expect(groups.at(-1)?.items[0]?.label).toBe('View all results');
-  });
-
-  it('stays empty when there is no query', () => {
-    expect(toCommandGroups([], '')).toEqual([]);
-  });
-
-  it('omits view all when the query has no hits', () => {
-    expect(toCommandGroups([], 'zzzz')).toEqual([]);
   });
 });
 

@@ -15,9 +15,17 @@ test('Talks / Browse and open a talk', async ({ homePage, talksPage }) => {
 
 test('Talks / Listing search', async ({ talksPage }) => {
   await talksPage.goto();
-  await talksPage.searchFor('grace');
+  await talksPage.searchFor('romans');
 
-  await expect(talksPage.page).toHaveURL(/search=grace/u);
+  await expect(talksPage.page).toHaveURL(/search=romans/u);
+  await expect(
+    talksPage.page.getByRole('link', { name: /Sample Sermon on Romans 8/u })
+  ).toBeVisible();
+  await expect(
+    talksPage.page.getByRole('link', {
+      name: /Example Talk: The Prodigal Son/u,
+    })
+  ).toHaveCount(0);
 });
 
 test('Talks / Related talks by topic', async ({ talksPage }) => {
