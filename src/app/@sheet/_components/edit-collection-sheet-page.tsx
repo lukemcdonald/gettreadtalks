@@ -7,8 +7,8 @@ import { EditCollectionSheetRoute } from '@/app/@sheet/_components/edit-collecti
 import { loadCollection } from '@/features/collections/queries/load-collection';
 import {
   ADMIN_LIST_PATHS,
-  getAdminLoginRedirect,
   buildEntityEditPath,
+  getLoginRedirect,
 } from '@/lib/entities/paths';
 import { requireAdminUser } from '@/services/auth/server';
 
@@ -24,9 +24,7 @@ export async function EditCollectionSheetPage({
   const { collectionId } = await params;
 
   await requireAdminUser(
-    getAdminLoginRedirect(
-      buildEntityEditPath('collections', collectionId)
-    ) as Route
+    getLoginRedirect(buildEntityEditPath('collections', collectionId)) as Route
   );
 
   const collection = await loadCollection(collectionId);

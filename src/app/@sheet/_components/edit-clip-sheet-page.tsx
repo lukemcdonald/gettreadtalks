@@ -8,8 +8,8 @@ import { loadFormOptions } from '@/app/@sheet/_queries/load-form-options';
 import { loadClip } from '@/features/clips/queries/load-clip';
 import {
   ADMIN_LIST_PATHS,
-  getAdminLoginRedirect,
   buildEntityEditPath,
+  getLoginRedirect,
 } from '@/lib/entities/paths';
 import { parseStatusPrefill } from '@/lib/entities/status-prefill';
 import { requireAdminUser } from '@/services/auth/server';
@@ -31,7 +31,7 @@ export async function EditClipSheetPage({
   const statusPrefill = parseStatusPrefill(status);
 
   await requireAdminUser(
-    getAdminLoginRedirect(
+    getLoginRedirect(
       buildEntityEditPath('clips', clipId, { status: statusPrefill })
     ) as Route
   );

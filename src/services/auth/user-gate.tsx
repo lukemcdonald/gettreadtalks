@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { headers } from 'next/headers';
 import { Suspense } from 'react';
 
-import { ACCOUNT_PATH, getAdminLoginRedirect } from '@/lib/entities/paths';
+import { ACCOUNT_PATH, getLoginRedirect } from '@/lib/entities/paths';
 import { requireCurrentUser } from '@/services/auth/server';
 import { getSafeRedirect } from '@/utils';
 
@@ -18,7 +18,7 @@ async function UserGateContent({ children }: { children: ReactNode }) {
   const pathname = headerList.get('x-pathname');
 
   await requireCurrentUser(
-    getAdminLoginRedirect(getSafeRedirect(pathname, ACCOUNT_PATH)) as Route
+    getLoginRedirect(getSafeRedirect(pathname, ACCOUNT_PATH)) as Route
   );
 
   return children;
