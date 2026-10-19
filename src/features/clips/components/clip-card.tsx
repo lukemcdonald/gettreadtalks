@@ -1,5 +1,3 @@
-'use client';
-
 import type { Clip } from '@/features/clips/types';
 import type { Speaker } from '@/features/speakers/types';
 

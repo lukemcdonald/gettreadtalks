@@ -1,5 +1,3 @@
-'use client';
-
 import type { Speaker } from '@/features/speakers/types';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui';

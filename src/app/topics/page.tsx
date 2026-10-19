@@ -1,3 +1,4 @@
+import type { TopicsBrowseSearchParams } from '@/app/topics/_components/topics-browse-content';
 import type { Metadata } from 'next';
 
 import { Suspense } from 'react';
@@ -22,14 +23,21 @@ export const metadata: Metadata = buildPageMetadata({
   title: 'Topics',
 });
 
-export default async function TopicsPage() {
+interface TopicsPageProps {
+  searchParams: Promise<TopicsBrowseSearchParams>;
+}
+
+export default async function TopicsPage({ searchParams }: TopicsPageProps) {
   const topicsWithTalks = await loadTopicsWithTalks();
 
   return (
     <SidebarLayout
       content={
         <Suspense fallback={<TopicsBrowseSkeleton />}>
-          <TopicsBrowseContent topics={topicsWithTalks} />
+          <TopicsBrowseContent
+            searchParams={searchParams}
+            topics={topicsWithTalks}
+          />
         </Suspense>
       }
       header={

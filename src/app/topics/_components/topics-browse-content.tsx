@@ -1,9 +1,5 @@
-'use client';
-
 import type { TalkWithSpeaker } from '@/features/talks/types';
 import type { Topic } from '@/features/topics/types';
-
-import { useSearchParams } from 'next/navigation';
 
 import { ListEmpty } from '@/components/list-empty';
 import { buildTopicsPath } from '@/features/topics/utils';
@@ -16,14 +12,21 @@ interface TopicWithTalks {
   topic: Pick<Topic, 'slug' | 'title'>;
 }
 
+export interface TopicsBrowseSearchParams {
+  topics?: string;
+}
+
 interface TopicsBrowseContentProps {
+  searchParams: Promise<TopicsBrowseSearchParams>;
   topics: TopicWithTalks[];
 }
 
-export function TopicsBrowseContent({ topics }: TopicsBrowseContentProps) {
-  const searchParams = useSearchParams();
-  const selectedTopics =
-    searchParams.get('topics')?.split(',').filter(Boolean) ?? [];
+export async function TopicsBrowseContent({
+  searchParams,
+  topics,
+}: TopicsBrowseContentProps) {
+  const params = await searchParams;
+  const selectedTopics = params.topics?.split(',').filter(Boolean) ?? [];
 
   const filteredTopics =
     selectedTopics.length > 0
