@@ -3,34 +3,37 @@ import type {
   MediaHealthEmailProps,
 } from '../../src/services/email/types';
 
-import { Button, Heading, Section, Text } from 'react-email';
+import { Button, Heading, Hr, Link, Section, Text } from 'react-email';
 
 import { site } from '../../src/configs/site';
+import { toYouTubeWatchUrl } from '../../src/utils/youtube';
 import { EmailLayout } from './components/layout';
+import { emailButton, emailParagraph } from './components/styles';
 
-export function MediaHealthEmail({ items }: MediaHealthEmailProps) {
+export function MediaHealthEmail({
+  items,
+  siteUrl,
+  stillOpenCount,
+  stillOpenHref,
+}: MediaHealthEmailProps) {
   const talks = items.filter((item) => item.entityTable === 'talks');
   const clips = items.filter((item) => item.entityTable === 'clips');
-  const siteUrl = process.env.SITE_URL || site.url;
 
   return (
-    <EmailLayout preview="Private or missing talk and clip media needs a look.">
-      <Text style={paragraph}>Hi,</Text>
-      <Text style={paragraph}>
-        These published YouTube or Vimeo URLs are currently private or missing.
-        Items marked New broke since the last check; the rest are still broken.
-        Open in admin to review and archive — Archived is preselected, and
-        nothing is saved until you press Save. View page opens the public talk
-        or clip. Check video opens the YouTube or Vimeo page. This job does not
-        change content for you.
+    <EmailLayout preview="New private or missing talk and clip media needs a look.">
+      <Text style={emailParagraph}>Hi,</Text>
+      <Text style={emailParagraph}>
+        These published YouTube or Vimeo URLs are newly private or missing. Open
+        in admin to review; nothing is saved until you press Save.
       </Text>
       {talks.length > 0 && (
         <>
           <Heading as="h2" style={sectionHeading}>
             Talks
           </Heading>
-          {talks.map((item) => (
+          {talks.map((item, index) => (
             <MediaHealthItem
+              isLast={index === talks.length - 1 && clips.length === 0}
               item={item}
               key={`${item.entityTable}-${item.adminPath}`}
               siteUrl={siteUrl}
@@ -43,8 +46,9 @@ export function MediaHealthEmail({ items }: MediaHealthEmailProps) {
           <Heading as="h2" style={sectionHeading}>
             Clips
           </Heading>
-          {clips.map((item) => (
+          {clips.map((item, index) => (
             <MediaHealthItem
+              isLast={index === clips.length - 1}
               item={item}
               key={`${item.entityTable}-${item.adminPath}`}
               siteUrl={siteUrl}
@@ -52,78 +56,119 @@ export function MediaHealthEmail({ items }: MediaHealthEmailProps) {
           ))}
         </>
       )}
-      <Text style={paragraph}>Blessings,</Text>
-      <Text style={paragraph}>The {site.name} job runner</Text>
+      {stillOpenCount > 0 && (
+        <Text style={emailParagraph}>
+          {stillOpenCount} still open.{' '}
+          <Link href={stillOpenHref} style={inlineLink}>
+            View open items
+          </Link>
+        </Text>
+      )}
+      <Text style={emailParagraph}>Blessings,</Text>
+      <Text style={emailParagraph}>The {site.name} job runner</Text>
     </EmailLayout>
   );
 }
 
 function MediaHealthItem({
+  isLast,
   item,
   siteUrl,
 }: {
+  isLast: boolean;
   item: MediaHealthEmailItem;
   siteUrl: string;
 }) {
   const adminHref = `${siteUrl}${item.adminPath}`;
   const publicHref = item.publicPath ? `${siteUrl}${item.publicPath}` : null;
+  const videoHref = toYouTubeWatchUrl(item.mediaUrl);
 
   return (
     <Section style={itemSection}>
       <Text style={titleText}>{item.title}</Text>
       <Text style={metaText}>
-        {item.isNew ? 'New · ' : ''}
-        {item.entityTable} · {item.previousStatus} to {item.newStatus}
+        {getMediaHealthStatusLabel(item.newStatus)} · First seen broken{' '}
+        {formatBrokenDate(item.firstBrokenAt)}
       </Text>
-      <Text style={metaText}>{item.mediaUrl}</Text>
       <Section style={buttonContainer}>
         <Button href={adminHref} style={button}>
           Open in admin
         </Button>
-        {publicHref ? (
-          <Button href={publicHref} style={secondaryButton}>
-            View page
-          </Button>
-        ) : null}
-        <Button href={item.mediaUrl} style={secondaryButton}>
+        <MediaHealthPageButton href={publicHref} />
+        <Button href={videoHref} style={secondaryButton}>
           Check video
         </Button>
       </Section>
+      <MediaHealthItemDivider isLast={isLast} />
     </Section>
   );
 }
 
+function getMediaHealthStatusLabel(status: MediaHealthEmailItem['newStatus']) {
+  if (status === 'private') {
+    return 'Private';
+  }
+
+  return 'Missing';
+}
+
+function MediaHealthPageButton({ href }: { href: string | null }) {
+  if (!href) {
+    return null;
+  }
+
+  return (
+    <Button href={href} style={secondaryButton}>
+      View page
+    </Button>
+  );
+}
+
+function MediaHealthItemDivider({ isLast }: { isLast: boolean }) {
+  if (isLast) {
+    return null;
+  }
+
+  return <Hr style={itemDivider} />;
+}
+
+function formatBrokenDate(timestamp: number) {
+  return new Date(timestamp).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+}
+
 const button = {
-  backgroundColor: '#2754C5',
-  borderRadius: '4px',
-  color: '#fff',
-  fontSize: '14px',
-  fontWeight: 'bold',
-  lineHeight: '40px',
-  padding: '0 16px',
-  textDecoration: 'none',
+  ...emailButton,
+  margin: '0 8px 8px 0',
 };
 
 const buttonContainer = {
   margin: '12px 0 0',
 };
 
+const inlineLink = {
+  color: '#2754C5',
+  fontSize: '16px',
+  textDecoration: 'underline',
+};
+
+const itemDivider = {
+  borderColor: '#eaeaea',
+  margin: '20px 0 0',
+};
+
 const itemSection = {
-  margin: '0 0 20px',
+  margin: '0 0 8px',
 };
 
 const metaText = {
   color: '#555',
-  fontSize: '14px',
+  fontSize: '15px',
   lineHeight: '22px',
   margin: '0 0 4px',
-};
-
-const paragraph = {
-  color: '#333',
-  fontSize: '16px',
-  lineHeight: '26px',
-  margin: '0 0 16px',
 };
 
 const secondaryButton = {
@@ -131,7 +176,6 @@ const secondaryButton = {
   backgroundColor: '#fff',
   border: '1px solid #2754C5',
   color: '#2754C5',
-  marginLeft: '8px',
 };
 
 const sectionHeading = {
@@ -139,7 +183,7 @@ const sectionHeading = {
   fontSize: '18px',
   fontWeight: 'bold',
   lineHeight: '26px',
-  margin: '24px 0 8px',
+  margin: '32px 0 16px',
 };
 
 const titleText = {

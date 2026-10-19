@@ -1,3 +1,4 @@
+import type { MediaHealthEmailProps } from '../src/services/email/types';
 import type { ActionCtx, MutationCtx } from './_generated/server';
 import type { EmailId, SendEmailOptions } from '@convex-dev/resend';
 import type { ReactElement } from 'react';
@@ -7,6 +8,10 @@ import { v } from 'convex/values';
 import { render } from 'react-email';
 
 import { site } from '../src/configs/site';
+import {
+  MEDIA_HEALTH_PATH,
+  joinOriginAndPath,
+} from '../src/lib/entities/path-constants';
 import { components, internal } from './_generated/api';
 import { internalAction, internalMutation } from './_generated/server';
 import { MediaHealthEmail } from './emails/mediaHealth';
@@ -152,6 +157,8 @@ export const handleEmailEvent = internalMutation({
 export const sendMediaHealthEmail = internalAction({
   args: {
     items: v.array(mediaHealthDigestItem),
+    siteUrl: v.optional(v.string()),
+    stillOpenCount: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     if (args.items.length === 0 || shouldSkipTestModeSend(site.email.contact)) {
@@ -159,11 +166,7 @@ export const sendMediaHealthEmail = internalAction({
     }
 
     try {
-      const template = MediaHealthEmail({
-        items: args.items,
-      });
-      const { html, text } = await renderEmail(template);
-
+      const { html, text } = await renderMediaHealthMessage(args);
       await sendTrackedEmail(
         ctx,
         {
@@ -348,6 +351,24 @@ function shouldSkipTestModeSend(to: string) {
   return (
     process.env.RESEND_TEST_MODE !== 'false' &&
     !to.toLowerCase().endsWith('@resend.dev')
+  );
+}
+
+async function renderMediaHealthMessage(args: {
+  items: MediaHealthEmailProps['items'];
+  siteUrl?: string;
+  stillOpenCount?: number;
+}) {
+  const siteUrl = args.siteUrl ?? getSiteUrl();
+  const stillOpenCount = args.stillOpenCount ?? 0;
+
+  return await renderEmail(
+    MediaHealthEmail({
+      items: args.items,
+      siteUrl,
+      stillOpenCount,
+      stillOpenHref: joinOriginAndPath(MEDIA_HEALTH_PATH, siteUrl),
+    })
   );
 }
 

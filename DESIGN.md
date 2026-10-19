@@ -72,7 +72,7 @@ Surfaces (cards, video, dialogs) are `rounded-2xl`. Buttons are `rounded-lg`. Pi
 Import COSS from `@/components/ui` (`src/components/ui`). Never edit `src/components/ui/primitives/`. `pnpm update:ui` pulls `@coss/ui`.
 
 - **Video** — `VideoFrame` / `MediaEmbed` in `src/components/media-embed/`. Featured listings use `FeaturedVideoCard`.
-- **Manage tables** — `Table variant="card"` via `src/components/manage-table/`. Title plus a muted second line. Outline status badge with a dot on desktop; status dot only on mobile. Row click opens the edit `FormSheet`. Trailing menu: View, Archive, Delete. Hover details on desktop. No Updated column.
+- **Manage tables** — `Table variant="card"` via `src/components/manage-table/`. Title plus a muted second line. Outline status badge with a dot on desktop; status dot only on mobile. Row click opens the edit `FormSheet`. Trailing menu: View, Archive, Delete. Hover details on desktop. No Updated column. Open dead-media items live at `/manage/media`; Ignore keeps a row out of the digest until its URL changes.
 - **Detail back link** — `ArchiveBackLink` in `src/components/archive-back-link.tsx` above the title. Keep JSON-LD breadcrumbs (`src/lib/json-ld.ts`). Do not render COSS `Breadcrumb`.
 - **Speaker role** — its own muted line under the name (`src/app/speakers/[speakerSlug]/_components/speaker-hero-details.tsx`, `src/features/speakers/components/speaker-card.tsx`). Never inline with the name.
 - **Search** — desktop `CommandDialog` in `src/features/search/components/header-search/desktop-search-dialog.tsx`. Mobile bottom `Drawer` in `src/features/search/components/header-search/mobile-search-drawer.tsx`.

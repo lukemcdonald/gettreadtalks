@@ -1,3 +1,5 @@
+import { parseYouTubeId } from '@/utils/youtube';
+
 export type MediaType =
   | { type: 'audio'; src: string }
   | { type: 'unknown'; href: string }
@@ -8,20 +10,6 @@ export type MediaType =
 const AUDIO_REGEX = /\.(?<format>mp3|wav|ogg|m4a|aac)(?<query>\?|$)/iu;
 const VIDEO_REGEX = /\.(?<format>mp4|webm|ogg|mov)(?<query>\?|$)/iu;
 const VIMEO_REGEX = /(?:vimeo\.com\/|player\.vimeo\.com\/video\/)(?<id>\d+)/u;
-const YOUTUBE_REGEX = [
-  /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)(?<id>[^&\n?#]+)/u,
-  /youtube\.com\/watch\?.*v=(?<id>[^&\n?#]+)/u,
-];
-
-function parseYouTubeUrl(url: string) {
-  for (const pattern of YOUTUBE_REGEX) {
-    const match = url.match(pattern);
-    if (match?.groups?.id) {
-      return match.groups.id;
-    }
-  }
-  return null;
-}
 
 function parseVimeoUrl(url: string) {
   const match = url.match(VIMEO_REGEX);
@@ -33,7 +21,7 @@ export function getVideoThumbnail(url?: string) {
     return null;
   }
 
-  const youtubeId = parseYouTubeUrl(url);
+  const youtubeId = parseYouTubeId(url);
   if (youtubeId) {
     return `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
   }
@@ -47,7 +35,7 @@ export function getVideoThumbnail(url?: string) {
 }
 
 export function detectMediaType(url: string): MediaType {
-  const youtubeId = parseYouTubeUrl(url);
+  const youtubeId = parseYouTubeId(url);
   if (youtubeId) {
     return { id: youtubeId, type: 'youtube' };
   }

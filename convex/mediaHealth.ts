@@ -1,34 +1,32 @@
 import type { ActionCtx } from './_generated/server';
-import type { MediaHealthDigestItem } from './model/mediaHealth/digest';
-import type { MediaCheckStatus } from './model/mediaHealth/validators';
 
 import { v } from 'convex/values';
 
 import { internal } from './_generated/api';
 import { internalAction } from './_generated/server';
 import { reportSentryException } from './lib/sentry';
+import { getSiteUrl } from './lib/siteUrl';
 import { formatErrorMessage } from './lib/utils';
-import {
-  appendMediaHealthItem,
-  buildMediaHealthDigest,
-} from './model/mediaHealth/digest';
 import { checkMediaUrl } from './model/mediaHealth/oembed';
-import {
-  mediaCheckEntityTable,
-  mediaHealthDigestItem,
-} from './model/mediaHealth/validators';
+import { mediaCheckEntityTable } from './model/mediaHealth/validators';
 
 const PAGE_SIZE = 40;
 
 const continueCheckArgs = {
-  items: v.array(mediaHealthDigestItem),
   paginationCursor: v.union(v.null(), v.string()),
   source: mediaCheckEntityTable,
 };
 
-export { upsertMediaCheck } from './model/mediaHealth/mutations';
+export {
+  ignoreMediaCheck,
+  resolveStaleMediaChecks,
+  stampMediaChecksNotified,
+  upsertMediaCheck,
+} from './model/mediaHealth/mutations';
 export {
   getMediaCheck,
+  listDigestMediaChecks,
+  listOpenMediaChecks,
   listPublishedMediaPage,
 } from './model/mediaHealth/queries';
 
@@ -36,7 +34,6 @@ export const checkPublishedMedia = internalAction({
   args: {},
   handler: async (ctx) => {
     await runMediaHealthPage(ctx, {
-      items: [],
       paginationCursor: null,
       source: 'talks',
     });
@@ -59,7 +56,6 @@ export const continueCheck = internalAction({
 async function runMediaHealthPage(
   ctx: ActionCtx,
   args: {
-    items: MediaHealthDigestItem[];
     paginationCursor: string | null;
     source: 'clips' | 'talks';
   }
@@ -76,8 +72,8 @@ async function runMediaHealthPage(
       }
     );
 
-    const items = await checkMediaPageItems(ctx, result.page, args.items);
-    const nextPage = nextMediaHealthPage(result, args, items);
+    await checkMediaPageItems(ctx, result.page);
+    const nextPage = nextMediaHealthPage(result, args);
 
     if (nextPage) {
       await ctx.scheduler.runAfter(
@@ -89,15 +85,7 @@ async function runMediaHealthPage(
       return;
     }
 
-    const digest = buildMediaHealthDigest(items);
-
-    if (!digest) {
-      return;
-    }
-
-    await ctx.runAction(internal.emails.sendMediaHealthEmail, {
-      items: digest,
-    });
+    await finishMediaHealthRun(ctx);
   } catch (error) {
     await reportSentryException({
       message: `Media health check failed: ${formatErrorMessage(error)}`,
@@ -118,60 +106,49 @@ interface PublishedMediaItem {
 
 async function checkMediaPageItems(
   ctx: ActionCtx,
-  pageItems: PublishedMediaItem[],
-  items: MediaHealthDigestItem[]
-): Promise<MediaHealthDigestItem[]> {
+  pageItems: PublishedMediaItem[]
+) {
   if (pageItems.length === 0) {
-    return items;
+    return;
   }
 
   const [item] = pageItems;
 
   if (!item) {
-    return items;
+    return;
   }
 
-  const nextItems = await checkPublishedMediaItem(ctx, item, items);
-
-  return await checkMediaPageItems(ctx, pageItems.slice(1), nextItems);
+  await checkPublishedMediaItem(ctx, item);
+  await checkMediaPageItems(ctx, pageItems.slice(1));
 }
 
 async function checkPublishedMediaItem(
   ctx: ActionCtx,
-  item: PublishedMediaItem,
-  items: MediaHealthDigestItem[]
-): Promise<MediaHealthDigestItem[]> {
+  item: PublishedMediaItem
+) {
   const check = await checkMediaUrl(item.mediaUrl);
 
   if (check.skipped) {
-    return items;
+    return;
   }
 
-  const outcome: {
-    isTransition: boolean;
-    persistStatus: MediaCheckStatus;
-    previousStatus: MediaCheckStatus | null;
-  } = await ctx.runMutation(internal.mediaHealth.upsertMediaCheck, {
+  await ctx.runMutation(internal.mediaHealth.upsertMediaCheck, {
     checkedAt: Date.now(),
     entityId: item.entityId,
     entityTable: item.entityTable,
     mediaUrl: item.mediaUrl,
     observedStatus: check.status,
   });
-
-  return appendMediaHealthItem(item, outcome, items);
 }
 
 function nextMediaHealthPage(
   result: { continueCursor: string; isDone: boolean },
   args: {
     source: 'clips' | 'talks';
-  },
-  items: MediaHealthDigestItem[]
+  }
 ) {
   if (!result.isDone) {
     return {
-      items,
       paginationCursor: result.continueCursor,
       source: args.source,
     };
@@ -179,11 +156,41 @@ function nextMediaHealthPage(
 
   if (args.source === 'talks') {
     return {
-      items,
       paginationCursor: null,
       source: 'clips' as const,
     };
   }
 
   return null;
+}
+
+async function finishMediaHealthRun(ctx: ActionCtx) {
+  await ctx.runMutation(internal.mediaHealth.resolveStaleMediaChecks, {});
+
+  const digestRows = await ctx.runQuery(
+    internal.mediaHealth.listDigestMediaChecks,
+    {}
+  );
+
+  if (
+    digestRows.newItems.length === 0 ||
+    process.env.RESEND_TEST_MODE !== 'false'
+  ) {
+    return;
+  }
+
+  await ctx.runAction(internal.emails.sendMediaHealthEmail, {
+    items: digestRows.newItems,
+    siteUrl: getSiteUrl(),
+    stillOpenCount: digestRows.stillOpenCount,
+  });
+
+  if (digestRows.newCheckIds.length === 0) {
+    return;
+  }
+
+  await ctx.runMutation(internal.mediaHealth.stampMediaChecksNotified, {
+    checkIds: digestRows.newCheckIds,
+    notifiedAt: Date.now(),
+  });
 }

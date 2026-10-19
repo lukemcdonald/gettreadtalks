@@ -1,5 +1,7 @@
 import type { MediaCheckStatus } from './validators';
 
+import { parseYouTubeId } from '../../../src/utils/youtube';
+
 const STATUS_BY_HTTP: Record<number, MediaCheckStatus> = {
   200: 'ok',
   401: 'private',
@@ -8,10 +10,6 @@ const STATUS_BY_HTTP: Record<number, MediaCheckStatus> = {
 };
 
 const VIMEO_REGEX = /(?:vimeo\.com\/|player\.vimeo\.com\/video\/)(?<id>\d+)/u;
-const YOUTUBE_REGEX = [
-  /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)(?<id>[^&\n?#]+)/u,
-  /youtube\.com\/watch\?.*v=(?<id>[^&\n?#]+)/u,
-];
 
 const OEMBED_TIMEOUT_MS = 8000;
 
@@ -75,5 +73,5 @@ function isVimeoUrl(url: string) {
 }
 
 function isYouTubeUrl(url: string) {
-  return YOUTUBE_REGEX.some((pattern) => pattern.test(url));
+  return parseYouTubeId(url) !== null;
 }

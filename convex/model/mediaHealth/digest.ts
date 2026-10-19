@@ -1,27 +1,14 @@
-import type { MediaCheckStatus } from './validators';
-
 export interface MediaHealthDigestItem {
   adminPath: string;
   entityTable: 'clips' | 'talks';
-  isNew: boolean;
+  firstBrokenAt: number;
   mediaUrl: string;
   newStatus: 'missing' | 'private';
-  previousStatus: MediaCheckStatus;
   publicPath: string | null;
   title: string;
 }
 
-export function buildMediaHealthDigest(
-  items: MediaHealthDigestItem[]
-): MediaHealthDigestItem[] | null {
-  if (items.length === 0) {
-    return null;
-  }
-
-  return items;
-}
-
-/** Matches buildClipPath / buildTalkPath without importing Next app modules into Convex. */
+/** Matches feature clip/talk path builders without importing those modules into Convex. */
 export function getMediaPublicPath(item: {
   entityTable: 'clips' | 'talks';
   slug: string;
@@ -38,53 +25,30 @@ export function getMediaPublicPath(item: {
   return `/talks/${item.speakerSlug}/${item.slug}`;
 }
 
-export function appendMediaHealthItem(
-  item: {
-    entityId: string;
-    entityTable: 'clips' | 'talks';
-    mediaUrl: string;
-    slug: string;
-    speakerSlug?: string;
-    title: string;
-  },
-  outcome: {
-    persistStatus: MediaCheckStatus;
-    previousStatus: MediaCheckStatus | null;
-  },
-  items: MediaHealthDigestItem[]
-): MediaHealthDigestItem[] {
-  if (!isBrokenPersistStatus(outcome.persistStatus)) {
-    return items;
-  }
-
-  return [
-    ...items,
-    {
-      adminPath: getMediaAdminEditPath(item.entityTable, item.entityId),
-      entityTable: item.entityTable,
-      isNew: isNewBrokenItem(outcome.previousStatus),
-      mediaUrl: item.mediaUrl,
-      newStatus: outcome.persistStatus,
-      previousStatus: outcome.previousStatus ?? 'unknown',
-      publicPath: getMediaPublicPath(item),
-      title: item.title,
-    },
-  ];
-}
-
-function getMediaAdminEditPath(
+export function getMediaAdminEditPath(
   entityTable: 'clips' | 'talks',
   entityId: string
 ) {
   return `/${entityTable}/edit/${entityId}?status=archived`;
 }
 
-function isBrokenPersistStatus(
-  status: MediaCheckStatus
-): status is 'missing' | 'private' {
-  return status === 'missing' || status === 'private';
-}
+export function isUnnotifiedOpenCheck(check: {
+  firstBrokenAt?: number;
+  lastNotifiedAt?: number;
+  state?: 'ignored' | 'open' | 'resolved';
+  status: 'missing' | 'ok' | 'private' | 'unknown';
+}) {
+  if (check.state === 'ignored' || check.state === 'resolved') {
+    return false;
+  }
 
-function isNewBrokenItem(previousStatus: MediaCheckStatus | null) {
-  return previousStatus === 'ok';
+  if (check.status !== 'missing' && check.status !== 'private') {
+    return false;
+  }
+
+  const firstBrokenAt = check.firstBrokenAt ?? 0;
+
+  return (
+    check.lastNotifiedAt === undefined || check.lastNotifiedAt < firstBrokenAt
+  );
 }

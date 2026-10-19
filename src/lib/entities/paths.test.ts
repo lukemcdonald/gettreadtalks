@@ -1,6 +1,11 @@
 import { describe, expect, it } from '@/test';
 
-import { buildEntityEditPath, buildPathQuery, getLoginRedirect } from './paths';
+import {
+  buildAbsoluteUrl,
+  buildEntityEditPath,
+  buildPathQuery,
+  getLoginRedirect,
+} from './paths';
 
 describe('buildPathQuery', () => {
   it('returns an empty string when there is nothing to serialize', () => {
@@ -29,6 +34,14 @@ describe('getLoginRedirect', () => {
   it('keeps nested query params on the original url', () => {
     expect(getLoginRedirect('/talks/edit/talk123?status=archived')).toBe(
       '/login?redirect=%2Ftalks%2Fedit%2Ftalk123%3Fstatus%3Darchived'
+    );
+  });
+});
+
+describe('buildAbsoluteUrl', () => {
+  it('joins origin and path without a double slash', () => {
+    expect(buildAbsoluteUrl('/manage/media')).toBe(
+      'https://www.gettreadtalks.com/manage/media'
     );
   });
 });
