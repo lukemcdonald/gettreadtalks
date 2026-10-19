@@ -4,7 +4,6 @@ import { paginationOptsValidator } from 'convex/server';
 import { v } from 'convex/values';
 
 import { query } from '../../_generated/server';
-import { filterCollectionsWithPublishedTalks } from '../../lib/filters';
 import { enrichWithSpeaker } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
@@ -69,20 +68,15 @@ export const getCollectionBySlug = query({
       return null;
     }
 
-    const publishedCollections = await filterCollectionsWithPublishedTalks(
-      ctx,
-      [collection]
-    );
-
-    if (publishedCollections.length === 0) {
-      return null;
-    }
-
     const talks = await listPublishedTalksForCollection(
       ctx,
       collection._id,
       limit
     );
+
+    if (talks.length === 0) {
+      return null;
+    }
 
     talks.sort((a, b) => (a.collectionOrder || 0) - (b.collectionOrder || 0));
 

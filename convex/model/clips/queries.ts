@@ -102,14 +102,14 @@ export const getClipBySlug = query({
       return null;
     }
 
-    const [[clipWithSpeaker], talk] = await Promise.all([
-      enrichClipsWithSpeaker(ctx, [clip]),
+    const [speaker, talk] = await Promise.all([
+      clip.speakerId ? ctx.db.get('speakers', clip.speakerId) : null,
       clip.talkId ? ctx.db.get('talks', clip.talkId) : null,
     ]);
 
     return {
       clip,
-      speaker: clipWithSpeaker.speaker,
+      speaker,
       talk,
     };
   },
