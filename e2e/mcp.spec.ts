@@ -70,6 +70,19 @@ async function callTool(
   return JSON.parse(text ?? '{}') as Record<string, unknown>;
 }
 
+function expectSiteUrl(url: string | undefined, pathPrefix: string) {
+  expect(url).toContain(`${SITE}${pathPrefix}`);
+}
+
+function getFirstHit(result: Record<string, unknown>, key: string) {
+  const hits = result[key];
+  expect(Array.isArray(hits)).toBe(true);
+  const [hit] = (hits ?? []) as { slug?: string; url?: string }[];
+  expect(hit).toBeDefined();
+
+  return hit ?? {};
+}
+
 test('MCP / Initialize advertises the catalog', async ({ request }) => {
   const initialized = await mcpRpc(request, 'initialize', {
     capabilities: {},
@@ -101,8 +114,7 @@ test('MCP / Initialize advertises the catalog', async ({ request }) => {
 
 test('MCP / Catalog tools return canonical urls', async ({ request }) => {
   const talks = await callTool(request, 'search_talks', { query: 'Romans' });
-  const talkHits = talks.talks as { url?: string }[];
-  expect(talkHits[0]?.url).toContain(`${SITE}/talks/`);
+  expectSiteUrl(getFirstHit(talks, 'talks').url, '/talks/');
 
   const talk = await callTool(request, 'get_talk', {
     speakerSlug: 'john-doe',
@@ -114,33 +126,27 @@ test('MCP / Catalog tools return canonical urls', async ({ request }) => {
   );
 
   const speakers = await callTool(request, 'list_speakers', { search: 'John' });
-  const speakerHits = speakers.speakers as { url?: string }[];
-  expect(speakerHits[0]?.url).toContain(`${SITE}/speakers/`);
+  expectSiteUrl(getFirstHit(speakers, 'speakers').url, '/speakers/');
 
   const topics = await callTool(request, 'list_topics', { search: 'Grace' });
-  const topicHits = topics.topics as { url?: string }[];
-  expect(topicHits[0]?.url).toContain(`${SITE}/topics/`);
+  expectSiteUrl(getFirstHit(topics, 'topics').url, '/topics/');
 
   const collections = await callTool(request, 'list_collections');
-  const collectionHits = collections.collections as {
-    slug?: string;
-    url?: string;
-  }[];
-  expect(collectionHits[0]?.url).toContain(`${SITE}/collections/`);
+  const collectionHit = getFirstHit(collections, 'collections');
+  expectSiteUrl(collectionHit.url, '/collections/');
 
   const collection = await callTool(request, 'get_collection', {
-    slug: collectionHits[0]?.slug ?? 'example-series-the-psalms',
+    slug: collectionHit.slug ?? 'example-series-the-psalms',
   });
-  const collectionTalks = collection.talks as { url?: string }[];
-  expect(collectionTalks[0]?.url).toContain(`${SITE}/talks/`);
+  expectSiteUrl(getFirstHit(collection, 'talks').url, '/talks/');
 
   const clips = await callTool(request, 'list_clips');
-  const clipHits = clips.clips as { slug?: string; url?: string }[];
-  expect(clipHits[0]?.url).toContain(`${SITE}/clips/`);
+  const clipHit = getFirstHit(clips, 'clips');
+  expectSiteUrl(clipHit.url, '/clips/');
 
   const clip = await callTool(request, 'get_clip', {
-    slug: clipHits[0]?.slug ?? 'sample-clip-no-condemnation',
+    slug: clipHit.slug ?? 'sample-clip-no-condemnation',
   });
   const clipResult = clip.clip as { url?: string };
-  expect(clipResult.url).toContain(`${SITE}/clips/`);
+  expectSiteUrl(clipResult.url, '/clips/');
 });
