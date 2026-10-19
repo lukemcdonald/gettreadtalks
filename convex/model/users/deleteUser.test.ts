@@ -56,13 +56,19 @@ describe('users.deleteUser', () => {
           q.eq('userId', userId).eq('talkId', talkId)
         )
         .first();
+      const talk = await ctx.db.get('talks', talkId);
+      const speaker = talk
+        ? await ctx.db.get('speakers', talk.speakerId)
+        : null;
 
-      return { account, favorite, user };
+      return { account, favorite, speaker, talk, user };
     });
 
     expect(leftover.user).toBe(null);
     expect(leftover.account).toBe(null);
     expect(leftover.favorite).toBe(null);
+    expect(leftover.talk).not.toBe(null);
+    expect(leftover.speaker).not.toBe(null);
   });
 
   it('rejects the wrong password without deleting the user', async () => {
