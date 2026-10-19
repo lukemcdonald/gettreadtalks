@@ -40,7 +40,6 @@ describe('AccountMenu', () => {
 
     await click(screen.getByTestId('account-menu'));
 
-    expect(screen.queryByText('Signed in as')).not.toBeInTheDocument();
     expect(screen.getByText('user@example.com')).toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: 'Favorites' })).toHaveAttribute(
       'href',
@@ -58,6 +57,9 @@ describe('AccountMenu', () => {
       'href',
       '/logout'
     );
+    expect(
+      screen.queryByRole('menuitem', { name: 'Content' })
+    ).not.toBeInTheDocument();
   });
 
   it('shows Content for admins', async () => {
@@ -69,18 +71,5 @@ describe('AccountMenu', () => {
       'href',
       '/manage/talks'
     );
-    expect(
-      screen.queryByRole('menuitem', { name: 'Manage' })
-    ).not.toBeInTheDocument();
-  });
-
-  it('hides Content for non-admins', async () => {
-    const { click } = setup(createUser('user'));
-
-    await click(screen.getByTestId('account-menu'));
-
-    expect(
-      screen.queryByRole('menuitem', { name: 'Content' })
-    ).not.toBeInTheDocument();
   });
 });

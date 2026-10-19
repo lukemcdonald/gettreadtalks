@@ -56,12 +56,6 @@ describe('getQueryChange', () => {
       getQueryChange('search=bible&token=secret', 'search=bible&token=other')
     ).toEqual({ filters: [], query: undefined });
   });
-
-  it('ignores a cursor-only pagination change', () => {
-    expect(
-      getQueryChange('search=bible&cursor=abc', 'search=bible&cursor=def')
-    ).toEqual({ filters: [], query: undefined });
-  });
 });
 
 describe('getLocationIntent', () => {

@@ -4,44 +4,44 @@ import { describe, expect, it } from '@/test';
 
 import { formatErrorMessage } from './convex';
 import {
-  looksLikeDeveloperError,
+  USER_ERROR_MESSAGE,
   reportUnexpectedError,
   toUserErrorMessage,
-  USER_ERROR_MESSAGE,
 } from './user-facing';
-
-describe('looksLikeDeveloperError', () => {
-  it('flags env vars, config hints, and stacks', () => {
-    expect(looksLikeDeveloperError('Set NEXT_PUBLIC_TURNSTILE_SITE_KEY')).toBe(
-      true
-    );
-    expect(looksLikeDeveloperError('TURNSTILE_SECRET_KEY is not set')).toBe(
-      true
-    );
-    expect(
-      looksLikeDeveloperError('Missing required environment variables')
-    ).toBe(true);
-    expect(looksLikeDeveloperError('Error\n    at foo (bar.ts:1:1)')).toBe(
-      true
-    );
-  });
-
-  it('allows normal user messages', () => {
-    expect(looksLikeDeveloperError('Invalid email or password')).toBe(false);
-    expect(looksLikeDeveloperError('Already taken')).toBe(false);
-    expect(looksLikeDeveloperError('Resource not found')).toBe(false);
-  });
-});
 
 describe('toUserErrorMessage', () => {
   it('keeps safe auth copy and uses the fallback when empty', () => {
     expect(toUserErrorMessage('Invalid email or password', 'Fallback')).toBe(
       'Invalid email or password'
     );
+    expect(toUserErrorMessage('Already taken', 'Fallback')).toBe(
+      'Already taken'
+    );
+    expect(toUserErrorMessage('Resource not found', 'Fallback')).toBe(
+      'Resource not found'
+    );
     expect(toUserErrorMessage(undefined, 'Fallback')).toBe('Fallback');
   });
 
   it('replaces config leaks with the fallback', () => {
+    expect(
+      toUserErrorMessage(
+        'Set NEXT_PUBLIC_TURNSTILE_SITE_KEY',
+        'Try again later'
+      )
+    ).toBe('Try again later');
+    expect(
+      toUserErrorMessage('TURNSTILE_SECRET_KEY is not set', 'Try again later')
+    ).toBe('Try again later');
+    expect(
+      toUserErrorMessage(
+        'Missing required environment variables',
+        'Try again later'
+      )
+    ).toBe('Try again later');
+    expect(
+      toUserErrorMessage('Error\n    at foo (bar.ts:1:1)', 'Try again later')
+    ).toBe('Try again later');
     expect(
       toUserErrorMessage(
         'Verification is not configured. Set NEXT_PUBLIC_TURNSTILE_SITE_KEY.',

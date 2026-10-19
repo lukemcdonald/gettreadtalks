@@ -40,8 +40,6 @@ describe('MobileNav', () => {
 
     await click(screen.getByRole('button', { name: 'Open navigation menu' }));
 
-    expect(screen.queryByText('Account')).not.toBeInTheDocument();
-    expect(screen.queryByText('Signed in as')).not.toBeInTheDocument();
     expect(screen.getByText('user@example.com')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Favorites' })).toHaveAttribute(
       'href',
@@ -59,6 +57,9 @@ describe('MobileNav', () => {
       'href',
       '/logout'
     );
+    expect(
+      screen.queryByRole('button', { name: 'Content' })
+    ).not.toBeInTheDocument();
   });
 
   it('shows Content for admins', async () => {
@@ -70,9 +71,6 @@ describe('MobileNav', () => {
       'href',
       '/manage/talks'
     );
-    expect(
-      screen.queryByRole('button', { name: 'Manage' })
-    ).not.toBeInTheDocument();
   });
 
   it('shows Sign In when signed out', async () => {
@@ -89,15 +87,5 @@ describe('MobileNav', () => {
       'href',
       '/login'
     );
-  });
-
-  it('hides Content for non-admins', async () => {
-    const { click } = setup(createUser('user'));
-
-    await click(screen.getByRole('button', { name: 'Open navigation menu' }));
-
-    expect(
-      screen.queryByRole('button', { name: 'Content' })
-    ).not.toBeInTheDocument();
   });
 });

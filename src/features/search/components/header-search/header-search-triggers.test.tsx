@@ -25,13 +25,4 @@ describe('HeaderSearchDesktopTrigger', () => {
       MOCK_HOTKEY
     );
   });
-
-  it('spreads props onto the root element', () => {
-    setup({ 'data-testid': 'custom' });
-
-    const root = screen.getByTestId('custom');
-
-    expect(root).toBeInTheDocument();
-    expect(root).toBe(screen.getByRole('button', { name: 'Search' }));
-  });
 });

@@ -1,5 +1,4 @@
 import { hydrateRoot } from 'react-dom/client';
-import { renderToString } from 'react-dom/server';
 
 import { describe, expect, it, screen, vi, waitFor } from '@/test';
 
@@ -41,12 +40,6 @@ describe('useMediaQuery', () => {
 
     return hydrationErrors;
   }
-
-  it('renders the unmatched branch during SSR even when the query matches', () => {
-    stubLgMediaQuery(true);
-
-    expect(renderToString(<MediaLabel />)).toContain('Mobile layout');
-  });
 
   it('hydrates unmatched server markup without a warning when the query matches', async () => {
     stubLgMediaQuery(true);

@@ -99,7 +99,7 @@ test('MCP / Initialize advertises the catalog', async ({ request }) => {
   );
 });
 
-test('MCP / Search and get talk return canonical urls', async ({ request }) => {
+test('MCP / Catalog tools return canonical urls', async ({ request }) => {
   const talks = await callTool(request, 'search_talks', { query: 'Romans' });
   const talkHits = talks.talks as { url?: string }[];
   expect(talkHits[0]?.url).toContain(`${SITE}/talks/`);
@@ -112,11 +112,7 @@ test('MCP / Search and get talk return canonical urls', async ({ request }) => {
   expect(talkResult.url).toBe(
     `${SITE}/talks/john-doe/sample-sermon-on-romans-8`
   );
-});
 
-test('MCP / List speakers and topics return canonical urls', async ({
-  request,
-}) => {
   const speakers = await callTool(request, 'list_speakers', { search: 'John' });
   const speakerHits = speakers.speakers as { url?: string }[];
   expect(speakerHits[0]?.url).toContain(`${SITE}/speakers/`);
@@ -124,11 +120,7 @@ test('MCP / List speakers and topics return canonical urls', async ({
   const topics = await callTool(request, 'list_topics', { search: 'Grace' });
   const topicHits = topics.topics as { url?: string }[];
   expect(topicHits[0]?.url).toContain(`${SITE}/topics/`);
-});
 
-test('MCP / List and get collection return canonical urls', async ({
-  request,
-}) => {
   const collections = await callTool(request, 'list_collections');
   const collectionHits = collections.collections as {
     slug?: string;
@@ -141,9 +133,7 @@ test('MCP / List and get collection return canonical urls', async ({
   });
   const collectionTalks = collection.talks as { url?: string }[];
   expect(collectionTalks[0]?.url).toContain(`${SITE}/talks/`);
-});
 
-test('MCP / List and get clip return canonical urls', async ({ request }) => {
   const clips = await callTool(request, 'list_clips');
   const clipHits = clips.clips as { slug?: string; url?: string }[];
   expect(clipHits[0]?.url).toContain(`${SITE}/clips/`);

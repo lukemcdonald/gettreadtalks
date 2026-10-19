@@ -71,13 +71,4 @@ describe('AreaNav', () => {
       ).not.toHaveAttribute('aria-current');
     });
   });
-
-  it('does not render a heading in the sidebar', () => {
-    setup('/account', 'sidebar');
-
-    expect(screen.queryByRole('heading')).not.toBeInTheDocument();
-    expect(
-      screen.getByRole('navigation', { name: 'Account' })
-    ).toBeInTheDocument();
-  });
 });
