@@ -2,11 +2,17 @@
 
 import type { Analytics } from '@segment/analytics-next';
 
+import { isSegmentEnabled } from './enabled';
 import { logAnalytics } from './log';
 import { getPageContext, sanitizePageProperties } from './page-context';
 
 const IDLE_LOAD_TIMEOUT_MS = 2000;
 const writeKey = process.env.NEXT_PUBLIC_SEGMENT_WRITE_KEY;
+const segmentEnabled = isSegmentEnabled(
+  writeKey,
+  process.env.NEXT_PUBLIC_SEGMENT_ENABLED,
+  process.env.NEXT_PUBLIC_VERCEL_ENV
+);
 
 let clientPromise: Promise<Analytics | undefined> | undefined;
 let dispatchQueue: Promise<void> = Promise.resolve();
@@ -45,7 +51,7 @@ async function loadClient(key: string) {
 }
 
 function getClient() {
-  if (!writeKey) {
+  if (!segmentEnabled || !writeKey) {
     return Promise.resolve();
   }
 

@@ -26,6 +26,7 @@ describe('analytics client', () => {
     segmentTrack.mockReset();
     segmentLoad.mockResolvedValue([{ track: segmentTrack }]);
     vi.stubEnv('NEXT_PUBLIC_SEGMENT_WRITE_KEY', MOCK_WRITE_KEY);
+    vi.stubEnv('NEXT_PUBLIC_VERCEL_ENV', 'production');
     await loadClientModule();
   });
 
@@ -76,5 +77,15 @@ describe('analytics client', () => {
       talk_id: 'talks:romans-8',
       talk_slug: 'romans-8',
     });
+  });
+
+  it('does not load Segment when the kill switch is off', async () => {
+    vi.stubEnv('NEXT_PUBLIC_SEGMENT_ENABLED', 'false');
+    await loadClientModule();
+
+    analytics.loadAnalytics();
+    await vi.advanceTimersByTimeAsync(MOCK_IDLE_TIMEOUT_MS);
+
+    expect(segmentLoad).not.toHaveBeenCalled();
   });
 });
