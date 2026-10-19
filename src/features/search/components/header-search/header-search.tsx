@@ -46,9 +46,10 @@ export function HeaderSearch() {
 
   return (
     <>
-      {isMobile ? (
+      <span className="md:hidden">
         <HeaderSearchMobileTrigger onClick={openSearch} />
-      ) : (
+      </span>
+      <span className="hidden md:inline-flex">
         <HeaderSearchDesktopTrigger
           className="m-1.5"
           hotkey={
@@ -60,7 +61,7 @@ export function HeaderSearch() {
           }
           onClick={openSearch}
         />
-      )}
+      </span>
       {isMobile ? (
         <MobileSearchDrawer
           groups={search.groups}
