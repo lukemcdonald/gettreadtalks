@@ -28,9 +28,11 @@ import { Link } from '@/components/ui/link';
 import { useCurrentUser } from '@/features/users/hooks/use-current-user';
 import { isAdmin } from '@/services/auth/utils';
 
-export function SignedOutAccountMenu() {
-  const pathname = usePathname();
-
+export function SignedOutAccountMenu({
+  isActive = false,
+}: {
+  isActive?: boolean;
+} = {}) {
   return (
     <>
       <div className="lg:hidden">
@@ -46,11 +48,7 @@ export function SignedOutAccountMenu() {
         </Button>
       </div>
       <div className="hidden lg:block">
-        <NavLink
-          data-testid="sign-in"
-          href="/login"
-          isActive={pathname === '/login'}
-        >
+        <NavLink data-testid="sign-in" href="/login" isActive={isActive}>
           <span>Sign In</span>
           <ArrowRightIcon className="size-4" />
         </NavLink>
@@ -65,9 +63,10 @@ interface AccountMenuProps {
 
 export function AccountMenu({ initialUser }: AccountMenuProps) {
   const { data: user } = useCurrentUser(initialUser);
+  const pathname = usePathname();
 
   if (!user) {
-    return <SignedOutAccountMenu />;
+    return <SignedOutAccountMenu isActive={pathname === '/login'} />;
   }
 
   const showContentLink = isAdmin(user);
