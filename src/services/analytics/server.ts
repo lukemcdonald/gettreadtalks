@@ -12,8 +12,7 @@ const SEGMENT_TRACK_URL = 'https://api.segment.io/v1/track';
 const writeKey = process.env.SEGMENT_WRITE_KEY;
 const segmentEnabled = isSegmentEnabled(
   writeKey,
-  process.env.NEXT_PUBLIC_SEGMENT_ENABLED,
-  process.env.NEXT_PUBLIC_VERCEL_ENV
+  process.env.NEXT_PUBLIC_SEGMENT_ENABLED
 );
 
 interface ServerTrackPayload<E extends keyof EventMap = keyof EventMap> {

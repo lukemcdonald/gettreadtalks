@@ -26,7 +26,6 @@ describe('analytics client', () => {
     segmentTrack.mockReset();
     segmentLoad.mockResolvedValue([{ track: segmentTrack }]);
     vi.stubEnv('NEXT_PUBLIC_SEGMENT_WRITE_KEY', MOCK_WRITE_KEY);
-    vi.stubEnv('NEXT_PUBLIC_VERCEL_ENV', 'production');
     await loadClientModule();
   });
 

@@ -10,8 +10,7 @@ const IDLE_LOAD_TIMEOUT_MS = 2000;
 const writeKey = process.env.NEXT_PUBLIC_SEGMENT_WRITE_KEY;
 const segmentEnabled = isSegmentEnabled(
   writeKey,
-  process.env.NEXT_PUBLIC_SEGMENT_ENABLED,
-  process.env.NEXT_PUBLIC_VERCEL_ENV
+  process.env.NEXT_PUBLIC_SEGMENT_ENABLED
 );
 
 let clientPromise: Promise<Analytics | undefined> | undefined;
