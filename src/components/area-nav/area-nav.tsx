@@ -116,7 +116,7 @@ export function AreaNav({ items, label, variant }: AreaNavProps) {
 
   return (
     <nav aria-label={label} className="overflow-x-auto">
-      <ul className="flex w-full min-w-max gap-1 border-b">
+      <ul className="border-input flex w-full min-w-max gap-1 border-b">
         {items.map((item) => {
           const isActive = item.href === pathname;
 

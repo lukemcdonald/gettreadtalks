@@ -53,7 +53,7 @@ function SearchResultGroup({
       <h2 className="text-muted-foreground mb-3 text-sm font-medium tracking-wide uppercase">
         {group.label}
       </h2>
-      <ul className="divide-border divide-y">
+      <ul className="divide-input divide-y">
         {group.hits.map((hit) => (
           <li key={hit.id}>
             <SearchHitLink

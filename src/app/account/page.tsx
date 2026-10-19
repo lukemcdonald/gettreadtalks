@@ -36,7 +36,7 @@ export default async function AccountPage() {
               <ProfileForm currentName={user?.name ?? ''} />
             </CardContent>
 
-            <Separator />
+            <Separator className="bg-input" />
 
             <CardHeader>
               <CardTitle>Email settings</CardTitle>
@@ -48,7 +48,7 @@ export default async function AccountPage() {
               <EmailForm currentEmail={user?.email ?? ''} />
             </CardContent>
 
-            <Separator />
+            <Separator className="bg-input" />
 
             <CardHeader>
               <CardTitle>Password settings</CardTitle>

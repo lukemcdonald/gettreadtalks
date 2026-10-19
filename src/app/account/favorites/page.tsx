@@ -117,7 +117,7 @@ function FavoritesTabs({ clips, speakers, talks }: UserFavorites) {
 
   return (
     <Tabs defaultValue={tabs[0]?.value ?? 'talks'}>
-      <div className="border-b px-6">
+      <div className="border-input border-b px-6">
         <TabsList variant="underline">
           {tabs.map((tab) => (
             <FavoritesTab

@@ -25,7 +25,7 @@ interface FilterPopupProps {
 export function FilterPopup({ label, name }: FilterPopupProps) {
   return (
     <ComboboxPopup aria-label={label ?? `Select ${name}`}>
-      <div className="border-b p-2">
+      <div className="border-input border-b p-2">
         <ComboboxInput
           className="rounded-md before:rounded-md"
           placeholder={`Search ${name}...`}

@@ -33,6 +33,7 @@ Use theme utilities (`bg-background`, `text-foreground`, `bg-card`, `text-muted-
 - **muted / muted-foreground** — secondary copy, captions, speaker role, table subtitles.
 - **secondary / accent** — quiet fills and hover.
 - **border / input / ring** — hairlines, fields, focus.
+- **dividers** — decorative rules use `border-input` / `bg-input` / `divide-input` so they match field outlines. Solid, never dashed. `SectionHeading` is the shared heading rule.
 - **destructive / info / success / warning** — status and alerts, each with a matching `*-foreground`.
 
 Dark mode is class-based (`next-themes`, `.dark` on `html`). Token names stay; values swap. Toggle with `ModeSwitcher` in `src/components/site-header/mode-switcher.tsx`.
@@ -76,6 +77,7 @@ Import COSS from `@/components/ui` (`src/components/ui`). Never edit `src/compon
 - **Detail back link** — `ArchiveBackLink` in `src/components/archive-back-link.tsx` above the title. Keep JSON-LD breadcrumbs (`src/lib/json-ld.ts`). Do not render COSS `Breadcrumb`.
 - **Speaker role** — its own muted line under the name (`src/app/speakers/[speakerSlug]/_components/speaker-hero-details.tsx`, `src/features/speakers/components/speaker-card.tsx`). Never inline with the name.
 - **Search** — desktop `CommandDialog` in `src/features/search/components/header-search/desktop-search-dialog.tsx`. Mobile bottom `Drawer` in `src/features/search/components/header-search/mobile-search-drawer.tsx`.
+- **Section heading** — `SectionHeading` in `src/components/section-heading.tsx`. Solid `bg-input` rule between heading and meta.
 
 ## Do's and Don'ts
 
