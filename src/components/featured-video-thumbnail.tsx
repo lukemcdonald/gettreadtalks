@@ -37,7 +37,7 @@ export function FeaturedVideoThumbnail({
   }
 
   return (
-    <>
+    <div className="relative size-full">
       <Image
         alt={title}
         className="object-cover"
@@ -51,6 +51,6 @@ export function FeaturedVideoThumbnail({
           <PlayIcon className="ml-0.5 size-5" fill="currentColor" />
         </span>
       </div>
-    </>
+    </div>
   );
 }
