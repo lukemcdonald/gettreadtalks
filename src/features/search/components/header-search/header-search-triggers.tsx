@@ -7,12 +7,24 @@ import { SearchIcon } from 'lucide-react';
 
 import { Button } from '@/components/ui';
 import { useSearchHotkeyLabel } from '@/features/search/hooks/use-header-search';
+import { formatSearchHotkeyLabel } from '@/features/search/utils';
 import { cn } from '@/utils';
+
+export function SearchHotkeyLabelText({ children }: { children: string }) {
+  return (
+    <span className="text-muted-foreground inline-grid text-xs">
+      <span aria-hidden className="invisible col-start-1 row-start-1">
+        {formatSearchHotkeyLabel()}
+      </span>
+      <span className="col-start-1 row-start-1">{children}</span>
+    </span>
+  );
+}
 
 export function SearchHotkeyLabel() {
   const hotkey = useSearchHotkeyLabel();
 
-  return <span className="text-muted-foreground text-xs">{hotkey}</span>;
+  return <SearchHotkeyLabelText>{hotkey}</SearchHotkeyLabelText>;
 }
 
 export function HeaderSearchDesktopTrigger({

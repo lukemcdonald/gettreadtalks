@@ -10,6 +10,7 @@ import {
   HeaderSearchDesktopTrigger,
   HeaderSearchMobileTrigger,
   SearchHotkeyLabel,
+  SearchHotkeyLabelText,
 } from './header-search-triggers';
 import { MobileSearchDrawer } from './mobile-search-drawer';
 
@@ -28,7 +29,7 @@ export function HeaderSearchFallback() {
           aria-hidden
           className="pointer-events-none m-1.5"
           disabled
-          hotkey={<span className="text-muted-foreground text-xs">⌘K</span>}
+          hotkey={<SearchHotkeyLabel />}
         />
       </span>
     </>
@@ -52,9 +53,7 @@ export function HeaderSearch() {
           className="m-1.5"
           hotkey={
             <Suspense
-              fallback={
-                <span className="text-muted-foreground text-xs">⌘K</span>
-              }
+              fallback={<SearchHotkeyLabelText>⌘K</SearchHotkeyLabelText>}
             >
               <SearchHotkeyLabel />
             </Suspense>

@@ -26,7 +26,7 @@ describe('AccountMenu', () => {
     } as AuthUser;
   }
 
-  function setup(user: AuthUser, options?: RenderOptions) {
+  function setup(user: AuthUser | null, options?: RenderOptions) {
     vi.mocked(useCurrentUser).mockReturnValue({
       data: user,
       isLoading: false,
@@ -34,6 +34,15 @@ describe('AccountMenu', () => {
 
     return render(<AccountMenu initialUser={user} />, options);
   }
+
+  it('shows Sign In when signed out', () => {
+    setup(null);
+
+    const signInLinks = screen.getAllByRole('link', { name: 'Sign In' });
+
+    expect(signInLinks.length).toBeGreaterThan(0);
+    expect(signInLinks[0]).toHaveAttribute('href', '/login');
+  });
 
   it('shows account destinations for signed-in users', async () => {
     const { click } = setup(createUser('user'));
