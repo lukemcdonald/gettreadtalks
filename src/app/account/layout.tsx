@@ -6,10 +6,7 @@ import { UserGate } from '@/services/auth/user-gate';
 
 export default function AccountLayout({ children }: { children: ReactNode }) {
   return (
-    <UserGate
-      fallback={<Skeleton className="h-96 w-full" />}
-      redirect="/login?redirect=/account"
-    >
+    <UserGate fallback={<Skeleton className="h-96 w-full" />}>
       <AreaLayout>{children}</AreaLayout>
     </UserGate>
   );
