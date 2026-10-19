@@ -152,15 +152,17 @@ export const handleEmailEvent = internalMutation({
 export const sendMediaHealthEmail = internalAction({
   args: {
     items: v.array(mediaHealthDigestItem),
+    stillBrokenCount: v.number(),
   },
   handler: async (ctx, args) => {
     if (args.items.length === 0 || shouldSkipTestModeSend(site.email.contact)) {
-      return null;
+      return false;
     }
 
     try {
       const template = MediaHealthEmail({
         items: args.items,
+        stillBrokenCount: args.stillBrokenCount,
       });
       const { html, text } = await renderEmail(template);
 
@@ -185,9 +187,9 @@ export const sendMediaHealthEmail = internalAction({
       });
     }
 
-    return null;
+    return true;
   },
-  returns: v.null(),
+  returns: v.boolean(),
 });
 
 export const sendPasswordResetEmail = internalAction({

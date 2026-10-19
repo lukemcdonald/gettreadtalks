@@ -18,11 +18,11 @@ export const mediaCheckStatus = v.union(
 
 export const mediaHealthDigestItem = v.object({
   adminPath: v.string(),
+  checkId: v.id('mediaChecks'),
   entityTable: mediaCheckEntityTable,
   isNew: v.boolean(),
   mediaUrl: v.string(),
   newStatus: v.union(v.literal('missing'), v.literal('private')),
-  previousStatus: mediaCheckStatus,
   publicPath: v.union(v.null(), v.string()),
   title: v.string(),
 });

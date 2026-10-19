@@ -8,22 +8,25 @@ import { Button, Heading, Section, Text } from 'react-email';
 import { site } from '../../src/configs/site';
 import { EmailLayout } from './components/layout';
 
-export function MediaHealthEmail({ items }: MediaHealthEmailProps) {
+export function MediaHealthEmail({
+  items,
+  stillBrokenCount,
+}: MediaHealthEmailProps) {
   const talks = items.filter((item) => item.entityTable === 'talks');
   const clips = items.filter((item) => item.entityTable === 'clips');
   const siteUrl = process.env.SITE_URL || site.url;
 
   return (
-    <EmailLayout preview="Private or missing talk and clip media needs a look.">
+    <EmailLayout preview="New private or missing talk and clip media needs a look.">
       <Text style={paragraph}>Hi,</Text>
       <Text style={paragraph}>
-        These published YouTube or Vimeo URLs are currently private or missing.
-        Items marked New broke since the last check; the rest are still broken.
-        Open in admin to review and archive — Archived is preselected, and
-        nothing is saved until you press Save. View page opens the public talk
-        or clip. Check video opens the YouTube or Vimeo page. This job does not
-        change content for you.
+        These published YouTube or Vimeo URLs are newly private or missing. Open
+        in admin to review and archive — Archived is preselected, and nothing is
+        saved until you press Save. View page opens the public talk or clip.
+        Check video opens the YouTube or Vimeo page. This job does not change
+        content for you.
       </Text>
+      {stillBrokenNote(stillBrokenCount)}
       {talks.length > 0 && (
         <>
           <Heading as="h2" style={sectionHeading}>
@@ -58,6 +61,14 @@ export function MediaHealthEmail({ items }: MediaHealthEmailProps) {
   );
 }
 
+function stillBrokenNote(count: number) {
+  if (count <= 0) {
+    return null;
+  }
+
+  return <Text style={paragraph}>{count} more still broken from earlier.</Text>;
+}
+
 function MediaHealthItem({
   item,
   siteUrl,
@@ -72,8 +83,7 @@ function MediaHealthItem({
     <Section style={itemSection}>
       <Text style={titleText}>{item.title}</Text>
       <Text style={metaText}>
-        {item.isNew ? 'New · ' : ''}
-        {item.entityTable} · {item.previousStatus} to {item.newStatus}
+        {item.entityTable} · {item.newStatus}
       </Text>
       <Text style={metaText}>{item.mediaUrl}</Text>
       <Section style={buttonContainer}>

@@ -1,59 +1,41 @@
 import { describe, expect, it } from 'vitest';
 
+import { internal } from '../../_generated/api';
+import { createConvexTest } from '../../test.setup';
 import {
   appendMediaHealthItem,
   buildMediaHealthDigest,
   getMediaPublicPath,
 } from './digest';
 
-const firstTalkInput = {
+const CHECKED_AT = 1_700_000_000_000;
+const MEDIA_URL = 'https://www.youtube.com/watch?v=0SVTl4Xa5fY';
+
+const talk = {
   entityId: 'talk1',
   entityTable: 'talks' as const,
-  mediaUrl: 'https://www.youtube.com/watch?v=abc',
+  mediaUrl: MEDIA_URL,
   slug: 'first-talk',
   speakerSlug: 'john-doe',
   title: 'First Talk',
 };
 
-const stillBrokenClipInput = {
-  entityId: 'clip1',
-  entityTable: 'clips' as const,
-  mediaUrl: 'https://vimeo.com/1',
-  slug: 'second-clip',
-  title: 'Second Clip',
-};
-
-const firstPrivateTalkInput = {
-  entityId: 'talk2',
-  entityTable: 'talks' as const,
-  mediaUrl: 'https://www.youtube.com/watch?v=def',
-  slug: 'new-talk',
-  speakerSlug: 'mary-smith',
-  title: 'New Talk',
-};
-
-const healthyTalkInput = {
-  entityId: 'talk3',
-  entityTable: 'talks' as const,
-  mediaUrl: 'https://www.youtube.com/watch?v=ghi',
-  slug: 'healthy-talk',
-  speakerSlug: 'john-doe',
-  title: 'Healthy Talk',
-};
-
-function firstAppendedItem(
-  input: Parameters<typeof appendMediaHealthItem>[0],
-  outcome: Parameters<typeof appendMediaHealthItem>[1]
+async function upsert(
+  t: ReturnType<typeof createConvexTest>,
+  observedStatus: 'missing' | 'ok' | 'private',
+  checkedAt = CHECKED_AT
 ) {
-  const items = appendMediaHealthItem(input, outcome, []);
-  const [item] = items;
+  return await t.mutation(internal.mediaHealth.upsertMediaCheck, {
+    checkedAt,
+    entityId: talk.entityId,
+    entityTable: talk.entityTable,
+    mediaUrl: MEDIA_URL,
+    observedStatus,
+  });
+}
 
-  expect(items.length).toBe(1);
-  if (!item) {
-    throw new Error('expected digest item');
-  }
-
-  return item;
+function digestFor(outcome: Awaited<ReturnType<typeof upsert>>) {
+  return buildMediaHealthDigest(appendMediaHealthItem(talk, outcome, []));
 }
 
 describe('buildMediaHealthDigest', () => {
@@ -73,50 +55,56 @@ describe('getMediaPublicPath', () => {
   });
 });
 
-describe('appendMediaHealthItem', () => {
-  it('includes newly broken media as new', () => {
-    const item = firstAppendedItem(firstTalkInput, {
-      persistStatus: 'private',
-      previousStatus: 'ok',
-    });
+describe('media health digest', () => {
+  it('emails a first break once', async () => {
+    const t = createConvexTest();
+    const digest = digestFor(await upsert(t, 'private'));
 
-    expect(item.adminPath).toBe('/talks/edit/talk1?status=archived');
-    expect(item.isNew).toBe(true);
-    expect(item.newStatus).toBe('private');
-    expect(item.publicPath).toBe('/talks/john-doe/first-talk');
+    expect(digest?.stillBrokenCount).toBe(0);
+    expect(digest?.items).toEqual([
+      {
+        adminPath: '/talks/edit/talk1?status=archived',
+        checkId: expect.any(String),
+        entityTable: 'talks',
+        isNew: true,
+        mediaUrl: MEDIA_URL,
+        newStatus: 'private',
+        publicPath: '/talks/john-doe/first-talk',
+        title: 'First Talk',
+      },
+    ]);
   });
 
-  it('includes still-broken media as not new', () => {
-    const item = firstAppendedItem(stillBrokenClipInput, {
-      persistStatus: 'missing',
-      previousStatus: 'missing',
+  it('does not re-email an already-notified break', async () => {
+    const t = createConvexTest();
+    const first = await upsert(t, 'private');
+
+    await t.mutation(internal.mediaHealth.stampMediaChecksNotified, {
+      checkIds: [first.checkId],
+      notifiedAt: CHECKED_AT + 1,
     });
 
-    expect(item.adminPath).toBe('/clips/edit/clip1?status=archived');
-    expect(item.isNew).toBe(false);
-    expect(item.publicPath).toBe('/clips/second-clip');
+    expect(digestFor(await upsert(t, 'private', CHECKED_AT + 2))).toBe(null);
   });
 
-  it('includes a first broken check as not new', () => {
-    const item = firstAppendedItem(firstPrivateTalkInput, {
-      persistStatus: 'private',
-      previousStatus: null,
+  it('emails again after recovery then a re-break', async () => {
+    const t = createConvexTest();
+    const first = await upsert(t, 'private');
+
+    await t.mutation(internal.mediaHealth.stampMediaChecksNotified, {
+      checkIds: [first.checkId],
+      notifiedAt: CHECKED_AT + 1,
     });
 
-    expect(item.isNew).toBe(false);
-    expect(item.publicPath).toBe('/talks/mary-smith/new-talk');
-  });
+    expect(digestFor(await upsert(t, 'ok', CHECKED_AT + 2))).toBe(null);
 
-  it('omits ok media', () => {
-    expect(
-      appendMediaHealthItem(
-        healthyTalkInput,
-        {
-          persistStatus: 'ok',
-          previousStatus: 'ok',
-        },
-        []
-      )
-    ).toEqual([]);
+    const digest = digestFor(await upsert(t, 'missing', CHECKED_AT + 3));
+
+    expect(digest?.items).toEqual([
+      expect.objectContaining({
+        isNew: true,
+        newStatus: 'missing',
+      }),
+    ]);
   });
 });

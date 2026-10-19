@@ -5,16 +5,15 @@ export interface EmailTemplateProps {
 export interface MediaHealthEmailItem {
   adminPath: string;
   entityTable: 'clips' | 'talks';
-  isNew: boolean;
   mediaUrl: string;
   newStatus: 'missing' | 'private';
-  previousStatus: 'missing' | 'ok' | 'private' | 'unknown';
   publicPath: string | null;
   title: string;
 }
 
 export interface MediaHealthEmailProps {
   items: MediaHealthEmailItem[];
+  stillBrokenCount: number;
 }
 
 export type PasswordResetEmailProps = EmailTemplateProps & {
