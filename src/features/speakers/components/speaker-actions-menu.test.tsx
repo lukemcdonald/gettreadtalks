@@ -33,7 +33,7 @@ describe('SpeakerActionsMenu', () => {
   };
 
   it('shows View and Delete without Edit when published', async () => {
-    const viewUrl = buildSpeakerPath(speaker.slug);
+    const viewUrl = buildSpeakerPath(speaker);
     const { click } = render(
       <SpeakerActionsMenu
         clipCount={0}

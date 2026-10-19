@@ -70,8 +70,14 @@ function getUrlChangeForTalk(talk: Talk, data: TalkFormData): UrlChange {
   const speakerSegment = speakerChanged ? '<new-speaker>' : '<speaker>';
 
   return {
-    newUrl: buildTalkPath(speakerSegment, newTalkSlug),
-    oldUrl: buildTalkPath('<speaker>', oldTalkSlug),
+    newUrl: buildTalkPath({
+      speaker: { slug: speakerSegment },
+      slug: newTalkSlug,
+    }),
+    oldUrl: buildTalkPath({
+      speaker: { slug: '<speaker>' },
+      slug: oldTalkSlug,
+    }),
   };
 }
 

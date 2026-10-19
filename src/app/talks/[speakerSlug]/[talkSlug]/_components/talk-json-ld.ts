@@ -66,6 +66,8 @@ export function buildTalkJsonLd({
     ...(uploadedAt && {
       uploadDate: new Date(uploadedAt).toISOString(),
     }),
-    url: buildAbsoluteUrl(buildTalkPath(speakerSlug, talkSlug)),
+    url: buildAbsoluteUrl(
+      buildTalkPath({ speaker: { slug: speakerSlug }, slug: talkSlug })
+    ),
   };
 }

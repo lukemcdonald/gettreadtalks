@@ -19,6 +19,6 @@ export default async function Page({ params }: PageProps) {
   await redirectPublicEdit({
     entity: 'topics',
     id: data.topic._id,
-    publicPath: buildTopicPath(topicSlug),
+    publicPath: buildTopicPath(data.topic),
   });
 }

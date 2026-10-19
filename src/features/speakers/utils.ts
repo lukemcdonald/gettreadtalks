@@ -1,5 +1,7 @@
 import type { Speaker } from '@/features/speakers/types';
 
+import { buildPathQuery } from '@/lib/entities/paths';
+
 type SpeakerNameFields = Pick<Speaker, 'firstName' | 'lastName'>;
 
 /**
@@ -22,12 +24,12 @@ export function getSpeakerInitials(speaker?: SpeakerNameFields | null): string {
   return speaker ? `${speaker.firstName?.[0]}${speaker.lastName?.[0]}` : '';
 }
 
-export function buildSpeakerPath(speakerSlug: string) {
-  return `/speakers/${speakerSlug}`;
+export function buildSpeakerPath(speaker: Pick<Speaker, 'slug'>) {
+  return `/speakers/${speaker.slug}`;
 }
 
-export function buildSpeakersPath() {
-  return '/speakers';
+export function buildSpeakersPath(options?: { query?: { sort?: string } }) {
+  return `/speakers${buildPathQuery(options?.query)}`;
 }
 
 /**

@@ -22,7 +22,7 @@ function getRelatedTopicSection(topic?: Topic) {
     description: `Enjoy more talks on ${topic.title}.`,
     quickLinks: [
       {
-        href: buildTopicPath(topic.slug),
+        href: buildTopicPath(topic),
         label: 'View topic',
       },
     ],

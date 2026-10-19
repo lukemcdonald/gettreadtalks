@@ -13,7 +13,7 @@ interface ClipsTableRowProps {
 export function ClipsTableRow({ clip }: ClipsTableRowProps) {
   const editPath = buildEntityEditPath('clips', clip._id);
   const publicPath =
-    clip.status === 'published' ? buildClipPath(clip.slug) : undefined;
+    clip.status === 'published' ? buildClipPath(clip) : undefined;
 
   return (
     <ManageRow

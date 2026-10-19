@@ -32,7 +32,7 @@ export function TopicBrowseSection({
           <Link
             className="hover:underline"
             data-testid="topic-link"
-            href={buildTopicPath(topic.slug)}
+            href={buildTopicPath(topic)}
           >
             {topic.title}
           </Link>
@@ -41,7 +41,7 @@ export function TopicBrowseSection({
           hasMoreTalks ? (
             <Link
               className="hover:text-foreground inline-flex items-center gap-1"
-              href={buildTopicPath(topic.slug)}
+              href={buildTopicPath(topic)}
             >
               {countLabel}
               <ChevronRightIcon className="size-3.5" />

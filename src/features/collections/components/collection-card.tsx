@@ -31,7 +31,7 @@ export function CollectionCard({
           <MediaCardTitle aria-label={collection.title}>
             <FauxLink
               data-testid="collection-card"
-              href={buildCollectionPath(collection.slug)}
+              href={buildCollectionPath(collection)}
             >
               {collection.title}
             </FauxLink>

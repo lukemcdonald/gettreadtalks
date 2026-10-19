@@ -29,7 +29,7 @@ export async function generateMetadata({
   const name = getSpeakerName(speaker);
 
   return buildPageMetadata({
-    canonical: buildSpeakerPath(speakerSlug),
+    canonical: buildSpeakerPath(speaker),
     description:
       speaker.description ?? `${name} — faithful minister of the Gospel.`,
     openGraphType: 'profile',

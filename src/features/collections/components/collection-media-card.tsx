@@ -13,7 +13,7 @@ export function CollectionMediaCard({ collection }: CollectionMediaCardProps) {
   return (
     <MediaCard
       ariaLabel={collection.title}
-      href={buildCollectionPath(collection.slug)}
+      href={buildCollectionPath(collection)}
       media={
         <MediaIconFrame>
           <FolderIcon className="size-5" />

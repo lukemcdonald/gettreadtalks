@@ -45,7 +45,10 @@ describe('TalkActionsMenu', () => {
     status: 'published',
     title: 'Justification',
   } as TalkWithSpeakerAndTopics;
-  const talkUrl = buildTalkPath('john-piper', talk.slug);
+  const talkUrl = buildTalkPath({
+    speaker: { slug: 'john-piper' },
+    slug: talk.slug,
+  });
 
   async function openMenu(viewUrl?: string) {
     const { click } = render(<TalkActionsMenu talk={talk} talkUrl={viewUrl} />);

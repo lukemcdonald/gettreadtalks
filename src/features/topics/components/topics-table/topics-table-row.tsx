@@ -12,7 +12,7 @@ interface TopicsTableRowProps {
 
 export function TopicsTableRow({ talkCount, topic }: TopicsTableRowProps) {
   const editPath = buildEntityEditPath('topics', topic._id);
-  const viewUrl = talkCount > 0 ? buildTopicPath(topic.slug) : undefined;
+  const viewUrl = talkCount > 0 ? buildTopicPath(topic) : undefined;
 
   return (
     <ManageRow

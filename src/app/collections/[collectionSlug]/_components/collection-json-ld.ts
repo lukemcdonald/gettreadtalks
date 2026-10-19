@@ -21,6 +21,6 @@ export function buildCollectionJsonLd({
     description,
     itemListElement: buildTalkListItemsJsonLd(talks),
     name: title,
-    url: buildAbsoluteUrl(buildCollectionPath(collectionSlug)),
+    url: buildAbsoluteUrl(buildCollectionPath({ slug: collectionSlug })),
   };
 }

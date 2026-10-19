@@ -21,6 +21,6 @@ export function buildTopicJsonLd({
     description,
     itemListElement: buildTalkListItemsJsonLd(talks),
     name: title,
-    url: buildAbsoluteUrl(buildTopicPath(topicSlug)),
+    url: buildAbsoluteUrl(buildTopicPath({ slug: topicSlug })),
   };
 }

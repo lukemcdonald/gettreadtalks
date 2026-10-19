@@ -118,7 +118,7 @@ export function toSearchHits(result: SiteSearchResult): SearchHit[] {
 
     return [
       {
-        href: buildTalkPath(talk.speaker.slug, talk.slug),
+        href: buildTalkPath(talk),
         id: talk._id,
         subtitle: getSpeakerName(talk.speaker),
         title: talk.title,
@@ -128,7 +128,7 @@ export function toSearchHits(result: SiteSearchResult): SearchHit[] {
   });
 
   const speakers = result.speakers.map((speaker) => ({
-    href: buildSpeakerPath(speaker.slug),
+    href: buildSpeakerPath(speaker),
     id: speaker._id,
     subtitle: speaker.ministry,
     title: getSpeakerName(speaker),
@@ -136,14 +136,14 @@ export function toSearchHits(result: SiteSearchResult): SearchHit[] {
   }));
 
   const topics = result.topics.map((topic) => ({
-    href: buildTopicPath(topic.slug),
+    href: buildTopicPath(topic),
     id: topic._id,
     title: topic.title,
     type: 'topic' as const,
   }));
 
   const clips = result.clips.map((clip) => ({
-    href: buildClipPath(clip.slug),
+    href: buildClipPath(clip),
     id: clip._id,
     subtitle: getSpeakerName(clip.speaker),
     title: clip.title,

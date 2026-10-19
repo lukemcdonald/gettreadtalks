@@ -36,7 +36,7 @@ export async function generateMetadata({
   const { collection } = data;
 
   return buildPageMetadata({
-    canonical: buildCollectionPath(collectionSlug),
+    canonical: buildCollectionPath(collection),
     description: collection.description,
     title: collection.title,
   });
@@ -54,7 +54,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
   const uniqueSpeakers = getUniqueSpeakersFromTalks(talks);
   const segments = [
     { href: buildCollectionsPath(), label: 'Collections' },
-    { href: buildCollectionPath(collectionSlug), label: collection.title },
+    { href: buildCollectionPath(collection), label: collection.title },
   ];
 
   return (

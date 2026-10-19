@@ -19,6 +19,6 @@ export default async function Page({ params }: PageProps) {
   await redirectPublicEdit({
     entity: 'clips',
     id: data.clip._id,
-    publicPath: buildClipPath(clipSlug),
+    publicPath: buildClipPath(data.clip),
   });
 }

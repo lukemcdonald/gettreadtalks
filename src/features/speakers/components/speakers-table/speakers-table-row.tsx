@@ -27,7 +27,7 @@ export function SpeakersTableRow({
   const editPath = buildEntityEditPath('speakers', speaker._id);
   const fullName = getSpeakerName(speaker);
   const publicPath =
-    status === 'published' ? buildSpeakerPath(speaker.slug) : undefined;
+    status === 'published' ? buildSpeakerPath(speaker) : undefined;
 
   return (
     <ManageRow

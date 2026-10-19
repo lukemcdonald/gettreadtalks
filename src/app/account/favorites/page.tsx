@@ -69,9 +69,7 @@ function FavoritesTabPanels({ clips, speakers, talks }: UserFavorites) {
         label="Talk"
         renderItem={(talk) => (
           <FavoriteTalkRow
-            href={
-              talk.speaker ? buildTalkPath(talk.speaker.slug, talk.slug) : ''
-            }
+            href={talk.speaker ? buildTalkPath(talk) : ''}
             key={talk._id}
             speaker={talk.speaker}
             talkId={talk._id}
@@ -85,7 +83,7 @@ function FavoritesTabPanels({ clips, speakers, talks }: UserFavorites) {
         label="Speaker"
         renderItem={(speaker) => (
           <FavoriteSpeakerRow
-            href={buildSpeakerPath(speaker.slug)}
+            href={buildSpeakerPath(speaker)}
             key={speaker._id}
             speakerId={speaker._id}
             title={getSpeakerName(speaker)}
@@ -99,7 +97,7 @@ function FavoritesTabPanels({ clips, speakers, talks }: UserFavorites) {
         renderItem={(clip) => (
           <FavoriteClipRow
             clipId={clip._id}
-            href={buildClipPath(clip.slug)}
+            href={buildClipPath(clip)}
             key={clip._id}
             title={clip.title}
           />

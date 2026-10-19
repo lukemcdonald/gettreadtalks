@@ -36,7 +36,7 @@ export function ClipHero({ clip, speaker }: ClipHeroProps) {
               by{' '}
               <Link
                 className="hover:underline"
-                href={buildSpeakerPath(speaker.slug)}
+                href={buildSpeakerPath(speaker)}
               >
                 {speakerName}
               </Link>

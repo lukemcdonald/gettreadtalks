@@ -32,7 +32,7 @@ export async function generateMetadata({
   const speakerName = getSpeakerName(speaker);
 
   return buildPageMetadata({
-    canonical: buildClipPath(clipSlug),
+    canonical: buildClipPath(clip),
     description:
       clip.description ??
       (speakerName ? `A clip from ${speakerName}.` : undefined),
@@ -51,7 +51,7 @@ export default async function ClipPage({ params }: ClipPageProps) {
   const { clip, speaker, talk } = data;
   const segments = [
     { href: buildClipsPath(), label: 'Clips' },
-    { href: buildClipPath(clip.slug), label: clip.title },
+    { href: buildClipPath(clip), label: clip.title },
   ];
 
   return (

@@ -10,7 +10,7 @@ interface ClipFeaturedCardProps {
 }
 
 export function ClipFeaturedCard({ clip }: ClipFeaturedCardProps) {
-  const href = buildClipPath(clip.slug);
+  const href = buildClipPath(clip);
   const thumbnail = getVideoThumbnail(clip.mediaUrl);
   const speakerName = clip.speaker ? getSpeakerName(clip.speaker) : undefined;
 

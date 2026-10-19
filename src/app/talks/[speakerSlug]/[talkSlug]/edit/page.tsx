@@ -25,6 +25,9 @@ export default async function Page({ params }: PageProps) {
   await redirectPublicEdit({
     entity: 'talks',
     id: talkResult.talk._id,
-    publicPath: buildTalkPath(speakerSlug, talkSlug),
+    publicPath: buildTalkPath({
+      speaker: talkResult.speaker,
+      slug: talkResult.talk.slug,
+    }),
   });
 }

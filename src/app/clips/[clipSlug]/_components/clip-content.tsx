@@ -36,7 +36,7 @@ export function ClipContent({ clip, speaker, talk }: ClipContentProps) {
             columns={{ default: 1 }}
             description={`Browse all talks by ${speakerName}.`}
             quickLinks={[
-              { href: buildSpeakerPath(speaker.slug), label: 'View all talks' },
+              { href: buildSpeakerPath(speaker), label: 'View all talks' },
             ]}
             sticky
             title="Speaker"

@@ -41,33 +41,38 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const talkEntries: MetadataRoute.Sitemap = talks.map((talk) => ({
     changeFrequency: 'weekly',
     lastModified: new Date(talk.updatedAt),
-    url: buildAbsoluteUrl(buildTalkPath(talk.speakerSlug, talk.talkSlug)),
+    url: buildAbsoluteUrl(
+      buildTalkPath({
+        speaker: { slug: talk.speakerSlug },
+        slug: talk.talkSlug,
+      })
+    ),
   }));
 
   const speakerEntries: MetadataRoute.Sitemap = speakers.map((speaker) => ({
     changeFrequency: 'monthly',
     lastModified: new Date(speaker.updatedAt),
-    url: buildAbsoluteUrl(buildSpeakerPath(speaker.slug)),
+    url: buildAbsoluteUrl(buildSpeakerPath(speaker)),
   }));
 
   const collectionEntries: MetadataRoute.Sitemap = collections.map(
     (collection) => ({
       changeFrequency: 'monthly',
       lastModified: new Date(collection.updatedAt),
-      url: buildAbsoluteUrl(buildCollectionPath(collection.slug)),
+      url: buildAbsoluteUrl(buildCollectionPath(collection)),
     })
   );
 
   const topicEntries: MetadataRoute.Sitemap = topics.map((topic) => ({
     changeFrequency: 'weekly',
     lastModified: new Date(topic.updatedAt),
-    url: buildAbsoluteUrl(buildTopicPath(topic.slug)),
+    url: buildAbsoluteUrl(buildTopicPath(topic)),
   }));
 
   const clipEntries: MetadataRoute.Sitemap = clips.map((clip) => ({
     changeFrequency: 'weekly',
     lastModified: new Date(clip.updatedAt),
-    url: buildAbsoluteUrl(buildClipPath(clip.slug)),
+    url: buildAbsoluteUrl(buildClipPath(clip)),
   }));
 
   return [

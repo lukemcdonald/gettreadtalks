@@ -47,7 +47,7 @@ export function TalkMediaCard({ speaker, talk }: TalkMediaCardProps) {
   return (
     <MediaCard
       ariaLabel={talk.title}
-      href={buildTalkPath(speaker.slug, talk.slug)}
+      href={buildTalkPath({ speaker, slug: talk.slug })}
       media={<TalkMediaIcon mediaUrl={talk.mediaUrl} />}
       subtitle={talk.scripture || getSpeakerName(speaker)}
       title={talk.title}

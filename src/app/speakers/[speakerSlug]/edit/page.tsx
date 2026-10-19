@@ -19,6 +19,6 @@ export default async function Page({ params }: PageProps) {
   await redirectPublicEdit({
     entity: 'speakers',
     id: data.speaker._id,
-    publicPath: buildSpeakerPath(speakerSlug),
+    publicPath: buildSpeakerPath(data.speaker),
   });
 }

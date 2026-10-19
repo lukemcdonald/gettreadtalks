@@ -24,7 +24,7 @@ export function SpeakerRelatedTalks({
       description={`Enjoy more talks by ${getSpeakerName(speaker)}.`}
       quickLinks={[
         {
-          href: buildSpeakerPath(speaker.slug),
+          href: buildSpeakerPath(speaker),
           label: 'View all talks',
         },
       ]}

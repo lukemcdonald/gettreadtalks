@@ -14,7 +14,7 @@ export function SpeakerHeroFeaturedTalk({
   speaker,
   talk,
 }: SpeakerHeroFeaturedTalkProps) {
-  const href = buildTalkPath(speaker.slug, talk.slug);
+  const href = buildTalkPath({ speaker, slug: talk.slug });
   const thumbnail = getVideoThumbnail(talk.mediaUrl);
 
   return (

@@ -13,7 +13,7 @@ export function ClipMediaCard({ clip }: ClipMediaCardProps) {
   return (
     <MediaCard
       ariaLabel={clip.title}
-      href={buildClipPath(clip.slug)}
+      href={buildClipPath(clip)}
       media={
         <MediaIconFrame>
           <FilmIcon className="size-5" />

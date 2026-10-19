@@ -40,7 +40,7 @@ async function TopicHeader({ topicSlug }: { topicSlug: string }) {
   const description = formatTopicPageDescription(topic.description, totalTalks);
   const segments = [
     { href: buildTopicsPath(), label: 'Topics' },
-    { href: buildTopicPath(topicSlug), label: topic.title },
+    { href: buildTopicPath(topic), label: topic.title },
   ];
 
   return (

@@ -19,7 +19,7 @@ export function CollectionsTableRow({
 }: CollectionsTableRowProps) {
   const editPath = buildEntityEditPath('collections', collection._id);
   const viewUrl =
-    status === 'published' ? buildCollectionPath(collection.slug) : undefined;
+    status === 'published' ? buildCollectionPath(collection) : undefined;
 
   return (
     <ManageRow

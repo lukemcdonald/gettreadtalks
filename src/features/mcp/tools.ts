@@ -217,7 +217,7 @@ function formatSpeaker(speaker: SpeakerRecord) {
     ministry: speaker.ministry,
     name: getSpeakerName(speaker),
     slug: speaker.slug,
-    url: buildAbsoluteUrl(buildSpeakerPath(speaker.slug)),
+    url: buildAbsoluteUrl(buildSpeakerPath(speaker)),
   };
 }
 
@@ -231,7 +231,7 @@ function formatTalk(talk: TalkRecord, speaker: SpeakerRecord | null) {
     title: talk.title,
     topics: talk.topicSlugs,
     url: speaker
-      ? buildAbsoluteUrl(buildTalkPath(speaker.slug, talk.slug))
+      ? buildAbsoluteUrl(buildTalkPath({ speaker, slug: talk.slug }))
       : undefined,
   };
 }
@@ -243,7 +243,7 @@ function formatClip(clip: ClipRecord, speaker: SpeakerRecord | null) {
     slug: clip.slug,
     speaker: speaker ? formatSpeaker(speaker) : null,
     title: clip.title,
-    url: buildAbsoluteUrl(buildClipPath(clip.slug)),
+    url: buildAbsoluteUrl(buildClipPath(clip)),
   };
 }
 
@@ -252,7 +252,7 @@ function formatCollection(collection: CollectionRecord) {
     description: collection.description,
     slug: collection.slug,
     title: collection.title,
-    url: buildAbsoluteUrl(buildCollectionPath(collection.slug)),
+    url: buildAbsoluteUrl(buildCollectionPath(collection)),
   };
 }
 
@@ -262,7 +262,7 @@ function formatTopic(topic: TopicRecord, talkCount?: number) {
     slug: topic.slug,
     talkCount,
     title: topic.title,
-    url: buildAbsoluteUrl(buildTopicPath(topic.slug)),
+    url: buildAbsoluteUrl(buildTopicPath(topic)),
   };
 }
 
@@ -411,7 +411,7 @@ export async function loadClip(
           slug: result.talk.slug,
           title: result.talk.title,
           url: buildAbsoluteUrl(
-            buildTalkPath(result.speaker.slug, result.talk.slug)
+            buildTalkPath({ speaker: result.speaker, slug: result.talk.slug })
           ),
         }
       : {

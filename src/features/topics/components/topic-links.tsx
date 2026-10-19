@@ -13,7 +13,7 @@ export function TopicLinks({ topics }: TopicLinksProps) {
       {topics.map((topic) => (
         <Link
           className="bg-muted text-foreground hover:bg-muted/80 inline-block rounded-full px-3 py-1.5 text-sm transition-colors"
-          href={buildTopicPath(topic.slug)}
+          href={buildTopicPath(topic)}
           key={topic._id}
         >
           {topic.title}

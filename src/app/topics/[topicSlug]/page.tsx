@@ -35,7 +35,7 @@ export async function generateMetadata({
   const { topic, totalTalks } = topicResult;
 
   return buildPageMetadata({
-    canonical: buildTopicPath(topicSlug),
+    canonical: buildTopicPath(topic),
     description: formatTopicMetaDescription(
       topic.description,
       topic.title,

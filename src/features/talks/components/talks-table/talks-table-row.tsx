@@ -14,7 +14,7 @@ export function TalksTableRow({ talk }: TalksTableRowProps) {
   const editPath = buildEntityEditPath('talks', talk._id);
   const publicPath =
     talk.status === 'published' && talk.speaker
-      ? buildTalkPath(talk.speaker.slug, talk.slug)
+      ? buildTalkPath(talk)
       : undefined;
 
   return (

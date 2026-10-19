@@ -23,6 +23,6 @@ export function buildSpeakerJsonLd({
     image: imageUrl,
     name,
     ...(websiteUrl && { sameAs: [websiteUrl] }),
-    url: buildAbsoluteUrl(buildSpeakerPath(speakerSlug)),
+    url: buildAbsoluteUrl(buildSpeakerPath({ slug: speakerSlug })),
   };
 }

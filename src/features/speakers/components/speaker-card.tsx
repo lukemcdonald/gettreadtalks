@@ -19,7 +19,7 @@ export function SpeakerCard({ speaker }: SpeakerCardProps) {
   return (
     <MediaCard
       data-testid="speaker-card"
-      href={buildSpeakerPath(speaker.slug)}
+      href={buildSpeakerPath(speaker)}
       media={<SpeakerAvatar speaker={speaker} />}
       subtitle={speaker.role}
       title={speakerName}

@@ -35,7 +35,7 @@ export async function generateMetadata({
   const { speaker, talk, topics } = talkResult;
 
   return buildPageMetadata({
-    canonical: buildTalkPath(speakerSlug, talkSlug),
+    canonical: buildTalkPath({ speaker, slug: talk.slug }),
     description: formatTalkMetaDescription({
       description: talk.description,
       scripture: talk.scripture,

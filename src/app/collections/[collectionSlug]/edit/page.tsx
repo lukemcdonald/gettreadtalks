@@ -19,6 +19,6 @@ export default async function Page({ params }: PageProps) {
   await redirectPublicEdit({
     entity: 'collections',
     id: data.collection._id,
-    publicPath: buildCollectionPath(collectionSlug),
+    publicPath: buildCollectionPath(data.collection),
   });
 }

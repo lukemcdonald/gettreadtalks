@@ -74,7 +74,7 @@ export default async function HomePage() {
               quickLinks={[
                 { href: buildTalksPath(), label: 'All Talks' },
                 {
-                  href: `${buildTalksPath()}?featured=true`,
+                  href: buildTalksPath({ query: { featured: true } }),
                   label: 'Featured Talks',
                 },
               ]}
@@ -95,7 +95,7 @@ export default async function HomePage() {
               quickLinks={[
                 { href: buildSpeakersPath(), label: 'All Speakers' },
                 {
-                  href: `${buildSpeakersPath()}?sort=featured`,
+                  href: buildSpeakersPath({ query: { sort: 'featured' } }),
                   label: 'Featured Speakers',
                 },
               ]}

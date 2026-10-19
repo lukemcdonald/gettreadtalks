@@ -54,7 +54,7 @@ async function SpeakerHeroSection({ speakerSlug }: { speakerSlug: string }) {
   const name = getSpeakerName(speaker);
   const segments = [
     { href: buildSpeakersPath(), label: 'Speakers' },
-    { href: buildSpeakerPath(speakerSlug), label: name },
+    { href: buildSpeakerPath(speaker), label: name },
   ];
 
   return (

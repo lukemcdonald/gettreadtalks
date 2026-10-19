@@ -1,11 +1,22 @@
-import { buildAbsoluteUrl } from '@/lib/entities/paths';
+import type { Speaker } from '@/features/speakers/types';
+import type { Talk } from '@/features/talks/types';
 
-export function buildTalkPath(speakerSlug: string, talkSlug: string): string {
-  return `/talks/${speakerSlug}/${talkSlug}`;
+import { buildAbsoluteUrl, buildPathQuery } from '@/lib/entities/paths';
+
+export function buildTalkPath(
+  talk: Pick<Talk, 'slug'> & {
+    speaker?: Pick<Speaker, 'slug'> | null;
+  }
+) {
+  if (!talk.speaker?.slug) {
+    return `/talks/${talk.slug}`;
+  }
+
+  return `/talks/${talk.speaker.slug}/${talk.slug}`;
 }
 
-export function buildTalksPath() {
-  return '/talks';
+export function buildTalksPath(options?: { query?: { featured?: boolean } }) {
+  return `/talks${buildPathQuery(options?.query)}`;
 }
 
 export function formatTalkMetaDescription({
@@ -47,8 +58,6 @@ export function buildTalkListItemsJsonLd(
     '@type': 'ListItem' as const,
     name: talk.title,
     position: index + 1,
-    url: talk.speaker
-      ? buildAbsoluteUrl(buildTalkPath(talk.speaker.slug, talk.slug))
-      : undefined,
+    url: talk.speaker ? buildAbsoluteUrl(buildTalkPath(talk)) : undefined,
   }));
 }

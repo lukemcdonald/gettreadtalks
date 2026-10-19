@@ -35,7 +35,7 @@ function TalkDetail({ speakerSlug, talkResult, talkSlug }: TalkDetailProps) {
   const { clips, collection, speaker, talk, topics } = talkResult;
   const segments = [
     { href: buildTalksPath(), label: 'Talks' },
-    { href: buildTalkPath(speakerSlug, talkSlug), label: talk.title },
+    { href: buildTalkPath({ speaker, slug: talk.slug }), label: talk.title },
   ];
 
   return (

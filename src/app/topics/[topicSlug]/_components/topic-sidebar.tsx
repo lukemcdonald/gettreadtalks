@@ -25,7 +25,7 @@ export function TopicSidebar({ topicSlug }: TopicSidebarProps) {
       {hasActiveFilters && (
         <Link
           className="text-primary text-sm hover:underline"
-          href={buildTopicPath(topicSlug)}
+          href={buildTopicPath({ slug: topicSlug })}
         >
           Clear filters
         </Link>

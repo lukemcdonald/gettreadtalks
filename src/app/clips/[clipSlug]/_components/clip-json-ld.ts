@@ -29,7 +29,7 @@ export function buildClipJsonLd({ clip, speaker, talk }: ClipJsonLdInput) {
     ...buildMediaJsonLd(clip.mediaUrl),
     description: clip.description,
     name: clip.title,
-    url: buildAbsoluteUrl(buildClipPath(clip.slug)),
+    url: buildAbsoluteUrl(buildClipPath(clip)),
     ...(speakerName && { creator: { '@type': 'Person', name: speakerName } }),
     ...(clip.publishedAt && {
       uploadDate: new Date(clip.publishedAt).toISOString(),
@@ -39,7 +39,7 @@ export function buildClipJsonLd({ clip, speaker, talk }: ClipJsonLdInput) {
         isPartOf: {
           '@type': 'CreativeWork',
           name: talk.title,
-          url: buildAbsoluteUrl(buildTalkPath(speaker.slug, talk.slug)),
+          url: buildAbsoluteUrl(buildTalkPath({ speaker, slug: talk.slug })),
         },
       }),
   };

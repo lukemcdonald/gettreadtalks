@@ -23,7 +23,7 @@ export function ClipCard({ clip, speaker }: ClipCardProps) {
     <MediaCard
       ariaLabel={accessibleLabel}
       className="items-center"
-      href={buildClipPath(clip.slug)}
+      href={buildClipPath(clip)}
       media={speaker ? <SpeakerAvatar speaker={speaker} /> : undefined}
       subtitle={speakerName}
       title={clip.title}
