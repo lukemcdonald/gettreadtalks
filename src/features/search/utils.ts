@@ -104,10 +104,14 @@ export function getSearchQuery(search?: string | string[]) {
   return value?.trim() ?? '';
 }
 
+export function buildSearchPath() {
+  return '/search';
+}
+
 export function buildSearchPageHref(query: string) {
   const params = new URLSearchParams({ search: query });
 
-  return `/search?${params.toString()}`;
+  return `${buildSearchPath()}?${params.toString()}`;
 }
 
 export function toSearchHits(result: SiteSearchResult): SearchHit[] {
