@@ -154,7 +154,7 @@ export const sendMediaHealthEmail = internalAction({
     items: v.array(mediaHealthDigestItem),
   },
   handler: async (ctx, args) => {
-    if (args.items.length === 0 || process.env.RESEND_TEST_MODE !== 'false') {
+    if (args.items.length === 0 || shouldSkipTestModeSend(site.email.contact)) {
       return null;
     }
 
@@ -197,6 +197,11 @@ export const sendPasswordResetEmail = internalAction({
     token: v.string(),
   },
   handler: async (ctx, args) => {
+    if (shouldSkipTestModeSend(args.email)) {
+      console.log('Skipping passwordReset email in Resend test mode');
+      return null;
+    }
+
     try {
       const template = ResetPasswordTemplate({
         email: args.email,
@@ -253,6 +258,11 @@ export const sendVerificationEmail = internalAction({
     verificationUrl: v.string(),
   },
   handler: async (ctx, args) => {
+    if (shouldSkipTestModeSend(args.email)) {
+      console.log('Skipping verification email in Resend test mode');
+      return null;
+    }
+
     try {
       const template = VerifyEmailTemplate({
         email: args.email,
@@ -292,6 +302,11 @@ export const sendWelcomeEmail = internalAction({
     userId: v.string(),
   },
   handler: async (ctx, args) => {
+    if (shouldSkipTestModeSend(args.email)) {
+      console.log('Skipping welcome email in Resend test mode');
+      return null;
+    }
+
     try {
       const template = WelcomeEmail({
         email: args.email,
@@ -328,6 +343,13 @@ export const sendWelcomeEmail = internalAction({
 // ============================================
 // HELPERS
 // ============================================
+
+function shouldSkipTestModeSend(to: string) {
+  return (
+    process.env.RESEND_TEST_MODE !== 'false' &&
+    !to.toLowerCase().endsWith('@resend.dev')
+  );
+}
 
 function getFromAddress() {
   return `${site.name} <${FROM_EMAIL}>`;
