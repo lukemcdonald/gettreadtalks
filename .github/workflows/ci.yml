@@ -103,6 +103,8 @@ jobs:
           exit 1
       - if: steps.changes.outputs.run == 'true' && steps.e2e-secrets.outputs.available == 'true'
         uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - if: steps.changes.outputs.run == 'true' && steps.e2e-secrets.outputs.available == 'true'
         name: Install pnpm and Node.js
         uses: pnpm/setup@v3

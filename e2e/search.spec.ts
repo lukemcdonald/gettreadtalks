@@ -15,6 +15,9 @@ test('Search / Site-wide', async ({ homePage, searchPage }) => {
 
 test('Search / Keyboard shortcut', async ({ homePage, searchPage }) => {
   await homePage.goto();
+  await expect(
+    searchPage.page.getByRole('button', { name: 'Search' })
+  ).toBeEnabled();
   await searchPage.page.keyboard.press('ControlOrMeta+K');
 
   await expect(searchPage.input).toBeVisible();
