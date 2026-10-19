@@ -30,7 +30,7 @@ export function ErrorFallback({
     <div className="flex min-h-[400px] flex-col items-center justify-center p-8">
       <div className="max-w-md space-y-4 text-center">
         <div className="space-y-2">
-          <h2 className="text-destructive text-2xl font-semibold">
+          <h2 className="text-destructive-foreground text-2xl font-semibold">
             Something went wrong
           </h2>
           <p className="text-muted-foreground">
