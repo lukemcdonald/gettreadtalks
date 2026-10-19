@@ -29,21 +29,8 @@ test('Talks / Related talks by topic', async ({ talksPage }) => {
     'Example Talk: The Prodigal Son'
   );
 
-  const relatedHeading = page.getByRole('heading', { name: 'Related Talks' });
-  await expect(relatedHeading).toBeVisible();
-  await relatedHeading.scrollIntoViewIfNeeded();
+  await expect(
+    page.getByRole('heading', { name: 'Related Talks' })
+  ).toBeVisible();
   await expect(page.getByTestId('talk-card')).not.toHaveCount(0);
-
-  await page.setViewportSize({ height: 900, width: 1440 });
-  await page.screenshot({
-    fullPage: true,
-    path: 'e2e/output/talk-related-after-desktop.png',
-  });
-
-  await page.setViewportSize({ height: 844, width: 390 });
-  await relatedHeading.scrollIntoViewIfNeeded();
-  await page.screenshot({
-    fullPage: true,
-    path: 'e2e/output/talk-related-after-mobile.png',
-  });
 });

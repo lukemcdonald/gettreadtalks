@@ -176,7 +176,5 @@ jobs:
         with:
           if-no-files-found: ignore
           name: playwright-report
-          path: |
-            playwright-report/
-            e2e/output/
+          path: playwright-report/
           retention-days: 7

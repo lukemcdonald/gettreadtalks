@@ -22,22 +22,7 @@ test('Speakers / Published talk topics', async ({ speakersPage }) => {
 
   await expect(speakersPage.speakerHeading).toHaveText('John Doe');
 
-  const topicsHeading = page.getByRole('heading', { name: 'Topics' });
-  await expect(topicsHeading).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Topics' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Grace' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Prayer' })).toBeVisible();
-  await topicsHeading.scrollIntoViewIfNeeded();
-
-  await page.setViewportSize({ height: 900, width: 1440 });
-  await page.screenshot({
-    fullPage: true,
-    path: 'e2e/output/speaker-topics-after-desktop.png',
-  });
-
-  await page.setViewportSize({ height: 844, width: 390 });
-  await topicsHeading.scrollIntoViewIfNeeded();
-  await page.screenshot({
-    fullPage: true,
-    path: 'e2e/output/speaker-topics-after-mobile.png',
-  });
 });
