@@ -3,6 +3,10 @@ import { describe, expect, it } from '@/test';
 import { isSegmentEnabled } from './enabled';
 
 describe('isSegmentEnabled', () => {
+  it('stays off when the enabled flag is unset', () => {
+    expect(isSegmentEnabled('write-key')).toBe(false);
+  });
+
   it('stays off when the enabled flag is false', () => {
     expect(isSegmentEnabled('write-key', 'false')).toBe(false);
   });
@@ -12,8 +16,7 @@ describe('isSegmentEnabled', () => {
     expect(isSegmentEnabled('', 'true')).toBe(false);
   });
 
-  it('enables when a write key is set and the flag is not false', () => {
-    expect(isSegmentEnabled('write-key')).toBe(true);
+  it('enables when a write key is set and the flag is true', () => {
     expect(isSegmentEnabled('write-key', 'true')).toBe(true);
   });
 });
