@@ -4,6 +4,7 @@ import ultracite from 'ultracite/oxfmt';
 export default defineConfig({
   ...ultracite,
   ignorePatterns: [
+    '.agents/**',
     '.claude/**',
     '.pnpm-store/**',
     'convex/**/_generated/**',

@@ -61,9 +61,11 @@ convex/migration/data/
 
 # Agents
 /CLAUDE.md
-**/.agents/skills/**
+**/.agents/skills/*
+!**/.agents/skills/convex-*
 **/.claude/plans/
 **/.claude/settings.local.json
-**/.claude/skills/**
+**/.claude/skills/*
+!**/.claude/skills/convex-*
 **/skills-lock.json
 **/skills-npm-lock.json

@@ -7,6 +7,7 @@ export default defineConfig({
   extends: [core, next, react],
   ignorePatterns: [
     ...(core.ignorePatterns ?? []),
+    '.agents/**',
     '.claude/**',
     '.pnpm-store/**',
     'convex/**/_generated/**',
