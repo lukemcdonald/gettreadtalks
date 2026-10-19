@@ -1,4 +1,6 @@
-import type { QueryCtx } from '../../_generated/server';
+import type { MutationCtx, QueryCtx } from '../../_generated/server';
+
+import { deleteAll } from '../../lib/utils';
 
 /**
  * Get user's favorite clips with clip data.
@@ -141,4 +143,31 @@ export async function getUserFinishedTalks(
   );
 
   return enriched.filter((x): x is NonNullable<typeof x> => x !== null);
+}
+
+/**
+ * Remove app-owned rows keyed by Better Auth user id. Auth tables are
+ * deleted by Better Auth itself.
+ */
+export async function destroyUserOwnedRows(ctx: MutationCtx, userId: string) {
+  const [clips, speakers, talks, finished] = await Promise.all([
+    ctx.db
+      .query('userFavoriteClips')
+      .withIndex('by_userId_and_clipId', (q) => q.eq('userId', userId))
+      .collect(),
+    ctx.db
+      .query('userFavoriteSpeakers')
+      .withIndex('by_userId_and_speakerId', (q) => q.eq('userId', userId))
+      .collect(),
+    ctx.db
+      .query('userFavoriteTalks')
+      .withIndex('by_userId_and_talkId', (q) => q.eq('userId', userId))
+      .collect(),
+    ctx.db
+      .query('userFinishedTalks')
+      .withIndex('by_userId', (q) => q.eq('userId', userId))
+      .collect(),
+  ]);
+
+  await deleteAll(ctx, [...clips, ...speakers, ...talks, ...finished]);
 }

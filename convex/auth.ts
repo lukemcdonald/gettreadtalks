@@ -15,6 +15,7 @@ import authSchema from './betterAuth/schema';
 import { authRateLimitPlugin } from './lib/plugins';
 import { isPreviewSiteUrl } from './lib/turnstile';
 import { formatErrorMessage } from './lib/utils';
+import { destroyUserOwnedRows } from './model/users/utils';
 
 const authFunctions: AuthFunctions = internal.auth;
 
@@ -38,6 +39,9 @@ export const authComponent = createClient<DataModel, typeof authSchema>(
       user: {
         onCreate: async (ctx, doc) => {
           await scheduleWelcomeEmail(ctx, doc);
+        },
+        onDelete: async (ctx, doc) => {
+          await destroyUserOwnedRows(ctx, doc._id);
         },
       },
     },
@@ -167,6 +171,9 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
       changeEmail: {
         enabled: true,
         updateEmailWithoutVerification: true,
+      },
+      deleteUser: {
+        enabled: true,
       },
     },
   } satisfies BetterAuthOptions;

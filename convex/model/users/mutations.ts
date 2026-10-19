@@ -2,7 +2,12 @@ import { v } from 'convex/values';
 
 import { internalMutation, mutation } from '../../_generated/server';
 import { authComponent, createAuth } from '../../auth';
-import { throwNotFound, throwValidationError } from '../../lib/errors';
+import {
+  throwAuthRequired,
+  throwConvexError,
+  throwNotFound,
+  throwValidationError,
+} from '../../lib/errors';
 import { requireAdmin } from '../auth/roles';
 import { getUserId } from '../auth/utils';
 import { userRole } from './validators';
@@ -285,13 +290,17 @@ export const deleteUser = mutation({
     password: v.string(),
   },
   handler: async (ctx, args) => {
-    await createAuth(ctx).api.deleteUser({
-      body: {
-        callbackURL: '/',
-        password: args.password,
-      },
-      headers: await authComponent.getHeaders(ctx),
-    });
+    try {
+      await createAuth(ctx).api.deleteUser({
+        body: {
+          callbackURL: '/',
+          password: args.password,
+        },
+        headers: await authComponent.getHeaders(ctx),
+      });
+    } catch (error) {
+      throwMappedDeleteUserError(error);
+    }
 
     return null;
   },
@@ -370,3 +379,38 @@ export const setUserRole = mutation({
   },
   returns: v.string(),
 });
+
+const SESSION_DELETE_CODES = new Set([
+  'SESSION_EXPIRED',
+  'SESSION_NOT_FRESH',
+  'UNAUTHORIZED',
+]);
+
+function throwMappedDeleteUserError(error: unknown): never {
+  const code = getBetterAuthErrorCode(error);
+
+  if (code === 'INVALID_PASSWORD') {
+    throwValidationError('Check your password and try again.', 'password');
+  }
+
+  if (code === 'CREDENTIAL_ACCOUNT_NOT_FOUND') {
+    throwValidationError(
+      'This account has no password to confirm.',
+      'password'
+    );
+  }
+
+  if (SESSION_DELETE_CODES.has(String(code))) {
+    throwAuthRequired(
+      'Your session expired. Sign in again to delete your account.'
+    );
+  }
+
+  throwConvexError(500, 'Something went wrong. Please try again.');
+}
+
+function getBetterAuthErrorCode(error: unknown) {
+  const code = (error as { body?: { code?: unknown } } | null)?.body?.code;
+
+  return typeof code === 'string' ? code : undefined;
+}
