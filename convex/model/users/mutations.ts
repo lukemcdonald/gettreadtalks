@@ -2,9 +2,17 @@ import { v } from 'convex/values';
 
 import { internalMutation, mutation } from '../../_generated/server';
 import { authComponent, createAuth } from '../../auth';
-import { throwNotFound, throwValidationError } from '../../lib/errors';
+import {
+  throwAuthRequired,
+  throwConvexError,
+  throwNotFound,
+  throwValidationError,
+} from '../../lib/errors';
+import { reportSentryException } from '../../lib/sentry';
+import { formatErrorMessage } from '../../lib/utils';
 import { requireAdmin } from '../auth/roles';
 import { getUserId } from '../auth/utils';
+import { destroyUserOwnedRows } from './utils';
 import { userRole } from './validators';
 
 /**
@@ -285,13 +293,21 @@ export const deleteUser = mutation({
     password: v.string(),
   },
   handler: async (ctx, args) => {
-    await createAuth(ctx).api.deleteUser({
-      body: {
-        callbackURL: '/',
-        password: args.password,
-      },
-      headers: await authComponent.getHeaders(ctx),
-    });
+    const userId = await getUserId(ctx);
+
+    try {
+      await createAuth(ctx).api.deleteUser({
+        body: {
+          callbackURL: '/',
+          password: args.password,
+        },
+        headers: await authComponent.getHeaders(ctx),
+      });
+    } catch (error) {
+      await throwMappedDeleteUserError(error);
+    }
+
+    await destroyUserOwnedRows(ctx, userId);
 
     return null;
   },
@@ -370,3 +386,71 @@ export const setUserRole = mutation({
   },
   returns: v.string(),
 });
+
+async function throwMappedDeleteUserError(error: unknown): Promise<never> {
+  const fingerprint = getAuthErrorFingerprint(error);
+
+  if (isAuthErrorCode(fingerprint, 'INVALID_PASSWORD')) {
+    throwValidationError('Check your password and try again.', 'password');
+  }
+
+  if (isAuthErrorCode(fingerprint, 'CREDENTIAL_ACCOUNT_NOT_FOUND')) {
+    throwValidationError(
+      'This account has no password to confirm.',
+      'password'
+    );
+  }
+
+  if (
+    isAuthErrorCode(fingerprint, 'SESSION_EXPIRED') ||
+    isAuthErrorCode(fingerprint, 'UNAUTHORIZED')
+  ) {
+    throwAuthRequired(
+      'Your session expired. Sign in again to delete your account.'
+    );
+  }
+
+  await reportSentryException({
+    message: `Delete account failed: ${formatErrorMessage(error)}`,
+    tags: { mutation: 'deleteUser' },
+  });
+
+  throwConvexError(500, 'Something went wrong. Please try again.');
+}
+
+function getAuthErrorFingerprint(error: unknown) {
+  if (!(error instanceof Error)) {
+    return String(error);
+  }
+
+  const extra = error as Error & {
+    body?: unknown;
+    status?: unknown;
+    statusCode?: unknown;
+  };
+
+  return [
+    error.message,
+    extra.status,
+    extra.statusCode,
+    stringifyUnknown(extra.body),
+  ]
+    .filter((part) => part !== undefined && part !== '')
+    .join(' ');
+}
+
+function isAuthErrorCode(fingerprint: string, code: string) {
+  return fingerprint.includes(code);
+}
+
+function stringifyUnknown(value: unknown) {
+  if (typeof value === 'string') {
+    return value;
+  }
+
+  try {
+    return JSON.stringify(value);
+  } catch {
+    return '';
+  }
+}

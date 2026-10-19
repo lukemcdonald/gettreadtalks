@@ -1,0 +1,97 @@
+import { describe, expect, it } from 'vitest';
+
+import { api, components } from '../../_generated/api';
+import { ErrorCodes } from '../../lib/errors';
+import { createConvexTest, signInAsPasswordUser } from '../../test.setup';
+
+const PASSWORD = 'correct-horse-battery';
+
+describe('users.deleteUser', () => {
+  it('deletes a password user and owned rows', async () => {
+    const t = createConvexTest();
+    const { asUser, userId } = await signInAsPasswordUser(t, {
+      email: 'luke@example.test',
+      name: 'Luke',
+      password: PASSWORD,
+      role: 'user',
+    });
+    const talkId = await t.run(async (ctx) => {
+      const speakerId = await ctx.db.insert('speakers', {
+        firstName: 'John',
+        lastName: 'Bunyan',
+        slug: 'john-bunyan',
+      });
+      const createdTalkId = await ctx.db.insert('talks', {
+        mediaUrl: 'https://www.youtube.com/watch?v=0SVTl4Xa5fY',
+        slug: 'grace-abounding',
+        speakerId,
+        status: 'published',
+        title: 'Grace Abounding',
+      });
+      await ctx.db.insert('userFavoriteTalks', {
+        talkId: createdTalkId,
+        userId,
+      });
+
+      return createdTalkId;
+    });
+
+    await asUser.mutation(api.users.deleteUser, { password: PASSWORD });
+
+    const leftover = await t.run(async (ctx) => {
+      const user = await ctx.runQuery(components.betterAuth.adapter.findOne, {
+        model: 'user',
+        where: [{ field: '_id', value: userId }],
+      });
+      const account = await ctx.runQuery(
+        components.betterAuth.adapter.findOne,
+        {
+          model: 'account',
+          where: [{ field: 'userId', value: userId }],
+        }
+      );
+      const favorite = await ctx.db
+        .query('userFavoriteTalks')
+        .withIndex('by_userId_and_talkId', (q) =>
+          q.eq('userId', userId).eq('talkId', talkId)
+        )
+        .first();
+
+      return { account, favorite, user };
+    });
+
+    expect(leftover.user).toBe(null);
+    expect(leftover.account).toBe(null);
+    expect(leftover.favorite).toBe(null);
+  });
+
+  it('rejects the wrong password without deleting the user', async () => {
+    const t = createConvexTest();
+    const { asUser, userId } = await signInAsPasswordUser(t, {
+      email: 'luke@example.test',
+      name: 'Luke',
+      password: PASSWORD,
+      role: 'user',
+    });
+
+    await expect(
+      asUser.mutation(api.users.deleteUser, { password: 'wrong-password' })
+    ).rejects.toMatchObject({
+      data: {
+        errorCode: ErrorCodes.VALIDATION_FAILED,
+        field: 'password',
+        message: 'Check your password and try again.',
+      },
+    });
+
+    const user = await t.run(
+      async (ctx) =>
+        await ctx.runQuery(components.betterAuth.adapter.findOne, {
+          model: 'user',
+          where: [{ field: '_id', value: userId }],
+        })
+    );
+
+    expect(user).not.toBe(null);
+  });
+});
