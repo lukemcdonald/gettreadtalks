@@ -1,10 +1,16 @@
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 
 export class FavoritesPage {
+  readonly heading: Locator;
   readonly page: Page;
 
   constructor(page: Page) {
     this.page = page;
+    this.heading = page.getByRole('heading', {
+      exact: true,
+      level: 1,
+      name: 'Favorites',
+    });
   }
 
   async goto() {
