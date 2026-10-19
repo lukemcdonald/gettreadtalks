@@ -54,10 +54,6 @@ Quick test: a person reads it = `format*`; assembled from parts = `build*`; one 
 
 JSDoc only when adding context beyond the function name (1–2 lines max). Skip `@param`/`@returns` unless documenting non-obvious constraints, defaults, or side effects. Never: commented-out code, obvious comments, redundant type docs.
 
-## Linear
-
-Always use the **gettreadtalks.com** project (`441dc110-d73c-46cb-b395-1c762d7e2958`) when searching, creating, or updating Linear issues for this codebase.
-
 ## Rules
 
 Never show env var names, stack traces, raw internal `error.message`, or config details in user-facing UI. Report those to Sentry with `reportUnexpectedError` and show a plain, friendly message. Keep the details in development/console.
@@ -232,7 +228,7 @@ This project uses [Convex](https://convex.dev) as its backend.
 
 When working on Convex code, **always read `convex/_generated/ai/guidelines.md` first** for important guidelines on how to correctly use Convex APIs and patterns. The file contains rules that override what you may have learned about Convex from training data.
 
-Convex agent skills for common tasks can be installed by running `npx convex ai-files install`.
+The project's chosen Convex skills are in `.agents/skills/`.
 
 <!-- convex-ai-end -->
 
