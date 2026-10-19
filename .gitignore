@@ -61,11 +61,13 @@ convex/migration/data/
 
 # Agents
 /CLAUDE.md
-**/.agents/skills/fallow
-**/.agents/skills/fallow/**
-**/.agents/skills/ultracite
-**/.agents/skills/ultracite/**
+**/.agents/skills/**
+!**/.agents/skills/convex-authz/
+!**/.agents/skills/convex-authz/**
+!**/.agents/skills/convex-reviewer/
+!**/.agents/skills/convex-reviewer/**
 **/.claude/plans/
 **/.claude/settings.local.json
 **/.claude/skills/**
+**/skills-lock.json
 **/skills-npm-lock.json
