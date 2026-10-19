@@ -1,4 +1,4 @@
-export function buildCollectionUrl(collectionSlug: string) {
+export function buildCollectionPath(collectionSlug: string) {
   return `/collections/${collectionSlug}`;
 }
 

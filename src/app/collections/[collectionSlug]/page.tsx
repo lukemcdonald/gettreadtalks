@@ -13,7 +13,7 @@ import { PageHeader } from '@/components/page-header';
 import { CollectionTalkList } from '@/features/collections/components/collection-talk-list';
 import { loadCollectionBySlug } from '@/features/collections/queries/load-collection-by-slug';
 import {
-  buildCollectionUrl,
+  buildCollectionPath,
   buildCollectionsPath,
 } from '@/features/collections/utils';
 import { buildBreadcrumbJsonLd } from '@/lib/json-ld';
@@ -36,7 +36,7 @@ export async function generateMetadata({
   const { collection } = data;
 
   return buildPageMetadata({
-    canonical: buildCollectionUrl(collectionSlug),
+    canonical: buildCollectionPath(collectionSlug),
     description: collection.description,
     title: collection.title,
   });
@@ -54,7 +54,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
   const uniqueSpeakers = getUniqueSpeakersFromTalks(talks);
   const segments = [
     { href: buildCollectionsPath(), label: 'Collections' },
-    { href: buildCollectionUrl(collectionSlug), label: collection.title },
+    { href: buildCollectionPath(collectionSlug), label: collection.title },
   ];
 
   return (

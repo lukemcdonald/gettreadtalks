@@ -1,7 +1,7 @@
 import { buildMediaJsonLd } from '@/components/media-embed/utils';
-import { site } from '@/configs/site';
 import { getSpeakerName } from '@/features/speakers/utils';
-import { buildTalkUrl } from '@/features/talks/utils';
+import { buildTalkPath } from '@/features/talks/utils';
+import { buildAbsoluteUrl } from '@/lib/entities/paths';
 
 interface TalkJsonLdInput {
   speaker: Parameters<typeof getSpeakerName>[0];
@@ -66,6 +66,6 @@ export function buildTalkJsonLd({
     ...(uploadedAt && {
       uploadDate: new Date(uploadedAt).toISOString(),
     }),
-    url: `${site.url}${buildTalkUrl(speakerSlug, talkSlug)}`,
+    url: buildAbsoluteUrl(buildTalkPath(speakerSlug, talkSlug)),
   };
 }

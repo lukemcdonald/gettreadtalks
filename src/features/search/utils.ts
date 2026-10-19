@@ -8,11 +8,11 @@ import type {
 } from '@/features/search/types';
 
 import { NAVIGATION_LINKS } from '@/components/site-header/constants';
-import { buildClipUrl } from '@/features/clips/utils';
+import { buildClipPath } from '@/features/clips/utils';
 import { SEARCH_RESULT_TYPES } from '@/features/search/types';
-import { buildSpeakerUrl, getSpeakerName } from '@/features/speakers/utils';
-import { buildTalkUrl } from '@/features/talks/utils';
-import { buildTopicUrl } from '@/features/topics/utils';
+import { buildSpeakerPath, getSpeakerName } from '@/features/speakers/utils';
+import { buildTalkPath } from '@/features/talks/utils';
+import { buildTopicPath } from '@/features/topics/utils';
 
 export const BROWSE_SEARCH_GROUP = 'Browse';
 const FAVORITES_SEARCH_HREF = '/account/favorites';
@@ -118,7 +118,7 @@ export function toSearchHits(result: SiteSearchResult): SearchHit[] {
 
     return [
       {
-        href: buildTalkUrl(talk.speaker.slug, talk.slug),
+        href: buildTalkPath(talk.speaker.slug, talk.slug),
         id: talk._id,
         subtitle: getSpeakerName(talk.speaker),
         title: talk.title,
@@ -128,7 +128,7 @@ export function toSearchHits(result: SiteSearchResult): SearchHit[] {
   });
 
   const speakers = result.speakers.map((speaker) => ({
-    href: buildSpeakerUrl(speaker.slug),
+    href: buildSpeakerPath(speaker.slug),
     id: speaker._id,
     subtitle: speaker.ministry,
     title: getSpeakerName(speaker),
@@ -136,14 +136,14 @@ export function toSearchHits(result: SiteSearchResult): SearchHit[] {
   }));
 
   const topics = result.topics.map((topic) => ({
-    href: buildTopicUrl(topic.slug),
+    href: buildTopicPath(topic.slug),
     id: topic._id,
     title: topic.title,
     type: 'topic' as const,
   }));
 
   const clips = result.clips.map((clip) => ({
-    href: buildClipUrl(clip.slug),
+    href: buildClipPath(clip.slug),
     id: clip._id,
     subtitle: getSpeakerName(clip.speaker),
     title: clip.title,

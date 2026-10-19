@@ -7,7 +7,7 @@ import { GridList } from '@/components/grid-list';
 import { SectionHeading } from '@/components/section-heading';
 import { Link } from '@/components/ui/link';
 import { TalkCard } from '@/features/talks/components/talk-card';
-import { buildTopicUrl } from '@/features/topics/utils';
+import { buildTopicPath } from '@/features/topics/utils';
 import { pluralize } from '@/utils';
 
 interface TopicBrowseSectionProps {
@@ -32,7 +32,7 @@ export function TopicBrowseSection({
           <Link
             className="hover:underline"
             data-testid="topic-link"
-            href={buildTopicUrl(topic.slug)}
+            href={buildTopicPath(topic.slug)}
           >
             {topic.title}
           </Link>
@@ -41,7 +41,7 @@ export function TopicBrowseSection({
           hasMoreTalks ? (
             <Link
               className="hover:text-foreground inline-flex items-center gap-1"
-              href={buildTopicUrl(topic.slug)}
+              href={buildTopicPath(topic.slug)}
             >
               {countLabel}
               <ChevronRightIcon className="size-3.5" />

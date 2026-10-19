@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 
 import { loadTopicBySlug } from '@/features/topics/queries/load-topic-by-slug';
-import { buildTopicUrl } from '@/features/topics/utils';
+import { buildTopicPath } from '@/features/topics/utils';
 import { redirectPublicEdit } from '@/lib/entities/redirect-public-edit';
 
 interface PageProps {
@@ -19,6 +19,6 @@ export default async function Page({ params }: PageProps) {
   await redirectPublicEdit({
     entity: 'topics',
     id: data.topic._id,
-    publicPath: buildTopicUrl(topicSlug),
+    publicPath: buildTopicPath(topicSlug),
   });
 }

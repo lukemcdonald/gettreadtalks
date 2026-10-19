@@ -3,7 +3,7 @@ import type { Talk } from '@/features/talks/types';
 
 import { FeaturedVideoCard } from '@/components/featured-video-card';
 import { getVideoThumbnail } from '@/components/media-embed';
-import { buildTalkUrl } from '@/features/talks/utils';
+import { buildTalkPath } from '@/features/talks/utils';
 
 interface SpeakerHeroFeaturedTalkProps {
   speaker: Speaker;
@@ -14,7 +14,7 @@ export function SpeakerHeroFeaturedTalk({
   speaker,
   talk,
 }: SpeakerHeroFeaturedTalkProps) {
-  const href = buildTalkUrl(speaker.slug, talk.slug);
+  const href = buildTalkPath(speaker.slug, talk.slug);
   const thumbnail = getVideoThumbnail(talk.mediaUrl);
 
   return (

@@ -1,5 +1,5 @@
-import { site } from '@/configs/site';
-import { buildSpeakerUrl } from '@/features/speakers/utils';
+import { buildSpeakerPath } from '@/features/speakers/utils';
+import { buildAbsoluteUrl } from '@/lib/entities/paths';
 
 interface SpeakerJsonLdInput {
   description?: string;
@@ -23,6 +23,6 @@ export function buildSpeakerJsonLd({
     image: imageUrl,
     name,
     ...(websiteUrl && { sameAs: [websiteUrl] }),
-    url: `${site.url}${buildSpeakerUrl(speakerSlug)}`,
+    url: buildAbsoluteUrl(buildSpeakerPath(speakerSlug)),
   };
 }

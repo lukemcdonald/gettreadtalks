@@ -8,7 +8,7 @@ import {
 } from '@/components/manage-table';
 import { SpeakerActionsMenu } from '@/features/speakers/components/speaker-actions-menu';
 import { SpeakerAvatar } from '@/features/speakers/components/speaker-avatar';
-import { buildSpeakerUrl, getSpeakerName } from '@/features/speakers/utils';
+import { buildSpeakerPath, getSpeakerName } from '@/features/speakers/utils';
 import { buildEntityEditPath } from '@/lib/entities/paths';
 
 interface SpeakersTableRowProps {
@@ -27,7 +27,7 @@ export function SpeakersTableRow({
   const editPath = buildEntityEditPath('speakers', speaker._id);
   const fullName = getSpeakerName(speaker);
   const publicPath =
-    status === 'published' ? buildSpeakerUrl(speaker.slug) : undefined;
+    status === 'published' ? buildSpeakerPath(speaker.slug) : undefined;
 
   return (
     <ManageRow

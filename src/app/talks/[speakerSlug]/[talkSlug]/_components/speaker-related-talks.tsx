@@ -2,7 +2,7 @@ import type { Speaker } from '@/features/speakers/types';
 import type { Talk } from '@/features/talks/types';
 
 import { FeaturedGrid } from '@/components/featured-grid';
-import { buildSpeakerUrl, getSpeakerName } from '@/features/speakers/utils';
+import { buildSpeakerPath, getSpeakerName } from '@/features/speakers/utils';
 import { TalkCard } from '@/features/talks/components/talk-card';
 
 interface SpeakerRelatedTalksProps {
@@ -24,7 +24,7 @@ export function SpeakerRelatedTalks({
       description={`Enjoy more talks by ${getSpeakerName(speaker)}.`}
       quickLinks={[
         {
-          href: buildSpeakerUrl(speaker.slug),
+          href: buildSpeakerPath(speaker.slug),
           label: 'View all talks',
         },
       ]}

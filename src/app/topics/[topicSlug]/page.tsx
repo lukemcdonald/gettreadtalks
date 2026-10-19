@@ -6,7 +6,7 @@ import { TopicPageContent } from '@/app/topics/[topicSlug]/_components/topic-pag
 import { TopicPageSkeleton } from '@/app/topics/[topicSlug]/_components/topic-page-skeleton';
 import { formatTopicMetaDescription } from '@/app/topics/[topicSlug]/_components/topic-talks-description';
 import { loadTopicBySlug } from '@/features/topics/queries/load-topic-by-slug';
-import { buildTopicUrl } from '@/features/topics/utils';
+import { buildTopicPath } from '@/features/topics/utils';
 import { buildPageMetadata } from '@/lib/metadata';
 
 // fallow-ignore-next-line unused-export
@@ -35,7 +35,7 @@ export async function generateMetadata({
   const { topic, totalTalks } = topicResult;
 
   return buildPageMetadata({
-    canonical: buildTopicUrl(topicSlug),
+    canonical: buildTopicPath(topicSlug),
     description: formatTopicMetaDescription(
       topic.description,
       topic.title,

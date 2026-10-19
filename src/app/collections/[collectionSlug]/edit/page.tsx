@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 
 import { loadCollectionBySlug } from '@/features/collections/queries/load-collection-by-slug';
-import { buildCollectionUrl } from '@/features/collections/utils';
+import { buildCollectionPath } from '@/features/collections/utils';
 import { redirectPublicEdit } from '@/lib/entities/redirect-public-edit';
 
 interface PageProps {
@@ -19,6 +19,6 @@ export default async function Page({ params }: PageProps) {
   await redirectPublicEdit({
     entity: 'collections',
     id: data.collection._id,
-    publicPath: buildCollectionUrl(collectionSlug),
+    publicPath: buildCollectionPath(collectionSlug),
   });
 }

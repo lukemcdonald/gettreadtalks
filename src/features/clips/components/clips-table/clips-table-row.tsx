@@ -2,7 +2,7 @@ import type { AdminClip } from '@/features/clips/types';
 
 import { ManageRow } from '@/components/manage-table';
 import { ClipActionsMenu } from '@/features/clips/components/clip-actions-menu';
-import { buildClipUrl } from '@/features/clips/utils';
+import { buildClipPath } from '@/features/clips/utils';
 import { getSpeakerName } from '@/features/speakers/utils';
 import { buildEntityEditPath } from '@/lib/entities/paths';
 
@@ -13,7 +13,7 @@ interface ClipsTableRowProps {
 export function ClipsTableRow({ clip }: ClipsTableRowProps) {
   const editPath = buildEntityEditPath('clips', clip._id);
   const publicPath =
-    clip.status === 'published' ? buildClipUrl(clip.slug) : undefined;
+    clip.status === 'published' ? buildClipPath(clip.slug) : undefined;
 
   return (
     <ManageRow

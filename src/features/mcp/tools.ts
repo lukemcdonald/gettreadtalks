@@ -1,12 +1,12 @@
 import { createMcpHandler, McpServer } from '@modelcontextprotocol/server';
 import { z } from 'zod';
 
-import { site } from '@/configs/site';
-import { buildClipUrl } from '@/features/clips/utils';
-import { buildCollectionUrl } from '@/features/collections/utils';
-import { buildSpeakerUrl, getSpeakerName } from '@/features/speakers/utils';
-import { buildTalkUrl } from '@/features/talks/utils';
-import { buildTopicUrl } from '@/features/topics/utils';
+import { buildClipPath } from '@/features/clips/utils';
+import { buildCollectionPath } from '@/features/collections/utils';
+import { buildSpeakerPath, getSpeakerName } from '@/features/speakers/utils';
+import { buildTalkPath } from '@/features/talks/utils';
+import { buildTopicPath } from '@/features/topics/utils';
+import { buildAbsoluteUrl } from '@/lib/entities/paths';
 
 import { withToolTracking } from './analytics';
 
@@ -197,10 +197,6 @@ export interface McpCatalog {
   >;
 }
 
-function canonicalUrl(path: string) {
-  return `${site.url}${path}`;
-}
-
 function toIsoDate(timestamp?: number) {
   if (!timestamp) {
     return;
@@ -221,7 +217,7 @@ function formatSpeaker(speaker: SpeakerRecord) {
     ministry: speaker.ministry,
     name: getSpeakerName(speaker),
     slug: speaker.slug,
-    url: canonicalUrl(buildSpeakerUrl(speaker.slug)),
+    url: buildAbsoluteUrl(buildSpeakerPath(speaker.slug)),
   };
 }
 
@@ -235,7 +231,7 @@ function formatTalk(talk: TalkRecord, speaker: SpeakerRecord | null) {
     title: talk.title,
     topics: talk.topicSlugs,
     url: speaker
-      ? canonicalUrl(buildTalkUrl(speaker.slug, talk.slug))
+      ? buildAbsoluteUrl(buildTalkPath(speaker.slug, talk.slug))
       : undefined,
   };
 }
@@ -247,7 +243,7 @@ function formatClip(clip: ClipRecord, speaker: SpeakerRecord | null) {
     slug: clip.slug,
     speaker: speaker ? formatSpeaker(speaker) : null,
     title: clip.title,
-    url: canonicalUrl(buildClipUrl(clip.slug)),
+    url: buildAbsoluteUrl(buildClipPath(clip.slug)),
   };
 }
 
@@ -256,7 +252,7 @@ function formatCollection(collection: CollectionRecord) {
     description: collection.description,
     slug: collection.slug,
     title: collection.title,
-    url: canonicalUrl(buildCollectionUrl(collection.slug)),
+    url: buildAbsoluteUrl(buildCollectionPath(collection.slug)),
   };
 }
 
@@ -266,7 +262,7 @@ function formatTopic(topic: TopicRecord, talkCount?: number) {
     slug: topic.slug,
     talkCount,
     title: topic.title,
-    url: canonicalUrl(buildTopicUrl(topic.slug)),
+    url: buildAbsoluteUrl(buildTopicPath(topic.slug)),
   };
 }
 
@@ -414,8 +410,8 @@ export async function loadClip(
       ? {
           slug: result.talk.slug,
           title: result.talk.title,
-          url: canonicalUrl(
-            buildTalkUrl(result.speaker.slug, result.talk.slug)
+          url: buildAbsoluteUrl(
+            buildTalkPath(result.speaker.slug, result.talk.slug)
           ),
         }
       : {

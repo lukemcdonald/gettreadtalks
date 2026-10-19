@@ -8,7 +8,7 @@ import { MediaEmbed } from '@/components/media-embed';
 import { Container, Section } from '@/components/ui';
 import { Link } from '@/components/ui/link';
 import { buildClipsPath } from '@/features/clips/utils';
-import { buildSpeakerUrl, getSpeakerName } from '@/features/speakers/utils';
+import { buildSpeakerPath, getSpeakerName } from '@/features/speakers/utils';
 
 interface ClipHeroProps {
   clip: Clip;
@@ -36,7 +36,7 @@ export function ClipHero({ clip, speaker }: ClipHeroProps) {
               by{' '}
               <Link
                 className="hover:underline"
-                href={buildSpeakerUrl(speaker.slug)}
+                href={buildSpeakerPath(speaker.slug)}
               >
                 {speakerName}
               </Link>

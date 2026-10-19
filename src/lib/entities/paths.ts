@@ -1,3 +1,5 @@
+import { site } from '@/configs/site';
+
 export const ACCOUNT_PATH = '/account';
 export const MANAGE_PATH = '/manage';
 
@@ -10,6 +12,10 @@ export const ADMIN_LIST_PATHS = {
 } as const;
 
 export type AdminEntity = keyof typeof ADMIN_LIST_PATHS;
+
+export function buildAbsoluteUrl(path: string) {
+  return `${site.url}${path}`;
+}
 
 export function buildAdminListPath(entity: AdminEntity) {
   return ADMIN_LIST_PATHS[entity];

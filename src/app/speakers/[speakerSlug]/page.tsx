@@ -5,7 +5,7 @@ import { Suspense } from 'react';
 import { SpeakerPageContent } from '@/app/speakers/[speakerSlug]/_components/speaker-page-content';
 import { SpeakerPageSkeleton } from '@/app/speakers/[speakerSlug]/_components/speaker-page-skeleton';
 import { loadSpeakerBySlug } from '@/features/speakers/queries/load-speaker-by-slug';
-import { buildSpeakerUrl, getSpeakerName } from '@/features/speakers/utils';
+import { buildSpeakerPath, getSpeakerName } from '@/features/speakers/utils';
 import { buildPageMetadata } from '@/lib/metadata';
 
 // fallow-ignore-next-line unused-export
@@ -29,7 +29,7 @@ export async function generateMetadata({
   const name = getSpeakerName(speaker);
 
   return buildPageMetadata({
-    canonical: buildSpeakerUrl(speakerSlug),
+    canonical: buildSpeakerPath(speakerSlug),
     description:
       speaker.description ?? `${name} — faithful minister of the Gospel.`,
     openGraphType: 'profile',

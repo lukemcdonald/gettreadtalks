@@ -7,7 +7,7 @@ import { TalkPageSkeleton } from '@/app/talks/[speakerSlug]/[talkSlug]/_componen
 import { getSpeakerName } from '@/features/speakers/utils';
 import { loadTalkBySlug } from '@/features/talks/queries/load-talk-by-slug';
 import {
-  buildTalkUrl,
+  buildTalkPath,
   formatTalkMetaDescription,
 } from '@/features/talks/utils';
 import { buildPageMetadata } from '@/lib/metadata';
@@ -35,7 +35,7 @@ export async function generateMetadata({
   const { speaker, talk, topics } = talkResult;
 
   return buildPageMetadata({
-    canonical: buildTalkUrl(speakerSlug, talkSlug),
+    canonical: buildTalkPath(speakerSlug, talkSlug),
     description: formatTalkMetaDescription({
       description: talk.description,
       scripture: talk.scripture,

@@ -1,12 +1,6 @@
-import { site } from '@/configs/site';
+import { buildAbsoluteUrl } from '@/lib/entities/paths';
 
-/**
- * Generate a talk URL with speaker and talk slugs.
- * @param speakerSlug - Speaker slug identifier
- * @param talkSlug - Talk slug identifier
- * @returns URL path for the talk
- */
-export function buildTalkUrl(speakerSlug: string, talkSlug: string): string {
+export function buildTalkPath(speakerSlug: string, talkSlug: string): string {
   return `/talks/${speakerSlug}/${talkSlug}`;
 }
 
@@ -54,7 +48,7 @@ export function buildTalkListItemsJsonLd(
     name: talk.title,
     position: index + 1,
     url: talk.speaker
-      ? `${site.url}${buildTalkUrl(talk.speaker.slug, talk.slug)}`
+      ? buildAbsoluteUrl(buildTalkPath(talk.speaker.slug, talk.slug))
       : undefined,
   }));
 }

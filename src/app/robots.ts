@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next';
 
-import { site } from '@/configs/site';
+import { buildAbsoluteUrl } from '@/lib/entities/paths';
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -19,6 +19,6 @@ export default function robots(): MetadataRoute.Robots {
       ],
       userAgent: '*',
     },
-    sitemap: `${site.url}/sitemap.xml`,
+    sitemap: buildAbsoluteUrl('/sitemap.xml'),
   };
 }

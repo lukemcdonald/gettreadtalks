@@ -4,7 +4,7 @@ import type { Talk } from '@/features/talks/types';
 
 import { FeaturedGrid } from '@/components/featured-grid';
 import { SpeakerCard } from '@/features/speakers/components/speaker-card';
-import { buildSpeakerUrl, getSpeakerName } from '@/features/speakers/utils';
+import { buildSpeakerPath, getSpeakerName } from '@/features/speakers/utils';
 import { TalkCard } from '@/features/talks/components/talk-card';
 
 interface ClipContentProps {
@@ -36,7 +36,7 @@ export function ClipContent({ clip, speaker, talk }: ClipContentProps) {
             columns={{ default: 1 }}
             description={`Browse all talks by ${speakerName}.`}
             quickLinks={[
-              { href: buildSpeakerUrl(speaker.slug), label: 'View all talks' },
+              { href: buildSpeakerPath(speaker.slug), label: 'View all talks' },
             ]}
             sticky
             title="Speaker"

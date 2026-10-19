@@ -10,6 +10,7 @@ import { buildSpeakersPath } from '@/features/speakers/utils';
 import { TalkCard } from '@/features/talks/components/talk-card';
 import { loadFeaturedTalks } from '@/features/talks/queries/load-featured-talks';
 import { buildTalksPath } from '@/features/talks/utils';
+import { buildAbsoluteUrl } from '@/lib/entities/paths';
 
 function buildWebsiteJsonLd() {
   return {
@@ -22,7 +23,9 @@ function buildWebsiteJsonLd() {
       'query-input': 'required name=search_term_string',
       target: {
         '@type': 'EntryPoint',
-        urlTemplate: `${site.url}${buildTalksPath()}?search={search_term_string}`,
+        urlTemplate: buildAbsoluteUrl(
+          `${buildTalksPath()}?search={search_term_string}`
+        ),
       },
     },
     url: site.url,

@@ -1,4 +1,4 @@
-export function buildTopicUrl(topicSlug: string) {
+export function buildTopicPath(topicSlug: string) {
   return `/topics/${topicSlug}`;
 }
 

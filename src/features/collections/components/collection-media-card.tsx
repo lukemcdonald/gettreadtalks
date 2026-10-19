@@ -3,7 +3,7 @@ import type { Collection } from '@/features/collections/types';
 import { FolderIcon } from 'lucide-react';
 
 import { MediaCard, MediaIconFrame } from '@/components/media-card';
-import { buildCollectionUrl } from '@/features/collections/utils';
+import { buildCollectionPath } from '@/features/collections/utils';
 
 interface CollectionMediaCardProps {
   collection: Pick<Collection, 'slug' | 'title'>;
@@ -13,7 +13,7 @@ export function CollectionMediaCard({ collection }: CollectionMediaCardProps) {
   return (
     <MediaCard
       ariaLabel={collection.title}
-      href={buildCollectionUrl(collection.slug)}
+      href={buildCollectionPath(collection.slug)}
       media={
         <MediaIconFrame>
           <FolderIcon className="size-5" />

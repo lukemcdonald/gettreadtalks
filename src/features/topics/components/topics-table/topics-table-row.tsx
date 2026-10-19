@@ -2,7 +2,7 @@ import type { Topic } from '@/features/topics/types';
 
 import { ManageCountCell, ManageRow } from '@/components/manage-table';
 import { TopicActionsMenu } from '@/features/topics/components/topic-actions-menu';
-import { buildTopicUrl } from '@/features/topics/utils';
+import { buildTopicPath } from '@/features/topics/utils';
 import { buildEntityEditPath } from '@/lib/entities/paths';
 
 interface TopicsTableRowProps {
@@ -12,7 +12,7 @@ interface TopicsTableRowProps {
 
 export function TopicsTableRow({ talkCount, topic }: TopicsTableRowProps) {
   const editPath = buildEntityEditPath('topics', topic._id);
-  const viewUrl = talkCount > 0 ? buildTopicUrl(topic.slug) : undefined;
+  const viewUrl = talkCount > 0 ? buildTopicPath(topic.slug) : undefined;
 
   return (
     <ManageRow

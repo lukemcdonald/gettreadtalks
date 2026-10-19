@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
 import { site } from '@/configs/site';
+import { buildAbsoluteUrl } from '@/lib/entities/paths';
 import { pluralize } from '@/utils';
 
 export const alt = site.name;
@@ -370,7 +371,7 @@ async function resolvePhotoSrc(photoUrl?: string) {
   try {
     return toDataUri(mimeFor(filePath), await readFile(filePath));
   } catch {
-    return `${site.url}${photoUrl}`;
+    return buildAbsoluteUrl(photoUrl);
   }
 }
 

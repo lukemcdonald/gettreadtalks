@@ -2,7 +2,7 @@
 
 import type { Speaker } from '@/features/speakers/types';
 
-import { buildSpeakerUrl } from '@/features/speakers/utils';
+import { buildSpeakerPath } from '@/features/speakers/utils';
 import { describe, expect, it, render, screen } from '@/test';
 
 import { SpeakerActionsMenu } from './speaker-actions-menu';
@@ -33,7 +33,7 @@ describe('SpeakerActionsMenu', () => {
   };
 
   it('shows View and Delete without Edit when published', async () => {
-    const viewUrl = buildSpeakerUrl(speaker.slug);
+    const viewUrl = buildSpeakerPath(speaker.slug);
     const { click } = render(
       <SpeakerActionsMenu
         clipCount={0}
