@@ -9,8 +9,8 @@ import { loadTalk } from '@/features/talks/queries/load-talk';
 import { loadTalkTopics } from '@/features/talks/queries/load-talk-topics';
 import {
   ADMIN_LIST_PATHS,
-  getAdminLoginRedirect,
   buildEntityEditPath,
+  getLoginRedirect,
 } from '@/lib/entities/paths';
 import { parseStatusPrefill } from '@/lib/entities/status-prefill';
 import { requireAdminUser } from '@/services/auth/server';
@@ -32,7 +32,7 @@ export async function EditTalkSheetPage({
   const statusPrefill = parseStatusPrefill(status);
 
   await requireAdminUser(
-    getAdminLoginRedirect(
+    getLoginRedirect(
       buildEntityEditPath('talks', talkId, { status: statusPrefill })
     ) as Route
   );

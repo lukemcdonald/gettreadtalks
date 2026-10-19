@@ -15,7 +15,7 @@ export function buildAdminListPath(entity: AdminEntity) {
   return ADMIN_LIST_PATHS[entity];
 }
 
-export function getAdminLoginRedirect(path: string) {
+export function getLoginRedirect(path: string) {
   return `/login?redirect=${encodeURIComponent(path)}`;
 }
 

@@ -5,7 +5,7 @@ import { Suspense } from 'react';
 
 import { AreaLayout } from '@/components/layouts';
 import { FormSheetSkeleton } from '@/components/ui';
-import { getAdminLoginRedirect } from '@/lib/entities/paths';
+import { getLoginRedirect } from '@/lib/entities/paths';
 import { requireAdminUser } from '@/services/auth/server';
 
 interface AdminSheetFallbackProps {
@@ -19,7 +19,7 @@ async function AdminSheetFallbackContent({
   returnPath,
   sheet,
 }: AdminSheetFallbackProps) {
-  await requireAdminUser(getAdminLoginRedirect(returnPath) as Route);
+  await requireAdminUser(getLoginRedirect(returnPath) as Route);
 
   return (
     <>
