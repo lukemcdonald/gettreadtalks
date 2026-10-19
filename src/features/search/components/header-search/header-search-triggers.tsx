@@ -23,13 +23,13 @@ export function HeaderSearchDesktopTrigger({
   return (
     <Button
       aria-keyshortcuts="Control+K Meta+K"
-      aria-label="Search"
       className={cn('rounded-full bg-transparent', className)}
       data-testid="search-cta"
       size="sm"
       variant="outline"
       {...delegated}
     >
+      <span className="sr-only">Search</span>
       <SearchIcon aria-hidden="true" />
       {hotkey}
     </Button>

@@ -21,8 +21,8 @@ describe('HeaderSearchDesktopTrigger', () => {
   it('renders the search hotkey', () => {
     setup();
 
-    expect(screen.getByRole('button', { name: 'Search' })).toHaveTextContent(
-      MOCK_HOTKEY
-    );
+    expect(
+      screen.getByRole('button', { name: `Search ${MOCK_HOTKEY}` })
+    ).toHaveTextContent(MOCK_HOTKEY);
   });
 });
