@@ -26,10 +26,12 @@ export const PREVIEW_SPEAKERS = [
 
 export const PREVIEW_TOPICS = [
   {
+    description: PLACEHOLDER_DESCRIPTION,
     slug: 'grace',
     title: 'Grace',
   },
   {
+    description: PLACEHOLDER_DESCRIPTION,
     slug: 'prayer',
     title: 'Prayer',
   },

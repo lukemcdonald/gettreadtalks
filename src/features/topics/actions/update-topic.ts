@@ -7,6 +7,7 @@ import type { ActionResult } from '@/lib/forms/types';
 import { updateTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
+import { stripEmptyStrings } from '@/lib/forms/schemas';
 import { toConvexFormErrors, toZodFormErrors } from '@/lib/forms/validation';
 import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
 
@@ -29,8 +30,8 @@ export async function updateTopicAction(
 
   try {
     await fetchAuthMutation(api.topics.updateTopic, {
+      ...stripEmptyStrings(parsed.data),
       id: topicId,
-      title: parsed.data.title,
     });
 
     updateTag('topics');

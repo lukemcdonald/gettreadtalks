@@ -7,6 +7,7 @@ import type { ActionResult } from '@/lib/forms/types';
 import { updateTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
+import { stripEmptyStrings } from '@/lib/forms/schemas';
 import { toConvexFormErrors, toZodFormErrors } from '@/lib/forms/validation';
 import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
 
@@ -29,7 +30,7 @@ export async function createTopicAction(
   try {
     const topicId = await fetchAuthMutation(
       api.topics.createTopic,
-      parsed.data
+      stripEmptyStrings(parsed.data)
     );
 
     updateTag('topics');

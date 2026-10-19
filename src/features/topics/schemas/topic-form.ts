@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 export const topicFormSchema = z.object({
+  description: z.string().optional(),
   title: z.string().trim().min(1, 'Title is required'),
 });
 

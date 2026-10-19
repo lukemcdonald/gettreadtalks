@@ -167,6 +167,7 @@ async function upsertTopic(
 
   if (existing) {
     await ctx.db.patch(existing._id, {
+      description: topic.description,
       title: topic.title,
       updatedAt: Date.now(),
     });
