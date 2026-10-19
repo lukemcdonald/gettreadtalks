@@ -12,7 +12,7 @@ const sectionVariants = cva('gap-6 px-4 sm:px-6', {
   variants: {
     spacing: {
       '2xl': 'py-4 sm:py-6 md:py-12 lg:py-16',
-      '3xl': 'xl:20 py-4 sm:py-6 md:py-12 lg:py-16',
+      '3xl': 'py-4 sm:py-6 md:py-12 lg:py-16 xl:py-20',
       lg: 'py-4 sm:py-6',
       md: 'py-4',
       sm: 'py-3',
