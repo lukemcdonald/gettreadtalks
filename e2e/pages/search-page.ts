@@ -10,7 +10,7 @@ export class SearchPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.cta = page.getByTestId('search-cta');
+    this.cta = page.getByTestId('search-cta').filter({ visible: true });
     this.heading = page.getByRole('heading', {
       exact: true,
       level: 1,
