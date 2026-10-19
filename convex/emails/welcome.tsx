@@ -7,7 +7,7 @@ import { EmailLayout } from './components/layout';
 
 export function WelcomeEmail({ name, siteUrl }: WelcomeEmailProps) {
   return (
-    <EmailLayout preview={`Welcome to {site.name}, ${name}!`}>
+    <EmailLayout preview={`Welcome to ${site.name}, ${name}!`}>
       <Text style={paragraph}>Hi {name},</Text>
       <Text style={paragraph}>
         Welcome to {site.name}! We&apos;re excited to have you join our
@@ -42,11 +42,21 @@ export function WelcomeEmail({ name, siteUrl }: WelcomeEmailProps) {
   );
 }
 
-const paragraph = {
-  color: '#333',
-  fontSize: '16px',
-  lineHeight: '26px',
-  margin: '0 0 16px',
+const button = {
+  backgroundColor: '#2754C5',
+  borderRadius: '4px',
+  color: '#fff',
+  display: 'inline-block',
+  fontSize: '14px',
+  fontWeight: 'bold',
+  lineHeight: '20px',
+  padding: '12px 20px',
+  textDecoration: 'none',
+};
+
+const buttonContainer = {
+  margin: '24px 0',
+  textAlign: 'center' as const,
 };
 
 const listItem = {
@@ -57,18 +67,9 @@ const listItem = {
   paddingLeft: '20px',
 };
 
-const buttonContainer = {
-  margin: '32px 0',
-  textAlign: 'center' as const,
-};
-
-const button = {
-  backgroundColor: '#2754C5',
-  borderRadius: '4px',
-  color: '#fff',
+const paragraph = {
+  color: '#333',
   fontSize: '16px',
-  fontWeight: 'bold',
-  lineHeight: '50px',
-  padding: '0 20px',
-  textDecoration: 'none',
+  lineHeight: '26px',
+  margin: '0 0 16px',
 };

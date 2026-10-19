@@ -47,7 +47,7 @@ describe('checkMediaUrl', () => {
 
     const results = await Promise.all(
       cases.map(({ status }) =>
-        checkMediaUrl('https://www.youtube.com/watch?v=abc', (() =>
+        checkMediaUrl('https://www.youtube.com/watch?v=LYncFGsKvCQ', (() =>
           Promise.resolve(new Response(null, { status }))) as typeof fetch)
       )
     );
@@ -57,7 +57,7 @@ describe('checkMediaUrl', () => {
     );
 
     const failed = await checkMediaUrl(
-      'https://www.youtube.com/watch?v=abc',
+      'https://www.youtube.com/watch?v=LYncFGsKvCQ',
       (() => Promise.reject(new Error('timeout'))) as typeof fetch
     );
 

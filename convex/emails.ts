@@ -1,20 +1,24 @@
 import type { ActionCtx, MutationCtx } from './_generated/server';
 import type { EmailId, SendEmailOptions } from '@convex-dev/resend';
-import type { ReactElement } from 'react';
 
 import { Resend, vEmailEvent, vEmailId } from '@convex-dev/resend';
 import { v } from 'convex/values';
-import { render } from 'react-email';
 
 import { site } from '../src/configs/site';
+import {
+  buildAbsoluteUrl,
+  buildMediaHealthPath,
+} from '../src/lib/entities/paths';
 import { components, internal } from './_generated/api';
 import { internalAction, internalMutation } from './_generated/server';
 import { MediaHealthEmail } from './emails/mediaHealth';
+import { renderEmailTemplate } from './emails/render';
 import { ResetPasswordTemplate } from './emails/resetPassword';
 import { VerifyEmailTemplate } from './emails/verifyEmail';
 import { WelcomeEmail } from './emails/welcome';
 import { throwConvexError } from './lib/errors';
 import { reportSentryException } from './lib/sentry';
+import { getSiteUrl, shouldSendEmail } from './lib/siteUrl';
 import { formatErrorMessage } from './lib/utils';
 import { mediaHealthDigestItem } from './model/mediaHealth/validators';
 
@@ -151,19 +155,26 @@ export const handleEmailEvent = internalMutation({
 export const sendMediaHealthEmail = internalAction({
   args: {
     items: v.array(mediaHealthDigestItem),
+    siteUrl: v.optional(v.string()),
+    stillOpenCount: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     if (args.items.length === 0) {
-      return null;
+      return false;
     }
 
     try {
+      const siteUrl = args.siteUrl ?? getSiteUrl();
+      const stillOpenCount = args.stillOpenCount ?? 0;
       const template = MediaHealthEmail({
         items: args.items,
+        siteUrl,
+        stillOpenCount,
+        stillOpenHref: buildAbsoluteUrl(buildMediaHealthPath(), siteUrl),
       });
-      const { html, text } = await renderEmail(template);
+      const { html, text } = renderEmailTemplate(template);
 
-      await sendTrackedEmail(
+      const emailId = await sendTrackedEmail(
         ctx,
         {
           from: getFromAddress(),
@@ -175,17 +186,18 @@ export const sendMediaHealthEmail = internalAction({
         },
         'mediaHealth'
       );
+
+      return emailId !== null;
     } catch (error) {
+      await reportEmailSendFailure('mediaHealth', error);
       throwConvexError(500, 'Failed to send media health email', {
         cause: formatErrorMessage(error),
         resource: 'email',
         resourceId: 'mediaHealth',
       });
     }
-
-    return null;
   },
-  returns: v.null(),
+  returns: v.boolean(),
 });
 
 export const sendPasswordResetEmail = internalAction({
@@ -201,7 +213,7 @@ export const sendPasswordResetEmail = internalAction({
         resetUrl: args.resetUrl,
         token: args.token,
       });
-      const { html, text } = await renderEmail(template);
+      const { html, text } = renderEmailTemplate(template);
 
       await sendTrackedEmail(
         ctx,
@@ -216,10 +228,11 @@ export const sendPasswordResetEmail = internalAction({
         'passwordReset'
       );
     } catch (error) {
+      await reportEmailSendFailure('passwordReset', error);
       throwConvexError(500, 'Failed to send password reset email', {
         cause: formatErrorMessage(error),
         resource: 'email',
-        resourceId: args.email,
+        resourceId: 'passwordReset',
       });
     }
   },
@@ -256,7 +269,7 @@ export const sendVerificationEmail = internalMutation({
         token: args.token,
         verificationUrl: args.verificationUrl,
       });
-      const { html, text } = await renderEmail(template);
+      const { html, text } = renderEmailTemplate(template);
 
       return await sendTrackedEmail(
         ctx,
@@ -271,14 +284,15 @@ export const sendVerificationEmail = internalMutation({
         'verification'
       );
     } catch (error) {
+      await reportEmailSendFailure('verification', error);
       throwConvexError(500, 'Failed to send verification email', {
         cause: formatErrorMessage(error),
         resource: 'email',
-        resourceId: args.email,
+        resourceId: 'verification',
       });
     }
   },
-  returns: vEmailId,
+  returns: v.union(vEmailId, v.null()),
 });
 
 export const sendWelcomeEmail = internalMutation({
@@ -292,9 +306,9 @@ export const sendWelcomeEmail = internalMutation({
       const template = WelcomeEmail({
         email: args.email,
         name: args.name,
-        siteUrl: process.env.SITE_URL || site.url,
+        siteUrl: getSiteUrl(),
       });
-      const { html, text } = await renderEmail(template);
+      const { html, text } = renderEmailTemplate(template);
 
       return await sendTrackedEmail(
         ctx,
@@ -309,14 +323,15 @@ export const sendWelcomeEmail = internalMutation({
         'welcome'
       );
     } catch (error) {
+      await reportEmailSendFailure('welcome', error);
       throwConvexError(500, 'Failed to send welcome email', {
         cause: formatErrorMessage(error),
         resource: 'email',
-        resourceId: args.email,
+        resourceId: 'welcome',
       });
     }
   },
-  returns: vEmailId,
+  returns: v.union(vEmailId, v.null()),
 });
 
 // ============================================
@@ -347,7 +362,11 @@ async function sendTrackedEmail(
   ctx: ActionCtx | MutationCtx,
   emailParams: SendEmailOptions,
   kind: EmailKind
-): Promise<EmailId> {
+): Promise<EmailId | null> {
+  if (!shouldSendEmail()) {
+    return null;
+  }
+
   const emailId = await resend.sendEmail(ctx, emailParams);
 
   try {
@@ -387,12 +406,11 @@ async function reportEmailFailure(params: {
   });
 }
 
-async function renderEmail(template: ReactElement) {
-  const [html, text] = await Promise.all([
-    render(template),
-    render(template, { plainText: true }),
-  ]);
-  return { html, text };
+async function reportEmailSendFailure(kind: EmailKind, error: unknown) {
+  await reportSentryException({
+    message: `Failed to send "${kind}" email: ${formatErrorMessage(error)}`,
+    tags: { emailKind: kind },
+  });
 }
 
 function normalizeRecipients(to: string | string[]): string[] {

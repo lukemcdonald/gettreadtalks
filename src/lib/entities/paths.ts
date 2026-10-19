@@ -1,7 +1,8 @@
-import { site } from '@/configs/site';
+import { site } from '../../configs/site';
 
 export const ACCOUNT_PATH = '/account';
 export const MANAGE_PATH = '/manage';
+export const MEDIA_HEALTH_PATH = '/manage/media';
 
 export const ADMIN_LIST_PATHS = {
   clips: '/manage/clips',
@@ -15,8 +16,11 @@ export type AdminEntity = keyof typeof ADMIN_LIST_PATHS;
 
 type PathQueryValue = boolean | number | string;
 
-export function buildAbsoluteUrl(path: string) {
-  return `${site.url}${path}`;
+export function buildAbsoluteUrl(path: string, origin = site.url) {
+  const base = origin.replace(/\/$/u, '');
+  const normalized = path.startsWith('/') ? path : `/${path}`;
+
+  return `${base}${normalized}`;
 }
 
 export function buildAdminListPath(entity: AdminEntity) {
@@ -69,4 +73,8 @@ export function buildEntityNewPath(entity: AdminEntity) {
 
 export function buildPublicEditPath(publicPath: string) {
   return `${publicPath}/edit`;
+}
+
+export function buildMediaHealthPath() {
+  return MEDIA_HEALTH_PATH;
 }

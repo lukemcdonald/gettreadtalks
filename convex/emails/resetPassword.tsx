@@ -10,7 +10,9 @@ export function ResetPasswordTemplate({
   resetUrl,
 }: PasswordResetEmailProps) {
   return (
-    <EmailLayout preview="Reset your {site.name} password to regain access to your account.">
+    <EmailLayout
+      preview={`Reset your ${site.name} password to regain access to your account.`}
+    >
       <Text style={paragraph}>Hi there,</Text>
       <Text style={paragraph}>
         We received a request to reset the password for your {site.name} account
@@ -49,11 +51,28 @@ export function ResetPasswordTemplate({
   );
 }
 
-const paragraph = {
-  color: '#333',
-  fontSize: '16px',
-  lineHeight: '26px',
-  margin: '0 0 16px',
+const button = {
+  backgroundColor: '#2754C5',
+  borderRadius: '4px',
+  color: '#fff',
+  display: 'inline-block',
+  fontSize: '14px',
+  fontWeight: 'bold',
+  lineHeight: '20px',
+  padding: '12px 20px',
+  textDecoration: 'none',
+};
+
+const buttonContainer = {
+  margin: '24px 0',
+  textAlign: 'center' as const,
+};
+
+const linkText = {
+  color: '#2754C5',
+  fontSize: '14px',
+  lineHeight: '22px',
+  wordBreak: 'break-all' as const,
 };
 
 const listItem = {
@@ -64,24 +83,9 @@ const listItem = {
   paddingLeft: '20px',
 };
 
-const buttonContainer = {
-  margin: '32px 0',
-  textAlign: 'center' as const,
-};
-
-const button = {
-  backgroundColor: '#2754C5',
-  borderRadius: '4px',
-  color: '#fff',
+const paragraph = {
+  color: '#333',
   fontSize: '16px',
-  fontWeight: 'bold',
-  lineHeight: '50px',
-  padding: '0 20px',
-  textDecoration: 'none',
-};
-
-const linkText = {
-  color: '#2754C5',
-  fontSize: '14px',
-  wordBreak: 'break-all' as const,
+  lineHeight: '26px',
+  margin: '0 0 16px',
 };
