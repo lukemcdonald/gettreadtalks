@@ -1,4 +1,4 @@
-import type * as SentrySdk from '@sentry/nextjs';
+import type * as SentrySdk from './sdk';
 
 import { IS_DEV } from '@/constants/env';
 
@@ -48,10 +48,6 @@ export function flushSentryQueue(client: SentryClient): void {
   }
 }
 
-export function getClientSentry(): SentryClient | null {
-  return sentry;
-}
-
 export function startClientSentry(): void {
   if (!IS_SENTRY_ENABLED || typeof window === 'undefined') {
     return;
@@ -75,12 +71,23 @@ function bufferWindowError(error: unknown): void {
 
 async function initClientSentry(): Promise<SentryClient | null> {
   try {
-    const Sentry = await import('@sentry/nextjs');
+    const Sentry = await import('./sdk');
 
     started = true;
 
     if (typeof window !== 'undefined') {
-      Sentry.init(baseSentryConfig);
+      const { tracesSampleRate: _tracesSampleRate, ...clientSentryConfig } =
+        baseSentryConfig;
+
+      Sentry.init({
+        ...clientSentryConfig,
+        integrations: (integrations) =>
+          integrations.filter(
+            (integration) => integration.name !== 'BrowserTracing'
+          ),
+        replaysOnErrorSampleRate: 0,
+        replaysSessionSampleRate: 0,
+      });
 
       if (IS_DEV) {
         (window as unknown as { Sentry?: SentryClient }).Sentry = Sentry;
