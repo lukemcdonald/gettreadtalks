@@ -155,7 +155,7 @@ export const sendMediaHealthEmail = internalAction({
     }
 
     try {
-      const { html, text } = renderMediaHealthMessage(args);
+      const { html, text } = await renderMediaHealthMessage(args);
       const emailId = await sendTrackedEmail(
         ctx,
         {
@@ -195,7 +195,7 @@ export const sendPasswordResetEmail = internalAction({
         resetUrl: args.resetUrl,
         token: args.token,
       });
-      const { html, text } = renderEmailTemplate(template);
+      const { html, text } = await renderEmailTemplate(template);
 
       await sendTrackedEmail(
         ctx,
@@ -251,7 +251,7 @@ export const sendVerificationEmail = internalMutation({
         token: args.token,
         verificationUrl: args.verificationUrl,
       });
-      const { html, text } = renderEmailTemplate(template);
+      const { html, text } = await renderEmailTemplate(template);
 
       return await sendTrackedEmail(
         ctx,
@@ -290,7 +290,7 @@ export const sendWelcomeEmail = internalMutation({
         name: args.name,
         siteUrl: getSiteUrl(),
       });
-      const { html, text } = renderEmailTemplate(template);
+      const { html, text } = await renderEmailTemplate(template);
 
       return await sendTrackedEmail(
         ctx,
@@ -344,7 +344,7 @@ function hasCheckSendBudget(startedAt: number) {
   );
 }
 
-function renderMediaHealthMessage(args: {
+async function renderMediaHealthMessage(args: {
   items: MediaHealthEmailProps['items'];
   siteUrl?: string;
   stillOpenCount?: number;
@@ -352,7 +352,7 @@ function renderMediaHealthMessage(args: {
   const siteUrl = args.siteUrl ?? getSiteUrl();
   const stillOpenCount = args.stillOpenCount ?? 0;
 
-  return renderEmailTemplate(
+  return await renderEmailTemplate(
     MediaHealthEmail({
       items: args.items,
       siteUrl,

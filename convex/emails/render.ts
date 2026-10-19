@@ -1,9 +1,13 @@
 import type { ReactElement } from 'react';
 
-import { renderToStaticMarkup } from 'react-dom/server.browser';
+import { render } from 'react-email';
 
-export function renderEmailTemplate(template: ReactElement) {
-  const html = `<!DOCTYPE html>${renderToStaticMarkup(template)}`;
+/**
+ * Static `react-email` import so Convex's `convex` condition bundles the
+ * edge renderer, not `@react-email/render`'s Node `node:stream` build.
+ */
+export async function renderEmailTemplate(template: ReactElement) {
+  const html = await render(template);
 
   return {
     html,

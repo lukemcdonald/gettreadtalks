@@ -7,8 +7,8 @@ import { renderEmailTemplate } from './render';
 import { WelcomeEmail } from './welcome';
 
 describe('renderEmailTemplate', () => {
-  it('renders welcome markup in the Convex V8 runtime', () => {
-    const { html, text } = renderEmailTemplate(
+  it('renders welcome markup in the Convex V8 runtime', async () => {
+    const { html, text } = await renderEmailTemplate(
       WelcomeEmail({
         email: 'luke@example.test',
         name: 'Luke',
@@ -16,14 +16,14 @@ describe('renderEmailTemplate', () => {
       })
     );
 
-    expect(html.startsWith('<!DOCTYPE html>')).toBe(true);
+    expect(html.toLowerCase().startsWith('<!doctype html')).toBe(true);
     expect(html).toContain('Welcome to TREAD Talks, Luke!');
     expect(html).toContain('https://www.gettreadtalks.com');
     expect(text).toContain('Hi Luke');
   });
 
-  it('renders digest markup in the Convex V8 runtime', () => {
-    const { html, text } = renderEmailTemplate(
+  it('renders digest markup in the Convex V8 runtime', async () => {
+    const { html, text } = await renderEmailTemplate(
       MediaHealthEmail({
         items: [
           {
@@ -42,7 +42,7 @@ describe('renderEmailTemplate', () => {
       })
     );
 
-    expect(html.startsWith('<!DOCTYPE html>')).toBe(true);
+    expect(html.toLowerCase().startsWith('<!doctype html')).toBe(true);
     expect(html).toContain('Grace Abounding');
     expect(html).toContain('https://www.youtube.com/watch?v=0SVTl4Xa5fY');
     expect(html).toContain('/manage/media');
