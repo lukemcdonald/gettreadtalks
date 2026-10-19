@@ -1,5 +1,6 @@
 import type { DataModel } from './_generated/dataModel';
-import type { GenericCtx } from '@convex-dev/better-auth';
+import type { MutationCtx } from './_generated/server';
+import type { AuthFunctions, GenericCtx } from '@convex-dev/better-auth';
 import type { BetterAuthOptions } from 'better-auth';
 
 import { createClient } from '@convex-dev/better-auth';
@@ -13,6 +14,9 @@ import authConfig from './auth.config';
 import authSchema from './betterAuth/schema';
 import { authRateLimitPlugin } from './lib/plugins';
 import { isPreviewSiteUrl } from './lib/turnstile';
+import { formatErrorMessage } from './lib/utils';
+
+const authFunctions: AuthFunctions = internal.auth;
 
 /**
  * Creates a new Better Auth component client.
@@ -26,11 +30,21 @@ import { isPreviewSiteUrl } from './lib/turnstile';
 export const authComponent = createClient<DataModel, typeof authSchema>(
   components.betterAuth,
   {
+    authFunctions,
     local: {
       schema: authSchema,
     },
+    triggers: {
+      user: {
+        onCreate: async (ctx, doc) => {
+          await scheduleWelcomeEmail(ctx, doc);
+        },
+      },
+    },
   }
 );
+
+export const { onCreate, onDelete, onUpdate } = authComponent.triggersApi();
 
 const TRUSTED_ORIGINS = [
   'https://*.vercel.app',
@@ -165,3 +179,24 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
   const options = createAuthOptions(ctx);
   return betterAuth(options);
 };
+
+/**
+ * Queue the welcome email so a send failure cannot roll back user creation.
+ */
+async function scheduleWelcomeEmail(
+  ctx: MutationCtx,
+  user: { _id: string; email: string; name: string }
+) {
+  try {
+    await ctx.scheduler.runAfter(0, internal.emails.sendWelcomeEmail, {
+      email: user.email,
+      name: user.name,
+      userId: user._id,
+    });
+  } catch (error) {
+    console.error(
+      'Failed to schedule welcome email:',
+      formatErrorMessage(error)
+    );
+  }
+}
