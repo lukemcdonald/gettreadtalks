@@ -58,21 +58,3 @@ export async function listPublishedTopicsForTalks(
     .filter((topic): topic is Doc<'topics'> => topic !== null)
     .toSorted((a, b) => a.title.localeCompare(b.title));
 }
-
-/** Distinct topics covered by a speaker's published talks, sorted by title. */
-export async function listPublishedTopicsForSpeaker(
-  ctx: QueryCtx,
-  speakerId: Id<'speakers'>
-) {
-  const talks = await ctx.db
-    .query('talks')
-    .withIndex('by_speakerId_and_status', (q) =>
-      q.eq('speakerId', speakerId).eq('status', 'published')
-    )
-    .collect();
-
-  return await listPublishedTopicsForTalks(
-    ctx,
-    talks.map((talk) => talk._id)
-  );
-}
