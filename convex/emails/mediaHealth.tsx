@@ -8,6 +8,7 @@ import { Button, Heading, Hr, Link, Section, Text } from 'react-email';
 import { site } from '../../src/configs/site';
 import { toYouTubeWatchUrl } from '../../src/utils/youtube';
 import { EmailLayout } from './components/layout';
+import { emailButton, emailParagraph } from './components/styles';
 
 export function MediaHealthEmail({
   items,
@@ -20,8 +21,8 @@ export function MediaHealthEmail({
 
   return (
     <EmailLayout preview="New private or missing talk and clip media needs a look.">
-      <Text style={paragraph}>Hi,</Text>
-      <Text style={paragraph}>
+      <Text style={emailParagraph}>Hi,</Text>
+      <Text style={emailParagraph}>
         These published YouTube or Vimeo URLs are newly private or missing. Open
         in admin to review; nothing is saved until you press Save.
       </Text>
@@ -56,15 +57,15 @@ export function MediaHealthEmail({
         </>
       )}
       {stillOpenCount > 0 && (
-        <Text style={paragraph}>
+        <Text style={emailParagraph}>
           {stillOpenCount} still open.{' '}
           <Link href={stillOpenHref} style={inlineLink}>
             View open items
           </Link>
         </Text>
       )}
-      <Text style={paragraph}>Blessings,</Text>
-      <Text style={paragraph}>The {site.name} job runner</Text>
+      <Text style={emailParagraph}>Blessings,</Text>
+      <Text style={emailParagraph}>The {site.name} job runner</Text>
     </EmailLayout>
   );
 }
@@ -116,16 +117,8 @@ function formatBrokenDate(timestamp: number) {
 }
 
 const button = {
-  backgroundColor: '#2754C5',
-  borderRadius: '4px',
-  color: '#fff',
-  display: 'inline-block',
-  fontSize: '14px',
-  fontWeight: 'bold',
-  lineHeight: '20px',
+  ...emailButton,
   margin: '0 8px 8px 0',
-  padding: '12px 20px',
-  textDecoration: 'none',
 };
 
 const buttonContainer = {
@@ -152,13 +145,6 @@ const metaText = {
   fontSize: '15px',
   lineHeight: '22px',
   margin: '0 0 4px',
-};
-
-const paragraph = {
-  color: '#333',
-  fontSize: '16px',
-  lineHeight: '26px',
-  margin: '0 0 16px',
 };
 
 const secondaryButton = {

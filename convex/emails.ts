@@ -6,9 +6,9 @@ import { v } from 'convex/values';
 
 import { site } from '../src/configs/site';
 import {
-  buildAbsoluteUrl,
-  buildMediaHealthPath,
-} from '../src/lib/entities/paths';
+  MEDIA_HEALTH_PATH,
+  joinOriginAndPath,
+} from '../src/lib/entities/path-constants';
 import { components, internal } from './_generated/api';
 import { internalAction, internalMutation } from './_generated/server';
 import { MediaHealthEmail } from './emails/mediaHealth';
@@ -170,7 +170,7 @@ export const sendMediaHealthEmail = internalAction({
         items: args.items,
         siteUrl,
         stillOpenCount,
-        stillOpenHref: buildAbsoluteUrl(buildMediaHealthPath(), siteUrl),
+        stillOpenHref: joinOriginAndPath(MEDIA_HEALTH_PATH, siteUrl),
       });
       const { html, text } = renderEmailTemplate(template);
 

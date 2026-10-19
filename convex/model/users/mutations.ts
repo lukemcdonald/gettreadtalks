@@ -388,27 +388,7 @@ export const setUserRole = mutation({
 });
 
 async function throwMappedDeleteUserError(error: unknown): Promise<never> {
-  const fingerprint = getAuthErrorFingerprint(error);
-
-  if (isAuthErrorCode(fingerprint, 'INVALID_PASSWORD')) {
-    throwValidationError('Check your password and try again.', 'password');
-  }
-
-  if (isAuthErrorCode(fingerprint, 'CREDENTIAL_ACCOUNT_NOT_FOUND')) {
-    throwValidationError(
-      'This account has no password to confirm.',
-      'password'
-    );
-  }
-
-  if (
-    isAuthErrorCode(fingerprint, 'SESSION_EXPIRED') ||
-    isAuthErrorCode(fingerprint, 'UNAUTHORIZED')
-  ) {
-    throwAuthRequired(
-      'Your session expired. Sign in again to delete your account.'
-    );
-  }
+  throwExpectedDeleteUserError(getAuthErrorFingerprint(error));
 
   await reportSentryException({
     message: `Delete account failed: ${formatErrorMessage(error)}`,
@@ -416,6 +396,40 @@ async function throwMappedDeleteUserError(error: unknown): Promise<never> {
   });
 
   throwConvexError(500, 'Something went wrong. Please try again.');
+}
+
+function throwExpectedDeleteUserError(fingerprint: string) {
+  const expected = [
+    {
+      codes: ['INVALID_PASSWORD'],
+      throwError: () => {
+        throwValidationError('Check your password and try again.', 'password');
+      },
+    },
+    {
+      codes: ['CREDENTIAL_ACCOUNT_NOT_FOUND'],
+      throwError: () => {
+        throwValidationError(
+          'This account has no password to confirm.',
+          'password'
+        );
+      },
+    },
+    {
+      codes: ['SESSION_EXPIRED', 'UNAUTHORIZED'],
+      throwError: () => {
+        throwAuthRequired(
+          'Your session expired. Sign in again to delete your account.'
+        );
+      },
+    },
+  ];
+
+  for (const mapping of expected) {
+    if (mapping.codes.some((code) => isAuthErrorCode(fingerprint, code))) {
+      mapping.throwError();
+    }
+  }
 }
 
 function getAuthErrorFingerprint(error: unknown) {

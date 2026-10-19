@@ -142,25 +142,17 @@ async function writeMediaCheck(
     state: MediaCheckState;
   }
 ) {
-  const fields: {
-    checkedAt: number;
-    firstBrokenAt?: number;
-    lastNotifiedAt?: number;
-    state: MediaCheckState;
-    status: Doc<'mediaChecks'>['status'];
-  } = {
+  const fields = {
     checkedAt: args.checkedAt,
     state: decision.state,
     status: decision.persistStatus,
+    ...(decision.firstBrokenAt === undefined
+      ? {}
+      : { firstBrokenAt: decision.firstBrokenAt }),
+    ...(decision.lastNotifiedAt === undefined
+      ? {}
+      : { lastNotifiedAt: decision.lastNotifiedAt }),
   };
-
-  if (decision.firstBrokenAt !== undefined) {
-    fields.firstBrokenAt = decision.firstBrokenAt;
-  }
-
-  if (decision.lastNotifiedAt !== undefined) {
-    fields.lastNotifiedAt = decision.lastNotifiedAt;
-  }
 
   if (existing) {
     await ctx.db.patch(existing._id, fields);
@@ -169,18 +161,10 @@ async function writeMediaCheck(
   }
 
   await ctx.db.insert('mediaChecks', {
-    checkedAt: fields.checkedAt,
     entityId: args.entityId,
     entityTable: args.entityTable,
     mediaUrl: args.mediaUrl,
-    state: fields.state,
-    status: fields.status,
-    ...(fields.firstBrokenAt === undefined
-      ? {}
-      : { firstBrokenAt: fields.firstBrokenAt }),
-    ...(fields.lastNotifiedAt === undefined
-      ? {}
-      : { lastNotifiedAt: fields.lastNotifiedAt }),
+    ...fields,
   });
 }
 
@@ -195,13 +179,10 @@ async function isCurrentPublishedUrl(
   ctx: MutationCtx,
   check: Doc<'mediaChecks'>
 ) {
-  if (check.entityTable === 'talks') {
-    const talk = await ctx.db.get('talks', check.entityId as Id<'talks'>);
+  const entity =
+    check.entityTable === 'talks'
+      ? await ctx.db.get('talks', check.entityId as Id<'talks'>)
+      : await ctx.db.get('clips', check.entityId as Id<'clips'>);
 
-    return talk?.status === 'published' && talk.mediaUrl === check.mediaUrl;
-  }
-
-  const clip = await ctx.db.get('clips', check.entityId as Id<'clips'>);
-
-  return clip?.status === 'published' && clip.mediaUrl === check.mediaUrl;
+  return entity?.status === 'published' && entity.mediaUrl === check.mediaUrl;
 }

@@ -1,5 +1,3 @@
-import { buildEntityEditPath } from '../../../src/lib/entities/paths';
-
 export interface MediaHealthDigestItem {
   adminPath: string;
   entityTable: 'clips' | 'talks';
@@ -45,7 +43,7 @@ export function getMediaAdminEditPath(
   entityTable: 'clips' | 'talks',
   entityId: string
 ) {
-  return buildEntityEditPath(entityTable, entityId, { status: 'archived' });
+  return `/${entityTable}/edit/${entityId}?status=archived`;
 }
 
 export function isUnnotifiedOpenCheck(check: {

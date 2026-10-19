@@ -219,29 +219,7 @@ export const listOpenMediaChecks = query({
       .collect();
 
     const items = await Promise.all(
-      checks.map(async (check) => {
-        if (!isBrokenStatus(check.status)) {
-          return null;
-        }
-
-        const entity = await loadMediaEntity(ctx, check);
-
-        return {
-          _id: check._id,
-          adminPath: getMediaAdminEditPath(check.entityTable, check.entityId),
-          firstBrokenAt: check.firstBrokenAt ?? check.checkedAt,
-          mediaUrl: check.mediaUrl,
-          publicPath: entity
-            ? getMediaPublicPath({
-                entityTable: check.entityTable,
-                slug: entity.slug,
-                speakerSlug: entity.speakerSlug,
-              })
-            : null,
-          status: check.status,
-          title: entity?.title ?? 'Untitled media',
-        };
-      })
+      checks.map(async (check) => await toOpenMediaCheckItem(ctx, check))
     );
 
     return items.filter(
@@ -251,6 +229,41 @@ export const listOpenMediaChecks = query({
   returns: v.array(openMediaCheckItem),
 });
 
+async function toOpenMediaCheckItem(
+  ctx: QueryCtx,
+  check: {
+    _id: Id<'mediaChecks'>;
+    checkedAt: number;
+    entityId: string;
+    entityTable: 'clips' | 'talks';
+    firstBrokenAt?: number;
+    mediaUrl: string;
+    status: 'missing' | 'ok' | 'private' | 'unknown';
+  }
+) {
+  if (!isBrokenStatus(check.status)) {
+    return null;
+  }
+
+  const entity = await loadMediaEntity(ctx, check);
+
+  return {
+    _id: check._id,
+    adminPath: getMediaAdminEditPath(check.entityTable, check.entityId),
+    firstBrokenAt: check.firstBrokenAt ?? check.checkedAt,
+    mediaUrl: check.mediaUrl,
+    publicPath: entity
+      ? getMediaPublicPath({
+          entityTable: check.entityTable,
+          slug: entity.slug,
+          speakerSlug: entity.speakerSlug,
+        })
+      : null,
+    status: check.status,
+    title: entity?.title ?? 'Untitled media',
+  };
+}
+
 async function loadMediaEntity(
   ctx: QueryCtx,
   check: {
@@ -259,22 +272,30 @@ async function loadMediaEntity(
   }
 ) {
   if (check.entityTable === 'talks') {
-    const talk = await ctx.db.get('talks', check.entityId as Id<'talks'>);
-
-    if (!talk) {
-      return null;
-    }
-
-    const speaker = await ctx.db.get('speakers', talk.speakerId);
-
-    return {
-      slug: talk.slug,
-      speakerSlug: speaker?.slug,
-      title: talk.title,
-    };
+    return await loadTalkMediaEntity(ctx, check.entityId);
   }
 
-  const clip = await ctx.db.get('clips', check.entityId as Id<'clips'>);
+  return await loadClipMediaEntity(ctx, check.entityId);
+}
+
+async function loadTalkMediaEntity(ctx: QueryCtx, entityId: string) {
+  const talk = await ctx.db.get('talks', entityId as Id<'talks'>);
+
+  if (!talk) {
+    return null;
+  }
+
+  const speaker = await ctx.db.get('speakers', talk.speakerId);
+
+  return {
+    slug: talk.slug,
+    speakerSlug: speaker?.slug,
+    title: talk.title,
+  };
+}
+
+async function loadClipMediaEntity(ctx: QueryCtx, entityId: string) {
+  const clip = await ctx.db.get('clips', entityId as Id<'clips'>);
 
   if (!clip) {
     return null;
