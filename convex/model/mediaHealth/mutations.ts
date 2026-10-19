@@ -5,6 +5,7 @@ import type { MediaCheckStatus } from './validators';
 import { v } from 'convex/values';
 
 import { internalMutation } from '../../_generated/server';
+import { loadMediaCheckByEntityUrl } from './queries';
 import { decideMediaCheck } from './record';
 import { mediaCheckEntityTable, mediaCheckStatus } from './validators';
 
@@ -16,37 +17,69 @@ export const upsertMediaCheck = internalMutation({
     mediaUrl: v.string(),
     observedStatus: mediaCheckStatus,
   },
-  // fallow-ignore-next-line complexity
   handler: async (ctx, args) => {
-    const existing = await ctx.db
-      .query('mediaChecks')
-      .withIndex('by_entityTable_and_entityId_and_mediaUrl', (q) =>
-        q
-          .eq('entityTable', args.entityTable)
-          .eq('entityId', args.entityId)
-          .eq('mediaUrl', args.mediaUrl)
-      )
-      .unique();
-
+    const existing = await loadExistingCheck(ctx, args);
+    const sameUrl = existing?.mediaUrl === args.mediaUrl;
     const decision = decideMediaCheck({
-      existingStatus: existing?.status ?? null,
+      checkedAt: args.checkedAt,
+      existing: sameUrl ? existing : null,
       observedStatus: args.observedStatus,
     });
-
-    await writeMediaCheck(ctx, existing, args, decision.persistStatus);
+    const checkId = await writeMediaCheck(ctx, existing, args, decision);
 
     return {
-      isTransition: decision.isTransition,
+      checkId,
+      firstBrokenAt: decision.firstBrokenAt,
+      lastNotifiedAt: decision.lastNotifiedAt,
       persistStatus: decision.persistStatus,
-      previousStatus: existing?.status ?? null,
     };
   },
   returns: v.object({
-    isTransition: v.boolean(),
+    checkId: v.id('mediaChecks'),
+    firstBrokenAt: v.optional(v.number()),
+    lastNotifiedAt: v.optional(v.number()),
     persistStatus: mediaCheckStatus,
-    previousStatus: v.union(mediaCheckStatus, v.null()),
   }),
 });
+
+export const stampMediaChecksNotified = internalMutation({
+  args: {
+    checkIds: v.array(v.id('mediaChecks')),
+    notifiedAt: v.number(),
+  },
+  handler: async (ctx, args) => {
+    await Promise.all(
+      args.checkIds.map((checkId) =>
+        ctx.db.patch(checkId, { lastNotifiedAt: args.notifiedAt })
+      )
+    );
+
+    return null;
+  },
+  returns: v.null(),
+});
+
+async function loadExistingCheck(
+  ctx: MutationCtx,
+  args: {
+    entityId: string;
+    entityTable: 'clips' | 'talks';
+    mediaUrl: string;
+  }
+) {
+  const exact = await loadMediaCheckByEntityUrl(ctx, args);
+
+  if (exact) {
+    return exact;
+  }
+
+  return await ctx.db
+    .query('mediaChecks')
+    .withIndex('by_entityTable_and_entityId_and_mediaUrl', (q) =>
+      q.eq('entityTable', args.entityTable).eq('entityId', args.entityId)
+    )
+    .first();
+}
 
 async function writeMediaCheck(
   ctx: MutationCtx,
@@ -57,22 +90,31 @@ async function writeMediaCheck(
     entityTable: 'clips' | 'talks';
     mediaUrl: string;
   },
-  persistStatus: MediaCheckStatus
-) {
-  if (existing) {
-    await ctx.db.patch(existing._id, {
-      checkedAt: args.checkedAt,
-      status: persistStatus,
-    });
-
-    return;
+  decision: {
+    firstBrokenAt?: number;
+    lastNotifiedAt?: number;
+    persistStatus: MediaCheckStatus;
   }
-
-  await ctx.db.insert('mediaChecks', {
+) {
+  const fields = {
     checkedAt: args.checkedAt,
     entityId: args.entityId,
     entityTable: args.entityTable,
     mediaUrl: args.mediaUrl,
-    status: persistStatus,
-  });
+    status: decision.persistStatus,
+    ...(decision.firstBrokenAt === undefined
+      ? {}
+      : { firstBrokenAt: decision.firstBrokenAt }),
+    ...(decision.lastNotifiedAt === undefined
+      ? {}
+      : { lastNotifiedAt: decision.lastNotifiedAt }),
+  };
+
+  if (existing) {
+    await ctx.db.replace(existing._id, fields);
+
+    return existing._id;
+  }
+
+  return await ctx.db.insert('mediaChecks', fields);
 }

@@ -3,42 +3,59 @@ import type { MediaCheckStatus } from './validators';
 const STRONG_STATUSES = new Set<MediaCheckStatus>(['missing', 'ok', 'private']);
 
 export function decideMediaCheck(args: {
-  existingStatus: MediaCheckStatus | null;
+  checkedAt: number;
+  existing: {
+    firstBrokenAt?: number;
+    lastNotifiedAt?: number;
+    status: MediaCheckStatus;
+  } | null;
   observedStatus: MediaCheckStatus;
 }): {
-  isTransition: boolean;
+  firstBrokenAt?: number;
+  lastNotifiedAt?: number;
   persistStatus: MediaCheckStatus;
 } {
   const persistStatus = persistStatusFor(args);
 
+  if (!isBrokenStatus(persistStatus)) {
+    return { persistStatus };
+  }
+
   return {
-    isTransition: isBrokenTransition(args.existingStatus, persistStatus),
+    firstBrokenAt: args.existing?.firstBrokenAt ?? args.checkedAt,
+    lastNotifiedAt: args.existing?.lastNotifiedAt,
     persistStatus,
   };
 }
 
-function isBrokenStatus(
+export function isBrokenStatus(
   status: MediaCheckStatus
 ): status is 'missing' | 'private' {
   return status === 'missing' || status === 'private';
 }
 
-function isBrokenTransition(
-  existingStatus: MediaCheckStatus | null,
-  persistStatus: MediaCheckStatus
-) {
-  if (existingStatus === null) {
+export function isUnnotifiedBreak(check: {
+  firstBrokenAt?: number;
+  lastNotifiedAt?: number;
+  persistStatus: MediaCheckStatus;
+}) {
+  if (!isBrokenStatus(check.persistStatus)) {
     return false;
   }
 
-  return existingStatus === 'ok' && isBrokenStatus(persistStatus);
+  const firstBrokenAt = check.firstBrokenAt ?? 0;
+
+  return (
+    check.lastNotifiedAt === undefined || check.lastNotifiedAt < firstBrokenAt
+  );
 }
 
 function persistStatusFor(args: {
-  existingStatus: MediaCheckStatus | null;
+  existing: { status: MediaCheckStatus } | null;
   observedStatus: MediaCheckStatus;
 }): MediaCheckStatus {
-  const { existingStatus, observedStatus } = args;
+  const existingStatus = args.existing?.status ?? null;
+  const { observedStatus } = args;
 
   if (existingStatus === null) {
     return observedStatus;

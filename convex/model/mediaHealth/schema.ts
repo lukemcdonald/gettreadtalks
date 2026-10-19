@@ -8,6 +8,8 @@ export const mediaHealthTables = {
     checkedAt: v.number(),
     entityId: v.string(),
     entityTable: mediaCheckEntityTable,
+    firstBrokenAt: v.optional(v.number()),
+    lastNotifiedAt: v.optional(v.number()),
     lastNotifiedStatus: v.optional(mediaCheckStatus),
     mediaUrl: v.string(),
     status: mediaCheckStatus,

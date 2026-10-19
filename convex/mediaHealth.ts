@@ -1,6 +1,5 @@
 import type { ActionCtx } from './_generated/server';
 import type { MediaHealthDigestItem } from './model/mediaHealth/digest';
-import type { MediaCheckStatus } from './model/mediaHealth/validators';
 
 import { v } from 'convex/values';
 
@@ -26,7 +25,10 @@ const continueCheckArgs = {
   source: mediaCheckEntityTable,
 };
 
-export { upsertMediaCheck } from './model/mediaHealth/mutations';
+export {
+  stampMediaChecksNotified,
+  upsertMediaCheck,
+} from './model/mediaHealth/mutations';
 export {
   getMediaCheck,
   listPublishedMediaPage,
@@ -89,15 +91,7 @@ async function runMediaHealthPage(
       return;
     }
 
-    const digest = buildMediaHealthDigest(items);
-
-    if (!digest) {
-      return;
-    }
-
-    await ctx.runAction(internal.emails.sendMediaHealthEmail, {
-      items: digest,
-    });
+    await sendNewBreakDigest(ctx, items);
   } catch (error) {
     await reportSentryException({
       message: `Media health check failed: ${formatErrorMessage(error)}`,
@@ -114,6 +108,31 @@ interface PublishedMediaItem {
   slug: string;
   speakerSlug?: string;
   title: string;
+}
+
+async function sendNewBreakDigest(
+  ctx: ActionCtx,
+  items: MediaHealthDigestItem[]
+) {
+  const digest = buildMediaHealthDigest(items);
+
+  if (!digest) {
+    return;
+  }
+
+  const sent = await ctx.runAction(internal.emails.sendMediaHealthEmail, {
+    items: digest.items,
+    stillBrokenCount: digest.stillBrokenCount,
+  });
+
+  if (!sent) {
+    return;
+  }
+
+  await ctx.runMutation(internal.mediaHealth.stampMediaChecksNotified, {
+    checkIds: digest.items.map((item) => item.checkId),
+    notifiedAt: Date.now(),
+  });
 }
 
 async function checkMediaPageItems(
@@ -147,11 +166,7 @@ async function checkPublishedMediaItem(
     return items;
   }
 
-  const outcome: {
-    isTransition: boolean;
-    persistStatus: MediaCheckStatus;
-    previousStatus: MediaCheckStatus | null;
-  } = await ctx.runMutation(internal.mediaHealth.upsertMediaCheck, {
+  const outcome = await ctx.runMutation(internal.mediaHealth.upsertMediaCheck, {
     checkedAt: Date.now(),
     entityId: item.entityId,
     entityTable: item.entityTable,

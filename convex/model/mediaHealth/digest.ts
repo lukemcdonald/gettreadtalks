@@ -1,24 +1,30 @@
+import type { Id } from '../../_generated/dataModel';
 import type { MediaCheckStatus } from './validators';
+
+import { isBrokenStatus, isUnnotifiedBreak } from './record';
 
 export interface MediaHealthDigestItem {
   adminPath: string;
+  checkId: Id<'mediaChecks'>;
   entityTable: 'clips' | 'talks';
   isNew: boolean;
   mediaUrl: string;
   newStatus: 'missing' | 'private';
-  previousStatus: MediaCheckStatus;
   publicPath: string | null;
   title: string;
 }
 
-export function buildMediaHealthDigest(
-  items: MediaHealthDigestItem[]
-): MediaHealthDigestItem[] | null {
-  if (items.length === 0) {
+export function buildMediaHealthDigest(items: MediaHealthDigestItem[]) {
+  const newItems = items.filter((item) => item.isNew);
+
+  if (newItems.length === 0) {
     return null;
   }
 
-  return items;
+  return {
+    items: newItems,
+    stillBrokenCount: items.length - newItems.length,
+  };
 }
 
 /** Matches buildClipPath / buildTalkPath without importing Next app modules into Convex. */
@@ -48,43 +54,28 @@ export function appendMediaHealthItem(
     title: string;
   },
   outcome: {
+    checkId: Id<'mediaChecks'>;
+    firstBrokenAt?: number;
+    lastNotifiedAt?: number;
     persistStatus: MediaCheckStatus;
-    previousStatus: MediaCheckStatus | null;
   },
   items: MediaHealthDigestItem[]
 ): MediaHealthDigestItem[] {
-  if (!isBrokenPersistStatus(outcome.persistStatus)) {
+  if (!isBrokenStatus(outcome.persistStatus)) {
     return items;
   }
 
   return [
     ...items,
     {
-      adminPath: getMediaAdminEditPath(item.entityTable, item.entityId),
+      adminPath: `/${item.entityTable}/edit/${item.entityId}?status=archived`,
+      checkId: outcome.checkId,
       entityTable: item.entityTable,
-      isNew: isNewBrokenItem(outcome.previousStatus),
+      isNew: isUnnotifiedBreak(outcome),
       mediaUrl: item.mediaUrl,
       newStatus: outcome.persistStatus,
-      previousStatus: outcome.previousStatus ?? 'unknown',
       publicPath: getMediaPublicPath(item),
       title: item.title,
     },
   ];
-}
-
-function getMediaAdminEditPath(
-  entityTable: 'clips' | 'talks',
-  entityId: string
-) {
-  return `/${entityTable}/edit/${entityId}?status=archived`;
-}
-
-function isBrokenPersistStatus(
-  status: MediaCheckStatus
-): status is 'missing' | 'private' {
-  return status === 'missing' || status === 'private';
-}
-
-function isNewBrokenItem(previousStatus: MediaCheckStatus | null) {
-  return previousStatus === 'ok';
 }

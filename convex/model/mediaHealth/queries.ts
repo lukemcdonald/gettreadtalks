@@ -1,3 +1,4 @@
+import type { MutationCtx, QueryCtx } from '../../_generated/server';
 import type { PaginationOptions } from 'convex/server';
 
 import {
@@ -24,16 +25,7 @@ export const getMediaCheck = internalQuery({
     entityTable: mediaCheckEntityTable,
     mediaUrl: v.string(),
   },
-  handler: async (ctx, args) =>
-    await ctx.db
-      .query('mediaChecks')
-      .withIndex('by_entityTable_and_entityId_and_mediaUrl', (q) =>
-        q
-          .eq('entityTable', args.entityTable)
-          .eq('entityId', args.entityId)
-          .eq('mediaUrl', args.mediaUrl)
-      )
-      .unique(),
+  handler: async (ctx, args) => await loadMediaCheckByEntityUrl(ctx, args),
   returns: v.union(
     v.null(),
     v.object({
@@ -42,6 +34,8 @@ export const getMediaCheck = internalQuery({
       checkedAt: v.number(),
       entityId: v.string(),
       entityTable: mediaCheckEntityTable,
+      firstBrokenAt: v.optional(v.number()),
+      lastNotifiedAt: v.optional(v.number()),
       lastNotifiedStatus: v.optional(mediaCheckStatus),
       mediaUrl: v.string(),
       status: mediaCheckStatus,
@@ -117,3 +111,22 @@ export const listPublishedMediaPage = internalQuery({
   },
   returns: paginationResultValidator(publishedMediaItem),
 });
+
+export function loadMediaCheckByEntityUrl(
+  ctx: MutationCtx | QueryCtx,
+  args: {
+    entityId: string;
+    entityTable: 'clips' | 'talks';
+    mediaUrl: string;
+  }
+) {
+  return ctx.db
+    .query('mediaChecks')
+    .withIndex('by_entityTable_and_entityId_and_mediaUrl', (q) =>
+      q
+        .eq('entityTable', args.entityTable)
+        .eq('entityId', args.entityId)
+        .eq('mediaUrl', args.mediaUrl)
+    )
+    .unique();
+}
