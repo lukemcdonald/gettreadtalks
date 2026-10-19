@@ -39,7 +39,7 @@ export function VimeoEmbed({ id, title }: VimeoEmbedProps) {
     >
       <Image
         alt=""
-        className="object-cover transition-transform group-hover:scale-105"
+        className="object-cover motion-safe:transition-transform motion-safe:group-hover:scale-105"
         fill
         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         src={thumbnailUrl}

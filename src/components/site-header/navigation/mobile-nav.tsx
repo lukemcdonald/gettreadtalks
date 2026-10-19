@@ -82,7 +82,7 @@ export function MobileNav({ className }: MobileNavProps) {
             size="icon-lg"
             variant="ghost"
           >
-            <MenuIcon className="size-6 transition-transform" />
+            <MenuIcon className="size-6" />
           </Button>
         }
       />
