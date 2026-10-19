@@ -4,6 +4,7 @@ import { JsonLd } from '@/components/json-ld';
 import { Main } from '@/components/main';
 import { Container, Section } from '@/components/ui';
 import { site } from '@/configs/site';
+import { buildSearchPath } from '@/features/search/utils';
 import { SpeakerCard } from '@/features/speakers/components/speaker-card';
 import { loadFeaturedSpeakers } from '@/features/speakers/queries/load-featured-speakers';
 import { buildSpeakersPath } from '@/features/speakers/utils';
@@ -24,7 +25,7 @@ function buildWebsiteJsonLd() {
       target: {
         '@type': 'EntryPoint',
         urlTemplate: buildAbsoluteUrl(
-          `${buildTalksPath()}?search={search_term_string}`
+          `${buildSearchPath()}?search={search_term_string}`
         ),
       },
     },
