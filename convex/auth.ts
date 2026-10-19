@@ -13,9 +13,10 @@ import { components, internal } from './_generated/api';
 import authConfig from './auth.config';
 import authSchema from './betterAuth/schema';
 import { authRateLimitPlugin } from './lib/plugins';
-import { getAuthSiteUrl } from './lib/siteUrl';
+import { getSiteUrl } from './lib/siteUrl';
 import { isPreviewSiteUrl } from './lib/turnstile';
 import { formatErrorMessage } from './lib/utils';
+import { destroyUserOwnedRows } from './model/users/utils';
 
 const authFunctions: AuthFunctions = internal.auth;
 
@@ -39,6 +40,9 @@ export const authComponent = createClient<DataModel, typeof authSchema>(
       user: {
         onCreate: async (ctx, doc) => {
           await scheduleWelcomeEmail(ctx, doc);
+        },
+        onDelete: async (ctx, doc) => {
+          await destroyUserOwnedRows(ctx, doc._id);
         },
       },
     },
@@ -138,7 +142,7 @@ function createAuthPlugins(ctx: GenericCtx<DataModel>, siteUrl: string) {
 export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
   const secret =
     process.env.BETTER_AUTH_SECRET ?? 'analysis-placeholder-secret';
-  const siteUrl = getAuthSiteUrl();
+  const siteUrl = getSiteUrl();
   const isHttps = siteUrl.startsWith('https://');
 
   warnIfAuthEnvInvalid(siteUrl);

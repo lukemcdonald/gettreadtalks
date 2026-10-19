@@ -1,44 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  buildMediaHealthDigest,
   getMediaAdminEditPath,
   getMediaPublicPath,
   isUnnotifiedOpenCheck,
 } from './digest';
-
-const newTalk = {
-  adminPath: '/talks/edit/talk1?status=archived',
-  entityTable: 'talks' as const,
-  firstBrokenAt: 1_700_000_000_000,
-  mediaUrl: 'https://www.youtube.com/watch?v=abc',
-  newStatus: 'private' as const,
-  publicPath: '/talks/john-doe/first-talk',
-  title: 'First Talk',
-};
-
-describe('buildMediaHealthDigest', () => {
-  it('returns null when nothing is new', () => {
-    expect(
-      buildMediaHealthDigest({
-        newItems: [],
-        stillOpenCount: 4,
-      })
-    ).toBe(null);
-  });
-
-  it('keeps new items and the still-open count', () => {
-    expect(
-      buildMediaHealthDigest({
-        newItems: [newTalk],
-        stillOpenCount: 2,
-      })
-    ).toEqual({
-      newItems: [newTalk],
-      stillOpenCount: 2,
-    });
-  });
-});
 
 describe('getMediaPublicPath', () => {
   it('returns null for a talk without a speaker slug', () => {

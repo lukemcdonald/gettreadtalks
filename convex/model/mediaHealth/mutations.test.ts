@@ -31,19 +31,12 @@ describe('media health checks', () => {
       });
     });
 
-    const first = await t.mutation(internal.mediaHealth.upsertMediaCheck, {
+    await t.mutation(internal.mediaHealth.upsertMediaCheck, {
       checkedAt: CHECKED_AT,
       entityId: talkId,
       entityTable: 'talks',
       mediaUrl: MEDIA_URL,
       observedStatus: 'private',
-    });
-
-    expect(first).toMatchObject({
-      firstBrokenAt: CHECKED_AT,
-      isNew: true,
-      persistStatus: 'private',
-      state: 'open',
     });
 
     const open = await asUser.query(api.mediaHealth.listOpenMediaChecks, {});
@@ -166,5 +159,45 @@ describe('media health checks', () => {
     expect(open).toHaveLength(1);
     expect(nextOpen?.status).toBe('private');
     expect(previous?.state).toBe('resolved');
+  });
+
+  it('lists checks with no state as open', async () => {
+    const t = createConvexTest();
+    const { asUser } = await signInAs(t, {
+      email: 'admin@example.test',
+      name: 'Admin',
+      role: 'admin',
+    });
+    await t.run(async (ctx) => {
+      const speakerId = await ctx.db.insert('speakers', {
+        firstName: 'John',
+        lastName: 'Bunyan',
+        slug: 'john-bunyan',
+      });
+      const talkId = await ctx.db.insert('talks', {
+        mediaUrl: MEDIA_URL,
+        publishedAt: CHECKED_AT,
+        slug: 'grace-abounding',
+        speakerId,
+        status: 'published',
+        title: 'Grace Abounding',
+      });
+
+      await ctx.db.insert('mediaChecks', {
+        checkedAt: CHECKED_AT,
+        entityId: talkId,
+        entityTable: 'talks',
+        mediaUrl: MEDIA_URL,
+        status: 'private',
+      });
+    });
+
+    const open = await asUser.query(api.mediaHealth.listOpenMediaChecks, {});
+
+    expect(open).toHaveLength(1);
+    expect(open[0]).toMatchObject({
+      status: 'private',
+      title: 'Grace Abounding',
+    });
   });
 });

@@ -8,20 +8,6 @@ export interface MediaHealthDigestItem {
   title: string;
 }
 
-export function buildMediaHealthDigest(args: {
-  newItems: MediaHealthDigestItem[];
-  stillOpenCount: number;
-}): {
-  newItems: MediaHealthDigestItem[];
-  stillOpenCount: number;
-} | null {
-  if (args.newItems.length === 0) {
-    return null;
-  }
-
-  return args;
-}
-
 /** Matches feature clip/talk path builders without importing those modules into Convex. */
 export function getMediaPublicPath(item: {
   entityTable: 'clips' | 'talks';

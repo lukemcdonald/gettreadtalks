@@ -3,7 +3,6 @@ import { describe, expect, it } from '@/test';
 import {
   buildAbsoluteUrl,
   buildEntityEditPath,
-  buildMediaHealthPath,
   buildPathQuery,
   getLoginRedirect,
 } from './paths';
@@ -44,17 +43,5 @@ describe('buildAbsoluteUrl', () => {
     expect(buildAbsoluteUrl('/manage/media')).toBe(
       'https://www.gettreadtalks.com/manage/media'
     );
-    expect(
-      buildAbsoluteUrl('/manage/media', 'https://www.gettreadtalks.com/')
-    ).toBe('https://www.gettreadtalks.com/manage/media');
-    expect(buildAbsoluteUrl('talks', 'https://www.gettreadtalks.com')).toBe(
-      'https://www.gettreadtalks.com/talks'
-    );
-  });
-});
-
-describe('content paths', () => {
-  it('builds the media health path', () => {
-    expect(buildMediaHealthPath()).toBe('/manage/media');
   });
 });

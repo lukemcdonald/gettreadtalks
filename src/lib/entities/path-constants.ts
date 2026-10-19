@@ -6,7 +6,3 @@ export function joinOriginAndPath(path: string, origin: string) {
 
   return `${base}${normalized}`;
 }
-
-export function buildMediaHealthPath() {
-  return MEDIA_HEALTH_PATH;
-}

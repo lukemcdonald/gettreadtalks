@@ -7,7 +7,6 @@ import { internalAction } from './_generated/server';
 import { reportSentryException } from './lib/sentry';
 import { getSiteUrl } from './lib/siteUrl';
 import { formatErrorMessage } from './lib/utils';
-import { buildMediaHealthDigest } from './model/mediaHealth/digest';
 import { checkMediaUrl } from './model/mediaHealth/oembed';
 import { mediaCheckEntityTable } from './model/mediaHealth/validators';
 
@@ -172,24 +171,21 @@ async function finishMediaHealthRun(ctx: ActionCtx) {
     internal.mediaHealth.listDigestMediaChecks,
     {}
   );
-  const digest = buildMediaHealthDigest({
-    newItems: digestRows.newItems,
-    stillOpenCount: digestRows.stillOpenCount,
-  });
 
-  if (!digest) {
+  if (
+    digestRows.newItems.length === 0 ||
+    process.env.RESEND_TEST_MODE !== 'false'
+  ) {
     return;
   }
 
-  const siteUrl = getSiteUrl();
-
-  const sent = await ctx.runAction(internal.emails.sendMediaHealthEmail, {
-    items: digest.newItems,
-    siteUrl,
-    stillOpenCount: digest.stillOpenCount,
+  await ctx.runAction(internal.emails.sendMediaHealthEmail, {
+    items: digestRows.newItems,
+    siteUrl: getSiteUrl(),
+    stillOpenCount: digestRows.stillOpenCount,
   });
 
-  if (!sent || digestRows.newCheckIds.length === 0) {
+  if (digestRows.newCheckIds.length === 0) {
     return;
   }
 

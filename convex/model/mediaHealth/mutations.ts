@@ -8,11 +8,7 @@ import { internalMutation, mutation } from '../../_generated/server';
 import { throwNotFound } from '../../lib/errors';
 import { requireAdmin } from '../auth/roles';
 import { decideMediaCheck, isBrokenStatus } from './record';
-import {
-  mediaCheckEntityTable,
-  mediaCheckState,
-  mediaCheckStatus,
-} from './validators';
+import { mediaCheckEntityTable, mediaCheckStatus } from './validators';
 
 export const upsertMediaCheck = internalMutation({
   args: {
@@ -48,19 +44,9 @@ export const upsertMediaCheck = internalMutation({
 
     await writeMediaCheck(ctx, existing, args, decision);
 
-    return {
-      firstBrokenAt: decision.firstBrokenAt,
-      isNew: decision.state === 'open' && existing?.state !== 'open',
-      persistStatus: decision.persistStatus,
-      state: decision.state,
-    };
+    return null;
   },
-  returns: v.object({
-    firstBrokenAt: v.optional(v.number()),
-    isNew: v.boolean(),
-    persistStatus: mediaCheckStatus,
-    state: mediaCheckState,
-  }),
+  returns: v.null(),
 });
 
 export const resolveStaleMediaChecks = internalMutation({

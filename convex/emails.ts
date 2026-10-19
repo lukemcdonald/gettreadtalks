@@ -1,9 +1,11 @@
 import type { MediaHealthEmailProps } from '../src/services/email/types';
 import type { ActionCtx, MutationCtx } from './_generated/server';
 import type { EmailId, SendEmailOptions } from '@convex-dev/resend';
+import type { ReactElement } from 'react';
 
 import { Resend, vEmailEvent, vEmailId } from '@convex-dev/resend';
 import { v } from 'convex/values';
+import { render } from 'react-email';
 
 import { site } from '../src/configs/site';
 import {
@@ -13,13 +15,12 @@ import {
 import { components, internal } from './_generated/api';
 import { internalAction, internalMutation } from './_generated/server';
 import { MediaHealthEmail } from './emails/mediaHealth';
-import { renderEmailTemplate } from './emails/render';
 import { ResetPasswordTemplate } from './emails/resetPassword';
 import { VerifyEmailTemplate } from './emails/verifyEmail';
 import { WelcomeEmail } from './emails/welcome';
 import { throwConvexError } from './lib/errors';
 import { reportSentryException } from './lib/sentry';
-import { getSiteUrl, shouldSendEmail } from './lib/siteUrl';
+import { getSiteUrl } from './lib/siteUrl';
 import { formatErrorMessage } from './lib/utils';
 import { mediaHealthDigestItem } from './model/mediaHealth/validators';
 
@@ -73,7 +74,7 @@ export const checkSendResult = internalAction({
 
     // `status.failed` is set only by Resend's webhook; the batch-rejection
     // and retry-exhausted paths this check targets only set `status.status`.
-    if (isFailedSendStatus(status)) {
+    if (status?.status === 'failed') {
       await reportEmailFailure({
         emailId: args.emailId,
         errorMessage: status.errorMessage,
@@ -82,24 +83,34 @@ export const checkSendResult = internalAction({
       return null;
     }
 
-    if (!isPendingSendStatus(status)) {
-      return null;
-    }
+    // Not yet in a terminal state -- reschedule while budget remains, since
+    // 'sent'/'delivery_delayed' can still transition to 'failed' later.
+    const isPending =
+      status === null ||
+      status.status === 'waiting' ||
+      status.status === 'queued' ||
+      status.status === 'sent' ||
+      status.status === 'delivery_delayed';
 
-    if (!hasCheckSendBudget(args.startedAt)) {
-      console.warn(
-        'checkSendResult gave up waiting for a terminal status:',
-        args.emailId,
-        args.kind
-      );
-      return null;
-    }
+    if (isPending) {
+      const withinBudget =
+        Date.now() - args.startedAt + CHECK_SEND_RESULT_DELAY_MS <=
+        CHECK_SEND_RESULT_MAX_BUDGET_MS;
 
-    await ctx.scheduler.runAfter(
-      CHECK_SEND_RESULT_DELAY_MS,
-      internal.emails.checkSendResult,
-      args
-    );
+      if (withinBudget) {
+        await ctx.scheduler.runAfter(
+          CHECK_SEND_RESULT_DELAY_MS,
+          internal.emails.checkSendResult,
+          args
+        );
+      } else {
+        console.warn(
+          'checkSendResult gave up waiting for a terminal status:',
+          args.emailId,
+          args.kind
+        );
+      }
+    }
 
     return null;
   },
@@ -151,12 +162,12 @@ export const sendMediaHealthEmail = internalAction({
   },
   handler: async (ctx, args) => {
     if (args.items.length === 0) {
-      return false;
+      return null;
     }
 
     try {
       const { html, text } = await renderMediaHealthMessage(args);
-      const emailId = await sendTrackedEmail(
+      await sendTrackedEmail(
         ctx,
         {
           from: getFromAddress(),
@@ -168,8 +179,6 @@ export const sendMediaHealthEmail = internalAction({
         },
         'mediaHealth'
       );
-
-      return emailId !== null;
     } catch (error) {
       await reportEmailSendFailure('mediaHealth', error);
       throwConvexError(500, 'Failed to send media health email', {
@@ -178,8 +187,10 @@ export const sendMediaHealthEmail = internalAction({
         resourceId: 'mediaHealth',
       });
     }
+
+    return null;
   },
-  returns: v.boolean(),
+  returns: v.null(),
 });
 
 export const sendPasswordResetEmail = internalAction({
@@ -195,7 +206,7 @@ export const sendPasswordResetEmail = internalAction({
         resetUrl: args.resetUrl,
         token: args.token,
       });
-      const { html, text } = await renderEmailTemplate(template);
+      const { html, text } = await renderEmail(template);
 
       await sendTrackedEmail(
         ctx,
@@ -238,7 +249,7 @@ export const sendTestEmail = internalMutation({
   },
 });
 
-export const sendVerificationEmail = internalMutation({
+export const sendVerificationEmail = internalAction({
   args: {
     email: v.string(),
     token: v.string(),
@@ -251,9 +262,9 @@ export const sendVerificationEmail = internalMutation({
         token: args.token,
         verificationUrl: args.verificationUrl,
       });
-      const { html, text } = await renderEmailTemplate(template);
+      const { html, text } = await renderEmail(template);
 
-      return await sendTrackedEmail(
+      await sendTrackedEmail(
         ctx,
         {
           from: getFromAddress(),
@@ -274,10 +285,10 @@ export const sendVerificationEmail = internalMutation({
       });
     }
   },
-  returns: v.union(vEmailId, v.null()),
+  returns: v.null(),
 });
 
-export const sendWelcomeEmail = internalMutation({
+export const sendWelcomeEmail = internalAction({
   args: {
     email: v.string(),
     name: v.string(),
@@ -290,9 +301,9 @@ export const sendWelcomeEmail = internalMutation({
         name: args.name,
         siteUrl: getSiteUrl(),
       });
-      const { html, text } = await renderEmailTemplate(template);
+      const { html, text } = await renderEmail(template);
 
-      return await sendTrackedEmail(
+      await sendTrackedEmail(
         ctx,
         {
           from: getFromAddress(),
@@ -304,6 +315,7 @@ export const sendWelcomeEmail = internalMutation({
         },
         'welcome'
       );
+      console.log('Welcome email sent');
     } catch (error) {
       await reportEmailSendFailure('welcome', error);
       throwConvexError(500, 'Failed to send welcome email', {
@@ -313,36 +325,12 @@ export const sendWelcomeEmail = internalMutation({
       });
     }
   },
-  returns: v.union(vEmailId, v.null()),
+  returns: v.null(),
 });
 
 // ============================================
 // HELPERS
 // ============================================
-
-const PENDING_SEND_STATUSES = new Set([
-  'delivery_delayed',
-  'queued',
-  'sent',
-  'waiting',
-]);
-
-function isFailedSendStatus(
-  status: { errorMessage: string | null; status: string } | null
-): status is { errorMessage: string | null; status: 'failed' } {
-  return status?.status === 'failed';
-}
-
-function isPendingSendStatus(status: { status: string } | null) {
-  return status === null || PENDING_SEND_STATUSES.has(status.status);
-}
-
-function hasCheckSendBudget(startedAt: number) {
-  return (
-    Date.now() - startedAt + CHECK_SEND_RESULT_DELAY_MS <=
-    CHECK_SEND_RESULT_MAX_BUDGET_MS
-  );
-}
 
 async function renderMediaHealthMessage(args: {
   items: MediaHealthEmailProps['items'];
@@ -352,7 +340,7 @@ async function renderMediaHealthMessage(args: {
   const siteUrl = args.siteUrl ?? getSiteUrl();
   const stillOpenCount = args.stillOpenCount ?? 0;
 
-  return await renderEmailTemplate(
+  return await renderEmail(
     MediaHealthEmail({
       items: args.items,
       siteUrl,
@@ -386,11 +374,7 @@ async function sendTrackedEmail(
   ctx: ActionCtx | MutationCtx,
   emailParams: SendEmailOptions,
   kind: EmailKind
-): Promise<EmailId | null> {
-  if (!shouldSendEmail()) {
-    return null;
-  }
-
+): Promise<EmailId> {
   const emailId = await resend.sendEmail(ctx, emailParams);
 
   try {
@@ -435,6 +419,14 @@ async function reportEmailSendFailure(kind: EmailKind, error: unknown) {
     message: `Failed to send "${kind}" email: ${formatErrorMessage(error)}`,
     tags: { emailKind: kind },
   });
+}
+
+async function renderEmail(template: ReactElement) {
+  const [html, text] = await Promise.all([
+    render(template),
+    render(template, { plainText: true }),
+  ]);
+  return { html, text };
 }
 
 function normalizeRecipients(to: string | string[]): string[] {

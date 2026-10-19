@@ -213,17 +213,21 @@ export const listOpenMediaChecks = query({
   handler: async (ctx) => {
     await requireAdmin(ctx);
 
-    const checks = await ctx.db
-      .query('mediaChecks')
-      .withIndex('by_state', (q) => q.eq('state', 'open'))
-      .collect();
-
-    const items = await Promise.all(
-      checks.map(async (check) => await toOpenMediaCheckItem(ctx, check))
+    const checks = await ctx.db.query('mediaChecks').collect();
+    const open = checks.filter(
+      (check): check is typeof check & { status: 'missing' | 'private' } =>
+        (check.state === 'open' || check.state === undefined) &&
+        isBrokenStatus(check.status)
     );
 
-    return items.filter(
-      (item): item is NonNullable<typeof item> => item !== null
+    return await Promise.all(
+      open.map(
+        async (check) =>
+          await toOpenMediaCheckItem(ctx, {
+            ...check,
+            firstBrokenAt: check.firstBrokenAt ?? check.checkedAt,
+          })
+      )
     );
   },
   returns: v.array(openMediaCheckItem),
@@ -233,57 +237,30 @@ async function toOpenMediaCheckItem(
   ctx: QueryCtx,
   check: {
     _id: Id<'mediaChecks'>;
-    checkedAt: number;
     entityId: string;
     entityTable: 'clips' | 'talks';
-    firstBrokenAt?: number;
+    firstBrokenAt: number;
     mediaUrl: string;
-    status: 'missing' | 'ok' | 'private' | 'unknown';
+    status: 'missing' | 'private';
   }
 ) {
-  if (!isBrokenStatus(check.status)) {
-    return null;
-  }
-
   const entity = await loadMediaEntity(ctx, check);
 
   return {
     _id: check._id,
     adminPath: getMediaAdminEditPath(check.entityTable, check.entityId),
-    firstBrokenAt: getOpenMediaFirstBrokenAt(check),
+    firstBrokenAt: check.firstBrokenAt,
     mediaUrl: check.mediaUrl,
-    publicPath: getOpenMediaPublicPath(check.entityTable, entity),
+    publicPath: entity
+      ? getMediaPublicPath({
+          entityTable: check.entityTable,
+          slug: entity.slug,
+          speakerSlug: entity.speakerSlug,
+        })
+      : null,
     status: check.status,
-    title: getOpenMediaTitle(entity),
+    title: entity ? entity.title : 'Untitled media',
   };
-}
-
-function getOpenMediaFirstBrokenAt(check: {
-  checkedAt: number;
-  firstBrokenAt?: number;
-}) {
-  return check.firstBrokenAt ?? check.checkedAt;
-}
-
-function getOpenMediaTitle(
-  entity: Awaited<ReturnType<typeof loadMediaEntity>>
-) {
-  return entity?.title ?? 'Untitled media';
-}
-
-function getOpenMediaPublicPath(
-  entityTable: 'clips' | 'talks',
-  entity: Awaited<ReturnType<typeof loadMediaEntity>>
-) {
-  if (!entity) {
-    return null;
-  }
-
-  return getMediaPublicPath({
-    entityTable,
-    slug: entity.slug,
-    speakerSlug: entity.speakerSlug,
-  });
 }
 
 async function loadMediaEntity(

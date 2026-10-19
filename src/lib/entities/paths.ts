@@ -2,7 +2,7 @@ import { site } from '@/configs/site';
 
 import { joinOriginAndPath } from './path-constants';
 
-export { MEDIA_HEALTH_PATH, buildMediaHealthPath } from './path-constants';
+export { MEDIA_HEALTH_PATH } from './path-constants';
 
 export const ACCOUNT_PATH = '/account';
 export const MANAGE_PATH = '/manage';
@@ -19,8 +19,8 @@ export type AdminEntity = keyof typeof ADMIN_LIST_PATHS;
 
 type PathQueryValue = boolean | number | string;
 
-export function buildAbsoluteUrl(path: string, origin: string = site.url) {
-  return joinOriginAndPath(path, origin);
+export function buildAbsoluteUrl(path: string) {
+  return joinOriginAndPath(path, site.url);
 }
 
 export function buildAdminListPath(entity: AdminEntity) {

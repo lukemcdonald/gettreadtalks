@@ -20,7 +20,7 @@ import {
 import { toastManager } from '@/components/ui/primitives/toast';
 import { deleteAccount } from '@/features/users/actions/delete-account';
 import { resetFormOnClose, setServerErrors } from '@/lib/forms/react-hook-form';
-import { formatErrorMessage } from '@/services/errors';
+import { captureException, formatErrorMessage } from '@/services/errors';
 
 interface DeleteFormValues {
   password: string;
@@ -43,6 +43,7 @@ export function DeleteAccountForm() {
         toastManager.add({ title: 'Account deleted', type: 'success' });
         window.location.assign('/');
       } catch (error) {
+        captureException(error, { fingerprint: ['auth', 'deleteAccount'] });
         form.setError('root', {
           message: formatErrorMessage(error),
         });

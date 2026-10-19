@@ -8,10 +8,8 @@ import {
   throwNotFound,
   throwValidationError,
 } from '../../lib/errors';
-import { reportSentryException } from '../../lib/sentry';
 import { requireAdmin } from '../auth/roles';
 import { getUserId } from '../auth/utils';
-import { destroyUserOwnedRows } from './utils';
 import { userRole } from './validators';
 
 /**
@@ -292,8 +290,6 @@ export const deleteUser = mutation({
     password: v.string(),
   },
   handler: async (ctx, args) => {
-    const userId = await getUserId(ctx);
-
     try {
       await createAuth(ctx).api.deleteUser({
         body: {
@@ -303,13 +299,7 @@ export const deleteUser = mutation({
         headers: await authComponent.getHeaders(ctx),
       });
     } catch (error) {
-      await throwMappedDeleteUserError(error);
-    }
-
-    try {
-      await destroyUserOwnedRows(ctx, userId);
-    } catch (error) {
-      await throwUnexpectedDeleteUserError(error, 'cascade');
+      throwMappedDeleteUserError(error);
     }
 
     return null;
@@ -390,91 +380,37 @@ export const setUserRole = mutation({
   returns: v.string(),
 });
 
-async function throwMappedDeleteUserError(error: unknown): Promise<never> {
-  throwExpectedDeleteUserError(getAuthErrorFingerprint(error));
+const SESSION_DELETE_CODES = new Set([
+  'SESSION_EXPIRED',
+  'SESSION_NOT_FRESH',
+  'UNAUTHORIZED',
+]);
 
-  return await throwUnexpectedDeleteUserError(error, 'auth');
-}
+function throwMappedDeleteUserError(error: unknown): never {
+  const code = getBetterAuthErrorCode(error);
 
-async function throwUnexpectedDeleteUserError(
-  error: unknown,
-  step: 'auth' | 'cascade'
-): Promise<never> {
-  await reportSentryException({
-    message: `Delete account failed (${step}): ${getAuthErrorFingerprint(error)}`,
-    tags: { mutation: 'deleteUser', step },
-  });
+  if (code === 'INVALID_PASSWORD') {
+    throwValidationError('Check your password and try again.', 'password');
+  }
+
+  if (code === 'CREDENTIAL_ACCOUNT_NOT_FOUND') {
+    throwValidationError(
+      'This account has no password to confirm.',
+      'password'
+    );
+  }
+
+  if (SESSION_DELETE_CODES.has(String(code))) {
+    throwAuthRequired(
+      'Your session expired. Sign in again to delete your account.'
+    );
+  }
 
   throwConvexError(500, 'Something went wrong. Please try again.');
 }
 
-function throwExpectedDeleteUserError(fingerprint: string) {
-  const expected = [
-    {
-      codes: ['INVALID_PASSWORD'],
-      throwError: () => {
-        throwValidationError('Check your password and try again.', 'password');
-      },
-    },
-    {
-      codes: ['CREDENTIAL_ACCOUNT_NOT_FOUND'],
-      throwError: () => {
-        throwValidationError(
-          'This account has no password to confirm.',
-          'password'
-        );
-      },
-    },
-    {
-      codes: ['SESSION_EXPIRED', 'SESSION_NOT_FRESH', 'UNAUTHORIZED'],
-      throwError: () => {
-        throwAuthRequired(
-          'Your session expired. Sign in again to delete your account.'
-        );
-      },
-    },
-  ];
+function getBetterAuthErrorCode(error: unknown) {
+  const code = (error as { body?: { code?: unknown } } | null)?.body?.code;
 
-  for (const mapping of expected) {
-    if (mapping.codes.some((code) => isAuthErrorCode(fingerprint, code))) {
-      mapping.throwError();
-    }
-  }
-}
-
-function getAuthErrorFingerprint(error: unknown) {
-  if (!(error instanceof Error)) {
-    return String(error);
-  }
-
-  const extra = error as Error & {
-    body?: unknown;
-    status?: unknown;
-    statusCode?: unknown;
-  };
-
-  return [
-    error.message,
-    extra.status,
-    extra.statusCode,
-    stringifyUnknown(extra.body),
-  ]
-    .filter((part) => part !== undefined && part !== '')
-    .join(' ');
-}
-
-function isAuthErrorCode(fingerprint: string, code: string) {
-  return fingerprint.includes(code);
-}
-
-function stringifyUnknown(value: unknown) {
-  if (typeof value === 'string') {
-    return value;
-  }
-
-  try {
-    return JSON.stringify(value);
-  } catch {
-    return '';
-  }
+  return typeof code === 'string' ? code : undefined;
 }
