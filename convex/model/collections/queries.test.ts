@@ -22,7 +22,7 @@ describe('listCollectionSlugs', () => {
 });
 
 describe('getCollectionBySlug', () => {
-  it.fails('returns a collection with published talks and hides a collection whose talks are all unpublished', async () => {
+  it('returns a collection with published talks and hides a collection whose talks are all unpublished', async () => {
     const t = createConvexTest();
     await seedVisibilityCatalog(t);
 

@@ -4,6 +4,7 @@ import { paginationOptsValidator } from 'convex/server';
 import { v } from 'convex/values';
 
 import { query } from '../../_generated/server';
+import { filterCollectionsWithPublishedTalks } from '../../lib/filters';
 import { enrichWithSpeaker } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
@@ -65,6 +66,15 @@ export const getCollectionBySlug = query({
     const collection = await getOneFrom(ctx.db, 'collections', 'by_slug', slug);
 
     if (!collection) {
+      return null;
+    }
+
+    const publishedCollections = await filterCollectionsWithPublishedTalks(
+      ctx,
+      [collection]
+    );
+
+    if (publishedCollections.length === 0) {
       return null;
     }
 

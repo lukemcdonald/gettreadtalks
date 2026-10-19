@@ -8,6 +8,7 @@ import {
 import { v } from 'convex/values';
 
 import { query } from '../../_generated/server';
+import { filterClipsByPublishedTalks } from '../../lib/filters';
 import { getContentComparator } from '../../lib/sort';
 import { paginateArray } from '../../lib/utils';
 import { doc, docs } from '../../lib/validators/schema';
@@ -95,14 +96,20 @@ export const getClipBySlug = query({
       return null;
     }
 
-    const [speaker, talk] = await Promise.all([
-      clip.speakerId ? ctx.db.get('speakers', clip.speakerId) : null,
+    const publishedClips = await filterClipsByPublishedTalks(ctx, [clip]);
+
+    if (publishedClips.length === 0) {
+      return null;
+    }
+
+    const [[clipWithSpeaker], talk] = await Promise.all([
+      enrichClipsWithSpeaker(ctx, [clip]),
       clip.talkId ? ctx.db.get('talks', clip.talkId) : null,
     ]);
 
     return {
       clip,
-      speaker,
+      speaker: clipWithSpeaker.speaker,
       talk,
     };
   },
