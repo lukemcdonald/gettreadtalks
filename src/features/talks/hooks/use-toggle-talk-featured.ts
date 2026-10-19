@@ -3,8 +3,6 @@
 import type { Speaker } from '@/features/speakers/types';
 import type { Talk } from '@/features/talks/types';
 
-import { useQuery } from 'convex/react';
-
 import { api } from '@/convex/_generated/api';
 import { useMutation, useOptimisticToggle } from '@/hooks';
 import { buildTalkTrackProps, track } from '@/services/analytics';
@@ -14,13 +12,12 @@ export function useToggleTalkFeatured({
   talk,
 }: {
   speaker?: Pick<Speaker, '_id' | 'slug'> | null;
-  talk: Pick<Talk, '_id' | 'slug'>;
+  talk: Pick<Talk, '_id' | 'featured' | 'slug'>;
 }) {
   const talkId = talk._id;
-  const talkDoc = useQuery(api.talks.getTalk, { id: talkId });
 
   const { clearOptimistic, isActive, isLoading, toggle } = useOptimisticToggle({
-    data: talkDoc?.featured,
+    data: talk.featured ?? false,
     onToggle: async (next) => {
       try {
         await update.mutateAsync({ featured: next, talkId });

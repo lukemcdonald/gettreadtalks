@@ -10,7 +10,7 @@ import {
   throwValidationError,
 } from '../../lib/errors';
 import { generateSlug, slugExists, slugify } from '../../lib/utils';
-import { requireAuth } from '../auth/utils';
+import { requireAdmin } from '../auth/roles';
 
 /**
  * Create a new collection.
@@ -22,7 +22,7 @@ export const createCollection = mutation({
     url: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    await requireAuth(ctx);
+    await requireAdmin(ctx);
 
     if (!args.title.trim()) {
       throwValidationError('Title cannot be empty', 'title');
@@ -48,7 +48,7 @@ export const destroyCollection = mutation({
   handler: async (ctx, args) => {
     const { collectionId } = args;
 
-    await requireAuth(ctx);
+    await requireAdmin(ctx);
 
     const collection = await ctx.db.get('collections', collectionId);
 
@@ -96,7 +96,7 @@ export const updateCollection = mutation({
   handler: async (ctx, args) => {
     const { collectionId, slug: rawSlug, ...rest } = args;
 
-    await requireAuth(ctx);
+    await requireAdmin(ctx);
 
     const updates: Partial<Doc<'collections'>> = rest;
     const collection: Doc<'collections'> | null = await ctx.db.get(

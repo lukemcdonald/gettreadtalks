@@ -11,7 +11,7 @@ import { useIsAdmin } from '@/features/users/hooks/use-is-admin';
 
 interface FeatureTalkButtonProps {
   speaker?: Pick<Speaker, '_id' | 'slug'> | null;
-  talk: Pick<Talk, '_id' | 'slug'>;
+  talk: Pick<Talk, '_id' | 'featured' | 'slug'>;
 }
 
 export function FeatureTalkButton({ speaker, talk }: FeatureTalkButtonProps) {

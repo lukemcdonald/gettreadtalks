@@ -20,8 +20,8 @@ import { enrichWithSpeaker, paginateArray } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
 import { statusFilterType } from '../../lib/validators/shared';
-import { canViewContent } from '../auth/roles';
-import { getCurrentUser, requireAuth } from '../auth/utils';
+import { canViewContent, requireAdmin } from '../auth/roles';
+import { getCurrentUser } from '../auth/utils';
 import { LIST_SEARCH_LIMIT } from '../search/constants';
 import { normalizeSearchQuery } from '../search/utils';
 import {
@@ -74,7 +74,11 @@ export const getTalk = query({
   args: {
     id: v.id('talks'),
   },
-  handler: async (ctx, args) => await ctx.db.get('talks', args.id),
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+
+    return await ctx.db.get('talks', args.id);
+  },
   returns: doc('talks').nullable(),
 });
 
@@ -86,7 +90,7 @@ export const listTalkTopics = query({
     talkId: v.id('talks'),
   },
   handler: async (ctx, args) => {
-    await requireAuth(ctx);
+    await requireAdmin(ctx);
 
     const topics = await getManyVia(
       ctx.db,
@@ -462,6 +466,8 @@ export const listAllTalks = query({
     status: v.optional(statusFilterType),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+
     const { paginationOpts, search, status = 'published' } = args;
 
     // Search requires in-memory filtering, can't use .paginate()

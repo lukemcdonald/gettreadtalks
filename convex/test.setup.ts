@@ -2,6 +2,8 @@
 
 import { convexTest } from 'convex-test';
 
+import { components } from './_generated/api';
+import betterAuthSchema from './betterAuth/schema';
 import schema from './schema';
 
 const modules = import.meta.glob([
@@ -11,8 +13,78 @@ const modules = import.meta.glob([
   '!./betterAuth/**',
 ]);
 
+const betterAuthModules = import.meta.glob([
+  './betterAuth/**/*.ts',
+  '!./betterAuth/**/*.d.ts',
+]);
+
 export function createConvexTest() {
-  return convexTest(schema, modules);
+  const t = convexTest(schema, modules);
+  t.registerComponent('betterAuth', betterAuthSchema, betterAuthModules);
+
+  return t;
+}
+
+type ConvexTest = ReturnType<typeof createConvexTest>;
+
+export async function signInAs(
+  t: ConvexTest,
+  params: {
+    email: string;
+    name: string;
+    role: 'admin' | 'user';
+  }
+) {
+  const now = Date.now();
+  const { email, name, role } = params;
+
+  const ids = await t.run(async (ctx) => {
+    const createdUser = await ctx.runMutation(
+      components.betterAuth.adapter.create,
+      {
+        input: {
+          data: {
+            createdAt: now,
+            email,
+            emailVerified: true,
+            name,
+            role,
+            updatedAt: now,
+          },
+          model: 'user',
+        },
+      }
+    );
+    const userId = createdUser._id;
+    const createdSession = await ctx.runMutation(
+      components.betterAuth.adapter.create,
+      {
+        input: {
+          data: {
+            createdAt: now,
+            expiresAt: now + 60 * 60 * 1000,
+            token: `test-token-${userId}`,
+            updatedAt: now,
+            userId,
+          },
+          model: 'session',
+        },
+      }
+    );
+
+    return {
+      sessionId: createdSession._id,
+      userId,
+    };
+  });
+
+  return {
+    asUser: t.withIdentity({
+      sessionId: ids.sessionId,
+      subject: ids.userId,
+    }),
+    userId: ids.userId,
+  };
 }
 
 const MEDIA_URL = 'https://www.youtube.com/watch?v=0SVTl4Xa5fY';

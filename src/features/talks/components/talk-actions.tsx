@@ -8,7 +8,7 @@ import { FinishTalkButton } from '@/features/users/components/finish-talk-button
 
 interface TalkActionsProps {
   speaker: Pick<Speaker, '_id' | 'slug'> | null;
-  talk: Pick<Talk, '_id' | 'slug' | 'title'>;
+  talk: Pick<Talk, '_id' | 'featured' | 'slug' | 'title'>;
 }
 
 export function TalkActions({ speaker, talk }: TalkActionsProps) {

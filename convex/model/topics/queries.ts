@@ -10,7 +10,7 @@ import { getTopicComparator } from '../../lib/sort';
 import { enrichWithSpeaker, paginateArray } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
-import { requireAuth } from '../auth/utils';
+import { requireAdmin } from '../auth/roles';
 import { LIST_SEARCH_LIMIT } from '../search/constants';
 import { normalizeSearchQuery } from '../search/utils';
 import {
@@ -26,7 +26,11 @@ export const getTopic = query({
   args: {
     id: v.id('topics'),
   },
-  handler: async (ctx, args) => await ctx.db.get('topics', args.id),
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+
+    return await ctx.db.get('topics', args.id);
+  },
   returns: doc('topics').nullable(),
 });
 
@@ -96,7 +100,7 @@ export const getTopicBySlug = query({
 export const listAllTopics = query({
   args: {},
   handler: async (ctx) => {
-    await requireAuth(ctx);
+    await requireAdmin(ctx);
 
     const topics = await ctx.db.query('topics').withIndex('by_title').collect();
 

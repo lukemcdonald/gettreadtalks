@@ -6,7 +6,7 @@ import { v } from 'convex/values';
 import { mutation } from '../../_generated/server';
 import { throwNotFound, throwValidationError } from '../../lib/errors';
 import { generateSlug } from '../../lib/utils';
-import { requireAuth } from '../auth/utils';
+import { requireAdmin } from '../auth/roles';
 import { toTopicUpdates } from './updates';
 
 /**
@@ -18,7 +18,7 @@ export const addTalkToTopic = mutation({
     topicId: v.id('topics'),
   },
   handler: async (ctx, args) => {
-    await requireAuth(ctx);
+    await requireAdmin(ctx);
 
     const talk = await ctx.db.get('talks', args.talkId);
     if (!talk) {
@@ -64,7 +64,7 @@ export const createTopic = mutation({
     title: v.string(),
   },
   handler: async (ctx, args) => {
-    await requireAuth(ctx);
+    await requireAdmin(ctx);
 
     // Validate input early
     if (!args.title.trim()) {
@@ -89,7 +89,7 @@ export const destroyTopic = mutation({
     id: v.id('topics'),
   },
   handler: async (ctx, args) => {
-    await requireAuth(ctx);
+    await requireAdmin(ctx);
 
     const topic = await ctx.db.get('topics', args.id);
 
@@ -129,7 +129,7 @@ export const removeTalkFromTopic = mutation({
     topicId: v.id('topics'),
   },
   handler: async (ctx, args) => {
-    await requireAuth(ctx);
+    await requireAdmin(ctx);
 
     const association = await ctx.db
       .query('talksOnTopics')
@@ -159,7 +159,7 @@ export const updateTopic = mutation({
     title: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
-    await requireAuth(ctx);
+    await requireAdmin(ctx);
 
     const { id, ...rest } = args;
     const updates: Partial<Doc<'topics'>> = toTopicUpdates(rest);
