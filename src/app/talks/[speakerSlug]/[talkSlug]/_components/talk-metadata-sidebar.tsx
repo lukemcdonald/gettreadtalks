@@ -34,16 +34,14 @@ export function TalkMetadataSidebar({
       )}
 
       {/* Topics */}
-      <div className="space-y-4">
-        <h3 className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">
-          Topics
-        </h3>
-        {topics.length > 0 ? (
+      {topics.length > 0 && (
+        <div className="space-y-4">
+          <h3 className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">
+            Topics
+          </h3>
           <TopicLinks topics={topics} />
-        ) : (
-          <span className="text-muted-foreground text-sm">No topics</span>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Scripture */}
       {talk.scripture && (
