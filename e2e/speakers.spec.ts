@@ -14,3 +14,15 @@ test('Speakers / Browse and open a speaker', async ({
   await expect(speakersPage.page).toHaveURL(/\/speakers\/[^/]+$/u);
   await expect(speakersPage.speakerHeading).toBeVisible();
 });
+
+test('Speakers / Published talk topics', async ({ speakersPage }) => {
+  const { page } = speakersPage;
+
+  await page.goto('/speakers/john-doe');
+
+  await expect(speakersPage.speakerHeading).toHaveText('John Doe');
+
+  await expect(page.getByRole('heading', { name: 'Topics' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Grace' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Prayer' })).toBeVisible();
+});

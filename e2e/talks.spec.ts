@@ -19,3 +19,18 @@ test('Talks / Listing search', async ({ talksPage }) => {
 
   await expect(talksPage.page).toHaveURL(/search=grace/u);
 });
+
+test('Talks / Related talks by topic', async ({ talksPage }) => {
+  const { page } = talksPage;
+
+  await page.goto('/talks/mary-smith/example-talk-the-prodigal-son');
+
+  await expect(talksPage.talkHeading).toHaveText(
+    'Example Talk: The Prodigal Son'
+  );
+
+  await expect(
+    page.getByRole('heading', { name: 'Related Talks' })
+  ).toBeVisible();
+  await expect(page.getByTestId('talk-card')).not.toHaveCount(0);
+});

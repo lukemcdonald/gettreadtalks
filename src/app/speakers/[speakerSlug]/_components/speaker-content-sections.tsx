@@ -2,6 +2,7 @@ import type { Clip } from '@/features/clips/types';
 import type { Collection } from '@/features/collections/types';
 import type { Speaker } from '@/features/speakers/types';
 import type { Talk } from '@/features/talks/types';
+import type { Topic } from '@/features/topics/types';
 
 import { SpeakerMetadataSidebar } from '@/app/speakers/[speakerSlug]/_components/speaker-metadata-sidebar';
 import { FeaturedGrid } from '@/components/featured-grid';
@@ -27,6 +28,7 @@ interface SpeakerContentSectionsProps {
   hasFeaturedVideo?: boolean;
   speaker: Speaker;
   talks: Talk[];
+  topics: Topic[];
 }
 
 export function SpeakerContentSections({
@@ -35,6 +37,7 @@ export function SpeakerContentSections({
   hasFeaturedVideo,
   speaker,
   talks,
+  topics,
 }: SpeakerContentSectionsProps) {
   const speakerName = getSpeakerName(speaker);
   const speakerTitle = speaker.role
@@ -121,6 +124,7 @@ export function SpeakerContentSections({
         <SpeakerMetadataSidebar
           hideAbout={hasFeaturedVideo}
           speaker={speaker}
+          topics={topics}
         />
       </aside>
     </div>

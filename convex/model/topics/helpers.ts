@@ -1,4 +1,7 @@
+import type { Doc, Id } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
+
+import { getManyFrom } from 'convex-helpers/server/relationships';
 
 import { filterTopicsWithPublishedTalks } from '../../lib/filters';
 
@@ -30,4 +33,28 @@ export async function searchPublishedTopics(
   const published = await filterTopicsWithPublishedTalks(ctx, topics);
 
   return published.slice(0, limit);
+}
+
+/** Distinct topics linked to the given talks, sorted by title. */
+export async function listPublishedTopicsForTalks(
+  ctx: QueryCtx,
+  talkIds: Id<'talks'>[]
+) {
+  if (talkIds.length === 0) {
+    return [];
+  }
+
+  const joinPages = await Promise.all(
+    talkIds.map((talkId) =>
+      getManyFrom(ctx.db, 'talksOnTopics', 'by_talkId', talkId)
+    )
+  );
+  const topicIds = [...new Set(joinPages.flat().map((join) => join.topicId))];
+  const topics = await Promise.all(
+    topicIds.map((topicId) => ctx.db.get('topics', topicId))
+  );
+
+  return topics
+    .filter((topic): topic is Doc<'topics'> => topic !== null)
+    .toSorted((a, b) => a.title.localeCompare(b.title));
 }

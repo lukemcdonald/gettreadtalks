@@ -1,48 +1,38 @@
 import type { Speaker } from '@/features/speakers/types';
 import type { TalkId } from '@/features/talks/types';
+import type { Topic } from '@/features/topics/types';
 
-import { FeaturedGrid } from '@/components/featured-grid';
-import { getSpeakerName } from '@/features/speakers/utils';
-import { TalkCard } from '@/features/talks/components/talk-card';
 import { loadRandomTalksBySpeaker } from '@/features/talks/queries/load-random-talks-by-speaker';
+import { loadTalksByTopics } from '@/features/talks/queries/load-talks-by-topics';
+
+import { SpeakerRelatedTalks } from './speaker-related-talks';
+import { TopicRelatedTalks } from './topic-related-talks';
 
 interface TalkRelatedTalksProps {
   excludeTalkId: TalkId;
-  speaker: Speaker;
+  speaker: Speaker | null;
+  topics: Topic[];
 }
 
 export async function TalkRelatedTalks({
   excludeTalkId,
   speaker,
+  topics,
 }: TalkRelatedTalksProps) {
-  const relatedTalks = await loadRandomTalksBySpeaker(
-    speaker._id,
-    excludeTalkId,
-    5
+  const speakerTalks = speaker
+    ? await loadRandomTalksBySpeaker(speaker._id, excludeTalkId, 5)
+    : [];
+  const topicTalks = await loadTalksByTopics(
+    topics.map((topic) => topic._id),
+    [excludeTalkId, ...speakerTalks.map((talk) => talk._id)]
   );
 
-  if (relatedTalks.length === 0) {
-    return null;
-  }
-
-  const speakerName = getSpeakerName(speaker);
-
   return (
-    <FeaturedGrid
-      columns={{ default: 1 }}
-      description={`Enjoy more talks by ${speakerName}.`}
-      quickLinks={[
-        {
-          href: `/speakers/${speaker.slug}`,
-          label: 'View all talks',
-        },
-      ]}
-      sticky
-      title="More Talks"
-    >
-      {relatedTalks.map((relatedTalk) => (
-        <TalkCard key={relatedTalk._id} speaker={speaker} talk={relatedTalk} />
-      ))}
-    </FeaturedGrid>
+    <>
+      {speaker ? (
+        <SpeakerRelatedTalks speaker={speaker} talks={speakerTalks} />
+      ) : null}
+      <TopicRelatedTalks talks={topicTalks} topics={topics} />
+    </>
   );
 }

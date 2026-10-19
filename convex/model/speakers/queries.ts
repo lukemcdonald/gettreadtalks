@@ -17,6 +17,7 @@ import { doc, docs } from '../../lib/validators/schema';
 import { requireAuth } from '../auth/utils';
 import { LIST_SEARCH_LIMIT } from '../search/constants';
 import { normalizeSearchQuery } from '../search/utils';
+import { listPublishedTopicsForTalks } from '../topics/helpers';
 import {
   listPublishedSpeakers,
   listPublishedSpeakersPage,
@@ -39,7 +40,7 @@ export const getSpeaker = query({
 
 /**
  * Get speaker by slug with related data (default for detail pages).
- * Returns speaker with related talks, collections, and clips.
+ * Returns speaker with related talks, collections, clips, and topics.
  */
 export const getSpeakerBySlug = query({
   args: {
@@ -76,9 +77,13 @@ export const getSpeakerBySlug = query({
         talks.flatMap((talk) => (talk.collectionId ? [talk.collectionId] : []))
       ),
     ];
-    const collectionsData = await Promise.all(
-      collectionIds.map((id) => ctx.db.get('collections', id))
-    );
+    const [collectionsData, topics] = await Promise.all([
+      Promise.all(collectionIds.map((id) => ctx.db.get('collections', id))),
+      listPublishedTopicsForTalks(
+        ctx,
+        talks.map((talk) => talk._id)
+      ),
+    ]);
     const collections = collectionsData.filter(
       (col): col is Doc<'collections'> => col !== null
     );
@@ -88,6 +93,7 @@ export const getSpeakerBySlug = query({
       collections,
       speaker,
       talks,
+      topics,
     };
   },
   returns: v.nullable(
@@ -96,6 +102,7 @@ export const getSpeakerBySlug = query({
       collections: docs('collections'),
       speaker: doc('speakers'),
       talks: docs('talks'),
+      topics: docs('topics'),
     })
   ),
 });

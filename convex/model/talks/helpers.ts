@@ -65,6 +65,47 @@ export async function listPublishedTalksForTopic(
   );
 }
 
+const TALKS_PER_TOPIC = 24;
+
+/** Published talks that share any of the given topics, excluding listed ids. */
+export async function listPublishedTalksForTopics(
+  ctx: QueryCtx,
+  topicIds: Id<'topics'>[],
+  options: {
+    excludeTalkIds?: Iterable<string>;
+  } = {}
+) {
+  if (topicIds.length === 0) {
+    return [];
+  }
+
+  const excludeTalkIds = new Set(options.excludeTalkIds);
+  const takePerTopic = TALKS_PER_TOPIC + excludeTalkIds.size;
+
+  const talkPages = await Promise.all(
+    topicIds.map(async (topicId) => {
+      const joins = await ctx.db
+        .query('talksOnTopics')
+        .withIndex('by_topicId', (q) => q.eq('topicId', topicId))
+        .order('desc')
+        .take(takePerTopic);
+
+      const talks = await Promise.all(
+        joins.map((join) => ctx.db.get('talks', join.talkId))
+      );
+
+      return talks.filter(
+        (talk): talk is Doc<'talks'> =>
+          talk !== null &&
+          talk.status === 'published' &&
+          !excludeTalkIds.has(talk._id)
+      );
+    })
+  );
+
+  return uniqueById(talkPages.flat());
+}
+
 export async function searchPublishedTalks(
   ctx: QueryCtx,
   queryText: string,

@@ -50,14 +50,13 @@ function TalkDetail({ speakerSlug, talkResult, talkSlug }: TalkDetailProps) {
             clips={clips}
             collection={collection}
             relatedTalks={
-              speaker ? (
-                <Suspense fallback={<TalkRelatedTalksSkeleton />}>
-                  <TalkRelatedTalks
-                    excludeTalkId={talk._id}
-                    speaker={speaker}
-                  />
-                </Suspense>
-              ) : null
+              <Suspense fallback={<TalkRelatedTalksSkeleton />}>
+                <TalkRelatedTalks
+                  excludeTalkId={talk._id}
+                  speaker={speaker}
+                  topics={topics}
+                />
+              </Suspense>
             }
             speaker={speaker}
             talk={talk}
