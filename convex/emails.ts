@@ -1,3 +1,4 @@
+import type { MediaHealthEmailProps } from '../src/services/email/types';
 import type { ActionCtx, MutationCtx } from './_generated/server';
 import type { EmailId, SendEmailOptions } from '@convex-dev/resend';
 
@@ -72,7 +73,7 @@ export const checkSendResult = internalAction({
 
     // `status.failed` is set only by Resend's webhook; the batch-rejection
     // and retry-exhausted paths this check targets only set `status.status`.
-    if (status?.status === 'failed') {
+    if (isFailedSendStatus(status)) {
       await reportEmailFailure({
         emailId: args.emailId,
         errorMessage: status.errorMessage,
@@ -81,34 +82,24 @@ export const checkSendResult = internalAction({
       return null;
     }
 
-    // Not yet in a terminal state -- reschedule while budget remains, since
-    // 'sent'/'delivery_delayed' can still transition to 'failed' later.
-    const isPending =
-      status === null ||
-      status.status === 'waiting' ||
-      status.status === 'queued' ||
-      status.status === 'sent' ||
-      status.status === 'delivery_delayed';
-
-    if (isPending) {
-      const withinBudget =
-        Date.now() - args.startedAt + CHECK_SEND_RESULT_DELAY_MS <=
-        CHECK_SEND_RESULT_MAX_BUDGET_MS;
-
-      if (withinBudget) {
-        await ctx.scheduler.runAfter(
-          CHECK_SEND_RESULT_DELAY_MS,
-          internal.emails.checkSendResult,
-          args
-        );
-      } else {
-        console.warn(
-          'checkSendResult gave up waiting for a terminal status:',
-          args.emailId,
-          args.kind
-        );
-      }
+    if (!isPendingSendStatus(status)) {
+      return null;
     }
+
+    if (!hasCheckSendBudget(args.startedAt)) {
+      console.warn(
+        'checkSendResult gave up waiting for a terminal status:',
+        args.emailId,
+        args.kind
+      );
+      return null;
+    }
+
+    await ctx.scheduler.runAfter(
+      CHECK_SEND_RESULT_DELAY_MS,
+      internal.emails.checkSendResult,
+      args
+    );
 
     return null;
   },
@@ -164,16 +155,7 @@ export const sendMediaHealthEmail = internalAction({
     }
 
     try {
-      const siteUrl = args.siteUrl ?? getSiteUrl();
-      const stillOpenCount = args.stillOpenCount ?? 0;
-      const template = MediaHealthEmail({
-        items: args.items,
-        siteUrl,
-        stillOpenCount,
-        stillOpenHref: joinOriginAndPath(MEDIA_HEALTH_PATH, siteUrl),
-      });
-      const { html, text } = renderEmailTemplate(template);
-
+      const { html, text } = renderMediaHealthMessage(args);
       const emailId = await sendTrackedEmail(
         ctx,
         {
@@ -337,6 +319,48 @@ export const sendWelcomeEmail = internalMutation({
 // ============================================
 // HELPERS
 // ============================================
+
+const PENDING_SEND_STATUSES = new Set([
+  'delivery_delayed',
+  'queued',
+  'sent',
+  'waiting',
+]);
+
+function isFailedSendStatus(
+  status: { errorMessage: string | null; status: string } | null
+): status is { errorMessage: string | null; status: 'failed' } {
+  return status?.status === 'failed';
+}
+
+function isPendingSendStatus(status: { status: string } | null) {
+  return status === null || PENDING_SEND_STATUSES.has(status.status);
+}
+
+function hasCheckSendBudget(startedAt: number) {
+  return (
+    Date.now() - startedAt + CHECK_SEND_RESULT_DELAY_MS <=
+    CHECK_SEND_RESULT_MAX_BUDGET_MS
+  );
+}
+
+function renderMediaHealthMessage(args: {
+  items: MediaHealthEmailProps['items'];
+  siteUrl?: string;
+  stillOpenCount?: number;
+}) {
+  const siteUrl = args.siteUrl ?? getSiteUrl();
+  const stillOpenCount = args.stillOpenCount ?? 0;
+
+  return renderEmailTemplate(
+    MediaHealthEmail({
+      items: args.items,
+      siteUrl,
+      stillOpenCount,
+      stillOpenHref: joinOriginAndPath(MEDIA_HEALTH_PATH, siteUrl),
+    })
+  );
+}
 
 function getFromAddress() {
   return `${site.name} <${FROM_EMAIL}>`;

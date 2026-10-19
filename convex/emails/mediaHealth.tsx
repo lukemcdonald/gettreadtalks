@@ -82,30 +82,54 @@ function MediaHealthItem({
   const adminHref = `${siteUrl}${item.adminPath}`;
   const publicHref = item.publicPath ? `${siteUrl}${item.publicPath}` : null;
   const videoHref = toYouTubeWatchUrl(item.mediaUrl);
-  const statusLabel = item.newStatus === 'private' ? 'Private' : 'Missing';
 
   return (
     <Section style={itemSection}>
       <Text style={titleText}>{item.title}</Text>
       <Text style={metaText}>
-        {statusLabel} · First seen broken {formatBrokenDate(item.firstBrokenAt)}
+        {getMediaHealthStatusLabel(item.newStatus)} · First seen broken{' '}
+        {formatBrokenDate(item.firstBrokenAt)}
       </Text>
       <Section style={buttonContainer}>
         <Button href={adminHref} style={button}>
           Open in admin
         </Button>
-        {publicHref ? (
-          <Button href={publicHref} style={secondaryButton}>
-            View page
-          </Button>
-        ) : null}
+        <MediaHealthPageButton href={publicHref} />
         <Button href={videoHref} style={secondaryButton}>
           Check video
         </Button>
       </Section>
-      {isLast ? null : <Hr style={itemDivider} />}
+      <MediaHealthItemDivider isLast={isLast} />
     </Section>
   );
+}
+
+function getMediaHealthStatusLabel(status: MediaHealthEmailItem['newStatus']) {
+  if (status === 'private') {
+    return 'Private';
+  }
+
+  return 'Missing';
+}
+
+function MediaHealthPageButton({ href }: { href: string | null }) {
+  if (!href) {
+    return null;
+  }
+
+  return (
+    <Button href={href} style={secondaryButton}>
+      View page
+    </Button>
+  );
+}
+
+function MediaHealthItemDivider({ isLast }: { isLast: boolean }) {
+  if (isLast) {
+    return null;
+  }
+
+  return <Hr style={itemDivider} />;
 }
 
 function formatBrokenDate(timestamp: number) {

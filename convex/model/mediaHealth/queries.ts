@@ -250,18 +250,40 @@ async function toOpenMediaCheckItem(
   return {
     _id: check._id,
     adminPath: getMediaAdminEditPath(check.entityTable, check.entityId),
-    firstBrokenAt: check.firstBrokenAt ?? check.checkedAt,
+    firstBrokenAt: getOpenMediaFirstBrokenAt(check),
     mediaUrl: check.mediaUrl,
-    publicPath: entity
-      ? getMediaPublicPath({
-          entityTable: check.entityTable,
-          slug: entity.slug,
-          speakerSlug: entity.speakerSlug,
-        })
-      : null,
+    publicPath: getOpenMediaPublicPath(check.entityTable, entity),
     status: check.status,
-    title: entity?.title ?? 'Untitled media',
+    title: getOpenMediaTitle(entity),
   };
+}
+
+function getOpenMediaFirstBrokenAt(check: {
+  checkedAt: number;
+  firstBrokenAt?: number;
+}) {
+  return check.firstBrokenAt ?? check.checkedAt;
+}
+
+function getOpenMediaTitle(
+  entity: Awaited<ReturnType<typeof loadMediaEntity>>
+) {
+  return entity?.title ?? 'Untitled media';
+}
+
+function getOpenMediaPublicPath(
+  entityTable: 'clips' | 'talks',
+  entity: Awaited<ReturnType<typeof loadMediaEntity>>
+) {
+  if (!entity) {
+    return null;
+  }
+
+  return getMediaPublicPath({
+    entityTable,
+    slug: entity.slug,
+    speakerSlug: entity.speakerSlug,
+  });
 }
 
 async function loadMediaEntity(
