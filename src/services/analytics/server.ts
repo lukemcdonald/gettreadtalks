@@ -5,10 +5,15 @@ import { after } from 'next/server';
 
 import { LOG_ANALYTICS_TO_CONSOLE } from '@/constants/env';
 
+import { isSegmentEnabled } from './enabled';
 import { logAnalytics } from './log';
 
 const SEGMENT_TRACK_URL = 'https://api.segment.io/v1/track';
 const writeKey = process.env.SEGMENT_WRITE_KEY;
+const segmentEnabled = isSegmentEnabled(
+  writeKey,
+  process.env.NEXT_PUBLIC_SEGMENT_ENABLED
+);
 
 interface ServerTrackPayload<E extends keyof EventMap = keyof EventMap> {
   anonymousId: string;
@@ -20,11 +25,11 @@ interface ServerTrackPayload<E extends keyof EventMap = keyof EventMap> {
 }
 
 function canTrackServer() {
-  return Boolean(writeKey || LOG_ANALYTICS_TO_CONSOLE);
+  return Boolean(segmentEnabled || LOG_ANALYTICS_TO_CONSOLE);
 }
 
 async function sendSegmentTrack(payload: ServerTrackPayload) {
-  if (!writeKey) {
+  if (!segmentEnabled || !writeKey) {
     return;
   }
 
