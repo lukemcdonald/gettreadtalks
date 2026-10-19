@@ -1,14 +1,8 @@
 import type { NextConfig } from 'next';
 
 import { withSentryConfig } from '@sentry/nextjs/config';
-import path from 'node:path';
 
 import { IS_SENTRY_ENABLED } from './src/configs/sentry';
-
-const SENTRY_CLIENT_EXCLUDE_TRACING_LOADER = path.join(
-  import.meta.dirname,
-  'scripts/sentry-client-exclude-tracing.cjs'
-);
 
 const cspHeader = `
   base-uri 'self';
@@ -93,25 +87,12 @@ const nextConfig = {
       source: '/account/topics',
     },
   ],
-  turbopack: {
-    rules: {
-      '*': {
-        condition: {
-          all: ['browser', { path: /@sentry\//u }],
-        },
-        loaders: [SENTRY_CLIENT_EXCLUDE_TRACING_LOADER],
-      },
-    },
-  },
   typedRoutes: false,
 } satisfies NextConfig;
 
-const config: NextConfig = IS_SENTRY_ENABLED
+const config = IS_SENTRY_ENABLED
   ? withSentryConfig(nextConfig, {
       authToken: process.env.SENTRY_AUTH_TOKEN,
-      bundleSizeOptimizations: {
-        excludeTracing: true,
-      },
       org: 'lukemcdonald',
       project: 'gettreadtalks',
       silent: !process.env.CI,
@@ -121,9 +102,5 @@ const config: NextConfig = IS_SENTRY_ENABLED
       widenClientFileUpload: true,
     })
   : nextConfig;
-
-// withSentryConfig sets compiler.define.__SENTRY_TRACING__ for every runtime.
-// Next cannot override that key in defineServer, so keep tracing DCE client-only.
-delete config.compiler?.define?.__SENTRY_TRACING__;
 
 export default config;

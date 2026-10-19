@@ -81,6 +81,10 @@ async function initClientSentry(): Promise<SentryClient | null> {
 
       Sentry.init({
         ...clientSentryConfig,
+        integrations: (integrations) =>
+          integrations.filter(
+            (integration) => integration.name !== 'BrowserTracing'
+          ),
         replaysOnErrorSampleRate: 0,
         replaysSessionSampleRate: 0,
       });
