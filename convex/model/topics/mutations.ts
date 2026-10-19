@@ -7,6 +7,7 @@ import { mutation } from '../../_generated/server';
 import { throwNotFound, throwValidationError } from '../../lib/errors';
 import { generateSlug } from '../../lib/utils';
 import { requireAuth } from '../auth/utils';
+import { toTopicUpdates } from './updates';
 
 /**
  * Add a talk to a topic.
@@ -161,7 +162,7 @@ export const updateTopic = mutation({
     await requireAuth(ctx);
 
     const { id, ...rest } = args;
-    const updates: Partial<Doc<'topics'>> = rest;
+    const updates: Partial<Doc<'topics'>> = toTopicUpdates(rest);
 
     const topic = await ctx.db.get('topics', id);
 
