@@ -27,22 +27,6 @@ export function createConvexTest() {
 
 type ConvexTest = ReturnType<typeof createConvexTest>;
 
-function getAdapterRecordId(record: unknown): string {
-  if (!record || typeof record !== 'object') {
-    throw new Error('Better Auth adapter did not return a record');
-  }
-
-  if ('id' in record && typeof record.id === 'string') {
-    return record.id;
-  }
-
-  if ('_id' in record && typeof record._id === 'string') {
-    return record._id;
-  }
-
-  throw new Error('Better Auth adapter record missing id');
-}
-
 export async function signInAs(
   t: ConvexTest,
   params: {
@@ -71,7 +55,7 @@ export async function signInAs(
         },
       }
     );
-    const userId = getAdapterRecordId(createdUser);
+    const userId = createdUser._id;
     const createdSession = await ctx.runMutation(
       components.betterAuth.adapter.create,
       {
@@ -89,7 +73,7 @@ export async function signInAs(
     );
 
     return {
-      sessionId: getAdapterRecordId(createdSession),
+      sessionId: createdSession._id,
       userId,
     };
   });

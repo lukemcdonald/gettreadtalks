@@ -10,20 +10,34 @@ const paginationOpts = {
   numItems: 10,
 };
 
-async function expectForbidden(promise: Promise<unknown>) {
+type TestClient = Pick<
+  ReturnType<typeof createConvexTest>,
+  'mutation' | 'query'
+>;
+type Seed = Awaited<ReturnType<typeof seedCatalog>>;
+
+async function expectRejected(
+  promise: Promise<unknown>,
+  errorCode: typeof ErrorCodes.AUTH_REQUIRED | typeof ErrorCodes.FORBIDDEN
+) {
   await expect(promise).rejects.toMatchObject({
     data: {
-      errorCode: ErrorCodes.FORBIDDEN,
+      errorCode,
     },
   });
 }
 
-async function seedSpeakerAndTalk(t: ReturnType<typeof createConvexTest>) {
+async function seedCatalog(t: ReturnType<typeof createConvexTest>) {
   return await t.run(async (ctx) => {
     const speakerId = await ctx.db.insert('speakers', {
       firstName: 'John',
       lastName: 'Bunyan',
       slug: 'john-bunyan',
+    });
+    const unusedSpeakerId = await ctx.db.insert('speakers', {
+      firstName: 'Unused',
+      lastName: 'Speaker',
+      slug: 'unused-speaker',
     });
     const talkId = await ctx.db.insert('talks', {
       mediaUrl: MEDIA_URL,
@@ -32,184 +46,312 @@ async function seedSpeakerAndTalk(t: ReturnType<typeof createConvexTest>) {
       status: 'published',
       title: 'Grace Abounding',
     });
+    const topicId = await ctx.db.insert('topics', {
+      slug: 'grace',
+      title: 'Grace',
+    });
+    const unusedTopicId = await ctx.db.insert('topics', {
+      slug: 'unused-topic',
+      title: 'Unused Topic',
+    });
+    await ctx.db.insert('talksOnTopics', {
+      talkId,
+      topicId,
+    });
+    const collectionId = await ctx.db.insert('collections', {
+      slug: 'unused-collection',
+      title: 'Unused Collection',
+    });
+    const clipId = await ctx.db.insert('clips', {
+      mediaUrl: MEDIA_URL,
+      slug: 'a-clip',
+      status: 'published',
+      title: 'A clip',
+    });
+    const affiliateLinkId = await ctx.db.insert('affiliateLinks', {
+      slug: 'a-book',
+      title: 'A book',
+      type: 'book',
+      url: 'https://example.test/book',
+    });
 
-    return { speakerId, talkId };
+    return {
+      affiliateLinkId,
+      clipId,
+      collectionId,
+      speakerId,
+      talkId,
+      topicId,
+      unusedSpeakerId,
+      unusedTopicId,
+    };
   });
 }
 
-describe('content mutations require admin', () => {
-  it('rejects a signed-in non-admin and allows an admin', async () => {
-    const t = createConvexTest();
-    const { speakerId } = await seedSpeakerAndTalk(t);
-    const { asUser: asMember } = await signInAs(t, {
-      email: 'member@example.test',
-      name: 'Member',
-      role: 'user',
-    });
-    const { asUser: asAdmin } = await signInAs(t, {
-      email: 'admin@example.test',
-      name: 'Admin',
-      role: 'admin',
-    });
-
-    await expectForbidden(
-      asMember.mutation(api.topics.createTopic, { title: 'Grace' })
-    );
-    await expectForbidden(
-      asMember.mutation(api.speakers.createSpeaker, {
-        firstName: 'John',
-        lastName: 'Owen',
-      })
-    );
-    await expectForbidden(
-      asMember.mutation(api.collections.createCollection, {
-        title: 'Pilgrim',
-      })
-    );
-    await expectForbidden(
-      asMember.mutation(api.clips.createClip, {
-        mediaUrl: MEDIA_URL,
-        title: 'A clip',
-      })
-    );
-    await expectForbidden(
-      asMember.mutation(api.talks.createTalk, {
-        mediaUrl: MEDIA_URL,
-        speakerId,
-        title: 'A talk',
-      })
-    );
-    await expectForbidden(
-      asMember.mutation(api.affiliateLinks.createAffiliateLink, {
-        title: 'A book',
+const gatedFunctions: {
+  call: (client: TestClient, seed: Seed) => Promise<unknown>;
+  name: string;
+}[] = [
+  {
+    call: (client) =>
+      client.mutation(api.affiliateLinks.createAffiliateLink, {
+        title: 'A new book',
         type: 'book',
-        url: 'https://example.test/book',
-      })
-    );
-
-    await expect(
-      asAdmin.mutation(api.topics.createTopic, { title: 'Grace' })
-    ).resolves.toEqual(expect.anything());
-    await expect(
-      asAdmin.mutation(api.speakers.createSpeaker, {
-        firstName: 'John',
-        lastName: 'Owen',
-      })
-    ).resolves.toEqual(expect.anything());
-    await expect(
-      asAdmin.mutation(api.collections.createCollection, {
-        title: 'Pilgrim',
-      })
-    ).resolves.toEqual(expect.anything());
-    await expect(
-      asAdmin.mutation(api.clips.createClip, {
-        mediaUrl: MEDIA_URL,
-        title: 'A clip',
-      })
-    ).resolves.toEqual(expect.anything());
-    await expect(
-      asAdmin.mutation(api.talks.createTalk, {
-        mediaUrl: MEDIA_URL,
-        speakerId,
-        title: 'A talk',
-      })
-    ).resolves.toEqual(expect.anything());
-    await expect(
-      asAdmin.mutation(api.affiliateLinks.createAffiliateLink, {
-        title: 'A book',
-        type: 'book',
-        url: 'https://example.test/book',
-      })
-    ).resolves.toEqual(expect.anything());
-  });
-});
-
-describe('listAll queries require admin', () => {
-  it('rejects a signed-in non-admin and allows an admin', async () => {
-    const t = createConvexTest();
-    await seedSpeakerAndTalk(t);
-    const { asUser: asMember } = await signInAs(t, {
-      email: 'member@example.test',
-      name: 'Member',
-      role: 'user',
-    });
-    const { asUser: asAdmin } = await signInAs(t, {
-      email: 'admin@example.test',
-      name: 'Admin',
-      role: 'admin',
-    });
-
-    await expectForbidden(
-      asMember.query(api.talks.listAllTalks, {
-        paginationOpts,
-        status: 'all',
-      })
-    );
-    await expectForbidden(asMember.query(api.topics.listAllTopics, {}));
-    await expectForbidden(
-      asMember.query(api.speakers.listAllSpeakers, { paginationOpts })
-    );
-    await expectForbidden(
-      asMember.query(api.speakers.listAllSpeakersAdmin, {})
-    );
-    await expectForbidden(asMember.query(api.speakers.listAllSpeakersRaw, {}));
-    await expectForbidden(
-      asMember.query(api.clips.listAllClips, {
-        paginationOpts,
-        status: 'all',
-      })
-    );
-    await expectForbidden(
-      asMember.query(api.collections.listAllCollections, { paginationOpts })
-    );
-
-    await expect(
-      asAdmin.query(api.talks.listAllTalks, {
-        paginationOpts,
-        status: 'all',
-      })
-    ).resolves.toMatchObject({
-      isDone: true,
-      page: [expect.objectContaining({ slug: 'grace-abounding' })],
-    });
-    await expect(asAdmin.query(api.topics.listAllTopics, {})).resolves.toEqual(
-      []
-    );
-    await expect(
-      asAdmin.query(api.speakers.listAllSpeakers, { paginationOpts })
-    ).resolves.toMatchObject({
-      page: [expect.objectContaining({ slug: 'john-bunyan' })],
-    });
-    await expect(
-      asAdmin.query(api.speakers.listAllSpeakersAdmin, {})
-    ).resolves.toEqual([
-      expect.objectContaining({
-        speaker: expect.objectContaining({ slug: 'john-bunyan' }),
+        url: 'https://example.test/new-book',
       }),
-    ]);
-    await expect(
-      asAdmin.query(api.speakers.listAllSpeakersRaw, {})
-    ).resolves.toEqual([expect.objectContaining({ slug: 'john-bunyan' })]);
-    await expect(
-      asAdmin.query(api.clips.listAllClips, {
+    name: 'affiliateLinks.createAffiliateLink',
+  },
+  {
+    call: (client, seed) =>
+      client.mutation(api.affiliateLinks.destroyAffiliateLink, {
+        affiliateLinkId: seed.affiliateLinkId,
+      }),
+    name: 'affiliateLinks.destroyAffiliateLink',
+  },
+  {
+    call: (client, seed) =>
+      client.mutation(api.affiliateLinks.updateAffiliateLink, {
+        affiliateLinkId: seed.affiliateLinkId,
+        title: 'Updated book',
+      }),
+    name: 'affiliateLinks.updateAffiliateLink',
+  },
+  {
+    call: (client, seed) =>
+      client.mutation(api.clips.archiveClip, { clipId: seed.clipId }),
+    name: 'clips.archiveClip',
+  },
+  {
+    call: (client) =>
+      client.mutation(api.clips.createClip, {
+        mediaUrl: MEDIA_URL,
+        title: 'A new clip',
+      }),
+    name: 'clips.createClip',
+  },
+  {
+    call: (client, seed) =>
+      client.mutation(api.clips.destroyClip, { clipId: seed.clipId }),
+    name: 'clips.destroyClip',
+  },
+  {
+    call: (client, seed) =>
+      client.query(api.clips.getClip, { id: seed.clipId }),
+    name: 'clips.getClip',
+  },
+  {
+    call: (client) =>
+      client.query(api.clips.listAllClips, {
         paginationOpts,
         status: 'all',
-      })
-    ).resolves.toMatchObject({
-      page: [],
-    });
-    await expect(
-      asAdmin.query(api.collections.listAllCollections, { paginationOpts })
-    ).resolves.toMatchObject({
-      page: [],
-    });
-  });
+      }),
+    name: 'clips.listAllClips',
+  },
+  {
+    call: (client, seed) =>
+      client.mutation(api.clips.updateClip, {
+        clipId: seed.clipId,
+        title: 'Updated clip',
+      }),
+    name: 'clips.updateClip',
+  },
+  {
+    call: (client) =>
+      client.mutation(api.collections.createCollection, {
+        title: 'A new collection',
+      }),
+    name: 'collections.createCollection',
+  },
+  {
+    call: (client, seed) =>
+      client.mutation(api.collections.destroyCollection, {
+        collectionId: seed.collectionId,
+      }),
+    name: 'collections.destroyCollection',
+  },
+  {
+    call: (client, seed) =>
+      client.query(api.collections.getCollection, {
+        collectionId: seed.collectionId,
+      }),
+    name: 'collections.getCollection',
+  },
+  {
+    call: (client) =>
+      client.query(api.collections.listAllCollections, { paginationOpts }),
+    name: 'collections.listAllCollections',
+  },
+  {
+    call: (client, seed) =>
+      client.mutation(api.collections.updateCollection, {
+        collectionId: seed.collectionId,
+        title: 'Updated collection',
+      }),
+    name: 'collections.updateCollection',
+  },
+  {
+    call: (client) =>
+      client.mutation(api.speakers.createSpeaker, {
+        firstName: 'John',
+        lastName: 'Owen',
+      }),
+    name: 'speakers.createSpeaker',
+  },
+  {
+    call: (client, seed) =>
+      client.mutation(api.speakers.destroySpeaker, {
+        speakerId: seed.unusedSpeakerId,
+      }),
+    name: 'speakers.destroySpeaker',
+  },
+  {
+    call: (client, seed) =>
+      client.query(api.speakers.getSpeaker, { speakerId: seed.speakerId }),
+    name: 'speakers.getSpeaker',
+  },
+  {
+    call: (client) => client.query(api.speakers.getSpeakersCount, {}),
+    name: 'speakers.getSpeakersCount',
+  },
+  {
+    call: (client) =>
+      client.query(api.speakers.listAllSpeakers, { paginationOpts }),
+    name: 'speakers.listAllSpeakers',
+  },
+  {
+    call: (client) => client.query(api.speakers.listAllSpeakersAdmin, {}),
+    name: 'speakers.listAllSpeakersAdmin',
+  },
+  {
+    call: (client) => client.query(api.speakers.listAllSpeakersRaw, {}),
+    name: 'speakers.listAllSpeakersRaw',
+  },
+  {
+    call: (client, seed) =>
+      client.mutation(api.speakers.updateSpeaker, {
+        firstName: 'Updated',
+        speakerId: seed.speakerId,
+      }),
+    name: 'speakers.updateSpeaker',
+  },
+  {
+    call: (client, seed) =>
+      client.mutation(api.talks.archiveTalk, { talkId: seed.talkId }),
+    name: 'talks.archiveTalk',
+  },
+  {
+    call: (client, seed) =>
+      client.mutation(api.talks.createTalk, {
+        mediaUrl: MEDIA_URL,
+        speakerId: seed.speakerId,
+        title: 'A new talk',
+      }),
+    name: 'talks.createTalk',
+  },
+  {
+    call: (client, seed) =>
+      client.mutation(api.talks.destroyTalk, { talkId: seed.talkId }),
+    name: 'talks.destroyTalk',
+  },
+  {
+    call: (client, seed) =>
+      client.query(api.talks.getTalk, { id: seed.talkId }),
+    name: 'talks.getTalk',
+  },
+  {
+    call: (client) =>
+      client.query(api.talks.listAllTalks, {
+        paginationOpts,
+        status: 'all',
+      }),
+    name: 'talks.listAllTalks',
+  },
+  {
+    call: (client, seed) =>
+      client.query(api.talks.listTalkTopics, { talkId: seed.talkId }),
+    name: 'talks.listTalkTopics',
+  },
+  {
+    call: (client, seed) =>
+      client.mutation(api.talks.updateTalk, {
+        talkId: seed.talkId,
+        title: 'Updated talk',
+      }),
+    name: 'talks.updateTalk',
+  },
+  {
+    call: (client, seed) =>
+      client.mutation(api.topics.addTalkToTopic, {
+        talkId: seed.talkId,
+        topicId: seed.unusedTopicId,
+      }),
+    name: 'topics.addTalkToTopic',
+  },
+  {
+    call: (client) =>
+      client.mutation(api.topics.createTopic, { title: 'A new topic' }),
+    name: 'topics.createTopic',
+  },
+  {
+    call: (client, seed) =>
+      client.mutation(api.topics.destroyTopic, { id: seed.unusedTopicId }),
+    name: 'topics.destroyTopic',
+  },
+  {
+    call: (client, seed) =>
+      client.query(api.topics.getTopic, { id: seed.topicId }),
+    name: 'topics.getTopic',
+  },
+  {
+    call: (client) => client.query(api.topics.listAllTopics, {}),
+    name: 'topics.listAllTopics',
+  },
+  {
+    call: (client, seed) =>
+      client.mutation(api.topics.removeTalkFromTopic, {
+        talkId: seed.talkId,
+        topicId: seed.topicId,
+      }),
+    name: 'topics.removeTalkFromTopic',
+  },
+  {
+    call: (client, seed) =>
+      client.mutation(api.topics.updateTopic, {
+        id: seed.topicId,
+        title: 'Updated topic',
+      }),
+    name: 'topics.updateTopic',
+  },
+];
+
+describe('admin-gated content functions', () => {
+  it.each(gatedFunctions)(
+    '$name rejects signed-out and member callers, and allows admin',
+    async ({ call }) => {
+      const t = createConvexTest();
+      const seed = await seedCatalog(t);
+      const { asUser: asMember } = await signInAs(t, {
+        email: 'member@example.test',
+        name: 'Member',
+        role: 'user',
+      });
+      const { asUser: asAdmin } = await signInAs(t, {
+        email: 'admin@example.test',
+        name: 'Admin',
+        role: 'admin',
+      });
+
+      await expectRejected(call(t, seed), ErrorCodes.AUTH_REQUIRED);
+      await expectRejected(call(asMember, seed), ErrorCodes.FORBIDDEN);
+      await call(asAdmin, seed);
+    }
+  );
 });
 
 describe('per-user mutations stay on the signed-in user', () => {
   it('does not let one user remove another user favorite', async () => {
     const t = createConvexTest();
-    const { talkId } = await seedSpeakerAndTalk(t);
+    const { talkId } = await seedCatalog(t);
     const { asUser: asOwner } = await signInAs(t, {
       email: 'owner@example.test',
       name: 'Owner',
