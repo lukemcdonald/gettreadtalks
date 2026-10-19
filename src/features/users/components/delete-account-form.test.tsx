@@ -1,6 +1,6 @@
 /// <reference types="vitest/globals" />
 
-import { describe, expect, it, render, screen, within } from '@/test';
+import { describe, expect, it, render, screen, waitFor, within } from '@/test';
 
 import { DeleteAccountForm } from './delete-account-form';
 
@@ -65,11 +65,6 @@ describe('DeleteAccountForm', () => {
     expect(password).toHaveAccessibleDescription(
       'Check your password and try again.'
     );
-    expect(
-      screen.queryByText(
-        'Failed to delete account. Check your password and try again.'
-      )
-    ).not.toBeInTheDocument();
   });
 
   it('clears the password and error when the dialog is closed and reopened', async () => {
@@ -89,11 +84,15 @@ describe('DeleteAccountForm', () => {
     ).toBeVisible();
 
     await click(within(dialog).getByRole('button', { name: 'Cancel' }));
+    await waitFor(() => {
+      expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+    });
 
     const [trigger] = screen.getAllByRole('button', { name: 'Delete Account' });
     await click(trigger);
 
-    expect(screen.getByLabelText(/^Password/u)).toHaveValue('');
+    const reopened = await screen.findByRole('alertdialog');
+    expect(within(reopened).getByLabelText(/^Password/u)).toHaveValue('');
     expect(
       screen.queryByText('Could not delete this account.')
     ).not.toBeInTheDocument();

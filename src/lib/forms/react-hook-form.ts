@@ -1,9 +1,4 @@
-import type {
-  FieldPath,
-  FieldValues,
-  UseFormReset,
-  UseFormSetError,
-} from 'react-hook-form';
+import type { FieldPath, FieldValues, UseFormSetError } from 'react-hook-form';
 
 /**
  * Server errors returned from Server Actions.
@@ -48,20 +43,4 @@ export function setServerErrors<T extends FieldValues>(
       type: 'server',
     });
   }
-}
-
-/**
- * Clears a dialog or overlay form when it closes so reopen is empty.
- */
-export function resetFormOnClose<T extends FieldValues>(
-  form: { reset: UseFormReset<T> },
-  onOpenChange?: (open: boolean) => void
-) {
-  return (open: boolean) => {
-    if (!open) {
-      form.reset();
-    }
-
-    onOpenChange?.(open);
-  };
 }

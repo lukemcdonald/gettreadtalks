@@ -19,7 +19,7 @@ import {
 } from '@/components/ui';
 import { toastManager } from '@/components/ui/primitives/toast';
 import { deleteAccount } from '@/features/users/actions/delete-account';
-import { resetFormOnClose, setServerErrors } from '@/lib/forms/react-hook-form';
+import { setServerErrors } from '@/lib/forms/react-hook-form';
 import { captureException, formatErrorMessage } from '@/services/errors';
 
 interface DeleteFormValues {
@@ -52,7 +52,13 @@ export function DeleteAccountForm() {
   }
 
   return (
-    <AlertDialog onOpenChange={resetFormOnClose(form)}>
+    <AlertDialog
+      onOpenChangeComplete={(open) => {
+        if (!open) {
+          form.reset();
+        }
+      }}
+    >
       <AlertDialogTrigger
         render={<Button size="sm" variant="destructive-outline" />}
       >
