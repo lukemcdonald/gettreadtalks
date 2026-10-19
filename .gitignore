@@ -60,7 +60,6 @@ certificates
 convex/migration/data/
 
 # Agents
-/CLAUDE.md
 **/.agents/skills/*
 !**/.agents/skills/convex-*
 **/.claude/plans/
