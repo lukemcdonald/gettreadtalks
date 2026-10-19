@@ -15,7 +15,13 @@ Tokens and values live in `src/assets/theme.css` (`@theme`, `:root`, `.dark`). T
 
 ## Overview
 
-Quiet zinc editorial on [COSS UI](https://coss.com/ui) `base-nova`. Neutral surfaces, brand-red primary, Inter only. Video is framed, never free-floating. Light and dark share the same semantic tokens. Prefer stock COSS variants over custom styling.
+A sermon archive's reading room on [COSS UI](https://coss.com/ui) `base-nova`: plain zinc paper, white index cards, red ink used only for the brand and the next action, and the preacher's video framed and lifted as the one object with depth. Stock COSS first, so nothing competes with the talk.
+
+- **Depth:** Paper and cards are flat. Only a video or hero frame is lifted.
+- **Color:** There is one red, in the same place in light and dark. Everything else is zinc.
+- **Type:** One voice, Inter. Hierarchy comes from size and weight, never from a second face.
+- **Imagery:** The preachers are the imagery: their photo or their video. No illustration. Initials when there's no photo.
+- **Motion:** Hover feedback only, mostly color fades. Nothing enters on scroll.
 
 ## Colors
 
