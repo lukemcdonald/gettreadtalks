@@ -5,7 +5,7 @@
 }
 
 @utility card-interactive {
-  @apply isolate ring-1 ring-transparent transition duration-300;
+  @apply isolate ring-1 ring-transparent motion-safe:transition motion-safe:duration-300;
 
   &:hover {
     @apply ring-card shadow-md/3;
