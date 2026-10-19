@@ -20,3 +20,22 @@ describe('listCollectionSlugs', () => {
     expect(slugs).not.toContain(visibilitySlugs.unpublishedOnlyCollection);
   });
 });
+
+describe('getCollectionBySlug', () => {
+  it.fails('returns a collection with published talks and hides a collection whose talks are all unpublished', async () => {
+    const t = createConvexTest();
+    await seedVisibilityCatalog(t);
+
+    const published = await t.query(api.collections.getCollectionBySlug, {
+      slug: visibilitySlugs.publishedCollection,
+    });
+    const unpublishedOnly = await t.query(api.collections.getCollectionBySlug, {
+      slug: visibilitySlugs.unpublishedOnlyCollection,
+    });
+
+    expect(published?.collection.slug).toBe(
+      visibilitySlugs.publishedCollection
+    );
+    expect(unpublishedOnly).toBeNull();
+  });
+});

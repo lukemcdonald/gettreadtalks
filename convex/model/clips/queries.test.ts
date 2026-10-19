@@ -48,3 +48,20 @@ describe('listClipSlugs', () => {
     expect(slugs).not.toContain(visibilitySlugs.clipOnDraftTalk);
   });
 });
+
+describe('getClipBySlug', () => {
+  it.fails('returns a published clip on a published talk and hides a clip whose parent talk is unpublished', async () => {
+    const t = createConvexTest();
+    await seedVisibilityCatalog(t);
+
+    const published = await t.query(api.clips.getClipBySlug, {
+      slug: visibilitySlugs.clipOnPublishedTalk,
+    });
+    const unpublishedParent = await t.query(api.clips.getClipBySlug, {
+      slug: visibilitySlugs.clipOnDraftTalk,
+    });
+
+    expect(published?.clip.slug).toBe(visibilitySlugs.clipOnPublishedTalk);
+    expect(unpublishedParent).toBeNull();
+  });
+});
