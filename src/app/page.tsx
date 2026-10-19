@@ -6,8 +6,11 @@ import { Container, Section } from '@/components/ui';
 import { site } from '@/configs/site';
 import { SpeakerCard } from '@/features/speakers/components/speaker-card';
 import { loadFeaturedSpeakers } from '@/features/speakers/queries/load-featured-speakers';
+import { buildSpeakersPath } from '@/features/speakers/utils';
 import { TalkCard } from '@/features/talks/components/talk-card';
 import { loadFeaturedTalks } from '@/features/talks/queries/load-featured-talks';
+import { buildTalksPath } from '@/features/talks/utils';
+import { buildAbsoluteUrl } from '@/lib/entities/paths';
 
 function buildWebsiteJsonLd() {
   return {
@@ -20,7 +23,9 @@ function buildWebsiteJsonLd() {
       'query-input': 'required name=search_term_string',
       target: {
         '@type': 'EntryPoint',
-        urlTemplate: `${site.url}/talks?search={search_term_string}`,
+        urlTemplate: buildAbsoluteUrl(
+          `${buildTalksPath()}?search={search_term_string}`
+        ),
       },
     },
     url: site.url,
@@ -46,8 +51,11 @@ export default async function HomePage() {
               description={site.description}
               imageAlt="Billy Graham preaching"
               imageSrc="/billy-graham-preaching-header.jpg"
-              primaryAction={{ href: '/talks', label: 'Browse Talks' }}
-              secondaryAction={{ href: '/speakers', label: 'Explore Speakers' }}
+              primaryAction={{ href: buildTalksPath(), label: 'Browse Talks' }}
+              secondaryAction={{
+                href: buildSpeakersPath(),
+                label: 'Explore Speakers',
+              }}
               title="Workout your salvation."
             />
           </Container>
@@ -64,8 +72,11 @@ export default async function HomePage() {
                 </>
               }
               quickLinks={[
-                { href: '/talks', label: 'All Talks' },
-                { href: '/talks?featured=true', label: 'Featured Talks' },
+                { href: buildTalksPath(), label: 'All Talks' },
+                {
+                  href: buildTalksPath({ query: { featured: true } }),
+                  label: 'Featured Talks',
+                },
               ]}
               title="Featured Talks"
             >
@@ -82,8 +93,11 @@ export default async function HomePage() {
               columns={{ default: 1, lg: 3, md: 3, sm: 2, xl: 3 }}
               description="Have you listened to one of these faithful ministers of the Gospel?"
               quickLinks={[
-                { href: '/speakers', label: 'All Speakers' },
-                { href: '/speakers?sort=featured', label: 'Featured Speakers' },
+                { href: buildSpeakersPath(), label: 'All Speakers' },
+                {
+                  href: buildSpeakersPath({ query: { sort: 'featured' } }),
+                  label: 'Featured Speakers',
+                },
               ]}
               title="Featured Speakers"
             >

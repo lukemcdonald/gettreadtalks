@@ -5,6 +5,7 @@ import { MediaCardTitle } from '@/components/media-card';
 import { Card, CardDescription } from '@/components/ui';
 import { FauxLink } from '@/components/ui/link';
 import { CollectionCardSpeaker } from '@/features/collections/components/collection-card-speaker';
+import { buildCollectionPath } from '@/features/collections/utils';
 import { pluralize } from '@/utils';
 
 const EMPTY_SPEAKERS: Pick<
@@ -30,7 +31,7 @@ export function CollectionCard({
           <MediaCardTitle aria-label={collection.title}>
             <FauxLink
               data-testid="collection-card"
-              href={`/collections/${collection.slug}`}
+              href={buildCollectionPath(collection)}
             >
               {collection.title}
             </FauxLink>

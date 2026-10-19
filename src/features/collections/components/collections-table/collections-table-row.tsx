@@ -3,7 +3,7 @@ import type { Collection } from '@/features/collections/types';
 
 import { ManageCountCell, ManageRow } from '@/components/manage-table';
 import { CollectionActionsMenu } from '@/features/collections/components/collection-actions-menu';
-import { buildCollectionUrl } from '@/features/collections/utils';
+import { buildCollectionPath } from '@/features/collections/utils';
 import { buildEntityEditPath } from '@/lib/entities/paths';
 
 interface CollectionsTableRowProps {
@@ -19,7 +19,7 @@ export function CollectionsTableRow({
 }: CollectionsTableRowProps) {
   const editPath = buildEntityEditPath('collections', collection._id);
   const viewUrl =
-    status === 'published' ? buildCollectionUrl(collection.slug) : undefined;
+    status === 'published' ? buildCollectionPath(collection) : undefined;
 
   return (
     <ManageRow

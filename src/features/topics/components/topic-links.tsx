@@ -1,7 +1,7 @@
 import type { Topic } from '@/features/topics/types';
 
 import { Link } from '@/components/ui/link';
-import { buildTopicUrl } from '@/features/topics/utils';
+import { buildTopicPath } from '@/features/topics/utils';
 
 interface TopicLinksProps {
   topics: Topic[];
@@ -13,7 +13,7 @@ export function TopicLinks({ topics }: TopicLinksProps) {
       {topics.map((topic) => (
         <Link
           className="bg-muted text-foreground hover:bg-muted/80 inline-block rounded-full px-3 py-1.5 text-sm transition-colors"
-          href={buildTopicUrl(topic.slug)}
+          href={buildTopicPath(topic)}
           key={topic._id}
         >
           {topic.title}

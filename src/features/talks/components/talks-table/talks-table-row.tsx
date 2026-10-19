@@ -3,7 +3,7 @@ import type { TalkWithSpeakerAndTopics } from '@/features/talks/types';
 import { getHoverItems, ManageRow } from '@/components/manage-table';
 import { getSpeakerName } from '@/features/speakers/utils';
 import { TalkActionsMenu } from '@/features/talks/components/talk-actions-menu';
-import { buildTalkUrl } from '@/features/talks/utils';
+import { buildTalkPath } from '@/features/talks/utils';
 import { buildEntityEditPath } from '@/lib/entities/paths';
 
 interface TalksTableRowProps {
@@ -14,7 +14,7 @@ export function TalksTableRow({ talk }: TalksTableRowProps) {
   const editPath = buildEntityEditPath('talks', talk._id);
   const publicPath =
     talk.status === 'published' && talk.speaker
-      ? buildTalkUrl(talk.speaker.slug, talk.slug)
+      ? buildTalkPath(talk)
       : undefined;
 
   return (

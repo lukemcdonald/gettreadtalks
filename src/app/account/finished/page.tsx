@@ -6,6 +6,7 @@ import {
   EmptyHeader,
   EmptyTitle,
 } from '@/components/ui';
+import { buildTalkPath } from '@/features/talks/utils';
 import { loadUserFinishedTalks } from '@/features/users/queries/load-user-finished-talks';
 
 import { AccountTable } from '../_components/account-table';
@@ -36,7 +37,7 @@ export default async function FinishedPage() {
           <AccountTable label="Talk">
             {talks.map((talk) => (
               <FinishedTalkRow
-                href={`/talks/${talk.speaker?.slug}/${talk.slug}`}
+                href={buildTalkPath(talk)}
                 key={talk._id}
                 speaker={talk.speaker}
                 talkId={talk._id}

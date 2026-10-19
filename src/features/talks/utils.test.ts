@@ -1,6 +1,34 @@
 import { describe, expect, it } from '@/test';
 
-import { buildTalkListItemsJsonLd, formatTalkMetaDescription } from './utils';
+import {
+  buildTalkListItemsJsonLd,
+  buildTalkPath,
+  buildTalksPath,
+  formatTalkMetaDescription,
+} from './utils';
+
+describe('buildTalkPath', () => {
+  it('nests the talk under the speaker slug', () => {
+    expect(
+      buildTalkPath({
+        speaker: { slug: 'lloyd-jones' },
+        slug: 'the-cross',
+      })
+    ).toBe('/talks/lloyd-jones/the-cross');
+  });
+
+  it('falls back to the talk slug when speaker is missing', () => {
+    expect(buildTalkPath({ slug: 'orphan' })).toBe('/talks/orphan');
+  });
+});
+
+describe('buildTalksPath', () => {
+  it('appends a featured query when requested', () => {
+    expect(buildTalksPath({ query: { featured: true } })).toBe(
+      '/talks?featured=true'
+    );
+  });
+});
 
 describe('buildTalkListItemsJsonLd', () => {
   it('uses a talk url when the speaker is present', () => {

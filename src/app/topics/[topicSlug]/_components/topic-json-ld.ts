@@ -1,6 +1,6 @@
-import { site } from '@/configs/site';
 import { buildTalkListItemsJsonLd } from '@/features/talks/utils';
-import { buildTopicUrl } from '@/features/topics/utils';
+import { buildTopicPath } from '@/features/topics/utils';
+import { buildAbsoluteUrl } from '@/lib/entities/paths';
 
 interface TopicJsonLdInput {
   description?: string;
@@ -21,6 +21,6 @@ export function buildTopicJsonLd({
     description,
     itemListElement: buildTalkListItemsJsonLd(talks),
     name: title,
-    url: `${site.url}${buildTopicUrl(topicSlug)}`,
+    url: buildAbsoluteUrl(buildTopicPath({ slug: topicSlug })),
   };
 }

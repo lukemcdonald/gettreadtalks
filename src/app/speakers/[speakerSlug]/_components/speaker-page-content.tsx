@@ -16,7 +16,7 @@ import { JsonLd } from '@/components/json-ld';
 import { EditorialProfileLayout } from '@/components/layouts';
 import { loadSpeakerBySlug } from '@/features/speakers/queries/load-speaker-by-slug';
 import {
-  buildSpeakerUrl,
+  buildSpeakerPath,
   buildSpeakersPath,
   getSpeakerName,
 } from '@/features/speakers/utils';
@@ -54,7 +54,7 @@ async function SpeakerHeroSection({ speakerSlug }: { speakerSlug: string }) {
   const name = getSpeakerName(speaker);
   const segments = [
     { href: buildSpeakersPath(), label: 'Speakers' },
-    { href: buildSpeakerUrl(speakerSlug), label: name },
+    { href: buildSpeakerPath(speaker), label: name },
   ];
 
   return (

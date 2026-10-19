@@ -1,15 +1,19 @@
 import { FooterColumn } from '@/components/site-footer/footer-column';
 import { FooterLink } from '@/components/site-footer/footer-link';
 import { site } from '@/configs/site';
+import { buildClipsPath } from '@/features/clips/utils';
+import { buildCollectionsPath } from '@/features/collections/utils';
+import { buildSpeakersPath } from '@/features/speakers/utils';
+import { buildTalksPath } from '@/features/talks/utils';
 
 export function FooterNav() {
   return (
     <div className="grid grid-cols-2 gap-8 sm:grid-cols-4 lg:grid-cols-5">
       <FooterColumn title="Engage">
-        <FooterLink href="/talks">Talks</FooterLink>
-        <FooterLink href="/speakers">Speakers</FooterLink>
-        <FooterLink href="/collections">Collections</FooterLink>
-        <FooterLink href="/clips">Clips</FooterLink>
+        <FooterLink href={buildTalksPath()}>Talks</FooterLink>
+        <FooterLink href={buildSpeakersPath()}>Speakers</FooterLink>
+        <FooterLink href={buildCollectionsPath()}>Collections</FooterLink>
+        <FooterLink href={buildClipsPath()}>Clips</FooterLink>
       </FooterColumn>
 
       <FooterColumn title="General">

@@ -7,8 +7,8 @@ import type { ReactNode } from 'react';
 import { MediaCard } from '@/components/media-card';
 import { Link } from '@/components/ui/link';
 import { SpeakerAvatar } from '@/features/speakers/components/speaker-avatar';
-import { getSpeakerName } from '@/features/speakers/utils';
-import { buildTalkUrl } from '@/features/talks/utils';
+import { buildSpeakerPath, getSpeakerName } from '@/features/speakers/utils';
+import { buildTalkPath } from '@/features/talks/utils';
 
 interface TalkCardProps {
   speaker?: Pick<
@@ -26,7 +26,10 @@ function SpeakerLink({
   slug: string;
 }) {
   return (
-    <Link className="relative z-10 hover:underline" href={`/speakers/${slug}`}>
+    <Link
+      className="relative z-10 hover:underline"
+      href={buildSpeakerPath({ slug })}
+    >
       {children}
     </Link>
   );
@@ -37,9 +40,7 @@ export function TalkCard({ speaker, talk }: TalkCardProps) {
   const accessibleLabel = speakerName
     ? `${talk.title} by ${speakerName}`
     : talk.title;
-  const talkHref = speaker?.slug
-    ? buildTalkUrl(speaker.slug, talk.slug)
-    : `/talks/${talk.slug}`;
+  const talkHref = buildTalkPath({ speaker, slug: talk.slug });
 
   function getSubtitle() {
     if (talk.scripture) {

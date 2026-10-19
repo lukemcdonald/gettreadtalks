@@ -4,7 +4,7 @@ import type { Clip } from '@/features/clips/types';
 import type { Speaker } from '@/features/speakers/types';
 
 import { MediaCard } from '@/components/media-card';
-import { buildClipUrl } from '@/features/clips/utils';
+import { buildClipPath } from '@/features/clips/utils';
 import { SpeakerAvatar } from '@/features/speakers/components/speaker-avatar';
 import { getSpeakerName } from '@/features/speakers/utils';
 
@@ -23,7 +23,7 @@ export function ClipCard({ clip, speaker }: ClipCardProps) {
     <MediaCard
       ariaLabel={accessibleLabel}
       className="items-center"
-      href={buildClipUrl(clip.slug)}
+      href={buildClipPath(clip)}
       media={speaker ? <SpeakerAvatar speaker={speaker} /> : undefined}
       subtitle={speakerName}
       title={clip.title}

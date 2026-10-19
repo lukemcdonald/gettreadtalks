@@ -3,7 +3,7 @@ import type { Topic } from '@/features/topics/types';
 
 import { FeaturedGrid } from '@/components/featured-grid';
 import { TalkCard } from '@/features/talks/components/talk-card';
-import { buildTopicUrl } from '@/features/topics/utils';
+import { buildTopicPath } from '@/features/topics/utils';
 
 interface TopicRelatedTalksProps {
   talks: TalkWithSpeaker[];
@@ -22,7 +22,7 @@ function getRelatedTopicSection(topic?: Topic) {
     description: `Enjoy more talks on ${topic.title}.`,
     quickLinks: [
       {
-        href: buildTopicUrl(topic.slug),
+        href: buildTopicPath(topic),
         label: 'View topic',
       },
     ],

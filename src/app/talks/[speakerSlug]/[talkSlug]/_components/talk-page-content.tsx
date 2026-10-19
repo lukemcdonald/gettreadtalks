@@ -13,7 +13,7 @@ import { JsonLd } from '@/components/json-ld';
 import { EditorialProfileLayout } from '@/components/layouts';
 import { loadTalkBySlug } from '@/features/talks/queries/load-talk-by-slug';
 import { loadTalkBySlugAdmin } from '@/features/talks/queries/load-talk-by-slug-admin';
-import { buildTalkUrl, buildTalksPath } from '@/features/talks/utils';
+import { buildTalkPath, buildTalksPath } from '@/features/talks/utils';
 import { buildBreadcrumbJsonLd } from '@/lib/json-ld';
 
 type TalkBySlug = NonNullable<Awaited<ReturnType<typeof loadTalkBySlug>>>;
@@ -35,7 +35,7 @@ function TalkDetail({ speakerSlug, talkResult, talkSlug }: TalkDetailProps) {
   const { clips, collection, speaker, talk, topics } = talkResult;
   const segments = [
     { href: buildTalksPath(), label: 'Talks' },
-    { href: buildTalkUrl(speakerSlug, talkSlug), label: talk.title },
+    { href: buildTalkPath({ speaker, slug: talk.slug }), label: talk.title },
   ];
 
   return (

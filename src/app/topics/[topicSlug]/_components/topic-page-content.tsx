@@ -16,7 +16,7 @@ import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { TalksListSkeleton } from '@/features/talks/components/talks-list-skeleton';
 import { loadTopicBySlug } from '@/features/topics/queries/load-topic-by-slug';
-import { buildTopicUrl, buildTopicsPath } from '@/features/topics/utils';
+import { buildTopicPath, buildTopicsPath } from '@/features/topics/utils';
 import { buildBreadcrumbJsonLd } from '@/lib/json-ld';
 
 interface TopicPageContentProps {
@@ -40,7 +40,7 @@ async function TopicHeader({ topicSlug }: { topicSlug: string }) {
   const description = formatTopicPageDescription(topic.description, totalTalks);
   const segments = [
     { href: buildTopicsPath(), label: 'Topics' },
-    { href: buildTopicUrl(topicSlug), label: topic.title },
+    { href: buildTopicPath(topic), label: topic.title },
   ];
 
   return (

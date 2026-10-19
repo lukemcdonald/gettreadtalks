@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { SidebarContent } from '@/components/sidebar-content';
 import { Link } from '@/components/ui/link';
 import { SearchInput } from '@/components/ui/search-input';
+import { buildTopicPath } from '@/features/topics/utils';
 
 interface TopicSidebarProps {
   topicSlug: string;
@@ -24,7 +25,7 @@ export function TopicSidebar({ topicSlug }: TopicSidebarProps) {
       {hasActiveFilters && (
         <Link
           className="text-primary text-sm hover:underline"
-          href={`/topics/${topicSlug}`}
+          href={buildTopicPath({ slug: topicSlug })}
         >
           Clear filters
         </Link>

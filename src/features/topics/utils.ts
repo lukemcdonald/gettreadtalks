@@ -1,5 +1,7 @@
-export function buildTopicUrl(topicSlug: string) {
-  return `/topics/${topicSlug}`;
+import type { Topic } from '@/features/topics/types';
+
+export function buildTopicPath(topic: Pick<Topic, 'slug'>) {
+  return `/topics/${topic.slug}`;
 }
 
 export function buildTopicsPath() {

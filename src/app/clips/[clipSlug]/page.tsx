@@ -6,7 +6,7 @@ import { buildClipJsonLd } from '@/app/clips/[clipSlug]/_components/clip-json-ld
 import { JsonLd } from '@/components/json-ld';
 import { EditorialProfileLayout } from '@/components/layouts';
 import { loadClipBySlug } from '@/features/clips/queries/load-clip-by-slug';
-import { buildClipUrl, buildClipsPath } from '@/features/clips/utils';
+import { buildClipPath, buildClipsPath } from '@/features/clips/utils';
 import { getSpeakerName } from '@/features/speakers/utils';
 import { buildBreadcrumbJsonLd } from '@/lib/json-ld';
 import { buildPageMetadata } from '@/lib/metadata';
@@ -32,7 +32,7 @@ export async function generateMetadata({
   const speakerName = getSpeakerName(speaker);
 
   return buildPageMetadata({
-    canonical: buildClipUrl(clipSlug),
+    canonical: buildClipPath(clip),
     description:
       clip.description ??
       (speakerName ? `A clip from ${speakerName}.` : undefined),
@@ -51,7 +51,7 @@ export default async function ClipPage({ params }: ClipPageProps) {
   const { clip, speaker, talk } = data;
   const segments = [
     { href: buildClipsPath(), label: 'Clips' },
-    { href: buildClipUrl(clip.slug), label: clip.title },
+    { href: buildClipPath(clip), label: clip.title },
   ];
 
   return (

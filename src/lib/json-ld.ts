@@ -1,4 +1,4 @@
-import { site } from '@/configs/site';
+import { buildAbsoluteUrl } from '@/lib/entities/paths';
 
 interface BreadcrumbSegment {
   href?: string;
@@ -17,7 +17,7 @@ export function buildBreadcrumbJsonLd(
     '@type': 'BreadcrumbList',
     itemListElement: items.map((segment, index) => ({
       '@type': 'ListItem' as const,
-      ...(segment.href && { item: `${site.url}${segment.href}` }),
+      ...(segment.href && { item: buildAbsoluteUrl(segment.href) }),
       name: segment.label,
       position: index + 1,
     })),

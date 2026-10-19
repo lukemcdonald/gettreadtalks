@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { ContentActionsGroup } from '@/components/actions-group';
 import { useArchiveTalk } from '@/features/talks/hooks/use-archive-talk';
 import { useDestroyTalk } from '@/features/talks/hooks/use-destroy-talk';
+import { buildTalksPath } from '@/features/talks/utils';
 import { buildAdminListPath } from '@/lib/entities/paths';
 
 interface TalkActionsMenuProps {
@@ -20,7 +21,7 @@ export function TalkActionsMenu({ talk, talkUrl }: TalkActionsMenuProps) {
 
   const { mutateAsync: archiveTalk } = useArchiveTalk();
   const { mutateAsync: destroyTalk } = useDestroyTalk({
-    onSuccess: () => router.push('/talks'),
+    onSuccess: () => router.push(buildTalksPath()),
   });
 
   const handleArchive = async () => {

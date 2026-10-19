@@ -1,3 +1,5 @@
+import { site } from '@/configs/site';
+
 export const ACCOUNT_PATH = '/account';
 export const MANAGE_PATH = '/manage';
 
@@ -11,6 +13,12 @@ export const ADMIN_LIST_PATHS = {
 
 export type AdminEntity = keyof typeof ADMIN_LIST_PATHS;
 
+type PathQueryValue = boolean | number | string;
+
+export function buildAbsoluteUrl(path: string) {
+  return `${site.url}${path}`;
+}
+
 export function buildAdminListPath(entity: AdminEntity) {
   return ADMIN_LIST_PATHS[entity];
 }
@@ -19,18 +27,40 @@ export function getLoginRedirect(path: string) {
   return `/login?redirect=${encodeURIComponent(path)}`;
 }
 
+export function buildPathQuery(
+  query?: Record<string, PathQueryValue | undefined>
+) {
+  if (!query) {
+    return '';
+  }
+
+  const params = new URLSearchParams();
+
+  for (const key of Object.keys(query).toSorted()) {
+    const value = query[key];
+
+    if (value === undefined) {
+      continue;
+    }
+
+    params.set(key, String(value));
+  }
+
+  const serialized = params.toString();
+
+  if (!serialized) {
+    return '';
+  }
+
+  return `?${serialized}`;
+}
+
 export function buildEntityEditPath(
   entity: AdminEntity,
   id: string,
   query?: { status?: 'archived' }
 ) {
-  const path = `/${entity}/edit/${id}`;
-
-  if (query?.status === 'archived') {
-    return `${path}?status=archived`;
-  }
-
-  return path;
+  return `/${entity}/edit/${id}${buildPathQuery(query)}`;
 }
 
 export function buildEntityNewPath(entity: AdminEntity) {

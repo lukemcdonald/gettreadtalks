@@ -1,8 +1,8 @@
 import { buildMediaJsonLd } from '@/components/media-embed/utils';
-import { site } from '@/configs/site';
-import { buildClipUrl } from '@/features/clips/utils';
+import { buildClipPath } from '@/features/clips/utils';
 import { getSpeakerName } from '@/features/speakers/utils';
-import { buildTalkUrl } from '@/features/talks/utils';
+import { buildTalkPath } from '@/features/talks/utils';
+import { buildAbsoluteUrl } from '@/lib/entities/paths';
 
 interface ClipJsonLdInput {
   clip: {
@@ -29,7 +29,7 @@ export function buildClipJsonLd({ clip, speaker, talk }: ClipJsonLdInput) {
     ...buildMediaJsonLd(clip.mediaUrl),
     description: clip.description,
     name: clip.title,
-    url: `${site.url}${buildClipUrl(clip.slug)}`,
+    url: buildAbsoluteUrl(buildClipPath(clip)),
     ...(speakerName && { creator: { '@type': 'Person', name: speakerName } }),
     ...(clip.publishedAt && {
       uploadDate: new Date(clip.publishedAt).toISOString(),
@@ -39,7 +39,7 @@ export function buildClipJsonLd({ clip, speaker, talk }: ClipJsonLdInput) {
         isPartOf: {
           '@type': 'CreativeWork',
           name: talk.title,
-          url: `${site.url}${buildTalkUrl(speaker.slug, talk.slug)}`,
+          url: buildAbsoluteUrl(buildTalkPath({ speaker, slug: talk.slug })),
         },
       }),
   };

@@ -4,6 +4,7 @@ import type { Speaker } from '@/features/speakers/types';
 import { GridList } from '@/components/grid-list';
 import { ListEmpty } from '@/components/list-empty';
 import { CollectionCard } from '@/features/collections/components/collection-card';
+import { buildCollectionsPath } from '@/features/collections/utils';
 
 interface CollectionsContentProps {
   collections: {
@@ -25,7 +26,7 @@ export function CollectionsContent({
   if (collections.length === 0) {
     return (
       <ListEmpty
-        clearPath="/collections"
+        clearPath={buildCollectionsPath()}
         description="Check back later for more collections."
         filteredDescription="Try adjusting your filters."
         hasActiveFilters={hasActiveFilters}

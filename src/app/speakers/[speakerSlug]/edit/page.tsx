@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 
 import { loadSpeakerBySlug } from '@/features/speakers/queries/load-speaker-by-slug';
+import { buildSpeakerPath } from '@/features/speakers/utils';
 import { redirectPublicEdit } from '@/lib/entities/redirect-public-edit';
 
 interface PageProps {
@@ -18,6 +19,6 @@ export default async function Page({ params }: PageProps) {
   await redirectPublicEdit({
     entity: 'speakers',
     id: data.speaker._id,
-    publicPath: `/speakers/${speakerSlug}`,
+    publicPath: buildSpeakerPath(data.speaker),
   });
 }

@@ -5,7 +5,7 @@ import { AdminEditButton } from '@/components/admin-edit-button';
 import { ArchiveBackLink } from '@/components/archive-back-link';
 import { HeroTitle } from '@/components/hero';
 import { Link } from '@/components/ui/link';
-import { buildSpeakerUrl, getSpeakerName } from '@/features/speakers/utils';
+import { buildSpeakerPath, getSpeakerName } from '@/features/speakers/utils';
 import { buildTalksPath } from '@/features/talks/utils';
 
 interface TalkHeroDetailsProps {
@@ -30,10 +30,7 @@ export function TalkHeroDetails({ speaker, talk }: TalkHeroDetailsProps) {
       {speaker && (
         <p className="text-muted-foreground text-lg">
           by{' '}
-          <Link
-            className="hover:underline"
-            href={buildSpeakerUrl(speaker.slug)}
-          >
+          <Link className="hover:underline" href={buildSpeakerPath(speaker)}>
             {speakerName}
           </Link>
         </p>

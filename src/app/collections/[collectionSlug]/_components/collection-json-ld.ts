@@ -1,6 +1,6 @@
-import { site } from '@/configs/site';
-import { buildCollectionUrl } from '@/features/collections/utils';
+import { buildCollectionPath } from '@/features/collections/utils';
 import { buildTalkListItemsJsonLd } from '@/features/talks/utils';
+import { buildAbsoluteUrl } from '@/lib/entities/paths';
 
 interface CollectionJsonLdInput {
   collectionSlug: string;
@@ -21,6 +21,6 @@ export function buildCollectionJsonLd({
     description,
     itemListElement: buildTalkListItemsJsonLd(talks),
     name: title,
-    url: `${site.url}${buildCollectionUrl(collectionSlug)}`,
+    url: buildAbsoluteUrl(buildCollectionPath({ slug: collectionSlug })),
   };
 }

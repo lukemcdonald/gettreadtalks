@@ -4,8 +4,9 @@ import { CenteredLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { CodeBlock } from '@/components/ui';
 import { site } from '@/configs/site';
+import { buildAbsoluteUrl } from '@/lib/entities/paths';
 
-const MCP_URL = `${site.url}/mcp`;
+const MCP_URL = buildAbsoluteUrl('/mcp');
 const PAGE_DESCRIPTION =
   'Connect Claude, ChatGPT, or Cursor to search talks, speakers, topics, collections, and clips.';
 const PAGE_TITLE = 'Ask AI about TREAD talks';
