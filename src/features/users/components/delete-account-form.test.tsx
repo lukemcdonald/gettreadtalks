@@ -46,6 +46,32 @@ describe('DeleteAccountForm', () => {
     expect(screen.queryByText(/Check your password/u)).not.toBeInTheDocument();
   });
 
+  it('attaches a password rejection to the password field', async () => {
+    deleteAccount.mockResolvedValue({
+      errors: { password: 'Check your password and try again.' },
+      success: false,
+    });
+
+    const { click, type } = await openDialog();
+    const dialog = await screen.findByRole('alertdialog');
+    const password = within(dialog).getByLabelText(/^Password/u);
+
+    await type(password, 'wrong-password');
+    await click(within(dialog).getByRole('button', { name: 'Delete Account' }));
+
+    expect(
+      await within(dialog).findByText('Check your password and try again.')
+    ).toBeVisible();
+    expect(password).toHaveAccessibleDescription(
+      'Check your password and try again.'
+    );
+    expect(
+      screen.queryByText(
+        'Failed to delete account. Check your password and try again.'
+      )
+    ).not.toBeInTheDocument();
+  });
+
   it('clears the password and error when the dialog is closed and reopened', async () => {
     deleteAccount.mockResolvedValue({
       errors: { _form: 'Could not delete this account.' },

@@ -9,7 +9,6 @@ import {
   throwValidationError,
 } from '../../lib/errors';
 import { reportSentryException } from '../../lib/sentry';
-import { formatErrorMessage } from '../../lib/utils';
 import { requireAdmin } from '../auth/roles';
 import { getUserId } from '../auth/utils';
 import { destroyUserOwnedRows } from './utils';
@@ -307,7 +306,11 @@ export const deleteUser = mutation({
       await throwMappedDeleteUserError(error);
     }
 
-    await destroyUserOwnedRows(ctx, userId);
+    try {
+      await destroyUserOwnedRows(ctx, userId);
+    } catch (error) {
+      await throwUnexpectedDeleteUserError(error, 'cascade');
+    }
 
     return null;
   },
@@ -390,9 +393,16 @@ export const setUserRole = mutation({
 async function throwMappedDeleteUserError(error: unknown): Promise<never> {
   throwExpectedDeleteUserError(getAuthErrorFingerprint(error));
 
+  return await throwUnexpectedDeleteUserError(error, 'auth');
+}
+
+async function throwUnexpectedDeleteUserError(
+  error: unknown,
+  step: 'auth' | 'cascade'
+): Promise<never> {
   await reportSentryException({
-    message: `Delete account failed: ${formatErrorMessage(error)}`,
-    tags: { mutation: 'deleteUser' },
+    message: `Delete account failed (${step}): ${getAuthErrorFingerprint(error)}`,
+    tags: { mutation: 'deleteUser', step },
   });
 
   throwConvexError(500, 'Something went wrong. Please try again.');
@@ -416,7 +426,7 @@ function throwExpectedDeleteUserError(fingerprint: string) {
       },
     },
     {
-      codes: ['SESSION_EXPIRED', 'UNAUTHORIZED'],
+      codes: ['SESSION_EXPIRED', 'SESSION_NOT_FRESH', 'UNAUTHORIZED'],
       throwError: () => {
         throwAuthRequired(
           'Your session expired. Sign in again to delete your account.'
