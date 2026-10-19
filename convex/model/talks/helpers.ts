@@ -87,6 +87,7 @@ export async function listPublishedTalksForTopics(
       const joins = await ctx.db
         .query('talksOnTopics')
         .withIndex('by_topicId', (q) => q.eq('topicId', topicId))
+        .order('desc')
         .take(takePerTopic);
 
       const talks = await Promise.all(
