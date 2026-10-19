@@ -3,7 +3,7 @@ import { buildTalkListItemsJsonLd } from '@/features/talks/utils';
 import { buildTopicUrl } from '@/features/topics/utils';
 
 interface TopicJsonLdInput {
-  description: string;
+  description?: string;
   talks: Parameters<typeof buildTalkListItemsJsonLd>[0];
   title: string;
   topicSlug: string;

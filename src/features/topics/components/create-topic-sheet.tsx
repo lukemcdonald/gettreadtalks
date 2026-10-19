@@ -7,9 +7,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 
-import { FormSheet, TextField } from '@/components/ui';
+import { FormSheet } from '@/components/ui';
 import { toastManager } from '@/components/ui/primitives/toast';
 import { createTopicAction } from '@/features/topics/actions/create-topic';
+import { TopicFormFields } from '@/features/topics/components/topic-form-fields';
 import { topicFormSchema } from '@/features/topics/schemas/topic-form';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
 
@@ -28,6 +29,7 @@ export function CreateTopicSheet({
 
   const form = useForm<TopicFormData>({
     defaultValues: {
+      description: '',
       title: '',
     },
     mode: 'onBlur',
@@ -65,16 +67,7 @@ export function CreateTopicSheet({
       submitLabel="Create Topic"
       title="Add New Topic"
     >
-      <div className="space-y-4">
-        <TextField
-          control={form.control}
-          description="A short, descriptive name for this topic"
-          label="Title"
-          name="title"
-          placeholder="Faith"
-          required
-        />
-      </div>
+      <TopicFormFields control={form.control} />
     </FormSheet>
   );
 }

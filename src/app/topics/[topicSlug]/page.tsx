@@ -4,7 +4,7 @@ import { Suspense } from 'react';
 
 import { TopicPageContent } from '@/app/topics/[topicSlug]/_components/topic-page-content';
 import { TopicPageSkeleton } from '@/app/topics/[topicSlug]/_components/topic-page-skeleton';
-import { formatTopicTalkCountPhrase } from '@/app/topics/[topicSlug]/_components/topic-talks-description';
+import { formatTopicMetaDescription } from '@/app/topics/[topicSlug]/_components/topic-talks-description';
 import { loadTopicBySlug } from '@/features/topics/queries/load-topic-by-slug';
 import { buildTopicUrl } from '@/features/topics/utils';
 import { buildPageMetadata } from '@/lib/metadata';
@@ -36,7 +36,11 @@ export async function generateMetadata({
 
   return buildPageMetadata({
     canonical: buildTopicUrl(topicSlug),
-    description: `Elevate your spiritual heartbeat with ${formatTopicTalkCountPhrase(totalTalks)} on ${topic.title}.`,
+    description: formatTopicMetaDescription(
+      topic.description,
+      topic.title,
+      totalTalks
+    ),
     title: topic.title,
   });
 }

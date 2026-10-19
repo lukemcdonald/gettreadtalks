@@ -5,6 +5,7 @@ import { timestampFields } from '../../lib/validators';
 
 export const topicFields = {
   ...timestampFields,
+  description: v.optional(v.string()),
   slug: v.string(),
   title: v.string(),
 };

@@ -7,9 +7,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 
-import { FormSheet, TextField } from '@/components/ui';
+import { FormSheet } from '@/components/ui';
 import { toastManager } from '@/components/ui/primitives/toast';
 import { updateTopicAction } from '@/features/topics/actions/update-topic';
+import { TopicFormFields } from '@/features/topics/components/topic-form-fields';
 import { topicFormSchema } from '@/features/topics/schemas/topic-form';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
 
@@ -17,7 +18,7 @@ interface EditTopicSheetProps {
   onOpenChange: (open: boolean) => void;
   onTopicUpdated: (topicId: TopicId) => void;
   open: boolean;
-  topic: Pick<Topic, '_id' | 'title'> | null;
+  topic: Pick<Topic, '_id' | 'description' | 'title'>;
 }
 
 export function EditTopicSheet({
@@ -32,15 +33,12 @@ export function EditTopicSheet({
     mode: 'onBlur',
     resolver: zodResolver(topicFormSchema),
     values: {
-      title: topic?.title ?? '',
+      description: topic.description ?? '',
+      title: topic.title,
     },
   });
 
   const handleSubmit = form.handleSubmit((data) => {
-    if (!topic) {
-      return;
-    }
-
     startTransition(async () => {
       const result = await updateTopicAction(data, topic._id);
 
@@ -55,10 +53,6 @@ export function EditTopicSheet({
     });
   });
 
-  if (!topic) {
-    return null;
-  }
-
   return (
     <FormSheet
       error={form.formState.errors.root}
@@ -69,16 +63,7 @@ export function EditTopicSheet({
       submitLabel="Save Changes"
       title="Edit Topic"
     >
-      <div className="space-y-4">
-        <TextField
-          control={form.control}
-          description="A short, descriptive name for this topic"
-          label="Title"
-          name="title"
-          placeholder="Faith"
-          required
-        />
-      </div>
+      <TopicFormFields control={form.control} />
     </FormSheet>
   );
 }

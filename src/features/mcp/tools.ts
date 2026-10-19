@@ -133,6 +133,7 @@ interface CollectionRecord {
 }
 
 interface TopicRecord {
+  description?: string;
   slug: string;
   title: string;
 }
@@ -261,6 +262,7 @@ function formatCollection(collection: CollectionRecord) {
 
 function formatTopic(topic: TopicRecord, talkCount?: number) {
   return {
+    description: topic.description,
     slug: topic.slug,
     talkCount,
     title: topic.title,

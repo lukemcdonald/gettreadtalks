@@ -29,6 +29,7 @@ export async function updateTopicAction(
 
   try {
     await fetchAuthMutation(api.topics.updateTopic, {
+      description: parsed.data.description,
       id: topicId,
       title: parsed.data.title,
     });

@@ -7,7 +7,7 @@ import { mutation } from '../../_generated/server';
 import { throwNotFound, throwValidationError } from '../../lib/errors';
 import { generateSlug } from '../../lib/utils';
 import { requireAuth } from '../auth/utils';
-import { topicStatus } from './validators';
+import { toTopicUpdates } from './updates';
 
 /**
  * Add a talk to a topic.
@@ -60,6 +60,7 @@ export const addTalkToTopic = mutation({
  */
 export const createTopic = mutation({
   args: {
+    description: v.optional(v.string()),
     title: v.string(),
   },
   handler: async (ctx, args) => {
@@ -155,14 +156,13 @@ export const updateTopic = mutation({
   args: {
     description: v.optional(v.string()),
     id: v.id('topics'),
-    status: v.optional(topicStatus),
     title: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     await requireAuth(ctx);
 
     const { id, ...rest } = args;
-    const updates: Partial<Doc<'topics'>> = rest;
+    const updates: Partial<Doc<'topics'>> = toTopicUpdates(rest);
 
     const topic = await ctx.db.get('topics', id);
 
