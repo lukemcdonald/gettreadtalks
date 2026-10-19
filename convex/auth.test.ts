@@ -1,12 +1,40 @@
-import { describe, expect, it, vi } from 'vitest';
+import type { DataModel } from './_generated/dataModel';
+import type { GenericCtx } from '@convex-dev/better-auth';
+
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { components } from './_generated/api';
 import { createAuth } from './auth';
 import { createConvexTest } from './test.setup';
 
+const ORIGINAL_CLOUD_URL = process.env.CONVEX_CLOUD_URL;
+const ORIGINAL_SITE_URL = process.env.SITE_URL;
 const SIGN_UP_EMAIL = 'welcome-signup@example.com';
 const SIGN_UP_NAME = 'Welcome User';
 const SIGN_UP_PASSWORD = 'password123';
+
+afterEach(() => {
+  if (ORIGINAL_CLOUD_URL === undefined) {
+    delete process.env.CONVEX_CLOUD_URL;
+  } else {
+    process.env.CONVEX_CLOUD_URL = ORIGINAL_CLOUD_URL;
+  }
+
+  if (ORIGINAL_SITE_URL === undefined) {
+    delete process.env.SITE_URL;
+  } else {
+    process.env.SITE_URL = ORIGINAL_SITE_URL;
+  }
+});
+
+describe('createAuth', () => {
+  it('evaluates during Convex analysis without SITE_URL', () => {
+    process.env.CONVEX_CLOUD_URL = 'https://preview.convex.cloud';
+    delete process.env.SITE_URL;
+
+    expect(() => createAuth({} as GenericCtx<DataModel>)).not.toThrow();
+  });
+});
 
 describe('welcome email on sign-up', () => {
   it('schedules one welcome email and still creates the user if send fails', async () => {

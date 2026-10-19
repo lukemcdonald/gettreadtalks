@@ -13,7 +13,7 @@ import { components, internal } from './_generated/api';
 import authConfig from './auth.config';
 import authSchema from './betterAuth/schema';
 import { authRateLimitPlugin } from './lib/plugins';
-import { getSiteUrl } from './lib/siteUrl';
+import { getAuthSiteUrl } from './lib/siteUrl';
 import { isPreviewSiteUrl } from './lib/turnstile';
 import { formatErrorMessage } from './lib/utils';
 
@@ -138,7 +138,7 @@ function createAuthPlugins(ctx: GenericCtx<DataModel>, siteUrl: string) {
 export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
   const secret =
     process.env.BETTER_AUTH_SECRET ?? 'analysis-placeholder-secret';
-  const siteUrl = getSiteUrl();
+  const siteUrl = getAuthSiteUrl();
   const isHttps = siteUrl.startsWith('https://');
 
   warnIfAuthEnvInvalid(siteUrl);

@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 
 import {
+  getAuthSiteUrl,
   getSiteUrl,
   isLiveSiteUrl,
   isLocalhostUrl,
@@ -129,6 +130,21 @@ describe('getSiteUrl', () => {
     delete process.env.SITE_URL;
 
     expect(() => getSiteUrl()).toThrow(/public site URL/u);
+  });
+});
+
+describe('getAuthSiteUrl', () => {
+  it('returns the configured public site url', () => {
+    process.env.SITE_URL = 'https://www.gettreadtalks.com/';
+
+    expect(getAuthSiteUrl()).toBe('https://www.gettreadtalks.com');
+  });
+
+  it('falls back to localhost during cloud analysis without SITE_URL', () => {
+    process.env.CONVEX_CLOUD_URL = 'https://preview.convex.cloud';
+    delete process.env.SITE_URL;
+
+    expect(getAuthSiteUrl()).toBe('https://localhost:3000');
   });
 });
 

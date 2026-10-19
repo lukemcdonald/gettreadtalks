@@ -65,6 +65,18 @@ export function getSiteUrl(): string {
 }
 
 /**
+ * Better Auth is constructed during Convex module analysis, when SITE_URL
+ * is often unset. Email sending still uses `getSiteUrl()` and can throw.
+ */
+export function getAuthSiteUrl(): string {
+  try {
+    return getSiteUrl();
+  } catch {
+    return LOCAL_SITE_URL;
+  }
+}
+
+/**
  * Live mail only goes out when SITE_URL is the public site, unless sending
  * off-production is explicitly enabled. Media health and other admin emails
  * share this gate so a dev Convex deployment cannot email real addresses.
