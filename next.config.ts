@@ -93,10 +93,6 @@ const nextConfig = {
 const config = IS_SENTRY_ENABLED
   ? withSentryConfig(nextConfig, {
       authToken: process.env.SENTRY_AUTH_TOKEN,
-      bundleSizeOptimizations: {
-        excludeReplayIframe: true,
-        excludeReplayShadowDom: true,
-      },
       org: 'lukemcdonald',
       project: 'gettreadtalks',
       silent: !process.env.CI,

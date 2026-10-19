@@ -1,4 +1,4 @@
-import type * as Sentry from '@sentry/nextjs';
+import type * as Sentry from './sdk';
 
 import { afterEach, describe, expect, it, vi } from '@/test';
 

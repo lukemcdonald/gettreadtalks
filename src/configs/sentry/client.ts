@@ -1,4 +1,4 @@
-import type * as SentrySdk from '@sentry/nextjs';
+import type * as SentrySdk from './sdk';
 
 import { IS_DEV } from '@/constants/env';
 
@@ -75,12 +75,16 @@ function bufferWindowError(error: unknown): void {
 
 async function initClientSentry(): Promise<SentryClient | null> {
   try {
-    const Sentry = await import('@sentry/nextjs');
+    const Sentry = await import('./sdk');
 
     started = true;
 
     if (typeof window !== 'undefined') {
-      Sentry.init(baseSentryConfig);
+      Sentry.init({
+        ...baseSentryConfig,
+        replaysOnErrorSampleRate: 0,
+        replaysSessionSampleRate: 0,
+      });
 
       if (IS_DEV) {
         (window as unknown as { Sentry?: SentryClient }).Sentry = Sentry;
