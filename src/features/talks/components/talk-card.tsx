@@ -1,5 +1,3 @@
-'use client';
-
 import type { Speaker } from '@/features/speakers/types';
 import type { Talk } from '@/features/talks/types';
 import type { ReactNode } from 'react';
