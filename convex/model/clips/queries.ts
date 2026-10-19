@@ -82,6 +82,7 @@ export const getClipBySlug = query({
   args: {
     slug: v.string(),
   },
+  // fallow-ignore-next-line complexity
   handler: async (ctx, args) => {
     const clip = await getOneFrom(ctx.db, 'clips', 'by_slug', args.slug);
 
