@@ -1,5 +1,7 @@
 import type { Doc } from '../../_generated/dataModel';
+import type { QueryCtx } from '../../_generated/server';
 import type { ContentSortOption } from '../../lib/sort';
+import type { Infer } from 'convex/values';
 
 import {
   getManyFrom,
@@ -30,11 +32,17 @@ import {
   listPublishedTalksPage,
   searchPublishedTalksByTitleOrSpeaker,
 } from './helpers';
+import { talkTranscriptFields } from './schema';
 import {
   enrichAdminTalks,
   enrichWithTopics,
   filterTalksByTitleOrSpeaker,
 } from './utils';
+import {
+  talkTranscriptQuality,
+  talkTranscriptSource,
+  talkTranscriptStatus,
+} from './validators';
 
 /**
  * List slugs for published talks with their speaker slugs.
@@ -522,3 +530,132 @@ export const listAllTalks = query({
     })
   ),
 });
+
+const { text: _talkTranscriptText, ...talkTranscriptListFields } =
+  talkTranscriptFields;
+
+const talkTranscriptListItem = v.object({
+  _creationTime: v.number(),
+  _id: v.id('talkTranscripts'),
+  ...talkTranscriptListFields,
+});
+
+/**
+ * List published (or filtered) talks that have no transcript row.
+ */
+export const listTalksWithoutTranscript = query({
+  args: {
+    status: v.optional(statusFilterType),
+  },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+
+    const status = args.status ?? 'published';
+    const talks =
+      status === 'all'
+        ? await ctx.db.query('talks').order('desc').collect()
+        : await ctx.db
+            .query('talks')
+            .withIndex('by_status_and_publishedAt', (q) =>
+              q.eq('status', status)
+            )
+            .order('desc')
+            .collect();
+    const transcripts = await ctx.db.query('talkTranscripts').collect();
+    const talkIdsWithTranscript = new Set(
+      transcripts.map((transcript) => transcript.talkId)
+    );
+
+    return talks.filter((talk) => !talkIdsWithTranscript.has(talk._id));
+  },
+  returns: docs('talks'),
+});
+
+/**
+ * List transcript metadata by status, source, and quality. Omits transcript text.
+ */
+export const listTalkTranscripts = query({
+  args: {
+    quality: v.optional(talkTranscriptQuality),
+    source: v.optional(talkTranscriptSource),
+    status: v.optional(talkTranscriptStatus),
+  },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+
+    const transcripts = await loadTalkTranscripts(ctx, args);
+
+    return transcripts.flatMap((transcript) => {
+      if (args.quality !== undefined && transcript.quality !== args.quality) {
+        return [];
+      }
+
+      if (args.source !== undefined && transcript.source !== args.source) {
+        return [];
+      }
+
+      if (args.status !== undefined && transcript.status !== args.status) {
+        return [];
+      }
+
+      const { text: _text, ...item } = transcript;
+
+      return [item];
+    });
+  },
+  returns: v.array(talkTranscriptListItem),
+});
+
+/**
+ * List study rows still awaiting review.
+ */
+export const listDraftTalkStudies = query({
+  args: {},
+  handler: async (ctx) => {
+    await requireAdmin(ctx);
+
+    return await ctx.db
+      .query('talkStudies')
+      .withIndex('by_studyStatus', (q) => q.eq('studyStatus', 'draft'))
+      .collect();
+  },
+  returns: docs('talkStudies'),
+});
+
+async function loadTalkTranscripts(
+  ctx: QueryCtx,
+  args: {
+    quality?: Infer<typeof talkTranscriptQuality>;
+    source?: Infer<typeof talkTranscriptSource>;
+    status?: Infer<typeof talkTranscriptStatus>;
+  }
+) {
+  if (args.quality !== undefined) {
+    const { quality } = args;
+
+    return await ctx.db
+      .query('talkTranscripts')
+      .withIndex('by_quality', (q) => q.eq('quality', quality))
+      .collect();
+  }
+
+  if (args.status !== undefined) {
+    const { status } = args;
+
+    return await ctx.db
+      .query('talkTranscripts')
+      .withIndex('by_status', (q) => q.eq('status', status))
+      .collect();
+  }
+
+  if (args.source !== undefined) {
+    const { source } = args;
+
+    return await ctx.db
+      .query('talkTranscripts')
+      .withIndex('by_source', (q) => q.eq('source', source))
+      .collect();
+  }
+
+  return await ctx.db.query('talkTranscripts').collect();
+}

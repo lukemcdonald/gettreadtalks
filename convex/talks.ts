@@ -6,15 +6,19 @@ export const {
   getTalkBySlug,
   getTalksCount,
   listAllTalks,
+  listDraftTalkStudies,
   listFeaturedTalksWithSpeakers,
   listRandomTalksBySpeaker,
   listTalkSlugs,
   listTalkTopics,
+  listTalkTranscripts,
   listTalks,
   listTalksByCollection,
   listTalksBySpeaker,
   listTalksByTopics,
+  listTalksWithoutTranscript,
 } = queries;
 
 // Mutations
 export const { archiveTalk, createTalk, destroyTalk, updateTalk } = mutations;
+export const { saveTalkStudyDraft, upsertTalkTranscript } = mutations;

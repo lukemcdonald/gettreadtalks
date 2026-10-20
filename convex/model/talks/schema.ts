@@ -2,6 +2,13 @@ import { defineTable } from 'convex/server';
 import { v } from 'convex/values';
 
 import { statusType, timestampFields } from '../../lib/validators';
+import {
+  talkStudyContentFields,
+  talkStudyStatus,
+  talkTranscriptQuality,
+  talkTranscriptSource,
+  talkTranscriptStatus,
+} from './validators';
 
 export const talkFields = {
   ...timestampFields,
@@ -18,7 +25,38 @@ export const talkFields = {
   title: v.string(),
 };
 
+export const talkStudyFields = {
+  generatedAt: v.number(),
+  generator: v.string(),
+  manuallyEditedAt: v.optional(v.number()),
+  ...talkStudyContentFields,
+  studyStatus: talkStudyStatus,
+  talkId: v.id('talks'),
+};
+
+export const talkTranscriptFields = {
+  failureReason: v.optional(v.string()),
+  fetchedAt: v.optional(v.number()),
+  mediaUrlHash: v.optional(v.string()),
+  model: v.optional(v.string()),
+  quality: v.optional(talkTranscriptQuality),
+  source: talkTranscriptSource,
+  sourceUrl: v.optional(v.string()),
+  status: talkTranscriptStatus,
+  talkId: v.id('talks'),
+  text: v.optional(v.string()),
+  wordCount: v.optional(v.number()),
+};
+
 export const talkTables = {
+  talkStudies: defineTable(talkStudyFields)
+    .index('by_studyStatus', ['studyStatus'])
+    .index('by_talkId', ['talkId']),
+  talkTranscripts: defineTable(talkTranscriptFields)
+    .index('by_quality', ['quality'])
+    .index('by_source', ['source'])
+    .index('by_status', ['status'])
+    .index('by_talkId', ['talkId']),
   talks: defineTable(talkFields)
     .index('by_collectionId_and_collectionOrder', [
       'collectionId',

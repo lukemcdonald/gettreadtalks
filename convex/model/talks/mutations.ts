@@ -1,9 +1,10 @@
 import type { Doc, Id } from '../../_generated/dataModel';
 import type { MutationCtx } from '../../_generated/server';
+import type { Infer } from 'convex/values';
 
 import { v } from 'convex/values';
 
-import { mutation } from '../../_generated/server';
+import { internalMutation, mutation } from '../../_generated/server';
 import { throwDuplicateSlug, throwValidationError } from '../../lib/errors';
 import {
   deleteAll,
@@ -13,7 +14,13 @@ import {
   talkSlugExistsForSpeaker,
 } from '../../lib/utils';
 import { requireAdmin } from '../auth/roles';
-import { statusType } from './validators';
+import {
+  statusType,
+  talkStudyContentFields,
+  talkTranscriptQuality,
+  talkTranscriptSource,
+  talkTranscriptStatus,
+} from './validators';
 
 async function setTalkTopics(
   ctx: MutationCtx,
@@ -220,12 +227,24 @@ export const destroyTalk = mutation({
 
     await getOrThrow(ctx, 'talks', talkId);
 
-    const talksOnTopics = await ctx.db
-      .query('talksOnTopics')
-      .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
-      .collect();
+    const [studies, talksOnTopics, transcripts] = await Promise.all([
+      ctx.db
+        .query('talkStudies')
+        .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
+        .collect(),
+      ctx.db
+        .query('talksOnTopics')
+        .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
+        .collect(),
+      ctx.db
+        .query('talkTranscripts')
+        .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
+        .collect(),
+    ]);
 
+    await deleteAll(ctx, studies);
     await deleteAll(ctx, talksOnTopics);
+    await deleteAll(ctx, transcripts);
 
     const favorites = await ctx.db
       .query('userFavoriteTalks')
@@ -249,3 +268,111 @@ export const destroyTalk = mutation({
   },
   returns: v.null(),
 });
+
+/**
+ * Upsert a private talk transcript. Call from Grok Bot via `npx convex run`.
+ */
+export const upsertTalkTranscript = internalMutation({
+  args: {
+    failureReason: v.optional(v.string()),
+    fetchedAt: v.optional(v.number()),
+    mediaUrlHash: v.optional(v.string()),
+    model: v.optional(v.string()),
+    quality: v.optional(talkTranscriptQuality),
+    source: talkTranscriptSource,
+    sourceUrl: v.optional(v.string()),
+    status: talkTranscriptStatus,
+    talkId: v.id('talks'),
+    text: v.optional(v.string()),
+    wordCount: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    await getOrThrow(ctx, 'talks', args.talkId);
+
+    const existing = await ctx.db
+      .query('talkTranscripts')
+      .withIndex('by_talkId', (q) => q.eq('talkId', args.talkId))
+      .unique();
+    const fields = toTalkTranscriptFields(args);
+
+    if (existing) {
+      await ctx.db.replace(existing._id, fields);
+
+      return existing._id;
+    }
+
+    return await ctx.db.insert('talkTranscripts', fields);
+  },
+  returns: v.id('talkTranscripts'),
+});
+
+/**
+ * Save a study draft. Always stores studyStatus `draft`; never publishes.
+ */
+export const saveTalkStudyDraft = internalMutation({
+  args: {
+    generator: v.string(),
+    ...talkStudyContentFields,
+    talkId: v.id('talks'),
+  },
+  handler: async (ctx, args) => {
+    await getOrThrow(ctx, 'talks', args.talkId);
+
+    const existing = await ctx.db
+      .query('talkStudies')
+      .withIndex('by_talkId', (q) => q.eq('talkId', args.talkId))
+      .unique();
+    const fields = {
+      generatedAt: Date.now(),
+      generator: args.generator,
+      outline: args.outline,
+      scriptureRefs: args.scriptureRefs,
+      studyGuide: args.studyGuide,
+      studyStatus: 'draft' as const,
+      suggestedTopics: args.suggestedTopics,
+      summary: args.summary,
+      talkId: args.talkId,
+    };
+
+    if (existing) {
+      await ctx.db.replace(existing._id, fields);
+
+      return existing._id;
+    }
+
+    return await ctx.db.insert('talkStudies', fields);
+  },
+  returns: v.id('talkStudies'),
+});
+
+function toTalkTranscriptFields(args: {
+  failureReason?: string;
+  fetchedAt?: number;
+  mediaUrlHash?: string;
+  model?: string;
+  quality?: Infer<typeof talkTranscriptQuality>;
+  source: Infer<typeof talkTranscriptSource>;
+  sourceUrl?: string;
+  status: Infer<typeof talkTranscriptStatus>;
+  talkId: Id<'talks'>;
+  text?: string;
+  wordCount?: number;
+}) {
+  return {
+    source: args.source,
+    status: args.status,
+    talkId: args.talkId,
+    ...(args.failureReason === undefined
+      ? {}
+      : { failureReason: args.failureReason }),
+    ...(args.fetchedAt === undefined ? {} : { fetchedAt: args.fetchedAt }),
+    ...(args.mediaUrlHash === undefined
+      ? {}
+      : { mediaUrlHash: args.mediaUrlHash }),
+    ...(args.model === undefined ? {} : { model: args.model }),
+    ...(args.quality === undefined ? {} : { quality: args.quality }),
+    ...(args.sourceUrl === undefined ? {} : { sourceUrl: args.sourceUrl }),
+    ...(args.text === undefined ? {} : { text: args.text }),
+    ...(args.wordCount === undefined ? {} : { wordCount: args.wordCount }),
+  };
+}

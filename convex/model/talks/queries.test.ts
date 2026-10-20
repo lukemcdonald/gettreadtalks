@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { api } from '../../_generated/api';
+import { api, internal } from '../../_generated/api';
 import {
   createConvexTest,
   seedVisibilityCatalog,
@@ -39,6 +39,72 @@ describe('getTalkBySlug', () => {
 
     expect(published?.talk.slug).toBe(visibilitySlugs.publishedTalk);
     expect(unpublished).toBeNull();
+  });
+
+  it('does not expose private transcript or study draft text', async () => {
+    const t = createConvexTest();
+    await seedVisibilityCatalog(t);
+
+    const published = await t.query(api.talks.getTalkBySlug, {
+      speakerSlug: visibilitySlugs.publishedSpeaker,
+      talkSlug: visibilitySlugs.publishedTalk,
+    });
+
+    expect(published).not.toBeNull();
+
+    if (!published) {
+      throw new Error('expected a published talk');
+    }
+
+    const draftSecret = 'PRIVATE_STUDY_DRAFT_SENTINEL_volt332';
+    const transcriptSecret = 'PRIVATE_TRANSCRIPT_SENTINEL_volt332';
+
+    await t.mutation(internal.talks.upsertTalkTranscript, {
+      quality: 'good',
+      source: 'speaker_published',
+      status: 'done',
+      talkId: published.talk._id,
+      text: transcriptSecret,
+      wordCount: 3,
+    });
+    await t.mutation(internal.talks.saveTalkStudyDraft, {
+      generator: 'test',
+      outline: [{ heading: 'Grace', text: draftSecret }],
+      scriptureRefs: [{ book: 'Romans', chapter: 5, verseStart: 1 }],
+      studyGuide: [{ kind: 'key_idea', text: draftSecret }],
+      suggestedTopics: ['grace'],
+      summary: draftSecret,
+      talkId: published.talk._id,
+    });
+
+    const bySpeaker = await t.query(api.talks.listTalksBySpeaker, {
+      speakerId: published.talk.speakerId,
+    });
+    const featured = await t.query(api.talks.listFeaturedTalksWithSpeakers, {});
+    const listed = await t.query(api.talks.listTalks, {
+      paginationOpts: { cursor: null, numItems: 50 },
+    });
+    const related = await t.query(api.talks.listTalksByTopics, {
+      topicIds: published.topics.map((topic) => topic._id),
+    });
+    const search = await t.query(api.search.searchSite, { query: 'Grace' });
+    const slugs = await t.query(api.talks.listTalkSlugs, {});
+    const talk = await t.query(api.talks.getTalkBySlug, {
+      speakerSlug: visibilitySlugs.publishedSpeaker,
+      talkSlug: visibilitySlugs.publishedTalk,
+    });
+    const payload = JSON.stringify({
+      bySpeaker,
+      featured,
+      listed,
+      related,
+      search,
+      slugs,
+      talk,
+    });
+
+    expect(payload).not.toContain(draftSecret);
+    expect(payload).not.toContain(transcriptSecret);
   });
 });
 

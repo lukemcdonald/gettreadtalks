@@ -267,9 +267,21 @@ const gatedFunctions: {
     name: 'talks.listAllTalks',
   },
   {
+    call: (client) => client.query(api.talks.listDraftTalkStudies, {}),
+    name: 'talks.listDraftTalkStudies',
+  },
+  {
     call: (client, seed) =>
       client.query(api.talks.listTalkTopics, { talkId: seed.talkId }),
     name: 'talks.listTalkTopics',
+  },
+  {
+    call: (client) => client.query(api.talks.listTalkTranscripts, {}),
+    name: 'talks.listTalkTranscripts',
+  },
+  {
+    call: (client) => client.query(api.talks.listTalksWithoutTranscript, {}),
+    name: 'talks.listTalksWithoutTranscript',
   },
   {
     call: (client, seed) =>
