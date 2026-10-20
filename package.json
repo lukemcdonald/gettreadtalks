@@ -88,5 +88,14 @@
     "wait-on": "^9.5.1",
     "webmcp-types": "^0.1.10"
   },
-  "packageManager": "pnpm@12.11.2"
+  "packageManager": "pnpm@12.11.2",
+  "skills": [
+    {
+      "ref": "9229b1b8e5b59b9028e7a88327c6ad160fbbc265",
+      "skills": [
+        "build-webmcp-tools"
+      ],
+      "source": "GoogleChromeLabs/webmcp-tools/webmcp-skills"
+    }
+  ]
 }

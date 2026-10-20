@@ -69,5 +69,3 @@ convex/migration/data/
 **/.claude/skills/*
 !**/.claude/skills/build-webmcp-tools
 !**/.claude/skills/convex-*
-**/skills-lock.json
-**/skills-npm-lock.json
