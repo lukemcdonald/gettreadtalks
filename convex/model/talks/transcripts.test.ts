@@ -192,3 +192,64 @@ describe('talk transcript and study draft storage', () => {
     }
   });
 });
+
+describe('talk study review mutations', () => {
+  it('sets manuallyEditedAt when an admin updates study content', async () => {
+    const { asAdmin, t, talk } = await seedPublishedTalk();
+
+    await t.mutation(
+      internal.talks.saveTalkStudyDraft,
+      studyDraftArgs(talk._id)
+    );
+
+    const before = Date.now();
+    const editedSummary = 'Edited summary of grace.';
+
+    await asAdmin.mutation(api.talks.updateTalkStudy, {
+      outline: [{ heading: 'Grace', text: 'Edited outline' }],
+      scriptureRefs: [{ book: 'Romans', chapter: 5, verseStart: 1 }],
+      studyGuide: [{ kind: 'key_idea', text: 'Edited idea' }],
+      suggestedTopics: ['grace'],
+      summary: editedSummary,
+      talkId: talk._id,
+    });
+
+    const study = await asAdmin.query(api.talks.getTalkStudy, {
+      talkId: talk._id,
+    });
+
+    expect(study).toEqual(
+      expect.objectContaining({
+        manuallyEditedAt: expect.any(Number),
+        studyStatus: 'draft',
+        summary: editedSummary,
+      })
+    );
+    expect(study?.manuallyEditedAt).toBeGreaterThanOrEqual(before);
+  });
+
+  it('publishes and unpublishes one study', async () => {
+    const { asAdmin, t, talk } = await seedPublishedTalk();
+
+    await t.mutation(
+      internal.talks.saveTalkStudyDraft,
+      studyDraftArgs(talk._id)
+    );
+
+    await asAdmin.mutation(api.talks.publishTalkStudy, { talkId: talk._id });
+
+    const published = await asAdmin.query(api.talks.getTalkStudy, {
+      talkId: talk._id,
+    });
+
+    expect(published?.studyStatus).toBe('published');
+
+    await asAdmin.mutation(api.talks.unpublishTalkStudy, { talkId: talk._id });
+
+    const unpublished = await asAdmin.query(api.talks.getTalkStudy, {
+      talkId: talk._id,
+    });
+
+    expect(unpublished?.studyStatus).toBe('draft');
+  });
+});

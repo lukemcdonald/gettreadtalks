@@ -12,8 +12,10 @@ import {
   PREVIEW_CLIPS,
   PREVIEW_COLLECTIONS,
   PREVIEW_SPEAKERS,
+  PREVIEW_STUDIES,
   PREVIEW_TALKS,
   PREVIEW_TOPICS,
+  PREVIEW_TRANSCRIPTS,
 } from './previewFixtures';
 
 const seedContentResultValidator = v.object({
@@ -273,6 +275,66 @@ async function upsertClip(
   });
 }
 
+async function upsertTalkStudy(
+  ctx: MutationCtx,
+  talkId: Id<'talks'>,
+  study: (typeof PREVIEW_STUDIES)[number]
+): Promise<Id<'talkStudies'>> {
+  const existing = await ctx.db
+    .query('talkStudies')
+    .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
+    .unique();
+  const fields = {
+    generatedAt: existing?.generatedAt ?? Date.now(),
+    generator: study.generator,
+    outline: study.outline,
+    scriptureRefs: study.scriptureRefs,
+    studyGuide: study.studyGuide,
+    studyStatus: study.studyStatus,
+    suggestedTopics: study.suggestedTopics,
+    summary: study.summary,
+    talkId,
+  };
+
+  if (existing) {
+    await ctx.db.replace(existing._id, fields);
+
+    return existing._id;
+  }
+
+  return await ctx.db.insert('talkStudies', fields);
+}
+
+async function upsertTalkTranscript(
+  ctx: MutationCtx,
+  talkId: Id<'talks'>,
+  transcript: (typeof PREVIEW_TRANSCRIPTS)[number]
+): Promise<Id<'talkTranscripts'>> {
+  const existing = await ctx.db
+    .query('talkTranscripts')
+    .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
+    .unique();
+  const fields = {
+    source: transcript.source,
+    status: transcript.status,
+    talkId,
+    ...('failureReason' in transcript
+      ? { failureReason: transcript.failureReason }
+      : {}),
+    ...('quality' in transcript ? { quality: transcript.quality } : {}),
+    ...('text' in transcript ? { text: transcript.text } : {}),
+    ...('wordCount' in transcript ? { wordCount: transcript.wordCount } : {}),
+  };
+
+  if (existing) {
+    await ctx.db.replace(existing._id, fields);
+
+    return existing._id;
+  }
+
+  return await ctx.db.insert('talkTranscripts', fields);
+}
+
 async function upsertTalkTopics(
   ctx: MutationCtx,
   talkId: Id<'talks'>,
@@ -360,6 +422,26 @@ export const seedContent = internalMutation({
         );
 
         await upsertTalkTopics(ctx, talkId, topicIds);
+      })
+    );
+
+    await Promise.all(
+      PREVIEW_STUDIES.map(async (study) => {
+        const talkId = requireSeedId(talkIdsBySlug, 'talk', study.talkSlug);
+
+        await upsertTalkStudy(ctx, talkId, study);
+      })
+    );
+
+    await Promise.all(
+      PREVIEW_TRANSCRIPTS.map(async (transcript) => {
+        const talkId = requireSeedId(
+          talkIdsBySlug,
+          'talk',
+          transcript.talkSlug
+        );
+
+        await upsertTalkTranscript(ctx, talkId, transcript);
       })
     );
 

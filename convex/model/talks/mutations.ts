@@ -7,6 +7,7 @@ import { internalMutation, mutation } from '../../_generated/server';
 import {
   throwConvexError,
   throwDuplicateSlug,
+  throwNotFound,
   throwValidationError,
 } from '../../lib/errors';
 import {
@@ -334,5 +335,86 @@ export const saveTalkStudyDraft = internalMutation({
 
     return await ctx.db.insert('talkStudies', fields);
   },
+  returns: v.id('talkStudies'),
+});
+
+async function getTalkStudyByTalkId(ctx: MutationCtx, talkId: Id<'talks'>) {
+  const study = await ctx.db
+    .query('talkStudies')
+    .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
+    .unique();
+
+  if (!study) {
+    throwNotFound('Study not found', {
+      resource: 'talkStudy',
+      resourceId: talkId,
+    });
+  }
+
+  return study;
+}
+
+/**
+ * Update a talk's study content and mark it as manually edited.
+ */
+export const updateTalkStudy = mutation({
+  args: {
+    ...talkStudyContentFields,
+    talkId: v.id('talks'),
+  },
+  handler: async (ctx, args) => {
+    const { talkId, ...content } = args;
+
+    await requireAdmin(ctx);
+
+    const study = await getTalkStudyByTalkId(ctx, talkId);
+
+    await ctx.db.patch(study._id, {
+      ...content,
+      manuallyEditedAt: Date.now(),
+    });
+
+    return study._id;
+  },
+  returns: v.id('talkStudies'),
+});
+
+async function setTalkStudyStatus(
+  ctx: MutationCtx,
+  studyStatus: 'draft' | 'published',
+  talkId: Id<'talks'>
+) {
+  await requireAdmin(ctx);
+
+  const study = await getTalkStudyByTalkId(ctx, talkId);
+
+  await ctx.db.patch(study._id, {
+    studyStatus,
+  });
+
+  return study._id;
+}
+
+/**
+ * Publish one talk study.
+ */
+export const publishTalkStudy = mutation({
+  args: {
+    talkId: v.id('talks'),
+  },
+  handler: async (ctx, args) =>
+    await setTalkStudyStatus(ctx, 'published', args.talkId),
+  returns: v.id('talkStudies'),
+});
+
+/**
+ * Return one talk study to draft.
+ */
+export const unpublishTalkStudy = mutation({
+  args: {
+    talkId: v.id('talks'),
+  },
+  handler: async (ctx, args) =>
+    await setTalkStudyStatus(ctx, 'draft', args.talkId),
   returns: v.id('talkStudies'),
 });

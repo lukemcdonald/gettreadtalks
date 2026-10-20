@@ -4,6 +4,7 @@ import type { LucideIcon } from 'lucide-react';
 import type { Route } from 'next';
 
 import {
+  BookOpenIcon,
   CheckCircle2Icon,
   FilmIcon,
   FolderIcon,
@@ -26,6 +27,7 @@ export const AREA_NAV_ICONS = {
   finished: CheckCircle2Icon,
   settings: SettingsIcon,
   speakers: UsersIcon,
+  studies: BookOpenIcon,
   talks: MicIcon,
   topics: TagIcon,
 } as const satisfies Record<string, LucideIcon>;

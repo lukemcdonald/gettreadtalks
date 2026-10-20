@@ -19,6 +19,7 @@ export const AREA_NAV: AreaNavSection[] = [
   {
     href: ADMIN_LIST_PATHS.talks,
     items: [
+      { href: MANAGE_PATH, icon: 'studies', label: 'Studies' },
       { href: ADMIN_LIST_PATHS.talks, icon: 'talks', label: 'Talks' },
       { href: ADMIN_LIST_PATHS.clips, icon: 'clips', label: 'Clips' },
       { href: ADMIN_LIST_PATHS.speakers, icon: 'speakers', label: 'Speakers' },

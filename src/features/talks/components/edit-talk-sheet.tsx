@@ -3,9 +3,17 @@
 import type { CollectionListItem } from '@/features/collections/types';
 import type { SpeakerListItem } from '@/features/speakers/types';
 import type { TalkFormData } from '@/features/talks/schemas/talk-form';
-import type { Talk, TalkId, TalkWithTopicIds } from '@/features/talks/types';
+import type { EditTalkFormData } from '@/features/talks/schemas/talk-study-form';
+import type {
+  Talk,
+  TalkId,
+  TalkStudy,
+  TalkTranscript,
+  TalkWithTopicIds,
+} from '@/features/talks/types';
 import type { TopicListItem } from '@/features/topics/types';
 import type { StatusPrefill } from '@/lib/entities/status-prefill';
+import type { Control, UseFormSetValue } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState, useTransition } from 'react';
@@ -13,10 +21,18 @@ import { useForm } from 'react-hook-form';
 
 import { FormSheet } from '@/components/ui';
 import { slugify } from '@/convex/lib/utils';
+import { publishTalkStudyAction } from '@/features/talks/actions/publish-talk-study';
+import { unpublishTalkStudyAction } from '@/features/talks/actions/unpublish-talk-study';
 import { updateTalkAction } from '@/features/talks/actions/update-talk';
+import { updateTalkStudyAction } from '@/features/talks/actions/update-talk-study';
 import { TalkFormFields } from '@/features/talks/components/talk-form-fields';
+import { TalkStudyFields } from '@/features/talks/components/talk-study-fields';
+import { TalkTranscriptStatus } from '@/features/talks/components/talk-transcript-status';
 import { UrlChangeDialog } from '@/features/talks/components/url-change-dialog';
-import { talkFormSchema } from '@/features/talks/schemas/talk-form';
+import {
+  editTalkFormSchema,
+  formatSuggestedTopics,
+} from '@/features/talks/schemas/talk-study-form';
 import { buildTalkPath } from '@/features/talks/utils';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
 
@@ -27,16 +43,33 @@ interface EditTalkSheetProps {
   open: boolean;
   speakers: SpeakerListItem[];
   statusPrefill?: StatusPrefill;
+  study: TalkStudy | null;
   talk: TalkWithTopicIds;
   topics: TopicListItem[];
+  transcript: TalkTranscript | null;
 }
 
 type UrlChange = { newUrl: string; oldUrl: string } | null;
 
+function getStudyFormValues(study: TalkStudy | null) {
+  if (!study) {
+    return;
+  }
+
+  return {
+    outline: study.outline,
+    scriptureRefs: study.scriptureRefs,
+    studyGuide: study.studyGuide,
+    suggestedTopics: formatSuggestedTopics(study.suggestedTopics),
+    summary: study.summary,
+  };
+}
+
 function getTalkFormValues(
+  study: TalkStudy | null,
   talk: TalkWithTopicIds,
   statusPrefill?: StatusPrefill
-): TalkFormData {
+): EditTalkFormData {
   return {
     collectionId: talk.collectionId,
     collectionOrder: talk.collectionId ? talk.collectionOrder : undefined,
@@ -47,12 +80,13 @@ function getTalkFormValues(
     slug: talk.slug ?? '',
     speakerId: talk.speakerId,
     status: statusPrefill ?? talk.status ?? 'backlog',
+    study: getStudyFormValues(study),
     title: talk.title ?? '',
     topicIds: talk.topicIds,
   };
 }
 
-function getUrlChangeForTalk(talk: Talk, data: TalkFormData): UrlChange {
+function getUrlChangeForTalk(talk: Talk, data: EditTalkFormData): UrlChange {
   if (talk.status !== 'published') {
     return null;
   }
@@ -88,28 +122,40 @@ export function EditTalkSheet({
   open,
   speakers,
   statusPrefill,
+  study,
   talk,
   topics,
+  transcript,
 }: EditTalkSheetProps) {
   const [isPending, startTransition] = useTransition();
-  const [pendingData, setPendingData] = useState<TalkFormData | null>(null);
+  const [pendingData, setPendingData] = useState<EditTalkFormData | null>(null);
   const [urlChange, setUrlChange] = useState<UrlChange>(null);
   const [urlChangeOpen, setUrlChangeOpen] = useState(false);
 
-  const form = useForm<TalkFormData>({
+  const form = useForm<EditTalkFormData>({
     mode: 'onBlur',
     // oxlint-disable-next-line typescript/no-explicit-any -- Zod 4 compatibility with zodResolver
-    resolver: zodResolver(talkFormSchema as any),
-    values: getTalkFormValues(talk, statusPrefill),
+    resolver: zodResolver(editTalkFormSchema as any),
+    values: getTalkFormValues(study, talk, statusPrefill),
   });
 
-  function submitData(data: TalkFormData) {
+  function submitData(data: EditTalkFormData) {
     startTransition(async () => {
-      const result = await updateTalkAction(data, talk._id);
+      const { study: studyData, ...talkData } = data;
+      const talkResult = await updateTalkAction(talkData, talk._id);
 
-      if (!result.success) {
-        setServerErrors(form.setError, result.errors);
+      if (!talkResult.success) {
+        setServerErrors(form.setError, talkResult.errors);
         return;
+      }
+
+      if (studyData) {
+        const studyResult = await updateTalkStudyAction(studyData, talk._id);
+
+        if (!studyResult.success) {
+          setServerErrors(form.setError, studyResult.errors);
+          return;
+        }
       }
 
       onTalkUpdated(talk._id);
@@ -142,6 +188,32 @@ export function EditTalkSheet({
     submitData(data);
   }
 
+  function handlePublish() {
+    startTransition(async () => {
+      const result = await publishTalkStudyAction(talk._id);
+
+      if (!result.success) {
+        setServerErrors(form.setError, result.errors);
+        return;
+      }
+
+      onTalkUpdated(talk._id);
+    });
+  }
+
+  function handleUnpublish() {
+    startTransition(async () => {
+      const result = await unpublishTalkStudyAction(talk._id);
+
+      if (!result.success) {
+        setServerErrors(form.setError, result.errors);
+        return;
+      }
+
+      onTalkUpdated(talk._id);
+    });
+  }
+
   return (
     <>
       <FormSheet
@@ -155,12 +227,22 @@ export function EditTalkSheet({
       >
         <TalkFormFields
           collections={collections}
-          control={form.control}
+          control={form.control as Control<TalkFormData>}
           mode="edit"
-          setValue={form.setValue}
+          setValue={form.setValue as UseFormSetValue<TalkFormData>}
           speakers={speakers}
           topics={topics}
         />
+        {study ? (
+          <TalkStudyFields
+            control={form.control}
+            isPending={isPending}
+            onPublish={handlePublish}
+            onUnpublish={handleUnpublish}
+            studyStatus={study.studyStatus}
+          />
+        ) : null}
+        <TalkTranscriptStatus transcript={transcript} />
       </FormSheet>
 
       {urlChange && (
