@@ -2,8 +2,10 @@
 
 import type { CollectionListItem } from '@/features/collections/types';
 import type { SpeakerListItem } from '@/features/speakers/types';
-import type { TalkFormData } from '@/features/talks/schemas/talk-form';
-import type { EditTalkFormData } from '@/features/talks/schemas/talk-study-form';
+import type {
+  EditTalkFormData,
+  TalkFormData,
+} from '@/features/talks/schemas/talk-form';
 import type {
   Talk,
   TalkId,
@@ -23,15 +25,10 @@ import { FormSheet } from '@/components/ui';
 import { slugify } from '@/convex/lib/utils';
 import { setTalkStudyStatusAction } from '@/features/talks/actions/set-talk-study-status';
 import { updateTalkAction } from '@/features/talks/actions/update-talk';
-import { updateTalkStudyAction } from '@/features/talks/actions/update-talk-study';
 import { TalkFormFields } from '@/features/talks/components/talk-form-fields';
 import { TalkStudyFields } from '@/features/talks/components/talk-study-fields';
-import { TalkTranscriptStatus } from '@/features/talks/components/talk-transcript-status';
 import { UrlChangeDialog } from '@/features/talks/components/url-change-dialog';
-import {
-  editTalkFormSchema,
-  formatSuggestedTopics,
-} from '@/features/talks/schemas/talk-study-form';
+import { editTalkFormSchema } from '@/features/talks/schemas/talk-form';
 import { buildTalkPath } from '@/features/talks/utils';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
 
@@ -59,7 +56,7 @@ function getStudyFormValues(study: TalkStudy | null) {
     outline: study.outline,
     scriptureRefs: study.scriptureRefs,
     studyGuide: study.studyGuide,
-    suggestedTopics: formatSuggestedTopics(study.suggestedTopics),
+    suggestedTopics: study.suggestedTopics.join(', '),
     summary: study.summary,
   };
 }
@@ -140,21 +137,11 @@ export function EditTalkSheet({
 
   function submitData(data: EditTalkFormData) {
     startTransition(async () => {
-      const { study: studyData, ...talkData } = data;
-      const talkResult = await updateTalkAction(talkData, talk._id);
+      const result = await updateTalkAction(data, talk._id);
 
-      if (!talkResult.success) {
-        setServerErrors(form.setError, talkResult.errors);
+      if (!result.success) {
+        setServerErrors(form.setError, result.errors);
         return;
-      }
-
-      if (studyData) {
-        const studyResult = await updateTalkStudyAction(studyData, talk._id);
-
-        if (!studyResult.success) {
-          setServerErrors(form.setError, studyResult.errors);
-          return;
-        }
       }
 
       onTalkUpdated(talk._id);
@@ -224,16 +211,11 @@ export function EditTalkSheet({
             <TalkStudyFields
               control={form.control}
               isPending={isPending}
-              onPublish={() => {
-                handleStudyStatus('published');
-              }}
-              onUnpublish={() => {
-                handleStudyStatus('draft');
-              }}
-              studyStatus={study.studyStatus}
+              onSetStatus={handleStudyStatus}
+              study={study}
+              transcript={transcript}
             />
           ) : null}
-          <TalkTranscriptStatus transcript={transcript} />
         </div>
       </FormSheet>
 

@@ -117,10 +117,6 @@ export const PREVIEW_STUDIES = [
         heading: 'God works for good',
         text: 'Every circumstance in the life of those who love God is gathered up into his purpose.',
       },
-      {
-        heading: 'Called according to his purpose',
-        text: 'The good God works is not comfort first, but conformity to Christ.',
-      },
     ],
     scriptureRefs: [
       { book: 'Romans', chapter: 8, verseEnd: 28, verseStart: 28 },
@@ -130,23 +126,11 @@ export const PREVIEW_STUDIES = [
         kind: 'key_idea' as const,
         text: 'God is at work in all things for the good of those who love him.',
       },
-      {
-        kind: 'discussion_question' as const,
-        text: 'Where have you seen God work good from a hard place?',
-      },
-      {
-        kind: 'application' as const,
-        text: 'Name one present trouble and ask God to show his purpose in it.',
-      },
-      {
-        kind: 'prayer' as const,
-        text: 'Father, teach us to trust your purpose when we cannot see the good yet.',
-      },
     ],
     studyStatus: 'draft' as const,
     suggestedTopics: ['grace'],
     summary:
-      'This talk traces Romans 8:28 to show that God is not merely present in trouble but at work through it. The promised good is not ease, but being shaped into the likeness of Christ. The call is to love God and rest in the purpose he has already set.',
+      'This talk traces Romans 8:28 to show that God is not merely present in trouble but at work through it.',
     talkSlug: 'sample-sermon-on-romans-8',
   },
 ];
@@ -159,18 +143,6 @@ export const PREVIEW_TRANSCRIPTS = [
     talkSlug: 'sample-sermon-on-romans-8',
     text: 'Placeholder transcript for preview testing. We know that for those who love God all things work together for good, for those who are called according to his purpose.',
     wordCount: 32,
-  },
-  {
-    failureReason: 'Captions unavailable',
-    source: 'youtube_captions' as const,
-    status: 'failed' as const,
-    talkSlug: 'sample-talk-the-lord-is-my-shepherd',
-  },
-  {
-    failureReason: 'Hosted video blocked',
-    source: 'video_audio_stt' as const,
-    status: 'blocked' as const,
-    talkSlug: 'example-talk-bless-the-lord',
   },
 ];
 

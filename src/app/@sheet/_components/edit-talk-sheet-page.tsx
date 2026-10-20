@@ -5,11 +5,11 @@ import { redirect } from 'next/navigation';
 
 import { EditTalkSheetRoute } from '@/app/@sheet/_components/edit-talk-sheet-route';
 import { loadFormOptions } from '@/app/@sheet/_queries/load-form-options';
-import { loadTalk } from '@/features/talks/queries/load-talk';
 import {
+  loadTalk,
   loadTalkStudy,
   loadTalkTranscript,
-} from '@/features/talks/queries/load-talk-study';
+} from '@/features/talks/queries/load-talk';
 import { loadTalkTopics } from '@/features/talks/queries/load-talk-topics';
 import {
   ADMIN_LIST_PATHS,

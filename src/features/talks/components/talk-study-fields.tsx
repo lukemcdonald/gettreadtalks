@@ -1,10 +1,8 @@
 'use client';
 
-import type { EditTalkFormData } from '@/features/talks/schemas/talk-study-form';
-import type { TalkStudy } from '@/features/talks/types';
+import type { EditTalkFormData } from '@/features/talks/schemas/talk-form';
+import type { TalkStudy, TalkTranscript } from '@/features/talks/types';
 import type { Control } from 'react-hook-form';
-
-import { useFieldArray } from 'react-hook-form';
 
 import { ManageStatusBadge } from '@/components/manage-table';
 import { SectionHeading } from '@/components/section-heading';
@@ -13,6 +11,7 @@ import {
   NumberField,
   SelectField,
   TextField,
+  Textarea,
   TextareaField,
 } from '@/components/ui';
 
@@ -26,21 +25,45 @@ const STUDY_GUIDE_KIND_OPTIONS = [
 interface TalkStudyFieldsProps {
   control: Control<EditTalkFormData>;
   isPending: boolean;
-  onPublish: () => void;
-  onUnpublish: () => void;
-  studyStatus: TalkStudy['studyStatus'];
+  onSetStatus: (studyStatus: TalkStudy['studyStatus']) => void;
+  study: TalkStudy;
+  transcript: TalkTranscript | null;
 }
 
-function OutlineFields({ control }: { control: Control<EditTalkFormData> }) {
-  const { append, fields, remove } = useFieldArray({
-    control,
-    name: 'study.outline',
-  });
+// fallow-ignore-next-line complexity
+export function TalkStudyFields({
+  control,
+  isPending,
+  onSetStatus,
+  study,
+  transcript,
+}: TalkStudyFieldsProps) {
+  const isPublished = study.studyStatus === 'published';
 
   return (
     <div className="space-y-4">
-      {fields.map((field, index) => (
-        <div className="space-y-4" key={field.id}>
+      <SectionHeading heading="Study" />
+      <div className="flex items-center justify-between gap-3">
+        <ManageStatusBadge status={study.studyStatus} />
+        <Button
+          disabled={isPending}
+          onClick={() => {
+            onSetStatus(isPublished ? 'draft' : 'published');
+          }}
+          type="button"
+          variant={isPublished ? 'outline' : 'default'}
+        >
+          {isPublished ? 'Unpublish' : 'Publish'}
+        </Button>
+      </div>
+      <TextareaField
+        control={control}
+        label="Summary"
+        name="study.summary"
+        rows={4}
+      />
+      {study.outline.map((_, index) => (
+        <div className="space-y-4" key={index}>
           <TextField
             control={control}
             label="Outline heading"
@@ -52,42 +75,10 @@ function OutlineFields({ control }: { control: Control<EditTalkFormData> }) {
             name={`study.outline.${index}.text`}
             rows={3}
           />
-          <Button
-            onClick={() => {
-              remove(index);
-            }}
-            size="sm"
-            type="button"
-            variant="outline"
-          >
-            Remove outline item
-          </Button>
         </div>
       ))}
-      <Button
-        onClick={() => {
-          append({ heading: '', text: '' });
-        }}
-        size="sm"
-        type="button"
-        variant="outline"
-      >
-        Add outline item
-      </Button>
-    </div>
-  );
-}
-
-function StudyGuideFields({ control }: { control: Control<EditTalkFormData> }) {
-  const { append, fields, remove } = useFieldArray({
-    control,
-    name: 'study.studyGuide',
-  });
-
-  return (
-    <div className="space-y-4">
-      {fields.map((field, index) => (
-        <div className="space-y-4" key={field.id}>
+      {study.studyGuide.map((_, index) => (
+        <div className="space-y-4" key={index}>
           <SelectField
             control={control}
             label="Study guide kind"
@@ -100,46 +91,10 @@ function StudyGuideFields({ control }: { control: Control<EditTalkFormData> }) {
             name={`study.studyGuide.${index}.text`}
             rows={3}
           />
-          <Button
-            onClick={() => {
-              remove(index);
-            }}
-            size="sm"
-            type="button"
-            variant="outline"
-          >
-            Remove study guide section
-          </Button>
         </div>
       ))}
-      <Button
-        onClick={() => {
-          append({ kind: 'key_idea', text: '' });
-        }}
-        size="sm"
-        type="button"
-        variant="outline"
-      >
-        Add study guide section
-      </Button>
-    </div>
-  );
-}
-
-function ScriptureRefFields({
-  control,
-}: {
-  control: Control<EditTalkFormData>;
-}) {
-  const { append, fields, remove } = useFieldArray({
-    control,
-    name: 'study.scriptureRefs',
-  });
-
-  return (
-    <div className="space-y-4">
-      {fields.map((field, index) => (
-        <div className="space-y-4" key={field.id}>
+      {study.scriptureRefs.map((_, index) => (
+        <div className="space-y-4" key={index}>
           <TextField
             control={control}
             label="Book"
@@ -163,74 +118,20 @@ function ScriptureRefFields({
             min={1}
             name={`study.scriptureRefs.${index}.verseEnd`}
           />
-          <Button
-            onClick={() => {
-              remove(index);
-            }}
-            size="sm"
-            type="button"
-            variant="outline"
-          >
-            Remove scripture
-          </Button>
         </div>
       ))}
-      <Button
-        onClick={() => {
-          append({ book: '', chapter: 1 });
-        }}
-        size="sm"
-        type="button"
-        variant="outline"
-      >
-        Add scripture
-      </Button>
-    </div>
-  );
-}
-
-export function TalkStudyFields({
-  control,
-  isPending,
-  onPublish,
-  onUnpublish,
-  studyStatus,
-}: TalkStudyFieldsProps) {
-  return (
-    <div className="space-y-4">
-      <SectionHeading heading="Study" />
-      <div className="flex items-center justify-between gap-3">
-        <ManageStatusBadge status={studyStatus} />
-        {studyStatus === 'published' ? (
-          <Button
-            disabled={isPending}
-            onClick={onUnpublish}
-            type="button"
-            variant="outline"
-          >
-            Unpublish
-          </Button>
-        ) : (
-          <Button disabled={isPending} onClick={onPublish} type="button">
-            Publish
-          </Button>
-        )}
-      </div>
-      <TextareaField
-        control={control}
-        label="Summary"
-        name="study.summary"
-        rows={4}
-      />
-      <OutlineFields control={control} />
-      <StudyGuideFields control={control} />
-      <ScriptureRefFields control={control} />
       <TextField
         control={control}
         description="Separate topics with commas"
         label="Suggested topics"
         name="study.suggestedTopics"
       />
+      {transcript?.text ? (
+        <>
+          <SectionHeading heading="Transcript" />
+          <Textarea readOnly rows={8} value={transcript.text} />
+        </>
+      ) : null}
     </div>
   );
 }

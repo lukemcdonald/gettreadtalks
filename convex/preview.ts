@@ -305,36 +305,6 @@ async function upsertTalkStudy(
   return await ctx.db.insert('talkStudies', fields);
 }
 
-async function upsertTalkTranscript(
-  ctx: MutationCtx,
-  talkId: Id<'talks'>,
-  transcript: (typeof PREVIEW_TRANSCRIPTS)[number]
-): Promise<Id<'talkTranscripts'>> {
-  const existing = await ctx.db
-    .query('talkTranscripts')
-    .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
-    .unique();
-  const fields = {
-    source: transcript.source,
-    status: transcript.status,
-    talkId,
-    ...('failureReason' in transcript
-      ? { failureReason: transcript.failureReason }
-      : {}),
-    ...('quality' in transcript ? { quality: transcript.quality } : {}),
-    ...('text' in transcript ? { text: transcript.text } : {}),
-    ...('wordCount' in transcript ? { wordCount: transcript.wordCount } : {}),
-  };
-
-  if (existing) {
-    await ctx.db.replace(existing._id, fields);
-
-    return existing._id;
-  }
-
-  return await ctx.db.insert('talkTranscripts', fields);
-}
-
 async function upsertTalkTopics(
   ctx: MutationCtx,
   talkId: Id<'talks'>,
@@ -441,7 +411,14 @@ export const seedContent = internalMutation({
           transcript.talkSlug
         );
 
-        await upsertTalkTranscript(ctx, talkId, transcript);
+        await ctx.runMutation(internal.talks.upsertTalkTranscript, {
+          quality: transcript.quality,
+          source: transcript.source,
+          status: transcript.status,
+          talkId,
+          text: transcript.text,
+          wordCount: transcript.wordCount,
+        });
       })
     );
 

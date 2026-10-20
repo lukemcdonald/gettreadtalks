@@ -28,7 +28,6 @@ export const AREA_NAV: AreaNavSection[] = [
         icon: 'collections',
         label: 'Collections',
       },
-      { href: ADMIN_LIST_PATHS.studies, icon: 'studies', label: 'Studies' },
     ],
     label: 'Content',
   },
