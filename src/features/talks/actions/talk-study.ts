@@ -17,7 +17,7 @@ import {
 
 async function writeTalkStudy(
   talkId: TalkId,
-  write: () => Promise<void>
+  write: () => Promise<unknown>
 ): Promise<ActionResult<{ talkId: string }>> {
   await requireAdminUser();
 
