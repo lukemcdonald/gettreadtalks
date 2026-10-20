@@ -595,38 +595,22 @@ export const listDraftTalkStudies = query({
   returns: docs('talkStudies'),
 });
 
-/**
- * Get the study for a talk. Admin only.
- */
 export const getTalkStudy = query({
-  args: {
-    talkId: v.id('talks'),
-  },
-  handler: async (ctx, args) => {
+  args: { talkId: v.id('talks') },
+  handler: async (ctx, { talkId }) => {
     await requireAdmin(ctx);
 
-    return await ctx.db
-      .query('talkStudies')
-      .withIndex('by_talkId', (q) => q.eq('talkId', args.talkId))
-      .unique();
+    return await getOneFrom(ctx.db, 'talkStudies', 'by_talkId', talkId);
   },
   returns: doc('talkStudies').nullable(),
 });
 
-/**
- * Get the private transcript for a talk, including text. Admin only.
- */
 export const getTalkTranscript = query({
-  args: {
-    talkId: v.id('talks'),
-  },
-  handler: async (ctx, args) => {
+  args: { talkId: v.id('talks') },
+  handler: async (ctx, { talkId }) => {
     await requireAdmin(ctx);
 
-    return await ctx.db
-      .query('talkTranscripts')
-      .withIndex('by_talkId', (q) => q.eq('talkId', args.talkId))
-      .unique();
+    return await getOneFrom(ctx.db, 'talkTranscripts', 'by_talkId', talkId);
   },
   returns: doc('talkTranscripts').nullable(),
 });

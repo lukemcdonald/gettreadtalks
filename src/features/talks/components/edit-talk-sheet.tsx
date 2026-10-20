@@ -3,12 +3,7 @@
 import type { CollectionListItem } from '@/features/collections/types';
 import type { SpeakerListItem } from '@/features/speakers/types';
 import type { TalkFormData } from '@/features/talks/schemas/talk-form';
-import type {
-  Talk,
-  TalkId,
-  TalkStudy,
-  TalkWithTopicIds,
-} from '@/features/talks/types';
+import type { Talk, TalkStudy, TalkWithTopicIds } from '@/features/talks/types';
 import type { TopicListItem } from '@/features/topics/types';
 import type { StatusPrefill } from '@/lib/entities/status-prefill';
 
@@ -16,6 +11,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 
+import { useSheetRoute } from '@/app/@sheet/_hooks/use-sheet-route';
 import { ManageStatusBadge } from '@/components/manage-table';
 import { FormSheet } from '@/components/ui';
 import { Link } from '@/components/ui/link';
@@ -28,10 +24,8 @@ import { buildTalkPath, buildTalkStudyPath } from '@/features/talks/utils';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
 
 interface EditTalkSheetProps {
+  closeHref?: string;
   collections: CollectionListItem[];
-  onOpenChange: (open: boolean) => void;
-  onTalkUpdated: (talkId: TalkId) => void;
-  open: boolean;
   speakers: SpeakerListItem[];
   statusPrefill?: StatusPrefill;
   studyStatus?: TalkStudy['studyStatus'] | null;
@@ -90,16 +84,15 @@ function getUrlChangeForTalk(talk: Talk, data: TalkFormData): UrlChange {
 }
 
 export function EditTalkSheet({
+  closeHref,
   collections,
-  onOpenChange,
-  onTalkUpdated,
-  open,
   speakers,
   statusPrefill,
   studyStatus,
   talk,
   topics,
 }: EditTalkSheetProps) {
+  const { handleOpenChange, handleSuccess } = useSheetRoute(closeHref);
   const [isPending, startTransition] = useTransition();
   const [pendingData, setPendingData] = useState<TalkFormData | null>(null);
   const [urlChange, setUrlChange] = useState<UrlChange>(null);
@@ -121,8 +114,8 @@ export function EditTalkSheet({
         return;
       }
 
-      onTalkUpdated(talk._id);
-      onOpenChange(false);
+      handleSuccess();
+      handleOpenChange(false);
     });
   }
 
@@ -156,9 +149,9 @@ export function EditTalkSheet({
       <FormSheet
         error={form.formState.errors.root}
         isPending={isPending}
-        onOpenChange={onOpenChange}
+        onOpenChange={handleOpenChange}
         onSubmit={handleSubmit}
-        open={open}
+        open
         submitLabel="Save Changes"
         title="Edit Talk"
       >

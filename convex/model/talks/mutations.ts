@@ -1,6 +1,7 @@
 import type { Doc, Id } from '../../_generated/dataModel';
 import type { MutationCtx } from '../../_generated/server';
 
+import { getOneFrom } from 'convex-helpers/server/relationships';
 import { v } from 'convex/values';
 
 import { internalMutation, mutation } from '../../_generated/server';
@@ -342,65 +343,41 @@ export const saveTalkStudyDraft = internalMutation({
   returns: v.id('talkStudies'),
 });
 
-async function getTalkStudyByTalkId(ctx: MutationCtx, talkId: Id<'talks'>) {
-  const study = await ctx.db
-    .query('talkStudies')
-    .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
-    .unique();
+async function patchTalkStudy(
+  ctx: MutationCtx,
+  talkId: Id<'talks'>,
+  fields: Partial<Doc<'talkStudies'>>
+) {
+  await requireAdmin(ctx);
 
-  if (!study) {
+  const study =
+    (await getOneFrom(ctx.db, 'talkStudies', 'by_talkId', talkId)) ??
     throwNotFound('Study not found', {
       resource: 'talkStudy',
       resourceId: talkId,
     });
-  }
 
-  return study;
+  await ctx.db.patch(study._id, fields);
+
+  return study._id;
 }
 
-/**
- * Update a talk's study content and mark it as manually edited.
- */
 export const updateTalkStudy = mutation({
   args: {
     ...talkStudyContentFields,
     talkId: v.id('talks'),
   },
-  handler: async (ctx, args) => {
-    const { talkId, ...content } = args;
-
-    await requireAdmin(ctx);
-
-    const study = await getTalkStudyByTalkId(ctx, talkId);
-
-    await ctx.db.patch(study._id, {
-      ...content,
-      manuallyEditedAt: Date.now(),
-    });
-
-    return study._id;
-  },
+  handler: (ctx, { talkId, ...content }) =>
+    patchTalkStudy(ctx, talkId, { ...content, manuallyEditedAt: Date.now() }),
   returns: v.id('talkStudies'),
 });
 
-/**
- * Set a talk study to draft or published.
- */
 export const setTalkStudyStatus = mutation({
   args: {
     studyStatus: talkStudyStatus,
     talkId: v.id('talks'),
   },
-  handler: async (ctx, args) => {
-    await requireAdmin(ctx);
-
-    const study = await getTalkStudyByTalkId(ctx, args.talkId);
-
-    await ctx.db.patch(study._id, {
-      studyStatus: args.studyStatus,
-    });
-
-    return study._id;
-  },
+  handler: (ctx, { studyStatus, talkId }) =>
+    patchTalkStudy(ctx, talkId, { studyStatus }),
   returns: v.id('talkStudies'),
 });

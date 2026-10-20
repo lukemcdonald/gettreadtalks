@@ -1,12 +1,13 @@
 'use client';
 
 import type { UpdateSpeakerFormData } from '@/features/speakers/schemas/speaker-form';
-import type { Speaker, SpeakerId } from '@/features/speakers/types';
+import type { Speaker } from '@/features/speakers/types';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 
+import { useSheetRoute } from '@/app/@sheet/_hooks/use-sheet-route';
 import { FormSheet } from '@/components/ui';
 import { toastManager } from '@/components/ui/primitives/toast';
 import { updateSpeakerAction } from '@/features/speakers/actions/update-speaker';
@@ -16,18 +17,15 @@ import { setServerErrors } from '@/lib/forms/react-hook-form';
 import { SpeakerFormFields } from './speaker-form-fields';
 
 interface EditSpeakerSheetProps {
-  onOpenChange: (open: boolean) => void;
-  onSpeakerUpdated: (speakerId: SpeakerId) => void;
-  open: boolean;
+  closeHref?: string;
   speaker: Speaker | null;
 }
 
 export function EditSpeakerSheet({
-  onOpenChange,
-  onSpeakerUpdated,
-  open,
+  closeHref,
   speaker,
 }: EditSpeakerSheetProps) {
+  const { handleOpenChange, handleSuccess } = useSheetRoute(closeHref);
   const [isPending, startTransition] = useTransition();
 
   const form = useForm<UpdateSpeakerFormData>({
@@ -60,8 +58,8 @@ export function EditSpeakerSheet({
       }
 
       toastManager.add({ title: 'Speaker updated', type: 'success' });
-      onSpeakerUpdated(speaker._id);
-      onOpenChange(false);
+      handleSuccess();
+      handleOpenChange(false);
     });
   });
 
@@ -73,9 +71,9 @@ export function EditSpeakerSheet({
     <FormSheet
       error={form.formState.errors.root}
       isPending={isPending}
-      onOpenChange={onOpenChange}
+      onOpenChange={handleOpenChange}
       onSubmit={handleSubmit}
-      open={open}
+      open
       submitLabel="Save Changes"
       title="Edit Speaker"
     >
