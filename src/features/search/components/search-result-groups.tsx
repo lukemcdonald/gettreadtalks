@@ -4,6 +4,7 @@ import type { SearchHit } from '@/features/search/types';
 
 import { Link } from '@/components/ui/link';
 import { groupSearchHits } from '@/features/search/utils';
+import { TalkCardSubtitle } from '@/features/talks/components/talk-card-subtitle';
 import { track } from '@/services/analytics';
 
 function SearchHitLink({
@@ -30,9 +31,12 @@ function SearchHitLink({
       }}
     >
       <span className="text-foreground block font-medium">{hit.title}</span>
-      {!!hit.subtitle && (
-        <span className="text-muted-foreground block text-sm">
-          {hit.subtitle}
+      {!!(hit.scripture || hit.subtitle) && (
+        <span className="text-muted-foreground block min-w-0 text-sm">
+          <TalkCardSubtitle
+            scripture={hit.scripture}
+            speakerName={hit.subtitle}
+          />
         </span>
       )}
     </Link>

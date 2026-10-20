@@ -19,6 +19,7 @@ describe('searchSite', () => {
     expect(result.talks.map((talk) => talk.slug)).toEqual([
       visibilitySlugs.publishedTalk,
     ]);
+    expect(result.talks[0]?.scripture).toBe('Romans 5:1-2');
   });
 
   it('returns published clips and omits those whose parent talk is unpublished', async () => {

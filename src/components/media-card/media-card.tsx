@@ -34,14 +34,16 @@ export function MediaCard({
       {...delegated}
     >
       {media}
-      <div className="flex flex-1 flex-col justify-center gap-0.5">
+      <div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5">
         <MediaCardTitle aria-label={ariaLabel}>
           <FauxLink data-testid={testId} href={href}>
             {title}
           </FauxLink>
         </MediaCardTitle>
         {!!subtitle && (
-          <CardDescription className="text-pretty">{subtitle}</CardDescription>
+          <CardDescription className="min-w-0 text-pretty">
+            {subtitle}
+          </CardDescription>
         )}
       </div>
     </Card>

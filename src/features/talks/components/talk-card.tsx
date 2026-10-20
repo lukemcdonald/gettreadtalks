@@ -1,11 +1,10 @@
 import type { Speaker } from '@/features/speakers/types';
 import type { Talk } from '@/features/talks/types';
-import type { ReactNode } from 'react';
 
 import { MediaCard } from '@/components/media-card';
-import { Link } from '@/components/ui/link';
 import { SpeakerAvatar } from '@/features/speakers/components/speaker-avatar';
 import { buildSpeakerPath, getSpeakerName } from '@/features/speakers/utils';
+import { TalkCardSubtitle } from '@/features/talks/components/talk-card-subtitle';
 import { buildTalkPath } from '@/features/talks/utils';
 
 interface TalkCardProps {
@@ -16,23 +15,6 @@ interface TalkCardProps {
   talk: Pick<Talk, 'description' | 'scripture' | 'slug' | 'title'>;
 }
 
-function SpeakerLink({
-  children,
-  slug,
-}: {
-  children: ReactNode;
-  slug: string;
-}) {
-  return (
-    <Link
-      className="relative z-10 hover:underline"
-      href={buildSpeakerPath({ slug })}
-    >
-      {children}
-    </Link>
-  );
-}
-
 export function TalkCard({ speaker, talk }: TalkCardProps) {
   const speakerName = getSpeakerName(speaker);
   const accessibleLabel = speakerName
@@ -40,23 +22,21 @@ export function TalkCard({ speaker, talk }: TalkCardProps) {
     : talk.title;
   const talkHref = buildTalkPath({ speaker, slug: talk.slug });
 
-  function getSubtitle() {
-    if (talk.scripture) {
-      return talk.scripture;
-    }
-    if (speaker?.slug) {
-      return <SpeakerLink slug={speaker.slug}>{speakerName}</SpeakerLink>;
-    }
-    return speakerName;
-  }
-
   return (
     <MediaCard
       ariaLabel={accessibleLabel}
       data-testid="talk-card"
       href={talkHref}
       media={speaker ? <SpeakerAvatar speaker={speaker} /> : undefined}
-      subtitle={getSubtitle()}
+      subtitle={
+        <TalkCardSubtitle
+          scripture={talk.scripture}
+          speakerHref={
+            speaker?.slug ? buildSpeakerPath({ slug: speaker.slug }) : undefined
+          }
+          speakerName={speakerName}
+        />
+      }
       title={talk.title}
     />
   );

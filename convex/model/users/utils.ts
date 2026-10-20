@@ -89,6 +89,7 @@ export async function getUserFavoriteTalks(
       return {
         _id: talk._id,
         favoriteId: row._id,
+        scripture: talk.scripture,
         slug: talk.slug,
         speaker: speaker
           ? {

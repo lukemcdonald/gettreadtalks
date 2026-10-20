@@ -50,6 +50,7 @@ const result = {
   talks: [
     {
       _id: 'talk1',
+      scripture: 'Romans 8:28',
       slug: 'sample-sermon-on-romans-8',
       speaker: {
         firstName: 'John',
@@ -94,6 +95,7 @@ describe('toSearchHits', () => {
       {
         href: '/talks/john-doe/sample-sermon-on-romans-8',
         id: 'talk1',
+        scripture: 'Romans 8:28',
         subtitle: 'John Doe',
         title: 'Sample Sermon on Romans 8',
         type: 'talk',

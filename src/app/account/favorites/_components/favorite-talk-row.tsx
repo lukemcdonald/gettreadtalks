@@ -9,6 +9,7 @@ import { useOptimisticRow } from '@/hooks/use-optimistic-row';
 
 interface FavoriteTalkRowProps {
   href: string;
+  scripture?: string;
   speaker?: Pick<Speaker, 'firstName' | 'lastName'> | null;
   talkId: TalkId;
   title: string;
@@ -16,6 +17,7 @@ interface FavoriteTalkRowProps {
 
 export function FavoriteTalkRow({
   href,
+  scripture,
   speaker,
   talkId,
   title,
@@ -36,6 +38,7 @@ export function FavoriteTalkRow({
         />
       }
       href={href}
+      scripture={scripture}
       speaker={speaker}
       title={title}
     />

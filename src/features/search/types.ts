@@ -10,6 +10,7 @@ export type SearchResultType = (typeof SEARCH_RESULT_TYPES)[number];
 export interface CommandSearchItem {
   href: string;
   label: string;
+  scripture?: string;
   subtitle?: string;
   value: string;
 }
@@ -35,6 +36,7 @@ export interface SearchOverlayProps {
 export interface SearchHit {
   href: string;
   id: string;
+  scripture?: string;
   subtitle?: string;
   title: string;
   type: SearchResultType;
@@ -64,6 +66,7 @@ export interface SiteSearchResult {
   talks: {
     _id: string;
     description?: string;
+    scripture?: string;
     slug: string;
     speaker: SearchSpeaker | null;
     title: string;

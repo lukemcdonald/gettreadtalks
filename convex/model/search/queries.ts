@@ -37,6 +37,7 @@ const searchSpeakerResultValidator = v.object({
 const searchTalkValidator = v.object({
   _id: v.id('talks'),
   description: v.optional(v.string()),
+  scripture: v.optional(v.string()),
   slug: v.string(),
   speaker: v.nullable(searchSpeakerValidator),
   title: v.string(),
@@ -73,6 +74,7 @@ async function toSearchTalks(ctx: QueryCtx, talks: Doc<'talks'>[]) {
   return talksWithSpeakers.map((talk) => ({
     _id: talk._id,
     description: talk.description,
+    scripture: talk.scripture,
     slug: talk.slug,
     speaker: toSearchSpeaker(talk.speaker),
     title: talk.title,

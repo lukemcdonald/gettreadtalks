@@ -71,6 +71,7 @@ function FavoritesTabPanels({ clips, speakers, talks }: UserFavorites) {
           <FavoriteTalkRow
             href={talk.speaker ? buildTalkPath(talk) : ''}
             key={talk._id}
+            scripture={talk.scripture}
             speaker={talk.speaker}
             talkId={talk._id}
             title={talk.title}
