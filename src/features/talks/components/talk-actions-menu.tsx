@@ -1,6 +1,6 @@
 'use client';
 
-import type { TalkWithSpeakerAndTopics } from '@/features/talks/types';
+import type { Talk } from '@/features/talks/types';
 
 import { useRouter } from 'next/navigation';
 
@@ -11,7 +11,7 @@ import { buildTalksPath } from '@/features/talks/utils';
 import { buildAdminListPath } from '@/lib/entities/paths';
 
 interface TalkActionsMenuProps {
-  talk: TalkWithSpeakerAndTopics;
+  talk: Talk;
   talkUrl?: string;
 }
 

@@ -211,28 +211,30 @@ export function EditTalkSheet({
         submitLabel="Save Changes"
         title="Edit Talk"
       >
-        <TalkFormFields
-          collections={collections}
-          control={form.control as Control<TalkFormData>}
-          mode="edit"
-          setValue={form.setValue as UseFormSetValue<TalkFormData>}
-          speakers={speakers}
-          topics={topics}
-        />
-        {study ? (
-          <TalkStudyFields
-            control={form.control}
-            isPending={isPending}
-            onPublish={() => {
-              handleStudyStatus('published');
-            }}
-            onUnpublish={() => {
-              handleStudyStatus('draft');
-            }}
-            studyStatus={study.studyStatus}
+        <div className="space-y-4">
+          <TalkFormFields
+            collections={collections}
+            control={form.control as Control<TalkFormData>}
+            mode="edit"
+            setValue={form.setValue as UseFormSetValue<TalkFormData>}
+            speakers={speakers}
+            topics={topics}
           />
-        ) : null}
-        <TalkTranscriptStatus transcript={transcript} />
+          {study ? (
+            <TalkStudyFields
+              control={form.control}
+              isPending={isPending}
+              onPublish={() => {
+                handleStudyStatus('published');
+              }}
+              onUnpublish={() => {
+                handleStudyStatus('draft');
+              }}
+              studyStatus={study.studyStatus}
+            />
+          ) : null}
+          <TalkTranscriptStatus transcript={transcript} />
+        </div>
       </FormSheet>
 
       {urlChange && (

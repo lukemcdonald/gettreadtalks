@@ -26,8 +26,13 @@ export async function ManageStudiesContent() {
       </dl>
       <SectionHeading heading="Drafts" />
       <ManageTable isEmpty={drafts.length === 0} resource="studies">
-        {drafts.map(({ study, talk }) => (
-          <StudiesTableRow key={study._id} study={study} talk={talk} />
+        {drafts.map(({ speaker, study, talk }) => (
+          <StudiesTableRow
+            key={study._id}
+            speaker={speaker}
+            study={study}
+            talk={talk}
+          />
         ))}
       </ManageTable>
     </div>

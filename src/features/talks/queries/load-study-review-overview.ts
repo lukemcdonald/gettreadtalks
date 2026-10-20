@@ -16,6 +16,15 @@ export async function loadStudyReviewOverview() {
       fetchAuthQuery(api.talks.getTalk, { id: study.talkId })
     )
   );
+  const speakers = await Promise.all(
+    talks.map((talk) =>
+      talk?.speakerId
+        ? fetchAuthQuery(api.speakers.getSpeaker, {
+            speakerId: talk.speakerId,
+          })
+        : null
+    )
+  );
   const drafts = studies.flatMap((study, index) => {
     const talk = talks[index];
 
@@ -23,7 +32,7 @@ export async function loadStudyReviewOverview() {
       return [];
     }
 
-    return [{ study, talk }];
+    return [{ speaker: speakers[index] ?? null, study, talk }];
   });
 
   return {
