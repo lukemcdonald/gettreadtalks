@@ -30,6 +30,7 @@ import {
   listPublishedTalksPage,
   searchPublishedTalksByTitleOrSpeaker,
 } from './helpers';
+import { talkTranscriptFields } from './schema';
 import {
   enrichAdminTalks,
   enrichWithTopics,
@@ -521,4 +522,75 @@ export const listAllTalks = query({
       topicSlugs: v.array(v.string()),
     })
   ),
+});
+
+const { text: _talkTranscriptText, ...talkTranscriptListFields } =
+  talkTranscriptFields;
+
+const talkTranscriptListItem = v.object({
+  _creationTime: v.number(),
+  _id: v.id('talkTranscripts'),
+  ...talkTranscriptListFields,
+});
+
+/**
+ * List published (or filtered) talks that have no transcript row.
+ */
+export const listTalksWithoutTranscript = query({
+  args: {
+    status: v.optional(statusFilterType),
+  },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+
+    const status = args.status ?? 'published';
+    const talks =
+      status === 'all'
+        ? await ctx.db.query('talks').order('desc').collect()
+        : await ctx.db
+            .query('talks')
+            .withIndex('by_status_and_publishedAt', (q) =>
+              q.eq('status', status)
+            )
+            .order('desc')
+            .collect();
+    const transcripts = await ctx.db.query('talkTranscripts').collect();
+    const talkIdsWithTranscript = new Set(
+      transcripts.map((transcript) => transcript.talkId)
+    );
+
+    return talks.filter((talk) => !talkIdsWithTranscript.has(talk._id));
+  },
+  returns: docs('talks'),
+});
+
+/**
+ * List transcript metadata. Omits transcript text.
+ */
+export const listTalkTranscripts = query({
+  args: {},
+  handler: async (ctx) => {
+    await requireAdmin(ctx);
+
+    const transcripts = await ctx.db.query('talkTranscripts').collect();
+
+    return transcripts.map(({ text: _text, ...item }) => item);
+  },
+  returns: v.array(talkTranscriptListItem),
+});
+
+/**
+ * List study rows still awaiting review.
+ */
+export const listDraftTalkStudies = query({
+  args: {},
+  handler: async (ctx) => {
+    await requireAdmin(ctx);
+
+    return await ctx.db
+      .query('talkStudies')
+      .withIndex('by_studyStatus', (q) => q.eq('studyStatus', 'draft'))
+      .collect();
+  },
+  returns: docs('talkStudies'),
 });

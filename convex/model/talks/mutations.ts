@@ -3,8 +3,12 @@ import type { MutationCtx } from '../../_generated/server';
 
 import { v } from 'convex/values';
 
-import { mutation } from '../../_generated/server';
-import { throwDuplicateSlug, throwValidationError } from '../../lib/errors';
+import { internalMutation, mutation } from '../../_generated/server';
+import {
+  throwConvexError,
+  throwDuplicateSlug,
+  throwValidationError,
+} from '../../lib/errors';
 import {
   deleteAll,
   getOrThrow,
@@ -13,7 +17,8 @@ import {
   talkSlugExistsForSpeaker,
 } from '../../lib/utils';
 import { requireAdmin } from '../auth/roles';
-import { statusType } from './validators';
+import { talkTranscriptFields } from './schema';
+import { statusType, talkStudyContentFields } from './validators';
 
 async function setTalkTopics(
   ctx: MutationCtx,
@@ -220,12 +225,24 @@ export const destroyTalk = mutation({
 
     await getOrThrow(ctx, 'talks', talkId);
 
-    const talksOnTopics = await ctx.db
-      .query('talksOnTopics')
-      .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
-      .collect();
+    const [studies, talksOnTopics, transcripts] = await Promise.all([
+      ctx.db
+        .query('talkStudies')
+        .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
+        .collect(),
+      ctx.db
+        .query('talksOnTopics')
+        .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
+        .collect(),
+      ctx.db
+        .query('talkTranscripts')
+        .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
+        .collect(),
+    ]);
 
+    await deleteAll(ctx, studies);
     await deleteAll(ctx, talksOnTopics);
+    await deleteAll(ctx, transcripts);
 
     const favorites = await ctx.db
       .query('userFavoriteTalks')
@@ -248,4 +265,74 @@ export const destroyTalk = mutation({
     return null;
   },
   returns: v.null(),
+});
+
+/**
+ * Upsert a private talk transcript.
+ */
+export const upsertTalkTranscript = internalMutation({
+  args: talkTranscriptFields,
+  handler: async (ctx, args) => {
+    await getOrThrow(ctx, 'talks', args.talkId);
+
+    const existing = await ctx.db
+      .query('talkTranscripts')
+      .withIndex('by_talkId', (q) => q.eq('talkId', args.talkId))
+      .unique();
+
+    if (existing) {
+      await ctx.db.replace(existing._id, args);
+
+      return existing._id;
+    }
+
+    return await ctx.db.insert('talkTranscripts', args);
+  },
+  returns: v.id('talkTranscripts'),
+});
+
+/**
+ * Save a study draft. Always stores studyStatus `draft`; never publishes.
+ */
+export const saveTalkStudyDraft = internalMutation({
+  args: {
+    generator: v.string(),
+    ...talkStudyContentFields,
+    talkId: v.id('talks'),
+  },
+  handler: async (ctx, args) => {
+    await getOrThrow(ctx, 'talks', args.talkId);
+
+    const existing = await ctx.db
+      .query('talkStudies')
+      .withIndex('by_talkId', (q) => q.eq('talkId', args.talkId))
+      .unique();
+    const fields = {
+      generatedAt: Date.now(),
+      generator: args.generator,
+      outline: args.outline,
+      scriptureRefs: args.scriptureRefs,
+      studyGuide: args.studyGuide,
+      studyStatus: 'draft' as const,
+      suggestedTopics: args.suggestedTopics,
+      summary: args.summary,
+      talkId: args.talkId,
+    };
+
+    if (existing) {
+      if (
+        existing.studyStatus === 'published' ||
+        existing.manuallyEditedAt !== undefined
+      ) {
+        throwConvexError(409, 'Study already reviewed');
+      }
+
+      await ctx.db.replace(existing._id, fields);
+
+      return existing._id;
+    }
+
+    return await ctx.db.insert('talkStudies', fields);
+  },
+  returns: v.id('talkStudies'),
 });
