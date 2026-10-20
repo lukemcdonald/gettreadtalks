@@ -4,6 +4,9 @@
 @import './base.css';
 @import './utilities.css';
 
+@source not '../../.agents';
+@source not '../../.claude';
+
 /* Unused COSS primitives: remove a line when you start using that primitive. */
 @source not '../components/ui/primitives/accordion.tsx';
 @source not '../components/ui/primitives/breadcrumb.tsx';
