@@ -7,6 +7,7 @@ export const ADMIN_LIST_PATHS = {
   clips: '/manage/clips',
   collections: '/manage/collections',
   speakers: '/manage/speakers',
+  studies: '/manage/studies',
   talks: '/manage/talks',
   topics: '/manage/topics',
 } as const;
