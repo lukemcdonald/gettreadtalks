@@ -1,245 +1,162 @@
-import type { SiteSearchResult } from '@/features/search/types';
+import type { SpeakerRecord, TalkRecord } from '@/features/mcp/format';
+import type { ConvexReactClient } from 'convex/react';
+import type { WebMCP } from 'webmcp-types';
 
+import { api } from '@/convex/_generated/api';
 import { normalizeSearchQuery } from '@/convex/model/search/utils';
-import {
-  buildSearchPageHref,
-  SEARCH_PAGE_LIMIT,
-} from '@/features/search/utils';
-import { getSpeakerName } from '@/features/speakers/utils';
-import { buildTalkPath } from '@/features/talks/utils';
+import { formatTalk } from '@/features/mcp/format';
+import { buildSearchPageHref } from '@/features/search/utils';
 
-const WEBMCP_OUTPUT_MAX_CHARS = 1500;
-export const WEBMCP_SEARCH_PAGE_SIZE = 5;
-const WEBMCP_SEARCH_QUERY_MAX = 200;
+type SearchTalks = (args: {
+  limit: number;
+  search: string;
+}) => Promise<{ talks: (TalkRecord & { speaker: SpeakerRecord | null })[] }>;
 
-export interface WebMcpToolError {
-  code: string;
-  error: string;
-  retryable: boolean;
-  suggestion?: string;
+const SEARCH_LIMIT = 5;
+const TALK_PATH = /^\/talks\/[^/]+\/[^/]+$/u;
+
+function toolError(code: string, error: string, retryable = false) {
+  return { code, error, retryable };
 }
 
-export interface WebMcpTalkResult {
-  scripture?: string;
-  speaker: string;
-  title: string;
-  url: string;
-}
-
-export interface WebMcpSearchTalksResult {
-  page_size: number;
-  suggestion?: string;
-  talks: WebMcpTalkResult[];
-  total_count: number;
-}
-
-function isWebMcpToolError(
-  value: { href: string } | WebMcpToolError
-): value is WebMcpToolError {
-  return 'error' in value;
-}
-
-function invalidTalkError(): WebMcpToolError {
-  return {
-    code: 'INVALID_TALK',
-    error: 'That is not a talk on this site.',
-    retryable: false,
-    suggestion:
-      'Use a talk URL from search_talks, a /talks/... path, or speaker-slug/talk-slug.',
-  };
-}
-
-export function toTalkPath(
-  talk: string,
-  origin: string
-): { href: string } | WebMcpToolError {
-  const trimmed = talk.trim();
-
-  if (!trimmed) {
-    return invalidTalkError();
-  }
-
-  let url: URL;
-
+function resolveTalkHref(talk: string, origin: string) {
   try {
-    if (trimmed.startsWith('//')) {
-      url = new URL(`https:${trimmed}`);
-    } else if (trimmed.includes('://')) {
-      url = new URL(trimmed);
-    } else if (trimmed.startsWith('/')) {
-      url = new URL(trimmed, origin);
-    } else {
-      url = new URL(`/talks/${trimmed}`, origin);
+    const url = new URL(talk.trim(), origin);
+
+    if (url.origin !== origin) {
+      return toolError('CROSS_ORIGIN', 'Talk URLs must be on this site.');
     }
+
+    if (!TALK_PATH.test(url.pathname)) {
+      return toolError('INVALID_TALK', 'That is not a talk on this site.');
+    }
+
+    return { href: url.pathname };
   } catch {
-    return invalidTalkError();
+    return toolError('INVALID_TALK', 'That is not a talk on this site.');
   }
-
-  if (url.protocol !== 'http:' && url.protocol !== 'https:') {
-    return invalidTalkError();
-  }
-
-  if (url.origin !== origin) {
-    return {
-      code: 'CROSS_ORIGIN',
-      error: 'Talk URLs must be on this site.',
-      retryable: false,
-      suggestion: 'Use a path or URL from search_talks on this page.',
-    };
-  }
-
-  const pathname = url.pathname.replace(/\/+$/u, '') || '/';
-  const segments = pathname.split('/').filter(Boolean);
-
-  if (
-    segments[0] !== 'talks' ||
-    segments.length < 2 ||
-    segments.length > 3 ||
-    segments.some((segment) => segment === '.' || segment === '..')
-  ) {
-    return invalidTalkError();
-  }
-
-  return { href: pathname };
 }
 
-function toSearchTalkResults(
-  result: SiteSearchResult,
-  origin: string
-): WebMcpSearchTalksResult {
-  const talks = result.talks.flatMap((talk) => {
-    if (!talk.speaker) {
-      return [];
-    }
-
-    return [
-      {
-        ...(talk.scripture ? { scripture: talk.scripture } : {}),
-        speaker: getSpeakerName(talk.speaker),
-        title: talk.title,
-        url: `${origin}${buildTalkPath(talk)}`,
-      },
-    ];
-  });
-
-  return capSearchTalkResults({
-    page_size: WEBMCP_SEARCH_PAGE_SIZE,
-    ...(talks.length === 0
-      ? {
-          suggestion:
-            'Try a speaker name, a shorter phrase, or a scripture book.',
-        }
-      : {}),
-    talks: talks.slice(0, WEBMCP_SEARCH_PAGE_SIZE),
-    total_count: talks.length,
-  });
-}
-
-function capSearchTalkResults(
-  payload: WebMcpSearchTalksResult
-): WebMcpSearchTalksResult {
-  const talks = [...payload.talks];
-
-  while (
-    talks.length > 1 &&
-    JSON.stringify({ ...payload, talks }).length > WEBMCP_OUTPUT_MAX_CHARS
-  ) {
-    talks.pop();
-  }
-
-  return {
-    ...payload,
-    talks,
-  };
-}
-
-export async function searchTalksForAgent({
-  navigate,
-  origin,
-  query,
-  searchSite,
-  signal,
-}: {
-  navigate: (href: string) => void;
-  origin: string;
-  query: string;
-  searchSite: (args: {
-    limit?: number;
-    query: string;
-  }) => Promise<SiteSearchResult>;
-  signal: AbortSignal;
-}): Promise<WebMcpSearchTalksResult | WebMcpToolError> {
-  if (signal.aborted) {
-    return {
-      code: 'CANCELLED',
-      error: 'Search was cancelled.',
-      retryable: false,
-    };
-  }
-
-  const normalizedQuery = normalizeSearchQuery(query);
-
-  if (!normalizedQuery) {
-    return {
-      code: 'INVALID_QUERY',
-      error: 'A search query is required.',
-      retryable: false,
-      suggestion: 'Ask the user what talk, speaker, or topic to find.',
-    };
-  }
-
-  if (normalizedQuery.length > WEBMCP_SEARCH_QUERY_MAX) {
-    return {
-      code: 'INVALID_QUERY',
-      error: 'That search is too long.',
-      retryable: false,
-      suggestion: 'Use a shorter phrase.',
-    };
-  }
-
-  const href = buildSearchPageHref(normalizedQuery);
-  navigate(href);
-
-  try {
-    const result = await searchSite({
-      limit: SEARCH_PAGE_LIMIT,
-      query: normalizedQuery,
+export function createSearchTalks(
+  query: ConvexReactClient['query']
+): SearchTalks {
+  return async ({ limit, search }) => {
+    const result = await query(api.talks.listTalks, {
+      paginationOpts: { cursor: null, numItems: limit },
+      search,
+      sort: 'recent',
     });
 
-    if (signal.aborted) {
-      return {
-        code: 'CANCELLED',
-        error: 'Search was cancelled.',
-        retryable: false,
-      };
-    }
-
-    return toSearchTalkResults(result, origin);
-  } catch {
-    return {
-      code: 'SEARCH_FAILED',
-      error: 'Talk search failed. Try again in a moment.',
-      retryable: true,
-    };
-  }
+    return { talks: result.page };
+  };
 }
 
-export function openTalkForAgent({
+export async function registerWebMcpTools({
+  document: documentLike,
   navigate,
   origin,
-  talk,
+  searchTalks,
+  signal,
 }: {
+  document: { modelContext?: Pick<WebMCP.ModelContext, 'registerTool'> };
   navigate: (href: string) => void;
   origin: string;
-  talk: string;
-}): { href: string } | WebMcpToolError {
-  const resolved = toTalkPath(talk, origin);
+  searchTalks: SearchTalks;
+  signal: AbortSignal;
+}) {
+  const { modelContext } = documentLike;
 
-  if (isWebMcpToolError(resolved)) {
-    return resolved;
+  if (typeof modelContext?.registerTool !== 'function') {
+    return;
   }
 
-  navigate(resolved.href);
+  await Promise.all([
+    modelContext.registerTool(
+      {
+        annotations: {
+          untrustedContentHint: true,
+        },
+        description:
+          'Searches published talks by title or speaker and opens the site search. Use when the user wants to find a sermon.',
+        execute: async ({ query }: { query: string }) => {
+          const normalizedQuery = normalizeSearchQuery(query);
 
-  return { href: resolved.href };
+          if (!normalizedQuery) {
+            return toolError('INVALID_QUERY', 'A search query is required.');
+          }
+
+          navigate(buildSearchPageHref(normalizedQuery));
+
+          try {
+            const { talks } = await searchTalks({
+              limit: SEARCH_LIMIT,
+              search: normalizedQuery,
+            });
+            const formatted = talks.map((talk) =>
+              formatTalk(talk, talk.speaker, origin)
+            );
+
+            if (formatted.length === 0) {
+              return {
+                suggestion: 'Try a speaker name or a shorter phrase.',
+                talks: formatted,
+              };
+            }
+
+            return { talks: formatted };
+          } catch {
+            return toolError(
+              'SEARCH_FAILED',
+              'Talk search failed. Try again in a moment.',
+              true
+            );
+          }
+        },
+        inputSchema: {
+          properties: {
+            query: {
+              description: 'Words in a talk title or speaker name.',
+              type: 'string',
+            },
+          },
+          required: ['query'],
+          type: 'object',
+        },
+        name: 'search_talks',
+        title: 'Search talks',
+      },
+      { signal }
+    ),
+    modelContext.registerTool(
+      {
+        description:
+          'Opens a published talk on this site. Use when the user is ready to view a talk from search_talks.',
+        execute: ({ talk }: { talk: string }) => {
+          const resolved = resolveTalkHref(talk, origin);
+
+          if ('error' in resolved) {
+            return resolved;
+          }
+
+          navigate(resolved.href);
+
+          return resolved;
+        },
+        inputSchema: {
+          properties: {
+            talk: {
+              description:
+                'Same-origin talk URL or /talks/<speaker>/<talk> path from search_talks.',
+              type: 'string',
+            },
+          },
+          required: ['talk'],
+          type: 'object',
+        },
+        name: 'open_talk',
+        title: 'Open talk',
+      },
+      { signal }
+    ),
+  ]);
 }

@@ -1,15 +1,42 @@
 'use client';
 
-import dynamic from 'next/dynamic';
+import { useConvex } from 'convex/react';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
-const WebMcpRegistrar = dynamic(
-  () =>
-    import('@/features/webmcp/components/webmcp-registrar').then(
-      (module) => module.WebMcpRegistrar
-    ),
-  { ssr: false }
-);
+function loadWebMcpTools() {
+  return import('@/features/webmcp/tools');
+}
 
 export function WebMcpTools() {
-  return <WebMcpRegistrar />;
+  const convex = useConvex();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!document.modelContext) {
+      return;
+    }
+
+    const controller = new AbortController();
+
+    void loadWebMcpTools()
+      .then(({ createSearchTalks, registerWebMcpTools }) =>
+        registerWebMcpTools({
+          document,
+          navigate: (href) => {
+            router.push(href);
+          },
+          origin: window.location.origin,
+          searchTalks: createSearchTalks(convex.query),
+          signal: controller.signal,
+        })
+      )
+      .catch(() => {});
+
+    return () => {
+      controller.abort();
+    };
+  }, [convex, router]);
+
+  return null;
 }

@@ -1,14 +1,16 @@
+import type { SpeakerRecord, TalkRecord } from './format';
+
 import { createMcpHandler, McpServer } from '@modelcontextprotocol/server';
 import { z } from 'zod';
 
 import { buildClipPath } from '@/features/clips/utils';
 import { buildCollectionPath } from '@/features/collections/utils';
-import { buildSpeakerPath, getSpeakerName } from '@/features/speakers/utils';
 import { buildTalkPath } from '@/features/talks/utils';
 import { buildTopicPath } from '@/features/topics/utils';
 import { buildAbsoluteUrl } from '@/lib/entities/paths';
 
 import { withToolTracking } from './analytics';
+import { formatSpeaker, formatTalk, toIsoDate } from './format';
 
 const DEFAULT_LIST_LIMIT = 50;
 const DEFAULT_SEARCH_LIMIT = 10;
@@ -102,23 +104,6 @@ const getClipInputSchema = z.object({
   slug: slugSchema.describe('Clip URL slug from list_clips or get_talk.'),
 });
 
-interface SpeakerRecord {
-  description?: string;
-  firstName: string;
-  lastName: string;
-  ministry?: string;
-  slug: string;
-}
-
-interface TalkRecord {
-  description?: string;
-  publishedAt?: number;
-  scripture?: string;
-  slug: string;
-  title: string;
-  topicSlugs?: string[];
-}
-
 interface ClipRecord {
   description?: string;
   publishedAt?: number;
@@ -197,42 +182,10 @@ export interface McpCatalog {
   >;
 }
 
-function toIsoDate(timestamp?: number) {
-  if (!timestamp) {
-    return;
-  }
-
-  return new Date(timestamp).toISOString();
-}
-
 function toolResult(data: unknown, isError = false) {
   return {
     content: [{ text: JSON.stringify(data), type: 'text' as const }],
     isError,
-  };
-}
-
-function formatSpeaker(speaker: SpeakerRecord) {
-  return {
-    ministry: speaker.ministry,
-    name: getSpeakerName(speaker),
-    slug: speaker.slug,
-    url: buildAbsoluteUrl(buildSpeakerPath(speaker)),
-  };
-}
-
-function formatTalk(talk: TalkRecord, speaker: SpeakerRecord | null) {
-  return {
-    description: talk.description,
-    publishedAt: toIsoDate(talk.publishedAt),
-    scripture: talk.scripture,
-    slug: talk.slug,
-    speaker: speaker ? formatSpeaker(speaker) : null,
-    title: talk.title,
-    topics: talk.topicSlugs,
-    url: speaker
-      ? buildAbsoluteUrl(buildTalkPath({ speaker, slug: talk.slug }))
-      : undefined,
   };
 }
 

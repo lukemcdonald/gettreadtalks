@@ -1,71 +1,151 @@
+import { buildSearchPageHref } from '@/features/search/utils';
 import { describe, expect, it, vi } from '@/test';
 
-import { openTalkForAgent, toTalkPath } from './tools';
+import { registerWebMcpTools } from './tools';
 
 const origin = 'https://www.gettreadtalks.com';
 
-describe('toTalkPath', () => {
-  it('accepts a same-origin talk URL, path, or speaker/talk slug', () => {
-    expect(
-      toTalkPath(
-        'https://www.gettreadtalks.com/talks/john-doe/sample-sermon-on-romans-8',
-        origin
-      )
-    ).toEqual({
-      href: '/talks/john-doe/sample-sermon-on-romans-8',
-    });
-    expect(
-      toTalkPath('/talks/john-doe/sample-sermon-on-romans-8', origin)
-    ).toEqual({
-      href: '/talks/john-doe/sample-sermon-on-romans-8',
-    });
-    expect(toTalkPath('john-doe/sample-sermon-on-romans-8', origin)).toEqual({
-      href: '/talks/john-doe/sample-sermon-on-romans-8',
-    });
-  });
+const john = {
+  firstName: 'John',
+  lastName: 'Doe',
+  ministry: 'Sample Chapel',
+  slug: 'john-doe',
+};
 
-  it('rejects other origins and non-talk paths', () => {
-    expect(toTalkPath('https://evil.example/talks/john-doe/x', origin)).toEqual(
-      expect.objectContaining({ code: 'CROSS_ORIGIN' })
-    );
-    expect(toTalkPath('//evil.example/talks/john-doe/x', origin)).toEqual(
-      expect.objectContaining({ code: 'CROSS_ORIGIN' })
-    );
-    expect(toTalkPath('/manage/talks', origin)).toEqual(
-      expect.objectContaining({ code: 'INVALID_TALK' })
-    );
-    expect(toTalkPath('../manage', origin)).toEqual(
-      expect.objectContaining({ code: 'INVALID_TALK' })
-    );
-  });
-});
+const romansTalk = {
+  description: 'A sample sermon on Romans 8.',
+  publishedAt: Date.parse('2024-06-03T12:00:00.000Z'),
+  scripture: 'Romans 8:28',
+  slug: 'sample-sermon-on-romans-8',
+  speaker: john,
+  title: 'Sample Sermon on Romans 8',
+  topicSlugs: ['grace'],
+};
 
-describe('openTalkForAgent', () => {
-  it('navigates to a validated talk path', () => {
+function getExecute(registerTool: ReturnType<typeof vi.fn>, name: string) {
+  const tool = registerTool.mock.calls
+    .map(
+      ([registered]) =>
+        registered as {
+          execute?: (
+            input: Record<string, string>,
+            options: { signal: AbortSignal }
+          ) => Promise<unknown>;
+          name: string;
+        }
+    )
+    .find((registered) => registered.name === name);
+
+  if (!tool?.execute) {
+    throw new Error(`missing ${name}`);
+  }
+
+  return tool.execute;
+}
+
+describe('registerWebMcpTools', () => {
+  it('is a no-op when modelContext is missing', async () => {
     const navigate = vi.fn();
-    const result = openTalkForAgent({
+    const searchTalks = vi.fn();
+
+    await registerWebMcpTools({
+      document: {},
       navigate,
       origin,
-      talk: '/talks/john-doe/sample-sermon-on-romans-8',
-    });
-
-    expect(navigate).toHaveBeenCalledWith(
-      '/talks/john-doe/sample-sermon-on-romans-8'
-    );
-    expect(result).toEqual({
-      href: '/talks/john-doe/sample-sermon-on-romans-8',
-    });
-  });
-
-  it('does not navigate for a cross-origin URL', () => {
-    const navigate = vi.fn();
-    const result = openTalkForAgent({
-      navigate,
-      origin,
-      talk: 'https://evil.example/talks/john-doe/x',
+      searchTalks,
+      signal: new AbortController().signal,
     });
 
     expect(navigate).not.toHaveBeenCalled();
-    expect(result).toEqual(expect.objectContaining({ code: 'CROSS_ORIGIN' }));
+    expect(searchTalks).not.toHaveBeenCalled();
+  });
+
+  it('search_talks returns formatted talks and navigates to the search page', async () => {
+    const navigate = vi.fn();
+    const registerTool = vi.fn(async () => {});
+    const searchTalks = vi.fn().mockResolvedValue({ talks: [romansTalk] });
+
+    await registerWebMcpTools({
+      document: { modelContext: { registerTool } },
+      navigate,
+      origin,
+      searchTalks,
+      signal: new AbortController().signal,
+    });
+
+    const result = await getExecute(registerTool, 'search_talks')(
+      { query: 'Romans' },
+      { signal: new AbortController().signal }
+    );
+
+    expect(navigate).toHaveBeenCalledWith(buildSearchPageHref('Romans'));
+    expect(searchTalks).toHaveBeenCalledWith({
+      limit: 5,
+      search: 'Romans',
+    });
+    expect(result).toEqual({
+      talks: [
+        {
+          description: 'A sample sermon on Romans 8.',
+          publishedAt: '2024-06-03T12:00:00.000Z',
+          scripture: 'Romans 8:28',
+          slug: 'sample-sermon-on-romans-8',
+          speaker: {
+            ministry: 'Sample Chapel',
+            name: 'John Doe',
+            slug: 'john-doe',
+            url: 'https://www.gettreadtalks.com/speakers/john-doe',
+          },
+          title: 'Sample Sermon on Romans 8',
+          topics: ['grace'],
+          url: 'https://www.gettreadtalks.com/talks/john-doe/sample-sermon-on-romans-8',
+        },
+      ],
+    });
+  });
+
+  it.each([
+    {
+      expected: { href: '/talks/john-doe/sample-sermon-on-romans-8' },
+      navigates: true,
+      talk: 'https://www.gettreadtalks.com/talks/john-doe/sample-sermon-on-romans-8',
+    },
+    {
+      expected: expect.objectContaining({ code: 'CROSS_ORIGIN' }),
+      navigates: false,
+      talk: 'https://evil.example/talks/john-doe/x',
+    },
+    {
+      expected: expect.objectContaining({ code: 'INVALID_TALK' }),
+      navigates: false,
+      talk: '/manage/talks',
+    },
+  ])('open_talk handles $talk', async ({ expected, navigates, talk }) => {
+    const navigate = vi.fn();
+    const registerTool = vi.fn(async () => {});
+
+    await registerWebMcpTools({
+      document: { modelContext: { registerTool } },
+      navigate,
+      origin,
+      searchTalks: vi.fn(),
+      signal: new AbortController().signal,
+    });
+
+    const result = await getExecute(registerTool, 'open_talk')(
+      { talk },
+      { signal: new AbortController().signal }
+    );
+
+    expect(result).toEqual(expected);
+
+    if (navigates) {
+      expect(navigate).toHaveBeenCalledWith(
+        '/talks/john-doe/sample-sermon-on-romans-8'
+      );
+      return;
+    }
+
+    expect(navigate).not.toHaveBeenCalled();
   });
 });
