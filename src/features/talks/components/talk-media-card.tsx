@@ -6,6 +6,7 @@ import { LinkIcon, MicIcon, PlayIcon } from 'lucide-react';
 import { MediaCard, MediaIconFrame } from '@/components/media-card';
 import { detectMediaType } from '@/components/media-embed/utils';
 import { getSpeakerName } from '@/features/speakers/utils';
+import { TalkCardSubtitle } from '@/features/talks/components/talk-card-subtitle';
 import { buildTalkPath } from '@/features/talks/utils';
 
 interface TalkMediaCardProps {
@@ -49,7 +50,12 @@ export function TalkMediaCard({ speaker, talk }: TalkMediaCardProps) {
       ariaLabel={talk.title}
       href={buildTalkPath({ speaker, slug: talk.slug })}
       media={<TalkMediaIcon mediaUrl={talk.mediaUrl} />}
-      subtitle={talk.scripture || getSpeakerName(speaker)}
+      subtitle={
+        <TalkCardSubtitle
+          scripture={talk.scripture}
+          speakerName={getSpeakerName(speaker)}
+        />
+      }
       title={talk.title}
     />
   );
