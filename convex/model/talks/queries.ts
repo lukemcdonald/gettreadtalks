@@ -36,11 +36,6 @@ import {
   enrichWithTopics,
   filterTalksByTitleOrSpeaker,
 } from './utils';
-import {
-  talkTranscriptQuality,
-  talkTranscriptSource,
-  talkTranscriptStatus,
-} from './validators';
 
 /**
  * List slugs for published talks with their speaker slugs.
@@ -570,39 +565,16 @@ export const listTalksWithoutTranscript = query({
 });
 
 /**
- * List transcript metadata by status, source, and quality. Omits transcript text.
+ * List transcript metadata. Omits transcript text.
  */
 export const listTalkTranscripts = query({
-  args: {
-    quality: v.optional(talkTranscriptQuality),
-    source: v.optional(talkTranscriptSource),
-    status: v.optional(talkTranscriptStatus),
-  },
-  // fallow-ignore-next-line complexity
-  handler: async (ctx, args) => {
+  args: {},
+  handler: async (ctx) => {
     await requireAdmin(ctx);
 
-    const items = [];
+    const transcripts = await ctx.db.query('talkTranscripts').collect();
 
-    for (const transcript of await ctx.db.query('talkTranscripts').collect()) {
-      if (args.quality !== undefined && transcript.quality !== args.quality) {
-        continue;
-      }
-
-      if (args.source !== undefined && transcript.source !== args.source) {
-        continue;
-      }
-
-      if (args.status !== undefined && transcript.status !== args.status) {
-        continue;
-      }
-
-      const { text: _text, ...item } = transcript;
-
-      items.push(item);
-    }
-
-    return items;
+    return transcripts.map(({ text: _text, ...item }) => item);
   },
   returns: v.array(talkTranscriptListItem),
 });
