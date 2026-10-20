@@ -21,8 +21,7 @@ import { useForm } from 'react-hook-form';
 
 import { FormSheet } from '@/components/ui';
 import { slugify } from '@/convex/lib/utils';
-import { publishTalkStudyAction } from '@/features/talks/actions/publish-talk-study';
-import { unpublishTalkStudyAction } from '@/features/talks/actions/unpublish-talk-study';
+import { setTalkStudyStatusAction } from '@/features/talks/actions/set-talk-study-status';
 import { updateTalkAction } from '@/features/talks/actions/update-talk';
 import { updateTalkStudyAction } from '@/features/talks/actions/update-talk-study';
 import { TalkFormFields } from '@/features/talks/components/talk-form-fields';
@@ -188,22 +187,9 @@ export function EditTalkSheet({
     submitData(data);
   }
 
-  function handlePublish() {
+  function handleStudyStatus(studyStatus: TalkStudy['studyStatus']) {
     startTransition(async () => {
-      const result = await publishTalkStudyAction(talk._id);
-
-      if (!result.success) {
-        setServerErrors(form.setError, result.errors);
-        return;
-      }
-
-      onTalkUpdated(talk._id);
-    });
-  }
-
-  function handleUnpublish() {
-    startTransition(async () => {
-      const result = await unpublishTalkStudyAction(talk._id);
+      const result = await setTalkStudyStatusAction(talk._id, studyStatus);
 
       if (!result.success) {
         setServerErrors(form.setError, result.errors);
@@ -237,8 +223,12 @@ export function EditTalkSheet({
           <TalkStudyFields
             control={form.control}
             isPending={isPending}
-            onPublish={handlePublish}
-            onUnpublish={handleUnpublish}
+            onPublish={() => {
+              handleStudyStatus('published');
+            }}
+            onUnpublish={() => {
+              handleStudyStatus('draft');
+            }}
             studyStatus={study.studyStatus}
           />
         ) : null}

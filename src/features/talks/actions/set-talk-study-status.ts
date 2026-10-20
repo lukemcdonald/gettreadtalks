@@ -1,7 +1,7 @@
 'use server';
 
 import 'server-only';
-import type { TalkId } from '../types';
+import type { TalkId, TalkStudy } from '../types';
 import type { ActionResult } from '@/lib/forms/types';
 
 import { updateTag } from 'next/cache';
@@ -10,13 +10,17 @@ import { api } from '@/convex/_generated/api';
 import { toConvexFormErrors } from '@/lib/forms/validation';
 import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
 
-export async function publishTalkStudyAction(
-  talkId: TalkId
+export async function setTalkStudyStatusAction(
+  talkId: TalkId,
+  studyStatus: TalkStudy['studyStatus']
 ): Promise<ActionResult<{ talkId: string }>> {
   await requireAdminUser();
 
   try {
-    await fetchAuthMutation(api.talks.publishTalkStudy, { talkId });
+    await fetchAuthMutation(api.talks.setTalkStudyStatus, {
+      studyStatus,
+      talkId,
+    });
 
     updateTag('talks');
 

@@ -306,13 +306,11 @@ const gatedFunctions: {
   },
   {
     call: (client, seed) =>
-      client.mutation(api.talks.publishTalkStudy, { talkId: seed.talkId }),
-    name: 'talks.publishTalkStudy',
-  },
-  {
-    call: (client, seed) =>
-      client.mutation(api.talks.unpublishTalkStudy, { talkId: seed.talkId }),
-    name: 'talks.unpublishTalkStudy',
+      client.mutation(api.talks.setTalkStudyStatus, {
+        studyStatus: 'published',
+        talkId: seed.talkId,
+      }),
+    name: 'talks.setTalkStudyStatus',
   },
   {
     call: (client, seed) =>

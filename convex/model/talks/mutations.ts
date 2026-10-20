@@ -19,7 +19,11 @@ import {
 } from '../../lib/utils';
 import { requireAdmin } from '../auth/roles';
 import { talkTranscriptFields } from './schema';
-import { statusType, talkStudyContentFields } from './validators';
+import {
+  statusType,
+  talkStudyContentFields,
+  talkStudyStatus,
+} from './validators';
 
 async function setTalkTopics(
   ctx: MutationCtx,
@@ -379,42 +383,24 @@ export const updateTalkStudy = mutation({
   returns: v.id('talkStudies'),
 });
 
-async function setTalkStudyStatus(
-  ctx: MutationCtx,
-  studyStatus: 'draft' | 'published',
-  talkId: Id<'talks'>
-) {
-  await requireAdmin(ctx);
-
-  const study = await getTalkStudyByTalkId(ctx, talkId);
-
-  await ctx.db.patch(study._id, {
-    studyStatus,
-  });
-
-  return study._id;
-}
-
 /**
- * Publish one talk study.
+ * Set a talk study to draft or published.
  */
-export const publishTalkStudy = mutation({
+export const setTalkStudyStatus = mutation({
   args: {
+    studyStatus: talkStudyStatus,
     talkId: v.id('talks'),
   },
-  handler: async (ctx, args) =>
-    await setTalkStudyStatus(ctx, 'published', args.talkId),
-  returns: v.id('talkStudies'),
-});
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
 
-/**
- * Return one talk study to draft.
- */
-export const unpublishTalkStudy = mutation({
-  args: {
-    talkId: v.id('talks'),
+    const study = await getTalkStudyByTalkId(ctx, args.talkId);
+
+    await ctx.db.patch(study._id, {
+      studyStatus: args.studyStatus,
+    });
+
+    return study._id;
   },
-  handler: async (ctx, args) =>
-    await setTalkStudyStatus(ctx, 'draft', args.talkId),
   returns: v.id('talkStudies'),
 });

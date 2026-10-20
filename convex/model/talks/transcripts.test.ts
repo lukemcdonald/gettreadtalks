@@ -236,7 +236,10 @@ describe('talk study review mutations', () => {
       studyDraftArgs(talk._id)
     );
 
-    await asAdmin.mutation(api.talks.publishTalkStudy, { talkId: talk._id });
+    await asAdmin.mutation(api.talks.setTalkStudyStatus, {
+      studyStatus: 'published',
+      talkId: talk._id,
+    });
 
     const published = await asAdmin.query(api.talks.getTalkStudy, {
       talkId: talk._id,
@@ -244,7 +247,10 @@ describe('talk study review mutations', () => {
 
     expect(published?.studyStatus).toBe('published');
 
-    await asAdmin.mutation(api.talks.unpublishTalkStudy, { talkId: talk._id });
+    await asAdmin.mutation(api.talks.setTalkStudyStatus, {
+      studyStatus: 'draft',
+      talkId: talk._id,
+    });
 
     const unpublished = await asAdmin.query(api.talks.getTalkStudy, {
       talkId: talk._id,
