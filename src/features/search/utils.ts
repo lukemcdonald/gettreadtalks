@@ -150,7 +150,6 @@ export function toSearchHits(result: SiteSearchResult): SearchHit[] {
   const clips = result.clips.map((clip) => ({
     href: buildClipPath(clip),
     id: clip._id,
-    scripture: clip.scripture,
     subtitle: getSpeakerName(clip.speaker),
     title: clip.title,
     type: 'clip' as const,

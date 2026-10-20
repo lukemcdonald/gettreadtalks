@@ -33,25 +33,6 @@ describe('listAllClips', () => {
   });
 });
 
-describe('listClips', () => {
-  it('includes scripture from the published parent talk', async () => {
-    const t = createConvexTest();
-    await seedVisibilityCatalog(t);
-
-    const result = await t.query(api.clips.listClips, {
-      paginationOpts: {
-        cursor: null,
-        numItems: 20,
-      },
-    });
-    const clip = result.page.find(
-      (item) => item.slug === visibilitySlugs.clipOnPublishedTalk
-    );
-
-    expect(clip?.scripture).toBe('Romans 5:1-2');
-  });
-});
-
 describe('listClipSlugs', () => {
   it('omits published clips whose parent talk is unpublished', async () => {
     const t = createConvexTest();

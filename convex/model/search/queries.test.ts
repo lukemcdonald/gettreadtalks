@@ -34,14 +34,5 @@ describe('searchSite', () => {
       visibilitySlugs.clipOnPublishedTalk,
       visibilitySlugs.standaloneClip,
     ]);
-    expect(
-      result.clips.find(
-        (clip) => clip.slug === visibilitySlugs.clipOnPublishedTalk
-      )?.scripture
-    ).toBe('Romans 5:1-2');
-    expect(
-      result.clips.find((clip) => clip.slug === visibilitySlugs.standaloneClip)
-        ?.scripture
-    ).toBeUndefined();
   });
 });

@@ -21,22 +21,10 @@ export async function getUserFavoriteClips(
       if (!clip) {
         return null;
       }
-      const [speaker, talk] = await Promise.all([
-        clip.speakerId ? ctx.db.get(clip.speakerId) : null,
-        clip.talkId ? ctx.db.get(clip.talkId) : null,
-      ]);
-
       return {
         _id: clip._id,
         favoriteId: row._id,
-        scripture: talk?.scripture,
         slug: clip.slug,
-        speaker: speaker
-          ? {
-              firstName: speaker.firstName,
-              lastName: speaker.lastName,
-            }
-          : null,
         title: clip.title,
       };
     })

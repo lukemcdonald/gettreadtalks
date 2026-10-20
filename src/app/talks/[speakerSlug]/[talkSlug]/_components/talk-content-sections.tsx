@@ -50,7 +50,7 @@ export function TalkContentSections({
           >
             {clips.map((clip) => (
               <ClipCard
-                clip={{ ...clip, scripture: talk.scripture }}
+                clip={clip}
                 key={clip._id}
                 speaker={speaker ?? undefined}
               />

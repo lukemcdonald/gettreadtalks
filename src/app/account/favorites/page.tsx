@@ -100,8 +100,6 @@ function FavoritesTabPanels({ clips, speakers, talks }: UserFavorites) {
             clipId={clip._id}
             href={buildClipPath(clip)}
             key={clip._id}
-            scripture={clip.scripture}
-            speaker={clip.speaker}
             title={clip.title}
           />
         )}

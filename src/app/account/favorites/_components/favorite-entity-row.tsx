@@ -1,9 +1,8 @@
 'use client';
 
 import type { ClipId } from '@/features/clips/types';
-import type { Speaker, SpeakerId } from '@/features/speakers/types';
+import type { SpeakerId } from '@/features/speakers/types';
 
-import { TalkTableRow } from '@/features/users/components/talk-table-row';
 import {
   UnfavoriteClipButton,
   UnfavoriteSpeakerButton,
@@ -47,18 +46,10 @@ export function FavoriteSpeakerRow({
 interface FavoriteClipRowProps {
   clipId: ClipId;
   href: string;
-  scripture?: string;
-  speaker?: Pick<Speaker, 'firstName' | 'lastName'> | null;
   title: string;
 }
 
-export function FavoriteClipRow({
-  clipId,
-  href,
-  scripture,
-  speaker,
-  title,
-}: FavoriteClipRowProps) {
+export function FavoriteClipRow({ clipId, href, title }: FavoriteClipRowProps) {
   const { onError, onMutate, removed } = useOptimisticRow();
 
   if (removed) {
@@ -66,7 +57,7 @@ export function FavoriteClipRow({
   }
 
   return (
-    <TalkTableRow
+    <EntityTableRow
       action={
         <UnfavoriteClipButton
           clipId={clipId}
@@ -75,8 +66,6 @@ export function FavoriteClipRow({
         />
       }
       href={href}
-      scripture={scripture}
-      speaker={speaker}
       title={title}
     />
   );

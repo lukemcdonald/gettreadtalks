@@ -29,7 +29,6 @@ const result = {
   clips: [
     {
       _id: 'clip1',
-      scripture: 'Romans 8:1',
       slug: 'sample-clip-no-condemnation',
       speaker: {
         firstName: 'John',
@@ -117,7 +116,6 @@ describe('toSearchHits', () => {
       {
         href: '/clips/sample-clip-no-condemnation',
         id: 'clip1',
-        scripture: 'Romans 8:1',
         subtitle: 'John Doe',
         title: 'Sample Clip: No Condemnation',
         type: 'clip',

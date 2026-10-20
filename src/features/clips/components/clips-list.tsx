@@ -38,7 +38,6 @@ export async function ClipsList({ clips }: ClipsListProps) {
         <ClipCard
           clip={{
             description: clip.description,
-            scripture: clip.scripture,
             slug: clip.slug,
             title: clip.title,
           }}

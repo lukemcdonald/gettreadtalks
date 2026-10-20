@@ -19,7 +19,7 @@ import { LIST_SEARCH_LIMIT } from '../search/constants';
 import { normalizeSearchQuery } from '../search/utils';
 import {
   enrichClipsForAdmin,
-  enrichClipsWithSpeakerAndScripture,
+  enrichClipsWithSpeaker,
   listPublishedClips,
   listPublishedClipsPage,
   searchPublishedClips,
@@ -27,7 +27,6 @@ import {
 
 const clipPageWithSpeakersValidator = paginationResultValidator(
   doc('clips').extend({
-    scripture: v.optional(v.string()),
     speaker: doc('speakers').nullable(),
   })
 );
@@ -155,7 +154,7 @@ export const listClips = query({
 
       return {
         ...clipPages,
-        page: await enrichClipsWithSpeakerAndScripture(ctx, clipPages.page),
+        page: await enrichClipsWithSpeaker(ctx, clipPages.page),
       };
     }
 
@@ -196,7 +195,7 @@ export const listClips = query({
     return {
       continueCursor,
       isDone,
-      page: await enrichClipsWithSpeakerAndScripture(ctx, page),
+      page: await enrichClipsWithSpeaker(ctx, page),
     };
   },
   returns: clipPageWithSpeakersValidator,

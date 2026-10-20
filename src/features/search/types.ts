@@ -52,7 +52,6 @@ export interface SiteSearchResult {
   clips: {
     _id: string;
     description?: string;
-    scripture?: string;
     slug: string;
     speaker: SearchSpeaker | null;
     title: string;

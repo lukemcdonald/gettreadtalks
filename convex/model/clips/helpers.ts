@@ -65,21 +65,6 @@ export async function enrichClipsWithSpeaker<
   });
 }
 
-export async function enrichClipsWithSpeakerAndScripture<
-  T extends { speakerId?: Id<'speakers'>; talkId?: Id<'talks'> },
->(ctx: QueryCtx, items: T[]) {
-  const clipsWithSpeakers = await enrichClipsWithSpeaker(ctx, items);
-
-  return await asyncMap(clipsWithSpeakers, async (clip) => {
-    const talk = clip.talkId ? await ctx.db.get('talks', clip.talkId) : null;
-
-    return {
-      ...clip,
-      scripture: talk?.scripture,
-    };
-  });
-}
-
 export async function enrichClipsForAdmin(
   ctx: QueryCtx,
   clips: Doc<'clips'>[]
