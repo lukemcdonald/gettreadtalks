@@ -1,6 +1,6 @@
 'use client';
 
-import type { EditTalkFormData } from '@/features/talks/schemas/talk-form';
+import type { TalkStudyFormData } from '@/features/talks/schemas/talk-study-form';
 import type { TalkStudy, TalkTranscript } from '@/features/talks/types';
 import type { Control } from 'react-hook-form';
 
@@ -23,10 +23,10 @@ const STUDY_GUIDE_KIND_OPTIONS = [
 ];
 
 interface TalkStudyFieldsProps {
-  control: Control<EditTalkFormData>;
+  control: Control<TalkStudyFormData>;
   isPending: boolean;
   onSetStatus: (studyStatus: TalkStudy['studyStatus']) => void;
-  study: TalkStudy;
+  study: TalkStudy | null;
   transcript: TalkTranscript | null;
 }
 
@@ -38,94 +38,103 @@ export function TalkStudyFields({
   study,
   transcript,
 }: TalkStudyFieldsProps) {
-  const isPublished = study.studyStatus === 'published';
+  const isPublished = study?.studyStatus === 'published';
 
   return (
     <div className="space-y-4">
-      <SectionHeading heading="Study" />
       <div className="flex items-center justify-between gap-3">
-        <ManageStatusBadge status={study.studyStatus} />
-        <Button
-          disabled={isPending}
-          onClick={() => {
-            onSetStatus(isPublished ? 'draft' : 'published');
-          }}
-          type="button"
-          variant={isPublished ? 'outline' : 'default'}
-        >
-          {isPublished ? 'Unpublish' : 'Publish'}
-        </Button>
+        {study ? (
+          <ManageStatusBadge status={study.studyStatus} />
+        ) : (
+          <span className="text-sm">None</span>
+        )}
+        {study ? (
+          <Button
+            disabled={isPending}
+            onClick={() => {
+              onSetStatus(isPublished ? 'draft' : 'published');
+            }}
+            type="button"
+            variant={isPublished ? 'outline' : 'default'}
+          >
+            {isPublished ? 'Unpublish' : 'Publish'}
+          </Button>
+        ) : null}
       </div>
-      <TextareaField
-        control={control}
-        label="Summary"
-        name="study.summary"
-        rows={4}
-      />
-      {study.outline.map((_, index) => (
-        <div className="space-y-4" key={index}>
-          <TextField
-            control={control}
-            label="Outline heading"
-            name={`study.outline.${index}.heading`}
-          />
+      {study ? (
+        <>
           <TextareaField
             control={control}
-            label="Outline text"
-            name={`study.outline.${index}.text`}
-            rows={3}
+            label="Summary"
+            name="summary"
+            rows={4}
           />
-        </div>
-      ))}
-      {study.studyGuide.map((_, index) => (
-        <div className="space-y-4" key={index}>
-          <SelectField
-            control={control}
-            label="Study guide kind"
-            name={`study.studyGuide.${index}.kind`}
-            options={STUDY_GUIDE_KIND_OPTIONS}
-          />
-          <TextareaField
-            control={control}
-            label="Study guide text"
-            name={`study.studyGuide.${index}.text`}
-            rows={3}
-          />
-        </div>
-      ))}
-      {study.scriptureRefs.map((_, index) => (
-        <div className="space-y-4" key={index}>
+          {study.outline.map((_, index) => (
+            <div className="space-y-4" key={index}>
+              <TextField
+                control={control}
+                label="Outline heading"
+                name={`outline.${index}.heading`}
+              />
+              <TextareaField
+                control={control}
+                label="Outline text"
+                name={`outline.${index}.text`}
+                rows={3}
+              />
+            </div>
+          ))}
+          {study.studyGuide.map((_, index) => (
+            <div className="space-y-4" key={index}>
+              <SelectField
+                control={control}
+                label="Study guide kind"
+                name={`studyGuide.${index}.kind`}
+                options={STUDY_GUIDE_KIND_OPTIONS}
+              />
+              <TextareaField
+                control={control}
+                label="Study guide text"
+                name={`studyGuide.${index}.text`}
+                rows={3}
+              />
+            </div>
+          ))}
+          {study.scriptureRefs.map((_, index) => (
+            <div className="space-y-4" key={index}>
+              <TextField
+                control={control}
+                label="Book"
+                name={`scriptureRefs.${index}.book`}
+              />
+              <NumberField
+                control={control}
+                label="Chapter"
+                min={1}
+                name={`scriptureRefs.${index}.chapter`}
+              />
+              <NumberField
+                control={control}
+                label="Verse start"
+                min={1}
+                name={`scriptureRefs.${index}.verseStart`}
+              />
+              <NumberField
+                control={control}
+                label="Verse end"
+                min={1}
+                name={`scriptureRefs.${index}.verseEnd`}
+              />
+            </div>
+          ))}
           <TextField
             control={control}
-            label="Book"
-            name={`study.scriptureRefs.${index}.book`}
+            description="Separate topics with commas"
+            label="Suggested topics"
+            name="suggestedTopics"
           />
-          <NumberField
-            control={control}
-            label="Chapter"
-            min={1}
-            name={`study.scriptureRefs.${index}.chapter`}
-          />
-          <NumberField
-            control={control}
-            label="Verse start"
-            min={1}
-            name={`study.scriptureRefs.${index}.verseStart`}
-          />
-          <NumberField
-            control={control}
-            label="Verse end"
-            min={1}
-            name={`study.scriptureRefs.${index}.verseEnd`}
-          />
-        </div>
-      ))}
-      <TextField
-        control={control}
-        description="Separate topics with commas"
-        label="Suggested topics"
-        name="study.suggestedTopics"
-      />
+        </>
+      ) : null}
       {transcript?.text ? (
         <>
           <SectionHeading heading="Transcript" />

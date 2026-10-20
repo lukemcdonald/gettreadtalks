@@ -28,35 +28,3 @@ export const talkFormSchema = z.object({
  * Type inferred from the talk form schema.
  */
 export type TalkFormData = z.infer<typeof talkFormSchema>;
-
-const scriptureRefSchema = z.object({
-  book: z.string(),
-  chapter: z.number(),
-  verseEnd: z.number().optional(),
-  verseStart: z.number().optional(),
-});
-
-export const editTalkFormSchema = talkFormSchema.extend({
-  study: z
-    .object({
-      outline: z.array(z.object({ heading: z.string(), text: z.string() })),
-      scriptureRefs: z.array(scriptureRefSchema),
-      studyGuide: z.array(
-        z.object({
-          kind: z.enum([
-            'application',
-            'discussion_question',
-            'key_idea',
-            'prayer',
-          ]),
-          scriptureRefs: z.array(scriptureRefSchema).optional(),
-          text: z.string(),
-        })
-      ),
-      suggestedTopics: z.string(),
-      summary: z.string(),
-    })
-    .optional(),
-});
-
-export type EditTalkFormData = z.infer<typeof editTalkFormSchema>;

@@ -5,11 +5,7 @@ import { redirect } from 'next/navigation';
 
 import { EditTalkSheetRoute } from '@/app/@sheet/_components/edit-talk-sheet-route';
 import { loadFormOptions } from '@/app/@sheet/_queries/load-form-options';
-import {
-  loadTalk,
-  loadTalkStudy,
-  loadTalkTranscript,
-} from '@/features/talks/queries/load-talk';
+import { loadTalk, loadTalkStudy } from '@/features/talks/queries/load-talk';
 import { loadTalkTopics } from '@/features/talks/queries/load-talk-topics';
 import {
   ADMIN_LIST_PATHS,
@@ -41,19 +37,13 @@ export async function EditTalkSheetPage({
     ) as Route
   );
 
-  const [
-    talk,
-    talkTopics,
-    study,
-    transcript,
-    { collections, speakers, topics },
-  ] = await Promise.all([
-    loadTalk(talkId),
-    loadTalkTopics(talkId),
-    loadTalkStudy(talkId),
-    loadTalkTranscript(talkId),
-    loadFormOptions(),
-  ]);
+  const [talk, talkTopics, study, { collections, speakers, topics }] =
+    await Promise.all([
+      loadTalk(talkId),
+      loadTalkTopics(talkId),
+      loadTalkStudy(talkId),
+      loadFormOptions(),
+    ]);
 
   if (!talk) {
     redirect(ADMIN_LIST_PATHS.talks);
@@ -65,13 +55,12 @@ export async function EditTalkSheetPage({
       collections={collections}
       speakers={speakers}
       statusPrefill={statusPrefill}
-      study={study}
+      studyStatus={study?.studyStatus ?? null}
       talk={{
         ...talk,
         topicIds: talkTopics.map((topic) => topic._id),
       }}
       topics={topics}
-      transcript={transcript}
     />
   );
 }

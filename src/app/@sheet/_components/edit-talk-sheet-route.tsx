@@ -2,11 +2,7 @@
 
 import type { CollectionListItem } from '@/features/collections/types';
 import type { SpeakerListItem } from '@/features/speakers/types';
-import type {
-  TalkStudy,
-  TalkTranscript,
-  TalkWithTopicIds,
-} from '@/features/talks/types';
+import type { TalkStudy, TalkWithTopicIds } from '@/features/talks/types';
 import type { TopicListItem } from '@/features/topics/types';
 import type { StatusPrefill } from '@/lib/entities/status-prefill';
 
@@ -18,10 +14,9 @@ interface EditTalkSheetRouteProps {
   collections: CollectionListItem[];
   speakers: SpeakerListItem[];
   statusPrefill?: StatusPrefill;
-  study: TalkStudy | null;
+  studyStatus?: TalkStudy['studyStatus'] | null;
   talk: TalkWithTopicIds;
   topics: TopicListItem[];
-  transcript: TalkTranscript | null;
 }
 
 export function EditTalkSheetRoute({
@@ -29,10 +24,9 @@ export function EditTalkSheetRoute({
   collections,
   speakers,
   statusPrefill,
-  study,
+  studyStatus,
   talk,
   topics,
-  transcript,
 }: EditTalkSheetRouteProps) {
   const { handleOpenChange, handleSuccess } = useSheetRoute(closeHref);
 
@@ -44,10 +38,9 @@ export function EditTalkSheetRoute({
       open
       speakers={speakers}
       statusPrefill={statusPrefill}
-      study={study}
+      studyStatus={studyStatus}
       talk={talk}
       topics={topics}
-      transcript={transcript}
     />
   );
 }

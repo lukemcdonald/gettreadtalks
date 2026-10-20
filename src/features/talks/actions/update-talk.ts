@@ -10,7 +10,7 @@ import { api } from '@/convex/_generated/api';
 import { toConvexFormErrors, toZodFormErrors } from '@/lib/forms/validation';
 import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
 
-import { editTalkFormSchema } from '../schemas/talk-form';
+import { talkFormSchema } from '../schemas/talk-form';
 
 /**
  * Updates an existing talk. Validates data on server and requires admin authorization.
@@ -22,7 +22,7 @@ export async function updateTalkAction(
   // Re-verify authorization on every request
   await requireAdminUser();
 
-  const parsed = editTalkFormSchema.safeParse(data);
+  const parsed = talkFormSchema.safeParse(data);
 
   if (!parsed.success) {
     return {
@@ -31,24 +31,8 @@ export async function updateTalkAction(
     };
   }
 
-  const { study, ...talkData } = parsed.data;
-
   try {
-    await fetchAuthMutation(api.talks.updateTalk, { ...talkData, talkId });
-
-    if (study) {
-      await fetchAuthMutation(api.talks.updateTalkStudy, {
-        outline: study.outline,
-        scriptureRefs: study.scriptureRefs,
-        studyGuide: study.studyGuide,
-        suggestedTopics: study.suggestedTopics
-          .split(',')
-          .map((topic) => topic.trim())
-          .filter(Boolean),
-        summary: study.summary,
-        talkId,
-      });
-    }
+    await fetchAuthMutation(api.talks.updateTalk, { ...parsed.data, talkId });
 
     updateTag('talks');
     updateTag('form-options');
