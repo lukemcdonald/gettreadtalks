@@ -60,21 +60,22 @@ async function saveEnrichment(ctx: ActionCtx, req: Request) {
 
     return Response.json({ studyId, transcriptId });
   } catch (error) {
-    if (isConflictError(error)) {
-      return new Response('Study already reviewed', { status: 409 });
-    }
-
-    return new Response('Bad request', { status: 400 });
+    return toEnrichmentErrorResponse(error);
   }
+}
+
+function toEnrichmentErrorResponse(error: unknown) {
+  if (isConflictError(error)) {
+    return new Response('Study already reviewed', { status: 409 });
+  }
+
+  return new Response('Bad request', { status: 400 });
 }
 
 function isConflictError(error: unknown) {
   return (
     error instanceof ConvexError &&
-    typeof error.data === 'object' &&
-    error.data !== null &&
-    'statusCode' in error.data &&
-    error.data.statusCode === 409
+    (error.data as { statusCode?: number }).statusCode === 409
   );
 }
 
