@@ -4,7 +4,11 @@ import type { MutationCtx } from '../../_generated/server';
 import { v } from 'convex/values';
 
 import { internalMutation, mutation } from '../../_generated/server';
-import { throwDuplicateSlug, throwValidationError } from '../../lib/errors';
+import {
+  throwConvexError,
+  throwDuplicateSlug,
+  throwValidationError,
+} from '../../lib/errors';
 import {
   deleteAll,
   getOrThrow,
@@ -316,6 +320,13 @@ export const saveTalkStudyDraft = internalMutation({
     };
 
     if (existing) {
+      if (
+        existing.studyStatus === 'published' ||
+        existing.manuallyEditedAt !== undefined
+      ) {
+        throwConvexError(409, 'Study already reviewed');
+      }
+
       await ctx.db.replace(existing._id, fields);
 
       return existing._id;

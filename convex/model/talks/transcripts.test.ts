@@ -111,6 +111,59 @@ describe('talk transcript and study draft storage', () => {
     expect(transcripts).toEqual([]);
   });
 
+  it('refuses to overwrite a published study', async () => {
+    const { t, talk } = await seedPublishedTalk();
+    const reviewedAt = 1_700_000_000_000;
+    const reviewedSummary = 'Reviewed published summary';
+    const studyId = await t.run(
+      async (ctx) =>
+        await ctx.db.insert('talkStudies', {
+          generatedAt: reviewedAt,
+          generator: 'reviewer',
+          manuallyEditedAt: reviewedAt,
+          outline: [{ heading: 'Grace', text: 'Reviewed outline' }],
+          scriptureRefs: [{ book: 'Romans', chapter: 5, verseStart: 1 }],
+          studyGuide: [{ kind: 'key_idea', text: 'Reviewed idea' }],
+          studyStatus: 'published',
+          suggestedTopics: ['grace'],
+          summary: reviewedSummary,
+          talkId: talk._id,
+        })
+    );
+
+    const previous = process.env.ENRICHMENT_API_TOKEN;
+
+    try {
+      process.env.ENRICHMENT_API_TOKEN = 'correct-token';
+
+      const response = await t.fetch('/enrichment', {
+        body: JSON.stringify({ study: studyDraftArgs(talk._id) }),
+        headers: { Authorization: 'Bearer correct-token' },
+        method: 'POST',
+      });
+
+      expect(response.status).toBe(409);
+    } finally {
+      if (previous === undefined) {
+        delete process.env.ENRICHMENT_API_TOKEN;
+      } else {
+        process.env.ENRICHMENT_API_TOKEN = previous;
+      }
+    }
+
+    const study = await t.run(async (ctx) => await ctx.db.get(studyId));
+
+    expect(study).toEqual(
+      expect.objectContaining({
+        generatedAt: reviewedAt,
+        generator: 'reviewer',
+        manuallyEditedAt: reviewedAt,
+        studyStatus: 'published',
+        summary: reviewedSummary,
+      })
+    );
+  });
+
   it('returns 401 when the enrichment token is missing or wrong', async () => {
     const t = createConvexTest();
     const previous = process.env.ENRICHMENT_API_TOKEN;

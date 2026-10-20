@@ -1,7 +1,7 @@
 import type { ActionCtx } from '../../_generated/server';
 
 import { parse } from 'convex-helpers/validators';
-import { v } from 'convex/values';
+import { ConvexError, v } from 'convex/values';
 
 import { internal } from '../../_generated/api';
 import { talkTranscriptFields } from './schema';
@@ -59,9 +59,23 @@ async function saveEnrichment(ctx: ActionCtx, req: Request) {
     }
 
     return Response.json({ studyId, transcriptId });
-  } catch {
+  } catch (error) {
+    if (isConflictError(error)) {
+      return new Response('Study already reviewed', { status: 409 });
+    }
+
     return new Response('Bad request', { status: 400 });
   }
+}
+
+function isConflictError(error: unknown) {
+  return (
+    error instanceof ConvexError &&
+    typeof error.data === 'object' &&
+    error.data !== null &&
+    'statusCode' in error.data &&
+    error.data.statusCode === 409
+  );
 }
 
 function parseEnrichmentBody(value: unknown) {
