@@ -14,10 +14,14 @@ export class AuthPage {
     this.accountMenu = page
       .getByTestId('account-menu')
       .filter({ visible: true });
-    this.email = page.getByPlaceholder('name@example.com');
-    this.password = page.locator('input[type="password"]');
+    this.email = page
+      .getByRole('textbox', { name: /email address/iu })
+      .filter({ visible: true });
+    this.password = page.getByLabel(/^password/iu).filter({ visible: true });
     this.signIn = page.getByTestId('sign-in').filter({ visible: true });
-    this.signInSubmit = page.getByTestId('sign-in-submit');
+    this.signInSubmit = page
+      .getByTestId('sign-in-submit')
+      .filter({ visible: true });
     this.signOut = page.getByTestId('sign-out');
   }
 

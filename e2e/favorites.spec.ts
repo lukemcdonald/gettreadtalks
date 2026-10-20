@@ -6,10 +6,14 @@ import {
 
 const user = getE2eUser();
 
-test('Favorites / Signed out redirects to login', async ({ favoritesPage }) => {
+test('Favorites / Signed out redirects to login', async ({
+  authPage,
+  favoritesPage,
+}) => {
   await favoritesPage.goto();
 
   await expect(favoritesPage.page).toHaveURL(/\/login\?redirect=/u);
+  await authPage.email.fill('user@example.com');
 });
 
 test('Favorites / Sign in returns to favorites', async ({
