@@ -14,6 +14,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import '@/assets/styles.css';
 import { ToastProvider } from '@/components/ui/primitives/toast';
 import { site } from '@/configs/site';
+import { WebMcpTools } from '@/features/webmcp/components/webmcp-tools';
 import { cn } from '@/utils';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
@@ -87,6 +88,7 @@ export default function RootLayout({
                   {sheet}
                 </ToastProvider>
               </AnalyticsProvider>
+              <WebMcpTools />
             </AuthProvider>
           </ThemeProvider>
         </ErrorBoundary>
