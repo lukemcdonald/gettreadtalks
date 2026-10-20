@@ -2,6 +2,7 @@ import type { SpeakerRecord, TalkRecord } from '@/features/mcp/format';
 import type { ConvexReactClient } from 'convex/react';
 import type { WebMCP } from 'webmcp-types';
 
+import { site } from '@/configs/site';
 import { api } from '@/convex/_generated/api';
 import { normalizeSearchQuery } from '@/convex/model/search/utils';
 import { formatTalk } from '@/features/mcp/format';
@@ -23,7 +24,7 @@ function resolveTalkHref(talk: string, origin: string) {
   try {
     const url = new URL(talk.trim(), origin);
 
-    if (url.origin !== origin) {
+    if (url.origin !== origin && url.origin !== new URL(site.url).origin) {
       return toolError('CROSS_ORIGIN', 'Talk URLs must be on this site.');
     }
 
@@ -93,7 +94,7 @@ export async function registerWebMcpTools({
               search: normalizedQuery,
             });
             const formatted = talks.map((talk) =>
-              formatTalk(talk, talk.speaker, origin)
+              formatTalk(talk, talk.speaker)
             );
 
             if (formatted.length === 0) {

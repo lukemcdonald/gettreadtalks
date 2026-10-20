@@ -1,4 +1,3 @@
-import { site } from '@/configs/site';
 import { buildSpeakerPath, getSpeakerName } from '@/features/speakers/utils';
 import { buildTalkPath } from '@/features/talks/utils';
 import { buildAbsoluteUrl } from '@/lib/entities/paths';
@@ -37,11 +36,7 @@ export function formatSpeaker(speaker: SpeakerRecord) {
   };
 }
 
-export function formatTalk(
-  talk: TalkRecord,
-  speaker: SpeakerRecord | null,
-  origin: string = site.url
-) {
+export function formatTalk(talk: TalkRecord, speaker: SpeakerRecord | null) {
   return {
     description: talk.description,
     publishedAt: toIsoDate(talk.publishedAt),
@@ -51,7 +46,7 @@ export function formatTalk(
     title: talk.title,
     topics: talk.topicSlugs,
     url: speaker
-      ? `${origin}${buildTalkPath({ slug: talk.slug, speaker })}`
+      ? buildAbsoluteUrl(buildTalkPath({ slug: talk.slug, speaker }))
       : undefined,
   };
 }

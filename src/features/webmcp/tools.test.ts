@@ -108,6 +108,7 @@ describe('registerWebMcpTools', () => {
     {
       expected: { href: '/talks/john-doe/sample-sermon-on-romans-8' },
       navigates: true,
+      origin: 'http://localhost:3000',
       talk: 'https://www.gettreadtalks.com/talks/john-doe/sample-sermon-on-romans-8',
     },
     {
@@ -120,32 +121,35 @@ describe('registerWebMcpTools', () => {
       navigates: false,
       talk: '/manage/talks',
     },
-  ])('open_talk handles $talk', async ({ expected, navigates, talk }) => {
-    const navigate = vi.fn();
-    const registerTool = vi.fn(async () => {});
+  ])(
+    'open_talk handles $talk',
+    async ({ expected, navigates, origin: pageOrigin = origin, talk }) => {
+      const navigate = vi.fn();
+      const registerTool = vi.fn(async () => {});
 
-    await registerWebMcpTools({
-      document: { modelContext: { registerTool } },
-      navigate,
-      origin,
-      searchTalks: vi.fn(),
-      signal: new AbortController().signal,
-    });
+      await registerWebMcpTools({
+        document: { modelContext: { registerTool } },
+        navigate,
+        origin: pageOrigin,
+        searchTalks: vi.fn(),
+        signal: new AbortController().signal,
+      });
 
-    const result = await getExecute(registerTool, 'open_talk')(
-      { talk },
-      { signal: new AbortController().signal }
-    );
-
-    expect(result).toEqual(expected);
-
-    if (navigates) {
-      expect(navigate).toHaveBeenCalledWith(
-        '/talks/john-doe/sample-sermon-on-romans-8'
+      const result = await getExecute(registerTool, 'open_talk')(
+        { talk },
+        { signal: new AbortController().signal }
       );
-      return;
-    }
 
-    expect(navigate).not.toHaveBeenCalled();
-  });
+      expect(result).toEqual(expected);
+
+      if (navigates) {
+        expect(navigate).toHaveBeenCalledWith(
+          '/talks/john-doe/sample-sermon-on-romans-8'
+        );
+        return;
+      }
+
+      expect(navigate).not.toHaveBeenCalled();
+    }
+  );
 });
