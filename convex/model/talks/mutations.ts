@@ -1,6 +1,5 @@
 import type { Doc, Id } from '../../_generated/dataModel';
 import type { MutationCtx } from '../../_generated/server';
-import type { Infer } from 'convex/values';
 
 import { v } from 'convex/values';
 
@@ -14,13 +13,8 @@ import {
   talkSlugExistsForSpeaker,
 } from '../../lib/utils';
 import { requireAdmin } from '../auth/roles';
-import {
-  statusType,
-  talkStudyContentFields,
-  talkTranscriptQuality,
-  talkTranscriptSource,
-  talkTranscriptStatus,
-} from './validators';
+import { talkTranscriptFields } from './schema';
+import { statusType, talkStudyContentFields } from './validators';
 
 async function setTalkTopics(
   ctx: MutationCtx,
@@ -273,19 +267,7 @@ export const destroyTalk = mutation({
  * Upsert a private talk transcript. Call from Grok Bot via `npx convex run`.
  */
 export const upsertTalkTranscript = internalMutation({
-  args: {
-    failureReason: v.optional(v.string()),
-    fetchedAt: v.optional(v.number()),
-    mediaUrlHash: v.optional(v.string()),
-    model: v.optional(v.string()),
-    quality: v.optional(talkTranscriptQuality),
-    source: talkTranscriptSource,
-    sourceUrl: v.optional(v.string()),
-    status: talkTranscriptStatus,
-    talkId: v.id('talks'),
-    text: v.optional(v.string()),
-    wordCount: v.optional(v.number()),
-  },
+  args: talkTranscriptFields,
   handler: async (ctx, args) => {
     await getOrThrow(ctx, 'talks', args.talkId);
 
@@ -293,7 +275,7 @@ export const upsertTalkTranscript = internalMutation({
       .query('talkTranscripts')
       .withIndex('by_talkId', (q) => q.eq('talkId', args.talkId))
       .unique();
-    const fields = toTalkTranscriptFields(args);
+    const fields = omitUndefined(args);
 
     if (existing) {
       await ctx.db.replace(existing._id, fields);
@@ -345,34 +327,13 @@ export const saveTalkStudyDraft = internalMutation({
   returns: v.id('talkStudies'),
 });
 
-function toTalkTranscriptFields(args: {
-  failureReason?: string;
-  fetchedAt?: number;
-  mediaUrlHash?: string;
-  model?: string;
-  quality?: Infer<typeof talkTranscriptQuality>;
-  source: Infer<typeof talkTranscriptSource>;
-  sourceUrl?: string;
-  status: Infer<typeof talkTranscriptStatus>;
-  talkId: Id<'talks'>;
-  text?: string;
-  wordCount?: number;
-}) {
-  return {
-    source: args.source,
-    status: args.status,
-    talkId: args.talkId,
-    ...(args.failureReason === undefined
-      ? {}
-      : { failureReason: args.failureReason }),
-    ...(args.fetchedAt === undefined ? {} : { fetchedAt: args.fetchedAt }),
-    ...(args.mediaUrlHash === undefined
-      ? {}
-      : { mediaUrlHash: args.mediaUrlHash }),
-    ...(args.model === undefined ? {} : { model: args.model }),
-    ...(args.quality === undefined ? {} : { quality: args.quality }),
-    ...(args.sourceUrl === undefined ? {} : { sourceUrl: args.sourceUrl }),
-    ...(args.text === undefined ? {} : { text: args.text }),
-    ...(args.wordCount === undefined ? {} : { wordCount: args.wordCount }),
+function omitUndefined<T extends Record<string, unknown>>(value: T) {
+  return Object.fromEntries(
+    Object.entries(value).filter(([, item]) => item !== undefined)
+  ) as {
+    [K in keyof T as T[K] extends undefined ? never : K]: Exclude<
+      T[K],
+      undefined
+    >;
   };
 }

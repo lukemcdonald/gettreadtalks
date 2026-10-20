@@ -585,23 +585,9 @@ export const listTalkTranscripts = query({
 
     const transcripts = await loadTalkTranscripts(ctx, args);
 
-    return transcripts.flatMap((transcript) => {
-      if (args.quality !== undefined && transcript.quality !== args.quality) {
-        return [];
-      }
-
-      if (args.source !== undefined && transcript.source !== args.source) {
-        return [];
-      }
-
-      if (args.status !== undefined && transcript.status !== args.status) {
-        return [];
-      }
-
-      const { text: _text, ...item } = transcript;
-
-      return [item];
-    });
+    return transcripts
+      .filter((transcript) => talkTranscriptMatchesFilters(transcript, args))
+      .map(toTalkTranscriptListItem);
   },
   returns: v.array(talkTranscriptListItem),
 });
@@ -621,6 +607,31 @@ export const listDraftTalkStudies = query({
   },
   returns: docs('talkStudies'),
 });
+
+function matchesOptional<T>(expected: T | undefined, actual: T | undefined) {
+  return expected === undefined || expected === actual;
+}
+
+function talkTranscriptMatchesFilters(
+  transcript: Doc<'talkTranscripts'>,
+  filters: {
+    quality?: Infer<typeof talkTranscriptQuality>;
+    source?: Infer<typeof talkTranscriptSource>;
+    status?: Infer<typeof talkTranscriptStatus>;
+  }
+) {
+  return (
+    matchesOptional(filters.quality, transcript.quality) &&
+    matchesOptional(filters.source, transcript.source) &&
+    matchesOptional(filters.status, transcript.status)
+  );
+}
+
+function toTalkTranscriptListItem(transcript: Doc<'talkTranscripts'>) {
+  const { text: _text, ...item } = transcript;
+
+  return item;
+}
 
 async function loadTalkTranscripts(
   ctx: QueryCtx,
