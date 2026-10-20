@@ -1,4 +1,4 @@
-import type { TalkId } from '@/features/talks/types';
+import type { TalkId, TalkStudy } from '@/features/talks/types';
 import type { Route } from 'next';
 
 import { redirect } from 'next/navigation';
@@ -19,6 +19,14 @@ interface EditTalkSheetPageProps {
   closeHref?: string;
   params: Promise<{ talkId: TalkId }>;
   searchParams?: Promise<{ status?: string | string[] }>;
+}
+
+function getTalkStudyStatus(study: Pick<TalkStudy, 'studyStatus'> | null) {
+  if (!study) {
+    return null;
+  }
+
+  return study.studyStatus;
 }
 
 export async function EditTalkSheetPage({
@@ -55,7 +63,7 @@ export async function EditTalkSheetPage({
       collections={collections}
       speakers={speakers}
       statusPrefill={statusPrefill}
-      studyStatus={study?.studyStatus ?? null}
+      studyStatus={getTalkStudyStatus(study)}
       talk={{
         ...talk,
         topicIds: talkTopics.map((topic) => topic._id),
