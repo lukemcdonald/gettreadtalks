@@ -34,7 +34,7 @@ function hasModelContext(documentLike: {
   return typeof documentLike.modelContext?.registerTool === 'function';
 }
 
-export async function registerWebMcpTools({
+async function registerWebMcpTools({
   modelContext,
   navigate,
   origin,

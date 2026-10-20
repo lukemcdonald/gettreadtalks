@@ -8,9 +8,9 @@ import {
 import { getSpeakerName } from '@/features/speakers/utils';
 import { buildTalkPath } from '@/features/talks/utils';
 
-export const WEBMCP_OUTPUT_MAX_CHARS = 1500;
+const WEBMCP_OUTPUT_MAX_CHARS = 1500;
 export const WEBMCP_SEARCH_PAGE_SIZE = 5;
-export const WEBMCP_SEARCH_QUERY_MAX = 200;
+const WEBMCP_SEARCH_QUERY_MAX = 200;
 
 export interface WebMcpToolError {
   code: string;
@@ -103,7 +103,7 @@ export function toTalkPath(
   return { href: pathname };
 }
 
-export function toSearchTalkResults(
+function toSearchTalkResults(
   result: SiteSearchResult,
   origin: string
 ): WebMcpSearchTalksResult {
