@@ -19,6 +19,7 @@ describe('SearchResultGroups', () => {
     {
       href: '/talks/john-doe/romans-8',
       id: 'talk1',
+      scripture: 'Romans 8:28',
       subtitle: 'John Doe',
       title: 'Romans 8',
       type: 'talk',
@@ -54,6 +55,7 @@ describe('SearchResultGroups', () => {
     expect(screen.getByRole('heading', { name: 'Talks' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Topics' })).toBeInTheDocument();
     expect(screen.getByText('John Doe')).toBeInTheDocument();
+    expect(screen.getByText('Romans 8:28')).toBeInTheDocument();
 
     await click(screen.getByRole('link', { name: /romans 8/iu }));
     await click(screen.getByRole('link', { name: 'Grace' }));

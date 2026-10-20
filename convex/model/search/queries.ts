@@ -5,7 +5,10 @@ import { v } from 'convex/values';
 
 import { query } from '../../_generated/server';
 import { enrichWithSpeaker } from '../../lib/utils';
-import { enrichClipsWithSpeaker, searchPublishedClips } from '../clips/helpers';
+import {
+  enrichClipsWithSpeakerAndScripture,
+  searchPublishedClips,
+} from '../clips/helpers';
 import { searchPublishedSpeakers } from '../speakers/helpers';
 import { searchPublishedTalks } from '../talks/helpers';
 import { searchPublishedTopics } from '../topics/helpers';
@@ -21,6 +24,7 @@ const searchSpeakerValidator = v.object({
 const searchClipValidator = v.object({
   _id: v.id('clips'),
   description: v.optional(v.string()),
+  scripture: v.optional(v.string()),
   slug: v.string(),
   speaker: v.nullable(searchSpeakerValidator),
   title: v.string(),
@@ -37,6 +41,7 @@ const searchSpeakerResultValidator = v.object({
 const searchTalkValidator = v.object({
   _id: v.id('talks'),
   description: v.optional(v.string()),
+  scripture: v.optional(v.string()),
   slug: v.string(),
   speaker: v.nullable(searchSpeakerValidator),
   title: v.string(),
@@ -73,6 +78,7 @@ async function toSearchTalks(ctx: QueryCtx, talks: Doc<'talks'>[]) {
   return talksWithSpeakers.map((talk) => ({
     _id: talk._id,
     description: talk.description,
+    scripture: talk.scripture,
     slug: talk.slug,
     speaker: toSearchSpeaker(talk.speaker),
     title: talk.title,
@@ -80,11 +86,15 @@ async function toSearchTalks(ctx: QueryCtx, talks: Doc<'talks'>[]) {
 }
 
 async function toSearchClips(ctx: QueryCtx, clips: Doc<'clips'>[]) {
-  const clipsWithSpeakers = await enrichClipsWithSpeaker(ctx, clips);
+  const clipsWithScripture = await enrichClipsWithSpeakerAndScripture(
+    ctx,
+    clips
+  );
 
-  return clipsWithSpeakers.map((clip) => ({
+  return clipsWithScripture.map((clip) => ({
     _id: clip._id,
     description: clip.description,
+    scripture: clip.scripture,
     slug: clip.slug,
     speaker: toSearchSpeaker(clip.speaker),
     title: clip.title,

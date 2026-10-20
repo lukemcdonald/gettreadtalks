@@ -194,6 +194,7 @@ export async function seedVisibilityCatalog(
       collectionId: publishedCollectionId,
       mediaUrl: MEDIA_URL,
       publishedAt: Date.parse('2024-06-01T12:00:00.000Z'),
+      scripture: 'Romans 5:1-2',
       slug: visibilitySlugs.publishedTalk,
       speakerId: publishedSpeakerId,
       status: 'published',

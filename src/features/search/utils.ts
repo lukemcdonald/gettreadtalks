@@ -124,6 +124,7 @@ export function toSearchHits(result: SiteSearchResult): SearchHit[] {
       {
         href: buildTalkPath(talk),
         id: talk._id,
+        scripture: talk.scripture,
         subtitle: getSpeakerName(talk.speaker),
         title: talk.title,
         type: 'talk' as const,
@@ -149,6 +150,7 @@ export function toSearchHits(result: SiteSearchResult): SearchHit[] {
   const clips = result.clips.map((clip) => ({
     href: buildClipPath(clip),
     id: clip._id,
+    scripture: clip.scripture,
     subtitle: getSpeakerName(clip.speaker),
     title: clip.title,
     type: 'clip' as const,
@@ -301,6 +303,7 @@ export function toCommandGroups(
     items: group.hits.map((hit) => ({
       href: hit.href,
       label: hit.title,
+      scripture: hit.scripture,
       subtitle: hit.subtitle,
       value: hit.id,
     })),

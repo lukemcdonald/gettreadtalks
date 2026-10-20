@@ -19,6 +19,7 @@ describe('searchSite', () => {
     expect(result.talks.map((talk) => talk.slug)).toEqual([
       visibilitySlugs.publishedTalk,
     ]);
+    expect(result.talks[0]?.scripture).toBe('Romans 5:1-2');
   });
 
   it('returns published clips and omits those whose parent talk is unpublished', async () => {
@@ -33,5 +34,14 @@ describe('searchSite', () => {
       visibilitySlugs.clipOnPublishedTalk,
       visibilitySlugs.standaloneClip,
     ]);
+    expect(
+      result.clips.find(
+        (clip) => clip.slug === visibilitySlugs.clipOnPublishedTalk
+      )?.scripture
+    ).toBe('Romans 5:1-2');
+    expect(
+      result.clips.find((clip) => clip.slug === visibilitySlugs.standaloneClip)
+        ?.scripture
+    ).toBeUndefined();
   });
 });

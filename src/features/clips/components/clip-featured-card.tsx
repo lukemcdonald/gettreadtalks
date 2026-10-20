@@ -4,6 +4,7 @@ import { FeaturedVideoCard } from '@/components/featured-video-card';
 import { getVideoThumbnail } from '@/components/media-embed';
 import { buildClipPath } from '@/features/clips/utils';
 import { getSpeakerName } from '@/features/speakers/utils';
+import { TalkCardSubtitle } from '@/features/talks/components/talk-card-subtitle';
 
 interface ClipFeaturedCardProps {
   clip: ClipWithSpeaker;
@@ -19,7 +20,12 @@ export function ClipFeaturedCard({ clip }: ClipFeaturedCardProps) {
       actionLabel="Watch clip"
       href={href}
       sizes="(max-width: 768px) 100vw, 66vw"
-      subtitle={speakerName}
+      subtitle={
+        <TalkCardSubtitle
+          scripture={clip.scripture}
+          speakerName={speakerName}
+        />
+      }
       thumbnail={thumbnail}
       title={clip.title}
     />

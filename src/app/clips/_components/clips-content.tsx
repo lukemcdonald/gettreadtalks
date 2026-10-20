@@ -1,13 +1,8 @@
-import type { Doc } from '@/convex/_generated/dataModel';
-import type { Speaker } from '@/features/speakers/types';
+import type { ClipWithSpeaker } from '@/features/clips/types';
 
 import { Pagination } from '@/components/pagination';
 import { Empty, EmptyDescription, EmptyTitle } from '@/components/ui';
 import { ClipsList } from '@/features/clips/components/clips-list';
-
-type ClipWithSpeaker = Doc<'clips'> & {
-  speaker: Speaker | null;
-};
 
 interface ClipsContentProps {
   clips: ClipWithSpeaker[];

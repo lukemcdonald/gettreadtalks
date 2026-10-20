@@ -18,6 +18,7 @@ describe('SearchCommandResults', () => {
         {
           href: '/talks/john-doe/romans-8',
           label: 'Romans 8',
+          scripture: 'Romans 8:28',
           subtitle: 'John Doe',
           value: 'talk1',
         },
@@ -85,6 +86,7 @@ describe('SearchCommandResults', () => {
 
     expect(screen.getByText('Talks')).toBeInTheDocument();
     expect(screen.getByText('John Doe')).toBeInTheDocument();
+    expect(screen.getByText('Romans 8:28')).toBeInTheDocument();
     expect(screen.queryByText(VIEW_ALL_SEARCH_GROUP)).not.toBeInTheDocument();
     expect(
       screen.getByRole('option', { name: 'View all results' })
