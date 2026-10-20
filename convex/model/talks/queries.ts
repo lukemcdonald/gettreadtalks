@@ -1,7 +1,5 @@
 import type { Doc } from '../../_generated/dataModel';
-import type { QueryCtx } from '../../_generated/server';
 import type { ContentSortOption } from '../../lib/sort';
-import type { Infer } from 'convex/values';
 
 import {
   getManyFrom,
@@ -580,14 +578,31 @@ export const listTalkTranscripts = query({
     source: v.optional(talkTranscriptSource),
     status: v.optional(talkTranscriptStatus),
   },
+  // fallow-ignore-next-line complexity
   handler: async (ctx, args) => {
     await requireAdmin(ctx);
 
-    const transcripts = await loadTalkTranscripts(ctx, args);
+    const items = [];
 
-    return transcripts
-      .filter((transcript) => talkTranscriptMatchesFilters(transcript, args))
-      .map(toTalkTranscriptListItem);
+    for (const transcript of await ctx.db.query('talkTranscripts').collect()) {
+      if (args.quality !== undefined && transcript.quality !== args.quality) {
+        continue;
+      }
+
+      if (args.source !== undefined && transcript.source !== args.source) {
+        continue;
+      }
+
+      if (args.status !== undefined && transcript.status !== args.status) {
+        continue;
+      }
+
+      const { text: _text, ...item } = transcript;
+
+      items.push(item);
+    }
+
+    return items;
   },
   returns: v.array(talkTranscriptListItem),
 });
@@ -607,66 +622,3 @@ export const listDraftTalkStudies = query({
   },
   returns: docs('talkStudies'),
 });
-
-function matchesOptional<T>(expected: T | undefined, actual: T | undefined) {
-  return expected === undefined || expected === actual;
-}
-
-function talkTranscriptMatchesFilters(
-  transcript: Doc<'talkTranscripts'>,
-  filters: {
-    quality?: Infer<typeof talkTranscriptQuality>;
-    source?: Infer<typeof talkTranscriptSource>;
-    status?: Infer<typeof talkTranscriptStatus>;
-  }
-) {
-  return (
-    matchesOptional(filters.quality, transcript.quality) &&
-    matchesOptional(filters.source, transcript.source) &&
-    matchesOptional(filters.status, transcript.status)
-  );
-}
-
-function toTalkTranscriptListItem(transcript: Doc<'talkTranscripts'>) {
-  const { text: _text, ...item } = transcript;
-
-  return item;
-}
-
-async function loadTalkTranscripts(
-  ctx: QueryCtx,
-  args: {
-    quality?: Infer<typeof talkTranscriptQuality>;
-    source?: Infer<typeof talkTranscriptSource>;
-    status?: Infer<typeof talkTranscriptStatus>;
-  }
-) {
-  if (args.quality !== undefined) {
-    const { quality } = args;
-
-    return await ctx.db
-      .query('talkTranscripts')
-      .withIndex('by_quality', (q) => q.eq('quality', quality))
-      .collect();
-  }
-
-  if (args.status !== undefined) {
-    const { status } = args;
-
-    return await ctx.db
-      .query('talkTranscripts')
-      .withIndex('by_status', (q) => q.eq('status', status))
-      .collect();
-  }
-
-  if (args.source !== undefined) {
-    const { source } = args;
-
-    return await ctx.db
-      .query('talkTranscripts')
-      .withIndex('by_source', (q) => q.eq('source', source))
-      .collect();
-  }
-
-  return await ctx.db.query('talkTranscripts').collect();
-}

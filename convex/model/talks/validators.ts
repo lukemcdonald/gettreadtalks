@@ -9,7 +9,6 @@ export const statusType = v.union(
 
 export const talkStudyStatus = v.union(
   v.literal('draft'),
-  v.literal('none'),
   v.literal('published')
 );
 
@@ -64,7 +63,5 @@ export const talkTranscriptSource = v.union(
 export const talkTranscriptStatus = v.union(
   v.literal('blocked'),
   v.literal('done'),
-  v.literal('failed'),
-  v.literal('missing'),
-  v.literal('queued')
+  v.literal('failed')
 );

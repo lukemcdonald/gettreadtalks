@@ -20,5 +20,11 @@ export const {
 } = queries;
 
 // Mutations
-export const { archiveTalk, createTalk, destroyTalk, updateTalk } = mutations;
-export const { saveTalkStudyDraft, upsertTalkTranscript } = mutations;
+export const {
+  archiveTalk,
+  createTalk,
+  destroyTalk,
+  saveTalkStudyDraft,
+  updateTalk,
+  upsertTalkTranscript,
+} = mutations;

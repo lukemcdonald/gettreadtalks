@@ -264,7 +264,7 @@ export const destroyTalk = mutation({
 });
 
 /**
- * Upsert a private talk transcript. Call from Grok Bot via `npx convex run`.
+ * Upsert a private talk transcript.
  */
 export const upsertTalkTranscript = internalMutation({
   args: talkTranscriptFields,
@@ -275,15 +275,14 @@ export const upsertTalkTranscript = internalMutation({
       .query('talkTranscripts')
       .withIndex('by_talkId', (q) => q.eq('talkId', args.talkId))
       .unique();
-    const fields = omitUndefined(args);
 
     if (existing) {
-      await ctx.db.replace(existing._id, fields);
+      await ctx.db.replace(existing._id, args);
 
       return existing._id;
     }
 
-    return await ctx.db.insert('talkTranscripts', fields);
+    return await ctx.db.insert('talkTranscripts', args);
   },
   returns: v.id('talkTranscripts'),
 });
@@ -326,14 +325,3 @@ export const saveTalkStudyDraft = internalMutation({
   },
   returns: v.id('talkStudies'),
 });
-
-function omitUndefined<T extends Record<string, unknown>>(value: T) {
-  return Object.fromEntries(
-    Object.entries(value).filter(([, item]) => item !== undefined)
-  ) as {
-    [K in keyof T as T[K] extends undefined ? never : K]: Exclude<
-      T[K],
-      undefined
-    >;
-  };
-}

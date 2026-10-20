@@ -3,6 +3,7 @@ import { httpRouter } from 'convex/server';
 import { httpAction } from './_generated/server';
 import { authComponent, createAuth } from './auth';
 import { resend } from './emails';
+import { handleEnrichmentRequest } from './model/talks/enrichment';
 
 const http = httpRouter();
 
@@ -27,6 +28,12 @@ http.route({
   ),
   method: 'POST',
   path: '/resend-webhook',
+});
+
+http.route({
+  handler: httpAction(handleEnrichmentRequest),
+  method: 'POST',
+  path: '/enrichment',
 });
 
 export default http;

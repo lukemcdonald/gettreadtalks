@@ -52,11 +52,9 @@ export const talkTables = {
   talkStudies: defineTable(talkStudyFields)
     .index('by_studyStatus', ['studyStatus'])
     .index('by_talkId', ['talkId']),
-  talkTranscripts: defineTable(talkTranscriptFields)
-    .index('by_quality', ['quality'])
-    .index('by_source', ['source'])
-    .index('by_status', ['status'])
-    .index('by_talkId', ['talkId']),
+  talkTranscripts: defineTable(talkTranscriptFields).index('by_talkId', [
+    'talkId',
+  ]),
   talks: defineTable(talkFields)
     .index('by_collectionId_and_collectionOrder', [
       'collectionId',
