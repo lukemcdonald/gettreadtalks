@@ -123,15 +123,8 @@ describe('talk transcript and study draft storage', () => {
     const editedSummary = 'Edited summary of grace.';
 
     await asAdmin.mutation(api.talks.updateTalkStudy, {
-      outline: [{ heading: 'Grace', text: 'Edited outline' }],
-      scriptureRefs: [{ book: 'Romans', chapter: 5, verseStart: 1 }],
-      studyGuide: [{ kind: 'key_idea', text: 'Edited idea' }],
-      suggestedTopics: ['grace'],
-      summary: editedSummary,
-      talkId: talk._id,
-    });
-    await asAdmin.mutation(api.talks.setTalkStudyStatus, {
       studyStatus: 'published',
+      summary: editedSummary,
       talkId: talk._id,
     });
 

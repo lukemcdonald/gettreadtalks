@@ -306,14 +306,6 @@ const gatedFunctions: {
   },
   {
     call: (client, seed) =>
-      client.mutation(api.talks.setTalkStudyStatus, {
-        studyStatus: 'published',
-        talkId: seed.talkId,
-      }),
-    name: 'talks.setTalkStudyStatus',
-  },
-  {
-    call: (client, seed) =>
       client.mutation(api.talks.updateTalk, {
         talkId: seed.talkId,
         title: 'Updated talk',
@@ -323,10 +315,7 @@ const gatedFunctions: {
   {
     call: (client, seed) =>
       client.mutation(api.talks.updateTalkStudy, {
-        outline: [{ heading: 'Grace', text: 'Updated outline' }],
-        scriptureRefs: [{ book: 'Romans', chapter: 5, verseStart: 1 }],
-        studyGuide: [{ kind: 'key_idea', text: 'Updated idea' }],
-        suggestedTopics: ['grace'],
+        studyStatus: 'published',
         summary: 'Updated summary',
         talkId: seed.talkId,
       }),

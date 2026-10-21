@@ -27,7 +27,6 @@ export const {
   createTalk,
   destroyTalk,
   saveTalkStudyDraft,
-  setTalkStudyStatus,
   updateTalk,
   updateTalkStudy,
   upsertTalkTranscript,

@@ -343,41 +343,29 @@ export const saveTalkStudyDraft = internalMutation({
   returns: v.id('talkStudies'),
 });
 
-async function patchTalkStudy(
-  ctx: MutationCtx,
-  talkId: Id<'talks'>,
-  fields: Partial<Doc<'talkStudies'>>
-) {
-  await requireAdmin(ctx);
-
-  const study =
-    (await getOneFrom(ctx.db, 'talkStudies', 'by_talkId', talkId)) ??
-    throwNotFound('Study not found', {
-      resource: 'talkStudy',
-      resourceId: talkId,
-    });
-
-  await ctx.db.patch(study._id, fields);
-
-  return study._id;
-}
-
 export const updateTalkStudy = mutation({
   args: {
-    ...talkStudyContentFields,
-    talkId: v.id('talks'),
-  },
-  handler: (ctx, { talkId, ...content }) =>
-    patchTalkStudy(ctx, talkId, { ...content, manuallyEditedAt: Date.now() }),
-  returns: v.id('talkStudies'),
-});
-
-export const setTalkStudyStatus = mutation({
-  args: {
     studyStatus: talkStudyStatus,
+    summary: v.string(),
     talkId: v.id('talks'),
   },
-  handler: (ctx, { studyStatus, talkId }) =>
-    patchTalkStudy(ctx, talkId, { studyStatus }),
+  handler: async (ctx, { studyStatus, summary, talkId }) => {
+    await requireAdmin(ctx);
+
+    const study =
+      (await getOneFrom(ctx.db, 'talkStudies', 'by_talkId', talkId)) ??
+      throwNotFound('Study not found', {
+        resource: 'talkStudy',
+        resourceId: talkId,
+      });
+
+    await ctx.db.patch(study._id, {
+      manuallyEditedAt: Date.now(),
+      studyStatus,
+      summary,
+    });
+
+    return study._id;
+  },
   returns: v.id('talkStudies'),
 });
