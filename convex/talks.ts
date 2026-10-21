@@ -9,7 +9,6 @@ export const {
   getTalkStudy,
   getTalkTranscript,
   getTalkTranscriptFetch,
-  getTalkTranscriptFetchContext,
   getTalksCount,
   listAllTalks,
   listDraftTalkStudies,

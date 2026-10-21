@@ -8,7 +8,6 @@ import { useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { useSheetRoute } from '@/app/@sheet/_hooks/use-sheet-route';
-import { SectionHeading } from '@/components/section-heading';
 import { FormSheet, SelectField, TextareaField } from '@/components/ui';
 import { updateTalkStudyAction } from '@/features/talks/actions/update-talk-study';
 import { TalkTranscriptFetch } from '@/features/talks/components/talk-transcript-fetch';
@@ -92,8 +91,10 @@ export function EditTalkStudySheet({
         ) : (
           <span className="text-sm">None</span>
         )}
-        <SectionHeading heading="Transcript" />
-        <TalkTranscriptFetch talkId={talkId} transcript={transcript} />
+        <TalkTranscriptFetch
+          hasTranscript={Boolean(transcript?.text)}
+          talkId={talkId}
+        />
       </div>
     </FormSheet>
   );

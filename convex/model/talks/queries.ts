@@ -12,7 +12,7 @@ import {
 } from 'convex/server';
 import { v } from 'convex/values';
 
-import { internalQuery, query } from '../../_generated/server';
+import { query } from '../../_generated/server';
 import { getTalkIdsByTopicSlugs } from '../../lib/filters';
 import { rotateContent } from '../../lib/rotateContent';
 import { getContentComparator } from '../../lib/sort';
@@ -534,14 +534,15 @@ const talkTranscriptListItem = v.object({
   ...talkTranscriptListFields,
 });
 
-function isFailedTranscriptFetch(fetch: Doc<'talkTranscriptFetches'>) {
-  return fetch.status === 'failed' && fetch.errorCode && fetch.message;
-}
-
+// fallow-ignore-next-line complexity
 function getLastErrorByTalk(fetches: Doc<'talkTranscriptFetches'>[]) {
   const latest = new Map<Doc<'talks'>['_id'], Doc<'talkTranscriptFetches'>>();
 
-  for (const fetch of fetches.filter(isFailedTranscriptFetch)) {
+  for (const fetch of fetches) {
+    if (fetch.status !== 'failed' || !fetch.errorCode || !fetch.message) {
+      continue;
+    }
+
     const current = latest.get(fetch.talkId);
 
     if (!current || fetch.checkedAt > current.checkedAt) {
@@ -550,20 +551,6 @@ function getLastErrorByTalk(fetches: Doc<'talkTranscriptFetches'>[]) {
   }
 
   return latest;
-}
-
-function toLastTranscriptError(
-  fetch: Doc<'talkTranscriptFetches'> | undefined
-) {
-  if (!fetch?.errorCode || !fetch.message) {
-    return null;
-  }
-
-  return {
-    errorCode: fetch.errorCode,
-    message: fetch.message,
-    retryAfter: fetch.retryAfter,
-  };
 }
 
 /**
@@ -598,10 +585,21 @@ export const listTalksWithoutTranscript = query({
 
     return talks
       .filter((talk) => !talkIdsWithTranscript.has(talk._id))
-      .map((talk) => ({
-        ...talk,
-        lastError: toLastTranscriptError(lastErrorByTalk.get(talk._id)),
-      }));
+      .map((talk) => {
+        const fetch = lastErrorByTalk.get(talk._id);
+
+        return {
+          ...talk,
+          lastError:
+            fetch?.errorCode && fetch.message
+              ? {
+                  errorCode: fetch.errorCode,
+                  message: fetch.message,
+                  retryAfter: fetch.retryAfter,
+                }
+              : null,
+        };
+      });
   },
   returns: v.array(
     v.object({
@@ -676,37 +674,4 @@ export const getTalkTranscriptFetch = query({
       .first();
   },
   returns: doc('talkTranscriptFetches').nullable(),
-});
-
-export const getTalkTranscriptFetchContext = internalQuery({
-  args: { runId: v.id('talkTranscriptFetches') },
-  handler: async (ctx, { runId }) => {
-    const run = await ctx.db.get(runId);
-
-    if (!run || run.status !== 'pending') {
-      return null;
-    }
-
-    const talk = await ctx.db.get(run.talkId);
-
-    if (!talk) {
-      return null;
-    }
-
-    return {
-      confirmRefetch: run.confirmRefetch,
-      mediaUrl: talk.mediaUrl,
-      runId: run._id,
-      talkId: talk._id,
-    };
-  },
-  returns: v.union(
-    v.null(),
-    v.object({
-      confirmRefetch: v.boolean(),
-      mediaUrl: v.string(),
-      runId: v.id('talkTranscriptFetches'),
-      talkId: v.id('talks'),
-    })
-  ),
 });

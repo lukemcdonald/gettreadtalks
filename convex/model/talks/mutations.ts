@@ -377,9 +377,6 @@ export const updateTalkStudy = mutation({
   returns: v.id('talkStudies'),
 });
 
-/**
- * Schedule an on-demand YouTube transcript fetch. Returns immediately.
- */
 export const createTalkTranscriptFetch = mutation({
   args: {
     confirmRefetch: v.optional(v.boolean()),
@@ -387,8 +384,8 @@ export const createTalkTranscriptFetch = mutation({
   },
   handler: async (ctx, { confirmRefetch = false, talkId }) => {
     await requireAdmin(ctx);
-    await getOrThrow(ctx, 'talks', talkId);
 
+    const talk = await getOrThrow(ctx, 'talks', talkId);
     const existingFetches = await ctx.db
       .query('talkTranscriptFetches')
       .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
@@ -414,13 +411,14 @@ export const createTalkTranscriptFetch = mutation({
 
     const runId = await ctx.db.insert('talkTranscriptFetches', {
       checkedAt: Date.now(),
-      confirmRefetch,
       status: 'pending',
       talkId,
     });
 
     await ctx.scheduler.runAfter(0, internal.talks.fetchTalkTranscript, {
+      mediaUrl: talk.mediaUrl,
       runId,
+      talkId,
     });
 
     return runId;
@@ -428,44 +426,8 @@ export const createTalkTranscriptFetch = mutation({
   returns: v.id('talkTranscriptFetches'),
 });
 
-async function saveFetchedTranscript(
-  ctx: MutationCtx,
-  args: {
-    confirmRefetch: boolean;
-    talkId: Id<'talks'>;
-    text: string;
-    wordCount?: number;
-  }
-) {
-  const existing = await ctx.db
-    .query('talkTranscripts')
-    .withIndex('by_talkId', (q) => q.eq('talkId', args.talkId))
-    .unique();
-
-  if (existing && !args.confirmRefetch) {
-    return;
-  }
-
-  const fields = {
-    fetchedAt: Date.now(),
-    source: 'youtube_captions' as const,
-    status: 'done' as const,
-    talkId: args.talkId,
-    text: args.text,
-    wordCount: args.wordCount,
-  };
-
-  if (existing) {
-    await ctx.db.replace(existing._id, fields);
-    return;
-  }
-
-  await ctx.db.insert('talkTranscripts', fields);
-}
-
 export const completeTalkTranscriptFetch = internalMutation({
   args: {
-    confirmRefetch: v.boolean(),
     errorCode: v.optional(talkTranscriptFetchErrorCode),
     message: v.optional(v.string()),
     retryAfter: v.optional(v.number()),
@@ -473,7 +435,6 @@ export const completeTalkTranscriptFetch = internalMutation({
     status: v.union(v.literal('failed'), v.literal('success')),
     talkId: v.id('talks'),
     text: v.optional(v.string()),
-    wordCount: v.optional(v.number()),
   },
   // fallow-ignore-next-line complexity
   handler: async (ctx, args) => {
@@ -492,12 +453,24 @@ export const completeTalkTranscriptFetch = internalMutation({
     });
 
     if (args.status === 'success' && args.text) {
-      await saveFetchedTranscript(ctx, {
-        confirmRefetch: args.confirmRefetch,
+      const existing = await ctx.db
+        .query('talkTranscripts')
+        .withIndex('by_talkId', (q) => q.eq('talkId', args.talkId))
+        .unique();
+      const fields = {
+        fetchedAt: Date.now(),
+        source: 'youtube_captions' as const,
+        status: 'done' as const,
         talkId: args.talkId,
         text: args.text,
-        wordCount: args.wordCount,
-      });
+      };
+
+      if (existing) {
+        await ctx.db.replace(existing._id, fields);
+        return null;
+      }
+
+      await ctx.db.insert('talkTranscripts', fields);
     }
 
     return null;

@@ -52,7 +52,6 @@ export const talkTranscriptFields = {
 
 export const talkTranscriptFetchFields = {
   checkedAt: v.number(),
-  confirmRefetch: v.boolean(),
   errorCode: v.optional(talkTranscriptFetchErrorCode),
   message: v.optional(v.string()),
   retryAfter: v.optional(v.number()),

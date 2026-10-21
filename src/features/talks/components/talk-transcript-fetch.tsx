@@ -2,7 +2,6 @@
 
 import type {
   TalkId,
-  TalkTranscript,
   TalkTranscriptFetch as TranscriptFetch,
 } from '@/features/talks/types';
 
@@ -18,24 +17,19 @@ import {
   AlertDialogPopup,
   AlertDialogTitle,
   Button,
-  Textarea,
 } from '@/components/ui';
 import { api } from '@/convex/_generated/api';
-import { useFetchTalkTranscript } from '@/features/talks/hooks/use-fetch-talk-transcript';
 import {
   formatTranscriptFetchFailure,
-  formatTranscriptFetchSuccess,
   isTranscriptFetchCoolingDown,
 } from '@/features/talks/utils';
+import { useMutation } from '@/hooks';
 
 // fallow-ignore-next-line complexity
-function getTranscriptFetchStatusText({
-  fetch,
-  transcript,
-}: {
-  fetch: TranscriptFetch | null;
-  transcript: TalkTranscript | null;
-}) {
+function getTranscriptFetchStatusText(
+  fetch: TranscriptFetch | null,
+  hasTranscript: boolean
+) {
   if (fetch?.status === 'pending') {
     return 'Fetching transcript...';
   }
@@ -44,11 +38,7 @@ function getTranscriptFetchStatusText({
     return formatTranscriptFetchFailure(fetch);
   }
 
-  if (transcript?.text) {
-    return formatTranscriptFetchSuccess(transcript);
-  }
-
-  return null;
+  return hasTranscript ? 'Transcript saved' : null;
 }
 
 function RefetchTranscriptDialog({
@@ -84,23 +74,24 @@ function RefetchTranscriptDialog({
 }
 
 // fallow-ignore-next-line complexity
-function TalkTranscriptFetchStatus({
-  disabled,
-  fetch,
-  onFetch,
-  transcript,
+export function TalkTranscriptFetch({
+  hasTranscript,
+  talkId,
 }: {
-  disabled: boolean;
-  fetch: TranscriptFetch | null;
-  onFetch: (confirmRefetch: boolean) => void;
-  transcript: TalkTranscript | null;
+  hasTranscript: boolean;
+  talkId: TalkId;
 }) {
+  const liveFetch = useQuery(api.talks.getTalkTranscriptFetch, { talkId });
+  const { isLoading, mutate } = useMutation(
+    api.talks.createTalkTranscriptFetch
+  );
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [now, setNow] = useState(() => Date.now());
-  const hasTranscript = Boolean(transcript?.text);
+  const fetch = liveFetch ?? null;
+  const saved = hasTranscript || fetch?.status === 'success';
   const coolingDown = isTranscriptFetchCoolingDown(fetch, now);
-  const isPending = disabled || fetch?.status === 'pending' || coolingDown;
-  const statusText = getTranscriptFetchStatusText({ fetch, transcript });
+  const disabled = isLoading || fetch?.status === 'pending' || coolingDown;
+  const statusText = getTranscriptFetchStatusText(fetch, saved);
 
   useEffect(() => {
     if (!fetch?.retryAfter || fetch.retryAfter <= Date.now()) {
@@ -117,67 +108,32 @@ function TalkTranscriptFetchStatus({
   }, [fetch?.retryAfter]);
 
   function handleClick() {
-    if (hasTranscript) {
+    if (saved) {
       setConfirmOpen(true);
       return;
     }
 
-    onFetch(false);
-  }
-
-  function handleConfirm() {
-    setConfirmOpen(false);
-    onFetch(true);
+    mutate({ confirmRefetch: false, talkId });
   }
 
   return (
-    <div className="space-y-3">
-      <div className="flex flex-col gap-2">
-        <Button
-          disabled={isPending}
-          onClick={handleClick}
-          size="sm"
-          type="button"
-        >
-          {hasTranscript ? 'Re-fetch' : 'Get transcript'}
-        </Button>
-        {statusText ? (
-          <p aria-live="polite" className="text-muted-foreground text-sm">
-            {statusText}
-          </p>
-        ) : null}
-      </div>
-      {transcript?.text ? (
-        <Textarea readOnly rows={8} value={transcript.text} />
+    <div className="space-y-2">
+      <Button disabled={disabled} onClick={handleClick} size="sm" type="button">
+        {saved ? 'Re-fetch' : 'Get transcript'}
+      </Button>
+      {statusText ? (
+        <p aria-live="polite" className="text-muted-foreground text-sm">
+          {statusText}
+        </p>
       ) : null}
       <RefetchTranscriptDialog
-        onConfirm={handleConfirm}
+        onConfirm={() => {
+          setConfirmOpen(false);
+          mutate({ confirmRefetch: true, talkId });
+        }}
         onOpenChange={setConfirmOpen}
         open={confirmOpen}
       />
     </div>
-  );
-}
-
-export function TalkTranscriptFetch({
-  talkId,
-  transcript,
-}: {
-  talkId: TalkId;
-  transcript: TalkTranscript | null;
-}) {
-  const liveFetch = useQuery(api.talks.getTalkTranscriptFetch, { talkId });
-  const liveTranscript = useQuery(api.talks.getTalkTranscript, { talkId });
-  const { isLoading, mutate } = useFetchTalkTranscript();
-
-  return (
-    <TalkTranscriptFetchStatus
-      disabled={isLoading}
-      fetch={liveFetch ?? null}
-      onFetch={(confirmRefetch) => {
-        mutate({ confirmRefetch, talkId });
-      }}
-      transcript={liveTranscript === undefined ? transcript : liveTranscript}
-    />
   );
 }

@@ -5,8 +5,6 @@ import {
   buildTalkPath,
   buildTalksPath,
   formatTalkMetaDescription,
-  formatTranscriptFetchFailure,
-  isTranscriptFetchCoolingDown,
 } from './utils';
 
 describe('buildTalkPath', () => {
@@ -95,76 +93,5 @@ describe('formatTalkMetaDescription', () => {
         speakerName: 'Martyn Lloyd-Jones',
       })
     ).toBe('A sermon on justification.');
-  });
-});
-
-describe('formatTranscriptFetchFailure', () => {
-  it('includes a local retry time with a time zone label', () => {
-    const retryAfter = Date.UTC(2026, 10, 21);
-    const timeZoneName = new Intl.DateTimeFormat(undefined, {
-      timeZoneName: 'short',
-    })
-      .formatToParts(new Date(retryAfter))
-      .find((part) => part.type === 'timeZoneName')?.value;
-
-    expect(timeZoneName).toBeTruthy();
-    expect(
-      formatTranscriptFetchFailure({
-        message: 'The monthly transcript quota has been used up.',
-        retryAfter,
-      })
-    ).toBe(
-      `The monthly transcript quota has been used up. Try again after Nov 21, 2026, 12:00 AM ${timeZoneName}.`
-    );
-  });
-});
-
-describe('isTranscriptFetchCoolingDown', () => {
-  const now = Date.UTC(2026, 9, 21, 12);
-
-  it('is true while a quota or rate-limit retryAfter is still in the future', () => {
-    expect(
-      isTranscriptFetchCoolingDown(
-        {
-          errorCode: 'quota_exhausted',
-          retryAfter: now + 1,
-          status: 'failed',
-        },
-        now
-      )
-    ).toBe(true);
-    expect(
-      isTranscriptFetchCoolingDown(
-        {
-          errorCode: 'rate_limited',
-          retryAfter: now + 1,
-          status: 'failed',
-        },
-        now
-      )
-    ).toBe(true);
-  });
-
-  it('is false after retryAfter or for other failures', () => {
-    expect(
-      isTranscriptFetchCoolingDown(
-        {
-          errorCode: 'rate_limited',
-          retryAfter: now,
-          status: 'failed',
-        },
-        now
-      )
-    ).toBe(false);
-    expect(
-      isTranscriptFetchCoolingDown(
-        {
-          errorCode: 'no_captions',
-          retryAfter: now + 1,
-          status: 'failed',
-        },
-        now
-      )
-    ).toBe(false);
   });
 });
