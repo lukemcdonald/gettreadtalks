@@ -261,6 +261,13 @@ const gatedFunctions: {
   },
   {
     call: (client, seed) =>
+      client.mutation(api.talks.createTalkTranscriptFetch, {
+        talkId: seed.talkId,
+      }),
+    name: 'talks.createTalkTranscriptFetch',
+  },
+  {
+    call: (client, seed) =>
       client.mutation(api.talks.destroyTalk, { talkId: seed.talkId }),
     name: 'talks.destroyTalk',
   },
@@ -278,6 +285,11 @@ const gatedFunctions: {
     call: (client, seed) =>
       client.query(api.talks.getTalkTranscript, { talkId: seed.talkId }),
     name: 'talks.getTalkTranscript',
+  },
+  {
+    call: (client, seed) =>
+      client.query(api.talks.getTalkTranscriptFetch, { talkId: seed.talkId }),
+    name: 'talks.getTalkTranscriptFetch',
   },
   {
     call: (client) =>

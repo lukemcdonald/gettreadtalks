@@ -8,14 +8,9 @@ import { useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { useSheetRoute } from '@/app/@sheet/_hooks/use-sheet-route';
-import { SectionHeading } from '@/components/section-heading';
-import {
-  FormSheet,
-  SelectField,
-  Textarea,
-  TextareaField,
-} from '@/components/ui';
+import { FormSheet, SelectField, TextareaField } from '@/components/ui';
 import { updateTalkStudyAction } from '@/features/talks/actions/update-talk-study';
+import { TalkTranscriptFetch } from '@/features/talks/components/talk-transcript-fetch';
 import { talkStudyFormSchema } from '@/features/talks/schemas/talk-study-form';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
 
@@ -96,12 +91,10 @@ export function EditTalkStudySheet({
         ) : (
           <span className="text-sm">None</span>
         )}
-        {transcript?.text ? (
-          <>
-            <SectionHeading heading="Transcript" />
-            <Textarea readOnly rows={8} value={transcript.text} />
-          </>
-        ) : null}
+        <TalkTranscriptFetch
+          hasTranscript={Boolean(transcript?.text)}
+          talkId={talkId}
+        />
       </div>
     </FormSheet>
   );

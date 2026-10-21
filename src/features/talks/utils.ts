@@ -19,6 +19,48 @@ export function buildTalkStudyPath(talkId: TalkId) {
   return `/talks/edit/${talkId}/study`;
 }
 
+function formatTranscriptRetryAfter(retryAfter: number) {
+  return new Intl.DateTimeFormat(undefined, {
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    month: 'short',
+    timeZoneName: 'short',
+    year: 'numeric',
+  }).format(new Date(retryAfter));
+}
+
+export function isTranscriptFetchCoolingDown(
+  fetch: {
+    errorCode?: string | null;
+    retryAfter?: number;
+    status?: string;
+  } | null,
+  now = Date.now()
+) {
+  return (
+    fetch?.status === 'failed' &&
+    (fetch.errorCode === 'quota_exhausted' ||
+      fetch.errorCode === 'rate_limited') &&
+    (fetch.retryAfter ?? 0) > now
+  );
+}
+
+export function formatTranscriptFetchFailure(fetch: {
+  message?: string;
+  retryAfter?: number;
+}) {
+  if (!fetch.message) {
+    return null;
+  }
+
+  if (!fetch.retryAfter) {
+    return fetch.message;
+  }
+
+  return `${fetch.message} Try again after ${formatTranscriptRetryAfter(fetch.retryAfter)}.`;
+}
+
 export function buildTalksPath(options?: { query?: { featured?: boolean } }) {
   return `/talks${buildPathQuery(options?.query)}`;
 }

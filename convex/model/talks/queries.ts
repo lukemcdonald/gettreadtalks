@@ -30,12 +30,13 @@ import {
   listPublishedTalksPage,
   searchPublishedTalksByTitleOrSpeaker,
 } from './helpers';
-import { talkTranscriptFields } from './schema';
+import { talkFields, talkTranscriptFields } from './schema';
 import {
   enrichAdminTalks,
   enrichWithTopics,
   filterTalksByTitleOrSpeaker,
 } from './utils';
+import { talkTranscriptFetchLastError } from './validators';
 
 /**
  * List slugs for published talks with their speaker slugs.
@@ -533,6 +534,25 @@ const talkTranscriptListItem = v.object({
   ...talkTranscriptListFields,
 });
 
+// fallow-ignore-next-line complexity
+function getLastErrorByTalk(fetches: Doc<'talkTranscriptFetches'>[]) {
+  const latest = new Map<Doc<'talks'>['_id'], Doc<'talkTranscriptFetches'>>();
+
+  for (const fetch of fetches) {
+    if (fetch.status !== 'failed' || !fetch.errorCode || !fetch.message) {
+      continue;
+    }
+
+    const current = latest.get(fetch.talkId);
+
+    if (!current || fetch.checkedAt > current.checkedAt) {
+      latest.set(fetch.talkId, fetch);
+    }
+  }
+
+  return latest;
+}
+
 /**
  * List published (or filtered) talks that have no transcript row.
  */
@@ -554,14 +574,41 @@ export const listTalksWithoutTranscript = query({
             )
             .order('desc')
             .collect();
-    const transcripts = await ctx.db.query('talkTranscripts').collect();
+    const [fetches, transcripts] = await Promise.all([
+      ctx.db.query('talkTranscriptFetches').collect(),
+      ctx.db.query('talkTranscripts').collect(),
+    ]);
+    const lastErrorByTalk = getLastErrorByTalk(fetches);
     const talkIdsWithTranscript = new Set(
       transcripts.map((transcript) => transcript.talkId)
     );
 
-    return talks.filter((talk) => !talkIdsWithTranscript.has(talk._id));
+    return talks
+      .filter((talk) => !talkIdsWithTranscript.has(talk._id))
+      .map((talk) => {
+        const fetch = lastErrorByTalk.get(talk._id);
+
+        return {
+          ...talk,
+          lastError:
+            fetch?.errorCode && fetch.message
+              ? {
+                  errorCode: fetch.errorCode,
+                  message: fetch.message,
+                  retryAfter: fetch.retryAfter,
+                }
+              : null,
+        };
+      });
   },
-  returns: docs('talks'),
+  returns: v.array(
+    v.object({
+      _creationTime: v.number(),
+      _id: v.id('talks'),
+      ...talkFields,
+      lastError: v.union(talkTranscriptFetchLastError, v.null()),
+    })
+  ),
 });
 
 /**
@@ -613,4 +660,18 @@ export const getTalkTranscript = query({
     return await getOneFrom(ctx.db, 'talkTranscripts', 'by_talkId', talkId);
   },
   returns: doc('talkTranscripts').nullable(),
+});
+
+export const getTalkTranscriptFetch = query({
+  args: { talkId: v.id('talks') },
+  handler: async (ctx, { talkId }) => {
+    await requireAdmin(ctx);
+
+    return await ctx.db
+      .query('talkTranscriptFetches')
+      .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
+      .order('desc')
+      .first();
+  },
+  returns: doc('talkTranscriptFetches').nullable(),
 });

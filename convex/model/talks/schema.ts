@@ -5,6 +5,8 @@ import { statusType, timestampFields } from '../../lib/validators';
 import {
   talkStudyContentFields,
   talkStudyStatus,
+  talkTranscriptFetchErrorCode,
+  talkTranscriptFetchStatus,
   talkTranscriptQuality,
   talkTranscriptSource,
   talkTranscriptStatus,
@@ -48,10 +50,23 @@ export const talkTranscriptFields = {
   wordCount: v.optional(v.number()),
 };
 
+export const talkTranscriptFetchFields = {
+  checkedAt: v.number(),
+  errorCode: v.optional(talkTranscriptFetchErrorCode),
+  message: v.optional(v.string()),
+  retryAfter: v.optional(v.number()),
+  status: talkTranscriptFetchStatus,
+  talkId: v.id('talks'),
+};
+
 export const talkTables = {
   talkStudies: defineTable(talkStudyFields)
     .index('by_studyStatus', ['studyStatus'])
     .index('by_talkId', ['talkId']),
+  talkTranscriptFetches: defineTable(talkTranscriptFetchFields).index(
+    'by_talkId',
+    ['talkId']
+  ),
   talkTranscripts: defineTable(talkTranscriptFields).index('by_talkId', [
     'talkId',
   ]),

@@ -9,6 +9,7 @@ Faith-based talks platform. Next.js app with a Convex backend.
 - **App:** [Next.js](https://nextjs.org/docs) 16, [React](https://react.dev/) 19, [Tailwind CSS](https://tailwindcss.com/docs) v4
 - **UI:** [Coss UI](https://coss.com/ui) ([Base UI](https://base-ui.com/))
 - **Backend:** [Convex](https://docs.convex.dev/)
+- **Transcripts:** [youtube-transcript.io](https://www.youtube-transcript.io/)
 - **Auth:** [Better Auth](https://better-auth.com/) (+ [Cloudflare Turnstile](https://developers.cloudflare.com/turnstile/))
 - **Forms:** [React Hook Form](https://react-hook-form.com/) + [Zod](https://zod.dev/)
 - **Email:** [Resend](https://resend.com/docs) + [React Email](https://react.email/)

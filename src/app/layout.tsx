@@ -44,9 +44,6 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    ...(process.env.NEXT_PUBLIC_TWITTER_HANDLE && {
-      site: process.env.NEXT_PUBLIC_TWITTER_HANDLE,
-    }),
   },
 };
 
