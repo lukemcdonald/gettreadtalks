@@ -12,8 +12,10 @@ import {
   PREVIEW_CLIPS,
   PREVIEW_COLLECTIONS,
   PREVIEW_SPEAKERS,
+  PREVIEW_STUDIES,
   PREVIEW_TALKS,
   PREVIEW_TOPICS,
+  PREVIEW_TRANSCRIPTS,
 } from './previewFixtures';
 
 const seedContentResultValidator = v.object({
@@ -362,6 +364,34 @@ export const seedContent = internalMutation({
         await upsertTalkTopics(ctx, talkId, topicIds);
       })
     );
+
+    await Promise.all([
+      ...PREVIEW_STUDIES.map(async ({ talkSlug, ...content }) => {
+        const talkId = requireSeedId(talkIdsBySlug, 'talk', talkSlug);
+        const existing = await ctx.db
+          .query('talkStudies')
+          .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
+          .unique();
+        const fields = {
+          ...content,
+          generatedAt: existing?.generatedAt ?? Date.now(),
+          talkId,
+        };
+
+        if (existing) {
+          await ctx.db.replace(existing._id, fields);
+          return;
+        }
+
+        await ctx.db.insert('talkStudies', fields);
+      }),
+      ...PREVIEW_TRANSCRIPTS.map(async ({ talkSlug, ...transcript }) => {
+        await ctx.runMutation(internal.talks.upsertTalkTranscript, {
+          ...transcript,
+          talkId: requireSeedId(talkIdsBySlug, 'talk', talkSlug),
+        });
+      }),
+    ]);
 
     await Promise.all(
       PREVIEW_CLIPS.map(async (clip) => {

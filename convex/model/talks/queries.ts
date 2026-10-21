@@ -594,3 +594,23 @@ export const listDraftTalkStudies = query({
   },
   returns: docs('talkStudies'),
 });
+
+export const getTalkStudy = query({
+  args: { talkId: v.id('talks') },
+  handler: async (ctx, { talkId }) => {
+    await requireAdmin(ctx);
+
+    return await getOneFrom(ctx.db, 'talkStudies', 'by_talkId', talkId);
+  },
+  returns: doc('talkStudies').nullable(),
+});
+
+export const getTalkTranscript = query({
+  args: { talkId: v.id('talks') },
+  handler: async (ctx, { talkId }) => {
+    await requireAdmin(ctx);
+
+    return await getOneFrom(ctx.db, 'talkTranscripts', 'by_talkId', talkId);
+  },
+  returns: doc('talkTranscripts').nullable(),
+});

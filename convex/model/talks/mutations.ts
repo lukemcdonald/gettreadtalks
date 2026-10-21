@@ -1,12 +1,14 @@
 import type { Doc, Id } from '../../_generated/dataModel';
 import type { MutationCtx } from '../../_generated/server';
 
+import { getOneFrom } from 'convex-helpers/server/relationships';
 import { v } from 'convex/values';
 
 import { internalMutation, mutation } from '../../_generated/server';
 import {
   throwConvexError,
   throwDuplicateSlug,
+  throwNotFound,
   throwValidationError,
 } from '../../lib/errors';
 import {
@@ -18,7 +20,11 @@ import {
 } from '../../lib/utils';
 import { requireAdmin } from '../auth/roles';
 import { talkTranscriptFields } from './schema';
-import { statusType, talkStudyContentFields } from './validators';
+import {
+  statusType,
+  talkStudyContentFields,
+  talkStudyStatus,
+} from './validators';
 
 async function setTalkTopics(
   ctx: MutationCtx,
@@ -333,6 +339,33 @@ export const saveTalkStudyDraft = internalMutation({
     }
 
     return await ctx.db.insert('talkStudies', fields);
+  },
+  returns: v.id('talkStudies'),
+});
+
+export const updateTalkStudy = mutation({
+  args: {
+    studyStatus: talkStudyStatus,
+    summary: v.string(),
+    talkId: v.id('talks'),
+  },
+  handler: async (ctx, { studyStatus, summary, talkId }) => {
+    await requireAdmin(ctx);
+
+    const study =
+      (await getOneFrom(ctx.db, 'talkStudies', 'by_talkId', talkId)) ??
+      throwNotFound('Study not found', {
+        resource: 'talkStudy',
+        resourceId: talkId,
+      });
+
+    await ctx.db.patch(study._id, {
+      manuallyEditedAt: Date.now(),
+      studyStatus,
+      summary,
+    });
+
+    return study._id;
   },
   returns: v.id('talkStudies'),
 });

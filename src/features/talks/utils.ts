@@ -1,5 +1,5 @@
 import type { Speaker } from '@/features/speakers/types';
-import type { Talk } from '@/features/talks/types';
+import type { Talk, TalkId } from '@/features/talks/types';
 
 import { buildAbsoluteUrl, buildPathQuery } from '@/lib/entities/paths';
 
@@ -13,6 +13,10 @@ export function buildTalkPath(
   }
 
   return `/talks/${talk.speaker.slug}/${talk.slug}`;
+}
+
+export function buildTalkStudyPath(talkId: TalkId) {
+  return `/talks/edit/${talkId}/study`;
 }
 
 export function buildTalksPath(options?: { query?: { featured?: boolean } }) {

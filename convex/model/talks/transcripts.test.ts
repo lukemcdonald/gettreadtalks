@@ -111,25 +111,35 @@ describe('talk transcript and study draft storage', () => {
     expect(transcripts).toEqual([]);
   });
 
-  it('refuses to overwrite a published study', async () => {
-    const { t, talk } = await seedPublishedTalk();
-    const reviewedAt = 1_700_000_000_000;
-    const reviewedSummary = 'Reviewed published summary';
-    const studyId = await t.run(
-      async (ctx) =>
-        await ctx.db.insert('talkStudies', {
-          generatedAt: reviewedAt,
-          generator: 'reviewer',
-          manuallyEditedAt: reviewedAt,
-          outline: [{ heading: 'Grace', text: 'Reviewed outline' }],
-          scriptureRefs: [{ book: 'Romans', chapter: 5, verseStart: 1 }],
-          studyGuide: [{ kind: 'key_idea', text: 'Reviewed idea' }],
-          studyStatus: 'published',
-          suggestedTopics: ['grace'],
-          summary: reviewedSummary,
-          talkId: talk._id,
-        })
+  it('marks a study edited, publishes it, and refuses a later generated draft', async () => {
+    const { asAdmin, t, talk } = await seedPublishedTalk();
+
+    await t.mutation(
+      internal.talks.saveTalkStudyDraft,
+      studyDraftArgs(talk._id)
     );
+
+    const before = Date.now();
+    const editedSummary = 'Edited summary of grace.';
+
+    await asAdmin.mutation(api.talks.updateTalkStudy, {
+      studyStatus: 'published',
+      summary: editedSummary,
+      talkId: talk._id,
+    });
+
+    const study = await asAdmin.query(api.talks.getTalkStudy, {
+      talkId: talk._id,
+    });
+
+    expect(study).toEqual(
+      expect.objectContaining({
+        manuallyEditedAt: expect.any(Number),
+        studyStatus: 'published',
+        summary: editedSummary,
+      })
+    );
+    expect(study?.manuallyEditedAt).toBeGreaterThanOrEqual(before);
 
     const previous = process.env.ENRICHMENT_API_TOKEN;
 
@@ -150,18 +160,6 @@ describe('talk transcript and study draft storage', () => {
         process.env.ENRICHMENT_API_TOKEN = previous;
       }
     }
-
-    const study = await t.run(async (ctx) => await ctx.db.get(studyId));
-
-    expect(study).toEqual(
-      expect.objectContaining({
-        generatedAt: reviewedAt,
-        generator: 'reviewer',
-        manuallyEditedAt: reviewedAt,
-        studyStatus: 'published',
-        summary: reviewedSummary,
-      })
-    );
   });
 
   it('returns 401 when the enrichment token is missing or wrong', async () => {

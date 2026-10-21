@@ -109,6 +109,43 @@ export const PREVIEW_TALKS = [
   },
 ];
 
+export const PREVIEW_STUDIES = [
+  {
+    generator: 'grok-bot',
+    outline: [
+      {
+        heading: 'God works for good',
+        text: 'Every circumstance in the life of those who love God is gathered up into his purpose.',
+      },
+    ],
+    scriptureRefs: [
+      { book: 'Romans', chapter: 8, verseEnd: 28, verseStart: 28 },
+    ],
+    studyGuide: [
+      {
+        kind: 'key_idea' as const,
+        text: 'God is at work in all things for the good of those who love him.',
+      },
+    ],
+    studyStatus: 'draft' as const,
+    suggestedTopics: ['grace'],
+    summary:
+      'This talk traces Romans 8:28 to show that God is not merely present in trouble but at work through it.',
+    talkSlug: 'sample-sermon-on-romans-8',
+  },
+];
+
+export const PREVIEW_TRANSCRIPTS = [
+  {
+    quality: 'good' as const,
+    source: 'speaker_published' as const,
+    status: 'done' as const,
+    talkSlug: 'sample-sermon-on-romans-8',
+    text: 'Placeholder transcript for preview testing. We know that for those who love God all things work together for good, for those who are called according to his purpose.',
+    wordCount: 32,
+  },
+];
+
 export const PREVIEW_CLIPS = [
   {
     description: PLACEHOLDER_DESCRIPTION,

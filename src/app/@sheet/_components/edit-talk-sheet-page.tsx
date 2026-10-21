@@ -3,10 +3,16 @@ import type { Route } from 'next';
 
 import { redirect } from 'next/navigation';
 
-import { EditTalkSheetRoute } from '@/app/@sheet/_components/edit-talk-sheet-route';
 import { loadFormOptions } from '@/app/@sheet/_queries/load-form-options';
-import { loadTalk } from '@/features/talks/queries/load-talk';
+import { EditTalkSheet } from '@/features/talks/components/edit-talk-sheet';
+import { EditTalkStudySheet } from '@/features/talks/components/edit-talk-study-sheet';
+import {
+  loadTalk,
+  loadTalkStudy,
+  loadTalkTranscript,
+} from '@/features/talks/queries/load-talk';
 import { loadTalkTopics } from '@/features/talks/queries/load-talk-topics';
+import { buildTalkStudyPath } from '@/features/talks/utils';
 import {
   ADMIN_LIST_PATHS,
   buildEntityEditPath,
@@ -21,6 +27,7 @@ interface EditTalkSheetPageProps {
   searchParams?: Promise<{ status?: string | string[] }>;
 }
 
+// fallow-ignore-next-line complexity
 export async function EditTalkSheetPage({
   closeHref,
   params,
@@ -37,10 +44,11 @@ export async function EditTalkSheetPage({
     ) as Route
   );
 
-  const [talk, talkTopics, { collections, speakers, topics }] =
+  const [talk, talkTopics, study, { collections, speakers, topics }] =
     await Promise.all([
       loadTalk(talkId),
       loadTalkTopics(talkId),
+      loadTalkStudy(talkId),
       loadFormOptions(),
     ]);
 
@@ -49,16 +57,46 @@ export async function EditTalkSheetPage({
   }
 
   return (
-    <EditTalkSheetRoute
+    <EditTalkSheet
       closeHref={closeHref}
       collections={collections}
       speakers={speakers}
       statusPrefill={statusPrefill}
+      studyStatus={study?.studyStatus}
       talk={{
         ...talk,
         topicIds: talkTopics.map((topic) => topic._id),
       }}
       topics={topics}
+    />
+  );
+}
+
+export async function EditTalkStudySheetPage({
+  closeHref,
+  params,
+}: {
+  closeHref?: string;
+  params: Promise<{ talkId: TalkId }>;
+}) {
+  const { talkId } = await params;
+  await requireAdminUser(getLoginRedirect(buildTalkStudyPath(talkId)) as Route);
+  const [talk, study, transcript] = await Promise.all([
+    loadTalk(talkId),
+    loadTalkStudy(talkId),
+    loadTalkTranscript(talkId),
+  ]);
+
+  if (!talk) {
+    redirect(ADMIN_LIST_PATHS.talks);
+  }
+
+  return (
+    <EditTalkStudySheet
+      closeHref={closeHref}
+      study={study}
+      talkId={talkId}
+      transcript={transcript}
     />
   );
 }

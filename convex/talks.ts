@@ -4,6 +4,8 @@ import { mutations, queries } from './model/talks';
 export const {
   getTalk,
   getTalkBySlug,
+  getTalkStudy,
+  getTalkTranscript,
   getTalksCount,
   listAllTalks,
   listDraftTalkStudies,
@@ -26,5 +28,6 @@ export const {
   destroyTalk,
   saveTalkStudyDraft,
   updateTalk,
+  updateTalkStudy,
   upsertTalkTranscript,
 } = mutations;

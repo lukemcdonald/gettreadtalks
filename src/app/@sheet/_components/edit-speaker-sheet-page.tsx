@@ -3,7 +3,7 @@ import type { Route } from 'next';
 
 import { redirect } from 'next/navigation';
 
-import { EditSpeakerSheetRoute } from '@/app/@sheet/_components/edit-speaker-sheet-route';
+import { EditSpeakerSheet } from '@/features/speakers/components/edit-speaker-sheet';
 import { loadSpeaker } from '@/features/speakers/queries/load-speaker';
 import {
   ADMIN_LIST_PATHS,
@@ -33,5 +33,5 @@ export async function EditSpeakerSheetPage({
     redirect(ADMIN_LIST_PATHS.speakers);
   }
 
-  return <EditSpeakerSheetRoute closeHref={closeHref} speaker={speaker} />;
+  return <EditSpeakerSheet closeHref={closeHref} speaker={speaker} />;
 }

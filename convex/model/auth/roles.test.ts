@@ -46,6 +46,17 @@ async function seedCatalog(t: ReturnType<typeof createConvexTest>) {
       status: 'published',
       title: 'Grace Abounding',
     });
+    await ctx.db.insert('talkStudies', {
+      generatedAt: Date.now(),
+      generator: 'test',
+      outline: [{ heading: 'Grace', text: 'Grace is a gift' }],
+      scriptureRefs: [{ book: 'Romans', chapter: 5, verseStart: 1 }],
+      studyGuide: [{ kind: 'key_idea', text: 'Grace' }],
+      studyStatus: 'draft',
+      suggestedTopics: ['grace'],
+      summary: 'A draft summary.',
+      talkId,
+    });
     const topicId = await ctx.db.insert('topics', {
       slug: 'grace',
       title: 'Grace',
@@ -259,6 +270,16 @@ const gatedFunctions: {
     name: 'talks.getTalk',
   },
   {
+    call: (client, seed) =>
+      client.query(api.talks.getTalkStudy, { talkId: seed.talkId }),
+    name: 'talks.getTalkStudy',
+  },
+  {
+    call: (client, seed) =>
+      client.query(api.talks.getTalkTranscript, { talkId: seed.talkId }),
+    name: 'talks.getTalkTranscript',
+  },
+  {
     call: (client) =>
       client.query(api.talks.listAllTalks, {
         paginationOpts,
@@ -290,6 +311,15 @@ const gatedFunctions: {
         title: 'Updated talk',
       }),
     name: 'talks.updateTalk',
+  },
+  {
+    call: (client, seed) =>
+      client.mutation(api.talks.updateTalkStudy, {
+        studyStatus: 'published',
+        summary: 'Updated summary',
+        talkId: seed.talkId,
+      }),
+    name: 'talks.updateTalkStudy',
   },
   {
     call: (client, seed) =>

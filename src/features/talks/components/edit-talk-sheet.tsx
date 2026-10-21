@@ -3,7 +3,7 @@
 import type { CollectionListItem } from '@/features/collections/types';
 import type { SpeakerListItem } from '@/features/speakers/types';
 import type { TalkFormData } from '@/features/talks/schemas/talk-form';
-import type { Talk, TalkId, TalkWithTopicIds } from '@/features/talks/types';
+import type { Talk, TalkStudy, TalkWithTopicIds } from '@/features/talks/types';
 import type { TopicListItem } from '@/features/topics/types';
 import type { StatusPrefill } from '@/lib/entities/status-prefill';
 
@@ -11,22 +11,24 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 
+import { useSheetRoute } from '@/app/@sheet/_hooks/use-sheet-route';
+import { ManageStatusBadge } from '@/components/manage-table';
 import { FormSheet } from '@/components/ui';
+import { Link } from '@/components/ui/link';
 import { slugify } from '@/convex/lib/utils';
 import { updateTalkAction } from '@/features/talks/actions/update-talk';
 import { TalkFormFields } from '@/features/talks/components/talk-form-fields';
 import { UrlChangeDialog } from '@/features/talks/components/url-change-dialog';
 import { talkFormSchema } from '@/features/talks/schemas/talk-form';
-import { buildTalkPath } from '@/features/talks/utils';
+import { buildTalkPath, buildTalkStudyPath } from '@/features/talks/utils';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
 
 interface EditTalkSheetProps {
+  closeHref?: string;
   collections: CollectionListItem[];
-  onOpenChange: (open: boolean) => void;
-  onTalkUpdated: (talkId: TalkId) => void;
-  open: boolean;
   speakers: SpeakerListItem[];
   statusPrefill?: StatusPrefill;
+  studyStatus?: TalkStudy['studyStatus'] | null;
   talk: TalkWithTopicIds;
   topics: TopicListItem[];
 }
@@ -82,15 +84,15 @@ function getUrlChangeForTalk(talk: Talk, data: TalkFormData): UrlChange {
 }
 
 export function EditTalkSheet({
+  closeHref,
   collections,
-  onOpenChange,
-  onTalkUpdated,
-  open,
   speakers,
   statusPrefill,
+  studyStatus,
   talk,
   topics,
 }: EditTalkSheetProps) {
+  const { handleOpenChange, handleSuccess } = useSheetRoute(closeHref);
   const [isPending, startTransition] = useTransition();
   const [pendingData, setPendingData] = useState<TalkFormData | null>(null);
   const [urlChange, setUrlChange] = useState<UrlChange>(null);
@@ -112,8 +114,8 @@ export function EditTalkSheet({
         return;
       }
 
-      onTalkUpdated(talk._id);
-      onOpenChange(false);
+      handleSuccess();
+      handleOpenChange(false);
     });
   }
 
@@ -147,20 +149,29 @@ export function EditTalkSheet({
       <FormSheet
         error={form.formState.errors.root}
         isPending={isPending}
-        onOpenChange={onOpenChange}
+        onOpenChange={handleOpenChange}
         onSubmit={handleSubmit}
-        open={open}
+        open
         submitLabel="Save Changes"
         title="Edit Talk"
       >
-        <TalkFormFields
-          collections={collections}
-          control={form.control}
-          mode="edit"
-          setValue={form.setValue}
-          speakers={speakers}
-          topics={topics}
-        />
+        <div className="space-y-4">
+          <TalkFormFields
+            collections={collections}
+            control={form.control}
+            mode="edit"
+            setValue={form.setValue}
+            speakers={speakers}
+            topics={topics}
+          />
+          <Link
+            className="flex items-center justify-between gap-3 text-sm"
+            href={buildTalkStudyPath(talk._id)}
+          >
+            <span className="font-medium">Study</span>
+            {studyStatus ? <ManageStatusBadge status={studyStatus} /> : 'None'}
+          </Link>
+        </div>
       </FormSheet>
 
       {urlChange && (

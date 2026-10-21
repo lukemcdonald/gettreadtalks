@@ -5,6 +5,8 @@ import type { StatusType } from '@/lib/entities/types';
 
 export type Talk = Doc<'talks'>;
 export type TalkId = Id<'talks'>;
+export type TalkStudy = Doc<'talkStudies'>;
+export type TalkTranscript = Doc<'talkTranscripts'>;
 
 /** Talk fields used in selection/dropdown UIs */
 export type TalkListItem = Pick<Talk, '_id' | 'title'>;
