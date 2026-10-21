@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 
 import { Analytics } from '@vercel/analytics/next';
@@ -24,13 +24,6 @@ export const metadata: Metadata = {
     canonical: './',
   },
   description: site.description,
-  icons: {
-    apple: '/favicon.png',
-    icon: [
-      { type: 'image/svg+xml', url: '/favicon.svg' },
-      { type: 'image/png', url: '/favicon.png' },
-    ],
-  },
   metadataBase: new URL(site.url),
   openGraph: {
     images: [
@@ -55,6 +48,13 @@ export const metadata: Metadata = {
       site: process.env.NEXT_PUBLIC_TWITTER_HANDLE,
     }),
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { color: site.themeColor.light, media: '(prefers-color-scheme: light)' },
+    { color: site.themeColor.dark, media: '(prefers-color-scheme: dark)' },
+  ],
 };
 
 export default function RootLayout({
