@@ -34,7 +34,7 @@ export function SortSelect({
   const defaultSort = firstSortValue(options);
 
   return (
-    <div className={cn('space-y-2', className)}>
+    <div className={cn('flex flex-col gap-2', className)}>
       <Label htmlFor={paramName}>{label}</Label>
       <Select
         disabled={isPending}

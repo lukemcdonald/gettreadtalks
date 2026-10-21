@@ -22,7 +22,7 @@ export function SearchInput({
   const [value, setValue] = useDebouncedSearchParam(paramName);
 
   return (
-    <div className={cn('space-y-2', className)}>
+    <div className={cn('flex flex-col gap-2', className)}>
       {!!label && <Label htmlFor={paramName}>{label}</Label>}
       <Input
         id={paramName}

@@ -7,7 +7,7 @@ function DesktopFilterFieldSkeleton({
   labelClassName: string;
 }) {
   return (
-    <div className="space-y-2">
+    <div className="flex flex-col gap-2">
       <Skeleton className={labelClassName} />
       <Skeleton className="h-9.5 w-full" />
     </div>
