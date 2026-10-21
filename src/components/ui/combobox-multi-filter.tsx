@@ -57,7 +57,7 @@ export function ComboboxMultiFilter({
   };
 
   return (
-    <div className={cn('space-y-2', className)}>
+    <div className={cn('flex flex-col gap-2', className)}>
       {!!label && <Label htmlFor={name}>{label}</Label>}
       <Combobox
         autoHighlight

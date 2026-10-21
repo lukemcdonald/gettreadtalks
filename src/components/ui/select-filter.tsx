@@ -45,7 +45,7 @@ export function SelectFilter({
   );
 
   return (
-    <div className={cn('space-y-2', className)}>
+    <div className={cn('flex flex-col gap-2', className)}>
       <Label htmlFor={name}>{label}</Label>
       <Select
         disabled={isPending}

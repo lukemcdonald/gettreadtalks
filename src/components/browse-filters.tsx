@@ -51,7 +51,7 @@ function MobileBrowseFilters({ children, search }: BrowseFilterPaneProps) {
 
 function DesktopBrowseFilters({ children, search }: BrowseFilterPaneProps) {
   return (
-    <div className="hidden md:flex md:flex-col md:gap-4">
+    <div className="hidden md:flex md:flex-col md:gap-5">
       {search ? <BrowseSearch label="Search" search={search} /> : null}
       {children}
     </div>
@@ -64,7 +64,7 @@ function DesktopBrowseFilters({ children, search }: BrowseFilterPaneProps) {
  */
 export function BrowseFilters({ children, search }: BrowseFiltersProps) {
   return (
-    <SidebarContent className="space-y-4">
+    <SidebarContent>
       <MobileBrowseFilters search={search}>{children}</MobileBrowseFilters>
       <DesktopBrowseFilters search={search}>{children}</DesktopBrowseFilters>
     </SidebarContent>
