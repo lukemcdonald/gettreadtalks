@@ -100,7 +100,7 @@ export function MobileFilterDrawer({
           <DrawerTitle>{title ?? label}</DrawerTitle>
         </DrawerHeader>
         <DrawerPanel>
-          <div className="flex flex-col gap-4 pb-2">{children}</div>
+          <div className="flex flex-col gap-5 pb-2">{children}</div>
         </DrawerPanel>
       </DrawerPopup>
     </Drawer>

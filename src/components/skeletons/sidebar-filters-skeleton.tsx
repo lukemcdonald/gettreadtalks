@@ -16,12 +16,12 @@ function DesktopFilterFieldSkeleton({
 
 export function SidebarFiltersSkeleton() {
   return (
-    <SidebarContent className="space-y-4">
+    <SidebarContent>
       <div className="flex items-center gap-2 md:hidden">
         <Skeleton className="h-9.5 flex-1" />
         <Skeleton className="size-10 shrink-0" />
       </div>
-      <div className="hidden md:flex md:flex-col md:gap-4">
+      <div className="hidden md:flex md:flex-col md:gap-5">
         <DesktopFilterFieldSkeleton labelClassName="h-4 w-12" />
         <DesktopFilterFieldSkeleton labelClassName="h-4 w-16" />
         <DesktopFilterFieldSkeleton labelClassName="h-4 w-12" />
