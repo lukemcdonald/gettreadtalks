@@ -6,6 +6,7 @@
 
 @source not '../../.agents';
 @source not '../../.claude';
+@source not '../../DESIGN.md';
 
 /* Unused COSS primitives: remove a line when you start using that primitive. */
 @source not '../components/ui/primitives/accordion.tsx';
