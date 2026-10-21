@@ -7,6 +7,14 @@ export type Talk = Doc<'talks'>;
 export type TalkId = Id<'talks'>;
 export type TalkStudy = Doc<'talkStudies'>;
 export type TalkTranscript = Doc<'talkTranscripts'>;
+export type TalkTranscriptFetch = Doc<'talkTranscriptFetches'>;
+export type TalkWithoutTranscript = Talk & {
+  lastError: {
+    errorCode: TalkTranscriptFetch['errorCode'];
+    message: string;
+    retryAfter?: number;
+  } | null;
+};
 
 /** Talk fields used in selection/dropdown UIs */
 export type TalkListItem = Pick<Talk, '_id' | 'title'>;

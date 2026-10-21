@@ -12,7 +12,7 @@ import {
 } from 'convex/server';
 import { v } from 'convex/values';
 
-import { query } from '../../_generated/server';
+import { internalQuery, query } from '../../_generated/server';
 import { getTalkIdsByTopicSlugs } from '../../lib/filters';
 import { rotateContent } from '../../lib/rotateContent';
 import { getContentComparator } from '../../lib/sort';
@@ -30,12 +30,13 @@ import {
   listPublishedTalksPage,
   searchPublishedTalksByTitleOrSpeaker,
 } from './helpers';
-import { talkTranscriptFields } from './schema';
+import { talkFields, talkTranscriptFields } from './schema';
 import {
   enrichAdminTalks,
   enrichWithTopics,
   filterTalksByTitleOrSpeaker,
 } from './utils';
+import { talkTranscriptFetchLastError } from './validators';
 
 /**
  * List slugs for published talks with their speaker slugs.
@@ -533,6 +534,38 @@ const talkTranscriptListItem = v.object({
   ...talkTranscriptListFields,
 });
 
+function isFailedTranscriptFetch(fetch: Doc<'talkTranscriptFetches'>) {
+  return fetch.status === 'failed' && fetch.errorCode && fetch.message;
+}
+
+function getLastErrorByTalk(fetches: Doc<'talkTranscriptFetches'>[]) {
+  const latest = new Map<Doc<'talks'>['_id'], Doc<'talkTranscriptFetches'>>();
+
+  for (const fetch of fetches.filter(isFailedTranscriptFetch)) {
+    const current = latest.get(fetch.talkId);
+
+    if (!current || fetch.checkedAt > current.checkedAt) {
+      latest.set(fetch.talkId, fetch);
+    }
+  }
+
+  return latest;
+}
+
+function toLastTranscriptError(
+  fetch: Doc<'talkTranscriptFetches'> | undefined
+) {
+  if (!fetch?.errorCode || !fetch.message) {
+    return null;
+  }
+
+  return {
+    errorCode: fetch.errorCode,
+    message: fetch.message,
+    retryAfter: fetch.retryAfter,
+  };
+}
+
 /**
  * List published (or filtered) talks that have no transcript row.
  */
@@ -554,14 +587,30 @@ export const listTalksWithoutTranscript = query({
             )
             .order('desc')
             .collect();
-    const transcripts = await ctx.db.query('talkTranscripts').collect();
+    const [fetches, transcripts] = await Promise.all([
+      ctx.db.query('talkTranscriptFetches').collect(),
+      ctx.db.query('talkTranscripts').collect(),
+    ]);
+    const lastErrorByTalk = getLastErrorByTalk(fetches);
     const talkIdsWithTranscript = new Set(
       transcripts.map((transcript) => transcript.talkId)
     );
 
-    return talks.filter((talk) => !talkIdsWithTranscript.has(talk._id));
+    return talks
+      .filter((talk) => !talkIdsWithTranscript.has(talk._id))
+      .map((talk) => ({
+        ...talk,
+        lastError: toLastTranscriptError(lastErrorByTalk.get(talk._id)),
+      }));
   },
-  returns: docs('talks'),
+  returns: v.array(
+    v.object({
+      _creationTime: v.number(),
+      _id: v.id('talks'),
+      ...talkFields,
+      lastError: v.union(talkTranscriptFetchLastError, v.null()),
+    })
+  ),
 });
 
 /**
@@ -613,4 +662,51 @@ export const getTalkTranscript = query({
     return await getOneFrom(ctx.db, 'talkTranscripts', 'by_talkId', talkId);
   },
   returns: doc('talkTranscripts').nullable(),
+});
+
+export const getTalkTranscriptFetch = query({
+  args: { talkId: v.id('talks') },
+  handler: async (ctx, { talkId }) => {
+    await requireAdmin(ctx);
+
+    return await ctx.db
+      .query('talkTranscriptFetches')
+      .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
+      .order('desc')
+      .first();
+  },
+  returns: doc('talkTranscriptFetches').nullable(),
+});
+
+export const getTalkTranscriptFetchContext = internalQuery({
+  args: { runId: v.id('talkTranscriptFetches') },
+  handler: async (ctx, { runId }) => {
+    const run = await ctx.db.get(runId);
+
+    if (!run || run.status !== 'pending') {
+      return null;
+    }
+
+    const talk = await ctx.db.get(run.talkId);
+
+    if (!talk) {
+      return null;
+    }
+
+    return {
+      confirmRefetch: run.confirmRefetch,
+      mediaUrl: talk.mediaUrl,
+      runId: run._id,
+      talkId: talk._id,
+    };
+  },
+  returns: v.union(
+    v.null(),
+    v.object({
+      confirmRefetch: v.boolean(),
+      mediaUrl: v.string(),
+      runId: v.id('talkTranscriptFetches'),
+      talkId: v.id('talks'),
+    })
+  ),
 });

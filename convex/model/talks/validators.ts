@@ -65,3 +65,26 @@ export const talkTranscriptStatus = v.union(
   v.literal('done'),
   v.literal('failed')
 );
+
+export const talkTranscriptFetchErrorCode = v.union(
+  v.literal('login_required'),
+  v.literal('no_captions'),
+  v.literal('not_youtube'),
+  v.literal('quota_exhausted'),
+  v.literal('rate_limited'),
+  v.literal('token_invalid'),
+  v.literal('token_missing'),
+  v.literal('upstream_error')
+);
+
+export const talkTranscriptFetchStatus = v.union(
+  v.literal('failed'),
+  v.literal('pending'),
+  v.literal('success')
+);
+
+export const talkTranscriptFetchLastError = v.object({
+  errorCode: talkTranscriptFetchErrorCode,
+  message: v.string(),
+  retryAfter: v.optional(v.number()),
+});

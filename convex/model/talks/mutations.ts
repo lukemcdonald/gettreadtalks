@@ -4,6 +4,7 @@ import type { MutationCtx } from '../../_generated/server';
 import { getOneFrom } from 'convex-helpers/server/relationships';
 import { v } from 'convex/values';
 
+import { internal } from '../../_generated/api';
 import { internalMutation, mutation } from '../../_generated/server';
 import {
   throwConvexError,
@@ -24,6 +25,7 @@ import {
   statusType,
   talkStudyContentFields,
   talkStudyStatus,
+  talkTranscriptFetchErrorCode,
 } from './validators';
 
 async function setTalkTopics(
@@ -231,7 +233,11 @@ export const destroyTalk = mutation({
 
     await getOrThrow(ctx, 'talks', talkId);
 
-    const [studies, talksOnTopics, transcripts] = await Promise.all([
+    const [fetches, studies, talksOnTopics, transcripts] = await Promise.all([
+      ctx.db
+        .query('talkTranscriptFetches')
+        .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
+        .collect(),
       ctx.db
         .query('talkStudies')
         .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
@@ -246,6 +252,7 @@ export const destroyTalk = mutation({
         .collect(),
     ]);
 
+    await deleteAll(ctx, fetches);
     await deleteAll(ctx, studies);
     await deleteAll(ctx, talksOnTopics);
     await deleteAll(ctx, transcripts);
@@ -368,4 +375,132 @@ export const updateTalkStudy = mutation({
     return study._id;
   },
   returns: v.id('talkStudies'),
+});
+
+/**
+ * Schedule an on-demand YouTube transcript fetch. Returns immediately.
+ */
+export const createTalkTranscriptFetch = mutation({
+  args: {
+    confirmRefetch: v.optional(v.boolean()),
+    talkId: v.id('talks'),
+  },
+  handler: async (ctx, { confirmRefetch = false, talkId }) => {
+    await requireAdmin(ctx);
+    await getOrThrow(ctx, 'talks', talkId);
+
+    const existingFetches = await ctx.db
+      .query('talkTranscriptFetches')
+      .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
+      .collect();
+    const pending = existingFetches.find((row) => row.status === 'pending');
+
+    if (pending) {
+      return pending._id;
+    }
+
+    const existingTranscript = await getOneFrom(
+      ctx.db,
+      'talkTranscripts',
+      'by_talkId',
+      talkId
+    );
+
+    if (existingTranscript && !confirmRefetch) {
+      throwValidationError(
+        'This talk already has a transcript. Confirm to fetch it again.'
+      );
+    }
+
+    const runId = await ctx.db.insert('talkTranscriptFetches', {
+      checkedAt: Date.now(),
+      confirmRefetch,
+      status: 'pending',
+      talkId,
+    });
+
+    await ctx.scheduler.runAfter(0, internal.talks.fetchTalkTranscript, {
+      runId,
+    });
+
+    return runId;
+  },
+  returns: v.id('talkTranscriptFetches'),
+});
+
+async function saveFetchedTranscript(
+  ctx: MutationCtx,
+  args: {
+    confirmRefetch: boolean;
+    talkId: Id<'talks'>;
+    text: string;
+    wordCount?: number;
+  }
+) {
+  const existing = await ctx.db
+    .query('talkTranscripts')
+    .withIndex('by_talkId', (q) => q.eq('talkId', args.talkId))
+    .unique();
+
+  if (existing && !args.confirmRefetch) {
+    return;
+  }
+
+  const fields = {
+    fetchedAt: Date.now(),
+    source: 'youtube_captions' as const,
+    status: 'done' as const,
+    talkId: args.talkId,
+    text: args.text,
+    wordCount: args.wordCount,
+  };
+
+  if (existing) {
+    await ctx.db.replace(existing._id, fields);
+    return;
+  }
+
+  await ctx.db.insert('talkTranscripts', fields);
+}
+
+export const completeTalkTranscriptFetch = internalMutation({
+  args: {
+    confirmRefetch: v.boolean(),
+    errorCode: v.optional(talkTranscriptFetchErrorCode),
+    message: v.optional(v.string()),
+    retryAfter: v.optional(v.number()),
+    runId: v.id('talkTranscriptFetches'),
+    status: v.union(v.literal('failed'), v.literal('success')),
+    talkId: v.id('talks'),
+    text: v.optional(v.string()),
+    wordCount: v.optional(v.number()),
+  },
+  // fallow-ignore-next-line complexity
+  handler: async (ctx, args) => {
+    const run = await ctx.db.get(args.runId);
+
+    if (run?.status !== 'pending') {
+      return null;
+    }
+
+    await ctx.db.patch(args.runId, {
+      checkedAt: Date.now(),
+      errorCode: args.errorCode,
+      message: args.message,
+      retryAfter: args.retryAfter,
+      status: args.status,
+    });
+
+    if (args.status === 'success' && args.text) {
+      await saveFetchedTranscript(ctx, {
+        confirmRefetch: args.confirmRefetch,
+        talkId: args.talkId,
+        text: args.text,
+        wordCount: args.wordCount,
+      });
+    }
+
+    return null;
+  },
+  returns: v.null(),
 });

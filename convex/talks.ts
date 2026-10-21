@@ -1,11 +1,15 @@
 import { mutations, queries } from './model/talks';
 
+export { fetchTalkTranscript } from './model/talks/transcriptFetch';
+
 // Queries
 export const {
   getTalk,
   getTalkBySlug,
   getTalkStudy,
   getTalkTranscript,
+  getTalkTranscriptFetch,
+  getTalkTranscriptFetchContext,
   getTalksCount,
   listAllTalks,
   listDraftTalkStudies,
@@ -24,7 +28,9 @@ export const {
 // Mutations
 export const {
   archiveTalk,
+  completeTalkTranscriptFetch,
   createTalk,
+  createTalkTranscriptFetch,
   destroyTalk,
   saveTalkStudyDraft,
   updateTalk,

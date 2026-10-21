@@ -21,7 +21,7 @@ interface ManageColumn {
   srOnly?: boolean;
 }
 
-const COLUMNS = {
+const COLUMNS: Record<string, readonly ManageColumn[]> = {
   clips: [
     { key: 'Title' },
     { className: HIDDEN_MD, key: 'Status' },
@@ -49,9 +49,16 @@ const COLUMNS = {
     { className: `${HIDDEN_MD} text-right`, key: 'Talks' },
     { className: 'w-px', key: 'Actions', srOnly: true },
   ],
-} satisfies Record<string, readonly ManageColumn[]>;
+  transcripts: [{ key: 'Title' }, { className: 'max-w-md', key: 'Last error' }],
+};
 
-type ManageResource = keyof typeof COLUMNS;
+type ManageResource =
+  | 'clips'
+  | 'collections'
+  | 'speakers'
+  | 'talks'
+  | 'topics'
+  | 'transcripts';
 
 export function ManageTable({
   children,

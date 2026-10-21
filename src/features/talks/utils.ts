@@ -1,5 +1,5 @@
 import type { Speaker } from '@/features/speakers/types';
-import type { Talk, TalkId } from '@/features/talks/types';
+import type { Talk, TalkId, TalkTranscript } from '@/features/talks/types';
 
 import { buildAbsoluteUrl, buildPathQuery } from '@/lib/entities/paths';
 
@@ -17,6 +17,46 @@ export function buildTalkPath(
 
 export function buildTalkStudyPath(talkId: TalkId) {
   return `/talks/edit/${talkId}/study`;
+}
+
+function formatTalkTranscriptSource(source: TalkTranscript['source']) {
+  if (source === 'youtube_captions') {
+    return 'YouTube captions';
+  }
+
+  return source.replaceAll('_', ' ');
+}
+
+function formatTranscriptRetryAfter(retryAfter: number) {
+  return new Intl.DateTimeFormat(undefined, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  }).format(new Date(retryAfter));
+}
+
+export function formatTranscriptFetchFailure(fetch: {
+  message?: string;
+  retryAfter?: number;
+}) {
+  if (!fetch.message) {
+    return null;
+  }
+
+  if (!fetch.retryAfter) {
+    return fetch.message;
+  }
+
+  return `${fetch.message} Try again after ${formatTranscriptRetryAfter(fetch.retryAfter)}.`;
+}
+
+export function formatTranscriptFetchSuccess(transcript: TalkTranscript) {
+  const source = formatTalkTranscriptSource(transcript.source);
+
+  if (transcript.wordCount === undefined) {
+    return `Transcript from ${source}.`;
+  }
+
+  return `${transcript.wordCount} words from ${source}.`;
 }
 
 export function buildTalksPath(options?: { query?: { featured?: boolean } }) {
