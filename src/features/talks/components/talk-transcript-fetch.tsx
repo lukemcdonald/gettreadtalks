@@ -7,7 +7,7 @@ import type {
 } from '@/features/talks/types';
 
 import { useQuery } from 'convex/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import {
   AlertDialog,
@@ -25,6 +25,7 @@ import { useFetchTalkTranscript } from '@/features/talks/hooks/use-fetch-talk-tr
 import {
   formatTranscriptFetchFailure,
   formatTranscriptFetchSuccess,
+  isTranscriptFetchCoolingDown,
 } from '@/features/talks/utils';
 
 // fallow-ignore-next-line complexity
@@ -95,9 +96,25 @@ function TalkTranscriptFetchStatus({
   transcript: TalkTranscript | null;
 }) {
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [now, setNow] = useState(() => Date.now());
   const hasTranscript = Boolean(transcript?.text);
-  const isPending = disabled || fetch?.status === 'pending';
+  const coolingDown = isTranscriptFetchCoolingDown(fetch, now);
+  const isPending = disabled || fetch?.status === 'pending' || coolingDown;
   const statusText = getTranscriptFetchStatusText({ fetch, transcript });
+
+  useEffect(() => {
+    if (!fetch?.retryAfter || fetch.retryAfter <= Date.now()) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setNow(Date.now());
+    }, fetch.retryAfter - Date.now());
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [fetch?.retryAfter]);
 
   function handleClick() {
     if (hasTranscript) {

@@ -29,9 +29,29 @@ function formatTalkTranscriptSource(source: TalkTranscript['source']) {
 
 function formatTranscriptRetryAfter(retryAfter: number) {
   return new Intl.DateTimeFormat(undefined, {
-    dateStyle: 'medium',
-    timeStyle: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    month: 'short',
+    timeZoneName: 'short',
+    year: 'numeric',
   }).format(new Date(retryAfter));
+}
+
+export function isTranscriptFetchCoolingDown(
+  fetch: {
+    errorCode?: string | null;
+    retryAfter?: number;
+    status?: string;
+  } | null,
+  now = Date.now()
+) {
+  return (
+    fetch?.status === 'failed' &&
+    (fetch.errorCode === 'quota_exhausted' ||
+      fetch.errorCode === 'rate_limited') &&
+    (fetch.retryAfter ?? 0) > now
+  );
 }
 
 export function formatTranscriptFetchFailure(fetch: {
