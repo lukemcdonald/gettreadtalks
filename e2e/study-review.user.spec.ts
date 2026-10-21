@@ -15,27 +15,24 @@ test('Admin study review screenshots', async ({ page }) => {
 
   const studyLink = page.getByRole('link', { name: /Study/u });
   await studyLink.click();
-  await expect(page.getByRole('heading', { name: 'Edit Study' })).toBeVisible();
-
-  const status = page.getByLabel('Status');
-  await expect(status).toContainText('Draft');
 
   const studySheet = page.getByRole('dialog', { name: 'Edit Study' });
+  const status = studySheet.getByRole('combobox', { name: 'Status' });
+  await expect(status).toContainText('Draft');
   await studySheet.screenshot({
     path: 'test-results/pr-assets/study-drawer-draft.png',
   });
 
   await status.click();
   await page.getByRole('option', { name: 'Published' }).click();
-  await page.getByRole('button', { name: 'Save Changes' }).click();
+  await studySheet.getByRole('button', { name: 'Save Changes' }).click();
 
   await expect(page.getByRole('heading', { name: 'Edit Talk' })).toBeVisible();
   await expect(studyLink).toContainText('Published');
 
   await studyLink.click();
-  await expect(page.getByRole('heading', { name: 'Edit Study' })).toBeVisible();
-  await expect(page.getByLabel('Status')).toContainText('Published');
-  await page.getByRole('dialog', { name: 'Edit Study' }).screenshot({
+  await expect(status).toContainText('Published');
+  await studySheet.screenshot({
     path: 'test-results/pr-assets/study-drawer-published.png',
   });
 });
