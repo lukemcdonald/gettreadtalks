@@ -93,7 +93,7 @@ Import COSS from `@/components/ui` (`src/components/ui`). Never edit `src/compon
 
 **Don't**
 
-- Don't paste hex, `oklch`, or arbitrary `[prop:var()]` values into components.
+- Don't paste hex, `oklch`, or arbitrary property values into components.
 - Don't add a one-off utility when a shared component exists.
 - Don't restyle `VideoFrame` per route or inset the featured caption.
 - Don't add visible breadcrumbs, an Updated column, or a mobile status badge on manage rows.
