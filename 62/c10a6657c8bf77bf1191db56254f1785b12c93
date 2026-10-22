@@ -1,0 +1,18 @@
+AGENTS.md
+  h_b34f5996212cca 239
+DESIGN.md
+  h_b34f5996212cca 96
+convex/_generated/api.d.ts
+  h_b34f5996212cca 18,34,52,57,68,72,77-78,82,85,89,117,133,151,156,167,171,176-177,181,184,188
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "62c10a6657c8bf77bf1191db56254f1785b12c93",
+  "prompts": {},
+  "humans": {
+    "h_b34f5996212cca": {
+      "author": "Luke McDonald <thelukemcdonald@gmail.com>"
+    }
+  }
+}
