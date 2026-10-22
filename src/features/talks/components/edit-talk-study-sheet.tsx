@@ -4,12 +4,15 @@ import type { TalkStudyFormData } from '@/features/talks/schemas/talk-study-form
 import type { TalkId, TalkStudy, TalkTranscript } from '@/features/talks/types';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useTransition } from 'react';
+import { useQuery } from 'convex/react';
+import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { useSheetRoute } from '@/app/@sheet/_hooks/use-sheet-route';
 import { FormSheet, SelectField, TextareaField } from '@/components/ui';
+import { api } from '@/convex/_generated/api';
 import { updateTalkStudyAction } from '@/features/talks/actions/update-talk-study';
+import { TalkSummaryGenerate } from '@/features/talks/components/talk-summary-generate';
 import { TalkTranscriptFetch } from '@/features/talks/components/talk-transcript-fetch';
 import { talkStudyFormSchema } from '@/features/talks/schemas/talk-study-form';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
@@ -22,9 +25,9 @@ const STUDY_STATUS_OPTIONS = [
 // fallow-ignore-next-line complexity
 export function EditTalkStudySheet({
   closeHref,
-  study,
+  study: initialStudy,
   talkId,
-  transcript,
+  transcript: initialTranscript,
 }: {
   closeHref?: string;
   study: TalkStudy | null;
@@ -32,7 +35,13 @@ export function EditTalkStudySheet({
   transcript: TalkTranscript | null;
 }) {
   const { handleOpenChange, handleSuccess } = useSheetRoute(closeHref);
+  const liveStudy = useQuery(api.talks.getTalkStudy, { talkId });
+  const liveTranscript = useQuery(api.talks.getTalkTranscript, { talkId });
+  const study = liveStudy === undefined ? initialStudy : liveStudy;
+  const transcript =
+    liveTranscript === undefined ? initialTranscript : liveTranscript;
   const [isPending, startTransition] = useTransition();
+  const [summaryFlags, setSummaryFlags] = useState<string[]>([]);
   const form = useForm<TalkStudyFormData>({
     mode: 'onBlur',
     // oxlint-disable-next-line typescript/no-explicit-any -- Zod 4 compatibility with zodResolver
@@ -87,10 +96,23 @@ export function EditTalkStudySheet({
               name="summary"
               rows={4}
             />
+            {summaryFlags.length > 0 ? (
+              <p
+                className="text-muted-foreground text-sm"
+                data-testid="summary-flags"
+              >
+                Review: {summaryFlags.join(' · ')}
+              </p>
+            ) : null}
           </>
         ) : (
           <span className="text-sm">None</span>
         )}
+        <TalkSummaryGenerate
+          hasTranscript={Boolean(transcript?.text)}
+          onFlagsChange={setSummaryFlags}
+          talkId={talkId}
+        />
         <TalkTranscriptFetch
           hasTranscript={Boolean(transcript?.text)}
           talkId={talkId}

@@ -12,7 +12,7 @@ const paginationOpts = {
 
 type TestClient = Pick<
   ReturnType<typeof createConvexTest>,
-  'mutation' | 'query'
+  'action' | 'mutation' | 'query'
 >;
 type Seed = Awaited<ReturnType<typeof seedCatalog>>;
 
@@ -270,6 +270,11 @@ const gatedFunctions: {
     call: (client, seed) =>
       client.mutation(api.talks.destroyTalk, { talkId: seed.talkId }),
     name: 'talks.destroyTalk',
+  },
+  {
+    call: (client, seed) =>
+      client.action(api.talks.generateTalkSummary, { talkId: seed.talkId }),
+    name: 'talks.generateTalkSummary',
   },
   {
     call: (client, seed) =>

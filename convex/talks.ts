@@ -1,5 +1,9 @@
 import { mutations, queries } from './model/talks';
 
+export {
+  generateTalkSummary,
+  loadTalkSummarySource,
+} from './model/talks/summaryGenerate';
 export { fetchTalkTranscript } from './model/talks/transcriptFetch';
 
 // Queries
