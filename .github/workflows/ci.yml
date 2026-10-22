@@ -55,7 +55,7 @@ jobs:
     name: E2E
     if: github.event_name == 'pull_request' && github.event.pull_request.draft == false
     permissions:
-      contents: write
+      contents: read
       deployments: read
       pull-requests: read
     runs-on: ubuntu-24.04
@@ -110,19 +110,6 @@ jobs:
         uses: actions/checkout@v7
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
-      - if: >-
-          steps.changes.outputs.run == 'true' && steps.e2e-secrets.outputs.available == 'true' && github.event.action == 'ready_for_review' && startsWith(github.head_ref, 'cursor/')
-        id: trigger
-        name: Trigger preview
-        env:
-          BRANCH: ${{ github.head_ref }}
-        run: |
-          set -euo pipefail
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git config user.name "github-actions[bot]"
-          git commit --allow-empty -m "chore: trigger preview"
-          git push origin "HEAD:refs/heads/${BRANCH}"
-          echo "sha=$(git rev-parse HEAD)" >> "${GITHUB_OUTPUT}"
       - if: steps.changes.outputs.run == 'true' && steps.e2e-secrets.outputs.available == 'true'
         name: Install pnpm and Node.js
         uses: pnpm/setup@v3
@@ -137,7 +124,7 @@ jobs:
         id: preview
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SHA: ${{ steps.trigger.outputs.sha || github.event.pull_request.head.sha }}
+          SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           set -euo pipefail
           deadline=$((SECONDS + 900))
