@@ -9,7 +9,11 @@ interface TalkCardSubtitleProps {
 function SpeakerName({ href, name }: { href?: string; name: string }) {
   if (href) {
     return (
-      <Link className="relative z-10 shrink-0 hover:underline" href={href}>
+      <Link
+        className="relative z-10 shrink-0 hover:underline"
+        href={href}
+        prefetch={false}
+      >
         {name}
       </Link>
     );
