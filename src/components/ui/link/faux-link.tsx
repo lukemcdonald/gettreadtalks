@@ -1,16 +1,17 @@
 import type { ComponentProps } from 'react';
 
-import { IntentLink } from './intent-link';
+import { Link } from './link';
 
 function FauxLink({
   children,
+  prefetch = 'intent',
   ...delegated
-}: ComponentProps<typeof IntentLink>) {
+}: ComponentProps<typeof Link>) {
   return (
-    <IntentLink {...delegated}>
+    <Link {...delegated} prefetch={prefetch}>
       <span className="absolute inset-0" />
       {children}
-    </IntentLink>
+    </Link>
   );
 }
 

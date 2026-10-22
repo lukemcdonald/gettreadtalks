@@ -24,9 +24,10 @@ export function useIntentPrefetch<
 
   function prefetch() {
     if (path) {
+      // PrefetchKind is an enum not exported from next/navigation.
       router.prefetch(path, {
         kind: 'full',
-      } as NonNullable<Parameters<typeof router.prefetch>[1]>);
+      } as Parameters<typeof router.prefetch>[1]);
     }
   }
 

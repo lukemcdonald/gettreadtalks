@@ -1,4 +1,4 @@
-import { IntentLink } from '@/components/ui/link';
+import { Link } from '@/components/ui/link';
 
 interface TalkCardSubtitleProps {
   scripture?: string | null;
@@ -8,9 +8,13 @@ interface TalkCardSubtitleProps {
 
 function SpeakerNameLink({ href, name }: { href: string; name: string }) {
   return (
-    <IntentLink className="relative z-10 shrink-0 hover:underline" href={href}>
+    <Link
+      className="relative z-10 shrink-0 hover:underline"
+      href={href}
+      prefetch="intent"
+    >
       {name}
-    </IntentLink>
+    </Link>
   );
 }
 

@@ -2,28 +2,24 @@
 
 import type { ComponentProps } from 'react';
 
-import { Link } from './link';
+import NextLink from 'next/link';
+
 import { useIntentPrefetch } from './use-intent-prefetch';
 
-function IntentLink({
-  children,
+function IntentPrefetchLink({
   href,
   onFocus,
   onMouseEnter,
   onTouchStart,
   ...delegated
-}: ComponentProps<typeof Link>) {
+}: ComponentProps<typeof NextLink>) {
   const intent = useIntentPrefetch(href, {
     onFocus,
     onMouseEnter,
     onTouchStart,
   });
 
-  return (
-    <Link {...delegated} href={href} prefetch={false} {...intent}>
-      {children}
-    </Link>
-  );
+  return <NextLink {...delegated} href={href} prefetch={false} {...intent} />;
 }
 
-export { IntentLink };
+export { IntentPrefetchLink };
