@@ -10,9 +10,14 @@ function FauxLink({
   href,
   onFocus,
   onMouseEnter,
+  onTouchStart,
   ...delegated
 }: ComponentProps<typeof Link>) {
-  const intent = useIntentPrefetch(href, { onFocus, onMouseEnter });
+  const intent = useIntentPrefetch(href, {
+    onFocus,
+    onMouseEnter,
+    onTouchStart,
+  });
 
   return (
     <Link {...delegated} href={href} prefetch={false} {...intent}>
