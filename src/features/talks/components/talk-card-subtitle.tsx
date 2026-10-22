@@ -1,7 +1,4 @@
-'use client';
-
-import { Link } from '@/components/ui/link';
-import { useIntentPrefetch } from '@/components/ui/link/use-intent-prefetch';
+import { IntentLink } from '@/components/ui/link';
 
 interface TalkCardSubtitleProps {
   scripture?: string | null;
@@ -10,17 +7,10 @@ interface TalkCardSubtitleProps {
 }
 
 function SpeakerNameLink({ href, name }: { href: string; name: string }) {
-  const intent = useIntentPrefetch(href);
-
   return (
-    <Link
-      className="relative z-10 shrink-0 hover:underline"
-      href={href}
-      prefetch={false}
-      {...intent}
-    >
+    <IntentLink className="relative z-10 shrink-0 hover:underline" href={href}>
       {name}
-    </Link>
+    </IntentLink>
   );
 }
 

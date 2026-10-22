@@ -14,6 +14,12 @@ import {
 
 import { SearchResultGroups } from './search-result-groups';
 
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    prefetch: vi.fn(),
+  }),
+}));
+
 describe('SearchResultGroups', () => {
   const MOCK_HITS: SearchHit[] = [
     {

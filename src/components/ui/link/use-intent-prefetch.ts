@@ -24,7 +24,9 @@ export function useIntentPrefetch<
 
   function prefetch() {
     if (path) {
-      router.prefetch(path);
+      router.prefetch(path, {
+        kind: 'full',
+      } as NonNullable<Parameters<typeof router.prefetch>[1]>);
     }
   }
 

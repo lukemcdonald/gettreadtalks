@@ -1,29 +1,16 @@
-'use client';
-
 import type { ComponentProps } from 'react';
 
-import { Link } from './link';
-import { useIntentPrefetch } from './use-intent-prefetch';
+import { IntentLink } from './intent-link';
 
 function FauxLink({
   children,
-  href,
-  onFocus,
-  onMouseEnter,
-  onTouchStart,
   ...delegated
-}: ComponentProps<typeof Link>) {
-  const intent = useIntentPrefetch(href, {
-    onFocus,
-    onMouseEnter,
-    onTouchStart,
-  });
-
+}: ComponentProps<typeof IntentLink>) {
   return (
-    <Link {...delegated} href={href} prefetch={false} {...intent}>
+    <IntentLink {...delegated}>
       <span className="absolute inset-0" />
       {children}
-    </Link>
+    </IntentLink>
   );
 }
 

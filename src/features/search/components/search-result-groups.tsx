@@ -2,7 +2,7 @@
 
 import type { SearchHit } from '@/features/search/types';
 
-import { Link } from '@/components/ui/link';
+import { IntentLink } from '@/components/ui/link';
 import { groupSearchHits } from '@/features/search/utils';
 import { TalkCardSubtitle } from '@/features/talks/components/talk-card-subtitle';
 import { track } from '@/services/analytics';
@@ -17,7 +17,7 @@ function SearchHitLink({
   query: string;
 }) {
   return (
-    <Link
+    <IntentLink
       className="block rounded-md py-3 outline-none hover:underline"
       href={hit.href}
       onClick={() => {
@@ -39,7 +39,7 @@ function SearchHitLink({
           />
         </span>
       )}
-    </Link>
+    </IntentLink>
   );
 }
 

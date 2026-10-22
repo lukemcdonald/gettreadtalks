@@ -5,7 +5,7 @@ import { ArrowRightIcon } from 'lucide-react';
 import { FeaturedVideoThumbnail } from '@/components/featured-video-thumbnail';
 import { VideoFrame, VideoFrameSkeleton } from '@/components/media-embed';
 import { Skeleton } from '@/components/ui';
-import { Link } from '@/components/ui/link';
+import { IntentLink } from '@/components/ui/link';
 import { cn } from '@/utils';
 
 interface FeaturedVideoCardProps {
@@ -64,7 +64,7 @@ export function FeaturedVideoCard({
   title,
 }: FeaturedVideoCardProps) {
   return (
-    <Link
+    <IntentLink
       className={cn(
         'group text-muted-foreground hover:text-foreground transition-colors',
         shellClassName
@@ -81,7 +81,7 @@ export function FeaturedVideoCard({
       </VideoFrame>
 
       <Caption actionLabel={actionLabel} subtitle={subtitle} title={title} />
-    </Link>
+    </IntentLink>
   );
 }
 
