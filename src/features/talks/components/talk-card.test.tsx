@@ -6,6 +6,12 @@ import { describe, expect, it, render, screen } from '@/test';
 
 import { TalkCard } from './talk-card';
 
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    prefetch: vi.fn(),
+  }),
+}));
+
 describe('TalkCard', () => {
   const speaker = {
     firstName: 'Jeff',

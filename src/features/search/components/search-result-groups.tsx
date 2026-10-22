@@ -29,6 +29,7 @@ function SearchHitLink({
           source: 'page',
         });
       }}
+      prefetch="intent"
     >
       <span className="text-foreground block font-medium">{hit.title}</span>
       {!!(hit.scripture || hit.subtitle) && (

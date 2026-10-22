@@ -70,6 +70,7 @@ export function FeaturedVideoCard({
         shellClassName
       )}
       href={href}
+      prefetch="intent"
     >
       <VideoFrame className="rounded-none shadow-none">
         <FeaturedVideoThumbnail

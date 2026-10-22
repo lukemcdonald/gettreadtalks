@@ -6,13 +6,21 @@ interface TalkCardSubtitleProps {
   speakerName?: string;
 }
 
+function SpeakerNameLink({ href, name }: { href: string; name: string }) {
+  return (
+    <Link
+      className="relative z-10 shrink-0 hover:underline"
+      href={href}
+      prefetch="intent"
+    >
+      {name}
+    </Link>
+  );
+}
+
 function SpeakerName({ href, name }: { href?: string; name: string }) {
   if (href) {
-    return (
-      <Link className="relative z-10 shrink-0 hover:underline" href={href}>
-        {name}
-      </Link>
-    );
+    return <SpeakerNameLink href={href} name={name} />;
   }
 
   return <span className="shrink-0">{name}</span>;
