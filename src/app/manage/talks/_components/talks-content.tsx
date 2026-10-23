@@ -17,6 +17,18 @@ interface ManageTalksContentProps {
   searchParams: Promise<ManageTalksSearchParams>;
 }
 
+function hasTalksFilters({ search, status, study }: ManageTalksSearchParams) {
+  if (search?.trim()) {
+    return true;
+  }
+
+  if (status && status !== 'all') {
+    return true;
+  }
+
+  return Boolean(study);
+}
+
 export async function ManageTalksContent({
   searchParams,
 }: ManageTalksContentProps) {
@@ -34,11 +46,7 @@ export async function ManageTalksContent({
       <ManageTable
         emptyAction={<NewTalkButton />}
         isEmpty={result.talks.length === 0}
-        isFiltered={
-          Boolean(search?.trim()) ||
-          (Boolean(status) && status !== 'all') ||
-          Boolean(study)
-        }
+        isFiltered={hasTalksFilters({ search, status, study })}
         resource="talks"
       >
         {result.talks.map((talk) => (
