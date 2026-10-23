@@ -25,7 +25,7 @@ async function capture(page: Page, name: string, viewport: ViewportName) {
 
 async function waitForSkeleton(page: Page) {
   await page.locator('[data-slot="skeleton"]').first().waitFor({
-    state: 'visible',
+    state: 'attached',
     timeout: 4000,
   });
 }
