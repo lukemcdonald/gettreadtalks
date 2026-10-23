@@ -2,8 +2,6 @@ name: Smoke
 
 on:
   deployment_status:
-  # Temporary: prove the CI path from this PR. Remove before ready.
-  pull_request:
   schedule:
     - cron: '0 13 * * *'
   workflow_dispatch:
