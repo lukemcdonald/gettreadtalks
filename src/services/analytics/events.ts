@@ -68,4 +68,10 @@ export interface EventMap {
   talk_unfavorited: TalkTrackProperties;
   talk_unfeatured: TalkTrackProperties;
   talk_unfinished: TalkTrackProperties;
+  webmcp_tool_called: {
+    result_count?: number;
+    status: 'error' | 'ok';
+    talk_slug?: string;
+    tool_name: string;
+  };
 }

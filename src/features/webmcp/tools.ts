@@ -7,6 +7,7 @@ import { api } from '@/convex/_generated/api';
 import { normalizeSearchQuery } from '@/convex/model/search/utils';
 import { formatTalk } from '@/features/mcp/format';
 import { buildSearchPageHref } from '@/features/search/utils';
+import { track } from '@/services/analytics';
 
 type SearchTalks = (args: {
   limit: number;
@@ -18,6 +19,39 @@ const TALK_PATH = /^\/talks\/[^/]+\/[^/]+$/u;
 
 function toolError(code: string, error: string, retryable = false) {
   return { code, error, retryable };
+}
+
+async function withTrackedExecute<T extends object>(
+  toolName: 'open_talk' | 'search_talks',
+  execute: () => T | Promise<T>
+) {
+  try {
+    const result = await execute();
+    const href =
+      'href' in result && typeof result.href === 'string'
+        ? result.href
+        : undefined;
+    const talks =
+      'talks' in result && Array.isArray(result.talks)
+        ? result.talks
+        : undefined;
+
+    track('webmcp_tool_called', {
+      ...(talks ? { result_count: talks.length } : {}),
+      status: 'error' in result ? 'error' : 'ok',
+      ...(href ? { talk_slug: href.split('/').at(-1) } : {}),
+      tool_name: toolName,
+    });
+
+    return result;
+  } catch (error) {
+    track('webmcp_tool_called', {
+      status: 'error',
+      tool_name: toolName,
+    });
+
+    throw error;
+  }
 }
 
 function resolveTalkHref(talk: string, origin: string) {
@@ -79,40 +113,41 @@ export async function registerWebMcpTools({
         },
         description:
           'Searches published talks by title or speaker and opens the site search. Use when the user wants to find a sermon.',
-        execute: async ({ query }: { query: string }) => {
-          const normalizedQuery = normalizeSearchQuery(query);
+        execute: ({ query }: { query: string }) =>
+          withTrackedExecute('search_talks', async () => {
+            const normalizedQuery = normalizeSearchQuery(query);
 
-          if (!normalizedQuery) {
-            return toolError('INVALID_QUERY', 'A search query is required.');
-          }
-
-          navigate(buildSearchPageHref(normalizedQuery));
-
-          try {
-            const { talks } = await searchTalks({
-              limit: SEARCH_LIMIT,
-              search: normalizedQuery,
-            });
-            const formatted = talks.map((talk) =>
-              formatTalk(talk, talk.speaker)
-            );
-
-            if (formatted.length === 0) {
-              return {
-                suggestion: 'Try a speaker name or a shorter phrase.',
-                talks: formatted,
-              };
+            if (!normalizedQuery) {
+              return toolError('INVALID_QUERY', 'A search query is required.');
             }
 
-            return { talks: formatted };
-          } catch {
-            return toolError(
-              'SEARCH_FAILED',
-              'Talk search failed. Try again in a moment.',
-              true
-            );
-          }
-        },
+            navigate(buildSearchPageHref(normalizedQuery));
+
+            try {
+              const { talks } = await searchTalks({
+                limit: SEARCH_LIMIT,
+                search: normalizedQuery,
+              });
+              const formatted = talks.map((talk) =>
+                formatTalk(talk, talk.speaker)
+              );
+
+              if (formatted.length === 0) {
+                return {
+                  suggestion: 'Try a speaker name or a shorter phrase.',
+                  talks: formatted,
+                };
+              }
+
+              return { talks: formatted };
+            } catch {
+              return toolError(
+                'SEARCH_FAILED',
+                'Talk search failed. Try again in a moment.',
+                true
+              );
+            }
+          }),
         inputSchema: {
           properties: {
             query: {
@@ -132,17 +167,18 @@ export async function registerWebMcpTools({
       {
         description:
           'Opens a published talk on this site. Use when the user is ready to view a talk from search_talks.',
-        execute: ({ talk }: { talk: string }) => {
-          const resolved = resolveTalkHref(talk, origin);
+        execute: ({ talk }: { talk: string }) =>
+          withTrackedExecute('open_talk', () => {
+            const resolved = resolveTalkHref(talk, origin);
 
-          if ('error' in resolved) {
+            if ('error' in resolved) {
+              return resolved;
+            }
+
+            navigate(resolved.href);
+
             return resolved;
-          }
-
-          navigate(resolved.href);
-
-          return resolved;
-        },
+          }),
         inputSchema: {
           properties: {
             talk: {
