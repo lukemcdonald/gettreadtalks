@@ -21,6 +21,10 @@ function hasTalkDescription(talk: Doc<'talks'>) {
 /**
  * One-off: unset leftover talk `description` fields so the schema field can
  * be removed. Default `dryRun: true` only reports counts.
+ *
+ * CLI (do not run on prod without Luke's approval):
+ * - npx convex run talks:unsetTalkDescriptions '{"dryRun":true}'
+ * - npx convex run talks:unsetTalkDescriptions '{"dryRun":false}'
  */
 export const unsetTalkDescriptions = internalMutation({
   args: {
