@@ -25,6 +25,7 @@
     "style": "ultracite fix .",
     "test": "vitest run",
     "test:e2e": "playwright test",
+    "test:smoke": "PLAYWRIGHT_SMOKE=1 playwright test --grep @smoke --project chromium --retries=1 --timeout=30000 --workers=2",
     "typecheck": "tsc --noEmit",
     "update:ui": "pnpm dlx shadcn@latest add @coss/ui --overwrite",
     "update:ui:styles": "pnpm dlx shadcn@latest add @coss/colors-neutral --overwrite"

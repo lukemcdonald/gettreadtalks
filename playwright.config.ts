@@ -8,7 +8,8 @@ import {
 } from './e2e/fixtures/user-credentials.ts';
 
 const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? 'http://127.0.0.1:3000';
-const signedIn = hasE2eUser();
+const smoke = Boolean(process.env.PLAYWRIGHT_SMOKE);
+const signedIn = !smoke && hasE2eUser();
 const tracesOff = Boolean(
   process.env.E2E_USER_EMAIL ||
   process.env.E2E_USER_PASSWORD ||
@@ -20,6 +21,12 @@ const chromium: Project = {
   testIgnore: signedIn ? /\.user\.spec\.ts$/u : undefined,
   use: { ...devices['Desktop Chrome'] },
 };
+
+if (smoke && !process.env.PLAYWRIGHT_BASE_URL) {
+  throw new Error(
+    'PLAYWRIGHT_BASE_URL is required when PLAYWRIGHT_SMOKE is set'
+  );
+}
 
 const projects: Project[] = signedIn
   ? [

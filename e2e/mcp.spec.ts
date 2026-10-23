@@ -83,34 +83,38 @@ function getFirstHit(result: Record<string, unknown>, key: string) {
   return hit ?? {};
 }
 
-test('MCP / Initialize advertises the catalog', async ({ request }) => {
-  const initialized = await mcpRpc(request, 'initialize', {
-    capabilities: {},
-    clientInfo: {
-      name: 'playwright',
-      version: '0.0.0',
-    },
-    protocolVersion: '2025-11-25',
-  });
+test(
+  'MCP / Initialize advertises the catalog',
+  { tag: '@smoke' },
+  async ({ request }) => {
+    const initialized = await mcpRpc(request, 'initialize', {
+      capabilities: {},
+      clientInfo: {
+        name: 'playwright',
+        version: '0.0.0',
+      },
+      protocolVersion: '2025-11-25',
+    });
 
-  expect(initialized?.serverInfo?.name).toBe('gettreadtalks');
+    expect(initialized?.serverInfo?.name).toBe('gettreadtalks');
 
-  const listed = await mcpRpc(request, 'tools/list', {}, 2);
-  const toolNames = listed?.tools?.map((tool) => tool.name) ?? [];
+    const listed = await mcpRpc(request, 'tools/list', {}, 2);
+    const toolNames = listed?.tools?.map((tool) => tool.name) ?? [];
 
-  expect(toolNames).toEqual(
-    expect.arrayContaining([
-      'get_clip',
-      'get_collection',
-      'get_talk',
-      'list_clips',
-      'list_collections',
-      'list_speakers',
-      'list_topics',
-      'search_talks',
-    ])
-  );
-});
+    expect(toolNames).toEqual(
+      expect.arrayContaining([
+        'get_clip',
+        'get_collection',
+        'get_talk',
+        'list_clips',
+        'list_collections',
+        'list_speakers',
+        'list_topics',
+        'search_talks',
+      ])
+    );
+  }
+);
 
 test('MCP / Catalog tools return canonical urls', async ({ request }) => {
   const talks = await callTool(request, 'search_talks', { query: 'Romans' });

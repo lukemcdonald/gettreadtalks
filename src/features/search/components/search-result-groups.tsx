@@ -19,6 +19,7 @@ function SearchHitLink({
   return (
     <Link
       className="block rounded-md py-3 outline-none hover:underline"
+      data-testid="search-result"
       href={hit.href}
       onClick={() => {
         track('search_result_selected', {

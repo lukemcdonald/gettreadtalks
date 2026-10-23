@@ -21,7 +21,11 @@ export function TalkHeroDetails({ speaker, talk }: TalkHeroDetailsProps) {
       <div>
         <ArchiveBackLink href={buildTalksPath()} label="Talks" />
         <div className="flex flex-wrap items-center justify-center gap-3">
-          <HeroTitle className="text-foreground min-w-0" size="sm">
+          <HeroTitle
+            className="text-foreground min-w-0"
+            data-testid="talk-heading"
+            size="sm"
+          >
             {talk.title}
           </HeroTitle>
           <AdminEditButton entity="talks" id={talk._id} />
