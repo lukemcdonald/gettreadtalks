@@ -153,4 +153,22 @@ describe('getTranscriptFetchToast', () => {
       type: 'error',
     });
   });
+
+  it('includes the retry time on a failed transcript fetch', () => {
+    const retryAfter = Date.UTC(2026, 0, 15, 18, 30);
+    const toast = getTranscriptFetchToast({
+      fetch: {
+        _id: 'run-3' as TalkTranscriptFetch['_id'],
+        message: 'The transcript service is rate limited.',
+        retryAfter,
+        status: 'failed',
+      },
+      toastedRunIds: new Set(),
+      watchedRunId: 'run-3',
+    });
+
+    expect(toast?.type).toBe('error');
+    expect(toast?.title).toContain('The transcript service is rate limited.');
+    expect(toast?.title).toContain('Try again after');
+  });
 });
