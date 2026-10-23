@@ -1,3 +1,5 @@
+import { vi } from 'vitest';
+
 import { buildSearchPageHref } from '@/features/search/utils';
 import {
   describe,
@@ -6,10 +8,13 @@ import {
   expectTrackedTimes,
   it,
   mockedTrack,
-  vi,
 } from '@/test';
 
 import { registerWebMcpTools } from './tools';
+
+vi.mock('@/services/analytics', () => ({
+  track: vi.fn(),
+}));
 
 const origin = 'https://www.gettreadtalks.com';
 
@@ -179,6 +184,7 @@ describe('registerWebMcpTools', () => {
     const openTalk = getExecute(registerTool, 'open_talk');
     const searchTalksTool = getExecute(registerTool, 'search_talks');
 
+    mockedTrack().mockClear();
     await searchTalksTool({ query }, { signal });
 
     expectTrackedTimes(1);
