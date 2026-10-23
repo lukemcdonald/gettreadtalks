@@ -10,6 +10,7 @@ interface GetAllTalksProps {
   limit?: number;
   search?: string;
   status?: StatusFilterType;
+  studyStatus?: 'draft' | 'none' | 'published';
 }
 
 /**
@@ -22,13 +23,13 @@ export async function loadAllTalks(args: GetAllTalksProps = {}) {
     cursor: args.cursor ?? null,
     numItems: args.limit ?? 50,
   };
-  const search = args?.search;
-  const status = args.status ?? 'published';
+  const { search, status = 'published', studyStatus } = args;
 
   const result = await fetchAuthQuery(api.talks.listAllTalks, {
     paginationOpts,
     search,
     status,
+    studyStatus,
   });
 
   return {

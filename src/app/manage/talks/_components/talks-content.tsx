@@ -10,6 +10,7 @@ export interface ManageTalksSearchParams {
   cursor?: string;
   search?: string;
   status?: StatusType | 'all';
+  study?: 'draft' | 'none' | 'published';
 }
 
 interface ManageTalksContentProps {
@@ -19,12 +20,13 @@ interface ManageTalksContentProps {
 export async function ManageTalksContent({
   searchParams,
 }: ManageTalksContentProps) {
-  const { cursor, search, status } = await searchParams;
+  const { cursor, search, status, study } = await searchParams;
   const result = await loadAllTalks({
     cursor,
     limit: 50,
     search,
     status: status || 'all',
+    studyStatus: study,
   });
 
   return (
@@ -33,7 +35,9 @@ export async function ManageTalksContent({
         emptyAction={<NewTalkButton />}
         isEmpty={result.talks.length === 0}
         isFiltered={
-          Boolean(search?.trim()) || (Boolean(status) && status !== 'all')
+          Boolean(search?.trim()) ||
+          (Boolean(status) && status !== 'all') ||
+          Boolean(study)
         }
         resource="talks"
       >

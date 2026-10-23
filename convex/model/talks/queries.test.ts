@@ -4,6 +4,7 @@ import { api, internal } from '../../_generated/api';
 import {
   createConvexTest,
   seedVisibilityCatalog,
+  signInAs,
   visibilitySlugs,
 } from '../../test.setup';
 
@@ -263,5 +264,138 @@ describe('listTalksByTopics', () => {
 
     expect(slugs).toContain(newestSlug);
     expect(slugs).not.toContain(oldestSlug);
+  });
+});
+
+describe('listAllTalks', () => {
+  it('filters talks by study status', async () => {
+    const t = createConvexTest();
+    const { asUser: asAdmin } = await signInAs(t, {
+      email: 'admin@example.test',
+      name: 'Admin',
+      role: 'admin',
+    });
+
+    await t.run(async (ctx) => {
+      const speakerId = await ctx.db.insert('speakers', {
+        firstName: 'John',
+        lastName: 'Owen',
+        slug: 'john-owen',
+      });
+      await ctx.db.insert('talks', {
+        mediaUrl: 'https://www.youtube.com/watch?v=0SVTl4Xa5fY',
+        publishedAt: Date.parse('2024-06-01T12:00:00.000Z'),
+        slug: 'study-none',
+        speakerId,
+        status: 'published',
+        title: 'Study None',
+      });
+      const draftTalkId = await ctx.db.insert('talks', {
+        mediaUrl: 'https://www.youtube.com/watch?v=0SVTl4Xa5fY',
+        publishedAt: Date.parse('2024-06-02T12:00:00.000Z'),
+        slug: 'study-draft',
+        speakerId,
+        status: 'published',
+        title: 'Study Draft',
+      });
+      const publishedTalkId = await ctx.db.insert('talks', {
+        mediaUrl: 'https://www.youtube.com/watch?v=0SVTl4Xa5fY',
+        publishedAt: Date.parse('2024-06-03T12:00:00.000Z'),
+        slug: 'study-published',
+        speakerId,
+        status: 'published',
+        title: 'Study Published',
+      });
+      const backlogDraftTalkId = await ctx.db.insert('talks', {
+        mediaUrl: 'https://www.youtube.com/watch?v=0SVTl4Xa5fY',
+        slug: 'study-backlog-draft',
+        speakerId,
+        status: 'backlog',
+        title: 'Study Backlog Draft',
+      });
+      const studyFields = {
+        generatedAt: Date.now(),
+        generator: 'test',
+        outline: [{ heading: 'Grace', text: 'Grace is a gift' }],
+        scriptureRefs: [{ book: 'Romans', chapter: 5, verseStart: 1 }],
+        studyGuide: [{ kind: 'key_idea' as const, text: 'Grace is a gift' }],
+        suggestedTopics: ['grace'],
+        summary: 'A study of grace.',
+      };
+
+      await ctx.db.insert('talkStudies', {
+        ...studyFields,
+        studyStatus: 'draft',
+        talkId: draftTalkId,
+      });
+      await ctx.db.insert('talkStudies', {
+        ...studyFields,
+        studyStatus: 'published',
+        talkId: publishedTalkId,
+      });
+      await ctx.db.insert('talkStudies', {
+        ...studyFields,
+        studyStatus: 'draft',
+        talkId: backlogDraftTalkId,
+      });
+    });
+
+    const paginationOpts = { cursor: null, numItems: 50 };
+    const none = await asAdmin.query(api.talks.listAllTalks, {
+      paginationOpts,
+      status: 'all',
+      studyStatus: 'none',
+    });
+    const draft = await asAdmin.query(api.talks.listAllTalks, {
+      paginationOpts,
+      status: 'all',
+      studyStatus: 'draft',
+    });
+    const published = await asAdmin.query(api.talks.listAllTalks, {
+      paginationOpts,
+      status: 'all',
+      studyStatus: 'published',
+    });
+    const publishedDrafts = await asAdmin.query(api.talks.listAllTalks, {
+      paginationOpts,
+      status: 'published',
+      studyStatus: 'draft',
+    });
+    const searchedDrafts = await asAdmin.query(api.talks.listAllTalks, {
+      paginationOpts,
+      search: 'Backlog',
+      status: 'all',
+      studyStatus: 'draft',
+    });
+    const firstPage = await asAdmin.query(api.talks.listAllTalks, {
+      paginationOpts: { cursor: null, numItems: 1 },
+      status: 'all',
+      studyStatus: 'draft',
+    });
+    const secondPage = await asAdmin.query(api.talks.listAllTalks, {
+      paginationOpts: { cursor: firstPage.continueCursor, numItems: 1 },
+      status: 'all',
+      studyStatus: 'draft',
+    });
+
+    expect(none.page.map((talk) => talk.slug)).toEqual(['study-none']);
+    expect(draft.page.map((talk) => talk.slug).toSorted()).toEqual([
+      'study-backlog-draft',
+      'study-draft',
+    ]);
+    expect(published.page.map((talk) => talk.slug)).toEqual([
+      'study-published',
+    ]);
+    expect(publishedDrafts.page.map((talk) => talk.slug)).toEqual([
+      'study-draft',
+    ]);
+    expect(searchedDrafts.page.map((talk) => talk.slug)).toEqual([
+      'study-backlog-draft',
+    ]);
+    expect(firstPage.isDone).toBe(false);
+    expect(secondPage.isDone).toBe(true);
+    expect(
+      [firstPage.page[0]?.slug, secondPage.page[0]?.slug].toSorted()
+    ).toEqual(['study-backlog-draft', 'study-draft']);
   });
 });
