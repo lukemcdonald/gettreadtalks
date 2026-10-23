@@ -44,11 +44,14 @@ async function startTranscriptFetch(page: Page) {
       .locator('[data-slot="alert-dialog-popup"]')
       .getByRole('button', { name: 'Re-fetch' })
       .click();
-    return;
+  } else {
+    await expect(getTranscript).toBeEnabled();
+    await getTranscript.click();
   }
 
-  await expect(getTranscript).toBeEnabled();
-  await getTranscript.click();
+  await expect(page.getByText('Fetching transcript...')).toBeVisible({
+    timeout: 90_000,
+  });
 }
 
 async function waitUntilSettled(locator: Locator) {
@@ -66,7 +69,6 @@ test('toast after the study sheet closes', async ({ page }) => {
   await page.setViewportSize({ height: 800, width: 1280 });
   await openStudy(page, 'Sample Talk: The Lord Is My Shepherd');
   await startTranscriptFetch(page);
-  await expect(page.getByText('Fetching transcript...')).toBeVisible();
   await page.getByRole('button', { name: 'Cancel' }).click();
   await expect(page.getByRole('heading', { name: 'Edit Talk' })).toBeVisible();
   await page.getByRole('button', { name: 'Cancel' }).click();
@@ -107,9 +109,6 @@ test('no toast on the study sheet', async ({ page }) => {
   await page.setViewportSize({ height: 800, width: 1280 });
   await openStudy(page, 'Sample Sermon on Romans 8');
   await startTranscriptFetch(page);
-  await expect(page.getByText('Fetching transcript...')).toBeVisible({
-    timeout: 90_000,
-  });
   await expectConfirmDialogClosed(page);
   await expect(page.getByText('Transcript saved')).toBeVisible({
     timeout: 90_000,
