@@ -36,3 +36,5 @@ export const {
   updateTalkStudy,
   upsertTalkTranscript,
 } = mutations;
+
+export { unsetTalkDescriptions } from './model/talks/unsetDescriptions';

@@ -13,7 +13,6 @@ const john = {
 };
 
 const romansTalk = {
-  description: 'A sample sermon on Romans 8.',
   publishedAt: Date.parse('2024-06-03T12:00:00.000Z'),
   scripture: 'Romans 8:28',
   slug: 'sample-sermon-on-romans-8',
@@ -86,7 +85,6 @@ describe('registerWebMcpTools', () => {
     expect(result).toEqual({
       talks: [
         {
-          description: 'A sample sermon on Romans 8.',
           publishedAt: '2024-06-03T12:00:00.000Z',
           scripture: 'Romans 8:28',
           slug: 'sample-sermon-on-romans-8',

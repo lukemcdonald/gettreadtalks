@@ -65,7 +65,6 @@ export interface SiteSearchResult {
   }[];
   talks: {
     _id: string;
-    description?: string;
     scripture?: string;
     slug: string;
     speaker: SearchSpeaker | null;

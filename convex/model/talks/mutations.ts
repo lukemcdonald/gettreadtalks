@@ -100,7 +100,6 @@ export const createTalk = mutation({
   args: {
     collectionId: v.optional(v.id('collections')),
     collectionOrder: v.optional(v.number()),
-    description: v.optional(v.string()),
     featured: v.optional(v.boolean()),
     mediaUrl: v.string(),
     scripture: v.optional(v.string()),
@@ -153,7 +152,6 @@ export const updateTalk = mutation({
   args: {
     collectionId: v.optional(v.id('collections')),
     collectionOrder: v.optional(v.number()),
-    description: v.optional(v.string()),
     featured: v.optional(v.boolean()),
     mediaUrl: v.optional(v.string()),
     scripture: v.optional(v.string()),

@@ -11,7 +11,7 @@ import { buildTalkPath } from '@/features/talks/utils';
 
 interface TalkMediaCardProps {
   speaker: Pick<Speaker, 'firstName' | 'lastName' | 'slug'>;
-  talk: Pick<Talk, 'description' | 'mediaUrl' | 'scripture' | 'slug' | 'title'>;
+  talk: Pick<Talk, 'mediaUrl' | 'scripture' | 'slug' | 'title'>;
 }
 
 function TalkMediaIcon({ mediaUrl }: { mediaUrl: string }) {

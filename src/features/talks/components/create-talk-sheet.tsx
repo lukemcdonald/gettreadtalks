@@ -42,7 +42,6 @@ export function CreateTalkSheet({
     defaultValues: {
       collectionId: undefined,
       collectionOrder: undefined,
-      description: '',
       featured: false,
       mediaUrl: '',
       scripture: '',

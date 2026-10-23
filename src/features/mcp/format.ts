@@ -11,7 +11,6 @@ export interface SpeakerRecord {
 }
 
 export interface TalkRecord {
-  description?: string;
   publishedAt?: number;
   scripture?: string;
   slug: string;
@@ -38,7 +37,6 @@ export function formatSpeaker(speaker: SpeakerRecord) {
 
 export function formatTalk(talk: TalkRecord, speaker: SpeakerRecord | null) {
   return {
-    description: talk.description,
     publishedAt: toIsoDate(talk.publishedAt),
     scripture: talk.scripture,
     slug: talk.slug,

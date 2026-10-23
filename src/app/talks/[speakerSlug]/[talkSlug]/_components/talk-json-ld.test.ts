@@ -1,3 +1,4 @@
+import { site } from '@/configs/site';
 import { describe, expect, it } from '@/test';
 
 import { buildTalkJsonLd } from './talk-json-ld';
@@ -77,32 +78,15 @@ describe('buildTalkJsonLd', () => {
     );
   });
 
-  it('falls back to title, speaker, and scripture when description is missing', () => {
+  it('uses the site default when there is no published summary', () => {
     const result = buildTalkJsonLd({
       speaker,
       speakerSlug: 'lloyd-jones',
-      talk: { scripture: 'Romans 3:21-26', title: 'The Cross' },
+      talk: { title: 'The Cross' },
       talkSlug: 'the-cross',
     });
 
-    expect(result.description).toBe(
-      'The Cross by Martyn Lloyd-Jones on Romans 3:21-26'
-    );
-  });
-
-  it('uses the talk description when it is present', () => {
-    const result = buildTalkJsonLd({
-      speaker,
-      speakerSlug: 'lloyd-jones',
-      talk: {
-        description: 'A sermon on justification.',
-        scripture: 'Romans 3:21-26',
-        title: 'The Cross',
-      },
-      talkSlug: 'the-cross',
-    });
-
-    expect(result.description).toBe('A sermon on justification.');
+    expect(result.description).toBe(site.description);
   });
 
   it('uses the full published summary when it is present', () => {
@@ -113,11 +97,7 @@ describe('buildTalkJsonLd', () => {
       speaker,
       speakerSlug: 'lloyd-jones',
       summary,
-      talk: {
-        description: 'A sermon on justification.',
-        scripture: 'Romans 3:21-26',
-        title: 'The Cross',
-      },
+      talk: { title: 'The Cross' },
       talkSlug: 'the-cross',
     });
 
