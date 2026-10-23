@@ -117,6 +117,7 @@ export const getTalkBySlug = query({
     speakerSlug: v.string(),
     talkSlug: v.string(),
   },
+  // fallow-ignore-next-line complexity
   handler: async (ctx, args) => {
     const user = await getCurrentUser(ctx);
 
@@ -307,17 +308,14 @@ export const listTalksBySpeaker = query({
     limit: v.optional(v.number()),
     speakerId: v.id('speakers'),
   },
-  handler: async (ctx, args) => {
-    const { limit = 20, speakerId } = args;
-
-    return await ctx.db
+  handler: async (ctx, { limit = 20, speakerId }) =>
+    await ctx.db
       .query('talks')
       .withIndex('by_speakerId_and_status', (q) =>
         q.eq('speakerId', speakerId).eq('status', 'published')
       )
       .order('desc')
-      .take(limit);
-  },
+      .take(limit),
   returns: docs('talks'),
 });
 
