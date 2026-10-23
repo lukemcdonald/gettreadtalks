@@ -2,6 +2,8 @@ name: Smoke
 
 on:
   deployment_status:
+  # Temporary: prove the CI path from this PR. Remove before ready.
+  pull_request:
   schedule:
     - cron: '0 13 * * *'
   workflow_dispatch:
@@ -33,8 +35,6 @@ jobs:
         shell: bash
     env:
       PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
-      PLAYWRIGHT_SMOKE: '1'
-      PLAYWRIGHT_TAG: '@smoke'
     steps:
       - uses: actions/checkout@v7
       - name: Trust workspace
@@ -57,25 +57,10 @@ jobs:
             echo "Update the smoke job container image to mcr.microsoft.com/playwright:v${installed}-noble."
             exit 1
           fi
-      - name: Resolve base URL
-        id: target
-        env:
-          DEPLOY_URL: ${{ github.event.deployment_status.environment_url }}
-          INPUT_URL: ${{ inputs.base-url }}
-        run: |
-          set -euo pipefail
-          if [[ -n "${INPUT_URL}" ]]; then
-            url="${INPUT_URL}"
-          elif [[ -n "${DEPLOY_URL}" ]]; then
-            url="${DEPLOY_URL}"
-          else
-            url="https://www.gettreadtalks.com"
-          fi
-          echo "url=${url%/}" >> "${GITHUB_OUTPUT}"
       - name: Run smoke tests
         env:
-          PLAYWRIGHT_BASE_URL: ${{ steps.target.outputs.url }}
-        run: pnpm exec playwright test --grep "${PLAYWRIGHT_TAG}" --project chromium --retries=1 --timeout=30000 --workers=2
+          PLAYWRIGHT_BASE_URL: ${{ inputs.base-url || 'https://www.gettreadtalks.com' }}
+        run: pnpm test:smoke
       - if: failure()
         uses: actions/upload-artifact@v7
         with:

@@ -19,9 +19,7 @@ test(
     await talksPage.openFirst();
 
     await expect(talksPage.page).toHaveURL(/\/talks\/[^/]+\/[^/]+/u);
-    await expect(
-      talksPage.page.getByTestId('talk-heading').or(talksPage.talkHeading)
-    ).toBeVisible();
+    await expect(talksPage.page.getByTestId('talk-heading')).toBeVisible();
   }
 );
 
@@ -39,10 +37,7 @@ test(
     await searchPage.goto(query);
 
     await expect(
-      searchPage.page
-        .getByTestId('search-result')
-        .or(searchPage.page.getByRole('link', { name: query }))
-        .first()
+      searchPage.page.getByTestId('search-result').first()
     ).toBeVisible();
   }
 );
