@@ -45,7 +45,13 @@ export default defineConfig({
   forbidOnly: Boolean(process.env.CI),
   fullyParallel: true,
   projects,
-  reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
+  reporter: process.env.CI
+    ? [
+        ['github'],
+        ['html', { open: 'never' }],
+        ['json', { outputFile: 'test-results/results.json' }],
+      ]
+    : 'list',
   retries: process.env.CI ? 2 : 0,
   testDir: './e2e',
   use: {
