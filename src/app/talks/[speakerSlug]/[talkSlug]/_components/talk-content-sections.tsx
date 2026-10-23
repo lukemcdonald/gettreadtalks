@@ -15,6 +15,7 @@ interface TalkContentSectionsProps {
   collection: Collection | null;
   relatedTalks?: ReactNode;
   speaker: Speaker | null;
+  summary: string | null;
   talk: Talk;
   topics: Topic[];
 }
@@ -24,6 +25,7 @@ export function TalkContentSections({
   collection,
   relatedTalks,
   speaker,
+  summary,
   talk,
   topics,
 }: TalkContentSectionsProps) {
@@ -62,7 +64,12 @@ export function TalkContentSections({
       </div>
 
       <aside className="order-1 lg:sticky lg:top-20 lg:order-2 lg:h-fit">
-        <TalkMetadataSidebar speaker={speaker} talk={talk} topics={topics} />
+        <TalkMetadataSidebar
+          speaker={speaker}
+          summary={summary}
+          talk={talk}
+          topics={topics}
+        />
       </aside>
     </div>
   );

@@ -107,6 +107,70 @@ describe('getTalkBySlug', () => {
     expect(payload).not.toContain(draftSecret);
     expect(payload).not.toContain(transcriptSecret);
   });
+
+  it('returns a published study summary and never returns a draft', async () => {
+    const t = createConvexTest();
+    await seedVisibilityCatalog(t);
+
+    const published = await t.query(api.talks.getTalkBySlug, {
+      speakerSlug: visibilitySlugs.publishedSpeaker,
+      talkSlug: visibilitySlugs.publishedTalk,
+    });
+
+    expect(published).not.toBeNull();
+
+    if (!published) {
+      throw new Error('expected a published talk');
+    }
+
+    const draftSummary = 'DRAFT_STUDY_SUMMARY_MUST_STAY_PRIVATE';
+    const publishedSummary = 'Published study summary for the talk page.';
+
+    await t.run(async (ctx) => {
+      await ctx.db.insert('talkStudies', {
+        generatedAt: Date.now(),
+        generator: 'test',
+        outline: [],
+        scriptureRefs: [],
+        studyGuide: [],
+        studyStatus: 'draft',
+        suggestedTopics: [],
+        summary: draftSummary,
+        talkId: published.talk._id,
+      });
+    });
+
+    const withDraft = await t.query(api.talks.getTalkBySlug, {
+      speakerSlug: visibilitySlugs.publishedSpeaker,
+      talkSlug: visibilitySlugs.publishedTalk,
+    });
+
+    expect(withDraft?.summary).toBeNull();
+    expect(JSON.stringify(withDraft)).not.toContain(draftSummary);
+
+    await t.run(async (ctx) => {
+      const study = await ctx.db
+        .query('talkStudies')
+        .withIndex('by_talkId', (q) => q.eq('talkId', published.talk._id))
+        .unique();
+
+      if (!study) {
+        throw new Error('expected a study');
+      }
+
+      await ctx.db.patch(study._id, {
+        studyStatus: 'published',
+        summary: publishedSummary,
+      });
+    });
+
+    const withPublished = await t.query(api.talks.getTalkBySlug, {
+      speakerSlug: visibilitySlugs.publishedSpeaker,
+      talkSlug: visibilitySlugs.publishedTalk,
+    });
+
+    expect(withPublished?.summary).toBe(publishedSummary);
+  });
 });
 
 describe('listTalksByTopics', () => {

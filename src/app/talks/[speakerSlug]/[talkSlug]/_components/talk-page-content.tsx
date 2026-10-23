@@ -32,7 +32,7 @@ interface TalkDetailProps {
 }
 
 function TalkDetail({ speakerSlug, talkResult, talkSlug }: TalkDetailProps) {
-  const { clips, collection, speaker, talk, topics } = talkResult;
+  const { clips, collection, speaker, summary, talk, topics } = talkResult;
   const segments = [
     { href: buildTalksPath(), label: 'Talks' },
     { href: buildTalkPath({ speaker, slug: talk.slug }), label: talk.title },
@@ -42,7 +42,13 @@ function TalkDetail({ speakerSlug, talkResult, talkSlug }: TalkDetailProps) {
     <>
       <JsonLd data={buildBreadcrumbJsonLd(segments)} />
       <JsonLd
-        data={buildTalkJsonLd({ speaker, speakerSlug, talk, talkSlug })}
+        data={buildTalkJsonLd({
+          speaker,
+          speakerSlug,
+          summary,
+          talk,
+          talkSlug,
+        })}
       />
       <EditorialProfileLayout
         content={
@@ -59,6 +65,7 @@ function TalkDetail({ speakerSlug, talkResult, talkSlug }: TalkDetailProps) {
               </Suspense>
             }
             speaker={speaker}
+            summary={summary}
             talk={talk}
             topics={topics}
           />

@@ -133,6 +133,29 @@ export const PREVIEW_STUDIES = [
       'This talk traces Romans 8:28 to show that God is not merely present in trouble but at work through it.',
     talkSlug: 'sample-sermon-on-romans-8',
   },
+  {
+    generator: 'grok-bot',
+    outline: [
+      {
+        heading: 'A father who runs',
+        text: 'The father does not wait for the son to finish a speech. He runs to meet him.',
+      },
+    ],
+    scriptureRefs: [
+      { book: 'Luke', chapter: 15, verseEnd: 32, verseStart: 11 },
+    ],
+    studyGuide: [
+      {
+        kind: 'key_idea' as const,
+        text: 'The father runs to the returning son before a word of apology is finished.',
+      },
+    ],
+    studyStatus: 'published' as const,
+    suggestedTopics: ['grace'],
+    summary:
+      'This talk follows the younger son home in Luke 15 and shows that the father runs to meet him before the apology is finished.\n\nGrace here is not a thin pardon. It is a restored place at the table, given at cost to the father.',
+    talkSlug: 'example-talk-the-prodigal-son',
+  },
 ];
 
 export const PREVIEW_TRANSCRIPTS = [

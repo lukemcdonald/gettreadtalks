@@ -117,6 +117,7 @@ export const getTalkBySlug = query({
     speakerSlug: v.string(),
     talkSlug: v.string(),
   },
+  // fallow-ignore-next-line complexity
   handler: async (ctx, args) => {
     const user = await getCurrentUser(ctx);
 
@@ -160,6 +161,7 @@ export const getTalkBySlug = query({
       collection: talk.collectionId
         ? ctx.db.get('collections', talk.collectionId)
         : null,
+      study: getOneFrom(ctx.db, 'talkStudies', 'by_talkId', talk._id),
       topics: getManyVia(
         ctx.db,
         'talksOnTopics',
@@ -170,9 +172,10 @@ export const getTalkBySlug = query({
       ),
     };
 
-    const [clips, collection, topics] = await Promise.all([
+    const [clips, collection, study, topics] = await Promise.all([
       queries.clips,
       queries.collection,
+      queries.study,
       queries.topics,
     ]);
 
@@ -182,6 +185,7 @@ export const getTalkBySlug = query({
       clips,
       collection,
       speaker,
+      summary: study?.studyStatus === 'published' ? study.summary : null,
       talk,
       topics: validTopics,
     };
@@ -191,6 +195,7 @@ export const getTalkBySlug = query({
       clips: docs('clips'),
       collection: doc('collections').nullable(),
       speaker: doc('speakers').nullable(),
+      summary: v.union(v.null(), v.string()),
       talk: doc('talks'),
       topics: docs('topics'),
     })
@@ -303,17 +308,14 @@ export const listTalksBySpeaker = query({
     limit: v.optional(v.number()),
     speakerId: v.id('speakers'),
   },
-  handler: async (ctx, args) => {
-    const { limit = 20, speakerId } = args;
-
-    return await ctx.db
+  handler: async (ctx, { limit = 20, speakerId }) =>
+    await ctx.db
       .query('talks')
       .withIndex('by_speakerId_and_status', (q) =>
         q.eq('speakerId', speakerId).eq('status', 'published')
       )
       .order('desc')
-      .take(limit);
-  },
+      .take(limit),
   returns: docs('talks'),
 });
 

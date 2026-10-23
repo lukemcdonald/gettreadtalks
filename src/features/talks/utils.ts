@@ -65,24 +65,60 @@ export function buildTalksPath(options?: { query?: { featured?: boolean } }) {
   return `/talks${buildPathQuery(options?.query)}`;
 }
 
+const META_DESCRIPTION_MAX_LENGTH = 160;
+
+export function getTalkAboutText({
+  description,
+  summary,
+}: {
+  description?: string;
+  summary?: string | null;
+}) {
+  return summary?.trim() || description?.trim() || undefined;
+}
+
+function trimAtWordBoundary(text: string, maxLength: number) {
+  if (text.length <= maxLength) {
+    return text;
+  }
+
+  const lastSpace = text.lastIndexOf(' ', maxLength);
+
+  if (lastSpace <= 0) {
+    return text.slice(0, maxLength);
+  }
+
+  return text.slice(0, lastSpace);
+}
+
 export function formatTalkMetaDescription({
   description,
   scripture,
   speakerName,
+  summary,
   topicTitles = [],
 }: {
   description?: string;
   scripture?: string;
   speakerName?: string;
+  summary?: string | null;
   topicTitles?: string[];
 }) {
-  const summary =
-    description?.trim() ||
-    (speakerName ? `A talk by ${speakerName}.` : undefined);
+  const about = getTalkAboutText({ description, summary });
+
+  if (about && summary?.trim()) {
+    return trimAtWordBoundary(
+      about.replaceAll(/\s+/gu, ' '),
+      META_DESCRIPTION_MAX_LENGTH
+    );
+  }
+
+  const fallback =
+    about || (speakerName ? `A talk by ${speakerName}.` : undefined);
   const topics = topicTitles.length
     ? `Topics: ${topicTitles.join(', ')}.`
     : undefined;
-  const parts = [summary, scripture, topics].filter((part): part is string =>
+  const parts = [fallback, scripture, topics].filter((part): part is string =>
     Boolean(part)
   );
 

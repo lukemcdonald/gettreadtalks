@@ -1,11 +1,12 @@
 import { buildMediaJsonLd } from '@/components/media-embed/utils';
 import { getSpeakerName } from '@/features/speakers/utils';
-import { buildTalkPath } from '@/features/talks/utils';
+import { buildTalkPath, getTalkAboutText } from '@/features/talks/utils';
 import { buildAbsoluteUrl } from '@/lib/entities/paths';
 
 interface TalkJsonLdInput {
   speaker: Parameters<typeof getSpeakerName>[0];
   speakerSlug: string;
+  summary?: string | null;
   talk: {
     _creationTime?: number;
     description?: string;
@@ -46,6 +47,7 @@ function formatTalkJsonLdDescription({
 export function buildTalkJsonLd({
   speaker,
   speakerSlug,
+  summary,
   talk,
   talkSlug,
 }: TalkJsonLdInput) {
@@ -56,7 +58,10 @@ export function buildTalkJsonLd({
     '@context': 'https://schema.org',
     ...buildMediaJsonLd(talk.mediaUrl),
     description: formatTalkJsonLdDescription({
-      description: talk.description,
+      description: getTalkAboutText({
+        description: talk.description,
+        summary,
+      }),
       scripture: talk.scripture,
       speakerName,
       title: talk.title,

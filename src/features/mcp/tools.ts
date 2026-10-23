@@ -160,6 +160,7 @@ export interface McpCatalog {
     clips: ClipRecord[];
     collection: CollectionRecord | null;
     speaker: SpeakerRecord | null;
+    summary: string | null;
     talk: TalkRecord;
     topics: TopicRecord[];
   } | null>;
@@ -255,13 +256,16 @@ export async function loadTalk(
     clips: result.clips.map((clip) => formatClip(clip, result.speaker)),
     collection: result.collection ? formatCollection(result.collection) : null,
     speaker: result.speaker ? formatSpeaker(result.speaker) : null,
-    talk: formatTalk(
-      {
-        ...result.talk,
-        topicSlugs: result.topics.map((topic) => topic.slug),
-      },
-      result.speaker
-    ),
+    talk: {
+      ...formatTalk(
+        {
+          ...result.talk,
+          topicSlugs: result.topics.map((topic) => topic.slug),
+        },
+        result.speaker
+      ),
+      summary: result.summary,
+    },
     topics: result.topics.map((topic) => formatTopic(topic)),
   });
 }
