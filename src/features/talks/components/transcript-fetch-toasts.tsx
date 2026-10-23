@@ -3,7 +3,7 @@
 import type { TalkId } from '@/features/talks/types';
 
 import { useQuery } from 'convex/react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useSyncExternalStore } from 'react';
 
 import { toastManager } from '@/components/ui';
@@ -12,6 +12,7 @@ import {
   buildTalkStudyPath,
   getTranscriptFetchToast,
 } from '@/features/talks/utils';
+import { useIsAdmin } from '@/features/users/hooks/use-is-admin';
 
 interface WatchedTranscriptFetch {
   runId: string;
@@ -62,7 +63,9 @@ function useWatchedTranscriptFetches() {
 
 function TranscriptFetchToast({ runId, talkId }: WatchedTranscriptFetch) {
   const fetch = useQuery(api.talks.getTalkTranscriptFetch, { talkId });
+  const pathname = usePathname();
   const router = useRouter();
+  const studyPath = buildTalkStudyPath(talkId);
 
   useEffect(() => {
     const toast = getTranscriptFetchToast({
@@ -76,24 +79,33 @@ function TranscriptFetchToast({ runId, talkId }: WatchedTranscriptFetch) {
     }
 
     toastedRunIds.add(runId);
-    toastManager.add({
-      actionProps: {
-        children: 'Open',
-        onClick() {
-          router.push(buildTalkStudyPath(talkId));
+
+    if (pathname !== studyPath) {
+      toastManager.add({
+        actionProps: {
+          children: 'Open',
+          onClick() {
+            router.push(studyPath);
+          },
         },
-      },
-      title: toast.title,
-      type: toast.type,
-    });
+        title: toast.title,
+        type: toast.type,
+      });
+    }
+
     unwatchTranscriptFetch(talkId);
-  }, [fetch, router, runId, talkId]);
+  }, [fetch, pathname, router, runId, studyPath, talkId]);
 
   return null;
 }
 
 export function TranscriptFetchToasts() {
+  const isAdmin = useIsAdmin();
   const watched = useWatchedTranscriptFetches();
+
+  if (!isAdmin) {
+    return null;
+  }
 
   return watched.map((watch) => (
     <TranscriptFetchToast

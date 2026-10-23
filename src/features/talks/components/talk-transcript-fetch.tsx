@@ -87,12 +87,8 @@ export function TalkTranscriptFetch({
     api.talks.createTalkTranscriptFetch,
     {
       onSuccess: (runId) => {
-        if (typeof runId !== 'string') {
-          return;
-        }
-
         watchTranscriptFetch({
-          runId,
+          runId: runId as string,
           talkId,
         });
       },
