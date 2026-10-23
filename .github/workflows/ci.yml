@@ -66,7 +66,21 @@ jobs:
       pull-requests: read
     runs-on: ubuntu-24.04
     timeout-minutes: 25
+    # Pin to the @playwright/test version in pnpm-lock.yaml. The version check fails if they drift.
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.1-noble
+      options: --user 1001
+    env:
+      PLAYWRIGHT_BROWSERS_PATH: /ms-playwright
     steps:
+      - name: Install GitHub CLI
+        run: |
+          set -euo pipefail
+          dest="${HOME}/.local/bin"
+          mkdir -p "${dest}"
+          curl -fsSL https://github.com/cli/cli/releases/download/v2.103.0/gh_2.103.0_linux_amd64.tar.gz \
+            | tar -xz --strip-components=2 -C "${dest}" gh_2.103.0_linux_amd64/bin/gh
+          echo "${dest}" >> "${GITHUB_PATH}"
       - name: Detect non-docs changes
         id: changes
         env:
@@ -117,6 +131,9 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - if: steps.changes.outputs.run == 'true' && steps.e2e-secrets.outputs.available == 'true'
+        name: Trust workspace
+        run: git config --global --add safe.directory "${GITHUB_WORKSPACE}"
+      - if: steps.changes.outputs.run == 'true' && steps.e2e-secrets.outputs.available == 'true'
         name: Read Node version
         id: node
         run: echo "version=$(tr -d 'v[:space:]' < .nvmrc)" >> "${GITHUB_OUTPUT}"
@@ -127,8 +144,16 @@ jobs:
           cache: true
           runtime: node@${{ steps.node.outputs.version }}
       - if: steps.changes.outputs.run == 'true' && steps.e2e-secrets.outputs.available == 'true'
-        name: Install Playwright browsers
-        run: pnpm exec playwright install --with-deps chromium
+        name: Check Playwright version
+        run: |
+          set -euo pipefail
+          installed="$(node -p "require('@playwright/test/package.json').version")"
+          expected="1.64.1"
+          if [[ "${installed}" != "${expected}" ]]; then
+            echo "Installed @playwright/test ${installed} does not match mcr.microsoft.com/playwright:v${expected}-noble."
+            echo "Update the e2e job container image to mcr.microsoft.com/playwright:v${installed}-noble."
+            exit 1
+          fi
       - if: steps.changes.outputs.run == 'true' && steps.e2e-secrets.outputs.available == 'true'
         name: Wait for Vercel preview
         id: preview
