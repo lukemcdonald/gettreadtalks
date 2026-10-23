@@ -192,12 +192,12 @@ jobs:
         name: Surface flaky tests
         run: |
           set -euo pipefail
-          {
+          summary() {
             echo '## Flaky tests'
             echo
             if [[ ! -f test-results/results.json ]]; then
               echo 'No Playwright JSON report found.'
-              exit 0
+              return 0
             fi
             if ! flakes="$(
               node -e '
@@ -226,10 +226,11 @@ jobs:
               '
             )"; then
               echo 'Could not parse Playwright JSON report.'
-              exit 0
+              return 0
             fi
             printf '%s\n' "${flakes}"
-          } >> "${GITHUB_STEP_SUMMARY}"
+          }
+          summary | tee -a "${GITHUB_STEP_SUMMARY}"
       - if: ${{ !cancelled() && steps.changes.outputs.run == 'true' && steps.e2e-secrets.outputs.available == 'true' }}
         uses: actions/upload-artifact@v7
         with:
