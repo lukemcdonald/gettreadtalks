@@ -94,7 +94,7 @@ export function formatTalkMetaDescription({
   summary?: string | null;
   topicTitles?: string[];
 }) {
-  const publishedSummary = summary?.trim();
+  const publishedSummary = summary?.trim().replaceAll(/\s+/gu, ' ');
 
   if (publishedSummary) {
     return trimAtWordBoundary(publishedSummary, META_DESCRIPTION_MAX_LENGTH);
