@@ -181,7 +181,7 @@ importers:
         version: 0.4.2(@standard-schema/spec@1.1.0)(convex@1.47.0(react@19.3.1))(react@19.3.1)(typescript@7.0.2)(zod@4.6.7)
       '@convex-dev/resend':
         specifier: ^0.2.9
-        version: 0.2.9(@react-email/render@2.1.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(convex-helpers@0.1.128(@standard-schema/spec@1.1.0)(convex@1.47.0(react@19.3.1))(react@19.3.1)(typescript@7.0.2)(zod@4.6.7))(convex@1.47.0(react@19.3.1))(react@19.3.1)
+        version: 0.2.9(@react-email/render@2.1.1(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(convex-helpers@0.1.128(@standard-schema/spec@1.1.0)(convex@1.47.0(react@19.3.1))(react@19.3.1)(typescript@7.0.2)(zod@4.6.7))(convex@1.47.0(react@19.3.1))(react@19.3.1)
       '@daypicker/react':
         specifier: ^10.0.2
         version: 10.0.2(@types/react@19.3.0)(react@19.3.1)
@@ -222,8 +222,8 @@ importers:
         specifier: ^1.0.0
         version: 1.0.0
       lucide-react:
-        specifier: ^1.58.0
-        version: 1.58.0(@types/react@19.3.0)(react@19.3.1)
+        specifier: ^1.60.0
+        version: 1.60.0(@types/react@19.3.0)(react@19.3.1)
       next:
         specifier: ^16.4.2
         version: 16.4.2(@babel/core@7.29.7(supports-color@8.1.1))(@opentelemetry/api@1.9.1)(@playwright/test@1.64.1)(@types/node@26.6.5)(babel-plugin-react-compiler@1.0.0)(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
@@ -237,8 +237,8 @@ importers:
         specifier: ^19.3.1
         version: 19.3.1(react@19.3.1)
       react-email:
-        specifier: ^6.11.2
-        version: 6.11.2(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(supports-color@8.1.1)
+        specifier: ^6.11.3
+        version: 6.11.3(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(supports-color@8.1.1)
       react-error-boundary:
         specifier: ^6.1.6
         version: 6.1.6(@types/react@19.3.0)(react@19.3.1)
@@ -249,8 +249,8 @@ importers:
         specifier: ^3.7.0
         version: 3.7.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       resend:
-        specifier: ^6.33.0
-        version: 6.33.0(@react-email/render@2.1.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1))
+        specifier: ^6.34.1
+        version: 6.34.1(@react-email/render@2.1.1(react-dom@19.3.1(react@19.3.1))(react@19.3.1))
       server-only:
         specifier: ^0.0.1
         version: 0.0.1
@@ -1757,8 +1757,8 @@ packages:
   '@quansync/fs@1.1.0':
     resolution: {integrity: sha512-qAPG/t3HqML1TlN7sY/pTbEjzFVAKsMjNNMGheyDosro+kT4iw2KCUoHcVdmliwWjorm4elZbgNQyU2eD97eDg==}
 
-  '@react-email/render@2.1.0':
-    resolution: {integrity: sha512-F+zE3O6d6sW6Aj2UjvZAA17R7tJKM7kcq2mgV6k4HCT8jeLLFaVP2txMtH1lgqYFRMZ0Gxsd37q2PRyiXLXXxA==}
+  '@react-email/render@2.1.1':
+    resolution: {integrity: sha512-DvVx4k6XjJ9cYBigd37+7SK2E89emUH32Lcn6COsMickQchXdvXa+ZA04BF7475Kg+8ikaIpus+zQYUwVVyjBg==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       react: ^18.0 || ^19.0 || ^19.0.0-rc
@@ -3735,8 +3735,8 @@ packages:
   lru-cache@5.1.1:
     resolution: {integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==}
 
-  lucide-react@1.58.0:
-    resolution: {integrity: sha512-hXaFNm6mk6QVtBnDGBn1YAs8j2tGUk0A4s/CpclIcczfxeXiW1rdOLVo6zCsoIih9XXsGvDODQerl749a2n7bA==}
+  lucide-react@1.60.0:
+    resolution: {integrity: sha512-UqxOW0FgAfDyb9VmjKb6/BkOzW6yfhf/QNboKtS2NDsscnNRW2CDzlyhbMKBQ1ontmcxuIDqHJ2AVgFR3NI+GA==}
     peerDependencies:
       '@types/react': '*'
       react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
@@ -4148,8 +4148,8 @@ packages:
     peerDependencies:
       react: ^19.3.1
 
-  react-email@6.11.2:
-    resolution: {integrity: sha512-iQmTWm+FzBPHJLoS360vDeqVh2JDGFfP4UWolxqtqfuLE3NjDbDR78heyrKkKAr1ljxy2LBY/wNaZKIFnhNWfQ==}
+  react-email@6.11.3:
+    resolution: {integrity: sha512-BVwyLQjyfHJ9DNLKCcddO8qeURZFONJv3jF+gf490tVx+VAKy6Qbc3d2BESvYMe51Un7G59kzRd0W55+vXIfmg==}
     engines: {node: '>=20.19.0'}
     hasBin: true
     peerDependencies:
@@ -4218,8 +4218,8 @@ packages:
   reselect@5.3.0:
     resolution: {integrity: sha512-XGoLeRAVzUTcJ1qkxPQhDJyIZ5d6zzZD9nT7AEZOaaU9UbWclhycElmhO+VD5bFeLuzhPBaOV2oXC8uG35ZSpg==}
 
-  resend@6.33.0:
-    resolution: {integrity: sha512-sbpWLrwlaIDZuGHRYNX6101CWtXLqRNcT1S9c8BB357Ab2+IUJ7dNpYffVmGh2C11/4AfcFvM4ltURH8NJlPGw==}
+  resend@6.34.1:
+    resolution: {integrity: sha512-3jo/j1WAW7CBkE6pzK4qLjZCfHRLIhY3ph3x/wzU+MN51cSw3EtReGce8S1cA1R0ipNDOdFYU5Lmt5r563lvYw==}
     engines: {node: '>=20'}
     peerDependencies:
       '@react-email/render': '*'
@@ -5229,14 +5229,14 @@ snapshots:
       - typescript
       - zod
 
-  '@convex-dev/resend@0.2.9(@react-email/render@2.1.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(convex-helpers@0.1.128(@standard-schema/spec@1.1.0)(convex@1.47.0(react@19.3.1))(react@19.3.1)(typescript@7.0.2)(zod@4.6.7))(convex@1.47.0(react@19.3.1))(react@19.3.1)':
+  '@convex-dev/resend@0.2.9(@react-email/render@2.1.1(react-dom@19.3.1(react@19.3.1))(react@19.3.1))(convex-helpers@0.1.128(@standard-schema/spec@1.1.0)(convex@1.47.0(react@19.3.1))(react@19.3.1)(typescript@7.0.2)(zod@4.6.7))(convex@1.47.0(react@19.3.1))(react@19.3.1)':
     dependencies:
       '@convex-dev/rate-limiter': 0.3.2(convex@1.47.0(react@19.3.1))(react@19.3.1)
       '@convex-dev/workpool': 0.4.11(convex-helpers@0.1.128(@standard-schema/spec@1.1.0)(convex@1.47.0(react@19.3.1))(react@19.3.1)(typescript@7.0.2)(zod@4.6.7))(convex@1.47.0(react@19.3.1))(react@19.3.1)
       convex: 1.47.0(react@19.3.1)
       convex-helpers: 0.1.128(@standard-schema/spec@1.1.0)(convex@1.47.0(react@19.3.1))(react@19.3.1)(typescript@7.0.2)(zod@4.6.7)
       remeda: 2.34.0
-      resend: 6.33.0(@react-email/render@2.1.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1))
+      resend: 6.34.1(@react-email/render@2.1.1(react-dom@19.3.1(react@19.3.1))(react@19.3.1))
       svix: 1.86.0
     transitivePeerDependencies:
       - '@react-email/render'
@@ -5882,7 +5882,7 @@ snapshots:
     dependencies:
       quansync: 1.0.0
 
-  '@react-email/render@2.1.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
+  '@react-email/render@2.1.1(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
     dependencies:
       entities: 4.5.0
       html-to-text: 9.0.5
@@ -7782,7 +7782,7 @@ snapshots:
       yallist: 3.1.1
     optional: true
 
-  lucide-react@1.58.0(@types/react@19.3.0)(react@19.3.1):
+  lucide-react@1.60.0(@types/react@19.3.0)(react@19.3.1):
     dependencies:
       react: 19.3.1
     optionalDependencies:
@@ -8173,11 +8173,11 @@ snapshots:
       react: 19.3.1
       scheduler: 0.28.0
 
-  react-email@6.11.2(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(supports-color@8.1.1):
+  react-email@6.11.3(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(supports-color@8.1.1):
     dependencies:
       '@babel/parser': 7.29.2
       '@babel/traverse': 7.29.0(supports-color@8.1.1)
-      '@react-email/render': 2.1.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      '@react-email/render': 2.1.1(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       chokidar: 5.0.0
       commander: 13.1.0
       conf: 15.1.0
@@ -8264,12 +8264,12 @@ snapshots:
 
   reselect@5.3.0: {}
 
-  resend@6.33.0(@react-email/render@2.1.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)):
+  resend@6.34.1(@react-email/render@2.1.1(react-dom@19.3.1(react@19.3.1))(react@19.3.1)):
     dependencies:
       postal-mime: 2.7.6
       standardwebhooks: 1.1.1
     optionalDependencies:
-      '@react-email/render': 2.1.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+      '@react-email/render': 2.1.1(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
 
   resolve.exports@2.0.3: {}
 
