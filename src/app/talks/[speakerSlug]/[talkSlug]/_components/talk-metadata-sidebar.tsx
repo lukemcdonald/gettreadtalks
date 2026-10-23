@@ -6,32 +6,44 @@ import { ExternalLinkIcon } from 'lucide-react';
 
 import { Link } from '@/components/ui/link';
 import { TalkActions } from '@/features/talks/components/talk-actions';
+import { getTalkAboutText } from '@/features/talks/utils';
 import { TopicLinks } from '@/features/topics/components/topic-links';
 
 interface TalkMetadataSidebarProps {
   speaker: Speaker | null;
+  summary: string | null;
   talk: Talk;
   topics: Topic[];
 }
 
 export function TalkMetadataSidebar({
   speaker,
+  summary,
   talk,
   topics,
 }: TalkMetadataSidebarProps) {
+  const about = getTalkAboutText({
+    description: talk.description,
+    summary,
+  });
+
   return (
     <div className="flex flex-col gap-8 sm:flex-row sm:flex-wrap sm:gap-12 lg:flex-col lg:gap-8">
-      {/* About */}
-      {talk.description && (
+      {about ? (
         <div className="space-y-4 sm:basis-full lg:basis-auto">
           <h3 className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">
             About
           </h3>
-          <p className="text-muted-foreground text-sm leading-relaxed">
-            {talk.description}
-          </p>
+          <div className="text-muted-foreground space-y-4 text-sm leading-relaxed">
+            {about
+              .split(/\n+/u)
+              .filter(Boolean)
+              .map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))}
+          </div>
         </div>
-      )}
+      ) : null}
 
       {/* Topics */}
       {topics.length > 0 && (
