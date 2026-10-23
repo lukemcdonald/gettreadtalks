@@ -1,4 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "pnpm run build:vercel"
+  "buildCommand": "pnpm run build:vercel",
+  "git": {
+    "deploymentEnabled": {
+      "pr-assets": false
+    }
+  }
 }
