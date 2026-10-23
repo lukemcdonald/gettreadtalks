@@ -81,7 +81,7 @@ function trimAtWordBoundary(text: string, maxLength: number) {
   return text.slice(0, lastSpace);
 }
 
-export function formatTalkMetaDescription(summary?: string | null) {
+export function formatTalkMetaDescription(summary: string | null) {
   const text = summary?.trim();
 
   if (!text) {
