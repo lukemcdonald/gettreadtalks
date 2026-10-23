@@ -36,7 +36,7 @@ export function TalkContentSections({
           <FeaturedGrid columns={{ default: 1 }} title="About this talk">
             <div className="space-y-4 text-sm leading-relaxed sm:text-base">
               {summary
-                .split(/\n+/)
+                .split(/\n+/u)
                 .filter(Boolean)
                 .map((paragraph) => (
                   <p key={paragraph}>{paragraph}</p>
