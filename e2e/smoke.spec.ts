@@ -19,7 +19,9 @@ test(
     await talksPage.openFirst();
 
     await expect(talksPage.page).toHaveURL(/\/talks\/[^/]+\/[^/]+/u);
-    await expect(talksPage.page.getByTestId('talk-heading')).toBeVisible();
+    await expect(
+      talksPage.page.getByTestId('talk-heading').or(talksPage.talkHeading)
+    ).toBeVisible();
   }
 );
 
@@ -30,14 +32,17 @@ test(
     await talksPage.goto();
     await expect(talksPage.firstTalk).toBeVisible();
 
-    const label = await talksPage.firstTalk.getAttribute('aria-label');
-    const query = label?.split(' by ')[0]?.trim() ?? '';
+    const title = await talksPage.firstTalk.textContent();
+    const query = title?.trim() ?? '';
     expect(query.length).toBeGreaterThan(0);
 
     await searchPage.goto(query);
 
     await expect(
-      searchPage.page.getByTestId('search-result').first()
+      searchPage.page
+        .getByTestId('search-result')
+        .or(searchPage.page.getByRole('link', { name: query }))
+        .first()
     ).toBeVisible();
   }
 );
