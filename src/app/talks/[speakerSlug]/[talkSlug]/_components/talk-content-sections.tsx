@@ -15,6 +15,7 @@ interface TalkContentSectionsProps {
   collection: Collection | null;
   relatedTalks?: ReactNode;
   speaker: Speaker | null;
+  summary: string | null;
   talk: Talk;
   topics: Topic[];
 }
@@ -24,12 +25,26 @@ export function TalkContentSections({
   collection,
   relatedTalks,
   speaker,
+  summary,
   talk,
   topics,
 }: TalkContentSectionsProps) {
   return (
     <div className="grid grid-cols-1 gap-x-8 gap-y-12 lg:grid-cols-[1fr_280px]">
       <div className="order-2 space-y-8 lg:order-1 lg:space-y-16">
+        {summary ? (
+          <FeaturedGrid columns={{ default: 1 }} title="About this talk">
+            <div className="space-y-4 text-sm leading-relaxed sm:text-base">
+              {summary
+                .split(/\n+/)
+                .filter(Boolean)
+                .map((paragraph) => (
+                  <p key={paragraph}>{paragraph}</p>
+                ))}
+            </div>
+          </FeaturedGrid>
+        ) : null}
+
         {collection && (
           <FeaturedGrid
             columns={{ default: 1 }}

@@ -156,6 +156,7 @@ function createCatalog(overrides: Partial<McpCatalog> = {}): McpCatalog {
         clips: talk.slug === romansTalk.slug ? [noCondemnationClip] : [],
         collection: talk.slug === psalmsTalk.slug ? psalmsCollection : null,
         speaker: talk.speaker,
+        summary: null,
         talk,
         topics: talk.topicSlugs.includes('grace') ? [graceTopic] : [],
       });

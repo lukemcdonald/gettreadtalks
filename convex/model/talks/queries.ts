@@ -160,6 +160,7 @@ export const getTalkBySlug = query({
       collection: talk.collectionId
         ? ctx.db.get('collections', talk.collectionId)
         : null,
+      study: getOneFrom(ctx.db, 'talkStudies', 'by_talkId', talk._id),
       topics: getManyVia(
         ctx.db,
         'talksOnTopics',
@@ -170,9 +171,10 @@ export const getTalkBySlug = query({
       ),
     };
 
-    const [clips, collection, topics] = await Promise.all([
+    const [clips, collection, study, topics] = await Promise.all([
       queries.clips,
       queries.collection,
+      queries.study,
       queries.topics,
     ]);
 
@@ -182,6 +184,7 @@ export const getTalkBySlug = query({
       clips,
       collection,
       speaker,
+      summary: study?.studyStatus === 'published' ? study.summary : null,
       talk,
       topics: validTopics,
     };
@@ -191,6 +194,7 @@ export const getTalkBySlug = query({
       clips: docs('clips'),
       collection: doc('collections').nullable(),
       speaker: doc('speakers').nullable(),
+      summary: v.union(v.null(), v.string()),
       talk: doc('talks'),
       topics: docs('topics'),
     })

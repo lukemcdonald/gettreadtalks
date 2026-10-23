@@ -104,4 +104,23 @@ describe('buildTalkJsonLd', () => {
 
     expect(result.description).toBe('A sermon on justification.');
   });
+
+  it('uses the full published summary when it is present', () => {
+    const summary =
+      'This talk traces Romans 3 at length to show that justification is a gift, not a wage, and that this published summary must stay whole in JSON-LD even when it is longer than a typical meta description.';
+
+    const result = buildTalkJsonLd({
+      speaker,
+      speakerSlug: 'lloyd-jones',
+      summary,
+      talk: {
+        description: 'A sermon on justification.',
+        scripture: 'Romans 3:21-26',
+        title: 'The Cross',
+      },
+      talkSlug: 'the-cross',
+    });
+
+    expect(result.description).toBe(summary);
+  });
 });
