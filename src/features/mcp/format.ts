@@ -3,7 +3,6 @@ import { buildTalkPath } from '@/features/talks/utils';
 import { buildAbsoluteUrl } from '@/lib/entities/paths';
 
 export interface SpeakerRecord {
-  description?: string;
   firstName: string;
   lastName: string;
   ministry?: string;

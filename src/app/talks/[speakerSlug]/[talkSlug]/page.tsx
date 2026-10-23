@@ -32,11 +32,10 @@ export async function generateMetadata({
   }
 
   const { speaker, summary, talk } = talkResult;
-  const description = formatTalkMetaDescription(summary);
 
   return buildPageMetadata({
     canonical: buildTalkPath({ speaker, slug: talk.slug }),
-    ...(description ? { description } : {}),
+    description: formatTalkMetaDescription(summary),
     openGraphType: 'video.other',
     title: talk.title,
   });

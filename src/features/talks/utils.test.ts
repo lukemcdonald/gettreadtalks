@@ -66,7 +66,7 @@ describe('buildTalkListItemsJsonLd', () => {
 
 describe('formatTalkMetaDescription', () => {
   it('returns nothing when there is no published summary', () => {
-    expect(formatTalkMetaDescription()).toBeUndefined();
+    expect(formatTalkMetaDescription(null)).toBeUndefined();
     expect(formatTalkMetaDescription('   ')).toBeUndefined();
   });
 
