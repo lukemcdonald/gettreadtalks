@@ -1,3 +1,5 @@
+import type { TalkTranscriptFetch } from '@/features/talks/types';
+
 import { describe, expect, it } from '@/test';
 
 import {
@@ -5,6 +7,7 @@ import {
   buildTalkPath,
   buildTalksPath,
   formatTalkMetaDescription,
+  getTranscriptFetchToast,
 } from './utils';
 
 describe('buildTalkPath', () => {
@@ -84,5 +87,70 @@ describe('formatTalkMetaDescription', () => {
       'This talk traces Romans 3 at length to show that justification is a gift, not a wage, and that this published summary must stay whole in JSON-LD even when it is'
     );
     expect(formatTalkMetaDescription(summary)?.length).toBeLessThanOrEqual(160);
+  });
+});
+
+describe('getTranscriptFetchToast', () => {
+  it('toasts a finished transcript fetch once per run', () => {
+    const toastedRunIds = new Set<string>();
+    const watchedRunId = 'run-1' as TalkTranscriptFetch['_id'];
+
+    expect(
+      getTranscriptFetchToast({
+        fetch: { _id: watchedRunId, status: 'pending' },
+        toastedRunIds,
+        watchedRunId,
+      })
+    ).toBeNull();
+
+    expect(
+      getTranscriptFetchToast({
+        fetch: { _id: watchedRunId, status: 'success' },
+        toastedRunIds,
+        watchedRunId,
+      })
+    ).toEqual({
+      title: 'Transcript saved',
+      type: 'success',
+    });
+
+    toastedRunIds.add(watchedRunId);
+
+    expect(
+      getTranscriptFetchToast({
+        fetch: { _id: watchedRunId, status: 'success' },
+        toastedRunIds,
+        watchedRunId,
+      })
+    ).toBeNull();
+
+    expect(
+      getTranscriptFetchToast({
+        fetch: {
+          _id: 'old-run' as TalkTranscriptFetch['_id'],
+          message: 'No captions are available for this talk.',
+          status: 'failed',
+        },
+        toastedRunIds,
+        watchedRunId,
+      })
+    ).toBeNull();
+
+    const nextRunId = 'run-2' as TalkTranscriptFetch['_id'];
+
+    expect(
+      getTranscriptFetchToast({
+        fetch: {
+          _id: nextRunId,
+          message: 'No captions are available for this talk.',
+          status: 'failed',
+        },
+        toastedRunIds,
+        watchedRunId: nextRunId,
+      })
+    ).toEqual({
+      title: 'No captions are available for this talk.',
+      type: 'error',
+    });
   });
 });

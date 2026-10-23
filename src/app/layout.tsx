@@ -14,6 +14,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import '@/assets/styles.css';
 import { ToastProvider } from '@/components/ui/primitives/toast';
 import { site } from '@/configs/site';
+import { TranscriptFetchToasts } from '@/features/talks/components/transcript-fetch-toasts';
 import { WebMcpTools } from '@/features/webmcp/components/webmcp-tools';
 import { cn } from '@/utils';
 
@@ -73,6 +74,7 @@ export default function RootLayout({
             <AuthProvider>
               <AnalyticsProvider>
                 <ToastProvider>
+                  <TranscriptFetchToasts />
                   <SkipNavLink href="#main" />
                   <SiteHeader />
                   <div

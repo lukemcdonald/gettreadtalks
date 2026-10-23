@@ -19,6 +19,7 @@ import {
   Button,
 } from '@/components/ui';
 import { api } from '@/convex/_generated/api';
+import { watchTranscriptFetch } from '@/features/talks/components/transcript-fetch-toasts';
 import {
   formatTranscriptFetchFailure,
   isTranscriptFetchCoolingDown,
@@ -83,7 +84,19 @@ export function TalkTranscriptFetch({
 }) {
   const liveFetch = useQuery(api.talks.getTalkTranscriptFetch, { talkId });
   const { isLoading, mutate } = useMutation(
-    api.talks.createTalkTranscriptFetch
+    api.talks.createTalkTranscriptFetch,
+    {
+      onSuccess: (runId) => {
+        if (typeof runId !== 'string') {
+          return;
+        }
+
+        watchTranscriptFetch({
+          runId,
+          talkId,
+        });
+      },
+    }
   );
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [now, setNow] = useState(() => Date.now());

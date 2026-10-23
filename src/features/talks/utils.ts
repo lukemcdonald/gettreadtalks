@@ -1,5 +1,5 @@
 import type { Speaker } from '@/features/speakers/types';
-import type { Talk, TalkId } from '@/features/talks/types';
+import type { Talk, TalkId, TalkTranscriptFetch } from '@/features/talks/types';
 
 import { buildAbsoluteUrl, buildPathQuery } from '@/lib/entities/paths';
 
@@ -59,6 +59,45 @@ export function formatTranscriptFetchFailure(fetch: {
   }
 
   return `${fetch.message} Try again after ${formatTranscriptRetryAfter(fetch.retryAfter)}.`;
+}
+
+export function getTranscriptFetchToast({
+  fetch,
+  toastedRunIds,
+  watchedRunId,
+}: {
+  fetch:
+    | (Pick<TalkTranscriptFetch, '_id' | 'status'> &
+        Partial<Pick<TalkTranscriptFetch, 'message' | 'retryAfter'>>)
+    | null;
+  toastedRunIds: ReadonlySet<string>;
+  watchedRunId: string;
+}) {
+  if (!fetch || fetch._id !== watchedRunId || toastedRunIds.has(fetch._id)) {
+    return null;
+  }
+
+  if (fetch.status === 'success') {
+    return {
+      title: 'Transcript saved',
+      type: 'success' as const,
+    };
+  }
+
+  if (fetch.status !== 'failed') {
+    return null;
+  }
+
+  const title = formatTranscriptFetchFailure(fetch);
+
+  if (!title) {
+    return null;
+  }
+
+  return {
+    title,
+    type: 'error' as const,
+  };
 }
 
 export function buildTalksPath(options?: { query?: { featured?: boolean } }) {
