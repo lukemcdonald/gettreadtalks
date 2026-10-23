@@ -1,28 +1,17 @@
 import { SpeakerHeroSkeleton } from '@/app/speakers/[speakerSlug]/_components/speaker-hero-skeleton';
-import { FeaturedGrid } from '@/components/featured-grid';
 import { EditorialProfileLayout } from '@/components/layouts';
-import { MediaCardSkeleton } from '@/components/skeletons';
+import { Skeleton } from '@/components/ui';
 
 export function SpeakerContentSkeleton() {
   return (
-    <>
-      <FeaturedGrid columns={{ default: 1, lg: 2, md: 2, sm: 2 }} title="Talks">
-        {Array.from({ length: 4 }).map((_, i) => (
-          // oxlint-disable-next-line react/no-array-index-key -- static skeleton items never reorder
-          <MediaCardSkeleton key={i} />
-        ))}
-      </FeaturedGrid>
-
-      <FeaturedGrid
-        columns={{ default: 1, lg: 2, md: 2, sm: 2 }}
-        title="Collections"
-      >
-        {Array.from({ length: 2 }).map((_, i) => (
-          // oxlint-disable-next-line react/no-array-index-key -- static skeleton items never reorder
-          <MediaCardSkeleton key={i} />
-        ))}
-      </FeaturedGrid>
-    </>
+    <div className="grid grid-cols-1 gap-x-8 gap-y-12 lg:grid-cols-[1fr_280px]">
+      <aside className="lg:sticky lg:top-20 lg:col-start-2 lg:h-fit">
+        <div className="space-y-4">
+          <Skeleton className="h-3 w-16" />
+          <Skeleton className="size-9 rounded-full" />
+        </div>
+      </aside>
+    </div>
   );
 }
 

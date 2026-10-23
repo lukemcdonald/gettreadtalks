@@ -46,7 +46,7 @@ Titles use `HeroTitle` in `src/components/hero/hero-title.tsx` or `PageHeader` i
 
 ## Layout
 
-`Section` (`src/components/ui/section.tsx`) and `Container` (`src/components/ui/container.tsx`) wrap pages. Browse uses `SidebarLayout` (`src/components/layouts/sidebar-layout.tsx`): twelve columns, sidebar three, content nine. Account and manage use `AreaLayout` (`src/components/layouts/area-layout.tsx`). Page bodies use `PageContainer` (`src/components/page-container.tsx`). Browse filter Suspense fallbacks must match `BrowseFilters`: compact search plus icon on mobile, stacked fields on desktop (`SidebarFiltersSkeleton`).
+`Section` (`src/components/ui/section.tsx`) and `Container` (`src/components/ui/container.tsx`) wrap pages. Browse uses `SidebarLayout` (`src/components/layouts/sidebar-layout.tsx`): twelve columns, sidebar three, content nine. Account and manage use `AreaLayout` (`src/components/layouts/area-layout.tsx`). Page bodies use `PageContainer` (`src/components/page-container.tsx`). Browse filter Suspense fallbacks must match `BrowseFilters`: compact search plus icon on mobile, stacked fields on desktop (`SidebarFiltersSkeleton`). Loading skeletons show placeholders only for content that always renders. Optional copy (descriptions, bios, summaries, ministry) and optional lists appear when loaded.
 
 Overlays: `Dialog` for centered blocking UI (confirm, alert, desktop search). `Drawer` for nav, mobile search, mobile filters, and `FormSheet` (`src/components/ui/form-sheet.tsx`) — right on large screens, bottom on small. Do not import `Sheet` in feature or page code.
 
