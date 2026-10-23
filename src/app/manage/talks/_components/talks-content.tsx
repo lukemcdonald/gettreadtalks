@@ -10,21 +10,35 @@ export interface ManageTalksSearchParams {
   cursor?: string;
   search?: string;
   status?: StatusType | 'all';
+  study?: 'draft' | 'none' | 'published';
 }
 
 interface ManageTalksContentProps {
   searchParams: Promise<ManageTalksSearchParams>;
 }
 
+function hasTalksFilters({ search, status, study }: ManageTalksSearchParams) {
+  if (search?.trim()) {
+    return true;
+  }
+
+  if (status && status !== 'all') {
+    return true;
+  }
+
+  return Boolean(study);
+}
+
 export async function ManageTalksContent({
   searchParams,
 }: ManageTalksContentProps) {
-  const { cursor, search, status } = await searchParams;
+  const { cursor, search, status, study } = await searchParams;
   const result = await loadAllTalks({
     cursor,
     limit: 50,
     search,
     status: status || 'all',
+    studyStatus: study,
   });
 
   return (
@@ -32,9 +46,7 @@ export async function ManageTalksContent({
       <ManageTable
         emptyAction={<NewTalkButton />}
         isEmpty={result.talks.length === 0}
-        isFiltered={
-          Boolean(search?.trim()) || (Boolean(status) && status !== 'all')
-        }
+        isFiltered={hasTalksFilters({ search, status, study })}
         resource="talks"
       >
         {result.talks.map((talk) => (

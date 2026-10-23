@@ -466,14 +466,16 @@ export const listAllTalks = query({
     paginationOpts: paginationOptsValidator,
     search: v.optional(v.string()),
     status: v.optional(statusFilterType),
+    studyStatus: v.optional(
+      v.union(v.literal('draft'), v.literal('none'), v.literal('published'))
+    ),
   },
   handler: async (ctx, args) => {
     await requireAdmin(ctx);
 
-    const { paginationOpts, search, status = 'published' } = args;
+    const { paginationOpts, search, status = 'published', studyStatus } = args;
 
-    // Search requires in-memory filtering, can't use .paginate()
-    const talks: Doc<'talks'>[] =
+    let talks: Doc<'talks'>[] =
       status === 'all'
         ? await ctx.db.query('talks').order('desc').collect()
         : await ctx.db
@@ -485,21 +487,22 @@ export const listAllTalks = query({
             .collect();
 
     if (search) {
-      const matchingTalks = await filterTalksByTitleOrSpeaker(
-        ctx,
-        search,
-        talks
+      talks = await filterTalksByTitleOrSpeaker(ctx, search, talks);
+    }
+
+    if (studyStatus) {
+      const studies = await ctx.db.query('talkStudies').collect();
+      const statusByTalkId = new Map(
+        studies.map((study) => [study.talkId, study.studyStatus])
       );
-      const { continueCursor, isDone, page } = paginateArray(
-        matchingTalks,
-        paginationOpts.cursor,
-        paginationOpts.numItems
-      );
-      return {
-        continueCursor,
-        isDone,
-        page: await enrichAdminTalks(ctx, page),
-      };
+
+      talks = talks.filter((talk) => {
+        const current = statusByTalkId.get(talk._id);
+
+        return studyStatus === 'none'
+          ? current === undefined
+          : current === studyStatus;
+      });
     }
 
     const { continueCursor, isDone, page } = paginateArray(
