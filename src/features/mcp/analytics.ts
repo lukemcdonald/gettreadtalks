@@ -14,11 +14,17 @@ interface ToolExtra {
   sessionId?: string;
 }
 
+function getResultCount(result: object) {
+  if ('talks' in result && Array.isArray(result.talks)) {
+    return result.talks.length;
+  }
+}
+
 function text(value: unknown) {
   return typeof value === 'string' && value.trim() ? value.trim() : undefined;
 }
 
-export function buildMcpToolCallProperties({
+function buildMcpToolCallProperties({
   durationMs: duration_ms,
   error,
   query,
@@ -49,7 +55,7 @@ export function buildMcpToolCallProperties({
 export function withToolTracking<H>(toolName: string, handler: H): H {
   return (async (args: ToolArgs, extra: ToolExtra = {}) => {
     const startedAt = performance.now();
-    const finish = (success: boolean, error?: string) =>
+    const finish = (success: boolean, error?: string, resultCount?: number) =>
       scheduleServerTrack(() =>
         Promise.resolve({
           anonymousId: extra.sessionId ?? randomUUID(),
@@ -58,6 +64,7 @@ export function withToolTracking<H>(toolName: string, handler: H): H {
             durationMs: Math.round(performance.now() - startedAt),
             error,
             query: text(args.query) ?? text(args.search),
+            resultCount,
             success,
             toolName,
             userAgent: extra.http?.req?.headers.get('user-agent') ?? undefined,
@@ -72,7 +79,11 @@ export function withToolTracking<H>(toolName: string, handler: H): H {
           e?: ToolExtra
         ) => Promise<{ isError?: boolean }>
       )(args, extra);
-      finish(!result.isError, result.isError ? 'tool_error' : undefined);
+      finish(
+        !result.isError,
+        result.isError ? 'tool_error' : undefined,
+        getResultCount(result)
+      );
 
       return result;
     } catch (error) {

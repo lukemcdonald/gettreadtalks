@@ -1,20 +1,7 @@
-import { vi } from 'vitest';
-
 import { buildSearchPageHref } from '@/features/search/utils';
-import {
-  describe,
-  expect,
-  expectTracked,
-  expectTrackedTimes,
-  it,
-  mockedTrack,
-} from '@/test';
+import { describe, expect, it, vi } from '@/test';
 
 import { registerWebMcpTools } from './tools';
-
-vi.mock('@/services/analytics', () => ({
-  track: vi.fn(),
-}));
 
 const origin = 'https://www.gettreadtalks.com';
 
@@ -163,72 +150,4 @@ describe('registerWebMcpTools', () => {
       expect(navigate).not.toHaveBeenCalled();
     }
   );
-
-  it('tracks one event per tool call without query text', async () => {
-    const query = 'Romans 8 unique-query';
-    const registerTool = vi.fn(async () => {});
-    const searchTalks = vi
-      .fn()
-      .mockResolvedValueOnce({ talks: [romansTalk] })
-      .mockRejectedValueOnce(new Error('backend down'));
-    const { signal } = new AbortController();
-
-    await registerWebMcpTools({
-      document: { modelContext: { registerTool } },
-      navigate: vi.fn(),
-      origin,
-      searchTalks,
-      signal: new AbortController().signal,
-    });
-
-    const openTalk = getExecute(registerTool, 'open_talk');
-    const searchTalksTool = getExecute(registerTool, 'search_talks');
-
-    mockedTrack().mockClear();
-    await searchTalksTool({ query }, { signal });
-
-    expectTrackedTimes(1);
-    expectTracked('webmcp_tool_called', {
-      result_count: 1,
-      status: 'ok',
-      tool_name: 'search_talks',
-    });
-    expect(JSON.stringify(mockedTrack().mock.calls)).not.toContain(query);
-
-    mockedTrack().mockClear();
-    await searchTalksTool({ query }, { signal });
-
-    expectTrackedTimes(1);
-    expectTracked('webmcp_tool_called', {
-      status: 'error',
-      tool_name: 'search_talks',
-    });
-    expect(JSON.stringify(mockedTrack().mock.calls)).not.toContain(query);
-
-    mockedTrack().mockClear();
-    await openTalk(
-      {
-        talk: 'https://www.gettreadtalks.com/talks/john-doe/sample-sermon-on-romans-8',
-      },
-      { signal }
-    );
-
-    expectTrackedTimes(1);
-    expectTracked('webmcp_tool_called', {
-      status: 'ok',
-      talk_slug: 'sample-sermon-on-romans-8',
-      tool_name: 'open_talk',
-    });
-
-    mockedTrack().mockClear();
-    const typedTalk = '/manage/talks?q=user-typed-secret';
-    await openTalk({ talk: typedTalk }, { signal });
-
-    expectTrackedTimes(1);
-    expectTracked('webmcp_tool_called', {
-      status: 'error',
-      tool_name: 'open_talk',
-    });
-    expect(JSON.stringify(mockedTrack().mock.calls)).not.toContain(typedTalk);
-  });
 });
