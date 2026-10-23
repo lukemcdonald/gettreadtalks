@@ -4,7 +4,6 @@ import { Suspense } from 'react';
 
 import { TalkPageContent } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-page-content';
 import { TalkPageSkeleton } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-page-skeleton';
-import { getSpeakerName } from '@/features/speakers/utils';
 import { loadTalkBySlug } from '@/features/talks/queries/load-talk-by-slug';
 import {
   buildTalkPath,
@@ -32,17 +31,12 @@ export async function generateMetadata({
     return {};
   }
 
-  const { speaker, summary, talk, topics } = talkResult;
+  const { speaker, summary, talk } = talkResult;
+  const description = formatTalkMetaDescription(summary);
 
   return buildPageMetadata({
     canonical: buildTalkPath({ speaker, slug: talk.slug }),
-    description: formatTalkMetaDescription({
-      description: talk.description,
-      scripture: talk.scripture,
-      speakerName: getSpeakerName(speaker),
-      summary,
-      topicTitles: topics.map((topic) => topic.title),
-    }),
+    ...(description ? { description } : {}),
     openGraphType: 'video.other',
     title: talk.title,
   });

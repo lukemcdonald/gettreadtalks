@@ -27,7 +27,6 @@ const graceTopic = {
 };
 
 const romansTalk = {
-  description: 'A sample sermon on Romans 8.',
   publishedAt: Date.parse('2024-06-03T12:00:00.000Z'),
   scripture: 'Romans 8:28',
   slug: 'sample-sermon-on-romans-8',
@@ -37,7 +36,6 @@ const romansTalk = {
 };
 
 const psalmsTalk = {
-  description: 'A sample talk on Psalm 23.',
   publishedAt: Date.parse('2024-06-02T12:00:00.000Z'),
   scripture: 'Psalm 23:1-3',
   slug: 'sample-talk-the-lord-is-my-shepherd',

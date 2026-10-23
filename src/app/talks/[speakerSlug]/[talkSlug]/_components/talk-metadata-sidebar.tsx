@@ -6,7 +6,6 @@ import { ExternalLinkIcon } from 'lucide-react';
 
 import { Link } from '@/components/ui/link';
 import { TalkActions } from '@/features/talks/components/talk-actions';
-import { getTalkAboutText } from '@/features/talks/utils';
 import { TopicLinks } from '@/features/topics/components/topic-links';
 
 interface TalkMetadataSidebarProps {
@@ -22,10 +21,7 @@ export function TalkMetadataSidebar({
   talk,
   topics,
 }: TalkMetadataSidebarProps) {
-  const about = getTalkAboutText({
-    description: talk.description,
-    summary,
-  });
+  const about = summary?.trim();
 
   return (
     <div className="flex flex-col gap-8 sm:flex-row sm:flex-wrap sm:gap-12 lg:flex-col lg:gap-8">

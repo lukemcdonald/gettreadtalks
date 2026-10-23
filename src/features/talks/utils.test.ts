@@ -65,33 +65,24 @@ describe('buildTalkListItemsJsonLd', () => {
 });
 
 describe('formatTalkMetaDescription', () => {
-  it('includes scripture and topics when they are present', () => {
+  it('returns nothing when there is no published summary', () => {
+    expect(formatTalkMetaDescription()).toBeUndefined();
+    expect(formatTalkMetaDescription('   ')).toBeUndefined();
+  });
+
+  it('collapses whitespace and keeps a short summary whole', () => {
     expect(
-      formatTalkMetaDescription({
-        description: 'A sermon on justification.',
-        scripture: 'Romans 3:21-26',
-        speakerName: 'Martyn Lloyd-Jones',
-        topicTitles: ['Justification', 'The Gospel'],
-      })
-    ).toBe(
-      'A sermon on justification. Romans 3:21-26 Topics: Justification, The Gospel.'
+      formatTalkMetaDescription('Justification is a gift,\n\nnot a wage.')
+    ).toBe('Justification is a gift, not a wage.');
+  });
+
+  it('trims a long summary to 160 characters at a word boundary', () => {
+    const summary =
+      'This talk traces Romans 3 at length to show that justification is a gift, not a wage, and that this published summary must stay whole in JSON-LD even when it is longer than a typical meta description.';
+
+    expect(formatTalkMetaDescription(summary)).toBe(
+      'This talk traces Romans 3 at length to show that justification is a gift, not a wage, and that this published summary must stay whole in JSON-LD even when it is'
     );
-  });
-
-  it('falls back to the speaker when the talk has no description', () => {
-    expect(
-      formatTalkMetaDescription({
-        speakerName: 'Martyn Lloyd-Jones',
-      })
-    ).toBe('A talk by Martyn Lloyd-Jones.');
-  });
-
-  it('omits scripture and topics when they are missing', () => {
-    expect(
-      formatTalkMetaDescription({
-        description: 'A sermon on justification.',
-        speakerName: 'Martyn Lloyd-Jones',
-      })
-    ).toBe('A sermon on justification.');
+    expect(formatTalkMetaDescription(summary)?.length).toBeLessThanOrEqual(160);
   });
 });

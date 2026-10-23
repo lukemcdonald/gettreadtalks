@@ -12,7 +12,7 @@ interface TalkCardProps {
     Speaker,
     'firstName' | 'imageUrl' | 'lastName' | 'slug'
   > | null;
-  talk: Pick<Talk, 'description' | 'scripture' | 'slug' | 'title'>;
+  talk: Pick<Talk, 'scripture' | 'slug' | 'title'>;
 }
 
 export function TalkCard({ speaker, talk }: TalkCardProps) {

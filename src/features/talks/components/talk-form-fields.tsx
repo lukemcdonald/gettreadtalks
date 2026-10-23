@@ -15,7 +15,6 @@ import {
   NumberField,
   StatusField,
   TextField,
-  TextareaField,
   UrlField,
 } from '@/components/ui';
 import { CollectionSelectField } from '@/features/collections/components/collection-select-field';
@@ -130,14 +129,6 @@ export function TalkFormFields({
         name="mediaUrl"
         placeholder="https://example.com/audio.mp3"
         required
-      />
-
-      <TextareaField
-        control={control}
-        label="Description"
-        name="description"
-        placeholder="A message about..."
-        rows={3}
       />
 
       <TextField

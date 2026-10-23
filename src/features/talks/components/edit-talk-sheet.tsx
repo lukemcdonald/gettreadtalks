@@ -42,7 +42,6 @@ function getTalkFormValues(
   return {
     collectionId: talk.collectionId,
     collectionOrder: talk.collectionId ? talk.collectionOrder : undefined,
-    description: talk.description ?? '',
     featured: talk.featured ?? false,
     mediaUrl: talk.mediaUrl ?? '',
     scripture: talk.scripture ?? '',

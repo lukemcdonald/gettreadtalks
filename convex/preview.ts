@@ -216,7 +216,6 @@ async function upsertTalk(
   const fields = {
     collectionId,
     collectionOrder: talk.collectionOrder,
-    description: talk.description,
     featured: talk.featured,
     mediaUrl: talk.mediaUrl,
     publishedAt,

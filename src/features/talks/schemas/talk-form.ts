@@ -8,7 +8,6 @@ import { z } from 'zod';
 export const talkFormSchema = z.object({
   collectionId: zid('collections').optional(),
   collectionOrder: z.number().optional(),
-  description: z.string().optional(),
   featured: z.boolean().default(false),
   mediaUrl: z.url('Please enter a valid URL'),
   scripture: z.string().optional(),

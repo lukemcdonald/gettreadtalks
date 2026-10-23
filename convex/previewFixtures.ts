@@ -54,7 +54,6 @@ export const PREVIEW_TALKS = [
   {
     collectionOrder: 1,
     collectionSlug: 'sample-conference-2026',
-    description: PLACEHOLDER_DESCRIPTION,
     featured: true,
     mediaUrl: 'https://www.youtube.com/watch?v=0SVTl4Xa5fY',
     publishedAt: Date.parse('2024-06-03T12:00:00.000Z'),
@@ -68,7 +67,6 @@ export const PREVIEW_TALKS = [
   {
     collectionOrder: 1,
     collectionSlug: 'example-series-the-psalms',
-    description: PLACEHOLDER_DESCRIPTION,
     featured: false,
     mediaUrl: 'https://www.youtube.com/watch?v=j9phNEaPrv8',
     publishedAt: Date.parse('2024-06-02T12:00:00.000Z'),
@@ -82,7 +80,6 @@ export const PREVIEW_TALKS = [
   {
     collectionOrder: 2,
     collectionSlug: 'example-series-the-psalms',
-    description: PLACEHOLDER_DESCRIPTION,
     featured: false,
     mediaUrl: 'https://www.youtube.com/watch?v=plSNIwhAn5o',
     publishedAt: Date.parse('2024-06-01T12:00:00.000Z'),
@@ -96,7 +93,6 @@ export const PREVIEW_TALKS = [
   {
     collectionOrder: 2,
     collectionSlug: 'sample-conference-2026',
-    description: PLACEHOLDER_DESCRIPTION,
     featured: false,
     mediaUrl: 'https://www.youtube.com/watch?v=26z_KhwNdD8',
     publishedAt: Date.parse('2024-06-04T12:00:00.000Z'),
