@@ -6,7 +6,7 @@ import {
 } from '@/components/skeletons';
 import { Skeleton } from '@/components/ui';
 
-function TalkMetadataSidebarSkeleton() {
+function TalkActionsSkeleton() {
   return (
     <div className="space-y-4">
       <Skeleton className="h-3 w-16" />
@@ -29,8 +29,11 @@ export function TalkRelatedTalksSkeleton() {
 function TalkContentSkeleton() {
   return (
     <div className="grid grid-cols-1 gap-x-8 gap-y-12 lg:grid-cols-[1fr_280px]">
-      <aside className="lg:sticky lg:top-20 lg:col-start-2 lg:h-fit">
-        <TalkMetadataSidebarSkeleton />
+      <div className="order-2 space-y-8 lg:order-1 lg:space-y-16">
+        <TalkRelatedTalksSkeleton />
+      </div>
+      <aside className="order-1 lg:sticky lg:top-20 lg:order-2 lg:h-fit">
+        <TalkActionsSkeleton />
       </aside>
     </div>
   );
