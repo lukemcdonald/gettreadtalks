@@ -2,7 +2,7 @@
   "$schema": "./fallow.schema.json",
   "entry": [
     // Convex registers these modules as runtime functions; they are not imported from Next.js.
-    "convex/*.ts",
+    "convex/**/*.ts",
     // Vitest shared test entry and component setup. Loaded via test imports / vitest.config.ts.
     "src/test/index.ts",
     "src/test/setup.ts",
