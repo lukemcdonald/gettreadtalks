@@ -1,54 +1,30 @@
 'use client';
 
-import type { CommandSearchItem, SearchHit } from '@/features/search/types';
+import type { SearchHit } from '@/features/search/types';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useState, useSyncExternalStore } from 'react';
+import { useState } from 'react';
 
 import { useHeaderSearchAnalytics } from '@/features/search/analytics';
+import { useDebouncedSearchQuery } from '@/features/search/hooks/use-debounced-search-query';
+import { useHeaderSearchHandlers } from '@/features/search/hooks/use-header-search-handlers';
+import { useHeaderSearchHotkeys } from '@/features/search/hooks/use-header-search-hotkeys';
 import { useSearchSite } from '@/features/search/hooks/use-search-site';
 import {
-  getHeaderSearchQueryAfterClose,
   getHeaderSearchState,
-  formatSearchHotkeyLabel,
-  isSearchHotkey,
-  OPEN_HEADER_SEARCH_EVENT,
-  SEARCH_DEBOUNCE_MS,
   SEARCH_DROPDOWN_LIMIT,
   toSearchHits,
 } from '@/features/search/utils';
 import { useCurrentUser } from '@/features/users/hooks/use-current-user';
 
-function formatClientSearchHotkeyLabel() {
-  if (typeof window === 'undefined') {
-    return formatServerSearchHotkeyLabel();
-  }
-
-  return formatSearchHotkeyLabel(navigator.userAgent);
-}
-
-function formatServerSearchHotkeyLabel() {
-  return '⌘K';
-}
-
-function subscribeSearchHotkey() {
-  return () => {};
-}
-
-export function useSearchHotkeyLabel() {
-  return useSyncExternalStore(
-    subscribeSearchHotkey,
-    formatClientSearchHotkeyLabel,
-    formatServerSearchHotkeyLabel
-  );
-}
+export { useSearchHotkeyLabel } from './use-search-hotkey-label';
 
 export function useHeaderSearch() {
   const { data: user } = useCurrentUser();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState('');
-  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useDebouncedSearchQuery(value);
   const { isLoading, results } = useSearchSite(
     debouncedQuery,
     SEARCH_DROPDOWN_LIMIT
@@ -71,81 +47,22 @@ export function useHeaderSearch() {
     open,
   });
 
-  useEffect(() => {
-    function onOpenHeaderSearch() {
-      setOpen(true);
-    }
+  useHeaderSearchHotkeys(setOpen);
 
-    function onWindowKeyDown(event: globalThis.KeyboardEvent) {
-      if (!isSearchHotkey(event)) {
-        return;
-      }
-
-      event.preventDefault();
-      setOpen((isOpen) => !isOpen);
-    }
-
-    const controller = new AbortController();
-    const { signal } = controller;
-
-    window.addEventListener('keydown', onWindowKeyDown, { signal });
-    window.addEventListener(OPEN_HEADER_SEARCH_EVENT, onOpenHeaderSearch, {
-      signal,
+  const { handleOpenChange, handleSelect, handleValueChange } =
+    useHeaderSearchHandlers({
+      hasQuery,
+      hits,
+      isPending,
+      previousHits,
+      router,
+      setDebouncedQuery,
+      setOpen,
+      setPreviousHits,
+      setValue,
+      trackSelection,
+      value,
     });
-
-    return () => {
-      controller.abort();
-    };
-  }, []);
-
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setDebouncedQuery(value.trim());
-    }, SEARCH_DEBOUNCE_MS);
-
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, [value]);
-
-  function close(didNavigate = false) {
-    setOpen(false);
-    setValue((query) => getHeaderSearchQueryAfterClose(query, didNavigate));
-
-    if (didNavigate) {
-      setDebouncedQuery('');
-      setPreviousHits(null);
-    }
-  }
-
-  function handleValueChange(nextValue: string) {
-    if (!nextValue.trim()) {
-      setPreviousHits(null);
-    } else if (hasQuery && !isPending) {
-      setPreviousHits(hits);
-    }
-
-    setValue(nextValue);
-  }
-
-  function handleOpenChange(nextOpen: boolean) {
-    if (nextOpen) {
-      setOpen(true);
-      return;
-    }
-
-    close();
-  }
-
-  function handleSelect(item: CommandSearchItem) {
-    trackSelection({
-      hits: isPending && previousHits !== null ? previousHits : hits,
-      item,
-      query: value,
-    });
-    router.push(item.href);
-    close(true);
-  }
 
   return {
     groups,
