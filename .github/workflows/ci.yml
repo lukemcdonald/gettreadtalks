@@ -266,3 +266,10 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 7
+      - if: ${{ !cancelled() && steps.changes.outputs.run == 'true' && steps.e2e-secrets.outputs.available == 'true' }}
+        uses: actions/upload-artifact@v7
+        with:
+          if-no-files-found: ignore
+          name: pr-assets-screenshots
+          path: test-results/pr-assets/
+          retention-days: 7
