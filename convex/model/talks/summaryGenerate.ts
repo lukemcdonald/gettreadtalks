@@ -138,7 +138,7 @@ export const loadTalkSummarySource = internalQuery({
   }),
 });
 
-export async function generateTalkSummaryObject(input: {
+async function generateTalkSummaryObject(input: {
   scripture: string;
   speaker: string;
   title: string;

@@ -12,8 +12,6 @@ export const talkSummaryOutputSchema = z.object({
     .describe('The three-paragraph study summary and nothing else.'),
 });
 
-export type TalkSummaryOutput = z.infer<typeof talkSummaryOutputSchema>;
-
 export interface TalkSummaryPromptInput {
   scripture: string;
   speaker: string;
