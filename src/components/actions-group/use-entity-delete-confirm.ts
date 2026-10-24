@@ -10,10 +10,8 @@ import { formatErrorMessage } from '@/services/errors';
 
 import { getContentMenuItems } from './get-content-menu-items';
 
-type DeleteActionResult = ActionResult<unknown> | void;
-
 interface UseEntityDeleteConfirmOptions<TId> {
-  deleteAction?: (id: TId) => Promise<DeleteActionResult>;
+  deleteAction?: (id: TId) => Promise<unknown>;
   failureTitle: string;
   id: TId;
   listUrl?: string;
@@ -22,9 +20,14 @@ interface UseEntityDeleteConfirmOptions<TId> {
 }
 
 function isFailedActionResult(
-  result: DeleteActionResult
+  result: unknown
 ): result is Extract<ActionResult<unknown>, { success: false }> {
-  return result != null && result.success === false;
+  return (
+    typeof result === 'object' &&
+    result !== null &&
+    'success' in result &&
+    result.success === false
+  );
 }
 
 export function useEntityDeleteConfirm<TId>({
@@ -55,16 +58,15 @@ export function useEntityDeleteConfirm<TId>({
           title: failureTitle,
           type: 'error',
         });
-        return;
-      }
-
-      toastManager.add({ title: successTitle, type: 'success' });
-      setDeleteDialogOpen(false);
-
-      if (listUrl) {
-        router.push(listUrl);
       } else {
-        router.refresh();
+        toastManager.add({ title: successTitle, type: 'success' });
+        setDeleteDialogOpen(false);
+
+        if (listUrl) {
+          router.push(listUrl);
+        } else {
+          router.refresh();
+        }
       }
     } catch (error: unknown) {
       toastManager.add({
@@ -72,9 +74,9 @@ export function useEntityDeleteConfirm<TId>({
         title: failureTitle,
         type: 'error',
       });
-    } finally {
-      setIsDeleting(false);
     }
+
+    setIsDeleting(false);
   };
 
   return {
