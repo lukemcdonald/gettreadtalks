@@ -28,7 +28,6 @@ describe('withToolTracking', () => {
   it('tracks success, tool error, and throw', async () => {
     const search = withToolTracking('search_talks', (_args?: object) => ({
       isError: false,
-      talks: [{}, {}, {}],
     }));
 
     await search({});
@@ -36,7 +35,7 @@ describe('withToolTracking', () => {
     const success = await loadLastTrack();
 
     expect(success.event).toBe('mcp_tool_called');
-    expect(success.properties.result_count).toBe(3);
+    expect(success.properties.error).toBeUndefined();
     expect(success.properties.success).toBe(true);
     expect(success.properties.tool_name).toBe('search_talks');
 
@@ -50,7 +49,6 @@ describe('withToolTracking', () => {
 
     expect(toolError.event).toBe('mcp_tool_called');
     expect(toolError.properties.error).toBe('tool_error');
-    expect(toolError.properties.result_count).toBeUndefined();
     expect(toolError.properties.success).toBe(false);
     expect(toolError.properties.tool_name).toBe('get_talk');
 
@@ -63,7 +61,7 @@ describe('withToolTracking', () => {
     const thrown = await loadLastTrack();
 
     expect(thrown.event).toBe('mcp_tool_called');
-    expect(thrown.properties.error).toBe('backend down');
+    expect(thrown.properties.error).toBe('exception');
     expect(thrown.properties.success).toBe(false);
     expect(thrown.properties.tool_name).toBe('get_clip');
   });

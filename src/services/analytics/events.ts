@@ -10,7 +10,6 @@ interface TalkTrackProperties {
 
 export interface ToolCallProperties {
   error?: string;
-  result_count?: number;
   success: boolean;
   tool_name: string;
 }

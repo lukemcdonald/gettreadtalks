@@ -6,12 +6,6 @@ function getErrorCode(result: object) {
   }
 }
 
-function getResultCount(result: object) {
-  if ('talks' in result && Array.isArray(result.talks)) {
-    return result.talks.length;
-  }
-}
-
 export function withToolTracking<H>(toolName: string, execute: H): H {
   return (async (...args: unknown[]) => {
     try {
@@ -19,11 +13,9 @@ export function withToolTracking<H>(toolName: string, execute: H): H {
         ...args
       )) as object;
       const error = getErrorCode(result);
-      const resultCount = getResultCount(result);
 
       track('webmcp_tool_called', {
         ...(error ? { error } : {}),
-        ...(resultCount === undefined ? {} : { result_count: resultCount }),
         success: !('error' in result),
         tool_name: toolName,
       });
@@ -31,7 +23,7 @@ export function withToolTracking<H>(toolName: string, execute: H): H {
       return result;
     } catch (error) {
       track('webmcp_tool_called', {
-        error: error instanceof Error ? error.message : 'tool_error',
+        error: 'exception',
         success: false,
         tool_name: toolName,
       });

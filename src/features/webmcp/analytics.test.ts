@@ -20,16 +20,13 @@ describe('withToolTracking', () => {
     const query = 'Romans 8 unique-query';
     const search = withToolTracking(
       'search_talks',
-      (_input: { q: string }) => ({
-        talks: [{ slug: 'one' }, { slug: 'two' }],
-      })
+      (_input: { q: string }) => ({})
     );
 
     await search({ q: query });
 
     expectTrackedTimes(1);
     expectTracked('webmcp_tool_called', {
-      result_count: 2,
       success: true,
       tool_name: 'search_talks',
     });
@@ -58,7 +55,7 @@ describe('withToolTracking', () => {
     await expect(boom()).rejects.toThrow('backend down');
     expectTrackedTimes(1);
     expectTracked('webmcp_tool_called', {
-      error: 'backend down',
+      error: 'exception',
       success: false,
       tool_name: 'open_talk',
     });

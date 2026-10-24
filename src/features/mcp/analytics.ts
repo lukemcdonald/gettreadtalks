@@ -14,12 +14,6 @@ interface ToolExtra {
   sessionId?: string;
 }
 
-function getResultCount(result: object) {
-  if ('talks' in result && Array.isArray(result.talks)) {
-    return result.talks.length;
-  }
-}
-
 function text(value: unknown) {
   return typeof value === 'string' && value.trim() ? value.trim() : undefined;
 }
@@ -28,7 +22,6 @@ function buildMcpToolCallProperties({
   durationMs: duration_ms,
   error,
   query,
-  resultCount: result_count,
   success,
   toolName: tool_name,
   userAgent: user_agent,
@@ -36,7 +29,6 @@ function buildMcpToolCallProperties({
   durationMs: number;
   error?: string;
   query?: string;
-  resultCount?: number;
   success: boolean;
   toolName: string;
   userAgent?: string;
@@ -45,7 +37,6 @@ function buildMcpToolCallProperties({
     duration_ms,
     error,
     query,
-    result_count,
     success,
     tool_name,
     user_agent,
@@ -55,7 +46,7 @@ function buildMcpToolCallProperties({
 export function withToolTracking<H>(toolName: string, handler: H): H {
   return (async (args: ToolArgs, extra: ToolExtra = {}) => {
     const startedAt = performance.now();
-    const finish = (success: boolean, error?: string, resultCount?: number) =>
+    const finish = (success: boolean, error?: string) =>
       scheduleServerTrack(() =>
         Promise.resolve({
           anonymousId: extra.sessionId ?? randomUUID(),
@@ -64,7 +55,6 @@ export function withToolTracking<H>(toolName: string, handler: H): H {
             durationMs: Math.round(performance.now() - startedAt),
             error,
             query: text(args.query) ?? text(args.search),
-            resultCount,
             success,
             toolName,
             userAgent: extra.http?.req?.headers.get('user-agent') ?? undefined,
@@ -79,15 +69,11 @@ export function withToolTracking<H>(toolName: string, handler: H): H {
           e?: ToolExtra
         ) => Promise<{ isError?: boolean }>
       )(args, extra);
-      finish(
-        !result.isError,
-        result.isError ? 'tool_error' : undefined,
-        getResultCount(result)
-      );
+      finish(!result.isError, result.isError ? 'tool_error' : undefined);
 
       return result;
     } catch (error) {
-      finish(false, error instanceof Error ? error.message : 'tool_error');
+      finish(false, 'exception');
       throw error;
     }
   }) as H;
