@@ -79,6 +79,8 @@ import type * as model_talks_helpers from "../model/talks/helpers.js";
 import type * as model_talks_index from "../model/talks/index.js";
 import type * as model_talks_mutations from "../model/talks/mutations.js";
 import type * as model_talks_queries from "../model/talks/queries.js";
+import type * as model_talks_summaryGenerate from "../model/talks/summaryGenerate.js";
+import type * as model_talks_summaryPrompt from "../model/talks/summaryPrompt.js";
 import type * as model_talks_transcriptFetch from "../model/talks/transcriptFetch.js";
 import type * as model_talks_utils from "../model/talks/utils.js";
 import type * as model_talks_validators from "../model/talks/validators.js";
@@ -178,6 +180,8 @@ declare const fullApi: ApiFromModules<{
   "model/talks/index": typeof model_talks_index;
   "model/talks/mutations": typeof model_talks_mutations;
   "model/talks/queries": typeof model_talks_queries;
+  "model/talks/summaryGenerate": typeof model_talks_summaryGenerate;
+  "model/talks/summaryPrompt": typeof model_talks_summaryPrompt;
   "model/talks/transcriptFetch": typeof model_talks_transcriptFetch;
   "model/talks/utils": typeof model_talks_utils;
   "model/talks/validators": typeof model_talks_validators;
