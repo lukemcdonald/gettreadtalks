@@ -2,18 +2,13 @@
 
 import type { Speaker, SpeakerId } from '@/features/speakers/types';
 
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-
 import {
   ActionsGroup,
   DeleteBlockedDialog,
   DeleteConfirmDialog,
-  getEntityMenuItems,
+  useEntityDeleteConfirm,
 } from '@/components/actions-group';
-import { toastManager } from '@/components/ui/primitives/toast';
 import { deleteSpeakerAction } from '@/features/speakers/actions/delete-speaker';
-import { formatErrorMessage } from '@/services/errors';
 import { pluralize } from '@/utils';
 
 interface SpeakerActionsMenuProps {
@@ -29,41 +24,19 @@ export function SpeakerActionsMenu({
   talkCount,
   viewUrl,
 }: SpeakerActionsMenuProps) {
-  const router = useRouter();
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  const speakerId = speaker._id as SpeakerId;
-  const fullName = `${speaker.firstName} ${speaker.lastName}`;
-  const contentCount = talkCount + clipCount;
-
-  const handleDelete = async () => {
-    setIsDeleting(true);
-
-    try {
-      const result = await deleteSpeakerAction(speakerId);
-
-      if (result.success) {
-        toastManager.add({ title: 'Speaker deleted', type: 'success' });
-        setDeleteDialogOpen(false);
-        router.refresh();
-      } else {
-        toastManager.add({
-          description: result.errors?.root ?? 'An error occurred',
-          title: 'Failed to delete speaker',
-          type: 'error',
-        });
-      }
-    } catch (error: unknown) {
-      toastManager.add({
-        description: formatErrorMessage(error),
-        title: 'Failed to delete speaker',
-        type: 'error',
-      });
-    }
-
-    setIsDeleting(false);
-  };
+  const {
+    deleteDialogOpen,
+    handleDelete,
+    isDeleting,
+    menuItems,
+    setDeleteDialogOpen,
+  } = useEntityDeleteConfirm({
+    deleteAction: deleteSpeakerAction,
+    failureTitle: 'Failed to delete speaker',
+    id: speaker._id as SpeakerId,
+    successTitle: 'Speaker deleted',
+    viewUrl,
+  });
 
   const parts: string[] = [];
   if (talkCount > 0) {
@@ -72,28 +45,22 @@ export function SpeakerActionsMenu({
   if (clipCount > 0) {
     parts.push(`${clipCount} ${pluralize(clipCount, 'clip', 'clips')}`);
   }
-  const blockReason = `This speaker has ${parts.join(' and ')} associated. Remove all associated content before deleting.`;
-
-  const menuItems = getEntityMenuItems({
-    onDelete: () => setDeleteDialogOpen(true),
-    viewUrl,
-  });
 
   return (
     <>
       <ActionsGroup disabled={isDeleting} menuItems={menuItems} />
 
-      {contentCount > 0 ? (
+      {talkCount + clipCount > 0 ? (
         <DeleteBlockedDialog
-          blockReason={blockReason}
-          name={fullName}
+          blockReason={`This speaker has ${parts.join(' and ')} associated. Remove all associated content before deleting.`}
+          name={`${speaker.firstName} ${speaker.lastName}`}
           onOpenChange={setDeleteDialogOpen}
           open={deleteDialogOpen}
         />
       ) : (
         <DeleteConfirmDialog
           isDeleting={isDeleting}
-          name={fullName}
+          name={`${speaker.firstName} ${speaker.lastName}`}
           onDelete={handleDelete}
           onOpenChange={setDeleteDialogOpen}
           open={deleteDialogOpen}

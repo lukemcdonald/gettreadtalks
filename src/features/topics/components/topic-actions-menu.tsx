@@ -2,18 +2,13 @@
 
 import type { Topic, TopicId } from '@/features/topics/types';
 
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-
 import {
   ActionsGroup,
   DeleteBlockedDialog,
   DeleteConfirmDialog,
-  getEntityMenuItems,
+  useEntityDeleteConfirm,
 } from '@/components/actions-group';
-import { toastManager } from '@/components/ui/primitives/toast';
 import { deleteTopicAction } from '@/features/topics/actions/delete-topic';
-import { formatErrorMessage } from '@/services/errors';
 import { pluralize } from '@/utils';
 
 interface TopicActionsMenuProps {
@@ -27,42 +22,17 @@ export function TopicActionsMenu({
   topic,
   viewUrl,
 }: TopicActionsMenuProps) {
-  const router = useRouter();
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  const topicId = topic._id as TopicId;
-
-  const handleDelete = async () => {
-    setIsDeleting(true);
-
-    try {
-      const result = await deleteTopicAction(topicId);
-
-      if (result.success) {
-        toastManager.add({ title: 'Topic deleted', type: 'success' });
-        setDeleteDialogOpen(false);
-        router.refresh();
-      } else {
-        toastManager.add({
-          description: result.errors?.root ?? 'An error occurred',
-          title: 'Failed to delete topic',
-          type: 'error',
-        });
-      }
-    } catch (error: unknown) {
-      toastManager.add({
-        description: formatErrorMessage(error),
-        title: 'Failed to delete topic',
-        type: 'error',
-      });
-    }
-
-    setIsDeleting(false);
-  };
-
-  const menuItems = getEntityMenuItems({
-    onDelete: () => setDeleteDialogOpen(true),
+  const {
+    deleteDialogOpen,
+    handleDelete,
+    isDeleting,
+    menuItems,
+    setDeleteDialogOpen,
+  } = useEntityDeleteConfirm({
+    deleteAction: deleteTopicAction,
+    failureTitle: 'Failed to delete topic',
+    id: topic._id as TopicId,
+    successTitle: 'Topic deleted',
     viewUrl,
   });
 
