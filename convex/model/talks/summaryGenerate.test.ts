@@ -116,7 +116,7 @@ describe('generateTalkSummary', () => {
       });
 
       expect(refused).toEqual({
-        errorCode: 'already_reviewed',
+        errorCode: 'ALREADY_REVIEWED',
         message: 'This study has already been reviewed.',
         status: 'failed',
       });

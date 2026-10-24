@@ -17,17 +17,17 @@ import {
 import { talkStudyContentFields } from './validators';
 
 const SUMMARY_GENERATE_MESSAGES = {
-  already_reviewed: 'This study has already been reviewed.',
-  no_transcript: 'A transcript is required to generate a summary.',
-  token_missing: 'Summary service is not configured.',
-  upstream_error: 'Summary service returned an error.',
+  ALREADY_REVIEWED: 'This study has already been reviewed.',
+  NO_TRANSCRIPT: 'A transcript is required to generate a summary.',
+  TOKEN_MISSING: 'Summary service is not configured.',
+  UPSTREAM_ERROR: 'Summary service returned an error.',
 } as const;
 
 const talkSummaryGenerateErrorCode = v.union(
-  v.literal('already_reviewed'),
-  v.literal('no_transcript'),
-  v.literal('token_missing'),
-  v.literal('upstream_error')
+  v.literal('ALREADY_REVIEWED'),
+  v.literal('NO_TRANSCRIPT'),
+  v.literal('TOKEN_MISSING'),
+  v.literal('UPSTREAM_ERROR')
 );
 
 const talkSummaryGenerateFailure = v.object({
@@ -174,7 +174,7 @@ async function saveGeneratedTalkSummary(
       transcript: source.transcript,
     });
   } catch {
-    return toFailedResult('upstream_error');
+    return toFailedResult('UPSTREAM_ERROR');
   }
 
   try {
@@ -189,10 +189,10 @@ async function saveGeneratedTalkSummary(
     });
   } catch (error) {
     if (isConflictError(error)) {
-      return toFailedResult('already_reviewed');
+      return toFailedResult('ALREADY_REVIEWED');
     }
 
-    return toFailedResult('upstream_error');
+    return toFailedResult('UPSTREAM_ERROR');
   }
 
   return {
@@ -225,15 +225,15 @@ export const generateTalkSummary = action({
     );
 
     if (!source.transcript) {
-      return toFailedResult('no_transcript');
+      return toFailedResult('NO_TRANSCRIPT');
     }
 
     if (source.studyReviewed) {
-      return toFailedResult('already_reviewed');
+      return toFailedResult('ALREADY_REVIEWED');
     }
 
     if (!process.env.AI_GATEWAY_API_KEY) {
-      return toFailedResult('token_missing');
+      return toFailedResult('TOKEN_MISSING');
     }
 
     return await saveGeneratedTalkSummary(
