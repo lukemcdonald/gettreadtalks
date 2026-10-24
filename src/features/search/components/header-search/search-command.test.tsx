@@ -21,7 +21,7 @@ describe('SearchCommandField', () => {
     expect(field).toBeInstanceOf(HTMLLabelElement);
 
     if (!(field instanceof HTMLLabelElement)) {
-      throw new Error('Search field should wrap the input in a label');
+      throw new TypeError('Search field should wrap the input in a label');
     }
 
     const icon = field.querySelector('svg');
@@ -29,7 +29,7 @@ describe('SearchCommandField', () => {
     expect(icon).toBeInstanceOf(SVGElement);
 
     if (!(icon instanceof SVGElement)) {
-      throw new Error('Search field should include a search icon');
+      throw new TypeError('Search field should include a search icon');
     }
 
     input.blur();
