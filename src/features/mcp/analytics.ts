@@ -69,11 +69,11 @@ export function withToolTracking<H>(toolName: string, handler: H): H {
           e?: ToolExtra
         ) => Promise<{ isError?: boolean }>
       )(args, extra);
-      finish(!result.isError, result.isError ? 'tool_error' : undefined);
+      finish(!result.isError, result.isError ? 'TOOL_ERROR' : undefined);
 
       return result;
     } catch (error) {
-      finish(false, 'exception');
+      finish(false, 'EXCEPTION');
       throw error;
     }
   }) as H;

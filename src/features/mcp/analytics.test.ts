@@ -48,7 +48,7 @@ describe('withToolTracking', () => {
     const toolError = await loadLastTrack();
 
     expect(toolError.event).toBe('mcp_tool_called');
-    expect(toolError.properties.error).toBe('tool_error');
+    expect(toolError.properties.error).toBe('TOOL_ERROR');
     expect(toolError.properties.success).toBe(false);
     expect(toolError.properties.tool_name).toBe('get_talk');
 
@@ -61,7 +61,7 @@ describe('withToolTracking', () => {
     const thrown = await loadLastTrack();
 
     expect(thrown.event).toBe('mcp_tool_called');
-    expect(thrown.properties.error).toBe('exception');
+    expect(thrown.properties.error).toBe('EXCEPTION');
     expect(thrown.properties.success).toBe(false);
     expect(thrown.properties.tool_name).toBe('get_clip');
   });

@@ -1,7 +1,10 @@
+import type { TranscriptFetchErrorCode } from './transcriptFetchErrorCode';
+
 import { v } from 'convex/values';
 
 import { internal } from '../../_generated/api';
 import { internalAction } from '../../_generated/server';
+import { TRANSCRIPT_FETCH_ERROR_CODES } from './transcriptFetchErrorCode';
 
 const YOUTUBE_TRANSCRIPT_API_URL =
   'https://www.youtube-transcript.io/api/transcripts';
@@ -11,24 +14,14 @@ const YOUTUBE_ID_PATTERNS = [
 ];
 
 const TRANSCRIPT_FETCH_MESSAGES = {
-  login_required: 'YouTube requires a login to view this talk.',
-  no_captions: 'No captions are available for this talk.',
-  not_youtube: 'Transcripts can only be fetched from YouTube talks.',
-  quota_exhausted: 'The monthly transcript quota has been used up.',
-  rate_limited: 'Too many transcript requests.',
-  token_invalid: 'Transcript service rejected the request.',
-  token_missing: 'Transcript service is not configured.',
+  LOGIN_REQUIRED: 'YouTube requires a login to view this talk.',
+  NO_CAPTIONS: 'No captions are available for this talk.',
+  NOT_YOUTUBE: 'Transcripts can only be fetched from YouTube talks.',
+  QUOTA_EXHAUSTED: 'The monthly transcript quota has been used up.',
+  RATE_LIMITED: 'Too many transcript requests.',
+  TOKEN_INVALID: 'Transcript service rejected the request.',
+  TOKEN_MISSING: 'Transcript service is not configured.',
 } as const;
-
-type TranscriptFetchErrorCode =
-  | 'login_required'
-  | 'no_captions'
-  | 'not_youtube'
-  | 'quota_exhausted'
-  | 'rate_limited'
-  | 'token_invalid'
-  | 'token_missing'
-  | 'upstream_error';
 
 interface TranscriptFetchFailure {
   errorCode: TranscriptFetchErrorCode;
@@ -92,8 +85,8 @@ export function toTranscriptHttpError(
 ): TranscriptFetchFailure {
   if (status === 429) {
     return {
-      errorCode: 'rate_limited',
-      message: TRANSCRIPT_FETCH_MESSAGES.rate_limited,
+      errorCode: TRANSCRIPT_FETCH_ERROR_CODES.RATE_LIMITED,
+      message: TRANSCRIPT_FETCH_MESSAGES.RATE_LIMITED,
       retryAfter: parseRetryAfter(retryAfterHeader, nowMs),
       status: 'failed',
     };
@@ -104,8 +97,8 @@ export function toTranscriptHttpError(
     /credit|limit exceeded|limit reached|quota/iu.test(body)
   ) {
     return {
-      errorCode: 'quota_exhausted',
-      message: TRANSCRIPT_FETCH_MESSAGES.quota_exhausted,
+      errorCode: TRANSCRIPT_FETCH_ERROR_CODES.QUOTA_EXHAUSTED,
+      message: TRANSCRIPT_FETCH_MESSAGES.QUOTA_EXHAUSTED,
       retryAfter: getQuotaResetAt(nowMs),
       status: 'failed',
     };
@@ -113,14 +106,14 @@ export function toTranscriptHttpError(
 
   if (status === 401 || status === 403) {
     return {
-      errorCode: 'token_invalid',
-      message: TRANSCRIPT_FETCH_MESSAGES.token_invalid,
+      errorCode: TRANSCRIPT_FETCH_ERROR_CODES.TOKEN_INVALID,
+      message: TRANSCRIPT_FETCH_MESSAGES.TOKEN_INVALID,
       status: 'failed',
     };
   }
 
   return {
-    errorCode: 'upstream_error',
+    errorCode: TRANSCRIPT_FETCH_ERROR_CODES.UPSTREAM_ERROR,
     message: `Transcript service returned an error (HTTP ${status}).`,
     status: 'failed',
   };
@@ -166,7 +159,7 @@ function getVideoText(video: Record<string, unknown>) {
 export function parseTranscriptApiVideo(value: unknown): TranscriptFetchResult {
   if (!value || typeof value !== 'object') {
     return {
-      errorCode: 'upstream_error',
+      errorCode: TRANSCRIPT_FETCH_ERROR_CODES.UPSTREAM_ERROR,
       message: 'Transcript service returned an error (HTTP 200).',
       status: 'failed',
     };
@@ -184,8 +177,8 @@ export function parseTranscriptApiVideo(value: unknown): TranscriptFetchResult {
 
   if (video.isLoginRequired === true || /login required/iu.test(reason)) {
     return {
-      errorCode: 'login_required',
-      message: TRANSCRIPT_FETCH_MESSAGES.login_required,
+      errorCode: TRANSCRIPT_FETCH_ERROR_CODES.LOGIN_REQUIRED,
+      message: TRANSCRIPT_FETCH_MESSAGES.LOGIN_REQUIRED,
       status: 'failed',
     };
   }
@@ -197,8 +190,8 @@ export function parseTranscriptApiVideo(value: unknown): TranscriptFetchResult {
 
   if (!text) {
     return {
-      errorCode: 'no_captions',
-      message: TRANSCRIPT_FETCH_MESSAGES.no_captions,
+      errorCode: TRANSCRIPT_FETCH_ERROR_CODES.NO_CAPTIONS,
+      message: TRANSCRIPT_FETCH_MESSAGES.NO_CAPTIONS,
       status: 'failed',
     };
   }
@@ -227,7 +220,7 @@ async function loadYoutubeTranscript(
     });
   } catch {
     return {
-      errorCode: 'upstream_error',
+      errorCode: TRANSCRIPT_FETCH_ERROR_CODES.UPSTREAM_ERROR,
       message: 'Transcript service is unavailable.',
       status: 'failed',
     };
@@ -249,8 +242,8 @@ async function loadYoutubeTranscript(
 
     if (!Array.isArray(parsed) || parsed.length === 0) {
       return {
-        errorCode: 'no_captions',
-        message: TRANSCRIPT_FETCH_MESSAGES.no_captions,
+        errorCode: TRANSCRIPT_FETCH_ERROR_CODES.NO_CAPTIONS,
+        message: TRANSCRIPT_FETCH_MESSAGES.NO_CAPTIONS,
         status: 'failed',
       };
     }
@@ -258,7 +251,7 @@ async function loadYoutubeTranscript(
     return parseTranscriptApiVideo(parsed[0]);
   } catch {
     return {
-      errorCode: 'upstream_error',
+      errorCode: TRANSCRIPT_FETCH_ERROR_CODES.UPSTREAM_ERROR,
       message: 'Transcript service returned an error (HTTP 200).',
       status: 'failed',
     };
@@ -266,7 +259,10 @@ async function loadYoutubeTranscript(
 }
 
 function toFailedResult(
-  errorCode: Exclude<TranscriptFetchErrorCode, 'upstream_error'>
+  errorCode: Exclude<
+    TranscriptFetchErrorCode,
+    typeof TRANSCRIPT_FETCH_ERROR_CODES.UPSTREAM_ERROR
+  >
 ): TranscriptFetchFailure {
   return {
     errorCode,
@@ -280,13 +276,17 @@ function resolveTranscriptFetch(
   token: string
 ): Promise<TranscriptFetchResult> {
   if (!token) {
-    return Promise.resolve(toFailedResult('token_missing'));
+    return Promise.resolve(
+      toFailedResult(TRANSCRIPT_FETCH_ERROR_CODES.TOKEN_MISSING)
+    );
   }
 
   const videoId = parseYouTubeVideoId(mediaUrl);
 
   if (!videoId) {
-    return Promise.resolve(toFailedResult('not_youtube'));
+    return Promise.resolve(
+      toFailedResult(TRANSCRIPT_FETCH_ERROR_CODES.NOT_YOUTUBE)
+    );
   }
 
   return loadYoutubeTranscript(videoId, token);
