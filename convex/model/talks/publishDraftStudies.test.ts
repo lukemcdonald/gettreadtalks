@@ -16,61 +16,64 @@ const studyFields = {
   suggestedTopics: [],
 };
 
+function requireValue<T>(value: T | null | undefined, label: string): T {
+  if (value) {
+    return value;
+  }
+
+  throw new Error(`expected ${label}`);
+}
+
 describe('publishDraftStudies', () => {
   it('previews without writes, publishes eligible drafts, and is a no-op on re-run', async () => {
     const t = createConvexTest();
     await seedVisibilityCatalog(t);
 
-    const published = await t.query(api.talks.getTalkBySlug, {
-      speakerSlug: visibilitySlugs.publishedSpeaker,
-      talkSlug: visibilitySlugs.publishedTalk,
-    });
-
-    expect(published).not.toBeNull();
-
-    if (!published) {
-      throw new Error('expected a published talk');
-    }
+    const publishedTalk = requireValue(
+      await t.query(api.talks.getTalkBySlug, {
+        speakerSlug: visibilitySlugs.publishedSpeaker,
+        talkSlug: visibilitySlugs.publishedTalk,
+      }),
+      'a published talk'
+    );
 
     const ids = await t.run(async (ctx) => {
-      const draftTalk = await ctx.db
-        .query('talks')
-        .withIndex('by_slug', (q) => q.eq('slug', visibilitySlugs.draftTalk))
-        .unique();
-      const hiddenTalk = await ctx.db
-        .query('talks')
-        .withIndex('by_slug', (q) =>
-          q.eq('slug', 'unpublished-from-draft-speaker')
-        )
-        .unique();
-
-      if (!draftTalk || !hiddenTalk) {
-        throw new Error('expected seed talks');
-      }
-
-      const eligibleId = await ctx.db.insert('talkStudies', {
-        ...studyFields,
-        studyStatus: 'draft',
-        summary: 'A draft study summary ready to publish.',
-        talkId: published.talk._id,
-      });
-      const skippedId = await ctx.db.insert('talkStudies', {
-        ...studyFields,
-        studyStatus: 'draft',
-        summary: '   ',
-        talkId: draftTalk._id,
-      });
-      const alreadyPublishedId = await ctx.db.insert('talkStudies', {
-        ...studyFields,
-        studyStatus: 'published',
-        summary: 'Already on the talk page.',
-        talkId: hiddenTalk._id,
-      });
+      const draftTalk = requireValue(
+        await ctx.db
+          .query('talks')
+          .withIndex('by_slug', (q) => q.eq('slug', visibilitySlugs.draftTalk))
+          .unique(),
+        'a draft talk'
+      );
+      const hiddenTalk = requireValue(
+        await ctx.db
+          .query('talks')
+          .withIndex('by_slug', (q) =>
+            q.eq('slug', 'unpublished-from-draft-speaker')
+          )
+          .unique(),
+        'a hidden talk'
+      );
 
       return {
-        alreadyPublishedId,
-        eligibleId,
-        skippedId,
+        alreadyPublishedId: await ctx.db.insert('talkStudies', {
+          ...studyFields,
+          studyStatus: 'published',
+          summary: 'Already on the talk page.',
+          talkId: hiddenTalk._id,
+        }),
+        eligibleId: await ctx.db.insert('talkStudies', {
+          ...studyFields,
+          studyStatus: 'draft',
+          summary: 'A draft study summary ready to publish.',
+          talkId: publishedTalk.talk._id,
+        }),
+        skippedId: await ctx.db.insert('talkStudies', {
+          ...studyFields,
+          studyStatus: 'draft',
+          summary: '   ',
+          talkId: draftTalk._id,
+        }),
       };
     });
 
@@ -84,24 +87,23 @@ describe('publishDraftStudies', () => {
       titles: ['Grace Abounding'],
     });
 
-    const afterDryRun = await t.run(async (ctx) => ({
-      alreadyPublished: await ctx.db.get(ids.alreadyPublishedId),
-      eligible: await ctx.db.get(ids.eligibleId),
-      skipped: await ctx.db.get(ids.skippedId),
-    }));
+    const afterDryRun = requireValue(
+      await t.run(async (ctx) => await ctx.db.get(ids.eligibleId)),
+      'the eligible study after dry run'
+    );
 
-    expect(afterDryRun.eligible?.studyStatus).toBe('draft');
-    expect(afterDryRun.eligible?.manuallyEditedAt).toBeUndefined();
-    expect(afterDryRun.skipped?.studyStatus).toBe('draft');
-    expect(afterDryRun.alreadyPublished?.studyStatus).toBe('published');
-    expect(afterDryRun.alreadyPublished?.manuallyEditedAt).toBeUndefined();
+    expect(afterDryRun.studyStatus).toBe('draft');
+    expect(afterDryRun.manuallyEditedAt).toBeUndefined();
 
-    const stillDraftOnPage = await t.query(api.talks.getTalkBySlug, {
-      speakerSlug: visibilitySlugs.publishedSpeaker,
-      talkSlug: visibilitySlugs.publishedTalk,
-    });
+    const pageAfterDryRun = requireValue(
+      await t.query(api.talks.getTalkBySlug, {
+        speakerSlug: visibilitySlugs.publishedSpeaker,
+        talkSlug: visibilitySlugs.publishedTalk,
+      }),
+      'the talk page after dry run'
+    );
 
-    expect(stillDraftOnPage?.summary).toBeNull();
+    expect(pageAfterDryRun.summary).toBeNull();
 
     const beforePublish = Date.now();
     const publishedRun = await t.mutation(internal.talks.publishDraftStudies, {
@@ -117,29 +119,43 @@ describe('publishDraftStudies', () => {
     });
 
     const afterPublish = await t.run(async (ctx) => ({
-      alreadyPublished: await ctx.db.get(ids.alreadyPublishedId),
-      eligible: await ctx.db.get(ids.eligibleId),
-      skipped: await ctx.db.get(ids.skippedId),
+      alreadyPublished: requireValue(
+        await ctx.db.get(ids.alreadyPublishedId),
+        'the already published study'
+      ),
+      eligible: requireValue(
+        await ctx.db.get(ids.eligibleId),
+        'the eligible study after publish'
+      ),
+      skipped: requireValue(
+        await ctx.db.get(ids.skippedId),
+        'the skipped study'
+      ),
     }));
 
-    expect(afterPublish.eligible?.studyStatus).toBe('published');
-    expect(afterPublish.eligible?.summary).toBe(
+    expect(afterPublish.eligible.studyStatus).toBe('published');
+    expect(afterPublish.eligible.summary).toBe(
       'A draft study summary ready to publish.'
     );
-    expect(afterPublish.eligible?.manuallyEditedAt).toBeGreaterThanOrEqual(
+    expect(afterPublish.eligible.manuallyEditedAt).toBeGreaterThanOrEqual(
       beforePublish
     );
-    expect(afterPublish.skipped?.studyStatus).toBe('draft');
-    expect(afterPublish.skipped?.manuallyEditedAt).toBeUndefined();
-    expect(afterPublish.alreadyPublished?.studyStatus).toBe('published');
-    expect(afterPublish.alreadyPublished?.manuallyEditedAt).toBeUndefined();
+    expect(afterPublish.skipped.studyStatus).toBe('draft');
+    expect(afterPublish.skipped.manuallyEditedAt).toBeUndefined();
+    expect(afterPublish.alreadyPublished.studyStatus).toBe('published');
+    expect(afterPublish.alreadyPublished.manuallyEditedAt).toBeUndefined();
 
-    const onPage = await t.query(api.talks.getTalkBySlug, {
-      speakerSlug: visibilitySlugs.publishedSpeaker,
-      talkSlug: visibilitySlugs.publishedTalk,
-    });
+    const pageAfterPublish = requireValue(
+      await t.query(api.talks.getTalkBySlug, {
+        speakerSlug: visibilitySlugs.publishedSpeaker,
+        talkSlug: visibilitySlugs.publishedTalk,
+      }),
+      'the talk page after publish'
+    );
 
-    expect(onPage?.summary).toBe('A draft study summary ready to publish.');
+    expect(pageAfterPublish.summary).toBe(
+      'A draft study summary ready to publish.'
+    );
 
     const rerun = await t.mutation(internal.talks.publishDraftStudies, {
       dryRun: false,
@@ -153,12 +169,13 @@ describe('publishDraftStudies', () => {
       titles: [],
     });
 
-    const afterRerun = await t.run(
-      async (ctx) => await ctx.db.get(ids.eligibleId)
+    const afterRerun = requireValue(
+      await t.run(async (ctx) => await ctx.db.get(ids.eligibleId)),
+      'the eligible study after re-run'
     );
 
-    expect(afterRerun?.manuallyEditedAt).toBe(
-      afterPublish.eligible?.manuallyEditedAt
+    expect(afterRerun.manuallyEditedAt).toBe(
+      afterPublish.eligible.manuallyEditedAt
     );
   });
 });
