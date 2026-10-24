@@ -6,7 +6,7 @@ import {
   MANAGE_PATH,
 } from '@/lib/entities/paths';
 
-export const AREA_NAV: AreaNavSection[] = [
+const AREA_NAV: AreaNavSection[] = [
   {
     href: ACCOUNT_PATH,
     items: [

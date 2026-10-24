@@ -44,30 +44,6 @@ export function formatSearchHotkeyLabel(userAgent = '') {
   return /Mac|iPhone|iPad|iPod/u.test(userAgent) ? '⌘K' : 'Ctrl K';
 }
 
-export function getHeaderSearchStatus({
-  hasQuery,
-  hasResults,
-  isLoading,
-}: {
-  hasQuery: boolean;
-  hasResults: boolean;
-  isLoading: boolean;
-}): HeaderSearchStatus {
-  if (!hasQuery) {
-    return 'idle';
-  }
-
-  if (isLoading) {
-    return 'loading';
-  }
-
-  if (hasResults) {
-    return 'results';
-  }
-
-  return 'empty';
-}
-
 export function isSearchHotkey(event: {
   altKey: boolean;
   ctrlKey: boolean;
@@ -245,7 +221,7 @@ export function getHeaderSearchState({
   };
 }
 
-export function shouldShowViewAllResults(
+function shouldShowViewAllResults(
   hits: SearchHit[],
   limit = SEARCH_DROPDOWN_LIMIT
 ) {
@@ -327,8 +303,4 @@ export function toCommandGroups(
       value: VIEW_ALL_SEARCH_GROUP,
     },
   ];
-}
-
-export function hasSearchHits(result: SiteSearchResult) {
-  return toSearchHits(result).length > 0;
 }
