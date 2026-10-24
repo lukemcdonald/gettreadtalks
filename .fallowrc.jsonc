@@ -46,4 +46,15 @@
     "src/hooks/use-media-query.ts",
     "src/lib/segmented-control.ts",
   ],
+  // Relax only the 60-line unit-size ceiling for test suites. Dead-code and
+  // other health checks still analyze these files.
+  "health": {
+    "thresholdOverrides": [
+      {
+        "files": ["**/*.spec.*", "**/*.test.*"],
+        "maxUnitSize": 10000,
+        "reason": "Test and e2e suites are long describe() wrappers, not production functions.",
+      },
+    ],
+  },
 }

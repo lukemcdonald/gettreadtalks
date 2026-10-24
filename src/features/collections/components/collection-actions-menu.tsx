@@ -2,18 +2,13 @@
 
 import type { Collection, CollectionId } from '@/features/collections/types';
 
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-
 import {
   ActionsGroup,
   DeleteBlockedDialog,
   DeleteConfirmDialog,
-  getEntityMenuItems,
+  useEntityDeleteConfirm,
 } from '@/components/actions-group';
-import { toastManager } from '@/components/ui/primitives/toast';
 import { deleteCollectionAction } from '@/features/collections/actions/delete-collection';
-import { formatErrorMessage } from '@/services/errors';
 import { pluralize } from '@/utils';
 
 interface CollectionActionsMenuProps {
@@ -27,44 +22,17 @@ export function CollectionActionsMenu({
   talkCount,
   viewUrl,
 }: CollectionActionsMenuProps) {
-  const router = useRouter();
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  const collectionId = collection._id as CollectionId;
-
-  const handleDelete = async () => {
-    setIsDeleting(true);
-
-    try {
-      const result = await deleteCollectionAction(collectionId);
-
-      if (result.success) {
-        toastManager.add({ title: 'Collection deleted', type: 'success' });
-        setDeleteDialogOpen(false);
-        router.refresh();
-      } else {
-        toastManager.add({
-          description: result.errors?.root ?? 'An error occurred',
-          title: 'Failed to delete collection',
-          type: 'error',
-        });
-      }
-    } catch (error: unknown) {
-      toastManager.add({
-        description: formatErrorMessage(error),
-        title: 'Failed to delete collection',
-        type: 'error',
-      });
-    }
-
-    setIsDeleting(false);
-  };
-
-  const blockReason = `This collection has ${talkCount} ${pluralize(talkCount, 'talk', 'talks')}. Remove all talks before deleting.`;
-
-  const menuItems = getEntityMenuItems({
-    onDelete: () => setDeleteDialogOpen(true),
+  const {
+    deleteDialogOpen,
+    handleDelete,
+    isDeleting,
+    menuItems,
+    setDeleteDialogOpen,
+  } = useEntityDeleteConfirm({
+    deleteAction: deleteCollectionAction,
+    failureTitle: 'Failed to delete collection',
+    id: collection._id as CollectionId,
+    successTitle: 'Collection deleted',
     viewUrl,
   });
 
@@ -74,7 +42,7 @@ export function CollectionActionsMenu({
 
       {talkCount > 0 ? (
         <DeleteBlockedDialog
-          blockReason={blockReason}
+          blockReason={`This collection has ${talkCount} ${pluralize(talkCount, 'talk', 'talks')}. Remove all talks before deleting.`}
           name={collection.title}
           onOpenChange={setDeleteDialogOpen}
           open={deleteDialogOpen}

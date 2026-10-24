@@ -11,7 +11,7 @@ const DEVELOPER_DETAIL =
 
 const reported = new Set<string>();
 
-export function looksLikeDeveloperError(message: string): boolean {
+function looksLikeDeveloperError(message: string): boolean {
   return DEVELOPER_DETAIL.test(message);
 }
 

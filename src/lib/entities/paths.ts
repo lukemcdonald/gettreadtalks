@@ -66,7 +66,3 @@ export function buildEntityEditPath(
 export function buildEntityNewPath(entity: AdminEntity) {
   return `/${entity}/new`;
 }
-
-export function buildPublicEditPath(publicPath: string) {
-  return `${publicPath}/edit`;
-}

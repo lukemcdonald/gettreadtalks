@@ -11,6 +11,7 @@ import { formatErrorMessage } from '@/services/errors';
 import { capitalize } from '@/utils';
 
 import { getContentMenuItems } from './get-content-menu-items';
+import { useEntityDeleteConfirm } from './use-entity-delete-confirm';
 
 type ContentActionsStateProps = Pick<
   ContentActionsGroupProps,
@@ -82,60 +83,6 @@ function useArchiveContent({
   return { handleArchive, isArchiving };
 }
 
-function useDeleteContent({
-  contentId,
-  contentType,
-  listUrl,
-  onDeleteAction,
-}: {
-  contentId: ContentActionsGroupProps['content']['_id'];
-  contentType: string;
-  listUrl?: string;
-  onDeleteAction?: ContentActionsGroupProps['onDeleteAction'];
-}) {
-  const router = useRouter();
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  async function handleDelete() {
-    if (!onDeleteAction) {
-      return;
-    }
-
-    setIsDeleting(true);
-
-    try {
-      await onDeleteAction(contentId);
-      toastContentAction({
-        title: `${capitalize(contentType)} deleted`,
-        type: 'success',
-      });
-      setDeleteDialogOpen(false);
-
-      if (listUrl) {
-        router.push(listUrl);
-      } else {
-        router.refresh();
-      }
-    } catch (error: unknown) {
-      toastContentAction({
-        error,
-        title: `Failed to delete ${contentType}`,
-        type: 'error',
-      });
-    }
-
-    setIsDeleting(false);
-  }
-
-  return {
-    deleteDialogOpen,
-    handleDelete,
-    isDeleting,
-    setDeleteDialogOpen,
-  };
-}
-
 export function useContentActions({
   additionalActions,
   content,
@@ -154,11 +101,12 @@ export function useContentActions({
     onArchiveAction,
   });
   const { deleteDialogOpen, handleDelete, isDeleting, setDeleteDialogOpen } =
-    useDeleteContent({
-      contentId: content._id,
-      contentType,
+    useEntityDeleteConfirm({
+      deleteAction: onDeleteAction,
+      failureTitle: `Failed to delete ${contentType}`,
+      id: content._id,
       listUrl,
-      onDeleteAction,
+      successTitle: `${capitalize(contentType)} deleted`,
     });
 
   return {

@@ -4,12 +4,11 @@ import type { CollectionFormData } from '../schemas/collection-form';
 import type { CollectionId } from '@/features/collections/types';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { FormSheet } from '@/components/ui';
 import { createCollectionAction } from '@/features/collections/actions/create-collection';
-import { setServerErrors } from '@/lib/forms/react-hook-form';
+import { useCreateFormSheet } from '@/lib/forms/use-create-form-sheet';
 
 import { collectionFormSchema } from '../schemas/collection-form';
 import { CollectionFormFields } from './collection-form-fields';
@@ -25,8 +24,6 @@ export function CreateCollectionSheet({
   onOpenChange,
   open,
 }: CreateCollectionSheetProps) {
-  const [isPending, startTransition] = useTransition();
-
   const form = useForm<CollectionFormData>({
     defaultValues: {
       description: '',
@@ -37,25 +34,15 @@ export function CreateCollectionSheet({
     resolver: zodResolver(collectionFormSchema),
   });
 
-  const handleSubmit = form.handleSubmit((data) => {
-    startTransition(async () => {
-      const result = await createCollectionAction(data);
-
-      if (!result.success) {
-        setServerErrors(form.setError, result.errors);
-        return;
-      }
-
-      onCollectionCreated(result.data.collectionId);
-      onOpenChange(false);
-    });
+  const { handleSubmit, isPending } = useCreateFormSheet({
+    form,
+    onOpenChange,
+    onSuccess: (data) => {
+      onCollectionCreated(data.collectionId);
+    },
+    open,
+    submit: createCollectionAction,
   });
-
-  useEffect(() => {
-    if (!open) {
-      form.reset();
-    }
-  }, [form, open]);
 
   return (
     <FormSheet

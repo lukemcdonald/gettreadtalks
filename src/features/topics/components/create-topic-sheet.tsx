@@ -4,7 +4,6 @@ import type { TopicFormData } from '@/features/topics/schemas/topic-form';
 import type { TopicId } from '@/features/topics/types';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { FormSheet } from '@/components/ui';
@@ -12,7 +11,7 @@ import { toastManager } from '@/components/ui/primitives/toast';
 import { createTopicAction } from '@/features/topics/actions/create-topic';
 import { TopicFormFields } from '@/features/topics/components/topic-form-fields';
 import { topicFormSchema } from '@/features/topics/schemas/topic-form';
-import { setServerErrors } from '@/lib/forms/react-hook-form';
+import { useCreateFormSheet } from '@/lib/forms/use-create-form-sheet';
 
 interface CreateTopicSheetProps {
   onOpenChange: (open: boolean) => void;
@@ -25,8 +24,6 @@ export function CreateTopicSheet({
   onTopicCreated,
   open,
 }: CreateTopicSheetProps) {
-  const [isPending, startTransition] = useTransition();
-
   const form = useForm<TopicFormData>({
     defaultValues: {
       description: '',
@@ -36,26 +33,16 @@ export function CreateTopicSheet({
     resolver: zodResolver(topicFormSchema),
   });
 
-  const handleSubmit = form.handleSubmit((data) => {
-    startTransition(async () => {
-      const result = await createTopicAction(data);
-
-      if (!result.success) {
-        setServerErrors(form.setError, result.errors);
-        return;
-      }
-
+  const { handleSubmit, isPending } = useCreateFormSheet({
+    form,
+    onOpenChange,
+    onSuccess: (data) => {
       toastManager.add({ title: 'Topic created', type: 'success' });
-      onTopicCreated(result.data.topicId);
-      onOpenChange(false);
-    });
+      onTopicCreated(data.topicId);
+    },
+    open,
+    submit: createTopicAction,
   });
-
-  useEffect(() => {
-    if (!open) {
-      form.reset();
-    }
-  }, [form, open]);
 
   return (
     <FormSheet
