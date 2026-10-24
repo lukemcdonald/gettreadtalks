@@ -55,7 +55,7 @@ describe('withToolTracking', () => {
     await expect(boom()).rejects.toThrow('backend down');
     expectTrackedTimes(1);
     expectTracked('webmcp_tool_called', {
-      error: 'exception',
+      error: 'EXCEPTION',
       success: false,
       tool_name: 'open_talk',
     });

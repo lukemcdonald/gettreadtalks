@@ -23,7 +23,7 @@ export function withToolTracking<H>(toolName: string, execute: H): H {
       return result;
     } catch (error) {
       track('webmcp_tool_called', {
-        error: 'exception',
+        error: 'EXCEPTION',
         success: false,
         tool_name: toolName,
       });
