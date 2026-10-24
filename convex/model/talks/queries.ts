@@ -31,7 +31,6 @@ import {
   searchPublishedTalksByTitleOrSpeaker,
 } from './helpers';
 import { talkFields, talkTranscriptFields } from './schema';
-import { normalizeTranscriptFetchErrorCode } from './transcriptFetchErrorCode';
 import {
   enrichAdminTalks,
   enrichWithTopics,
@@ -599,7 +598,7 @@ export const listTalksWithoutTranscript = query({
           lastError:
             fetch?.errorCode && fetch.message
               ? {
-                  errorCode: normalizeTranscriptFetchErrorCode(fetch.errorCode),
+                  errorCode: fetch.errorCode,
                   message: fetch.message,
                   retryAfter: fetch.retryAfter,
                 }
@@ -673,20 +672,11 @@ export const getTalkTranscriptFetch = query({
   handler: async (ctx, { talkId }) => {
     await requireAdmin(ctx);
 
-    const fetch = await ctx.db
+    return await ctx.db
       .query('talkTranscriptFetches')
       .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
       .order('desc')
       .first();
-
-    if (!fetch?.errorCode) {
-      return fetch ?? null;
-    }
-
-    return {
-      ...fetch,
-      errorCode: normalizeTranscriptFetchErrorCode(fetch.errorCode),
-    };
   },
   returns: doc('talkTranscriptFetches').nullable(),
 });

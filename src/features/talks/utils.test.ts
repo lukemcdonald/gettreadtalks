@@ -69,31 +69,11 @@ describe('isTranscriptFetchCoolingDown', () => {
   const retryAfter = Date.UTC(2026, 9, 24, 20, 0, 0);
   const now = retryAfter - 1000;
 
-  it('treats legacy and new cooldown codes as the same', () => {
-    expect(
-      isTranscriptFetchCoolingDown(
-        {
-          errorCode: 'quota_exhausted',
-          retryAfter,
-          status: 'failed',
-        },
-        now
-      )
-    ).toBe(true);
+  it('cools down quota and rate-limit failures until retryAfter', () => {
     expect(
       isTranscriptFetchCoolingDown(
         {
           errorCode: 'QUOTA_EXHAUSTED',
-          retryAfter,
-          status: 'failed',
-        },
-        now
-      )
-    ).toBe(true);
-    expect(
-      isTranscriptFetchCoolingDown(
-        {
-          errorCode: 'rate_limited',
           retryAfter,
           status: 'failed',
         },
