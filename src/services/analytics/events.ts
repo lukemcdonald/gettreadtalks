@@ -8,19 +8,21 @@ interface TalkTrackProperties {
   talk_slug: string;
 }
 
+export interface ToolCallProperties {
+  error?: string;
+  success: boolean;
+  tool_name: string;
+}
+
 /** Add a key here, then call `track` from `@/services/analytics`. */
 export interface EventMap {
   clip_completed: { clip_id: string; clip_slug: string };
   clip_paused: { clip_id: string; clip_slug: string; progress_pct: number };
   clip_played: { clip_id: string; clip_slug: string };
   filter_applied: { filter: string; path: string; value: string };
-  mcp_tool_called: {
+  mcp_tool_called: ToolCallProperties & {
     duration_ms: number;
-    error?: string;
     query?: string;
-    result_count?: number;
-    success: boolean;
-    tool_name: string;
     user_agent?: string;
   };
   not_found_hit: { path: string };
@@ -68,4 +70,5 @@ export interface EventMap {
   talk_unfavorited: TalkTrackProperties;
   talk_unfeatured: TalkTrackProperties;
   talk_unfinished: TalkTrackProperties;
+  webmcp_tool_called: ToolCallProperties;
 }

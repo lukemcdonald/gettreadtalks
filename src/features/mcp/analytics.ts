@@ -18,11 +18,10 @@ function text(value: unknown) {
   return typeof value === 'string' && value.trim() ? value.trim() : undefined;
 }
 
-export function buildMcpToolCallProperties({
+function buildMcpToolCallProperties({
   durationMs: duration_ms,
   error,
   query,
-  resultCount: result_count,
   success,
   toolName: tool_name,
   userAgent: user_agent,
@@ -30,7 +29,6 @@ export function buildMcpToolCallProperties({
   durationMs: number;
   error?: string;
   query?: string;
-  resultCount?: number;
   success: boolean;
   toolName: string;
   userAgent?: string;
@@ -39,7 +37,6 @@ export function buildMcpToolCallProperties({
     duration_ms,
     error,
     query,
-    result_count,
     success,
     tool_name,
     user_agent,
@@ -76,7 +73,7 @@ export function withToolTracking<H>(toolName: string, handler: H): H {
 
       return result;
     } catch (error) {
-      finish(false, error instanceof Error ? error.message : 'tool_error');
+      finish(false, 'exception');
       throw error;
     }
   }) as H;

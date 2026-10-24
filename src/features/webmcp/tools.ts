@@ -8,6 +8,8 @@ import { normalizeSearchQuery } from '@/convex/model/search/utils';
 import { formatTalk } from '@/features/mcp/format';
 import { buildSearchPageHref } from '@/features/search/utils';
 
+import { withToolTracking } from './analytics';
+
 type SearchTalks = (args: {
   limit: number;
   search: string;
@@ -79,40 +81,43 @@ export async function registerWebMcpTools({
         },
         description:
           'Searches published talks by title or speaker and opens the site search. Use when the user wants to find a sermon.',
-        execute: async ({ query }: { query: string }) => {
-          const normalizedQuery = normalizeSearchQuery(query);
+        execute: withToolTracking(
+          'search_talks',
+          async ({ query }: { query: string }) => {
+            const normalizedQuery = normalizeSearchQuery(query);
 
-          if (!normalizedQuery) {
-            return toolError('INVALID_QUERY', 'A search query is required.');
-          }
-
-          navigate(buildSearchPageHref(normalizedQuery));
-
-          try {
-            const { talks } = await searchTalks({
-              limit: SEARCH_LIMIT,
-              search: normalizedQuery,
-            });
-            const formatted = talks.map((talk) =>
-              formatTalk(talk, talk.speaker)
-            );
-
-            if (formatted.length === 0) {
-              return {
-                suggestion: 'Try a speaker name or a shorter phrase.',
-                talks: formatted,
-              };
+            if (!normalizedQuery) {
+              return toolError('INVALID_QUERY', 'A search query is required.');
             }
 
-            return { talks: formatted };
-          } catch {
-            return toolError(
-              'SEARCH_FAILED',
-              'Talk search failed. Try again in a moment.',
-              true
-            );
+            navigate(buildSearchPageHref(normalizedQuery));
+
+            try {
+              const { talks } = await searchTalks({
+                limit: SEARCH_LIMIT,
+                search: normalizedQuery,
+              });
+              const formatted = talks.map((talk) =>
+                formatTalk(talk, talk.speaker)
+              );
+
+              if (formatted.length === 0) {
+                return {
+                  suggestion: 'Try a speaker name or a shorter phrase.',
+                  talks: formatted,
+                };
+              }
+
+              return { talks: formatted };
+            } catch {
+              return toolError(
+                'SEARCH_FAILED',
+                'Talk search failed. Try again in a moment.',
+                true
+              );
+            }
           }
-        },
+        ),
         inputSchema: {
           properties: {
             query: {
@@ -132,7 +137,7 @@ export async function registerWebMcpTools({
       {
         description:
           'Opens a published talk on this site. Use when the user is ready to view a talk from search_talks.',
-        execute: ({ talk }: { talk: string }) => {
+        execute: withToolTracking('open_talk', ({ talk }: { talk: string }) => {
           const resolved = resolveTalkHref(talk, origin);
 
           if ('error' in resolved) {
@@ -142,7 +147,7 @@ export async function registerWebMcpTools({
           navigate(resolved.href);
 
           return resolved;
-        },
+        }),
         inputSchema: {
           properties: {
             talk: {
