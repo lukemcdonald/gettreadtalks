@@ -6,13 +6,12 @@ import type { SpeakerListItem } from '@/features/speakers/types';
 import type { TalkListItem } from '@/features/talks/types';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { FormSheet } from '@/components/ui';
 import { toastManager } from '@/components/ui/primitives/toast';
 import { createClipAction } from '@/features/clips/actions/create-clip';
-import { setServerErrors } from '@/lib/forms/react-hook-form';
+import { useCreateFormSheet } from '@/lib/forms/use-create-form-sheet';
 
 import { clipFormSchema } from '../schemas/clip-form';
 import { ClipFormFields } from './clip-form-fields';
@@ -32,12 +31,7 @@ export function CreateClipSheet({
   speakers,
   talks,
 }: CreateClipSheetProps) {
-  const [isPending, startTransition] = useTransition();
-
   const form = useForm<ClipFormData>({
-    mode: 'onBlur',
-    // oxlint-disable-next-line typescript/no-explicit-any -- Zod 4 compatibility with zodResolver
-    resolver: zodResolver(clipFormSchema as any),
     defaultValues: {
       description: '',
       mediaUrl: '',
@@ -46,28 +40,21 @@ export function CreateClipSheet({
       talkId: undefined,
       title: '',
     },
+    mode: 'onBlur',
+    // oxlint-disable-next-line typescript/no-explicit-any -- Zod 4 compatibility with zodResolver
+    resolver: zodResolver(clipFormSchema as any),
   });
 
-  const handleSubmit = form.handleSubmit((data) => {
-    startTransition(async () => {
-      const result = await createClipAction(data);
-
-      if (!result.success) {
-        setServerErrors(form.setError, result.errors);
-        return;
-      }
-
+  const { handleSubmit, isPending } = useCreateFormSheet({
+    form,
+    onOpenChange,
+    onSuccess: (data) => {
       toastManager.add({ title: 'Clip created', type: 'success' });
-      onClipCreated(result.data.clipId);
-      onOpenChange(false);
-    });
+      onClipCreated(data.clipId);
+    },
+    open,
+    submit: createClipAction,
   });
-
-  useEffect(() => {
-    if (!open) {
-      form.reset();
-    }
-  }, [form, open]);
 
   return (
     <FormSheet

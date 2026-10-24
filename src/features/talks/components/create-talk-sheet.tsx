@@ -7,14 +7,13 @@ import type { TalkId } from '@/features/talks/types';
 import type { TopicListItem } from '@/features/topics/types';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { FormSheet } from '@/components/ui';
 import { createTalkAction } from '@/features/talks/actions/create-talk';
 import { TalkFormFields } from '@/features/talks/components/talk-form-fields';
 import { talkFormSchema } from '@/features/talks/schemas/talk-form';
-import { setServerErrors } from '@/lib/forms/react-hook-form';
+import { useCreateFormSheet } from '@/lib/forms/use-create-form-sheet';
 
 interface CreateTalkSheetProps {
   collections: CollectionListItem[];
@@ -33,12 +32,7 @@ export function CreateTalkSheet({
   speakers,
   topics,
 }: CreateTalkSheetProps) {
-  const [isPending, startTransition] = useTransition();
-
   const form = useForm<TalkFormData>({
-    mode: 'onBlur',
-    // oxlint-disable-next-line typescript/no-explicit-any -- Zod 4 compatibility with zodResolver
-    resolver: zodResolver(talkFormSchema as any),
     defaultValues: {
       collectionId: undefined,
       collectionOrder: undefined,
@@ -50,27 +44,20 @@ export function CreateTalkSheet({
       title: '',
       topicIds: [],
     },
+    mode: 'onBlur',
+    // oxlint-disable-next-line typescript/no-explicit-any -- Zod 4 compatibility with zodResolver
+    resolver: zodResolver(talkFormSchema as any),
   });
 
-  const handleSubmit = form.handleSubmit((data) => {
-    startTransition(async () => {
-      const result = await createTalkAction(data);
-
-      if (!result.success) {
-        setServerErrors(form.setError, result.errors);
-        return;
-      }
-
-      onTalkCreated(result.data.talkId as TalkId);
-      onOpenChange(false);
-    });
+  const { handleSubmit, isPending } = useCreateFormSheet({
+    form,
+    onOpenChange,
+    onSuccess: (data) => {
+      onTalkCreated(data.talkId as TalkId);
+    },
+    open,
+    submit: createTalkAction,
   });
-
-  useEffect(() => {
-    if (!open) {
-      form.reset();
-    }
-  }, [form, open]);
 
   return (
     <FormSheet
