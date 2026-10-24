@@ -13,11 +13,28 @@ const otherSpeakerId = 'speakers:piper' as Talk['speakerId'];
 
 function publishedTalk(overrides: Partial<Talk> = {}): Talk {
   return {
+    _creationTime: 0,
+    _id: 'talks:the-cross' as Talk['_id'],
     slug: 'the-cross',
     speakerId,
     status: 'published',
     ...overrides,
   } as Talk;
+}
+
+function talkWithTopics(
+  overrides: Partial<TalkWithTopicIds> = {}
+): TalkWithTopicIds {
+  return {
+    _creationTime: 0,
+    _id: 'talks:the-cross' as TalkWithTopicIds['_id'],
+    slug: 'the-cross',
+    speakerId,
+    status: 'published',
+    title: 'The Cross',
+    topicIds: [],
+    ...overrides,
+  } as TalkWithTopicIds;
 }
 
 function formData(overrides: Partial<TalkFormData> = {}): TalkFormData {
@@ -35,18 +52,13 @@ function formData(overrides: Partial<TalkFormData> = {}): TalkFormData {
 
 describe('getTalkFormValues', () => {
   it('omits collection order when the talk has no collection', () => {
-    const talk = {
+    const talk = talkWithTopics({
       collectionId: undefined,
       collectionOrder: 3,
-      featured: null,
-      mediaUrl: null,
-      scripture: null,
-      slug: 'the-cross',
-      speakerId,
-      status: 'published',
-      title: 'The Cross',
-      topicIds: [],
-    } as TalkWithTopicIds;
+      featured: undefined,
+      mediaUrl: '',
+      scripture: undefined,
+    });
 
     expect(getTalkFormValues(talk)).toEqual({
       collectionId: undefined,
@@ -63,18 +75,13 @@ describe('getTalkFormValues', () => {
   });
 
   it('keeps collection order and prefers a status prefill', () => {
-    const talk = {
+    const talk = talkWithTopics({
       collectionId: 'collections:romans' as Talk['collectionId'],
       collectionOrder: 3,
       featured: true,
       mediaUrl: 'https://example.com/talk',
       scripture: 'Romans 8',
-      slug: 'the-cross',
-      speakerId,
-      status: 'published',
-      title: 'The Cross',
-      topicIds: [],
-    } as TalkWithTopicIds;
+    });
 
     expect(getTalkFormValues(talk, 'archived')).toMatchObject({
       collectionOrder: 3,
