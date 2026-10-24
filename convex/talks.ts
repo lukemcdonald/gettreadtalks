@@ -36,5 +36,3 @@ export const {
   updateTalkStudy,
   upsertTalkTranscript,
 } = mutations;
-
-export { renameTalkTranscriptFetchErrorCodes } from './model/talks/renameTranscriptFetchErrorCodes';

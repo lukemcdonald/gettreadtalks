@@ -1,10 +1,7 @@
 import type { Speaker } from '@/features/speakers/types';
 import type { Talk, TalkId } from '@/features/talks/types';
 
-import {
-  normalizeTranscriptFetchErrorCode,
-  TRANSCRIPT_FETCH_ERROR_CODES,
-} from '@/convex/model/talks/transcriptFetchErrorCode';
+import { TRANSCRIPT_FETCH_ERROR_CODES } from '@/convex/model/talks/transcriptFetchErrorCode';
 import { buildAbsoluteUrl, buildPathQuery } from '@/lib/entities/paths';
 
 export function buildTalkPath(
@@ -42,14 +39,10 @@ export function isTranscriptFetchCoolingDown(
   } | null,
   now = Date.now()
 ) {
-  const errorCode = fetch?.errorCode
-    ? normalizeTranscriptFetchErrorCode(fetch.errorCode)
-    : undefined;
-
   return (
     fetch?.status === 'failed' &&
-    (errorCode === TRANSCRIPT_FETCH_ERROR_CODES.QUOTA_EXHAUSTED ||
-      errorCode === TRANSCRIPT_FETCH_ERROR_CODES.RATE_LIMITED) &&
+    (fetch.errorCode === TRANSCRIPT_FETCH_ERROR_CODES.QUOTA_EXHAUSTED ||
+      fetch.errorCode === TRANSCRIPT_FETCH_ERROR_CODES.RATE_LIMITED) &&
     (fetch.retryAfter ?? 0) > now
   );
 }
