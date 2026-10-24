@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { toastManager } from '@/components/ui/primitives/toast';
 import { formatErrorMessage } from '@/services/errors';
 
-import { getEntityMenuItems } from './get-entity-menu-items';
+import { getContentMenuItems } from './get-content-menu-items';
 
 interface UseEntityDeleteConfirmOptions<TId> {
   deleteAction: (id: TId) => Promise<ActionResult<null>>;
@@ -61,7 +61,7 @@ export function useEntityDeleteConfirm<TId>({
     deleteDialogOpen,
     handleDelete,
     isDeleting,
-    menuItems: getEntityMenuItems({
+    menuItems: getContentMenuItems({
       onDelete: () => setDeleteDialogOpen(true),
       viewUrl,
     }),
