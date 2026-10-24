@@ -4,7 +4,6 @@ import type { MutationCtx } from '../../_generated/server';
 import { v } from 'convex/values';
 
 import { internalMutation } from '../../_generated/server';
-import { setTalkStudy } from './mutations';
 
 const BATCH_SIZE = 64;
 const TITLE_PREVIEW_LIMIT = 10;
@@ -75,9 +74,8 @@ export const publishDraftStudies = internalMutation({
 
     await Promise.all(
       batch.map((row) =>
-        setTalkStudy(ctx, row.study._id, {
+        ctx.db.patch(row.study._id, {
           studyStatus: 'published',
-          summary: row.study.summary,
         })
       )
     );
