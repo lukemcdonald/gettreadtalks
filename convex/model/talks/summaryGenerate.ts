@@ -38,12 +38,46 @@ const talkSummaryGenerateFailure = v.object({
 
 type TalkSummaryGenerateErrorCode = keyof typeof SUMMARY_GENERATE_MESSAGES;
 
-function toFailedResult(errorCode: TalkSummaryGenerateErrorCode) {
+function toFailedResult(
+  errorCode: TalkSummaryGenerateErrorCode,
+  message: string = SUMMARY_GENERATE_MESSAGES[errorCode]
+) {
   return {
     errorCode,
-    message: SUMMARY_GENERATE_MESSAGES[errorCode],
+    message,
     status: 'failed' as const,
   };
+}
+
+function sanitizeUpstreamText(value: string) {
+  return value
+    .replaceAll(/AI_GATEWAY[A-Z0-9_]*/gu, '[redacted]')
+    .replaceAll(/Bearer\s+\S+/giu, '[redacted]');
+}
+
+function formatUpstreamErrorDetail(error: unknown) {
+  if (!(error instanceof Error)) {
+    return `name=${typeof error}`;
+  }
+
+  const record = error as Error & {
+    data?: { error?: { type?: string }; type?: string };
+    statusCode?: number;
+  };
+  const parts = [`name=${error.name}`];
+  const type = record.data?.error?.type ?? record.data?.type;
+
+  if (typeof record.statusCode === 'number') {
+    parts.push(`status=${record.statusCode}`);
+  }
+
+  if (type) {
+    parts.push(`type=${sanitizeUpstreamText(type)}`);
+  }
+
+  parts.push(`message=${sanitizeUpstreamText(error.message)}`);
+
+  return parts.join(' ');
 }
 
 function hasReviewedTalkStudy(study: {
@@ -173,8 +207,14 @@ async function saveGeneratedTalkSummary(
       title: source.title,
       transcript: source.transcript,
     });
-  } catch {
-    return toFailedResult('UPSTREAM_ERROR');
+  } catch (error) {
+    const detail = formatUpstreamErrorDetail(error);
+    console.error('talkSummaryGenerate upstream', detail);
+
+    return toFailedResult(
+      'UPSTREAM_ERROR',
+      `${SUMMARY_GENERATE_MESSAGES.UPSTREAM_ERROR} ${detail}`
+    );
   }
 
   try {

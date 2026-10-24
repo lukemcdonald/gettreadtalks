@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test';
 
-import { mkdir } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
 
 import { expect, test } from './fixtures/index.ts';
 import {
@@ -69,7 +69,9 @@ test('Admin study / Generate summary screenshots', async ({ page }) => {
 
   if (await status.isVisible()) {
     const message = (await status.textContent()) ?? '';
-    expect(message).not.toMatch(/AI_GATEWAY|stack|ConvexError/iu);
+    expect(message).toMatch(/^Summary service returned an error\./u);
+    expect(message).not.toMatch(/AI_GATEWAY/iu);
+    await writeFile(`${SHOTS}/upstream-error.txt`, message);
     await saveShot(page, 'error-desktop.png');
     await page.setViewportSize({ height: 844, width: 390 });
     await expect(status).toBeVisible();
