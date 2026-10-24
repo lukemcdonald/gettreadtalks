@@ -3,6 +3,7 @@ import { EditorialProfileLayout } from '@/components/layouts';
 import {
   EditorialProfileHeroSkeleton,
   MediaCardSkeleton,
+  SectionCopySkeleton,
 } from '@/components/skeletons';
 import { Skeleton } from '@/components/ui';
 
@@ -17,7 +18,11 @@ function TalkActionsSkeleton() {
 
 export function TalkRelatedTalksSkeleton() {
   return (
-    <FeaturedGrid columns={{ default: 1 }} title="More Talks">
+    <FeaturedGrid
+      columns={{ default: 1 }}
+      description={<SectionCopySkeleton />}
+      title="More Talks"
+    >
       {Array.from({ length: 3 }).map((_, i) => (
         // oxlint-disable-next-line react/no-array-index-key -- static skeleton items never reorder
         <MediaCardSkeleton key={i} />
