@@ -65,6 +65,21 @@ else
 fi
 url_file="$(mktemp)"
 
+# Reused previews created before VOLTA-507 can still have leftover
+# talk.description fields. The previous deploy of this preview still has
+# talks:unsetTalkDescriptions. Clear them so the new schema can push.
+# New previews will not have that function; ignore the miss.
+preview_deployment="preview/${preview_name}"
+if npx convex run talks:unsetTalkDescriptions '{"dryRun":false}' \
+  --deployment "${preview_deployment}"; then
+  echo "Cleared leftover talk descriptions on ${preview_deployment}."
+elif npx convex run internal.talks.unsetTalkDescriptions '{"dryRun":false}' \
+  --deployment "${preview_deployment}"; then
+  echo "Cleared leftover talk descriptions via internal on ${preview_deployment}."
+else
+  echo "No leftover talk-description cleanup on ${preview_deployment}."
+fi
+
 npx convex deploy \
   --cmd "sh -c 'printf %s \"\$NEXT_PUBLIC_CONVEX_URL\" > \"${url_file}\"'" \
   --cmd-url-env-var-name NEXT_PUBLIC_CONVEX_URL \
