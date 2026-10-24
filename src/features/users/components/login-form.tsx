@@ -1,27 +1,20 @@
 'use client';
 
 import type { ComponentPropsWithoutRef } from 'react';
+import type { UseFormReturn } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { CircleAlertIcon } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-  Button,
-  Field,
-  FieldError,
-  FieldLabel,
-  Fieldset,
-  Form,
-  Input,
-  PasswordInput,
-} from '@/components/ui';
 import { Link } from '@/components/ui/link';
+import {
+  AuthCardForm,
+  AuthEmailField,
+  AuthFormActions,
+  AuthPasswordField,
+} from '@/features/users/components/auth-form';
 import { track, waitForAnalytics } from '@/services/analytics';
 import { signIn } from '@/services/auth/client';
 import { AUTH_ERRORS } from '@/services/auth/config';
@@ -35,10 +28,35 @@ const loginFormSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginFormSchema>;
 
+async function submitLogin(
+  form: UseFormReturn<LoginFormData>,
+  redirectTo: string,
+  { email, password }: LoginFormData
+) {
+  try {
+    const { data, error: signInError } = await signIn({ email, password });
+
+    if (data) {
+      await waitForAnalytics(track('signed_in'));
+      // Use window.location.href to force full page reload and set JWT cookie
+      window.location.assign(redirectTo);
+    } else {
+      form.setError('root', {
+        message: toUserErrorMessage(
+          signInError?.message,
+          AUTH_ERRORS.INVALID_CREDENTIALS
+        ),
+      });
+    }
+  } catch (error) {
+    captureException(error, { fingerprint: ['auth', 'signIn'] });
+    form.setError('root', { message: AUTH_ERRORS.NETWORK_ERROR });
+  }
+}
+
 export function LoginForm({ ...delegated }: ComponentPropsWithoutRef<'form'>) {
   const searchParams = useSearchParams();
   const redirectTo = getSafeRedirect(searchParams.get('redirect'));
-
   const form = useForm<LoginFormData>({
     defaultValues: {
       email: searchParams.get('email') || '',
@@ -46,99 +64,44 @@ export function LoginForm({ ...delegated }: ComponentPropsWithoutRef<'form'>) {
     },
     resolver: zodResolver(loginFormSchema),
   });
-
   const { errors, isSubmitting } = form.formState;
 
-  const handleSubmit = form.handleSubmit(async ({ email, password }) => {
-    try {
-      const { data, error: signInError } = await signIn({ email, password });
-
-      if (data) {
-        await waitForAnalytics(track('signed_in'));
-        // Use window.location.href to force full page reload and set JWT cookie
-        window.location.assign(redirectTo);
-      } else {
-        form.setError('root', {
-          message: toUserErrorMessage(
-            signInError?.message,
-            AUTH_ERRORS.INVALID_CREDENTIALS
-          ),
-        });
-      }
-    } catch (error) {
-      captureException(error, { fingerprint: ['auth', 'signIn'] });
-      form.setError('root', { message: AUTH_ERRORS.NETWORK_ERROR });
-    }
-  });
-
   return (
-    <Form
-      className="flex w-full flex-col gap-6"
-      onSubmit={handleSubmit}
+    <AuthCardForm
+      error={errors.root}
+      isSubmitting={isSubmitting}
+      onSubmit={form.handleSubmit((values) =>
+        submitLogin(form, redirectTo, values)
+      )}
       {...delegated}
     >
-      {!!errors.root && (
-        <Alert variant="error">
-          <CircleAlertIcon />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{errors.root.message}</AlertDescription>
-        </Alert>
-      )}
-
-      <Fieldset disabled={isSubmitting}>
-        <Field invalid={!!errors.email}>
-          <FieldLabel>
-            Email address <span className="text-destructive">*</span>
-          </FieldLabel>
-          <Input
-            autoComplete="email"
-            placeholder="name@example.com"
-            size="lg"
-            type="email"
-            {...form.register('email')}
-          />
-          {!!errors.email && (
-            <FieldError match>{errors.email.message}</FieldError>
-          )}
-        </Field>
-
-        <Field invalid={!!errors.password}>
-          <FieldLabel>
-            Password <span className="text-destructive">*</span>
-          </FieldLabel>
-          <PasswordInput
-            autoComplete="current-password"
-            {...form.register('password')}
-          />
-          {!!errors.password && (
-            <FieldError match>{errors.password.message}</FieldError>
-          )}
-          <div className="flex justify-end">
-            <Link
-              className="text-muted-foreground text-sm hover:underline"
-              href="/forgot-password"
-            >
-              Forgot password?
-            </Link>
-          </div>
-        </Field>
-
-        <div className="mt-4 flex flex-col gap-3">
-          <Button
-            data-testid="sign-in-submit"
-            loading={isSubmitting}
-            type="submit"
+      <AuthEmailField error={errors.email} register={form.register('email')} />
+      <AuthPasswordField
+        autoComplete="current-password"
+        error={errors.password}
+        register={form.register('password')}
+      >
+        <div className="flex justify-end">
+          <Link
+            className="text-muted-foreground text-sm hover:underline"
+            href="/forgot-password"
           >
-            Sign In
-          </Button>
-          <p className="text-muted-foreground text-center text-sm">
-            Don&apos;t have an account?{' '}
-            <Link className="text-foreground hover:underline" href="/register">
-              Create one
-            </Link>
-          </p>
+            Forgot password?
+          </Link>
         </div>
-      </Fieldset>
-    </Form>
+      </AuthPasswordField>
+      <AuthFormActions
+        isSubmitting={isSubmitting}
+        label="Sign In"
+        testId="sign-in-submit"
+      >
+        <p className="text-muted-foreground text-center text-sm">
+          Don&apos;t have an account?{' '}
+          <Link className="text-foreground hover:underline" href="/register">
+            Create one
+          </Link>
+        </p>
+      </AuthFormActions>
+    </AuthCardForm>
   );
 }

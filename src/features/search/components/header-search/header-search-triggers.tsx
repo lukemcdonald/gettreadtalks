@@ -6,7 +6,7 @@ import type { ReactNode } from 'react';
 import { SearchIcon } from 'lucide-react';
 
 import { Button } from '@/components/ui';
-import { useSearchHotkeyLabel } from '@/features/search/hooks/use-header-search';
+import { useSearchHotkeyLabel } from '@/features/search/hooks/use-search-hotkey-label';
 import { formatSearchHotkeyLabel } from '@/features/search/utils';
 import { cn } from '@/utils';
 

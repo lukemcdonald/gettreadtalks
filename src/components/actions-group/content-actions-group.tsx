@@ -1,23 +1,13 @@
 'use client';
 
-import type {
-  ActionsGroupMenuItem,
-  ContentActionsGroupProps,
-} from './actions-group.types';
-
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-
-import { toastManager } from '@/components/ui/primitives/toast';
-import { formatArchiveLabel } from '@/lib/entities/utils';
-import { formatErrorMessage } from '@/services/errors';
-import { capitalize } from '@/utils';
+import type { ContentActionsGroupProps } from './actions-group.types';
 
 import { ActionsGroup } from './actions-group';
 import { ContentDeleteDialog } from './content-delete-dialog';
-import { getContentMenuItems } from './get-content-menu-items';
+import { useContentActions } from './use-content-actions';
 
-const EMPTY_ADDITIONAL_ACTIONS: ActionsGroupMenuItem[] = [];
+const EMPTY_ADDITIONAL_ACTIONS: ContentActionsGroupProps['additionalActions'] =
+  [];
 
 export function ContentActionsGroup({
   additionalActions = EMPTY_ADDITIONAL_ACTIONS,
@@ -30,88 +20,21 @@ export function ContentActionsGroup({
   primaryAction,
   viewUrl,
 }: ContentActionsGroupProps) {
-  const router = useRouter();
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [isArchiving, setIsArchiving] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  const isArchived = content.status === 'archived';
-  const isLoading = isArchiving || isDeleting;
-  const isDisabled = disabled || isLoading;
-
-  const archiveLabel = formatArchiveLabel({
-    isLoading: isArchiving,
-    status: content.status,
-  });
-
-  const handleArchive = async () => {
-    if (!onArchiveAction) {
-      return;
-    }
-
-    setIsArchiving(true);
-
-    try {
-      await onArchiveAction(content._id);
-      toastManager.add({
-        title: `${capitalize(contentType)} ${isArchived ? 'unarchived' : 'archived'}`,
-        type: 'success',
-      });
-      router.refresh();
-    } catch (error: unknown) {
-      toastManager.add({
-        description: formatErrorMessage(error),
-        title: `Failed to archive ${contentType}`,
-        type: 'error',
-      });
-    }
-
-    setIsArchiving(false);
-  };
-
-  const handleDelete = async () => {
-    if (!onDeleteAction) {
-      return;
-    }
-
-    setIsDeleting(true);
-
-    try {
-      await onDeleteAction(content._id);
-
-      toastManager.add({
-        title: `${capitalize(contentType)} deleted`,
-        type: 'success',
-      });
-
-      setDeleteDialogOpen(false);
-
-      if (listUrl) {
-        router.push(listUrl);
-      } else {
-        router.refresh();
-      }
-    } catch (error: unknown) {
-      toastManager.add({
-        description: formatErrorMessage(error),
-        title: `Failed to delete ${contentType}`,
-        type: 'error',
-      });
-    }
-
-    setIsDeleting(false);
-  };
-
-  const menuItems = getContentMenuItems({
+  const {
+    deleteDialogOpen,
+    handleDelete,
+    isDeleting,
+    isDisabled,
+    menuItems,
+    setDeleteDialogOpen,
+  } = useContentActions({
     additionalActions,
-    archive: onArchiveAction
-      ? {
-          disabled: isArchiving,
-          label: archiveLabel,
-          onClick: handleArchive,
-        }
-      : undefined,
-    onDelete: onDeleteAction ? () => setDeleteDialogOpen(true) : undefined,
+    content,
+    contentType,
+    disabled,
+    listUrl,
+    onArchiveAction,
+    onDeleteAction,
     viewUrl,
   });
 

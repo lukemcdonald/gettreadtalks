@@ -1,160 +1,69 @@
 'use client';
 
-import type { CommandSearchItem, SearchHit } from '@/features/search/types';
+import type { CommandSearchItem } from '@/features/search/types';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useState, useSyncExternalStore } from 'react';
+import { useReducer } from 'react';
 
 import { useHeaderSearchAnalytics } from '@/features/search/analytics';
-import { useSearchSite } from '@/features/search/hooks/use-search-site';
 import {
-  getHeaderSearchQueryAfterClose,
-  getHeaderSearchState,
-  formatSearchHotkeyLabel,
-  isSearchHotkey,
-  OPEN_HEADER_SEARCH_EVENT,
-  SEARCH_DEBOUNCE_MS,
-  SEARCH_DROPDOWN_LIMIT,
-  toSearchHits,
-} from '@/features/search/utils';
-import { useCurrentUser } from '@/features/users/hooks/use-current-user';
-
-function formatClientSearchHotkeyLabel() {
-  if (typeof window === 'undefined') {
-    return formatServerSearchHotkeyLabel();
-  }
-
-  return formatSearchHotkeyLabel(navigator.userAgent);
-}
-
-function formatServerSearchHotkeyLabel() {
-  return '⌘K';
-}
-
-function subscribeSearchHotkey() {
-  return () => {};
-}
-
-export function useSearchHotkeyLabel() {
-  return useSyncExternalStore(
-    subscribeSearchHotkey,
-    formatClientSearchHotkeyLabel,
-    formatServerSearchHotkeyLabel
-  );
-}
+  headerSearchReducer,
+  INITIAL_HEADER_SEARCH_STATE,
+} from '@/features/search/header-search-state';
+import { useHeaderSearchHotkeys } from '@/features/search/hooks/use-header-search-hotkeys';
+import { useHeaderSearchResults } from '@/features/search/hooks/use-header-search-results';
 
 export function useHeaderSearch() {
-  const { data: user } = useCurrentUser();
   const router = useRouter();
-  const [open, setOpen] = useState(false);
-  const [value, setValue] = useState('');
-  const [debouncedQuery, setDebouncedQuery] = useState('');
-  const { isLoading, results } = useSearchSite(
-    debouncedQuery,
-    SEARCH_DROPDOWN_LIMIT
+  const [state, dispatch] = useReducer(
+    headerSearchReducer,
+    INITIAL_HEADER_SEARCH_STATE
   );
-  const hits = toSearchHits(results);
-  const hasQuery = value.trim().length > 0;
-  const isPending = isLoading || value.trim() !== debouncedQuery;
-  const [previousHits, setPreviousHits] = useState<SearchHit[] | null>(null);
-  const { groups, status } = getHeaderSearchState({
-    hits,
-    isPending,
-    isSignedIn: Boolean(user),
-    previousHits,
-    value,
-  });
+  const { open, previousHits, value } = state;
+  const search = useHeaderSearchResults(previousHits, value);
   const { trackSelection } = useHeaderSearchAnalytics({
-    debouncedQuery,
-    hitsLength: hits.length,
-    isPending,
+    debouncedQuery: search.debouncedQuery,
+    hitsLength: search.hits.length,
+    isPending: search.isPending,
     open,
   });
 
-  useEffect(() => {
-    function onOpenHeaderSearch() {
-      setOpen(true);
-    }
+  useHeaderSearchHotkeys(dispatch);
 
-    function onWindowKeyDown(event: globalThis.KeyboardEvent) {
-      if (!isSearchHotkey(event)) {
-        return;
-      }
-
-      event.preventDefault();
-      setOpen((isOpen) => !isOpen);
-    }
-
-    const controller = new AbortController();
-    const { signal } = controller;
-
-    window.addEventListener('keydown', onWindowKeyDown, { signal });
-    window.addEventListener(OPEN_HEADER_SEARCH_EVENT, onOpenHeaderSearch, {
-      signal,
-    });
-
-    return () => {
-      controller.abort();
-    };
-  }, []);
-
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setDebouncedQuery(value.trim());
-    }, SEARCH_DEBOUNCE_MS);
-
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, [value]);
-
-  function close(didNavigate = false) {
-    setOpen(false);
-    setValue((query) => getHeaderSearchQueryAfterClose(query, didNavigate));
-
-    if (didNavigate) {
-      setDebouncedQuery('');
-      setPreviousHits(null);
-    }
+  function handleOpenChange(nextOpen: boolean) {
+    dispatch(nextOpen ? { type: 'open' } : { type: 'close' });
   }
 
   function handleValueChange(nextValue: string) {
-    if (!nextValue.trim()) {
-      setPreviousHits(null);
-    } else if (hasQuery && !isPending) {
-      setPreviousHits(hits);
-    }
-
-    setValue(nextValue);
-  }
-
-  function handleOpenChange(nextOpen: boolean) {
-    if (nextOpen) {
-      setOpen(true);
-      return;
-    }
-
-    close();
+    dispatch({
+      hasQuery: search.hasQuery,
+      hits: search.hits,
+      isPending: search.isPending,
+      nextValue,
+      type: 'changeValue',
+    });
   }
 
   function handleSelect(item: CommandSearchItem) {
     trackSelection({
-      hits: isPending && previousHits !== null ? previousHits : hits,
+      hits:
+        search.isPending && previousHits !== null ? previousHits : search.hits,
       item,
       query: value,
     });
     router.push(item.href);
-    close(true);
+    search.resetDebouncedQuery();
+    dispatch({ didNavigate: true, type: 'close' });
   }
 
   return {
-    groups,
+    groups: search.groups,
     handleOpenChange,
     handleSelect,
     handleValueChange,
-    isLoading: hasQuery && isPending,
+    isLoading: search.hasQuery && search.isPending,
     open,
-    status,
+    status: search.status,
     value,
   };
 }

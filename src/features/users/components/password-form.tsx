@@ -1,6 +1,7 @@
 'use client';
 
 import type { PasswordFormData } from '@/features/users/schemas/password-form';
+import type { Control, UseFormReturn } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTransition } from 'react';
@@ -9,7 +10,39 @@ import { useForm, useWatch } from 'react-hook-form';
 import { Button, Fieldset, PasswordField } from '@/components/ui';
 import { toastManager } from '@/components/ui/primitives/toast';
 import { updateUserPassword } from '@/features/users/actions/update-password';
+import { NewPasswordFields } from '@/features/users/components/auth-form';
 import { passwordFormSchema } from '@/features/users/schemas/password-form';
+
+function usePasswordsMatch(control: Control<PasswordFormData>) {
+  const confirmPassword = useWatch({ control, name: 'confirmPassword' });
+  const newPassword = useWatch({ control, name: 'newPassword' });
+
+  return newPassword.length > 0 && newPassword === confirmPassword;
+}
+
+async function submitPasswordUpdate(
+  form: UseFormReturn<PasswordFormData>,
+  values: PasswordFormData
+) {
+  try {
+    await updateUserPassword({
+      currentPassword: values.currentPassword,
+      newPassword: values.newPassword,
+    });
+    toastManager.add({
+      description: 'Your password has been changed. You are still logged in.',
+      title: 'Password updated',
+      type: 'success',
+    });
+    form.reset();
+  } catch {
+    toastManager.add({
+      description: 'Check that your current password is correct and try again.',
+      title: 'Failed to update password',
+      type: 'error',
+    });
+  }
+}
 
 export function PasswordForm() {
   const [isPending, startTransition] = useTransition();
@@ -22,55 +55,18 @@ export function PasswordForm() {
     mode: 'onTouched',
     resolver: zodResolver(passwordFormSchema),
   });
-
-  const newPassword = useWatch({ control: form.control, name: 'newPassword' });
-  const confirmPassword = useWatch({
-    control: form.control,
-    name: 'confirmPassword',
-  });
-  const passwordsMatch =
-    newPassword.length > 0 && newPassword === confirmPassword;
-
-  function onSubmit(values: PasswordFormData) {
-    startTransition(async () => {
-      try {
-        await updateUserPassword({
-          currentPassword: values.currentPassword,
-          newPassword: values.newPassword,
-        });
-        toastManager.add({
-          description:
-            'Your password has been changed. You are still logged in.',
-          title: 'Password updated',
-          type: 'success',
-        });
-        form.reset();
-      } catch {
-        toastManager.add({
-          description:
-            'Check that your current password is correct and try again.',
-          title: 'Failed to update password',
-          type: 'error',
-        });
-      }
-    });
-  }
+  const passwordsMatch = usePasswordsMatch(form.control);
 
   return (
-    <form onSubmit={form.handleSubmit(onSubmit)}>
+    <form
+      onSubmit={form.handleSubmit((values) => {
+        startTransition(async () => {
+          await submitPasswordUpdate(form, values);
+        });
+      })}
+    >
       <Fieldset disabled={isPending}>
-        <PasswordField
-          control={form.control}
-          label="New password"
-          name="newPassword"
-          required
-        />
-        <PasswordField
-          control={form.control}
-          label="Confirm new password"
-          name="confirmPassword"
-          required
-        />
+        <NewPasswordFields control={form.control} />
         {passwordsMatch && (
           <PasswordField
             control={form.control}
