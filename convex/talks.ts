@@ -38,4 +38,3 @@ export const {
 } = mutations;
 
 export { renameTalkTranscriptFetchErrorCodes } from './model/talks/renameTranscriptFetchErrorCodes';
-export { unsetTalkDescriptions } from './model/talks/unsetDescriptions';

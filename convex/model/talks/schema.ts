@@ -16,8 +16,6 @@ export const talkFields = {
   ...timestampFields,
   collectionId: v.optional(v.id('collections')),
   collectionOrder: v.optional(v.number()),
-  // Pending removal after unsetTalkDescriptions runs on prod.
-  description: v.optional(v.string()),
   featured: v.optional(v.boolean()),
   mediaUrl: v.string(),
   publishedAt: v.optional(v.number()),
