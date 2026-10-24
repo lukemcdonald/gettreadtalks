@@ -53,6 +53,7 @@ export const talkTranscriptFields = {
 
 export const talkTranscriptFetchFields = {
   checkedAt: v.number(),
+  // Old lowercase codes stay until renameTalkTranscriptFetchErrorCodes finishes on prod.
   errorCode: v.optional(talkTranscriptFetchErrorCode),
   message: v.optional(v.string()),
   retryAfter: v.optional(v.number()),

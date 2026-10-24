@@ -66,14 +66,23 @@ export const talkTranscriptStatus = v.union(
   v.literal('failed')
 );
 
+// Old lowercase codes stay until renameTalkTranscriptFetchErrorCodes finishes on prod.
 export const talkTranscriptFetchErrorCode = v.union(
+  v.literal('LOGIN_REQUIRED'),
   v.literal('login_required'),
+  v.literal('NO_CAPTIONS'),
   v.literal('no_captions'),
+  v.literal('NOT_YOUTUBE'),
   v.literal('not_youtube'),
+  v.literal('QUOTA_EXHAUSTED'),
   v.literal('quota_exhausted'),
+  v.literal('RATE_LIMITED'),
   v.literal('rate_limited'),
+  v.literal('TOKEN_INVALID'),
   v.literal('token_invalid'),
+  v.literal('TOKEN_MISSING'),
   v.literal('token_missing'),
+  v.literal('UPSTREAM_ERROR'),
   v.literal('upstream_error')
 );
 

@@ -21,6 +21,7 @@ import {
 } from '../../lib/utils';
 import { requireAdmin } from '../auth/roles';
 import { talkTranscriptFields } from './schema';
+import { normalizeTranscriptFetchErrorCode } from './transcriptFetchErrorCode';
 import {
   statusType,
   talkStudyContentFields,
@@ -444,7 +445,9 @@ export const completeTalkTranscriptFetch = internalMutation({
 
     await ctx.db.patch(args.runId, {
       checkedAt: Date.now(),
-      errorCode: args.errorCode,
+      errorCode: args.errorCode
+        ? normalizeTranscriptFetchErrorCode(args.errorCode)
+        : args.errorCode,
       message: args.message,
       retryAfter: args.retryAfter,
       status: args.status,
