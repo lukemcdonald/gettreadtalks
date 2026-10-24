@@ -348,6 +348,21 @@ export const saveTalkStudyDraft = internalMutation({
   returns: v.id('talkStudies'),
 });
 
+export async function setTalkStudy(
+  ctx: MutationCtx,
+  studyId: Id<'talkStudies'>,
+  fields: {
+    studyStatus: 'draft' | 'published';
+    summary: string;
+  }
+) {
+  await ctx.db.patch(studyId, {
+    manuallyEditedAt: Date.now(),
+    studyStatus: fields.studyStatus,
+    summary: fields.summary,
+  });
+}
+
 export const updateTalkStudy = mutation({
   args: {
     studyStatus: talkStudyStatus,
@@ -364,8 +379,7 @@ export const updateTalkStudy = mutation({
         resourceId: talkId,
       });
 
-    await ctx.db.patch(study._id, {
-      manuallyEditedAt: Date.now(),
+    await setTalkStudy(ctx, study._id, {
       studyStatus,
       summary,
     });
