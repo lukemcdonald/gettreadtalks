@@ -1,6 +1,7 @@
 'use client';
 
-import type { Dispatch, SetStateAction } from 'react';
+import type { HeaderSearchAction } from '@/features/search/header-search-state';
+import type { Dispatch } from 'react';
 
 import { useEffect } from 'react';
 
@@ -9,12 +10,10 @@ import {
   OPEN_HEADER_SEARCH_EVENT,
 } from '@/features/search/utils';
 
-export function useHeaderSearchHotkeys(
-  setOpen: Dispatch<SetStateAction<boolean>>
-) {
+export function useHeaderSearchHotkeys(dispatch: Dispatch<HeaderSearchAction>) {
   useEffect(() => {
     function onOpenHeaderSearch() {
-      setOpen(true);
+      dispatch({ type: 'open' });
     }
 
     function onWindowKeyDown(event: globalThis.KeyboardEvent) {
@@ -23,7 +22,7 @@ export function useHeaderSearchHotkeys(
       }
 
       event.preventDefault();
-      setOpen((isOpen) => !isOpen);
+      dispatch({ type: 'toggle' });
     }
 
     const controller = new AbortController();
@@ -37,5 +36,5 @@ export function useHeaderSearchHotkeys(
     return () => {
       controller.abort();
     };
-  }, [setOpen]);
+  }, [dispatch]);
 }

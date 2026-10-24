@@ -17,5 +17,9 @@ export function useDebouncedSearchQuery(value: string) {
     };
   }, [value]);
 
-  return [debouncedQuery, setDebouncedQuery] as const;
+  function resetDebouncedQuery() {
+    setDebouncedQuery('');
+  }
+
+  return { debouncedQuery, resetDebouncedQuery };
 }
