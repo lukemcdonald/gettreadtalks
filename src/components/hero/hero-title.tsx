@@ -20,11 +20,22 @@ const heroTitleVariants = cva('font-semibold tracking-tight', {
 interface HeroTitleProps {
   children: ReactNode;
   className?: string;
+  'data-testid'?: string;
   size?: 'sm' | 'md' | 'lg';
 }
 
-export function HeroTitle({ children, className, size }: HeroTitleProps) {
+export function HeroTitle({
+  children,
+  className,
+  'data-testid': testId,
+  size,
+}: HeroTitleProps) {
   return (
-    <h1 className={cn(heroTitleVariants({ size }), className)}>{children}</h1>
+    <h1
+      className={cn(heroTitleVariants({ size }), className)}
+      data-testid={testId}
+    >
+      {children}
+    </h1>
   );
 }
