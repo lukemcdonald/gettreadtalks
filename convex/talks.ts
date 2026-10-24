@@ -36,3 +36,5 @@ export const {
   updateTalkStudy,
   upsertTalkTranscript,
 } = mutations;
+
+export { publishDraftStudies } from './model/talks/publishDraftStudies';
