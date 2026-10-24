@@ -1,18 +1,16 @@
 'use client';
 
+import type { UseFormReturn } from 'react-hook-form';
+
 import { zodResolver } from '@hookform/resolvers/zod';
-import { CircleAlertIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import { Button } from '@/components/ui';
 import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-  Button,
-  Fieldset,
-  PasswordField,
-} from '@/components/ui';
+  AuthPageForm,
+  NewPasswordFields,
+} from '@/features/users/components/auth-form';
 import { resetPassword } from '@/services/auth/client';
 import { AUTH_ERRORS } from '@/services/auth/config';
 import { toUserErrorMessage } from '@/services/errors';
@@ -33,61 +31,50 @@ interface ResetPasswordFormProps {
   token: string;
 }
 
+async function submitResetPassword(
+  form: UseFormReturn<ResetPasswordData>,
+  token: string,
+  values: ResetPasswordData
+) {
+  const { error: submitError } = await resetPassword({
+    newPassword: values.newPassword,
+    token,
+  });
+
+  if (submitError) {
+    form.setError('root', {
+      message: toUserErrorMessage(
+        submitError.message,
+        AUTH_ERRORS.RESET_TOKEN_INVALID
+      ),
+    });
+  } else {
+    window.location.assign('/login');
+  }
+}
+
 export function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   const form = useForm<ResetPasswordData>({
     defaultValues: { confirmPassword: '', newPassword: '' },
     mode: 'onTouched',
     resolver: zodResolver(resetPasswordSchema),
   });
-
   const { errors, isSubmitting } = form.formState;
 
-  async function onSubmit(values: ResetPasswordData) {
-    const { error: submitError } = await resetPassword({
-      newPassword: values.newPassword,
-      token,
-    });
-
-    if (submitError) {
-      form.setError('root', {
-        message: toUserErrorMessage(
-          submitError.message,
-          AUTH_ERRORS.RESET_TOKEN_INVALID
-        ),
-      });
-    } else {
-      window.location.assign('/login');
-    }
-  }
-
   return (
-    <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
-      {!!errors.root && (
-        <Alert variant="error">
-          <CircleAlertIcon />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{errors.root.message}</AlertDescription>
-        </Alert>
+    <AuthPageForm
+      error={errors.root}
+      footer={
+        <Button loading={isSubmitting} type="submit">
+          Reset password
+        </Button>
+      }
+      isSubmitting={isSubmitting}
+      onSubmit={form.handleSubmit((values) =>
+        submitResetPassword(form, token, values)
       )}
-
-      <Fieldset disabled={isSubmitting}>
-        <PasswordField
-          control={form.control}
-          label="New password"
-          name="newPassword"
-          required
-        />
-        <PasswordField
-          control={form.control}
-          label="Confirm new password"
-          name="confirmPassword"
-          required
-        />
-      </Fieldset>
-
-      <Button loading={isSubmitting} type="submit">
-        Reset password
-      </Button>
-    </form>
+    >
+      <NewPasswordFields control={form.control} />
+    </AuthPageForm>
   );
 }
