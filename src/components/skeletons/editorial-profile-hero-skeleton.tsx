@@ -1,26 +1,17 @@
-import type { ReactNode } from 'react';
-
 import { VideoFrameSkeleton } from '@/components/media-embed';
 import { Container, Section, Skeleton } from '@/components/ui';
 
-interface EditorialProfileHeroSkeletonProps {
-  children?: ReactNode;
-}
-
-export function EditorialProfileHeroSkeleton({
-  children,
-}: EditorialProfileHeroSkeletonProps) {
+export function EditorialProfileHeroSkeleton() {
   return (
-    <Section className="relative overflow-hidden" spacing="3xl">
+    <Section className="bg-background relative overflow-hidden py-6 sm:py-8 md:py-12 lg:py-16">
       <Container className="relative space-y-8">
-        <div className="space-y-4 text-center">
-          <Skeleton className="mx-auto h-10 w-2/3 sm:h-12 lg:h-14" />
-          <Skeleton className="mx-auto h-5 w-40" />
+        <div className="space-y-2 text-center">
+          <Skeleton className="mx-auto h-8 w-2/3 sm:h-9 lg:h-10" />
+          <Skeleton className="mx-auto h-6 w-40" />
         </div>
-
-        <VideoFrameSkeleton />
-
-        {children}
+        <div className="mx-auto w-full max-w-4xl">
+          <VideoFrameSkeleton />
+        </div>
       </Container>
     </Section>
   );

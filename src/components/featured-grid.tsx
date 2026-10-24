@@ -51,9 +51,9 @@ export function FeaturedGrid({
               {title}
             </h2>
             {!!description && (
-              <p className="text-sm leading-relaxed sm:text-base">
+              <div className="text-sm leading-relaxed sm:text-base">
                 {description}
-              </p>
+              </div>
             )}
           </header>
 
