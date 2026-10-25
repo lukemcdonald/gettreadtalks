@@ -11,7 +11,6 @@ import {
   DialogClose,
   DialogFooter,
   DialogHeader,
-  DialogPanel,
   DialogPopup,
   DialogTitle,
   DialogTrigger,
@@ -41,18 +40,16 @@ function TalkTranscriptDialogBody({
       <DialogHeader>
         <DialogTitle>Transcript</DialogTitle>
       </DialogHeader>
-      <DialogPanel className="min-h-0 flex-1">
-        <Textarea
-          aria-label="Transcript"
-          className="min-h-48"
-          data-testid="talk-transcript"
-          disabled={!isReady || isLoading}
-          onChange={(event) => {
-            onDraftChange(event.target.value);
-          }}
-          value={text}
-        />
-      </DialogPanel>
+      <Textarea
+        aria-label="Transcript"
+        className="mx-6 mb-2 grid min-h-0 flex-1 grid-rows-1"
+        data-testid="talk-transcript"
+        disabled={!isReady || isLoading}
+        onChange={(event) => {
+          onDraftChange(event.target.value);
+        }}
+        value={text}
+      />
       {error ? (
         <p className="text-destructive px-6 text-sm">
           {formatErrorMessage(error)}

@@ -1,4 +1,4 @@
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 
 import { mkdir } from 'node:fs/promises';
 import path from 'node:path';
@@ -9,7 +9,21 @@ import {
   hasE2eUser,
 } from './fixtures/user-credentials.ts';
 
+const LONG_PARAGRAPH =
+  'We know that for those who love God all things work together for good, for those who are called according to his purpose.';
 const SHOT_DIR = 'test-results/301';
+
+function buildTranscriptText(marker: string) {
+  return [marker, ...Array.from({ length: 20 }, () => LONG_PARAGRAPH)].join(
+    '\n\n'
+  );
+}
+
+async function getTranscriptHeight(transcript: Locator) {
+  const box = await transcript.boundingBox();
+
+  return box?.height ?? 0;
+}
 
 async function saveShot(page: Page, name: string) {
   await mkdir(SHOT_DIR, { recursive: true });
@@ -33,7 +47,7 @@ test('Admin can view and edit a talk transcript', async ({ talksPage }) => {
 
   const viewTranscript = talksPage.page.getByTestId('view-transcript');
   const transcript = talksPage.page.getByTestId('talk-transcript');
-  const nextText = `E2E transcript ${Date.now()}`;
+  const nextText = buildTranscriptText(`E2E transcript ${Date.now()}`);
 
   await expect(viewTranscript).toBeVisible();
   await saveShot(talksPage.page, 'study-sheet-desktop');
@@ -41,14 +55,18 @@ test('Admin can view and edit a talk transcript', async ({ talksPage }) => {
   await viewTranscript.click();
   await expect(transcript).toBeVisible();
   await expect(transcript).not.toHaveValue('');
+  await transcript.fill(nextText);
+  await expect(transcript).toHaveValue(nextText);
+  await expect(talksPage.page.getByTestId('save-transcript')).toBeInViewport();
+  await expect.poll(() => getTranscriptHeight(transcript)).toBeGreaterThan(400);
   await saveShot(talksPage.page, 'dialog-desktop');
 
-  await transcript.fill(nextText);
   await talksPage.page.getByTestId('save-transcript').click();
   await expect(transcript).toBeHidden();
 
   await viewTranscript.click();
   await expect(transcript).toHaveValue(nextText);
+  await expect(talksPage.page.getByTestId('save-transcript')).toBeInViewport();
   await saveShot(talksPage.page, 'dialog-saved-desktop');
   await talksPage.page.keyboard.press('Escape');
   await expect(transcript).toBeHidden();
@@ -58,5 +76,7 @@ test('Admin can view and edit a talk transcript', async ({ talksPage }) => {
 
   await viewTranscript.click();
   await expect(transcript).toHaveValue(nextText);
+  await expect(talksPage.page.getByTestId('save-transcript')).toBeInViewport();
+  await expect.poll(() => getTranscriptHeight(transcript)).toBeGreaterThan(250);
   await saveShot(talksPage.page, 'dialog-saved-mobile');
 });
