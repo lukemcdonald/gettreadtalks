@@ -12,15 +12,19 @@ import { useMediaQuery } from '@/hooks/use-media-query';
 
 interface FormSheetShellProps {
   children: ReactNode;
+  header?: ReactNode;
   onOpenChange: (open: boolean) => void;
   open: boolean;
+  testId?: string;
   title: ReactNode;
 }
 
 export function FormSheetShell({
   children,
+  header,
   onOpenChange,
   open,
+  testId,
   title,
 }: FormSheetShellProps) {
   const isDesktop = useMediaQuery('lg');
@@ -33,12 +37,14 @@ export function FormSheetShell({
     >
       <DrawerPopup
         className="has-data-[slot=drawer-bar]:ps-0 has-data-[slot=drawer-bar]:pt-0"
+        data-testid={testId}
         showBar
         showCloseButton
         variant="default"
       >
         <DrawerHeader>
           <DrawerTitle>{title}</DrawerTitle>
+          {header}
         </DrawerHeader>
         {children}
       </DrawerPopup>

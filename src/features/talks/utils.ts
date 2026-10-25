@@ -20,6 +20,27 @@ export function buildTalkStudyPath(talkId: TalkId) {
   return `/talks/edit/${talkId}/study`;
 }
 
+export type EditTalkTab = 'content' | 'study';
+
+export function buildTalkEditPath(
+  talkId: TalkId,
+  tab: EditTalkTab = 'content'
+) {
+  if (tab === 'study') {
+    return buildTalkStudyPath(talkId);
+  }
+
+  return `/talks/edit/${talkId}`;
+}
+
+export function getEditTalkTab(pathname: string): EditTalkTab {
+  if (pathname.endsWith('/study')) {
+    return 'study';
+  }
+
+  return 'content';
+}
+
 function formatTranscriptRetryAfter(retryAfter: number) {
   return new Intl.DateTimeFormat(undefined, {
     day: 'numeric',

@@ -5,14 +5,8 @@ import { redirect } from 'next/navigation';
 
 import { loadFormOptions } from '@/app/@sheet/_queries/load-form-options';
 import { EditTalkSheet } from '@/features/talks/components/edit-talk-sheet';
-import { EditTalkStudySheet } from '@/features/talks/components/edit-talk-study-sheet';
-import {
-  loadTalk,
-  loadTalkStudy,
-  loadTalkTranscript,
-} from '@/features/talks/queries/load-talk';
+import { loadTalk, loadTalkStudy } from '@/features/talks/queries/load-talk';
 import { loadTalkTopics } from '@/features/talks/queries/load-talk-topics';
-import { buildTalkStudyPath } from '@/features/talks/utils';
 import {
   ADMIN_LIST_PATHS,
   buildEntityEditPath,
@@ -68,35 +62,6 @@ export async function EditTalkSheetPage({
         topicIds: talkTopics.map((topic) => topic._id),
       }}
       topics={topics}
-    />
-  );
-}
-
-export async function EditTalkStudySheetPage({
-  closeHref,
-  params,
-}: {
-  closeHref?: string;
-  params: Promise<{ talkId: TalkId }>;
-}) {
-  const { talkId } = await params;
-  await requireAdminUser(getLoginRedirect(buildTalkStudyPath(talkId)) as Route);
-  const [talk, study, transcript] = await Promise.all([
-    loadTalk(talkId),
-    loadTalkStudy(talkId),
-    loadTalkTranscript(talkId),
-  ]);
-
-  if (!talk) {
-    redirect(ADMIN_LIST_PATHS.talks);
-  }
-
-  return (
-    <EditTalkStudySheet
-      closeHref={closeHref}
-      study={study}
-      talkId={talkId}
-      transcript={transcript}
     />
   );
 }
