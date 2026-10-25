@@ -69,6 +69,12 @@ async function seedCatalog(t: ReturnType<typeof createConvexTest>) {
       talkId,
       topicId,
     });
+    await ctx.db.insert('talkTranscripts', {
+      source: 'manual',
+      status: 'done',
+      talkId,
+      text: 'A transcript',
+    });
     const collectionId = await ctx.db.insert('collections', {
       slug: 'unused-collection',
       title: 'Unused Collection',
@@ -262,6 +268,7 @@ const gatedFunctions: {
   {
     call: (client, seed) =>
       client.mutation(api.talks.createTalkTranscriptFetch, {
+        confirmRefetch: true,
         talkId: seed.talkId,
       }),
     name: 'talks.createTalkTranscriptFetch',
@@ -295,6 +302,11 @@ const gatedFunctions: {
     call: (client, seed) =>
       client.query(api.talks.getTalkTranscriptFetch, { talkId: seed.talkId }),
     name: 'talks.getTalkTranscriptFetch',
+  },
+  {
+    call: (client, seed) =>
+      client.query(api.talks.getTalkTranscriptText, { talkId: seed.talkId }),
+    name: 'talks.getTalkTranscriptText',
   },
   {
     call: (client) =>
@@ -337,6 +349,14 @@ const gatedFunctions: {
         talkId: seed.talkId,
       }),
     name: 'talks.updateTalkStudy',
+  },
+  {
+    call: (client, seed) =>
+      client.mutation(api.talks.updateTalkTranscript, {
+        talkId: seed.talkId,
+        text: 'Updated transcript',
+      }),
+    name: 'talks.updateTalkTranscript',
   },
   {
     call: (client, seed) =>

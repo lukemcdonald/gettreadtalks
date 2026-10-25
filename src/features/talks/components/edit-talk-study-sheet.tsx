@@ -1,7 +1,11 @@
 'use client';
 
 import type { TalkStudyFormData } from '@/features/talks/schemas/talk-study-form';
-import type { TalkId, TalkStudy, TalkTranscript } from '@/features/talks/types';
+import type {
+  TalkId,
+  TalkStudy,
+  TalkTranscriptMeta,
+} from '@/features/talks/types';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery } from 'convex/react';
@@ -13,6 +17,7 @@ import { FormSheet, SelectField, TextareaField } from '@/components/ui';
 import { api } from '@/convex/_generated/api';
 import { updateTalkStudyAction } from '@/features/talks/actions/update-talk-study';
 import { TalkSummaryGenerate } from '@/features/talks/components/talk-summary-generate';
+import { TalkTranscriptDialog } from '@/features/talks/components/talk-transcript-dialog';
 import { TalkTranscriptFetch } from '@/features/talks/components/talk-transcript-fetch';
 import { talkStudyFormSchema } from '@/features/talks/schemas/talk-study-form';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
@@ -32,7 +37,7 @@ export function EditTalkStudySheet({
   closeHref?: string;
   study: TalkStudy | null;
   talkId: TalkId;
-  transcript: TalkTranscript | null;
+  transcript: TalkTranscriptMeta | null;
 }) {
   const { handleOpenChange, handleSuccess } = useSheetRoute(closeHref);
   const liveStudy = useQuery(api.talks.getTalkStudy, { talkId });
@@ -109,14 +114,16 @@ export function EditTalkStudySheet({
           <span className="text-sm">None</span>
         )}
         <TalkSummaryGenerate
-          hasTranscript={Boolean(transcript?.text)}
+          hasTranscript={Boolean(transcript)}
           onFlagsChange={setSummaryFlags}
           talkId={talkId}
         />
         <TalkTranscriptFetch
-          hasTranscript={Boolean(transcript?.text)}
+          hasTranscript={Boolean(transcript)}
           talkId={talkId}
-        />
+        >
+          {transcript ? <TalkTranscriptDialog talkId={talkId} /> : null}
+        </TalkTranscriptFetch>
       </div>
     </FormSheet>
   );
