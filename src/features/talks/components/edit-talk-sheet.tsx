@@ -7,10 +7,9 @@ import type { TalkStudy, TalkWithTopicIds } from '@/features/talks/types';
 import type { EditTalkTab } from '@/features/talks/utils';
 import type { TopicListItem } from '@/features/topics/types';
 import type { StatusPrefill } from '@/lib/entities/status-prefill';
-import type { Route } from 'next';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 
@@ -114,28 +113,26 @@ function useEditTalkSheet({
 
 function useEditTalkTab(talkId: TalkWithTopicIds['_id']) {
   const pathname = usePathname();
-  const router = useRouter();
   const searchParams = useSearchParams();
-  const tab = getEditTalkTab(pathname);
+  const [tab, setTab] = useState(() => getEditTalkTab(pathname));
 
   function handleTabChange(next: EditTalkTab) {
     if (next === tab) {
       return;
     }
 
-    if (next === 'study') {
-      router.replace(buildTalkEditPath(talkId, 'study') as Route);
-      return;
-    }
-
     const status = searchParams.get('status');
-    router.replace(
-      buildEntityEditPath(
-        'talks',
-        talkId,
-        status === 'archived' ? { status: 'archived' } : undefined
-      ) as Route
-    );
+    const href =
+      next === 'study'
+        ? buildTalkEditPath(talkId, 'study')
+        : buildEntityEditPath(
+            'talks',
+            talkId,
+            status === 'archived' ? { status: 'archived' } : undefined
+          );
+
+    setTab(next);
+    window.history.replaceState(window.history.state, '', href);
   }
 
   return { handleTabChange, tab };

@@ -19,8 +19,10 @@ export class TalksPage {
   constructor(page: Page) {
     this.page = page;
     this.adminEdit = page.getByTestId('admin-edit');
-    this.contentTab = page.getByTestId('edit-talk-tab-content');
-    this.editDrawer = page.getByTestId('edit-talk-drawer');
+    this.editDrawer = page.getByTestId('edit-talk-drawer').filter({
+      visible: true,
+    });
+    this.contentTab = this.editDrawer.getByTestId('edit-talk-tab-content');
     this.editSheet = page.getByRole('heading', { name: 'Edit Talk' });
     this.favorite = page.getByTestId('favorite-talk');
     this.talkCards = page.getByRole('link').and(page.getByTestId('talk-card'));
@@ -35,8 +37,8 @@ export class TalksPage {
       .or(page.getByRole('link', { name: 'Open Media' }))
       .or(page.locator('audio[controls], video[controls]'));
     this.search = page.getByRole('searchbox', { name: 'Search' });
-    this.studyPanel = page.getByTestId('edit-talk-study-panel');
-    this.studyTab = page.getByTestId('edit-talk-tab-study');
+    this.studyPanel = this.editDrawer.getByTestId('edit-talk-study-panel');
+    this.studyTab = this.editDrawer.getByTestId('edit-talk-tab-study');
     this.talkHeading = page.getByRole('heading', { level: 1 });
   }
 

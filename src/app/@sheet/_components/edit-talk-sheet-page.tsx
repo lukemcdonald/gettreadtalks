@@ -54,6 +54,7 @@ export async function EditTalkSheetPage({
     <EditTalkSheet
       closeHref={closeHref}
       collections={collections}
+      key={talk._id}
       speakers={speakers}
       statusPrefill={statusPrefill}
       studyStatus={study?.studyStatus}
