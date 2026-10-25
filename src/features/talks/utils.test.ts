@@ -1,10 +1,14 @@
+import type { TalkId } from '@/features/talks/types';
+
 import { describe, expect, it } from '@/test';
 
 import {
+  buildTalkEditPath,
   buildTalkListItemsJsonLd,
   buildTalkPath,
   buildTalksPath,
   formatTalkMetaDescription,
+  getEditTalkTab,
   isTranscriptFetchCoolingDown,
 } from './utils';
 
@@ -20,6 +24,27 @@ describe('buildTalkPath', () => {
 
   it('falls back to the talk slug when speaker is missing', () => {
     expect(buildTalkPath({ slug: 'orphan' })).toBe('/talks/orphan');
+  });
+});
+
+describe('buildTalkEditPath', () => {
+  const talkId = 'talks:the-cross' as TalkId;
+
+  it('builds the content and study edit urls', () => {
+    expect(buildTalkEditPath(talkId)).toBe('/talks/edit/talks:the-cross');
+    expect(buildTalkEditPath(talkId, 'content')).toBe(
+      '/talks/edit/talks:the-cross'
+    );
+    expect(buildTalkEditPath(talkId, 'study')).toBe(
+      '/talks/edit/talks:the-cross/study'
+    );
+  });
+});
+
+describe('getEditTalkTab', () => {
+  it('reads the study tab from the edit url', () => {
+    expect(getEditTalkTab('/talks/edit/talks:the-cross')).toBe('content');
+    expect(getEditTalkTab('/talks/edit/talks:the-cross/study')).toBe('study');
   });
 });
 

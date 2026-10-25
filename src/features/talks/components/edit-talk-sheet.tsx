@@ -4,23 +4,34 @@ import type { CollectionListItem } from '@/features/collections/types';
 import type { SpeakerListItem } from '@/features/speakers/types';
 import type { TalkFormData } from '@/features/talks/schemas/talk-form';
 import type { TalkStudy, TalkWithTopicIds } from '@/features/talks/types';
+import type { EditTalkTab } from '@/features/talks/utils';
 import type { TopicListItem } from '@/features/topics/types';
 import type { StatusPrefill } from '@/lib/entities/status-prefill';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 
 import { useSheetRoute } from '@/app/@sheet/_hooks/use-sheet-route';
-import { FormSheet } from '@/components/ui';
+import {
+  Button,
+  FormError,
+  FormSheetBody,
+  FormSheetShell,
+} from '@/components/ui';
 import { updateTalkAction } from '@/features/talks/actions/update-talk';
-import { EditTalkFields } from '@/features/talks/components/edit-talk-fields';
 import {
   getTalkFormValues,
   getUrlChangeForTalk,
 } from '@/features/talks/components/edit-talk-sheet-utils';
+import { EditTalkStudyPanel } from '@/features/talks/components/edit-talk-study-panel';
+import { EditTalkTabs } from '@/features/talks/components/edit-talk-tabs';
+import { TalkFormFields } from '@/features/talks/components/talk-form-fields';
 import { UrlChangeDialog } from '@/features/talks/components/url-change-dialog';
 import { talkFormSchema } from '@/features/talks/schemas/talk-form';
+import { buildTalkEditPath, getEditTalkTab } from '@/features/talks/utils';
+import { buildEntityEditPath } from '@/lib/entities/paths';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
 
 interface EditTalkSheetProps {
@@ -83,6 +94,7 @@ function useEditTalkSheet({
     confirmPendingUpdate,
     form,
     handleOpenChange,
+    handleSuccess,
     handleSubmit: form.handleSubmit((data) => {
       const urlChange = getUrlChangeForTalk(talk, data);
 
@@ -99,6 +111,33 @@ function useEditTalkSheet({
   };
 }
 
+function useEditTalkTab(talkId: TalkWithTopicIds['_id']) {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [tab, setTab] = useState(() => getEditTalkTab(pathname));
+
+  function handleTabChange(next: EditTalkTab) {
+    if (next === tab) {
+      return;
+    }
+
+    const status = searchParams.get('status');
+    const href =
+      next === 'study'
+        ? buildTalkEditPath(talkId, 'study')
+        : buildEntityEditPath(
+            'talks',
+            talkId,
+            status === 'archived' ? { status: 'archived' } : undefined
+          );
+
+    setTab(next);
+    window.history.replaceState(window.history.state, '', href);
+  }
+
+  return { handleTabChange, tab };
+}
+
 export function EditTalkSheet({
   closeHref,
   collections,
@@ -112,32 +151,74 @@ export function EditTalkSheet({
     confirmPendingUpdate,
     form,
     handleOpenChange,
+    handleSuccess,
     handleSubmit,
     isPending,
     pendingUpdate,
     setPendingUpdate,
   } = useEditTalkSheet({ closeHref, statusPrefill, talk });
+  const { handleTabChange, tab } = useEditTalkTab(talk._id);
 
   return (
     <>
-      <FormSheet
-        error={form.formState.errors.root}
-        isPending={isPending}
+      <FormSheetShell
+        header={
+          <EditTalkTabs
+            onValueChange={handleTabChange}
+            studyStatus={studyStatus}
+            value={tab}
+          />
+        }
         onOpenChange={handleOpenChange}
-        onSubmit={handleSubmit}
         open
-        submitLabel="Save Changes"
+        testId="edit-talk-drawer"
         title="Edit Talk"
       >
-        <EditTalkFields
-          collections={collections}
-          form={form}
-          speakers={speakers}
-          studyStatus={studyStatus}
-          talkId={talk._id}
-          topics={topics}
-        />
-      </FormSheet>
+        {tab === 'content' ? (
+          <form className="contents" onSubmit={handleSubmit}>
+            <FormSheetBody
+              footer={
+                <>
+                  <Button
+                    disabled={isPending}
+                    onClick={() => {
+                      handleOpenChange(false);
+                    }}
+                    type="button"
+                    variant="outline"
+                  >
+                    Cancel
+                  </Button>
+                  <Button loading={isPending} type="submit">
+                    Save Changes
+                  </Button>
+                </>
+              }
+            >
+              <FormError error={form.formState.errors.root} />
+              <TalkFormFields
+                collections={collections}
+                control={form.control}
+                mode="edit"
+                setValue={form.setValue}
+                speakers={speakers}
+                topics={topics}
+              />
+            </FormSheetBody>
+          </form>
+        ) : (
+          <EditTalkStudyPanel
+            onClose={() => {
+              handleOpenChange(false);
+            }}
+            onSaved={() => {
+              handleSuccess();
+              handleOpenChange(false);
+            }}
+            talkId={talk._id}
+          />
+        )}
+      </FormSheetShell>
       <UrlChangeDialog
         newUrl={pendingUpdate?.urlChange.newUrl ?? ''}
         oldUrl={pendingUpdate?.urlChange.oldUrl ?? ''}

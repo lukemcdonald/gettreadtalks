@@ -43,7 +43,7 @@ test('Admin can view and edit a talk transcript', async ({ talksPage }) => {
   await talksPage.openAdminEdit();
   await expect(talksPage.editSheet).toBeVisible();
 
-  await talksPage.page.getByTestId('edit-talk-study').click();
+  await talksPage.openStudyTab();
 
   const viewTranscript = talksPage.page.getByTestId('view-transcript');
   const transcript = talksPage.page.getByTestId('talk-transcript');
