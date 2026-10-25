@@ -4,6 +4,7 @@ import type {
   TalkId,
   TalkTranscriptFetch as TranscriptFetch,
 } from '@/features/talks/types';
+import type { ReactNode } from 'react';
 
 import { useQuery } from 'convex/react';
 import { useEffect, useState } from 'react';
@@ -56,8 +57,8 @@ function RefetchTranscriptDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>Fetch this transcript again?</AlertDialogTitle>
           <AlertDialogDescription>
-            This replaces the saved transcript. Published or hand-edited studies
-            are left as they are.
+            This replaces the saved transcript, including any edits. Published
+            or hand-edited studies are left as they are.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -75,9 +76,11 @@ function RefetchTranscriptDialog({
 
 // fallow-ignore-next-line complexity
 export function TalkTranscriptFetch({
+  children,
   hasTranscript,
   talkId,
 }: {
+  children?: ReactNode;
   hasTranscript: boolean;
   talkId: TalkId;
 }) {
@@ -118,9 +121,17 @@ export function TalkTranscriptFetch({
 
   return (
     <div className="space-y-2">
-      <Button disabled={disabled} onClick={handleClick} size="sm" type="button">
-        {saved ? 'Re-fetch' : 'Get transcript'}
-      </Button>
+      <div className="flex flex-wrap gap-2">
+        <Button
+          disabled={disabled}
+          onClick={handleClick}
+          size="sm"
+          type="button"
+        >
+          {saved ? 'Re-fetch' : 'Get transcript'}
+        </Button>
+        {children}
+      </div>
       {statusText ? (
         <p aria-live="polite" className="text-muted-foreground text-sm">
           {statusText}

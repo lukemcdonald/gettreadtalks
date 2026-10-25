@@ -375,6 +375,36 @@ export const updateTalkStudy = mutation({
   returns: v.id('talkStudies'),
 });
 
+export const updateTalkTranscript = mutation({
+  args: {
+    talkId: v.id('talks'),
+    text: v.string(),
+  },
+  handler: async (ctx, { talkId, text }) => {
+    await requireAdmin(ctx);
+
+    const trimmed = text.trim();
+
+    if (!trimmed) {
+      throwValidationError('Transcript cannot be empty', 'text');
+    }
+
+    const transcript =
+      (await getOneFrom(ctx.db, 'talkTranscripts', 'by_talkId', talkId)) ??
+      throwNotFound('Transcript not found', {
+        resource: 'talkTranscript',
+        resourceId: talkId,
+      });
+
+    await ctx.db.patch(transcript._id, {
+      text: trimmed,
+    });
+
+    return transcript._id;
+  },
+  returns: v.id('talkTranscripts'),
+});
+
 export const createTalkTranscriptFetch = mutation({
   args: {
     confirmRefetch: v.optional(v.boolean()),

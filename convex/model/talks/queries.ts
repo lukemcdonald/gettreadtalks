@@ -1,4 +1,5 @@
-import type { Doc } from '../../_generated/dataModel';
+import type { Doc, Id } from '../../_generated/dataModel';
+import type { QueryCtx } from '../../_generated/server';
 import type { ContentSortOption } from '../../lib/sort';
 
 import {
@@ -657,14 +658,53 @@ export const getTalkStudy = query({
   returns: doc('talkStudies').nullable(),
 });
 
+async function loadTalkTranscript(ctx: QueryCtx, talkId: Id<'talks'>) {
+  await requireAdmin(ctx);
+
+  return await getOneFrom(ctx.db, 'talkTranscripts', 'by_talkId', talkId);
+}
+
+/**
+ * Transcript metadata for one talk. Omits transcript text.
+ */
 export const getTalkTranscript = query({
   args: { talkId: v.id('talks') },
   handler: async (ctx, { talkId }) => {
-    await requireAdmin(ctx);
+    const transcript = await loadTalkTranscript(ctx, talkId);
 
-    return await getOneFrom(ctx.db, 'talkTranscripts', 'by_talkId', talkId);
+    if (!transcript) {
+      return null;
+    }
+
+    const { text: _text, ...item } = transcript;
+
+    return item;
   },
-  returns: doc('talkTranscripts').nullable(),
+  returns: v.union(v.null(), talkTranscriptListItem),
+});
+
+/**
+ * Transcript text for one talk. Load only when an admin opens the editor.
+ */
+export const getTalkTranscriptText = query({
+  args: { talkId: v.id('talks') },
+  handler: async (ctx, { talkId }) => {
+    const transcript = await loadTalkTranscript(ctx, talkId);
+
+    if (!transcript) {
+      return null;
+    }
+
+    return {
+      text: transcript.text ?? '',
+    };
+  },
+  returns: v.union(
+    v.null(),
+    v.object({
+      text: v.string(),
+    })
+  ),
 });
 
 export const getTalkTranscriptFetch = query({

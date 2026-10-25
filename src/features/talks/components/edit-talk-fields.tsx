@@ -41,6 +41,7 @@ export function EditTalkFields({
       />
       <Link
         className="flex items-center justify-between gap-3 text-sm"
+        data-testid="edit-talk-study"
         href={buildTalkStudyPath(talkId)}
       >
         <span className="font-medium">Study</span>

@@ -13,6 +13,7 @@ export const {
   getTalkStudy,
   getTalkTranscript,
   getTalkTranscriptFetch,
+  getTalkTranscriptText,
   getTalksCount,
   listAllTalks,
   listDraftTalkStudies,
@@ -38,5 +39,6 @@ export const {
   saveTalkStudyDraft,
   updateTalk,
   updateTalkStudy,
+  updateTalkTranscript,
   upsertTalkTranscript,
 } = mutations;

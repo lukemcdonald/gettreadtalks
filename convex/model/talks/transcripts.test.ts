@@ -3,6 +3,7 @@ import type { Id } from '../../_generated/dataModel';
 import { describe, expect, it } from 'vitest';
 
 import { api, internal } from '../../_generated/api';
+import { ErrorCodes } from '../../lib/errors';
 import {
   createConvexTest,
   seedVisibilityCatalog,
@@ -83,6 +84,17 @@ describe('talk transcript and study draft storage', () => {
     ]);
     expect(transcripts[0]).not.toHaveProperty('text');
     expect(JSON.stringify(transcripts)).not.toContain(transcriptSecret);
+
+    const metadata = await asAdmin.query(api.talks.getTalkTranscript, {
+      talkId: talk._id,
+    });
+    const loaded = await asAdmin.query(api.talks.getTalkTranscriptText, {
+      talkId: talk._id,
+    });
+
+    expect(metadata).not.toHaveProperty('text');
+    expect(JSON.stringify(metadata)).not.toContain(transcriptSecret);
+    expect(loaded).toEqual({ text: transcriptSecret });
     expect(missing.map((item) => item.slug)).not.toContain(
       visibilitySlugs.publishedTalk
     );
@@ -160,6 +172,39 @@ describe('talk transcript and study draft storage', () => {
         process.env.ENRICHMENT_API_TOKEN = previous;
       }
     }
+  });
+
+  it('updates a transcript after trim and rejects an empty one', async () => {
+    const { asAdmin, t, talk } = await seedPublishedTalk();
+
+    await t.mutation(internal.talks.upsertTalkTranscript, {
+      source: 'manual',
+      status: 'done',
+      talkId: talk._id,
+      text: transcriptSecret,
+    });
+
+    await asAdmin.mutation(api.talks.updateTalkTranscript, {
+      talkId: talk._id,
+      text: '  Edited transcript text.  ',
+    });
+
+    const loaded = await asAdmin.query(api.talks.getTalkTranscriptText, {
+      talkId: talk._id,
+    });
+
+    expect(loaded).toEqual({ text: 'Edited transcript text.' });
+
+    await expect(
+      asAdmin.mutation(api.talks.updateTalkTranscript, {
+        talkId: talk._id,
+        text: '   ',
+      })
+    ).rejects.toMatchObject({
+      data: {
+        errorCode: ErrorCodes.VALIDATION_FAILED,
+      },
+    });
   });
 
   it('returns 401 when the enrichment token is missing or wrong', async () => {
