@@ -25,6 +25,12 @@ async function getTranscriptHeight(transcript: Locator) {
   return box?.height ?? 0;
 }
 
+async function getTranscriptRight(transcript: Locator) {
+  const box = await transcript.boundingBox();
+
+  return box ? box.x + box.width : Number.POSITIVE_INFINITY;
+}
+
 async function saveShot(page: Page, name: string) {
   await mkdir(SHOT_DIR, { recursive: true });
   await page.screenshot({
@@ -76,7 +82,13 @@ test('Admin can view and edit a talk transcript', async ({ talksPage }) => {
 
   await viewTranscript.click();
   await expect(transcript).toHaveValue(nextText);
+  await expect(
+    talksPage.page.getByTestId('cancel-transcript')
+  ).toBeInViewport();
   await expect(talksPage.page.getByTestId('save-transcript')).toBeInViewport();
   await expect.poll(() => getTranscriptHeight(transcript)).toBeGreaterThan(250);
+  await expect
+    .poll(() => getTranscriptRight(transcript))
+    .toBeLessThanOrEqual(390);
   await saveShot(talksPage.page, 'dialog-saved-mobile');
 });

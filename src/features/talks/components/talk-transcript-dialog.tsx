@@ -36,27 +36,32 @@ function TalkTranscriptDialogBody({
   text: string;
 }) {
   return (
-    <DialogPopup className="h-dvh max-w-7xl">
+    <DialogPopup className="h-dvh max-w-7xl max-sm:row-span-2 max-sm:row-start-1 max-sm:h-full">
       <DialogHeader>
         <DialogTitle>Transcript</DialogTitle>
       </DialogHeader>
-      <Textarea
-        aria-label="Transcript"
-        className="mx-6 mb-2 grid min-h-0 flex-1 grid-rows-1"
-        data-testid="talk-transcript"
-        disabled={!isReady || isLoading}
-        onChange={(event) => {
-          onDraftChange(event.target.value);
-        }}
-        value={text}
-      />
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col px-6 pb-2">
+        <Textarea
+          aria-label="Transcript"
+          className="grid min-h-0 min-w-0 flex-1 grid-cols-1 grid-rows-1 [&_[data-slot=textarea]]:min-w-0"
+          data-testid="talk-transcript"
+          disabled={!isReady || isLoading}
+          onChange={(event) => {
+            onDraftChange(event.target.value);
+          }}
+          value={text}
+        />
+      </div>
       {error ? (
         <p className="text-destructive px-6 text-sm">
           {formatErrorMessage(error)}
         </p>
       ) : null}
       <DialogFooter>
-        <DialogClose disabled={isLoading} render={<Button variant="outline" />}>
+        <DialogClose
+          disabled={isLoading}
+          render={<Button data-testid="cancel-transcript" variant="outline" />}
+        >
           Cancel
         </DialogClose>
         <Button
