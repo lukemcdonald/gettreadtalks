@@ -56,7 +56,6 @@ export async function getUserFavoriteSpeakers(
         _id: speaker._id,
         favoriteId: row._id,
         firstName: speaker.firstName,
-        imageUrl: speaker.imageUrl,
         lastName: speaker.lastName,
         slug: speaker.slug,
       };

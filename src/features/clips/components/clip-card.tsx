@@ -9,7 +9,7 @@ import { getSpeakerName } from '@/features/speakers/utils';
 interface ClipCardProps {
   clip: Pick<Clip, 'description' | 'slug' | 'title'>;
   headingLevel?: 2 | 3;
-  speaker?: Pick<Speaker, 'firstName' | 'lastName' | 'imageUrl' | 'slug'>;
+  speaker?: Pick<Speaker, 'firstName' | 'lastName' | 'slug'>;
 }
 
 export function ClipCard({ clip, headingLevel, speaker }: ClipCardProps) {

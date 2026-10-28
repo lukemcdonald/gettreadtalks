@@ -47,7 +47,6 @@ export function CollectionsContent({
           key={item.collection._id}
           speakers={item.speakers.map((speaker) => ({
             firstName: speaker.firstName,
-            imageUrl: speaker.imageUrl,
             lastName: speaker.lastName,
             slug: speaker.slug,
           }))}

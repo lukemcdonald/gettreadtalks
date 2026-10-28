@@ -25,7 +25,7 @@ export function buildSpeakerJsonLd({
     '@id': url,
     '@type': 'Person',
     description,
-    image: imageUrl,
+    ...(imageUrl && { image: buildAbsoluteUrl(imageUrl) }),
     ...(role && { jobTitle: role }),
     name,
     ...(websiteUrl && { sameAs: [websiteUrl] }),

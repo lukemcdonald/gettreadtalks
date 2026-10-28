@@ -5,9 +5,7 @@ const SPEAKER_AVATAR_DIRECTORY = '/images/speakers';
 /**
  * Avatars are files at `public/images/speakers/{slug}.jpg` (also jpeg, png, or
  * webp). Drop a file named after the speaker's Convex slug — the same value as
- * the `/speakers/{slug}` URL. Accents are folded to ASCII and punctuation is
- * stripped, matching slug creation. Convex `imageUrl` is only used when no
- * matching file exists.
+ * the `/speakers/{slug}` URL.
  */
 const SPEAKER_AVATAR_MODULES = import.meta.glob([
   '/public/images/speakers/*.jpeg',
@@ -18,7 +16,6 @@ const SPEAKER_AVATAR_MODULES = import.meta.glob([
 
 interface SpeakerAvatarFields {
   firstName?: string;
-  imageUrl?: string;
   lastName?: string;
   slug?: string;
 }
@@ -39,8 +36,8 @@ function getSpeakerAvatarSlug({
   return toSpeakerAvatarSlug(`${firstName ?? ''} ${lastName ?? ''}`.trim());
 }
 
-function getSpeakerAvatarFilenames() {
-  const filenames: string[] = [];
+function buildSpeakerAvatarPaths() {
+  const paths: Record<string, string> = {};
 
   for (const filePath of Object.keys(SPEAKER_AVATAR_MODULES)) {
     const filename = filePath.split('/').at(-1);
@@ -49,16 +46,6 @@ function getSpeakerAvatarFilenames() {
       continue;
     }
 
-    filenames.push(filename);
-  }
-
-  return filenames;
-}
-
-function buildSpeakerAvatarPaths(filenames: readonly string[]) {
-  const paths: Record<string, string> = {};
-
-  for (const filename of filenames) {
     const slug = toSpeakerAvatarSlug(filename.replace(/\.[^.]+$/u, ''));
     paths[slug] = `${SPEAKER_AVATAR_DIRECTORY}/${filename}`;
   }
@@ -66,42 +53,14 @@ function buildSpeakerAvatarPaths(filenames: readonly string[]) {
   return paths;
 }
 
-function getFallbackImageUrl(imageUrl?: string) {
-  if (!imageUrl) {
+const SPEAKER_AVATAR_PATHS = buildSpeakerAvatarPaths();
+
+export function getSpeakerAvatarUrl(speaker: SpeakerAvatarFields) {
+  const slug = getSpeakerAvatarSlug(speaker);
+
+  if (!slug) {
     return;
   }
 
-  if (imageUrl.startsWith('/')) {
-    return imageUrl;
-  }
-
-  try {
-    const url = new URL(imageUrl);
-
-    if (url.pathname.startsWith(`${SPEAKER_AVATAR_DIRECTORY}/`)) {
-      return url.pathname;
-    }
-  } catch {
-    return imageUrl;
-  }
-
-  return imageUrl;
-}
-
-const SPEAKER_AVATAR_PATHS = buildSpeakerAvatarPaths(
-  getSpeakerAvatarFilenames()
-);
-
-export function getSpeakerAvatarUrl(
-  speaker: SpeakerAvatarFields,
-  avatarFiles: Readonly<Record<string, string>> = SPEAKER_AVATAR_PATHS
-) {
-  const slug = getSpeakerAvatarSlug(speaker);
-  const localPath = slug ? avatarFiles[slug] : undefined;
-
-  if (localPath) {
-    return localPath;
-  }
-
-  return getFallbackImageUrl(speaker.imageUrl);
+  return SPEAKER_AVATAR_PATHS[slug];
 }

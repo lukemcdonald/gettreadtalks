@@ -16,7 +16,6 @@ export const createSpeaker = mutation({
   args: {
     description: v.optional(v.string()),
     firstName: v.string(),
-    imageUrl: v.optional(v.string()),
     lastName: v.string(),
     ministry: v.optional(v.string()),
     role: v.optional(speakerRoleType),
@@ -114,7 +113,6 @@ export const updateSpeaker = mutation({
     description: v.optional(v.string()),
     featured: v.optional(v.boolean()),
     firstName: v.optional(v.string()),
-    imageUrl: v.optional(v.string()),
     lastName: v.optional(v.string()),
     ministry: v.optional(v.string()),
     role: v.optional(speakerRoleType),

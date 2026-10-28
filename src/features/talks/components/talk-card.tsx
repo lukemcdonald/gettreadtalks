@@ -9,10 +9,7 @@ import { buildTalkPath } from '@/features/talks/utils';
 
 interface TalkCardProps {
   headingLevel?: 2 | 3;
-  speaker?: Pick<
-    Speaker,
-    'firstName' | 'imageUrl' | 'lastName' | 'slug'
-  > | null;
+  speaker?: Pick<Speaker, 'firstName' | 'lastName' | 'slug'> | null;
   talk: Pick<Talk, 'scripture' | 'slug' | 'title'>;
 }
 

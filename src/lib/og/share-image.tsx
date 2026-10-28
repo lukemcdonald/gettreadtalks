@@ -37,7 +37,6 @@ interface ShareSpeaker {
 
 interface ShareSpeakerSource {
   firstName?: string;
-  imageUrl?: string;
   lastName?: string;
   ministry?: string;
   role?: string;

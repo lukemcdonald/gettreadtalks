@@ -10,7 +10,6 @@ import {
 
 const speaker = {
   firstName: 'Voddie',
-  imageUrl: '/images/speakers/voddie-baucham.jpg',
   lastName: 'Baucham',
   ministry: 'Founders Ministries',
   role: 'Pastor',
@@ -38,7 +37,6 @@ describe('buildSharePropsForTalk', () => {
       buildSharePropsForTalk({
         speaker: {
           firstName: 'Eric',
-          imageUrl: undefined,
           lastName: 'Alexander',
         },
         title: 'A Talk',
@@ -90,7 +88,6 @@ describe('buildSharePropsForSpeaker', () => {
     expect(
       buildSharePropsForSpeaker({
         firstName: 'Alistair',
-        imageUrl: '/images/speakers/alistair-begg.jpg',
         lastName: 'Begg',
         ministry: 'Truth For Life',
         role: 'Pastor',

@@ -51,7 +51,7 @@ interface SpeakerAvatarProps {
   className?: string;
   rounded?: 'sm' | 'md' | 'lg' | 'full';
   size?: '2xl' | 'lg' | 'md' | 'sm' | 'xl' | 'xs';
-  speaker: Pick<Speaker, 'firstName' | 'imageUrl' | 'lastName'> &
+  speaker: Pick<Speaker, 'firstName' | 'lastName'> &
     Partial<Pick<Speaker, 'slug'>>;
 }
 

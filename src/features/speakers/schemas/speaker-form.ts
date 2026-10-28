@@ -5,7 +5,6 @@ import { speakerRoles } from '@/convex/model/speakers/validators';
 const baseSpeakerSchema = z.object({
   description: z.string().optional(),
   firstName: z.string().trim().min(1, 'First name is required'),
-  imageUrl: z.url('Must be a valid URL').or(z.literal('')),
   lastName: z.string().trim().min(1, 'Last name is required'),
   ministry: z.string().optional(),
   role: z.enum(speakerRoles).or(z.literal('')),

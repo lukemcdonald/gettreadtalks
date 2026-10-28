@@ -5,7 +5,7 @@ import { getSpeakerAvatarUrl } from '@/features/speakers/get-speaker-avatar-url'
 import { getSpeakerInitials, getSpeakerName } from '@/features/speakers/utils';
 
 interface CollectionCardSpeakerProps {
-  speaker: Pick<Speaker, 'firstName' | 'imageUrl' | 'lastName' | 'slug'>;
+  speaker: Pick<Speaker, 'firstName' | 'lastName' | 'slug'>;
 }
 
 export function CollectionCardSpeaker({ speaker }: CollectionCardSpeakerProps) {
