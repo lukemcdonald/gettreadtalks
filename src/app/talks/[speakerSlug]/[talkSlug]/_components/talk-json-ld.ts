@@ -16,7 +16,6 @@ interface TalkJsonLdInput {
   speakerSlug: string;
   summary?: string | null;
   talk: {
-    _creationTime?: number;
     mediaUrl?: string;
     publishedAt?: number;
     title: string;
@@ -59,13 +58,11 @@ function getTalkDescription(
 }
 
 function getTalkUploadDate(talk: TalkJsonLdInput['talk']) {
-  const uploadedAt = talk.publishedAt ?? talk._creationTime;
-
-  if (!uploadedAt) {
+  if (!talk.publishedAt) {
     return;
   }
 
-  return new Date(uploadedAt).toISOString();
+  return new Date(talk.publishedAt).toISOString();
 }
 
 export function buildTalkJsonLd({

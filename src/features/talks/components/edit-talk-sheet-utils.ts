@@ -2,6 +2,7 @@ import type { TalkFormData } from '@/features/talks/schemas/talk-form';
 import type { Talk, TalkWithTopicIds } from '@/features/talks/types';
 import type { StatusPrefill } from '@/lib/entities/status-prefill';
 
+import { formatUtcDate } from '@/convex/lib/publishedAt';
 import { slugify } from '@/convex/lib/utils';
 import { buildTalkPath } from '@/features/talks/utils';
 
@@ -19,6 +20,7 @@ export function getTalkFormValues(
     collectionOrder: talk.collectionId ? talk.collectionOrder : undefined,
     featured: talk.featured ?? false,
     mediaUrl: talk.mediaUrl ?? '',
+    publishedAt: talk.publishedAt ? formatUtcDate(talk.publishedAt) : '',
     scripture: talk.scripture ?? '',
     slug: talk.slug ?? '',
     speakerId: talk.speakerId,

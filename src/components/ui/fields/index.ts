@@ -2,6 +2,7 @@
 export { Field, FieldDescription, FieldError } from '../primitives/field';
 export * from '../primitives/number-field';
 // Export custom field components
+export { DateField } from './date-field';
 export { FeaturedField } from './featured-field';
 export { FieldLabel } from './field-label';
 export { NumberField } from './number-field';

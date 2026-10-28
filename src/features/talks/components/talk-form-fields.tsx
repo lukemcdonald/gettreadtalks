@@ -11,6 +11,7 @@ import { useEffect } from 'react';
 import { Controller, useWatch } from 'react-hook-form';
 
 import {
+  DateField,
   FeaturedField,
   NumberField,
   StatusField,
@@ -95,6 +96,11 @@ export function TalkFormFields({
   speakers,
   topics,
 }: TalkFormFieldsProps) {
+  const status = useWatch({
+    control,
+    name: 'status',
+  });
+
   return (
     <div className="space-y-4">
       <TextField
@@ -147,6 +153,16 @@ export function TalkFormFields({
       />
 
       <StatusField control={control} name="status" onChange={onStatusChange} />
+
+      {mode === 'edit' && status === 'published' ? (
+        <DateField
+          control={control}
+          data-testid="publish-date"
+          description="Defaults to today when first published. Cannot be in the future."
+          label="Publish date"
+          name="publishedAt"
+        />
+      ) : null}
 
       <FeaturedField control={control} name="featured" />
     </div>

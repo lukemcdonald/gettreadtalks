@@ -7,6 +7,7 @@ import type { ActionResult } from '@/lib/forms/types';
 import { updateTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
+import { parseUtcDate } from '@/convex/lib/publishedAt';
 import { toConvexFormErrors, toZodFormErrors } from '@/lib/forms/validation';
 import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
 
@@ -32,7 +33,13 @@ export async function updateTalkAction(
   }
 
   try {
-    await fetchAuthMutation(api.talks.updateTalk, { ...parsed.data, talkId });
+    const { publishedAt, ...talk } = parsed.data;
+
+    await fetchAuthMutation(api.talks.updateTalk, {
+      ...talk,
+      publishedAt: publishedAt ? parseUtcDate(publishedAt) : undefined,
+      talkId,
+    });
 
     updateTag('talks');
     updateTag('form-options');

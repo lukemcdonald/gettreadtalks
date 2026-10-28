@@ -32,6 +32,7 @@ export const {
 // Mutations
 export const {
   archiveTalk,
+  backfillTalkPublishedAt,
   completeTalkTranscriptFetch,
   createTalk,
   createTalkTranscriptFetch,
