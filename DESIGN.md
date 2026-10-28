@@ -78,7 +78,7 @@ Import COSS from `@/components/ui` (`src/components/ui`). Never edit `src/compon
 - **Edit talk drawer** — `EditTalkSheet` uses Content | Study tabs. Content is the talk form with Save Changes. Study is `EditTalkStudyPanel` and loads only when that tab is selected. `/talks/edit/<id>` and `/talks/edit/<id>/study` select the tab. Do not stack a second study sheet.
 - **Detail back link** — `ArchiveBackLink` in `src/components/archive-back-link.tsx` above the title. Keep JSON-LD breadcrumbs (`src/lib/json-ld.ts`). Do not render COSS `Breadcrumb`.
 - **Speaker role** — its own muted line under the name (`src/app/speakers/[speakerSlug]/_components/speaker-hero-details.tsx`, `src/features/speakers/components/speaker-card.tsx`). Never inline with the name.
-- **Search** — desktop `CommandDialog` in `src/features/search/components/header-search/desktop-search-dialog.tsx`. Mobile bottom `Drawer` in `src/features/search/components/header-search/mobile-search-drawer.tsx`.
+- **Search** — desktop `CommandDialog` in `src/features/search/components/header-search/desktop-search-dialog.tsx`. Mobile bottom `Drawer` in `src/features/search/components/header-search/mobile-search-drawer.tsx`. Result copy is `SearchResultItem`: semibold title, `MediaCardSubtitle` for speaker and similar details.
 - **Transcript** — admin study uses a large stock `Dialog` (`src/features/talks/components/talk-transcript-dialog.tsx`) with a plain textarea that fills the dialog body. The field stays inside the dialog padding. Long text scrolls inside the textarea. The footer stays on screen. Load text only when the dialog opens.
 - **Section heading** — `SectionHeading` in `src/components/section-heading.tsx`. Solid `bg-input` rule between heading and meta.
 
