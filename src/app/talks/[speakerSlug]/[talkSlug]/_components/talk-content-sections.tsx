@@ -39,7 +39,7 @@ export function TalkContentSections({
             sticky
             title="Collection"
           >
-            <CollectionMediaCard collection={collection} />
+            <CollectionMediaCard collection={collection} headingLevel={3} />
           </FeaturedGrid>
         )}
 
@@ -53,6 +53,7 @@ export function TalkContentSections({
             {clips.map((clip) => (
               <ClipCard
                 clip={clip}
+                headingLevel={3}
                 key={clip._id}
                 speaker={speaker ?? undefined}
               />

@@ -10,6 +10,7 @@ import { TalkCardSubtitle } from '@/features/talks/components/talk-card-subtitle
 import { buildTalkPath } from '@/features/talks/utils';
 
 interface TalkMediaCardProps {
+  headingLevel?: 2 | 3;
   speaker: Pick<Speaker, 'firstName' | 'lastName' | 'slug'>;
   talk: Pick<Talk, 'mediaUrl' | 'scripture' | 'slug' | 'title'>;
 }
@@ -44,10 +45,15 @@ function TalkMediaIcon({ mediaUrl }: { mediaUrl: string }) {
   );
 }
 
-export function TalkMediaCard({ speaker, talk }: TalkMediaCardProps) {
+export function TalkMediaCard({
+  headingLevel,
+  speaker,
+  talk,
+}: TalkMediaCardProps) {
   return (
     <MediaCard
       ariaLabel={talk.title}
+      headingLevel={headingLevel}
       href={buildTalkPath({ speaker, slug: talk.slug })}
       media={<TalkMediaIcon mediaUrl={talk.mediaUrl} />}
       subtitle={

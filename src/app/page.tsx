@@ -80,7 +80,12 @@ export default async function HomePage() {
             title="Featured Talks"
           >
             {featuredTalks.map((talk) => (
-              <TalkCard key={talk._id} speaker={talk.speaker} talk={talk} />
+              <TalkCard
+                headingLevel={3}
+                key={talk._id}
+                speaker={talk.speaker}
+                talk={talk}
+              />
             ))}
           </FeaturedGrid>
         </Container>
@@ -102,6 +107,7 @@ export default async function HomePage() {
           >
             {featuredSpeakers.map((speaker) => (
               <SpeakerCard
+                headingLevel={3}
                 key={speaker._id}
                 speaker={{
                   firstName: speaker.firstName,

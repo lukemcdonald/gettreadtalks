@@ -76,7 +76,12 @@ export function SpeakerContentSections({
             title="Talks"
           >
             {talks.slice(0, MAX_TALKS).map((talk) => (
-              <TalkMediaCard key={talk._id} speaker={speaker} talk={talk} />
+              <TalkMediaCard
+                headingLevel={3}
+                key={talk._id}
+                speaker={speaker}
+                talk={talk}
+              />
             ))}
           </FeaturedGrid>
         )}
@@ -92,6 +97,7 @@ export function SpeakerContentSections({
             {collections.slice(0, MAX_COLLECTIONS).map((collection) => (
               <CollectionMediaCard
                 collection={collection}
+                headingLevel={3}
                 key={collection._id}
               />
             ))}
@@ -112,6 +118,7 @@ export function SpeakerContentSections({
                   slug: clip.slug,
                   title: clip.title,
                 }}
+                headingLevel={3}
                 key={clip._id}
               />
             ))}

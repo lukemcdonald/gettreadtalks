@@ -15,12 +15,14 @@ const EMPTY_SPEAKERS: Pick<
 
 interface CollectionCardProps {
   collection: Pick<Collection, 'description' | 'slug' | 'title'>;
+  headingLevel?: 2 | 3;
   speakers?: Pick<Speaker, 'firstName' | 'lastName' | 'imageUrl' | 'slug'>[];
   talkCount?: number;
 }
 
 export function CollectionCard({
   collection,
+  headingLevel,
   speakers = EMPTY_SPEAKERS,
   talkCount,
 }: CollectionCardProps) {
@@ -28,7 +30,7 @@ export function CollectionCard({
     <Card className="group card-interactive relative flex flex-col gap-3 border-0 p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 space-y-0.5">
-          <MediaCardTitle>
+          <MediaCardTitle level={headingLevel}>
             <FauxLink
               data-testid="collection-card"
               href={buildCollectionPath(collection)}

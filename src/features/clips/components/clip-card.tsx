@@ -8,10 +8,11 @@ import { getSpeakerName } from '@/features/speakers/utils';
 
 interface ClipCardProps {
   clip: Pick<Clip, 'description' | 'slug' | 'title'>;
+  headingLevel?: 2 | 3;
   speaker?: Pick<Speaker, 'firstName' | 'lastName' | 'imageUrl' | 'slug'>;
 }
 
-export function ClipCard({ clip, speaker }: ClipCardProps) {
+export function ClipCard({ clip, headingLevel, speaker }: ClipCardProps) {
   const speakerName = getSpeakerName(speaker);
   const accessibleLabel = speakerName
     ? `${clip.title} by ${speakerName}`
@@ -21,6 +22,7 @@ export function ClipCard({ clip, speaker }: ClipCardProps) {
     <MediaCard
       ariaLabel={accessibleLabel}
       className="items-center"
+      headingLevel={headingLevel}
       href={buildClipPath(clip)}
       media={speaker ? <SpeakerAvatar speaker={speaker} /> : undefined}
       subtitle={speakerName}

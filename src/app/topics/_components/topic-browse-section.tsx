@@ -4,7 +4,6 @@ import type { Topic } from '@/features/topics/types';
 import { ChevronRightIcon } from 'lucide-react';
 
 import { GridList } from '@/components/grid-list';
-import { MediaCardHeadingLevel } from '@/components/media-card';
 import { SectionHeading } from '@/components/section-heading';
 import { Link } from '@/components/ui/link';
 import { TalkCard } from '@/features/talks/components/talk-card';
@@ -56,13 +55,16 @@ export function TopicBrowseSection({
       {talks.length === 0 ? (
         <p className="text-muted-foreground text-sm">No talks yet</p>
       ) : (
-        <MediaCardHeadingLevel level={3}>
-          <GridList columns={{ default: 1, md: 2 }}>
-            {talks.map((talk) => (
-              <TalkCard key={talk._id} speaker={talk.speaker} talk={talk} />
-            ))}
-          </GridList>
-        </MediaCardHeadingLevel>
+        <GridList columns={{ default: 1, md: 2 }}>
+          {talks.map((talk) => (
+            <TalkCard
+              headingLevel={3}
+              key={talk._id}
+              speaker={talk.speaker}
+              talk={talk}
+            />
+          ))}
+        </GridList>
       )}
     </section>
   );

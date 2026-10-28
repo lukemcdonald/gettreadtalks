@@ -1,7 +1,6 @@
 import type { GridColumns } from './grid-list';
 import type { ReactNode } from 'react';
 
-import { MediaCardHeadingLevel } from '@/components/media-card';
 import { Link } from '@/components/ui/link';
 import { cn } from '@/utils';
 
@@ -77,9 +76,7 @@ export function FeaturedGrid({
       </header>
 
       <div className="min-w-0">
-        <MediaCardHeadingLevel level={3}>
-          <GridList columns={gridColumns}>{children}</GridList>
-        </MediaCardHeadingLevel>
+        <GridList columns={gridColumns}>{children}</GridList>
       </div>
     </section>
   );

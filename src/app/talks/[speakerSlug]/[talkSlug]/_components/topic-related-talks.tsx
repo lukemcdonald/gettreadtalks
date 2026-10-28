@@ -48,7 +48,12 @@ export function TopicRelatedTalks({ talks, topics }: TopicRelatedTalksProps) {
       title={section.title}
     >
       {talks.map((talk) => (
-        <TalkCard key={talk._id} speaker={talk.speaker} talk={talk} />
+        <TalkCard
+          headingLevel={3}
+          key={talk._id}
+          speaker={talk.speaker}
+          talk={talk}
+        />
       ))}
     </FeaturedGrid>
   );

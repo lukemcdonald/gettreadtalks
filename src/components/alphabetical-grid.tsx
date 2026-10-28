@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 
-import { MediaCardHeadingLevel } from '@/components/media-card';
 import { cn } from '@/utils';
 
 import { GridList } from './grid-list';
@@ -23,11 +22,9 @@ export function AlphabeticalGrid({ className, groups }: AlphabeticalGridProps) {
       {groups.map((group) => (
         <section className="space-y-3 md:space-y-6" key={group.letter}>
           <SectionHeading heading={group.letter} meta={group.range} />
-          <MediaCardHeadingLevel level={3}>
-            <GridList columns={{ default: 1, lg: 3, md: 2, sm: 2, xl: 3 }}>
-              {group.items}
-            </GridList>
-          </MediaCardHeadingLevel>
+          <GridList columns={{ default: 1, lg: 3, md: 2, sm: 2, xl: 3 }}>
+            {group.items}
+          </GridList>
         </section>
       ))}
     </div>

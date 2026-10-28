@@ -28,7 +28,7 @@ export function ClipContent({ clip, speaker, talk }: ClipContentProps) {
             sticky
             title="From the Talk"
           >
-            <TalkCard speaker={speaker} talk={talk} />
+            <TalkCard headingLevel={3} speaker={speaker} talk={talk} />
           </FeaturedGrid>
         )}
 
@@ -42,7 +42,7 @@ export function ClipContent({ clip, speaker, talk }: ClipContentProps) {
             sticky
             title="Speaker"
           >
-            <SpeakerCard speaker={speaker} />
+            <SpeakerCard headingLevel={3} speaker={speaker} />
           </FeaturedGrid>
         )}
       </div>
