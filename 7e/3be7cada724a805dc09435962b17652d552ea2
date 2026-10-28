@@ -1,0 +1,14 @@
+convex/model/talks/transcriptFetch.ts
+  h_b34f5996212cca 11-18,41-44,46-47,50-64
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "7e3be7cada724a805dc09435962b17652d552ea2",
+  "prompts": {},
+  "humans": {
+    "h_b34f5996212cca": {
+      "author": "Luke McDonald <thelukemcdonald@gmail.com>"
+    }
+  }
+}
