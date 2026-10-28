@@ -134,6 +134,13 @@ describe('media health digest', () => {
     ]);
   });
 
+  it('omits a recovered break from the digest', async () => {
+    const t = createConvexTest();
+    await upsert(t, 'private');
+
+    expect(digestFor(await upsert(t, 'ok'))).toBe(null);
+  });
+
   it('emails again after recovery then a re-break', async () => {
     const t = createConvexTest();
     const first = await upsert(t, 'private');
