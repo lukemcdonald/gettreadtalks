@@ -91,7 +91,7 @@ async function runMediaHealthPage(
       return;
     }
 
-    await sendNewBreakDigest(ctx, items);
+    await sendMediaHealthDigest(ctx, items);
   } catch (error) {
     await reportSentryException({
       message: `Media health check failed: ${formatErrorMessage(error)}`,
@@ -110,7 +110,7 @@ interface PublishedMediaItem {
   title: string;
 }
 
-async function sendNewBreakDigest(
+async function sendMediaHealthDigest(
   ctx: ActionCtx,
   items: MediaHealthDigestItem[]
 ) {
@@ -122,7 +122,6 @@ async function sendNewBreakDigest(
 
   const sent = await ctx.runAction(internal.emails.sendMediaHealthEmail, {
     items: digest.items,
-    stillBrokenCount: digest.stillBrokenCount,
   });
 
   if (!sent) {

@@ -12,7 +12,12 @@ import {
   getPublishedAtForStatus,
 } from '../../lib/utils';
 import { requireAdmin } from '../auth/roles';
+import {
+  clearMediaChecksForEntity,
+  clearStaleMediaChecks,
+} from '../mediaHealth/clear';
 import { statusType } from './validators';
+
 /**
  * Archive a clip (soft delete by setting status to archived).
  */
@@ -29,6 +34,11 @@ export const archiveClip = mutation({
       publishedAt: undefined,
       status: 'archived',
       updatedAt: Date.now(),
+    });
+
+    await clearMediaChecksForEntity(ctx, {
+      entityId: args.clipId,
+      entityTable: 'clips',
     });
 
     return null;
@@ -49,6 +59,11 @@ export const destroyClip = mutation({
     await requireAdmin(ctx);
 
     await getOrThrow(ctx, 'clips', clipId);
+
+    await clearMediaChecksForEntity(ctx, {
+      entityId: clipId,
+      entityTable: 'clips',
+    });
 
     const favorites = await getManyFrom(
       ctx.db,
@@ -144,6 +159,15 @@ export const updateClip = mutation({
     updates.updatedAt = Date.now();
 
     await ctx.db.patch(clipId, updates);
+
+    await clearStaleMediaChecks(ctx, {
+      entityId: clipId,
+      entityTable: 'clips',
+      nextMediaUrl: updates.mediaUrl,
+      nextStatus: updates.status,
+      previousMediaUrl: clip.mediaUrl,
+      previousStatus: clip.status,
+    });
 
     return clipId;
   },

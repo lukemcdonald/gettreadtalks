@@ -8,28 +8,62 @@ import { Button, Heading, Section, Text } from 'react-email';
 import { site } from '../../src/configs/site';
 import { EmailLayout } from './components/layout';
 
-export function MediaHealthEmail({
-  items,
-  stillBrokenCount,
-}: MediaHealthEmailProps) {
-  const talks = items.filter((item) => item.entityTable === 'talks');
-  const clips = items.filter((item) => item.entityTable === 'clips');
-  const siteUrl = process.env.SITE_URL || site.url;
+export function MediaHealthEmail({ items, siteUrl }: MediaHealthEmailProps) {
+  const newItems = items.filter((item) => item.isNew);
+  const unresolvedItems = items.filter((item) => !item.isNew);
 
   return (
-    <EmailLayout preview="New private or missing talk and clip media needs a look.">
+    <EmailLayout preview="Private or missing talk and clip media still needs a look.">
       <Text style={paragraph}>Hi,</Text>
       <Text style={paragraph}>
-        These published YouTube or Vimeo URLs are newly private or missing. Open
-        in admin to review and archive — Archived is preselected, and nothing is
-        saved until you press Save. View page opens the public talk or clip.
-        Check video opens the YouTube or Vimeo page. This job does not change
-        content for you.
+        These published YouTube or Vimeo URLs are private or missing and still
+        need action. New since last email is anything flagged since the last
+        digest. Still unresolved was already reported and has not been archived
+        or fixed. Open in admin to review and archive — Archived is preselected,
+        and nothing is saved until you press Save. View page opens the public
+        talk or clip. Check video opens the YouTube or Vimeo page. This job does
+        not change content for you.
       </Text>
-      {stillBrokenNote(stillBrokenCount)}
+      <MediaHealthGroup
+        heading="New since last email"
+        items={newItems}
+        siteUrl={siteUrl}
+      />
+      <MediaHealthGroup
+        heading="Still unresolved"
+        items={unresolvedItems}
+        siteUrl={siteUrl}
+      />
+      <Text style={paragraph}>Blessings,</Text>
+      <Text style={paragraph}>The {site.name} job runner</Text>
+    </EmailLayout>
+  );
+}
+
+function MediaHealthGroup({
+  heading,
+  items,
+  siteUrl,
+}: {
+  heading: string;
+  items: MediaHealthEmailItem[];
+  siteUrl: string;
+}) {
+  if (items.length === 0) {
+    return null;
+  }
+
+  const clips = items.filter((item) => item.entityTable === 'clips');
+  const talks = items.filter((item) => item.entityTable === 'talks');
+
+  return (
+    <>
+      <Heading as="h2" style={sectionHeading}>
+        {heading}
+      </Heading>
       {talks.length > 0 && (
         <>
-          <Heading as="h2" style={sectionHeading}>
+          <Heading as="h3" style={entityHeading}>
             Talks
           </Heading>
           {talks.map((item) => (
@@ -43,7 +77,7 @@ export function MediaHealthEmail({
       )}
       {clips.length > 0 && (
         <>
-          <Heading as="h2" style={sectionHeading}>
+          <Heading as="h3" style={entityHeading}>
             Clips
           </Heading>
           {clips.map((item) => (
@@ -55,18 +89,8 @@ export function MediaHealthEmail({
           ))}
         </>
       )}
-      <Text style={paragraph}>Blessings,</Text>
-      <Text style={paragraph}>The {site.name} job runner</Text>
-    </EmailLayout>
+    </>
   );
-}
-
-function stillBrokenNote(count: number) {
-  if (count <= 0) {
-    return null;
-  }
-
-  return <Text style={paragraph}>{count} more still broken from earlier.</Text>;
 }
 
 function MediaHealthItem({
@@ -116,6 +140,14 @@ const button = {
 
 const buttonContainer = {
   margin: '12px 0 0',
+};
+
+const entityHeading = {
+  color: '#111',
+  fontSize: '16px',
+  fontWeight: 'bold',
+  lineHeight: '24px',
+  margin: '16px 0 8px',
 };
 
 const itemSection = {
