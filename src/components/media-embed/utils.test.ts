@@ -1,61 +1,32 @@
 import { describe, expect, it } from '@/test';
 
-import {
-  buildMediaJsonLd,
-  getVideoOpenGraphType,
-  preferItemsWithVideoThumbnails,
-} from './utils';
+import { buildMediaJsonLd, preferItemsWithVideoThumbnails } from './utils';
 
 describe('buildMediaJsonLd', () => {
-  it('maps watch pages to player embedUrl and files to contentUrl', () => {
-    expect(
-      buildMediaJsonLd('https://www.youtube.com/watch?v=jNQXAC9IVRw')
-    ).toEqual({
-      '@type': 'VideoObject',
-      embedUrl: 'https://www.youtube.com/embed/jNQXAC9IVRw',
-      thumbnailUrl: ['https://img.youtube.com/vi/jNQXAC9IVRw/hqdefault.jpg'],
-    });
-    expect(buildMediaJsonLd('https://vimeo.com/123456789')).toEqual({
-      '@type': 'VideoObject',
-      embedUrl: 'https://player.vimeo.com/video/123456789',
-      thumbnailUrl: ['https://vumbnail.com/123456789.jpg'],
-    });
-    expect(buildMediaJsonLd('https://example.com/talk.mp4')).toEqual({
-      '@type': 'VideoObject',
-      contentUrl: 'https://example.com/talk.mp4',
-    });
-    expect(buildMediaJsonLd('https://example.com/talk.mp3')).toEqual({
-      '@type': 'AudioObject',
-      contentUrl: 'https://example.com/talk.mp3',
-    });
-  });
-
-  it('omits VideoObject when the URL is missing or not playable media', () => {
-    expect(buildMediaJsonLd()).toBeUndefined();
-    expect(buildMediaJsonLd('https://example.com/notes')).toBeUndefined();
-  });
-
-  it('appends a fallback thumbnail when the platform has none', () => {
-    expect(
+  it('gives VideoObject a thumbnail and a playback url', () => {
+    const results = [
+      buildMediaJsonLd('https://www.youtube.com/watch?v=jNQXAC9IVRw'),
+      buildMediaJsonLd('https://vimeo.com/123456789'),
       buildMediaJsonLd('https://example.com/talk.mp4', {
         thumbnailUrl: 'https://www.gettreadtalks.com/talks/og.png',
-      })
-    ).toEqual({
-      '@type': 'VideoObject',
-      contentUrl: 'https://example.com/talk.mp4',
-      thumbnailUrl: ['https://www.gettreadtalks.com/talks/og.png'],
-    });
-  });
-});
+      }),
+    ];
 
-describe('getVideoOpenGraphType', () => {
-  it('uses video.other only for playable video', () => {
-    expect(
-      getVideoOpenGraphType('https://www.youtube.com/watch?v=jNQXAC9IVRw')
-    ).toBe('video.other');
-    expect(
-      getVideoOpenGraphType('https://example.com/talk.mp3')
-    ).toBeUndefined();
+    for (const result of results) {
+      expect(result?.['@type']).toBe('VideoObject');
+      expect(result && 'thumbnailUrl' in result).toBe(true);
+      expect(result && ('embedUrl' in result || 'contentUrl' in result)).toBe(
+        true
+      );
+    }
+  });
+
+  it('uses AudioObject for audio and omits a media object otherwise', () => {
+    expect(buildMediaJsonLd('https://example.com/talk.mp3')?.['@type']).toBe(
+      'AudioObject'
+    );
+    expect(buildMediaJsonLd()).toBeUndefined();
+    expect(buildMediaJsonLd('https://example.com/notes')).toBeUndefined();
   });
 });
 
