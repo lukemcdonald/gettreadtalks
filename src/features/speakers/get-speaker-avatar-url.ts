@@ -4,66 +4,17 @@ const SPEAKER_AVATAR_DIRECTORY = '/images/speakers';
 
 /**
  * Avatars are files at `public/images/speakers/{slug}.jpg` (also jpeg, png, or
- * webp). Name the file after the speaker's Convex slug — the same value as the
- * `/speakers/{slug}` URL. Accents are folded to ASCII and punctuation is
+ * webp). Drop a file named after the speaker's Convex slug — the same value as
+ * the `/speakers/{slug}` URL. Accents are folded to ASCII and punctuation is
  * stripped, matching slug creation. Convex `imageUrl` is only used when no
  * matching file exists.
  */
-const SPEAKER_AVATAR_FILES = [
-  'albert-martin.jpg',
-  'albert-mohler.jpg',
-  'alex-montoya.jpg',
-  'alistair-begg.jpg',
-  'austin-duncan.jpg',
-  'aw-tozer.jpg',
-  'billy-graham.jpg',
-  'brooks-simpson.jpg',
-  'bryan-loritts.jpg',
-  'conrad-mbewe.jpg',
-  'david-platt.jpg',
-  'derek-thomas.jpg',
-  'eric-mason.jpg',
-  'francis-chan.jpg',
-  'greg-bahnsen.jpg',
-  'james-white.jpg',
-  'jay-adams.jpg',
-  'jeff-durbin.jpg',
-  'john-macarthur.jpg',
-  'john-piper.jpg',
-  'joni-eareckson-tada.jpg',
-  'jonny-ardavanis.jpg',
-  'josh-buice.jpg',
-  'kevin-carson.jpg',
-  'leonard-ravenhill.jpg',
-  'martin-loyd-jones.jpg',
-  'matt-chandler.jpg',
-  'mez-mcconnell.jpg',
-  'michael-mahoney.jpg',
-  'mike-fabarez.jpg',
-  'mike-kelsey.jpg',
-  'mike-riccardi.jpg',
-  'nathan-busenitz.jpg',
-  'paris-reidhead.jpg',
-  'paul-twiss.jpg',
-  'paul-washer.jpg',
-  'phil-johnson.jpg',
-  'philip-anthony-mitchell.jpg',
-  'ravi-zacharias.jpg',
-  'rc-sproul.jpg',
-  'richard-owen-roberts.jpg',
-  'rt-kendall.jpg',
-  'rusty-thomas.jpg',
-  'shai-linne.jpg',
-  'steven-lawson.jpg',
-  'tim-challies.jpg',
-  'tim-keesee.jpg',
-  'tony-miano.jpg',
-  'tony-payne.jpg',
-  'vance-havner.jpg',
-  'voddie-baucham.jpg',
-  'wa-criswell.jpg',
-  'walter-martin.jpg',
-] as const;
+const SPEAKER_AVATAR_MODULES = import.meta.glob([
+  '/public/images/speakers/*.jpeg',
+  '/public/images/speakers/*.jpg',
+  '/public/images/speakers/*.png',
+  '/public/images/speakers/*.webp',
+]);
 
 interface SpeakerAvatarFields {
   firstName?: string;
@@ -86,6 +37,22 @@ function getSpeakerAvatarSlug({
   }
 
   return toSpeakerAvatarSlug(`${firstName ?? ''} ${lastName ?? ''}`.trim());
+}
+
+function getSpeakerAvatarFilenames() {
+  const filenames: string[] = [];
+
+  for (const filePath of Object.keys(SPEAKER_AVATAR_MODULES)) {
+    const filename = filePath.split('/').at(-1);
+
+    if (!filename || filename.includes('-banner')) {
+      continue;
+    }
+
+    filenames.push(filename);
+  }
+
+  return filenames;
 }
 
 function buildSpeakerAvatarPaths(filenames: readonly string[]) {
@@ -121,7 +88,9 @@ function getFallbackImageUrl(imageUrl?: string) {
   return imageUrl;
 }
 
-const SPEAKER_AVATAR_PATHS = buildSpeakerAvatarPaths(SPEAKER_AVATAR_FILES);
+const SPEAKER_AVATAR_PATHS = buildSpeakerAvatarPaths(
+  getSpeakerAvatarFilenames()
+);
 
 export function getSpeakerAvatarUrl(
   speaker: SpeakerAvatarFields,
