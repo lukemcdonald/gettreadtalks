@@ -22,6 +22,15 @@ describe('buildSpeakerJsonLd', () => {
     expect('sameAs' in result).toBe(false);
   });
 
+  it('omits inLanguage because Person does not define that property', () => {
+    const result = buildSpeakerJsonLd({
+      name: 'Martyn Lloyd-Jones',
+      speakerSlug: 'lloyd-jones',
+    });
+
+    expect('inLanguage' in result).toBe(false);
+  });
+
   it('adds jobTitle when the speaker has a role', () => {
     const result = buildSpeakerJsonLd({
       name: 'Martyn Lloyd-Jones',

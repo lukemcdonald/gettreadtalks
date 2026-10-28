@@ -1,4 +1,3 @@
-import { getSiteLanguage } from '@/configs/site';
 import { buildCollectionPath } from '@/features/collections/utils';
 import { buildTalkListItemsJsonLd } from '@/features/talks/utils';
 import { buildAbsoluteUrl } from '@/lib/entities/paths';
@@ -20,7 +19,6 @@ export function buildCollectionJsonLd({
     '@context': 'https://schema.org',
     '@type': 'ItemList',
     description,
-    inLanguage: getSiteLanguage(),
     itemListElement: buildTalkListItemsJsonLd(talks),
     name: title,
     numberOfItems: talks.length,

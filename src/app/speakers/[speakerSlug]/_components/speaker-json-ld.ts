@@ -1,4 +1,3 @@
-import { getSiteLanguage } from '@/configs/site';
 import { buildSpeakerPath } from '@/features/speakers/utils';
 import { buildAbsoluteUrl } from '@/lib/entities/paths';
 
@@ -27,7 +26,6 @@ export function buildSpeakerJsonLd({
     '@type': 'Person',
     description,
     image: imageUrl,
-    inLanguage: getSiteLanguage(),
     ...(role && { jobTitle: role }),
     name,
     ...(websiteUrl && { sameAs: [websiteUrl] }),
