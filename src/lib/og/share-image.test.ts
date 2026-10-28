@@ -36,7 +36,11 @@ describe('buildSharePropsForTalk', () => {
   it('omits the avatar when the speaker has no photo', () => {
     expect(
       buildSharePropsForTalk({
-        speaker: { ...speaker, imageUrl: undefined },
+        speaker: {
+          firstName: 'Eric',
+          imageUrl: undefined,
+          lastName: 'Alexander',
+        },
         title: 'A Talk',
       }).speaker?.imageUrl
     ).toBeUndefined();
@@ -73,7 +77,7 @@ describe('buildSharePropsForClip', () => {
     ).toEqual({
       speaker: {
         detail: 'Matthias Media',
-        imageUrl: undefined,
+        imageUrl: '/images/speakers/tony-payne.jpg',
         name: 'Tony Payne',
       },
       title: 'Two Ways to Live',

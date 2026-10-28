@@ -4,6 +4,7 @@ import { cva } from 'class-variance-authority';
 import Image from 'next/image';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui';
+import { getSpeakerAvatarUrl } from '@/features/speakers/get-speaker-avatar-url';
 import { getSpeakerInitials, getSpeakerName } from '@/features/speakers/utils';
 import { cn } from '@/utils';
 
@@ -50,7 +51,8 @@ interface SpeakerAvatarProps {
   className?: string;
   rounded?: 'sm' | 'md' | 'lg' | 'full';
   size?: '2xl' | 'lg' | 'md' | 'sm' | 'xl' | 'xs';
-  speaker: Pick<Speaker, 'firstName' | 'lastName' | 'imageUrl'>;
+  speaker: Pick<Speaker, 'firstName' | 'imageUrl' | 'lastName'> &
+    Partial<Pick<Speaker, 'slug'>>;
 }
 
 export function SpeakerAvatar({
@@ -59,7 +61,7 @@ export function SpeakerAvatar({
   size,
   speaker,
 }: SpeakerAvatarProps) {
-  const { imageUrl } = speaker;
+  const imageUrl = getSpeakerAvatarUrl(speaker);
   const speakerName = getSpeakerName(speaker);
   const pixelSize = avatarPixelSize[size ?? 'md'];
 
