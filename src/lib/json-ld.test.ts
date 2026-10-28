@@ -1,6 +1,7 @@
+import { site } from '@/configs/site';
 import { describe, expect, it } from '@/test';
 
-import { buildBreadcrumbJsonLd } from './json-ld';
+import { buildBreadcrumbJsonLd, getOrganizationJsonLd } from './json-ld';
 
 describe('buildBreadcrumbJsonLd', () => {
   it('matches breadcrumb items, names, order, and absolute urls', () => {
@@ -18,15 +19,21 @@ describe('buildBreadcrumbJsonLd', () => {
       itemListElement: [
         {
           '@type': 'ListItem',
+          item: site.url,
+          name: 'Home',
+          position: 1,
+        },
+        {
+          '@type': 'ListItem',
           item: 'https://www.gettreadtalks.com/talks',
           name: 'Talks',
-          position: 1,
+          position: 2,
         },
         {
           '@type': 'ListItem',
           item: 'https://www.gettreadtalks.com/talks/lloyd-jones/the-cross',
           name: 'The Cross',
-          position: 2,
+          position: 3,
         },
       ],
     });
@@ -46,16 +53,32 @@ describe('buildBreadcrumbJsonLd', () => {
       itemListElement: [
         {
           '@type': 'ListItem',
-          item: 'https://www.gettreadtalks.com/talks',
-          name: 'Talks',
+          item: site.url,
+          name: 'Home',
           position: 1,
         },
         {
           '@type': 'ListItem',
-          name: 'The Cross',
+          item: 'https://www.gettreadtalks.com/talks',
+          name: 'Talks',
           position: 2,
         },
+        {
+          '@type': 'ListItem',
+          name: 'The Cross',
+          position: 3,
+        },
       ],
+    });
+  });
+});
+
+describe('getOrganizationJsonLd', () => {
+  it('identifies the site as the publisher', () => {
+    expect(getOrganizationJsonLd()).toEqual({
+      '@type': 'Organization',
+      name: site.name,
+      url: site.url,
     });
   });
 });

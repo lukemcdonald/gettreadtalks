@@ -19,6 +19,7 @@ describe('buildClipJsonLd', () => {
     expect(result.creator).toEqual({
       '@type': 'Person',
       name: 'Martyn Lloyd-Jones',
+      url: 'https://www.gettreadtalks.com/speakers/lloyd-jones',
     });
     expect(result.url).toBe(
       'https://www.gettreadtalks.com/clips/the-cross-clip'
@@ -37,6 +38,30 @@ describe('buildClipJsonLd', () => {
     });
 
     expect(result.uploadDate).toBe('2024-01-15T00:00:00.000Z');
+  });
+
+  it('uses AudioObject for audio clips and omits VideoObject otherwise', () => {
+    const audio = buildClipJsonLd({
+      clip: {
+        mediaUrl: 'https://example.com/clip.mp3',
+        slug: 'the-cross-clip',
+        title: 'The Cross clip',
+      },
+      speaker,
+      talk: null,
+    });
+    const unknown = buildClipJsonLd({
+      clip: {
+        mediaUrl: 'https://example.com/notes',
+        slug: 'the-cross-clip',
+        title: 'The Cross clip',
+      },
+      speaker,
+      talk: null,
+    });
+
+    expect(audio['@type']).toBe('AudioObject');
+    expect(unknown['@type']).toBe('CreativeWork');
   });
 
   it('omits creator and uploadDate when those fields are missing', () => {

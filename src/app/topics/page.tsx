@@ -19,7 +19,7 @@ export const ensureStatic = 'shell';
 export const metadata: Metadata = buildPageMetadata({
   canonical: buildTopicsPath(),
   description:
-    'Browse talks by Bible topic or theme and deepen your understanding of Scripture.',
+    'Browse talks by Bible topic or theme and deepen your understanding of Scripture with Christ centered teaching you can listen to today.',
   title: 'Topics',
 });
 

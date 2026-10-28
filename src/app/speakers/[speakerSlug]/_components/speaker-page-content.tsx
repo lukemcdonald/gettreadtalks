@@ -65,6 +65,7 @@ async function SpeakerHeroSection({ speakerSlug }: { speakerSlug: string }) {
           description: speaker.description,
           imageUrl: speaker.imageUrl,
           name,
+          role: speaker.role,
           speakerSlug,
           websiteUrl: speaker.websiteUrl,
         })}

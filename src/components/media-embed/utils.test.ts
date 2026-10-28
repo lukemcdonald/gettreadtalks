@@ -1,6 +1,10 @@
 import { describe, expect, it } from '@/test';
 
-import { buildMediaJsonLd, preferItemsWithVideoThumbnails } from './utils';
+import {
+  buildMediaJsonLd,
+  getVideoOpenGraphType,
+  preferItemsWithVideoThumbnails,
+} from './utils';
 
 describe('buildMediaJsonLd', () => {
   it('maps watch pages to player embedUrl and files to contentUrl', () => {
@@ -9,11 +13,12 @@ describe('buildMediaJsonLd', () => {
     ).toEqual({
       '@type': 'VideoObject',
       embedUrl: 'https://www.youtube.com/embed/jNQXAC9IVRw',
-      thumbnailUrl: 'https://img.youtube.com/vi/jNQXAC9IVRw/hqdefault.jpg',
+      thumbnailUrl: ['https://img.youtube.com/vi/jNQXAC9IVRw/hqdefault.jpg'],
     });
     expect(buildMediaJsonLd('https://vimeo.com/123456789')).toEqual({
       '@type': 'VideoObject',
       embedUrl: 'https://player.vimeo.com/video/123456789',
+      thumbnailUrl: ['https://vumbnail.com/123456789.jpg'],
     });
     expect(buildMediaJsonLd('https://example.com/talk.mp4')).toEqual({
       '@type': 'VideoObject',
@@ -25,11 +30,32 @@ describe('buildMediaJsonLd', () => {
     });
   });
 
-  it('uses MediaObject when the URL is missing or not playable media', () => {
-    expect(buildMediaJsonLd()).toEqual({ '@type': 'MediaObject' });
-    expect(buildMediaJsonLd('https://example.com/notes')).toEqual({
-      '@type': 'MediaObject',
+  it('omits VideoObject when the URL is missing or not playable media', () => {
+    expect(buildMediaJsonLd()).toBeUndefined();
+    expect(buildMediaJsonLd('https://example.com/notes')).toBeUndefined();
+  });
+
+  it('appends a fallback thumbnail when the platform has none', () => {
+    expect(
+      buildMediaJsonLd('https://example.com/talk.mp4', {
+        thumbnailUrl: 'https://www.gettreadtalks.com/talks/og.png',
+      })
+    ).toEqual({
+      '@type': 'VideoObject',
+      contentUrl: 'https://example.com/talk.mp4',
+      thumbnailUrl: ['https://www.gettreadtalks.com/talks/og.png'],
     });
+  });
+});
+
+describe('getVideoOpenGraphType', () => {
+  it('uses video.other only for playable video', () => {
+    expect(
+      getVideoOpenGraphType('https://www.youtube.com/watch?v=jNQXAC9IVRw')
+    ).toBe('video.other');
+    expect(
+      getVideoOpenGraphType('https://example.com/talk.mp3')
+    ).toBeUndefined();
   });
 });
 

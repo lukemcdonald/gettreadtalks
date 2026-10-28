@@ -19,7 +19,7 @@ export const ensureStatic = 'shell';
 export const metadata: Metadata = buildPageMetadata({
   canonical: buildSpeakersPath(),
   description:
-    'Discover faithful ministers of the Gospel and be strengthened by their teaching.',
+    'Discover faithful ministers of the Gospel and be strengthened by their teaching. Browse speakers and listen to Christ centered talks.',
   title: 'Speakers',
 });
 

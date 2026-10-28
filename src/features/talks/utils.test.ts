@@ -8,6 +8,7 @@ import {
   buildTalkPath,
   buildTalksPath,
   formatTalkMetaDescription,
+  formatTalkMetaTitle,
   getEditTalkTab,
   isTranscriptFetchCoolingDown,
 } from './utils';
@@ -70,6 +71,9 @@ describe('buildTalkListItemsJsonLd', () => {
       throw new Error('expected list item');
     }
 
+    expect(item.item).toBe(
+      'https://www.gettreadtalks.com/talks/lloyd-jones/the-cross'
+    );
     expect(item.position).toBe(1);
     expect(item.url).toBe(
       'https://www.gettreadtalks.com/talks/lloyd-jones/the-cross'
@@ -118,10 +122,35 @@ describe('isTranscriptFetchCoolingDown', () => {
   });
 });
 
+describe('formatTalkMetaTitle', () => {
+  it('includes the speaker when the combined title stays within 60 characters', () => {
+    expect(formatTalkMetaTitle('The Cross', 'Martyn Lloyd-Jones')).toBe(
+      'The Cross | Martyn Lloyd-Jones'
+    );
+  });
+
+  it('drops the speaker when adding them would exceed the title limit', () => {
+    expect(
+      formatTalkMetaTitle('Confronting the Woke Church', 'Martyn Lloyd-Jones')
+    ).toBe('Confronting the Woke Church');
+  });
+});
+
 describe('formatTalkMetaDescription', () => {
-  it('returns nothing when there is no published summary', () => {
+  it('returns nothing when there is no published summary or talk', () => {
     expect(formatTalkMetaDescription(null)).toBeUndefined();
     expect(formatTalkMetaDescription('   ')).toBeUndefined();
+  });
+
+  it('falls back to a unique description when the summary is missing', () => {
+    expect(
+      formatTalkMetaDescription(null, {
+        speakerName: 'Martyn Lloyd-Jones',
+        title: 'The Cross',
+      })
+    ).toBe(
+      'The Cross is a Christ centered talk by Martyn Lloyd-Jones. Christ centered sermons to elevate your spiritual heartbeat.'
+    );
   });
 
   it('collapses whitespace and keeps a short summary whole', () => {

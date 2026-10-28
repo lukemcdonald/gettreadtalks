@@ -1,37 +1,16 @@
+import { buildWebsiteJsonLd } from '@/app/_components/website-json-ld';
 import { FeaturedGrid } from '@/components/featured-grid';
 import { HeroSection } from '@/components/hero';
 import { JsonLd } from '@/components/json-ld';
 import { Main } from '@/components/main';
 import { Container, Section } from '@/components/ui';
 import { site } from '@/configs/site';
-import { buildSearchPath } from '@/features/search/utils';
 import { SpeakerCard } from '@/features/speakers/components/speaker-card';
 import { loadFeaturedSpeakers } from '@/features/speakers/queries/load-featured-speakers';
 import { buildSpeakersPath } from '@/features/speakers/utils';
 import { TalkCard } from '@/features/talks/components/talk-card';
 import { loadFeaturedTalks } from '@/features/talks/queries/load-featured-talks';
 import { buildTalksPath } from '@/features/talks/utils';
-import { buildAbsoluteUrl } from '@/lib/entities/paths';
-
-function buildWebsiteJsonLd() {
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'WebSite',
-    description: site.description,
-    name: site.name,
-    potentialAction: {
-      '@type': 'SearchAction',
-      'query-input': 'required name=search_term_string',
-      target: {
-        '@type': 'EntryPoint',
-        urlTemplate: buildAbsoluteUrl(
-          `${buildSearchPath()}?search={search_term_string}`
-        ),
-      },
-    },
-    url: site.url,
-  };
-}
 
 export default async function HomePage() {
   const [featuredTalksResult, featuredSpeakersResult] = await Promise.all([

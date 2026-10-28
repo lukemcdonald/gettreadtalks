@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import { buildClipJsonLd } from '@/app/clips/[clipSlug]/_components/clip-json-ld';
 import { JsonLd } from '@/components/json-ld';
 import { EditorialProfileLayout } from '@/components/layouts';
+import { getVideoOpenGraphType } from '@/components/media-embed/utils';
 import { loadClipBySlug } from '@/features/clips/queries/load-clip-by-slug';
 import { buildClipPath, buildClipsPath } from '@/features/clips/utils';
 import { getSpeakerName } from '@/features/speakers/utils';
@@ -18,6 +19,21 @@ interface ClipPageProps {
   params: Promise<{ clipSlug: string }>;
 }
 
+function getClipMetaDescription(
+  description: string | undefined,
+  speakerName: string
+) {
+  if (description) {
+    return description;
+  }
+
+  if (!speakerName) {
+    return;
+  }
+
+  return `A clip from ${speakerName}.`;
+}
+
 export async function generateMetadata({
   params,
 }: ClipPageProps): Promise<Metadata> {
@@ -29,13 +45,14 @@ export async function generateMetadata({
   }
 
   const { clip, speaker } = data;
-  const speakerName = getSpeakerName(speaker);
 
   return buildPageMetadata({
     canonical: buildClipPath(clip),
-    description:
-      clip.description ??
-      (speakerName ? `A clip from ${speakerName}.` : undefined),
+    description: getClipMetaDescription(
+      clip.description,
+      getSpeakerName(speaker)
+    ),
+    openGraphType: getVideoOpenGraphType(clip.mediaUrl),
     title: clip.title,
   });
 }

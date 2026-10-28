@@ -4,10 +4,13 @@ import { Suspense } from 'react';
 
 import { TalkPageContent } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-page-content';
 import { TalkPageSkeleton } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-page-skeleton';
+import { getVideoOpenGraphType } from '@/components/media-embed/utils';
+import { getSpeakerName } from '@/features/speakers/utils';
 import { loadTalkBySlug } from '@/features/talks/queries/load-talk-by-slug';
 import {
   buildTalkPath,
   formatTalkMetaDescription,
+  formatTalkMetaTitle,
 } from '@/features/talks/utils';
 import { buildPageMetadata } from '@/lib/metadata';
 
@@ -32,12 +35,16 @@ export async function generateMetadata({
   }
 
   const { speaker, summary, talk } = talkResult;
+  const speakerName = getSpeakerName(speaker);
 
   return buildPageMetadata({
     canonical: buildTalkPath({ speaker, slug: talk.slug }),
-    description: formatTalkMetaDescription(summary),
-    openGraphType: 'video.other',
-    title: talk.title,
+    description: formatTalkMetaDescription(summary, {
+      speakerName,
+      title: talk.title,
+    }),
+    openGraphType: getVideoOpenGraphType(talk.mediaUrl),
+    title: formatTalkMetaTitle(talk.title, speakerName),
   });
 }
 

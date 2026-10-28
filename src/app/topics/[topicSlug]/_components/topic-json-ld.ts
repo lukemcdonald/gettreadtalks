@@ -1,3 +1,4 @@
+import { getSiteLanguage } from '@/configs/site';
 import { buildTalkListItemsJsonLd } from '@/features/talks/utils';
 import { buildTopicPath } from '@/features/topics/utils';
 import { buildAbsoluteUrl } from '@/lib/entities/paths';
@@ -19,8 +20,10 @@ export function buildTopicJsonLd({
     '@context': 'https://schema.org',
     '@type': 'ItemList',
     description,
+    inLanguage: getSiteLanguage(),
     itemListElement: buildTalkListItemsJsonLd(talks),
     name: title,
+    numberOfItems: talks.length,
     url: buildAbsoluteUrl(buildTopicPath({ slug: topicSlug })),
   };
 }

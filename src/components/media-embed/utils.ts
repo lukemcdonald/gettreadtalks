@@ -80,19 +80,40 @@ export function isVideoMediaType(url?: string): boolean {
   );
 }
 
-// fallow-ignore-next-line complexity
-export function buildMediaJsonLd(url?: string) {
+export function getVideoOpenGraphType(url?: string) {
+  if (isVideoMediaType(url)) {
+    return 'video.other' as const;
+  }
+}
+
+function getJsonLdThumbnailUrls(url: string, fallbackThumbnailUrl?: string) {
+  const thumbnailUrls = [getVideoThumbnail(url), fallbackThumbnailUrl].filter(
+    (thumbnailUrl): thumbnailUrl is string => Boolean(thumbnailUrl)
+  );
+
+  if (thumbnailUrls.length === 0) {
+    return;
+  }
+
+  return { thumbnailUrl: thumbnailUrls };
+}
+
+export function buildMediaJsonLd(
+  url?: string,
+  options?: { thumbnailUrl?: string }
+) {
   if (!url) {
-    return { '@type': 'MediaObject' as const };
+    return;
   }
 
   const media = detectMediaType(url);
+  const thumbnails = getJsonLdThumbnailUrls(url, options?.thumbnailUrl);
 
   if (media.type === 'youtube') {
     return {
       '@type': 'VideoObject' as const,
       embedUrl: `https://www.youtube.com/embed/${media.id}`,
-      thumbnailUrl: `https://img.youtube.com/vi/${media.id}/hqdefault.jpg`,
+      ...thumbnails,
     };
   }
 
@@ -100,6 +121,7 @@ export function buildMediaJsonLd(url?: string) {
     return {
       '@type': 'VideoObject' as const,
       embedUrl: `https://player.vimeo.com/video/${media.id}`,
+      ...thumbnails,
     };
   }
 
@@ -107,6 +129,7 @@ export function buildMediaJsonLd(url?: string) {
     return {
       '@type': 'VideoObject' as const,
       contentUrl: media.src,
+      ...thumbnails,
     };
   }
 
@@ -116,8 +139,6 @@ export function buildMediaJsonLd(url?: string) {
       contentUrl: media.src,
     };
   }
-
-  return { '@type': 'MediaObject' as const };
 }
 
 export function preferItemsWithVideoThumbnails<T extends { mediaUrl?: string }>(

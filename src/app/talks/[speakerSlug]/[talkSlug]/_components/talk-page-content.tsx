@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
+import { buildSpeakerJsonLd } from '@/app/speakers/[speakerSlug]/_components/speaker-json-ld';
 import { TalkContentSections } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-content-sections';
 import { TalkHero } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-hero';
 import { buildTalkJsonLd } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-json-ld';
@@ -11,6 +12,7 @@ import {
 import { TalkRelatedTalks } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-related-talks';
 import { JsonLd } from '@/components/json-ld';
 import { EditorialProfileLayout } from '@/components/layouts';
+import { getSpeakerName } from '@/features/speakers/utils';
 import { loadTalkBySlug } from '@/features/talks/queries/load-talk-by-slug';
 import { loadTalkBySlugAdmin } from '@/features/talks/queries/load-talk-by-slug-admin';
 import { buildTalkPath, buildTalksPath } from '@/features/talks/utils';
@@ -41,6 +43,18 @@ function TalkDetail({ speakerSlug, talkResult, talkSlug }: TalkDetailProps) {
   return (
     <>
       <JsonLd data={buildBreadcrumbJsonLd(segments)} />
+      {speaker ? (
+        <JsonLd
+          data={buildSpeakerJsonLd({
+            description: speaker.description,
+            imageUrl: speaker.imageUrl,
+            name: getSpeakerName(speaker),
+            role: speaker.role,
+            speakerSlug,
+            websiteUrl: speaker.websiteUrl,
+          })}
+        />
+      ) : null}
       <JsonLd
         data={buildTalkJsonLd({
           speaker,

@@ -21,4 +21,17 @@ describe('buildSpeakerJsonLd', () => {
 
     expect('sameAs' in result).toBe(false);
   });
+
+  it('adds jobTitle when the speaker has a role', () => {
+    const result = buildSpeakerJsonLd({
+      name: 'Martyn Lloyd-Jones',
+      role: 'Pastor',
+      speakerSlug: 'lloyd-jones',
+    });
+
+    expect(result.jobTitle).toBe('Pastor');
+    expect(result.url).toBe(
+      'https://www.gettreadtalks.com/speakers/lloyd-jones'
+    );
+  });
 });
