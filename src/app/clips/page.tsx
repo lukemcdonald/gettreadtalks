@@ -16,7 +16,7 @@ export const ensureStatic = 'shell';
 export const metadata: Metadata = buildPageMetadata({
   canonical: buildClipsPath(),
   description:
-    'Short Christ centered clips — quick encouragement from the best talks.',
+    'Short Christ centered clips from TREAD Talks. Get quick encouragement from the best sermons and talks you can listen to and share.',
   title: 'Clips',
 });
 

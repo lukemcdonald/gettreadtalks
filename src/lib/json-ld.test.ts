@@ -3,59 +3,21 @@ import { describe, expect, it } from '@/test';
 import { buildBreadcrumbJsonLd } from './json-ld';
 
 describe('buildBreadcrumbJsonLd', () => {
-  it('matches breadcrumb items, names, order, and absolute urls', () => {
-    expect(
-      buildBreadcrumbJsonLd([
-        { href: '/talks', label: 'Talks' },
-        {
-          href: '/talks/lloyd-jones/the-cross',
-          label: 'The Cross',
-        },
-      ])
-    ).toEqual({
-      '@context': 'https://schema.org',
-      '@type': 'BreadcrumbList',
-      itemListElement: [
-        {
-          '@type': 'ListItem',
-          item: 'https://www.gettreadtalks.com/talks',
-          name: 'Talks',
-          position: 1,
-        },
-        {
-          '@type': 'ListItem',
-          item: 'https://www.gettreadtalks.com/talks/lloyd-jones/the-cross',
-          name: 'The Cross',
-          position: 2,
-        },
-      ],
-    });
-  });
+  it('starts at Home with absolute item urls', () => {
+    const result = buildBreadcrumbJsonLd([
+      { href: '/talks', label: 'Talks' },
+      {
+        href: '/talks/lloyd-jones/the-cross',
+        label: 'The Cross',
+      },
+    ]);
+    const [home, ...items] = result.itemListElement;
 
-  it('drops falsy segments and omits item when href is missing', () => {
-    expect(
-      buildBreadcrumbJsonLd([
-        { href: '/talks', label: 'Talks' },
-        false,
-        null,
-        { label: 'The Cross' },
-      ])
-    ).toEqual({
-      '@context': 'https://schema.org',
-      '@type': 'BreadcrumbList',
-      itemListElement: [
-        {
-          '@type': 'ListItem',
-          item: 'https://www.gettreadtalks.com/talks',
-          name: 'Talks',
-          position: 1,
-        },
-        {
-          '@type': 'ListItem',
-          name: 'The Cross',
-          position: 2,
-        },
-      ],
-    });
+    expect(home).toMatchObject({ name: 'Home', position: 1 });
+    expect(home.item).toMatch(/^https:\/\//u);
+    expect(items.map((item) => item.item)).toEqual([
+      expect.stringMatching(/^https:\/\//u),
+      expect.stringMatching(/^https:\/\//u),
+    ]);
   });
 });

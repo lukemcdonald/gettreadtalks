@@ -1,8 +1,10 @@
 import { buildMediaJsonLd } from '@/components/media-embed/utils';
+import { getSiteLanguage, site } from '@/configs/site';
 import { buildClipPath } from '@/features/clips/utils';
-import { getSpeakerName } from '@/features/speakers/utils';
+import { buildSpeakerPath, getSpeakerName } from '@/features/speakers/utils';
 import { buildTalkPath } from '@/features/talks/utils';
 import { buildAbsoluteUrl } from '@/lib/entities/paths';
+import { getOrganizationJsonLd } from '@/lib/json-ld';
 
 interface ClipJsonLdInput {
   clip: {
@@ -14,26 +16,56 @@ interface ClipJsonLdInput {
   };
   speaker: {
     firstName: string;
+    imageUrl?: string;
     lastName: string;
     slug: string;
   } | null;
   talk: { slug: string; title: string } | null;
 }
 
-// fallow-ignore-next-line complexity
+function getClipCreatorJsonLd(speaker: ClipJsonLdInput['speaker']) {
+  const name = getSpeakerName(speaker);
+
+  if (!(name && speaker)) {
+    return;
+  }
+
+  return {
+    '@type': 'Person' as const,
+    ...(speaker.imageUrl && { image: speaker.imageUrl }),
+    name,
+    url: buildAbsoluteUrl(buildSpeakerPath(speaker)),
+  };
+}
+
+function getClipDescription(
+  clip: ClipJsonLdInput['clip'],
+  speakerName: string
+) {
+  const description = clip.description?.trim();
+
+  if (description) {
+    return description;
+  }
+
+  const byline = speakerName ? ` from ${speakerName}` : '';
+
+  return `${clip.title}${byline}. ${site.description}`;
+}
+
 export function buildClipJsonLd({ clip, speaker, talk }: ClipJsonLdInput) {
   const speakerName = getSpeakerName(speaker);
+  const clipUrl = buildAbsoluteUrl(buildClipPath(clip));
+  const creator = getClipCreatorJsonLd(speaker);
 
   return {
     '@context': 'https://schema.org',
-    ...buildMediaJsonLd(clip.mediaUrl),
-    description: clip.description,
-    name: clip.title,
-    url: buildAbsoluteUrl(buildClipPath(clip)),
-    ...(speakerName && { creator: { '@type': 'Person', name: speakerName } }),
-    ...(clip.publishedAt && {
-      uploadDate: new Date(clip.publishedAt).toISOString(),
-    }),
+    ...(buildMediaJsonLd(clip.mediaUrl, {
+      thumbnailUrl: `${clipUrl}/opengraph-image`,
+    }) ?? { '@type': 'CreativeWork' as const }),
+    ...(creator && { creator }),
+    description: getClipDescription(clip, speakerName),
+    inLanguage: getSiteLanguage(),
     ...(talk &&
       speaker && {
         isPartOf: {
@@ -42,5 +74,11 @@ export function buildClipJsonLd({ clip, speaker, talk }: ClipJsonLdInput) {
           url: buildAbsoluteUrl(buildTalkPath({ speaker, slug: talk.slug })),
         },
       }),
+    name: clip.title,
+    publisher: getOrganizationJsonLd(),
+    ...(clip.publishedAt && {
+      uploadDate: new Date(clip.publishedAt).toISOString(),
+    }),
+    url: clipUrl,
   };
 }

@@ -21,7 +21,7 @@ export const ensureStatic = 'shell';
 export const metadata: Metadata = buildPageMetadata({
   canonical: buildTalksPath(),
   description:
-    'Browse Christ centered talks from faithful ministers of the Gospel.',
+    'Browse Christ centered talks from faithful ministers of the Gospel and elevate your spiritual heartbeat with sermons you can listen to and share.',
   title: 'Talks',
 });
 

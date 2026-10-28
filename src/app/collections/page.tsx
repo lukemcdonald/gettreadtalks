@@ -19,7 +19,7 @@ export const ensureStatic = 'shell';
 export const metadata: Metadata = buildPageMetadata({
   canonical: buildCollectionsPath(),
   description:
-    'Explore curated talk series — each collection covers one topic or book of the Bible.',
+    'Explore curated talk series from TREAD Talks. Each collection covers one topic or book of the Bible from faithful ministers of the Gospel.',
   title: 'Collections',
 });
 

@@ -13,7 +13,7 @@ import { SkipNavLink } from '@/components/site-header/navigation/skip-nav-link';
 import { ThemeProvider } from '@/components/theme-provider';
 import '@/assets/styles.css';
 import { ToastProvider } from '@/components/ui/primitives/toast';
-import { site } from '@/configs/site';
+import { getSiteLanguage, site } from '@/configs/site';
 import { WebMcpTools } from '@/features/webmcp/components/webmcp-tools';
 import { cn } from '@/utils';
 
@@ -21,9 +21,9 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
 export const metadata: Metadata = {
   alternates: {
-    canonical: './',
+    canonical: site.url,
   },
-  description: site.description,
+  description: site.metaDescription,
   metadataBase: new URL(site.url),
   openGraph: {
     images: [
@@ -37,6 +37,18 @@ export const metadata: Metadata = {
     locale: site.locale,
     siteName: site.name,
     type: 'website',
+    url: site.url,
+  },
+  robots: {
+    follow: true,
+    googleBot: {
+      follow: true,
+      index: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+      'max-video-preview': -1,
+    },
+    index: true,
   },
   title: {
     default: site.name,
@@ -64,7 +76,7 @@ export default function RootLayout({
   return (
     <html
       className={cn('h-full', inter.variable)}
-      lang="en"
+      lang={getSiteLanguage()}
       suppressHydrationWarning
     >
       <body className="bg-background text-foreground flex min-h-full flex-col bg-cover">

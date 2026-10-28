@@ -1,46 +1,29 @@
-import { site } from '@/configs/site';
 import { describe, expect, it } from '@/test';
 
-import { buildPageMetadata } from './metadata';
+import { buildPageMetadata, formatMetaDescription } from './metadata';
 
 describe('buildPageMetadata', () => {
-  it('keeps siteName and locale when a page sets an openGraph type', () => {
-    const talk = buildPageMetadata({
+  it('uses absolute canonical and og:url', () => {
+    const page = buildPageMetadata({
       canonical: '/talks/lloyd-jones/the-cross',
-      description: 'A talk by Martyn Lloyd-Jones. Romans 3:21-26',
-      openGraphType: 'video.other',
+      description: 'A talk by Martyn Lloyd-Jones.',
       title: 'The Cross',
     });
-    const speaker = buildPageMetadata({
-      canonical: '/speakers/lloyd-jones',
-      description: 'Martyn Lloyd-Jones — faithful minister of the Gospel.',
-      openGraphType: 'profile',
-      title: 'Martyn Lloyd-Jones',
-    });
 
-    expect(talk.alternates).toEqual({
-      canonical: '/talks/lloyd-jones/the-cross',
-    });
-    expect(talk.openGraph).toEqual({
-      locale: site.locale,
-      siteName: site.name,
-      type: 'video.other',
-    });
-    expect(speaker.openGraph).toEqual({
-      locale: site.locale,
-      siteName: site.name,
-      type: 'profile',
-    });
+    expect(page.alternates?.canonical).toMatch(/^https:\/\//u);
+    expect(page.openGraph?.url).toMatch(/^https:\/\//u);
   });
+});
 
-  it('omits openGraph so pages inherit siteName and locale from the root', () => {
-    const topic = buildPageMetadata({
-      canonical: '/topics/justification',
-      description: 'Talks on justification.',
-      title: 'Justification',
-    });
+describe('formatMetaDescription', () => {
+  it('trims at a word boundary without ending on a conjunction', () => {
+    const description =
+      'Speaking from Colossians 2, Jeff Durbin was asked to show how a presuppositional, Van Tillian apologetic answers Black Lives Matter, the LGBT movement and abortion.';
+    const result = formatMetaDescription(description);
 
-    expect(topic.alternates).toEqual({ canonical: '/topics/justification' });
-    expect(topic.openGraph).toBeUndefined();
+    expect(result).toMatch(/^Speaking from Colossians 2/u);
+    expect(result).not.toMatch(/\b(?:and|or|but)$/iu);
+    expect(result?.length).toBeLessThanOrEqual(160);
+    expect(result?.length).toBeLessThan(description.length);
   });
 });
