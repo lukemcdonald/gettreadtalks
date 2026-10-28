@@ -3,8 +3,8 @@
 import type { SearchHit } from '@/features/search/types';
 
 import { Link } from '@/components/ui/link';
+import { SearchResultItem } from '@/features/search/components/search-result-item';
 import { groupSearchHits } from '@/features/search/utils';
-import { TalkCardSubtitle } from '@/features/talks/components/talk-card-subtitle';
 import { track } from '@/services/analytics';
 
 function SearchHitLink({
@@ -32,15 +32,11 @@ function SearchHitLink({
       }}
       prefetch="intent"
     >
-      <span className="text-foreground block font-medium">{hit.title}</span>
-      {!!(hit.scripture || hit.subtitle) && (
-        <span className="text-muted-foreground block min-w-0 text-sm">
-          <TalkCardSubtitle
-            scripture={hit.scripture}
-            speakerName={hit.subtitle}
-          />
-        </span>
-      )}
+      <SearchResultItem
+        scripture={hit.scripture}
+        subtitle={hit.subtitle}
+        title={hit.title}
+      />
     </Link>
   );
 }

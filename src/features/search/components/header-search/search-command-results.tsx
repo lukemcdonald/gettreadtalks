@@ -12,8 +12,8 @@ import {
   CommandList,
   CommandSeparator,
 } from '@/components/ui';
+import { SearchResultItem } from '@/features/search/components/search-result-item';
 import { VIEW_ALL_SEARCH_GROUP } from '@/features/search/utils';
-import { TalkCardSubtitle } from '@/features/talks/components/talk-card-subtitle';
 
 function SearchCommandItem({
   item,
@@ -30,17 +30,11 @@ function SearchCommandItem({
       }}
       value={item.value}
     >
-      <span className="flex min-w-0 flex-1 flex-col">
-        <span>{item.label}</span>
-        {!!(item.scripture || item.subtitle) && (
-          <span className="text-muted-foreground min-w-0 text-sm">
-            <TalkCardSubtitle
-              scripture={item.scripture}
-              speakerName={item.subtitle}
-            />
-          </span>
-        )}
-      </span>
+      <SearchResultItem
+        scripture={item.scripture}
+        subtitle={item.subtitle}
+        title={item.label}
+      />
     </CommandItem>
   );
 }

@@ -1,9 +1,10 @@
 import type { ComponentProps, ReactNode } from 'react';
 
-import { Card, CardDescription } from '@/components/ui';
+import { Card } from '@/components/ui';
 import { FauxLink } from '@/components/ui/link';
 import { cn } from '@/utils';
 
+import { MediaCardSubtitle } from './media-card-subtitle';
 import { MediaCardTitle } from './media-card-title';
 
 type MediaCardProps = {
@@ -40,11 +41,7 @@ export function MediaCard({
             {title}
           </FauxLink>
         </MediaCardTitle>
-        {!!subtitle && (
-          <CardDescription className="min-w-0 text-pretty">
-            {subtitle}
-          </CardDescription>
-        )}
+        {!!subtitle && <MediaCardSubtitle>{subtitle}</MediaCardSubtitle>}
       </div>
     </Card>
   );
