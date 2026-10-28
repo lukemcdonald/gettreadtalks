@@ -30,6 +30,7 @@ export function TopicPageSkeleton() {
     <SidebarLayout
       content={<TalksListSkeleton />}
       header={<TopicHeaderSkeleton />}
+      render={<article />}
       sidebar={<TopicSidebarSkeleton />}
       sidebarSticky
     />

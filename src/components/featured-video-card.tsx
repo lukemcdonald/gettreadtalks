@@ -41,7 +41,7 @@ function Caption({
     <CaptionCard>
       <div className="flex items-start justify-between gap-4 text-sm">
         <div className="min-w-0">
-          <h2 className="text-foreground font-medium text-pretty">{title}</h2>
+          <p className="text-foreground font-medium text-pretty">{title}</p>
           {!!subtitle && (
             <p className="text-muted-foreground min-w-0">{subtitle}</p>
           )}

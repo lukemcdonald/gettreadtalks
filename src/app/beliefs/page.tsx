@@ -63,6 +63,7 @@ export default function BeliefsPage() {
     <CenteredLayout
       content={<BeliefsContent />}
       header={<PageHeader title="Beliefs" />}
+      render={<article />}
     />
   );
 }

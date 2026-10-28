@@ -6,9 +6,9 @@ export function MediaCardTitle({
   children,
   className,
   ...delegated
-}: ComponentProps<'h3'>) {
+}: ComponentProps<'p'>) {
   return (
-    <h3
+    <p
       className={cn(
         'line-clamp-2 text-base font-semibold text-balance',
         className
@@ -16,6 +16,6 @@ export function MediaCardTitle({
       {...delegated}
     >
       {children}
-    </h3>
+    </p>
   );
 }

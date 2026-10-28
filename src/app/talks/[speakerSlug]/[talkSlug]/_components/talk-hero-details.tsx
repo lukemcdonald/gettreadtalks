@@ -17,7 +17,7 @@ export function TalkHeroDetails({ speaker, talk }: TalkHeroDetailsProps) {
   const speakerName = getSpeakerName(speaker);
 
   return (
-    <div className="space-y-2 text-center">
+    <header className="space-y-2 text-center">
       <div>
         <ArchiveBackLink href={buildTalksPath()} label="Talks" />
         <div className="flex flex-wrap items-center justify-center gap-3">
@@ -39,6 +39,6 @@ export function TalkHeroDetails({ speaker, talk }: TalkHeroDetailsProps) {
           </Link>
         </p>
       )}
-    </div>
+    </header>
   );
 }

@@ -7,6 +7,7 @@ import { Inter } from 'next/font/google';
 import { AnalyticsProvider } from '@/components/analytics-provider';
 import { AuthProvider } from '@/components/auth-provider';
 import { ErrorBoundary } from '@/components/error-boundary';
+import { Main } from '@/components/main';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
 import { SkipNavLink } from '@/components/site-header/navigation/skip-nav-link';
@@ -75,12 +76,9 @@ export default function RootLayout({
                 <ToastProvider>
                   <SkipNavLink href="#main" />
                   <SiteHeader />
-                  <div
-                    className="flex-1 py-6 sm:py-8 md:py-10 lg:py-12"
-                    id="content"
-                  >
+                  <Main className="flex-1 py-6 sm:py-8 md:py-10 lg:py-12">
                     {children}
-                  </div>
+                  </Main>
                   <SiteFooter />
                   {sheet}
                 </ToastProvider>

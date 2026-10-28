@@ -22,7 +22,7 @@ test('Speakers / Published talk topics', async ({ speakersPage }) => {
 
   await expect(speakersPage.speakerHeading).toHaveText('John Doe');
 
-  await expect(page.getByRole('heading', { name: 'Topics' })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Topics' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Grace' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Prayer' })).toBeVisible();
 });

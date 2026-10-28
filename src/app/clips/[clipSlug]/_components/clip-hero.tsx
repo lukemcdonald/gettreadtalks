@@ -21,7 +21,7 @@ export function ClipHero({ clip, speaker }: ClipHeroProps) {
   return (
     <Section className="bg-background relative overflow-hidden py-6 sm:py-8 md:py-12 lg:py-16">
       <Container className="relative space-y-8">
-        <div className="space-y-2 text-center">
+        <header className="space-y-2 text-center">
           <div>
             <ArchiveBackLink href={buildClipsPath()} label="Clips" />
             <div className="flex flex-wrap items-center justify-center gap-3">
@@ -42,7 +42,7 @@ export function ClipHero({ clip, speaker }: ClipHeroProps) {
               </Link>
             </p>
           )}
-        </div>
+        </header>
 
         {!!clip.mediaUrl && (
           <div className="mx-auto w-full max-w-4xl">

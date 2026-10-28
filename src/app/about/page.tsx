@@ -74,6 +74,7 @@ export default function AboutPage() {
     <CenteredLayout
       content={<AboutContent />}
       header={<PageHeader title="About" />}
+      render={<article />}
     />
   );
 }

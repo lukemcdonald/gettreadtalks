@@ -35,8 +35,8 @@ export function MediaCard({
     >
       {media}
       <div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5">
-        <MediaCardTitle aria-label={ariaLabel}>
-          <FauxLink data-testid={testId} href={href}>
+        <MediaCardTitle>
+          <FauxLink aria-label={ariaLabel} data-testid={testId} href={href}>
             {title}
           </FauxLink>
         </MediaCardTitle>

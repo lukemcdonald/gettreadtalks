@@ -28,7 +28,7 @@ export function CollectionCard({
     <Card className="group card-interactive relative flex flex-col gap-3 border-0 p-4">
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 space-y-0.5">
-          <MediaCardTitle aria-label={collection.title}>
+          <MediaCardTitle>
             <FauxLink
               data-testid="collection-card"
               href={buildCollectionPath(collection)}

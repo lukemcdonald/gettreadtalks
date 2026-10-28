@@ -48,6 +48,10 @@ Titles use `HeroTitle` in `src/components/hero/hero-title.tsx` or `PageHeader` i
 
 `Section` (`src/components/ui/section.tsx`) and `Container` (`src/components/ui/container.tsx`) wrap pages. Browse uses `SidebarLayout` (`src/components/layouts/sidebar-layout.tsx`): twelve columns, sidebar three, content nine. Account and manage use `AreaLayout` (`src/components/layouts/area-layout.tsx`). Page bodies use `PageContainer` (`src/components/page-container.tsx`). Browse filter Suspense fallbacks must match `BrowseFilters`: compact search plus icon on mobile, stacked fields on desktop (`SidebarFiltersSkeleton`). Loading skeletons match the page's stable layout (grid/columns, hero shape, the main content area) so the page does not jump when it loads. Omit only optional blocks whose absence would shift content or show something that might not exist (About, summaries, optional cards). Always-renders applies to sections, not to dropping the layout skeleton.
 
+The document has one site `header`, one `main` (`#main`, skip target), and one `footer`. Public content pages (talk, speaker, topic, collection, clip, about, beliefs, /ai) are an `article`. Listings and groupings are a `section`.
+
+Every public page has one `h1` (`PageHeader` or `HeroTitle`). Real section titles are `h2` (`SectionHeading`, `FeaturedGrid`, search groups). Nested groups under an `h2` may use `h3`. Do not skip levels. Metadata labels (`MetadataGroup`), footer column titles, and card or caption titles are not headings — keep the same classes on `p`.
+
 Overlays: `Dialog` for centered blocking UI (confirm, alert, desktop search). `Drawer` for nav, mobile search, mobile filters, and `FormSheet` (`src/components/ui/form-sheet.tsx`) — right on large screens, bottom on small. Do not import `Sheet` in feature or page code.
 
 The header is `src/components/site-header/site-header.tsx`. Desktop shows branding, nav, search, theme, and account. Mobile is search plus menu only; account and theme live in `src/components/site-header/navigation/mobile-nav.tsx`.
@@ -81,6 +85,7 @@ Import COSS from `@/components/ui` (`src/components/ui`). Never edit `src/compon
 - **Search** — desktop `CommandDialog` in `src/features/search/components/header-search/desktop-search-dialog.tsx`. Mobile bottom `Drawer` in `src/features/search/components/header-search/mobile-search-drawer.tsx`.
 - **Transcript** — admin study uses a large stock `Dialog` (`src/features/talks/components/talk-transcript-dialog.tsx`) with a plain textarea that fills the dialog body. The field stays inside the dialog padding. Long text scrolls inside the textarea. The footer stays on screen. Load text only when the dialog opens.
 - **Section heading** — `SectionHeading` in `src/components/section-heading.tsx`. Solid `bg-input` rule between heading and meta.
+- **Metadata labels** — `MetadataGroup` in `src/components/metadata-group.tsx`. Uppercase muted labels for About, Topics, Scripture, Actions. Not headings.
 
 ## Do's and Don'ts
 

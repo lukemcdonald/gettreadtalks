@@ -32,5 +32,8 @@ test('Favorites / Sign in returns to favorites', async ({
 
   await expect(authPage.page).toHaveURL(/\/account\/favorites\/?$/u);
   await expect(favoritesPage.heading).toBeVisible();
+  await expect(
+    favoritesPage.page.getByRole('heading', { level: 1 })
+  ).toHaveCount(1);
   await expect(authPage.accountMenu).toBeVisible();
 });

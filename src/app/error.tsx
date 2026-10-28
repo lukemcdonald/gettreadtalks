@@ -8,7 +8,6 @@ import {
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle,
 } from '@/components/ui';
 import { captureException } from '@/services/errors';
 
@@ -24,7 +23,9 @@ export default function AppError({ error, reset }: ErrorProps) {
   return (
     <Card className="m-auto w-full max-w-sm">
       <CardHeader>
-        <CardTitle>Something went wrong</CardTitle>
+        <h1 className="font-heading text-lg leading-none font-semibold">
+          Something went wrong
+        </h1>
         <CardDescription>
           {eventId ? `Event ID: ${eventId}` : 'An unexpected error occurred.'}
         </CardDescription>
