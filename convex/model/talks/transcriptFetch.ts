@@ -8,10 +8,14 @@ import { TRANSCRIPT_FETCH_ERROR_CODES } from './transcriptFetchErrorCode';
 
 const YOUTUBE_TRANSCRIPT_API_URL =
   'https://www.youtube-transcript.io/api/transcripts';
-const YOUTUBE_ID_PATTERNS = [
-  /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)(?<id>[^&\n?#]+)/u,
-  /youtube\.com\/watch\?.*v=(?<id>[^&\n?#]+)/u,
-];
+
+const YOUTUBE_HOSTS = new Set([
+  'm.youtube.com',
+  'music.youtube.com',
+  'www.youtube.com',
+  'youtu.be',
+  'youtube.com',
+]);
 
 const TRANSCRIPT_FETCH_MESSAGES = {
   LOGIN_REQUIRED: 'YouTube requires a login to view this talk.',
@@ -34,16 +38,30 @@ type TranscriptFetchResult =
   | TranscriptFetchFailure
   | { status: 'success'; text: string };
 
-function parseYouTubeVideoId(url: string) {
-  for (const pattern of YOUTUBE_ID_PATTERNS) {
-    const match = url.match(pattern);
+function parseYouTubeVideoId(input: string): string | null {
+  try {
+    const url = new URL(input);
+    const host = url.hostname.toLowerCase();
 
-    if (match?.groups?.id) {
-      return match.groups.id;
+    if (!YOUTUBE_HOSTS.has(host)) {
+      return null;
     }
-  }
 
-  return null;
+    let id: string | null | undefined;
+
+    if (host === 'youtu.be') {
+      id = url.pathname.split('/').find(Boolean);
+    } else if (url.pathname === '/watch') {
+      id = url.searchParams.get('v');
+    } else {
+      id = url.pathname.match(/^\/(?:live|shorts|embed|v)\/(?<id>[^/?#]+)/u)
+        ?.groups?.id;
+    }
+
+    return id || null;
+  } catch {
+    return null;
+  }
 }
 
 function getQuotaResetAt(nowMs: number) {
