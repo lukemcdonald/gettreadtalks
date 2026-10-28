@@ -1,3 +1,5 @@
+import type { Page } from '@playwright/test';
+
 import { expect, test } from './fixtures/index.ts';
 
 const PUBLIC_PAGES = [
@@ -17,15 +19,35 @@ const PUBLIC_PAGES = [
   { name: 'topics', path: '/topics' },
 ] as const;
 
+async function expectHeadingOutline(page: Page) {
+  await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
+  await expect(page.getByRole('main')).toHaveCount(1);
+
+  const levels = await page
+    .getByRole('heading')
+    .evaluateAll((elements) =>
+      elements.map((element) => Math.trunc(Number(element.tagName.slice(1))))
+    );
+
+  let previousLevel = 0;
+
+  for (const level of levels) {
+    expect(level).toBeGreaterThan(0);
+    expect(level).toBeLessThanOrEqual(previousLevel + 1);
+    previousLevel = level;
+  }
+}
+
 for (const { name, path } of PUBLIC_PAGES) {
-  test(`Headings / ${name} has one h1`, async ({ page }) => {
+  test(`Headings / ${name} has one h1 and no skipped levels`, async ({
+    page,
+  }) => {
     const response = await page.goto(path);
 
     if (name === 'not found') {
       expect(response?.status()).toBe(404);
     }
 
-    await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
-    await expect(page.getByRole('main')).toHaveCount(1);
+    await expectHeadingOutline(page);
   });
 }

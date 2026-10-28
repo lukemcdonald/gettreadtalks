@@ -50,7 +50,7 @@ Titles use `HeroTitle` in `src/components/hero/hero-title.tsx` or `PageHeader` i
 
 The document has one site `header`, one `main` (`#main`, skip target), and one `footer`. Public content pages (talk, speaker, topic, collection, clip, about, beliefs, /ai) are an `article`. Listings and groupings are a `section`.
 
-Every public page has one `h1` (`PageHeader` or `HeroTitle`). Real section titles are `h2` (`SectionHeading`, `FeaturedGrid`, search groups). Nested groups under an `h2` may use `h3`. Do not skip levels. Metadata labels (`MetadataGroup`), footer column titles, and card or caption titles are not headings — keep the same classes on `p`.
+Every public page has one `h1` (`PageHeader` or `HeroTitle`). Real section titles are `h2` (`SectionHeading`, `FeaturedGrid`, search groups). Card titles (`MediaCardTitle`) and featured captions are one level below their container: `h3` under a section `h2`, `h2` on flat listings. Nested groups under an `h2` may use `h3`. Do not skip levels. Metadata labels (`MetadataGroup`) and footer column titles are not headings.
 
 Overlays: `Dialog` for centered blocking UI (confirm, alert, desktop search). `Drawer` for nav, mobile search, mobile filters, and `FormSheet` (`src/components/ui/form-sheet.tsx`) — right on large screens, bottom on small. Do not import `Sheet` in feature or page code.
 

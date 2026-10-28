@@ -11,6 +11,7 @@ import { cn } from '@/utils';
 interface FeaturedVideoCardProps {
   actionLabel?: string;
   href: string;
+  level?: 2 | 3;
   sizes?: string;
   subtitle?: ReactNode;
   thumbnail: string | null;
@@ -30,18 +31,25 @@ function CaptionCard({ children }: { children: ReactNode }) {
 
 function Caption({
   actionLabel,
+  level = 2,
   subtitle,
   title,
 }: {
   actionLabel: string;
+  level?: 2 | 3;
   subtitle?: ReactNode;
   title: string;
 }) {
+  const Heading = level === 3 ? 'h3' : 'h2';
+
   return (
     <CaptionCard>
       <div className="flex items-start justify-between gap-4 text-sm">
         <div className="min-w-0">
-          <p className="text-foreground font-medium text-pretty">{title}</p>
+          <Heading className="text-foreground font-medium text-pretty">
+            {title}
+          </Heading>
+
           {!!subtitle && (
             <p className="text-muted-foreground min-w-0">{subtitle}</p>
           )}
@@ -58,6 +66,7 @@ function Caption({
 export function FeaturedVideoCard({
   actionLabel = 'View details',
   href,
+  level,
   sizes = '(max-width: 1024px) 100vw, 50vw',
   subtitle,
   thumbnail,
@@ -81,7 +90,12 @@ export function FeaturedVideoCard({
         />
       </VideoFrame>
 
-      <Caption actionLabel={actionLabel} subtitle={subtitle} title={title} />
+      <Caption
+        actionLabel={actionLabel}
+        level={level}
+        subtitle={subtitle}
+        title={title}
+      />
     </Link>
   );
 }
