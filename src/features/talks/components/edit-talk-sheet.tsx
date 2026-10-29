@@ -11,7 +11,7 @@ import type { StatusPrefill } from '@/lib/entities/status-prefill';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useState, useTransition } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 
 import { useSheetRoute } from '@/app/@sheet/_hooks/use-sheet-route';
 import {
@@ -179,6 +179,7 @@ export function EditTalkSheet({
     talk,
   });
   const { handleTabChange, tab } = useEditTalkTab(talk._id);
+  const mediaUrl = useWatch({ control: form.control, name: 'mediaUrl' });
 
   return (
     <>
@@ -236,7 +237,7 @@ export function EditTalkSheet({
                 />
                 <TalkTranscriptFetch
                   hasTranscript={summary.hasTranscript}
-                  mediaUrl={talk.mediaUrl}
+                  mediaUrl={mediaUrl}
                   talkId={talk._id}
                 >
                   {summary.hasTranscript ? (
