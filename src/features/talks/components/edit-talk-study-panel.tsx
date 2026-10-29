@@ -121,14 +121,14 @@ function TalkStudyBodyField({
       name="body"
       render={({ field, fieldState }) => (
         <Field
+          className="min-h-0 w-full flex-1"
           dirty={fieldState.isDirty}
           invalid={fieldState.invalid}
           name={field.name}
           touched={fieldState.isTouched}
         >
           <Textarea
-            className="[&_[data-slot=textarea]]:field-sizing-fixed [&_[data-slot=textarea]]:min-h-64"
-            rows={16}
+            className="grid min-h-40 w-full min-w-0 flex-1 grid-cols-1 grid-rows-1 sm:min-h-64 [&_[data-slot=textarea]]:field-sizing-fixed [&_[data-slot=textarea]]:h-full [&_[data-slot=textarea]]:min-h-0 [&_[data-slot=textarea]]:min-w-0 [&_[data-slot=textarea]]:resize-none"
             size="lg"
             {...field}
             aria-invalid={fieldState.invalid}
@@ -237,9 +237,10 @@ export function EditTalkStudyPanel({
             </Button>
           </>
         }
+        scrollable={!isEditing}
       >
         <div
-          className="flex flex-col gap-4"
+          className="flex min-h-0 flex-1 flex-col gap-4"
           data-testid="edit-talk-study-panel"
         >
           <FormError error={form.formState.errors.root} />
