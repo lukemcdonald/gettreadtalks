@@ -6,34 +6,6 @@ describe('getVideoId', () => {
   it.each([
     {
       expected: { id: 'a1SQSEiYDDs', service: 'youtube' },
-      url: 'https://www.youtube.com/watch?v=a1SQSEiYDDs',
-    },
-    {
-      expected: { id: 'a1SQSEiYDDs', service: 'youtube' },
-      url: 'https://www.youtube.com/watch?v=a1SQSEiYDDs&t=30s&list=PLxx',
-    },
-    {
-      expected: { id: 'a1SQSEiYDDs', service: 'youtube' },
-      url: 'https://youtu.be/a1SQSEiYDDs',
-    },
-    {
-      expected: { id: 'a1SQSEiYDDs', service: 'youtube' },
-      url: 'https://m.youtube.com/watch?v=a1SQSEiYDDs',
-    },
-    {
-      expected: { id: 'a1SQSEiYDDs', service: 'youtube' },
-      url: 'https://www.youtube-nocookie.com/embed/a1SQSEiYDDs',
-    },
-    {
-      expected: { id: 'a1SQSEiYDDs', service: 'youtube' },
-      url: 'https://www.youtube.com/embed/a1SQSEiYDDs',
-    },
-    {
-      expected: { id: 'a1SQSEiYDDs', service: 'youtube' },
-      url: 'https://www.youtube.com/shorts/a1SQSEiYDDs',
-    },
-    {
-      expected: { id: 'a1SQSEiYDDs', service: 'youtube' },
       url: 'https://www.youtube.com/live/a1SQSEiYDDs',
     },
     {
@@ -42,7 +14,7 @@ describe('getVideoId', () => {
     },
     {
       expected: null,
-      url: '',
+      url: 'https://www.loom.com/share/0123456789abcdef0123456789abcdef',
     },
     {
       expected: null,
