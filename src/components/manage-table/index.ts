@@ -2,6 +2,7 @@ export { getHoverItems } from './manage-hover-details';
 export { ManageCountCell, ManageRow } from './manage-row';
 export {
   type ManageListSearchParams,
+  ManageListToolbar,
   ManageSearchInput,
 } from './manage-search-input';
 export type { ManageStatus } from './manage-status';

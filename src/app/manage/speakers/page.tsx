@@ -4,6 +4,7 @@ import { Suspense } from 'react';
 
 import { ManageSpeakersContent } from '@/app/manage/speakers/_components/speakers-content';
 import {
+  ManageListToolbar,
   ManageSearchInput,
   ManageTableSkeleton,
 } from '@/components/manage-table';
@@ -25,8 +26,10 @@ export default function ManageSpeakersPage({
         description="Manage all speakers"
         title="Manage Speakers"
       />
-      <Suspense fallback={<Skeleton className="h-10 w-full" />}>
-        <ManageSearchInput placeholder="Search speakers..." />
+      <Suspense fallback={<Skeleton className="h-16 w-full" />}>
+        <ManageListToolbar>
+          <ManageSearchInput placeholder="Search speakers..." />
+        </ManageListToolbar>
       </Suspense>
       <Suspense fallback={<ManageTableSkeleton resource="speakers" />}>
         <ManageSpeakersContent searchParams={searchParams} />

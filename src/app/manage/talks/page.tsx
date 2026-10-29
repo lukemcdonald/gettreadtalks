@@ -35,7 +35,7 @@ export default function ManageTalksPage({
         description="Manage all talks across all statuses"
         title="Manage Talks"
       />
-      <Suspense fallback={<Skeleton className="h-10 w-full" />}>
+      <Suspense fallback={<Skeleton className="h-16 w-full" />}>
         <TalksFilters />
       </Suspense>
       <Suspense fallback={<ManageTableSkeleton resource="talks" />}>

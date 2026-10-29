@@ -4,6 +4,7 @@ import { Suspense } from 'react';
 
 import { ManageTopicsContent } from '@/app/manage/topics/_components/topics-content';
 import {
+  ManageListToolbar,
   ManageSearchInput,
   ManageTableSkeleton,
 } from '@/components/manage-table';
@@ -25,8 +26,10 @@ export default function ManageTopicsPage({
         description="Manage all topics"
         title="Manage Topics"
       />
-      <Suspense fallback={<Skeleton className="h-10 w-full" />}>
-        <ManageSearchInput placeholder="Search topics..." />
+      <Suspense fallback={<Skeleton className="h-16 w-full" />}>
+        <ManageListToolbar>
+          <ManageSearchInput placeholder="Search topics..." />
+        </ManageListToolbar>
       </Suspense>
       <Suspense fallback={<ManageTableSkeleton resource="topics" />}>
         <ManageTopicsContent searchParams={searchParams} />

@@ -1,4 +1,7 @@
-import { ManageSearchInput } from '@/components/manage-table';
+import {
+  ManageListToolbar,
+  ManageSearchInput,
+} from '@/components/manage-table';
 import { SelectFilter } from '@/components/ui/select-filter';
 
 const FILTER_OPTIONS = [
@@ -10,7 +13,7 @@ const FILTER_OPTIONS = [
 
 export function ClipsFilters() {
   return (
-    <div className="flex flex-wrap gap-4">
+    <ManageListToolbar>
       <SelectFilter
         className="w-48"
         label="Status"
@@ -19,6 +22,6 @@ export function ClipsFilters() {
         placeholder="All Statuses"
       />
       <ManageSearchInput placeholder="Search clips..." />
-    </div>
+    </ManageListToolbar>
   );
 }

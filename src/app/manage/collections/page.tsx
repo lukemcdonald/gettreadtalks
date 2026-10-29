@@ -4,6 +4,7 @@ import { Suspense } from 'react';
 
 import { ManageCollectionsContent } from '@/app/manage/collections/_components/collections-content';
 import {
+  ManageListToolbar,
   ManageSearchInput,
   ManageTableSkeleton,
 } from '@/components/manage-table';
@@ -25,8 +26,10 @@ export default function ManageCollectionsPage({
         description="Manage all collections"
         title="Manage Collections"
       />
-      <Suspense fallback={<Skeleton className="h-10 w-full" />}>
-        <ManageSearchInput placeholder="Search collections..." />
+      <Suspense fallback={<Skeleton className="h-16 w-full" />}>
+        <ManageListToolbar>
+          <ManageSearchInput placeholder="Search collections..." />
+        </ManageListToolbar>
       </Suspense>
       <Suspense fallback={<ManageTableSkeleton resource="collections" />}>
         <ManageCollectionsContent searchParams={searchParams} />

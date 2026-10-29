@@ -62,7 +62,7 @@ export function Pagination({
   }
 
   return (
-    <div className="mt-8 flex justify-center gap-4">
+    <div className="flex justify-center gap-4">
       <Button
         disabled={!hasPrevPage}
         onClick={handlePrevious}
