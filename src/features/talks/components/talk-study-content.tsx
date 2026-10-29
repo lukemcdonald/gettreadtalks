@@ -77,6 +77,7 @@ export function TalkStudyContent({ body }: { body?: string | null }) {
       <Markdown
         allowedElements={STUDY_MARKDOWN_ELEMENTS}
         components={studyMarkdownComponents}
+        skipHtml
         unwrapDisallowed
       >
         {markdown}
