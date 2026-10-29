@@ -7,6 +7,7 @@ import { Button, Heading, Section, Text } from 'react-email';
 
 import { site } from '../../src/configs/site';
 import { EmailLayout } from './components/layout';
+import { emailButton, emailColors, emailParagraph } from './components/styles';
 
 export function MediaHealthEmail({ items, siteUrl }: MediaHealthEmailProps) {
   const newItems = items.filter((item) => item.isNew);
@@ -14,8 +15,8 @@ export function MediaHealthEmail({ items, siteUrl }: MediaHealthEmailProps) {
 
   return (
     <EmailLayout preview="Private or missing talk and clip media still needs a look.">
-      <Text style={paragraph}>Hi,</Text>
-      <Text style={paragraph}>
+      <Text style={emailParagraph}>Hi,</Text>
+      <Text style={emailParagraph}>
         These published YouTube or Vimeo URLs are private or missing and still
         need action. New since last email is anything flagged since the last
         digest. Still unresolved was already reported and has not been archived
@@ -34,8 +35,8 @@ export function MediaHealthEmail({ items, siteUrl }: MediaHealthEmailProps) {
         items={unresolvedItems}
         siteUrl={siteUrl}
       />
-      <Text style={paragraph}>Blessings,</Text>
-      <Text style={paragraph}>The {site.name} job runner</Text>
+      <Text style={emailParagraph}>Blessings,</Text>
+      <Text style={emailParagraph}>The {site.name} job runner</Text>
     </EmailLayout>
   );
 }
@@ -128,14 +129,10 @@ function MediaHealthItem({
 }
 
 const button = {
-  backgroundColor: '#2754C5',
-  borderRadius: '4px',
-  color: '#fff',
+  ...emailButton,
   fontSize: '14px',
-  fontWeight: 'bold',
   lineHeight: '40px',
   padding: '0 16px',
-  textDecoration: 'none',
 };
 
 const buttonContainer = {
@@ -143,9 +140,9 @@ const buttonContainer = {
 };
 
 const entityHeading = {
-  color: '#111',
+  color: emailColors.foreground,
   fontSize: '16px',
-  fontWeight: 'bold',
+  fontWeight: '600',
   lineHeight: '24px',
   margin: '16px 0 8px',
 };
@@ -155,39 +152,32 @@ const itemSection = {
 };
 
 const metaText = {
-  color: '#555',
+  color: emailColors.muted,
   fontSize: '14px',
   lineHeight: '22px',
   margin: '0 0 4px',
 };
 
-const paragraph = {
-  color: '#333',
-  fontSize: '16px',
-  lineHeight: '26px',
-  margin: '0 0 16px',
-};
-
 const secondaryButton = {
   ...button,
-  backgroundColor: '#fff',
-  border: '1px solid #2754C5',
-  color: '#2754C5',
+  backgroundColor: emailColors.card,
+  border: `1px solid ${emailColors.primary}`,
+  color: emailColors.primary,
   marginLeft: '8px',
 };
 
 const sectionHeading = {
-  color: '#111',
+  color: emailColors.foreground,
   fontSize: '18px',
-  fontWeight: 'bold',
+  fontWeight: '600',
   lineHeight: '26px',
   margin: '24px 0 8px',
 };
 
 const titleText = {
-  color: '#111',
+  color: emailColors.foreground,
   fontSize: '16px',
-  fontWeight: 'bold',
+  fontWeight: '600',
   lineHeight: '24px',
   margin: '0 0 4px',
 };

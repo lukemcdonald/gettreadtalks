@@ -87,6 +87,7 @@ Import COSS from `@/components/ui` (`src/components/ui`). Never edit `src/compon
 - **Transcript** — admin Content tab uses a large stock `Dialog` (`src/features/talks/components/talk-transcript-dialog.tsx`) with a plain textarea that fills the dialog body. The field stays inside the dialog padding. Long text scrolls inside the textarea. The footer stays on screen. Load text only when the dialog opens.
 - **Section heading** — `SectionHeading` in `src/components/section-heading.tsx`. Solid `bg-input` rule between heading and meta.
 - **Metadata labels** — `MetadataGroup` in `src/components/metadata-group.tsx`. Uppercase muted labels for About, Topics, Scripture, Actions. Not headings.
+- **Transactional email** — `convex/emails/`. Shared chrome in `components/layout.tsx`; colors and type in `components/styles.ts` as hex (email clients do not honor CSS variables or oklch). Wordmark is the hosted PNG at `{site.url}/logo.png`. The primary button is brand red; the raw URL under it is a muted fallback. Keep copy short: one action, expiry, ignore-if-not-you, support. Do not wrap templates in React Email `Tailwind` — Tailwind v4 emits oklch.
 
 ## Do's and Don'ts
 
@@ -101,7 +102,8 @@ Import COSS from `@/components/ui` (`src/components/ui`). Never edit `src/compon
 
 **Don't**
 
-- Don't paste hex, `oklch`, or arbitrary property values into components.
+- Don't paste hex, `oklch`, or arbitrary property values into components. Email templates are the exception: they use hex in `convex/emails/components/styles.ts`.
+- Don't wrap email templates in React Email `Tailwind`.
 - Don't add a one-off utility when a shared component exists.
 - Don't restyle `VideoFrame` per route or inset the featured caption.
 - Don't add visible breadcrumbs, an Updated column, or a mobile status badge on manage rows.
