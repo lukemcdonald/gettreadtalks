@@ -4,12 +4,18 @@ import { convexTest } from 'convex-test';
 
 import { components } from './_generated/api';
 import betterAuthSchema from './betterAuth/schema';
+import { insertClip } from './model/clips/factory';
+import { insertCollection } from './model/collections/factory';
+import { insertSpeaker } from './model/speakers/factory';
+import { insertTalk } from './model/talks/factory';
+import { insertTalkOnTopic, insertTopic } from './model/topics/factory';
 import schema from './schema';
 
 const modules = import.meta.glob([
   './**/*.{js,ts}',
   '!./**/*.d.ts',
   '!./**/*.test.ts',
+  '!./**/factory.ts',
   '!./betterAuth/**',
 ]);
 
@@ -123,8 +129,6 @@ export async function signInAsPasswordUser(
   return signedIn;
 }
 
-const MEDIA_URL = 'https://www.youtube.com/watch?v=0SVTl4Xa5fY';
-
 export const visibilitySlugs = {
   clipOnDraftTalk: 'clip-on-draft-talk',
   clipOnPublishedTalk: 'clip-on-published-talk',
@@ -145,102 +149,89 @@ export async function seedVisibilityCatalog(
   t: ReturnType<typeof createConvexTest>
 ) {
   await t.run(async (ctx) => {
-    const draftSpeakerId = await ctx.db.insert('speakers', {
+    const draftSpeakerId = await insertSpeaker(ctx, {
       firstName: 'Draft',
       lastName: 'Only',
       slug: visibilitySlugs.draftSpeaker,
     });
-    const publishedSpeakerId = await ctx.db.insert('speakers', {
-      firstName: 'John',
-      lastName: 'Bunyan',
+    const publishedSpeakerId = await insertSpeaker(ctx, {
       slug: visibilitySlugs.publishedSpeaker,
     });
 
-    await ctx.db.insert('collections', {
+    await insertCollection(ctx, {
       slug: visibilitySlugs.emptyCollection,
       title: 'Empty Collection',
     });
-    const publishedCollectionId = await ctx.db.insert('collections', {
+    const publishedCollectionId = await insertCollection(ctx, {
       slug: visibilitySlugs.publishedCollection,
       title: 'Published Collection',
     });
-    const unpublishedOnlyCollectionId = await ctx.db.insert('collections', {
+    const unpublishedOnlyCollectionId = await insertCollection(ctx, {
       slug: visibilitySlugs.unpublishedOnlyCollection,
       title: 'Unpublished Collection',
     });
 
-    await ctx.db.insert('topics', {
+    await insertTopic(ctx, {
       slug: visibilitySlugs.emptyTopic,
       title: 'Empty Topic',
     });
-    const publishedTopicId = await ctx.db.insert('topics', {
+    const publishedTopicId = await insertTopic(ctx, {
       slug: visibilitySlugs.publishedTopic,
       title: 'Published Topic',
     });
-    const unpublishedOnlyTopicId = await ctx.db.insert('topics', {
+    const unpublishedOnlyTopicId = await insertTopic(ctx, {
       slug: visibilitySlugs.unpublishedOnlyTopic,
       title: 'Unpublished Topic',
     });
 
-    const draftTalkId = await ctx.db.insert('talks', {
+    const draftTalkId = await insertTalk(ctx, {
       collectionId: unpublishedOnlyCollectionId,
-      mediaUrl: MEDIA_URL,
       slug: visibilitySlugs.draftTalk,
       speakerId: publishedSpeakerId,
       status: 'backlog',
       title: 'Grace Draft',
     });
-    const publishedTalkId = await ctx.db.insert('talks', {
+    const publishedTalkId = await insertTalk(ctx, {
       collectionId: publishedCollectionId,
-      mediaUrl: MEDIA_URL,
       publishedAt: Date.parse('2024-06-01T12:00:00.000Z'),
       scripture: 'Romans 5:1-2',
       slug: visibilitySlugs.publishedTalk,
       speakerId: publishedSpeakerId,
-      status: 'published',
-      title: 'Grace Abounding',
     });
 
-    await ctx.db.insert('talks', {
-      mediaUrl: MEDIA_URL,
+    await insertTalk(ctx, {
       slug: 'unpublished-from-draft-speaker',
       speakerId: draftSpeakerId,
       status: 'backlog',
       title: 'Hidden Talk',
     });
 
-    await ctx.db.insert('clips', {
-      mediaUrl: MEDIA_URL,
+    await insertClip(ctx, {
       publishedAt: Date.parse('2024-06-01T12:30:00.000Z'),
       slug: visibilitySlugs.clipOnPublishedTalk,
       speakerId: publishedSpeakerId,
-      status: 'published',
       talkId: publishedTalkId,
       title: 'Grace Clip',
     });
-    await ctx.db.insert('clips', {
-      mediaUrl: MEDIA_URL,
+    await insertClip(ctx, {
       publishedAt: Date.parse('2024-06-01T12:45:00.000Z'),
       slug: visibilitySlugs.clipOnDraftTalk,
       speakerId: publishedSpeakerId,
-      status: 'published',
       talkId: draftTalkId,
       title: 'Grace Clip Draft',
     });
-    await ctx.db.insert('clips', {
-      mediaUrl: MEDIA_URL,
+    await insertClip(ctx, {
       publishedAt: Date.parse('2024-06-01T13:00:00.000Z'),
       slug: visibilitySlugs.standaloneClip,
       speakerId: publishedSpeakerId,
-      status: 'published',
       title: 'Standalone Grace Clip',
     });
 
-    await ctx.db.insert('talksOnTopics', {
+    await insertTalkOnTopic(ctx, {
       talkId: publishedTalkId,
       topicId: publishedTopicId,
     });
-    await ctx.db.insert('talksOnTopics', {
+    await insertTalkOnTopic(ctx, {
       talkId: draftTalkId,
       topicId: unpublishedOnlyTopicId,
     });
