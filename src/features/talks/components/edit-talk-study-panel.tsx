@@ -6,13 +6,13 @@ import type { Control, Resolver, UseFormSetError } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery } from 'convex/react';
+import { useState } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 
 import {
   Button,
   Field,
   FieldError,
-  FieldLabel,
   FormError,
   FormSheetBody,
   Textarea,
@@ -70,6 +70,44 @@ function getStudyTemplateWarning(body: string) {
   return `Missing template headings: ${missingHeadings.join(', ')}.`;
 }
 
+function TalkStudyToolbar({
+  control,
+  hasTranscript,
+  isEditing,
+  onGenerated,
+  onToggleEditing,
+  talkId,
+}: {
+  control: Control<TalkFeatureFormData>;
+  hasTranscript: boolean;
+  isEditing: boolean;
+  onGenerated: () => void;
+  onToggleEditing: () => void;
+  talkId: TalkId;
+}) {
+  return (
+    <div className="flex w-full flex-wrap items-center gap-2">
+      <TalkStudyGenerate
+        hasTranscript={hasTranscript}
+        onGenerated={onGenerated}
+        talkId={talkId}
+      />
+      <Button
+        className="shrink-0"
+        onClick={onToggleEditing}
+        size="sm"
+        type="button"
+        variant="outline"
+      >
+        {isEditing ? 'Done' : 'Edit'}
+      </Button>
+      <div className="ml-auto">
+        <StudyStatusSelect control={control} name="status" />
+      </div>
+    </div>
+  );
+}
+
 function TalkStudyBodyField({
   control,
   warningText,
@@ -78,47 +116,89 @@ function TalkStudyBodyField({
   warningText: string | null;
 }) {
   return (
-    <div className="flex w-full flex-col gap-2">
-      <div className="flex w-full items-center justify-between gap-2">
-        <Field className="contents">
-          <FieldLabel htmlFor="body">Study</FieldLabel>
+    <Controller
+      control={control}
+      name="body"
+      render={({ field, fieldState }) => (
+        <Field
+          dirty={fieldState.isDirty}
+          invalid={fieldState.invalid}
+          name={field.name}
+          touched={fieldState.isTouched}
+        >
+          <Textarea
+            className="[&_[data-slot=textarea]]:field-sizing-fixed [&_[data-slot=textarea]]:min-h-64"
+            rows={16}
+            size="lg"
+            {...field}
+            aria-invalid={fieldState.invalid}
+            aria-label="Study"
+            id={field.name}
+          />
+          {fieldState.error ? (
+            <FieldError match>{fieldState.error.message}</FieldError>
+          ) : null}
+          {warningText ? (
+            <p
+              className="text-muted-foreground text-sm"
+              data-testid="study-template-warning"
+            >
+              {warningText}
+            </p>
+          ) : null}
         </Field>
-        <StudyStatusSelect control={control} name="status" />
-      </div>
-      <Controller
-        control={control}
-        name="body"
-        render={({ field, fieldState }) => (
-          <Field
-            dirty={fieldState.isDirty}
-            invalid={fieldState.invalid}
-            name={field.name}
-            touched={fieldState.isTouched}
-          >
-            <Textarea
-              className="[&_[data-slot=textarea]]:field-sizing-fixed [&_[data-slot=textarea]]:min-h-64"
-              rows={16}
-              size="lg"
-              {...field}
-              aria-invalid={fieldState.invalid}
-              id={field.name}
-            />
-            {fieldState.error ? (
-              <FieldError match>{fieldState.error.message}</FieldError>
-            ) : null}
-            {warningText ? (
-              <p
-                className="text-muted-foreground text-sm"
-                data-testid="study-template-warning"
-              >
-                {warningText}
-              </p>
-            ) : null}
-          </Field>
-        )}
-      />
-    </div>
+      )}
+    />
   );
+}
+
+function TalkStudyPanelBody({
+  body,
+  control,
+  isEditing,
+}: {
+  body: string;
+  control: Control<TalkFeatureFormData>;
+  isEditing: boolean;
+}) {
+  if (isEditing) {
+    return (
+      <TalkStudyBodyField
+        control={control}
+        warningText={getStudyTemplateWarning(body)}
+      />
+    );
+  }
+
+  return <TalkStudyContent body={body} />;
+}
+
+function useTalkStudyPanelForm({
+  initialFeature,
+  talkId,
+}: {
+  initialFeature?: TalkFeature | null;
+  talkId: TalkId;
+}) {
+  const liveFeature = useQuery(api.talkFeatures.get, { kind: 'study', talkId });
+  const feature = liveFeature === undefined ? initialFeature : liveFeature;
+  const [isEditing, setIsEditing] = useState(!initialFeature?.body?.trim());
+  const form = useForm<TalkFeatureFormData>({
+    mode: 'onBlur',
+    resolver: talkFeatureResolver,
+    values: getTalkFeatureFormValues(feature ?? EMPTY_STUDY_FEATURE),
+  });
+  const body = useWatch({
+    control: form.control,
+    name: 'body',
+  });
+
+  return {
+    body,
+    form,
+    isEditing,
+    setIsEditing,
+  };
 }
 
 export function EditTalkStudyPanel({
@@ -134,16 +214,9 @@ export function EditTalkStudyPanel({
   onSuccess: () => void;
   talkId: TalkId;
 }) {
-  const liveFeature = useQuery(api.talkFeatures.get, { kind: 'study', talkId });
-  const feature = liveFeature === undefined ? initialFeature : liveFeature;
-  const form = useForm<TalkFeatureFormData>({
-    mode: 'onBlur',
-    resolver: talkFeatureResolver,
-    values: getTalkFeatureFormValues(feature ?? EMPTY_STUDY_FEATURE),
-  });
-  const previewBody = useWatch({
-    control: form.control,
-    name: 'body',
+  const { body, form, isEditing, setIsEditing } = useTalkStudyPanelForm({
+    initialFeature,
+    talkId,
   });
 
   return (
@@ -165,19 +238,28 @@ export function EditTalkStudyPanel({
           </>
         }
       >
-        <div className="space-y-6" data-testid="edit-talk-study-panel">
+        <div
+          className="flex flex-col gap-4"
+          data-testid="edit-talk-study-panel"
+        >
           <FormError error={form.formState.errors.root} />
-          <TalkStudyGenerate hasTranscript={hasTranscript} talkId={talkId} />
-          <TalkStudyBodyField
+          <TalkStudyToolbar
             control={form.control}
-            warningText={getStudyTemplateWarning(previewBody ?? '')}
+            hasTranscript={hasTranscript}
+            isEditing={isEditing}
+            onGenerated={() => {
+              setIsEditing(false);
+            }}
+            onToggleEditing={() => {
+              setIsEditing((current) => !current);
+            }}
+            talkId={talkId}
           />
-          <div className="space-y-4" data-testid="talk-study-preview">
-            <p className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">
-              Preview
-            </p>
-            <TalkStudyContent body={previewBody} />
-          </div>
+          <TalkStudyPanelBody
+            body={body ?? ''}
+            control={form.control}
+            isEditing={isEditing}
+          />
         </div>
       </FormSheetBody>
     </form>

@@ -30,9 +30,11 @@ function getStudyGenerateStatusText({
 
 export function TalkStudyGenerate({
   hasTranscript,
+  onGenerated,
   talkId,
 }: {
   hasTranscript: boolean;
+  onGenerated?: () => void;
   talkId: TalkId;
 }) {
   const generate = useAction(api.talkFeatures.generateStudy);
@@ -52,7 +54,10 @@ export function TalkStudyGenerate({
       .then((result) => {
         if (result.status === 'failed') {
           setError(result.message);
+          return;
         }
+
+        onGenerated?.();
       })
       .catch(() => {
         setError('Something went wrong. Please try again.');
