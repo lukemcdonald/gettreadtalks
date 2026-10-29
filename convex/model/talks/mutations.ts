@@ -33,6 +33,45 @@ import {
   talkTranscriptFetchErrorCode,
 } from './validators';
 
+function definedFields<T extends object>(fields: T): Partial<T> {
+  return Object.fromEntries(
+    Object.entries(fields).filter(([, value]) => value !== undefined)
+  ) as Partial<T>;
+}
+
+function hasReviewedTalkStudy(
+  study: {
+    manuallyEditedAt?: number;
+    studyStatus: 'draft' | 'published';
+  } | null
+) {
+  return (
+    study !== null &&
+    (study.studyStatus === 'published' || study.manuallyEditedAt !== undefined)
+  );
+}
+
+function firstDefined<T>(primary: T | undefined, fallback: T | undefined) {
+  if (primary !== undefined) {
+    return primary;
+  }
+
+  return fallback;
+}
+
+function talkStudyOptionalContent(
+  args: {
+    keyPassages?: Doc<'talkStudies'>['keyPassages'];
+    mainPoints?: Doc<'talkStudies'>['mainPoints'];
+  },
+  existing: Doc<'talkStudies'> | null
+) {
+  return definedFields({
+    keyPassages: firstDefined(args.keyPassages, existing?.keyPassages),
+    mainPoints: firstDefined(args.mainPoints, existing?.mainPoints),
+  });
+}
+
 async function setTalkTopics(
   ctx: MutationCtx,
   talkId: Id<'talks'>,
@@ -393,9 +432,15 @@ export const saveTalkStudyDraft = internalMutation({
       .query('talkStudies')
       .withIndex('by_talkId', (q) => q.eq('talkId', args.talkId))
       .unique();
+
+    if (hasReviewedTalkStudy(existing)) {
+      throwConvexError(409, 'Study already reviewed');
+    }
+
     const fields = {
       generatedAt: Date.now(),
       generator: args.generator,
+      ...talkStudyOptionalContent(args, existing),
       outline: args.outline,
       scriptureRefs: args.scriptureRefs,
       studyGuide: args.studyGuide,
@@ -406,13 +451,6 @@ export const saveTalkStudyDraft = internalMutation({
     };
 
     if (existing) {
-      if (
-        existing.studyStatus === 'published' ||
-        existing.manuallyEditedAt !== undefined
-      ) {
-        throwConvexError(409, 'Study already reviewed');
-      }
-
       await ctx.db.replace(existing._id, fields);
 
       return existing._id;
@@ -425,27 +463,34 @@ export const saveTalkStudyDraft = internalMutation({
 
 export const updateTalkStudy = mutation({
   args: {
-    studyStatus: talkStudyStatus,
-    summary: v.string(),
+    keyPassages: talkStudyContentFields.keyPassages,
+    mainPoints: talkStudyContentFields.mainPoints,
+    studyStatus: v.optional(talkStudyStatus),
+    summary: v.optional(v.string()),
     talkId: v.id('talks'),
   },
-  handler: async (ctx, { studyStatus, summary, talkId }) => {
+  handler: async (ctx, args) => {
     await requireAdmin(ctx);
-    await getOrThrow(ctx, 'talks', talkId);
+    await getOrThrow(ctx, 'talks', args.talkId);
 
     const existing = await getOneFrom(
       ctx.db,
       'talkStudies',
       'by_talkId',
-      talkId
+      args.talkId
     );
+    const content = definedFields({
+      keyPassages: args.keyPassages,
+      mainPoints: args.mainPoints,
+      studyStatus: args.studyStatus,
+      summary: args.summary,
+    });
     const editedAt = Date.now();
 
     if (existing) {
       await ctx.db.patch(existing._id, {
+        ...content,
         manuallyEditedAt: editedAt,
-        studyStatus,
-        summary,
       });
 
       return existing._id;
@@ -454,14 +499,15 @@ export const updateTalkStudy = mutation({
     return await ctx.db.insert('talkStudies', {
       generatedAt: editedAt,
       generator: 'manual',
+      ...content,
       manuallyEditedAt: editedAt,
       outline: [],
       scriptureRefs: [],
       studyGuide: [],
-      studyStatus,
+      studyStatus: args.studyStatus ?? 'draft',
       suggestedTopics: [],
-      summary,
-      talkId,
+      summary: args.summary ?? '',
+      talkId: args.talkId,
     });
   },
   returns: v.id('talkStudies'),

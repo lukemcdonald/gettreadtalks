@@ -1,7 +1,7 @@
 import type { Clip } from '@/features/clips/types';
 import type { Collection } from '@/features/collections/types';
 import type { Speaker } from '@/features/speakers/types';
-import type { Talk } from '@/features/talks/types';
+import type { Talk, TalkStudy } from '@/features/talks/types';
 import type { Topic } from '@/features/topics/types';
 import type { ReactNode } from 'react';
 
@@ -13,6 +13,8 @@ import { CollectionMediaCard } from '@/features/collections/components/collectio
 interface TalkContentSectionsProps {
   clips: Clip[];
   collection: Collection | null;
+  keyPassages: TalkStudy['keyPassages'] | null;
+  mainPoints: TalkStudy['mainPoints'] | null;
   relatedTalks?: ReactNode;
   speaker: Speaker | null;
   summary: string | null;
@@ -23,6 +25,8 @@ interface TalkContentSectionsProps {
 export function TalkContentSections({
   clips,
   collection,
+  keyPassages,
+  mainPoints,
   relatedTalks,
   speaker,
   summary,
@@ -66,6 +70,8 @@ export function TalkContentSections({
 
       <aside className="order-1 lg:sticky lg:top-20 lg:order-2 lg:h-fit">
         <TalkMetadataSidebar
+          keyPassages={keyPassages}
+          mainPoints={mainPoints}
           speaker={speaker}
           summary={summary}
           talk={talk}

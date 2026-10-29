@@ -14,7 +14,11 @@ import {
   TALK_SUMMARY_SYSTEM_PROMPT,
   talkSummaryOutputSchema,
 } from './summaryPrompt';
-import { talkStudyContentFields } from './validators';
+import {
+  talkStudyContentFields,
+  talkStudyKeyPassage,
+  talkStudyMainPoint,
+} from './validators';
 
 const SUMMARY_GENERATE_MESSAGES = {
   ALREADY_REVIEWED: 'This study has already been reviewed.',
@@ -70,19 +74,27 @@ function getTalkStudyDraftFields(study: Doc<'talkStudies'> | null) {
       studyGuide: [],
       studyReviewed: false,
       suggestedTopics: [],
+      summary: '',
     };
   }
 
   return {
+    ...(study.keyPassages === undefined
+      ? {}
+      : { keyPassages: study.keyPassages }),
+    ...(study.mainPoints === undefined ? {} : { mainPoints: study.mainPoints }),
     outline: study.outline,
     scriptureRefs: study.scriptureRefs,
     studyGuide: study.studyGuide,
     studyReviewed: hasReviewedTalkStudy(study),
     suggestedTopics: study.suggestedTopics,
+    summary: study.summary,
   };
 }
 
-interface TalkSummarySource {
+export interface TalkSummarySource {
+  keyPassages?: Doc<'talkStudies'>['keyPassages'];
+  mainPoints?: Doc<'talkStudies'>['mainPoints'];
   outline: Doc<'talkStudies'>['outline'];
   scripture: string;
   scriptureRefs: Doc<'talkStudies'>['scriptureRefs'];
@@ -90,8 +102,46 @@ interface TalkSummarySource {
   studyGuide: Doc<'talkStudies'>['studyGuide'];
   studyReviewed: boolean;
   suggestedTopics: Doc<'talkStudies'>['suggestedTopics'];
+  summary: string;
   title: string;
   transcript: string | null;
+}
+
+export type TalkGenerateGuardError =
+  | 'ALREADY_REVIEWED'
+  | 'NO_TRANSCRIPT'
+  | 'TOKEN_MISSING';
+
+export async function loadTalkGenerateSource(
+  ctx: ActionCtx,
+  talkId: Id<'talks'>
+): Promise<
+  | { errorCode: TalkGenerateGuardError }
+  | (TalkSummarySource & { transcript: string })
+> {
+  const source: TalkSummarySource = await ctx.runQuery(
+    internal.talks.loadTalkSummarySource,
+    {
+      talkId,
+    }
+  );
+
+  if (!source.transcript) {
+    return { errorCode: 'NO_TRANSCRIPT' };
+  }
+
+  if (source.studyReviewed) {
+    return { errorCode: 'ALREADY_REVIEWED' };
+  }
+
+  if (!process.env.AI_GATEWAY_API_KEY) {
+    return { errorCode: 'TOKEN_MISSING' };
+  }
+
+  return {
+    ...source,
+    transcript: source.transcript,
+  };
 }
 
 function toTalkSummarySource(
@@ -126,6 +176,8 @@ export const loadTalkSummarySource = internalQuery({
     return toTalkSummarySource(speaker, study, talk, transcript);
   },
   returns: v.object({
+    keyPassages: v.optional(v.array(talkStudyKeyPassage)),
+    mainPoints: v.optional(v.array(talkStudyMainPoint)),
     outline: talkStudyContentFields.outline,
     scripture: v.string(),
     scriptureRefs: talkStudyContentFields.scriptureRefs,
@@ -133,6 +185,7 @@ export const loadTalkSummarySource = internalQuery({
     studyGuide: talkStudyContentFields.studyGuide,
     studyReviewed: v.boolean(),
     suggestedTopics: talkStudyContentFields.suggestedTopics,
+    summary: v.string(),
     title: v.string(),
     transcript: v.union(v.null(), v.string()),
   }),
@@ -180,6 +233,12 @@ async function saveGeneratedTalkSummary(
   try {
     await ctx.runMutation(internal.talks.saveTalkStudyDraft, {
       generator: TALK_SUMMARY_MODEL,
+      ...(source.keyPassages === undefined
+        ? {}
+        : { keyPassages: source.keyPassages }),
+      ...(source.mainPoints === undefined
+        ? {}
+        : { mainPoints: source.mainPoints }),
       outline: source.outline,
       scriptureRefs: source.scriptureRefs,
       studyGuide: source.studyGuide,
@@ -217,33 +276,13 @@ export const generateTalkSummary = action({
       }
     | { flags: string[]; status: 'success'; summary: string }
   > => {
-    const source: TalkSummarySource = await ctx.runQuery(
-      internal.talks.loadTalkSummarySource,
-      {
-        talkId,
-      }
-    );
+    const source = await loadTalkGenerateSource(ctx, talkId);
 
-    if (!source.transcript) {
-      return toFailedResult('NO_TRANSCRIPT');
+    if ('errorCode' in source) {
+      return toFailedResult(source.errorCode);
     }
 
-    if (source.studyReviewed) {
-      return toFailedResult('ALREADY_REVIEWED');
-    }
-
-    if (!process.env.AI_GATEWAY_API_KEY) {
-      return toFailedResult('TOKEN_MISSING');
-    }
-
-    return await saveGeneratedTalkSummary(
-      ctx,
-      {
-        ...source,
-        transcript: source.transcript,
-      },
-      talkId
-    );
+    return await saveGeneratedTalkSummary(ctx, source, talkId);
   },
   returns: v.union(
     talkSummaryGenerateFailure,

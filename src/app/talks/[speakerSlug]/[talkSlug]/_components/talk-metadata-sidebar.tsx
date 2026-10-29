@@ -1,5 +1,5 @@
 import type { Speaker } from '@/features/speakers/types';
-import type { Talk } from '@/features/talks/types';
+import type { Talk, TalkStudy } from '@/features/talks/types';
 import type { Topic } from '@/features/topics/types';
 
 import { ExternalLinkIcon } from 'lucide-react';
@@ -7,9 +7,12 @@ import { ExternalLinkIcon } from 'lucide-react';
 import { MetadataGroup } from '@/components/metadata-group';
 import { Link } from '@/components/ui/link';
 import { TalkActions } from '@/features/talks/components/talk-actions';
+import { TalkStudyContent } from '@/features/talks/components/talk-study-content';
 import { TopicLinks } from '@/features/topics/components/topic-links';
 
 interface TalkMetadataSidebarProps {
+  keyPassages: TalkStudy['keyPassages'] | null;
+  mainPoints: TalkStudy['mainPoints'] | null;
   speaker: Speaker | null;
   summary: string | null;
   talk: Talk;
@@ -17,6 +20,8 @@ interface TalkMetadataSidebarProps {
 }
 
 export function TalkMetadataSidebar({
+  keyPassages,
+  mainPoints,
   speaker,
   summary,
   talk,
@@ -38,6 +43,8 @@ export function TalkMetadataSidebar({
           </div>
         </MetadataGroup>
       ) : null}
+
+      <TalkStudyContent keyPassages={keyPassages} mainPoints={mainPoints} />
 
       {topics.length > 0 && (
         <MetadataGroup label="Topics">

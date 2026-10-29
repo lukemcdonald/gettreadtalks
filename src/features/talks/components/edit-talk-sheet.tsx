@@ -168,6 +168,7 @@ export function EditTalkSheet({
     confirmPendingUpdate,
     form,
     handleOpenChange,
+    handleSuccess,
     handleSubmit,
     isPending,
     pendingUpdate,
@@ -249,9 +250,15 @@ export function EditTalkSheet({
           </form>
         ) : (
           <EditTalkStudyPanel
+            hasTranscript={summary.hasTranscript}
             onClose={() => {
               handleOpenChange(false);
             }}
+            onSuccess={() => {
+              handleSuccess();
+              handleOpenChange(false);
+            }}
+            talkId={talk._id}
           />
         )}
       </FormSheetShell>

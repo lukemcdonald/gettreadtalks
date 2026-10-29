@@ -250,6 +250,11 @@ const gatedFunctions: {
   },
   {
     call: (client, seed) =>
+      client.action(api.talks.generateTalkStudy, { talkId: seed.talkId }),
+    name: 'talks.generateTalkStudy',
+  },
+  {
+    call: (client, seed) =>
       client.action(api.talks.generateTalkSummary, { talkId: seed.talkId }),
     name: 'talks.generateTalkSummary',
   },

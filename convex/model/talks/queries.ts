@@ -36,7 +36,11 @@ import {
 } from './helpers';
 import { talkFields, talkTranscriptFields } from './schema';
 import { enrichAdminTalks, enrichWithTopics } from './utils';
-import { talkTranscriptFetchLastError } from './validators';
+import {
+  talkStudyKeyPassage,
+  talkStudyMainPoint,
+  talkTranscriptFetchLastError,
+} from './validators';
 
 /**
  * List slugs for published talks with their speaker slugs.
@@ -180,12 +184,15 @@ export const getTalkBySlug = query({
     ]);
 
     const validTopics = topics.filter((topic) => topic !== null);
+    const publishedStudy = study?.studyStatus === 'published' ? study : null;
 
     return {
       clips,
       collection,
+      keyPassages: publishedStudy?.keyPassages ?? null,
+      mainPoints: publishedStudy?.mainPoints ?? null,
       speaker,
-      summary: study?.studyStatus === 'published' ? study.summary : null,
+      summary: publishedStudy?.summary ?? null,
       talk,
       topics: validTopics,
     };
@@ -194,6 +201,8 @@ export const getTalkBySlug = query({
     v.object({
       clips: docs('clips'),
       collection: doc('collections').nullable(),
+      keyPassages: v.union(v.null(), v.array(talkStudyKeyPassage)),
+      mainPoints: v.union(v.null(), v.array(talkStudyMainPoint)),
       speaker: doc('speakers').nullable(),
       summary: v.union(v.null(), v.string()),
       talk: doc('talks'),

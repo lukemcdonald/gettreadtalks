@@ -19,6 +19,22 @@ const scriptureRef = v.object({
   verseEnd: v.optional(v.number()),
 });
 
+export const talkStudyRef = v.object({
+  osis: v.union(v.null(), v.string()),
+  text: v.string(),
+});
+
+export const talkStudyMainPoint = v.object({
+  body: v.string(),
+  heading: v.string(),
+  references: v.array(talkStudyRef),
+});
+
+export const talkStudyKeyPassage = v.object({
+  note: v.string(),
+  reference: talkStudyRef,
+});
+
 const talkStudyGuideKind = v.union(
   v.literal('application'),
   v.literal('discussion_question'),
@@ -38,6 +54,8 @@ const talkStudyOutlineItem = v.object({
 });
 
 export const talkStudyContentFields = {
+  keyPassages: v.optional(v.array(talkStudyKeyPassage)),
+  mainPoints: v.optional(v.array(talkStudyMainPoint)),
   outline: v.array(talkStudyOutlineItem),
   scriptureRefs: v.array(scriptureRef),
   studyGuide: v.array(talkStudyGuideSection),
