@@ -5,7 +5,7 @@ import { doc } from '../../lib/validators/schema';
 import { requireAdmin } from '../auth/roles';
 import { talkFeatureKind } from './validators';
 
-export const get = query({
+export const getTalkFeature = query({
   args: {
     kind: talkFeatureKind,
     talkId: v.id('talks'),

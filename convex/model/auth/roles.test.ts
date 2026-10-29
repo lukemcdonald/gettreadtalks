@@ -228,21 +228,21 @@ const gatedFunctions: {
   },
   {
     call: (client, seed) =>
-      client.query(api.talkFeatures.get, {
+      client.query(api.talkFeatures.getTalkFeature, {
         kind: 'study',
         talkId: seed.talkId,
       }),
-    name: 'talkFeatures.get',
+    name: 'talkFeatures.getTalkFeature',
   },
   {
     call: (client, seed) =>
-      client.mutation(api.talkFeatures.update, {
+      client.mutation(api.talkFeatures.updateTalkFeature, {
         body: '## Main points\n\nUpdated study.',
         kind: 'study',
         status: 'draft',
         talkId: seed.talkId,
       }),
-    name: 'talkFeatures.update',
+    name: 'talkFeatures.updateTalkFeature',
   },
   {
     call: (client, seed) =>

@@ -86,7 +86,7 @@ async function saveGeneratedTalkStudy(
   }
 
   try {
-    await ctx.runMutation(internal.talkFeatures.saveDraft, {
+    await ctx.runMutation(internal.talkFeatures.saveTalkFeatureDraft, {
       body,
       kind: 'study',
       talkId,
@@ -129,7 +129,7 @@ export const generateStudy = action({
       return toFailedResult('NO_TRANSCRIPT');
     }
 
-    const feature = await ctx.runQuery(api.talkFeatures.get, {
+    const feature = await ctx.runQuery(api.talkFeatures.getTalkFeature, {
       kind: 'study',
       talkId,
     });

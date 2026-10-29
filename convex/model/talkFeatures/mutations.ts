@@ -23,7 +23,7 @@ async function getTalkFeature(
     .unique();
 }
 
-export const saveDraft = internalMutation({
+export const saveTalkFeatureDraft = internalMutation({
   args: {
     body: v.string(),
     kind: talkFeatureKind,
@@ -59,7 +59,7 @@ export const saveDraft = internalMutation({
   returns: v.id('talkFeatures'),
 });
 
-export const update = mutation({
+export const updateTalkFeature = mutation({
   args: {
     body: v.string(),
     kind: talkFeatureKind,

@@ -28,7 +28,7 @@ export async function updateTalkFeatureAction(
   }
 
   try {
-    await fetchAuthMutation(api.talkFeatures.update, {
+    await fetchAuthMutation(api.talkFeatures.updateTalkFeature, {
       ...parsed.data,
       kind: 'study',
       talkId,

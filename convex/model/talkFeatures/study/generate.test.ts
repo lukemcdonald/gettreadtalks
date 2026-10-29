@@ -91,7 +91,7 @@ describe('generateStudy', () => {
 
       expect(created.status).toBe('success');
 
-      const draft = await asAdmin.query(api.talkFeatures.get, {
+      const draft = await asAdmin.query(api.talkFeatures.getTalkFeature, {
         kind: 'study',
         talkId,
       });
@@ -104,7 +104,7 @@ describe('generateStudy', () => {
       );
       expect(draft?.manuallyEditedAt).toBeUndefined();
 
-      await asAdmin.mutation(api.talkFeatures.update, {
+      await asAdmin.mutation(api.talkFeatures.updateTalkFeature, {
         body: '## Main points\n\nHand-edited study.',
         kind: 'study',
         status: 'draft',
@@ -115,7 +115,7 @@ describe('generateStudy', () => {
         api.talkFeatures.generateStudy,
         { talkId }
       );
-      const manual = await asAdmin.query(api.talkFeatures.get, {
+      const manual = await asAdmin.query(api.talkFeatures.getTalkFeature, {
         kind: 'study',
         talkId,
       });
@@ -141,7 +141,7 @@ describe('generateStudy', () => {
         api.talkFeatures.generateStudy,
         { talkId }
       );
-      const published = await asAdmin.query(api.talkFeatures.get, {
+      const published = await asAdmin.query(api.talkFeatures.getTalkFeature, {
         kind: 'study',
         talkId,
       });

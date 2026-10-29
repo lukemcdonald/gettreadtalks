@@ -180,7 +180,10 @@ function useTalkStudyPanelForm({
   initialFeature?: TalkFeature | null;
   talkId: TalkId;
 }) {
-  const liveFeature = useQuery(api.talkFeatures.get, { kind: 'study', talkId });
+  const liveFeature = useQuery(api.talkFeatures.getTalkFeature, {
+    kind: 'study',
+    talkId,
+  });
   const feature = liveFeature === undefined ? initialFeature : liveFeature;
   const [isEditing, setIsEditing] = useState(!initialFeature?.body?.trim());
   const form = useForm<TalkFeatureFormData>({

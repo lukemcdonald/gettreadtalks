@@ -17,7 +17,7 @@ export async function loadTalk(id: TalkId) {
 export async function loadTalkFeature(talkId: TalkId) {
   cacheLife('hours');
   cacheTag('talks');
-  return await fetchAuthQuery(api.talkFeatures.get, {
+  return await fetchAuthQuery(api.talkFeatures.getTalkFeature, {
     kind: 'study',
     talkId,
   });
