@@ -14,11 +14,7 @@ import {
   TALK_SUMMARY_SYSTEM_PROMPT,
   talkSummaryOutputSchema,
 } from './summaryPrompt';
-import {
-  talkStudyContentFields,
-  talkStudyKeyPassage,
-  talkStudyMainPoint,
-} from './validators';
+import { talkStudyContentFields } from './validators';
 
 const SUMMARY_GENERATE_MESSAGES = {
   ALREADY_REVIEWED: 'This study has already been reviewed.',
@@ -79,10 +75,6 @@ function getTalkStudyDraftFields(study: Doc<'talkStudies'> | null) {
   }
 
   return {
-    ...(study.keyPassages === undefined
-      ? {}
-      : { keyPassages: study.keyPassages }),
-    ...(study.mainPoints === undefined ? {} : { mainPoints: study.mainPoints }),
     outline: study.outline,
     scriptureRefs: study.scriptureRefs,
     studyGuide: study.studyGuide,
@@ -93,8 +85,6 @@ function getTalkStudyDraftFields(study: Doc<'talkStudies'> | null) {
 }
 
 export interface TalkSummarySource {
-  keyPassages?: Doc<'talkStudies'>['keyPassages'];
-  mainPoints?: Doc<'talkStudies'>['mainPoints'];
   outline: Doc<'talkStudies'>['outline'];
   scripture: string;
   scriptureRefs: Doc<'talkStudies'>['scriptureRefs'];
@@ -176,8 +166,6 @@ export const loadTalkSummarySource = internalQuery({
     return toTalkSummarySource(speaker, study, talk, transcript);
   },
   returns: v.object({
-    keyPassages: v.optional(v.array(talkStudyKeyPassage)),
-    mainPoints: v.optional(v.array(talkStudyMainPoint)),
     outline: talkStudyContentFields.outline,
     scripture: v.string(),
     scriptureRefs: talkStudyContentFields.scriptureRefs,
@@ -233,12 +221,6 @@ async function saveGeneratedTalkSummary(
   try {
     await ctx.runMutation(internal.talks.saveTalkStudyDraft, {
       generator: TALK_SUMMARY_MODEL,
-      ...(source.keyPassages === undefined
-        ? {}
-        : { keyPassages: source.keyPassages }),
-      ...(source.mainPoints === undefined
-        ? {}
-        : { mainPoints: source.mainPoints }),
       outline: source.outline,
       scriptureRefs: source.scriptureRefs,
       studyGuide: source.studyGuide,

@@ -19,20 +19,15 @@ const scriptureRef = v.object({
   verseEnd: v.optional(v.number()),
 });
 
-export const talkStudyRef = v.object({
-  osis: v.union(v.null(), v.string()),
-  text: v.string(),
-});
-
 export const talkStudyMainPoint = v.object({
   body: v.string(),
   heading: v.string(),
-  references: v.array(talkStudyRef),
+  references: v.array(v.string()),
 });
 
 export const talkStudyKeyPassage = v.object({
   note: v.string(),
-  reference: talkStudyRef,
+  reference: v.string(),
 });
 
 const talkStudyGuideKind = v.union(

@@ -7,10 +7,6 @@ import type { ActionResult } from '@/lib/forms/types';
 import { updateTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
-import {
-  toTalkStudyKeyPassages,
-  toTalkStudyMainPoints,
-} from '@/convex/model/talks/scriptureRef';
 import { toConvexFormErrors, toZodFormErrors } from '@/lib/forms/validation';
 import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
 
@@ -18,6 +14,22 @@ import {
   talkStudyContentFormSchema,
   talkStudyFormSchema,
 } from '../schemas/talk-study-form';
+
+async function saveTalkStudy(
+  data: Record<string, unknown>,
+  talkId: TalkId
+): Promise<ActionResult<{ talkId: string }>> {
+  try {
+    await fetchAuthMutation(api.talks.updateTalkStudy, {
+      ...data,
+      talkId,
+    });
+    updateTag('talks');
+    return { data: { talkId }, success: true };
+  } catch (error) {
+    return { errors: toConvexFormErrors(error), success: false };
+  }
+}
 
 export async function updateTalkStudyAction(
   data: unknown,
@@ -31,16 +43,7 @@ export async function updateTalkStudyAction(
     return { errors: toZodFormErrors(parsed.error), success: false };
   }
 
-  try {
-    await fetchAuthMutation(api.talks.updateTalkStudy, {
-      ...parsed.data,
-      talkId,
-    });
-    updateTag('talks');
-    return { data: { talkId }, success: true };
-  } catch (error) {
-    return { errors: toConvexFormErrors(error), success: false };
-  }
+  return await saveTalkStudy(parsed.data, talkId);
 }
 
 export async function updateTalkStudyContentAction(
@@ -55,15 +58,5 @@ export async function updateTalkStudyContentAction(
     return { errors: toZodFormErrors(parsed.error), success: false };
   }
 
-  try {
-    await fetchAuthMutation(api.talks.updateTalkStudy, {
-      keyPassages: toTalkStudyKeyPassages(parsed.data.keyPassages),
-      mainPoints: toTalkStudyMainPoints(parsed.data.mainPoints),
-      talkId,
-    });
-    updateTag('talks');
-    return { data: { talkId }, success: true };
-  } catch (error) {
-    return { errors: toConvexFormErrors(error), success: false };
-  }
+  return await saveTalkStudy(parsed.data, talkId);
 }

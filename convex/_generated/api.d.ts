@@ -79,7 +79,6 @@ import type * as model_talks_helpers from "../model/talks/helpers.js";
 import type * as model_talks_index from "../model/talks/index.js";
 import type * as model_talks_mutations from "../model/talks/mutations.js";
 import type * as model_talks_queries from "../model/talks/queries.js";
-import type * as model_talks_scriptureRef from "../model/talks/scriptureRef.js";
 import type * as model_talks_studyGenerate from "../model/talks/studyGenerate.js";
 import type * as model_talks_studyPrompt from "../model/talks/studyPrompt.js";
 import type * as model_talks_summaryGenerate from "../model/talks/summaryGenerate.js";
@@ -183,7 +182,6 @@ declare const fullApi: ApiFromModules<{
   "model/talks/index": typeof model_talks_index;
   "model/talks/mutations": typeof model_talks_mutations;
   "model/talks/queries": typeof model_talks_queries;
-  "model/talks/scriptureRef": typeof model_talks_scriptureRef;
   "model/talks/studyGenerate": typeof model_talks_studyGenerate;
   "model/talks/studyPrompt": typeof model_talks_studyPrompt;
   "model/talks/summaryGenerate": typeof model_talks_summaryGenerate;

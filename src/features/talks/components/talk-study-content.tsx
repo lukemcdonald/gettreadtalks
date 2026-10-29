@@ -1,14 +1,14 @@
 import type { TalkStudy } from '@/features/talks/types';
 import type { ReactNode } from 'react';
 
-import { SectionHeading } from '@/components/section-heading';
+import { cn } from '@/utils';
 
 type TalkStudyKeyPassage = NonNullable<TalkStudy['keyPassages']>[number];
 type TalkStudyMainPoint = NonNullable<TalkStudy['mainPoints']>[number];
 
 function formatStudyRefs(references: TalkStudyMainPoint['references']) {
   return references
-    .map((reference) => reference.text.trim())
+    .map((reference) => reference.trim())
     .filter(Boolean)
     .join(', ');
 }
@@ -18,7 +18,7 @@ function hasMainPointContent(point: TalkStudyMainPoint) {
 }
 
 function hasKeyPassageContent(passage: TalkStudyKeyPassage) {
-  return Boolean(passage.reference.text.trim() || passage.note.trim());
+  return Boolean(passage.reference.trim() || passage.note.trim());
 }
 
 function toStudyItems<T>(
@@ -32,11 +32,13 @@ function StudySection({
   children,
   heading,
   items,
+  stacked,
   testId,
 }: {
   children: ReactNode;
   heading: string;
   items: unknown[];
+  stacked?: boolean;
   testId: string;
 }) {
   if (items.length === 0) {
@@ -44,9 +46,18 @@ function StudySection({
   }
 
   return (
-    <section className="space-y-6" data-testid={testId}>
-      <SectionHeading heading={heading} />
-      <div className="space-y-6">{children}</div>
+    <section
+      className={
+        stacked ? 'space-y-4' : 'grid gap-4 lg:grid-cols-[280px_1fr] lg:gap-8'
+      }
+      data-testid={testId}
+    >
+      <header className={stacked ? undefined : 'lg:sticky lg:top-20 lg:h-fit'}>
+        <h2 className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
+          {heading}
+        </h2>
+      </header>
+      <div className="min-w-0 space-y-6">{children}</div>
     </section>
   );
 }
@@ -73,7 +84,7 @@ function TalkStudyKeyPassageItem({
   passage: TalkStudyKeyPassage;
 }) {
   const note = passage.note.trim();
-  const reference = passage.reference.text.trim();
+  const reference = passage.reference.trim();
 
   return (
     <div className="space-y-2">
@@ -90,9 +101,11 @@ function TalkStudyKeyPassageItem({
 export function TalkStudyContent({
   keyPassages,
   mainPoints,
+  stacked,
 }: {
   keyPassages?: TalkStudyKeyPassage[] | null;
   mainPoints?: TalkStudyMainPoint[] | null;
+  stacked?: boolean;
 }) {
   const points = toStudyItems(mainPoints, hasMainPointContent);
   const passages = toStudyItems(keyPassages, hasKeyPassageContent);
@@ -102,10 +115,14 @@ export function TalkStudyContent({
   }
 
   return (
-    <div className="space-y-8" data-testid="talk-study-content">
+    <div
+      className={cn('space-y-8', !stacked && 'lg:space-y-16')}
+      data-testid="talk-study-content"
+    >
       <StudySection
         heading="Main points"
         items={points}
+        stacked={stacked}
         testId="talk-study-main-points"
       >
         {points.map((point) => (
@@ -118,11 +135,12 @@ export function TalkStudyContent({
       <StudySection
         heading="Key passages"
         items={passages}
+        stacked={stacked}
         testId="talk-study-key-passages"
       >
         {passages.map((passage) => (
           <TalkStudyKeyPassageItem
-            key={passage.reference.text || passage.note}
+            key={passage.reference || passage.note}
             passage={passage}
           />
         ))}

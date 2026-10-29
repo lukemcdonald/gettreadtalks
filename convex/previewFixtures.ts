@@ -113,23 +113,23 @@ export const PREVIEW_STUDIES = {
     keyPassages: [
       {
         note: 'The promise that God is at work in every circumstance for those who love him.',
-        reference: { osis: 'Rom.8.28', text: 'Romans 8:28' },
+        reference: 'Romans 8:28',
       },
       {
         note: 'The good in view is being conformed to the image of the Son.',
-        reference: { osis: 'Rom.8.29', text: 'Romans 8:29' },
+        reference: 'Romans 8:29',
       },
     ],
     mainPoints: [
       {
         body: 'God is not merely present in trouble. He is at work through it for those who love him.',
         heading: 'God works in all things',
-        references: [{ osis: 'Rom.8.28', text: 'Romans 8:28' }],
+        references: ['Romans 8:28'],
       },
       {
         body: 'The good he is after is not comfort first. It is being shaped like the Son.',
         heading: 'The good is the Son',
-        references: [{ osis: 'Rom.8.29', text: 'Romans 8:29' }],
+        references: ['Romans 8:29'],
       },
     ],
     outline: [
@@ -158,34 +158,28 @@ export const PREVIEW_STUDIES = {
     keyPassages: [
       {
         note: 'The father runs to the returning son before the apology is finished.',
-        reference: {
-          osis: 'Luke.15.11-Luke.15.32',
-          text: 'Luke 15:11-32',
-        },
+        reference: 'Luke 15:11-32',
       },
       {
         note: 'Grace is a restored place at the table, given at cost.',
-        reference: { osis: 'Luke.15.22-Luke.15.24', text: 'Luke 15:22-24' },
+        reference: 'Luke 15:22-24',
       },
     ],
     mainPoints: [
       {
         body: 'The father does not wait for the son to finish a speech. He runs to meet him.',
         heading: 'A father who runs',
-        references: [{ osis: 'Luke.15.20', text: 'Luke 15:20' }],
+        references: ['Luke 15:20'],
       },
       {
         body: 'The older brother stands outside the feast, measuring love by labor.',
         heading: 'An older brother who stays out',
-        references: [{ osis: 'Luke.15.28-Luke.15.32', text: 'Luke 15:28-32' }],
+        references: ['Luke 15:28-32'],
       },
       {
         body: 'Grace here is not a thin pardon. It is a restored place at the table.',
         heading: 'A place at the table',
-        references: [
-          { osis: 'Luke.15.22-Luke.15.24', text: 'Luke 15:22-24' },
-          { osis: 'Rom.5.8', text: 'Romans 5:8' },
-        ],
+        references: ['Luke 15:22-24', 'Romans 5:8'],
       },
     ],
     outline: [

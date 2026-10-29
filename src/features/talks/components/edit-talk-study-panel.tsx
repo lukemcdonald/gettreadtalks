@@ -3,7 +3,13 @@
 import type { TalkStudyContentFormData } from '@/features/talks/schemas/talk-study-form';
 import type { TalkId } from '@/features/talks/types';
 import type { ReactNode } from 'react';
-import type { Control, Resolver, UseFieldArrayReturn } from 'react-hook-form';
+import type {
+  Control,
+  Resolver,
+  UseFieldArrayReturn,
+  UseFormSetError,
+  UseFormSetValue,
+} from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery } from 'convex/react';
@@ -24,11 +30,11 @@ import { TalkStudyGenerate } from '@/features/talks/components/talk-study-genera
 import { talkStudyContentFormSchema } from '@/features/talks/schemas/talk-study-form';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
 
-const EMPTY_PASSAGE = { note: '', reference: { text: '' } };
+const EMPTY_PASSAGE = { note: '', reference: '' };
 const EMPTY_POINT = {
   body: '',
   heading: '',
-  references: [{ text: '' }],
+  references: [''],
 };
 const MAX_MAIN_POINTS = 5;
 const MAX_POINT_REFS = 3;
@@ -36,24 +42,35 @@ const talkStudyContentResolver = zodResolver(
   talkStudyContentFormSchema
 ) as Resolver<TalkStudyContentFormData>;
 
-function toPreviewKeyPassages(
-  passages: TalkStudyContentFormData['keyPassages']
-) {
-  return passages.map((passage) => ({
-    note: passage.note,
-    reference: { osis: null, text: passage.reference.text },
-  }));
+const EMPTY_STUDY_CONTENT: TalkStudyContentFormData = {
+  keyPassages: [],
+  mainPoints: [],
+};
+
+function getTalkStudyFormValues(study: {
+  keyPassages?: TalkStudyContentFormData['keyPassages'];
+  mainPoints?: TalkStudyContentFormData['mainPoints'];
+}): TalkStudyContentFormData {
+  return {
+    keyPassages: study.keyPassages ?? EMPTY_STUDY_CONTENT.keyPassages,
+    mainPoints: study.mainPoints ?? EMPTY_STUDY_CONTENT.mainPoints,
+  };
 }
 
-function toPreviewMainPoints(points: TalkStudyContentFormData['mainPoints']) {
-  return points.map((point) => ({
-    body: point.body,
-    heading: point.heading,
-    references: point.references.map((ref) => ({
-      osis: null,
-      text: ref.text,
-    })),
-  }));
+async function saveTalkStudyContent(
+  data: TalkStudyContentFormData,
+  onSuccess: () => void,
+  setError: UseFormSetError<TalkStudyContentFormData>,
+  talkId: TalkId
+) {
+  const result = await updateTalkStudyContentAction(data, talkId);
+
+  if (!result.success) {
+    setServerErrors(setError, result.errors);
+    return;
+  }
+
+  onSuccess();
 }
 
 function ListItemActions({
@@ -151,6 +168,7 @@ function TalkStudyPointFields({
   onMoveDown,
   onMoveUp,
   onRemove,
+  setValue,
   total,
 }: {
   control: Control<TalkStudyContentFormData>;
@@ -158,12 +176,14 @@ function TalkStudyPointFields({
   onMoveDown: () => void;
   onMoveUp: () => void;
   onRemove: () => void;
+  setValue: UseFormSetValue<TalkStudyContentFormData>;
   total: number;
 }) {
-  const references = useFieldArray({
-    control,
-    name: `mainPoints.${index}.references`,
-  });
+  const references =
+    useWatch({
+      control,
+      name: `mainPoints.${index}.references`,
+    }) ?? [];
 
   return (
     <StudyListItem
@@ -186,21 +206,24 @@ function TalkStudyPointFields({
         rows={3}
       />
       <div className="space-y-4">
-        {references.fields.map((field, refIndex) => (
-          <div className="flex items-end gap-2" key={field.id}>
+        {references.map((_, refIndex) => (
+          <div className="flex items-end gap-2" key={refIndex}>
             <div className="min-w-0 flex-1">
               <TextField
                 control={control}
                 label={`Reference ${refIndex + 1}`}
-                name={`mainPoints.${index}.references.${refIndex}.text`}
+                name={`mainPoints.${index}.references.${refIndex}`}
               />
             </div>
             <Button
               aria-label={`Remove point ${index + 1} reference ${refIndex + 1}`}
               className="mb-1"
-              disabled={references.fields.length < 2}
+              disabled={references.length < 2}
               onClick={() => {
-                references.remove(refIndex);
+                setValue(
+                  `mainPoints.${index}.references`,
+                  references.toSpliced(refIndex, 1)
+                );
               }}
               size="icon-sm"
               type="button"
@@ -210,10 +233,10 @@ function TalkStudyPointFields({
             </Button>
           </div>
         ))}
-        {references.fields.length < MAX_POINT_REFS ? (
+        {references.length < MAX_POINT_REFS ? (
           <Button
             onClick={() => {
-              references.append({ text: '' });
+              setValue(`mainPoints.${index}.references`, [...references, '']);
             }}
             size="sm"
             type="button"
@@ -254,7 +277,7 @@ function TalkStudyPassageFields({
       <TextField
         control={control}
         label="Reference"
-        name={`keyPassages.${index}.reference.text`}
+        name={`keyPassages.${index}.reference`}
       />
       <TextareaField
         control={control}
@@ -266,69 +289,14 @@ function TalkStudyPassageFields({
   );
 }
 
-function useTalkStudyContentForm(talkId: TalkId, onSuccess: () => void) {
-  const study = useQuery(api.talks.getTalkStudy, { talkId });
-  const form = useForm<TalkStudyContentFormData>({
-    mode: 'onBlur',
-    resolver: talkStudyContentResolver,
-    values: {
-      keyPassages:
-        study?.keyPassages?.map((passage) => ({
-          note: passage.note,
-          reference: { text: passage.reference.text },
-        })) ?? [],
-      mainPoints:
-        study?.mainPoints?.map((point) => ({
-          body: point.body,
-          heading: point.heading,
-          references: point.references.map((ref) => ({ text: ref.text })),
-        })) ?? [],
-    },
-  });
-  const mainPoints = useFieldArray({
-    control: form.control,
-    name: 'mainPoints',
-  });
-  const keyPassages = useFieldArray({
-    control: form.control,
-    name: 'keyPassages',
-  });
-  const previewKeyPassages = useWatch({
-    control: form.control,
-    name: 'keyPassages',
-  });
-  const previewMainPoints = useWatch({
-    control: form.control,
-    name: 'mainPoints',
-  });
-
-  async function handleSubmit(data: TalkStudyContentFormData) {
-    const result = await updateTalkStudyContentAction(data, talkId);
-
-    if (!result.success) {
-      setServerErrors(form.setError, result.errors);
-      return;
-    }
-
-    onSuccess();
-  }
-
-  return {
-    form,
-    handleSubmit,
-    keyPassages,
-    mainPoints,
-    previewKeyPassages,
-    previewMainPoints,
-  };
-}
-
 function TalkStudyPointsEditor({
   control,
   mainPoints,
+  setValue,
 }: {
   control: Control<TalkStudyContentFormData>;
   mainPoints: UseFieldArrayReturn<TalkStudyContentFormData, 'mainPoints'>;
+  setValue: UseFormSetValue<TalkStudyContentFormData>;
 }) {
   return (
     <div className="space-y-6">
@@ -347,6 +315,7 @@ function TalkStudyPointsEditor({
           onRemove={() => {
             mainPoints.remove(index);
           }}
+          setValue={setValue}
           total={mainPoints.fields.length}
         />
       ))}
@@ -418,17 +387,36 @@ export function EditTalkStudyPanel({
   onSuccess: () => void;
   talkId: TalkId;
 }) {
-  const {
-    form,
-    handleSubmit,
-    keyPassages,
-    mainPoints,
-    previewKeyPassages,
-    previewMainPoints,
-  } = useTalkStudyContentForm(talkId, onSuccess);
+  const study = useQuery(api.talks.getTalkStudy, { talkId });
+  const form = useForm<TalkStudyContentFormData>({
+    mode: 'onBlur',
+    resolver: talkStudyContentResolver,
+    values: getTalkStudyFormValues(study ?? EMPTY_STUDY_CONTENT),
+  });
+  const mainPoints = useFieldArray({
+    control: form.control,
+    name: 'mainPoints',
+  });
+  const keyPassages = useFieldArray({
+    control: form.control,
+    name: 'keyPassages',
+  });
+  const previewKeyPassages = useWatch({
+    control: form.control,
+    name: 'keyPassages',
+  });
+  const previewMainPoints = useWatch({
+    control: form.control,
+    name: 'mainPoints',
+  });
 
   return (
-    <form className="contents" onSubmit={form.handleSubmit(handleSubmit)}>
+    <form
+      className="contents"
+      onSubmit={form.handleSubmit((data) =>
+        saveTalkStudyContent(data, onSuccess, form.setError, talkId)
+      )}
+    >
       <FormSheetBody
         footer={
           <>
@@ -447,6 +435,7 @@ export function EditTalkStudyPanel({
           <TalkStudyPointsEditor
             control={form.control}
             mainPoints={mainPoints}
+            setValue={form.setValue}
           />
           <TalkStudyPassagesEditor
             control={form.control}
@@ -457,8 +446,9 @@ export function EditTalkStudyPanel({
               Preview
             </p>
             <TalkStudyContent
-              keyPassages={toPreviewKeyPassages(previewKeyPassages ?? [])}
-              mainPoints={toPreviewMainPoints(previewMainPoints ?? [])}
+              keyPassages={previewKeyPassages}
+              mainPoints={previewMainPoints}
+              stacked
             />
           </div>
         </div>

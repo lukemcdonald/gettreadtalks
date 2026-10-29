@@ -8,20 +8,20 @@ import {
   signInAs,
   visibilitySlugs,
 } from '../../test.setup';
-import { talkStudyGenerator } from './studyGenerate';
+import { orderKeyPassages, talkStudyGenerator } from './studyGenerate';
 
 const GENERATED_MAIN_POINTS = [
   {
     body: 'The father runs before the speech is finished.',
     heading: 'A father who runs',
-    references: [{ text: 'Luke 15:20' }],
+    references: ['Luke 15:20'],
   },
 ];
 
 const GENERATED_KEY_PASSAGES = [
   {
     note: 'The father runs to the returning son.',
-    reference: { text: 'Luke 15:11-32' },
+    reference: 'Luke 15:11-32',
   },
 ];
 
@@ -64,6 +64,30 @@ async function seedTalkWithTranscript() {
     talkId: published.talk._id,
   };
 }
+
+describe('orderKeyPassages', () => {
+  it('moves the main text first and keeps the rest in order', () => {
+    expect(
+      orderKeyPassages(
+        [
+          {
+            note: 'The older brother stays outside.',
+            reference: 'Luke 15:25-32',
+          },
+          {
+            note: 'The father runs to the returning son.',
+            reference: 'Luke 15:11-32',
+          },
+          {
+            note: 'Grace is not a wage.',
+            reference: 'Romans 4:4-5',
+          },
+        ],
+        'Luke 15:11-32'
+      ).map((passage) => passage.reference)
+    ).toEqual(['Luke 15:11-32', 'Luke 15:25-32', 'Romans 4:4-5']);
+  });
+});
 
 describe('generateTalkStudy', () => {
   it('saves a draft and refuses a manually edited or published study', async () => {
@@ -108,7 +132,7 @@ describe('generateTalkStudy', () => {
             {
               body: 'The father runs before the speech is finished.',
               heading: 'A father who runs',
-              references: [{ osis: 'Luke.15.20', text: 'Luke 15:20' }],
+              references: ['Luke 15:20'],
             },
           ],
           studyStatus: 'draft',
@@ -121,7 +145,7 @@ describe('generateTalkStudy', () => {
           {
             body: 'Hand-edited point body.',
             heading: 'Hand-edited point',
-            references: [{ osis: 'Luke.15.20', text: 'Luke 15:20' }],
+            references: ['Luke 15:20'],
           },
         ],
         studyStatus: 'draft',
@@ -142,7 +166,7 @@ describe('generateTalkStudy', () => {
         {
           body: 'Hand-edited point body.',
           heading: 'Hand-edited point',
-          references: [{ osis: 'Luke.15.20', text: 'Luke 15:20' }],
+          references: ['Luke 15:20'],
         },
       ]);
 

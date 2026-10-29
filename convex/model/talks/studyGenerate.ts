@@ -1,16 +1,12 @@
 import type { Id } from '../../_generated/dataModel';
 import type { ActionCtx } from '../../_generated/server';
 import type { TalkSummarySource } from './summaryGenerate';
+import type { z } from 'zod';
 
 import { ConvexError, v } from 'convex/values';
 
 import { internal } from '../../_generated/api';
 import { action } from '../../_generated/server';
-import {
-  orderKeyPassages,
-  toTalkStudyKeyPassages,
-  toTalkStudyMainPoints,
-} from './scriptureRef';
 import {
   buildTalkStudyPrompt,
   TALK_STUDY_SYSTEM_PROMPT,
@@ -41,6 +37,7 @@ const talkStudyGenerateFailure = v.object({
 });
 
 type TalkStudyGenerateErrorCode = keyof typeof STUDY_GENERATE_MESSAGES;
+type TalkStudyGenerated = z.infer<typeof talkStudyOutputSchema>;
 
 function toFailedResult(errorCode: TalkStudyGenerateErrorCode) {
   return {
@@ -55,6 +52,52 @@ function isConflictError(error: unknown) {
     error instanceof ConvexError &&
     (error.data as { statusCode?: number }).statusCode === 409
   );
+}
+
+function toTalkStudyMainPoints(points: TalkStudyGenerated['mainPoints']) {
+  return points.map((point) => ({
+    body: point.body.trim(),
+    heading: point.heading.trim(),
+    references: point.references.map((reference) => reference.trim()),
+  }));
+}
+
+function toTalkStudyKeyPassages(passages: TalkStudyGenerated['keyPassages']) {
+  return passages.map((passage) => ({
+    note: passage.note.trim(),
+    reference: passage.reference.trim(),
+  }));
+}
+
+export function orderKeyPassages<T extends { reference: string }>(
+  passages: T[],
+  mainScripture: string
+): T[] {
+  const main = mainScripture.trim().toLowerCase();
+
+  if (passages.length < 2 || !main) {
+    return passages;
+  }
+
+  const mainIndex = passages.findIndex(
+    (passage) => passage.reference.trim().toLowerCase() === main
+  );
+
+  if (mainIndex <= 0) {
+    return passages;
+  }
+
+  const mainPassage = passages[mainIndex];
+
+  if (!mainPassage) {
+    return passages;
+  }
+
+  return [
+    mainPassage,
+    ...passages.slice(0, mainIndex),
+    ...passages.slice(mainIndex + 1),
+  ];
 }
 
 async function generateTalkStudyObject(input: {
@@ -83,14 +126,7 @@ async function saveGeneratedTalkStudy(
   source: TalkSummarySource & { transcript: string },
   talkId: Id<'talks'>
 ) {
-  let generated: {
-    keyPassages: { note: string; reference: { text: string } }[];
-    mainPoints: {
-      body: string;
-      heading: string;
-      references: { text: string }[];
-    }[];
-  };
+  let generated: TalkStudyGenerated;
 
   try {
     generated = await talkStudyGenerator.generate({

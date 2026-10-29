@@ -1,9 +1,5 @@
 import { z } from 'zod';
 
-const talkStudyRefFormSchema = z.object({
-  text: z.string(),
-});
-
 export const talkStudyFormSchema = z.object({
   studyStatus: z.enum(['draft', 'published']),
   summary: z.string(),
@@ -13,14 +9,14 @@ export const talkStudyContentFormSchema = z.object({
   keyPassages: z.array(
     z.object({
       note: z.string(),
-      reference: talkStudyRefFormSchema,
+      reference: z.string(),
     })
   ),
   mainPoints: z.array(
     z.object({
       body: z.string(),
       heading: z.string(),
-      references: z.array(talkStudyRefFormSchema),
+      references: z.array(z.string()),
     })
   ),
 });

@@ -1,11 +1,5 @@
 import { z } from 'zod';
 
-const talkStudyRefOutputSchema = z.object({
-  text: z
-    .string()
-    .describe('A plain scripture reference, such as Romans 8:28.'),
-});
-
 export const talkStudyOutputSchema = z.object({
   keyPassages: z
     .array(
@@ -13,7 +7,9 @@ export const talkStudyOutputSchema = z.object({
         note: z
           .string()
           .describe('One line on why this passage matters in the talk.'),
-        reference: talkStudyRefOutputSchema,
+        reference: z
+          .string()
+          .describe('A plain scripture reference, such as Romans 8:28.'),
       })
     )
     .min(1)
@@ -29,7 +25,11 @@ export const talkStudyOutputSchema = z.object({
           .describe('One or two plain sentences. No markdown or links.'),
         heading: z.string().describe('A short heading for the point.'),
         references: z
-          .array(talkStudyRefOutputSchema)
+          .array(
+            z
+              .string()
+              .describe('A plain scripture reference, such as Romans 8:28.')
+          )
           .min(1)
           .max(3)
           .describe('Verses the speaker actually uses.'),
