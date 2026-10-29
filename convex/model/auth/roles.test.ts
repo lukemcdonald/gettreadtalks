@@ -3,6 +3,16 @@ import { describe, expect, it } from 'vitest';
 import { api } from '../../_generated/api';
 import { ErrorCodes } from '../../lib/errors';
 import { createConvexTest, signInAs } from '../../test.setup';
+import { insertAffiliateLink } from '../affiliateLinks/test-factory';
+import { insertClip } from '../clips/test-factory';
+import { insertCollection } from '../collections/test-factory';
+import { insertSpeaker } from '../speakers/test-factory';
+import {
+  insertTalk,
+  insertTalkStudy,
+  insertTalkTranscript,
+} from '../talks/test-factory';
+import { insertTalkOnTopic, insertTopic } from '../topics/test-factory';
 
 const MEDIA_URL = 'https://www.youtube.com/watch?v=0SVTl4Xa5fY';
 const paginationOpts = {
@@ -29,68 +39,27 @@ async function expectRejected(
 
 async function seedCatalog(t: ReturnType<typeof createConvexTest>) {
   return await t.run(async (ctx) => {
-    const speakerId = await ctx.db.insert('speakers', {
-      firstName: 'John',
-      lastName: 'Bunyan',
-      slug: 'john-bunyan',
-    });
-    const unusedSpeakerId = await ctx.db.insert('speakers', {
+    const speakerId = await insertSpeaker(ctx);
+    const unusedSpeakerId = await insertSpeaker(ctx, {
       firstName: 'Unused',
       lastName: 'Speaker',
       slug: 'unused-speaker',
     });
-    const talkId = await ctx.db.insert('talks', {
-      mediaUrl: MEDIA_URL,
-      slug: 'grace-abounding',
-      speakerId,
-      status: 'published',
-      title: 'Grace Abounding',
-    });
-    await ctx.db.insert('talkStudies', {
-      generatedAt: Date.now(),
-      generator: 'test',
-      outline: [{ heading: 'Grace', text: 'Grace is a gift' }],
-      scriptureRefs: [{ book: 'Romans', chapter: 5, verseStart: 1 }],
-      studyGuide: [{ kind: 'key_idea', text: 'Grace' }],
-      studyStatus: 'draft',
-      suggestedTopics: ['grace'],
-      summary: 'A draft summary.',
-      talkId,
-    });
-    const topicId = await ctx.db.insert('topics', {
-      slug: 'grace',
-      title: 'Grace',
-    });
-    const unusedTopicId = await ctx.db.insert('topics', {
+    const talkId = await insertTalk(ctx, { speakerId });
+    await insertTalkStudy(ctx, { talkId });
+    const topicId = await insertTopic(ctx);
+    const unusedTopicId = await insertTopic(ctx, {
       slug: 'unused-topic',
       title: 'Unused Topic',
     });
-    await ctx.db.insert('talksOnTopics', {
-      talkId,
-      topicId,
-    });
-    await ctx.db.insert('talkTranscripts', {
-      source: 'manual',
-      status: 'done',
-      talkId,
-      text: 'A transcript',
-    });
-    const collectionId = await ctx.db.insert('collections', {
+    await insertTalkOnTopic(ctx, { talkId, topicId });
+    await insertTalkTranscript(ctx, { talkId });
+    const collectionId = await insertCollection(ctx, {
       slug: 'unused-collection',
       title: 'Unused Collection',
     });
-    const clipId = await ctx.db.insert('clips', {
-      mediaUrl: MEDIA_URL,
-      slug: 'a-clip',
-      status: 'published',
-      title: 'A clip',
-    });
-    const affiliateLinkId = await ctx.db.insert('affiliateLinks', {
-      slug: 'a-book',
-      title: 'A book',
-      type: 'book',
-      url: 'https://example.test/book',
-    });
+    const clipId = await insertClip(ctx);
+    const affiliateLinkId = await insertAffiliateLink(ctx);
 
     return {
       affiliateLinkId,
