@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 
 import { Container, Section } from '@/components/ui';
 import { cn } from '@/utils';
@@ -11,6 +11,7 @@ interface CenteredLayoutProps {
   content: ReactNode;
   header?: ReactNode;
   maxWidth?: MaxWidth;
+  render?: ComponentProps<typeof Section>['render'];
   spacing?: Spacing;
 }
 
@@ -26,10 +27,11 @@ export function CenteredLayout({
   content,
   header,
   maxWidth = 'prose',
+  render,
   spacing = 'xl',
 }: CenteredLayoutProps) {
   return (
-    <Section spacing={spacing}>
+    <Section render={render} spacing={spacing}>
       <Container
         className={cn('mx-auto', maxWidthClasses[maxWidth], className)}
       >

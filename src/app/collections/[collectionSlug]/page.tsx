@@ -86,6 +86,7 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
             />
           </>
         }
+        render={<article />}
         sidebar={<CollectionSidebar speakers={uniqueSpeakers} />}
       />
     </>

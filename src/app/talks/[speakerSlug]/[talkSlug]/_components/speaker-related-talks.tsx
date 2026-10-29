@@ -32,7 +32,12 @@ export function SpeakerRelatedTalks({
       title="More Talks"
     >
       {talks.map((talk) => (
-        <TalkCard key={talk._id} speaker={speaker} talk={talk} />
+        <TalkCard
+          headingLevel={3}
+          key={talk._id}
+          speaker={speaker}
+          talk={talk}
+        />
       ))}
     </FeaturedGrid>
   );

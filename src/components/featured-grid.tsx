@@ -41,12 +41,12 @@ export function FeaturedGrid({
   const stickyClass = sticky ? 'lg:sticky lg:top-20 lg:h-fit' : undefined;
 
   return (
-    <div
+    <section
       className={cn('grid gap-4 lg:grid-cols-[280px_1fr] lg:gap-8', className)}
     >
-      <aside className={cn(stickyClass)}>
+      <header className={cn(stickyClass)}>
         <div className="space-y-6">
-          <header className="text-muted-foreground space-y-3">
+          <div className="text-muted-foreground space-y-3">
             <h2 className="text-xs font-semibold tracking-wide uppercase">
               {title}
             </h2>
@@ -55,7 +55,7 @@ export function FeaturedGrid({
                 {description}
               </div>
             )}
-          </header>
+          </div>
 
           {!!quickLinks && quickLinks.length > 0 && (
             <div className="space-y-3">
@@ -73,11 +73,11 @@ export function FeaturedGrid({
             </div>
           )}
         </div>
-      </aside>
+      </header>
 
       <div className="min-w-0">
         <GridList columns={gridColumns}>{children}</GridList>
       </div>
-    </div>
+    </section>
   );
 }

@@ -7,12 +7,14 @@ import { buildClipPath } from '@/features/clips/utils';
 
 interface ClipMediaCardProps {
   clip: Pick<Clip, 'description' | 'slug' | 'title'>;
+  headingLevel?: 2 | 3;
 }
 
-export function ClipMediaCard({ clip }: ClipMediaCardProps) {
+export function ClipMediaCard({ clip, headingLevel }: ClipMediaCardProps) {
   return (
     <MediaCard
       ariaLabel={clip.title}
+      headingLevel={headingLevel}
       href={buildClipPath(clip)}
       media={
         <MediaIconFrame>

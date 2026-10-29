@@ -16,9 +16,9 @@ export function SidebarContent({
   return (
     <div className={cn('space-y-2', className)}>
       {!!title && (
-        <h3 className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
+        <p className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">
           {title}
-        </h3>
+        </p>
       )}
       <div className="flex flex-col gap-4">{children}</div>
     </div>

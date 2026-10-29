@@ -1,6 +1,7 @@
 import type { Speaker } from '@/features/speakers/types';
 import type { Topic } from '@/features/topics/types';
 
+import { MetadataGroup } from '@/components/metadata-group';
 import { ShareSpeakerButton } from '@/features/speakers/components/share-speaker-button';
 import { SpeakerMinistryLink } from '@/features/speakers/components/speaker-ministry-link';
 import { TopicLinks } from '@/features/topics/components/topic-links';
@@ -19,51 +20,35 @@ export function SpeakerMetadataSidebar({
 }: SpeakerMetadataSidebarProps) {
   return (
     <div className="flex flex-col gap-8 sm:flex-row sm:flex-wrap sm:gap-12 lg:flex-col lg:gap-8">
-      {/* About */}
       {!hideAbout && speaker.description && (
-        <div className="space-y-4 sm:basis-full lg:basis-auto">
-          <h3 className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">
-            About
-          </h3>
+        <MetadataGroup className="sm:basis-full lg:basis-auto" label="About">
           <p className="text-muted-foreground text-sm leading-relaxed">
             {speaker.description}
           </p>
-        </div>
+        </MetadataGroup>
       )}
 
-      {/* Ministry */}
       {!hideAbout && (speaker.ministry || speaker.websiteUrl) && (
-        <div className="space-y-4">
-          <h3 className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">
-            Ministry
-          </h3>
+        <MetadataGroup label="Ministry">
           <SpeakerMinistryLink
             className="text-foreground text-sm"
             speaker={speaker}
           />
-        </div>
+        </MetadataGroup>
       )}
 
-      {/* Topics */}
       {topics.length > 0 && (
-        <div className="space-y-4">
-          <h3 className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">
-            Topics
-          </h3>
+        <MetadataGroup label="Topics">
           <TopicLinks topics={topics} />
-        </div>
+        </MetadataGroup>
       )}
 
-      {/* Actions */}
-      <div className="space-y-4">
-        <h3 className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">
-          Actions
-        </h3>
+      <MetadataGroup label="Actions">
         <div className="flex flex-wrap gap-2">
           <ShareSpeakerButton speaker={speaker} />
           <FavoriteSpeakerButton speaker={speaker} />
         </div>
-      </div>
+      </MetadataGroup>
     </div>
   );
 }

@@ -150,6 +150,7 @@ export default function AiPage() {
     <CenteredLayout
       content={<AiPageContent />}
       header={<PageHeader description={PAGE_DESCRIPTION} title={PAGE_TITLE} />}
+      render={<article />}
     />
   );
 }

@@ -8,6 +8,7 @@ import { TalkCardSubtitle } from '@/features/talks/components/talk-card-subtitle
 import { buildTalkPath } from '@/features/talks/utils';
 
 interface TalkCardProps {
+  headingLevel?: 2 | 3;
   speaker?: Pick<
     Speaker,
     'firstName' | 'imageUrl' | 'lastName' | 'slug'
@@ -15,7 +16,7 @@ interface TalkCardProps {
   talk: Pick<Talk, 'scripture' | 'slug' | 'title'>;
 }
 
-export function TalkCard({ speaker, talk }: TalkCardProps) {
+export function TalkCard({ headingLevel, speaker, talk }: TalkCardProps) {
   const speakerName = getSpeakerName(speaker);
   const accessibleLabel = speakerName
     ? `${talk.title} by ${speakerName}`
@@ -26,6 +27,7 @@ export function TalkCard({ speaker, talk }: TalkCardProps) {
     <MediaCard
       ariaLabel={accessibleLabel}
       data-testid="talk-card"
+      headingLevel={headingLevel}
       href={talkHref}
       media={speaker ? <SpeakerAvatar speaker={speaker} /> : undefined}
       subtitle={

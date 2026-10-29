@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 
 import { Container, Section } from '@/components/ui';
 import { cn } from '@/utils';
@@ -7,6 +7,7 @@ interface SidebarLayoutProps {
   className?: string;
   content: ReactNode;
   header?: ReactNode;
+  render?: ComponentProps<typeof Section>['render'];
   sidebar: ReactNode;
   sidebarSticky?: boolean;
   spacing?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
@@ -16,12 +17,13 @@ export function SidebarLayout({
   className,
   content,
   header,
+  render,
   sidebar,
   sidebarSticky = false,
   spacing = 'xl',
 }: SidebarLayoutProps) {
   return (
-    <Section spacing={spacing}>
+    <Section render={render} spacing={spacing}>
       <Container className={className}>
         {!!header && <div className="mb-10">{header}</div>}
 

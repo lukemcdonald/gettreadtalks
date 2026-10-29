@@ -15,7 +15,7 @@ export default function NotFound() {
   }, [pathname]);
 
   return (
-    <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 text-center">
+    <section className="flex min-h-[50vh] flex-col items-center justify-center gap-4 text-center">
       <h1 className="text-4xl font-semibold">404</h1>
       <p className="text-muted-foreground">This page could not be found.</p>
       <div className="flex items-center gap-4">
@@ -33,6 +33,6 @@ export default function NotFound() {
           Try searching
         </button>
       </div>
-    </div>
+    </section>
   );
 }

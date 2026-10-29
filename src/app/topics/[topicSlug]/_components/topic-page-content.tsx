@@ -83,6 +83,7 @@ export async function TopicPageContent({
           <TopicHeader topicSlug={topicSlug} />
         </Suspense>
       }
+      render={<article />}
       sidebar={
         <Suspense fallback={<TopicSidebarSkeleton />}>
           <TopicSidebar topicSlug={topicSlug} />

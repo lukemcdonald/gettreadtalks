@@ -7,12 +7,17 @@ import { buildCollectionPath } from '@/features/collections/utils';
 
 interface CollectionMediaCardProps {
   collection: Pick<Collection, 'slug' | 'title'>;
+  headingLevel?: 2 | 3;
 }
 
-export function CollectionMediaCard({ collection }: CollectionMediaCardProps) {
+export function CollectionMediaCard({
+  collection,
+  headingLevel,
+}: CollectionMediaCardProps) {
   return (
     <MediaCard
       ariaLabel={collection.title}
+      headingLevel={headingLevel}
       href={buildCollectionPath(collection)}
       media={
         <MediaIconFrame>

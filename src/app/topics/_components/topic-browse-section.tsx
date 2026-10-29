@@ -57,7 +57,12 @@ export function TopicBrowseSection({
       ) : (
         <GridList columns={{ default: 1, md: 2 }}>
           {talks.map((talk) => (
-            <TalkCard key={talk._id} speaker={talk.speaker} talk={talk} />
+            <TalkCard
+              headingLevel={3}
+              key={talk._id}
+              speaker={talk.speaker}
+              talk={talk}
+            />
           ))}
         </GridList>
       )}

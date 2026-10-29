@@ -27,12 +27,12 @@ export function ErrorFallback({
   const router = useRouter();
 
   return (
-    <div className="flex min-h-[400px] flex-col items-center justify-center p-8">
+    <main className="flex min-h-[400px] flex-col items-center justify-center p-8">
       <div className="max-w-md space-y-4 text-center">
         <div className="space-y-2">
-          <h2 className="text-destructive-foreground text-2xl font-semibold">
+          <h1 className="text-destructive-foreground text-2xl font-semibold">
             Something went wrong
-          </h2>
+          </h1>
           <p className="text-muted-foreground">
             We encountered an unexpected error. This has been reported to our
             team.
@@ -80,6 +80,6 @@ export function ErrorFallback({
           </button>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

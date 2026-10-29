@@ -15,9 +15,7 @@ export function FooterColumn({
 }: FooterColumnProps) {
   return (
     <div className={cn('space-y-4', className)}>
-      <h3 className="text-foreground text-sm font-semibold uppercase">
-        {title}
-      </h3>
+      <p className="text-foreground text-sm font-semibold uppercase">{title}</p>
       <nav aria-label={title} className="flex flex-col space-y-2">
         {children}
       </nav>

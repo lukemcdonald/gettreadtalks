@@ -34,6 +34,7 @@ export default function CollectionLoading() {
     <SidebarLayout
       content={<CollectionTalksSkeleton />}
       header={<CollectionHeaderSkeleton />}
+      render={<article />}
       sidebar={null}
     />
   );

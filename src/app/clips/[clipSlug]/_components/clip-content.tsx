@@ -3,6 +3,7 @@ import type { Speaker } from '@/features/speakers/types';
 import type { Talk } from '@/features/talks/types';
 
 import { FeaturedGrid } from '@/components/featured-grid';
+import { MetadataGroup } from '@/components/metadata-group';
 import { SpeakerCard } from '@/features/speakers/components/speaker-card';
 import { buildSpeakerPath, getSpeakerName } from '@/features/speakers/utils';
 import { TalkCard } from '@/features/talks/components/talk-card';
@@ -27,7 +28,7 @@ export function ClipContent({ clip, speaker, talk }: ClipContentProps) {
             sticky
             title="From the Talk"
           >
-            <TalkCard speaker={speaker} talk={talk} />
+            <TalkCard headingLevel={3} speaker={speaker} talk={talk} />
           </FeaturedGrid>
         )}
 
@@ -41,7 +42,7 @@ export function ClipContent({ clip, speaker, talk }: ClipContentProps) {
             sticky
             title="Speaker"
           >
-            <SpeakerCard speaker={speaker} />
+            <SpeakerCard headingLevel={3} speaker={speaker} />
           </FeaturedGrid>
         )}
       </div>
@@ -49,14 +50,11 @@ export function ClipContent({ clip, speaker, talk }: ClipContentProps) {
       {/* Sidebar */}
       <aside className="order-1 lg:sticky lg:top-20 lg:order-2 lg:h-fit">
         {!!clip.description && (
-          <div className="space-y-4">
-            <h3 className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">
-              About
-            </h3>
+          <MetadataGroup label="About">
             <p className="text-muted-foreground text-sm leading-relaxed">
               {clip.description}
             </p>
-          </div>
+          </MetadataGroup>
         )}
       </aside>
     </div>

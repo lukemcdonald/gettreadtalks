@@ -10,6 +10,7 @@ import { MediaCardTitle } from './media-card-title';
 type MediaCardProps = {
   ariaLabel?: string;
   'data-testid'?: string;
+  headingLevel?: 2 | 3;
   href: string;
   media?: ReactNode;
   subtitle?: ReactNode;
@@ -20,6 +21,7 @@ export function MediaCard({
   ariaLabel,
   className,
   'data-testid': testId,
+  headingLevel,
   href,
   media,
   subtitle,
@@ -36,8 +38,8 @@ export function MediaCard({
     >
       {media}
       <div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5">
-        <MediaCardTitle aria-label={ariaLabel}>
-          <FauxLink data-testid={testId} href={href}>
+        <MediaCardTitle level={headingLevel}>
+          <FauxLink aria-label={ariaLabel} data-testid={testId} href={href}>
             {title}
           </FauxLink>
         </MediaCardTitle>

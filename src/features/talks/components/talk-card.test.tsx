@@ -47,4 +47,16 @@ describe('TalkCard', () => {
     expect(screen.getByText('Jeff Durbin')).toBeVisible();
     expect(screen.queryByText('Acts 19:23-31')).not.toBeInTheDocument();
   });
+
+  it('defaults the title to an h2', () => {
+    setup();
+
+    expect(screen.getByRole('heading', { level: 2 })).toBeVisible();
+  });
+
+  it('renders the title at the given heading level', () => {
+    render(<TalkCard headingLevel={3} speaker={speaker} talk={talk} />);
+
+    expect(screen.getByRole('heading', { level: 3 })).toBeVisible();
+  });
 });

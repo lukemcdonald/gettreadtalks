@@ -38,6 +38,7 @@ export function SpeakersList({ groups, hasActiveFilters }: SpeakersListProps) {
       groups={groups.map((group) => ({
         items: group.items.map((speaker) => (
           <SpeakerCard
+            headingLevel={3}
             key={speaker._id}
             speaker={{
               featured: speaker.featured,
