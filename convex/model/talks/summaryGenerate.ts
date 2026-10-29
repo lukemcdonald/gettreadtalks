@@ -14,10 +14,9 @@ import {
   TALK_SUMMARY_SYSTEM_PROMPT,
   talkSummaryOutputSchema,
 } from './summaryPrompt';
-import { talkStudyContentFields } from './validators';
 
 const SUMMARY_GENERATE_MESSAGES = {
-  ALREADY_REVIEWED: 'This study has already been reviewed.',
+  ALREADY_REVIEWED: 'This summary has already been edited.',
   NO_TRANSCRIPT: 'A transcript is required to generate a summary.',
   TOKEN_MISSING: 'Summary service is not configured.',
   UPSTREAM_ERROR: 'Summary service returned an error.',
@@ -46,15 +45,6 @@ function toFailedResult(errorCode: TalkSummaryGenerateErrorCode) {
   };
 }
 
-function hasReviewedTalkStudy(study: {
-  manuallyEditedAt?: number;
-  studyStatus: 'draft' | 'published';
-}) {
-  return (
-    study.studyStatus === 'published' || study.manuallyEditedAt !== undefined
-  );
-}
-
 function isConflictError(error: unknown) {
   return (
     error instanceof ConvexError &&
@@ -62,37 +52,11 @@ function isConflictError(error: unknown) {
   );
 }
 
-function getTalkStudyDraftFields(study: Doc<'talkStudies'> | null) {
-  if (!study) {
-    return {
-      outline: [],
-      scriptureRefs: [],
-      studyGuide: [],
-      studyReviewed: false,
-      suggestedTopics: [],
-      summary: '',
-    };
-  }
-
-  return {
-    outline: study.outline,
-    scriptureRefs: study.scriptureRefs,
-    studyGuide: study.studyGuide,
-    studyReviewed: hasReviewedTalkStudy(study),
-    suggestedTopics: study.suggestedTopics,
-    summary: study.summary,
-  };
-}
-
 export interface TalkSummarySource {
-  outline: Doc<'talkStudies'>['outline'];
   scripture: string;
-  scriptureRefs: Doc<'talkStudies'>['scriptureRefs'];
   speaker: string;
-  studyGuide: Doc<'talkStudies'>['studyGuide'];
-  studyReviewed: boolean;
-  suggestedTopics: Doc<'talkStudies'>['suggestedTopics'];
   summary: string;
+  summaryManuallyEdited: boolean;
   title: string;
   transcript: string | null;
 }
@@ -120,7 +84,7 @@ export async function loadTalkGenerateSource(
     return { errorCode: 'NO_TRANSCRIPT' };
   }
 
-  if (source.studyReviewed) {
+  if (source.summaryManuallyEdited) {
     return { errorCode: 'ALREADY_REVIEWED' };
   }
 
@@ -136,14 +100,14 @@ export async function loadTalkGenerateSource(
 
 function toTalkSummarySource(
   speaker: Doc<'speakers'>,
-  study: Doc<'talkStudies'> | null,
   talk: Doc<'talks'>,
   transcript: Doc<'talkTranscripts'> | null
 ): TalkSummarySource {
   return {
-    ...getTalkStudyDraftFields(study),
     scripture: talk.scripture ?? '',
     speaker: `${speaker.firstName} ${speaker.lastName}`.trim(),
+    summary: talk.summary ?? '',
+    summaryManuallyEdited: talk.summaryManuallyEditedAt !== undefined,
     title: talk.title,
     transcript: transcript?.text?.trim() || null,
   };
@@ -158,22 +122,20 @@ export const loadTalkSummarySource = internalQuery({
 
     const talk = await getOrThrow(ctx, 'talks', talkId);
     const speaker = await getOrThrow(ctx, 'speakers', talk.speakerId);
-    const [study, transcript] = await Promise.all([
-      getOneFrom(ctx.db, 'talkStudies', 'by_talkId', talkId),
-      getOneFrom(ctx.db, 'talkTranscripts', 'by_talkId', talkId),
-    ]);
+    const transcript = await getOneFrom(
+      ctx.db,
+      'talkTranscripts',
+      'by_talkId',
+      talkId
+    );
 
-    return toTalkSummarySource(speaker, study, talk, transcript);
+    return toTalkSummarySource(speaker, talk, transcript);
   },
   returns: v.object({
-    outline: talkStudyContentFields.outline,
     scripture: v.string(),
-    scriptureRefs: talkStudyContentFields.scriptureRefs,
     speaker: v.string(),
-    studyGuide: talkStudyContentFields.studyGuide,
-    studyReviewed: v.boolean(),
-    suggestedTopics: talkStudyContentFields.suggestedTopics,
     summary: v.string(),
+    summaryManuallyEdited: v.boolean(),
     title: v.string(),
     transcript: v.union(v.null(), v.string()),
   }),
@@ -219,12 +181,8 @@ async function saveGeneratedTalkSummary(
   }
 
   try {
-    await ctx.runMutation(internal.talks.saveTalkStudyDraft, {
+    await ctx.runMutation(internal.talks.saveTalkSummaryDraft, {
       generator: TALK_SUMMARY_MODEL,
-      outline: source.outline,
-      scriptureRefs: source.scriptureRefs,
-      studyGuide: source.studyGuide,
-      suggestedTopics: source.suggestedTopics,
       summary: generated.summary,
       talkId,
     });

@@ -12,7 +12,7 @@ import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
 
 import {
   talkFeatureFormSchema,
-  talkStudyFormSchema,
+  talkSummaryFormSchema,
 } from '../schemas/talk-study-form';
 
 export async function updateTalkFeatureAction(
@@ -40,20 +40,20 @@ export async function updateTalkFeatureAction(
   }
 }
 
-export async function updateTalkStudyAction(
+export async function updateTalkSummaryAction(
   data: unknown,
   talkId: TalkId
 ): Promise<ActionResult<{ talkId: string }>> {
   await requireAdminUser();
 
-  const parsed = talkStudyFormSchema.safeParse(data);
+  const parsed = talkSummaryFormSchema.safeParse(data);
 
   if (!parsed.success) {
     return { errors: toZodFormErrors(parsed.error), success: false };
   }
 
   try {
-    await fetchAuthMutation(api.talks.updateTalkStudy, {
+    await fetchAuthMutation(api.talks.updateTalkSummary, {
       ...parsed.data,
       talkId,
     });

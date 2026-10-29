@@ -7,11 +7,7 @@ import { insertAffiliateLink } from '../affiliateLinks/test.factory';
 import { insertClip } from '../clips/test.factory';
 import { insertCollection } from '../collections/test.factory';
 import { insertSpeaker } from '../speakers/test.factory';
-import {
-  insertTalk,
-  insertTalkStudy,
-  insertTalkTranscript,
-} from '../talks/test.factory';
+import { insertTalk, insertTalkTranscript } from '../talks/test.factory';
 import { insertTalkOnTopic, insertTopic } from '../topics/test.factory';
 
 const MEDIA_URL = 'https://www.youtube.com/watch?v=0SVTl4Xa5fY';
@@ -46,7 +42,6 @@ async function seedCatalog(t: ReturnType<typeof createConvexTest>) {
       slug: 'unused-speaker',
     });
     const talkId = await insertTalk(ctx, { speakerId });
-    await insertTalkStudy(ctx, { talkId });
     const topicId = await insertTopic(ctx);
     const unusedTopicId = await insertTopic(ctx, {
       slug: 'unused-topic',
@@ -283,11 +278,6 @@ const gatedFunctions: {
   },
   {
     call: (client, seed) =>
-      client.query(api.talks.getTalkStudy, { talkId: seed.talkId }),
-    name: 'talks.getTalkStudy',
-  },
-  {
-    call: (client, seed) =>
       client.query(api.talks.getTalkTranscript, { talkId: seed.talkId }),
     name: 'talks.getTalkTranscript',
   },
@@ -308,10 +298,6 @@ const gatedFunctions: {
         status: 'all',
       }),
     name: 'talks.listAllTalks',
-  },
-  {
-    call: (client) => client.query(api.talks.listDraftTalkStudies, {}),
-    name: 'talks.listDraftTalkStudies',
   },
   {
     call: (client, seed) =>
@@ -336,12 +322,11 @@ const gatedFunctions: {
   },
   {
     call: (client, seed) =>
-      client.mutation(api.talks.updateTalkStudy, {
-        studyStatus: 'published',
+      client.mutation(api.talks.updateTalkSummary, {
         summary: 'Updated summary',
         talkId: seed.talkId,
       }),
-    name: 'talks.updateTalkStudy',
+    name: 'talks.updateTalkSummary',
   },
   {
     call: (client, seed) =>

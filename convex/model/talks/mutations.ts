@@ -26,30 +26,7 @@ import {
   clearStaleMediaChecks,
 } from '../mediaHealth/clear';
 import { talkTranscriptFields } from './schema';
-import {
-  statusType,
-  talkStudyContentFields,
-  talkStudyStatus,
-  talkTranscriptFetchErrorCode,
-} from './validators';
-
-function definedFields<T extends object>(fields: T): Partial<T> {
-  return Object.fromEntries(
-    Object.entries(fields).filter(([, value]) => value !== undefined)
-  ) as Partial<T>;
-}
-
-function hasReviewedTalkStudy(
-  study: {
-    manuallyEditedAt?: number;
-    studyStatus: 'draft' | 'published';
-  } | null
-) {
-  return (
-    study !== null &&
-    (study.studyStatus === 'published' || study.manuallyEditedAt !== undefined)
-  );
-}
+import { statusType, talkTranscriptFetchErrorCode } from './validators';
 
 async function setTalkTopics(
   ctx: MutationCtx,
@@ -401,96 +378,58 @@ export const upsertTalkTranscript = internalMutation({
   returns: v.id('talkTranscripts'),
 });
 
+function hasManuallyEditedTalkSummary(talk: Doc<'talks'>) {
+  return talk.summaryManuallyEditedAt !== undefined;
+}
+
 /**
- * Save a study draft. Always stores studyStatus `draft`; never publishes.
+ * Save a generated talk summary. Never overwrites a manually edited summary.
  */
-export const saveTalkStudyDraft = internalMutation({
+export const saveTalkSummaryDraft = internalMutation({
   args: {
     generator: v.string(),
-    ...talkStudyContentFields,
+    summary: v.string(),
     talkId: v.id('talks'),
   },
   handler: async (ctx, args) => {
-    await getOrThrow(ctx, 'talks', args.talkId);
+    const talk = await getOrThrow(ctx, 'talks', args.talkId);
 
-    const existing = await ctx.db
-      .query('talkStudies')
-      .withIndex('by_talkId', (q) => q.eq('talkId', args.talkId))
-      .unique();
-
-    if (hasReviewedTalkStudy(existing)) {
-      throwConvexError(409, 'Study already reviewed');
+    if (hasManuallyEditedTalkSummary(talk)) {
+      throwConvexError(409, 'Summary already edited');
     }
 
-    const fields = {
-      generatedAt: Date.now(),
-      generator: args.generator,
-      outline: args.outline,
-      scriptureRefs: args.scriptureRefs,
-      studyGuide: args.studyGuide,
-      studyStatus: 'draft' as const,
-      suggestedTopics: args.suggestedTopics,
+    await ctx.db.patch(args.talkId, {
       summary: args.summary,
-      talkId: args.talkId,
-    };
+      summaryGeneratedAt: Date.now(),
+      summaryGenerator: args.generator,
+    });
 
-    if (existing) {
-      await ctx.db.replace(existing._id, fields);
-
-      return existing._id;
-    }
-
-    return await ctx.db.insert('talkStudies', fields);
+    return args.talkId;
   },
-  returns: v.id('talkStudies'),
+  returns: v.id('talks'),
 });
 
-export const updateTalkStudy = mutation({
+export const updateTalkSummary = mutation({
   args: {
-    studyStatus: v.optional(talkStudyStatus),
-    summary: v.optional(v.string()),
+    summary: v.string(),
     talkId: v.id('talks'),
   },
   handler: async (ctx, args) => {
     await requireAdmin(ctx);
-    await getOrThrow(ctx, 'talks', args.talkId);
 
-    const existing = await getOneFrom(
-      ctx.db,
-      'talkStudies',
-      'by_talkId',
-      args.talkId
-    );
-    const content = definedFields({
-      studyStatus: args.studyStatus,
-      summary: args.summary,
-    });
+    const talk = await getOrThrow(ctx, 'talks', args.talkId);
     const editedAt = Date.now();
 
-    if (existing) {
-      await ctx.db.patch(existing._id, {
-        ...content,
-        manuallyEditedAt: editedAt,
-      });
-
-      return existing._id;
-    }
-
-    return await ctx.db.insert('talkStudies', {
-      generatedAt: editedAt,
-      generator: 'manual',
-      ...content,
-      manuallyEditedAt: editedAt,
-      outline: [],
-      scriptureRefs: [],
-      studyGuide: [],
-      studyStatus: args.studyStatus ?? 'draft',
-      suggestedTopics: [],
-      summary: args.summary ?? '',
-      talkId: args.talkId,
+    await ctx.db.patch(args.talkId, {
+      summary: args.summary,
+      summaryGeneratedAt: talk.summaryGeneratedAt ?? editedAt,
+      summaryGenerator: talk.summaryGenerator ?? 'manual',
+      summaryManuallyEditedAt: editedAt,
     });
+
+    return args.talkId;
   },
-  returns: v.id('talkStudies'),
+  returns: v.id('talks'),
 });
 
 export const updateTalkTranscript = mutation({
@@ -599,6 +538,53 @@ export const backfillTalkPublishedAt = internalMutation({
   },
   returns: v.object({
     scanned: v.number(),
+    updated: v.number(),
+  }),
+});
+
+/**
+ * Copy talkStudies summaries onto talks. Safe to re-run: skips talks that
+ * already have a summary. Does not delete talkStudies rows.
+ */
+export const migrateTalkSummaries = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const [studies, talks] = await Promise.all([
+      ctx.db.query('talkStudies').collect(),
+      ctx.db.query('talks').collect(),
+    ]);
+    const talksById = new Map(talks.map((talk) => [talk._id, talk]));
+    const copies = studies.flatMap((study) => {
+      const talk = talksById.get(study.talkId);
+      const summary = study.summary?.trim();
+
+      if (!talk || talk.summary?.trim() || !summary) {
+        return [];
+      }
+
+      return [{ study, talk }];
+    });
+
+    await Promise.all(
+      copies.map(({ study, talk }) =>
+        ctx.db.patch(talk._id, {
+          summary: study.summary,
+          summaryGeneratedAt: study.generatedAt,
+          summaryGenerator: study.generator,
+          summaryManuallyEditedAt: study.manuallyEditedAt,
+        })
+      )
+    );
+
+    return {
+      scanned: studies.length,
+      skipped: studies.length - copies.length,
+      updated: copies.length,
+    };
+  },
+  returns: v.object({
+    scanned: v.number(),
+    skipped: v.number(),
     updated: v.number(),
   }),
 });

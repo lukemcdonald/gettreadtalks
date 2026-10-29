@@ -1,6 +1,6 @@
 'use client';
 
-import type { TalkStudyFormData } from '@/features/talks/schemas/talk-study-form';
+import type { TalkSummaryFormData } from '@/features/talks/schemas/talk-study-form';
 import type { TalkId } from '@/features/talks/types';
 import type { UseFormReturn } from 'react-hook-form';
 
@@ -11,10 +11,9 @@ import { Controller, useForm } from 'react-hook-form';
 
 import { Field, FieldError, FieldLabel, Textarea } from '@/components/ui';
 import { api } from '@/convex/_generated/api';
-import { updateTalkStudyAction } from '@/features/talks/actions/update-talk-study';
-import { StudyStatusSelect } from '@/features/talks/components/study-status-select';
+import { updateTalkSummaryAction } from '@/features/talks/actions/update-talk-study';
 import { TalkSummaryGenerate } from '@/features/talks/components/talk-summary-generate';
-import { talkStudyFormSchema } from '@/features/talks/schemas/talk-study-form';
+import { talkSummaryFormSchema } from '@/features/talks/schemas/talk-study-form';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
 
 // fallow-ignore-next-line complexity
@@ -22,16 +21,15 @@ export function useTalkSummaryForm(
   talkId: TalkId,
   hasTranscriptPrefill = false
 ) {
-  const study = useQuery(api.talks.getTalkStudy, { talkId });
+  const talkDoc = useQuery(api.talks.getTalk, { id: talkId });
   const transcript = useQuery(api.talks.getTalkTranscript, { talkId });
   const [summaryFlags, setSummaryFlags] = useState<string[]>([]);
-  const form = useForm<TalkStudyFormData>({
+  const form = useForm<TalkSummaryFormData>({
     mode: 'onBlur',
     // oxlint-disable-next-line typescript/no-explicit-any -- Zod 4 compatibility with zodResolver
-    resolver: zodResolver(talkStudyFormSchema as any),
+    resolver: zodResolver(talkSummaryFormSchema as any),
     values: {
-      studyStatus: study?.studyStatus ?? 'draft',
-      summary: study?.summary ?? '',
+      summary: talkDoc?.summary ?? '',
     },
   });
 
@@ -40,7 +38,7 @@ export function useTalkSummaryForm(
       return { success: true as const };
     }
 
-    const result = await updateTalkStudyAction(form.getValues(), talkId);
+    const result = await updateTalkSummaryAction(form.getValues(), talkId);
 
     if (!result.success) {
       setServerErrors(form.setError, result.errors);
@@ -66,7 +64,7 @@ export function TalkSummaryFields({
   summaryFlags,
   talkId,
 }: {
-  form: UseFormReturn<TalkStudyFormData>;
+  form: UseFormReturn<TalkSummaryFormData>;
   hasTranscript: boolean;
   onFlagsChange: (flags: string[]) => void;
   summaryFlags: string[];
@@ -74,12 +72,9 @@ export function TalkSummaryFields({
 }) {
   return (
     <div className="flex w-full flex-col gap-2">
-      <div className="flex w-full items-center justify-between gap-2">
-        <Field className="contents">
-          <FieldLabel htmlFor="summary">Summary</FieldLabel>
-        </Field>
-        <StudyStatusSelect control={form.control} name="studyStatus" />
-      </div>
+      <Field className="contents">
+        <FieldLabel htmlFor="summary">Summary</FieldLabel>
+      </Field>
       <Controller
         control={form.control}
         name="summary"

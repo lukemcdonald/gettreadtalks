@@ -161,7 +161,6 @@ export const getTalkBySlug = query({
       collection: talk.collectionId
         ? ctx.db.get('collections', talk.collectionId)
         : null,
-      study: getOneFrom(ctx.db, 'talkStudies', 'by_talkId', talk._id),
       studyFeature: ctx.db
         .query('talkFeatures')
         .withIndex('by_talkId_and_kind', (q) =>
@@ -178,25 +177,24 @@ export const getTalkBySlug = query({
       ),
     };
 
-    const [clips, collection, study, studyFeature, topics] = await Promise.all([
+    const [clips, collection, studyFeature, topics] = await Promise.all([
       queries.clips,
       queries.collection,
-      queries.study,
       queries.studyFeature,
       queries.topics,
     ]);
 
     const validTopics = topics.filter((topic) => topic !== null);
-    const publishedStudy = study?.studyStatus === 'published' ? study : null;
     const publishedStudyBody =
       studyFeature?.status === 'published' ? studyFeature.body : null;
+    const summary = talk.summary?.trim() ? talk.summary : null;
 
     return {
       clips,
       collection,
       speaker,
       studyBody: publishedStudyBody,
-      summary: publishedStudy?.summary ?? null,
+      summary,
       talk,
       topics: validTopics,
     };
@@ -480,9 +478,20 @@ async function filterTalksByStudyStatus(
   talks: Doc<'talks'>[],
   studyStatus: 'draft' | 'none' | 'published'
 ) {
-  const studies = await ctx.db.query('talkStudies').collect();
+  const features = await Promise.all(
+    talks.map((talk) =>
+      ctx.db
+        .query('talkFeatures')
+        .withIndex('by_talkId_and_kind', (q) =>
+          q.eq('talkId', talk._id).eq('kind', 'study')
+        )
+        .unique()
+    )
+  );
   const statusByTalkId = new Map(
-    studies.map((study) => [study.talkId, study.studyStatus])
+    features.flatMap((feature) =>
+      feature ? [[feature.talkId, feature.status] as const] : []
+    )
   );
 
   return talks.filter((talk) => {
@@ -646,32 +655,6 @@ export const listTalkTranscripts = query({
     return transcripts.map(({ text: _text, ...item }) => item);
   },
   returns: v.array(talkTranscriptListItem),
-});
-
-/**
- * List study rows still awaiting review.
- */
-export const listDraftTalkStudies = query({
-  args: {},
-  handler: async (ctx) => {
-    await requireAdmin(ctx);
-
-    return await ctx.db
-      .query('talkStudies')
-      .withIndex('by_studyStatus', (q) => q.eq('studyStatus', 'draft'))
-      .collect();
-  },
-  returns: docs('talkStudies'),
-});
-
-export const getTalkStudy = query({
-  args: { talkId: v.id('talks') },
-  handler: async (ctx, { talkId }) => {
-    await requireAdmin(ctx);
-
-    return await getOneFrom(ctx.db, 'talkStudies', 'by_talkId', talkId);
-  },
-  returns: doc('talkStudies').nullable(),
 });
 
 async function loadTalkTranscript(ctx: QueryCtx, talkId: Id<'talks'>) {
