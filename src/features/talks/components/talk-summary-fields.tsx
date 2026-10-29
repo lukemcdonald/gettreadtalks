@@ -2,14 +2,24 @@
 
 import type { TalkStudyFormData } from '@/features/talks/schemas/talk-study-form';
 import type { TalkId } from '@/features/talks/types';
-import type { UseFormReturn } from 'react-hook-form';
+import type { Control, UseFormReturn } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery } from 'convex/react';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 
-import { SelectField, TextareaField } from '@/components/ui';
+import {
+  Field,
+  FieldError,
+  FieldLabel,
+  Select,
+  SelectItem,
+  SelectPopup,
+  SelectTrigger,
+  SelectValue,
+  Textarea,
+} from '@/components/ui';
 import { api } from '@/convex/_generated/api';
 import { updateTalkStudyAction } from '@/features/talks/actions/update-talk-study';
 import { TalkSummaryGenerate } from '@/features/talks/components/talk-summary-generate';
@@ -20,6 +30,45 @@ const STUDY_STATUS_OPTIONS = [
   { label: 'Draft', value: 'draft' },
   { label: 'Published', value: 'published' },
 ];
+
+function StudyStatusSelect({
+  control,
+}: {
+  control: Control<TalkStudyFormData>;
+}) {
+  return (
+    <Controller
+      control={control}
+      name="studyStatus"
+      render={({ field }) => (
+        <Select
+          items={STUDY_STATUS_OPTIONS}
+          name={field.name}
+          onValueChange={(nextValue) => {
+            field.onChange(nextValue ?? 'draft');
+          }}
+          value={field.value}
+        >
+          <SelectTrigger
+            aria-label="Status"
+            className="w-auto min-w-24"
+            id={field.name}
+            size="sm"
+          >
+            <SelectValue />
+          </SelectTrigger>
+          <SelectPopup>
+            {STUDY_STATUS_OPTIONS.map((item) => (
+              <SelectItem key={item.value} value={item.value}>
+                {item.label}
+              </SelectItem>
+            ))}
+          </SelectPopup>
+        </Select>
+      )}
+    />
+  );
+}
 
 // fallow-ignore-next-line complexity
 export function useTalkSummaryForm(talkId: TalkId) {
@@ -73,34 +122,45 @@ export function TalkSummaryFields({
   talkId: TalkId;
 }) {
   return (
-    <div className="space-y-4">
-      <TextareaField
-        control={form.control}
-        label="Summary"
-        name="summary"
-        rows={4}
-      />
-      <div className="flex flex-wrap items-end gap-4">
-        <TalkSummaryGenerate
-          hasTranscript={hasTranscript}
-          onFlagsChange={onFlagsChange}
-          talkId={talkId}
-        />
-        <SelectField
-          control={form.control}
-          label="Status"
-          name="studyStatus"
-          options={STUDY_STATUS_OPTIONS}
-        />
-      </div>
-      {summaryFlags.length > 0 ? (
-        <p
-          className="text-muted-foreground text-sm"
-          data-testid="summary-flags"
+    <Controller
+      control={form.control}
+      name="summary"
+      render={({ field, fieldState }) => (
+        <Field
+          dirty={fieldState.isDirty}
+          invalid={fieldState.invalid}
+          name={field.name}
+          touched={fieldState.isTouched}
         >
-          Review: {summaryFlags.join(' · ')}
-        </p>
-      ) : null}
-    </div>
+          <div className="flex w-full items-center justify-between gap-2">
+            <FieldLabel htmlFor={field.name}>Summary</FieldLabel>
+            <StudyStatusSelect control={form.control} />
+          </div>
+          <Textarea
+            rows={8}
+            size="lg"
+            {...field}
+            aria-invalid={fieldState.invalid}
+            id={field.name}
+          />
+          {fieldState.error ? (
+            <FieldError match>{fieldState.error.message}</FieldError>
+          ) : null}
+          <TalkSummaryGenerate
+            hasTranscript={hasTranscript}
+            onFlagsChange={onFlagsChange}
+            talkId={talkId}
+          />
+          {summaryFlags.length > 0 ? (
+            <p
+              className="text-muted-foreground text-sm"
+              data-testid="summary-flags"
+            >
+              Review: {summaryFlags.join(' · ')}
+            </p>
+          ) : null}
+        </Field>
+      )}
+    />
   );
 }

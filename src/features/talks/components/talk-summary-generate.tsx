@@ -10,16 +10,22 @@ import { api } from '@/convex/_generated/api';
 
 function getSummaryGenerateStatusText({
   error,
+  hasTranscript,
   isPending,
 }: {
   error: string | null;
+  hasTranscript: boolean;
   isPending: boolean;
 }) {
   if (isPending) {
     return 'Generating summary...';
   }
 
-  return error;
+  if (error) {
+    return error;
+  }
+
+  return hasTranscript ? null : 'Needs a transcript';
 }
 
 export function TalkSummaryGenerate({
@@ -36,6 +42,7 @@ export function TalkSummaryGenerate({
   const [isPending, setIsPending] = useState(false);
   const statusText = getSummaryGenerateStatusText({
     error,
+    hasTranscript,
     isPending,
   });
 
@@ -62,7 +69,7 @@ export function TalkSummaryGenerate({
   }
 
   return (
-    <div className="space-y-2">
+    <div className="flex flex-wrap items-center gap-2">
       <Button
         data-testid="generate-summary"
         disabled={!hasTranscript || isPending}
@@ -70,6 +77,7 @@ export function TalkSummaryGenerate({
         onClick={handleClick}
         size="sm"
         type="button"
+        variant="outline"
       >
         Generate summary
       </Button>
