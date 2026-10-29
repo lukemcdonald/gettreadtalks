@@ -1,19 +1,17 @@
 import type { Metadata } from 'next';
 
-import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
 
-import { buildClipJsonLd } from '@/app/clips/[clipSlug]/_components/clip-json-ld';
-import { JsonLd } from '@/components/json-ld';
-import { EditorialProfileLayout } from '@/components/layouts';
+import { ClipPageContent } from '@/app/clips/[clipSlug]/_components/clip-page-content';
+import { ClipPageSkeleton } from '@/app/clips/[clipSlug]/_components/clip-page-skeleton';
 import { getVideoOpenGraphType } from '@/components/media-embed/utils';
 import { loadClipBySlug } from '@/features/clips/queries/load-clip-by-slug';
-import { buildClipPath, buildClipsPath } from '@/features/clips/utils';
+import { buildClipPath } from '@/features/clips/utils';
 import { getSpeakerName } from '@/features/speakers/utils';
-import { buildBreadcrumbJsonLd } from '@/lib/json-ld';
 import { buildPageMetadata } from '@/lib/metadata';
 
-import { ClipContent } from './_components/clip-content';
-import { ClipHero } from './_components/clip-hero';
+// fallow-ignore-next-line unused-export
+export const ensureStatic = 'shell';
 
 interface ClipPageProps {
   params: Promise<{ clipSlug: string }>;
@@ -58,28 +56,10 @@ export async function generateMetadata({
   });
 }
 
-export default async function ClipPage({ params }: ClipPageProps) {
-  const { clipSlug } = await params;
-  const data = await loadClipBySlug(clipSlug);
-
-  if (!data) {
-    notFound();
-  }
-
-  const { clip, speaker, talk } = data;
-  const segments = [
-    { href: buildClipsPath(), label: 'Clips' },
-    { href: buildClipPath(clip), label: clip.title },
-  ];
-
+export default function ClipPage({ params }: ClipPageProps) {
   return (
-    <>
-      <JsonLd data={buildBreadcrumbJsonLd(segments)} />
-      <JsonLd data={buildClipJsonLd({ clip, speaker, talk })} />
-      <EditorialProfileLayout
-        content={<ClipContent clip={clip} speaker={speaker} talk={talk} />}
-        hero={<ClipHero clip={clip} speaker={speaker} />}
-      />
-    </>
+    <Suspense fallback={<ClipPageSkeleton />}>
+      <ClipPageContent params={params} />
+    </Suspense>
   );
 }
