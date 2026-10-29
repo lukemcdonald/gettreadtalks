@@ -1,0 +1,24 @@
+{
+  "url": "https://www.youtube.com/live/0SVTl4Xa5fY",
+  "before": {
+    "parseYouTubeUrl": null,
+    "detectMediaType": "unknown",
+    "embedUrl": null,
+    "oembed": null,
+    "transcriptEligible": false
+  },
+  "after": {
+    "getVideoId": {
+      "id": "0SVTl4Xa5fY",
+      "service": "youtube"
+    },
+    "detectMediaType": {
+      "id": "0SVTl4Xa5fY",
+      "type": "youtube"
+    },
+    "getVideoThumbnail": "https://img.youtube.com/vi/0SVTl4Xa5fY/hqdefault.jpg",
+    "embedUrl": "https://www.youtube.com/embed/0SVTl4Xa5fY",
+    "oembed": "https://www.youtube.com/oembed?format=json&url=https%3A%2F%2Fwww.youtube.com%2Flive%2F0SVTl4Xa5fY",
+    "transcriptEligible": true
+  }
+}
