@@ -1,3 +1,4 @@
+import type { ManageListSearchParams } from '@/components/manage-table';
 import type { SpeakerId } from '@/features/speakers/types';
 
 import { EditSpeakerSheetPage } from '@/app/@sheet/_components/edit-speaker-sheet-page';
@@ -7,9 +8,10 @@ import { ADMIN_LIST_PATHS, buildEntityEditPath } from '@/lib/entities/paths';
 
 interface PageProps {
   params: Promise<{ speakerId: SpeakerId }>;
+  searchParams: Promise<ManageListSearchParams>;
 }
 
-export default async function Page({ params }: PageProps) {
+export default async function Page({ params, searchParams }: PageProps) {
   const { speakerId } = await params;
 
   return (
@@ -22,7 +24,7 @@ export default async function Page({ params }: PageProps) {
         />
       }
     >
-      <ManageSpeakersPage searchParams={Promise.resolve({})} />
+      <ManageSpeakersPage searchParams={searchParams} />
     </AdminSheetFallback>
   );
 }

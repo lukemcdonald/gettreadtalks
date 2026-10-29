@@ -1,3 +1,4 @@
+import type { ManageTalksSearchParams } from '@/app/manage/talks/_components/talks-content';
 import type { TalkId } from '@/features/talks/types';
 
 import { EditTalkSheetPage } from '@/app/@sheet/_components/edit-talk-sheet-page';
@@ -8,7 +9,7 @@ import { parseStatusPrefill } from '@/lib/entities/status-prefill';
 
 interface PageProps {
   params: Promise<{ talkId: TalkId }>;
-  searchParams: Promise<{ status?: string | string[] }>;
+  searchParams: Promise<ManageTalksSearchParams>;
 }
 
 export default async function Page({ params, searchParams }: PageProps) {
@@ -29,11 +30,7 @@ export default async function Page({ params, searchParams }: PageProps) {
         />
       }
     >
-      <ManageTalksPage
-        searchParams={Promise.resolve(
-          statusPrefill ? { status: statusPrefill } : {}
-        )}
-      />
+      <ManageTalksPage searchParams={searchParams} />
     </AdminSheetFallback>
   );
 }

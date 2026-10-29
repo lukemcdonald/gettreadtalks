@@ -1,3 +1,4 @@
+import type { ManageClipsSearchParams } from '@/app/manage/clips/_components/clips-content';
 import type { ClipId } from '@/features/clips/types';
 
 import { EditClipSheetPage } from '@/app/@sheet/_components/edit-clip-sheet-page';
@@ -8,7 +9,7 @@ import { parseStatusPrefill } from '@/lib/entities/status-prefill';
 
 interface PageProps {
   params: Promise<{ clipId: ClipId }>;
-  searchParams: Promise<{ status?: string | string[] }>;
+  searchParams: Promise<ManageClipsSearchParams>;
 }
 
 export default async function Page({ params, searchParams }: PageProps) {
@@ -29,11 +30,7 @@ export default async function Page({ params, searchParams }: PageProps) {
         />
       }
     >
-      <ManageClipsPage
-        searchParams={Promise.resolve(
-          statusPrefill ? { status: statusPrefill } : {}
-        )}
-      />
+      <ManageClipsPage searchParams={searchParams} />
     </AdminSheetFallback>
   );
 }
