@@ -80,6 +80,24 @@ else
   echo "No leftover talk-description cleanup on ${preview_deployment}."
 fi
 
+# Reused previews from earlier 517 commits stored keyPassages/mainPoints on
+# talkStudies. Those fields are gone from the schema, so leftover documents
+# block deploy. Replace the table; seedPreview rewrites studies after push.
+studies_file="$(mktemp)"
+printf '[]\n' > "${studies_file}"
+if npx convex import \
+  --deployment "${preview_deployment}" \
+  --format jsonArray \
+  --replace \
+  --table talkStudies \
+  --yes \
+  "${studies_file}"; then
+  echo "Cleared leftover talk studies on ${preview_deployment}."
+else
+  echo "No leftover talk-study cleanup on ${preview_deployment}."
+fi
+rm -f "${studies_file}"
+
 npx convex deploy \
   --cmd "sh -c 'printf %s \"\$NEXT_PUBLIC_CONVEX_URL\" > \"${url_file}\"'" \
   --cmd-url-env-var-name NEXT_PUBLIC_CONVEX_URL \
