@@ -1,6 +1,9 @@
 import { asyncMap } from 'convex-helpers';
 import { getAll, getOneFrom } from 'convex-helpers/server/relationships';
-import { paginationOptsValidator } from 'convex/server';
+import {
+  paginationOptsValidator,
+  paginationResultValidator,
+} from 'convex/server';
 import { v } from 'convex/values';
 
 import { query } from '../../_generated/server';
@@ -8,10 +11,15 @@ import { enrichWithSpeaker } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
 import { requireAdmin } from '../auth/roles';
+import { LIST_SEARCH_LIMIT } from '../search/constants';
+import { listAllAdmin } from '../search/listAll';
 import { listPublishedTalksForCollection } from '../talks/helpers';
 import {
+  enrichCollectionsForAdmin,
   listPublishedCollections,
   listPublishedCollectionsPage,
+  loadSpeakersForTalks,
+  searchCollections,
 } from './helpers';
 
 /**
@@ -150,14 +158,9 @@ export const listCollections = query({
           collection._id
         );
 
-        // Get unique speaker IDs
-        const speakerIds = [...new Set(talks.map((talk) => talk.speakerId))];
-        const speakers = await getAll(ctx.db, speakerIds);
-        const validSpeakers = speakers.filter((speaker) => speaker !== null);
-
         return {
           collection,
-          speakers: validSpeakers,
+          speakers: await loadSpeakersForTalks(ctx, talks),
           talkCount: talks.length,
         };
       }
@@ -172,6 +175,15 @@ export const listCollections = query({
   returns: v.any(),
 });
 
+const collectionAdminPageValidator = paginationResultValidator(
+  v.object({
+    collection: doc('collections'),
+    speakers: docs('speakers'),
+    status: v.union(v.literal('draft'), v.literal('published')),
+    talkCount: v.number(),
+  })
+);
+
 /**
  * List all collections with stats.
  * Returns all collections without filtering.
@@ -179,43 +191,17 @@ export const listCollections = query({
 export const listAllCollections = query({
   args: {
     paginationOpts: paginationOptsValidator,
+    search: v.optional(v.string()),
   },
-  handler: async (ctx, args) => {
-    await requireAdmin(ctx);
-
-    const collectionPages = await ctx.db
-      .query('collections')
-      .order('desc')
-      .paginate(args.paginationOpts);
-
-    // Enrich each collection with stats
-    const enrichedPage = await asyncMap(
-      collectionPages.page,
-      async (collection) => {
-        const talks = await listPublishedTalksForCollection(
-          ctx,
-          collection._id
-        );
-
-        const speakerIds = [...new Set(talks.map((talk) => talk.speakerId))];
-        const speakers = await getAll(ctx.db, speakerIds);
-        const validSpeakers = speakers.filter((speaker) => speaker !== null);
-
-        return {
-          collection,
-          speakers: validSpeakers,
-          status:
-            talks.length > 0 ? ('published' as const) : ('draft' as const),
-          talkCount: talks.length,
-        };
-      }
-    );
-
-    return {
-      ...collectionPages,
-      page: enrichedPage,
-    };
-  },
-  // PaginationResult with enriched page: Array<{ collection, speakers, talkCount }>
-  returns: v.any(),
+  handler: async (ctx, args) =>
+    await listAllAdmin(ctx, {
+      enrich: (page) => enrichCollectionsForAdmin(ctx, page),
+      listPage: () =>
+        ctx.db.query('collections').order('desc').paginate(args.paginationOpts),
+      paginationOpts: args.paginationOpts,
+      search: args.search,
+      searchItems: (queryText) =>
+        searchCollections(ctx, queryText, LIST_SEARCH_LIMIT),
+    }),
+  returns: collectionAdminPageValidator,
 });

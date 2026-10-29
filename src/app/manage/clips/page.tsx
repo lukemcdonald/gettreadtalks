@@ -23,7 +23,7 @@ export default function ManageClipsPage({
         description="Manage all clips across all statuses"
         title="Manage Clips"
       />
-      <Suspense fallback={<Skeleton className="h-10 w-full" />}>
+      <Suspense fallback={<Skeleton className="h-16 w-full" />}>
         <ClipsFilters />
       </Suspense>
       <Suspense fallback={<ManageTableSkeleton resource="clips" />}>

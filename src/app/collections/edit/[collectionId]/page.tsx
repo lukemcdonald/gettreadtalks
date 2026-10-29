@@ -1,3 +1,4 @@
+import type { ManageListSearchParams } from '@/components/manage-table';
 import type { CollectionId } from '@/features/collections/types';
 
 import { EditCollectionSheetPage } from '@/app/@sheet/_components/edit-collection-sheet-page';
@@ -7,9 +8,10 @@ import { ADMIN_LIST_PATHS, buildEntityEditPath } from '@/lib/entities/paths';
 
 interface PageProps {
   params: Promise<{ collectionId: CollectionId }>;
+  searchParams: Promise<ManageListSearchParams>;
 }
 
-export default async function Page({ params }: PageProps) {
+export default async function Page({ params, searchParams }: PageProps) {
   const { collectionId } = await params;
 
   return (
@@ -22,7 +24,7 @@ export default async function Page({ params }: PageProps) {
         />
       }
     >
-      <ManageCollectionsPage />
+      <ManageCollectionsPage searchParams={searchParams} />
     </AdminSheetFallback>
   );
 }

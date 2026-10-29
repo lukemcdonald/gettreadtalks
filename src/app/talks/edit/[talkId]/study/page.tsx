@@ -1,3 +1,4 @@
+import type { ManageTalksSearchParams } from '@/app/manage/talks/_components/talks-content';
 import type { TalkId } from '@/features/talks/types';
 
 import { EditTalkSheetPage } from '@/app/@sheet/_components/edit-talk-sheet-page';
@@ -8,8 +9,10 @@ import { ADMIN_LIST_PATHS } from '@/lib/entities/paths';
 
 export default async function Page({
   params,
+  searchParams,
 }: {
   params: Promise<{ talkId: TalkId }>;
+  searchParams: Promise<ManageTalksSearchParams>;
 }) {
   const { talkId } = await params;
 
@@ -20,7 +23,7 @@ export default async function Page({
         <EditTalkSheetPage closeHref={ADMIN_LIST_PATHS.talks} params={params} />
       }
     >
-      <ManageTalksPage searchParams={Promise.resolve({})} />
+      <ManageTalksPage searchParams={searchParams} />
     </AdminSheetFallback>
   );
 }

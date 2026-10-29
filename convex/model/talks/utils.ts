@@ -5,64 +5,6 @@ import { asyncMap } from 'convex-helpers';
 
 import { enrichWithSpeaker } from '../../lib/utils';
 
-function speakerNameMatches(
-  searchLower: string,
-  speaker: Doc<'speakers'> | null
-): boolean {
-  if (!speaker) {
-    return false;
-  }
-
-  return `${speaker.firstName ?? ''} ${speaker.lastName ?? ''}`
-    .toLowerCase()
-    .includes(searchLower);
-}
-
-function talkTitleMatches(searchLower: string, title: string): boolean {
-  return title.toLowerCase().includes(searchLower);
-}
-
-/**
- * Title-match first, then load unique speakers only for remaining talks.
- */
-// fallow-ignore-next-line complexity
-export async function filterTalksByTitleOrSpeaker(
-  ctx: QueryCtx,
-  search: string,
-  talks: Doc<'talks'>[]
-): Promise<Doc<'talks'>[]> {
-  const searchLower = search.toLowerCase();
-  const remaining: Doc<'talks'>[] = [];
-  const titleHitIds = new Set<Id<'talks'>>();
-
-  for (const talk of talks) {
-    if (talkTitleMatches(searchLower, talk.title)) {
-      titleHitIds.add(talk._id);
-    } else {
-      remaining.push(talk);
-    }
-  }
-
-  const speakerIds = [...new Set(remaining.map((talk) => talk.speakerId))];
-  const speakers = await Promise.all(
-    speakerIds.map((speakerId) => ctx.db.get('speakers', speakerId))
-  );
-  const matchingSpeakerIds = new Set(
-    speakerIds.filter((speakerId, index) =>
-      speakerNameMatches(searchLower, speakers[index] ?? null)
-    )
-  );
-  const matchingIds = new Set(titleHitIds);
-
-  for (const talk of remaining) {
-    if (matchingSpeakerIds.has(talk.speakerId)) {
-      matchingIds.add(talk._id);
-    }
-  }
-
-  return talks.filter((talk) => matchingIds.has(talk._id));
-}
-
 /**
  * Enrich talks with topic slugs for client-side filtering.
  * Composable: works with raw talks or already-enriched talks.

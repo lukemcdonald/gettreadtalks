@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { getPublishedAtForStatus, paginateArray, slugify } from './utils';
+import {
+  getPublishedAtForStatus,
+  paginateArray,
+  paginateSearchOrList,
+  slugify,
+} from './utils';
 
 describe('slugify', () => {
   it('returns empty for missing text', () => {
@@ -64,5 +69,60 @@ describe('paginateArray', () => {
       isDone: true,
       page: ['a', 'b'],
     });
+  });
+});
+
+describe('paginateSearchOrList', () => {
+  it('uses search with cursor pages, and lists when the query is empty', async () => {
+    const listed = {
+      continueCursor: 'listed',
+      isDone: false,
+      page: ['listed'],
+    };
+    const items = ['a', 'b', 'c'];
+
+    const first = await paginateSearchOrList({
+      listPage: () => Promise.resolve(listed),
+      paginationOpts: {
+        cursor: null,
+        numItems: 2,
+      },
+      queryText: 'grace',
+      search: () => Promise.resolve(items),
+    });
+
+    expect(first).toEqual({
+      continueCursor: '2',
+      isDone: false,
+      page: ['a', 'b'],
+    });
+
+    const second = await paginateSearchOrList({
+      listPage: () => Promise.resolve(listed),
+      paginationOpts: {
+        cursor: first.continueCursor,
+        numItems: 2,
+      },
+      queryText: 'grace',
+      search: () => Promise.resolve(items),
+    });
+
+    expect(second).toEqual({
+      continueCursor: '',
+      isDone: true,
+      page: ['c'],
+    });
+
+    const unfiltered = await paginateSearchOrList({
+      listPage: () => Promise.resolve(listed),
+      paginationOpts: {
+        cursor: null,
+        numItems: 2,
+      },
+      queryText: '',
+      search: () => Promise.resolve(items),
+    });
+
+    expect(unfiltered).toBe(listed);
   });
 });

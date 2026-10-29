@@ -1,15 +1,26 @@
-'use cache: private';
-
-import { cacheLife, cacheTag } from 'next/cache';
+'use server';
 
 import { api } from '@/convex/_generated/api';
 import { fetchAuthQuery } from '@/services/auth/server';
 
-export async function loadSpeakersAdmin() {
-  cacheLife('hours');
-  cacheTag('speakers');
+interface LoadSpeakersAdminProps {
+  cursor?: string;
+  limit?: number;
+  search?: string;
+}
 
-  const speakers = await fetchAuthQuery(api.speakers.listAllSpeakersAdmin, {});
+export async function loadSpeakersAdmin(args: LoadSpeakersAdminProps = {}) {
+  const result = await fetchAuthQuery(api.speakers.listAllSpeakersAdmin, {
+    paginationOpts: {
+      cursor: args.cursor ?? null,
+      numItems: args.limit ?? 50,
+    },
+    search: args.search,
+  });
 
-  return { speakers };
+  return {
+    continueCursor: result.continueCursor,
+    isDone: result.isDone,
+    speakers: result.page,
+  };
 }

@@ -4,9 +4,14 @@ import { withSentryConfig } from '@sentry/nextjs/config';
 
 import { IS_SENTRY_ENABLED } from './src/configs/sentry';
 
+const isDev = process.env.NODE_ENV === 'development';
+const localConvexConnect = isDev
+  ? ' http://127.0.0.1:3210 http://127.0.0.1:3211 http://localhost:3210 http://localhost:3211 ws://127.0.0.1:3210 ws://localhost:3210'
+  : '';
+
 const cspHeader = `
   base-uri 'self';
-  connect-src 'self' https://*.convex.cloud wss://*.convex.cloud https://api.segment.com https://api.segment.io https://cdn.segment.com https://challenges.cloudflare.com https://*.sentry.io https://*.ingest.us.sentry.io https://va.vercel-scripts.com;
+  connect-src 'self' https://*.convex.cloud wss://*.convex.cloud${localConvexConnect} https://api.segment.com https://api.segment.io https://cdn.segment.com https://challenges.cloudflare.com https://*.sentry.io https://*.ingest.us.sentry.io https://va.vercel-scripts.com;
   default-src 'self';
   font-src 'self' data:;
   form-action 'self';
@@ -18,7 +23,7 @@ const cspHeader = `
   script-src 'self' 'unsafe-eval' 'unsafe-inline' https://cdn.segment.com https://challenges.cloudflare.com https://vercel.live https://va.vercel-scripts.com;
   style-src 'self' 'unsafe-inline';
   worker-src 'self' blob:;
-  upgrade-insecure-requests;
+  ${isDev ? '' : 'upgrade-insecure-requests;'}
 `;
 
 const nextConfig = {

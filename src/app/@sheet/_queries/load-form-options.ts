@@ -23,7 +23,7 @@ export async function loadFormOptions() {
       fetchAuthQuery(api.collections.listAllCollections, { paginationOpts }),
       fetchAuthQuery(api.speakers.listAllSpeakers, { paginationOpts }),
       fetchAuthQuery(api.talks.listAllTalks, { paginationOpts, status: 'all' }),
-      fetchAuthQuery(api.topics.listAllTopics, {}),
+      fetchAuthQuery(api.topics.listAllTopics, { paginationOpts }),
     ]);
 
   return {
@@ -42,7 +42,7 @@ export async function loadFormOptions() {
       _id: item._id,
       title: item.title,
     })),
-    topics: topicsResult.map((item) => ({
+    topics: topicsResult.page.map((item) => ({
       _id: item.topic._id,
       slug: item.topic.slug,
       title: item.topic.title,

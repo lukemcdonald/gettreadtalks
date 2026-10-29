@@ -1,8 +1,11 @@
 import type { TopicSortOption } from '../../lib/sort';
 
 import { asyncMap } from 'convex-helpers';
-import { getManyFrom, getOneFrom } from 'convex-helpers/server/relationships';
-import { paginationOptsValidator } from 'convex/server';
+import { getOneFrom } from 'convex-helpers/server/relationships';
+import {
+  paginationOptsValidator,
+  paginationResultValidator,
+} from 'convex/server';
 import { v } from 'convex/values';
 
 import { query } from '../../_generated/server';
@@ -12,12 +15,18 @@ import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
 import { requireAdmin } from '../auth/roles';
 import { LIST_SEARCH_LIMIT } from '../search/constants';
+import { listAllAdmin } from '../search/listAll';
 import { normalizeSearchQuery } from '../search/utils';
 import {
   listPublishedTalksForTopic,
   searchPublishedTalksByTitleOrSpeaker,
 } from '../talks/helpers';
-import { listPublishedTopics, searchPublishedTopics } from './helpers';
+import {
+  enrichTopicsForAdmin,
+  listPublishedTopics,
+  searchPublishedTopics,
+  searchTopics,
+} from './helpers';
 
 /**
  * Get topic by ID.
@@ -94,36 +103,36 @@ export const getTopicBySlug = query({
   ),
 });
 
+const topicAdminPageValidator = paginationResultValidator(
+  v.object({
+    talkCount: v.number(),
+    topic: doc('topics'),
+  })
+);
+
 /**
  * List all topics for admin use, with total talk count (all statuses).
  */
 export const listAllTopics = query({
-  args: {},
-  handler: async (ctx) => {
-    await requireAdmin(ctx);
-
-    const topics = await ctx.db.query('topics').withIndex('by_title').collect();
-
-    return await asyncMap(topics, async (topic) => {
-      const talksOnTopic = await getManyFrom(
-        ctx.db,
-        'talksOnTopics',
-        'by_topicId',
-        topic._id
-      );
-
-      return {
-        talkCount: talksOnTopic.length,
-        topic,
-      };
-    });
+  args: {
+    paginationOpts: paginationOptsValidator,
+    search: v.optional(v.string()),
   },
-  returns: v.array(
-    v.object({
-      talkCount: v.number(),
-      topic: doc('topics'),
-    })
-  ),
+  handler: async (ctx, args) =>
+    await listAllAdmin(ctx, {
+      enrich: (page) => enrichTopicsForAdmin(ctx, page),
+      listPage: () =>
+        ctx.db
+          .query('topics')
+          .withIndex('by_title')
+          .order('asc')
+          .paginate(args.paginationOpts),
+      paginationOpts: args.paginationOpts,
+      search: args.search,
+      searchItems: (queryText) =>
+        searchTopics(ctx, queryText, LIST_SEARCH_LIMIT),
+    }),
+  returns: topicAdminPageValidator,
 });
 
 /**

@@ -1,4 +1,7 @@
-import { SearchInput } from '@/components/ui/search-input';
+import {
+  ManageListToolbar,
+  ManageSearchInput,
+} from '@/components/manage-table';
 import { SelectFilter } from '@/components/ui/select-filter';
 
 const STATUS_FILTER_OPTIONS = [
@@ -16,7 +19,7 @@ const STUDY_FILTER_OPTIONS = [
 
 export function TalksFilters() {
   return (
-    <div className="flex flex-wrap gap-4">
+    <ManageListToolbar>
       <SelectFilter
         className="w-48"
         label="Status"
@@ -31,12 +34,7 @@ export function TalksFilters() {
         options={STUDY_FILTER_OPTIONS}
         placeholder="All"
       />
-      <SearchInput
-        className="max-w-96 min-w-0 flex-1"
-        label="Search"
-        paramName="search"
-        placeholder="Search talks and speakers..."
-      />
-    </div>
+      <ManageSearchInput placeholder="Search talks and speakers..." />
+    </ManageListToolbar>
   );
 }

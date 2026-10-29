@@ -12,5 +12,9 @@ export const collectionFields = {
 };
 
 export const collectionTables = {
-  collections: defineTable(collectionFields).index('by_slug', ['slug']),
+  collections: defineTable(collectionFields)
+    .index('by_slug', ['slug'])
+    .searchIndex('search_title', {
+      searchField: 'title',
+    }),
 };

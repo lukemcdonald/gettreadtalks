@@ -16,12 +16,14 @@ import { statusFilterType } from '../../lib/validators/shared';
 import { canViewContent, requireAdmin } from '../auth/roles';
 import { getCurrentUser } from '../auth/utils';
 import { LIST_SEARCH_LIMIT } from '../search/constants';
+import { listAllAdmin } from '../search/listAll';
 import { normalizeSearchQuery } from '../search/utils';
 import {
   enrichClipsForAdmin,
   enrichClipsWithSpeaker,
   listPublishedClips,
   listPublishedClipsPage,
+  searchClips,
   searchPublishedClips,
 } from './helpers';
 
@@ -231,28 +233,29 @@ export const listClipsBySpeaker = query({
 export const listAllClips = query({
   args: {
     paginationOpts: paginationOptsValidator,
+    search: v.optional(v.string()),
     status: v.optional(statusFilterType),
   },
   handler: async (ctx, args) => {
-    await requireAdmin(ctx);
+    const { paginationOpts, search, status } = args;
 
-    const { paginationOpts, status } = args;
-
-    const clipPages =
-      !status || status === 'all'
-        ? await ctx.db.query('clips').order('desc').paginate(paginationOpts)
-        : await ctx.db
-            .query('clips')
-            .withIndex('by_status_and_publishedAt', (q) =>
-              q.eq('status', status)
-            )
-            .order('desc')
-            .paginate(paginationOpts);
-
-    return {
-      ...clipPages,
-      page: await enrichClipsForAdmin(ctx, clipPages.page),
-    };
+    return await listAllAdmin(ctx, {
+      enrich: (page) => enrichClipsForAdmin(ctx, page),
+      listPage: () =>
+        !status || status === 'all'
+          ? ctx.db.query('clips').order('desc').paginate(paginationOpts)
+          : ctx.db
+              .query('clips')
+              .withIndex('by_status_and_publishedAt', (q) =>
+                q.eq('status', status)
+              )
+              .order('desc')
+              .paginate(paginationOpts),
+      paginationOpts,
+      search,
+      searchItems: (queryText) =>
+        searchClips(ctx, queryText, LIST_SEARCH_LIMIT, status),
+    });
   },
   returns: clipAdminPageValidator,
 });
