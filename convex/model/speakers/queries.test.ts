@@ -86,4 +86,41 @@ describe('getSpeakerBySlug', () => {
 
     expect(speaker?.topics).toEqual([]);
   });
+
+  it('lists talks newest-first by publishedAt', async () => {
+    const t = createConvexTest();
+    await seedVisibilityCatalog(t);
+
+    const published = await t.query(api.talks.getTalkBySlug, {
+      speakerSlug: visibilitySlugs.publishedSpeaker,
+      talkSlug: visibilitySlugs.publishedTalk,
+    });
+    const speakerId = published?.talk.speakerId;
+
+    expect(speakerId).toBeDefined();
+
+    if (!speakerId) {
+      throw new Error('expected a published talk');
+    }
+
+    await t.run(async (ctx) => {
+      await ctx.db.insert('talks', {
+        mediaUrl: 'https://www.youtube.com/watch?v=0SVTl4Xa5fY',
+        publishedAt: Date.parse('2020-01-01T12:00:00.000Z'),
+        slug: 'older-speaker-talk',
+        speakerId,
+        status: 'published',
+        title: 'Older Speaker Talk',
+      });
+    });
+
+    const speaker = await t.query(api.speakers.getSpeakerBySlug, {
+      slug: visibilitySlugs.publishedSpeaker,
+    });
+
+    expect(speaker?.talks.map((talk) => talk.slug)).toEqual([
+      visibilitySlugs.publishedTalk,
+      'older-speaker-talk',
+    ]);
+  });
 });

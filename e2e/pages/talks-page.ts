@@ -10,6 +10,7 @@ export class TalksPage {
   readonly heading: Locator;
   readonly page: Page;
   readonly playback: Locator;
+  readonly publishDate: Locator;
   readonly search: Locator;
   readonly studyPanel: Locator;
   readonly studyTab: Locator;
@@ -36,6 +37,7 @@ export class TalksPage {
       .getByRole('button', { name: /^(?:Play|Watch) /u })
       .or(page.getByRole('link', { name: 'Open Media' }))
       .or(page.locator('audio[controls], video[controls]'));
+    this.publishDate = this.editDrawer.getByTestId('publish-date');
     this.search = page.getByRole('searchbox', { name: 'Search' });
     this.studyPanel = this.editDrawer.getByTestId('edit-talk-study-panel');
     this.studyTab = this.editDrawer.getByTestId('edit-talk-tab-study');
@@ -44,6 +46,10 @@ export class TalksPage {
 
   async closeEditDrawer() {
     await this.editDrawer.getByRole('button', { name: 'Close' }).click();
+  }
+
+  async fillPublishDate(value: string) {
+    await this.publishDate.fill(value);
   }
 
   getEditTalkId() {
@@ -56,6 +62,14 @@ export class TalksPage {
     }
 
     return talkId;
+  }
+
+  async getTalkHrefs() {
+    const hrefs = await this.talkCards.evaluateAll((cards) =>
+      cards.map((card) => card.getAttribute('href') ?? '')
+    );
+
+    return hrefs;
   }
 
   async goto() {
@@ -87,6 +101,20 @@ export class TalksPage {
   async openTalkAt(index: number) {
     await this.talkCards.nth(index).click();
     await this.page.waitForURL(/\/talks\/[^/]+\/[^/]+$/u);
+  }
+
+  async saveChanges() {
+    const saved = this.page.waitForResponse((response) => {
+      const request = response.request();
+      const isMutation =
+        request.method() === 'POST' &&
+        Boolean(request.headers()['next-action']);
+
+      return isMutation;
+    });
+
+    await this.editDrawer.getByRole('button', { name: 'Save Changes' }).click();
+    await saved;
   }
 
   async searchFor(query: string) {

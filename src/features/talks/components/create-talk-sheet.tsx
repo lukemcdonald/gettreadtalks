@@ -38,6 +38,7 @@ export function CreateTalkSheet({
       collectionOrder: undefined,
       featured: false,
       mediaUrl: '',
+      publishedAt: '',
       scripture: '',
       speakerId: undefined,
       status: 'backlog',

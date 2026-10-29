@@ -16,7 +16,7 @@ import { v } from 'convex/values';
 import { query } from '../../_generated/server';
 import { getTalkIdsByTopicSlugs } from '../../lib/filters';
 import { rotateContent } from '../../lib/rotateContent';
-import { getContentComparator } from '../../lib/sort';
+import { byPublishedAt, getContentComparator } from '../../lib/sort';
 import { enrichWithSpeaker, paginateArray } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
@@ -309,14 +309,18 @@ export const listTalksBySpeaker = query({
     limit: v.optional(v.number()),
     speakerId: v.id('speakers'),
   },
-  handler: async (ctx, { limit = 20, speakerId }) =>
-    await ctx.db
+  handler: async (ctx, { limit = 20, speakerId }) => {
+    const talks = await ctx.db
       .query('talks')
       .withIndex('by_speakerId_and_status', (q) =>
         q.eq('speakerId', speakerId).eq('status', 'published')
       )
-      .order('desc')
-      .take(limit),
+      .collect();
+
+    return talks
+      .toSorted((a, b) => byPublishedAt(a, b, 'desc'))
+      .slice(0, limit);
+  },
   returns: docs('talks'),
 });
 

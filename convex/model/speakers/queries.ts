@@ -11,7 +11,7 @@ import { v } from 'convex/values';
 
 import { query } from '../../_generated/server';
 import { rotateContent } from '../../lib/rotateContent';
-import { getSpeakerComparator } from '../../lib/sort';
+import { byPublishedAt, getSpeakerComparator } from '../../lib/sort';
 import { paginateArray } from '../../lib/utils';
 import { doc, docs } from '../../lib/validators/schema';
 import { requireAdmin } from '../auth/roles';
@@ -65,8 +65,10 @@ export const getSpeakerBySlug = query({
         .withIndex('by_speakerId_and_status', (q) =>
           q.eq('speakerId', speakerId).eq('status', 'published')
         )
-        .order('desc')
-        .collect(),
+        .collect()
+        .then((rows) =>
+          rows.toSorted((left, right) => byPublishedAt(left, right, 'desc'))
+        ),
       ctx.db
         .query('clips')
         .withIndex('by_speakerId_and_status', (q) =>

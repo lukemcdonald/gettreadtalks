@@ -65,6 +65,7 @@ describe('getTalkFormValues', () => {
       collectionOrder: undefined,
       featured: false,
       mediaUrl: '',
+      publishedAt: '',
       scripture: '',
       slug: 'the-cross',
       speakerId,
@@ -85,8 +86,19 @@ describe('getTalkFormValues', () => {
 
     expect(getTalkFormValues(talk, 'archived')).toMatchObject({
       collectionOrder: 3,
+      publishedAt: '',
       status: 'archived',
     });
+  });
+
+  it('formats publishedAt as a UTC calendar date', () => {
+    expect(
+      getTalkFormValues(
+        talkWithTopics({
+          publishedAt: Date.UTC(2020, 0, 15),
+        })
+      ).publishedAt
+    ).toBe('2020-01-15');
   });
 });
 

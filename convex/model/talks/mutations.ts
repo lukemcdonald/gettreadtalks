@@ -1,5 +1,6 @@
 import type { Doc, Id } from '../../_generated/dataModel';
 import type { MutationCtx } from '../../_generated/server';
+import type { StatusType } from '../../lib/types';
 
 import { getOneFrom } from 'convex-helpers/server/relationships';
 import { v } from 'convex/values';
@@ -12,10 +13,10 @@ import {
   throwNotFound,
   throwValidationError,
 } from '../../lib/errors';
+import { isFuturePublishedAt, resolvePublishedAt } from '../../lib/publishedAt';
 import {
   deleteAll,
   getOrThrow,
-  getPublishedAtForStatus,
   slugify,
   talkSlugExistsForSpeaker,
 } from '../../lib/utils';
@@ -65,6 +66,28 @@ async function setTalkTopics(
   );
 }
 
+function publishedAtForTalk({
+  currentPublishedAt,
+  requestedPublishedAt,
+  status,
+}: {
+  currentPublishedAt?: number;
+  requestedPublishedAt?: number;
+  status: StatusType;
+}): number | undefined {
+  const publishedAt = resolvePublishedAt({
+    currentPublishedAt,
+    requestedPublishedAt,
+    status,
+  });
+
+  if (publishedAt !== undefined && isFuturePublishedAt(publishedAt)) {
+    throwValidationError('Publish date cannot be in the future', 'publishedAt');
+  }
+
+  return publishedAt;
+}
+
 /**
  * Archive a talk (soft delete by setting status to archived).
  */
@@ -102,6 +125,7 @@ export const createTalk = mutation({
     collectionOrder: v.optional(v.number()),
     featured: v.optional(v.boolean()),
     mediaUrl: v.string(),
+    publishedAt: v.optional(v.number()),
     scripture: v.optional(v.string()),
     speakerId: v.id('speakers'),
     status: v.optional(statusType),
@@ -111,7 +135,7 @@ export const createTalk = mutation({
   handler: async (ctx, args) => {
     await requireAdmin(ctx);
 
-    const { topicIds, ...talkArgs } = args;
+    const { publishedAt: requestedPublishedAt, topicIds, ...talkArgs } = args;
 
     if (!talkArgs.title.trim()) {
       throwValidationError('Title cannot be empty', 'title');
@@ -127,7 +151,10 @@ export const createTalk = mutation({
     }
 
     const status = talkArgs.status || 'backlog';
-    const publishedAt = getPublishedAtForStatus(status);
+    const publishedAt = publishedAtForTalk({
+      requestedPublishedAt,
+      status,
+    });
 
     const talkId = await ctx.db.insert('talks', {
       ...talkArgs,
@@ -154,6 +181,7 @@ export const updateTalk = mutation({
     collectionOrder: v.optional(v.number()),
     featured: v.optional(v.boolean()),
     mediaUrl: v.optional(v.string()),
+    publishedAt: v.optional(v.number()),
     scripture: v.optional(v.string()),
     slug: v.optional(v.string()),
     speakerId: v.optional(v.id('speakers')),
@@ -163,7 +191,13 @@ export const updateTalk = mutation({
     topicIds: v.optional(v.array(v.id('topics'))),
   },
   handler: async (ctx, args) => {
-    const { slug: rawSlug, talkId, topicIds, ...rest } = args;
+    const {
+      publishedAt: requestedPublishedAt,
+      slug: rawSlug,
+      talkId,
+      topicIds,
+      ...rest
+    } = args;
 
     await requireAdmin(ctx);
 
@@ -197,13 +231,11 @@ export const updateTalk = mutation({
       }
     }
 
-    if (updates.status) {
-      updates.publishedAt = getPublishedAtForStatus(
-        updates.status,
-        talk.publishedAt
-      );
-    }
-
+    updates.publishedAt = publishedAtForTalk({
+      currentPublishedAt: talk.publishedAt,
+      requestedPublishedAt,
+      status: updates.status ?? talk.status,
+    });
     updates.updatedAt = Date.now();
 
     await ctx.db.patch(talkId, updates);
@@ -452,6 +484,37 @@ export const createTalkTranscriptFetch = mutation({
     return runId;
   },
   returns: v.id('talkTranscriptFetches'),
+});
+
+/**
+ * Fill publishedAt for published talks that are missing it.
+ * Safe to re-run: never overwrites an existing date.
+ */
+export const backfillTalkPublishedAt = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const talks = await ctx.db.query('talks').collect();
+    const missing = talks.filter(
+      (talk) => talk.status === 'published' && talk.publishedAt === undefined
+    );
+
+    await Promise.all(
+      missing.map((talk) =>
+        ctx.db.patch(talk._id, {
+          publishedAt: talk._creationTime,
+        })
+      )
+    );
+
+    return {
+      scanned: talks.length,
+      updated: missing.length,
+    };
+  },
+  returns: v.object({
+    scanned: v.number(),
+    updated: v.number(),
+  }),
 });
 
 export const completeTalkTranscriptFetch = internalMutation({

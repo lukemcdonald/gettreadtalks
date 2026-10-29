@@ -52,4 +52,29 @@ describe('buildTalkJsonLd', () => {
     expect(unknown['@type']).toBe('CreativeWork');
     expect(missing['@type']).toBe('CreativeWork');
   });
+
+  it('uses publishedAt for uploadDate', () => {
+    const result = buildTalkJsonLd({
+      speaker,
+      speakerSlug: 'lloyd-jones',
+      talk: {
+        publishedAt: Date.UTC(2020, 0, 15),
+        title: 'The Cross',
+      },
+      talkSlug: 'the-cross',
+    });
+
+    expect(result.uploadDate).toBe('2020-01-15T00:00:00.000Z');
+  });
+
+  it('omits uploadDate when publishedAt is missing', () => {
+    const result = buildTalkJsonLd({
+      speaker,
+      speakerSlug: 'lloyd-jones',
+      talk: { title: 'The Cross' },
+      talkSlug: 'the-cross',
+    });
+
+    expect('uploadDate' in result).toBe(false);
+  });
 });
