@@ -1,14 +1,17 @@
 import type { TalksPage } from './pages/talks-page.ts';
 
-import { expect, test } from './fixtures/index.ts';
+import { PREVIEW_TALKS } from '../convex/previewFixtures.ts';
+import { expect, talkPath, test } from './fixtures/index.ts';
 import {
   E2E_USER_SKIP_REASON,
   hasE2eUser,
 } from './fixtures/user-credentials.ts';
 
-const NEWEST_DATE = '2024-06-04';
+const NEWEST_DATE = new Date(PREVIEW_TALKS.THE_PRODIGAL_SON.publishedAt)
+  .toISOString()
+  .slice(0, 10);
 const PAST_DATE = '2020-01-01';
-const TALK_PATH = '/talks/mary-smith/example-talk-the-prodigal-son';
+const TALK_PATH = talkPath(PREVIEW_TALKS.THE_PRODIGAL_SON);
 
 async function setPublishDate(talksPage: TalksPage, value: string) {
   await talksPage.page.goto(TALK_PATH);
