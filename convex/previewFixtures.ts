@@ -156,6 +156,52 @@ export const PREVIEW_STUDIES = {
   },
 };
 
+export const PREVIEW_TALK_FEATURES = {
+  ROMANS_8: {
+    body: `## Main points
+
+### God works in all things
+God is not merely present in trouble. He is at work through it for those who love him. Romans 8:28
+
+### The good is the Son
+The good he is after is not comfort first. It is being shaped like the Son. Romans 8:29
+
+## Key passages
+
+### Romans 8:28
+The promise that God is at work in every circumstance for those who love him.
+
+### Romans 8:29
+The good in view is being conformed to the image of the Son.`,
+    kind: 'study' as const,
+    status: 'draft' as const,
+    talkSlug: PREVIEW_TALKS.ROMANS_8.slug,
+  },
+  THE_PRODIGAL_SON: {
+    body: `## Main points
+
+### A father who runs
+The father does not wait for the son to finish a speech. He runs to meet him. Luke 15:20
+
+### An older brother who stays out
+The older brother stands outside the feast, measuring love by labor. Luke 15:28-32
+
+### A place at the table
+Grace here is not a thin pardon. It is a restored place at the table. Luke 15:22-24, Romans 5:8
+
+## Key passages
+
+### Luke 15:11-32
+The father runs to the returning son before the apology is finished.
+
+### Luke 15:22-24
+Grace is a restored place at the table, given at cost.`,
+    kind: 'study' as const,
+    status: 'published' as const,
+    talkSlug: PREVIEW_TALKS.THE_PRODIGAL_SON.slug,
+  },
+};
+
 export const PREVIEW_TRANSCRIPTS = {
   ROMANS_8: {
     quality: 'good' as const,

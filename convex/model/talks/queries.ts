@@ -162,6 +162,12 @@ export const getTalkBySlug = query({
         ? ctx.db.get('collections', talk.collectionId)
         : null,
       study: getOneFrom(ctx.db, 'talkStudies', 'by_talkId', talk._id),
+      studyFeature: ctx.db
+        .query('talkFeatures')
+        .withIndex('by_talkId_and_kind', (q) =>
+          q.eq('talkId', talk._id).eq('kind', 'study')
+        )
+        .unique(),
       topics: getManyVia(
         ctx.db,
         'talksOnTopics',
@@ -172,20 +178,25 @@ export const getTalkBySlug = query({
       ),
     };
 
-    const [clips, collection, study, topics] = await Promise.all([
+    const [clips, collection, study, studyFeature, topics] = await Promise.all([
       queries.clips,
       queries.collection,
       queries.study,
+      queries.studyFeature,
       queries.topics,
     ]);
 
     const validTopics = topics.filter((topic) => topic !== null);
+    const publishedStudy = study?.studyStatus === 'published' ? study : null;
+    const publishedStudyBody =
+      studyFeature?.status === 'published' ? studyFeature.body : null;
 
     return {
       clips,
       collection,
       speaker,
-      summary: study?.studyStatus === 'published' ? study.summary : null,
+      studyBody: publishedStudyBody,
+      summary: publishedStudy?.summary ?? null,
       talk,
       topics: validTopics,
     };
@@ -195,6 +206,7 @@ export const getTalkBySlug = query({
       clips: docs('clips'),
       collection: doc('collections').nullable(),
       speaker: doc('speakers').nullable(),
+      studyBody: v.union(v.null(), v.string()),
       summary: v.union(v.null(), v.string()),
       talk: doc('talks'),
       topics: docs('topics'),

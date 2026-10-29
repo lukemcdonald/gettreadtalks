@@ -7,6 +7,7 @@ import { collectionTables } from './model/collections/schema';
 import { emailTables } from './model/emails/schema';
 import { mediaHealthTables } from './model/mediaHealth/schema';
 import { speakerTables } from './model/speakers/schema';
+import { talkFeatureTables } from './model/talkFeatures/schema';
 import { talkTables } from './model/talks/schema';
 import { topicTables } from './model/topics/schema';
 
@@ -17,6 +18,7 @@ export default defineSchema({
   ...emailTables,
   ...mediaHealthTables,
   ...speakerTables,
+  ...talkFeatureTables,
   ...talkTables,
   ...topicTables,
 

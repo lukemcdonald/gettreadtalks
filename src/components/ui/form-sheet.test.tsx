@@ -127,6 +127,21 @@ describe('FormSheet', () => {
   });
 
   it.each([
+    { hasBar: true, label: 'on mobile', matchesLg: false },
+    { hasBar: false, label: 'on desktop', matchesLg: true },
+  ] as const)('shows the drag bar only $label', ({ hasBar, matchesLg }) => {
+    setup({}, undefined, matchesLg);
+
+    const bar = document.querySelector('[data-slot="drawer-bar"]');
+
+    if (hasBar) {
+      expect(bar).toBeInTheDocument();
+    } else {
+      expect(bar).not.toBeInTheDocument();
+    }
+  });
+
+  it.each([
     { label: 'on mobile', matchesLg: false },
     { label: 'on desktop', matchesLg: true },
   ] as const)(

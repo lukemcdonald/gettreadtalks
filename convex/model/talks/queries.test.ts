@@ -61,6 +61,7 @@ describe('getTalkBySlug', () => {
     }
 
     const draftSecret = 'PRIVATE_STUDY_DRAFT_SENTINEL_volt332';
+    const featureSecret = 'PRIVATE_STUDY_FEATURE_SENTINEL_volt517';
     const transcriptSecret = 'PRIVATE_TRANSCRIPT_SENTINEL_volt332';
 
     await t.mutation(internal.talks.upsertTalkTranscript, {
@@ -79,6 +80,16 @@ describe('getTalkBySlug', () => {
       suggestedTopics: ['grace'],
       summary: draftSecret,
       talkId: published.talk._id,
+    });
+    await t.run(async (ctx) => {
+      await ctx.db.insert('talkFeatures', {
+        body: `## Main points\n\n${featureSecret}`,
+        generatedAt: Date.now(),
+        kind: 'study',
+        status: 'draft',
+        talkId: published.talk._id,
+        updatedAt: Date.now(),
+      });
     });
 
     const bySpeaker = await t.query(api.talks.listTalksBySpeaker, {
@@ -108,7 +119,9 @@ describe('getTalkBySlug', () => {
     });
 
     expect(payload).not.toContain(draftSecret);
+    expect(payload).not.toContain(featureSecret);
     expect(payload).not.toContain(transcriptSecret);
+    expect(talk?.studyBody).toBeNull();
   });
 
   it('returns a published study summary and never returns a draft', async () => {
@@ -127,6 +140,7 @@ describe('getTalkBySlug', () => {
     }
 
     const draftSummary = 'DRAFT_STUDY_SUMMARY_MUST_STAY_PRIVATE';
+    const publishedStudyBody = '## Main points\n\nPublished study body.';
     const publishedSummary = 'Published study summary for the talk page.';
 
     await t.run(async (ctx) => {
@@ -142,6 +156,7 @@ describe('getTalkBySlug', () => {
       talkSlug: visibilitySlugs.publishedTalk,
     });
 
+    expect(withDraft?.studyBody).toBeNull();
     expect(withDraft?.summary).toBeNull();
     expect(JSON.stringify(withDraft)).not.toContain(draftSummary);
 
@@ -159,6 +174,14 @@ describe('getTalkBySlug', () => {
         studyStatus: 'published',
         summary: publishedSummary,
       });
+      await ctx.db.insert('talkFeatures', {
+        body: publishedStudyBody,
+        generatedAt: Date.now(),
+        kind: 'study',
+        status: 'published',
+        talkId: published.talk._id,
+        updatedAt: Date.now(),
+      });
     });
 
     const withPublished = await t.query(api.talks.getTalkBySlug, {
@@ -166,6 +189,7 @@ describe('getTalkBySlug', () => {
       talkSlug: visibilitySlugs.publishedTalk,
     });
 
+    expect(withPublished?.studyBody).toBe(publishedStudyBody);
     expect(withPublished?.summary).toBe(publishedSummary);
   });
 });

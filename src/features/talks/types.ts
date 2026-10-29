@@ -4,11 +4,9 @@ import type { TopicId } from '@/features/topics/types';
 import type { StatusType } from '@/lib/entities/types';
 
 export type Talk = Doc<'talks'>;
+export type TalkFeature = Doc<'talkFeatures'>;
 export type TalkId = Id<'talks'>;
-export type TalkStudy = Doc<'talkStudies'>;
-export type TalkTranscript = Doc<'talkTranscripts'>;
 export type TalkTranscriptFetch = Doc<'talkTranscriptFetches'>;
-export type TalkTranscriptMeta = Omit<TalkTranscript, 'text'>;
 export type TalkWithoutTranscript = Talk & {
   lastError: {
     errorCode: TalkTranscriptFetch['errorCode'];

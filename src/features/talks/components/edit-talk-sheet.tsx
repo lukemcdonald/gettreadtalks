@@ -3,7 +3,7 @@
 import type { CollectionListItem } from '@/features/collections/types';
 import type { SpeakerListItem } from '@/features/speakers/types';
 import type { TalkFormData } from '@/features/talks/schemas/talk-form';
-import type { TalkStudy, TalkWithTopicIds } from '@/features/talks/types';
+import type { TalkFeature, TalkWithTopicIds } from '@/features/talks/types';
 import type { EditTalkTab } from '@/features/talks/utils';
 import type { TopicListItem } from '@/features/topics/types';
 import type { StatusPrefill } from '@/lib/entities/status-prefill';
@@ -43,9 +43,11 @@ import { setServerErrors } from '@/lib/forms/react-hook-form';
 interface EditTalkSheetProps {
   closeHref?: string;
   collections: CollectionListItem[];
+  hasTranscript?: boolean;
   speakers: SpeakerListItem[];
   statusPrefill?: StatusPrefill;
-  studyStatus?: TalkStudy['studyStatus'] | null;
+  studyFeature?: TalkFeature | null;
+  studyStatus?: TalkFeature['status'] | null;
   talk: TalkWithTopicIds;
   topics: TopicListItem[];
 }
@@ -157,17 +159,20 @@ function useEditTalkTab(talkId: TalkWithTopicIds['_id']) {
 export function EditTalkSheet({
   closeHref,
   collections,
+  hasTranscript = false,
   speakers,
   statusPrefill,
+  studyFeature,
   studyStatus,
   talk,
   topics,
 }: EditTalkSheetProps) {
-  const summary = useTalkSummaryForm(talk._id);
+  const summary = useTalkSummaryForm(talk._id, hasTranscript);
   const {
     confirmPendingUpdate,
     form,
     handleOpenChange,
+    handleSuccess,
     handleSubmit,
     isPending,
     pendingUpdate,
@@ -249,9 +254,16 @@ export function EditTalkSheet({
           </form>
         ) : (
           <EditTalkStudyPanel
+            feature={studyFeature}
+            hasTranscript={summary.hasTranscript}
             onClose={() => {
               handleOpenChange(false);
             }}
+            onSuccess={() => {
+              handleSuccess();
+              handleOpenChange(false);
+            }}
+            talkId={talk._id}
           />
         )}
       </FormSheetShell>

@@ -33,6 +33,24 @@ import {
   talkTranscriptFetchErrorCode,
 } from './validators';
 
+function definedFields<T extends object>(fields: T): Partial<T> {
+  return Object.fromEntries(
+    Object.entries(fields).filter(([, value]) => value !== undefined)
+  ) as Partial<T>;
+}
+
+function hasReviewedTalkStudy(
+  study: {
+    manuallyEditedAt?: number;
+    studyStatus: 'draft' | 'published';
+  } | null
+) {
+  return (
+    study !== null &&
+    (study.studyStatus === 'published' || study.manuallyEditedAt !== undefined)
+  );
+}
+
 async function setTalkTopics(
   ctx: MutationCtx,
   talkId: Id<'talks'>,
@@ -306,25 +324,31 @@ export const destroyTalk = mutation({
       entityTable: 'talks',
     });
 
-    const [fetches, studies, talksOnTopics, transcripts] = await Promise.all([
-      ctx.db
-        .query('talkTranscriptFetches')
-        .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
-        .collect(),
-      ctx.db
-        .query('talkStudies')
-        .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
-        .collect(),
-      ctx.db
-        .query('talksOnTopics')
-        .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
-        .collect(),
-      ctx.db
-        .query('talkTranscripts')
-        .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
-        .collect(),
-    ]);
+    const [features, fetches, studies, talksOnTopics, transcripts] =
+      await Promise.all([
+        ctx.db
+          .query('talkFeatures')
+          .withIndex('by_talkId_and_kind', (q) => q.eq('talkId', talkId))
+          .collect(),
+        ctx.db
+          .query('talkTranscriptFetches')
+          .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
+          .collect(),
+        ctx.db
+          .query('talkStudies')
+          .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
+          .collect(),
+        ctx.db
+          .query('talksOnTopics')
+          .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
+          .collect(),
+        ctx.db
+          .query('talkTranscripts')
+          .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
+          .collect(),
+      ]);
 
+    await deleteAll(ctx, features);
     await deleteAll(ctx, fetches);
     await deleteAll(ctx, studies);
     await deleteAll(ctx, talksOnTopics);
@@ -393,6 +417,11 @@ export const saveTalkStudyDraft = internalMutation({
       .query('talkStudies')
       .withIndex('by_talkId', (q) => q.eq('talkId', args.talkId))
       .unique();
+
+    if (hasReviewedTalkStudy(existing)) {
+      throwConvexError(409, 'Study already reviewed');
+    }
+
     const fields = {
       generatedAt: Date.now(),
       generator: args.generator,
@@ -406,13 +435,6 @@ export const saveTalkStudyDraft = internalMutation({
     };
 
     if (existing) {
-      if (
-        existing.studyStatus === 'published' ||
-        existing.manuallyEditedAt !== undefined
-      ) {
-        throwConvexError(409, 'Study already reviewed');
-      }
-
       await ctx.db.replace(existing._id, fields);
 
       return existing._id;
@@ -425,27 +447,30 @@ export const saveTalkStudyDraft = internalMutation({
 
 export const updateTalkStudy = mutation({
   args: {
-    studyStatus: talkStudyStatus,
-    summary: v.string(),
+    studyStatus: v.optional(talkStudyStatus),
+    summary: v.optional(v.string()),
     talkId: v.id('talks'),
   },
-  handler: async (ctx, { studyStatus, summary, talkId }) => {
+  handler: async (ctx, args) => {
     await requireAdmin(ctx);
-    await getOrThrow(ctx, 'talks', talkId);
+    await getOrThrow(ctx, 'talks', args.talkId);
 
     const existing = await getOneFrom(
       ctx.db,
       'talkStudies',
       'by_talkId',
-      talkId
+      args.talkId
     );
+    const content = definedFields({
+      studyStatus: args.studyStatus,
+      summary: args.summary,
+    });
     const editedAt = Date.now();
 
     if (existing) {
       await ctx.db.patch(existing._id, {
+        ...content,
         manuallyEditedAt: editedAt,
-        studyStatus,
-        summary,
       });
 
       return existing._id;
@@ -454,14 +479,15 @@ export const updateTalkStudy = mutation({
     return await ctx.db.insert('talkStudies', {
       generatedAt: editedAt,
       generator: 'manual',
+      ...content,
       manuallyEditedAt: editedAt,
       outline: [],
       scriptureRefs: [],
       studyGuide: [],
-      studyStatus,
+      studyStatus: args.studyStatus ?? 'draft',
       suggestedTopics: [],
-      summary,
-      talkId,
+      summary: args.summary ?? '',
+      talkId: args.talkId,
     });
   },
   returns: v.id('talkStudies'),

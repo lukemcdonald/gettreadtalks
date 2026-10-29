@@ -9,12 +9,14 @@ import { TalkMetadataSidebar } from '@/app/talks/[speakerSlug]/[talkSlug]/_compo
 import { FeaturedGrid } from '@/components/featured-grid';
 import { ClipCard } from '@/features/clips/components/clip-card';
 import { CollectionMediaCard } from '@/features/collections/components/collection-media-card';
+import { TalkStudyContent } from '@/features/talks/components/talk-study-content';
 
 interface TalkContentSectionsProps {
   clips: Clip[];
   collection: Collection | null;
   relatedTalks?: ReactNode;
   speaker: Speaker | null;
+  studyBody: string | null;
   summary: string | null;
   talk: Talk;
   topics: Topic[];
@@ -25,6 +27,7 @@ export function TalkContentSections({
   collection,
   relatedTalks,
   speaker,
+  studyBody,
   summary,
   talk,
   topics,
@@ -32,6 +35,8 @@ export function TalkContentSections({
   return (
     <div className="grid grid-cols-1 gap-x-8 gap-y-12 lg:grid-cols-[1fr_280px]">
       <div className="order-2 space-y-8 lg:order-1 lg:space-y-16">
+        <TalkStudyContent body={studyBody} />
+
         {collection && (
           <FeaturedGrid
             columns={{ default: 1 }}

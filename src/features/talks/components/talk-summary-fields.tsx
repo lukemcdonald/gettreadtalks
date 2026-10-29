@@ -2,76 +2,26 @@
 
 import type { TalkStudyFormData } from '@/features/talks/schemas/talk-study-form';
 import type { TalkId } from '@/features/talks/types';
-import type { Control, UseFormReturn } from 'react-hook-form';
+import type { UseFormReturn } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery } from 'convex/react';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
-import {
-  Field,
-  FieldError,
-  FieldLabel,
-  Select,
-  SelectItem,
-  SelectPopup,
-  SelectTrigger,
-  SelectValue,
-  Textarea,
-} from '@/components/ui';
+import { Field, FieldError, FieldLabel, Textarea } from '@/components/ui';
 import { api } from '@/convex/_generated/api';
 import { updateTalkStudyAction } from '@/features/talks/actions/update-talk-study';
+import { StudyStatusSelect } from '@/features/talks/components/study-status-select';
 import { TalkSummaryGenerate } from '@/features/talks/components/talk-summary-generate';
 import { talkStudyFormSchema } from '@/features/talks/schemas/talk-study-form';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
 
-const STUDY_STATUS_OPTIONS = [
-  { label: 'Draft', value: 'draft' },
-  { label: 'Published', value: 'published' },
-];
-
-function StudyStatusSelect({
-  control,
-}: {
-  control: Control<TalkStudyFormData>;
-}) {
-  return (
-    <Controller
-      control={control}
-      name="studyStatus"
-      render={({ field }) => (
-        <Select
-          items={STUDY_STATUS_OPTIONS}
-          name={field.name}
-          onValueChange={(nextValue) => {
-            field.onChange(nextValue ?? 'draft');
-          }}
-          value={field.value}
-        >
-          <SelectTrigger
-            aria-label="Status"
-            className="w-auto min-w-24"
-            id={field.name}
-            size="sm"
-          >
-            <SelectValue />
-          </SelectTrigger>
-          <SelectPopup>
-            {STUDY_STATUS_OPTIONS.map((item) => (
-              <SelectItem key={item.value} value={item.value}>
-                {item.label}
-              </SelectItem>
-            ))}
-          </SelectPopup>
-        </Select>
-      )}
-    />
-  );
-}
-
 // fallow-ignore-next-line complexity
-export function useTalkSummaryForm(talkId: TalkId) {
+export function useTalkSummaryForm(
+  talkId: TalkId,
+  hasTranscriptPrefill = false
+) {
   const study = useQuery(api.talks.getTalkStudy, { talkId });
   const transcript = useQuery(api.talks.getTalkTranscript, { talkId });
   const [summaryFlags, setSummaryFlags] = useState<string[]>([]);
@@ -102,7 +52,8 @@ export function useTalkSummaryForm(talkId: TalkId) {
   return {
     form,
     handleFlagsChange: setSummaryFlags,
-    hasTranscript: Boolean(transcript),
+    hasTranscript:
+      transcript === undefined ? hasTranscriptPrefill : Boolean(transcript),
     save,
     summaryFlags,
   };
@@ -127,7 +78,7 @@ export function TalkSummaryFields({
         <Field className="contents">
           <FieldLabel htmlFor="summary">Summary</FieldLabel>
         </Field>
-        <StudyStatusSelect control={form.control} />
+        <StudyStatusSelect control={form.control} name="studyStatus" />
       </div>
       <Controller
         control={form.control}
