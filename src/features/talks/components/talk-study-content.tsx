@@ -22,7 +22,7 @@ const STUDY_MARKDOWN_ELEMENTS = [
 ];
 
 const STUDY_HEADING_CLASS_NAME = {
-  h2: 'text-muted-foreground text-xs font-semibold tracking-wide uppercase',
+  h2: 'text-muted-foreground text-xs font-semibold tracking-wide uppercase first:pt-0 pt-6',
   h3: 'text-base font-semibold',
   h4: 'text-sm font-semibold',
 } as const;
