@@ -3,16 +3,16 @@ import { describe, expect, it } from 'vitest';
 import { api } from '../../_generated/api';
 import { ErrorCodes } from '../../lib/errors';
 import { createConvexTest, signInAs } from '../../test.setup';
-import { insertAffiliateLink } from '../affiliateLinks/test-factory';
-import { insertClip } from '../clips/test-factory';
-import { insertCollection } from '../collections/test-factory';
-import { insertSpeaker } from '../speakers/test-factory';
+import { insertAffiliateLink } from '../affiliateLinks/test.factory';
+import { insertClip } from '../clips/test.factory';
+import { insertCollection } from '../collections/test.factory';
+import { insertSpeaker } from '../speakers/test.factory';
 import {
   insertTalk,
   insertTalkStudy,
   insertTalkTranscript,
-} from '../talks/test-factory';
-import { insertTalkOnTopic, insertTopic } from '../topics/test-factory';
+} from '../talks/test.factory';
+import { insertTalkOnTopic, insertTopic } from '../topics/test.factory';
 
 const MEDIA_URL = 'https://www.youtube.com/watch?v=0SVTl4Xa5fY';
 const paginationOpts = {

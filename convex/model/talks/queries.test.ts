@@ -7,6 +7,9 @@ import {
   signInAs,
   visibilitySlugs,
 } from '../../test.setup';
+import { insertSpeaker } from '../speakers/test.factory';
+import { insertTalkOnTopic } from '../topics/test.factory';
+import { insertTalk, insertTalkStudy } from './test.factory';
 
 describe('listTalkSlugs', () => {
   it('lists only published talks', async () => {
@@ -127,14 +130,8 @@ describe('getTalkBySlug', () => {
     const publishedSummary = 'Published study summary for the talk page.';
 
     await t.run(async (ctx) => {
-      await ctx.db.insert('talkStudies', {
-        generatedAt: Date.now(),
-        generator: 'test',
-        outline: [],
-        scriptureRefs: [],
-        studyGuide: [],
+      await insertTalkStudy(ctx, {
         studyStatus: 'draft',
-        suggestedTopics: [],
         summary: draftSummary,
         talkId: published.talk._id,
       });
@@ -198,7 +195,7 @@ describe('listTalksByTopics', () => {
     }
 
     const sameSpeakerTalkId = await t.run(async (ctx) => {
-      const otherSpeakerId = await ctx.db.insert('speakers', {
+      const otherSpeakerId = await insertSpeaker(ctx, {
         firstName: 'Charles',
         lastName: 'Spurgeon',
         slug: 'charles-spurgeon',
@@ -206,43 +203,38 @@ describe('listTalksByTopics', () => {
 
       await Promise.all(
         [1, 2, 3, 4, 5].map(async (index) => {
-          const talkId = await ctx.db.insert('talks', {
-            mediaUrl: 'https://www.youtube.com/watch?v=0SVTl4Xa5fY',
+          const talkId = await insertTalk(ctx, {
             publishedAt: Date.parse(`2024-08-0${index}T12:00:00.000Z`),
             slug: `related-talk-${index}`,
             speakerId: otherSpeakerId,
-            status: 'published',
             title: `Related Talk ${index}`,
           });
 
-          await ctx.db.insert('talksOnTopics', {
+          await insertTalkOnTopic(ctx, {
             talkId,
             topicId,
           });
         })
       );
 
-      const extraTalkId = await ctx.db.insert('talks', {
-        mediaUrl: 'https://www.youtube.com/watch?v=0SVTl4Xa5fY',
+      const extraTalkId = await insertTalk(ctx, {
         publishedAt: Date.parse('2024-08-06T12:00:00.000Z'),
         slug: 'same-speaker-related',
         speakerId,
-        status: 'published',
         title: 'Same Speaker Related',
       });
-      await ctx.db.insert('talksOnTopics', {
+      await insertTalkOnTopic(ctx, {
         talkId: extraTalkId,
         topicId,
       });
 
-      const draftTalkId = await ctx.db.insert('talks', {
-        mediaUrl: 'https://www.youtube.com/watch?v=0SVTl4Xa5fY',
+      const draftTalkId = await insertTalk(ctx, {
         slug: 'draft-same-topic',
         speakerId: otherSpeakerId,
         status: 'backlog',
         title: 'Draft Same Topic',
       });
-      await ctx.db.insert('talksOnTopics', {
+      await insertTalkOnTopic(ctx, {
         talkId: draftTalkId,
         topicId,
       });
@@ -302,17 +294,15 @@ describe('listTalksByTopics', () => {
 
       for (const index of indexes) {
         // oxlint-disable-next-line no-await-in-loop -- join creation time must stay sequential
-        const talkId = await ctx.db.insert('talks', {
-          mediaUrl: 'https://www.youtube.com/watch?v=0SVTl4Xa5fY',
+        const talkId = await insertTalk(ctx, {
           publishedAt: Date.parse('2024-07-01T12:00:00.000Z'),
           slug: `related-grace-${index}`,
           speakerId,
-          status: 'published',
           title: `Related Grace ${index}`,
         });
 
         // oxlint-disable-next-line no-await-in-loop -- join creation time must stay sequential
-        await ctx.db.insert('talksOnTopics', {
+        await insertTalkOnTopic(ctx, {
           talkId,
           topicId,
         });
@@ -341,64 +331,45 @@ describe('listAllTalks', () => {
     });
 
     await t.run(async (ctx) => {
-      const speakerId = await ctx.db.insert('speakers', {
+      const speakerId = await insertSpeaker(ctx, {
         firstName: 'John',
         lastName: 'Owen',
         slug: 'john-owen',
       });
-      await ctx.db.insert('talks', {
-        mediaUrl: 'https://www.youtube.com/watch?v=0SVTl4Xa5fY',
+      await insertTalk(ctx, {
         publishedAt: Date.parse('2024-06-01T12:00:00.000Z'),
         slug: 'study-none',
         speakerId,
-        status: 'published',
         title: 'Study None',
       });
-      const draftTalkId = await ctx.db.insert('talks', {
-        mediaUrl: 'https://www.youtube.com/watch?v=0SVTl4Xa5fY',
+      const draftTalkId = await insertTalk(ctx, {
         publishedAt: Date.parse('2024-06-02T12:00:00.000Z'),
         slug: 'study-draft',
         speakerId,
-        status: 'published',
         title: 'Study Draft',
       });
-      const publishedTalkId = await ctx.db.insert('talks', {
-        mediaUrl: 'https://www.youtube.com/watch?v=0SVTl4Xa5fY',
+      const publishedTalkId = await insertTalk(ctx, {
         publishedAt: Date.parse('2024-06-03T12:00:00.000Z'),
         slug: 'study-published',
         speakerId,
-        status: 'published',
         title: 'Study Published',
       });
-      const backlogDraftTalkId = await ctx.db.insert('talks', {
-        mediaUrl: 'https://www.youtube.com/watch?v=0SVTl4Xa5fY',
+      const backlogDraftTalkId = await insertTalk(ctx, {
         slug: 'study-backlog-draft',
         speakerId,
         status: 'backlog',
         title: 'Study Backlog Draft',
       });
-      const studyFields = {
-        generatedAt: Date.now(),
-        generator: 'test',
-        outline: [{ heading: 'Grace', text: 'Grace is a gift' }],
-        scriptureRefs: [{ book: 'Romans', chapter: 5, verseStart: 1 }],
-        studyGuide: [{ kind: 'key_idea' as const, text: 'Grace is a gift' }],
-        suggestedTopics: ['grace'],
-        summary: 'A study of grace.',
-      };
 
-      await ctx.db.insert('talkStudies', {
-        ...studyFields,
+      await insertTalkStudy(ctx, {
         studyStatus: 'draft',
         talkId: draftTalkId,
       });
-      await ctx.db.insert('talkStudies', {
-        ...studyFields,
+      await insertTalkStudy(ctx, {
         studyStatus: 'published',
         talkId: publishedTalkId,
       });
-      await ctx.db.insert('talkStudies', {
-        ...studyFields,
+      await insertTalkStudy(ctx, {
         studyStatus: 'draft',
         talkId: backlogDraftTalkId,
       });
@@ -468,25 +439,21 @@ describe('publishedAt order', () => {
   it('lists talks newest-first by publishedAt, not creation time', async () => {
     const t = createConvexTest();
     const speakerId = await t.run(async (ctx) => {
-      const id = await ctx.db.insert('speakers', {
+      const id = await insertSpeaker(ctx, {
         firstName: 'John',
         lastName: 'Owen',
         slug: 'john-owen-order',
       });
-      await ctx.db.insert('talks', {
-        mediaUrl: 'https://www.youtube.com/watch?v=0SVTl4Xa5fY',
+      await insertTalk(ctx, {
         publishedAt: Date.parse('2024-06-03T12:00:00.000Z'),
         slug: 'newer-by-date',
         speakerId: id,
-        status: 'published',
         title: 'Newer By Date',
       });
-      await ctx.db.insert('talks', {
-        mediaUrl: 'https://www.youtube.com/watch?v=0SVTl4Xa5fY',
+      await insertTalk(ctx, {
         publishedAt: Date.parse('2020-01-01T12:00:00.000Z'),
         slug: 'older-by-date',
         speakerId: id,
-        status: 'published',
         title: 'Older By Date',
       });
 

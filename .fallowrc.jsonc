@@ -36,8 +36,8 @@
     "convex/**/_generated/**",
     // convex-test harness. Not a Convex function module.
     "convex/test.setup.ts",
-    // Test-only fixtures. Imported from convex-test seeds, not Convex functions.
-    "**/test-*.ts",
+    // Test-only factories. Imported from convex-test seeds, not Convex functions.
+    "**/*.factory.ts",
     // CLI-only preview seed. Called from scripts/vercel-build.sh, not app imports.
     "convex/preview.ts",
     // Better Auth CLI output. Do not edit; regenerate with the Better Auth schema command.

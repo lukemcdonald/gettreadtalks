@@ -4,18 +4,18 @@ import { convexTest } from 'convex-test';
 
 import { components } from './_generated/api';
 import betterAuthSchema from './betterAuth/schema';
-import { insertClip } from './model/clips/test-factory';
-import { insertCollection } from './model/collections/test-factory';
-import { insertSpeaker } from './model/speakers/test-factory';
-import { insertTalk } from './model/talks/test-factory';
-import { insertTalkOnTopic, insertTopic } from './model/topics/test-factory';
+import { insertClip } from './model/clips/test.factory';
+import { insertCollection } from './model/collections/test.factory';
+import { insertSpeaker } from './model/speakers/test.factory';
+import { insertTalk } from './model/talks/test.factory';
+import { insertTalkOnTopic, insertTopic } from './model/topics/test.factory';
 import schema from './schema';
 
 const modules = import.meta.glob([
   './**/*.{js,ts}',
   '!./**/*.d.ts',
+  '!./**/*.factory.ts',
   '!./**/*.test.ts',
-  '!./**/test-*.ts',
   '!./betterAuth/**',
 ]);
 

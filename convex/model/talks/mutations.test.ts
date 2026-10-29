@@ -3,6 +3,8 @@ import { describe, expect, it } from 'vitest';
 import { api, internal } from '../../_generated/api';
 import { ErrorCodes } from '../../lib/errors';
 import { createConvexTest, signInAs } from '../../test.setup';
+import { insertSpeaker } from '../speakers/test.factory';
+import { insertTalk } from './test.factory';
 
 const MEDIA_URL = 'https://www.youtube.com/watch?v=0SVTl4Xa5fY';
 const PAST_PUBLISHED_AT = Date.parse('2020-01-15T00:00:00.000Z');
@@ -12,7 +14,7 @@ async function seedAdminTalk() {
   const t = createConvexTest();
   const speakerId = await t.run(
     async (ctx) =>
-      await ctx.db.insert('speakers', {
+      await insertSpeaker(ctx, {
         firstName: 'John',
         lastName: 'Owen',
         slug: 'john-owen',
@@ -126,28 +128,19 @@ describe('backfillTalkPublishedAt', () => {
   it('fills missing dates and leaves existing dates alone', async () => {
     const t = createConvexTest();
     const ids = await t.run(async (ctx) => {
-      const speakerId = await ctx.db.insert('speakers', {
-        firstName: 'John',
-        lastName: 'Bunyan',
-        slug: 'john-bunyan',
-      });
-      const missingId = await ctx.db.insert('talks', {
-        mediaUrl: MEDIA_URL,
+      const speakerId = await insertSpeaker(ctx);
+      const missingId = await insertTalk(ctx, {
         slug: 'missing-date',
         speakerId,
-        status: 'published',
         title: 'Missing Date',
       });
-      const keptId = await ctx.db.insert('talks', {
-        mediaUrl: MEDIA_URL,
+      const keptId = await insertTalk(ctx, {
         publishedAt: PAST_PUBLISHED_AT,
         slug: 'kept-date',
         speakerId,
-        status: 'published',
         title: 'Kept Date',
       });
-      const backlogId = await ctx.db.insert('talks', {
-        mediaUrl: MEDIA_URL,
+      const backlogId = await insertTalk(ctx, {
         slug: 'backlog-talk',
         speakerId,
         status: 'backlog',
