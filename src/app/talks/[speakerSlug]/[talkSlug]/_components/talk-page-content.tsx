@@ -12,6 +12,7 @@ import {
 import { TalkRelatedTalks } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-related-talks';
 import { JsonLd } from '@/components/json-ld';
 import { EditorialProfileLayout } from '@/components/layouts';
+import { getSpeakerAvatarUrl } from '@/features/speakers/get-speaker-avatar-url';
 import { getSpeakerName } from '@/features/speakers/utils';
 import { loadTalkBySlug } from '@/features/talks/queries/load-talk-by-slug';
 import { loadTalkBySlugAdmin } from '@/features/talks/queries/load-talk-by-slug-admin';
@@ -47,7 +48,7 @@ function TalkDetail({ speakerSlug, talkResult, talkSlug }: TalkDetailProps) {
         <JsonLd
           data={buildSpeakerJsonLd({
             description: speaker.description,
-            imageUrl: speaker.imageUrl,
+            imageUrl: getSpeakerAvatarUrl(speaker),
             name: getSpeakerName(speaker),
             role: speaker.role,
             speakerSlug,

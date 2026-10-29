@@ -1,6 +1,7 @@
 import { buildMediaJsonLd } from '@/components/media-embed/utils';
 import { getSiteLanguage, site } from '@/configs/site';
 import { buildClipPath } from '@/features/clips/utils';
+import { getSpeakerAvatarUrl } from '@/features/speakers/get-speaker-avatar-url';
 import { buildSpeakerPath, getSpeakerName } from '@/features/speakers/utils';
 import { buildTalkPath } from '@/features/talks/utils';
 import { buildAbsoluteUrl } from '@/lib/entities/paths';
@@ -16,7 +17,6 @@ interface ClipJsonLdInput {
   };
   speaker: {
     firstName: string;
-    imageUrl?: string;
     lastName: string;
     slug: string;
   } | null;
@@ -30,9 +30,11 @@ function getClipCreatorJsonLd(speaker: ClipJsonLdInput['speaker']) {
     return;
   }
 
+  const imageUrl = getSpeakerAvatarUrl(speaker);
+
   return {
     '@type': 'Person' as const,
-    ...(speaker.imageUrl && { image: speaker.imageUrl }),
+    ...(imageUrl && { image: buildAbsoluteUrl(imageUrl) }),
     name,
     url: buildAbsoluteUrl(buildSpeakerPath(speaker)),
   };

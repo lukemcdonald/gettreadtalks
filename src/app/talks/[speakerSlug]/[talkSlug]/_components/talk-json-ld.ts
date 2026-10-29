@@ -1,5 +1,6 @@
 import { buildMediaJsonLd } from '@/components/media-embed/utils';
 import { getSiteLanguage, site } from '@/configs/site';
+import { getSpeakerAvatarUrl } from '@/features/speakers/get-speaker-avatar-url';
 import { buildSpeakerPath, getSpeakerName } from '@/features/speakers/utils';
 import { buildTalkPath } from '@/features/talks/utils';
 import { buildAbsoluteUrl } from '@/lib/entities/paths';
@@ -7,8 +8,8 @@ import { getOrganizationJsonLd } from '@/lib/json-ld';
 
 interface TalkJsonLdSpeaker {
   firstName: string;
-  imageUrl?: string;
   lastName: string;
+  slug?: string;
 }
 
 interface TalkJsonLdInput {
@@ -34,9 +35,11 @@ function getTalkCreatorJsonLd(
     return;
   }
 
+  const imageUrl = getSpeakerAvatarUrl(speaker ?? {});
+
   return {
     '@type': 'Person' as const,
-    ...(speaker?.imageUrl && { image: speaker.imageUrl }),
+    ...(imageUrl && { image: buildAbsoluteUrl(imageUrl) }),
     name,
     url: buildAbsoluteUrl(buildSpeakerPath({ slug: speakerSlug })),
   };
