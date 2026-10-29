@@ -3,14 +3,14 @@ import { expect, test } from './fixtures/index.ts';
 
 test('Search / Site-wide', async ({ homePage, searchPage }) => {
   await homePage.goto();
-  await searchPage.searchFor(PREVIEW_TOPIC_GRACE.slug);
+  await searchPage.searchFor(PREVIEW_TOPIC_GRACE.title);
 
   await expect(
     searchPage.dropdownResult(PREVIEW_TOPIC_GRACE.title)
   ).toBeVisible();
   await expect(searchPage.viewAll).toBeHidden();
 
-  await searchPage.goto(PREVIEW_TOPIC_GRACE.slug);
+  await searchPage.goto(PREVIEW_TOPIC_GRACE.title);
 
   await expect(searchPage.heading).toBeVisible();
   await expect(searchPage.result(PREVIEW_TOPIC_GRACE.title)).toBeVisible();
@@ -42,7 +42,7 @@ test('Search / Mobile drawer', async ({ homePage, searchPage }) => {
   await expect(searchPage.dropdownResult('Talks')).toBeVisible();
   await expect(searchPage.dropdownResult('Collections')).toBeVisible();
 
-  await searchPage.input.fill(PREVIEW_TOPIC_GRACE.slug);
+  await searchPage.input.fill(PREVIEW_TOPIC_GRACE.title);
   await expect(
     searchPage.dropdownResult(PREVIEW_TOPIC_GRACE.title)
   ).toBeVisible();
@@ -54,14 +54,14 @@ test('Search / Keeps query on dismiss and clears after navigate', async ({
   searchPage,
 }) => {
   await homePage.goto();
-  await searchPage.searchFor(PREVIEW_TOPIC_GRACE.slug);
+  await searchPage.searchFor(PREVIEW_TOPIC_GRACE.title);
   await expect(
     searchPage.dropdownResult(PREVIEW_TOPIC_GRACE.title)
   ).toBeVisible();
 
   await searchPage.input.press('Escape');
   await searchPage.open();
-  await expect(searchPage.input).toHaveValue(PREVIEW_TOPIC_GRACE.slug);
+  await expect(searchPage.input).toHaveValue(PREVIEW_TOPIC_GRACE.title);
 
   await searchPage.dropdownResult(PREVIEW_TOPIC_GRACE.title).click();
   await expect(searchPage.page).toHaveURL(

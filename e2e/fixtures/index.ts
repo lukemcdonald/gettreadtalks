@@ -13,6 +13,10 @@ import { TopicsPage } from '../pages/topics-page.ts';
 
 export { expect } from '@playwright/test';
 
+export function talkPath(talk: { slug: string; speakerSlug: string }) {
+  return `/talks/${talk.speakerSlug}/${talk.slug}`;
+}
+
 interface Fixtures {
   aiPage: AiPage;
   authPage: AuthPage;

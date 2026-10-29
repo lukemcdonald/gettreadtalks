@@ -7,7 +7,7 @@ import {
   PREVIEW_TALK_ROMANS_8,
   PREVIEW_TOPIC_GRACE,
 } from '../convex/previewFixtures.ts';
-import { expect, test } from './fixtures/index.ts';
+import { expect, talkPath, test } from './fixtures/index.ts';
 
 const MCP_HEADERS = {
   Accept: 'application/json, text/event-stream',
@@ -132,9 +132,7 @@ test('MCP / Catalog tools return canonical urls', async ({ request }) => {
     talkSlug: PREVIEW_TALK_ROMANS_8.slug,
   });
   const talkResult = talk.talk as { url?: string };
-  expect(talkResult.url).toBe(
-    `${SITE}/talks/${PREVIEW_TALK_ROMANS_8.speakerSlug}/${PREVIEW_TALK_ROMANS_8.slug}`
-  );
+  expect(talkResult.url).toBe(`${SITE}${talkPath(PREVIEW_TALK_ROMANS_8)}`);
 
   const speakers = await callTool(request, 'list_speakers', {
     search: PREVIEW_SPEAKER_JOHN_DOE.firstName,

@@ -1,7 +1,7 @@
 import type { TalksPage } from './pages/talks-page.ts';
 
 import { PREVIEW_TALK_THE_PRODIGAL_SON } from '../convex/previewFixtures.ts';
-import { expect, test } from './fixtures/index.ts';
+import { expect, talkPath, test } from './fixtures/index.ts';
 import {
   E2E_USER_SKIP_REASON,
   hasE2eUser,
@@ -11,7 +11,7 @@ const NEWEST_DATE = new Date(PREVIEW_TALK_THE_PRODIGAL_SON.publishedAt)
   .toISOString()
   .slice(0, 10);
 const PAST_DATE = '2020-01-01';
-const TALK_PATH = `/talks/${PREVIEW_TALK_THE_PRODIGAL_SON.speakerSlug}/${PREVIEW_TALK_THE_PRODIGAL_SON.slug}`;
+const TALK_PATH = talkPath(PREVIEW_TALK_THE_PRODIGAL_SON);
 
 async function setPublishDate(talksPage: TalksPage, value: string) {
   await talksPage.page.goto(TALK_PATH);
