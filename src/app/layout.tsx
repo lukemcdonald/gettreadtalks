@@ -16,6 +16,7 @@ import '@/assets/styles.css';
 import { ToastProvider } from '@/components/ui/primitives/toast';
 import { getSiteLanguage, site } from '@/configs/site';
 import { WebMcpTools } from '@/features/webmcp/components/webmcp-tools';
+import { DEFAULT_SHARE_IMAGE } from '@/lib/metadata';
 import { cn } from '@/utils';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
@@ -27,14 +28,7 @@ export const metadata: Metadata = {
   description: site.metaDescription,
   metadataBase: new URL(site.url),
   openGraph: {
-    images: [
-      {
-        alt: site.name,
-        height: 630,
-        url: '/default-seo-image.png',
-        width: 1200,
-      },
-    ],
+    images: [DEFAULT_SHARE_IMAGE],
     locale: site.locale,
     siteName: site.name,
     type: 'website',

@@ -43,6 +43,7 @@ export async function generateMetadata({
       speakerName,
       title: talk.title,
     }),
+    hasGeneratedShareImage: true,
     openGraphType: getVideoOpenGraphType(talk.mediaUrl),
     title: formatTalkMetaTitle(talk.title, speakerName),
   });

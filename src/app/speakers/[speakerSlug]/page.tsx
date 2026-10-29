@@ -32,6 +32,7 @@ export async function generateMetadata({
     canonical: buildSpeakerPath(speaker),
     description:
       speaker.description ?? `${name} — faithful minister of the Gospel.`,
+    hasGeneratedShareImage: true,
     openGraphType: 'profile',
     title: name,
   });

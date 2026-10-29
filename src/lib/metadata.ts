@@ -3,6 +3,13 @@ import type { Metadata } from 'next';
 import { site } from '@/configs/site';
 import { buildAbsoluteUrl } from '@/lib/entities/paths';
 
+export const DEFAULT_SHARE_IMAGE = {
+  alt: site.name,
+  height: 630,
+  url: '/default-seo-image.png',
+  width: 1200,
+};
+
 export const META_DESCRIPTION_MAX_LENGTH = 160;
 
 const TRAILING_META_WORDS = new Set([
@@ -18,19 +25,6 @@ const TRAILING_META_WORDS = new Set([
   'to',
   'with',
 ]);
-
-const openGraphDefaults = {
-  images: [
-    {
-      alt: site.name,
-      height: 630,
-      url: '/default-seo-image.png',
-      width: 1200,
-    },
-  ],
-  locale: site.locale,
-  siteName: site.name,
-};
 
 function toCanonicalUrl(canonical: string) {
   if (canonical.startsWith('http://') || canonical.startsWith('https://')) {
@@ -63,6 +57,16 @@ function trimAtWordBoundary(text: string, maxLength: number) {
   return trimmed.slice(0, previousSpace);
 }
 
+function getShareImages(hasGeneratedShareImage?: boolean) {
+  if (hasGeneratedShareImage) {
+    return {};
+  }
+
+  return {
+    images: [DEFAULT_SHARE_IMAGE],
+  };
+}
+
 export function formatMetaDescription(text: string | null | undefined) {
   const normalized = text?.trim().replaceAll(/\s+/gu, ' ');
 
@@ -76,11 +80,13 @@ export function formatMetaDescription(text: string | null | undefined) {
 export function buildPageMetadata({
   canonical,
   description,
+  hasGeneratedShareImage,
   openGraphType,
   title,
 }: {
   canonical: string;
   description?: string;
+  hasGeneratedShareImage?: boolean;
   openGraphType?: 'profile' | 'video.other';
   title: string;
 }): Metadata {
@@ -99,19 +105,25 @@ export function buildPageMetadata({
 
   if (openGraphType === 'profile') {
     metadata.openGraph = {
-      ...openGraphDefaults,
+      ...getShareImages(hasGeneratedShareImage),
+      locale: site.locale,
+      siteName: site.name,
       type: 'profile',
       url: canonicalUrl,
     };
   } else if (openGraphType === 'video.other') {
     metadata.openGraph = {
-      ...openGraphDefaults,
+      ...getShareImages(hasGeneratedShareImage),
+      locale: site.locale,
+      siteName: site.name,
       type: 'video.other',
       url: canonicalUrl,
     };
   } else {
     metadata.openGraph = {
-      ...openGraphDefaults,
+      ...getShareImages(hasGeneratedShareImage),
+      locale: site.locale,
+      siteName: site.name,
       type: 'website',
       url: canonicalUrl,
     };

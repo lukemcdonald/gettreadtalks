@@ -3,8 +3,8 @@ import type { Metadata } from 'next';
 import { CenteredLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { CodeBlock } from '@/components/ui';
-import { site } from '@/configs/site';
 import { buildAbsoluteUrl } from '@/lib/entities/paths';
+import { DEFAULT_SHARE_IMAGE } from '@/lib/metadata';
 
 const MCP_URL = buildAbsoluteUrl('/mcp');
 const PAGE_DESCRIPTION =
@@ -79,14 +79,7 @@ export const metadata: Metadata = {
   description: PAGE_DESCRIPTION,
   openGraph: {
     description: PAGE_DESCRIPTION,
-    images: [
-      {
-        alt: site.name,
-        height: 630,
-        url: '/default-seo-image.png',
-        width: 1200,
-      },
-    ],
+    images: [DEFAULT_SHARE_IMAGE],
     title: PAGE_TITLE,
     url: '/ai',
   },
