@@ -18,10 +18,13 @@ import {
   AlertDialogPopup,
   AlertDialogTitle,
   Button,
+  Field,
+  FieldLabel,
 } from '@/components/ui';
 import { api } from '@/convex/_generated/api';
 import {
   formatTranscriptFetchFailure,
+  hasTalkTranscriptSource,
   isTranscriptFetchCoolingDown,
 } from '@/features/talks/utils';
 import { useMutation } from '@/hooks';
@@ -32,14 +35,15 @@ function getTranscriptFetchStatusText(
   hasTranscript: boolean
 ) {
   if (fetch?.status === 'pending') {
-    return 'Fetching transcript...';
+    return 'Fetching...';
   }
 
   if (fetch?.status === 'failed') {
-    return formatTranscriptFetchFailure(fetch);
+    const detail = formatTranscriptFetchFailure(fetch);
+    return detail ? `Failed. ${detail}` : 'Failed';
   }
 
-  return hasTranscript ? 'Transcript saved' : null;
+  return hasTranscript ? 'Saved' : 'None';
 }
 
 function RefetchTranscriptDialog({
@@ -75,7 +79,7 @@ function RefetchTranscriptDialog({
 }
 
 // fallow-ignore-next-line complexity
-export function TalkTranscriptFetch({
+function TalkTranscriptFetchControls({
   children,
   hasTranscript,
   talkId,
@@ -110,33 +114,46 @@ export function TalkTranscriptFetch({
     };
   }, [fetch?.retryAfter]);
 
-  function handleClick() {
-    if (saved) {
-      setConfirmOpen(true);
-      return;
-    }
-
+  function handleGet() {
     mutate({ confirmRefetch: false, talkId });
   }
 
+  function handleRefetch() {
+    setConfirmOpen(true);
+  }
+
   return (
-    <div className="space-y-2">
-      <div className="flex flex-wrap gap-2">
-        <Button
-          disabled={disabled}
-          onClick={handleClick}
-          size="sm"
-          type="button"
-        >
-          {saved ? 'Re-fetch' : 'Get transcript'}
-        </Button>
-        {children}
-      </div>
-      {statusText ? (
+    <Field>
+      <FieldLabel>Transcript</FieldLabel>
+      <div className="flex w-full flex-wrap items-center gap-2">
         <p aria-live="polite" className="text-muted-foreground text-sm">
           {statusText}
         </p>
-      ) : null}
+        {saved ? (
+          children
+        ) : (
+          <Button
+            disabled={disabled}
+            onClick={handleGet}
+            size="sm"
+            type="button"
+            variant="outline"
+          >
+            Get
+          </Button>
+        )}
+        {saved ? (
+          <Button
+            disabled={disabled}
+            onClick={handleRefetch}
+            size="sm"
+            type="button"
+            variant="ghost"
+          >
+            Re-fetch
+          </Button>
+        ) : null}
+      </div>
       <RefetchTranscriptDialog
         onConfirm={() => {
           setConfirmOpen(false);
@@ -145,6 +162,35 @@ export function TalkTranscriptFetch({
         onOpenChange={setConfirmOpen}
         open={confirmOpen}
       />
-    </div>
+    </Field>
+  );
+}
+
+export function TalkTranscriptFetch({
+  children,
+  hasTranscript,
+  mediaUrl,
+  talkId,
+}: {
+  children?: ReactNode;
+  hasTranscript: boolean;
+  mediaUrl: string;
+  talkId: TalkId;
+}) {
+  if (!hasTalkTranscriptSource(mediaUrl)) {
+    return (
+      <Field>
+        <FieldLabel>Transcript</FieldLabel>
+        <p className="text-muted-foreground text-sm">
+          No transcript source for this media.
+        </p>
+      </Field>
+    );
+  }
+
+  return (
+    <TalkTranscriptFetchControls hasTranscript={hasTranscript} talkId={talkId}>
+      {children}
+    </TalkTranscriptFetchControls>
   );
 }

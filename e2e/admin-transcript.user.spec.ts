@@ -49,8 +49,6 @@ test('Admin can view and edit a talk transcript', async ({ talksPage }) => {
   await talksPage.openAdminEdit();
   await expect(talksPage.editSheet).toBeVisible();
 
-  await talksPage.openStudyTab();
-
   const viewTranscript = talksPage.page.getByTestId('view-transcript');
   const transcript = talksPage.page.getByTestId('talk-transcript');
   const nextText = buildTranscriptText(`E2E transcript ${Date.now()}`);
@@ -91,4 +89,45 @@ test('Admin can view and edit a talk transcript', async ({ talksPage }) => {
     .poll(() => getTranscriptRight(transcript))
     .toBeLessThanOrEqual(390);
   await saveShot(talksPage.page, 'dialog-saved-mobile');
+});
+
+test('Content tab summary and transcript layout', async ({ talksPage }) => {
+  await talksPage.page.setViewportSize({ height: 900, width: 1440 });
+  await talksPage.page.goto('/talks/john-doe/sample-sermon-on-romans-8');
+  await expect(talksPage.talkHeading).toBeVisible();
+  await talksPage.openAdminEdit();
+  await expect(talksPage.editSheet).toBeVisible();
+  const summary = talksPage.page.getByRole('textbox', { name: 'Summary' });
+  await summary.scrollIntoViewIfNeeded();
+  await expect(talksPage.page.getByTestId('generate-summary')).toBeEnabled();
+  await expect(talksPage.page.getByTestId('view-transcript')).toBeVisible();
+  await expect(
+    talksPage.editDrawer.getByText('Saved', { exact: true })
+  ).toBeVisible();
+  await saveShot(talksPage.page, 'content-youtube');
+
+  await talksPage.page.goto(
+    '/talks/john-doe/sample-talk-the-lord-is-my-shepherd'
+  );
+  await expect(talksPage.talkHeading).toBeVisible();
+  await talksPage.openAdminEdit();
+  await expect(talksPage.editSheet).toBeVisible();
+  await talksPage.page
+    .getByLabel('Media URL')
+    .fill('https://example.com/audio.mp3');
+  await expect(
+    talksPage.editDrawer.getByText('No transcript source for this media.')
+  ).toBeVisible();
+  await expect(talksPage.page.getByTestId('generate-summary')).toBeDisabled();
+  await expect(
+    talksPage.page.getByTestId('generate-summary-status')
+  ).toHaveText('Needs a transcript');
+  await talksPage.page
+    .getByRole('textbox', { name: 'Summary' })
+    .scrollIntoViewIfNeeded();
+  await saveShot(talksPage.page, 'content-nonyoutube');
+
+  await talksPage.openStudyTab();
+  await expect(talksPage.studyPanel).toBeVisible();
+  await saveShot(talksPage.page, 'study-empty');
 });
