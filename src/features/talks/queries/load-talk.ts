@@ -22,3 +22,9 @@ export async function loadTalkFeature(talkId: TalkId) {
     talkId,
   });
 }
+
+export async function loadTalkTranscript(talkId: TalkId) {
+  cacheLife('hours');
+  cacheTag('talks');
+  return await fetchAuthQuery(api.talks.getTalkTranscript, { talkId });
+}

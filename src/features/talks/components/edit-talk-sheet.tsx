@@ -43,8 +43,10 @@ import { setServerErrors } from '@/lib/forms/react-hook-form';
 interface EditTalkSheetProps {
   closeHref?: string;
   collections: CollectionListItem[];
+  hasTranscript?: boolean;
   speakers: SpeakerListItem[];
   statusPrefill?: StatusPrefill;
+  studyFeature?: TalkFeature | null;
   studyStatus?: TalkFeature['status'] | null;
   talk: TalkWithTopicIds;
   topics: TopicListItem[];
@@ -157,13 +159,15 @@ function useEditTalkTab(talkId: TalkWithTopicIds['_id']) {
 export function EditTalkSheet({
   closeHref,
   collections,
+  hasTranscript = false,
   speakers,
   statusPrefill,
+  studyFeature,
   studyStatus,
   talk,
   topics,
 }: EditTalkSheetProps) {
-  const summary = useTalkSummaryForm(talk._id);
+  const summary = useTalkSummaryForm(talk._id, hasTranscript);
   const {
     confirmPendingUpdate,
     form,
@@ -250,6 +254,7 @@ export function EditTalkSheet({
           </form>
         ) : (
           <EditTalkStudyPanel
+            feature={studyFeature}
             hasTranscript={summary.hasTranscript}
             onClose={() => {
               handleOpenChange(false);

@@ -18,7 +18,10 @@ import { talkStudyFormSchema } from '@/features/talks/schemas/talk-study-form';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
 
 // fallow-ignore-next-line complexity
-export function useTalkSummaryForm(talkId: TalkId) {
+export function useTalkSummaryForm(
+  talkId: TalkId,
+  hasTranscriptPrefill = false
+) {
   const study = useQuery(api.talks.getTalkStudy, { talkId });
   const transcript = useQuery(api.talks.getTalkTranscript, { talkId });
   const [summaryFlags, setSummaryFlags] = useState<string[]>([]);
@@ -49,7 +52,8 @@ export function useTalkSummaryForm(talkId: TalkId) {
   return {
     form,
     handleFlagsChange: setSummaryFlags,
-    hasTranscript: Boolean(transcript),
+    hasTranscript:
+      transcript === undefined ? hasTranscriptPrefill : Boolean(transcript),
     save,
     summaryFlags,
   };

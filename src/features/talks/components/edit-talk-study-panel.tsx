@@ -1,7 +1,7 @@
 'use client';
 
 import type { TalkFeatureFormData } from '@/features/talks/schemas/talk-study-form';
-import type { TalkId } from '@/features/talks/types';
+import type { TalkFeature, TalkId } from '@/features/talks/types';
 import type { Control, Resolver, UseFormSetError } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -122,17 +122,20 @@ function TalkStudyBodyField({
 }
 
 export function EditTalkStudyPanel({
+  feature: initialFeature,
   hasTranscript,
   onClose,
   onSuccess,
   talkId,
 }: {
+  feature?: TalkFeature | null;
   hasTranscript: boolean;
   onClose: () => void;
   onSuccess: () => void;
   talkId: TalkId;
 }) {
-  const feature = useQuery(api.talkFeatures.get, { kind: 'study', talkId });
+  const liveFeature = useQuery(api.talkFeatures.get, { kind: 'study', talkId });
+  const feature = liveFeature === undefined ? initialFeature : liveFeature;
   const form = useForm<TalkFeatureFormData>({
     mode: 'onBlur',
     resolver: talkFeatureResolver,
