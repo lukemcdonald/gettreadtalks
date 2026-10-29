@@ -52,7 +52,7 @@ The document has one site `header`, one `main` (`#main`, skip target), and one `
 
 Every public page has one `h1` (`PageHeader` or `HeroTitle`). Real section titles are `h2` (`SectionHeading`, `FeaturedGrid`, search groups). Card titles (`MediaCardTitle`) and featured captions are one level below their container: `h3` under a section `h2`, `h2` on flat listings. Nested groups under an `h2` may use `h3`. Do not skip levels. Metadata labels (`MetadataGroup`) and footer column titles are not headings.
 
-Overlays: `Dialog` for centered blocking UI (confirm, alert, desktop search). `Drawer` for nav, mobile search, mobile filters, and `FormSheet` (`src/components/ui/form-sheet.tsx`) — right on large screens, bottom on small. Do not import `Sheet` in feature or page code.
+Overlays: `Dialog` for centered blocking UI (confirm, alert, desktop search). `Drawer` for nav, mobile search, mobile filters, and `FormSheet` (`src/components/ui/form-sheet.tsx`) — right on large screens, bottom on small. FormSheet shows the drag bar only on small screens. Do not import `Sheet` in feature or page code.
 
 The header is `src/components/site-header/site-header.tsx`. Desktop shows branding, nav, search, theme, and account. Mobile is search plus menu only; account and theme live in `src/components/site-header/navigation/mobile-nav.tsx`.
 

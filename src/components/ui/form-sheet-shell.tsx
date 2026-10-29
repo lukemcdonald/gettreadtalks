@@ -38,7 +38,7 @@ export function FormSheetShell({
       <DrawerPopup
         className="has-data-[slot=drawer-bar]:ps-0 has-data-[slot=drawer-bar]:pt-0"
         data-testid={testId}
-        showBar
+        showBar={!isDesktop}
         showCloseButton
         variant="default"
       >
