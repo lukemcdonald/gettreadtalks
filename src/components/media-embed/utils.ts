@@ -1,3 +1,5 @@
+import { getVideoId } from '@/convex/lib/videoUrl';
+
 export type MediaType =
   | { type: 'audio'; src: string }
   | { type: 'unknown'; href: string }
@@ -7,54 +9,34 @@ export type MediaType =
 
 const AUDIO_REGEX = /\.(?<format>mp3|wav|ogg|m4a|aac)(?<query>\?|$)/iu;
 const VIDEO_REGEX = /\.(?<format>mp4|webm|ogg|mov)(?<query>\?|$)/iu;
-const VIMEO_REGEX = /(?:vimeo\.com\/|player\.vimeo\.com\/video\/)(?<id>\d+)/u;
-const YOUTUBE_REGEX = [
-  /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)(?<id>[^&\n?#]+)/u,
-  /youtube\.com\/watch\?.*v=(?<id>[^&\n?#]+)/u,
-];
-
-function parseYouTubeUrl(url: string) {
-  for (const pattern of YOUTUBE_REGEX) {
-    const match = url.match(pattern);
-    if (match?.groups?.id) {
-      return match.groups.id;
-    }
-  }
-  return null;
-}
-
-function parseVimeoUrl(url: string) {
-  const match = url.match(VIMEO_REGEX);
-  return match?.groups?.id ?? null;
-}
 
 export function getVideoThumbnail(url?: string) {
   if (!url) {
     return null;
   }
 
-  const youtubeId = parseYouTubeUrl(url);
-  if (youtubeId) {
-    return `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg`;
+  const video = getVideoId(url);
+
+  if (video?.service === 'youtube') {
+    return `https://img.youtube.com/vi/${video.id}/hqdefault.jpg`;
   }
 
-  const vimeoId = parseVimeoUrl(url);
-  if (vimeoId) {
-    return `https://vumbnail.com/${vimeoId}.jpg`;
+  if (video?.service === 'vimeo') {
+    return `https://vumbnail.com/${video.id}.jpg`;
   }
 
   return null;
 }
 
 export function detectMediaType(url: string): MediaType {
-  const youtubeId = parseYouTubeUrl(url);
-  if (youtubeId) {
-    return { id: youtubeId, type: 'youtube' };
+  const video = getVideoId(url);
+
+  if (video?.service === 'youtube') {
+    return { id: video.id, type: 'youtube' };
   }
 
-  const vimeoId = parseVimeoUrl(url);
-  if (vimeoId) {
-    return { id: vimeoId, type: 'vimeo' };
+  if (video?.service === 'vimeo') {
+    return { id: video.id, type: 'vimeo' };
   }
 
   if (VIDEO_REGEX.test(url)) {

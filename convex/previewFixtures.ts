@@ -55,7 +55,7 @@ export const PREVIEW_TALKS = [
     collectionOrder: 1,
     collectionSlug: 'sample-conference-2026',
     featured: true,
-    mediaUrl: 'https://www.youtube.com/watch?v=0SVTl4Xa5fY',
+    mediaUrl: 'https://www.youtube.com/live/0SVTl4Xa5fY',
     publishedAt: Date.parse('2024-06-03T12:00:00.000Z'),
     scripture: 'Romans 8:28',
     slug: 'sample-sermon-on-romans-8',
