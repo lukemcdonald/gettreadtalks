@@ -3,7 +3,7 @@ import type { WelcomeEmailProps } from '../../src/services/email/types';
 import { Text } from 'react-email';
 
 import { site } from '../../src/configs/site';
-import { EmailAction, EmailLayout, EmailSupport } from './components/layout';
+import { EmailButton, EmailLayout, EmailSupport } from './components/layout';
 import { emailParagraph } from './components/styles';
 
 export function WelcomeEmail({ name, siteUrl }: WelcomeEmailProps) {
@@ -16,7 +16,7 @@ export function WelcomeEmail({ name, siteUrl }: WelcomeEmailProps) {
         Your {site.name} account is ready. Browse talks and save favorites to
         come back to.
       </Text>
-      <EmailAction href={siteUrl} label="Explore talks" />
+      <EmailButton href={siteUrl} label="Explore talks" />
       <EmailSupport />
     </EmailLayout>
   );

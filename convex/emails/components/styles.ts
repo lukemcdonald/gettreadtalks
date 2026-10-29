@@ -30,17 +30,23 @@ export const emailButton = {
 };
 
 export const emailButtonContainer = {
-  margin: '24px 0 8px',
-  textAlign: 'center' as const,
+  margin: '24px 0',
+  textAlign: 'left' as const,
+};
+
+export const emailFallbackLabel = {
+  color: emailColors.mutedSoft,
+  fontSize: '13px',
+  lineHeight: '20px',
+  margin: '0 0 24px',
 };
 
 export const emailFallbackLink = {
   color: emailColors.mutedFaint,
   display: 'block',
-  fontSize: '12px',
-  lineHeight: '18px',
-  margin: '0 0 24px',
-  textAlign: 'center' as const,
+  fontSize: '13px',
+  lineHeight: '20px',
+  margin: '4px 0 0',
   textDecoration: 'underline',
   wordBreak: 'break-all' as const,
 };

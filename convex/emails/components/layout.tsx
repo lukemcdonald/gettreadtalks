@@ -20,6 +20,7 @@ import {
   emailButton,
   emailButtonContainer,
   emailColors,
+  emailFallbackLabel,
   emailFallbackLink,
   emailFontFamily,
   emailHeading,
@@ -30,9 +31,13 @@ import {
 const LOGO_HEIGHT = 33;
 const LOGO_WIDTH = 240;
 
-interface EmailActionProps {
+interface EmailButtonProps {
   href: string;
   label: string;
+}
+
+interface EmailFallbackLinkProps {
+  href: string;
 }
 
 interface EmailLayoutProps {
@@ -41,20 +46,24 @@ interface EmailLayoutProps {
   preview?: string;
 }
 
-export function EmailAction({ href, label }: EmailActionProps) {
+export function EmailButton({ href, label }: EmailButtonProps) {
   return (
-    <>
-      <Section style={emailButtonContainer}>
-        <Button href={href} style={emailButton}>
-          {label}
-        </Button>
-      </Section>
-      <Section>
-        <Link href={href} style={emailFallbackLink}>
-          {href}
-        </Link>
-      </Section>
-    </>
+    <Section align="left" style={emailButtonContainer}>
+      <Button href={href} style={emailButton}>
+        {label}
+      </Button>
+    </Section>
+  );
+}
+
+export function EmailFallbackLink({ href }: EmailFallbackLinkProps) {
+  return (
+    <Text style={emailFallbackLabel}>
+      Button not working? Paste this link:
+      <Link href={href} style={emailFallbackLink}>
+        {href}
+      </Link>
+    </Text>
   );
 }
 
