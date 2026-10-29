@@ -19,8 +19,10 @@ Use the Fallow skill for deeper audit and debug workflows.
 
 - Test behavior, not implementation. Add a test only if it would catch a real regression; a bug fix gets a test that fails without the fix.
 - Use the lowest layer that proves it: pure logic with Vitest (`*.test.ts`), Convex functions with `convex-test` (`convex/**/*.test.ts` under edge-runtime), interactive components with Vitest + RTL (happy-dom), and critical journeys with Playwright (`e2e/*.spec.ts`) on a seeded preview. `pnpm test` runs Vitest.
+- E2E is for critical user flows only (sign-in, favorites, the admin transcript and summary flow, search). Never for markup or page structure (e.g. heading order, JSON-LD shape).
 - Never read source or match code strings, snapshot markup, mock Convex or Next internals, test the framework, or duplicate another layer's coverage.
-- Query UI by role, label, or text. Keep tests independent and deterministic, and seed their own data.
+- Find elements by test ID or role, not copy. Check text only where the exact content matters. Keep tests independent and deterministic, and seed their own data.
+- Don't test code that has no logic. Prefer one unit test on a small function over several tests of the same rule.
 - Components that emit analytics get a component test that mocks `@/services/analytics` and asserts `track`'s call count, event name, and properties, using shared helpers (create them with the first test). E2E tests cover workflows and data, not events.
 
 ## Conventions
