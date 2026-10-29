@@ -2,6 +2,9 @@ import { describe, expect, it } from 'vitest';
 
 import { api, internal } from '../../_generated/api';
 import { createConvexTest, signInAs } from '../../test.setup';
+import { insertClip } from '../clips/test-factory.fixture';
+import { insertSpeaker } from '../speakers/test-factory.fixture';
+import { insertTalk } from '../talks/test-factory.fixture';
 
 const CHECKED_AT = 1_700_000_000_000;
 const MEDIA_URL = 'https://www.youtube.com/watch?v=0SVTl4Xa5fY';
@@ -15,22 +18,18 @@ describe('clearMediaChecksForEntity', () => {
       role: 'admin',
     });
     const ids = await t.run(async (ctx) => {
-      const speakerId = await ctx.db.insert('speakers', {
+      const speakerId = await insertSpeaker(ctx, {
         firstName: 'John',
         lastName: 'Doe',
         slug: 'john-doe',
       });
-      const talkId = await ctx.db.insert('talks', {
-        mediaUrl: MEDIA_URL,
+      const talkId = await insertTalk(ctx, {
         slug: 'first-talk',
         speakerId,
-        status: 'published',
         title: 'First Talk',
       });
-      const clipId = await ctx.db.insert('clips', {
-        mediaUrl: MEDIA_URL,
+      const clipId = await insertClip(ctx, {
         slug: 'first-clip',
-        status: 'published',
         title: 'First Clip',
       });
 

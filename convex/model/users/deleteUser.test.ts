@@ -3,6 +3,9 @@ import { describe, expect, it } from 'vitest';
 import { api, components } from '../../_generated/api';
 import { ErrorCodes } from '../../lib/errors';
 import { createConvexTest, signInAsPasswordUser } from '../../test.setup';
+import { insertSpeaker } from '../speakers/test-factory.fixture';
+import { insertTalk } from '../talks/test-factory.fixture';
+import { insertUserFavoriteTalk } from './test-factory.fixture';
 
 const PASSWORD = 'correct-horse-battery';
 
@@ -16,19 +19,9 @@ describe('users.deleteUser', () => {
       role: 'user',
     });
     const talkId = await t.run(async (ctx) => {
-      const speakerId = await ctx.db.insert('speakers', {
-        firstName: 'John',
-        lastName: 'Bunyan',
-        slug: 'john-bunyan',
-      });
-      const createdTalkId = await ctx.db.insert('talks', {
-        mediaUrl: 'https://www.youtube.com/watch?v=0SVTl4Xa5fY',
-        slug: 'grace-abounding',
-        speakerId,
-        status: 'published',
-        title: 'Grace Abounding',
-      });
-      await ctx.db.insert('userFavoriteTalks', {
+      const speakerId = await insertSpeaker(ctx);
+      const createdTalkId = await insertTalk(ctx, { speakerId });
+      await insertUserFavoriteTalk(ctx, {
         talkId: createdTalkId,
         userId,
       });

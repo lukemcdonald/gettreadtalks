@@ -6,6 +6,8 @@ import {
   seedVisibilityCatalog,
   visibilitySlugs,
 } from '../../test.setup';
+import { insertTalk } from '../talks/test-factory.fixture';
+import { insertTalkOnTopic, insertTopic } from '../topics/test-factory.fixture';
 
 describe('listSpeakerSlugs', () => {
   it('lists only speakers with published talks or clips', async () => {
@@ -40,24 +42,22 @@ describe('getSpeakerBySlug', () => {
     }
 
     await t.run(async (ctx) => {
-      const earlierTopicId = await ctx.db.insert('topics', {
+      const earlierTopicId = await insertTopic(ctx, {
         slug: 'another-topic',
         title: 'Another Topic',
       });
-      const talkId = await ctx.db.insert('talks', {
-        mediaUrl: 'https://www.youtube.com/watch?v=0SVTl4Xa5fY',
+      const talkId = await insertTalk(ctx, {
         publishedAt: Date.parse('2024-07-01T12:00:00.000Z'),
         slug: 'another-published-talk',
         speakerId,
-        status: 'published',
         title: 'Another Published Talk',
       });
 
-      await ctx.db.insert('talksOnTopics', {
+      await insertTalkOnTopic(ctx, {
         talkId,
         topicId: earlierTopicId,
       });
-      await ctx.db.insert('talksOnTopics', {
+      await insertTalkOnTopic(ctx, {
         talkId,
         topicId: existingTopicId,
       });
@@ -104,12 +104,10 @@ describe('getSpeakerBySlug', () => {
     }
 
     await t.run(async (ctx) => {
-      await ctx.db.insert('talks', {
-        mediaUrl: 'https://www.youtube.com/watch?v=0SVTl4Xa5fY',
+      await insertTalk(ctx, {
         publishedAt: Date.parse('2020-01-01T12:00:00.000Z'),
         slug: 'older-speaker-talk',
         speakerId,
-        status: 'published',
         title: 'Older Speaker Talk',
       });
     });

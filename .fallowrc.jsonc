@@ -37,6 +37,7 @@
     // convex-test harness. Not a Convex function module.
     "convex/test.setup.ts",
     // Test-only fixtures. Imported from convex-test seeds, not Convex functions.
+    "**/*.fixture.ts",
     "**/test-*.ts",
     // CLI-only preview seed. Called from scripts/vercel-build.sh, not app imports.
     "convex/preview.ts",
