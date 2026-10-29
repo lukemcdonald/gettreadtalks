@@ -10,14 +10,6 @@ export function getSiteUrl(): string {
   return trimTrailingSlash(process.env.SITE_URL || site.url);
 }
 
-export function isLoopbackSiteUrl(url: string) {
-  try {
-    return LOOPBACK_HOSTS.has(new URL(url).hostname);
-  } catch {
-    return false;
-  }
-}
-
 export function resolvePublicSiteUrl(configured?: string) {
   const canonical = trimTrailingSlash(site.url);
 
