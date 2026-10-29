@@ -3,6 +3,7 @@ import type { Locator, Page } from '@playwright/test';
 import { mkdir } from 'node:fs/promises';
 import path from 'node:path';
 
+import { PREVIEW_TALK_ROMANS_8 } from '../convex/previewFixtures.ts';
 import { expect, test } from './fixtures/index.ts';
 import {
   E2E_USER_SKIP_REASON,
@@ -44,7 +45,9 @@ test.skip(!hasE2eUser(), E2E_USER_SKIP_REASON);
 
 test('Admin can view and edit a talk transcript', async ({ talksPage }) => {
   await talksPage.page.setViewportSize({ height: 900, width: 1440 });
-  await talksPage.page.goto('/talks/john-doe/sample-sermon-on-romans-8');
+  await talksPage.page.goto(
+    `/talks/${PREVIEW_TALK_ROMANS_8.speakerSlug}/${PREVIEW_TALK_ROMANS_8.slug}`
+  );
   await expect(talksPage.talkHeading).toBeVisible();
   await talksPage.openAdminEdit();
   await expect(talksPage.editSheet).toBeVisible();

@@ -1,3 +1,7 @@
+import {
+  PREVIEW_TALK_ROMANS_8,
+  PREVIEW_TALK_THE_PRODIGAL_SON,
+} from '../convex/previewFixtures.ts';
 import { expect, test } from './fixtures/index.ts';
 
 test('Talks / Browse and open a talk', async ({ homePage, talksPage }) => {
@@ -19,11 +23,13 @@ test('Talks / Listing search', async ({ talksPage }) => {
 
   await expect(talksPage.page).toHaveURL(/search=romans/u);
   await expect(
-    talksPage.page.getByRole('link', { name: /Sample Sermon on Romans 8/u })
+    talksPage.page.getByRole('link', {
+      name: new RegExp(PREVIEW_TALK_ROMANS_8.title, 'u'),
+    })
   ).toBeVisible();
   await expect(
     talksPage.page.getByRole('link', {
-      name: /Example Talk: The Prodigal Son/u,
+      name: new RegExp(PREVIEW_TALK_THE_PRODIGAL_SON.title, 'u'),
     })
   ).toHaveCount(0);
 });
@@ -31,10 +37,12 @@ test('Talks / Listing search', async ({ talksPage }) => {
 test('Talks / Related talks by topic', async ({ talksPage }) => {
   const { page } = talksPage;
 
-  await page.goto('/talks/mary-smith/example-talk-the-prodigal-son');
+  await page.goto(
+    `/talks/${PREVIEW_TALK_THE_PRODIGAL_SON.speakerSlug}/${PREVIEW_TALK_THE_PRODIGAL_SON.slug}`
+  );
 
   await expect(talksPage.talkHeading).toHaveText(
-    'Example Talk: The Prodigal Son'
+    PREVIEW_TALK_THE_PRODIGAL_SON.title
   );
 
   await expect(
