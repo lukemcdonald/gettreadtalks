@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest';
 
 import { api, internal } from '../../_generated/api';
 import { createConvexTest, signInAs } from '../../test.setup';
-import { insertClip } from '../clips/test-factory.fixture';
-import { insertSpeaker } from '../speakers/test-factory.fixture';
-import { insertTalk } from '../talks/test-factory.fixture';
+import { insertClip } from '../clips/test.factory';
+import { insertSpeaker } from '../speakers/test.factory';
+import { insertTalk } from '../talks/test.factory';
 
 const CHECKED_AT = 1_700_000_000_000;
 const MEDIA_URL = 'https://www.youtube.com/watch?v=0SVTl4Xa5fY';

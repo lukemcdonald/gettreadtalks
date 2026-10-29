@@ -3,9 +3,9 @@ import { describe, expect, it } from 'vitest';
 import { api, components } from '../../_generated/api';
 import { ErrorCodes } from '../../lib/errors';
 import { createConvexTest, signInAsPasswordUser } from '../../test.setup';
-import { insertSpeaker } from '../speakers/test-factory.fixture';
-import { insertTalk } from '../talks/test-factory.fixture';
-import { insertUserFavoriteTalk } from './test-factory.fixture';
+import { insertSpeaker } from '../speakers/test.factory';
+import { insertTalk } from '../talks/test.factory';
+import { insertUserFavoriteTalk } from './test.factory';
 
 const PASSWORD = 'correct-horse-battery';
 

@@ -7,9 +7,9 @@ import {
   signInAs,
   visibilitySlugs,
 } from '../../test.setup';
-import { insertSpeaker } from '../speakers/test-factory.fixture';
-import { insertTalkOnTopic } from '../topics/test-factory.fixture';
-import { insertTalk, insertTalkStudy } from './test-factory.fixture';
+import { insertSpeaker } from '../speakers/test.factory';
+import { insertTalkOnTopic } from '../topics/test.factory';
+import { insertTalk, insertTalkStudy } from './test.factory';
 
 describe('listTalkSlugs', () => {
   it('lists only published talks', async () => {

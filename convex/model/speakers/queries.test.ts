@@ -6,8 +6,8 @@ import {
   seedVisibilityCatalog,
   visibilitySlugs,
 } from '../../test.setup';
-import { insertTalk } from '../talks/test-factory.fixture';
-import { insertTalkOnTopic, insertTopic } from '../topics/test-factory.fixture';
+import { insertTalk } from '../talks/test.factory';
+import { insertTalkOnTopic, insertTopic } from '../topics/test.factory';
 
 describe('listSpeakerSlugs', () => {
   it('lists only speakers with published talks or clips', async () => {

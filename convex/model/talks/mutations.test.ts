@@ -3,8 +3,8 @@ import { describe, expect, it } from 'vitest';
 import { api, internal } from '../../_generated/api';
 import { ErrorCodes } from '../../lib/errors';
 import { createConvexTest, signInAs } from '../../test.setup';
-import { insertSpeaker } from '../speakers/test-factory.fixture';
-import { insertTalk } from './test-factory.fixture';
+import { insertSpeaker } from '../speakers/test.factory';
+import { insertTalk } from './test.factory';
 
 const MEDIA_URL = 'https://www.youtube.com/watch?v=0SVTl4Xa5fY';
 const PAST_PUBLISHED_AT = Date.parse('2020-01-15T00:00:00.000Z');
