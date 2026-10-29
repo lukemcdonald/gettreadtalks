@@ -1,3 +1,8 @@
+import type { Page } from '@playwright/test';
+
+import { mkdir } from 'node:fs/promises';
+import path from 'node:path';
+
 import { PREVIEW_SPEAKERS, PREVIEW_TALKS } from '../convex/previewFixtures.ts';
 import { expect, test } from './fixtures/index.ts';
 import {
@@ -5,9 +10,20 @@ import {
   hasE2eUser,
 } from './fixtures/user-credentials.ts';
 
+const SHOT_DIR = 'test-results/301';
+
+async function saveShot(page: Page, name: string) {
+  await mkdir(SHOT_DIR, { recursive: true });
+  await page.screenshot({
+    animations: 'disabled',
+    path: path.join(SHOT_DIR, `${name}.png`),
+  });
+}
+
 test.skip(!hasE2eUser(), E2E_USER_SKIP_REASON);
 
 test('Admin create talk opens the edit content tab', async ({ talksPage }) => {
+  await talksPage.page.setViewportSize({ height: 900, width: 1440 });
   await talksPage.gotoManageTalks();
   await talksPage.openNewTalk();
   await expect(talksPage.createDrawer).toBeVisible();
@@ -17,6 +33,7 @@ test('Admin create talk opens the edit content tab', async ({ talksPage }) => {
     speakerQuery: PREVIEW_SPEAKERS.JOHN_DOE.firstName,
     title: `E2E create ${Date.now()}`,
   });
+  await saveShot(talksPage.page, 'create-filled-desktop');
   await talksPage.submitCreateTalk();
 
   await expect(talksPage.editDrawer).toBeVisible();
@@ -24,6 +41,10 @@ test('Admin create talk opens the edit content tab', async ({ talksPage }) => {
   await expect(talksPage.contentTab).toBeVisible();
   await expect(talksPage.generateSummary).toBeVisible();
   await expect(talksPage.getTranscript).toBeVisible();
+  await saveShot(talksPage.page, 'edit-content-desktop');
+
+  await talksPage.page.setViewportSize({ height: 844, width: 390 });
+  await saveShot(talksPage.page, 'edit-content-mobile');
 });
 
 test('Admin edit / Signed-in shortcut', async ({ talksPage }) => {
