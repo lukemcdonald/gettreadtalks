@@ -38,6 +38,7 @@ export async function generateMetadata({
   return buildPageMetadata({
     canonical: buildCollectionPath(collection),
     description: collection.description,
+    hasGeneratedShareImage: true,
     title: collection.title,
   });
 }

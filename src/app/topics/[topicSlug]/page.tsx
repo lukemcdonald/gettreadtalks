@@ -41,6 +41,7 @@ export async function generateMetadata({
       topic.title,
       totalTalks
     ),
+    hasGeneratedShareImage: true,
     title: topic.title,
   });
 }

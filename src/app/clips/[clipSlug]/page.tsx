@@ -52,6 +52,7 @@ export async function generateMetadata({
       clip.description,
       getSpeakerName(speaker)
     ),
+    hasGeneratedShareImage: true,
     openGraphType: getVideoOpenGraphType(clip.mediaUrl),
     title: clip.title,
   });
