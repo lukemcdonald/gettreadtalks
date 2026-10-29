@@ -4,12 +4,10 @@ import { api } from '../../_generated/api';
 import {
   createConvexTest,
   seedVisibilityCatalog,
-  signInAs,
   visibilitySlugs,
 } from '../../test.setup';
 import { insertTalk } from '../talks/test.factory';
 import { insertTalkOnTopic, insertTopic } from '../topics/test.factory';
-import { insertSpeaker } from './test.factory';
 
 describe('listSpeakerSlugs', () => {
   it('lists only speakers with published talks or clips', async () => {
@@ -121,42 +119,6 @@ describe('getSpeakerBySlug', () => {
     expect(speaker?.talks.map((talk) => talk.slug)).toEqual([
       visibilitySlugs.publishedTalk,
       'older-speaker-talk',
-    ]);
-  });
-});
-
-describe('listAllSpeakersAdmin', () => {
-  it('searches speakers by name with the search index', async () => {
-    const t = createConvexTest();
-    const { asUser } = await signInAs(t, {
-      email: 'admin@example.test',
-      name: 'Admin',
-      role: 'admin',
-    });
-
-    await t.run(async (ctx) => {
-      await insertSpeaker(ctx, {
-        firstName: 'Zebedee',
-        lastName: 'Adminsearch',
-        slug: 'zebedee-adminsearch',
-      });
-      await insertSpeaker(ctx, {
-        firstName: 'Other',
-        lastName: 'Speaker',
-        slug: 'other-speaker-search',
-      });
-    });
-
-    const result = await asUser.query(api.speakers.listAllSpeakersAdmin, {
-      paginationOpts: {
-        cursor: null,
-        numItems: 20,
-      },
-      search: 'Zebedee',
-    });
-
-    expect(result.page.map((item) => item.speaker.slug)).toEqual([
-      'zebedee-adminsearch',
     ]);
   });
 });

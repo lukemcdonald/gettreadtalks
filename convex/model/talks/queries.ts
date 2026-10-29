@@ -17,17 +17,14 @@ import { query } from '../../_generated/server';
 import { getTalkIdsByTopicSlugs } from '../../lib/filters';
 import { rotateContent } from '../../lib/rotateContent';
 import { byPublishedAt, getContentComparator } from '../../lib/sort';
-import {
-  enrichWithSpeaker,
-  paginateArray,
-  paginateSearchOrList,
-} from '../../lib/utils';
+import { enrichWithSpeaker, paginateArray } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
 import { statusFilterType } from '../../lib/validators/shared';
 import { canViewContent, requireAdmin } from '../auth/roles';
 import { getCurrentUser } from '../auth/utils';
 import { LIST_SEARCH_LIMIT } from '../search/constants';
+import { listAllAdmin } from '../search/listAll';
 import { normalizeSearchQuery } from '../search/utils';
 import {
   listPublishedTalks,
@@ -499,12 +496,12 @@ export const listAllTalks = query({
     ),
   },
   handler: async (ctx, args) => {
-    await requireAdmin(ctx);
-
     const { paginationOpts, search, status = 'published', studyStatus } = args;
-    const queryText = normalizeSearchQuery(search ?? '');
 
     if (studyStatus) {
+      await requireAdmin(ctx);
+
+      const queryText = normalizeSearchQuery(search ?? '');
       let talks = queryText
         ? await searchTalksByTitleOrSpeaker(
             ctx,
@@ -527,18 +524,14 @@ export const listAllTalks = query({
       };
     }
 
-    const result = await paginateSearchOrList({
+    return await listAllAdmin(ctx, {
+      enrich: (page) => enrichAdminTalks(ctx, page),
       listPage: () => talksByStatusQuery(ctx, status).paginate(paginationOpts),
       paginationOpts,
-      queryText,
-      search: () =>
+      search,
+      searchItems: (queryText) =>
         searchTalksByTitleOrSpeaker(ctx, queryText, LIST_SEARCH_LIMIT, status),
     });
-
-    return {
-      ...result,
-      page: await enrichAdminTalks(ctx, result.page),
-    };
   },
   returns: paginationResultValidator(
     v.object({

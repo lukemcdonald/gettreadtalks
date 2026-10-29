@@ -1,4 +1,4 @@
-import { SearchInput } from '@/components/ui/search-input';
+import { ManageSearchInput } from '@/components/manage-table';
 import { SelectFilter } from '@/components/ui/select-filter';
 
 const STATUS_FILTER_OPTIONS = [
@@ -31,12 +31,7 @@ export function TalksFilters() {
         options={STUDY_FILTER_OPTIONS}
         placeholder="All"
       />
-      <SearchInput
-        className="max-w-96 min-w-0 flex-1"
-        label="Search"
-        paramName="search"
-        placeholder="Search talks and speakers..."
-      />
+      <ManageSearchInput placeholder="Search talks and speakers..." />
     </div>
   );
 }

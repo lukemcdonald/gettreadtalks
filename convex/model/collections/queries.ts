@@ -7,12 +7,12 @@ import {
 import { v } from 'convex/values';
 
 import { query } from '../../_generated/server';
-import { enrichWithSpeaker, paginateSearchOrList } from '../../lib/utils';
+import { enrichWithSpeaker } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
 import { requireAdmin } from '../auth/roles';
 import { LIST_SEARCH_LIMIT } from '../search/constants';
-import { normalizeSearchQuery } from '../search/utils';
+import { listAllAdmin } from '../search/listAll';
 import { listPublishedTalksForCollection } from '../talks/helpers';
 import {
   enrichCollectionsForAdmin,
@@ -193,22 +193,15 @@ export const listAllCollections = query({
     paginationOpts: paginationOptsValidator,
     search: v.optional(v.string()),
   },
-  handler: async (ctx, args) => {
-    await requireAdmin(ctx);
-
-    const queryText = normalizeSearchQuery(args.search ?? '');
-    const result = await paginateSearchOrList({
+  handler: async (ctx, args) =>
+    await listAllAdmin(ctx, {
+      enrich: (page) => enrichCollectionsForAdmin(ctx, page),
       listPage: () =>
         ctx.db.query('collections').order('desc').paginate(args.paginationOpts),
       paginationOpts: args.paginationOpts,
-      queryText,
-      search: () => searchCollections(ctx, queryText, LIST_SEARCH_LIMIT),
-    });
-
-    return {
-      ...result,
-      page: await enrichCollectionsForAdmin(ctx, result.page),
-    };
-  },
+      search: args.search,
+      searchItems: (queryText) =>
+        searchCollections(ctx, queryText, LIST_SEARCH_LIMIT),
+    }),
   returns: collectionAdminPageValidator,
 });

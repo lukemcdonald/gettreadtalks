@@ -1,16 +1,18 @@
-import type { ManageCollectionsSearchParams } from '@/app/manage/collections/_components/collections-content';
+import type { ManageListSearchParams } from '@/components/manage-table';
 
 import { Suspense } from 'react';
 
 import { ManageCollectionsContent } from '@/app/manage/collections/_components/collections-content';
-import { CollectionsFilters } from '@/app/manage/collections/_components/collections-filters';
-import { ManageTableSkeleton } from '@/components/manage-table';
+import {
+  ManageSearchInput,
+  ManageTableSkeleton,
+} from '@/components/manage-table';
 import { PageHeader } from '@/components/page-header';
 import { Skeleton } from '@/components/ui';
 import { NewCollectionButton } from '@/features/collections/components/new-collection-button';
 
 interface ManageCollectionsPageProps {
-  searchParams: Promise<ManageCollectionsSearchParams>;
+  searchParams: Promise<ManageListSearchParams>;
 }
 
 export default function ManageCollectionsPage({
@@ -24,7 +26,7 @@ export default function ManageCollectionsPage({
         title="Manage Collections"
       />
       <Suspense fallback={<Skeleton className="h-10 w-full" />}>
-        <CollectionsFilters />
+        <ManageSearchInput placeholder="Search collections..." />
       </Suspense>
       <Suspense fallback={<ManageTableSkeleton resource="collections" />}>
         <ManageCollectionsContent searchParams={searchParams} />

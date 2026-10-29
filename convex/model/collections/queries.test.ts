@@ -45,7 +45,7 @@ describe('getCollectionBySlug', () => {
 });
 
 describe('listAllCollections', () => {
-  it('searches collection titles and counts talks of every status', async () => {
+  it('counts talks of every status on the admin collection list', async () => {
     const t = createConvexTest();
     const { asUser } = await signInAs(t, {
       email: 'admin@example.test',

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 
+import { Pagination } from '@/components/pagination';
 import {
   Empty,
   EmptyDescription,
@@ -62,15 +63,23 @@ type ManageResource =
 
 export function ManageTable({
   children,
+  continueCursor,
+  cursor,
   emptyAction,
+  isDone,
   isEmpty,
   isFiltered = false,
+  itemCount,
   resource,
 }: {
   children?: ReactNode;
+  continueCursor?: string | null;
+  cursor?: string;
   emptyAction?: ReactNode;
+  isDone?: boolean;
   isEmpty: boolean;
   isFiltered?: boolean;
+  itemCount?: number;
   resource: ManageResource;
 }) {
   if (isEmpty) {
@@ -89,10 +98,22 @@ export function ManageTable({
   }
 
   return (
-    <Table variant="card">
-      <Header resource={resource} />
-      <TableBody>{children}</TableBody>
-    </Table>
+    <div className="space-y-6">
+      <Table variant="card">
+        <Header resource={resource} />
+        <TableBody>{children}</TableBody>
+      </Table>
+      {continueCursor === undefined ||
+      isDone === undefined ||
+      itemCount === undefined ? null : (
+        <Pagination
+          continueCursor={continueCursor}
+          hasNextPage={!isDone}
+          hasPrevPage={Boolean(cursor)}
+          itemCount={itemCount}
+        />
+      )}
+    </div>
   );
 }
 

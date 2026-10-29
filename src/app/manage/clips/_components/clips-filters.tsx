@@ -1,4 +1,4 @@
-import { SearchInput } from '@/components/ui/search-input';
+import { ManageSearchInput } from '@/components/manage-table';
 import { SelectFilter } from '@/components/ui/select-filter';
 
 const FILTER_OPTIONS = [
@@ -18,12 +18,7 @@ export function ClipsFilters() {
         options={FILTER_OPTIONS}
         placeholder="All Statuses"
       />
-      <SearchInput
-        className="max-w-96 min-w-0 flex-1"
-        label="Search"
-        paramName="search"
-        placeholder="Search clips..."
-      />
+      <ManageSearchInput placeholder="Search clips..." />
     </div>
   );
 }

@@ -1,16 +1,12 @@
+import type { ManageListSearchParams } from '@/components/manage-table';
+
 import { ManageTable } from '@/components/manage-table';
-import { Pagination } from '@/components/pagination';
 import { CollectionsTableRow } from '@/features/collections/components/collections-table/collections-table-row';
 import { NewCollectionButton } from '@/features/collections/components/new-collection-button';
 import { loadAllCollections } from '@/features/collections/queries/load-all-collections';
 
-export interface ManageCollectionsSearchParams {
-  cursor?: string;
-  search?: string;
-}
-
 interface ManageCollectionsContentProps {
-  searchParams: Promise<ManageCollectionsSearchParams>;
+  searchParams: Promise<ManageListSearchParams>;
 }
 
 export async function ManageCollectionsContent({
@@ -24,28 +20,24 @@ export async function ManageCollectionsContent({
   });
 
   return (
-    <div className="space-y-6">
-      <ManageTable
-        emptyAction={<NewCollectionButton />}
-        isEmpty={result.collections.length === 0}
-        isFiltered={Boolean(search?.trim())}
-        resource="collections"
-      >
-        {result.collections.map(({ collection, status, talkCount }) => (
-          <CollectionsTableRow
-            collection={collection}
-            key={collection._id}
-            status={status}
-            talkCount={talkCount}
-          />
-        ))}
-      </ManageTable>
-      <Pagination
-        continueCursor={result.continueCursor}
-        hasNextPage={!result.isDone}
-        hasPrevPage={!!cursor}
-        itemCount={result.collections.length}
-      />
-    </div>
+    <ManageTable
+      continueCursor={result.continueCursor}
+      cursor={cursor}
+      emptyAction={<NewCollectionButton />}
+      isDone={result.isDone}
+      isEmpty={result.collections.length === 0}
+      isFiltered={Boolean(search?.trim())}
+      itemCount={result.collections.length}
+      resource="collections"
+    >
+      {result.collections.map(({ collection, status, talkCount }) => (
+        <CollectionsTableRow
+          collection={collection}
+          key={collection._id}
+          status={status}
+          talkCount={talkCount}
+        />
+      ))}
+    </ManageTable>
   );
 }

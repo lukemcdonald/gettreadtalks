@@ -10,15 +10,12 @@ import { v } from 'convex/values';
 
 import { query } from '../../_generated/server';
 import { getTopicComparator } from '../../lib/sort';
-import {
-  enrichWithSpeaker,
-  paginateArray,
-  paginateSearchOrList,
-} from '../../lib/utils';
+import { enrichWithSpeaker, paginateArray } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
 import { requireAdmin } from '../auth/roles';
 import { LIST_SEARCH_LIMIT } from '../search/constants';
+import { listAllAdmin } from '../search/listAll';
 import { normalizeSearchQuery } from '../search/utils';
 import {
   listPublishedTalksForTopic,
@@ -121,11 +118,9 @@ export const listAllTopics = query({
     paginationOpts: paginationOptsValidator,
     search: v.optional(v.string()),
   },
-  handler: async (ctx, args) => {
-    await requireAdmin(ctx);
-
-    const queryText = normalizeSearchQuery(args.search ?? '');
-    const result = await paginateSearchOrList({
+  handler: async (ctx, args) =>
+    await listAllAdmin(ctx, {
+      enrich: (page) => enrichTopicsForAdmin(ctx, page),
       listPage: () =>
         ctx.db
           .query('topics')
@@ -133,15 +128,10 @@ export const listAllTopics = query({
           .order('asc')
           .paginate(args.paginationOpts),
       paginationOpts: args.paginationOpts,
-      queryText,
-      search: () => searchTopics(ctx, queryText, LIST_SEARCH_LIMIT),
-    });
-
-    return {
-      ...result,
-      page: await enrichTopicsForAdmin(ctx, result.page),
-    };
-  },
+      search: args.search,
+      searchItems: (queryText) =>
+        searchTopics(ctx, queryText, LIST_SEARCH_LIMIT),
+    }),
   returns: topicAdminPageValidator,
 });
 

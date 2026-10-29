@@ -10,12 +10,13 @@ import { v } from 'convex/values';
 import { query } from '../../_generated/server';
 import { filterClipsByPublishedTalks } from '../../lib/filters';
 import { getContentComparator } from '../../lib/sort';
-import { paginateArray, paginateSearchOrList } from '../../lib/utils';
+import { paginateArray } from '../../lib/utils';
 import { doc, docs } from '../../lib/validators/schema';
 import { statusFilterType } from '../../lib/validators/shared';
 import { canViewContent, requireAdmin } from '../auth/roles';
 import { getCurrentUser } from '../auth/utils';
 import { LIST_SEARCH_LIMIT } from '../search/constants';
+import { listAllAdmin } from '../search/listAll';
 import { normalizeSearchQuery } from '../search/utils';
 import {
   enrichClipsForAdmin,
@@ -236,11 +237,10 @@ export const listAllClips = query({
     status: v.optional(statusFilterType),
   },
   handler: async (ctx, args) => {
-    await requireAdmin(ctx);
-
     const { paginationOpts, search, status } = args;
-    const queryText = normalizeSearchQuery(search ?? '');
-    const result = await paginateSearchOrList({
+
+    return await listAllAdmin(ctx, {
+      enrich: (page) => enrichClipsForAdmin(ctx, page),
       listPage: () =>
         !status || status === 'all'
           ? ctx.db.query('clips').order('desc').paginate(paginationOpts)
@@ -252,14 +252,10 @@ export const listAllClips = query({
               .order('desc')
               .paginate(paginationOpts),
       paginationOpts,
-      queryText,
-      search: () => searchClips(ctx, queryText, LIST_SEARCH_LIMIT, status),
+      search,
+      searchItems: (queryText) =>
+        searchClips(ctx, queryText, LIST_SEARCH_LIMIT, status),
     });
-
-    return {
-      ...result,
-      page: await enrichClipsForAdmin(ctx, result.page),
-    };
   },
   returns: clipAdminPageValidator,
 });

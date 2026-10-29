@@ -1,7 +1,6 @@
 import type { StatusType } from '@/lib/entities/types';
 
 import { ManageTable } from '@/components/manage-table';
-import { Pagination } from '@/components/pagination';
 import { NewTalkButton } from '@/features/talks/components/new-talk-button';
 import { TalksTableRow } from '@/features/talks/components/talks-table/talks-table-row';
 import { loadAllTalks } from '@/features/talks/queries/load-all-talks';
@@ -42,23 +41,19 @@ export async function ManageTalksContent({
   });
 
   return (
-    <div className="space-y-6">
-      <ManageTable
-        emptyAction={<NewTalkButton />}
-        isEmpty={result.talks.length === 0}
-        isFiltered={hasTalksFilters({ search, status, study })}
-        resource="talks"
-      >
-        {result.talks.map((talk) => (
-          <TalksTableRow key={talk._id} talk={talk} />
-        ))}
-      </ManageTable>
-      <Pagination
-        continueCursor={result.continueCursor}
-        hasNextPage={!result.isDone}
-        hasPrevPage={!!cursor}
-        itemCount={result.talks.length}
-      />
-    </div>
+    <ManageTable
+      continueCursor={result.continueCursor}
+      cursor={cursor}
+      emptyAction={<NewTalkButton />}
+      isDone={result.isDone}
+      isEmpty={result.talks.length === 0}
+      isFiltered={hasTalksFilters({ search, status, study })}
+      itemCount={result.talks.length}
+      resource="talks"
+    >
+      {result.talks.map((talk) => (
+        <TalksTableRow key={talk._id} talk={talk} />
+      ))}
+    </ManageTable>
   );
 }
