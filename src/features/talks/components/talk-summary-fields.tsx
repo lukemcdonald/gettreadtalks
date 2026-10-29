@@ -122,45 +122,49 @@ export function TalkSummaryFields({
   talkId: TalkId;
 }) {
   return (
-    <Controller
-      control={form.control}
-      name="summary"
-      render={({ field, fieldState }) => (
-        <Field
-          dirty={fieldState.isDirty}
-          invalid={fieldState.invalid}
-          name={field.name}
-          touched={fieldState.isTouched}
-        >
-          <div className="flex w-full items-center justify-between gap-2">
-            <FieldLabel htmlFor={field.name}>Summary</FieldLabel>
-            <StudyStatusSelect control={form.control} />
-          </div>
-          <Textarea
-            rows={8}
-            size="lg"
-            {...field}
-            aria-invalid={fieldState.invalid}
-            id={field.name}
-          />
-          {fieldState.error ? (
-            <FieldError match>{fieldState.error.message}</FieldError>
-          ) : null}
-          <TalkSummaryGenerate
-            hasTranscript={hasTranscript}
-            onFlagsChange={onFlagsChange}
-            talkId={talkId}
-          />
-          {summaryFlags.length > 0 ? (
-            <p
-              className="text-muted-foreground text-sm"
-              data-testid="summary-flags"
-            >
-              Review: {summaryFlags.join(' · ')}
-            </p>
-          ) : null}
+    <div className="flex w-full flex-col gap-2">
+      <div className="flex w-full items-center justify-between gap-2">
+        <Field className="contents">
+          <FieldLabel htmlFor="summary">Summary</FieldLabel>
         </Field>
-      )}
-    />
+        <StudyStatusSelect control={form.control} />
+      </div>
+      <Controller
+        control={form.control}
+        name="summary"
+        render={({ field, fieldState }) => (
+          <Field
+            dirty={fieldState.isDirty}
+            invalid={fieldState.invalid}
+            name={field.name}
+            touched={fieldState.isTouched}
+          >
+            <Textarea
+              rows={8}
+              size="lg"
+              {...field}
+              aria-invalid={fieldState.invalid}
+              id={field.name}
+            />
+            {fieldState.error ? (
+              <FieldError match>{fieldState.error.message}</FieldError>
+            ) : null}
+            <TalkSummaryGenerate
+              hasTranscript={hasTranscript}
+              onFlagsChange={onFlagsChange}
+              talkId={talkId}
+            />
+            {summaryFlags.length > 0 ? (
+              <p
+                className="text-muted-foreground text-sm"
+                data-testid="summary-flags"
+              >
+                Review: {summaryFlags.join(' · ')}
+              </p>
+            ) : null}
+          </Field>
+        )}
+      />
+    </div>
   );
 }

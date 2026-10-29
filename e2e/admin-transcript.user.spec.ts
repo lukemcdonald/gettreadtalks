@@ -97,10 +97,13 @@ test('Content tab summary and transcript layout', async ({ talksPage }) => {
   await expect(talksPage.talkHeading).toBeVisible();
   await talksPage.openAdminEdit();
   await expect(talksPage.editSheet).toBeVisible();
-  await talksPage.page.getByLabel('Summary').scrollIntoViewIfNeeded();
+  const summary = talksPage.page.getByRole('textbox', { name: 'Summary' });
+  await summary.scrollIntoViewIfNeeded();
   await expect(talksPage.page.getByTestId('generate-summary')).toBeEnabled();
   await expect(talksPage.page.getByTestId('view-transcript')).toBeVisible();
-  await expect(talksPage.editDrawer.getByText('Saved')).toBeVisible();
+  await expect(
+    talksPage.editDrawer.getByText('Saved', { exact: true })
+  ).toBeVisible();
   await saveShot(talksPage.page, 'content-youtube');
 
   await talksPage.page.goto(
@@ -119,7 +122,9 @@ test('Content tab summary and transcript layout', async ({ talksPage }) => {
   await expect(
     talksPage.page.getByTestId('generate-summary-status')
   ).toHaveText('Needs a transcript');
-  await talksPage.page.getByLabel('Summary').scrollIntoViewIfNeeded();
+  await talksPage.page
+    .getByRole('textbox', { name: 'Summary' })
+    .scrollIntoViewIfNeeded();
   await saveShot(talksPage.page, 'content-nonyoutube');
 
   await talksPage.openStudyTab();
