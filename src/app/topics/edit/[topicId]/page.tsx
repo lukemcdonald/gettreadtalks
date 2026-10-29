@@ -22,7 +22,7 @@ export default async function Page({ params }: PageProps) {
         />
       }
     >
-      <ManageTopicsPage />
+      <ManageTopicsPage searchParams={Promise.resolve({})} />
     </AdminSheetFallback>
   );
 }

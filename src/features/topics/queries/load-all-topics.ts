@@ -1,15 +1,26 @@
-'use cache: private';
-
-import { cacheLife, cacheTag } from 'next/cache';
+'use server';
 
 import { api } from '@/convex/_generated/api';
 import { fetchAuthQuery } from '@/services/auth/server';
 
-export async function loadAllTopics() {
-  cacheLife('hours');
-  cacheTag('topics');
+interface LoadAllTopicsProps {
+  cursor?: string;
+  limit?: number;
+  search?: string;
+}
 
-  const topics = await fetchAuthQuery(api.topics.listAllTopics, {});
+export async function loadAllTopics(args: LoadAllTopicsProps = {}) {
+  const result = await fetchAuthQuery(api.topics.listAllTopics, {
+    paginationOpts: {
+      cursor: args.cursor ?? null,
+      numItems: args.limit ?? 50,
+    },
+    search: args.search,
+  });
 
-  return { topics };
+  return {
+    continueCursor: result.continueCursor,
+    isDone: result.isDone,
+    topics: result.page,
+  };
 }

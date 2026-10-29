@@ -1,6 +1,7 @@
 import type { Doc, Id, TableNames } from '../_generated/dataModel';
 import type { MutationCtx, QueryCtx } from '../_generated/server';
 import type { StatusType } from './types';
+import type { PaginationOptions, PaginationResult } from 'convex/server';
 
 import { asyncMap } from 'convex-helpers';
 import { getOneFrom } from 'convex-helpers/server/relationships';
@@ -187,6 +188,26 @@ export function paginateArray<T>(
     isDone: !hasMore,
     page,
   };
+}
+
+/**
+ * Native Convex pagination when listing, or search-index hits then offset pages.
+ */
+export async function paginateSearchOrList<T>(options: {
+  listPage: () => Promise<PaginationResult<T>>;
+  paginationOpts: PaginationOptions;
+  queryText: string;
+  search: () => Promise<T[]>;
+}): Promise<PaginationResult<T>> {
+  const { listPage, paginationOpts, queryText, search } = options;
+
+  if (queryText.length > 0) {
+    const items = await search();
+
+    return paginateArray(items, paginationOpts.cursor, paginationOpts.numItems);
+  }
+
+  return await listPage();
 }
 
 /**

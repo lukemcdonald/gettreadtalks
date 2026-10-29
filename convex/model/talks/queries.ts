@@ -17,7 +17,11 @@ import { query } from '../../_generated/server';
 import { getTalkIdsByTopicSlugs } from '../../lib/filters';
 import { rotateContent } from '../../lib/rotateContent';
 import { byPublishedAt, getContentComparator } from '../../lib/sort';
-import { enrichWithSpeaker, paginateArray } from '../../lib/utils';
+import {
+  enrichWithSpeaker,
+  paginateArray,
+  paginateSearchOrList,
+} from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
 import { statusFilterType } from '../../lib/validators/shared';
@@ -30,13 +34,11 @@ import {
   listPublishedTalksForTopics,
   listPublishedTalksPage,
   searchPublishedTalksByTitleOrSpeaker,
+  searchTalksByTitleOrSpeaker,
+  talksByStatusQuery,
 } from './helpers';
 import { talkFields, talkTranscriptFields } from './schema';
-import {
-  enrichAdminTalks,
-  enrichWithTopics,
-  filterTalksByTitleOrSpeaker,
-} from './utils';
+import { enrichAdminTalks, enrichWithTopics } from './utils';
 import { talkTranscriptFetchLastError } from './validators';
 
 /**
@@ -464,6 +466,25 @@ export const listTalks = query({
   ),
 });
 
+async function filterTalksByStudyStatus(
+  ctx: QueryCtx,
+  talks: Doc<'talks'>[],
+  studyStatus: 'draft' | 'none' | 'published'
+) {
+  const studies = await ctx.db.query('talkStudies').collect();
+  const statusByTalkId = new Map(
+    studies.map((study) => [study.talkId, study.studyStatus])
+  );
+
+  return talks.filter((talk) => {
+    const current = statusByTalkId.get(talk._id);
+
+    return studyStatus === 'none'
+      ? current === undefined
+      : current === studyStatus;
+  });
+}
+
 /**
  * List all talks with speaker data and filtering support.
  * Use status='all' to fetch across all statuses, defaults to 'published'.
@@ -481,47 +502,42 @@ export const listAllTalks = query({
     await requireAdmin(ctx);
 
     const { paginationOpts, search, status = 'published', studyStatus } = args;
-
-    let talks: Doc<'talks'>[] =
-      status === 'all'
-        ? await ctx.db.query('talks').order('desc').collect()
-        : await ctx.db
-            .query('talks')
-            .withIndex('by_status_and_publishedAt', (q) =>
-              q.eq('status', status)
-            )
-            .order('desc')
-            .collect();
-
-    if (search) {
-      talks = await filterTalksByTitleOrSpeaker(ctx, search, talks);
-    }
+    const queryText = normalizeSearchQuery(search ?? '');
 
     if (studyStatus) {
-      const studies = await ctx.db.query('talkStudies').collect();
-      const statusByTalkId = new Map(
-        studies.map((study) => [study.talkId, study.studyStatus])
+      let talks = queryText
+        ? await searchTalksByTitleOrSpeaker(
+            ctx,
+            queryText,
+            LIST_SEARCH_LIMIT,
+            status
+          )
+        : await talksByStatusQuery(ctx, status).collect();
+      talks = await filterTalksByStudyStatus(ctx, talks, studyStatus);
+      const { continueCursor, isDone, page } = paginateArray(
+        talks,
+        paginationOpts.cursor,
+        paginationOpts.numItems
       );
 
-      talks = talks.filter((talk) => {
-        const current = statusByTalkId.get(talk._id);
-
-        return studyStatus === 'none'
-          ? current === undefined
-          : current === studyStatus;
-      });
+      return {
+        continueCursor,
+        isDone,
+        page: await enrichAdminTalks(ctx, page),
+      };
     }
 
-    const { continueCursor, isDone, page } = paginateArray(
-      talks,
-      paginationOpts.cursor,
-      paginationOpts.numItems
-    );
+    const result = await paginateSearchOrList({
+      listPage: () => talksByStatusQuery(ctx, status).paginate(paginationOpts),
+      paginationOpts,
+      queryText,
+      search: () =>
+        searchTalksByTitleOrSpeaker(ctx, queryText, LIST_SEARCH_LIMIT, status),
+    });
 
     return {
-      continueCursor,
-      isDone,
-      page: await enrichAdminTalks(ctx, page),
+      ...result,
+      page: await enrichAdminTalks(ctx, result.page),
     };
   },
   returns: paginationResultValidator(
@@ -574,16 +590,7 @@ export const listTalksWithoutTranscript = query({
     await requireAdmin(ctx);
 
     const status = args.status ?? 'published';
-    const talks =
-      status === 'all'
-        ? await ctx.db.query('talks').order('desc').collect()
-        : await ctx.db
-            .query('talks')
-            .withIndex('by_status_and_publishedAt', (q) =>
-              q.eq('status', status)
-            )
-            .order('desc')
-            .collect();
+    const talks = await talksByStatusQuery(ctx, status).collect();
     const [fetches, transcripts] = await Promise.all([
       ctx.db.query('talkTranscriptFetches').collect(),
       ctx.db.query('talkTranscripts').collect(),

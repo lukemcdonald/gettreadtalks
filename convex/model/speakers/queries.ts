@@ -1,8 +1,7 @@
 import type { Doc } from '../../_generated/dataModel';
 import type { SpeakerSortOption } from '../../lib/sort';
 
-import { asyncMap } from 'convex-helpers';
-import { getManyFrom, getOneFrom } from 'convex-helpers/server/relationships';
+import { getOneFrom } from 'convex-helpers/server/relationships';
 import {
   paginationOptsValidator,
   paginationResultValidator,
@@ -12,16 +11,18 @@ import { v } from 'convex/values';
 import { query } from '../../_generated/server';
 import { rotateContent } from '../../lib/rotateContent';
 import { byPublishedAt, getSpeakerComparator } from '../../lib/sort';
-import { paginateArray } from '../../lib/utils';
+import { paginateArray, paginateSearchOrList } from '../../lib/utils';
 import { doc, docs } from '../../lib/validators/schema';
 import { requireAdmin } from '../auth/roles';
 import { LIST_SEARCH_LIMIT } from '../search/constants';
 import { normalizeSearchQuery } from '../search/utils';
 import { listPublishedTopicsForTalks } from '../topics/helpers';
 import {
+  enrichSpeakersForAdmin,
   listPublishedSpeakers,
   listPublishedSpeakersPage,
   searchPublishedSpeakers,
+  searchSpeakers,
 } from './helpers';
 import { speakerRoleType } from './validators';
 
@@ -235,56 +236,45 @@ export const listSpeakers = query({
   returns: speakerPageValidator,
 });
 
+const speakerAdminPageValidator = paginationResultValidator(
+  v.object({
+    clipCount: v.number(),
+    speaker: doc('speakers'),
+    status: v.union(v.literal('draft'), v.literal('published')),
+    talkCount: v.number(),
+  })
+);
+
 /**
  * List all speakers for admin use, with total talk and clip counts (all statuses).
  */
 export const listAllSpeakersAdmin = query({
-  args: {},
-  handler: async (ctx) => {
+  args: {
+    paginationOpts: paginationOptsValidator,
+    search: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
     await requireAdmin(ctx);
 
-    const speakers = await ctx.db
-      .query('speakers')
-      .withIndex('by_lastName')
-      .collect();
-
-    return await asyncMap(speakers, async (speaker) => {
-      const talks = await ctx.db
-        .query('talks')
-        .withIndex('by_speakerId_and_status', (q) =>
-          q.eq('speakerId', speaker._id)
-        )
-        .collect();
-
-      const clips = await getManyFrom(
-        ctx.db,
-        'clips',
-        'by_speakerId',
-        speaker._id
-      );
-
-      const hasPublishedContent =
-        talks.some((talk) => talk.status === 'published') ||
-        clips.some((clip) => clip.status === 'published');
-
-      return {
-        clipCount: clips.length,
-        speaker,
-        status: hasPublishedContent
-          ? ('published' as const)
-          : ('draft' as const),
-        talkCount: talks.length,
-      };
+    const queryText = normalizeSearchQuery(args.search ?? '');
+    const result = await paginateSearchOrList({
+      listPage: () =>
+        ctx.db
+          .query('speakers')
+          .withIndex('by_lastName')
+          .order('asc')
+          .paginate(args.paginationOpts),
+      paginationOpts: args.paginationOpts,
+      queryText,
+      search: () => searchSpeakers(ctx, queryText, LIST_SEARCH_LIMIT),
     });
+
+    return {
+      ...result,
+      page: await enrichSpeakersForAdmin(ctx, result.page),
+    };
   },
-  returns: v.array(
-    v.object({
-      clipCount: v.number(),
-      speaker: doc('speakers'),
-      status: v.union(v.literal('draft'), v.literal('published')),
-      talkCount: v.number(),
-    })
-  ),
+  returns: speakerAdminPageValidator,
 });
 
 /**

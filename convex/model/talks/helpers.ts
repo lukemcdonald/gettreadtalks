@@ -1,17 +1,29 @@
 import type { Doc, Id } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
+import type { StatusFilterType } from '../../lib/types';
 import type { PaginationOptions } from 'convex/server';
 
 import { getManyVia } from 'convex-helpers/server/relationships';
 
 import { DEFAULT_SEARCH_LIMIT } from '../search/constants';
-import { uniqueById } from '../search/utils';
-import { searchPublishedSpeakers } from '../speakers/helpers';
+import { searchTitleQuery, uniqueById } from '../search/utils';
+import { searchPublishedSpeakers, searchSpeakers } from '../speakers/helpers';
 
 function publishedTalksQuery(ctx: QueryCtx) {
   return ctx.db
     .query('talks')
     .withIndex('by_status_and_publishedAt', (q) => q.eq('status', 'published'))
+    .order('desc');
+}
+
+export function talksByStatusQuery(ctx: QueryCtx, status: StatusFilterType) {
+  if (status === 'all') {
+    return ctx.db.query('talks').order('desc');
+  }
+
+  return ctx.db
+    .query('talks')
+    .withIndex('by_status_and_publishedAt', (q) => q.eq('status', status))
     .order('desc');
 }
 
@@ -45,6 +57,18 @@ export async function listPublishedTalksForCollection(
   const talks = publishedTalksForCollectionQuery(ctx, collectionId);
 
   return await (limit ? talks.take(limit) : talks.collect());
+}
+
+export async function listTalksForCollection(
+  ctx: QueryCtx,
+  collectionId: Id<'collections'>
+) {
+  return await ctx.db
+    .query('talks')
+    .withIndex('by_collectionId_and_status', (q) =>
+      q.eq('collectionId', collectionId)
+    )
+    .collect();
 }
 
 export async function listPublishedTalksForTopic(
@@ -106,28 +130,38 @@ export async function listPublishedTalksForTopics(
   return uniqueById(talkPages.flat());
 }
 
+export async function searchTalks(
+  ctx: QueryCtx,
+  queryText: string,
+  limit: number,
+  status?: StatusFilterType
+) {
+  return await ctx.db
+    .query('talks')
+    .withSearchIndex('search_title', searchTitleQuery(queryText, status))
+    .take(limit);
+}
+
 export async function searchPublishedTalks(
   ctx: QueryCtx,
   queryText: string,
   limit: number
 ) {
-  return await ctx.db
-    .query('talks')
-    .withSearchIndex('search_title', (q) =>
-      q.search('title', queryText).eq('status', 'published')
-    )
-    .take(limit);
+  return await searchTalks(ctx, queryText, limit, 'published');
 }
 
-/** Title matches plus published talks by speakers whose names match. */
-export async function searchPublishedTalksByTitleOrSpeaker(
+/** Title matches plus talks by speakers whose names match. */
+export async function searchTalksByTitleOrSpeaker(
   ctx: QueryCtx,
   queryText: string,
-  limit: number
+  limit: number,
+  status?: StatusFilterType
 ) {
+  const searchSpeakersByName =
+    status === 'published' ? searchPublishedSpeakers : searchSpeakers;
   const [titleHits, speakers] = await Promise.all([
-    searchPublishedTalks(ctx, queryText, limit),
-    searchPublishedSpeakers(ctx, queryText, DEFAULT_SEARCH_LIMIT),
+    searchTalks(ctx, queryText, limit, status),
+    searchSpeakersByName(ctx, queryText, DEFAULT_SEARCH_LIMIT),
   ]);
 
   if (speakers.length === 0) {
@@ -138,9 +172,13 @@ export async function searchPublishedTalksByTitleOrSpeaker(
     speakers.map((speaker) =>
       ctx.db
         .query('talks')
-        .withIndex('by_speakerId_and_status', (q) =>
-          q.eq('speakerId', speaker._id).eq('status', 'published')
-        )
+        .withIndex('by_speakerId_and_status', (q) => {
+          const bySpeaker = q.eq('speakerId', speaker._id);
+
+          return status && status !== 'all'
+            ? bySpeaker.eq('status', status)
+            : bySpeaker;
+        })
         .take(limit)
     )
   );
@@ -149,4 +187,12 @@ export async function searchPublishedTalksByTitleOrSpeaker(
     ...titleHits,
     ...speakerTalkPages.flat(),
   ]).slice(0, limit);
+}
+
+export async function searchPublishedTalksByTitleOrSpeaker(
+  ctx: QueryCtx,
+  queryText: string,
+  limit: number
+) {
+  return await searchTalksByTitleOrSpeaker(ctx, queryText, limit, 'published');
 }

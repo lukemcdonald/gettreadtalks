@@ -1,3 +1,4 @@
+import { SearchInput } from '@/components/ui/search-input';
 import { SelectFilter } from '@/components/ui/select-filter';
 
 const FILTER_OPTIONS = [
@@ -9,12 +10,20 @@ const FILTER_OPTIONS = [
 
 export function ClipsFilters() {
   return (
-    <SelectFilter
-      className="w-48"
-      label="Status"
-      name="status"
-      options={FILTER_OPTIONS}
-      placeholder="All Statuses"
-    />
+    <div className="flex flex-wrap gap-4">
+      <SelectFilter
+        className="w-48"
+        label="Status"
+        name="status"
+        options={FILTER_OPTIONS}
+        placeholder="All Statuses"
+      />
+      <SearchInput
+        className="max-w-96 min-w-0 flex-1"
+        label="Search"
+        paramName="search"
+        placeholder="Search clips..."
+      />
+    </div>
   );
 }

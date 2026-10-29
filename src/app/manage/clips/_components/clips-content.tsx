@@ -8,6 +8,7 @@ import { loadAllClips } from '@/features/clips/queries/load-all-clips';
 
 export interface ManageClipsSearchParams {
   cursor?: string;
+  search?: string;
   status?: StatusType | 'all';
 }
 
@@ -15,13 +16,22 @@ interface ManageClipsContentProps {
   searchParams: Promise<ManageClipsSearchParams>;
 }
 
+function hasClipsFilters({ search, status }: ManageClipsSearchParams) {
+  if (search?.trim()) {
+    return true;
+  }
+
+  return Boolean(status) && status !== 'all';
+}
+
 export async function ManageClipsContent({
   searchParams,
 }: ManageClipsContentProps) {
-  const { cursor, status } = await searchParams;
+  const { cursor, search, status } = await searchParams;
   const result = await loadAllClips({
     cursor,
     limit: 50,
+    search,
     status: status || 'all',
   });
 
@@ -30,7 +40,7 @@ export async function ManageClipsContent({
       <ManageTable
         emptyAction={<NewClipButton />}
         isEmpty={result.clips.length === 0}
-        isFiltered={Boolean(status) && status !== 'all'}
+        isFiltered={hasClipsFilters({ search, status })}
         resource="clips"
       >
         {result.clips.map((clip) => (

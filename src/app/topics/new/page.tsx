@@ -9,7 +9,7 @@ export default function Page() {
       returnPath={buildEntityNewPath('topics')}
       sheet={<CreateTopicSheetRoute closeHref={ADMIN_LIST_PATHS.topics} />}
     >
-      <ManageTopicsPage />
+      <ManageTopicsPage searchParams={Promise.resolve({})} />
     </AdminSheetFallback>
   );
 }

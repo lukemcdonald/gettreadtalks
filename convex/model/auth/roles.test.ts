@@ -205,7 +205,8 @@ const gatedFunctions: {
     name: 'speakers.listAllSpeakers',
   },
   {
-    call: (client) => client.query(api.speakers.listAllSpeakersAdmin, {}),
+    call: (client) =>
+      client.query(api.speakers.listAllSpeakersAdmin, { paginationOpts }),
     name: 'speakers.listAllSpeakersAdmin',
   },
   {
@@ -351,7 +352,8 @@ const gatedFunctions: {
     name: 'topics.getTopic',
   },
   {
-    call: (client) => client.query(api.topics.listAllTopics, {}),
+    call: (client) =>
+      client.query(api.topics.listAllTopics, { paginationOpts }),
     name: 'topics.listAllTopics',
   },
   {

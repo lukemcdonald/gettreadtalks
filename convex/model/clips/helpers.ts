@@ -1,10 +1,12 @@
 import type { Doc, Id } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
+import type { StatusFilterType } from '../../lib/types';
 import type { PaginationOptions } from 'convex/server';
 
 import { asyncMap } from 'convex-helpers';
 
 import { filterClipsByPublishedTalks } from '../../lib/filters';
+import { searchTitleQuery } from '../search/utils';
 
 function publishedClipsQuery(ctx: QueryCtx) {
   return ctx.db
@@ -32,6 +34,18 @@ export async function listPublishedClipsPage(
   };
 }
 
+export async function searchClips(
+  ctx: QueryCtx,
+  queryText: string,
+  limit: number,
+  status?: StatusFilterType
+) {
+  return await ctx.db
+    .query('clips')
+    .withSearchIndex('search_title', searchTitleQuery(queryText, status))
+    .take(limit);
+}
+
 export async function searchPublishedClips(
   ctx: QueryCtx,
   queryText: string,
@@ -39,12 +53,7 @@ export async function searchPublishedClips(
 ) {
   const clips = await filterClipsByPublishedTalks(
     ctx,
-    await ctx.db
-      .query('clips')
-      .withSearchIndex('search_title', (q) =>
-        q.search('title', queryText).eq('status', 'published')
-      )
-      .take(limit)
+    await searchClips(ctx, queryText, limit, 'published')
   );
 
   return clips.slice(0, limit);

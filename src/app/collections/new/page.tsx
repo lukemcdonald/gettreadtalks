@@ -11,7 +11,7 @@ export default function Page() {
         <CreateCollectionSheetRoute closeHref={ADMIN_LIST_PATHS.collections} />
       }
     >
-      <ManageCollectionsPage />
+      <ManageCollectionsPage searchParams={Promise.resolve({})} />
     </AdminSheetFallback>
   );
 }

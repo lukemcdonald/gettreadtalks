@@ -10,7 +10,7 @@ import { v } from 'convex/values';
 import { query } from '../../_generated/server';
 import { filterClipsByPublishedTalks } from '../../lib/filters';
 import { getContentComparator } from '../../lib/sort';
-import { paginateArray } from '../../lib/utils';
+import { paginateArray, paginateSearchOrList } from '../../lib/utils';
 import { doc, docs } from '../../lib/validators/schema';
 import { statusFilterType } from '../../lib/validators/shared';
 import { canViewContent, requireAdmin } from '../auth/roles';
@@ -22,6 +22,7 @@ import {
   enrichClipsWithSpeaker,
   listPublishedClips,
   listPublishedClipsPage,
+  searchClips,
   searchPublishedClips,
 } from './helpers';
 
@@ -231,27 +232,33 @@ export const listClipsBySpeaker = query({
 export const listAllClips = query({
   args: {
     paginationOpts: paginationOptsValidator,
+    search: v.optional(v.string()),
     status: v.optional(statusFilterType),
   },
   handler: async (ctx, args) => {
     await requireAdmin(ctx);
 
-    const { paginationOpts, status } = args;
-
-    const clipPages =
-      !status || status === 'all'
-        ? await ctx.db.query('clips').order('desc').paginate(paginationOpts)
-        : await ctx.db
-            .query('clips')
-            .withIndex('by_status_and_publishedAt', (q) =>
-              q.eq('status', status)
-            )
-            .order('desc')
-            .paginate(paginationOpts);
+    const { paginationOpts, search, status } = args;
+    const queryText = normalizeSearchQuery(search ?? '');
+    const result = await paginateSearchOrList({
+      listPage: () =>
+        !status || status === 'all'
+          ? ctx.db.query('clips').order('desc').paginate(paginationOpts)
+          : ctx.db
+              .query('clips')
+              .withIndex('by_status_and_publishedAt', (q) =>
+                q.eq('status', status)
+              )
+              .order('desc')
+              .paginate(paginationOpts),
+      paginationOpts,
+      queryText,
+      search: () => searchClips(ctx, queryText, LIST_SEARCH_LIMIT, status),
+    });
 
     return {
-      ...clipPages,
-      page: await enrichClipsForAdmin(ctx, clipPages.page),
+      ...result,
+      page: await enrichClipsForAdmin(ctx, result.page),
     };
   },
   returns: clipAdminPageValidator,

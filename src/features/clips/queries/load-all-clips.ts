@@ -8,6 +8,7 @@ import { fetchAuthQuery } from '@/services/auth/server';
 interface GetAllClipsProps {
   cursor?: string;
   limit?: number;
+  search?: string;
   status?: StatusFilterType;
 }
 
@@ -16,7 +17,7 @@ interface GetAllClipsProps {
  * Supports status='all' to fetch clips across all statuses.
  */
 export async function loadAllClips(args?: GetAllClipsProps) {
-  const { cursor, limit, status } = args ?? {};
+  const { cursor, limit, search, status } = args ?? {};
 
   const paginationOpts = {
     cursor: cursor ?? null,
@@ -25,6 +26,7 @@ export async function loadAllClips(args?: GetAllClipsProps) {
 
   const result = await fetchAuthQuery(api.clips.listAllClips, {
     paginationOpts,
+    search,
     status,
   });
 

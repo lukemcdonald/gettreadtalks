@@ -9,7 +9,7 @@ export default function Page() {
       returnPath={buildEntityNewPath('speakers')}
       sheet={<CreateSpeakerSheetRoute closeHref={ADMIN_LIST_PATHS.speakers} />}
     >
-      <ManageSpeakersPage />
+      <ManageSpeakersPage searchParams={Promise.resolve({})} />
     </AdminSheetFallback>
   );
 }

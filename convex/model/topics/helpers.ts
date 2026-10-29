@@ -1,6 +1,7 @@
 import type { Doc, Id } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
 
+import { asyncMap } from 'convex-helpers';
 import { getManyFrom } from 'convex-helpers/server/relationships';
 
 import { filterTopicsWithPublishedTalks } from '../../lib/filters';
@@ -21,18 +22,47 @@ export async function listPublishedTopics(ctx: QueryCtx, limit?: number) {
   return await filterTopicsWithPublishedTalks(ctx, topics);
 }
 
+export async function searchTopics(
+  ctx: QueryCtx,
+  queryText: string,
+  limit: number
+) {
+  return await ctx.db
+    .query('topics')
+    .withSearchIndex('search_title', (q) => q.search('title', queryText))
+    .take(limit);
+}
+
 export async function searchPublishedTopics(
   ctx: QueryCtx,
   queryText: string,
   limit: number
 ) {
-  const topics = await ctx.db
-    .query('topics')
-    .withSearchIndex('search_title', (q) => q.search('title', queryText))
-    .take(limit * UNFILTERED_SEARCH_MULTIPLIER);
-  const published = await filterTopicsWithPublishedTalks(ctx, topics);
+  const published = await filterTopicsWithPublishedTalks(
+    ctx,
+    await searchTopics(ctx, queryText, limit * UNFILTERED_SEARCH_MULTIPLIER)
+  );
 
   return published.slice(0, limit);
+}
+
+export async function enrichTopicsForAdmin(
+  ctx: QueryCtx,
+  topics: Doc<'topics'>[]
+) {
+  return await asyncMap(topics, async (topic) => {
+    const talksOnTopic = await getManyFrom(
+      ctx.db,
+      'talksOnTopics',
+      'by_topicId',
+      topic._id
+    );
+
+    return {
+      talkCount: talksOnTopic.length,
+      topic,
+    };
+  });
 }
 
 /** Distinct topics linked to the given talks, sorted by title. */

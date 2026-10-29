@@ -22,7 +22,7 @@ export default async function Page({ params }: PageProps) {
         />
       }
     >
-      <ManageCollectionsPage />
+      <ManageCollectionsPage searchParams={Promise.resolve({})} />
     </AdminSheetFallback>
   );
 }
