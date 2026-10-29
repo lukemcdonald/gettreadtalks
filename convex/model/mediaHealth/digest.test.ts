@@ -60,22 +60,16 @@ describe('media health digest', () => {
     const t = createConvexTest();
     const digest = digestFor(await upsert(t, 'private'));
 
-    expect(digest?.stillBrokenCount).toBe(0);
-    expect(digest?.items).toEqual([
-      {
-        adminPath: '/talks/edit/talk1?status=archived',
-        checkId: expect.any(String),
-        entityTable: 'talks',
+    expect(digest?.newItems).toEqual([
+      expect.objectContaining({
         isNew: true,
-        mediaUrl: MEDIA_URL,
-        newStatus: 'private',
-        publicPath: '/talks/john-doe/first-talk',
-        title: 'First Talk',
-      },
+        title: talk.title,
+      }),
     ]);
+    expect(digest?.unresolvedItems).toEqual([]);
   });
 
-  it('does not re-email an already-notified break', async () => {
+  it('groups an already-notified break as still unresolved', async () => {
     const t = createConvexTest();
     const first = await upsert(t, 'private');
 
@@ -84,7 +78,22 @@ describe('media health digest', () => {
       notifiedAt: CHECKED_AT + 1,
     });
 
-    expect(digestFor(await upsert(t, 'private', CHECKED_AT + 2))).toBe(null);
+    const digest = digestFor(await upsert(t, 'private', CHECKED_AT + 2));
+
+    expect(digest?.newItems).toEqual([]);
+    expect(digest?.unresolvedItems).toEqual([
+      expect.objectContaining({
+        isNew: false,
+        newStatus: 'private',
+      }),
+    ]);
+  });
+
+  it('omits a recovered break from the digest', async () => {
+    const t = createConvexTest();
+    await upsert(t, 'private');
+
+    expect(digestFor(await upsert(t, 'ok'))).toBe(null);
   });
 
   it('emails again after recovery then a re-break', async () => {
@@ -96,11 +105,11 @@ describe('media health digest', () => {
       notifiedAt: CHECKED_AT + 1,
     });
 
-    expect(digestFor(await upsert(t, 'ok', CHECKED_AT + 2))).toBe(null);
+    await upsert(t, 'ok', CHECKED_AT + 2);
 
     const digest = digestFor(await upsert(t, 'missing', CHECKED_AT + 3));
 
-    expect(digest?.items).toEqual([
+    expect(digest?.newItems).toEqual([
       expect.objectContaining({
         isNew: true,
         newStatus: 'missing',

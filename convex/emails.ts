@@ -15,7 +15,7 @@ import { VerifyEmailTemplate } from './emails/verifyEmail';
 import { WelcomeEmail } from './emails/welcome';
 import { throwConvexError } from './lib/errors';
 import { reportSentryException } from './lib/sentry';
-import { getSiteUrl } from './lib/siteUrl';
+import { getPublicSiteUrl, getSiteUrl } from './lib/siteUrl';
 import { formatErrorMessage } from './lib/utils';
 import { mediaHealthDigestItem } from './model/mediaHealth/validators';
 
@@ -152,7 +152,6 @@ export const handleEmailEvent = internalMutation({
 export const sendMediaHealthEmail = internalAction({
   args: {
     items: v.array(mediaHealthDigestItem),
-    stillBrokenCount: v.number(),
   },
   handler: async (ctx, args) => {
     if (args.items.length === 0 || shouldSkipTestModeSend(site.email.contact)) {
@@ -162,7 +161,7 @@ export const sendMediaHealthEmail = internalAction({
     try {
       const template = MediaHealthEmail({
         items: args.items,
-        stillBrokenCount: args.stillBrokenCount,
+        siteUrl: getPublicSiteUrl(),
       });
       const { html, text } = await renderEmail(template);
 

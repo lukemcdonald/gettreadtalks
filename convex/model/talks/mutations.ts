@@ -21,6 +21,10 @@ import {
   talkSlugExistsForSpeaker,
 } from '../../lib/utils';
 import { requireAdmin } from '../auth/roles';
+import {
+  clearMediaChecksForEntity,
+  clearStaleMediaChecks,
+} from '../mediaHealth/clear';
 import { talkTranscriptFields } from './schema';
 import {
   statusType,
@@ -66,6 +70,38 @@ async function setTalkTopics(
   );
 }
 
+async function applyTalkSlugUpdate(
+  ctx: MutationCtx,
+  args: {
+    rawSlug: string;
+    speakerId: Id<'speakers'>;
+    talk: Doc<'talks'>;
+    talkId: Id<'talks'>;
+    updates: Partial<Doc<'talks'>>;
+  }
+) {
+  const newSlug = slugify(args.rawSlug);
+
+  if (!newSlug) {
+    throwValidationError('Slug cannot be empty', 'slug');
+  }
+
+  if (newSlug === args.talk.slug) {
+    return;
+  }
+
+  if (
+    await talkSlugExistsForSpeaker(ctx, args.speakerId, newSlug, args.talkId)
+  ) {
+    throwDuplicateSlug(
+      'A talk with this slug already exists for this speaker',
+      'slug'
+    );
+  }
+
+  args.updates.slug = newSlug;
+}
+
 function publishedAtForTalk({
   currentPublishedAt,
   requestedPublishedAt,
@@ -109,6 +145,11 @@ export const archiveTalk = mutation({
       publishedAt: isArchived ? undefined : talk.publishedAt,
       status: newStatus,
       updatedAt: Date.now(),
+    });
+
+    await clearMediaChecksForEntity(ctx, {
+      entityId: talkId,
+      entityTable: 'talks',
     });
 
     return null;
@@ -209,26 +250,14 @@ export const updateTalk = mutation({
       throwValidationError('Title cannot be empty', 'title');
     }
 
-    // Use explicit slug if provided, otherwise keep existing slug
     if (rawSlug !== undefined) {
-      const newSlug = slugify(rawSlug);
-
-      if (!newSlug) {
-        throwValidationError('Slug cannot be empty', 'slug');
-      }
-
-      if (newSlug !== talk.slug) {
-        if (
-          await talkSlugExistsForSpeaker(ctx, speakerIdToCheck, newSlug, talkId)
-        ) {
-          throwDuplicateSlug(
-            'A talk with this slug already exists for this speaker',
-            'slug'
-          );
-        }
-
-        updates.slug = newSlug;
-      }
+      await applyTalkSlugUpdate(ctx, {
+        rawSlug,
+        speakerId: speakerIdToCheck,
+        talk,
+        talkId,
+        updates,
+      });
     }
 
     updates.publishedAt = publishedAtForTalk({
@@ -243,6 +272,15 @@ export const updateTalk = mutation({
     if (topicIds !== undefined) {
       await setTalkTopics(ctx, talkId, topicIds);
     }
+
+    await clearStaleMediaChecks(ctx, {
+      entityId: talkId,
+      entityTable: 'talks',
+      nextMediaUrl: updates.mediaUrl,
+      nextStatus: updates.status,
+      previousMediaUrl: talk.mediaUrl,
+      previousStatus: talk.status,
+    });
 
     return talkId;
   },
@@ -262,6 +300,11 @@ export const destroyTalk = mutation({
     await requireAdmin(ctx);
 
     await getOrThrow(ctx, 'talks', talkId);
+
+    await clearMediaChecksForEntity(ctx, {
+      entityId: talkId,
+      entityTable: 'talks',
+    });
 
     const [fetches, studies, talksOnTopics, transcripts] = await Promise.all([
       ctx.db

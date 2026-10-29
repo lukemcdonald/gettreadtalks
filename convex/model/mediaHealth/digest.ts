@@ -15,15 +15,23 @@ export interface MediaHealthDigestItem {
 }
 
 export function buildMediaHealthDigest(items: MediaHealthDigestItem[]) {
-  const newItems = items.filter((item) => item.isNew);
-
-  if (newItems.length === 0) {
+  if (items.length === 0) {
     return null;
   }
 
+  const { newItems, unresolvedItems } = partitionMediaHealthItems(items);
+
   return {
-    items: newItems,
-    stillBrokenCount: items.length - newItems.length,
+    items,
+    newItems,
+    unresolvedItems,
+  };
+}
+
+export function partitionMediaHealthItems(items: MediaHealthDigestItem[]) {
+  return {
+    newItems: items.filter((item) => item.isNew),
+    unresolvedItems: items.filter((item) => !item.isNew),
   };
 }
 
