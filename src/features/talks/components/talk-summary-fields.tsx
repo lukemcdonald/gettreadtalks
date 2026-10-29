@@ -140,6 +140,7 @@ export function TalkSummaryFields({
             touched={fieldState.isTouched}
           >
             <Textarea
+              className="[&_[data-slot=textarea]]:field-sizing-fixed [&_[data-slot=textarea]]:min-h-40"
               rows={8}
               size="lg"
               {...field}

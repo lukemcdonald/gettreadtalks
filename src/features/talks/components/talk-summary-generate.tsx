@@ -5,7 +5,7 @@ import type { TalkId } from '@/features/talks/types';
 import { useAction } from 'convex/react';
 import { useState } from 'react';
 
-import { Button } from '@/components/ui';
+import { Button, FieldDescription } from '@/components/ui';
 import { api } from '@/convex/_generated/api';
 
 function getSummaryGenerateStatusText({
@@ -82,13 +82,12 @@ export function TalkSummaryGenerate({
         Generate summary
       </Button>
       {statusText ? (
-        <p
+        <FieldDescription
           aria-live="polite"
-          className="text-muted-foreground text-sm"
           data-testid="generate-summary-status"
         >
           {statusText}
-        </p>
+        </FieldDescription>
       ) : null}
     </div>
   );
