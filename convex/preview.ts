@@ -18,6 +18,8 @@ import {
   PREVIEW_TRANSCRIPTS,
 } from './previewFixtures';
 
+type PreviewRecord<Group> = Group[keyof Group];
+
 const seedContentResultValidator = v.object({
   clipCount: v.number(),
   collectionCount: v.number(),
@@ -134,7 +136,7 @@ async function upsertCredentialAccount(
 
 async function upsertSpeaker(
   ctx: MutationCtx,
-  speaker: (typeof PREVIEW_SPEAKERS)[number]
+  speaker: PreviewRecord<typeof PREVIEW_SPEAKERS>
 ): Promise<Id<'speakers'>> {
   const existing = await getOneFrom(
     ctx.db,
@@ -163,7 +165,7 @@ async function upsertSpeaker(
 
 async function upsertTopic(
   ctx: MutationCtx,
-  topic: (typeof PREVIEW_TOPICS)[number]
+  topic: PreviewRecord<typeof PREVIEW_TOPICS>
 ): Promise<Id<'topics'>> {
   const existing = await getOneFrom(ctx.db, 'topics', 'by_slug', topic.slug);
 
@@ -182,7 +184,7 @@ async function upsertTopic(
 
 async function upsertCollection(
   ctx: MutationCtx,
-  collection: (typeof PREVIEW_COLLECTIONS)[number]
+  collection: PreviewRecord<typeof PREVIEW_COLLECTIONS>
 ): Promise<Id<'collections'>> {
   const existing = await getOneFrom(
     ctx.db,
@@ -208,7 +210,7 @@ async function upsertTalk(
   ctx: MutationCtx,
   collectionId: Id<'collections'>,
   speakerId: Id<'speakers'>,
-  talk: (typeof PREVIEW_TALKS)[number]
+  talk: PreviewRecord<typeof PREVIEW_TALKS>
 ): Promise<Id<'talks'>> {
   const existing = await getOneFrom(ctx.db, 'talks', 'by_slug', talk.slug);
   const publishedAt =
@@ -244,7 +246,7 @@ async function upsertClip(
   ctx: MutationCtx,
   speakerId: Id<'speakers'>,
   talkId: Id<'talks'>,
-  clip: (typeof PREVIEW_CLIPS)[number]
+  clip: PreviewRecord<typeof PREVIEW_CLIPS>
 ): Promise<Id<'clips'>> {
   const existing = await getOneFrom(ctx.db, 'clips', 'by_slug', clip.slug);
   const publishedAt =
@@ -317,19 +319,19 @@ export const seedContent = internalMutation({
 
     await Promise.all([
       Promise.all(
-        PREVIEW_SPEAKERS.map(async (speaker) => {
+        Object.values(PREVIEW_SPEAKERS).map(async (speaker) => {
           const speakerId = await upsertSpeaker(ctx, speaker);
           speakerIdsBySlug.set(speaker.slug, speakerId);
         })
       ),
       Promise.all(
-        PREVIEW_TOPICS.map(async (topic) => {
+        Object.values(PREVIEW_TOPICS).map(async (topic) => {
           const topicId = await upsertTopic(ctx, topic);
           topicIdsBySlug.set(topic.slug, topicId);
         })
       ),
       Promise.all(
-        PREVIEW_COLLECTIONS.map(async (collection) => {
+        Object.values(PREVIEW_COLLECTIONS).map(async (collection) => {
           const collectionId = await upsertCollection(ctx, collection);
           collectionIdsBySlug.set(collection.slug, collectionId);
         })
@@ -337,7 +339,7 @@ export const seedContent = internalMutation({
     ]);
 
     await Promise.all(
-      PREVIEW_TALKS.map(async (talk) => {
+      Object.values(PREVIEW_TALKS).map(async (talk) => {
         const collectionId = requireSeedId(
           collectionIdsBySlug,
           'collection',
@@ -354,7 +356,7 @@ export const seedContent = internalMutation({
     );
 
     await Promise.all(
-      PREVIEW_TALKS.map(async (talk) => {
+      Object.values(PREVIEW_TALKS).map(async (talk) => {
         const talkId = requireSeedId(talkIdsBySlug, 'talk', talk.slug);
         const topicIds = talk.topicSlugs.map((topicSlug) =>
           requireSeedId(topicIdsBySlug, 'topic', topicSlug)
@@ -365,35 +367,39 @@ export const seedContent = internalMutation({
     );
 
     await Promise.all([
-      ...PREVIEW_STUDIES.map(async ({ talkSlug, ...content }) => {
-        const talkId = requireSeedId(talkIdsBySlug, 'talk', talkSlug);
-        const existing = await ctx.db
-          .query('talkStudies')
-          .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
-          .unique();
-        const fields = {
-          ...content,
-          generatedAt: existing?.generatedAt ?? Date.now(),
-          talkId,
-        };
+      ...Object.values(PREVIEW_STUDIES).map(
+        async ({ talkSlug, ...content }) => {
+          const talkId = requireSeedId(talkIdsBySlug, 'talk', talkSlug);
+          const existing = await ctx.db
+            .query('talkStudies')
+            .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
+            .unique();
+          const fields = {
+            ...content,
+            generatedAt: existing?.generatedAt ?? Date.now(),
+            talkId,
+          };
 
-        if (existing) {
-          await ctx.db.replace(existing._id, fields);
-          return;
+          if (existing) {
+            await ctx.db.replace(existing._id, fields);
+            return;
+          }
+
+          await ctx.db.insert('talkStudies', fields);
         }
-
-        await ctx.db.insert('talkStudies', fields);
-      }),
-      ...PREVIEW_TRANSCRIPTS.map(async ({ talkSlug, ...transcript }) => {
-        await ctx.runMutation(internal.talks.upsertTalkTranscript, {
-          ...transcript,
-          talkId: requireSeedId(talkIdsBySlug, 'talk', talkSlug),
-        });
-      }),
+      ),
+      ...Object.values(PREVIEW_TRANSCRIPTS).map(
+        async ({ talkSlug, ...transcript }) => {
+          await ctx.runMutation(internal.talks.upsertTalkTranscript, {
+            ...transcript,
+            talkId: requireSeedId(talkIdsBySlug, 'talk', talkSlug),
+          });
+        }
+      ),
     ]);
 
     await Promise.all(
-      PREVIEW_CLIPS.map(async (clip) => {
+      Object.values(PREVIEW_CLIPS).map(async (clip) => {
         const speakerId = requireSeedId(
           speakerIdsBySlug,
           'speaker',
@@ -406,11 +412,11 @@ export const seedContent = internalMutation({
     );
 
     return {
-      clipCount: PREVIEW_CLIPS.length,
-      collectionCount: PREVIEW_COLLECTIONS.length,
-      speakerCount: PREVIEW_SPEAKERS.length,
-      talkCount: PREVIEW_TALKS.length,
-      topicCount: PREVIEW_TOPICS.length,
+      clipCount: Object.values(PREVIEW_CLIPS).length,
+      collectionCount: Object.values(PREVIEW_COLLECTIONS).length,
+      speakerCount: Object.values(PREVIEW_SPEAKERS).length,
+      talkCount: Object.values(PREVIEW_TALKS).length,
+      topicCount: Object.values(PREVIEW_TOPICS).length,
     };
   },
   returns: seedContentResultValidator,

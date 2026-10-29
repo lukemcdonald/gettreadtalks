@@ -1,11 +1,11 @@
 import type { APIRequestContext, APIResponse } from '@playwright/test';
 
 import {
-  PREVIEW_CLIP_NO_CONDEMNATION,
-  PREVIEW_COLLECTION_THE_PSALMS,
-  PREVIEW_SPEAKER_JOHN_DOE,
-  PREVIEW_TALK_ROMANS_8,
-  PREVIEW_TOPIC_GRACE,
+  PREVIEW_CLIPS,
+  PREVIEW_COLLECTIONS,
+  PREVIEW_SPEAKERS,
+  PREVIEW_TALKS,
+  PREVIEW_TOPICS,
 } from '../convex/previewFixtures.ts';
 import { expect, talkPath, test } from './fixtures/index.ts';
 
@@ -128,19 +128,19 @@ test('MCP / Catalog tools return canonical urls', async ({ request }) => {
   expectSiteUrl(getFirstHit(talks, 'talks').url, '/talks/');
 
   const talk = await callTool(request, 'get_talk', {
-    speakerSlug: PREVIEW_TALK_ROMANS_8.speakerSlug,
-    talkSlug: PREVIEW_TALK_ROMANS_8.slug,
+    speakerSlug: PREVIEW_TALKS.ROMANS_8.speakerSlug,
+    talkSlug: PREVIEW_TALKS.ROMANS_8.slug,
   });
   const talkResult = talk.talk as { url?: string };
-  expect(talkResult.url).toBe(`${SITE}${talkPath(PREVIEW_TALK_ROMANS_8)}`);
+  expect(talkResult.url).toBe(`${SITE}${talkPath(PREVIEW_TALKS.ROMANS_8)}`);
 
   const speakers = await callTool(request, 'list_speakers', {
-    search: PREVIEW_SPEAKER_JOHN_DOE.firstName,
+    search: PREVIEW_SPEAKERS.JOHN_DOE.firstName,
   });
   expectSiteUrl(getFirstHit(speakers, 'speakers').url, '/speakers/');
 
   const topics = await callTool(request, 'list_topics', {
-    search: PREVIEW_TOPIC_GRACE.title,
+    search: PREVIEW_TOPICS.GRACE.title,
   });
   expectSiteUrl(getFirstHit(topics, 'topics').url, '/topics/');
 
@@ -149,7 +149,7 @@ test('MCP / Catalog tools return canonical urls', async ({ request }) => {
   expectSiteUrl(collectionHit.url, '/collections/');
 
   const collection = await callTool(request, 'get_collection', {
-    slug: collectionHit.slug ?? PREVIEW_COLLECTION_THE_PSALMS.slug,
+    slug: collectionHit.slug ?? PREVIEW_COLLECTIONS.THE_PSALMS.slug,
   });
   expectSiteUrl(getFirstHit(collection, 'talks').url, '/talks/');
 
@@ -158,7 +158,7 @@ test('MCP / Catalog tools return canonical urls', async ({ request }) => {
   expectSiteUrl(clipHit.url, '/clips/');
 
   const clip = await callTool(request, 'get_clip', {
-    slug: clipHit.slug ?? PREVIEW_CLIP_NO_CONDEMNATION.slug,
+    slug: clipHit.slug ?? PREVIEW_CLIPS.NO_CONDEMNATION.slug,
   });
   const clipResult = clip.clip as { url?: string };
   expectSiteUrl(clipResult.url, '/clips/');
