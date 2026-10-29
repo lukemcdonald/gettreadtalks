@@ -4,7 +4,6 @@ import type { Components } from 'react-markdown';
 import Markdown from 'react-markdown';
 
 const STUDY_MARKDOWN_ELEMENTS = [
-  'blockquote',
   'br',
   'em',
   'h1',
@@ -22,9 +21,9 @@ const STUDY_MARKDOWN_ELEMENTS = [
 ];
 
 const STUDY_HEADING_CLASS_NAME = {
-  h2: 'text-muted-foreground text-xs font-semibold tracking-wide uppercase first:pt-0 pt-6',
-  h3: 'text-base font-semibold',
-  h4: 'text-sm font-semibold',
+  h2: 'text-muted-foreground mt-6 first:mt-0 text-xs font-semibold tracking-wide uppercase',
+  h3: 'mt-3 text-base font-semibold',
+  h4: 'mt-3 text-sm font-semibold',
 } as const;
 
 function StudyHeading({
@@ -38,11 +37,6 @@ function StudyHeading({
 }
 
 const studyMarkdownComponents: Components = {
-  blockquote: ({ children }) => (
-    <blockquote className="border-border text-muted-foreground border-l-2 pl-4 text-sm leading-relaxed">
-      {children}
-    </blockquote>
-  ),
   h1: ({ children }) => <StudyHeading as="h2">{children}</StudyHeading>,
   h2: ({ children }) => <StudyHeading as="h2">{children}</StudyHeading>,
   h3: ({ children }) => <StudyHeading as="h3">{children}</StudyHeading>,
@@ -51,15 +45,17 @@ const studyMarkdownComponents: Components = {
   h6: ({ children }) => <StudyHeading as="h4">{children}</StudyHeading>,
   li: ({ children }) => <li>{children}</li>,
   ol: ({ children }) => (
-    <ol className="text-muted-foreground list-decimal space-y-1 pl-5 text-sm leading-relaxed">
+    <ol className="text-muted-foreground mt-1 list-decimal space-y-1 pl-5 text-sm leading-relaxed">
       {children}
     </ol>
   ),
   p: ({ children }) => (
-    <p className="text-muted-foreground text-sm leading-relaxed">{children}</p>
+    <p className="text-muted-foreground mt-1 text-sm leading-relaxed">
+      {children}
+    </p>
   ),
   ul: ({ children }) => (
-    <ul className="text-muted-foreground list-disc space-y-1 pl-5 text-sm leading-relaxed">
+    <ul className="text-muted-foreground mt-1 list-disc space-y-1 pl-5 text-sm leading-relaxed">
       {children}
     </ul>
   ),
@@ -73,7 +69,7 @@ export function TalkStudyContent({ body }: { body?: string | null }) {
   }
 
   return (
-    <div className="space-y-6" data-testid="talk-study-content">
+    <div data-testid="talk-study-content">
       <Markdown
         allowedElements={STUDY_MARKDOWN_ELEMENTS}
         components={studyMarkdownComponents}

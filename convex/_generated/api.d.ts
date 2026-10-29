@@ -70,6 +70,7 @@ import type * as model_mediaHealth_record from "../model/mediaHealth/record.js";
 import type * as model_mediaHealth_validators from "../model/mediaHealth/validators.js";
 import type * as model_search_constants from "../model/search/constants.js";
 import type * as model_search_index from "../model/search/index.js";
+import type * as model_search_listAll from "../model/search/listAll.js";
 import type * as model_search_queries from "../model/search/queries.js";
 import type * as model_search_utils from "../model/search/utils.js";
 import type * as model_speakers_helpers from "../model/speakers/helpers.js";
@@ -184,6 +185,7 @@ declare const fullApi: ApiFromModules<{
   "model/mediaHealth/validators": typeof model_mediaHealth_validators;
   "model/search/constants": typeof model_search_constants;
   "model/search/index": typeof model_search_index;
+  "model/search/listAll": typeof model_search_listAll;
   "model/search/queries": typeof model_search_queries;
   "model/search/utils": typeof model_search_utils;
   "model/speakers/helpers": typeof model_speakers_helpers;
