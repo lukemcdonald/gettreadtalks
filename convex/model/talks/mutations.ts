@@ -431,21 +431,38 @@ export const updateTalkStudy = mutation({
   },
   handler: async (ctx, { studyStatus, summary, talkId }) => {
     await requireAdmin(ctx);
+    await getOrThrow(ctx, 'talks', talkId);
 
-    const study =
-      (await getOneFrom(ctx.db, 'talkStudies', 'by_talkId', talkId)) ??
-      throwNotFound('Study not found', {
-        resource: 'talkStudy',
-        resourceId: talkId,
+    const existing = await getOneFrom(
+      ctx.db,
+      'talkStudies',
+      'by_talkId',
+      talkId
+    );
+    const editedAt = Date.now();
+
+    if (existing) {
+      await ctx.db.patch(existing._id, {
+        manuallyEditedAt: editedAt,
+        studyStatus,
+        summary,
       });
 
-    await ctx.db.patch(study._id, {
-      manuallyEditedAt: Date.now(),
-      studyStatus,
-      summary,
-    });
+      return existing._id;
+    }
 
-    return study._id;
+    return await ctx.db.insert('talkStudies', {
+      generatedAt: editedAt,
+      generator: 'manual',
+      manuallyEditedAt: editedAt,
+      outline: [],
+      scriptureRefs: [],
+      studyGuide: [],
+      studyStatus,
+      suggestedTopics: [],
+      summary,
+      talkId,
+    });
   },
   returns: v.id('talkStudies'),
 });

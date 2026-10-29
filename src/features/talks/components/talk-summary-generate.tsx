@@ -39,10 +39,6 @@ export function TalkSummaryGenerate({
     isPending,
   });
 
-  if (!hasTranscript) {
-    return null;
-  }
-
   function handleClick() {
     setError(null);
     setIsPending(true);
@@ -69,7 +65,7 @@ export function TalkSummaryGenerate({
     <div className="space-y-2">
       <Button
         data-testid="generate-summary"
-        disabled={isPending}
+        disabled={!hasTranscript || isPending}
         loading={isPending}
         onClick={handleClick}
         size="sm"

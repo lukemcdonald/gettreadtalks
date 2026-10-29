@@ -118,7 +118,7 @@ export function TalkTranscriptDialog({ talkId }: { talkId: TalkId }) {
           />
         }
       >
-        View transcript
+        View/edit
       </DialogTrigger>
       <TalkTranscriptDialogBody
         error={error}

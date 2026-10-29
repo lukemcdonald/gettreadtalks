@@ -28,6 +28,12 @@ import {
 import { EditTalkStudyPanel } from '@/features/talks/components/edit-talk-study-panel';
 import { EditTalkTabs } from '@/features/talks/components/edit-talk-tabs';
 import { TalkFormFields } from '@/features/talks/components/talk-form-fields';
+import {
+  TalkSummaryFields,
+  useTalkSummaryForm,
+} from '@/features/talks/components/talk-summary-fields';
+import { TalkTranscriptDialog } from '@/features/talks/components/talk-transcript-dialog';
+import { TalkTranscriptFetch } from '@/features/talks/components/talk-transcript-fetch';
 import { UrlChangeDialog } from '@/features/talks/components/url-change-dialog';
 import { talkFormSchema } from '@/features/talks/schemas/talk-form';
 import { buildTalkEditPath, getEditTalkTab } from '@/features/talks/utils';
@@ -51,9 +57,12 @@ interface PendingTalkUpdate {
 
 function useEditTalkSheet({
   closeHref,
+  saveSummary,
   statusPrefill,
   talk,
-}: Pick<EditTalkSheetProps, 'closeHref' | 'statusPrefill' | 'talk'>) {
+}: Pick<EditTalkSheetProps, 'closeHref' | 'statusPrefill' | 'talk'> & {
+  saveSummary: () => Promise<{ success: boolean }>;
+}) {
   const { handleOpenChange, handleSuccess } = useSheetRoute(closeHref);
   const [isPending, startTransition] = useTransition();
   const [pendingUpdate, setPendingUpdate] = useState<PendingTalkUpdate | null>(
@@ -72,6 +81,12 @@ function useEditTalkSheet({
 
       if (!result.success) {
         setServerErrors(form.setError, result.errors);
+        return;
+      }
+
+      const summaryResult = await saveSummary();
+
+      if (!summaryResult.success) {
         return;
       }
 
@@ -138,6 +153,7 @@ function useEditTalkTab(talkId: TalkWithTopicIds['_id']) {
   return { handleTabChange, tab };
 }
 
+// fallow-ignore-next-line complexity
 export function EditTalkSheet({
   closeHref,
   collections,
@@ -147,16 +163,21 @@ export function EditTalkSheet({
   talk,
   topics,
 }: EditTalkSheetProps) {
+  const summary = useTalkSummaryForm(talk._id);
   const {
     confirmPendingUpdate,
     form,
     handleOpenChange,
-    handleSuccess,
     handleSubmit,
     isPending,
     pendingUpdate,
     setPendingUpdate,
-  } = useEditTalkSheet({ closeHref, statusPrefill, talk });
+  } = useEditTalkSheet({
+    closeHref,
+    saveSummary: summary.save,
+    statusPrefill,
+    talk,
+  });
   const { handleTabChange, tab } = useEditTalkTab(talk._id);
 
   return (
@@ -195,15 +216,34 @@ export function EditTalkSheet({
                 </>
               }
             >
-              <FormError error={form.formState.errors.root} />
-              <TalkFormFields
-                collections={collections}
-                control={form.control}
-                mode="edit"
-                setValue={form.setValue}
-                speakers={speakers}
-                topics={topics}
-              />
+              <div className="space-y-4">
+                <FormError error={form.formState.errors.root} />
+                <FormError error={summary.form.formState.errors.root} />
+                <TalkFormFields
+                  collections={collections}
+                  control={form.control}
+                  mode="edit"
+                  setValue={form.setValue}
+                  speakers={speakers}
+                  topics={topics}
+                />
+                <TalkSummaryFields
+                  form={summary.form}
+                  hasTranscript={summary.hasTranscript}
+                  onFlagsChange={summary.handleFlagsChange}
+                  summaryFlags={summary.summaryFlags}
+                  talkId={talk._id}
+                />
+                <TalkTranscriptFetch
+                  hasTranscript={summary.hasTranscript}
+                  mediaUrl={talk.mediaUrl}
+                  talkId={talk._id}
+                >
+                  {summary.hasTranscript ? (
+                    <TalkTranscriptDialog talkId={talk._id} />
+                  ) : null}
+                </TalkTranscriptFetch>
+              </div>
             </FormSheetBody>
           </form>
         ) : (
@@ -211,11 +251,6 @@ export function EditTalkSheet({
             onClose={() => {
               handleOpenChange(false);
             }}
-            onSaved={() => {
-              handleSuccess();
-              handleOpenChange(false);
-            }}
-            talkId={talk._id}
           />
         )}
       </FormSheetShell>

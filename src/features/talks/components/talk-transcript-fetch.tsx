@@ -22,6 +22,7 @@ import {
 import { api } from '@/convex/_generated/api';
 import {
   formatTranscriptFetchFailure,
+  hasTalkTranscriptSource,
   isTranscriptFetchCoolingDown,
 } from '@/features/talks/utils';
 import { useMutation } from '@/hooks';
@@ -75,7 +76,7 @@ function RefetchTranscriptDialog({
 }
 
 // fallow-ignore-next-line complexity
-export function TalkTranscriptFetch({
+function TalkTranscriptFetchControls({
   children,
   hasTranscript,
   talkId,
@@ -146,5 +147,34 @@ export function TalkTranscriptFetch({
         open={confirmOpen}
       />
     </div>
+  );
+}
+
+export function TalkTranscriptFetch({
+  children,
+  hasTranscript,
+  mediaUrl,
+  talkId,
+}: {
+  children?: ReactNode;
+  hasTranscript: boolean;
+  mediaUrl: string;
+  talkId: TalkId;
+}) {
+  if (!hasTalkTranscriptSource(mediaUrl)) {
+    return (
+      <div className="space-y-2">
+        <p className="text-muted-foreground text-sm">
+          This talk has no transcript source for its media.
+        </p>
+        {children}
+      </div>
+    );
+  }
+
+  return (
+    <TalkTranscriptFetchControls hasTranscript={hasTranscript} talkId={talkId}>
+      {children}
+    </TalkTranscriptFetchControls>
   );
 }

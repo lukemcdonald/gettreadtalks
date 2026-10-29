@@ -123,6 +123,30 @@ describe('talk transcript and study draft storage', () => {
     expect(transcripts).toEqual([]);
   });
 
+  it('creates a study when an admin saves a typed summary', async () => {
+    const { asAdmin, talk } = await seedPublishedTalk();
+    const typedSummary = 'A typed summary for a talk without a study.';
+
+    await asAdmin.mutation(api.talks.updateTalkStudy, {
+      studyStatus: 'published',
+      summary: typedSummary,
+      talkId: talk._id,
+    });
+
+    const study = await asAdmin.query(api.talks.getTalkStudy, {
+      talkId: talk._id,
+    });
+
+    expect(study).toEqual(
+      expect.objectContaining({
+        generator: 'manual',
+        outline: [],
+        studyStatus: 'published',
+        summary: typedSummary,
+      })
+    );
+  });
+
   it('marks a study edited, publishes it, and refuses a later generated draft', async () => {
     const { asAdmin, t, talk } = await seedPublishedTalk();
 
