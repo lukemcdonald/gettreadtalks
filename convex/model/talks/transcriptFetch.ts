@@ -4,18 +4,11 @@ import { v } from 'convex/values';
 
 import { internal } from '../../_generated/api';
 import { internalAction } from '../../_generated/server';
+import { getVideoId } from '../../lib/videoUrl';
 import { TRANSCRIPT_FETCH_ERROR_CODES } from './transcriptFetchErrorCode';
 
 const YOUTUBE_TRANSCRIPT_API_URL =
   'https://www.youtube-transcript.io/api/transcripts';
-
-const YOUTUBE_HOSTS = new Set([
-  'm.youtube.com',
-  'music.youtube.com',
-  'www.youtube.com',
-  'youtu.be',
-  'youtube.com',
-]);
 
 const TRANSCRIPT_FETCH_MESSAGES = {
   LOGIN_REQUIRED: 'YouTube requires a login to view this talk.',
@@ -37,32 +30,6 @@ interface TranscriptFetchFailure {
 type TranscriptFetchResult =
   | TranscriptFetchFailure
   | { status: 'success'; text: string };
-
-function parseYouTubeVideoId(input: string): string | null {
-  try {
-    const url = new URL(input);
-    const host = url.hostname.toLowerCase();
-
-    if (!YOUTUBE_HOSTS.has(host)) {
-      return null;
-    }
-
-    let id: string | null | undefined;
-
-    if (host === 'youtu.be') {
-      id = url.pathname.split('/').find(Boolean);
-    } else if (url.pathname === '/watch') {
-      id = url.searchParams.get('v');
-    } else {
-      id = url.pathname.match(/^\/(?:live|shorts|embed|v)\/(?<id>[^/?#]+)/u)
-        ?.groups?.id;
-    }
-
-    return id || null;
-  } catch {
-    return null;
-  }
-}
 
 function getQuotaResetAt(nowMs: number) {
   const now = new Date(nowMs);
@@ -299,15 +266,15 @@ function resolveTranscriptFetch(
     );
   }
 
-  const videoId = parseYouTubeVideoId(mediaUrl);
+  const video = getVideoId(mediaUrl);
 
-  if (!videoId) {
+  if (video?.service !== 'youtube') {
     return Promise.resolve(
       toFailedResult(TRANSCRIPT_FETCH_ERROR_CODES.NOT_YOUTUBE)
     );
   }
 
-  return loadYoutubeTranscript(videoId, token);
+  return loadYoutubeTranscript(video.id, token);
 }
 
 export const fetchTalkTranscript = internalAction({

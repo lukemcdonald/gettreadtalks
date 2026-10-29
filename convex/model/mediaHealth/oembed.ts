@@ -1,17 +1,13 @@
 import type { MediaCheckStatus } from './validators';
 
+import { getVideoId } from '../../lib/videoUrl';
+
 const STATUS_BY_HTTP: Record<number, MediaCheckStatus> = {
   200: 'ok',
   401: 'private',
   403: 'private',
   404: 'missing',
 };
-
-const VIMEO_REGEX = /(?:vimeo\.com\/|player\.vimeo\.com\/video\/)(?<id>\d+)/u;
-const YOUTUBE_REGEX = [
-  /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)(?<id>[^&\n?#]+)/u,
-  /youtube\.com\/watch\?.*v=(?<id>[^&\n?#]+)/u,
-];
 
 const OEMBED_TIMEOUT_MS = 8000;
 
@@ -24,7 +20,9 @@ export function classifyOEmbedStatus(status?: number): MediaCheckStatus {
 }
 
 export function getOEmbedRequest(mediaUrl: string): URL | null {
-  if (isYouTubeUrl(mediaUrl)) {
+  const video = getVideoId(mediaUrl);
+
+  if (video?.service === 'youtube') {
     const href = new URL('https://www.youtube.com/oembed');
     href.searchParams.set('format', 'json');
     href.searchParams.set('url', mediaUrl);
@@ -32,7 +30,7 @@ export function getOEmbedRequest(mediaUrl: string): URL | null {
     return href;
   }
 
-  if (isVimeoUrl(mediaUrl)) {
+  if (video?.service === 'vimeo') {
     const href = new URL('https://vimeo.com/api/oembed.json');
     href.searchParams.set('url', mediaUrl);
 
@@ -68,12 +66,4 @@ export async function checkMediaUrl(
       status: 'unknown',
     };
   }
-}
-
-function isVimeoUrl(url: string) {
-  return VIMEO_REGEX.test(url);
-}
-
-function isYouTubeUrl(url: string) {
-  return YOUTUBE_REGEX.some((pattern) => pattern.test(url));
 }
