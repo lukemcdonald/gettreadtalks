@@ -23,9 +23,12 @@ import {
 } from '@/components/ui';
 import { api } from '@/convex/_generated/api';
 import {
+  clearCreatedTalkTranscriptFetch,
   formatTranscriptFetchFailure,
+  hasCreatedTalkTranscriptFetch,
   hasTalkTranscriptSource,
   isTranscriptFetchCoolingDown,
+  shouldAutoFetchTalkTranscript,
 } from '@/features/talks/utils';
 import { useMutation } from '@/hooks';
 
@@ -82,10 +85,12 @@ function RefetchTranscriptDialog({
 function TalkTranscriptFetchControls({
   children,
   hasTranscript,
+  mediaUrl,
   talkId,
 }: {
   children?: ReactNode;
   hasTranscript: boolean;
+  mediaUrl: string;
   talkId: TalkId;
 }) {
   const liveFetch = useQuery(api.talks.getTalkTranscriptFetch, { talkId });
@@ -114,6 +119,26 @@ function TalkTranscriptFetchControls({
     };
   }, [fetch?.retryAfter]);
 
+  useEffect(() => {
+    if (isLoading) {
+      return;
+    }
+
+    if (
+      !shouldAutoFetchTalkTranscript({
+        autoFetch: hasCreatedTalkTranscriptFetch(talkId),
+        fetch: liveFetch,
+        hasTranscript: saved,
+        mediaUrl,
+      })
+    ) {
+      return;
+    }
+
+    clearCreatedTalkTranscriptFetch(talkId);
+    mutate({ confirmRefetch: false, talkId });
+  }, [isLoading, liveFetch, mediaUrl, mutate, saved, talkId]);
+
   function handleGet() {
     mutate({ confirmRefetch: false, talkId });
   }
@@ -126,13 +151,18 @@ function TalkTranscriptFetchControls({
     <Field>
       <FieldLabel>Transcript</FieldLabel>
       <div className="flex w-full flex-wrap items-center gap-2">
-        <p aria-live="polite" className="text-muted-foreground text-sm">
+        <p
+          aria-live="polite"
+          className="text-muted-foreground text-sm"
+          data-testid="transcript-status"
+        >
           {statusText}
         </p>
         {saved ? (
           children
         ) : (
           <Button
+            data-testid="get-transcript"
             disabled={disabled}
             onClick={handleGet}
             size="sm"
@@ -181,7 +211,10 @@ export function TalkTranscriptFetch({
     return (
       <Field>
         <FieldLabel>Transcript</FieldLabel>
-        <p className="text-muted-foreground text-sm">
+        <p
+          className="text-muted-foreground text-sm"
+          data-testid="transcript-status"
+        >
           No transcript source for this media.
         </p>
       </Field>
@@ -189,7 +222,11 @@ export function TalkTranscriptFetch({
   }
 
   return (
-    <TalkTranscriptFetchControls hasTranscript={hasTranscript} talkId={talkId}>
+    <TalkTranscriptFetchControls
+      hasTranscript={hasTranscript}
+      mediaUrl={mediaUrl}
+      talkId={talkId}
+    >
       {children}
     </TalkTranscriptFetchControls>
   );

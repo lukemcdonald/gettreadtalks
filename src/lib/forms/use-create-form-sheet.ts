@@ -8,14 +8,16 @@ import { useEffect, useTransition } from 'react';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
 
 interface UseCreateFormSheetOptions<TFieldValues extends FieldValues, TResult> {
+  closeOnSuccess?: boolean;
   form: UseFormReturn<TFieldValues>;
   onOpenChange: (open: boolean) => void;
-  onSuccess: (data: TResult, values: TFieldValues) => void;
+  onSuccess: (data: TResult, values: TFieldValues) => void | Promise<void>;
   open: boolean;
   submit: (values: TFieldValues) => Promise<ActionResult<TResult>>;
 }
 
 export function useCreateFormSheet<TFieldValues extends FieldValues, TResult>({
+  closeOnSuccess = true,
   form,
   onOpenChange,
   onSuccess,
@@ -33,8 +35,11 @@ export function useCreateFormSheet<TFieldValues extends FieldValues, TResult>({
         return;
       }
 
-      onSuccess(result.data, values);
-      onOpenChange(false);
+      await onSuccess(result.data, values);
+
+      if (closeOnSuccess) {
+        onOpenChange(false);
+      }
     });
   });
 

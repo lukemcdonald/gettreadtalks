@@ -51,6 +51,7 @@ export function CreateTalkSheet({
   });
 
   const { handleSubmit, isPending } = useCreateFormSheet({
+    closeOnSuccess: false,
     form,
     onOpenChange,
     onSuccess: (data) => {
@@ -68,6 +69,7 @@ export function CreateTalkSheet({
       onSubmit={handleSubmit}
       open={open}
       submitLabel="Create Talk"
+      testId="create-talk-drawer"
       title="Add New Talk"
     >
       <TalkFormFields

@@ -1,3 +1,4 @@
+import { PREVIEW_SPEAKERS, PREVIEW_TALKS } from '../convex/previewFixtures.ts';
 import { expect, test } from './fixtures/index.ts';
 import {
   E2E_USER_SKIP_REASON,
@@ -5,6 +6,25 @@ import {
 } from './fixtures/user-credentials.ts';
 
 test.skip(!hasE2eUser(), E2E_USER_SKIP_REASON);
+
+test('Admin create talk opens the edit content tab', async ({ talksPage }) => {
+  await talksPage.gotoManageTalks();
+  await talksPage.openNewTalk();
+  await expect(talksPage.createDrawer).toBeVisible();
+
+  await talksPage.fillCreateTalk({
+    mediaUrl: PREVIEW_TALKS.ROMANS_8.mediaUrl,
+    speakerQuery: PREVIEW_SPEAKERS.JOHN_DOE.firstName,
+    title: `E2E create ${Date.now()}`,
+  });
+  await talksPage.submitCreateTalk();
+
+  await expect(talksPage.editDrawer).toBeVisible();
+  await expect(talksPage.page).toHaveURL(/\/talks\/edit\/[^/?]+/u);
+  await expect(talksPage.contentTab).toBeVisible();
+  await expect(talksPage.generateSummary).toBeVisible();
+  await expect(talksPage.getTranscript).toBeVisible();
+});
 
 test('Admin edit / Signed-in shortcut', async ({ talksPage }) => {
   await talksPage.goto();

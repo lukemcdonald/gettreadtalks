@@ -3,11 +3,15 @@ import type { Locator, Page } from '@playwright/test';
 export class TalksPage {
   readonly adminEdit: Locator;
   readonly contentTab: Locator;
+  readonly createDrawer: Locator;
   readonly editDrawer: Locator;
   readonly editSheet: Locator;
   readonly favorite: Locator;
   readonly firstTalk: Locator;
+  readonly generateSummary: Locator;
+  readonly getTranscript: Locator;
   readonly heading: Locator;
+  readonly newTalk: Locator;
   readonly page: Page;
   readonly playback: Locator;
   readonly publishDate: Locator;
@@ -20,10 +24,16 @@ export class TalksPage {
   constructor(page: Page) {
     this.page = page;
     this.adminEdit = page.getByTestId('admin-edit');
+    this.createDrawer = page.getByTestId('create-talk-drawer').filter({
+      visible: true,
+    });
     this.editDrawer = page.getByTestId('edit-talk-drawer').filter({
       visible: true,
     });
     this.contentTab = this.editDrawer.getByTestId('edit-talk-tab-content');
+    this.generateSummary = this.editDrawer.getByTestId('generate-summary');
+    this.getTranscript = this.editDrawer.getByTestId('get-transcript');
+    this.newTalk = page.getByTestId('new-talk');
     this.editSheet = page.getByRole('heading', { name: 'Edit Talk' });
     this.favorite = page.getByTestId('favorite-talk');
     this.talkCards = page.getByRole('link').and(page.getByTestId('talk-card'));
@@ -48,8 +58,29 @@ export class TalksPage {
     await this.editDrawer.getByRole('button', { name: 'Close' }).click();
   }
 
+  async fillCreateTalk({
+    mediaUrl,
+    speakerQuery,
+    title,
+  }: {
+    mediaUrl: string;
+    speakerQuery: string;
+    title: string;
+  }) {
+    await this.createDrawer.getByLabel('Title').fill(title);
+    await this.createDrawer
+      .getByPlaceholder('Search speakers...')
+      .fill(speakerQuery);
+    await this.page.getByRole('option').first().click();
+    await this.createDrawer.getByLabel('Media URL').fill(mediaUrl);
+  }
+
   async fillPublishDate(value: string) {
     await this.publishDate.fill(value);
+  }
+
+  async gotoManageTalks() {
+    await this.page.goto('/manage/talks');
   }
 
   getEditTalkId() {
@@ -94,6 +125,10 @@ export class TalksPage {
     await this.openTalkAt(0);
   }
 
+  async openNewTalk() {
+    await this.newTalk.click();
+  }
+
   async openStudyTab() {
     await this.studyTab.click();
   }
@@ -104,21 +139,19 @@ export class TalksPage {
   }
 
   async saveChanges() {
-    const saved = this.page.waitForResponse((response) => {
-      const request = response.request();
-      const isMutation =
-        request.method() === 'POST' &&
-        Boolean(request.headers()['next-action']);
-
-      return isMutation;
-    });
-
-    await this.editDrawer.getByRole('button', { name: 'Save Changes' }).click();
-    await saved;
+    await this.waitForServerAction(() =>
+      this.editDrawer.getByRole('button', { name: 'Save Changes' }).click()
+    );
   }
 
   async searchFor(query: string) {
     await this.search.fill(query);
+  }
+
+  async submitCreateTalk() {
+    await this.waitForServerAction(() =>
+      this.createDrawer.getByTestId('form-sheet-submit').click()
+    );
   }
 
   async toggleFavorite() {
@@ -133,5 +166,19 @@ export class TalksPage {
 
     await this.favorite.click();
     await revalidated;
+  }
+
+  async waitForServerAction(action: () => Promise<void>) {
+    const completed = this.page.waitForResponse((response) => {
+      const request = response.request();
+      const isMutation =
+        request.method() === 'POST' &&
+        Boolean(request.headers()['next-action']);
+
+      return isMutation;
+    });
+
+    await action();
+    await completed;
   }
 }
