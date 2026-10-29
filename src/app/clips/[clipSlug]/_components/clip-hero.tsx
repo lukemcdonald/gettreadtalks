@@ -44,7 +44,7 @@ export function ClipHero({ clip, speaker }: ClipHeroProps) {
           )}
         </header>
 
-        {!!clip.mediaUrl && (
+        {clip.mediaUrl && (
           <div className="mx-auto w-full max-w-4xl">
             <MediaEmbed
               mediaUrl={clip.mediaUrl}
