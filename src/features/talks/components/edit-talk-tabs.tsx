@@ -1,6 +1,6 @@
 'use client';
 
-import type { TalkStudy } from '@/features/talks/types';
+import type { TalkFeature } from '@/features/talks/types';
 import type { EditTalkTab } from '@/features/talks/utils';
 
 import { ManageStatusDot } from '@/components/manage-table/manage-status-badge';
@@ -8,7 +8,7 @@ import { Tabs, TabsList, TabsTab } from '@/components/ui';
 
 interface EditTalkTabsProps {
   onValueChange: (tab: EditTalkTab) => void;
-  studyStatus?: TalkStudy['studyStatus'] | null;
+  studyStatus?: TalkFeature['status'] | null;
   value: EditTalkTab;
 }
 

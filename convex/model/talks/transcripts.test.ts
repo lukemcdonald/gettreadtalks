@@ -114,12 +114,27 @@ describe('talk transcript and study draft storage', () => {
       studyDraftArgs(talk._id)
     );
 
+    await t.run(async (ctx) => {
+      await ctx.db.insert('talkFeatures', {
+        body: '## Main points\n\nA draft study.',
+        generatedAt: Date.now(),
+        kind: 'study',
+        status: 'draft',
+        talkId: talk._id,
+        updatedAt: Date.now(),
+      });
+    });
+
     await asAdmin.mutation(api.talks.destroyTalk, { talkId: talk._id });
 
     const drafts = await asAdmin.query(api.talks.listDraftTalkStudies, {});
+    const features = await t.run(
+      async (ctx) => await ctx.db.query('talkFeatures').collect()
+    );
     const transcripts = await asAdmin.query(api.talks.listTalkTranscripts, {});
 
     expect(drafts).toEqual([]);
+    expect(features).toEqual([]);
     expect(transcripts).toEqual([]);
   });
 

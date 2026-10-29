@@ -1,7 +1,7 @@
 import type { Clip } from '@/features/clips/types';
 import type { Collection } from '@/features/collections/types';
 import type { Speaker } from '@/features/speakers/types';
-import type { Talk, TalkStudy } from '@/features/talks/types';
+import type { Talk } from '@/features/talks/types';
 import type { Topic } from '@/features/topics/types';
 import type { ReactNode } from 'react';
 
@@ -14,10 +14,9 @@ import { TalkStudyContent } from '@/features/talks/components/talk-study-content
 interface TalkContentSectionsProps {
   clips: Clip[];
   collection: Collection | null;
-  keyPassages: TalkStudy['keyPassages'] | null;
-  mainPoints: TalkStudy['mainPoints'] | null;
   relatedTalks?: ReactNode;
   speaker: Speaker | null;
+  studyBody: string | null;
   summary: string | null;
   talk: Talk;
   topics: Topic[];
@@ -26,10 +25,9 @@ interface TalkContentSectionsProps {
 export function TalkContentSections({
   clips,
   collection,
-  keyPassages,
-  mainPoints,
   relatedTalks,
   speaker,
+  studyBody,
   summary,
   talk,
   topics,
@@ -37,7 +35,7 @@ export function TalkContentSections({
   return (
     <div className="grid grid-cols-1 gap-x-8 gap-y-12 lg:grid-cols-[1fr_280px]">
       <div className="order-2 space-y-8 lg:order-1 lg:space-y-16">
-        <TalkStudyContent keyPassages={keyPassages} mainPoints={mainPoints} />
+        <TalkStudyContent body={studyBody} />
 
         {collection && (
           <FeaturedGrid

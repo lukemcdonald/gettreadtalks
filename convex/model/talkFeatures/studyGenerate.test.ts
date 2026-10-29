@@ -8,22 +8,17 @@ import {
   signInAs,
   visibilitySlugs,
 } from '../../test.setup';
-import { orderKeyPassages, talkStudyGenerator } from './studyGenerate';
+import { talkStudyGenerator } from './studyGenerate';
 
-const GENERATED_MAIN_POINTS = [
-  {
-    body: 'The father runs before the speech is finished.',
-    heading: 'A father who runs',
-    references: ['Luke 15:20'],
-  },
-];
+const GENERATED_STUDY_BODY = `## Main points
 
-const GENERATED_KEY_PASSAGES = [
-  {
-    note: 'The father runs to the returning son.',
-    reference: 'Luke 15:11-32',
-  },
-];
+### A father who runs
+The father runs before the speech is finished. Luke 15:20
+
+## Key passages
+
+### Luke 15:11-32
+The father runs to the returning son.`;
 
 async function seedTalkWithTranscript() {
   const t = createConvexTest();
@@ -65,110 +60,72 @@ async function seedTalkWithTranscript() {
   };
 }
 
-describe('orderKeyPassages', () => {
-  it('moves the main text first and keeps the rest in order', () => {
-    expect(
-      orderKeyPassages(
-        [
-          {
-            note: 'The older brother stays outside.',
-            reference: 'Luke 15:25-32',
-          },
-          {
-            note: 'The father runs to the returning son.',
-            reference: 'Luke 15:11-32',
-          },
-          {
-            note: 'Grace is not a wage.',
-            reference: 'Romans 4:4-5',
-          },
-        ],
-        'Luke 15:11-32'
-      ).map((passage) => passage.reference)
-    ).toEqual(['Luke 15:11-32', 'Luke 15:25-32', 'Romans 4:4-5']);
-  });
-});
-
-describe('generateTalkStudy', () => {
+describe('generateStudy', () => {
   it('saves a draft and refuses a manually edited or published study', async () => {
     const { asAdmin, asMember, t, talkId } = await seedTalkWithTranscript();
     const previousKey = process.env.AI_GATEWAY_API_KEY;
     const previousGenerate = talkStudyGenerator.generate;
 
-    talkStudyGenerator.generate = () =>
-      Promise.resolve({
-        keyPassages: GENERATED_KEY_PASSAGES,
-        mainPoints: GENERATED_MAIN_POINTS,
-      });
+    talkStudyGenerator.generate = () => Promise.resolve(GENERATED_STUDY_BODY);
     process.env.AI_GATEWAY_API_KEY = 'test-gateway-key';
 
     try {
       await expect(
-        t.action(api.talks.generateTalkStudy, { talkId })
+        t.action(api.talkFeatures.generateStudy, { talkId })
       ).rejects.toMatchObject({
         data: {
           errorCode: ErrorCodes.AUTH_REQUIRED,
         },
       });
       await expect(
-        asMember.action(api.talks.generateTalkStudy, { talkId })
+        asMember.action(api.talkFeatures.generateStudy, { talkId })
       ).rejects.toMatchObject({
         data: {
           errorCode: ErrorCodes.FORBIDDEN,
         },
       });
 
-      const created = await asAdmin.action(api.talks.generateTalkStudy, {
+      const created = await asAdmin.action(api.talkFeatures.generateStudy, {
         talkId,
       });
 
       expect(created.status).toBe('success');
 
-      const draft = await asAdmin.query(api.talks.getTalkStudy, { talkId });
+      const draft = await asAdmin.query(api.talkFeatures.get, {
+        kind: 'study',
+        talkId,
+      });
 
       expect(draft).toEqual(
         expect.objectContaining({
-          mainPoints: [
-            {
-              body: 'The father runs before the speech is finished.',
-              heading: 'A father who runs',
-              references: ['Luke 15:20'],
-            },
-          ],
-          studyStatus: 'draft',
+          body: GENERATED_STUDY_BODY,
+          status: 'draft',
         })
       );
       expect(draft?.manuallyEditedAt).toBeUndefined();
 
-      await asAdmin.mutation(api.talks.updateTalkStudy, {
-        mainPoints: [
-          {
-            body: 'Hand-edited point body.',
-            heading: 'Hand-edited point',
-            references: ['Luke 15:20'],
-          },
-        ],
-        studyStatus: 'draft',
+      await asAdmin.mutation(api.talkFeatures.update, {
+        body: '## Main points\n\nHand-edited study.',
+        kind: 'study',
+        status: 'draft',
         talkId,
       });
 
-      const refusedManual = await asAdmin.action(api.talks.generateTalkStudy, {
+      const refusedManual = await asAdmin.action(
+        api.talkFeatures.generateStudy,
+        { talkId }
+      );
+      const manual = await asAdmin.query(api.talkFeatures.get, {
+        kind: 'study',
         talkId,
       });
-      const manual = await asAdmin.query(api.talks.getTalkStudy, { talkId });
 
       expect(refusedManual).toEqual({
         errorCode: 'ALREADY_REVIEWED',
         message: 'This study has already been reviewed.',
         status: 'failed',
       });
-      expect(manual?.mainPoints).toEqual([
-        {
-          body: 'Hand-edited point body.',
-          heading: 'Hand-edited point',
-          references: ['Luke 15:20'],
-        },
-      ]);
+      expect(manual?.body).toBe('## Main points\n\nHand-edited study.');
 
       await t.run(async (ctx) => {
         if (!manual) {
@@ -176,15 +133,16 @@ describe('generateTalkStudy', () => {
         }
 
         await ctx.db.patch(manual._id, {
-          studyStatus: 'published',
+          status: 'published',
         });
       });
 
       const refusedPublished = await asAdmin.action(
-        api.talks.generateTalkStudy,
+        api.talkFeatures.generateStudy,
         { talkId }
       );
-      const published = await asAdmin.query(api.talks.getTalkStudy, {
+      const published = await asAdmin.query(api.talkFeatures.get, {
+        kind: 'study',
         talkId,
       });
 
@@ -193,7 +151,7 @@ describe('generateTalkStudy', () => {
         message: 'This study has already been reviewed.',
         status: 'failed',
       });
-      expect(published?.mainPoints).toEqual(manual?.mainPoints);
+      expect(published?.body).toBe(manual?.body);
     } finally {
       talkStudyGenerator.generate = previousGenerate;
 

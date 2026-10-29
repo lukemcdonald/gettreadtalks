@@ -35,16 +35,8 @@ interface TalkDetailProps {
 }
 
 function TalkDetail({ speakerSlug, talkResult, talkSlug }: TalkDetailProps) {
-  const {
-    clips,
-    collection,
-    keyPassages,
-    mainPoints,
-    speaker,
-    summary,
-    talk,
-    topics,
-  } = talkResult;
+  const { clips, collection, speaker, studyBody, summary, talk, topics } =
+    talkResult;
   const segments = [
     { href: buildTalksPath(), label: 'Talks' },
     { href: buildTalkPath({ speaker, slug: talk.slug }), label: talk.title },
@@ -79,8 +71,6 @@ function TalkDetail({ speakerSlug, talkResult, talkSlug }: TalkDetailProps) {
           <TalkContentSections
             clips={clips}
             collection={collection}
-            keyPassages={keyPassages}
-            mainPoints={mainPoints}
             relatedTalks={
               <Suspense fallback={<TalkRelatedTalksSkeleton />}>
                 <TalkRelatedTalks
@@ -91,6 +81,7 @@ function TalkDetail({ speakerSlug, talkResult, talkSlug }: TalkDetailProps) {
               </Suspense>
             }
             speaker={speaker}
+            studyBody={studyBody}
             summary={summary}
             talk={talk}
             topics={topics}

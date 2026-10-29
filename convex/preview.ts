@@ -13,6 +13,7 @@ import {
   PREVIEW_COLLECTIONS,
   PREVIEW_SPEAKERS,
   PREVIEW_STUDIES,
+  PREVIEW_TALK_FEATURES,
   PREVIEW_TALKS,
   PREVIEW_TOPICS,
   PREVIEW_TRANSCRIPTS,
@@ -386,6 +387,31 @@ export const seedContent = internalMutation({
           }
 
           await ctx.db.insert('talkStudies', fields);
+        }
+      ),
+      ...Object.values(PREVIEW_TALK_FEATURES).map(
+        async ({ talkSlug, ...content }) => {
+          const talkId = requireSeedId(talkIdsBySlug, 'talk', talkSlug);
+          const existing = await ctx.db
+            .query('talkFeatures')
+            .withIndex('by_talkId_and_kind', (q) =>
+              q.eq('talkId', talkId).eq('kind', content.kind)
+            )
+            .unique();
+          const now = Date.now();
+          const fields = {
+            ...content,
+            generatedAt: existing?.generatedAt ?? now,
+            talkId,
+            updatedAt: now,
+          };
+
+          if (existing) {
+            await ctx.db.replace(existing._id, fields);
+            return;
+          }
+
+          await ctx.db.insert('talkFeatures', fields);
         }
       ),
       ...Object.values(PREVIEW_TRANSCRIPTS).map(

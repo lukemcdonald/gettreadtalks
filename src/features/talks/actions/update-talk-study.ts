@@ -11,17 +11,26 @@ import { toConvexFormErrors, toZodFormErrors } from '@/lib/forms/validation';
 import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
 
 import {
-  talkStudyContentFormSchema,
+  talkFeatureFormSchema,
   talkStudyFormSchema,
 } from '../schemas/talk-study-form';
 
-async function saveTalkStudy(
-  data: Record<string, unknown>,
+export async function updateTalkFeatureAction(
+  data: unknown,
   talkId: TalkId
 ): Promise<ActionResult<{ talkId: string }>> {
+  await requireAdminUser();
+
+  const parsed = talkFeatureFormSchema.safeParse(data);
+
+  if (!parsed.success) {
+    return { errors: toZodFormErrors(parsed.error), success: false };
+  }
+
   try {
-    await fetchAuthMutation(api.talks.updateTalkStudy, {
-      ...data,
+    await fetchAuthMutation(api.talkFeatures.update, {
+      ...parsed.data,
+      kind: 'study',
       talkId,
     });
     updateTag('talks');
@@ -43,20 +52,14 @@ export async function updateTalkStudyAction(
     return { errors: toZodFormErrors(parsed.error), success: false };
   }
 
-  return await saveTalkStudy(parsed.data, talkId);
-}
-
-export async function updateTalkStudyContentAction(
-  data: unknown,
-  talkId: TalkId
-): Promise<ActionResult<{ talkId: string }>> {
-  await requireAdminUser();
-
-  const parsed = talkStudyContentFormSchema.safeParse(data);
-
-  if (!parsed.success) {
-    return { errors: toZodFormErrors(parsed.error), success: false };
+  try {
+    await fetchAuthMutation(api.talks.updateTalkStudy, {
+      ...parsed.data,
+      talkId,
+    });
+    updateTag('talks');
+    return { data: { talkId }, success: true };
+  } catch (error) {
+    return { errors: toConvexFormErrors(error), success: false };
   }
-
-  return await saveTalkStudy(parsed.data, talkId);
 }

@@ -35,7 +35,7 @@ export function TalkStudyGenerate({
   hasTranscript: boolean;
   talkId: TalkId;
 }) {
-  const generate = useAction(api.talks.generateTalkStudy);
+  const generate = useAction(api.talkFeatures.generateStudy);
   const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
   const statusText = getStudyGenerateStatusText({

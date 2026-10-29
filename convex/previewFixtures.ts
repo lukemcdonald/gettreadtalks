@@ -110,28 +110,6 @@ export const PREVIEW_TALKS = {
 export const PREVIEW_STUDIES = {
   ROMANS_8: {
     generator: 'grok-bot',
-    keyPassages: [
-      {
-        note: 'The promise that God is at work in every circumstance for those who love him.',
-        reference: 'Romans 8:28',
-      },
-      {
-        note: 'The good in view is being conformed to the image of the Son.',
-        reference: 'Romans 8:29',
-      },
-    ],
-    mainPoints: [
-      {
-        body: 'God is not merely present in trouble. He is at work through it for those who love him.',
-        heading: 'God works in all things',
-        references: ['Romans 8:28'],
-      },
-      {
-        body: 'The good he is after is not comfort first. It is being shaped like the Son.',
-        heading: 'The good is the Son',
-        references: ['Romans 8:29'],
-      },
-    ],
     outline: [
       {
         heading: 'God works for good',
@@ -155,33 +133,6 @@ export const PREVIEW_STUDIES = {
   },
   THE_PRODIGAL_SON: {
     generator: 'grok-bot',
-    keyPassages: [
-      {
-        note: 'The father runs to the returning son before the apology is finished.',
-        reference: 'Luke 15:11-32',
-      },
-      {
-        note: 'Grace is a restored place at the table, given at cost.',
-        reference: 'Luke 15:22-24',
-      },
-    ],
-    mainPoints: [
-      {
-        body: 'The father does not wait for the son to finish a speech. He runs to meet him.',
-        heading: 'A father who runs',
-        references: ['Luke 15:20'],
-      },
-      {
-        body: 'The older brother stands outside the feast, measuring love by labor.',
-        heading: 'An older brother who stays out',
-        references: ['Luke 15:28-32'],
-      },
-      {
-        body: 'Grace here is not a thin pardon. It is a restored place at the table.',
-        heading: 'A place at the table',
-        references: ['Luke 15:22-24', 'Romans 5:8'],
-      },
-    ],
     outline: [
       {
         heading: 'A father who runs',
@@ -201,6 +152,52 @@ export const PREVIEW_STUDIES = {
     suggestedTopics: [PREVIEW_TOPICS.GRACE.slug],
     summary:
       'This talk follows the younger son home in Luke 15 and shows that the father runs to meet him before the apology is finished.\n\nGrace here is not a thin pardon. It is a restored place at the table, given at cost to the father.',
+    talkSlug: PREVIEW_TALKS.THE_PRODIGAL_SON.slug,
+  },
+};
+
+export const PREVIEW_TALK_FEATURES = {
+  ROMANS_8: {
+    body: `## Main points
+
+### God works in all things
+God is not merely present in trouble. He is at work through it for those who love him. Romans 8:28
+
+### The good is the Son
+The good he is after is not comfort first. It is being shaped like the Son. Romans 8:29
+
+## Key passages
+
+### Romans 8:28
+The promise that God is at work in every circumstance for those who love him.
+
+### Romans 8:29
+The good in view is being conformed to the image of the Son.`,
+    kind: 'study' as const,
+    status: 'draft' as const,
+    talkSlug: PREVIEW_TALKS.ROMANS_8.slug,
+  },
+  THE_PRODIGAL_SON: {
+    body: `## Main points
+
+### A father who runs
+The father does not wait for the son to finish a speech. He runs to meet him. Luke 15:20
+
+### An older brother who stays out
+The older brother stands outside the feast, measuring love by labor. Luke 15:28-32
+
+### A place at the table
+Grace here is not a thin pardon. It is a restored place at the table. Luke 15:22-24, Romans 5:8
+
+## Key passages
+
+### Luke 15:11-32
+The father runs to the returning son before the apology is finished.
+
+### Luke 15:22-24
+Grace is a restored place at the table, given at cost.`,
+    kind: 'study' as const,
+    status: 'published' as const,
     talkSlug: PREVIEW_TALKS.THE_PRODIGAL_SON.slug,
   },
 };

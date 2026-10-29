@@ -1,6 +1,5 @@
 import { mutations, queries } from './model/talks';
 
-export { generateTalkStudy } from './model/talks/studyGenerate';
 export {
   generateTalkSummary,
   loadTalkSummarySource,

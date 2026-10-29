@@ -51,27 +51,6 @@ function hasReviewedTalkStudy(
   );
 }
 
-function firstDefined<T>(primary: T | undefined, fallback: T | undefined) {
-  if (primary !== undefined) {
-    return primary;
-  }
-
-  return fallback;
-}
-
-function talkStudyOptionalContent(
-  args: {
-    keyPassages?: Doc<'talkStudies'>['keyPassages'];
-    mainPoints?: Doc<'talkStudies'>['mainPoints'];
-  },
-  existing: Doc<'talkStudies'> | null
-) {
-  return definedFields({
-    keyPassages: firstDefined(args.keyPassages, existing?.keyPassages),
-    mainPoints: firstDefined(args.mainPoints, existing?.mainPoints),
-  });
-}
-
 async function setTalkTopics(
   ctx: MutationCtx,
   talkId: Id<'talks'>,
@@ -345,25 +324,31 @@ export const destroyTalk = mutation({
       entityTable: 'talks',
     });
 
-    const [fetches, studies, talksOnTopics, transcripts] = await Promise.all([
-      ctx.db
-        .query('talkTranscriptFetches')
-        .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
-        .collect(),
-      ctx.db
-        .query('talkStudies')
-        .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
-        .collect(),
-      ctx.db
-        .query('talksOnTopics')
-        .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
-        .collect(),
-      ctx.db
-        .query('talkTranscripts')
-        .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
-        .collect(),
-    ]);
+    const [features, fetches, studies, talksOnTopics, transcripts] =
+      await Promise.all([
+        ctx.db
+          .query('talkFeatures')
+          .withIndex('by_talkId_and_kind', (q) => q.eq('talkId', talkId))
+          .collect(),
+        ctx.db
+          .query('talkTranscriptFetches')
+          .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
+          .collect(),
+        ctx.db
+          .query('talkStudies')
+          .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
+          .collect(),
+        ctx.db
+          .query('talksOnTopics')
+          .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
+          .collect(),
+        ctx.db
+          .query('talkTranscripts')
+          .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
+          .collect(),
+      ]);
 
+    await deleteAll(ctx, features);
     await deleteAll(ctx, fetches);
     await deleteAll(ctx, studies);
     await deleteAll(ctx, talksOnTopics);
@@ -440,7 +425,6 @@ export const saveTalkStudyDraft = internalMutation({
     const fields = {
       generatedAt: Date.now(),
       generator: args.generator,
-      ...talkStudyOptionalContent(args, existing),
       outline: args.outline,
       scriptureRefs: args.scriptureRefs,
       studyGuide: args.studyGuide,
@@ -463,8 +447,6 @@ export const saveTalkStudyDraft = internalMutation({
 
 export const updateTalkStudy = mutation({
   args: {
-    keyPassages: talkStudyContentFields.keyPassages,
-    mainPoints: talkStudyContentFields.mainPoints,
     studyStatus: v.optional(talkStudyStatus),
     summary: v.optional(v.string()),
     talkId: v.id('talks'),
@@ -480,8 +462,6 @@ export const updateTalkStudy = mutation({
       args.talkId
     );
     const content = definedFields({
-      keyPassages: args.keyPassages,
-      mainPoints: args.mainPoints,
       studyStatus: args.studyStatus,
       summary: args.summary,
     });

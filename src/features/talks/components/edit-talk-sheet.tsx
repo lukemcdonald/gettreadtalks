@@ -3,7 +3,7 @@
 import type { CollectionListItem } from '@/features/collections/types';
 import type { SpeakerListItem } from '@/features/speakers/types';
 import type { TalkFormData } from '@/features/talks/schemas/talk-form';
-import type { TalkStudy, TalkWithTopicIds } from '@/features/talks/types';
+import type { TalkFeature, TalkWithTopicIds } from '@/features/talks/types';
 import type { EditTalkTab } from '@/features/talks/utils';
 import type { TopicListItem } from '@/features/topics/types';
 import type { StatusPrefill } from '@/lib/entities/status-prefill';
@@ -45,7 +45,7 @@ interface EditTalkSheetProps {
   collections: CollectionListItem[];
   speakers: SpeakerListItem[];
   statusPrefill?: StatusPrefill;
-  studyStatus?: TalkStudy['studyStatus'] | null;
+  studyStatus?: TalkFeature['status'] | null;
   talk: TalkWithTopicIds;
   topics: TopicListItem[];
 }

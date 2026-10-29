@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 
 import { loadFormOptions } from '@/app/@sheet/_queries/load-form-options';
 import { EditTalkSheet } from '@/features/talks/components/edit-talk-sheet';
-import { loadTalk, loadTalkStudy } from '@/features/talks/queries/load-talk';
+import { loadTalk, loadTalkFeature } from '@/features/talks/queries/load-talk';
 import { loadTalkTopics } from '@/features/talks/queries/load-talk-topics';
 import {
   ADMIN_LIST_PATHS,
@@ -38,11 +38,11 @@ export async function EditTalkSheetPage({
     ) as Route
   );
 
-  const [talk, talkTopics, study, { collections, speakers, topics }] =
+  const [talk, talkTopics, feature, { collections, speakers, topics }] =
     await Promise.all([
       loadTalk(talkId),
       loadTalkTopics(talkId),
-      loadTalkStudy(talkId),
+      loadTalkFeature(talkId),
       loadFormOptions(),
     ]);
 
@@ -57,7 +57,7 @@ export async function EditTalkSheetPage({
       key={talk._id}
       speakers={speakers}
       statusPrefill={statusPrefill}
-      studyStatus={study?.studyStatus}
+      studyStatus={feature?.status}
       talk={{
         ...talk,
         topicIds: talkTopics.map((topic) => topic._id),
