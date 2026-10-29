@@ -5,6 +5,7 @@ import { ArchiveBackLink } from '@/components/archive-back-link';
 import { HeroTitle } from '@/components/hero';
 import { SpeakerAvatar } from '@/features/speakers/components/speaker-avatar';
 import { SpeakerMinistryLink } from '@/features/speakers/components/speaker-ministry-link';
+import { getSpeakerAvatarUrl } from '@/features/speakers/get-speaker-avatar-url';
 import { buildSpeakersPath, getSpeakerName } from '@/features/speakers/utils';
 import { cn } from '@/utils';
 
@@ -18,7 +19,7 @@ export function SpeakerHeroDetails({
   variant = 'centered',
 }: SpeakerHeroDetailsProps) {
   const speakerName = getSpeakerName(speaker);
-  const hasImage = !!speaker.imageUrl;
+  const hasImage = !!getSpeakerAvatarUrl(speaker);
   const hasMinistry = !!(speaker.ministry || speaker.websiteUrl);
   const isInline = variant === 'inline';
 

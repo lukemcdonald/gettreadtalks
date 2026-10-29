@@ -9,6 +9,7 @@ export const speakerFields = {
   description: v.optional(v.string()),
   featured: v.optional(v.boolean()),
   firstName: v.string(),
+  /** Unused for now; avatars come from public/images/speakers/{slug}.jpg */
   imageUrl: v.optional(v.string()),
   lastName: v.string(),
   ministry: v.optional(v.string()),

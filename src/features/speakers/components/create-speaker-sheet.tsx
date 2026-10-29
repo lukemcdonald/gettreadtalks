@@ -15,10 +15,7 @@ import { useCreateFormSheet } from '@/lib/forms/use-create-form-sheet';
 
 import { SpeakerFormFields } from './speaker-form-fields';
 
-type NewSpeaker = Pick<
-  Speaker,
-  '_id' | 'firstName' | 'lastName' | 'imageUrl' | 'role'
->;
+type NewSpeaker = Pick<Speaker, '_id' | 'firstName' | 'lastName' | 'role'>;
 
 interface CreateSpeakerSheetProps {
   onOpenChange: (open: boolean) => void;
@@ -35,7 +32,6 @@ export function CreateSpeakerSheet({
     defaultValues: {
       description: '',
       firstName: '',
-      imageUrl: '',
       lastName: '',
       ministry: '',
       role: '',
@@ -53,7 +49,6 @@ export function CreateSpeakerSheet({
       const newSpeaker: NewSpeaker = {
         _id: data.speakerId,
         firstName: cleaned.firstName,
-        imageUrl: cleaned.imageUrl,
         lastName: cleaned.lastName,
         role: cleaned.role,
       };

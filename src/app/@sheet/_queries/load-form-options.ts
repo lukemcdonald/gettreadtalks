@@ -35,7 +35,6 @@ export async function loadFormOptions() {
     speakers: speakersResult.page.map((item) => ({
       _id: item._id,
       firstName: item.firstName,
-      imageUrl: item.imageUrl,
       lastName: item.lastName,
       role: item.role,
     })),

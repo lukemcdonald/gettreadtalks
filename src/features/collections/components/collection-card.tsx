@@ -8,15 +8,12 @@ import { CollectionCardSpeaker } from '@/features/collections/components/collect
 import { buildCollectionPath } from '@/features/collections/utils';
 import { pluralize } from '@/utils';
 
-const EMPTY_SPEAKERS: Pick<
-  Speaker,
-  'firstName' | 'imageUrl' | 'lastName' | 'slug'
->[] = [];
+const EMPTY_SPEAKERS: Pick<Speaker, 'firstName' | 'lastName' | 'slug'>[] = [];
 
 interface CollectionCardProps {
   collection: Pick<Collection, 'description' | 'slug' | 'title'>;
   headingLevel?: 2 | 3;
-  speakers?: Pick<Speaker, 'firstName' | 'lastName' | 'imageUrl' | 'slug'>[];
+  speakers?: Pick<Speaker, 'firstName' | 'lastName' | 'slug'>[];
   talkCount?: number;
 }
 

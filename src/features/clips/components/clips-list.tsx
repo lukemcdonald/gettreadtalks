@@ -46,7 +46,6 @@ export async function ClipsList({ clips }: ClipsListProps) {
             clip.speaker
               ? {
                   firstName: clip.speaker.firstName,
-                  imageUrl: clip.speaker.imageUrl,
                   lastName: clip.speaker.lastName,
                   slug: clip.speaker.slug,
                 }

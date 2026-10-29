@@ -35,7 +35,6 @@ export function EditSpeakerSheet({
       description: speaker?.description ?? '',
       featured: speaker?.featured ?? false,
       firstName: speaker?.firstName ?? '',
-      imageUrl: speaker?.imageUrl ?? '',
       lastName: speaker?.lastName ?? '',
       ministry: speaker?.ministry ?? '',
       role: speaker?.role ?? '',

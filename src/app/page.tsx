@@ -90,7 +90,6 @@ export default async function HomePage() {
                 key={speaker._id}
                 speaker={{
                   firstName: speaker.firstName,
-                  imageUrl: speaker.imageUrl,
                   lastName: speaker.lastName,
                   role: speaker.role,
                   slug: speaker.slug,

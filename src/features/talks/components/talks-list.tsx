@@ -22,7 +22,6 @@ export function TalksList({ talks }: TalksListProps) {
             talk.speaker
               ? {
                   firstName: talk.speaker.firstName,
-                  imageUrl: talk.speaker.imageUrl,
                   lastName: talk.speaker.lastName,
                   slug: talk.speaker.slug,
                 }

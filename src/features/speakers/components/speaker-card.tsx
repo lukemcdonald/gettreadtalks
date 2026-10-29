@@ -8,7 +8,7 @@ interface SpeakerCardProps {
   headingLevel?: 2 | 3;
   speaker: Pick<
     Speaker,
-    'featured' | 'firstName' | 'lastName' | 'imageUrl' | 'role' | 'slug'
+    'featured' | 'firstName' | 'lastName' | 'role' | 'slug'
   >;
 }
 

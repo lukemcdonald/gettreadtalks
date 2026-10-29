@@ -6,5 +6,5 @@ export type SpeakerId = Id<'speakers'>;
 /** Speaker fields used in selection/dropdown UIs */
 export type SpeakerListItem = Pick<
   Speaker,
-  '_id' | 'firstName' | 'lastName' | 'imageUrl' | 'role'
+  '_id' | 'firstName' | 'lastName' | 'role'
 >;

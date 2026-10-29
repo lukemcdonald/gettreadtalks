@@ -81,13 +81,6 @@ export function SpeakerFormFields({
 
       <UrlField
         control={control}
-        label="Profile Image URL"
-        name="imageUrl"
-        placeholder="https://example.com/image.jpg"
-      />
-
-      <UrlField
-        control={control}
         label="Website URL"
         name="websiteUrl"
         placeholder="https://example.com"

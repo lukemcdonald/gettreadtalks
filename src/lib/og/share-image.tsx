@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
 import { site } from '@/configs/site';
+import { getSpeakerAvatarUrl } from '@/features/speakers/get-speaker-avatar-url';
 import { buildAbsoluteUrl } from '@/lib/entities/paths';
 import { pluralize } from '@/utils';
 
@@ -36,10 +37,10 @@ interface ShareSpeaker {
 
 interface ShareSpeakerSource {
   firstName?: string;
-  imageUrl?: string;
   lastName?: string;
   ministry?: string;
   role?: string;
+  slug?: string;
 }
 
 interface ShareImageInput {
@@ -120,7 +121,7 @@ function toShareSpeaker(
 
   return {
     detail: speaker.ministry || speaker.role,
-    imageUrl: speaker.imageUrl,
+    imageUrl: getSpeakerAvatarUrl(speaker),
     name,
   };
 }

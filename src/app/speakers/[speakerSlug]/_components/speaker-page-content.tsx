@@ -14,6 +14,7 @@ import { buildSpeakerJsonLd } from '@/app/speakers/[speakerSlug]/_components/spe
 import { SpeakerContentSkeleton } from '@/app/speakers/[speakerSlug]/_components/speaker-page-skeleton';
 import { JsonLd } from '@/components/json-ld';
 import { EditorialProfileLayout } from '@/components/layouts';
+import { getSpeakerAvatarUrl } from '@/features/speakers/get-speaker-avatar-url';
 import { loadSpeakerBySlug } from '@/features/speakers/queries/load-speaker-by-slug';
 import {
   buildSpeakerPath,
@@ -63,7 +64,7 @@ async function SpeakerHeroSection({ speakerSlug }: { speakerSlug: string }) {
       <JsonLd
         data={buildSpeakerJsonLd({
           description: speaker.description,
-          imageUrl: speaker.imageUrl,
+          imageUrl: getSpeakerAvatarUrl(speaker),
           name,
           role: speaker.role,
           speakerSlug,

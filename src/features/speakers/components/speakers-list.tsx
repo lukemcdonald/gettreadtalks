@@ -43,7 +43,6 @@ export function SpeakersList({ groups, hasActiveFilters }: SpeakersListProps) {
             speaker={{
               featured: speaker.featured,
               firstName: speaker.firstName,
-              imageUrl: speaker.imageUrl,
               lastName: speaker.lastName,
               role: speaker.role,
               slug: speaker.slug,
