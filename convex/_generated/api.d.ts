@@ -82,9 +82,9 @@ import type * as model_talkFeatures_helpers from "../model/talkFeatures/helpers.
 import type * as model_talkFeatures_index from "../model/talkFeatures/index.js";
 import type * as model_talkFeatures_mutations from "../model/talkFeatures/mutations.js";
 import type * as model_talkFeatures_queries from "../model/talkFeatures/queries.js";
-import type * as model_talkFeatures_studyGenerate from "../model/talkFeatures/studyGenerate.js";
-import type * as model_talkFeatures_studyPrompt from "../model/talkFeatures/studyPrompt.js";
-import type * as model_talkFeatures_studyTemplate from "../model/talkFeatures/studyTemplate.js";
+import type * as model_talkFeatures_study_generate from "../model/talkFeatures/study/generate.js";
+import type * as model_talkFeatures_study_prompt from "../model/talkFeatures/study/prompt.js";
+import type * as model_talkFeatures_study_template from "../model/talkFeatures/study/template.js";
 import type * as model_talkFeatures_validators from "../model/talkFeatures/validators.js";
 import type * as model_talks_enrichment from "../model/talks/enrichment.js";
 import type * as model_talks_helpers from "../model/talks/helpers.js";
@@ -197,9 +197,9 @@ declare const fullApi: ApiFromModules<{
   "model/talkFeatures/index": typeof model_talkFeatures_index;
   "model/talkFeatures/mutations": typeof model_talkFeatures_mutations;
   "model/talkFeatures/queries": typeof model_talkFeatures_queries;
-  "model/talkFeatures/studyGenerate": typeof model_talkFeatures_studyGenerate;
-  "model/talkFeatures/studyPrompt": typeof model_talkFeatures_studyPrompt;
-  "model/talkFeatures/studyTemplate": typeof model_talkFeatures_studyTemplate;
+  "model/talkFeatures/study/generate": typeof model_talkFeatures_study_generate;
+  "model/talkFeatures/study/prompt": typeof model_talkFeatures_study_prompt;
+  "model/talkFeatures/study/template": typeof model_talkFeatures_study_template;
   "model/talkFeatures/validators": typeof model_talkFeatures_validators;
   "model/talks/enrichment": typeof model_talks_enrichment;
   "model/talks/helpers": typeof model_talks_helpers;

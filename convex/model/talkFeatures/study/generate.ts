@@ -1,14 +1,14 @@
-import type { Id } from '../../_generated/dataModel';
-import type { ActionCtx } from '../../_generated/server';
-import type { TalkSummarySource } from '../talks/summaryGenerate';
+import type { Id } from '../../../_generated/dataModel';
+import type { ActionCtx } from '../../../_generated/server';
+import type { TalkSummarySource } from '../../talks/summaryGenerate';
 
 import { ConvexError, v } from 'convex/values';
 
-import { api, internal } from '../../_generated/api';
-import { action } from '../../_generated/server';
-import { TALK_SUMMARY_MODEL } from '../talks/summaryPrompt';
-import { hasReviewedTalkFeature } from './helpers';
-import { buildTalkStudyPrompt, TALK_STUDY_SYSTEM_PROMPT } from './studyPrompt';
+import { api, internal } from '../../../_generated/api';
+import { action } from '../../../_generated/server';
+import { TALK_SUMMARY_MODEL } from '../../talks/summaryPrompt';
+import { hasReviewedTalkFeature } from '../helpers';
+import { buildTalkStudyPrompt, TALK_STUDY_SYSTEM_PROMPT } from './prompt';
 
 const STUDY_GENERATE_MESSAGES = {
   ALREADY_REVIEWED: 'This study has already been reviewed.',

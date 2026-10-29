@@ -1,6 +1,6 @@
 import { mutations, queries } from './model/talkFeatures';
 
-export { generateStudy } from './model/talkFeatures/studyGenerate';
+export { generateStudy } from './model/talkFeatures/study/generate';
 
 export const { get } = queries;
 export const { saveDraft, update } = mutations;

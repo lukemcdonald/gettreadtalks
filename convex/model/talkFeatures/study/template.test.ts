@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { getMissingStudyTemplateHeadings } from './studyTemplate';
+import { getMissingStudyTemplateHeadings } from './template';
 
 describe('getMissingStudyTemplateHeadings', () => {
   it('returns only the required template headings that are missing', () => {

@@ -1,4 +1,4 @@
-import { STUDY_TEMPLATE } from './studyTemplate';
+import { STUDY_TEMPLATE } from './template';
 
 export interface TalkStudyPromptInput {
   scripture: string;

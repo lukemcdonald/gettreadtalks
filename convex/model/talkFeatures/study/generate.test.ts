@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
-import { api, internal } from '../../_generated/api';
-import { ErrorCodes } from '../../lib/errors';
+import { api, internal } from '../../../_generated/api';
+import { ErrorCodes } from '../../../lib/errors';
 import {
   createConvexTest,
   seedVisibilityCatalog,
   signInAs,
   visibilitySlugs,
-} from '../../test.setup';
-import { talkStudyGenerator } from './studyGenerate';
+} from '../../../test.setup';
+import { talkStudyGenerator } from './generate';
 
 const GENERATED_STUDY_BODY = `## Main points
 

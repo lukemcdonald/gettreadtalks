@@ -18,7 +18,7 @@ import {
   Textarea,
 } from '@/components/ui';
 import { api } from '@/convex/_generated/api';
-import { getMissingStudyTemplateHeadings } from '@/convex/model/talkFeatures/studyTemplate';
+import { getMissingStudyTemplateHeadings } from '@/convex/model/talkFeatures/study/template';
 import { updateTalkFeatureAction } from '@/features/talks/actions/update-talk-study';
 import { StudyStatusSelect } from '@/features/talks/components/study-status-select';
 import { TalkStudyContent } from '@/features/talks/components/talk-study-content';
