@@ -1,14 +1,30 @@
 import type { Locator, Page } from '@playwright/test';
 
 export class SearchPage {
+  readonly cta: Locator;
+  readonly heading: Locator;
   readonly input: Locator;
   readonly page: Page;
+  readonly pageSearch: Locator;
+  readonly viewAll: Locator;
 
   constructor(page: Page) {
     this.page = page;
+    this.cta = page.getByTestId('search-cta').filter({ visible: true });
+    this.heading = page.getByRole('heading', {
+      exact: true,
+      level: 1,
+      name: 'Search',
+    });
     this.input = page.getByRole('combobox', {
       name: 'Search talks, speakers, topics, and clips',
     });
+    this.pageSearch = page.getByRole('searchbox', { name: 'Search' });
+    this.viewAll = page.getByRole('option', { name: 'View all results' });
+  }
+
+  dropdownResult(name: string) {
+    return this.page.getByRole('option', { name });
   }
 
   async goto(query?: string) {
@@ -22,8 +38,12 @@ export class SearchPage {
   }
 
   async open() {
-    await this.page.getByTestId('search-cta').filter({ visible: true }).click();
+    await this.cta.click();
     await this.input.waitFor({ state: 'visible' });
+  }
+
+  result(name: string) {
+    return this.page.getByRole('link', { name });
   }
 
   async searchFor(query: string) {

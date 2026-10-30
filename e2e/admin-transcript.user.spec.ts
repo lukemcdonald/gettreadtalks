@@ -18,9 +18,7 @@ test('Admin can save a talk transcript', async ({ talksPage }) => {
   const savedText = `E2E transcript ${Date.now()}`;
 
   await transcript.fill(savedText);
-  await talksPage.waitForServerAction(() =>
-    talksPage.page.getByTestId('save-transcript').click()
-  );
+  await talksPage.page.getByTestId('save-transcript').click();
 
   const talkId = talksPage.getEditTalkId();
   await talksPage.page.goto(`/talks/edit/${talkId}/transcript`);

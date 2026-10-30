@@ -13,16 +13,13 @@ test('User can favorite and unfavorite a talk', async ({
   await talksPage.goto();
   await talksPage.openFirst();
 
-  const headingText = await talksPage.page
-    .getByTestId('talk-heading')
-    .textContent();
-  const title = headingText?.trim() ?? '';
-  expect(title.length).toBeGreaterThan(0);
+  const title = await talksPage.talkHeading.textContent();
+
+  if (!title) {
+    throw new Error('Expected the talk heading to have a title');
+  }
 
   const talkUrl = talksPage.page.url();
-  const favoriteCard = favoritesPage.page
-    .getByTestId('talk-card')
-    .filter({ hasText: title });
   const startedFavorited =
     (await talksPage.favorite.getAttribute('aria-pressed')) === 'true';
 
@@ -33,14 +30,14 @@ test('User can favorite and unfavorite a talk', async ({
   await expect(talksPage.favorite).toHaveAttribute('aria-pressed', 'true');
 
   await favoritesPage.goto();
-  await expect(favoriteCard).toBeVisible();
+  await expect(favoritesPage.talkNamed(title)).toBeVisible();
 
   await talksPage.page.goto(talkUrl);
   await talksPage.toggleFavorite();
   await expect(talksPage.favorite).toHaveAttribute('aria-pressed', 'false');
 
   await favoritesPage.goto();
-  await expect(favoriteCard).toHaveCount(0);
+  await expect(favoritesPage.talkNamed(title)).toHaveCount(0);
 
   if (startedFavorited) {
     await talksPage.page.goto(talkUrl);
@@ -48,6 +45,6 @@ test('User can favorite and unfavorite a talk', async ({
     await expect(talksPage.favorite).toHaveAttribute('aria-pressed', 'true');
 
     await favoritesPage.goto();
-    await expect(favoriteCard).toBeVisible();
+    await expect(favoritesPage.talkNamed(title)).toBeVisible();
   }
 });

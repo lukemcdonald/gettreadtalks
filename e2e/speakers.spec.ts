@@ -7,6 +7,8 @@ test('User can browse speakers and open one', async ({
 }) => {
   await homePage.goto();
   await homePage.exploreSpeakers.click();
+
+  await expect(speakersPage.heading).toBeVisible();
   await speakersPage.openFirst();
 
   await expect(speakersPage.page).toHaveURL(/\/speakers\/[^/]+$/u);

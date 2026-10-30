@@ -13,6 +13,7 @@ export class TalksPage {
   readonly studyPanel: Locator;
   readonly studyTab: Locator;
   readonly talkCards: Locator;
+  readonly talkHeading: Locator;
   readonly transcriptTab: Locator;
 
   constructor(page: Page) {
@@ -35,6 +36,7 @@ export class TalksPage {
     this.transcriptTab = this.editDrawer.getByTestId(
       'edit-talk-tab-transcript'
     );
+    this.talkHeading = page.getByRole('heading', { level: 1 });
   }
 
   async closeEditDrawer() {

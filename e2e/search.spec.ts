@@ -9,13 +9,11 @@ test('User can search and open full results', async ({
   await searchPage.searchFor(PREVIEW_TOPICS.GRACE.title);
 
   await expect(
-    searchPage.page.getByTestId('search-result').first()
+    searchPage.dropdownResult(PREVIEW_TOPICS.GRACE.title)
   ).toBeVisible();
 
   await searchPage.goto(PREVIEW_TOPICS.GRACE.title);
 
   await expect(searchPage.page).toHaveURL(/\/search\?search=/u);
-  await expect(
-    searchPage.page.getByTestId('search-result').first()
-  ).toBeVisible();
+  await expect(searchPage.result(PREVIEW_TOPICS.GRACE.title)).toBeVisible();
 });
