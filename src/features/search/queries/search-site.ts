@@ -4,7 +4,7 @@ import { fetchQuery } from 'convex/nextjs';
 import { cacheLife, cacheTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
-import { normalizeSearchQuery } from '@/convex/model/search/utils';
+import { normalizeSearchQuery } from '@/convex/model/search/helpers';
 import { emptySiteSearch } from '@/features/search/utils';
 
 interface SearchSiteArgs {

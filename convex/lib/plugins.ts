@@ -21,19 +21,19 @@ const RATE_LIMIT_ENDPOINTS: Record<
 > = {
   '/change-password': {
     message: 'Too many password change attempts. Please try again later.',
-    mutation: internal.model.auth.rateLimiter.checkChangePassword,
+    mutation: internal.model.auth.mutations.checkChangePassword,
   },
   '/request-password-reset': {
     message: 'Too many reset requests. Please try again later.',
-    mutation: internal.model.auth.rateLimiter.checkPasswordReset,
+    mutation: internal.model.auth.mutations.checkPasswordReset,
   },
   '/sign-in/email': {
     message: 'Too many login attempts. Please try again later.',
-    mutation: internal.model.auth.rateLimiter.checkSignIn,
+    mutation: internal.model.auth.mutations.checkSignIn,
   },
   '/sign-up/email': {
     message: 'Too many registration attempts. Please try again later.',
-    mutation: internal.model.auth.rateLimiter.checkSignUp,
+    mutation: internal.model.auth.mutations.checkSignUp,
   },
 };
 

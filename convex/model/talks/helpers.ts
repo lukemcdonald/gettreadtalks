@@ -7,8 +7,11 @@ import { asyncMap } from 'convex-helpers';
 import { getManyVia } from 'convex-helpers/server/relationships';
 
 import { enrichWithSpeaker } from '../../lib/utils';
-import { DEFAULT_SEARCH_LIMIT } from '../search/constants';
-import { searchTitleQuery, uniqueById } from '../search/utils';
+import {
+  DEFAULT_SEARCH_LIMIT,
+  searchTitleQuery,
+  uniqueById,
+} from '../search/helpers';
 import { searchPublishedSpeakers, searchSpeakers } from '../speakers/helpers';
 
 function publishedTalksQuery(ctx: QueryCtx) {

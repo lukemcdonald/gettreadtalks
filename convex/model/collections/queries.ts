@@ -10,9 +10,8 @@ import { query } from '../../_generated/server';
 import { enrichWithSpeaker } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
-import { requireAdmin } from '../auth/roles';
-import { LIST_SEARCH_LIMIT } from '../search/constants';
-import { listAllAdmin } from '../search/listAll';
+import { requireAdmin } from '../auth/helpers';
+import { LIST_SEARCH_LIMIT, listAllAdmin } from '../search/helpers';
 import { listPublishedTalksForCollection } from '../talks/helpers';
 import {
   enrichCollectionsForAdmin,

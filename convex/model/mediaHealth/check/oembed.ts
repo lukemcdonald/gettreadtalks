@@ -1,6 +1,6 @@
-import type { MediaCheckStatus } from './validators';
+import type { MediaCheckStatus } from '../validators';
 
-import { getVideoId } from '../../lib/videoUrl';
+import { getVideoId } from '../../../lib/videoUrl';
 
 const STATUS_BY_HTTP: Record<number, MediaCheckStatus> = {
   200: 'ok',

@@ -20,11 +20,11 @@ import {
   slugify,
   talkSlugExistsForSpeaker,
 } from '../../lib/utils';
-import { requireAdmin } from '../auth/roles';
+import { requireAdmin } from '../auth/helpers';
 import {
   clearMediaChecksForEntity,
   clearStaleMediaChecks,
-} from '../mediaHealth/clear';
+} from '../mediaHealth/check/clear';
 import { talkTranscriptFields } from './schema';
 import { findOrInsertPendingTalkTranscriptFetch } from './transcript/fetch';
 import { statusType, talkTranscriptFetchErrorCode } from './validators';

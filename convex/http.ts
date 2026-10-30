@@ -3,7 +3,7 @@ import { httpRouter } from 'convex/server';
 import { httpAction } from './_generated/server';
 import { authComponent, createAuth } from './auth';
 import { resend } from './emails';
-import { handleEnrichmentRequest } from './model/talks/enrichment';
+import { handleEnrichmentRequest } from './model/talks/enrichment/handler';
 
 const http = httpRouter();
 

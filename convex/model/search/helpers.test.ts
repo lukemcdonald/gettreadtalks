@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { normalizeSearchQuery, searchPhrases, uniqueById } from './utils';
+import { normalizeSearchQuery, searchPhrases, uniqueById } from './helpers';
 
 describe('normalizeSearchQuery', () => {
   it('trims and collapses whitespace', () => {

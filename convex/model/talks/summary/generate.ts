@@ -7,7 +7,7 @@ import { ConvexError, v } from 'convex/values';
 import { internal } from '../../../_generated/api';
 import { action, internalQuery } from '../../../_generated/server';
 import { getOrThrow } from '../../../lib/utils';
-import { requireAdmin } from '../../auth/roles';
+import { requireAdmin } from '../../auth/helpers';
 import { loadTranscriptForGenerate } from '../transcript/fetch';
 import {
   buildTalkSummaryPrompt,

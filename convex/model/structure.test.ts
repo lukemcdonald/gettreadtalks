@@ -24,41 +24,6 @@ const STANDARD_BASES = new Set([
   'validators',
 ]);
 
-// Legacy top-level files tracked for cleanup in a follow-up ticket; new allowlist entries need Luke's approval.
-const DOMAIN_FILE_ALLOWLIST: Record<string, Record<string, string>> = {
-  auth: {
-    'rateLimiter.ts': 'Better Auth rate limit wiring, not CRUD.',
-    'roles.ts': 'Admin role checks shared across domains.',
-    'roles.test.ts': 'Tests for roles.ts.',
-    'types.ts': 'Auth-specific TypeScript types.',
-    'utils.ts': 'Session helpers used by roles and gates.',
-  },
-  mediaHealth: {
-    'clear.test.ts': 'Tests for clear.ts.',
-    'clear.ts': 'Stale media check cleanup.',
-    'cronJob.ts': 'Scheduled media health sweep.',
-    'digest.test.ts': 'Tests for digest.ts.',
-    'digest.ts': 'Admin digest of media failures.',
-    'oembed.test.ts': 'Tests for oembed.ts.',
-    'oembed.ts': 'oEmbed probe for media URLs.',
-    'record.test.ts': 'Tests for record.ts.',
-    'record.ts': 'Persist media check results.',
-  },
-  search: {
-    'constants.ts': 'Shared search limits.',
-    'listAll.ts': 'Admin list-all search entry.',
-    'utils.test.ts': 'Tests for search utils.',
-    'utils.ts': 'Search query normalization helpers.',
-  },
-  talks: {
-    'enrichment.ts': 'HTTP handler for external bulk enrichment webhook.',
-  },
-  users: {
-    'deleteUser.test.ts': 'Tests for deleteUser flow in mutations.',
-    'utils.ts': 'User lookup helpers without a separate queries surface.',
-  },
-};
-
 function isStandardTopLevelFile(name: string) {
   if (STANDARD_TOP_LEVEL.has(name)) {
     return true;
@@ -89,7 +54,6 @@ describe('convex model domain structure', () => {
 
     for (const domain of listDomainDirectories()) {
       const domainPath = path.join(MODEL_ROOT, domain);
-      const allowlist = DOMAIN_FILE_ALLOWLIST[domain] ?? {};
 
       for (const entry of readdirSync(domainPath)) {
         const entryPath = path.join(domainPath, entry);
@@ -99,10 +63,6 @@ describe('convex model domain structure', () => {
         }
 
         if (isStandardTopLevelFile(entry)) {
-          continue;
-        }
-
-        if (entry in allowlist) {
           continue;
         }
 

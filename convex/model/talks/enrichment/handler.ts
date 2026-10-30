@@ -1,10 +1,10 @@
-import type { ActionCtx } from '../../_generated/server';
+import type { ActionCtx } from '../../../_generated/server';
 
 import { parse } from 'convex-helpers/validators';
 import { ConvexError, v } from 'convex/values';
 
-import { internal } from '../../_generated/api';
-import { talkTranscriptFields } from './schema';
+import { internal } from '../../../_generated/api';
+import { talkTranscriptFields } from '../schema';
 
 const enrichmentBody = v.object({
   summary: v.optional(

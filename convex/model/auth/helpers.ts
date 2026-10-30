@@ -1,11 +1,39 @@
 import type { MutationCtx, QueryCtx } from '../../_generated/server';
 import type { StatusType } from '../../lib/types';
-import type { AdminUser, User } from './types';
+import type { AdminUser, User } from './validators';
 
-import { throwForbidden } from '../../lib/errors';
-import { requireAuth } from './utils';
+import { authComponent } from '../../auth';
+import { throwAuthRequired, throwForbidden } from '../../lib/errors';
 
 export type UserRole = 'admin' | 'user';
+
+/**
+ * Get the current authenticated user. Returns null if not authenticated.
+ */
+export async function getCurrentUser(ctx: QueryCtx | MutationCtx) {
+  return await authComponent.safeGetAuthUser(ctx);
+}
+
+/**
+ * Get user ID from authenticated user. Throws error if not authenticated.
+ */
+export async function getUserId(ctx: QueryCtx | MutationCtx) {
+  const user = await requireAuth(ctx);
+  return user._id;
+}
+
+/**
+ * Require authentication and return the current user. Throws error if not authenticated.
+ */
+export async function requireAuth(ctx: QueryCtx | MutationCtx) {
+  const user = await getCurrentUser(ctx);
+
+  if (!user) {
+    throwAuthRequired();
+  }
+
+  return user;
+}
 
 /**
  * Check if a user has admin role.

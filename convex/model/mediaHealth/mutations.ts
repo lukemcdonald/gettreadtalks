@@ -5,8 +5,8 @@ import type { MediaCheckStatus } from './validators';
 import { v } from 'convex/values';
 
 import { internalMutation } from '../../_generated/server';
+import { decideMediaCheck } from './check/record';
 import { loadMediaCheckByEntityUrl } from './queries';
-import { decideMediaCheck } from './record';
 import { mediaCheckEntityTable, mediaCheckStatus } from './validators';
 
 export const upsertMediaCheck = internalMutation({
