@@ -26,6 +26,19 @@ const STANDARD_BASES = new Set([
   'validators',
 ]);
 
+const DOMAIN_FILE_ALLOWLIST: Record<string, Record<string, string>> = {
+  auth: {
+    'rateLimiter.ts':
+      'Registered Convex functions; moving would rename public/internal API paths.',
+  },
+  talks: {
+    'summaryGenerate.ts':
+      'Registered Convex functions; moving would rename public/internal API paths.',
+    'transcriptFetch.ts':
+      'Registered Convex functions; moving would rename public/internal API paths.',
+  },
+};
+
 function isStandardTopLevelFile(name: string) {
   if (STANDARD_TOP_LEVEL.has(name)) {
     return true;
@@ -56,6 +69,7 @@ describe('convex model domain structure', () => {
 
     for (const domain of listDomainDirectories()) {
       const domainPath = path.join(MODEL_ROOT, domain);
+      const allowlist = DOMAIN_FILE_ALLOWLIST[domain] ?? {};
 
       for (const entry of readdirSync(domainPath)) {
         const entryPath = path.join(domainPath, entry);
@@ -65,6 +79,10 @@ describe('convex model domain structure', () => {
         }
 
         if (isStandardTopLevelFile(entry)) {
+          continue;
+        }
+
+        if (entry in allowlist) {
           continue;
         }
 

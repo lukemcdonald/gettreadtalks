@@ -38,7 +38,7 @@ async function consumeMcpRateLimit(request: Request) {
   }
 
   try {
-    return await fetchMutation(api.model.auth.mutations.checkMcp, {
+    return await fetchMutation(api.model.auth.rateLimiter.checkMcp, {
       key: buildMcpRateLimitKey(request, secret),
       token,
     });

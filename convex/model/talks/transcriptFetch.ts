@@ -1,14 +1,14 @@
-import type { Id } from '../../../_generated/dataModel';
-import type { ActionCtx, MutationCtx } from '../../../_generated/server';
-import type { TranscriptFetchErrorCode } from '../validators';
+import type { Id } from '../../_generated/dataModel';
+import type { ActionCtx, MutationCtx } from '../../_generated/server';
+import type { TranscriptFetchErrorCode } from './validators';
 
 import { v } from 'convex/values';
 
-import { internal } from '../../../_generated/api';
-import { internalAction } from '../../../_generated/server';
-import { getVideoId, hasTalkTranscriptSource } from '../../../lib/videoUrl';
-import { NO_TRANSCRIPT_SOURCE_MESSAGE } from '../summary/prompt';
-import { TRANSCRIPT_FETCH_ERROR_CODES } from '../validators';
+import { internal } from '../../_generated/api';
+import { internalAction, internalMutation } from '../../_generated/server';
+import { getVideoId, hasTalkTranscriptSource } from '../../lib/videoUrl';
+import { NO_TRANSCRIPT_SOURCE_MESSAGE } from './summary/prompt';
+import { TRANSCRIPT_FETCH_ERROR_CODES } from './validators';
 
 export async function findOrInsertPendingTalkTranscriptFetch(
   ctx: MutationCtx,
@@ -347,6 +347,15 @@ export function resolveTranscriptFetch(
 
   return loadYoutubeTranscript(video.id, token);
 }
+
+export const insertPendingTalkTranscriptFetch = internalMutation({
+  args: {
+    talkId: v.id('talks'),
+  },
+  handler: async (ctx, { talkId }) =>
+    await findOrInsertPendingTalkTranscriptFetch(ctx, talkId),
+  returns: v.id('talkTranscriptFetches'),
+});
 
 export const fetchTalkTranscript = internalAction({
   args: {

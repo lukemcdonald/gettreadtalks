@@ -1,21 +1,21 @@
-import type { Doc, Id } from '../../../_generated/dataModel';
-import type { ActionCtx } from '../../../_generated/server';
+import type { Doc, Id } from '../../_generated/dataModel';
+import type { ActionCtx } from '../../_generated/server';
 
 import { getOneFrom } from 'convex-helpers/server/relationships';
 import { ConvexError, v } from 'convex/values';
 
-import { internal } from '../../../_generated/api';
-import { action, internalQuery } from '../../../_generated/server';
-import { getOrThrow } from '../../../lib/utils';
-import { requireAdmin } from '../../auth/helpers';
-import { loadTranscriptForGenerate } from '../transcript/fetch';
+import { internal } from '../../_generated/api';
+import { action, internalQuery } from '../../_generated/server';
+import { getOrThrow } from '../../lib/utils';
+import { requireAdmin } from '../auth/helpers';
 import {
   buildTalkSummaryPrompt,
   NO_TRANSCRIPT_SOURCE_MESSAGE,
   TALK_SUMMARY_MODEL,
   TALK_SUMMARY_SYSTEM_PROMPT,
   talkSummaryOutputSchema,
-} from './prompt';
+} from './summary/prompt';
+import { loadTranscriptForGenerate } from './transcriptFetch';
 
 const SUMMARY_GENERATE_MESSAGES = {
   ALREADY_REVIEWED: 'This summary has already been edited.',

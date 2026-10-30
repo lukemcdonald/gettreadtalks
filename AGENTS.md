@@ -138,7 +138,8 @@ Public reads live in `src/features/*/queries` with `'use cache'`, `cacheLife()`,
 ### File Structure
 
 - `convex/{domain}.ts` - Public API exports
-- `convex/model/{domain}/` - Standard top-level files: `schema.ts`, `validators.ts`, `types.ts`, `queries.ts`, `mutations.ts`, `helpers.ts`, `index.ts`, `test.factory.ts`, plus matching `*.test.ts`. Service domains without their own table (e.g. auth, search, mediaHealth) use only the standard files they need and feature subfolders; do not add empty files to match. Put feature code in a subfolder (e.g. `talkFeatures/study/`, `talks/summary/`, `mediaHealth/check/`); inside subfolders use the same standard names (`mutations`, `queries`, `helpers`, etc.) plus the feature's main file. Only top-level domain folders are checked by `convex/model/structure.test.ts`.
+- `convex/model/{domain}/` - Use only the standard top-level files the domain needs (`schema`, `validators`, `types`, `queries`, `mutations`, `helpers`, `index`, `test.factory`, and matching tests).
+- Put feature-specific code in a subfolder; use the same standard file names inside it where they fit.
 - `convex/model/auth/` - Authentication helpers
 - `convex/lib/` - Shared utilities
 
