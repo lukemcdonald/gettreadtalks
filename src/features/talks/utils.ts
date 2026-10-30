@@ -1,8 +1,8 @@
 import type { Speaker } from '@/features/speakers/types';
 import type { Talk, TalkId } from '@/features/talks/types';
 
-import { detectMediaType } from '@/components/media-embed/utils';
 import { site } from '@/configs/site';
+import { hasTalkTranscriptSource } from '@/convex/lib/hasTalkTranscriptSource';
 import { TRANSCRIPT_FETCH_ERROR_CODES } from '@/convex/model/talks/transcriptFetchErrorCode';
 import { buildAbsoluteUrl, buildPathQuery } from '@/lib/entities/paths';
 import {
@@ -73,9 +73,7 @@ export function clearCreatedTalkTranscriptFetch(talkId: TalkId) {
   createdTalkTranscriptFetchIds.delete(talkId);
 }
 
-export function hasTalkTranscriptSource(mediaUrl: string) {
-  return detectMediaType(mediaUrl).type === 'youtube';
-}
+export { hasTalkTranscriptSource } from '@/convex/lib/hasTalkTranscriptSource';
 
 export function shouldAutoFetchTalkTranscript({
   autoFetch,

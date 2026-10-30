@@ -1,3 +1,5 @@
+import type { Id } from '../../_generated/dataModel';
+import type { ActionCtx } from '../../_generated/server';
 import type { TranscriptFetchErrorCode } from './transcriptFetchErrorCode';
 
 import { v } from 'convex/values';
@@ -256,6 +258,53 @@ export interface TranscriptFetchFailure {
   status: 'failed';
 }
 
+export const talkTranscriptResolver = {
+  resolve: resolveTranscriptFetch,
+};
+
+function toCompleteTalkTranscriptFetchArgs(
+  result: TranscriptFetchResult,
+  runId: Id<'talkTranscriptFetches'>,
+  talkId: Id<'talks'>
+) {
+  return {
+    runId,
+    talkId,
+    ...(result.status === 'failed'
+      ? {
+          errorCode: result.errorCode,
+          message: result.message,
+          retryAfter: result.retryAfter,
+          status: 'failed' as const,
+        }
+      : {
+          status: 'success' as const,
+          text: result.text,
+        }),
+  };
+}
+
+export async function resolveAndCompleteTalkTranscriptFetch(
+  ctx: ActionCtx,
+  args: {
+    mediaUrl: string;
+    runId: Id<'talkTranscriptFetches'>;
+    talkId: Id<'talks'>;
+  }
+): Promise<TranscriptFetchResult> {
+  const result = await talkTranscriptResolver.resolve(
+    args.mediaUrl,
+    process.env.YOUTUBE_TRANSCRIPT_IO_TOKEN ?? ''
+  );
+
+  await ctx.runMutation(
+    internal.talks.completeTalkTranscriptFetch,
+    toCompleteTalkTranscriptFetchArgs(result, args.runId, args.talkId)
+  );
+
+  return result;
+}
+
 export function resolveTranscriptFetch(
   mediaUrl: string,
   token: string
@@ -284,26 +333,7 @@ export const fetchTalkTranscript = internalAction({
     talkId: v.id('talks'),
   },
   handler: async (ctx, args) => {
-    const result = await resolveTranscriptFetch(
-      args.mediaUrl,
-      process.env.YOUTUBE_TRANSCRIPT_IO_TOKEN ?? ''
-    );
-
-    await ctx.runMutation(internal.talks.completeTalkTranscriptFetch, {
-      ...(result.status === 'failed'
-        ? {
-            errorCode: result.errorCode,
-            message: result.message,
-            retryAfter: result.retryAfter,
-            status: 'failed' as const,
-          }
-        : {
-            status: 'success' as const,
-            text: result.text,
-          }),
-      runId: args.runId,
-      talkId: args.talkId,
-    });
+    await resolveAndCompleteTalkTranscriptFetch(ctx, args);
 
     return null;
   },

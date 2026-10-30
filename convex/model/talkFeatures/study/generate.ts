@@ -6,10 +6,8 @@ import { ConvexError, v } from 'convex/values';
 
 import { api, internal } from '../../../_generated/api';
 import { action } from '../../../_generated/server';
-import {
-  ensureTalkTranscriptText,
-  NO_TRANSCRIPT_SOURCE_MESSAGE,
-} from '../../talks/ensureTalkTranscript';
+import { NO_TRANSCRIPT_SOURCE_MESSAGE } from '../../../lib/hasTalkTranscriptSource';
+import { loadTranscriptForGenerate } from '../../talks/ensureTalkTranscript';
 import { TALK_SUMMARY_MODEL } from '../../talks/summaryPrompt';
 import { hasReviewedTalkFeature } from '../helpers';
 import { buildTalkStudyPrompt, TALK_STUDY_SYSTEM_PROMPT } from './prompt';
@@ -36,10 +34,13 @@ const talkStudyGenerateFailure = v.object({
 
 type TalkStudyGenerateErrorCode = keyof typeof STUDY_GENERATE_MESSAGES;
 
-function toFailedResult(errorCode: TalkStudyGenerateErrorCode) {
+function toFailedResult(
+  errorCode: TalkStudyGenerateErrorCode,
+  message?: string
+) {
   return {
     errorCode,
-    message: STUDY_GENERATE_MESSAGES[errorCode],
+    message: message ?? STUDY_GENERATE_MESSAGES[errorCode],
     status: 'failed' as const,
   };
 }
@@ -142,28 +143,20 @@ export const generateStudy = action({
       return toFailedResult('TOKEN_MISSING');
     }
 
-    const ensured = await ensureTalkTranscriptText(
+    const loaded = await loadTranscriptForGenerate(
       ctx,
       talkId,
       source.transcript,
       source.mediaUrl
     );
 
-    if (ensured.status === 'failed') {
-      if (ensured.errorCode === 'NO_TRANSCRIPT_SOURCE') {
-        return toFailedResult('NO_TRANSCRIPT_SOURCE');
-      }
-
-      return {
-        errorCode: 'UPSTREAM_ERROR' as const,
-        message: ensured.message,
-        status: 'failed' as const,
-      };
+    if ('errorCode' in loaded) {
+      return toFailedResult(loaded.errorCode, loaded.message);
     }
 
     return await saveGeneratedTalkStudy(
       ctx,
-      { ...source, transcript: ensured.text },
+      { ...source, transcript: loaded.transcript },
       talkId
     );
   },

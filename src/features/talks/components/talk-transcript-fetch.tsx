@@ -21,6 +21,7 @@ import {
   FieldLabel,
 } from '@/components/ui';
 import { api } from '@/convex/_generated/api';
+import { NO_TRANSCRIPT_SOURCE_MESSAGE } from '@/convex/lib/hasTalkTranscriptSource';
 import {
   clearCreatedTalkTranscriptFetch,
   formatTranscriptFetchFailure,
@@ -212,7 +213,7 @@ export function TalkTranscriptFetch({
           className="text-muted-foreground text-sm"
           data-testid="transcript-status"
         >
-          Add a media URL to generate.
+          {NO_TRANSCRIPT_SOURCE_MESSAGE}
         </p>
       </Field>
     );

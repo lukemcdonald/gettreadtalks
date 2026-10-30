@@ -7,7 +7,10 @@ import { useState } from 'react';
 
 import { Button, FieldDescription } from '@/components/ui';
 import { api } from '@/convex/_generated/api';
-import { formatTalkGenerateStatusText } from '@/features/talks/components/talk-generate-status';
+import {
+  getTalkGenerateIdleStatus,
+  getTalkGeneratePendingLabel,
+} from '@/features/talks/components/talk-generate-status';
 
 export function TalkSummaryGenerate({
   canGenerate,
@@ -23,14 +26,9 @@ export function TalkSummaryGenerate({
   const generate = useAction(api.talks.generateTalkSummary);
   const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
-  const statusText = formatTalkGenerateStatusText({
-    canGenerate,
-    combinedPendingLabel: 'Getting transcript and generating summary...',
-    error,
-    hasTranscript,
-    isPending,
-    pendingLabel: 'Generating summary...',
-  });
+  const statusText = isPending
+    ? getTalkGeneratePendingLabel(canGenerate, hasTranscript, 'summary')
+    : getTalkGenerateIdleStatus(canGenerate, error);
 
   function handleClick() {
     setError(null);

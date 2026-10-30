@@ -26,6 +26,7 @@ import {
   clearStaleMediaChecks,
 } from '../mediaHealth/clear';
 import { talkTranscriptFields } from './schema';
+import { findOrInsertPendingTalkTranscriptFetch } from './transcriptFetchPending';
 import { statusType, talkTranscriptFetchErrorCode } from './validators';
 
 async function setTalkTopics(
@@ -471,16 +472,6 @@ export const createTalkTranscriptFetch = mutation({
     await requireAdmin(ctx);
 
     const talk = await getOrThrow(ctx, 'talks', talkId);
-    const existingFetches = await ctx.db
-      .query('talkTranscriptFetches')
-      .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
-      .collect();
-    const pending = existingFetches.find((row) => row.status === 'pending');
-
-    if (pending) {
-      return pending._id;
-    }
-
     const existingTranscript = await getOneFrom(
       ctx.db,
       'talkTranscripts',
@@ -494,11 +485,7 @@ export const createTalkTranscriptFetch = mutation({
       );
     }
 
-    const runId = await ctx.db.insert('talkTranscriptFetches', {
-      checkedAt: Date.now(),
-      status: 'pending',
-      talkId,
-    });
+    const runId = await findOrInsertPendingTalkTranscriptFetch(ctx, talkId);
 
     await ctx.scheduler.runAfter(0, internal.talks.fetchTalkTranscript, {
       mediaUrl: talk.mediaUrl,

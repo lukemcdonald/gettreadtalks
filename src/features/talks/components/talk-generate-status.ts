@@ -1,25 +1,9 @@
-import { NO_TRANSCRIPT_SOURCE_MESSAGE } from '@/convex/model/talks/ensureTalkTranscript';
+import { NO_TRANSCRIPT_SOURCE_MESSAGE } from '@/convex/lib/hasTalkTranscriptSource';
 
-// fallow-ignore-next-line complexity
-export function formatTalkGenerateStatusText({
-  canGenerate,
-  combinedPendingLabel,
-  error,
-  hasTranscript,
-  isPending,
-  pendingLabel,
-}: {
-  canGenerate: boolean;
-  combinedPendingLabel: string;
-  error: string | null;
-  hasTranscript: boolean;
-  isPending: boolean;
-  pendingLabel: string;
-}) {
-  if (isPending) {
-    return canGenerate && !hasTranscript ? combinedPendingLabel : pendingLabel;
-  }
-
+export function getTalkGenerateIdleStatus(
+  canGenerate: boolean,
+  error: string | null
+) {
   if (error) {
     return error;
   }
@@ -29,4 +13,18 @@ export function formatTalkGenerateStatusText({
   }
 
   return null;
+}
+
+export function getTalkGeneratePendingLabel(
+  canGenerate: boolean,
+  hasTranscript: boolean,
+  kind: 'study' | 'summary'
+) {
+  const label = kind === 'summary' ? 'summary' : 'study';
+
+  if (canGenerate && !hasTranscript) {
+    return `Getting transcript and generating ${label}...`;
+  }
+
+  return `Generating ${label}...`;
 }

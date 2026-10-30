@@ -5,7 +5,7 @@ export {
   loadTalkSummarySource,
 } from './model/talks/summaryGenerate';
 export { fetchTalkTranscript } from './model/talks/transcriptFetch';
-export { saveTalkTranscriptFetchOutcome } from './model/talks/transcriptPersistence';
+export { insertPendingTalkTranscriptFetch } from './model/talks/transcriptMutations';
 
 // Queries
 export const {

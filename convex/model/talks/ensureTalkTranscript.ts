@@ -3,34 +3,75 @@ import type { ActionCtx } from '../../_generated/server';
 import type { TranscriptFetchFailure } from './transcriptFetch';
 
 import { internal } from '../../_generated/api';
-import { getVideoId } from '../../lib/videoUrl';
-import { resolveTranscriptFetch } from './transcriptFetch';
+import {
+  hasTalkTranscriptSource,
+  NO_TRANSCRIPT_SOURCE_MESSAGE,
+} from '../../lib/hasTalkTranscriptSource';
+import { resolveAndCompleteTalkTranscriptFetch } from './transcriptFetch';
 
-export const NO_TRANSCRIPT_SOURCE_MESSAGE = 'Add a media URL to generate.';
-
-export function hasTalkTranscriptSourceFromMediaUrl(mediaUrl: string) {
-  const video = getVideoId(mediaUrl);
-
-  return video?.service === 'youtube';
-}
-
-export const talkTranscriptResolver = {
-  resolve: resolveTranscriptFetch,
-};
+export {
+  hasTalkTranscriptSource,
+  NO_TRANSCRIPT_SOURCE_MESSAGE,
+} from '../../lib/hasTalkTranscriptSource';
 
 export type EnsureTalkTranscriptResult =
   | TranscriptFetchFailure
+  | {
+      errorCode: 'NO_TRANSCRIPT_SOURCE';
+      message: string;
+      status: 'failed';
+    }
   | { status: 'success'; text: string };
+
+export interface GenerateTranscriptEnsureFailure {
+  errorCode: 'NO_TRANSCRIPT_SOURCE' | 'UPSTREAM_ERROR';
+  message: string;
+}
+
+export function toGenerateTranscriptEnsureFailure(
+  ensured: Exclude<EnsureTalkTranscriptResult, { status: 'success' }>
+): GenerateTranscriptEnsureFailure {
+  if (ensured.errorCode === 'NO_TRANSCRIPT_SOURCE') {
+    return {
+      errorCode: 'NO_TRANSCRIPT_SOURCE',
+      message: NO_TRANSCRIPT_SOURCE_MESSAGE,
+    };
+  }
+
+  return {
+    errorCode: 'UPSTREAM_ERROR',
+    message: ensured.message,
+  };
+}
+
+export async function loadTranscriptForGenerate(
+  ctx: ActionCtx,
+  talkId: Id<'talks'>,
+  existingTranscript: string | null,
+  mediaUrl: string
+): Promise<{ transcript: string } | GenerateTranscriptEnsureFailure> {
+  const ensured = await ensureTalkTranscriptText(
+    ctx,
+    talkId,
+    existingTranscript,
+    mediaUrl
+  );
+
+  if (ensured.status === 'success') {
+    return {
+      transcript: ensured.text,
+    };
+  }
+
+  return toGenerateTranscriptEnsureFailure(ensured);
+}
 
 export async function ensureTalkTranscriptText(
   ctx: ActionCtx,
   talkId: Id<'talks'>,
   existingTranscript: string | null,
   mediaUrl: string
-): Promise<
-  | { errorCode: 'NO_TRANSCRIPT_SOURCE'; message: string; status: 'failed' }
-  | EnsureTalkTranscriptResult
-> {
+): Promise<EnsureTalkTranscriptResult> {
   const trimmed = existingTranscript?.trim();
 
   if (trimmed) {
@@ -40,7 +81,7 @@ export async function ensureTalkTranscriptText(
     };
   }
 
-  if (!hasTalkTranscriptSourceFromMediaUrl(mediaUrl)) {
+  if (!hasTalkTranscriptSource(mediaUrl)) {
     return {
       errorCode: 'NO_TRANSCRIPT_SOURCE',
       message: NO_TRANSCRIPT_SOURCE_MESSAGE,
@@ -48,25 +89,14 @@ export async function ensureTalkTranscriptText(
     };
   }
 
-  const result = await talkTranscriptResolver.resolve(
-    mediaUrl,
-    process.env.YOUTUBE_TRANSCRIPT_IO_TOKEN ?? ''
+  const runId = await ctx.runMutation(
+    internal.talks.insertPendingTalkTranscriptFetch,
+    { talkId }
   );
 
-  await ctx.runMutation(internal.talks.saveTalkTranscriptFetchOutcome, {
+  return await resolveAndCompleteTalkTranscriptFetch(ctx, {
+    mediaUrl,
+    runId,
     talkId,
-    ...(result.status === 'failed'
-      ? {
-          errorCode: result.errorCode,
-          message: result.message,
-          retryAfter: result.retryAfter,
-          status: 'failed' as const,
-        }
-      : {
-          status: 'success' as const,
-          text: result.text,
-        }),
   });
-
-  return result;
 }

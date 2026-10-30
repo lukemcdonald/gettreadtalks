@@ -6,12 +6,10 @@ import { ConvexError, v } from 'convex/values';
 
 import { internal } from '../../_generated/api';
 import { action, internalQuery } from '../../_generated/server';
+import { NO_TRANSCRIPT_SOURCE_MESSAGE } from '../../lib/hasTalkTranscriptSource';
 import { getOrThrow } from '../../lib/utils';
 import { requireAdmin } from '../auth/roles';
-import {
-  ensureTalkTranscriptText,
-  NO_TRANSCRIPT_SOURCE_MESSAGE,
-} from './ensureTalkTranscript';
+import { loadTranscriptForGenerate } from './ensureTalkTranscript';
 import {
   buildTalkSummaryPrompt,
   TALK_SUMMARY_MODEL,
@@ -41,10 +39,13 @@ const talkSummaryGenerateFailure = v.object({
 
 type TalkSummaryGenerateErrorCode = keyof typeof SUMMARY_GENERATE_MESSAGES;
 
-function toFailedResult(errorCode: TalkSummaryGenerateErrorCode) {
+function toFailedResult(
+  errorCode: TalkSummaryGenerateErrorCode,
+  message?: string
+) {
   return {
     errorCode,
-    message: SUMMARY_GENERATE_MESSAGES[errorCode],
+    message: message ?? SUMMARY_GENERATE_MESSAGES[errorCode],
     status: 'failed' as const,
   };
 }
@@ -71,17 +72,16 @@ export type TalkGenerateGuardError =
   | 'NO_TRANSCRIPT_SOURCE'
   | 'TOKEN_MISSING';
 
-export type TalkGenerateSourceResult =
-  | { errorCode: TalkGenerateGuardError }
-  | {
-      fetchError: { message: string };
-    }
-  | (TalkSummarySource & { transcript: string });
-
 export async function loadTalkGenerateSource(
   ctx: ActionCtx,
   talkId: Id<'talks'>
-): Promise<TalkGenerateSourceResult> {
+): Promise<
+  | (TalkSummarySource & { transcript: string })
+  | {
+      errorCode: TalkGenerateGuardError | 'UPSTREAM_ERROR';
+      message?: string;
+    }
+> {
   const source: TalkSummarySource = await ctx.runQuery(
     internal.talks.loadTalkSummarySource,
     {
@@ -97,28 +97,20 @@ export async function loadTalkGenerateSource(
     return { errorCode: 'TOKEN_MISSING' };
   }
 
-  const ensured = await ensureTalkTranscriptText(
+  const loaded = await loadTranscriptForGenerate(
     ctx,
     talkId,
     source.transcript,
     source.mediaUrl
   );
 
-  if (ensured.status === 'failed') {
-    if (ensured.errorCode === 'NO_TRANSCRIPT_SOURCE') {
-      return { errorCode: 'NO_TRANSCRIPT_SOURCE' };
-    }
-
-    return {
-      fetchError: {
-        message: ensured.message,
-      },
-    };
+  if ('errorCode' in loaded) {
+    return loaded;
   }
 
   return {
     ...source,
-    transcript: ensured.text,
+    transcript: loaded.transcript,
   };
 }
 
@@ -244,16 +236,8 @@ export const generateTalkSummary = action({
   > => {
     const source = await loadTalkGenerateSource(ctx, talkId);
 
-    if ('errorCode' in source) {
-      return toFailedResult(source.errorCode);
-    }
-
-    if ('fetchError' in source) {
-      return {
-        errorCode: 'UPSTREAM_ERROR' as const,
-        message: source.fetchError.message,
-        status: 'failed' as const,
-      };
+    if (!('transcript' in source)) {
+      return toFailedResult(source.errorCode, source.message);
     }
 
     return await saveGeneratedTalkSummary(ctx, source, talkId);
