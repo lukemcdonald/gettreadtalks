@@ -50,8 +50,8 @@ export function EditTalkTranscriptPanel({
           showLabel={false}
           talkId={talkId}
         />
-        {hasTalkTranscriptSource(mediaUrl) ? (
-          <TalkTranscriptEditor active={active} talkId={talkId} />
+        {active && hasTalkTranscriptSource(mediaUrl) ? (
+          <TalkTranscriptEditor talkId={talkId} />
         ) : null}
       </div>
     </FormSheetBody>

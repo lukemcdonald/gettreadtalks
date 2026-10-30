@@ -2,43 +2,140 @@
 
 import type { TalkId } from '@/features/talks/types';
 
-import { TalkTranscriptEditorError } from '@/features/talks/components/talk-transcript-editor-error';
-import { TalkTranscriptEditorFooter } from '@/features/talks/components/talk-transcript-editor-footer';
-import { TalkTranscriptTextarea } from '@/features/talks/components/talk-transcript-textarea';
-import { useTalkTranscriptEditor } from '@/features/talks/hooks/use-talk-transcript-editor';
+import { useQuery } from 'convex/react';
+import { useState } from 'react';
 
-function TalkTranscriptEditorLoaded({ talkId }: { talkId: TalkId }) {
-  const editor = useTalkTranscriptEditor(talkId);
+import { Button, Textarea } from '@/components/ui';
+import { api } from '@/convex/_generated/api';
+import { useMutation } from '@/hooks';
+import { formatErrorMessage } from '@/services/errors';
+
+function TranscriptEditorError({ error }: { error: Error | null }) {
+  if (!error) {
+    return null;
+  }
+
+  return (
+    <p className="text-destructive text-sm">{formatErrorMessage(error)}</p>
+  );
+}
+
+function TranscriptEditorActions({
+  draft,
+  isLoading,
+  onCancel,
+  onSave,
+  text,
+  transcriptLoaded,
+}: {
+  draft: string | undefined;
+  isLoading: boolean;
+  onCancel: () => void;
+  onSave: () => void;
+  text: string;
+  transcriptLoaded: boolean;
+}) {
+  const canSave = transcriptLoaded && text.trim().length > 0;
+
+  return (
+    <div className="flex flex-wrap gap-2">
+      <Button
+        data-testid="cancel-transcript"
+        disabled={isLoading || draft === undefined}
+        onClick={onCancel}
+        type="button"
+        variant="outline"
+      >
+        Cancel
+      </Button>
+      <Button
+        data-testid="save-transcript"
+        disabled={!canSave}
+        loading={isLoading}
+        onClick={onSave}
+        type="button"
+      >
+        Save
+      </Button>
+    </div>
+  );
+}
+
+function TalkTranscriptEditorBody({
+  draft,
+  error,
+  isLoading,
+  mutateAsync,
+  reset,
+  setDraft,
+  talkId,
+  text,
+  transcriptLoaded,
+}: {
+  draft: string | undefined;
+  error: Error | null;
+  isLoading: boolean;
+  mutateAsync: (args: { talkId: TalkId; text: string }) => Promise<unknown>;
+  reset: () => void;
+  setDraft: (value: string | undefined) => void;
+  talkId: TalkId;
+  text: string;
+  transcriptLoaded: boolean;
+}) {
+  function handleCancel() {
+    reset();
+    setDraft(undefined);
+  }
+
+  function handleSave() {
+    void mutateAsync({ talkId, text }).then(handleCancel);
+  }
 
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-2">
-      <TalkTranscriptTextarea
-        disabled={!editor.isReady || editor.isLoading}
-        onChange={editor.handleChange}
-        value={editor.text}
+      <Textarea
+        aria-label="Transcript"
+        className="grid min-h-0 min-w-0 flex-1 grid-cols-1 grid-rows-1 [&_[data-slot=textarea]]:min-h-60 [&_[data-slot=textarea]]:min-w-0"
+        data-testid="talk-transcript"
+        disabled={!transcriptLoaded || isLoading}
+        onChange={(event) => {
+          setDraft(event.target.value);
+        }}
+        value={text}
       />
-      <TalkTranscriptEditorError error={editor.error} />
-      <TalkTranscriptEditorFooter
-        canCancel={editor.canCancel}
-        canSave={editor.canSave}
-        isLoading={editor.isLoading}
-        onCancel={editor.handleCancel}
-        onSave={editor.handleSave}
+      <TranscriptEditorError error={error} />
+      <TranscriptEditorActions
+        draft={draft}
+        isLoading={isLoading}
+        onCancel={handleCancel}
+        onSave={handleSave}
+        text={text}
+        transcriptLoaded={transcriptLoaded}
       />
     </div>
   );
 }
 
-export function TalkTranscriptEditor({
-  active,
-  talkId,
-}: {
-  active: boolean;
-  talkId: TalkId;
-}) {
-  if (!active) {
-    return null;
-  }
+export function TalkTranscriptEditor({ talkId }: { talkId: TalkId }) {
+  const [draft, setDraft] = useState<string | undefined>();
+  const transcript = useQuery(api.talks.getTalkTranscriptText, { talkId });
+  const { error, isLoading, mutateAsync, reset } = useMutation(
+    api.talks.updateTalkTranscript
+  );
+  const transcriptLoaded = transcript !== undefined;
+  const text = draft ?? transcript?.text ?? '';
 
-  return <TalkTranscriptEditorLoaded talkId={talkId} />;
+  return (
+    <TalkTranscriptEditorBody
+      draft={draft}
+      error={error}
+      isLoading={isLoading}
+      mutateAsync={mutateAsync}
+      reset={reset}
+      setDraft={setDraft}
+      talkId={talkId}
+      text={text}
+      transcriptLoaded={transcriptLoaded}
+    />
+  );
 }
