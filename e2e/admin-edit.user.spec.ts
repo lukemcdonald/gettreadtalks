@@ -40,6 +40,7 @@ test('Admin create talk opens the edit content tab', async ({ talksPage }) => {
   await expect(talksPage.page).toHaveURL(/\/talks\/edit\/[^/?]+/u);
   await expect(talksPage.contentTab).toBeVisible();
   await expect(talksPage.generateSummary).toBeVisible();
+  await talksPage.openTranscriptTab();
   await expect(talksPage.getTranscript).toBeVisible();
   await saveShot(talksPage.page, 'edit-content-desktop');
 

@@ -18,6 +18,7 @@ export class TalksPage {
   readonly search: Locator;
   readonly studyPanel: Locator;
   readonly studyTab: Locator;
+  readonly transcriptTab: Locator;
   readonly talkCards: Locator;
   readonly talkHeading: Locator;
 
@@ -51,6 +52,9 @@ export class TalksPage {
     this.search = page.getByRole('searchbox', { name: 'Search' });
     this.studyPanel = this.editDrawer.getByTestId('edit-talk-study-panel');
     this.studyTab = this.editDrawer.getByTestId('edit-talk-tab-study');
+    this.transcriptTab = this.editDrawer.getByTestId(
+      'edit-talk-tab-transcript'
+    );
     this.talkHeading = page.getByRole('heading', { level: 1 });
   }
 
@@ -131,6 +135,10 @@ export class TalksPage {
 
   async openStudyTab() {
     await this.studyTab.click();
+  }
+
+  async openTranscriptTab() {
+    await this.transcriptTab.click();
   }
 
   async openTalkAt(index: number) {

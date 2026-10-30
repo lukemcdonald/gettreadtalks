@@ -95,7 +95,7 @@ function TalkTranscriptEditorBody({
     <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-2">
       <Textarea
         aria-label="Transcript"
-        className="grid min-h-0 min-w-0 flex-1 grid-cols-1 grid-rows-1 [&_[data-slot=textarea]]:min-h-60 [&_[data-slot=textarea]]:min-w-0"
+        className="grid min-h-0 min-w-0 flex-1 grid-cols-1 grid-rows-1 [&_[data-slot=textarea]]:max-h-[25rem] [&_[data-slot=textarea]]:min-h-[25rem] [&_[data-slot=textarea]]:min-w-0 [&_[data-slot=textarea]]:overflow-y-auto"
         data-testid="talk-transcript"
         disabled={!transcriptLoaded || isLoading}
         onChange={(event) => {
