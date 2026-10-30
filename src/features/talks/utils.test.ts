@@ -31,13 +31,16 @@ describe('buildTalkPath', () => {
 describe('buildTalkEditPath', () => {
   const talkId = 'talks:the-cross' as TalkId;
 
-  it('builds the content and study edit urls', () => {
+  it('builds the content, study, and transcript edit urls', () => {
     expect(buildTalkEditPath(talkId)).toBe('/talks/edit/talks:the-cross');
     expect(buildTalkEditPath(talkId, 'content')).toBe(
       '/talks/edit/talks:the-cross'
     );
     expect(buildTalkEditPath(talkId, 'study')).toBe(
       '/talks/edit/talks:the-cross/study'
+    );
+    expect(buildTalkEditPath(talkId, 'transcript')).toBe(
+      '/talks/edit/talks:the-cross/transcript'
     );
   });
 });
@@ -105,9 +108,12 @@ describe('shouldAutoFetchTalkTranscript', () => {
 });
 
 describe('getEditTalkTab', () => {
-  it('reads the study tab from the edit url', () => {
+  it('reads the edit tab from the edit url', () => {
     expect(getEditTalkTab('/talks/edit/talks:the-cross')).toBe('content');
     expect(getEditTalkTab('/talks/edit/talks:the-cross/study')).toBe('study');
+    expect(getEditTalkTab('/talks/edit/talks:the-cross/transcript')).toBe(
+      'transcript'
+    );
   });
 });
 

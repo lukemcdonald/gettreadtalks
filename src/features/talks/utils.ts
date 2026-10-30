@@ -26,7 +26,11 @@ export function buildTalkStudyPath(talkId: TalkId) {
   return `/talks/edit/${talkId}/study`;
 }
 
-export type EditTalkTab = 'content' | 'study';
+export function buildTalkTranscriptPath(talkId: TalkId) {
+  return `/talks/edit/${talkId}/transcript`;
+}
+
+export type EditTalkTab = 'content' | 'study' | 'transcript';
 
 const createdTalkTranscriptFetchIds = new Set<string>();
 
@@ -38,12 +42,20 @@ export function buildTalkEditPath(
     return buildTalkStudyPath(talkId);
   }
 
+  if (tab === 'transcript') {
+    return buildTalkTranscriptPath(talkId);
+  }
+
   return `/talks/edit/${talkId}`;
 }
 
 export function getEditTalkTab(pathname: string): EditTalkTab {
   if (pathname.endsWith('/study')) {
     return 'study';
+  }
+
+  if (pathname.endsWith('/transcript')) {
+    return 'transcript';
   }
 
   return 'content';

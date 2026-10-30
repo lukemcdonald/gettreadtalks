@@ -9,6 +9,10 @@ import { action, internalQuery } from '../../_generated/server';
 import { getOrThrow } from '../../lib/utils';
 import { requireAdmin } from '../auth/roles';
 import {
+  ensureTalkTranscriptText,
+  NO_TRANSCRIPT_SOURCE_MESSAGE,
+} from './ensureTalkTranscript';
+import {
   buildTalkSummaryPrompt,
   TALK_SUMMARY_MODEL,
   TALK_SUMMARY_SYSTEM_PROMPT,
@@ -17,14 +21,14 @@ import {
 
 const SUMMARY_GENERATE_MESSAGES = {
   ALREADY_REVIEWED: 'This summary has already been edited.',
-  NO_TRANSCRIPT: 'A transcript is required to generate a summary.',
+  NO_TRANSCRIPT_SOURCE: NO_TRANSCRIPT_SOURCE_MESSAGE,
   TOKEN_MISSING: 'Summary service is not configured.',
   UPSTREAM_ERROR: 'Summary service returned an error.',
 } as const;
 
 const talkSummaryGenerateErrorCode = v.union(
   v.literal('ALREADY_REVIEWED'),
-  v.literal('NO_TRANSCRIPT'),
+  v.literal('NO_TRANSCRIPT_SOURCE'),
   v.literal('TOKEN_MISSING'),
   v.literal('UPSTREAM_ERROR')
 );
@@ -53,6 +57,7 @@ function isConflictError(error: unknown) {
 }
 
 export interface TalkSummarySource {
+  mediaUrl: string;
   scripture: string;
   speaker: string;
   summary: string;
@@ -63,26 +68,26 @@ export interface TalkSummarySource {
 
 export type TalkGenerateGuardError =
   | 'ALREADY_REVIEWED'
-  | 'NO_TRANSCRIPT'
+  | 'NO_TRANSCRIPT_SOURCE'
   | 'TOKEN_MISSING';
+
+export type TalkGenerateSourceResult =
+  | { errorCode: TalkGenerateGuardError }
+  | {
+      fetchError: { message: string };
+    }
+  | (TalkSummarySource & { transcript: string });
 
 export async function loadTalkGenerateSource(
   ctx: ActionCtx,
   talkId: Id<'talks'>
-): Promise<
-  | { errorCode: TalkGenerateGuardError }
-  | (TalkSummarySource & { transcript: string })
-> {
+): Promise<TalkGenerateSourceResult> {
   const source: TalkSummarySource = await ctx.runQuery(
     internal.talks.loadTalkSummarySource,
     {
       talkId,
     }
   );
-
-  if (!source.transcript) {
-    return { errorCode: 'NO_TRANSCRIPT' };
-  }
 
   if (source.summaryManuallyEdited) {
     return { errorCode: 'ALREADY_REVIEWED' };
@@ -92,9 +97,28 @@ export async function loadTalkGenerateSource(
     return { errorCode: 'TOKEN_MISSING' };
   }
 
+  const ensured = await ensureTalkTranscriptText(
+    ctx,
+    talkId,
+    source.transcript,
+    source.mediaUrl
+  );
+
+  if (ensured.status === 'failed') {
+    if (ensured.errorCode === 'NO_TRANSCRIPT_SOURCE') {
+      return { errorCode: 'NO_TRANSCRIPT_SOURCE' };
+    }
+
+    return {
+      fetchError: {
+        message: ensured.message,
+      },
+    };
+  }
+
   return {
     ...source,
-    transcript: source.transcript,
+    transcript: ensured.text,
   };
 }
 
@@ -104,6 +128,7 @@ function toTalkSummarySource(
   transcript: Doc<'talkTranscripts'> | null
 ): TalkSummarySource {
   return {
+    mediaUrl: talk.mediaUrl,
     scripture: talk.scripture ?? '',
     speaker: `${speaker.firstName} ${speaker.lastName}`.trim(),
     summary: talk.summary ?? '',
@@ -132,6 +157,7 @@ export const loadTalkSummarySource = internalQuery({
     return toTalkSummarySource(speaker, talk, transcript);
   },
   returns: v.object({
+    mediaUrl: v.string(),
     scripture: v.string(),
     speaker: v.string(),
     summary: v.string(),
@@ -220,6 +246,14 @@ export const generateTalkSummary = action({
 
     if ('errorCode' in source) {
       return toFailedResult(source.errorCode);
+    }
+
+    if ('fetchError' in source) {
+      return {
+        errorCode: 'UPSTREAM_ERROR' as const,
+        message: source.fetchError.message,
+        status: 'failed' as const,
+      };
     }
 
     return await saveGeneratedTalkSummary(ctx, source, talkId);

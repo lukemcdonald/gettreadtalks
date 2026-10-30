@@ -7,32 +7,15 @@ import { useState } from 'react';
 
 import { Button } from '@/components/ui';
 import { api } from '@/convex/_generated/api';
-
-function getStudyGenerateStatusText({
-  error,
-  hasTranscript,
-  isPending,
-}: {
-  error: string | null;
-  hasTranscript: boolean;
-  isPending: boolean;
-}) {
-  if (isPending) {
-    return 'Generating study...';
-  }
-
-  if (error) {
-    return error;
-  }
-
-  return hasTranscript ? null : 'Needs a transcript';
-}
+import { formatTalkGenerateStatusText } from '@/features/talks/components/talk-generate-status';
 
 export function TalkStudyGenerate({
+  canGenerate,
   hasTranscript,
   onGenerated,
   talkId,
 }: {
+  canGenerate: boolean;
   hasTranscript: boolean;
   onGenerated?: () => void;
   talkId: TalkId;
@@ -40,10 +23,13 @@ export function TalkStudyGenerate({
   const generate = useAction(api.talkFeatures.generateStudy);
   const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
-  const statusText = getStudyGenerateStatusText({
+  const statusText = formatTalkGenerateStatusText({
+    canGenerate,
+    combinedPendingLabel: 'Getting transcript and generating study...',
     error,
     hasTranscript,
     isPending,
+    pendingLabel: 'Generating study...',
   });
 
   function handleClick() {
@@ -71,7 +57,7 @@ export function TalkStudyGenerate({
     <div className="flex flex-wrap items-center gap-2">
       <Button
         data-testid="generate-study"
-        disabled={!hasTranscript || isPending}
+        disabled={!canGenerate || isPending}
         loading={isPending}
         onClick={handleClick}
         size="sm"

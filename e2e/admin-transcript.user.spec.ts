@@ -50,15 +50,17 @@ test('Admin can view and edit a talk transcript', async ({ talksPage }) => {
   await talksPage.openAdminEdit();
   await expect(talksPage.editSheet).toBeVisible();
 
-  const viewTranscript = talksPage.page.getByTestId('view-transcript');
+  await talksPage.page.getByTestId('edit-talk-tab-transcript').click();
+  await expect(
+    talksPage.page.getByTestId('edit-talk-transcript-panel')
+  ).toBeVisible();
+
   const transcript = talksPage.page.getByTestId('talk-transcript');
   const nextText = buildTranscriptText(`E2E transcript ${Date.now()}`);
 
-  await expect(viewTranscript).toBeVisible();
+  await expect(transcript).toBeVisible();
   await saveShot(talksPage.page, 'study-sheet-desktop');
 
-  await viewTranscript.click();
-  await expect(transcript).toBeVisible();
   await expect(transcript).not.toHaveValue('');
   await transcript.fill(nextText);
   await expect(transcript).toHaveValue(nextText);
@@ -67,19 +69,13 @@ test('Admin can view and edit a talk transcript', async ({ talksPage }) => {
   await saveShot(talksPage.page, 'dialog-desktop');
 
   await talksPage.page.getByTestId('save-transcript').click();
-  await expect(transcript).toBeHidden();
-
-  await viewTranscript.click();
   await expect(transcript).toHaveValue(nextText);
   await expect(talksPage.page.getByTestId('save-transcript')).toBeInViewport();
   await saveShot(talksPage.page, 'dialog-saved-desktop');
-  await talksPage.page.keyboard.press('Escape');
-  await expect(transcript).toBeHidden();
 
   await talksPage.page.setViewportSize({ height: 844, width: 390 });
   await saveShot(talksPage.page, 'study-sheet-mobile');
 
-  await viewTranscript.click();
   await expect(transcript).toHaveValue(nextText);
   await expect(
     talksPage.page.getByTestId('cancel-transcript')

@@ -4,7 +4,6 @@ import type {
   TalkId,
   TalkTranscriptFetch as TranscriptFetch,
 } from '@/features/talks/types';
-import type { ReactNode } from 'react';
 
 import { useQuery } from 'convex/react';
 import { useEffect, useState } from 'react';
@@ -83,14 +82,14 @@ function RefetchTranscriptDialog({
 
 // fallow-ignore-next-line complexity
 function TalkTranscriptFetchControls({
-  children,
   hasTranscript,
   mediaUrl,
+  showLabel,
   talkId,
 }: {
-  children?: ReactNode;
   hasTranscript: boolean;
   mediaUrl: string;
+  showLabel: boolean;
   talkId: TalkId;
 }) {
   const liveFetch = useQuery(api.talks.getTalkTranscriptFetch, { talkId });
@@ -149,7 +148,7 @@ function TalkTranscriptFetchControls({
 
   return (
     <Field>
-      <FieldLabel>Transcript</FieldLabel>
+      {showLabel ? <FieldLabel>Transcript</FieldLabel> : null}
       <div className="flex w-full flex-wrap items-center gap-2">
         <p
           aria-live="polite"
@@ -158,9 +157,7 @@ function TalkTranscriptFetchControls({
         >
           {statusText}
         </p>
-        {saved ? (
-          children
-        ) : (
+        {saved ? null : (
           <Button
             data-testid="get-transcript"
             disabled={disabled}
@@ -197,25 +194,25 @@ function TalkTranscriptFetchControls({
 }
 
 export function TalkTranscriptFetch({
-  children,
   hasTranscript,
   mediaUrl,
+  showLabel = true,
   talkId,
 }: {
-  children?: ReactNode;
   hasTranscript: boolean;
   mediaUrl: string;
+  showLabel?: boolean;
   talkId: TalkId;
 }) {
   if (!hasTalkTranscriptSource(mediaUrl)) {
     return (
       <Field>
-        <FieldLabel>Transcript</FieldLabel>
+        {showLabel ? <FieldLabel>Transcript</FieldLabel> : null}
         <p
           className="text-muted-foreground text-sm"
           data-testid="transcript-status"
         >
-          No transcript source for this media.
+          Add a media URL to generate.
         </p>
       </Field>
     );
@@ -225,9 +222,8 @@ export function TalkTranscriptFetch({
     <TalkTranscriptFetchControls
       hasTranscript={hasTranscript}
       mediaUrl={mediaUrl}
+      showLabel={showLabel}
       talkId={talkId}
-    >
-      {children}
-    </TalkTranscriptFetchControls>
+    />
   );
 }

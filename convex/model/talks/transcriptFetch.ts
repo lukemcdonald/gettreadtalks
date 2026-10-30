@@ -20,13 +20,6 @@ const TRANSCRIPT_FETCH_MESSAGES = {
   TOKEN_MISSING: 'Transcript service is not configured.',
 } as const;
 
-interface TranscriptFetchFailure {
-  errorCode: TranscriptFetchErrorCode;
-  message: string;
-  retryAfter?: number;
-  status: 'failed';
-}
-
 type TranscriptFetchResult =
   | TranscriptFetchFailure
   | { status: 'success'; text: string };
@@ -256,7 +249,14 @@ function toFailedResult(
   };
 }
 
-function resolveTranscriptFetch(
+export interface TranscriptFetchFailure {
+  errorCode: TranscriptFetchErrorCode;
+  message: string;
+  retryAfter?: number;
+  status: 'failed';
+}
+
+export function resolveTranscriptFetch(
   mediaUrl: string,
   token: string
 ): Promise<TranscriptFetchResult> {

@@ -71,6 +71,7 @@ function getStudyTemplateWarning(body: string) {
 }
 
 function TalkStudyToolbar({
+  canGenerate,
   control,
   hasTranscript,
   isEditing,
@@ -78,6 +79,7 @@ function TalkStudyToolbar({
   onToggleEditing,
   talkId,
 }: {
+  canGenerate: boolean;
   control: Control<TalkFeatureFormData>;
   hasTranscript: boolean;
   isEditing: boolean;
@@ -88,6 +90,7 @@ function TalkStudyToolbar({
   return (
     <div className="flex w-full flex-wrap items-center gap-2">
       <TalkStudyGenerate
+        canGenerate={canGenerate}
         hasTranscript={hasTranscript}
         onGenerated={onGenerated}
         talkId={talkId}
@@ -205,12 +208,14 @@ function useTalkStudyPanelForm({
 }
 
 export function EditTalkStudyPanel({
+  canGenerate,
   feature: initialFeature,
   hasTranscript,
   onClose,
   onSuccess,
   talkId,
 }: {
+  canGenerate: boolean;
   feature?: TalkFeature | null;
   hasTranscript: boolean;
   onClose: () => void;
@@ -248,6 +253,7 @@ export function EditTalkStudyPanel({
         >
           <FormError error={form.formState.errors.root} />
           <TalkStudyToolbar
+            canGenerate={canGenerate}
             control={form.control}
             hasTranscript={hasTranscript}
             isEditing={isEditing}
