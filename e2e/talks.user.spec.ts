@@ -6,50 +6,48 @@ import {
 
 test.skip(!hasE2eUser(), E2E_USER_SKIP_REASON);
 
-test('Talks / Favorite and unfavorite', async ({
+test('User can favorite and unfavorite a talk', async ({
   favoritesPage,
   talksPage,
 }) => {
   await talksPage.goto();
   await talksPage.openFirst();
 
-  await expect(talksPage.favorite).toBeVisible();
-  await expect(talksPage.favorite).toBeEnabled();
-
-  const title = await talksPage.talkHeading.textContent();
-
-  if (!title) {
-    throw new Error('Expected the talk heading to have a title');
-  }
+  const headingText = await talksPage.page
+    .getByTestId('talk-heading')
+    .textContent();
+  const title = headingText?.trim() ?? '';
+  expect(title.length).toBeGreaterThan(0);
 
   const talkUrl = talksPage.page.url();
-  const startedPressed =
+  const favoriteCard = favoritesPage.page
+    .getByTestId('talk-card')
+    .filter({ hasText: title });
+  const startedFavorited =
     (await talksPage.favorite.getAttribute('aria-pressed')) === 'true';
 
-  if (!startedPressed) {
+  if (!startedFavorited) {
     await talksPage.toggleFavorite();
   }
 
   await expect(talksPage.favorite).toHaveAttribute('aria-pressed', 'true');
 
   await favoritesPage.goto();
-  await expect(favoritesPage.talkNamed(title)).toBeVisible();
+  await expect(favoriteCard).toBeVisible();
 
   await talksPage.page.goto(talkUrl);
-  await expect(talksPage.favorite).toBeVisible();
   await talksPage.toggleFavorite();
   await expect(talksPage.favorite).toHaveAttribute('aria-pressed', 'false');
 
   await favoritesPage.goto();
-  await expect(favoritesPage.talkNamed(title)).toHaveCount(0);
+  await expect(favoriteCard).toHaveCount(0);
 
-  if (startedPressed) {
+  if (startedFavorited) {
     await talksPage.page.goto(talkUrl);
-    await expect(talksPage.favorite).toBeVisible();
     await talksPage.toggleFavorite();
     await expect(talksPage.favorite).toHaveAttribute('aria-pressed', 'true');
 
     await favoritesPage.goto();
-    await expect(favoritesPage.talkNamed(title)).toBeVisible();
+    await expect(favoriteCard).toBeVisible();
   }
 });

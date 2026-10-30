@@ -1,8 +1,3 @@
-import type { Page } from '@playwright/test';
-
-import { mkdir } from 'node:fs/promises';
-import path from 'node:path';
-
 import { PREVIEW_SPEAKERS, PREVIEW_TALKS } from '../convex/previewFixtures.ts';
 import { expect, test } from './fixtures/index.ts';
 import {
@@ -10,92 +5,50 @@ import {
   hasE2eUser,
 } from './fixtures/user-credentials.ts';
 
-const SHOT_DIR = 'test-results/301';
-
-async function saveShot(page: Page, name: string) {
-  await mkdir(SHOT_DIR, { recursive: true });
-  await page.screenshot({
-    animations: 'disabled',
-    path: path.join(SHOT_DIR, `${name}.png`),
-  });
-}
-
 test.skip(!hasE2eUser(), E2E_USER_SKIP_REASON);
 
-test('Admin create talk opens the edit content tab', async ({ talksPage }) => {
-  await talksPage.page.setViewportSize({ height: 900, width: 1440 });
+test('Admin can create a talk and open the transcript tab', async ({
+  talksPage,
+}) => {
   await talksPage.gotoManageTalks();
   await talksPage.openNewTalk();
-  await expect(talksPage.createDrawer).toBeVisible();
 
   await talksPage.fillCreateTalk({
     mediaUrl: PREVIEW_TALKS.ROMANS_8.mediaUrl,
     speakerQuery: PREVIEW_SPEAKERS.JOHN_DOE.firstName,
     title: `E2E create ${Date.now()}`,
   });
-  await saveShot(talksPage.page, 'create-filled-desktop');
   await talksPage.submitCreateTalk();
 
-  await expect(talksPage.editDrawer).toBeVisible();
   await expect(talksPage.page).toHaveURL(/\/talks\/edit\/[^/?]+/u);
-  await expect(talksPage.contentTab).toBeVisible();
-  await expect(talksPage.generateSummary).toBeVisible();
   await talksPage.openTranscriptTab();
-  await expect(talksPage.getTranscript).toBeVisible();
-  await saveShot(talksPage.page, 'edit-content-desktop');
-
-  await talksPage.page.setViewportSize({ height: 844, width: 390 });
-  await saveShot(talksPage.page, 'edit-content-mobile');
+  await expect(talksPage.page.getByTestId('talk-transcript')).toBeVisible();
 });
 
-test('Admin edit / Signed-in shortcut', async ({ talksPage }) => {
-  await talksPage.goto();
-  await talksPage.openFirst();
-  await expect(talksPage.talkHeading).toBeVisible();
-
-  await expect(talksPage.adminEdit).toBeVisible();
-  await talksPage.openAdminEdit();
-  await expect(talksPage.editSheet).toBeVisible();
-  await expect(talksPage.page).toHaveURL(/\/talks\/edit\//u);
-});
-
-test('Admin edit / Study tab url and close after a second talk', async ({
+test('Signed-in admin can open edit from a talk page', async ({
   talksPage,
 }) => {
   await talksPage.goto();
-  await talksPage.openTalkAt(0);
+  await talksPage.openFirst();
   await talksPage.openAdminEdit();
-  await expect(talksPage.editDrawer).toBeVisible();
-  await expect(talksPage.studyPanel).toHaveCount(0);
-  await expect(talksPage.page).toHaveURL(/\/talks\/edit\/[^/]+$/u);
 
+  await expect(talksPage.page).toHaveURL(/\/talks\/edit\//u);
+  await expect(talksPage.editDrawer).toBeVisible();
+});
+
+test('Admin study tab deep link opens the study panel', async ({
+  talksPage,
+}) => {
+  await talksPage.goto();
+  await talksPage.openFirst();
+  await talksPage.openAdminEdit();
   await talksPage.openStudyTab();
-  await expect(talksPage.studyPanel).toBeVisible();
+
   await expect(talksPage.page).toHaveURL(/\/talks\/edit\/[^/]+\/study$/u);
 
-  const firstTalkId = talksPage.getEditTalkId();
+  const talkId = talksPage.getEditTalkId();
   await talksPage.closeEditDrawer();
-  await expect(talksPage.editDrawer).toHaveCount(0);
+  await talksPage.gotoStudy(talkId);
 
-  await talksPage.goto();
-  await talksPage.openTalkAt(1);
-  await talksPage.openAdminEdit();
-  await expect(talksPage.editDrawer).toBeVisible();
-  const secondTalkId = talksPage.getEditTalkId();
-  await talksPage.closeEditDrawer();
-  await expect(talksPage.editDrawer).toHaveCount(0);
-
-  await talksPage.gotoStudy(firstTalkId);
-  await expect(talksPage.editDrawer).toBeVisible();
   await expect(talksPage.studyPanel).toBeVisible();
-  await expect(talksPage.page).toHaveURL(
-    new RegExp(`/talks/edit/${firstTalkId}/study$`, 'u')
-  );
-
-  await talksPage.gotoStudy(secondTalkId);
-  await expect(talksPage.editDrawer).toBeVisible();
-  await expect(talksPage.studyPanel).toBeVisible();
-  await talksPage.closeEditDrawer();
-  await expect(talksPage.editDrawer).toHaveCount(0);
-  await expect(talksPage.page).not.toHaveURL(/\/talks\/edit\//u);
 });

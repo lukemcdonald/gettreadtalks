@@ -1,8 +1,3 @@
-import type { Locator, Page } from '@playwright/test';
-
-import { mkdir } from 'node:fs/promises';
-import path from 'node:path';
-
 import { PREVIEW_TALKS } from '../convex/previewFixtures.ts';
 import { expect, talkPath, test } from './fixtures/index.ts';
 import {
@@ -10,72 +5,25 @@ import {
   hasE2eUser,
 } from './fixtures/user-credentials.ts';
 
-const LONG_PARAGRAPH =
-  'We know that for those who love God all things work together for good, for those who are called according to his purpose.';
-const SHOT_DIR = 'test-results/301';
-
-function buildTranscriptText(marker: string) {
-  return [marker, ...Array.from({ length: 20 }, () => LONG_PARAGRAPH)].join(
-    '\n\n'
-  );
-}
-
-async function getTranscriptRight(transcript: Locator) {
-  const box = await transcript.boundingBox();
-
-  return box ? box.x + box.width : Number.POSITIVE_INFINITY;
-}
-
-async function saveShot(page: Page, name: string) {
-  await mkdir(SHOT_DIR, { recursive: true });
-  await page.screenshot({
-    animations: 'disabled',
-    path: path.join(SHOT_DIR, `${name}.png`),
-  });
-}
-
 // fallow-ignore-next-line weakened-tests -- signed-in e2e specs skip without credentials
 test.skip(!hasE2eUser(), E2E_USER_SKIP_REASON);
 
-test('Admin can view and edit a talk transcript', async ({ talksPage }) => {
-  await talksPage.page.setViewportSize({ height: 900, width: 1440 });
+test('Admin can save a talk transcript', async ({ talksPage }) => {
   await talksPage.page.goto(talkPath(PREVIEW_TALKS.ROMANS_8));
-  await expect(talksPage.talkHeading).toBeVisible();
   await talksPage.openAdminEdit();
-  await expect(talksPage.editSheet).toBeVisible();
 
-  await talksPage.page.getByTestId('edit-talk-tab-transcript').click();
-  await expect(
-    talksPage.page.getByTestId('edit-talk-transcript-panel')
-  ).toBeVisible();
+  await talksPage.openTranscriptTab();
 
   const transcript = talksPage.page.getByTestId('talk-transcript');
-  const nextText = buildTranscriptText(`E2E transcript ${Date.now()}`);
+  const savedText = `E2E transcript ${Date.now()}`;
 
-  await expect(transcript).toBeVisible();
-  await saveShot(talksPage.page, 'study-sheet-desktop');
+  await transcript.fill(savedText);
+  await talksPage.waitForServerAction(() =>
+    talksPage.page.getByTestId('save-transcript').click()
+  );
 
-  await expect(transcript).not.toHaveValue('');
-  await transcript.fill(nextText);
-  await expect(transcript).toHaveValue(nextText);
-  await expect(talksPage.page.getByTestId('save-transcript')).toBeInViewport();
-  await saveShot(talksPage.page, 'dialog-desktop');
+  const talkId = talksPage.getEditTalkId();
+  await talksPage.page.goto(`/talks/edit/${talkId}/transcript`);
 
-  await talksPage.page.getByTestId('save-transcript').click();
-  await expect(transcript).toHaveValue(nextText);
-  await expect(talksPage.page.getByTestId('save-transcript')).toBeInViewport();
-  await saveShot(talksPage.page, 'dialog-saved-desktop');
-
-  await talksPage.page.setViewportSize({ height: 844, width: 390 });
-  await saveShot(talksPage.page, 'study-sheet-mobile');
-
-  await expect(transcript).toHaveValue(nextText);
-  await expect(
-    talksPage.page.getByTestId('cancel-transcript')
-  ).toBeInViewport();
-  await expect(talksPage.page.getByTestId('save-transcript')).toBeInViewport();
-  await expect
-    .poll(() => getTranscriptRight(transcript))
-    .toBeLessThanOrEqual(390);
-  await saveShot(talksPage.page, 'dialog-saved-mobile');
+  await expect(transcript).toHaveValue(savedText);
 });

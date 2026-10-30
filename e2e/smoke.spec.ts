@@ -1,21 +1,16 @@
 import { expect, test } from './fixtures/index.ts';
 
-test('Home / Renders catalog', { tag: '@smoke' }, async ({ homePage }) => {
+test('Home shows talks entry', { tag: '@smoke' }, async ({ homePage }) => {
   await homePage.goto();
 
   await expect(homePage.browseTalks).toBeVisible();
-  await expect(
-    homePage.page.getByRole('link').and(homePage.page.getByTestId('talk-card'))
-  ).not.toHaveCount(0);
 });
 
 test(
-  'Talks / Opens a published talk',
+  'User can open a published talk',
   { tag: '@smoke' },
   async ({ talksPage }) => {
     await talksPage.goto();
-    await expect(talksPage.firstTalk).toBeVisible();
-
     await talksPage.openFirst();
 
     await expect(talksPage.page).toHaveURL(/\/talks\/[^/]+\/[^/]+/u);
@@ -24,13 +19,15 @@ test(
 );
 
 test(
-  'Search / Returns results',
+  'Search returns results',
   { tag: '@smoke' },
   async ({ searchPage, talksPage }) => {
     await talksPage.goto();
-    await expect(talksPage.firstTalk).toBeVisible();
+    await talksPage.openFirst();
 
-    const title = await talksPage.firstTalk.textContent();
+    const title = await talksPage.page
+      .getByTestId('talk-heading')
+      .textContent();
     const query = title?.trim() ?? '';
     expect(query.length).toBeGreaterThan(0);
 

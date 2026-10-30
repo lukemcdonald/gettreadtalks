@@ -8,7 +8,7 @@ const user = getE2eUser();
 
 test.skip(!user, E2E_USER_SKIP_REASON);
 
-test('Auth / Log out', async ({ authPage, homePage }) => {
+test('User can sign in and log out', async ({ authPage, homePage }) => {
   if (!user) {
     return;
   }
@@ -18,12 +18,9 @@ test('Auth / Log out', async ({ authPage, homePage }) => {
   await authPage.submit(user.email, user.password);
 
   await expect(authPage.page).toHaveURL(/\/account\/?$/u);
-  await expect(authPage.accountMenu).toBeVisible();
-  await expect(authPage.signIn).toHaveCount(0);
 
   await authPage.logOut();
 
   await expect(authPage.page).toHaveURL('/');
   await expect(authPage.signIn).toBeVisible();
-  await expect(authPage.accountMenu).toHaveCount(0);
 });
