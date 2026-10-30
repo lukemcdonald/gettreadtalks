@@ -1,6 +1,6 @@
 import type { MutationCtx, QueryCtx } from '../../_generated/server';
 import type { StatusType } from '../../lib/types';
-import type { AdminUser, User } from './validators';
+import type { AdminUser, User } from './types';
 
 import { authComponent } from '../../auth';
 import { throwAuthRequired, throwForbidden } from '../../lib/errors';

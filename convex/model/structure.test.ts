@@ -11,6 +11,7 @@ const STANDARD_TOP_LEVEL = new Set([
   'queries.ts',
   'schema.ts',
   'test.factory.ts',
+  'types.ts',
   'validators.ts',
 ]);
 
@@ -21,6 +22,7 @@ const STANDARD_BASES = new Set([
   'queries',
   'schema',
   'test.factory',
+  'types',
   'validators',
 ]);
 
