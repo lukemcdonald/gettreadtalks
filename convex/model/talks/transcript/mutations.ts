@@ -1,9 +1,7 @@
 import { v } from 'convex/values';
 
-import { internalMutation } from '../../_generated/server';
-import { findOrInsertPendingTalkTranscriptFetch } from './transcriptFetchPending';
-
-export { findOrInsertPendingTalkTranscriptFetch } from './transcriptFetchPending';
+import { internalMutation } from '../../../_generated/server';
+import { findOrInsertPendingTalkTranscriptFetch } from './fetch';
 
 export const insertPendingTalkTranscriptFetch = internalMutation({
   args: {

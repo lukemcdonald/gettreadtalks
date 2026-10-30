@@ -21,7 +21,7 @@ import {
   FieldLabel,
 } from '@/components/ui';
 import { api } from '@/convex/_generated/api';
-import { NO_TRANSCRIPT_SOURCE_MESSAGE } from '@/convex/lib/hasTalkTranscriptSource';
+import { NO_TRANSCRIPT_SOURCE_MESSAGE } from '@/convex/model/talks/summary/prompt';
 import {
   clearCreatedTalkTranscriptFetch,
   formatTranscriptFetchFailure,

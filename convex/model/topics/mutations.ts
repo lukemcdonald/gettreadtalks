@@ -7,7 +7,7 @@ import { mutation } from '../../_generated/server';
 import { throwNotFound, throwValidationError } from '../../lib/errors';
 import { generateSlug } from '../../lib/utils';
 import { requireAdmin } from '../auth/roles';
-import { toTopicUpdates } from './updates';
+import { toTopicUpdates } from './helpers';
 
 /**
  * Add a talk to a topic.

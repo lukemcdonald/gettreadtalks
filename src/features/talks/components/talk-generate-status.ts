@@ -1,4 +1,4 @@
-import { NO_TRANSCRIPT_SOURCE_MESSAGE } from '@/convex/lib/hasTalkTranscriptSource';
+import { NO_TRANSCRIPT_SOURCE_MESSAGE } from '@/convex/model/talks/summary/prompt';
 
 export function getTalkGenerateIdleStatus(
   canGenerate: boolean,

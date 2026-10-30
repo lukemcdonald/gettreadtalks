@@ -2,8 +2,8 @@ import type { Speaker } from '@/features/speakers/types';
 import type { Talk, TalkId } from '@/features/talks/types';
 
 import { site } from '@/configs/site';
-import { hasTalkTranscriptSource } from '@/convex/lib/hasTalkTranscriptSource';
-import { TRANSCRIPT_FETCH_ERROR_CODES } from '@/convex/model/talks/transcriptFetchErrorCode';
+import { hasTalkTranscriptSource } from '@/convex/lib/videoUrl';
+import { TRANSCRIPT_FETCH_ERROR_CODES } from '@/convex/model/talks/validators';
 import { buildAbsoluteUrl, buildPathQuery } from '@/lib/entities/paths';
 import {
   META_DESCRIPTION_MAX_LENGTH,
@@ -73,7 +73,7 @@ export function clearCreatedTalkTranscriptFetch(talkId: TalkId) {
   createdTalkTranscriptFetchIds.delete(talkId);
 }
 
-export { hasTalkTranscriptSource } from '@/convex/lib/hasTalkTranscriptSource';
+export { hasTalkTranscriptSource } from '@/convex/lib/videoUrl';
 
 export function shouldAutoFetchTalkTranscript({
   autoFetch,

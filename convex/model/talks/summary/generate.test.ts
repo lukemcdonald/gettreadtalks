@@ -1,15 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
-import { api, internal } from '../../_generated/api';
-import { ErrorCodes } from '../../lib/errors';
+import { api, internal } from '../../../_generated/api';
+import { ErrorCodes } from '../../../lib/errors';
 import {
   createConvexTest,
   seedVisibilityCatalog,
   signInAs,
   visibilitySlugs,
-} from '../../test.setup';
-import { talkSummaryGenerator } from './summaryGenerate';
-import { talkTranscriptResolver } from './transcriptFetch';
+} from '../../../test.setup';
+import { talkTranscriptResolver } from '../transcript/fetch';
+import { talkSummaryGenerator } from './generate';
 
 const GENERATED_SUMMARY = 'A generated draft summary of the talk.';
 const GENERATED_FLAGS = ['Scripture field does not match the sermon.'];

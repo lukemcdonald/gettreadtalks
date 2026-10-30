@@ -27,6 +27,8 @@ import { LIST_SEARCH_LIMIT } from '../search/constants';
 import { listAllAdmin } from '../search/listAll';
 import { normalizeSearchQuery } from '../search/utils';
 import {
+  enrichAdminTalks,
+  enrichWithTopics,
   listPublishedTalks,
   listPublishedTalksForTopics,
   listPublishedTalksPage,
@@ -35,7 +37,6 @@ import {
   talksByStatusQuery,
 } from './helpers';
 import { talkFields, talkTranscriptFields } from './schema';
-import { enrichAdminTalks, enrichWithTopics } from './utils';
 import { talkTranscriptFetchLastError } from './validators';
 
 /**

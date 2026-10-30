@@ -6,6 +6,19 @@ import { getManyFrom } from 'convex-helpers/server/relationships';
 
 import { filterTopicsWithPublishedTalks } from '../../lib/filters';
 
+export function toTopicUpdates(fields: {
+  description?: string;
+  title?: string;
+}) {
+  const updates = { ...fields };
+
+  if (updates.description === '') {
+    updates.description = undefined;
+  }
+
+  return updates;
+}
+
 const UNFILTERED_SEARCH_MULTIPLIER = 3;
 
 function publishedTopicsQuery(ctx: QueryCtx) {

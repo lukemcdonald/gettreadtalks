@@ -138,7 +138,7 @@ Public reads live in `src/features/*/queries` with `'use cache'`, `cacheLife()`,
 ### File Structure
 
 - `convex/{domain}.ts` - Public API exports
-- `convex/model/{domain}/` - Entity helpers (queries.ts, mutations.ts, schema.ts, validators.ts)
+- `convex/model/{domain}/` - Entity helpers (`schema.ts`, `validators.ts`, `queries.ts`, `mutations.ts`, `helpers.ts`, `index.ts`, `test.factory.ts`, plus matching `*.test.ts`). Put feature-specific code in a subfolder (e.g. `talkFeatures/study/`, `talks/summary/`, `talks/transcript/`) instead of new top-level files in the domain folder.
 - `convex/model/auth/` - Authentication helpers
 - `convex/lib/` - Shared utilities
 

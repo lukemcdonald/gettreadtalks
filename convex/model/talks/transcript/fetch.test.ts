@@ -1,10 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  parseTranscriptApiVideo,
-  toTranscriptHttpError,
-} from './transcriptFetch';
-import { TRANSCRIPT_FETCH_ERROR_CODES } from './transcriptFetchErrorCode';
+import { TRANSCRIPT_FETCH_ERROR_CODES } from '../validators';
+import { parseTranscriptApiVideo, toTranscriptHttpError } from './fetch';
 
 const NOW = Date.UTC(2026, 9, 21, 12, 0, 0);
 

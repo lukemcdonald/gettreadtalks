@@ -3,9 +3,9 @@ import { mutations, queries } from './model/talks';
 export {
   generateTalkSummary,
   loadTalkSummarySource,
-} from './model/talks/summaryGenerate';
-export { fetchTalkTranscript } from './model/talks/transcriptFetch';
-export { insertPendingTalkTranscriptFetch } from './model/talks/transcriptMutations';
+} from './model/talks/summary/generate';
+export { fetchTalkTranscript } from './model/talks/transcript/fetch';
+export { insertPendingTalkTranscriptFetch } from './model/talks/transcript/mutations';
 
 // Queries
 export const {

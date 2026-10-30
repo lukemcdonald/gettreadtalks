@@ -8,7 +8,7 @@ import {
   signInAs,
   visibilitySlugs,
 } from '../../../test.setup';
-import { talkTranscriptResolver } from '../../talks/transcriptFetch';
+import { talkTranscriptResolver } from '../../talks/transcript/fetch';
 import { talkStudyGenerator } from './generate';
 
 const GENERATED_STUDY_BODY = `## Main points

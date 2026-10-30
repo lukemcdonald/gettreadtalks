@@ -26,7 +26,7 @@ import {
   clearStaleMediaChecks,
 } from '../mediaHealth/clear';
 import { talkTranscriptFields } from './schema';
-import { findOrInsertPendingTalkTranscriptFetch } from './transcriptFetchPending';
+import { findOrInsertPendingTalkTranscriptFetch } from './transcript/fetch';
 import { statusType, talkTranscriptFetchErrorCode } from './validators';
 
 async function setTalkTopics(

@@ -1,14 +1,16 @@
 import type { Id } from '../../../_generated/dataModel';
 import type { ActionCtx } from '../../../_generated/server';
-import type { TalkSummarySource } from '../../talks/summaryGenerate';
+import type { TalkSummarySource } from '../../talks/summary/generate';
 
 import { ConvexError, v } from 'convex/values';
 
 import { api, internal } from '../../../_generated/api';
 import { action } from '../../../_generated/server';
-import { NO_TRANSCRIPT_SOURCE_MESSAGE } from '../../../lib/hasTalkTranscriptSource';
-import { loadTranscriptForGenerate } from '../../talks/ensureTalkTranscript';
-import { TALK_SUMMARY_MODEL } from '../../talks/summaryPrompt';
+import {
+  NO_TRANSCRIPT_SOURCE_MESSAGE,
+  TALK_SUMMARY_MODEL,
+} from '../../talks/summary/prompt';
+import { loadTranscriptForGenerate } from '../../talks/transcript/fetch';
 import { hasReviewedTalkFeature } from '../helpers';
 import { buildTalkStudyPrompt, TALK_STUDY_SYSTEM_PROMPT } from './prompt';
 
