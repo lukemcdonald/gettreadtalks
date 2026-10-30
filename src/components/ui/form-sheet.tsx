@@ -17,6 +17,7 @@ export interface FormSheetProps {
   onSubmit: FormEventHandler<HTMLFormElement>;
   open: boolean;
   submitLabel: string;
+  testId?: string;
   title: string;
 }
 
@@ -28,10 +29,16 @@ export function FormSheet({
   onSubmit,
   open,
   submitLabel,
+  testId,
   title,
 }: FormSheetProps) {
   return (
-    <FormSheetShell onOpenChange={onOpenChange} open={open} title={title}>
+    <FormSheetShell
+      onOpenChange={onOpenChange}
+      open={open}
+      testId={testId}
+      title={title}
+    >
       <form className="contents" onSubmit={onSubmit}>
         <FormSheetBody
           footer={
@@ -46,7 +53,11 @@ export function FormSheet({
               >
                 Cancel
               </Button>
-              <Button loading={isPending} type="submit">
+              <Button
+                data-testid="form-sheet-submit"
+                loading={isPending}
+                type="submit"
+              >
                 {submitLabel}
               </Button>
             </>

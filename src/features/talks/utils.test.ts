@@ -10,6 +10,7 @@ import {
   formatTalkMetaDescription,
   getEditTalkTab,
   isTranscriptFetchCoolingDown,
+  shouldAutoFetchTalkTranscript,
 } from './utils';
 
 describe('buildTalkPath', () => {
@@ -38,6 +39,68 @@ describe('buildTalkEditPath', () => {
     expect(buildTalkEditPath(talkId, 'study')).toBe(
       '/talks/edit/talks:the-cross/study'
     );
+  });
+});
+
+describe('shouldAutoFetchTalkTranscript', () => {
+  const youtube = 'https://www.youtube.com/watch?v=jNQXAC9IVRw';
+  const audio = 'https://example.com/talk.mp3';
+
+  it('fetches after create when media has a source and no fetch exists', () => {
+    expect(
+      shouldAutoFetchTalkTranscript({
+        autoFetch: true,
+        fetch: null,
+        hasTranscript: false,
+        mediaUrl: youtube,
+      })
+    ).toBe(true);
+  });
+
+  it('does not fetch on a normal edit open or while loading', () => {
+    expect(
+      shouldAutoFetchTalkTranscript({
+        autoFetch: false,
+        fetch: null,
+        hasTranscript: false,
+        mediaUrl: youtube,
+      })
+    ).toBe(false);
+    expect(
+      shouldAutoFetchTalkTranscript({
+        autoFetch: true,
+        fetch: undefined,
+        hasTranscript: false,
+        mediaUrl: youtube,
+      })
+    ).toBe(false);
+  });
+
+  it('does not fetch twice or without a transcript source', () => {
+    expect(
+      shouldAutoFetchTalkTranscript({
+        autoFetch: true,
+        fetch: { status: 'pending' },
+        hasTranscript: false,
+        mediaUrl: youtube,
+      })
+    ).toBe(false);
+    expect(
+      shouldAutoFetchTalkTranscript({
+        autoFetch: true,
+        fetch: null,
+        hasTranscript: true,
+        mediaUrl: youtube,
+      })
+    ).toBe(false);
+    expect(
+      shouldAutoFetchTalkTranscript({
+        autoFetch: true,
+        fetch: null,
+        hasTranscript: false,
+        mediaUrl: audio,
+      })
+    ).toBe(false);
   });
 });
 

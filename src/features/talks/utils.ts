@@ -28,6 +28,8 @@ export function buildTalkStudyPath(talkId: TalkId) {
 
 export type EditTalkTab = 'content' | 'study';
 
+const createdTalkTranscriptFetchIds = new Set<string>();
+
 export function buildTalkEditPath(
   talkId: TalkId,
   tab: EditTalkTab = 'content'
@@ -47,8 +49,54 @@ export function getEditTalkTab(pathname: string): EditTalkTab {
   return 'content';
 }
 
+export function markCreatedTalkTranscriptFetch(talkId: TalkId) {
+  createdTalkTranscriptFetchIds.add(talkId);
+}
+
+export function hasCreatedTalkTranscriptFetch(talkId: TalkId) {
+  return createdTalkTranscriptFetchIds.has(talkId);
+}
+
+export function clearCreatedTalkTranscriptFetch(talkId: TalkId) {
+  createdTalkTranscriptFetchIds.delete(talkId);
+}
+
 export function hasTalkTranscriptSource(mediaUrl: string) {
   return detectMediaType(mediaUrl).type === 'youtube';
+}
+
+export function shouldAutoFetchTalkTranscript({
+  autoFetch,
+  fetch,
+  hasTranscript,
+  mediaUrl,
+}: {
+  autoFetch: boolean;
+  fetch: { status?: string } | null | undefined;
+  hasTranscript: boolean;
+  mediaUrl: string;
+}) {
+  if (!autoFetch) {
+    return false;
+  }
+
+  if (!hasTalkTranscriptSource(mediaUrl)) {
+    return false;
+  }
+
+  if (hasTranscript) {
+    return false;
+  }
+
+  if (fetch === undefined) {
+    return false;
+  }
+
+  if (fetch) {
+    return false;
+  }
+
+  return true;
 }
 
 function formatTranscriptRetryAfter(retryAfter: number) {

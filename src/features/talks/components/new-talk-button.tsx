@@ -6,7 +6,11 @@ import { buildEntityNewPath } from '@/lib/entities/paths';
 
 export function NewTalkButton() {
   return (
-    <Button render={<Link href={buildEntityNewPath('talks')} />} size="sm">
+    <Button
+      data-testid="new-talk"
+      render={<Link href={buildEntityNewPath('talks')} />}
+      size="sm"
+    >
       <PlusIcon className="size-4" />
       New Talk
     </Button>
