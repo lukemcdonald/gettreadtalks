@@ -24,7 +24,7 @@ const STANDARD_BASES = new Set([
   'validators',
 ]);
 
-/** Per-domain allowlist for legacy top-level files (keep minimal). */
+// Legacy top-level files tracked for cleanup in a follow-up ticket; new allowlist entries need Luke's approval.
 const DOMAIN_FILE_ALLOWLIST: Record<string, Record<string, string>> = {
   auth: {
     'rateLimiter.ts': 'Better Auth rate limit wiring, not CRUD.',
@@ -32,9 +32,6 @@ const DOMAIN_FILE_ALLOWLIST: Record<string, Record<string, string>> = {
     'roles.test.ts': 'Tests for roles.ts.',
     'types.ts': 'Auth-specific TypeScript types.',
     'utils.ts': 'Session helpers used by roles and gates.',
-  },
-  emails: {
-    'schema.ts': 'Email component tables only; no queries yet.',
   },
   mediaHealth: {
     'clear.test.ts': 'Tests for clear.ts.',
