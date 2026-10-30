@@ -5,13 +5,12 @@ import { ConvexError, v } from 'convex/values';
 
 import { internal } from '../../_generated/api';
 import { talkTranscriptFields } from './schema';
-import { talkStudyContentFields } from './validators';
 
 const enrichmentBody = v.object({
-  study: v.optional(
+  summary: v.optional(
     v.object({
       generator: v.string(),
-      ...talkStudyContentFields,
+      summary: v.string(),
       talkId: v.id('talks'),
     })
   ),
@@ -41,13 +40,13 @@ function isAuthorizedEnrichmentRequest(req: Request) {
 async function saveEnrichment(ctx: ActionCtx, req: Request) {
   try {
     const body = parseEnrichmentBody(await req.json());
-    let studyId = null;
+    let summaryTalkId = null;
     let transcriptId = null;
 
-    if (body.study) {
-      studyId = await ctx.runMutation(
-        internal.talks.saveTalkStudyDraft,
-        body.study
+    if (body.summary) {
+      summaryTalkId = await ctx.runMutation(
+        internal.talks.saveTalkSummaryDraft,
+        body.summary
       );
     }
 
@@ -58,7 +57,7 @@ async function saveEnrichment(ctx: ActionCtx, req: Request) {
       );
     }
 
-    return Response.json({ studyId, transcriptId });
+    return Response.json({ summaryTalkId, transcriptId });
   } catch (error) {
     return toEnrichmentErrorResponse(error);
   }
@@ -66,7 +65,7 @@ async function saveEnrichment(ctx: ActionCtx, req: Request) {
 
 function toEnrichmentErrorResponse(error: unknown) {
   if (isConflictError(error)) {
-    return new Response('Study already reviewed', { status: 409 });
+    return new Response('Summary already edited', { status: 409 });
   }
 
   return new Response('Bad request', { status: 400 });
@@ -82,7 +81,7 @@ function isConflictError(error: unknown) {
 function parseEnrichmentBody(value: unknown) {
   const body = parse(enrichmentBody, value);
 
-  if (!(body.study || body.transcript)) {
+  if (!(body.summary || body.transcript)) {
     throw new Error('empty');
   }
 

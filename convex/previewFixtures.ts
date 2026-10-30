@@ -63,6 +63,8 @@ export const PREVIEW_TALKS = {
     slug: 'sample-sermon-on-romans-8',
     speakerSlug: PREVIEW_SPEAKERS.JOHN_DOE.slug,
     status: 'published' as const,
+    summary:
+      'This talk traces Romans 8:28 to show that God is not merely present in trouble but at work through it.',
     title: 'Sample Sermon on Romans 8',
     topicSlugs: [PREVIEW_TOPICS.GRACE.slug],
   },
@@ -76,6 +78,8 @@ export const PREVIEW_TALKS = {
     slug: 'sample-talk-the-lord-is-my-shepherd',
     speakerSlug: PREVIEW_SPEAKERS.JOHN_DOE.slug,
     status: 'published' as const,
+    summary:
+      'This talk walks Psalm 23 as a shepherd who restores, leads, and stays with his people, even in the dark valley.',
     title: 'Sample Talk: The Lord Is My Shepherd',
     topicSlugs: [PREVIEW_TOPICS.PRAYER.slug],
   },
@@ -102,6 +106,8 @@ export const PREVIEW_TALKS = {
     slug: 'example-talk-the-prodigal-son',
     speakerSlug: PREVIEW_SPEAKERS.MARY_SMITH.slug,
     status: 'published' as const,
+    summary:
+      'This talk follows the younger son home in Luke 15 and shows that the father runs to meet him before the apology is finished.\n\nGrace here is not a thin pardon. It is a restored place at the table, given at cost to the father.',
     title: 'Example Talk: The Prodigal Son',
     topicSlugs: [PREVIEW_TOPICS.GRACE.slug, PREVIEW_TOPICS.PRAYER.slug],
   },
@@ -130,6 +136,27 @@ export const PREVIEW_STUDIES = {
     summary:
       'This talk traces Romans 8:28 to show that God is not merely present in trouble but at work through it.',
     talkSlug: PREVIEW_TALKS.ROMANS_8.slug,
+  },
+  THE_LORD_IS_MY_SHEPHERD: {
+    generator: 'grok-bot',
+    outline: [
+      {
+        heading: 'The Lord shepherds',
+        text: 'The psalm is not advice about coping. It is a claim that the Lord himself shepherds his people.',
+      },
+    ],
+    scriptureRefs: [{ book: 'Psalm', chapter: 23, verseEnd: 3, verseStart: 1 }],
+    studyGuide: [
+      {
+        kind: 'key_idea' as const,
+        text: 'The Lord restores, leads, and stays with his people.',
+      },
+    ],
+    studyStatus: 'published' as const,
+    suggestedTopics: [PREVIEW_TOPICS.PRAYER.slug],
+    summary:
+      'This talk walks Psalm 23 as a shepherd who restores, leads, and stays with his people, even in the dark valley.',
+    talkSlug: PREVIEW_TALKS.THE_LORD_IS_MY_SHEPHERD.slug,
   },
   THE_PRODIGAL_SON: {
     generator: 'grok-bot',

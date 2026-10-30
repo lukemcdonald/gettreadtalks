@@ -23,15 +23,24 @@ export const talkFields = {
   slug: v.string(),
   speakerId: v.id('speakers'),
   status: statusType,
+  summary: v.optional(v.string()),
+  summaryGeneratedAt: v.optional(v.number()),
+  summaryGenerator: v.optional(v.string()),
+  summaryManuallyEditedAt: v.optional(v.number()),
   title: v.string(),
 };
 
+/** Legacy table. Pending removal after the talk summary migration runs on prod. */
 export const talkStudyFields = {
-  generatedAt: v.number(),
-  generator: v.string(),
+  generatedAt: v.optional(v.number()),
+  generator: v.optional(v.string()),
   manuallyEditedAt: v.optional(v.number()),
-  ...talkStudyContentFields,
-  studyStatus: talkStudyStatus,
+  outline: v.optional(talkStudyContentFields.outline),
+  scriptureRefs: v.optional(talkStudyContentFields.scriptureRefs),
+  studyGuide: v.optional(talkStudyContentFields.studyGuide),
+  studyStatus: v.optional(talkStudyStatus),
+  suggestedTopics: v.optional(talkStudyContentFields.suggestedTopics),
+  summary: v.optional(v.string()),
   talkId: v.id('talks'),
 };
 
@@ -59,9 +68,7 @@ export const talkTranscriptFetchFields = {
 };
 
 export const talkTables = {
-  talkStudies: defineTable(talkStudyFields)
-    .index('by_studyStatus', ['studyStatus'])
-    .index('by_talkId', ['talkId']),
+  talkStudies: defineTable(talkStudyFields).index('by_talkId', ['talkId']),
   talkTranscriptFetches: defineTable(talkTranscriptFetchFields).index(
     'by_talkId',
     ['talkId']

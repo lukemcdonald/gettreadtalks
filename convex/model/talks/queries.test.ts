@@ -9,7 +9,7 @@ import {
 } from '../../test.setup';
 import { insertSpeaker } from '../speakers/test.factory';
 import { insertTalkOnTopic } from '../topics/test.factory';
-import { insertTalk, insertTalkStudy } from './test.factory';
+import { insertTalk } from './test.factory';
 
 describe('listTalkSlugs', () => {
   it('lists only published talks', async () => {
@@ -60,7 +60,6 @@ describe('getTalkBySlug', () => {
       throw new Error('expected a published talk');
     }
 
-    const draftSecret = 'PRIVATE_STUDY_DRAFT_SENTINEL_volt332';
     const featureSecret = 'PRIVATE_STUDY_FEATURE_SENTINEL_volt517';
     const transcriptSecret = 'PRIVATE_TRANSCRIPT_SENTINEL_volt332';
 
@@ -71,15 +70,6 @@ describe('getTalkBySlug', () => {
       talkId: published.talk._id,
       text: transcriptSecret,
       wordCount: 3,
-    });
-    await t.mutation(internal.talks.saveTalkStudyDraft, {
-      generator: 'test',
-      outline: [{ heading: 'Grace', text: draftSecret }],
-      scriptureRefs: [{ book: 'Romans', chapter: 5, verseStart: 1 }],
-      studyGuide: [{ kind: 'key_idea', text: draftSecret }],
-      suggestedTopics: ['grace'],
-      summary: draftSecret,
-      talkId: published.talk._id,
     });
     await t.run(async (ctx) => {
       await ctx.db.insert('talkFeatures', {
@@ -118,13 +108,12 @@ describe('getTalkBySlug', () => {
       talk,
     });
 
-    expect(payload).not.toContain(draftSecret);
     expect(payload).not.toContain(featureSecret);
     expect(payload).not.toContain(transcriptSecret);
     expect(talk?.studyBody).toBeNull();
   });
 
-  it('returns a published study summary and never returns a draft', async () => {
+  it('returns the talk summary when it is set', async () => {
     const t = createConvexTest();
     await seedVisibilityCatalog(t);
 
@@ -139,40 +128,20 @@ describe('getTalkBySlug', () => {
       throw new Error('expected a published talk');
     }
 
-    const draftSummary = 'DRAFT_STUDY_SUMMARY_MUST_STAY_PRIVATE';
     const publishedStudyBody = '## Main points\n\nPublished study body.';
-    const publishedSummary = 'Published study summary for the talk page.';
+    const talkSummary = 'Talk summary for the About section.';
 
-    await t.run(async (ctx) => {
-      await insertTalkStudy(ctx, {
-        studyStatus: 'draft',
-        summary: draftSummary,
-        talkId: published.talk._id,
-      });
-    });
-
-    const withDraft = await t.query(api.talks.getTalkBySlug, {
+    const withoutSummary = await t.query(api.talks.getTalkBySlug, {
       speakerSlug: visibilitySlugs.publishedSpeaker,
       talkSlug: visibilitySlugs.publishedTalk,
     });
 
-    expect(withDraft?.studyBody).toBeNull();
-    expect(withDraft?.summary).toBeNull();
-    expect(JSON.stringify(withDraft)).not.toContain(draftSummary);
+    expect(withoutSummary?.studyBody).toBeNull();
+    expect(withoutSummary?.summary).toBeNull();
 
     await t.run(async (ctx) => {
-      const study = await ctx.db
-        .query('talkStudies')
-        .withIndex('by_talkId', (q) => q.eq('talkId', published.talk._id))
-        .unique();
-
-      if (!study) {
-        throw new Error('expected a study');
-      }
-
-      await ctx.db.patch(study._id, {
-        studyStatus: 'published',
-        summary: publishedSummary,
+      await ctx.db.patch(published.talk._id, {
+        summary: talkSummary,
       });
       await ctx.db.insert('talkFeatures', {
         body: publishedStudyBody,
@@ -184,13 +153,13 @@ describe('getTalkBySlug', () => {
       });
     });
 
-    const withPublished = await t.query(api.talks.getTalkBySlug, {
+    const withSummary = await t.query(api.talks.getTalkBySlug, {
       speakerSlug: visibilitySlugs.publishedSpeaker,
       talkSlug: visibilitySlugs.publishedTalk,
     });
 
-    expect(withPublished?.studyBody).toBe(publishedStudyBody);
-    expect(withPublished?.summary).toBe(publishedSummary);
+    expect(withSummary?.studyBody).toBe(publishedStudyBody);
+    expect(withSummary?.summary).toBe(talkSummary);
   });
 });
 
@@ -364,6 +333,7 @@ describe('listAllTalks', () => {
         publishedAt: Date.parse('2024-06-01T12:00:00.000Z'),
         slug: 'study-none',
         speakerId,
+        summary: 'A summary without a study.',
         title: 'Study None',
       });
       const draftTalkId = await insertTalk(ctx, {
@@ -385,17 +355,29 @@ describe('listAllTalks', () => {
         title: 'Study Backlog Draft',
       });
 
-      await insertTalkStudy(ctx, {
-        studyStatus: 'draft',
+      await ctx.db.insert('talkFeatures', {
+        body: '## Main points\n\nDraft study.',
+        generatedAt: Date.now(),
+        kind: 'study',
+        status: 'draft',
         talkId: draftTalkId,
+        updatedAt: Date.now(),
       });
-      await insertTalkStudy(ctx, {
-        studyStatus: 'published',
+      await ctx.db.insert('talkFeatures', {
+        body: '## Main points\n\nPublished study.',
+        generatedAt: Date.now(),
+        kind: 'study',
+        status: 'published',
         talkId: publishedTalkId,
+        updatedAt: Date.now(),
       });
-      await insertTalkStudy(ctx, {
-        studyStatus: 'draft',
+      await ctx.db.insert('talkFeatures', {
+        body: '## Main points\n\nBacklog draft study.',
+        generatedAt: Date.now(),
+        kind: 'study',
+        status: 'draft',
         talkId: backlogDraftTalkId,
+        updatedAt: Date.now(),
       });
     });
 

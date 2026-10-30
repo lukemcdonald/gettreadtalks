@@ -5,10 +5,9 @@ export const talkFeatureFormSchema = z.object({
   status: z.enum(['draft', 'published']),
 });
 
-export const talkStudyFormSchema = z.object({
-  studyStatus: z.enum(['draft', 'published']),
+export const talkSummaryFormSchema = z.object({
   summary: z.string(),
 });
 
 export type TalkFeatureFormData = z.infer<typeof talkFeatureFormSchema>;
-export type TalkStudyFormData = z.infer<typeof talkStudyFormSchema>;
+export type TalkSummaryFormData = z.infer<typeof talkSummaryFormSchema>;

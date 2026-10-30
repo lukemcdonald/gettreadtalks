@@ -54,7 +54,7 @@ async function seedTalkWithTranscript() {
 }
 
 describe('generateTalkSummary', () => {
-  it('guards admin, saves a draft only, and refuses a published study', async () => {
+  it('writes the talk summary and refuses to overwrite a manually edited one', async () => {
     const { asAdmin, asMember, t, talkId } = await seedTalkWithTranscript();
     const previousKey = process.env.AI_GATEWAY_API_KEY;
     const previousGenerate = talkSummaryGenerator.generate;
@@ -92,40 +92,38 @@ describe('generateTalkSummary', () => {
         summary: GENERATED_SUMMARY,
       });
 
-      const draft = await asAdmin.query(api.talks.getTalkStudy, { talkId });
+      const generated = await asAdmin.query(api.talks.getTalk, { id: talkId });
 
-      expect(draft).toEqual(
+      expect(generated).toEqual(
         expect.objectContaining({
-          studyStatus: 'draft',
           summary: GENERATED_SUMMARY,
         })
       );
-      expect(draft?.manuallyEditedAt).toBeUndefined();
+      expect(generated?.summaryManuallyEditedAt).toBeUndefined();
 
-      await asAdmin.mutation(api.talks.updateTalkStudy, {
-        studyStatus: 'published',
-        summary: 'Hand-edited published summary.',
+      await asAdmin.mutation(api.talks.updateTalkSummary, {
+        summary: 'Hand-edited summary.',
         talkId,
       });
 
       const refused = await asAdmin.action(api.talks.generateTalkSummary, {
         talkId,
       });
-      const published = await asAdmin.query(api.talks.getTalkStudy, {
-        talkId,
+      const edited = await asAdmin.query(api.talks.getTalk, {
+        id: talkId,
       });
 
       expect(refused).toEqual({
         errorCode: 'ALREADY_REVIEWED',
-        message: 'This study has already been reviewed.',
+        message: 'This summary has already been edited.',
         status: 'failed',
       });
-      expect(published).toEqual(
+      expect(edited).toEqual(
         expect.objectContaining({
-          studyStatus: 'published',
-          summary: 'Hand-edited published summary.',
+          summary: 'Hand-edited summary.',
         })
       );
+      expect(edited?.summaryManuallyEditedAt).toEqual(expect.any(Number));
     } finally {
       talkSummaryGenerator.generate = previousGenerate;
 

@@ -11,16 +11,11 @@ import {
   visibilitySlugs,
 } from '../../test.setup';
 
-const draftSecret = 'PRIVATE_STUDY_DRAFT_SENTINEL_volt332';
 const transcriptSecret = 'PRIVATE_TRANSCRIPT_SENTINEL_volt332';
 
-function studyDraftArgs(talkId: Id<'talks'>) {
+function summaryDraftArgs(talkId: Id<'talks'>) {
   return {
     generator: 'grok-bot',
-    outline: [{ heading: 'Grace', text: 'Grace is a gift' }],
-    scriptureRefs: [{ book: 'Romans', chapter: 5, verseStart: 1 }],
-    studyGuide: [{ kind: 'key_idea' as const, text: draftSecret }],
-    suggestedTopics: ['grace'],
     summary: 'A draft summary of grace.',
     talkId,
   };
@@ -110,8 +105,8 @@ describe('talk transcript and study draft storage', () => {
       text: transcriptSecret,
     });
     await t.mutation(
-      internal.talks.saveTalkStudyDraft,
-      studyDraftArgs(talk._id)
+      internal.talks.saveTalkSummaryDraft,
+      summaryDraftArgs(talk._id)
     );
 
     await t.run(async (ctx) => {
@@ -123,74 +118,77 @@ describe('talk transcript and study draft storage', () => {
         talkId: talk._id,
         updatedAt: Date.now(),
       });
+      await ctx.db.insert('talkStudies', {
+        generatedAt: Date.now(),
+        generator: 'test',
+        summary: 'Legacy summary',
+        talkId: talk._id,
+      });
     });
 
     await asAdmin.mutation(api.talks.destroyTalk, { talkId: talk._id });
 
-    const drafts = await asAdmin.query(api.talks.listDraftTalkStudies, {});
     const features = await t.run(
       async (ctx) => await ctx.db.query('talkFeatures').collect()
     );
+    const studies = await t.run(
+      async (ctx) => await ctx.db.query('talkStudies').collect()
+    );
     const transcripts = await asAdmin.query(api.talks.listTalkTranscripts, {});
 
-    expect(drafts).toEqual([]);
     expect(features).toEqual([]);
+    expect(studies).toEqual([]);
     expect(transcripts).toEqual([]);
   });
 
-  it('creates a study when an admin saves a typed summary', async () => {
+  it('saves a typed summary on the talk', async () => {
     const { asAdmin, talk } = await seedPublishedTalk();
     const typedSummary = 'A typed summary for a talk without a study.';
 
-    await asAdmin.mutation(api.talks.updateTalkStudy, {
-      studyStatus: 'published',
+    await asAdmin.mutation(api.talks.updateTalkSummary, {
       summary: typedSummary,
       talkId: talk._id,
     });
 
-    const study = await asAdmin.query(api.talks.getTalkStudy, {
-      talkId: talk._id,
+    const saved = await asAdmin.query(api.talks.getTalk, {
+      id: talk._id,
     });
 
-    expect(study).toEqual(
+    expect(saved).toEqual(
       expect.objectContaining({
-        generator: 'manual',
-        outline: [],
-        studyStatus: 'published',
         summary: typedSummary,
+        summaryGenerator: 'manual',
       })
     );
+    expect(saved?.summaryManuallyEditedAt).toEqual(expect.any(Number));
   });
 
-  it('marks a study edited, publishes it, and refuses a later generated draft', async () => {
+  it('marks a summary edited and refuses a later generated draft', async () => {
     const { asAdmin, t, talk } = await seedPublishedTalk();
 
     await t.mutation(
-      internal.talks.saveTalkStudyDraft,
-      studyDraftArgs(talk._id)
+      internal.talks.saveTalkSummaryDraft,
+      summaryDraftArgs(talk._id)
     );
 
     const before = Date.now();
     const editedSummary = 'Edited summary of grace.';
 
-    await asAdmin.mutation(api.talks.updateTalkStudy, {
-      studyStatus: 'published',
+    await asAdmin.mutation(api.talks.updateTalkSummary, {
       summary: editedSummary,
       talkId: talk._id,
     });
 
-    const study = await asAdmin.query(api.talks.getTalkStudy, {
-      talkId: talk._id,
+    const saved = await asAdmin.query(api.talks.getTalk, {
+      id: talk._id,
     });
 
-    expect(study).toEqual(
+    expect(saved).toEqual(
       expect.objectContaining({
-        manuallyEditedAt: expect.any(Number),
-        studyStatus: 'published',
         summary: editedSummary,
       })
     );
-    expect(study?.manuallyEditedAt).toBeGreaterThanOrEqual(before);
+    expect(saved?.summaryManuallyEditedAt).toBeGreaterThanOrEqual(before);
 
     const previous = process.env.ENRICHMENT_API_TOKEN;
 
@@ -198,7 +196,7 @@ describe('talk transcript and study draft storage', () => {
       process.env.ENRICHMENT_API_TOKEN = 'correct-token';
 
       const response = await t.fetch('/enrichment', {
-        body: JSON.stringify({ study: studyDraftArgs(talk._id) }),
+        body: JSON.stringify({ summary: summaryDraftArgs(talk._id) }),
         headers: { Authorization: 'Bearer correct-token' },
         method: 'POST',
       });

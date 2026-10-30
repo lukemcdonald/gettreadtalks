@@ -216,6 +216,15 @@ async function upsertTalk(
   const existing = await getOneFrom(ctx.db, 'talks', 'by_slug', talk.slug);
   const publishedAt =
     talk.status === 'published' ? talk.publishedAt : undefined;
+  const summary = 'summary' in talk ? talk.summary : existing?.summary;
+  const summaryFields =
+    summary === undefined
+      ? {}
+      : {
+          summary,
+          summaryGeneratedAt: existing?.summaryGeneratedAt ?? Date.now(),
+          summaryGenerator: existing?.summaryGenerator ?? 'grok-bot',
+        };
   const fields = {
     collectionId,
     collectionOrder: talk.collectionOrder,
@@ -225,6 +234,7 @@ async function upsertTalk(
     scripture: talk.scripture,
     speakerId,
     status: talk.status,
+    ...summaryFields,
     title: talk.title,
   };
 

@@ -179,7 +179,7 @@ describe('isTranscriptFetchCoolingDown', () => {
 });
 
 describe('formatTalkMetaDescription', () => {
-  it('returns nothing when there is no published summary or talk', () => {
+  it('returns nothing when there is no summary or talk', () => {
     expect(formatTalkMetaDescription(null)).toBeUndefined();
     expect(formatTalkMetaDescription('   ')).toBeUndefined();
   });
