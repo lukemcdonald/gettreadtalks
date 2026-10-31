@@ -280,8 +280,8 @@ export interface TranscriptFetchFailure {
   status: 'failed';
 }
 
-export const talkTranscriptResolver = {
-  resolve: resolveTranscriptFetch,
+export const talkTranscriptFetcher = {
+  fetch: fetchTranscript,
 };
 
 function toCompleteTalkTranscriptFetchArgs(
@@ -314,7 +314,7 @@ export async function resolveAndCompleteTalkTranscriptFetch(
     talkId: Id<'talks'>;
   }
 ): Promise<TranscriptFetchResult> {
-  const result = await talkTranscriptResolver.resolve(
+  const result = await talkTranscriptFetcher.fetch(
     args.mediaUrl,
     process.env.YOUTUBE_TRANSCRIPT_IO_TOKEN ?? ''
   );
@@ -327,7 +327,7 @@ export async function resolveAndCompleteTalkTranscriptFetch(
   return result;
 }
 
-export function resolveTranscriptFetch(
+export function fetchTranscript(
   mediaUrl: string,
   token: string
 ): Promise<TranscriptFetchResult> {

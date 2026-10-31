@@ -39,6 +39,7 @@ Applies to `src/` and Convex internal helpers. Convex registered query/mutation 
 - `get*`: cheap sync read or computed value; never async or side effects
 - `load*` / `fetch*`: async I/O reading content (`fetch*` for network)
 - `resolve*`: returns a location, not contents
+- Name functions and objects that wrap an external call with a specific verb for what they do (`fetch`, `generate`, `parse`, `save`); avoid vague verbs like `resolve`, `handle`, `process`, or `manage`.
 - `to*`: pure conversion (one thing reshaped)
 - `build*`: assemble URL/path/id/config from parts
 - `format*`: human-readable output

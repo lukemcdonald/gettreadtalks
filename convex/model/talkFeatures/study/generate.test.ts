@@ -8,7 +8,7 @@ import {
   signInAs,
   visibilitySlugs,
 } from '../../../test.setup';
-import { talkTranscriptResolver } from '../../talks/transcriptFetch';
+import { talkTranscriptFetcher } from '../../talks/transcriptFetch';
 import { talkStudyGenerator } from './generate';
 
 const GENERATED_STUDY_BODY = `## Main points
@@ -83,11 +83,11 @@ describe('generateStudy', () => {
     });
     const talkId = published.talk._id;
     const fetchedTranscript = 'Fetched transcript for study generation.';
-    const previousFetch = talkTranscriptResolver.resolve;
+    const previousFetch = talkTranscriptFetcher.fetch;
     const previousGenerate = talkStudyGenerator.generate;
     const previousKey = process.env.AI_GATEWAY_API_KEY;
 
-    talkTranscriptResolver.resolve = () =>
+    talkTranscriptFetcher.fetch = () =>
       Promise.resolve({
         status: 'success',
         text: fetchedTranscript,
@@ -108,7 +108,7 @@ describe('generateStudy', () => {
 
       expect(loaded?.text).toBe(fetchedTranscript);
     } finally {
-      talkTranscriptResolver.resolve = previousFetch;
+      talkTranscriptFetcher.fetch = previousFetch;
       talkStudyGenerator.generate = previousGenerate;
 
       if (previousKey === undefined) {

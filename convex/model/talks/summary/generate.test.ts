@@ -9,7 +9,7 @@ import {
   visibilitySlugs,
 } from '../../../test.setup';
 import { talkSummaryGenerator } from '../summaryGenerate';
-import { talkTranscriptResolver } from '../transcriptFetch';
+import { talkTranscriptFetcher } from '../transcriptFetch';
 
 const GENERATED_SUMMARY = 'A generated draft summary of the talk.';
 const GENERATED_FLAGS = ['Scripture field does not match the sermon.'];
@@ -76,11 +76,11 @@ describe('generateTalkSummary', () => {
     });
     const talkId = published.talk._id;
     const fetchedTranscript = 'Fetched transcript for summary generation.';
-    const previousFetch = talkTranscriptResolver.resolve;
+    const previousFetch = talkTranscriptFetcher.fetch;
     const previousGenerate = talkSummaryGenerator.generate;
     const previousKey = process.env.AI_GATEWAY_API_KEY;
 
-    talkTranscriptResolver.resolve = () =>
+    talkTranscriptFetcher.fetch = () =>
       Promise.resolve({
         status: 'success',
         text: fetchedTranscript,
@@ -109,7 +109,7 @@ describe('generateTalkSummary', () => {
 
       expect(loaded?.text).toBe(fetchedTranscript);
     } finally {
-      talkTranscriptResolver.resolve = previousFetch;
+      talkTranscriptFetcher.fetch = previousFetch;
       talkSummaryGenerator.generate = previousGenerate;
 
       if (previousKey === undefined) {
