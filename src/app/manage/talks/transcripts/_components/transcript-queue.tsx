@@ -4,7 +4,7 @@ import { ManageTable, ManageTitleLink } from '@/components/manage-table';
 import { TableCell, TableRow } from '@/components/ui';
 import { loadTalksWithoutTranscript } from '@/features/talks/queries/load-talks-without-transcript';
 import {
-  buildTalkStudyPath,
+  buildTalkTranscriptPath,
   formatTranscriptFetchFailure,
 } from '@/features/talks/utils';
 
@@ -21,7 +21,7 @@ export async function TranscriptQueue() {
         <TableRow className="relative min-h-11" key={talk._id}>
           <TableCell className="whitespace-normal">
             <ManageTitleLink
-              href={buildTalkStudyPath(talk._id)}
+              href={buildTalkTranscriptPath(talk._id)}
               title={talk.title}
             />
           </TableCell>
