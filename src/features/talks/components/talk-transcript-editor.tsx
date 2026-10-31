@@ -88,7 +88,12 @@ function TalkTranscriptEditorBody({
   }
 
   function handleSave() {
-    void mutateAsync({ talkId, text }).then(handleCancel);
+    const saved = text.trim();
+
+    void mutateAsync({ talkId, text: saved }).then(() => {
+      reset();
+      setDraft(saved);
+    });
   }
 
   return (
