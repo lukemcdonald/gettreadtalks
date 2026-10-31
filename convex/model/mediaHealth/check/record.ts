@@ -1,4 +1,4 @@
-import type { MediaCheckStatus } from './validators';
+import type { MediaCheckStatus } from '../validators';
 
 const STRONG_STATUSES = new Set<MediaCheckStatus>(['missing', 'ok', 'private']);
 

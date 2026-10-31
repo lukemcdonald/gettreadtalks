@@ -20,7 +20,7 @@ export function EditTalkTabs({
   return (
     <Tabs
       onValueChange={(next) => {
-        if (next === 'content' || next === 'study') {
+        if (next === 'content' || next === 'study' || next === 'transcript') {
           onValueChange(next);
         }
       }}
@@ -45,6 +45,13 @@ export function EditTalkTabs({
         >
           Study
           {studyStatus ? <ManageStatusDot status={studyStatus} /> : null}
+        </TabsTab>
+        <TabsTab
+          className="grow-0"
+          data-testid="edit-talk-tab-transcript"
+          value="transcript"
+        >
+          Transcript
         </TabsTab>
       </TabsList>
     </Tabs>

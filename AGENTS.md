@@ -138,7 +138,8 @@ Public reads live in `src/features/*/queries` with `'use cache'`, `cacheLife()`,
 ### File Structure
 
 - `convex/{domain}.ts` - Public API exports
-- `convex/model/{domain}/` - Entity helpers (queries.ts, mutations.ts, schema.ts, validators.ts)
+- `convex/model/{domain}/` - Use only the standard top-level files the domain needs (`schema`, `validators`, `types`, `queries`, `mutations`, `helpers`, `index`, `test.factory`, and matching tests).
+- Put feature-specific code in a subfolder; use the same standard file names inside it where they fit.
 - `convex/model/auth/` - Authentication helpers
 - `convex/lib/` - Shared utilities
 

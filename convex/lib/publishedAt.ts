@@ -44,7 +44,7 @@ export function parseUtcDate(isoDate: string): number | undefined {
  * Resolve the stored publishedAt for a status change.
  * Empty requested dates keep the existing timestamp, or now when first publishing.
  */
-export function resolvePublishedAt({
+export function getPublishedAt({
   currentPublishedAt,
   now = Date.now(),
   requestedPublishedAt,

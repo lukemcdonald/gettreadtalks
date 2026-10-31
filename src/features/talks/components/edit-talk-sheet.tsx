@@ -27,16 +27,19 @@ import {
 } from '@/features/talks/components/edit-talk-sheet-utils';
 import { EditTalkStudyPanel } from '@/features/talks/components/edit-talk-study-panel';
 import { EditTalkTabs } from '@/features/talks/components/edit-talk-tabs';
+import { EditTalkTranscriptPanel } from '@/features/talks/components/edit-talk-transcript-panel';
 import { TalkFormFields } from '@/features/talks/components/talk-form-fields';
 import {
   TalkSummaryFields,
   useTalkSummaryForm,
 } from '@/features/talks/components/talk-summary-fields';
-import { TalkTranscriptDialog } from '@/features/talks/components/talk-transcript-dialog';
-import { TalkTranscriptFetch } from '@/features/talks/components/talk-transcript-fetch';
 import { UrlChangeDialog } from '@/features/talks/components/url-change-dialog';
 import { talkFormSchema } from '@/features/talks/schemas/talk-form';
-import { buildTalkEditPath, getEditTalkTab } from '@/features/talks/utils';
+import {
+  buildTalkEditPath,
+  getEditTalkTab,
+  hasTalkTranscriptSource,
+} from '@/features/talks/utils';
 import { buildEntityEditPath } from '@/lib/entities/paths';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
 
@@ -139,14 +142,12 @@ function useEditTalkTab(talkId: TalkWithTopicIds['_id']) {
     }
 
     const status = searchParams.get('status');
+    const archivedQuery =
+      status === 'archived' ? { status: 'archived' as const } : undefined;
     const href =
-      next === 'study'
-        ? buildTalkEditPath(talkId, 'study')
-        : buildEntityEditPath(
-            'talks',
-            talkId,
-            status === 'archived' ? { status: 'archived' } : undefined
-          );
+      next === 'content'
+        ? buildEntityEditPath('talks', talkId, archivedQuery)
+        : buildTalkEditPath(talkId, next);
 
     setTab(next);
     window.history.replaceState(window.history.state, '', href);
@@ -185,6 +186,7 @@ export function EditTalkSheet({
   });
   const { handleTabChange, tab } = useEditTalkTab(talk._id);
   const mediaUrl = useWatch({ control: form.control, name: 'mediaUrl' });
+  const canGenerate = hasTalkTranscriptSource(mediaUrl);
 
   return (
     <>
@@ -234,26 +236,20 @@ export function EditTalkSheet({
                   topics={topics}
                 />
                 <TalkSummaryFields
+                  canGenerate={canGenerate}
                   form={summary.form}
                   hasTranscript={summary.hasTranscript}
                   onFlagsChange={summary.handleFlagsChange}
                   summaryFlags={summary.summaryFlags}
                   talkId={talk._id}
                 />
-                <TalkTranscriptFetch
-                  hasTranscript={summary.hasTranscript}
-                  mediaUrl={mediaUrl}
-                  talkId={talk._id}
-                >
-                  {summary.hasTranscript ? (
-                    <TalkTranscriptDialog talkId={talk._id} />
-                  ) : null}
-                </TalkTranscriptFetch>
               </div>
             </FormSheetBody>
           </form>
-        ) : (
+        ) : null}
+        {tab === 'study' ? (
           <EditTalkStudyPanel
+            canGenerate={canGenerate}
             feature={studyFeature}
             hasTranscript={summary.hasTranscript}
             onClose={() => {
@@ -265,7 +261,17 @@ export function EditTalkSheet({
             }}
             talkId={talk._id}
           />
-        )}
+        ) : null}
+        {tab === 'transcript' ? (
+          <EditTalkTranscriptPanel
+            active={tab === 'transcript'}
+            mediaUrl={mediaUrl}
+            onClose={() => {
+              handleOpenChange(false);
+            }}
+            talkId={talk._id}
+          />
+        ) : null}
       </FormSheetShell>
       <UrlChangeDialog
         newUrl={pendingUpdate?.urlChange.newUrl ?? ''}

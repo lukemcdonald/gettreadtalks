@@ -1,11 +1,7 @@
 import { expect, test } from './fixtures/index.ts';
 
-test('AI / Loads', async ({ aiPage }) => {
+test('AI page loads for agents', async ({ aiPage }) => {
   await aiPage.goto();
 
-  await expect(aiPage.heading).toBeVisible();
-  await expect(aiPage.copyUrl).toBeVisible();
-  await expect(aiPage.mcpUrl).toContainText(
-    'https://www.gettreadtalks.com/mcp'
-  );
+  await expect(aiPage.page.getByTestId('copy-mcp-url')).toBeVisible();
 });

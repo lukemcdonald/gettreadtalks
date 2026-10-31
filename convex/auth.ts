@@ -16,7 +16,7 @@ import { authRateLimitPlugin } from './lib/plugins';
 import { getSiteUrl } from './lib/siteUrl';
 import { isPreviewSiteUrl } from './lib/turnstile';
 import { formatErrorMessage } from './lib/utils';
-import { destroyUserOwnedRows } from './model/users/utils';
+import { destroyUserOwnedRows } from './model/users/helpers';
 
 const authFunctions: AuthFunctions = internal.auth;
 

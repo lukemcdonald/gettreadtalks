@@ -1,14 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
-import { api, internal } from '../../_generated/api';
-import { ErrorCodes } from '../../lib/errors';
+import { api, internal } from '../../../_generated/api';
+import { ErrorCodes } from '../../../lib/errors';
 import {
   createConvexTest,
   seedVisibilityCatalog,
   signInAs,
   visibilitySlugs,
-} from '../../test.setup';
-import { talkSummaryGenerator } from './summaryGenerate';
+} from '../../../test.setup';
+import { talkSummaryGenerator } from '../summaryGenerate';
+import { talkTranscriptFetcher } from '../transcriptFetch';
 
 const GENERATED_SUMMARY = 'A generated draft summary of the talk.';
 const GENERATED_FLAGS = ['Scripture field does not match the sermon.'];
@@ -54,6 +55,71 @@ async function seedTalkWithTranscript() {
 }
 
 describe('generateTalkSummary', () => {
+  it('fetches a missing transcript before generating', async () => {
+    const t = createConvexTest();
+    await seedVisibilityCatalog(t);
+    const published = await t.query(api.talks.getTalkBySlug, {
+      speakerSlug: visibilitySlugs.publishedSpeaker,
+      talkSlug: visibilitySlugs.publishedTalk,
+    });
+
+    expect(published).not.toBeNull();
+
+    if (!published) {
+      throw new Error('expected a published talk');
+    }
+
+    const { asUser: asAdmin } = await signInAs(t, {
+      email: 'admin@example.test',
+      name: 'Admin',
+      role: 'admin',
+    });
+    const talkId = published.talk._id;
+    const fetchedTranscript = 'Fetched transcript for summary generation.';
+    const previousFetch = talkTranscriptFetcher.fetch;
+    const previousGenerate = talkSummaryGenerator.generate;
+    const previousKey = process.env.AI_GATEWAY_API_KEY;
+
+    talkTranscriptFetcher.fetch = () =>
+      Promise.resolve({
+        status: 'success',
+        text: fetchedTranscript,
+      });
+    talkSummaryGenerator.generate = () =>
+      Promise.resolve({
+        flags: [],
+        summary: GENERATED_SUMMARY,
+      });
+    process.env.AI_GATEWAY_API_KEY = 'test-gateway-key';
+
+    try {
+      const created = await asAdmin.action(api.talks.generateTalkSummary, {
+        talkId,
+      });
+
+      expect(created).toEqual({
+        flags: [],
+        status: 'success',
+        summary: GENERATED_SUMMARY,
+      });
+
+      const loaded = await asAdmin.query(api.talks.getTalkTranscriptText, {
+        talkId,
+      });
+
+      expect(loaded?.text).toBe(fetchedTranscript);
+    } finally {
+      talkTranscriptFetcher.fetch = previousFetch;
+      talkSummaryGenerator.generate = previousGenerate;
+
+      if (previousKey === undefined) {
+        delete process.env.AI_GATEWAY_API_KEY;
+      } else {
+        process.env.AI_GATEWAY_API_KEY = previousKey;
+      }
+    }
+  });
+
   it('writes the talk summary and refuses to overwrite a manually edited one', async () => {
     const { asAdmin, asMember, t, talkId } = await seedTalkWithTranscript();
     const previousKey = process.env.AI_GATEWAY_API_KEY;

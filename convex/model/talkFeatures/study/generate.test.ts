@@ -8,6 +8,7 @@ import {
   signInAs,
   visibilitySlugs,
 } from '../../../test.setup';
+import { talkTranscriptFetcher } from '../../talks/transcriptFetch';
 import { talkStudyGenerator } from './generate';
 
 const GENERATED_STUDY_BODY = `## Main points
@@ -61,6 +62,63 @@ async function seedTalkWithTranscript() {
 }
 
 describe('generateStudy', () => {
+  it('fetches a missing transcript before generating', async () => {
+    const t = createConvexTest();
+    await seedVisibilityCatalog(t);
+    const published = await t.query(api.talks.getTalkBySlug, {
+      speakerSlug: visibilitySlugs.publishedSpeaker,
+      talkSlug: visibilitySlugs.publishedTalk,
+    });
+
+    expect(published).not.toBeNull();
+
+    if (!published) {
+      throw new Error('expected a published talk');
+    }
+
+    const { asUser: asAdmin } = await signInAs(t, {
+      email: 'admin@example.test',
+      name: 'Admin',
+      role: 'admin',
+    });
+    const talkId = published.talk._id;
+    const fetchedTranscript = 'Fetched transcript for study generation.';
+    const previousFetch = talkTranscriptFetcher.fetch;
+    const previousGenerate = talkStudyGenerator.generate;
+    const previousKey = process.env.AI_GATEWAY_API_KEY;
+
+    talkTranscriptFetcher.fetch = () =>
+      Promise.resolve({
+        status: 'success',
+        text: fetchedTranscript,
+      });
+    talkStudyGenerator.generate = () => Promise.resolve(GENERATED_STUDY_BODY);
+    process.env.AI_GATEWAY_API_KEY = 'test-gateway-key';
+
+    try {
+      const created = await asAdmin.action(api.talkFeatures.generateStudy, {
+        talkId,
+      });
+
+      expect(created.status).toBe('success');
+
+      const loaded = await asAdmin.query(api.talks.getTalkTranscriptText, {
+        talkId,
+      });
+
+      expect(loaded?.text).toBe(fetchedTranscript);
+    } finally {
+      talkTranscriptFetcher.fetch = previousFetch;
+      talkStudyGenerator.generate = previousGenerate;
+
+      if (previousKey === undefined) {
+        delete process.env.AI_GATEWAY_API_KEY;
+      } else {
+        process.env.AI_GATEWAY_API_KEY = previousKey;
+      }
+    }
+  });
+
   it('saves a draft and refuses a manually edited or published study', async () => {
     const { asAdmin, asMember, t, talkId } = await seedTalkWithTranscript();
     const previousKey = process.env.AI_GATEWAY_API_KEY;

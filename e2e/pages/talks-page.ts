@@ -2,24 +2,19 @@ import type { Locator, Page } from '@playwright/test';
 
 export class TalksPage {
   readonly adminEdit: Locator;
-  readonly contentTab: Locator;
   readonly createDrawer: Locator;
   readonly editDrawer: Locator;
-  readonly editSheet: Locator;
   readonly favorite: Locator;
   readonly firstTalk: Locator;
-  readonly generateSummary: Locator;
-  readonly getTranscript: Locator;
-  readonly heading: Locator;
   readonly newTalk: Locator;
   readonly page: Page;
-  readonly playback: Locator;
   readonly publishDate: Locator;
   readonly search: Locator;
   readonly studyPanel: Locator;
   readonly studyTab: Locator;
   readonly talkCards: Locator;
   readonly talkHeading: Locator;
+  readonly transcriptTab: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -30,27 +25,17 @@ export class TalksPage {
     this.editDrawer = page.getByTestId('edit-talk-drawer').filter({
       visible: true,
     });
-    this.contentTab = this.editDrawer.getByTestId('edit-talk-tab-content');
-    this.generateSummary = this.editDrawer.getByTestId('generate-summary');
-    this.getTranscript = this.editDrawer.getByTestId('get-transcript');
-    this.newTalk = page.getByTestId('new-talk');
-    this.editSheet = page.getByRole('heading', { name: 'Edit Talk' });
     this.favorite = page.getByTestId('favorite-talk');
-    this.talkCards = page.getByRole('link').and(page.getByTestId('talk-card'));
-    this.firstTalk = this.talkCards.first();
-    this.heading = page.getByRole('heading', {
-      exact: true,
-      level: 1,
-      name: 'Talks',
-    });
-    this.playback = page
-      .getByRole('button', { name: /^(?:Play|Watch) /u })
-      .or(page.getByRole('link', { name: 'Open Media' }))
-      .or(page.locator('audio[controls], video[controls]'));
+    this.newTalk = page.getByTestId('new-talk');
     this.publishDate = this.editDrawer.getByTestId('publish-date');
     this.search = page.getByRole('searchbox', { name: 'Search' });
     this.studyPanel = this.editDrawer.getByTestId('edit-talk-study-panel');
     this.studyTab = this.editDrawer.getByTestId('edit-talk-tab-study');
+    this.talkCards = page.getByRole('link').and(page.getByTestId('talk-card'));
+    this.firstTalk = this.talkCards.first();
+    this.transcriptTab = this.editDrawer.getByTestId(
+      'edit-talk-tab-transcript'
+    );
     this.talkHeading = page.getByRole('heading', { level: 1 });
   }
 
@@ -131,6 +116,10 @@ export class TalksPage {
 
   async openStudyTab() {
     await this.studyTab.click();
+  }
+
+  async openTranscriptTab() {
+    await this.transcriptTab.click();
   }
 
   async openTalkAt(index: number) {

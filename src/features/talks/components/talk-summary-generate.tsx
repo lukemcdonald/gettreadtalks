@@ -7,32 +7,18 @@ import { useState } from 'react';
 
 import { Button, FieldDescription } from '@/components/ui';
 import { api } from '@/convex/_generated/api';
-
-function getSummaryGenerateStatusText({
-  error,
-  hasTranscript,
-  isPending,
-}: {
-  error: string | null;
-  hasTranscript: boolean;
-  isPending: boolean;
-}) {
-  if (isPending) {
-    return 'Generating summary...';
-  }
-
-  if (error) {
-    return error;
-  }
-
-  return hasTranscript ? null : 'Needs a transcript';
-}
+import {
+  getTalkGenerateIdleStatus,
+  getTalkGeneratePendingLabel,
+} from '@/features/talks/components/talk-generate-status';
 
 export function TalkSummaryGenerate({
+  canGenerate,
   hasTranscript,
   onFlagsChange,
   talkId,
 }: {
+  canGenerate: boolean;
   hasTranscript: boolean;
   onFlagsChange?: (flags: string[]) => void;
   talkId: TalkId;
@@ -40,11 +26,9 @@ export function TalkSummaryGenerate({
   const generate = useAction(api.talks.generateTalkSummary);
   const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
-  const statusText = getSummaryGenerateStatusText({
-    error,
-    hasTranscript,
-    isPending,
-  });
+  const statusText = isPending
+    ? getTalkGeneratePendingLabel(canGenerate, hasTranscript, 'summary')
+    : getTalkGenerateIdleStatus(canGenerate, error);
 
   function handleClick() {
     setError(null);
@@ -72,7 +56,7 @@ export function TalkSummaryGenerate({
     <div className="flex flex-wrap items-center gap-2">
       <Button
         data-testid="generate-summary"
-        disabled={!hasTranscript || isPending}
+        disabled={!canGenerate || isPending}
         loading={isPending}
         onClick={handleClick}
         size="sm"

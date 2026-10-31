@@ -5,7 +5,7 @@ import {
   MEDIA_HEALTH_CRON_ARGS,
   MEDIA_HEALTH_CRON_IDENTIFIER,
   MEDIA_HEALTH_CRON_SPEC,
-} from './model/mediaHealth/cronJob';
+} from './model/mediaHealth/check/cronJob';
 
 const crons = cronJobs();
 

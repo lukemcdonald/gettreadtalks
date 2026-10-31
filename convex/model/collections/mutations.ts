@@ -10,7 +10,7 @@ import {
   throwValidationError,
 } from '../../lib/errors';
 import { generateSlug, slugExists, slugify } from '../../lib/utils';
-import { requireAdmin } from '../auth/roles';
+import { requireAdmin } from '../auth/helpers';
 
 /**
  * Create a new collection.

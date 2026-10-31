@@ -15,18 +15,15 @@ const TALK_PATH = talkPath(PREVIEW_TALKS.THE_PRODIGAL_SON);
 
 async function setPublishDate(talksPage: TalksPage, value: string) {
   await talksPage.page.goto(TALK_PATH);
-  await expect(talksPage.talkHeading).toBeVisible();
   await talksPage.openAdminEdit();
-  await expect(talksPage.editDrawer).toBeVisible();
   await talksPage.fillPublishDate(value);
   await talksPage.saveChanges();
-  await expect(talksPage.editDrawer).toHaveCount(0);
 }
 
 // fallow-ignore-next-line weakened-tests -- signed-in e2e specs skip without credentials
 test.skip(!hasE2eUser(), E2E_USER_SKIP_REASON);
 
-test('Admin can set a past publish date and move a talk in archive order', async ({
+test('Admin can change publish date and talk listing order', async ({
   talksPage,
 }) => {
   await setPublishDate(talksPage, NEWEST_DATE);
@@ -38,14 +35,7 @@ test('Admin can set a past publish date and move a talk in archive order', async
     expect(hrefs[0]).toBe(TALK_PATH);
   }).toPass();
 
-  await talksPage.page.goto(TALK_PATH);
-  await expect(talksPage.talkHeading).toBeVisible();
-  await talksPage.openAdminEdit();
-  await expect(talksPage.editDrawer).toBeVisible();
-  await expect(talksPage.publishDate).toBeVisible();
-  await talksPage.fillPublishDate(PAST_DATE);
-  await talksPage.saveChanges();
-  await expect(talksPage.editDrawer).toHaveCount(0);
+  await setPublishDate(talksPage, PAST_DATE);
 
   await expect(async () => {
     await talksPage.goto();

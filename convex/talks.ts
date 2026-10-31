@@ -1,10 +1,13 @@
 import { mutations, queries } from './model/talks';
 
 export {
+  fetchTalkTranscript,
+  insertPendingTalkTranscriptFetch,
+} from './model/talks/transcriptFetch';
+export {
   generateTalkSummary,
   loadTalkSummarySource,
 } from './model/talks/summaryGenerate';
-export { fetchTalkTranscript } from './model/talks/transcriptFetch';
 
 // Queries
 export const {

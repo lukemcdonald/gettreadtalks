@@ -9,7 +9,7 @@ import {
   throwValidationError,
 } from '../../lib/errors';
 import { slugExists, slugify } from '../../lib/utils';
-import { requireAdmin } from '../auth/roles';
+import { requireAdmin } from '../auth/helpers';
 import { affiliateLinkTypes } from './validators';
 
 /**

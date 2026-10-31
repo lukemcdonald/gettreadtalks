@@ -6,20 +6,24 @@ import { ConvexError, v } from 'convex/values';
 
 import { api, internal } from '../../../_generated/api';
 import { action } from '../../../_generated/server';
-import { TALK_SUMMARY_MODEL } from '../../talks/summaryPrompt';
+import {
+  NO_TRANSCRIPT_SOURCE_MESSAGE,
+  TALK_SUMMARY_MODEL,
+} from '../../talks/summary/prompt';
+import { loadTranscriptForGenerate } from '../../talks/transcriptFetch';
 import { hasReviewedTalkFeature } from '../helpers';
 import { buildTalkStudyPrompt, TALK_STUDY_SYSTEM_PROMPT } from './prompt';
 
 const STUDY_GENERATE_MESSAGES = {
   ALREADY_REVIEWED: 'This study has already been reviewed.',
-  NO_TRANSCRIPT: 'A transcript is required to generate a study.',
+  NO_TRANSCRIPT_SOURCE: NO_TRANSCRIPT_SOURCE_MESSAGE,
   TOKEN_MISSING: 'Study service is not configured.',
   UPSTREAM_ERROR: 'Study service returned an error.',
 } as const;
 
 const talkStudyGenerateErrorCode = v.union(
   v.literal('ALREADY_REVIEWED'),
-  v.literal('NO_TRANSCRIPT'),
+  v.literal('NO_TRANSCRIPT_SOURCE'),
   v.literal('TOKEN_MISSING'),
   v.literal('UPSTREAM_ERROR')
 );
@@ -32,10 +36,13 @@ const talkStudyGenerateFailure = v.object({
 
 type TalkStudyGenerateErrorCode = keyof typeof STUDY_GENERATE_MESSAGES;
 
-function toFailedResult(errorCode: TalkStudyGenerateErrorCode) {
+function toFailedResult(
+  errorCode: TalkStudyGenerateErrorCode,
+  message?: string
+) {
   return {
     errorCode,
-    message: STUDY_GENERATE_MESSAGES[errorCode],
+    message: message ?? STUDY_GENERATE_MESSAGES[errorCode],
     status: 'failed' as const,
   };
 }
@@ -125,10 +132,6 @@ export const generateStudy = action({
       { talkId }
     );
 
-    if (!source.transcript) {
-      return toFailedResult('NO_TRANSCRIPT');
-    }
-
     const feature = await ctx.runQuery(api.talkFeatures.getTalkFeature, {
       kind: 'study',
       talkId,
@@ -142,9 +145,20 @@ export const generateStudy = action({
       return toFailedResult('TOKEN_MISSING');
     }
 
+    const loaded = await loadTranscriptForGenerate(
+      ctx,
+      talkId,
+      source.transcript,
+      source.mediaUrl
+    );
+
+    if ('errorCode' in loaded) {
+      return toFailedResult(loaded.errorCode, loaded.message);
+    }
+
     return await saveGeneratedTalkStudy(
       ctx,
-      { ...source, transcript: source.transcript },
+      { ...source, transcript: loaded.transcript },
       talkId
     );
   },

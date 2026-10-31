@@ -30,6 +30,7 @@ export class SearchPage {
   async goto(query?: string) {
     if (query) {
       await this.page.goto(`/search?search=${encodeURIComponent(query)}`);
+
       return;
     }
 
