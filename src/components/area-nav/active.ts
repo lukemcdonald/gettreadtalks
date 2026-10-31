@@ -4,15 +4,8 @@ interface AreaNavActiveItem {
 }
 
 export function isAreaNavItemActive(item: AreaNavActiveItem, pathname: string) {
-  if (item.href === pathname) {
-    return true;
-  }
-
-  for (const child of item.children ?? []) {
-    if (isAreaNavItemActive(child, pathname)) {
-      return true;
-    }
-  }
-
-  return false;
+  return (
+    item.href === pathname ||
+    (item.children ?? []).some((child) => isAreaNavItemActive(child, pathname))
+  );
 }

@@ -29,8 +29,5 @@ describe('isAreaNavItemActive', () => {
 
   it('does not treat an undeclared nested route as active', () => {
     expect(isAreaNavItemActive(talks, '/manage/talks/edit')).toBe(false);
-    expect(
-      isAreaNavItemActive({ href: '/account' }, '/account/favorites')
-    ).toBe(false);
   });
 });

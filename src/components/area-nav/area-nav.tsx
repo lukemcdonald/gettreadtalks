@@ -204,16 +204,7 @@ export function AreaNav({ items, label, variant }: AreaNavProps) {
       return;
     }
 
-    let hasCurrentItem = false;
-
-    for (const item of items) {
-      if (isAreaNavItemActive(item, pathname)) {
-        hasCurrentItem = true;
-        break;
-      }
-    }
-
-    if (!hasCurrentItem) {
+    if (!items.some((item) => isAreaNavItemActive(item, pathname))) {
       return;
     }
 
