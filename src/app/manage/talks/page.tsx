@@ -6,8 +6,7 @@ import { ManageTalksContent } from '@/app/manage/talks/_components/talks-content
 import { TalksFilters } from '@/app/manage/talks/_components/talks-filters';
 import { ManageTableSkeleton } from '@/components/manage-table';
 import { PageHeader } from '@/components/page-header';
-import { Button, Skeleton } from '@/components/ui';
-import { Link } from '@/components/ui/link';
+import { Skeleton } from '@/components/ui';
 import { NewTalkButton } from '@/features/talks/components/new-talk-button';
 
 interface ManageTalksPageProps {
@@ -20,18 +19,7 @@ export default function ManageTalksPage({
   return (
     <>
       <PageHeader
-        actions={
-          <div className="flex items-center gap-2">
-            <Button
-              render={<Link href="/manage/talks/transcripts" />}
-              size="sm"
-              variant="outline"
-            >
-              Transcripts
-            </Button>
-            <NewTalkButton />
-          </div>
-        }
+        actions={<NewTalkButton />}
         description="Manage all talks across all statuses"
         title="Manage Talks"
       />
