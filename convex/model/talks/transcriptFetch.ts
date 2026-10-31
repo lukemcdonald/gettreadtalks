@@ -306,7 +306,7 @@ function toCompleteTalkTranscriptFetchArgs(
   };
 }
 
-export async function resolveAndCompleteTalkTranscriptFetch(
+export async function fetchAndCompleteTalkTranscript(
   ctx: ActionCtx,
   args: {
     mediaUrl: string;
@@ -364,7 +364,7 @@ export const fetchTalkTranscript = internalAction({
     talkId: v.id('talks'),
   },
   handler: async (ctx, args) => {
-    await resolveAndCompleteTalkTranscriptFetch(ctx, args);
+    await fetchAndCompleteTalkTranscript(ctx, args);
 
     return null;
   },
@@ -451,7 +451,7 @@ export async function ensureTalkTranscriptText(
     { talkId }
   );
 
-  return await resolveAndCompleteTalkTranscriptFetch(ctx, {
+  return await fetchAndCompleteTalkTranscript(ctx, {
     mediaUrl,
     runId,
     talkId,

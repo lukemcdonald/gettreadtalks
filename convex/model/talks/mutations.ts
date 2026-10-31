@@ -13,7 +13,7 @@ import {
   throwNotFound,
   throwValidationError,
 } from '../../lib/errors';
-import { isFuturePublishedAt, resolvePublishedAt } from '../../lib/publishedAt';
+import { getPublishedAt, isFuturePublishedAt } from '../../lib/publishedAt';
 import {
   deleteAll,
   getOrThrow,
@@ -107,7 +107,7 @@ function publishedAtForTalk({
   requestedPublishedAt?: number;
   status: StatusType;
 }): number | undefined {
-  const publishedAt = resolvePublishedAt({
+  const publishedAt = getPublishedAt({
     currentPublishedAt,
     requestedPublishedAt,
     status,

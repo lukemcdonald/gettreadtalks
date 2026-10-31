@@ -5,7 +5,7 @@ import {
   isFuturePublishedAt,
   isFutureUtcDate,
   parseUtcDate,
-  resolvePublishedAt,
+  getPublishedAt,
 } from './publishedAt';
 
 const NOW = Date.parse('2026-10-28T15:30:00.000Z');
@@ -55,10 +55,10 @@ describe('isFuturePublishedAt', () => {
   });
 });
 
-describe('resolvePublishedAt', () => {
+describe('getPublishedAt', () => {
   it('clears the timestamp when the talk is not published', () => {
     expect(
-      resolvePublishedAt({
+      getPublishedAt({
         currentPublishedAt: NOW,
         requestedPublishedAt: Date.parse('2020-01-01T00:00:00.000Z'),
         status: 'backlog',
@@ -68,7 +68,7 @@ describe('resolvePublishedAt', () => {
 
   it('defaults to now when first publishing without a date', () => {
     expect(
-      resolvePublishedAt({
+      getPublishedAt({
         now: NOW,
         status: 'published',
       })
@@ -79,7 +79,7 @@ describe('resolvePublishedAt', () => {
     const currentPublishedAt = Date.parse('2024-06-03T12:00:00.000Z');
 
     expect(
-      resolvePublishedAt({
+      getPublishedAt({
         currentPublishedAt,
         now: NOW,
         status: 'published',
@@ -91,7 +91,7 @@ describe('resolvePublishedAt', () => {
     const currentPublishedAt = Date.parse('2024-06-03T12:00:00.000Z');
 
     expect(
-      resolvePublishedAt({
+      getPublishedAt({
         currentPublishedAt,
         requestedPublishedAt: Date.parse('2024-06-03T00:00:00.000Z'),
         status: 'published',
@@ -103,7 +103,7 @@ describe('resolvePublishedAt', () => {
     const requestedPublishedAt = Date.parse('2020-01-01T00:00:00.000Z');
 
     expect(
-      resolvePublishedAt({
+      getPublishedAt({
         currentPublishedAt: Date.parse('2024-06-03T12:00:00.000Z'),
         requestedPublishedAt,
         status: 'published',
