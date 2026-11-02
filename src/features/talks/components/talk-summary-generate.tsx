@@ -46,26 +46,24 @@ export function TalkSummaryGenerate({
     isPending,
   });
 
-  function handleClick() {
+  async function handleClick() {
     setError(null);
     setIsPending(true);
     onFlagsChange?.([]);
 
-    void generate({ talkId })
-      .then((result) => {
-        if (result.status === 'failed') {
-          setError(result.message);
-          return;
-        }
+    try {
+      const result = await generate({ talkId });
 
+      if (result.status === 'failed') {
+        setError(result.message);
+      } else {
         onFlagsChange?.(result.flags);
-      })
-      .catch(() => {
-        setError('Something went wrong. Please try again.');
-      })
-      .then(() => {
-        setIsPending(false);
-      });
+      }
+    } catch {
+      setError('Something went wrong. Please try again.');
+    }
+
+    setIsPending(false);
   }
 
   return (
