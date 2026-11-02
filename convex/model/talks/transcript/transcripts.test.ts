@@ -1,15 +1,15 @@
-import type { Id } from '../../_generated/dataModel';
+import type { Id } from '../../../_generated/dataModel';
 
 import { describe, expect, it } from 'vitest';
 
-import { api, internal } from '../../_generated/api';
-import { ErrorCodes } from '../../lib/errors';
+import { api, internal } from '../../../_generated/api';
+import { ErrorCodes } from '../../../lib/errors';
 import {
   createConvexTest,
   seedVisibilityCatalog,
   signInAs,
   visibilitySlugs,
-} from '../../test.setup';
+} from '../../../test.setup';
 
 const transcriptSecret = 'PRIVATE_TRANSCRIPT_SENTINEL_volt332';
 

@@ -6,8 +6,8 @@ import { v } from 'convex/values';
 import { mutation } from '../../_generated/server';
 import { throwNotFound, throwValidationError } from '../../lib/errors';
 import { generateSlug } from '../../lib/utils';
-import { requireAdmin } from '../auth/roles';
-import { toTopicUpdates } from './updates';
+import { requireAdmin } from '../auth/helpers';
+import { toTopicUpdates } from './helpers';
 
 /**
  * Add a talk to a topic.

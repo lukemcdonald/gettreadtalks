@@ -1,5 +1,5 @@
 import type { ActionCtx } from './_generated/server';
-import type { MediaHealthDigestItem } from './model/mediaHealth/digest';
+import type { MediaHealthDigestItem } from './model/mediaHealth/check/digest';
 
 import { v } from 'convex/values';
 
@@ -10,8 +10,8 @@ import { formatErrorMessage } from './lib/utils';
 import {
   appendMediaHealthItem,
   buildMediaHealthDigest,
-} from './model/mediaHealth/digest';
-import { checkMediaUrl } from './model/mediaHealth/oembed';
+} from './model/mediaHealth/check/digest';
+import { checkMediaUrl } from './model/mediaHealth/check/oembed';
 import {
   mediaCheckEntityTable,
   mediaHealthDigestItem,

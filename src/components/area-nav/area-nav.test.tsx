@@ -70,5 +70,37 @@ describe('AreaNav', () => {
         screen.getByRole('link', { name: 'Settings' })
       ).not.toHaveAttribute('aria-current');
     });
+
+    it('marks a nested item as the current page', () => {
+      usePathname.mockReturnValue('/manage/talks/transcripts');
+
+      render(
+        <AreaNav
+          items={[
+            {
+              children: [
+                {
+                  href: '/manage/talks/transcripts',
+                  icon: 'transcripts',
+                  label: 'Transcripts',
+                },
+              ],
+              href: '/manage/talks',
+              icon: 'talks',
+              label: 'Talks',
+            },
+          ]}
+          label="Content"
+          variant={variant}
+        />
+      );
+
+      expect(
+        screen.getByTestId('nav-manage-talks-transcripts')
+      ).toHaveAttribute('aria-current', 'page');
+      expect(screen.getByTestId('nav-manage-talks')).not.toHaveAttribute(
+        'aria-current'
+      );
+    });
   });
 });

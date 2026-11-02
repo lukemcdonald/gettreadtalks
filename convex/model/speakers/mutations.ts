@@ -6,7 +6,7 @@ import { v } from 'convex/values';
 import { mutation } from '../../_generated/server';
 import { throwDuplicateSlug, throwValidationError } from '../../lib/errors';
 import { deleteAll, getOrThrow, slugExists, slugify } from '../../lib/utils';
-import { requireAdmin } from '../auth/roles';
+import { requireAdmin } from '../auth/helpers';
 import { speakerRoleType } from './validators';
 
 /**

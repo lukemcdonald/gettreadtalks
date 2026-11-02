@@ -8,8 +8,7 @@ import {
   throwNotFound,
   throwValidationError,
 } from '../../lib/errors';
-import { requireAdmin } from '../auth/roles';
-import { getUserId } from '../auth/utils';
+import { getUserId, requireAdmin } from '../auth/helpers';
 import { userRole } from './validators';
 
 /**

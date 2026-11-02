@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { internal } from '../../_generated/api';
-import { createConvexTest } from '../../test.setup';
+import { internal } from '../../../_generated/api';
+import { createConvexTest } from '../../../test.setup';
 import {
   appendMediaHealthItem,
   buildMediaHealthDigest,

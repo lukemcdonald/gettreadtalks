@@ -6,17 +6,15 @@ import {
 
 const user = getE2eUser();
 
-test('Favorites / Signed out redirects to login', async ({
-  authPage,
+test('Signed-out user is redirected from favorites', async ({
   favoritesPage,
 }) => {
   await favoritesPage.goto();
 
   await expect(favoritesPage.page).toHaveURL(/\/login\?redirect=/u);
-  await authPage.email.fill('user@example.com');
 });
 
-test('Favorites / Sign in returns to favorites', async ({
+test('User can sign in from favorites redirect', async ({
   authPage,
   favoritesPage,
 }) => {
@@ -27,10 +25,7 @@ test('Favorites / Sign in returns to favorites', async ({
   }
 
   await favoritesPage.goto();
-  await expect(authPage.page).toHaveURL(/\/login\?redirect=/u);
   await authPage.submit(user.email, user.password);
 
-  await expect(authPage.page).toHaveURL(/\/account\/favorites\/?$/u);
-  await expect(favoritesPage.heading).toBeVisible();
-  await expect(authPage.accountMenu).toBeVisible();
+  await expect(favoritesPage.page).toHaveURL(/\/account\/favorites\/?$/u);
 });

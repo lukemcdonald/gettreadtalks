@@ -2,7 +2,7 @@ import { v } from 'convex/values';
 
 import { query } from '../../_generated/server';
 import { doc } from '../../lib/validators/schema';
-import { requireAdmin } from '../auth/roles';
+import { requireAdmin } from '../auth/helpers';
 import { talkFeatureKind } from './validators';
 
 export const getTalkFeature = query({

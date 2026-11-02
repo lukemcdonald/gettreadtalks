@@ -1,13 +1,13 @@
 import { v } from 'convex/values';
 
 import { query } from '../../_generated/server';
-import { getCurrentUser as getAuthUser } from '../auth/utils';
+import { getCurrentUser as getAuthUser } from '../auth/helpers';
 import {
   getUserFavoriteClips,
   getUserFavoriteSpeakers,
   getUserFavoriteTalks,
   getUserFinishedTalks,
-} from './utils';
+} from './helpers';
 
 /**
  * Get the current authenticated user. Returns null if not authenticated.

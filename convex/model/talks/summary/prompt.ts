@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+export const NO_TRANSCRIPT_SOURCE_MESSAGE = 'Generating needs a YouTube video.';
+
 /** Switch models here. Gateway ids: https://vercel.com/ai-gateway/models */
 export const TALK_SUMMARY_MODEL = 'spacexai/grok-4.20-reasoning';
 

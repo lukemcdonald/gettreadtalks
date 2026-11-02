@@ -58,12 +58,14 @@ export function useTalkSummaryForm(
 }
 
 export function TalkSummaryFields({
+  canGenerate,
   form,
   hasTranscript,
   onFlagsChange,
   summaryFlags,
   talkId,
 }: {
+  canGenerate: boolean;
   form: UseFormReturn<TalkSummaryFormData>;
   hasTranscript: boolean;
   onFlagsChange: (flags: string[]) => void;
@@ -97,6 +99,7 @@ export function TalkSummaryFields({
               <FieldError match>{fieldState.error.message}</FieldError>
             ) : null}
             <TalkSummaryGenerate
+              canGenerate={canGenerate}
               hasTranscript={hasTranscript}
               onFlagsChange={onFlagsChange}
               talkId={talkId}

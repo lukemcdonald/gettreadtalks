@@ -6,7 +6,7 @@ import type { PaginationOptions } from 'convex/server';
 import { asyncMap } from 'convex-helpers';
 
 import { filterClipsByPublishedTalks } from '../../lib/filters';
-import { searchTitleQuery } from '../search/utils';
+import { searchTitleQuery } from '../search/helpers';
 
 function publishedClipsQuery(ctx: QueryCtx) {
   return ctx.db

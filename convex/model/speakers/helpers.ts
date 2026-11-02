@@ -6,7 +6,7 @@ import { asyncMap } from 'convex-helpers';
 import { getManyFrom } from 'convex-helpers/server/relationships';
 
 import { filterSpeakersWithPublishedTalks } from '../../lib/filters';
-import { searchPhrases, uniqueById } from '../search/utils';
+import { searchPhrases, uniqueById } from '../search/helpers';
 
 const UNFILTERED_SEARCH_MULTIPLIER = 3;
 

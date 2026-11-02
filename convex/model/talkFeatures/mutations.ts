@@ -6,7 +6,7 @@ import { v } from 'convex/values';
 import { internalMutation, mutation } from '../../_generated/server';
 import { throwConvexError } from '../../lib/errors';
 import { getOrThrow } from '../../lib/utils';
-import { requireAdmin } from '../auth/roles';
+import { requireAdmin } from '../auth/helpers';
 import { hasReviewedTalkFeature } from './helpers';
 import { talkFeatureKind, talkFeatureStatus } from './validators';
 

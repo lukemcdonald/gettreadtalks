@@ -1,5 +1,5 @@
-import type { Id } from '../../_generated/dataModel';
-import type { MediaCheckStatus } from './validators';
+import type { Id } from '../../../_generated/dataModel';
+import type { MediaCheckStatus } from '../validators';
 
 import { isBrokenStatus, isUnnotifiedBreak } from './record';
 

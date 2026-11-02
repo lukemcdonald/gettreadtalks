@@ -18,3 +18,7 @@ export function getVideoId(url: string): VideoId | null {
 
   return { id, service };
 }
+
+export function hasTalkTranscriptSource(mediaUrl: string) {
+  return getVideoId(mediaUrl)?.service === 'youtube';
+}

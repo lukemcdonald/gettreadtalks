@@ -11,11 +11,11 @@ import {
   getOrThrow,
   getPublishedAtForStatus,
 } from '../../lib/utils';
-import { requireAdmin } from '../auth/roles';
+import { requireAdmin } from '../auth/helpers';
 import {
   clearMediaChecksForEntity,
   clearStaleMediaChecks,
-} from '../mediaHealth/clear';
+} from '../mediaHealth/check/clear';
 import { statusType } from './validators';
 
 /**

@@ -13,19 +13,20 @@ import {
   throwNotFound,
   throwValidationError,
 } from '../../lib/errors';
-import { isFuturePublishedAt, resolvePublishedAt } from '../../lib/publishedAt';
+import { getPublishedAt, isFuturePublishedAt } from '../../lib/publishedAt';
 import {
   deleteAll,
   getOrThrow,
   slugify,
   talkSlugExistsForSpeaker,
 } from '../../lib/utils';
-import { requireAdmin } from '../auth/roles';
+import { requireAdmin } from '../auth/helpers';
 import {
   clearMediaChecksForEntity,
   clearStaleMediaChecks,
-} from '../mediaHealth/clear';
+} from '../mediaHealth/check/clear';
 import { talkTranscriptFields } from './schema';
+import { findOrInsertPendingTalkTranscriptFetch } from './transcriptFetch';
 import { statusType, talkTranscriptFetchErrorCode } from './validators';
 
 async function setTalkTopics(
@@ -106,7 +107,7 @@ function publishedAtForTalk({
   requestedPublishedAt?: number;
   status: StatusType;
 }): number | undefined {
-  const publishedAt = resolvePublishedAt({
+  const publishedAt = getPublishedAt({
     currentPublishedAt,
     requestedPublishedAt,
     status,
@@ -471,16 +472,6 @@ export const createTalkTranscriptFetch = mutation({
     await requireAdmin(ctx);
 
     const talk = await getOrThrow(ctx, 'talks', talkId);
-    const existingFetches = await ctx.db
-      .query('talkTranscriptFetches')
-      .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
-      .collect();
-    const pending = existingFetches.find((row) => row.status === 'pending');
-
-    if (pending) {
-      return pending._id;
-    }
-
     const existingTranscript = await getOneFrom(
       ctx.db,
       'talkTranscripts',
@@ -494,11 +485,7 @@ export const createTalkTranscriptFetch = mutation({
       );
     }
 
-    const runId = await ctx.db.insert('talkTranscriptFetches', {
-      checkedAt: Date.now(),
-      status: 'pending',
-      talkId,
-    });
+    const runId = await findOrInsertPendingTalkTranscriptFetch(ctx, talkId);
 
     await ctx.scheduler.runAfter(0, internal.talks.fetchTalkTranscript, {
       mediaUrl: talk.mediaUrl,

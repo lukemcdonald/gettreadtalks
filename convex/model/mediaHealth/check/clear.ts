@@ -1,6 +1,6 @@
-import type { MutationCtx } from '../../_generated/server';
+import type { MutationCtx } from '../../../_generated/server';
 
-import { deleteAll } from '../../lib/utils';
+import { deleteAll } from '../../../lib/utils';
 
 export function shouldClearMediaChecks(args: {
   mediaUrlChanged: boolean;

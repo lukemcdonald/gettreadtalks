@@ -3,7 +3,7 @@
 import { useQuery } from 'convex/react';
 
 import { api } from '@/convex/_generated/api';
-import { normalizeSearchQuery } from '@/convex/model/search/utils';
+import { normalizeSearchQuery } from '@/convex/model/search/helpers';
 import { emptySiteSearch } from '@/features/search/utils';
 
 export function useSearchSite(query: string, limit?: number) {

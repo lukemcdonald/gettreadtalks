@@ -13,10 +13,12 @@ import { getTopicComparator } from '../../lib/sort';
 import { enrichWithSpeaker, paginateArray } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
-import { requireAdmin } from '../auth/roles';
-import { LIST_SEARCH_LIMIT } from '../search/constants';
-import { listAllAdmin } from '../search/listAll';
-import { normalizeSearchQuery } from '../search/utils';
+import { requireAdmin } from '../auth/helpers';
+import {
+  LIST_SEARCH_LIMIT,
+  listAllAdmin,
+  normalizeSearchQuery,
+} from '../search/helpers';
 import {
   listPublishedTalksForTopic,
   searchPublishedTalksByTitleOrSpeaker,

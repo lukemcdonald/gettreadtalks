@@ -2,6 +2,7 @@
 
 import type { LucideIcon } from 'lucide-react';
 import type { Route } from 'next';
+import type { RefObject } from 'react';
 
 import {
   CheckCircle2Icon,
@@ -9,6 +10,7 @@ import {
   FolderIcon,
   HeartIcon,
   MicIcon,
+  ScrollTextIcon,
   SettingsIcon,
   TagIcon,
   UsersIcon,
@@ -19,6 +21,8 @@ import { useEffect, useRef } from 'react';
 import { Link } from '@/components/ui/link';
 import { cn } from '@/utils';
 
+import { isAreaNavItemActive } from './active';
+
 export const AREA_NAV_ICONS = {
   clips: FilmIcon,
   collections: FolderIcon,
@@ -28,11 +32,13 @@ export const AREA_NAV_ICONS = {
   speakers: UsersIcon,
   talks: MicIcon,
   topics: TagIcon,
+  transcripts: ScrollTextIcon,
 } as const satisfies Record<string, LucideIcon>;
 
 export type AreaNavIcon = keyof typeof AREA_NAV_ICONS;
 
 export interface AreaNavItem {
+  children?: AreaNavItem[];
   href: Route;
   icon: AreaNavIcon;
   label: string;
@@ -44,10 +50,34 @@ export interface AreaNavSection {
   label: string;
 }
 
+type AreaNavVariant = 'sidebar' | 'tabs';
+
 interface AreaNavProps {
   items: AreaNavItem[];
   label: string;
-  variant: 'sidebar' | 'tabs';
+  variant: AreaNavVariant;
+}
+
+interface AreaNavLinkProps {
+  href: Route;
+  icon: AreaNavIcon;
+  isActive: boolean;
+  isCurrent: boolean;
+  label: string;
+  linkRef: RefObject<HTMLAnchorElement | null>;
+  variant: AreaNavVariant;
+}
+
+interface AreaNavListProps {
+  items: AreaNavItem[];
+  linkRef: RefObject<HTMLAnchorElement | null>;
+  nested?: boolean;
+  pathname: string;
+  variant: AreaNavVariant;
+}
+
+function buildAreaNavTestId(href: string) {
+  return `nav-${href.slice(1).replaceAll('/', '-')}`;
 }
 
 function AreaNavGlyph({ name }: { name: AreaNavIcon }) {
@@ -61,6 +91,110 @@ function AreaNavGlyph({ name }: { name: AreaNavIcon }) {
   );
 }
 
+function getAreaNavLinkClassName(isActive: boolean, variant: AreaNavVariant) {
+  if (variant === 'sidebar') {
+    return cn(
+      'flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium outline-none',
+      'focus-visible:ring-ring focus-visible:ring-offset-background focus-visible:ring-2 focus-visible:ring-offset-1',
+      isActive
+        ? 'bg-muted text-foreground'
+        : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground'
+    );
+  }
+
+  return cn(
+    'relative inline-flex items-center gap-2 px-3 py-2 text-sm font-medium whitespace-nowrap',
+    isActive
+      ? 'text-foreground after:bg-primary after:absolute after:inset-x-0 after:bottom-0 after:h-0.5'
+      : 'text-muted-foreground hover:text-foreground'
+  );
+}
+
+function getAreaNavListClassName(nested: boolean, variant: AreaNavVariant) {
+  if (nested && variant === 'sidebar') {
+    return 'border-input mt-1 ms-5 flex flex-col gap-1 border-s ps-1';
+  }
+
+  if (nested) {
+    return 'border-input ms-1 flex border-s ps-1';
+  }
+
+  if (variant === 'sidebar') {
+    return '-mx-3 flex flex-col gap-1';
+  }
+
+  return 'border-input flex w-full min-w-max gap-1 border-b';
+}
+
+function AreaNavLink({
+  href,
+  icon,
+  isActive,
+  isCurrent,
+  label,
+  linkRef,
+  variant,
+}: AreaNavLinkProps) {
+  return (
+    <Link
+      aria-current={isCurrent ? 'page' : undefined}
+      className={getAreaNavLinkClassName(isActive, variant)}
+      data-testid={buildAreaNavTestId(href)}
+      href={href}
+      ref={isCurrent ? linkRef : undefined}
+    >
+      <AreaNavGlyph name={icon} />
+      {label}
+    </Link>
+  );
+}
+
+function AreaNavList({
+  items,
+  linkRef,
+  nested = false,
+  pathname,
+  variant,
+}: AreaNavListProps) {
+  return (
+    <ul className={getAreaNavListClassName(nested, variant)}>
+      {items.map((item) => {
+        const isCurrent = item.href === pathname;
+
+        return (
+          <li
+            className={cn(
+              variant === 'sidebar'
+                ? 'flex flex-col'
+                : 'flex shrink-0 items-end'
+            )}
+            key={item.href}
+          >
+            <AreaNavLink
+              href={item.href}
+              icon={item.icon}
+              isActive={isAreaNavItemActive(item, pathname)}
+              isCurrent={isCurrent}
+              label={item.label}
+              linkRef={linkRef}
+              variant={variant}
+            />
+            {item.children?.length ? (
+              <AreaNavList
+                items={item.children}
+                linkRef={linkRef}
+                nested
+                pathname={pathname}
+                variant={variant}
+              />
+            ) : null}
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
 export function AreaNav({ items, label, variant }: AreaNavProps) {
   const pathname = usePathname();
   const activeRef = useRef<HTMLAnchorElement>(null);
@@ -70,9 +204,7 @@ export function AreaNav({ items, label, variant }: AreaNavProps) {
       return;
     }
 
-    const activeItem = items.find((item) => item.href === pathname);
-
-    if (!activeItem) {
+    if (!items.some((item) => isAreaNavItemActive(item, pathname))) {
       return;
     }
 
@@ -83,63 +215,17 @@ export function AreaNav({ items, label, variant }: AreaNavProps) {
     });
   }, [items, pathname, variant]);
 
-  if (variant === 'sidebar') {
-    return (
-      <nav aria-label={label} className="flex flex-col">
-        <ul className="-mx-3 flex flex-col gap-1">
-          {items.map((item) => {
-            const isActive = item.href === pathname;
-
-            return (
-              <li key={item.href}>
-                <Link
-                  aria-current={isActive ? 'page' : undefined}
-                  className={cn(
-                    'flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium outline-none',
-                    'focus-visible:ring-ring focus-visible:ring-offset-background focus-visible:ring-2 focus-visible:ring-offset-1',
-                    isActive
-                      ? 'bg-muted text-foreground'
-                      : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground'
-                  )}
-                  href={item.href}
-                >
-                  <AreaNavGlyph name={item.icon} />
-                  {item.label}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-      </nav>
-    );
-  }
-
   return (
-    <nav aria-label={label} className="overflow-x-auto">
-      <ul className="border-input flex w-full min-w-max gap-1 border-b">
-        {items.map((item) => {
-          const isActive = item.href === pathname;
-
-          return (
-            <li className="shrink-0" key={item.href}>
-              <Link
-                aria-current={isActive ? 'page' : undefined}
-                className={cn(
-                  'relative inline-flex items-center gap-2 px-3 py-2 text-sm font-medium whitespace-nowrap',
-                  isActive
-                    ? 'text-foreground after:bg-primary after:absolute after:inset-x-0 after:bottom-0 after:h-0.5'
-                    : 'text-muted-foreground hover:text-foreground'
-                )}
-                href={item.href}
-                ref={isActive ? activeRef : undefined}
-              >
-                <AreaNavGlyph name={item.icon} />
-                {item.label}
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+    <nav
+      aria-label={label}
+      className={variant === 'tabs' ? 'overflow-x-auto' : 'flex flex-col'}
+    >
+      <AreaNavList
+        items={items}
+        linkRef={activeRef}
+        pathname={pathname}
+        variant={variant}
+      />
     </nav>
   );
 }

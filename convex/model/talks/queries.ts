@@ -21,12 +21,15 @@ import { enrichWithSpeaker, paginateArray } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
 import { statusFilterType } from '../../lib/validators/shared';
-import { canViewContent, requireAdmin } from '../auth/roles';
-import { getCurrentUser } from '../auth/utils';
-import { LIST_SEARCH_LIMIT } from '../search/constants';
-import { listAllAdmin } from '../search/listAll';
-import { normalizeSearchQuery } from '../search/utils';
+import { canViewContent, getCurrentUser, requireAdmin } from '../auth/helpers';
 import {
+  LIST_SEARCH_LIMIT,
+  listAllAdmin,
+  normalizeSearchQuery,
+} from '../search/helpers';
+import {
+  enrichAdminTalks,
+  enrichWithTopics,
   listPublishedTalks,
   listPublishedTalksForTopics,
   listPublishedTalksPage,
@@ -35,7 +38,6 @@ import {
   talksByStatusQuery,
 } from './helpers';
 import { talkFields, talkTranscriptFields } from './schema';
-import { enrichAdminTalks, enrichWithTopics } from './utils';
 import { talkTranscriptFetchLastError } from './validators';
 
 /**

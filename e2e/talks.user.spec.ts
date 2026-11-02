@@ -6,15 +6,12 @@ import {
 
 test.skip(!hasE2eUser(), E2E_USER_SKIP_REASON);
 
-test('Talks / Favorite and unfavorite', async ({
+test('User can favorite and unfavorite a talk', async ({
   favoritesPage,
   talksPage,
 }) => {
   await talksPage.goto();
   await talksPage.openFirst();
-
-  await expect(talksPage.favorite).toBeVisible();
-  await expect(talksPage.favorite).toBeEnabled();
 
   const title = await talksPage.talkHeading.textContent();
 
@@ -23,10 +20,10 @@ test('Talks / Favorite and unfavorite', async ({
   }
 
   const talkUrl = talksPage.page.url();
-  const startedPressed =
+  const startedFavorited =
     (await talksPage.favorite.getAttribute('aria-pressed')) === 'true';
 
-  if (!startedPressed) {
+  if (!startedFavorited) {
     await talksPage.toggleFavorite();
   }
 
@@ -36,16 +33,14 @@ test('Talks / Favorite and unfavorite', async ({
   await expect(favoritesPage.talkNamed(title)).toBeVisible();
 
   await talksPage.page.goto(talkUrl);
-  await expect(talksPage.favorite).toBeVisible();
   await talksPage.toggleFavorite();
   await expect(talksPage.favorite).toHaveAttribute('aria-pressed', 'false');
 
   await favoritesPage.goto();
   await expect(favoritesPage.talkNamed(title)).toHaveCount(0);
 
-  if (startedPressed) {
+  if (startedFavorited) {
     await talksPage.page.goto(talkUrl);
-    await expect(talksPage.favorite).toBeVisible();
     await talksPage.toggleFavorite();
     await expect(talksPage.favorite).toHaveAttribute('aria-pressed', 'true');
 

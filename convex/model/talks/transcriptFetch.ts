@@ -1,11 +1,35 @@
-import type { TranscriptFetchErrorCode } from './transcriptFetchErrorCode';
+import type { Id } from '../../_generated/dataModel';
+import type { ActionCtx, MutationCtx } from '../../_generated/server';
+import type { TranscriptFetchErrorCode } from './validators';
 
 import { v } from 'convex/values';
 
 import { internal } from '../../_generated/api';
-import { internalAction } from '../../_generated/server';
-import { getVideoId } from '../../lib/videoUrl';
-import { TRANSCRIPT_FETCH_ERROR_CODES } from './transcriptFetchErrorCode';
+import { internalAction, internalMutation } from '../../_generated/server';
+import { getVideoId, hasTalkTranscriptSource } from '../../lib/videoUrl';
+import { NO_TRANSCRIPT_SOURCE_MESSAGE } from './summary/prompt';
+import { TRANSCRIPT_FETCH_ERROR_CODES } from './validators';
+
+export async function findOrInsertPendingTalkTranscriptFetch(
+  ctx: MutationCtx,
+  talkId: Id<'talks'>
+) {
+  const existingFetches = await ctx.db
+    .query('talkTranscriptFetches')
+    .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
+    .collect();
+  const pending = existingFetches.find((row) => row.status === 'pending');
+
+  if (pending) {
+    return pending._id;
+  }
+
+  return await ctx.db.insert('talkTranscriptFetches', {
+    checkedAt: Date.now(),
+    status: 'pending',
+    talkId,
+  });
+}
 
 const YOUTUBE_TRANSCRIPT_API_URL =
   'https://www.youtube-transcript.io/api/transcripts';
@@ -19,13 +43,6 @@ const TRANSCRIPT_FETCH_MESSAGES = {
   TOKEN_INVALID: 'Transcript service rejected the request.',
   TOKEN_MISSING: 'Transcript service is not configured.',
 } as const;
-
-interface TranscriptFetchFailure {
-  errorCode: TranscriptFetchErrorCode;
-  message: string;
-  retryAfter?: number;
-  status: 'failed';
-}
 
 type TranscriptFetchResult =
   | TranscriptFetchFailure
@@ -256,7 +273,61 @@ function toFailedResult(
   };
 }
 
-function resolveTranscriptFetch(
+export interface TranscriptFetchFailure {
+  errorCode: TranscriptFetchErrorCode;
+  message: string;
+  retryAfter?: number;
+  status: 'failed';
+}
+
+export const talkTranscriptFetcher = {
+  fetch: fetchTranscript,
+};
+
+function toCompleteTalkTranscriptFetchArgs(
+  result: TranscriptFetchResult,
+  runId: Id<'talkTranscriptFetches'>,
+  talkId: Id<'talks'>
+) {
+  return {
+    runId,
+    talkId,
+    ...(result.status === 'failed'
+      ? {
+          errorCode: result.errorCode,
+          message: result.message,
+          retryAfter: result.retryAfter,
+          status: 'failed' as const,
+        }
+      : {
+          status: 'success' as const,
+          text: result.text,
+        }),
+  };
+}
+
+export async function fetchAndCompleteTalkTranscript(
+  ctx: ActionCtx,
+  args: {
+    mediaUrl: string;
+    runId: Id<'talkTranscriptFetches'>;
+    talkId: Id<'talks'>;
+  }
+): Promise<TranscriptFetchResult> {
+  const result = await talkTranscriptFetcher.fetch(
+    args.mediaUrl,
+    process.env.YOUTUBE_TRANSCRIPT_IO_TOKEN ?? ''
+  );
+
+  await ctx.runMutation(
+    internal.talks.completeTalkTranscriptFetch,
+    toCompleteTalkTranscriptFetchArgs(result, args.runId, args.talkId)
+  );
+
+  return result;
+}
+
+export function fetchTranscript(
   mediaUrl: string,
   token: string
 ): Promise<TranscriptFetchResult> {
@@ -277,6 +348,15 @@ function resolveTranscriptFetch(
   return loadYoutubeTranscript(video.id, token);
 }
 
+export const insertPendingTalkTranscriptFetch = internalMutation({
+  args: {
+    talkId: v.id('talks'),
+  },
+  handler: async (ctx, { talkId }) =>
+    await findOrInsertPendingTalkTranscriptFetch(ctx, talkId),
+  returns: v.id('talkTranscriptFetches'),
+});
+
 export const fetchTalkTranscript = internalAction({
   args: {
     mediaUrl: v.string(),
@@ -284,28 +364,96 @@ export const fetchTalkTranscript = internalAction({
     talkId: v.id('talks'),
   },
   handler: async (ctx, args) => {
-    const result = await resolveTranscriptFetch(
-      args.mediaUrl,
-      process.env.YOUTUBE_TRANSCRIPT_IO_TOKEN ?? ''
-    );
-
-    await ctx.runMutation(internal.talks.completeTalkTranscriptFetch, {
-      ...(result.status === 'failed'
-        ? {
-            errorCode: result.errorCode,
-            message: result.message,
-            retryAfter: result.retryAfter,
-            status: 'failed' as const,
-          }
-        : {
-            status: 'success' as const,
-            text: result.text,
-          }),
-      runId: args.runId,
-      talkId: args.talkId,
-    });
+    await fetchAndCompleteTalkTranscript(ctx, args);
 
     return null;
   },
   returns: v.null(),
 });
+
+export type EnsureTalkTranscriptResult =
+  | TranscriptFetchFailure
+  | {
+      errorCode: 'NO_TRANSCRIPT_SOURCE';
+      message: string;
+      status: 'failed';
+    }
+  | { status: 'success'; text: string };
+
+export interface GenerateTranscriptEnsureFailure {
+  errorCode: 'NO_TRANSCRIPT_SOURCE' | 'UPSTREAM_ERROR';
+  message: string;
+}
+
+export function toGenerateTranscriptEnsureFailure(
+  ensured: Exclude<EnsureTalkTranscriptResult, { status: 'success' }>
+): GenerateTranscriptEnsureFailure {
+  if (ensured.errorCode === 'NO_TRANSCRIPT_SOURCE') {
+    return {
+      errorCode: 'NO_TRANSCRIPT_SOURCE',
+      message: NO_TRANSCRIPT_SOURCE_MESSAGE,
+    };
+  }
+
+  return {
+    errorCode: 'UPSTREAM_ERROR',
+    message: ensured.message,
+  };
+}
+
+export async function loadTranscriptForGenerate(
+  ctx: ActionCtx,
+  talkId: Id<'talks'>,
+  existingTranscript: string | null,
+  mediaUrl: string
+): Promise<{ transcript: string } | GenerateTranscriptEnsureFailure> {
+  const ensured = await ensureTalkTranscriptText(
+    ctx,
+    talkId,
+    existingTranscript,
+    mediaUrl
+  );
+
+  if (ensured.status === 'success') {
+    return {
+      transcript: ensured.text,
+    };
+  }
+
+  return toGenerateTranscriptEnsureFailure(ensured);
+}
+
+export async function ensureTalkTranscriptText(
+  ctx: ActionCtx,
+  talkId: Id<'talks'>,
+  existingTranscript: string | null,
+  mediaUrl: string
+): Promise<EnsureTalkTranscriptResult> {
+  const trimmed = existingTranscript?.trim();
+
+  if (trimmed) {
+    return {
+      status: 'success',
+      text: trimmed,
+    };
+  }
+
+  if (!hasTalkTranscriptSource(mediaUrl)) {
+    return {
+      errorCode: 'NO_TRANSCRIPT_SOURCE',
+      message: NO_TRANSCRIPT_SOURCE_MESSAGE,
+      status: 'failed',
+    };
+  }
+
+  const runId = await ctx.runMutation(
+    internal.talks.insertPendingTalkTranscriptFetch,
+    { talkId }
+  );
+
+  return await fetchAndCompleteTalkTranscript(ctx, {
+    mediaUrl,
+    runId,
+    talkId,
+  });
+}

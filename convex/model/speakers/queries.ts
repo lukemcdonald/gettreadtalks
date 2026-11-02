@@ -13,10 +13,12 @@ import { rotateContent } from '../../lib/rotateContent';
 import { byPublishedAt, getSpeakerComparator } from '../../lib/sort';
 import { paginateArray } from '../../lib/utils';
 import { doc, docs } from '../../lib/validators/schema';
-import { requireAdmin } from '../auth/roles';
-import { LIST_SEARCH_LIMIT } from '../search/constants';
-import { listAllAdmin } from '../search/listAll';
-import { normalizeSearchQuery } from '../search/utils';
+import { requireAdmin } from '../auth/helpers';
+import {
+  LIST_SEARCH_LIMIT,
+  listAllAdmin,
+  normalizeSearchQuery,
+} from '../search/helpers';
 import { listPublishedTopicsForTalks } from '../topics/helpers';
 import {
   enrichSpeakersForAdmin,
