@@ -5,7 +5,7 @@ import type { StatusFilterType } from '@/lib/entities/types';
 import { api } from '@/convex/_generated/api';
 import { fetchAuthQuery } from '@/services/auth/server';
 
-interface GetAllTalksProps {
+interface LoadAllTalksProps {
   cursor?: string;
   limit?: number;
   search?: string;
@@ -18,7 +18,7 @@ interface GetAllTalksProps {
  * Use status='all' to fetch across all statuses, defaults to 'published'.
  */
 // fallow-ignore-next-line complexity
-export async function loadAllTalks(args: GetAllTalksProps = {}) {
+export async function loadAllTalks(args: LoadAllTalksProps = {}) {
   const paginationOpts = {
     cursor: args.cursor ?? null,
     numItems: args.limit ?? 50,

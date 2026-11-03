@@ -3,14 +3,14 @@
 import { api } from '@/convex/_generated/api';
 import { fetchAuthQuery } from '@/services/auth/server';
 
-interface GetAllCollectionsProps {
+interface LoadAllCollectionsProps {
   cursor?: string;
   limit?: number;
   search?: string;
   status?: 'all' | 'draft' | 'published';
 }
 
-export async function loadAllCollections(args: GetAllCollectionsProps = {}) {
+export async function loadAllCollections(args: LoadAllCollectionsProps = {}) {
   const result = await fetchAuthQuery(api.collections.listAllCollections, {
     paginationOpts: {
       cursor: args.cursor ?? null,
