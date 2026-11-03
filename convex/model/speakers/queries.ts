@@ -17,17 +17,14 @@ import { requireAdmin } from '../auth/helpers';
 import {
   LIST_SEARCH_LIMIT,
   adminListArgs,
-  listAllAdmin,
   normalizeSearchQuery,
 } from '../search/helpers';
 import { listPublishedTopicsForTalks } from '../topics/helpers';
 import {
-  enrichSpeakersForAdmin,
   listPublishedSpeakers,
   listPublishedSpeakersPage,
-  listSpeakersForAdminStatus,
+  listSpeakersForAdmin,
   searchPublishedSpeakers,
-  searchSpeakers,
 } from './helpers';
 import { speakerRoleType } from './validators';
 
@@ -257,30 +254,12 @@ const speakerAdminPageValidator = paginationResultValidator(
 export const listAllSpeakersAdmin = query({
   args: adminListArgs,
   handler: async (ctx, args) => {
-    const status = args.status ?? 'published';
-
-    if (status === 'all') {
-      return await listAllAdmin(ctx, {
-        enrich: (speakers) => enrichSpeakersForAdmin(ctx, speakers),
-        listPage: () =>
-          ctx.db
-            .query('speakers')
-            .withIndex('by_lastName')
-            .order('asc')
-            .paginate(args.paginationOpts),
-        paginationOpts: args.paginationOpts,
-        search: args.search,
-        searchItems: (queryText) =>
-          searchSpeakers(ctx, queryText, LIST_SEARCH_LIMIT),
-      });
-    }
-
     await requireAdmin(ctx);
 
-    return await listSpeakersForAdminStatus(ctx, {
+    return await listSpeakersForAdmin(ctx, {
       paginationOpts: args.paginationOpts,
       search: args.search,
-      status,
+      status: args.status ?? 'published',
     });
   },
   returns: speakerAdminPageValidator,
