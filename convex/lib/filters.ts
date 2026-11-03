@@ -3,6 +3,20 @@ import type { QueryCtx } from '../_generated/server';
 
 import { getOneFrom } from 'convex-helpers/server/relationships';
 
+export function splitByPublished<T extends { _id: string }>(
+  items: T[],
+  published: T[],
+  status: 'draft' | 'published'
+) {
+  if (status === 'published') {
+    return published;
+  }
+
+  const publishedIds = new Set(published.map((item) => item._id));
+
+  return items.filter((item) => !publishedIds.has(item._id));
+}
+
 /**
  * Filter speakers to only those with at least one published talk or clip.
  * Building block for listPublishedSpeakers / searchPublishedSpeakers.

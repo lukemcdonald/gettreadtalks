@@ -3,14 +3,10 @@ import type { ManageListSearchParams } from '@/components/manage-table';
 import { Suspense } from 'react';
 
 import { ManageTopicsContent } from '@/app/manage/topics/_components/topics-content';
-import {
-  ManageListToolbar,
-  ManageSearchInput,
-  ManageTableSkeleton,
-} from '@/components/manage-table';
-import { PageHeader } from '@/components/page-header';
+import { ManageNewButton } from '@/components/manage-new-button';
+import { ManagePageHeader } from '@/components/manage-page-header';
+import { ManageFilters, ManageTableSkeleton } from '@/components/manage-table';
 import { Skeleton } from '@/components/ui';
-import { NewTopicButton } from '@/features/topics/components/new-topic-button';
 
 interface ManageTopicsPageProps {
   searchParams: Promise<ManageListSearchParams>;
@@ -21,15 +17,12 @@ export default function ManageTopicsPage({
 }: ManageTopicsPageProps) {
   return (
     <>
-      <PageHeader
-        actions={<NewTopicButton />}
-        description="Manage all topics"
-        title="Manage Topics"
+      <ManagePageHeader
+        action={<ManageNewButton entity="topics" />}
+        title="Topics"
       />
       <Suspense fallback={<Skeleton className="h-16 w-full" />}>
-        <ManageListToolbar>
-          <ManageSearchInput placeholder="Search topics..." />
-        </ManageListToolbar>
+        <ManageFilters searchPlaceholder="Search topics..." />
       </Suspense>
       <Suspense fallback={<ManageTableSkeleton resource="topics" />}>
         <ManageTopicsContent searchParams={searchParams} />

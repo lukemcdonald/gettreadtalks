@@ -20,6 +20,7 @@ interface FilterOption {
 
 interface SelectFilterProps {
   className?: string;
+  clearValue?: string;
   defaultValue?: string;
   label: string;
   name: string;
@@ -29,6 +30,7 @@ interface SelectFilterProps {
 
 export function SelectFilter({
   className,
+  clearValue,
   defaultValue,
   label,
   name,
@@ -43,6 +45,7 @@ export function SelectFilter({
     filterOptions,
     placeholder
   );
+  const omittedValue = placeholder ? FILTER_ALL : (clearValue ?? FILTER_ALL);
 
   return (
     <div className={cn('flex flex-col gap-2', className)}>
@@ -52,7 +55,7 @@ export function SelectFilter({
         items={filterOptions}
         name={name}
         onValueChange={(newValue) => {
-          updateUnlessDefault(newValue, FILTER_ALL);
+          updateUnlessDefault(newValue, omittedValue);
         }}
         value={value}
       >

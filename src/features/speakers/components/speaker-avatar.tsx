@@ -77,7 +77,8 @@ export function SpeakerAvatar({
       <AvatarFallback
         className={cn(
           roundedClasses({ rounded }),
-          'bg-neutral-200 text-base text-neutral-600 dark:bg-neutral-700 dark:text-neutral-300'
+          size === 'xs' ? 'text-xs leading-none' : 'text-base',
+          'bg-neutral-200 text-neutral-600 dark:bg-neutral-700 dark:text-neutral-300'
         )}
       >
         {getSpeakerInitials(speaker)}

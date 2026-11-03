@@ -11,10 +11,16 @@ import { enrichWithSpeaker } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
 import { requireAdmin } from '../auth/helpers';
-import { LIST_SEARCH_LIMIT, listAllAdmin } from '../search/helpers';
+import {
+  LIST_SEARCH_LIMIT,
+  adminListArgs,
+  listAdminByPublishState,
+  listAllAdmin,
+} from '../search/helpers';
 import { listPublishedTalksForCollection } from '../talks/helpers';
 import {
   enrichCollectionsForAdmin,
+  listCollectionsForAdminStatus,
   listPublishedCollections,
   listPublishedCollectionsPage,
   loadSpeakersForTalks,
@@ -184,23 +190,36 @@ const collectionAdminPageValidator = paginationResultValidator(
 );
 
 /**
- * List all collections with stats.
- * Returns all collections without filtering.
+ * List collections for admin use.
+ * Omitted status returns every collection. published and draft use the
+ * collection talk status index, then paginate.
  */
 export const listAllCollections = query({
-  args: {
-    paginationOpts: paginationOptsValidator,
-    search: v.optional(v.string()),
+  args: adminListArgs,
+  handler: async (ctx, args) => {
+    const page = await listAdminByPublishState(ctx, args.status, {
+      listAll: () =>
+        listAllAdmin(ctx, {
+          enrich: (collections) => enrichCollectionsForAdmin(ctx, collections),
+          listPage: () =>
+            ctx.db
+              .query('collections')
+              .order('desc')
+              .paginate(args.paginationOpts),
+          paginationOpts: args.paginationOpts,
+          search: args.search,
+          searchItems: (queryText) =>
+            searchCollections(ctx, queryText, LIST_SEARCH_LIMIT),
+        }),
+      listFiltered: (status) =>
+        listCollectionsForAdminStatus(ctx, {
+          paginationOpts: args.paginationOpts,
+          search: args.search,
+          status,
+        }),
+    });
+
+    return page;
   },
-  handler: async (ctx, args) =>
-    await listAllAdmin(ctx, {
-      enrich: (page) => enrichCollectionsForAdmin(ctx, page),
-      listPage: () =>
-        ctx.db.query('collections').order('desc').paginate(args.paginationOpts),
-      paginationOpts: args.paginationOpts,
-      search: args.search,
-      searchItems: (queryText) =>
-        searchCollections(ctx, queryText, LIST_SEARCH_LIMIT),
-    }),
   returns: collectionAdminPageValidator,
 });

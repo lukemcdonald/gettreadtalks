@@ -315,6 +315,36 @@ describe('listTalksByTopics', () => {
 });
 
 describe('listAllTalks', () => {
+  it('defaults to published and returns every status for all', async () => {
+    const t = createConvexTest();
+    await seedVisibilityCatalog(t);
+    const { asUser: asAdmin } = await signInAs(t, {
+      email: 'admin@example.test',
+      name: 'Admin',
+      role: 'admin',
+    });
+    const paginationOpts = { cursor: null, numItems: 20 };
+
+    const published = await asAdmin.query(api.talks.listAllTalks, {
+      paginationOpts,
+    });
+    const all = await asAdmin.query(api.talks.listAllTalks, {
+      paginationOpts,
+      status: 'all',
+    });
+
+    expect(published.page.map((talk) => talk.slug)).toEqual([
+      visibilitySlugs.publishedTalk,
+    ]);
+    expect(published.page.map((talk) => talk.status)).toEqual(['published']);
+    expect(all.page.map((talk) => talk.status).toSorted()).toEqual([
+      'backlog',
+      'backlog',
+      'published',
+    ]);
+    expect(all.page).toHaveLength(published.page.length + 2);
+  });
+
   it('filters talks by study status', async () => {
     const t = createConvexTest();
     const { asUser: asAdmin } = await signInAs(t, {

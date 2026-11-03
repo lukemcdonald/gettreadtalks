@@ -5,6 +5,7 @@ import { SearchInput } from '@/components/ui/search-input';
 export interface ManageListSearchParams {
   cursor?: string;
   search?: string;
+  status?: string;
 }
 
 export function ManageListToolbar({ children }: { children: ReactNode }) {

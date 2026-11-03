@@ -7,6 +7,7 @@ interface GetAllCollectionsProps {
   cursor?: string;
   limit?: number;
   search?: string;
+  status?: 'all' | 'draft' | 'published';
 }
 
 export async function loadAllCollections(args: GetAllCollectionsProps = {}) {
@@ -16,6 +17,7 @@ export async function loadAllCollections(args: GetAllCollectionsProps = {}) {
       numItems: args.limit ?? 50,
     },
     search: args.search,
+    status: args.status,
   });
 
   return {

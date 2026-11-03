@@ -1,9 +1,13 @@
 import type { StatusType } from '@/lib/entities/types';
 
+import { ManageNewButton } from '@/components/manage-new-button';
 import { ManageTable } from '@/components/manage-table';
-import { NewTalkButton } from '@/features/talks/components/new-talk-button';
 import { TalksTableRow } from '@/features/talks/components/talks-table/talks-table-row';
 import { loadAllTalks } from '@/features/talks/queries/load-all-talks';
+import {
+  hasManageListFilters,
+  parseContentStatus,
+} from '@/lib/entities/manage-status';
 
 export interface ManageTalksSearchParams {
   cursor?: string;
@@ -16,12 +20,16 @@ interface ManageTalksContentProps {
   searchParams: Promise<ManageTalksSearchParams>;
 }
 
-function hasTalksFilters({ search, status, study }: ManageTalksSearchParams) {
-  if (search?.trim()) {
-    return true;
-  }
-
-  if (status && status !== 'all') {
+function hasTalksFilters({
+  search,
+  status,
+  study,
+}: {
+  search?: string;
+  status: string;
+  study?: string;
+}) {
+  if (hasManageListFilters({ search, status })) {
     return true;
   }
 
@@ -31,12 +39,13 @@ function hasTalksFilters({ search, status, study }: ManageTalksSearchParams) {
 export async function ManageTalksContent({
   searchParams,
 }: ManageTalksContentProps) {
-  const { cursor, search, status, study } = await searchParams;
+  const { cursor, search, status: statusParam, study } = await searchParams;
+  const status = parseContentStatus(statusParam);
   const result = await loadAllTalks({
     cursor,
     limit: 50,
     search,
-    status: status || 'all',
+    status,
     studyStatus: study,
   });
 
@@ -44,7 +53,7 @@ export async function ManageTalksContent({
     <ManageTable
       continueCursor={result.continueCursor}
       cursor={cursor}
-      emptyAction={<NewTalkButton />}
+      emptyAction={<ManageNewButton entity="talks" />}
       isDone={result.isDone}
       isEmpty={result.talks.length === 0}
       isFiltered={hasTalksFilters({ search, status, study })}

@@ -7,6 +7,7 @@ interface LoadSpeakersAdminProps {
   cursor?: string;
   limit?: number;
   search?: string;
+  status?: 'all' | 'draft' | 'published';
 }
 
 export async function loadSpeakersAdmin(args: LoadSpeakersAdminProps = {}) {
@@ -16,6 +17,7 @@ export async function loadSpeakersAdmin(args: LoadSpeakersAdminProps = {}) {
       numItems: args.limit ?? 50,
     },
     search: args.search,
+    status: args.status,
   });
 
   return {

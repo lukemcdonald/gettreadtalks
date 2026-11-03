@@ -16,7 +16,7 @@ import {
   UsersIcon,
 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Link } from '@/components/ui/link';
 import { cn } from '@/utils';
@@ -198,27 +198,57 @@ function AreaNavList({
 export function AreaNav({ items, label, variant }: AreaNavProps) {
   const pathname = usePathname();
   const activeRef = useRef<HTMLAnchorElement>(null);
+  const scrollerRef = useRef<HTMLElement>(null);
+  const [showEndFade, setShowEndFade] = useState(false);
+  const [showStartFade, setShowStartFade] = useState(false);
 
   useEffect(() => {
     if (variant !== 'tabs') {
       return;
     }
 
-    if (!items.some((item) => isAreaNavItemActive(item, pathname))) {
+    const scroller = scrollerRef.current;
+
+    if (!scroller) {
       return;
     }
 
-    activeRef.current?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'nearest',
-      inline: 'center',
-    });
+    const element = scroller;
+
+    function updateEdges() {
+      const maxScroll = element.scrollWidth - element.clientWidth;
+
+      setShowStartFade(element.scrollLeft > 1);
+      setShowEndFade(maxScroll > 1 && element.scrollLeft < maxScroll - 1);
+    }
+
+    if (items.some((item) => isAreaNavItemActive(item, pathname))) {
+      activeRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'center',
+      });
+    }
+
+    updateEdges();
+    element.addEventListener('scroll', updateEdges, { passive: true });
+    const observer =
+      typeof ResizeObserver === 'undefined'
+        ? null
+        : new ResizeObserver(updateEdges);
+    observer?.observe(element);
+
+    return () => {
+      element.removeEventListener('scroll', updateEdges);
+      observer?.disconnect();
+    };
   }, [items, pathname, variant]);
 
-  return (
+  const nav = (
     <nav
       aria-label={label}
       className={variant === 'tabs' ? 'overflow-x-auto' : 'flex flex-col'}
+      ref={scrollerRef}
     >
       <AreaNavList
         items={items}
@@ -227,5 +257,27 @@ export function AreaNav({ items, label, variant }: AreaNavProps) {
         variant={variant}
       />
     </nav>
+  );
+
+  if (variant !== 'tabs') {
+    return nav;
+  }
+
+  return (
+    <div className="relative">
+      {showStartFade ? (
+        <div
+          aria-hidden="true"
+          className="from-background pointer-events-none absolute inset-y-0 left-0 z-10 w-6 bg-linear-to-r to-transparent"
+        />
+      ) : null}
+      {nav}
+      {showEndFade ? (
+        <div
+          aria-hidden="true"
+          className="from-background pointer-events-none absolute inset-y-0 right-0 z-10 w-6 bg-linear-to-l to-transparent"
+        />
+      ) : null}
+    </div>
   );
 }

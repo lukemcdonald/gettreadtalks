@@ -14,7 +14,7 @@ interface GetAllClipsProps {
 
 /**
  * Get all clips with speakers with filtering support.
- * Supports status='all' to fetch clips across all statuses.
+ * Defaults to published. Pass status='all' to fetch every status.
  */
 export async function loadAllClips(args?: GetAllClipsProps) {
   const { cursor, limit, search, status } = args ?? {};

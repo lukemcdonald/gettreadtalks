@@ -16,6 +16,8 @@ import { doc, docs } from '../../lib/validators/schema';
 import { requireAdmin } from '../auth/helpers';
 import {
   LIST_SEARCH_LIMIT,
+  adminListArgs,
+  listAdminByPublishState,
   listAllAdmin,
   normalizeSearchQuery,
 } from '../search/helpers';
@@ -24,6 +26,7 @@ import {
   enrichSpeakersForAdmin,
   listPublishedSpeakers,
   listPublishedSpeakersPage,
+  listSpeakersForAdminStatus,
   searchPublishedSpeakers,
   searchSpeakers,
 } from './helpers';
@@ -249,27 +252,38 @@ const speakerAdminPageValidator = paginationResultValidator(
 );
 
 /**
- * List all speakers for admin use, with total talk and clip counts (all statuses).
+ * List speakers for admin use, with talk and clip counts.
+ * Omitted status returns every speaker. published and draft use the
+ * speaker content status indexes, then paginate.
  */
 export const listAllSpeakersAdmin = query({
-  args: {
-    paginationOpts: paginationOptsValidator,
-    search: v.optional(v.string()),
+  args: adminListArgs,
+  handler: async (ctx, args) => {
+    const page = await listAdminByPublishState(ctx, args.status, {
+      listAll: () =>
+        listAllAdmin(ctx, {
+          enrich: (speakers) => enrichSpeakersForAdmin(ctx, speakers),
+          listPage: () =>
+            ctx.db
+              .query('speakers')
+              .withIndex('by_lastName')
+              .order('asc')
+              .paginate(args.paginationOpts),
+          paginationOpts: args.paginationOpts,
+          search: args.search,
+          searchItems: (queryText) =>
+            searchSpeakers(ctx, queryText, LIST_SEARCH_LIMIT),
+        }),
+      listFiltered: (status) =>
+        listSpeakersForAdminStatus(ctx, {
+          paginationOpts: args.paginationOpts,
+          search: args.search,
+          status,
+        }),
+    });
+
+    return page;
   },
-  handler: async (ctx, args) =>
-    await listAllAdmin(ctx, {
-      enrich: (page) => enrichSpeakersForAdmin(ctx, page),
-      listPage: () =>
-        ctx.db
-          .query('speakers')
-          .withIndex('by_lastName')
-          .order('asc')
-          .paginate(args.paginationOpts),
-      paginationOpts: args.paginationOpts,
-      search: args.search,
-      searchItems: (queryText) =>
-        searchSpeakers(ctx, queryText, LIST_SEARCH_LIMIT),
-    }),
   returns: speakerAdminPageValidator,
 });
 

@@ -3,11 +3,11 @@ import type { ManageClipsSearchParams } from '@/app/manage/clips/_components/cli
 import { Suspense } from 'react';
 
 import { ManageClipsContent } from '@/app/manage/clips/_components/clips-content';
-import { ClipsFilters } from '@/app/manage/clips/_components/clips-filters';
-import { ManageTableSkeleton } from '@/components/manage-table';
-import { PageHeader } from '@/components/page-header';
+import { ManageNewButton } from '@/components/manage-new-button';
+import { ManagePageHeader } from '@/components/manage-page-header';
+import { ManageFilters, ManageTableSkeleton } from '@/components/manage-table';
 import { Skeleton } from '@/components/ui';
-import { NewClipButton } from '@/features/clips/components/new-clip-button';
+import { CONTENT_STATUS_OPTIONS } from '@/lib/entities/manage-status';
 
 interface ManageClipsPageProps {
   searchParams: Promise<ManageClipsSearchParams>;
@@ -18,13 +18,15 @@ export default function ManageClipsPage({
 }: ManageClipsPageProps) {
   return (
     <>
-      <PageHeader
-        actions={<NewClipButton />}
-        description="Manage all clips across all statuses"
-        title="Manage Clips"
+      <ManagePageHeader
+        action={<ManageNewButton entity="clips" />}
+        title="Clips"
       />
       <Suspense fallback={<Skeleton className="h-16 w-full" />}>
-        <ClipsFilters />
+        <ManageFilters
+          searchPlaceholder="Search clips..."
+          statusOptions={CONTENT_STATUS_OPTIONS}
+        />
       </Suspense>
       <Suspense fallback={<ManageTableSkeleton resource="clips" />}>
         <ManageClipsContent searchParams={searchParams} />

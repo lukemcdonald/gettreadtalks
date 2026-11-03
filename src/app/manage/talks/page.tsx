@@ -3,11 +3,22 @@ import type { ManageTalksSearchParams } from '@/app/manage/talks/_components/tal
 import { Suspense } from 'react';
 
 import { ManageTalksContent } from '@/app/manage/talks/_components/talks-content';
-import { TalksFilters } from '@/app/manage/talks/_components/talks-filters';
-import { ManageTableSkeleton } from '@/components/manage-table';
-import { PageHeader } from '@/components/page-header';
+import { ManageNewButton } from '@/components/manage-new-button';
+import { ManagePageHeader } from '@/components/manage-page-header';
+import {
+  ManageFilters,
+  ManageTableSkeleton,
+  manageFilterSelectClassName,
+} from '@/components/manage-table';
 import { Skeleton } from '@/components/ui';
-import { NewTalkButton } from '@/features/talks/components/new-talk-button';
+import { SelectFilter } from '@/components/ui/select-filter';
+import { CONTENT_STATUS_OPTIONS } from '@/lib/entities/manage-status';
+
+const STUDY_FILTER_OPTIONS = [
+  { label: 'None', value: 'none' },
+  { label: 'Draft', value: 'draft' },
+  { label: 'Published', value: 'published' },
+];
 
 interface ManageTalksPageProps {
   searchParams: Promise<ManageTalksSearchParams>;
@@ -18,13 +29,23 @@ export default function ManageTalksPage({
 }: ManageTalksPageProps) {
   return (
     <>
-      <PageHeader
-        actions={<NewTalkButton />}
-        description="Manage all talks across all statuses"
-        title="Manage Talks"
+      <ManagePageHeader
+        action={<ManageNewButton entity="talks" />}
+        title="Talks"
       />
       <Suspense fallback={<Skeleton className="h-16 w-full" />}>
-        <TalksFilters />
+        <ManageFilters
+          searchPlaceholder="Search talks and speakers..."
+          statusOptions={CONTENT_STATUS_OPTIONS}
+        >
+          <SelectFilter
+            className={manageFilterSelectClassName}
+            label="Study"
+            name="study"
+            options={STUDY_FILTER_OPTIONS}
+            placeholder="All"
+          />
+        </ManageFilters>
       </Suspense>
       <Suspense fallback={<ManageTableSkeleton resource="talks" />}>
         <ManageTalksContent searchParams={searchParams} />

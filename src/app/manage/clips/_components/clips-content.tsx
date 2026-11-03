@@ -1,9 +1,13 @@
 import type { StatusType } from '@/lib/entities/types';
 
+import { ManageNewButton } from '@/components/manage-new-button';
 import { ManageTable } from '@/components/manage-table';
 import { ClipsTableRow } from '@/features/clips/components/clips-table/clips-table-row';
-import { NewClipButton } from '@/features/clips/components/new-clip-button';
 import { loadAllClips } from '@/features/clips/queries/load-all-clips';
+import {
+  hasManageListFilters,
+  parseContentStatus,
+} from '@/lib/entities/manage-status';
 
 export interface ManageClipsSearchParams {
   cursor?: string;
@@ -15,33 +19,26 @@ interface ManageClipsContentProps {
   searchParams: Promise<ManageClipsSearchParams>;
 }
 
-function hasClipsFilters({ search, status }: ManageClipsSearchParams) {
-  if (search?.trim()) {
-    return true;
-  }
-
-  return Boolean(status) && status !== 'all';
-}
-
 export async function ManageClipsContent({
   searchParams,
 }: ManageClipsContentProps) {
-  const { cursor, search, status } = await searchParams;
+  const { cursor, search, status: statusParam } = await searchParams;
+  const status = parseContentStatus(statusParam);
   const result = await loadAllClips({
     cursor,
     limit: 50,
     search,
-    status: status || 'all',
+    status,
   });
 
   return (
     <ManageTable
       continueCursor={result.continueCursor}
       cursor={cursor}
-      emptyAction={<NewClipButton />}
+      emptyAction={<ManageNewButton entity="clips" />}
       isDone={result.isDone}
       isEmpty={result.clips.length === 0}
-      isFiltered={hasClipsFilters({ search, status })}
+      isFiltered={hasManageListFilters({ search, status })}
       itemCount={result.clips.length}
       resource="clips"
     >

@@ -5,8 +5,17 @@ import type { PaginationOptions } from 'convex/server';
 import { asyncMap } from 'convex-helpers';
 import { getManyFrom } from 'convex-helpers/server/relationships';
 
-import { filterSpeakersWithPublishedTalks } from '../../lib/filters';
-import { searchPhrases, uniqueById } from '../search/helpers';
+import {
+  filterSpeakersWithPublishedTalks,
+  splitByPublished,
+} from '../../lib/filters';
+import { paginateArray } from '../../lib/utils';
+import {
+  LIST_SEARCH_LIMIT,
+  normalizeSearchQuery,
+  searchPhrases,
+  uniqueById,
+} from '../search/helpers';
 
 const UNFILTERED_SEARCH_MULTIPLIER = 3;
 
@@ -114,4 +123,32 @@ export async function enrichSpeakersForAdmin(
       talkCount: talks.length,
     };
   });
+}
+
+export async function listSpeakersForAdminStatus(
+  ctx: QueryCtx,
+  options: {
+    paginationOpts: PaginationOptions;
+    search?: string;
+    status: 'draft' | 'published';
+  }
+) {
+  const queryText = normalizeSearchQuery(options.search ?? '');
+  const speakers =
+    queryText.length > 0
+      ? await searchSpeakers(ctx, queryText, LIST_SEARCH_LIMIT)
+      : await publishedSpeakersQuery(ctx).collect();
+  const published = await filterSpeakersWithPublishedTalks(ctx, speakers);
+  const filtered = splitByPublished(speakers, published, options.status);
+  const result = paginateArray(
+    filtered,
+    options.paginationOpts.cursor,
+    options.paginationOpts.numItems
+  );
+
+  return {
+    continueCursor: result.continueCursor,
+    isDone: result.isDone,
+    page: await enrichSpeakersForAdmin(ctx, result.page),
+  };
 }
