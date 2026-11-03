@@ -2,7 +2,7 @@ import type { ManageListSearchParams } from '@/components/manage-table';
 
 import { ManageTable } from '@/components/manage-table';
 import { SpeakersTableRow } from '@/features/speakers/components/speakers-table/speakers-table-row';
-import { loadSpeakersAdmin } from '@/features/speakers/queries/load-speakers-admin';
+import { loadAllSpeakers } from '@/features/speakers/queries/load-all-speakers';
 import {
   hasManageListFilters,
   parsePresenceStatus,
@@ -17,7 +17,7 @@ export async function ManageSpeakersContent({
 }: ManageSpeakersContentProps) {
   const { cursor, search, status: statusParam } = await searchParams;
   const status = parsePresenceStatus(statusParam);
-  const result = await loadSpeakersAdmin({
+  const result = await loadAllSpeakers({
     cursor,
     limit: 50,
     search,

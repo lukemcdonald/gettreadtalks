@@ -200,15 +200,6 @@ const gatedFunctions: {
     name: 'speakers.listAllSpeakers',
   },
   {
-    call: (client) =>
-      client.query(api.speakers.listAllSpeakersAdmin, { paginationOpts }),
-    name: 'speakers.listAllSpeakersAdmin',
-  },
-  {
-    call: (client) => client.query(api.speakers.listAllSpeakersRaw, {}),
-    name: 'speakers.listAllSpeakersRaw',
-  },
-  {
     call: (client, seed) =>
       client.mutation(api.speakers.updateSpeaker, {
         firstName: 'Updated',

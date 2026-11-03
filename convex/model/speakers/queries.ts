@@ -138,19 +138,6 @@ export const listSpeakerSlugs = query({
 });
 
 /**
- * List all speakers without pagination (for migration/cleanup scripts).
- */
-export const listAllSpeakersRaw = query({
-  args: {},
-  handler: async (ctx) => {
-    await requireAdmin(ctx);
-
-    return await ctx.db.query('speakers').collect();
-  },
-  returns: docs('speakers'),
-});
-
-/**
  * Get total count of speakers.
  */
 export const getSpeakersCount = query({
@@ -251,7 +238,7 @@ const speakerAdminPageValidator = paginationResultValidator(
  * List speakers for admin use, with talk and clip counts.
  * Omitted status means published. Pass status='all' for every speaker.
  */
-export const listAllSpeakersAdmin = query({
+export const listAllSpeakers = query({
   args: adminListArgs,
   handler: async (ctx, args) => {
     await requireAdmin(ctx);
@@ -263,26 +250,4 @@ export const listAllSpeakersAdmin = query({
     });
   },
   returns: speakerAdminPageValidator,
-});
-
-/**
- * List all speakers with pagination.
- * Returns all speakers without filtering.
- */
-export const listAllSpeakers = query({
-  args: {
-    paginationOpts: paginationOptsValidator,
-  },
-  handler: async (ctx, args) => {
-    await requireAdmin(ctx);
-
-    const speakerPages = await ctx.db
-      .query('speakers')
-      .withIndex('by_lastName')
-      .order('asc')
-      .paginate(args.paginationOpts);
-
-    return speakerPages;
-  },
-  returns: speakerPageValidator,
 });

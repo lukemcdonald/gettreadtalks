@@ -124,7 +124,7 @@ describe('getSpeakerBySlug', () => {
   });
 });
 
-describe('listAllSpeakersAdmin', () => {
+describe('listAllSpeakers', () => {
   it('defaults to published and returns every speaker for all', async () => {
     const t = createConvexTest();
     await seedVisibilityCatalog(t);
@@ -135,10 +135,10 @@ describe('listAllSpeakersAdmin', () => {
     });
     const paginationOpts = { cursor: null, numItems: 20 };
 
-    const published = await asAdmin.query(api.speakers.listAllSpeakersAdmin, {
+    const published = await asAdmin.query(api.speakers.listAllSpeakers, {
       paginationOpts,
     });
-    const all = await asAdmin.query(api.speakers.listAllSpeakersAdmin, {
+    const all = await asAdmin.query(api.speakers.listAllSpeakers, {
       paginationOpts,
       status: 'all',
     });

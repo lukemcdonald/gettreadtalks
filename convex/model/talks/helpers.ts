@@ -268,7 +268,10 @@ async function loadCollectionTitles(
   );
 }
 
-export async function enrichAdminTalks(ctx: QueryCtx, talks: Doc<'talks'>[]) {
+export async function enrichTalksForAdmin(
+  ctx: QueryCtx,
+  talks: Doc<'talks'>[]
+) {
   const talksWithTopics = await enrichWithTopics(
     ctx,
     await enrichWithSpeaker(ctx, talks)

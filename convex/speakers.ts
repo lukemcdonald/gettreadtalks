@@ -6,8 +6,6 @@ export const {
   getSpeakerBySlug,
   getSpeakersCount,
   listAllSpeakers,
-  listAllSpeakersAdmin,
-  listAllSpeakersRaw,
   listFeaturedSpeakers,
   listSpeakerSlugs,
   listSpeakers,
