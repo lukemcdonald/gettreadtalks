@@ -4,6 +4,7 @@ import { api } from '../../_generated/api';
 import {
   createConvexTest,
   seedVisibilityCatalog,
+  signInAs,
   visibilitySlugs,
 } from '../../test.setup';
 import { insertTalk } from '../talks/test.factory';
@@ -119,6 +120,35 @@ describe('getSpeakerBySlug', () => {
     expect(speaker?.talks.map((talk) => talk.slug)).toEqual([
       visibilitySlugs.publishedTalk,
       'older-speaker-talk',
+    ]);
+  });
+});
+
+describe('listAllSpeakersAdmin', () => {
+  it('defaults to published and returns every speaker for all', async () => {
+    const t = createConvexTest();
+    await seedVisibilityCatalog(t);
+    const { asUser: asAdmin } = await signInAs(t, {
+      email: 'admin@example.test',
+      name: 'Admin',
+      role: 'admin',
+    });
+    const paginationOpts = { cursor: null, numItems: 20 };
+
+    const published = await asAdmin.query(api.speakers.listAllSpeakersAdmin, {
+      paginationOpts,
+    });
+    const all = await asAdmin.query(api.speakers.listAllSpeakersAdmin, {
+      paginationOpts,
+      status: 'all',
+    });
+
+    expect(published.page.map((item) => item.speaker.slug)).toEqual([
+      visibilitySlugs.publishedSpeaker,
+    ]);
+    expect(all.page.map((item) => item.speaker.slug).toSorted()).toEqual([
+      visibilitySlugs.draftSpeaker,
+      visibilitySlugs.publishedSpeaker,
     ]);
   });
 });

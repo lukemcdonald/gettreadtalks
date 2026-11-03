@@ -191,8 +191,7 @@ const collectionAdminPageValidator = paginationResultValidator(
 
 /**
  * List collections for admin use.
- * Omitted status returns every collection. published and draft use the
- * collection talk status index, then paginate.
+ * Omitted status means published. Pass status='all' for every collection.
  */
 export const listAllCollections = query({
   args: adminListArgs,

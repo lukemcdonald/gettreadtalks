@@ -20,7 +20,10 @@ export async function loadFormOptions() {
 
   const [collectionsResult, speakersResult, talksResult, topicsResult] =
     await Promise.all([
-      fetchAuthQuery(api.collections.listAllCollections, { paginationOpts }),
+      fetchAuthQuery(api.collections.listAllCollections, {
+        paginationOpts,
+        status: 'all',
+      }),
       fetchAuthQuery(api.speakers.listAllSpeakers, { paginationOpts }),
       fetchAuthQuery(api.talks.listAllTalks, { paginationOpts, status: 'all' }),
       fetchAuthQuery(api.topics.listAllTopics, { paginationOpts }),

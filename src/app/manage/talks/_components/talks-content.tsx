@@ -1,6 +1,5 @@
 import type { StatusType } from '@/lib/entities/types';
 
-import { ManageNewButton } from '@/components/manage-new-button';
 import { ManageTable } from '@/components/manage-table';
 import { TalksTableRow } from '@/features/talks/components/talks-table/talks-table-row';
 import { loadAllTalks } from '@/features/talks/queries/load-all-talks';
@@ -53,7 +52,6 @@ export async function ManageTalksContent({
     <ManageTable
       continueCursor={result.continueCursor}
       cursor={cursor}
-      emptyAction={<ManageNewButton entity="talks" />}
       isDone={result.isDone}
       isEmpty={result.talks.length === 0}
       isFiltered={hasTalksFilters({ search, status, study })}

@@ -37,7 +37,6 @@ function ManageStatusFilter({
   return (
     <SelectFilter
       className={manageFilterSelectClassName}
-      clearValue="published"
       defaultValue="published"
       label="Status"
       name="status"

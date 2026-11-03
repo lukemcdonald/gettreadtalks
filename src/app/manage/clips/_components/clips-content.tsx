@@ -1,6 +1,5 @@
 import type { StatusType } from '@/lib/entities/types';
 
-import { ManageNewButton } from '@/components/manage-new-button';
 import { ManageTable } from '@/components/manage-table';
 import { ClipsTableRow } from '@/features/clips/components/clips-table/clips-table-row';
 import { loadAllClips } from '@/features/clips/queries/load-all-clips';
@@ -35,7 +34,6 @@ export async function ManageClipsContent({
     <ManageTable
       continueCursor={result.continueCursor}
       cursor={cursor}
-      emptyAction={<ManageNewButton entity="clips" />}
       isDone={result.isDone}
       isEmpty={result.clips.length === 0}
       isFiltered={hasManageListFilters({ search, status })}

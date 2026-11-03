@@ -253,8 +253,7 @@ const speakerAdminPageValidator = paginationResultValidator(
 
 /**
  * List speakers for admin use, with talk and clip counts.
- * Omitted status returns every speaker. published and draft use the
- * speaker content status indexes, then paginate.
+ * Omitted status means published. Pass status='all' for every speaker.
  */
 export const listAllSpeakersAdmin = query({
   args: adminListArgs,

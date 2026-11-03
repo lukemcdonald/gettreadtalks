@@ -1,6 +1,5 @@
 import type { ManageListSearchParams } from '@/components/manage-table';
 
-import { ManageNewButton } from '@/components/manage-new-button';
 import { ManageTable } from '@/components/manage-table';
 import { SpeakersTableRow } from '@/features/speakers/components/speakers-table/speakers-table-row';
 import { loadSpeakersAdmin } from '@/features/speakers/queries/load-speakers-admin';
@@ -29,7 +28,6 @@ export async function ManageSpeakersContent({
     <ManageTable
       continueCursor={result.continueCursor}
       cursor={cursor}
-      emptyAction={<ManageNewButton entity="speakers" />}
       isDone={result.isDone}
       isEmpty={result.speakers.length === 0}
       isFiltered={hasManageListFilters({ search, status })}

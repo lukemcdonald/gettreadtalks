@@ -1,6 +1,5 @@
 import type { ManageListSearchParams } from '@/components/manage-table';
 
-import { ManageNewButton } from '@/components/manage-new-button';
 import { ManageTable } from '@/components/manage-table';
 import { CollectionsTableRow } from '@/features/collections/components/collections-table/collections-table-row';
 import { loadAllCollections } from '@/features/collections/queries/load-all-collections';
@@ -29,7 +28,6 @@ export async function ManageCollectionsContent({
     <ManageTable
       continueCursor={result.continueCursor}
       cursor={cursor}
-      emptyAction={<ManageNewButton entity="collections" />}
       isDone={result.isDone}
       isEmpty={result.collections.length === 0}
       isFiltered={hasManageListFilters({ search, status })}

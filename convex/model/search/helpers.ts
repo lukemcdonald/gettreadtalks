@@ -82,13 +82,13 @@ export async function listAdminByPublishState<T>(
     listFiltered: (status: 'draft' | 'published') => Promise<T>;
   }
 ) {
-  if (!status || status === 'all') {
+  if (status === 'all') {
     return await options.listAll();
   }
 
   await requireAdmin(ctx);
 
-  return await options.listFiltered(status);
+  return await options.listFiltered(status ?? 'published');
 }
 
 export async function listAllAdmin<T, TPage>(
