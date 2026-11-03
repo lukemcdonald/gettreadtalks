@@ -5,10 +5,7 @@ import type { PaginationOptions } from 'convex/server';
 import { asyncMap } from 'convex-helpers';
 import { getManyFrom } from 'convex-helpers/server/relationships';
 
-import {
-  filterSpeakersWithPublishedTalks,
-  splitByPublished,
-} from '../../lib/filters';
+import { filterSpeakersWithPublishedTalks } from '../../lib/filters';
 import { paginateArray } from '../../lib/utils';
 import {
   LIST_SEARCH_LIMIT,
@@ -139,7 +136,13 @@ export async function listSpeakersForAdminStatus(
       ? await searchSpeakers(ctx, queryText, LIST_SEARCH_LIMIT)
       : await publishedSpeakersQuery(ctx).collect();
   const published = await filterSpeakersWithPublishedTalks(ctx, speakers);
-  const filtered = splitByPublished(speakers, published, options.status);
+  let filtered = published;
+
+  if (options.status === 'draft') {
+    const publishedIds = new Set(published.map((speaker) => speaker._id));
+
+    filtered = speakers.filter((speaker) => !publishedIds.has(speaker._id));
+  }
   const result = paginateArray(
     filtered,
     options.paginationOpts.cursor,

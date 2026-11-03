@@ -74,23 +74,6 @@ export function uniqueById<T extends { _id: string }>(items: T[]) {
   return unique;
 }
 
-export async function listAdminByPublishState<T>(
-  ctx: QueryCtx,
-  status: 'all' | 'draft' | 'published' | undefined,
-  options: {
-    listAll: () => Promise<T>;
-    listFiltered: (status: 'draft' | 'published') => Promise<T>;
-  }
-) {
-  if (status === 'all') {
-    return await options.listAll();
-  }
-
-  await requireAdmin(ctx);
-
-  return await options.listFiltered(status ?? 'published');
-}
-
 export async function listAllAdmin<T, TPage>(
   ctx: QueryCtx,
   options: {

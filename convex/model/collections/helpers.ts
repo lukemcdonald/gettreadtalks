@@ -5,10 +5,7 @@ import type { PaginationOptions } from 'convex/server';
 import { asyncMap } from 'convex-helpers';
 import { getAll } from 'convex-helpers/server/relationships';
 
-import {
-  filterCollectionsWithPublishedTalks,
-  splitByPublished,
-} from '../../lib/filters';
+import { filterCollectionsWithPublishedTalks } from '../../lib/filters';
 import { paginateArray } from '../../lib/utils';
 import { LIST_SEARCH_LIMIT, normalizeSearchQuery } from '../search/helpers';
 import { listTalksForCollection } from '../talks/helpers';
@@ -90,7 +87,15 @@ export async function listCollectionsForAdminStatus(
       ? await searchCollections(ctx, queryText, LIST_SEARCH_LIMIT)
       : await publishedCollectionsQuery(ctx).collect();
   const published = await filterCollectionsWithPublishedTalks(ctx, collections);
-  const filtered = splitByPublished(collections, published, options.status);
+  let filtered = published;
+
+  if (options.status === 'draft') {
+    const publishedIds = new Set(published.map((collection) => collection._id));
+
+    filtered = collections.filter(
+      (collection) => !publishedIds.has(collection._id)
+    );
+  }
   const result = paginateArray(
     filtered,
     options.paginationOpts.cursor,

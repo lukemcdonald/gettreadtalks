@@ -14,7 +14,6 @@ import { requireAdmin } from '../auth/helpers';
 import {
   LIST_SEARCH_LIMIT,
   adminListArgs,
-  listAdminByPublishState,
   listAllAdmin,
 } from '../search/helpers';
 import { listPublishedTalksForCollection } from '../talks/helpers';
@@ -196,29 +195,30 @@ const collectionAdminPageValidator = paginationResultValidator(
 export const listAllCollections = query({
   args: adminListArgs,
   handler: async (ctx, args) => {
-    const page = await listAdminByPublishState(ctx, args.status, {
-      listAll: () =>
-        listAllAdmin(ctx, {
-          enrich: (collections) => enrichCollectionsForAdmin(ctx, collections),
-          listPage: () =>
-            ctx.db
-              .query('collections')
-              .order('desc')
-              .paginate(args.paginationOpts),
-          paginationOpts: args.paginationOpts,
-          search: args.search,
-          searchItems: (queryText) =>
-            searchCollections(ctx, queryText, LIST_SEARCH_LIMIT),
-        }),
-      listFiltered: (status) =>
-        listCollectionsForAdminStatus(ctx, {
-          paginationOpts: args.paginationOpts,
-          search: args.search,
-          status,
-        }),
-    });
+    const status = args.status ?? 'published';
 
-    return page;
+    if (status === 'all') {
+      return await listAllAdmin(ctx, {
+        enrich: (collections) => enrichCollectionsForAdmin(ctx, collections),
+        listPage: () =>
+          ctx.db
+            .query('collections')
+            .order('desc')
+            .paginate(args.paginationOpts),
+        paginationOpts: args.paginationOpts,
+        search: args.search,
+        searchItems: (queryText) =>
+          searchCollections(ctx, queryText, LIST_SEARCH_LIMIT),
+      });
+    }
+
+    await requireAdmin(ctx);
+
+    return await listCollectionsForAdminStatus(ctx, {
+      paginationOpts: args.paginationOpts,
+      search: args.search,
+      status,
+    });
   },
   returns: collectionAdminPageValidator,
 });

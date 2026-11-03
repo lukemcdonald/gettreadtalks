@@ -17,7 +17,6 @@ import { requireAdmin } from '../auth/helpers';
 import {
   LIST_SEARCH_LIMIT,
   adminListArgs,
-  listAdminByPublishState,
   listAllAdmin,
   normalizeSearchQuery,
 } from '../search/helpers';
@@ -258,30 +257,31 @@ const speakerAdminPageValidator = paginationResultValidator(
 export const listAllSpeakersAdmin = query({
   args: adminListArgs,
   handler: async (ctx, args) => {
-    const page = await listAdminByPublishState(ctx, args.status, {
-      listAll: () =>
-        listAllAdmin(ctx, {
-          enrich: (speakers) => enrichSpeakersForAdmin(ctx, speakers),
-          listPage: () =>
-            ctx.db
-              .query('speakers')
-              .withIndex('by_lastName')
-              .order('asc')
-              .paginate(args.paginationOpts),
-          paginationOpts: args.paginationOpts,
-          search: args.search,
-          searchItems: (queryText) =>
-            searchSpeakers(ctx, queryText, LIST_SEARCH_LIMIT),
-        }),
-      listFiltered: (status) =>
-        listSpeakersForAdminStatus(ctx, {
-          paginationOpts: args.paginationOpts,
-          search: args.search,
-          status,
-        }),
-    });
+    const status = args.status ?? 'published';
 
-    return page;
+    if (status === 'all') {
+      return await listAllAdmin(ctx, {
+        enrich: (speakers) => enrichSpeakersForAdmin(ctx, speakers),
+        listPage: () =>
+          ctx.db
+            .query('speakers')
+            .withIndex('by_lastName')
+            .order('asc')
+            .paginate(args.paginationOpts),
+        paginationOpts: args.paginationOpts,
+        search: args.search,
+        searchItems: (queryText) =>
+          searchSpeakers(ctx, queryText, LIST_SEARCH_LIMIT),
+      });
+    }
+
+    await requireAdmin(ctx);
+
+    return await listSpeakersForAdminStatus(ctx, {
+      paginationOpts: args.paginationOpts,
+      search: args.search,
+      status,
+    });
   },
   returns: speakerAdminPageValidator,
 });

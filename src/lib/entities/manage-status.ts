@@ -20,8 +20,8 @@ const PRESENCE_STATUS_VALUES = [
   ...PRESENCE_STATUS_OPTIONS.map((option) => option.value),
 ] as const;
 
-export type ContentStatusFilter = (typeof CONTENT_STATUS_VALUES)[number];
-export type PresenceStatusFilter = (typeof PRESENCE_STATUS_VALUES)[number];
+type ContentStatusFilter = (typeof CONTENT_STATUS_VALUES)[number];
+type PresenceStatusFilter = (typeof PRESENCE_STATUS_VALUES)[number];
 
 export function parseContentStatus(status?: string): ContentStatusFilter {
   if (isListed(status, CONTENT_STATUS_VALUES)) {
