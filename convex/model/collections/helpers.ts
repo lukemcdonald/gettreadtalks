@@ -73,6 +73,26 @@ export async function enrichCollectionsForAdmin(
   });
 }
 
+async function filterCollectionsByStatus(
+  ctx: QueryCtx,
+  collections: Doc<'collections'>[],
+  status: 'all' | 'draft' | 'published'
+) {
+  if (status === 'all') {
+    return collections;
+  }
+
+  const published = await filterCollectionsWithPublishedTalks(ctx, collections);
+
+  if (status === 'published') {
+    return published;
+  }
+
+  const publishedIds = new Set(published.map((collection) => collection._id));
+
+  return collections.filter((collection) => !publishedIds.has(collection._id));
+}
+
 export async function listCollectionsForAdmin(
   ctx: QueryCtx,
   options: {
@@ -86,27 +106,11 @@ export async function listCollectionsForAdmin(
     queryText.length > 0
       ? await searchCollections(ctx, queryText, LIST_SEARCH_LIMIT)
       : await publishedCollectionsQuery(ctx).collect();
-  let filtered = collections;
-
-  if (options.status !== 'all') {
-    const published = await filterCollectionsWithPublishedTalks(
-      ctx,
-      collections
-    );
-
-    if (options.status === 'published') {
-      filtered = published;
-    } else {
-      const publishedIds = new Set(
-        published.map((collection) => collection._id)
-      );
-
-      filtered = collections.filter(
-        (collection) => !publishedIds.has(collection._id)
-      );
-    }
-  }
-
+  const filtered = await filterCollectionsByStatus(
+    ctx,
+    collections,
+    options.status
+  );
   const result = paginateArray(
     filtered,
     options.paginationOpts.cursor,

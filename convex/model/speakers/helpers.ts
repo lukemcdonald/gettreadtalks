@@ -122,6 +122,26 @@ export async function enrichSpeakersForAdmin(
   });
 }
 
+async function filterSpeakersByStatus(
+  ctx: QueryCtx,
+  speakers: Doc<'speakers'>[],
+  status: 'all' | 'draft' | 'published'
+) {
+  if (status === 'all') {
+    return speakers;
+  }
+
+  const published = await filterSpeakersWithPublishedTalks(ctx, speakers);
+
+  if (status === 'published') {
+    return published;
+  }
+
+  const publishedIds = new Set(published.map((speaker) => speaker._id));
+
+  return speakers.filter((speaker) => !publishedIds.has(speaker._id));
+}
+
 export async function listSpeakersForAdmin(
   ctx: QueryCtx,
   options: {
@@ -135,20 +155,7 @@ export async function listSpeakersForAdmin(
     queryText.length > 0
       ? await searchSpeakers(ctx, queryText, LIST_SEARCH_LIMIT)
       : await publishedSpeakersQuery(ctx).collect();
-  let filtered = speakers;
-
-  if (options.status !== 'all') {
-    const published = await filterSpeakersWithPublishedTalks(ctx, speakers);
-
-    if (options.status === 'published') {
-      filtered = published;
-    } else {
-      const publishedIds = new Set(published.map((speaker) => speaker._id));
-
-      filtered = speakers.filter((speaker) => !publishedIds.has(speaker._id));
-    }
-  }
-
+  const filtered = await filterSpeakersByStatus(ctx, speakers, options.status);
   const result = paginateArray(
     filtered,
     options.paginationOpts.cursor,
