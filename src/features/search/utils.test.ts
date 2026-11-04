@@ -90,7 +90,7 @@ describe('buildSearchPageHref', () => {
 });
 
 describe('toSearchHits', () => {
-  it('maps published results to canonical links and skips talks without speakers', () => {
+  it('maps published results to canonical links, including talks without speakers', () => {
     expect(toSearchHits(result)).toEqual([
       {
         href: '/talks/john-doe/sample-sermon-on-romans-8',
@@ -98,6 +98,12 @@ describe('toSearchHits', () => {
         scripture: 'Romans 8:28',
         subtitle: 'John Doe',
         title: 'Sample Sermon on Romans 8',
+        type: 'talk',
+      },
+      {
+        href: '/talks/missing-speaker',
+        id: 'talk2',
+        title: 'Orphan Talk',
         type: 'talk',
       },
       {
@@ -291,7 +297,7 @@ describe('getSearchSelectionAnalytics', () => {
     ).toEqual({
       position: 3,
       query: 'grace',
-      result_type: 'topic',
+      result_type: 'speaker',
     });
     expect(
       getSearchSelectionAnalytics({

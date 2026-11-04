@@ -6,6 +6,7 @@ import type { PaginationOptions } from 'convex/server';
 import { asyncMap } from 'convex-helpers';
 
 import { filterClipsByPublishedTalks } from '../../lib/filters';
+import { paginateUntilFull } from '../../lib/utils';
 import { searchTitleQuery } from '../search/helpers';
 
 function publishedClipsQuery(ctx: QueryCtx) {
@@ -26,12 +27,11 @@ export async function listPublishedClipsPage(
   ctx: QueryCtx,
   paginationOpts: PaginationOptions
 ) {
-  const result = await publishedClipsQuery(ctx).paginate(paginationOpts);
-
-  return {
-    ...result,
-    page: await filterClipsByPublishedTalks(ctx, result.page),
-  };
+  return await paginateUntilFull(
+    (opts) => publishedClipsQuery(ctx).paginate(opts),
+    (clips) => filterClipsByPublishedTalks(ctx, clips),
+    paginationOpts
+  );
 }
 
 export async function searchClips(
@@ -46,17 +46,39 @@ export async function searchClips(
     .take(limit);
 }
 
+export async function paginatePublishedClipSearch(
+  ctx: QueryCtx,
+  queryText: string,
+  paginationOpts: PaginationOptions,
+  accept: (clips: Doc<'clips'>[]) => Promise<Doc<'clips'>[]>
+) {
+  return await paginateUntilFull(
+    (opts) =>
+      ctx.db
+        .query('clips')
+        .withSearchIndex(
+          'search_title',
+          searchTitleQuery(queryText, 'published')
+        )
+        .paginate(opts),
+    accept,
+    paginationOpts
+  );
+}
+
 export async function searchPublishedClips(
   ctx: QueryCtx,
   queryText: string,
   limit: number
 ) {
-  const clips = await filterClipsByPublishedTalks(
+  const result = await paginatePublishedClipSearch(
     ctx,
-    await searchClips(ctx, queryText, limit, 'published')
+    queryText,
+    { cursor: null, numItems: limit },
+    (clips) => filterClipsByPublishedTalks(ctx, clips)
   );
 
-  return clips.slice(0, limit);
+  return result.page;
 }
 
 export async function enrichClipsWithSpeaker<

@@ -115,7 +115,8 @@ describe('auto draft', () => {
       const audio = await loadDraft(t, audioId);
 
       expect(youtube.transcript?.text).toBe(FETCHED_TRANSCRIPT);
-      expect(youtube.talk?.summary).toBe(GENERATED_SUMMARY);
+      expect(youtube.talk?.summary).toBeUndefined();
+      expect(youtube.talk?.summaryDraft).toBe(GENERATED_SUMMARY);
       expect(youtube.talk?.status).toBe('backlog');
       expect(youtube.study).toMatchObject({
         body: GENERATED_STUDY,

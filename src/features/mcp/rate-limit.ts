@@ -50,6 +50,14 @@ export function withMcpCors(response: Response) {
   });
 }
 
+export function getMcpLimiterUnavailableResult(): McpRateLimitResult {
+  if (process.env.NODE_ENV === 'production') {
+    return { ok: false, retryAfter: 60_000 };
+  }
+
+  return { ok: true, retryAfter: null };
+}
+
 export function createMcpRateLimitedHandler(
   handler: (request: Request) => Promise<Response>,
   consume: ConsumeMcpRateLimit
@@ -60,7 +68,7 @@ export function createMcpRateLimitedHandler(
     try {
       limit = await consume(request);
     } catch {
-      limit = { ok: true, retryAfter: null };
+      limit = getMcpLimiterUnavailableResult();
     }
 
     if (!limit.ok) {

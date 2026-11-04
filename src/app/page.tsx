@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+
 import { buildWebsiteJsonLd } from '@/app/_components/website-json-ld';
 import { FeaturedGrid } from '@/components/featured-grid';
 import { HeroSection } from '@/components/hero';
@@ -10,6 +12,12 @@ import { buildSpeakersPath } from '@/features/speakers/utils';
 import { TalkCard } from '@/features/talks/components/talk-card';
 import { loadFeaturedTalks } from '@/features/talks/queries/load-featured-talks';
 import { buildTalksPath } from '@/features/talks/utils';
+
+export const metadata: Metadata = {
+  alternates: {
+    canonical: site.url,
+  },
+};
 
 export default async function HomePage() {
   const [featuredTalksResult, featuredSpeakersResult] = await Promise.all([

@@ -15,12 +15,11 @@ export function Pagination({
   continueCursor,
   hasNextPage,
   hasPrevPage,
-  itemCount,
 }: PaginationProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  if (itemCount === 0 || !(hasNextPage || hasPrevPage)) {
+  if (!(hasNextPage || hasPrevPage)) {
     return null;
   }
 

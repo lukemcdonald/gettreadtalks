@@ -75,7 +75,8 @@ export type TalkGenerateGuardError =
 
 export async function loadTalkGenerateSource(
   ctx: ActionCtx,
-  talkId: Id<'talks'>
+  talkId: Id<'talks'>,
+  kind: 'study' | 'summary' = 'summary'
 ): Promise<
   | (TalkSummarySource & { transcript: string })
   | {
@@ -89,8 +90,17 @@ export async function loadTalkGenerateSource(
       talkId,
     }
   );
+  const reviewed =
+    kind === 'study'
+      ? hasReviewedTalkFeature(
+          await ctx.runQuery(internal.talkFeatures.loadTalkFeature, {
+            kind: 'study',
+            talkId,
+          })
+        )
+      : source.summaryManuallyEdited;
 
-  if (source.summaryManuallyEdited) {
+  if (reviewed) {
     return { errorCode: 'ALREADY_REVIEWED' };
   }
 
@@ -124,7 +134,7 @@ function toTalkSummarySource(
     mediaUrl: talk.mediaUrl,
     scripture: talk.scripture ?? '',
     speaker: `${speaker.firstName} ${speaker.lastName}`.trim(),
-    summary: talk.summary ?? '',
+    summary: talk.summary?.trim() ? talk.summary : (talk.summaryDraft ?? ''),
     summaryManuallyEdited: talk.summaryManuallyEditedAt !== undefined,
     title: talk.title,
     transcript: transcript?.text?.trim() || null,

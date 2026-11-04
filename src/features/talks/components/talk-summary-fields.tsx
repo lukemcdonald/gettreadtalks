@@ -29,12 +29,16 @@ export function useTalkSummaryForm(
     // oxlint-disable-next-line typescript/no-explicit-any -- Zod 4 compatibility with zodResolver
     resolver: zodResolver(talkSummaryFormSchema as any),
     values: {
-      summary: talkDoc?.summary ?? '',
+      summary: talkDoc?.summaryDraft?.trim()
+        ? talkDoc.summaryDraft
+        : (talkDoc?.summary ?? ''),
     },
   });
 
   async function save() {
-    if (!form.formState.isDirty) {
+    const hasDraft = Boolean(talkDoc?.summaryDraft?.trim());
+
+    if (!form.formState.isDirty && !hasDraft) {
       return { success: true as const };
     }
 

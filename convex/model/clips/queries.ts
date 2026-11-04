@@ -19,13 +19,14 @@ import {
   listAllAdmin,
   normalizeSearchQuery,
 } from '../search/helpers';
+import { speakerIdsForSlugs } from '../speakers/helpers';
 import {
   enrichClipsForAdmin,
   enrichClipsWithSpeaker,
   listPublishedClips,
   listPublishedClipsPage,
+  paginatePublishedClipSearch,
   searchClips,
-  searchPublishedClips,
 } from './helpers';
 
 const clipWithSpeakerValidator = doc('clips').extend({
@@ -162,9 +163,41 @@ export const listClips = query({
       };
     }
 
-    let clips = hasSearch
-      ? await searchPublishedClips(ctx, queryText, LIST_SEARCH_LIMIT)
-      : await listPublishedClips(ctx);
+    if (hasSearch) {
+      const speakerIds = hasSpeakerFilter
+        ? await speakerIdsForSlugs(ctx, speakerSlugs)
+        : null;
+      const result = await paginatePublishedClipSearch(
+        ctx,
+        queryText,
+        paginationOpts,
+        async (clips) => {
+          const published = await filterClipsByPublishedTalks(ctx, clips);
+
+          if (!speakerIds) {
+            return published;
+          }
+
+          return speakerIds.size > 0
+            ? published.filter(
+                (clip) => clip.speakerId && speakerIds.has(clip.speakerId)
+              )
+            : [];
+        }
+      );
+
+      if (needsCustomSort) {
+        result.page.sort(getContentComparator(sort as ContentSortOption));
+      }
+
+      return {
+        continueCursor: result.continueCursor,
+        isDone: result.isDone,
+        page: await enrichClipsWithSpeaker(ctx, result.page),
+      };
+    }
+
+    let clips = await listPublishedClips(ctx);
 
     // Apply speaker filter (multi-select)
     if (hasSpeakerFilter) {
@@ -216,13 +249,16 @@ export const listClipsBySpeaker = query({
   handler: async (ctx, args) => {
     const { limit = 20, speakerId } = args;
 
-    return await ctx.db
+    const clips = await ctx.db
       .query('clips')
       .withIndex('by_speakerId_and_status', (q) =>
         q.eq('speakerId', speakerId).eq('status', 'published')
       )
       .order('desc')
-      .take(limit);
+      .collect();
+    const visible = await filterClipsByPublishedTalks(ctx, clips);
+
+    return visible.slice(0, limit);
   },
   returns: docs('clips'),
 });

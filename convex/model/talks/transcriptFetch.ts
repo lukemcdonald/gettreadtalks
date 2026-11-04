@@ -10,20 +10,10 @@ import { getVideoId, hasTalkTranscriptSource } from '../../lib/videoUrl';
 import { NO_TRANSCRIPT_SOURCE_MESSAGE } from './summary/prompt';
 import { TRANSCRIPT_FETCH_ERROR_CODES } from './validators';
 
-export async function findOrInsertPendingTalkTranscriptFetch(
+export async function createPendingTalkTranscriptFetch(
   ctx: MutationCtx,
   talkId: Id<'talks'>
 ) {
-  const existingFetches = await ctx.db
-    .query('talkTranscriptFetches')
-    .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
-    .collect();
-  const pending = existingFetches.find((row) => row.status === 'pending');
-
-  if (pending) {
-    return pending._id;
-  }
-
   return await ctx.db.insert('talkTranscriptFetches', {
     checkedAt: Date.now(),
     status: 'pending',
@@ -354,7 +344,7 @@ export const insertPendingTalkTranscriptFetch = internalMutation({
     talkId: v.id('talks'),
   },
   handler: async (ctx, { talkId }) =>
-    await findOrInsertPendingTalkTranscriptFetch(ctx, talkId),
+    await createPendingTalkTranscriptFetch(ctx, talkId),
   returns: v.id('talkTranscriptFetches'),
 });
 

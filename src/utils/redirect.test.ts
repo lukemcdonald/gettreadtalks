@@ -27,4 +27,18 @@ describe('getSafeRedirect', () => {
     expect(getSafeRedirect(null)).toBe('/account');
     expect(getSafeRedirect('', '/login')).toBe('/login');
   });
+
+  it('rejects paths that normalize to a protocol-relative url', () => {
+    expect(getSafeRedirect('/.//evil.com')).toBe('/account');
+    expect(getSafeRedirect('/login/..//evil.com')).toBe('/account');
+    expect(getSafeRedirect('/login/..\\/\\evil.com')).toBe('/account');
+    expect(getSafeRedirect('///evil.com')).toBe('/account');
+  });
+
+  it('keeps a site path with a query and the site root', () => {
+    expect(getSafeRedirect('/talks?topic=grace#start')).toBe(
+      '/talks?topic=grace#start'
+    );
+    expect(getSafeRedirect('/', '/account')).toBe('/');
+  });
 });

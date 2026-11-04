@@ -82,16 +82,16 @@ function useEditTalkSheet({
 
   function submitData(data: TalkFormData) {
     startTransition(async () => {
+      const summaryResult = await saveSummary();
+
+      if (!summaryResult.success) {
+        return;
+      }
+
       const result = await updateTalkAction(data, talk._id);
 
       if (!result.success) {
         setServerErrors(form.setError, result.errors);
-        return;
-      }
-
-      const summaryResult = await saveSummary();
-
-      if (!summaryResult.success) {
         return;
       }
 
@@ -269,6 +269,7 @@ export function EditTalkSheet({
             onClose={() => {
               handleOpenChange(false);
             }}
+            savedMediaUrl={talk.mediaUrl}
             talkId={talk._id}
           />
         ) : null}

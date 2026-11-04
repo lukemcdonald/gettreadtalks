@@ -17,26 +17,28 @@ export function ClipsContent({
   hasNextPage,
   hasPrevPage,
 }: ClipsContentProps) {
-  if (clips.length === 0) {
-    return (
-      <Empty>
-        <EmptyTitle>No clips found</EmptyTitle>
-        <EmptyDescription>
-          There are no clips available at this time.
-        </EmptyDescription>
-      </Empty>
-    );
-  }
+  const isEmpty = clips.length === 0;
 
   return (
     <>
-      <ClipsList clips={clips} />
-      <Pagination
-        continueCursor={continueCursor}
-        hasNextPage={hasNextPage}
-        hasPrevPage={hasPrevPage}
-        itemCount={clips.length}
-      />
+      {isEmpty ? (
+        <Empty>
+          <EmptyTitle>No clips found</EmptyTitle>
+          <EmptyDescription>
+            There are no clips available at this time.
+          </EmptyDescription>
+        </Empty>
+      ) : (
+        <ClipsList clips={clips} />
+      )}
+      {!isEmpty || hasNextPage || hasPrevPage ? (
+        <Pagination
+          continueCursor={continueCursor}
+          hasNextPage={hasNextPage}
+          hasPrevPage={hasPrevPage}
+          itemCount={clips.length}
+        />
+      ) : null}
     </>
   );
 }

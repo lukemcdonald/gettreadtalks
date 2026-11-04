@@ -26,6 +26,7 @@ export const talkFields = {
   speakerId: v.id('speakers'),
   status: statusType,
   summary: v.optional(v.string()),
+  summaryDraft: v.optional(v.string()),
   summaryGeneratedAt: v.optional(v.number()),
   summaryGenerator: v.optional(v.string()),
   summaryManuallyEditedAt: v.optional(v.number()),

@@ -6,7 +6,7 @@ import { asyncMap } from 'convex-helpers';
 import { getAll } from 'convex-helpers/server/relationships';
 
 import { filterCollectionsWithPublishedTalks } from '../../lib/filters';
-import { paginateArray } from '../../lib/utils';
+import { paginateArray, paginateUntilFull } from '../../lib/utils';
 import { LIST_SEARCH_LIMIT, normalizeSearchQuery } from '../search/helpers';
 import { listTalksForCollection } from '../talks/helpers';
 
@@ -25,13 +25,11 @@ export async function listPublishedCollectionsPage(
   ctx: QueryCtx,
   paginationOpts: PaginationOptions
 ) {
-  const collectionPages =
-    await publishedCollectionsQuery(ctx).paginate(paginationOpts);
-
-  return {
-    ...collectionPages,
-    page: await filterCollectionsWithPublishedTalks(ctx, collectionPages.page),
-  };
+  return await paginateUntilFull(
+    (opts) => publishedCollectionsQuery(ctx).paginate(opts),
+    (collections) => filterCollectionsWithPublishedTalks(ctx, collections),
+    paginationOpts
+  );
 }
 
 export async function searchCollections(

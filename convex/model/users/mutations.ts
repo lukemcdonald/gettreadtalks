@@ -1,3 +1,6 @@
+import type { Id } from '../../_generated/dataModel';
+import type { MutationCtx } from '../../_generated/server';
+
 import { v } from 'convex/values';
 
 import { internalMutation, mutation } from '../../_generated/server';
@@ -11,6 +14,45 @@ import {
 import { getUserId, requireAdmin } from '../auth/helpers';
 import { userRole } from './validators';
 
+async function requirePublishedTalk(ctx: MutationCtx, talkId: Id<'talks'>) {
+  const talk = await ctx.db.get('talks', talkId);
+
+  if (!talk || talk.status !== 'published') {
+    throwNotFound('Talk not found', {
+      resource: 'talks',
+      resourceId: talkId,
+    });
+  }
+
+  return talk;
+}
+
+async function requirePublishedClip(ctx: MutationCtx, clipId: Id<'clips'>) {
+  const clip = await ctx.db.get('clips', clipId);
+
+  if (!clip || clip.status !== 'published') {
+    throwNotFound('Clip not found', {
+      resource: 'clips',
+      resourceId: clipId,
+    });
+  }
+
+  if (!clip.talkId) {
+    return clip;
+  }
+
+  const talk = await ctx.db.get('talks', clip.talkId);
+
+  if (talk?.status !== 'published') {
+    throwNotFound('Clip not found', {
+      resource: 'clips',
+      resourceId: clipId,
+    });
+  }
+
+  return clip;
+}
+
 /**
  * Add a clip to user favorites.
  */
@@ -20,6 +62,8 @@ export const favoriteClip = mutation({
   },
   handler: async (ctx, args) => {
     const userId = await getUserId(ctx);
+
+    await requirePublishedClip(ctx, args.clipId);
 
     const existing = await ctx.db
       .query('userFavoriteClips')
@@ -79,6 +123,8 @@ export const favoriteTalk = mutation({
   handler: async (ctx, args) => {
     const userId = await getUserId(ctx);
 
+    await requirePublishedTalk(ctx, args.talkId);
+
     const existing = await ctx.db
       .query('userFavoriteTalks')
       .withIndex('by_userId_and_talkId', (q) =>
@@ -107,6 +153,8 @@ export const finishTalk = mutation({
   },
   handler: async (ctx, args) => {
     const userId = await getUserId(ctx);
+
+    await requirePublishedTalk(ctx, args.talkId);
 
     const existing = await ctx.db
       .query('userFinishedTalks')

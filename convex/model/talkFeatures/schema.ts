@@ -14,8 +14,7 @@ export const talkFeatureFields = {
 };
 
 export const talkFeatureTables = {
-  talkFeatures: defineTable(talkFeatureFields).index('by_talkId_and_kind', [
-    'talkId',
-    'kind',
-  ]),
+  talkFeatures: defineTable(talkFeatureFields)
+    .index('by_kind_and_status', ['kind', 'status'])
+    .index('by_talkId_and_kind', ['talkId', 'kind']),
 };

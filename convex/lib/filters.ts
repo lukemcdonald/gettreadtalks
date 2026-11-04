@@ -3,8 +3,20 @@ import type { QueryCtx } from '../_generated/server';
 
 import { getOneFrom } from 'convex-helpers/server/relationships';
 
+async function speakerHasPublicClip(ctx: QueryCtx, speakerId: Id<'speakers'>) {
+  const clips = await ctx.db
+    .query('clips')
+    .withIndex('by_speakerId_and_status', (q) =>
+      q.eq('speakerId', speakerId).eq('status', 'published')
+    )
+    .collect();
+  const visible = await filterClipsByPublishedTalks(ctx, clips);
+
+  return visible.length > 0;
+}
+
 /**
- * Filter speakers to only those with at least one published talk or clip.
+ * Filter speakers to only those with at least one published talk or public clip.
  * Building block for listPublishedSpeakers / searchPublishedSpeakers.
  */
 export async function filterSpeakersWithPublishedTalks(
@@ -20,12 +32,7 @@ export async function filterSpeakersWithPublishedTalks(
             q.eq('speakerId', speaker._id).eq('status', 'published')
           )
           .first(),
-        ctx.db
-          .query('clips')
-          .withIndex('by_speakerId_and_status', (q) =>
-            q.eq('speakerId', speaker._id).eq('status', 'published')
-          )
-          .first(),
+        speakerHasPublicClip(ctx, speaker._id),
       ]);
 
       return hasTalks || hasClips ? speaker : null;

@@ -1,9 +1,16 @@
+import type { Metadata } from 'next';
+
 import { Suspense } from 'react';
 
 import { SidebarsLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { Card } from '@/components/ui';
 import { LoginForm } from '@/features/users/components/login-form';
+import { PRIVATE_ROBOTS } from '@/lib/metadata';
+
+export const metadata: Metadata = {
+  robots: PRIVATE_ROBOTS,
+};
 
 export default function LoginPage() {
   return (

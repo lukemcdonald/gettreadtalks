@@ -4,14 +4,13 @@ import type { TalkSummarySource } from '../../talks/summaryGenerate';
 
 import { ConvexError, v } from 'convex/values';
 
-import { api, internal } from '../../../_generated/api';
+import { internal } from '../../../_generated/api';
 import { action } from '../../../_generated/server';
 import {
   NO_TRANSCRIPT_SOURCE_MESSAGE,
   TALK_SUMMARY_MODEL,
 } from '../../talks/summary/prompt';
-import { loadTranscriptForGenerate } from '../../talks/transcriptFetch';
-import { hasReviewedTalkFeature } from '../helpers';
+import { loadTalkGenerateSource } from '../../talks/summaryGenerate';
 import { buildTalkStudyPrompt, TALK_STUDY_SYSTEM_PROMPT } from './prompt';
 
 export const STUDY_GENERATE_MESSAGES = {
@@ -127,40 +126,13 @@ export const generateStudy = action({
       }
     | { body: string; status: 'success' }
   > => {
-    const source: TalkSummarySource = await ctx.runQuery(
-      internal.talks.loadTalkSummarySource,
-      { talkId }
-    );
+    const source = await loadTalkGenerateSource(ctx, talkId, 'study');
 
-    const feature = await ctx.runQuery(api.talkFeatures.getTalkFeature, {
-      kind: 'study',
-      talkId,
-    });
-
-    if (hasReviewedTalkFeature(feature)) {
-      return toFailedResult('ALREADY_REVIEWED');
+    if (!('transcript' in source)) {
+      return toFailedResult(source.errorCode, source.message);
     }
 
-    if (!process.env.AI_GATEWAY_API_KEY) {
-      return toFailedResult('TOKEN_MISSING');
-    }
-
-    const loaded = await loadTranscriptForGenerate(
-      ctx,
-      talkId,
-      source.transcript,
-      source.mediaUrl
-    );
-
-    if ('errorCode' in loaded) {
-      return toFailedResult(loaded.errorCode, loaded.message);
-    }
-
-    return await saveGeneratedTalkStudy(
-      ctx,
-      { ...source, transcript: loaded.transcript },
-      talkId
-    );
+    return await saveGeneratedTalkStudy(ctx, source, talkId);
   },
   returns: v.union(
     talkStudyGenerateFailure,

@@ -1,12 +1,12 @@
-import type { Doc } from '../../_generated/dataModel';
+import type { Doc, Id } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
 import type { PaginationOptions } from 'convex/server';
 
 import { asyncMap } from 'convex-helpers';
-import { getManyFrom } from 'convex-helpers/server/relationships';
+import { getManyFrom, getOneFrom } from 'convex-helpers/server/relationships';
 
 import { filterSpeakersWithPublishedTalks } from '../../lib/filters';
-import { paginateArray } from '../../lib/utils';
+import { paginateArray, paginateUntilFull } from '../../lib/utils';
 import {
   LIST_SEARCH_LIMIT,
   normalizeSearchQuery,
@@ -15,6 +15,17 @@ import {
 } from '../search/helpers';
 
 const UNFILTERED_SEARCH_MULTIPLIER = 3;
+
+export async function speakerIdsForSlugs(
+  ctx: QueryCtx,
+  slugs: string[]
+): Promise<Set<Id<'speakers'>>> {
+  const speakers = await Promise.all(
+    slugs.map((slug) => getOneFrom(ctx.db, 'speakers', 'by_slug', slug))
+  );
+
+  return new Set(speakers.flatMap((speaker) => (speaker ? [speaker._id] : [])));
+}
 
 function publishedSpeakersQuery(ctx: QueryCtx) {
   return ctx.db.query('speakers').withIndex('by_lastName').order('asc');
@@ -31,12 +42,11 @@ export async function listPublishedSpeakersPage(
   ctx: QueryCtx,
   paginationOpts: PaginationOptions
 ) {
-  const result = await publishedSpeakersQuery(ctx).paginate(paginationOpts);
-
-  return {
-    ...result,
-    page: await filterSpeakersWithPublishedTalks(ctx, result.page),
-  };
+  return await paginateUntilFull(
+    (opts) => publishedSpeakersQuery(ctx).paginate(opts),
+    (speakers) => filterSpeakersWithPublishedTalks(ctx, speakers),
+    paginationOpts
+  );
 }
 
 async function searchSpeakerDocuments(

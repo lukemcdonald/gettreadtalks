@@ -12,6 +12,15 @@ export const DEFAULT_SHARE_IMAGE = {
 
 export const META_DESCRIPTION_MAX_LENGTH = 160;
 
+export const PRIVATE_ROBOTS = {
+  follow: false,
+  googleBot: {
+    follow: false,
+    index: false,
+  },
+  index: false,
+} as const;
+
 const TRAILING_META_WORDS = new Set([
   'a',
   'an',
