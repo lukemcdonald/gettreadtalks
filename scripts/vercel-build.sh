@@ -106,6 +106,5 @@ echo "Preview Convex ${deployment_name} at ${NEXT_PUBLIC_CONVEX_URL}"
 npx convex env set SITE_URL "${preview_site_url}" --deployment "${deployment_name}"
 
 npx convex run --deployment "${deployment_name}" internal.preview.seedPreview
-npx convex run --deployment "${deployment_name}" internal.talks.unsetTalkAutoDrafts || true
 
 pnpm build
