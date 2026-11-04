@@ -199,7 +199,16 @@ The good he is after is not comfort first. It is being shaped like the Son. Roma
 The promise that God is at work in every circumstance for those who love him.
 
 ### Romans 8:29
-The good in view is being conformed to the image of the Son.`,
+The good in view is being conformed to the image of the Son.
+
+## Questions
+
+- Where do you treat God's work as absence until the trouble lifts?
+- What would change if the good he is after is the Son, not comfort?
+
+## Next step
+
+Name one hard circumstance and ask to be shaped like the Son in it this week.`,
     kind: 'study' as const,
     status: 'draft' as const,
     talkSlug: PREVIEW_TALKS.ROMANS_8.slug,
@@ -222,7 +231,16 @@ Grace here is not a thin pardon. It is a restored place at the table. Luke 15:22
 The father runs to the returning son before the apology is finished.
 
 ### Luke 15:22-24
-Grace is a restored place at the table, given at cost.`,
+Grace is a restored place at the table, given at cost.
+
+## Questions
+
+- Where are you still rehearsing an apology God has already run to meet?
+- Which part of the feast are you standing outside of?
+
+## Next step
+
+This week, receive one person the way the father runs: before the speech is finished.`,
     kind: 'study' as const,
     status: 'published' as const,
     talkSlug: PREVIEW_TALKS.THE_PRODIGAL_SON.slug,

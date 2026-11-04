@@ -32,6 +32,8 @@ Rules
 - Use those ## headings exactly. Do not add a title heading above them.
 - Main points: 3 to 5 ### headings. Each is a short title, then a sentence or two. Include plain-text references like Romans 8:28 in the point body. Prefer verses the speaker actually uses. Do not overwhelm.
 - Key passages: the main text first (the stored scripture field when it matches the sermon), then in the order the talk's argument builds on them. Each passage is a ### heading with the reference, then a one-line note.
+- Questions: 3 to 5 bullets. Personal reflection for someone studying alone, phrased so a group can use the same questions. No ### headings.
+- Next step: one or two sentences. A concrete prompt toward obedience drawn from the talk. No ### heading.
 - No links. No HTML. No verse quotations. References are the typed citation only (for example "Romans 8:28" or "Psalm 23:1-3").
 - Return Markdown only. No JSON. No preamble.
 
