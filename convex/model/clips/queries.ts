@@ -28,15 +28,16 @@ import {
   searchPublishedClips,
 } from './helpers';
 
+const clipWithSpeakerValidator = doc('clips').extend({
+  speaker: doc('speakers').nullable(),
+});
+
 const clipPageWithSpeakersValidator = paginationResultValidator(
-  doc('clips').extend({
-    speaker: doc('speakers').nullable(),
-  })
+  clipWithSpeakerValidator
 );
 
 const clipAdminPageValidator = paginationResultValidator(
-  doc('clips').extend({
-    speaker: doc('speakers').nullable(),
+  clipWithSpeakerValidator.extend({
     talkTitle: v.union(v.null(), v.string()),
   })
 );

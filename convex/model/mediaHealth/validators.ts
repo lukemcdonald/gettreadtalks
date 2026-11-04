@@ -16,7 +16,7 @@ export const mediaCheckStatus = v.union(
   v.literal('unknown')
 );
 
-export const mediaHealthDigestItem = v.object({
+export const mediaHealthDigestItemValidator = v.object({
   adminPath: v.string(),
   checkId: v.id('mediaChecks'),
   entityTable: mediaCheckEntityTable,

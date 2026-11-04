@@ -17,7 +17,7 @@ import { throwConvexError } from './lib/errors';
 import { reportSentryException } from './lib/sentry';
 import { getPublicSiteUrl, getSiteUrl } from './lib/siteUrl';
 import { formatErrorMessage } from './lib/utils';
-import { mediaHealthDigestItem } from './model/mediaHealth/validators';
+import { mediaHealthDigestItemValidator } from './model/mediaHealth/validators';
 
 // Email constants - same across all environments
 const TEST_DOMAIN_EMAIL = 'delivered@resend.dev';
@@ -151,7 +151,7 @@ export const handleEmailEvent = internalMutation({
 
 export const sendMediaHealthEmail = internalAction({
   args: {
-    items: v.array(mediaHealthDigestItem),
+    items: v.array(mediaHealthDigestItemValidator),
   },
   handler: async (ctx, args) => {
     if (args.items.length === 0 || shouldSkipTestModeSend(site.email.contact)) {

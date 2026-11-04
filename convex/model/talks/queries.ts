@@ -40,6 +40,29 @@ import {
 import { talkFields, talkTranscriptFields } from './schema';
 import { talkTranscriptFetchLastError } from './validators';
 
+const talkPageValidator = paginationResultValidator(
+  talkWithSpeakerValidator.extend({
+    topicSlugs: v.array(v.string()),
+  })
+);
+
+const talkAdminPageValidator = paginationResultValidator(
+  talkWithSpeakerValidator.extend({
+    collectionTitle: v.union(v.null(), v.string()),
+    featuredClipTitle: v.union(v.null(), v.string()),
+    topicSlugs: v.array(v.string()),
+  })
+);
+
+const { text: _talkTranscriptText, ...talkTranscriptListFields } =
+  talkTranscriptFields;
+
+const talkTranscriptListItemValidator = v.object({
+  _creationTime: v.number(),
+  _id: v.id('talkTranscripts'),
+  ...talkTranscriptListFields,
+});
+
 /**
  * List slugs for published talks with their speaker slugs.
  */
@@ -468,11 +491,7 @@ export const listTalks = query({
       page: enrichedTalks,
     };
   },
-  returns: paginationResultValidator(
-    talkWithSpeakerValidator.extend({
-      topicSlugs: v.array(v.string()),
-    })
-  ),
+  returns: talkPageValidator,
 });
 
 async function filterTalksByStudyStatus(
@@ -556,24 +575,7 @@ export const listAllTalks = query({
         searchTalksByTitleOrSpeaker(ctx, queryText, LIST_SEARCH_LIMIT, status),
     });
   },
-  returns: paginationResultValidator(
-    v.object({
-      ...doc('talks').fields,
-      collectionTitle: v.union(v.null(), v.string()),
-      featuredClipTitle: v.union(v.null(), v.string()),
-      speaker: doc('speakers').nullable(),
-      topicSlugs: v.array(v.string()),
-    })
-  ),
-});
-
-const { text: _talkTranscriptText, ...talkTranscriptListFields } =
-  talkTranscriptFields;
-
-const talkTranscriptListItem = v.object({
-  _creationTime: v.number(),
-  _id: v.id('talkTranscripts'),
-  ...talkTranscriptListFields,
+  returns: talkAdminPageValidator,
 });
 
 // fallow-ignore-next-line complexity
@@ -656,7 +658,7 @@ export const listTalkTranscripts = query({
 
     return transcripts.map(({ text: _text, ...item }) => item);
   },
-  returns: v.array(talkTranscriptListItem),
+  returns: v.array(talkTranscriptListItemValidator),
 });
 
 async function loadTalkTranscript(ctx: QueryCtx, talkId: Id<'talks'>) {
@@ -681,7 +683,7 @@ export const getTalkTranscript = query({
 
     return item;
   },
-  returns: v.union(v.null(), talkTranscriptListItem),
+  returns: v.union(v.null(), talkTranscriptListItemValidator),
 });
 
 /**

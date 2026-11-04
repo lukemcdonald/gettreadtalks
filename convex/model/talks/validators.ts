@@ -32,13 +32,13 @@ const talkStudyGuideSection = v.object({
   text: v.string(),
 });
 
-const talkStudyOutlineItem = v.object({
+const talkStudyOutlineItemValidator = v.object({
   heading: v.string(),
   text: v.string(),
 });
 
 export const talkStudyContentFields = {
-  outline: v.array(talkStudyOutlineItem),
+  outline: v.array(talkStudyOutlineItemValidator),
   scriptureRefs: v.array(scriptureRef),
   studyGuide: v.array(talkStudyGuideSection),
   suggestedTopics: v.array(v.string()),

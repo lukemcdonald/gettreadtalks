@@ -17,6 +17,9 @@ export const statusType = v.union(
  */
 export const statusFilterType = v.union(statusType, v.literal('all'));
 
+/** Draft or published, derived from whether related content is published. */
+export const publishState = v.union(v.literal('draft'), v.literal('published'));
+
 /** Admin filter for entities whose status is derived from published content. */
 export const publishStateFilter = v.union(
   v.literal('all'),
