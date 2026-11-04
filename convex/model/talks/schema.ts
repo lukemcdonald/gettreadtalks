@@ -3,6 +3,7 @@ import { v } from 'convex/values';
 
 import { statusType, timestampFields } from '../../lib/validators';
 import {
+  talkAutoDraft,
   talkStudyContentFields,
   talkStudyStatus,
   talkTranscriptFetchErrorCode,
@@ -14,6 +15,7 @@ import {
 
 export const talkFields = {
   ...timestampFields,
+  autoDraft: v.optional(talkAutoDraft),
   collectionId: v.optional(v.id('collections')),
   collectionOrder: v.optional(v.number()),
   featured: v.optional(v.boolean()),

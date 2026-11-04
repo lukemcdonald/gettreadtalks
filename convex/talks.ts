@@ -1,11 +1,16 @@
 import { mutations, queries } from './model/talks';
 
 export {
+  draftTalkSummaryAndStudy,
+  setTalkAutoDraftStep,
+} from './model/talks/autoDraft';
+export {
   fetchTalkTranscript,
   insertPendingTalkTranscriptFetch,
 } from './model/talks/transcriptFetch';
 export {
   generateTalkSummary,
+  loadTalkDraftSource,
   loadTalkSummarySource,
 } from './model/talks/summaryGenerate';
 

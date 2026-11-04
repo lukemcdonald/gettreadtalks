@@ -28,3 +28,19 @@ export function getTalkGeneratePendingLabel(
 
   return `Generating ${label}...`;
 }
+
+export function getTalkAutoDraftStatusText(
+  status: 'failed' | 'pending' | undefined,
+  message: string | undefined,
+  pendingLabel: string
+) {
+  if (status === 'pending') {
+    return pendingLabel;
+  }
+
+  if (status === 'failed') {
+    return message ?? 'Failed';
+  }
+
+  return null;
+}

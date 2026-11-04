@@ -20,11 +20,13 @@ import {
   slugify,
   talkSlugExistsForSpeaker,
 } from '../../lib/utils';
+import { hasTalkTranscriptSource } from '../../lib/videoUrl';
 import { requireAdmin } from '../auth/helpers';
 import {
   clearMediaChecksForEntity,
   clearStaleMediaChecks,
 } from '../mediaHealth/check/clear';
+import { clearTalkAutoDraftStep } from './autoDraft';
 import { talkTranscriptFields } from './schema';
 import { findOrInsertPendingTalkTranscriptFetch } from './transcriptFetch';
 import { statusType, talkTranscriptFetchErrorCode } from './validators';
@@ -202,6 +204,18 @@ export const createTalk = mutation({
 
     if (topicIds !== undefined) {
       await setTalkTopics(ctx, talkId, topicIds);
+    }
+
+    // YouTube talks draft the transcript, summary, and study in the background.
+    if (hasTalkTranscriptSource(talkArgs.mediaUrl)) {
+      const runId = await findOrInsertPendingTalkTranscriptFetch(ctx, talkId);
+
+      await ctx.scheduler.runAfter(0, internal.talks.fetchTalkTranscript, {
+        continueDraft: true,
+        mediaUrl: talkArgs.mediaUrl,
+        runId,
+        talkId,
+      });
     }
 
     return talkId;
@@ -404,6 +418,7 @@ export const saveTalkSummaryDraft = internalMutation({
       summaryGeneratedAt: Date.now(),
       summaryGenerator: args.generator,
     });
+    await clearTalkAutoDraftStep(ctx, args.talkId, 'summary');
 
     return args.talkId;
   },
@@ -579,6 +594,7 @@ export const migrateTalkSummaries = internalMutation({
 export const completeTalkTranscriptFetch = internalMutation({
   args: {
     errorCode: v.optional(talkTranscriptFetchErrorCode),
+    keepExistingTranscript: v.optional(v.boolean()),
     message: v.optional(v.string()),
     retryAfter: v.optional(v.number()),
     runId: v.id('talkTranscriptFetches'),
@@ -607,6 +623,11 @@ export const completeTalkTranscriptFetch = internalMutation({
         .query('talkTranscripts')
         .withIndex('by_talkId', (q) => q.eq('talkId', args.talkId))
         .unique();
+
+      if (existing?.text?.trim() && args.keepExistingTranscript) {
+        return null;
+      }
+
       const fields = {
         fetchedAt: Date.now(),
         source: 'youtube_captions' as const,

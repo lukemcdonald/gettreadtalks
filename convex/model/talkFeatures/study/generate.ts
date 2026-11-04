@@ -14,7 +14,7 @@ import { loadTranscriptForGenerate } from '../../talks/transcriptFetch';
 import { hasReviewedTalkFeature } from '../helpers';
 import { buildTalkStudyPrompt, TALK_STUDY_SYSTEM_PROMPT } from './prompt';
 
-const STUDY_GENERATE_MESSAGES = {
+export const STUDY_GENERATE_MESSAGES = {
   ALREADY_REVIEWED: 'This study has already been reviewed.',
   NO_TRANSCRIPT_SOURCE: NO_TRANSCRIPT_SOURCE_MESSAGE,
   TOKEN_MISSING: 'Study service is not configured.',
@@ -74,7 +74,7 @@ export const talkStudyGenerator = {
   generate: generateTalkStudyMarkdown,
 };
 
-async function saveGeneratedTalkStudy(
+export async function saveGeneratedTalkStudy(
   ctx: ActionCtx,
   source: TalkSummarySource & { transcript: string },
   talkId: Id<'talks'>

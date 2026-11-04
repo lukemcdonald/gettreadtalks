@@ -91,6 +91,18 @@ export const talkTranscriptFetchErrorCode = v.union(
   v.literal('UPSTREAM_ERROR')
 );
 
+export const talkAutoDraftStepStatus = v.union(
+  v.literal('failed'),
+  v.literal('pending')
+);
+
+export const talkAutoDraft = v.object({
+  studyMessage: v.optional(v.string()),
+  studyStatus: v.optional(talkAutoDraftStepStatus),
+  summaryMessage: v.optional(v.string()),
+  summaryStatus: v.optional(talkAutoDraftStepStatus),
+});
+
 export const talkTranscriptFetchStatus = v.union(
   v.literal('failed'),
   v.literal('pending'),

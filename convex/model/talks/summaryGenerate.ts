@@ -1,5 +1,5 @@
 import type { Doc, Id } from '../../_generated/dataModel';
-import type { ActionCtx } from '../../_generated/server';
+import type { ActionCtx, QueryCtx } from '../../_generated/server';
 
 import { getOneFrom } from 'convex-helpers/server/relationships';
 import { ConvexError, v } from 'convex/values';
@@ -8,6 +8,7 @@ import { internal } from '../../_generated/api';
 import { action, internalQuery } from '../../_generated/server';
 import { getOrThrow } from '../../lib/utils';
 import { requireAdmin } from '../auth/helpers';
+import { hasReviewedTalkFeature } from '../talkFeatures/helpers';
 import {
   buildTalkSummaryPrompt,
   NO_TRANSCRIPT_SOURCE_MESSAGE,
@@ -17,7 +18,7 @@ import {
 } from './summary/prompt';
 import { loadTranscriptForGenerate } from './transcriptFetch';
 
-const SUMMARY_GENERATE_MESSAGES = {
+export const SUMMARY_GENERATE_MESSAGES = {
   ALREADY_REVIEWED: 'This summary has already been edited.',
   NO_TRANSCRIPT_SOURCE: NO_TRANSCRIPT_SOURCE_MESSAGE,
   TOKEN_MISSING: 'Summary service is not configured.',
@@ -130,6 +131,29 @@ function toTalkSummarySource(
   };
 }
 
+async function readTalkSummarySource(ctx: QueryCtx, talkId: Id<'talks'>) {
+  const talk = await getOrThrow(ctx, 'talks', talkId);
+  const speaker = await getOrThrow(ctx, 'speakers', talk.speakerId);
+  const transcript = await getOneFrom(
+    ctx.db,
+    'talkTranscripts',
+    'by_talkId',
+    talkId
+  );
+
+  return toTalkSummarySource(speaker, talk, transcript);
+}
+
+const talkSummarySourceValidator = v.object({
+  mediaUrl: v.string(),
+  scripture: v.string(),
+  speaker: v.string(),
+  summary: v.string(),
+  summaryManuallyEdited: v.boolean(),
+  title: v.string(),
+  transcript: v.union(v.null(), v.string()),
+});
+
 export const loadTalkSummarySource = internalQuery({
   args: {
     talkId: v.id('talks'),
@@ -137,25 +161,33 @@ export const loadTalkSummarySource = internalQuery({
   handler: async (ctx, { talkId }) => {
     await requireAdmin(ctx);
 
-    const talk = await getOrThrow(ctx, 'talks', talkId);
-    const speaker = await getOrThrow(ctx, 'speakers', talk.speakerId);
-    const transcript = await getOneFrom(
-      ctx.db,
-      'talkTranscripts',
-      'by_talkId',
-      talkId
-    );
-
-    return toTalkSummarySource(speaker, talk, transcript);
+    return await readTalkSummarySource(ctx, talkId);
   },
-  returns: v.object({
-    mediaUrl: v.string(),
-    scripture: v.string(),
-    speaker: v.string(),
-    summary: v.string(),
-    summaryManuallyEdited: v.boolean(),
-    title: v.string(),
-    transcript: v.union(v.null(), v.string()),
+  returns: talkSummarySourceValidator,
+});
+
+export const loadTalkDraftSource = internalQuery({
+  args: {
+    talkId: v.id('talks'),
+  },
+  handler: async (ctx, { talkId }) => {
+    const source = await readTalkSummarySource(ctx, talkId);
+    const feature = await ctx.db
+      .query('talkFeatures')
+      .withIndex('by_talkId_and_kind', (q) =>
+        q.eq('talkId', talkId).eq('kind', 'study')
+      )
+      .unique();
+
+    return {
+      ...source,
+      studyBody: feature?.body ?? '',
+      studyReviewed: hasReviewedTalkFeature(feature),
+    };
+  },
+  returns: talkSummarySourceValidator.extend({
+    studyBody: v.string(),
+    studyReviewed: v.boolean(),
   }),
 });
 
@@ -180,7 +212,7 @@ export const talkSummaryGenerator = {
   generate: generateTalkSummaryObject,
 };
 
-async function saveGeneratedTalkSummary(
+export async function saveGeneratedTalkSummary(
   ctx: ActionCtx,
   source: TalkSummarySource & { transcript: string },
   talkId: Id<'talks'>

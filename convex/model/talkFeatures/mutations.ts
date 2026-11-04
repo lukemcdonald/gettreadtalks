@@ -7,6 +7,7 @@ import { internalMutation, mutation } from '../../_generated/server';
 import { throwConvexError } from '../../lib/errors';
 import { getOrThrow } from '../../lib/utils';
 import { requireAdmin } from '../auth/helpers';
+import { clearTalkAutoDraftStep } from '../talks/autoDraft';
 import { hasReviewedTalkFeature } from './helpers';
 import { talkFeatureKind, talkFeatureStatus } from './validators';
 
@@ -48,13 +49,17 @@ export const saveTalkFeatureDraft = internalMutation({
       updatedAt: now,
     };
 
+    const featureId = existing
+      ? existing._id
+      : await ctx.db.insert('talkFeatures', fields);
+
     if (existing) {
       await ctx.db.replace(existing._id, fields);
-
-      return existing._id;
     }
 
-    return await ctx.db.insert('talkFeatures', fields);
+    await clearTalkAutoDraftStep(ctx, args.talkId, 'study');
+
+    return featureId;
   },
   returns: v.id('talkFeatures'),
 });

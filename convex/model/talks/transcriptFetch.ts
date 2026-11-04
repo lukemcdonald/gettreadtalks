@@ -309,6 +309,7 @@ function toCompleteTalkTranscriptFetchArgs(
 export async function fetchAndCompleteTalkTranscript(
   ctx: ActionCtx,
   args: {
+    keepExistingTranscript?: boolean;
     mediaUrl: string;
     runId: Id<'talkTranscriptFetches'>;
     talkId: Id<'talks'>;
@@ -319,10 +320,10 @@ export async function fetchAndCompleteTalkTranscript(
     process.env.YOUTUBE_TRANSCRIPT_IO_TOKEN ?? ''
   );
 
-  await ctx.runMutation(
-    internal.talks.completeTalkTranscriptFetch,
-    toCompleteTalkTranscriptFetchArgs(result, args.runId, args.talkId)
-  );
+  await ctx.runMutation(internal.talks.completeTalkTranscriptFetch, {
+    ...toCompleteTalkTranscriptFetchArgs(result, args.runId, args.talkId),
+    ...(args.keepExistingTranscript ? { keepExistingTranscript: true } : {}),
+  });
 
   return result;
 }
@@ -357,14 +358,48 @@ export const insertPendingTalkTranscriptFetch = internalMutation({
   returns: v.id('talkTranscriptFetches'),
 });
 
+async function scheduleTalkDraft(ctx: ActionCtx, talkId: Id<'talks'>) {
+  await ctx.scheduler.runAfter(0, internal.talks.draftTalkSummaryAndStudy, {
+    talkId,
+  });
+}
+
 export const fetchTalkTranscript = internalAction({
   args: {
+    continueDraft: v.optional(v.boolean()),
     mediaUrl: v.string(),
     runId: v.id('talkTranscriptFetches'),
     talkId: v.id('talks'),
   },
   handler: async (ctx, args) => {
-    await fetchAndCompleteTalkTranscript(ctx, args);
+    if (args.continueDraft) {
+      const source: { transcript: string | null } = await ctx.runQuery(
+        internal.talks.loadTalkDraftSource,
+        { talkId: args.talkId }
+      );
+
+      if (source.transcript?.trim()) {
+        await ctx.runMutation(internal.talks.completeTalkTranscriptFetch, {
+          runId: args.runId,
+          status: 'success',
+          talkId: args.talkId,
+        });
+        await scheduleTalkDraft(ctx, args.talkId);
+
+        return null;
+      }
+    }
+
+    const result = await fetchAndCompleteTalkTranscript(ctx, {
+      keepExistingTranscript: args.continueDraft,
+      mediaUrl: args.mediaUrl,
+      runId: args.runId,
+      talkId: args.talkId,
+    });
+
+    if (args.continueDraft && result.status === 'success') {
+      await scheduleTalkDraft(ctx, args.talkId);
+    }
 
     return null;
   },

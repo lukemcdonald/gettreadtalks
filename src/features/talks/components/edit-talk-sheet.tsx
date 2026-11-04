@@ -9,6 +9,7 @@ import type { TopicListItem } from '@/features/topics/types';
 import type { StatusPrefill } from '@/lib/entities/status-prefill';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useQuery } from 'convex/react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
@@ -20,6 +21,7 @@ import {
   FormSheetBody,
   FormSheetShell,
 } from '@/components/ui';
+import { api } from '@/convex/_generated/api';
 import { updateTalkAction } from '@/features/talks/actions/update-talk';
 import {
   getTalkFormValues,
@@ -156,6 +158,35 @@ function useEditTalkTab(talkId: TalkWithTopicIds['_id']) {
   return { handleTabChange, tab };
 }
 
+function useEditTalkDraftTabs(
+  studyStatus: EditTalkSheetProps['studyStatus'],
+  talkId: TalkWithTopicIds['_id']
+) {
+  const liveStudy = useQuery(api.talkFeatures.getTalkFeature, {
+    kind: 'study',
+    talkId,
+  });
+  const liveTalk = useQuery(api.talks.getTalk, { id: talkId });
+  const transcriptFetch = useQuery(api.talks.getTalkTranscriptFetch, {
+    talkId,
+  });
+  const transcriptStatus = transcriptFetch?.status;
+
+  return {
+    studyMessage: liveTalk?.autoDraft?.studyMessage,
+    studyStatus:
+      liveStudy === undefined ? studyStatus : (liveStudy?.status ?? null),
+    studyStepStatus: liveTalk?.autoDraft?.studyStatus,
+    summaryMessage: liveTalk?.autoDraft?.summaryMessage,
+    summaryStepStatus: liveTalk?.autoDraft?.summaryStatus,
+    transcriptMessage: transcriptFetch?.message,
+    transcriptStepStatus:
+      transcriptStatus === 'failed' || transcriptStatus === 'pending'
+        ? transcriptStatus
+        : undefined,
+  };
+}
+
 // fallow-ignore-next-line complexity
 export function EditTalkSheet({
   closeHref,
@@ -185,6 +216,7 @@ export function EditTalkSheet({
     talk,
   });
   const { handleTabChange, tab } = useEditTalkTab(talk._id);
+  const draftTabs = useEditTalkDraftTabs(studyStatus, talk._id);
   const mediaUrl = useWatch({ control: form.control, name: 'mediaUrl' });
   const canGenerate = hasTalkTranscriptSource(mediaUrl);
 
@@ -194,7 +226,7 @@ export function EditTalkSheet({
         header={
           <EditTalkTabs
             onValueChange={handleTabChange}
-            studyStatus={studyStatus}
+            {...draftTabs}
             value={tab}
           />
         }
