@@ -6,7 +6,7 @@ import { asyncMap } from 'convex-helpers';
 import { getManyFrom, getOneFrom } from 'convex-helpers/server/relationships';
 
 import { filterSpeakersWithPublishedTalks } from '../../lib/filters';
-import { paginateArray, paginateUntilFull } from '../../lib/utils';
+import { paginateArray, loadFullPage } from '../../lib/utils';
 import {
   LIST_SEARCH_LIMIT,
   normalizeSearchQuery,
@@ -16,7 +16,7 @@ import {
 
 const UNFILTERED_SEARCH_MULTIPLIER = 3;
 
-export async function speakerIdsForSlugs(
+export async function loadSpeakerIdsBySlugs(
   ctx: QueryCtx,
   slugs: string[]
 ): Promise<Set<Id<'speakers'>>> {
@@ -42,7 +42,7 @@ export async function listPublishedSpeakersPage(
   ctx: QueryCtx,
   paginationOpts: PaginationOptions
 ) {
-  return await paginateUntilFull(
+  return await loadFullPage(
     (opts) => publishedSpeakersQuery(ctx).paginate(opts),
     (speakers) => filterSpeakersWithPublishedTalks(ctx, speakers),
     paginationOpts

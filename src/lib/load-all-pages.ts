@@ -6,7 +6,7 @@ interface PageResult<T> {
 
 const MAX_PAGE_READS = 50;
 
-export async function loadEveryPage<T>(
+export async function loadAllPages<T>(
   loadPage: (cursor: string | null) => Promise<PageResult<T>>
 ) {
   const page: T[] = [];

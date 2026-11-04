@@ -2,23 +2,23 @@ import type { Doc, Id } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
 import type { ContentSortOption } from '../../lib/sort';
 import type { StatusFilterType } from '../../lib/types';
-import type { PaginationOptions, PaginationResult } from 'convex/server';
+import type { PaginationOptions } from 'convex/server';
 
 import { asyncMap } from 'convex-helpers';
 import { getManyVia } from 'convex-helpers/server/relationships';
 
 import { getTalkIdsByTopicSlugs } from '../../lib/filters';
 import { getContentComparator } from '../../lib/sort';
-import { enrichWithSpeaker, paginateUntilFull } from '../../lib/utils';
+import { enrichWithSpeaker, loadFullPage } from '../../lib/utils';
 import {
   DEFAULT_SEARCH_LIMIT,
   searchTitleQuery,
   uniqueById,
 } from '../search/helpers';
 import {
+  loadSpeakerIdsBySlugs,
   searchPublishedSpeakers,
   searchSpeakers,
-  speakerIdsForSlugs,
 } from '../speakers/helpers';
 
 function publishedTalksQuery(ctx: QueryCtx) {
@@ -185,46 +185,6 @@ function filterTalkSearchHits(
   });
 }
 
-export async function paginatePublishedTalkSearch(
-  ctx: QueryCtx,
-  options: {
-    featured?: boolean;
-    paginationOpts: PaginationOptions;
-    queryText: string;
-    sort: ContentSortOption;
-    speakerIds: Set<Id<'speakers'>> | null;
-    topicTalkIds: Set<Id<'talks'>> | null | undefined;
-  }
-): Promise<PaginationResult<Doc<'talks'>>> {
-  const {
-    featured,
-    paginationOpts,
-    queryText,
-    sort,
-    speakerIds,
-    topicTalkIds,
-  } = options;
-  const result = await paginateUntilFull(
-    (opts) =>
-      ctx.db
-        .query('talks')
-        .withSearchIndex(
-          'search_title',
-          searchTitleQuery(queryText, 'published')
-        )
-        .paginate(opts),
-    (found) =>
-      filterTalkSearchHits(found, { featured, speakerIds, topicTalkIds }),
-    paginationOpts
-  );
-
-  if (sort !== 'recent') {
-    result.page.sort(getContentComparator(sort));
-  }
-
-  return result;
-}
-
 export async function loadPublishedTalkSearchPage(
   ctx: QueryCtx,
   options: {
@@ -245,19 +205,29 @@ export async function loadPublishedTalkSearchPage(
     topicSlugs,
   } = options;
   const speakerIds = speakerSlugs?.length
-    ? await speakerIdsForSlugs(ctx, speakerSlugs)
+    ? await loadSpeakerIdsBySlugs(ctx, speakerSlugs)
     : null;
   const topicTalkIds = topicSlugs?.length
     ? await getTalkIdsByTopicSlugs(ctx, topicSlugs)
     : undefined;
-  const result = await paginatePublishedTalkSearch(ctx, {
-    featured,
-    paginationOpts,
-    queryText,
-    sort,
-    speakerIds,
-    topicTalkIds,
-  });
+  const result = await loadFullPage(
+    (opts) =>
+      ctx.db
+        .query('talks')
+        .withSearchIndex(
+          'search_title',
+          searchTitleQuery(queryText, 'published')
+        )
+        .paginate(opts),
+    (found) =>
+      filterTalkSearchHits(found, { featured, speakerIds, topicTalkIds }),
+    paginationOpts
+  );
+
+  if (sort !== 'recent') {
+    result.page.sort(getContentComparator(sort));
+  }
+
   const talksWithSpeakers = await enrichWithSpeaker(ctx, result.page);
 
   return {

@@ -20,7 +20,7 @@ import { byPublishedAt, getContentComparator } from '../../lib/sort';
 import {
   enrichWithSpeaker,
   paginateArray,
-  paginateUntilFull,
+  loadFullPage,
 } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
@@ -567,7 +567,7 @@ export const listAllTalks = query({
       let result;
 
       if (queryText) {
-        result = await paginateUntilFull(
+        result = await loadFullPage(
           (opts) =>
             ctx.db
               .query('talks')
@@ -583,13 +583,13 @@ export const listAllTalks = query({
           paginationOpts
         );
       } else if (studyStatus === 'none') {
-        result = await paginateUntilFull(
+        result = await loadFullPage(
           (opts) => talksByStatusQuery(ctx, status).paginate(opts),
           acceptStudyStatus,
           paginationOpts
         );
       } else {
-        result = await paginateUntilFull(
+        result = await loadFullPage(
           (opts) =>
             ctx.db
               .query('talkFeatures')

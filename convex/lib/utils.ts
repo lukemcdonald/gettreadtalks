@@ -179,7 +179,7 @@ const MAX_PAGINATION_SCANS = 25;
  * Read pages until `numItems` survive `accept`, or the index is exhausted.
  * Rejected rows advance the cursor so a filtered-empty page does not stop the scan.
  */
-export async function paginateUntilFull<TSource, TItem>(
+export async function loadFullPage<TSource, TItem>(
   loadPage: (
     paginationOpts: PaginationOptions
   ) => Promise<PaginationResult<TSource>>,

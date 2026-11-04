@@ -15,7 +15,7 @@ import {
   normalizeSearchQuery,
 } from './helpers';
 
-function clampSearchLimit(limit: number | undefined) {
+function normalizeSearchLimit(limit: number | undefined) {
   if (limit === undefined || !Number.isFinite(limit) || limit < 1) {
     return DEFAULT_SEARCH_LIMIT;
   }
@@ -114,7 +114,7 @@ export const searchSite = query({
       return emptySiteSearch;
     }
 
-    const limit = clampSearchLimit(args.limit);
+    const limit = normalizeSearchLimit(args.limit);
     const [clips, speakers, talks, topics] = await Promise.all([
       searchPublishedClips(ctx, queryText, limit),
       searchPublishedSpeakers(ctx, queryText, limit),

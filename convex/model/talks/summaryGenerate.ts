@@ -93,7 +93,7 @@ export async function loadTalkGenerateSource(
   const reviewed =
     kind === 'study'
       ? hasReviewedTalkFeature(
-          await ctx.runQuery(internal.talkFeatures.loadTalkFeature, {
+          await ctx.runQuery(internal.talkFeatures.getTalkFeatureInternal, {
             kind: 'study',
             talkId,
           })

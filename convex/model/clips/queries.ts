@@ -19,13 +19,13 @@ import {
   listAllAdmin,
   normalizeSearchQuery,
 } from '../search/helpers';
-import { speakerIdsForSlugs } from '../speakers/helpers';
+import { loadSpeakerIdsBySlugs } from '../speakers/helpers';
 import {
   enrichClipsForAdmin,
   enrichClipsWithSpeaker,
   listPublishedClips,
   listPublishedClipsPage,
-  paginatePublishedClipSearch,
+  loadPublishedClipSearchPage,
   searchClips,
 } from './helpers';
 
@@ -165,9 +165,9 @@ export const listClips = query({
 
     if (hasSearch) {
       const speakerIds = hasSpeakerFilter
-        ? await speakerIdsForSlugs(ctx, speakerSlugs)
+        ? await loadSpeakerIdsBySlugs(ctx, speakerSlugs)
         : null;
-      const result = await paginatePublishedClipSearch(
+      const result = await loadPublishedClipSearchPage(
         ctx,
         queryText,
         paginationOpts,

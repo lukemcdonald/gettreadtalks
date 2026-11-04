@@ -5,7 +5,7 @@ import { cacheLife, cacheTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
 import { speakerRoles } from '@/convex/model/speakers/validators';
-import { loadEveryPage } from '@/lib/load-every-page';
+import { loadAllPages } from '@/lib/load-all-pages';
 
 type SortOption = 'alphabetical' | 'featured';
 const VALID_SORT_OPTIONS = new Set(['alphabetical', 'featured']);
@@ -45,7 +45,7 @@ export async function loadSpeakers(args?: GetSpeakersProps) {
       sort: sortOption,
     });
   const result =
-    limit === undefined ? await loadEveryPage(listPage) : await listPage(null);
+    limit === undefined ? await loadAllPages(listPage) : await listPage(null);
 
   return {
     continueCursor: result.continueCursor,

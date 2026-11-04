@@ -5,7 +5,7 @@ import { doc } from '../../lib/validators/schema';
 import { requireAdmin } from '../auth/helpers';
 import { talkFeatureKind } from './validators';
 
-export const loadTalkFeature = internalQuery({
+export const getTalkFeatureInternal = internalQuery({
   args: {
     kind: talkFeatureKind,
     talkId: v.id('talks'),

@@ -6,7 +6,7 @@ import type { PaginationOptions } from 'convex/server';
 import { asyncMap } from 'convex-helpers';
 
 import { filterClipsByPublishedTalks } from '../../lib/filters';
-import { paginateUntilFull } from '../../lib/utils';
+import { loadFullPage } from '../../lib/utils';
 import { searchTitleQuery } from '../search/helpers';
 
 function publishedClipsQuery(ctx: QueryCtx) {
@@ -27,7 +27,7 @@ export async function listPublishedClipsPage(
   ctx: QueryCtx,
   paginationOpts: PaginationOptions
 ) {
-  return await paginateUntilFull(
+  return await loadFullPage(
     (opts) => publishedClipsQuery(ctx).paginate(opts),
     (clips) => filterClipsByPublishedTalks(ctx, clips),
     paginationOpts
@@ -46,13 +46,13 @@ export async function searchClips(
     .take(limit);
 }
 
-export async function paginatePublishedClipSearch(
+export async function loadPublishedClipSearchPage(
   ctx: QueryCtx,
   queryText: string,
   paginationOpts: PaginationOptions,
   accept: (clips: Doc<'clips'>[]) => Promise<Doc<'clips'>[]>
 ) {
-  return await paginateUntilFull(
+  return await loadFullPage(
     (opts) =>
       ctx.db
         .query('clips')
@@ -71,7 +71,7 @@ export async function searchPublishedClips(
   queryText: string,
   limit: number
 ) {
-  const result = await paginatePublishedClipSearch(
+  const result = await loadPublishedClipSearchPage(
     ctx,
     queryText,
     { cursor: null, numItems: limit },
