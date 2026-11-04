@@ -1,7 +1,6 @@
 import type { ManageListSearchParams } from '@/components/manage-table';
 
 import { ManageTable } from '@/components/manage-table';
-import { NewTopicButton } from '@/features/topics/components/new-topic-button';
 import { TopicsTableRow } from '@/features/topics/components/topics-table/topics-table-row';
 import { loadAllTopics } from '@/features/topics/queries/load-all-topics';
 
@@ -23,7 +22,6 @@ export async function ManageTopicsContent({
     <ManageTable
       continueCursor={result.continueCursor}
       cursor={cursor}
-      emptyAction={<NewTopicButton />}
       isDone={result.isDone}
       isEmpty={result.topics.length === 0}
       isFiltered={Boolean(search?.trim())}

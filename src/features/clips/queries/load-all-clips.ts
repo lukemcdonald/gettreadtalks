@@ -5,7 +5,7 @@ import type { StatusFilterType } from '@/lib/entities/types';
 import { api } from '@/convex/_generated/api';
 import { fetchAuthQuery } from '@/services/auth/server';
 
-interface GetAllClipsProps {
+interface LoadAllClipsProps {
   cursor?: string;
   limit?: number;
   search?: string;
@@ -14,9 +14,9 @@ interface GetAllClipsProps {
 
 /**
  * Get all clips with speakers with filtering support.
- * Supports status='all' to fetch clips across all statuses.
+ * Defaults to published. Pass status='all' to fetch every status.
  */
-export async function loadAllClips(args?: GetAllClipsProps) {
+export async function loadAllClips(args?: LoadAllClipsProps) {
   const { cursor, limit, search, status } = args ?? {};
 
   const paginationOpts = {

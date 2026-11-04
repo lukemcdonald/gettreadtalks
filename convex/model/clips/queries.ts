@@ -229,7 +229,7 @@ export const listClipsBySpeaker = query({
 /**
  * List all clips with speaker data.
  * Returns all clips without filtering by parent talk status.
- * Supports status='all' to fetch clips across all statuses.
+ * Defaults to published. Pass status='all' to fetch every status.
  */
 export const listAllClips = query({
   args: {
@@ -238,12 +238,12 @@ export const listAllClips = query({
     status: v.optional(statusFilterType),
   },
   handler: async (ctx, args) => {
-    const { paginationOpts, search, status } = args;
+    const { paginationOpts, search, status = 'published' } = args;
 
     return await listAllAdmin(ctx, {
       enrich: (page) => enrichClipsForAdmin(ctx, page),
       listPage: () =>
-        !status || status === 'all'
+        status === 'all'
           ? ctx.db.query('clips').order('desc').paginate(paginationOpts)
           : ctx.db
               .query('clips')

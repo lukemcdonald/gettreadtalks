@@ -2,8 +2,18 @@ import type { QueryCtx } from '../../_generated/server';
 import type { StatusFilterType } from '../../lib/types';
 import type { PaginationOptions, PaginationResult } from 'convex/server';
 
+import { paginationOptsValidator } from 'convex/server';
+import { v } from 'convex/values';
+
 import { paginateSearchOrList } from '../../lib/utils';
+import { publishStateFilter } from '../../lib/validators/shared';
 import { requireAdmin } from '../auth/helpers';
+
+export const adminListArgs = {
+  paginationOpts: paginationOptsValidator,
+  search: v.optional(v.string()),
+  status: v.optional(publishStateFilter),
+};
 
 export const DEFAULT_SEARCH_LIMIT = 12;
 export const LIST_SEARCH_LIMIT = 100;

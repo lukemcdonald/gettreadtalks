@@ -28,7 +28,7 @@ import {
   normalizeSearchQuery,
 } from '../search/helpers';
 import {
-  enrichAdminTalks,
+  enrichTalksForAdmin,
   enrichWithTopics,
   listPublishedTalks,
   listPublishedTalksForTopics,
@@ -543,12 +543,12 @@ export const listAllTalks = query({
       return {
         continueCursor,
         isDone,
-        page: await enrichAdminTalks(ctx, page),
+        page: await enrichTalksForAdmin(ctx, page),
       };
     }
 
     return await listAllAdmin(ctx, {
-      enrich: (page) => enrichAdminTalks(ctx, page),
+      enrich: (page) => enrichTalksForAdmin(ctx, page),
       listPage: () => talksByStatusQuery(ctx, status).paginate(paginationOpts),
       paginationOpts,
       search,

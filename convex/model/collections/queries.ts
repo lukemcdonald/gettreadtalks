@@ -11,14 +11,13 @@ import { enrichWithSpeaker } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
 import { requireAdmin } from '../auth/helpers';
-import { LIST_SEARCH_LIMIT, listAllAdmin } from '../search/helpers';
+import { adminListArgs } from '../search/helpers';
 import { listPublishedTalksForCollection } from '../talks/helpers';
 import {
-  enrichCollectionsForAdmin,
+  listCollectionsForAdmin,
   listPublishedCollections,
   listPublishedCollectionsPage,
   loadSpeakersForTalks,
-  searchCollections,
 } from './helpers';
 
 /**
@@ -184,23 +183,19 @@ const collectionAdminPageValidator = paginationResultValidator(
 );
 
 /**
- * List all collections with stats.
- * Returns all collections without filtering.
+ * List collections for admin use.
+ * Omitted status means published. Pass status='all' for every collection.
  */
 export const listAllCollections = query({
-  args: {
-    paginationOpts: paginationOptsValidator,
-    search: v.optional(v.string()),
-  },
-  handler: async (ctx, args) =>
-    await listAllAdmin(ctx, {
-      enrich: (page) => enrichCollectionsForAdmin(ctx, page),
-      listPage: () =>
-        ctx.db.query('collections').order('desc').paginate(args.paginationOpts),
+  args: adminListArgs,
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+
+    return await listCollectionsForAdmin(ctx, {
       paginationOpts: args.paginationOpts,
       search: args.search,
-      searchItems: (queryText) =>
-        searchCollections(ctx, queryText, LIST_SEARCH_LIMIT),
-    }),
+      status: args.status ?? 'published',
+    });
+  },
   returns: collectionAdminPageValidator,
 });

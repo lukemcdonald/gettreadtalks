@@ -17,6 +17,13 @@ export const statusType = v.union(
  */
 export const statusFilterType = v.union(statusType, v.literal('all'));
 
+/** Admin filter for entities whose status is derived from published content. */
+export const publishStateFilter = v.union(
+  v.literal('all'),
+  v.literal('draft'),
+  v.literal('published')
+);
+
 export const timestampFields = {
   // Note: Convex provides a `_creationTime` field automatically
   deletedAt: v.optional(v.number()),

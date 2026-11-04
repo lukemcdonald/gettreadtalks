@@ -43,6 +43,7 @@ export function SelectFilter({
     filterOptions,
     placeholder
   );
+  const omittedValue = defaultValue ?? FILTER_ALL;
 
   return (
     <div className={cn('flex flex-col gap-2', className)}>
@@ -52,7 +53,7 @@ export function SelectFilter({
         items={filterOptions}
         name={name}
         onValueChange={(newValue) => {
-          updateUnlessDefault(newValue, FILTER_ALL);
+          updateUnlessDefault(newValue, omittedValue);
         }}
         value={value}
       >

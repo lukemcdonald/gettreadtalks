@@ -6,6 +6,8 @@ import { asyncMap } from 'convex-helpers';
 import { getAll } from 'convex-helpers/server/relationships';
 
 import { filterCollectionsWithPublishedTalks } from '../../lib/filters';
+import { paginateArray } from '../../lib/utils';
+import { LIST_SEARCH_LIMIT, normalizeSearchQuery } from '../search/helpers';
 import { listTalksForCollection } from '../talks/helpers';
 
 function publishedCollectionsQuery(ctx: QueryCtx) {
@@ -69,4 +71,55 @@ export async function enrichCollectionsForAdmin(
       talkCount: talks.length,
     };
   });
+}
+
+async function filterCollectionsByStatus(
+  ctx: QueryCtx,
+  collections: Doc<'collections'>[],
+  status: 'all' | 'draft' | 'published'
+) {
+  if (status === 'all') {
+    return collections;
+  }
+
+  const published = await filterCollectionsWithPublishedTalks(ctx, collections);
+
+  if (status === 'published') {
+    return published;
+  }
+
+  const publishedIds = new Set(published.map((collection) => collection._id));
+
+  return collections.filter((collection) => !publishedIds.has(collection._id));
+}
+
+export async function listCollectionsForAdmin(
+  ctx: QueryCtx,
+  options: {
+    paginationOpts: PaginationOptions;
+    search?: string;
+    status: 'all' | 'draft' | 'published';
+  }
+) {
+  const queryText = normalizeSearchQuery(options.search ?? '');
+  const collections =
+    queryText.length > 0
+      ? await searchCollections(ctx, queryText, LIST_SEARCH_LIMIT)
+      : await publishedCollectionsQuery(ctx).collect();
+  const filtered = await filterCollectionsByStatus(
+    ctx,
+    collections,
+    options.status
+  );
+  const result = paginateArray(
+    filtered,
+    options.paginationOpts.cursor,
+    options.paginationOpts.numItems
+  );
+
+  return {
+    continueCursor: result.continueCursor,
+    isDone: result.isDone,
+    page: await enrichCollectionsForAdmin(ctx, result.page),
+  };
 }

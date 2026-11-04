@@ -16,16 +16,15 @@ import { doc, docs } from '../../lib/validators/schema';
 import { requireAdmin } from '../auth/helpers';
 import {
   LIST_SEARCH_LIMIT,
-  listAllAdmin,
+  adminListArgs,
   normalizeSearchQuery,
 } from '../search/helpers';
 import { listPublishedTopicsForTalks } from '../topics/helpers';
 import {
-  enrichSpeakersForAdmin,
   listPublishedSpeakers,
   listPublishedSpeakersPage,
+  listSpeakersForAdmin,
   searchPublishedSpeakers,
-  searchSpeakers,
 } from './helpers';
 import { speakerRoleType } from './validators';
 
@@ -139,19 +138,6 @@ export const listSpeakerSlugs = query({
 });
 
 /**
- * List all speakers without pagination (for migration/cleanup scripts).
- */
-export const listAllSpeakersRaw = query({
-  args: {},
-  handler: async (ctx) => {
-    await requireAdmin(ctx);
-
-    return await ctx.db.query('speakers').collect();
-  },
-  returns: docs('speakers'),
-});
-
-/**
  * Get total count of speakers.
  */
 export const getSpeakersCount = query({
@@ -249,48 +235,19 @@ const speakerAdminPageValidator = paginationResultValidator(
 );
 
 /**
- * List all speakers for admin use, with total talk and clip counts (all statuses).
- */
-export const listAllSpeakersAdmin = query({
-  args: {
-    paginationOpts: paginationOptsValidator,
-    search: v.optional(v.string()),
-  },
-  handler: async (ctx, args) =>
-    await listAllAdmin(ctx, {
-      enrich: (page) => enrichSpeakersForAdmin(ctx, page),
-      listPage: () =>
-        ctx.db
-          .query('speakers')
-          .withIndex('by_lastName')
-          .order('asc')
-          .paginate(args.paginationOpts),
-      paginationOpts: args.paginationOpts,
-      search: args.search,
-      searchItems: (queryText) =>
-        searchSpeakers(ctx, queryText, LIST_SEARCH_LIMIT),
-    }),
-  returns: speakerAdminPageValidator,
-});
-
-/**
- * List all speakers with pagination.
- * Returns all speakers without filtering.
+ * List speakers for admin use, with talk and clip counts.
+ * Omitted status means published. Pass status='all' for every speaker.
  */
 export const listAllSpeakers = query({
-  args: {
-    paginationOpts: paginationOptsValidator,
-  },
+  args: adminListArgs,
   handler: async (ctx, args) => {
     await requireAdmin(ctx);
 
-    const speakerPages = await ctx.db
-      .query('speakers')
-      .withIndex('by_lastName')
-      .order('asc')
-      .paginate(args.paginationOpts);
-
-    return speakerPages;
+    return await listSpeakersForAdmin(ctx, {
+      paginationOpts: args.paginationOpts,
+      search: args.search,
+      status: args.status ?? 'published',
+    });
   },
-  returns: speakerPageValidator,
+  returns: speakerAdminPageValidator,
 });
