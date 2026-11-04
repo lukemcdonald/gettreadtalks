@@ -26,6 +26,7 @@ import {
   clearMediaChecksForEntity,
   clearStaleMediaChecks,
 } from '../mediaHealth/check/clear';
+import { clearTalkDraftStep } from './autoDraft';
 import { talkTranscriptFields } from './schema';
 import { findOrInsertPendingTalkTranscriptFetch } from './transcriptFetch';
 import { statusType, talkTranscriptFetchErrorCode } from './validators';
@@ -413,11 +414,11 @@ export const saveTalkSummaryDraft = internalMutation({
     }
 
     await ctx.db.patch(args.talkId, {
-      draftSummary: undefined,
       summary: args.summary,
       summaryGeneratedAt: Date.now(),
       summaryGenerator: args.generator,
     });
+    await clearTalkDraftStep(ctx, args.talkId, 'summary');
 
     return args.talkId;
   },
@@ -441,6 +442,7 @@ export const updateTalkSummary = mutation({
       summaryGenerator: talk.summaryGenerator ?? 'manual',
       summaryManuallyEditedAt: editedAt,
     });
+    await clearTalkDraftStep(ctx, args.talkId, 'summary');
 
     return args.talkId;
   },

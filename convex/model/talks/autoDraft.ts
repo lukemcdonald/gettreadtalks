@@ -1,5 +1,5 @@
 import type { Id } from '../../_generated/dataModel';
-import type { ActionCtx } from '../../_generated/server';
+import type { ActionCtx, MutationCtx } from '../../_generated/server';
 
 import { v } from 'convex/values';
 
@@ -36,6 +36,17 @@ function hasExistingDraft(text: string | null | undefined, locked: boolean) {
   return locked || Boolean(text?.trim());
 }
 
+export async function clearTalkDraftStep(
+  ctx: MutationCtx,
+  talkId: Id<'talks'>,
+  step: DraftStep
+) {
+  await ctx.db.patch(
+    talkId,
+    step === 'study' ? { draftStudy: undefined } : { draftSummary: undefined }
+  );
+}
+
 export const setTalkDraftStep = internalMutation({
   args: {
     step: v.union(v.literal('study'), v.literal('summary')),
@@ -44,6 +55,13 @@ export const setTalkDraftStep = internalMutation({
   },
   handler: async (ctx, { step, talkId, value }) => {
     await getOrThrow(ctx, 'talks', talkId);
+
+    if (value === undefined) {
+      await clearTalkDraftStep(ctx, talkId, step);
+
+      return null;
+    }
+
     await ctx.db.patch(
       talkId,
       step === 'study' ? { draftStudy: value } : { draftSummary: value }
@@ -103,31 +121,41 @@ export const draftTalkSummaryAndStudy = internalAction({
       talkId,
     });
 
-    if (!hasExistingDraft(source.summary, source.summaryManuallyEdited)) {
-      await draftStep(
-        ctx,
-        talkId,
-        'summary',
-        source,
-        async (transcript) =>
-          await saveGeneratedTalkSummary(ctx, { ...source, transcript }, talkId)
-      );
-    }
+    await (hasExistingDraft(source.summary, source.summaryManuallyEdited)
+      ? ctx.runMutation(internal.talks.setTalkDraftStep, {
+          step: 'summary',
+          talkId,
+        })
+      : draftStep(
+          ctx,
+          talkId,
+          'summary',
+          source,
+          async (transcript) =>
+            await saveGeneratedTalkSummary(
+              ctx,
+              { ...source, transcript },
+              talkId
+            )
+        ));
 
     const fresh = await ctx.runQuery(internal.talks.loadTalkDraftSource, {
       talkId,
     });
 
-    if (!hasExistingDraft(fresh.studyBody, fresh.studyReviewed)) {
-      await draftStep(
-        ctx,
-        talkId,
-        'study',
-        fresh,
-        async (transcript) =>
-          await saveGeneratedTalkStudy(ctx, { ...fresh, transcript }, talkId)
-      );
-    }
+    await (hasExistingDraft(fresh.studyBody, fresh.studyReviewed)
+      ? ctx.runMutation(internal.talks.setTalkDraftStep, {
+          step: 'study',
+          talkId,
+        })
+      : draftStep(
+          ctx,
+          talkId,
+          'study',
+          fresh,
+          async (transcript) =>
+            await saveGeneratedTalkStudy(ctx, { ...fresh, transcript }, talkId)
+        ));
 
     return null;
   },

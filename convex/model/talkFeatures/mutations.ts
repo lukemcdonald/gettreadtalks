@@ -7,6 +7,7 @@ import { internalMutation, mutation } from '../../_generated/server';
 import { throwConvexError } from '../../lib/errors';
 import { getOrThrow } from '../../lib/utils';
 import { requireAdmin } from '../auth/helpers';
+import { clearTalkDraftStep } from '../talks/autoDraft';
 import { hasReviewedTalkFeature } from './helpers';
 import { talkFeatureKind, talkFeatureStatus } from './validators';
 
@@ -56,7 +57,7 @@ export const saveTalkFeatureDraft = internalMutation({
       await ctx.db.replace(existing._id, fields);
     }
 
-    await ctx.db.patch(args.talkId, { draftStudy: undefined });
+    await clearTalkDraftStep(ctx, args.talkId, 'study');
 
     return featureId;
   },
@@ -76,6 +77,17 @@ export const updateTalkFeature = mutation({
 
     const existing = await getTalkFeature(ctx, args.kind, args.talkId);
     const now = Date.now();
+    const featureId = existing
+      ? existing._id
+      : await ctx.db.insert('talkFeatures', {
+          body: args.body,
+          generatedAt: now,
+          kind: args.kind,
+          manuallyEditedAt: now,
+          status: args.status,
+          talkId: args.talkId,
+          updatedAt: now,
+        });
 
     if (existing) {
       await ctx.db.patch(existing._id, {
@@ -84,19 +96,11 @@ export const updateTalkFeature = mutation({
         status: args.status,
         updatedAt: now,
       });
-
-      return existing._id;
     }
 
-    return await ctx.db.insert('talkFeatures', {
-      body: args.body,
-      generatedAt: now,
-      kind: args.kind,
-      manuallyEditedAt: now,
-      status: args.status,
-      talkId: args.talkId,
-      updatedAt: now,
-    });
+    await clearTalkDraftStep(ctx, args.talkId, 'study');
+
+    return featureId;
   },
   returns: v.id('talkFeatures'),
 });

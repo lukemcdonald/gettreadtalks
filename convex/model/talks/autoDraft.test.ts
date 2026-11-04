@@ -2,11 +2,12 @@ import type { Id } from '../../_generated/dataModel';
 
 import { vi } from 'vitest';
 
-import { api } from '../../_generated/api';
+import { api, internal } from '../../_generated/api';
 import { createConvexTest, signInAs } from '../../test.setup';
 import { insertSpeaker } from '../speakers/test.factory';
 import { talkStudyGenerator } from '../talkFeatures/study/generate';
 import { talkSummaryGenerator } from './summaryGenerate';
+import { insertTalk } from './test.factory';
 import { talkTranscriptFetcher } from './transcriptFetch';
 
 const AUDIO_URL = 'https://example.com/talk.mp3';
@@ -198,5 +199,64 @@ describe('auto draft', () => {
         status: 'draft',
       });
     });
+  });
+
+  it('clears a stored failure when that step is saved or skipped', async () => {
+    const { asAdmin, speakerId, t } = await seedAdmin();
+    const talkId = await t.run(async (ctx) => {
+      const id = await insertTalk(ctx, {
+        speakerId,
+        status: 'backlog',
+        summary: 'Kept summary.',
+      });
+
+      await ctx.db.patch(id, {
+        draftStudy: 'Study failed.',
+        draftSummary: 'Summary failed.',
+      });
+      await ctx.db.insert('talkFeatures', {
+        body: 'Kept study.',
+        generatedAt: Date.now(),
+        kind: 'study',
+        status: 'draft',
+        talkId: id,
+        updatedAt: Date.now(),
+      });
+
+      return id;
+    });
+
+    await asAdmin.mutation(api.talks.updateTalkSummary, {
+      summary: 'Saved summary.',
+      talkId,
+    });
+    await asAdmin.mutation(api.talkFeatures.updateTalkFeature, {
+      body: 'Saved study.',
+      kind: 'study',
+      status: 'draft',
+      talkId,
+    });
+
+    const saved = await t.run(async (ctx) => await ctx.db.get('talks', talkId));
+
+    expect(saved?.summary).toBe('Saved summary.');
+    expect(saved?.draftSummary).toBeUndefined();
+    expect(saved?.draftStudy).toBeUndefined();
+
+    await t.run(async (ctx) => {
+      await ctx.db.patch(talkId, {
+        draftStudy: 'Study failed.',
+        draftSummary: 'Summary failed.',
+      });
+    });
+    await t.action(internal.talks.draftTalkSummaryAndStudy, { talkId });
+
+    const skipped = await t.run(
+      async (ctx) => await ctx.db.get('talks', talkId)
+    );
+
+    expect(skipped?.summary).toBe('Saved summary.');
+    expect(skipped?.draftSummary).toBeUndefined();
+    expect(skipped?.draftStudy).toBeUndefined();
   });
 });

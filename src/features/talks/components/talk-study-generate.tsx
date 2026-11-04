@@ -63,7 +63,9 @@ export function TalkStudyGenerate({
     <div className="flex flex-wrap items-center gap-2">
       <Button
         data-testid="generate-study"
-        disabled={!canGenerate || isPending || draftPending}
+        disabled={
+          !canGenerate || isPending || talk === undefined || draftPending
+        }
         loading={isPending}
         onClick={handleClick}
         size="sm"
