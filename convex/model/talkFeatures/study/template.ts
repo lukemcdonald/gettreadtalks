@@ -1,4 +1,9 @@
-export const STUDY_TEMPLATE_HEADINGS = ['Main points', 'Key passages'] as const;
+export const STUDY_TEMPLATE_HEADINGS = [
+  'Main points',
+  'Key passages',
+  'Questions',
+  'Next step',
+] as const;
 
 export const STUDY_TEMPLATE = `## Main points
 
@@ -8,7 +13,15 @@ One or two sentences. Include plain-text references like Romans 8:28.
 ## Key passages
 
 ### Romans 8:28
-One-line note on why this passage matters.`;
+One-line note on why this passage matters.
+
+## Questions
+
+- One personal question a group could also discuss.
+
+## Next step
+
+One short prompt toward obedience.`;
 
 function escapeRegExp(value: string) {
   return value.replaceAll(/[.*+?^${}()|[\]\\]/gu, '\\$&');
