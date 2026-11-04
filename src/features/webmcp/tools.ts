@@ -1,6 +1,6 @@
-import type { Id } from '@/convex/_generated/dataModel';
 import type { SpeakerRecord, TalkRecord } from '@/features/mcp/format';
 import type { ConvexReactClient } from 'convex/react';
+import type { FunctionReturnType } from 'convex/server';
 import type { WebMCP } from 'webmcp-types';
 
 import { site } from '@/configs/site';
@@ -30,21 +30,24 @@ const talkFlagTools = [
     description:
       'Saves or removes a published talk for the signed-in visitor. Use when the user wants that talk kept or removed from favorites.',
     enabledDescription: 'True saves the talk. False removes it.',
-    flag: 'favorite',
     name: 'set_favorite',
+    read: api.users.isTalkFavorited,
+    set: api.users.favoriteTalk,
     title: 'Set favorite',
+    unset: api.users.unfavoriteTalk,
   },
   {
     description:
       'Records whether the signed-in visitor has finished a published talk. Use when the user wants that talk marked done or not done.',
     enabledDescription: 'True marks the talk finished. False clears the mark.',
-    flag: 'finished',
     name: 'set_finished',
+    read: api.users.isTalkFinished,
+    set: api.users.finishTalk,
     title: 'Set finished',
+    unset: api.users.unfinishTalk,
   },
 ] as const;
 
-type TalkFlag = (typeof talkFlagTools)[number]['flag'];
 type TalkQuery = ConvexReactClient['query'];
 type TalkMutation = ConvexReactClient['mutation'];
 
@@ -60,11 +63,15 @@ function resolveTalkHref(talk: string, origin: string) {
       return toolError('CROSS_ORIGIN', 'Talk URLs must be on this site.');
     }
 
-    if (!TALK_PATH.test(url.pathname)) {
+    const slugs = TALK_PATH.exec(url.pathname);
+    const speakerSlug = slugs?.groups?.speakerSlug;
+    const talkSlug = slugs?.groups?.talkSlug;
+
+    if (!(speakerSlug && talkSlug)) {
       return toolError('INVALID_TALK', 'That is not a talk on this site.');
     }
 
-    return { href: url.pathname };
+    return { href: url.pathname, speakerSlug, talkSlug };
   } catch {
     return toolError('INVALID_TALK', 'That is not a talk on this site.');
   }
@@ -176,7 +183,7 @@ export async function registerWebMcpTools({
 
           navigate(resolved.href);
 
-          return resolved;
+          return { href: resolved.href };
         }),
         inputSchema: {
           properties: {
@@ -191,196 +198,6 @@ export async function registerWebMcpTools({
       { signal }
     ),
   ]);
-}
-
-async function loadPublishedTalk(
-  query: TalkQuery,
-  speakerSlug: string,
-  talkSlug: string
-) {
-  const result = await query(api.talks.getTalkBySlug, {
-    speakerSlug,
-    talkSlug,
-  });
-
-  if (!result?.talk) {
-    return null;
-  }
-
-  return {
-    speaker: result.speaker
-      ? {
-          firstName: result.speaker.firstName,
-          lastName: result.speaker.lastName,
-          ministry: result.speaker.ministry,
-          slug: result.speaker.slug,
-        }
-      : null,
-    talk: {
-      id: result.talk._id,
-      publishedAt: result.talk.publishedAt,
-      scripture: result.talk.scripture,
-      slug: result.talk.slug,
-      title: result.talk.title,
-      topicSlugs: result.topics.map((topic) => topic.slug),
-    },
-  };
-}
-
-function readTalkFlag(query: TalkQuery, flag: TalkFlag, talkId: Id<'talks'>) {
-  if (flag === 'favorite') {
-    return query(api.users.isTalkFavorited, { talkId });
-  }
-
-  return query(api.users.isTalkFinished, { talkId });
-}
-
-function writeTalkFlag(
-  mutate: TalkMutation,
-  flag: TalkFlag,
-  talkId: Id<'talks'>,
-  enabled: boolean
-) {
-  if (flag === 'favorite') {
-    if (enabled) {
-      return mutate(api.users.favoriteTalk, { talkId });
-    }
-
-    return mutate(api.users.unfavoriteTalk, { talkId });
-  }
-
-  if (enabled) {
-    return mutate(api.users.finishTalk, { talkId });
-  }
-
-  return mutate(api.users.unfinishTalk, { talkId });
-}
-
-function resolveTalkTarget(talk: string, origin: string) {
-  const resolved = resolveTalkHref(talk, origin);
-
-  if ('error' in resolved) {
-    return resolved;
-  }
-
-  const slugs = TALK_PATH.exec(resolved.href);
-  const speakerSlug = slugs?.groups?.speakerSlug;
-  const talkSlug = slugs?.groups?.talkSlug;
-
-  if (!(speakerSlug && talkSlug)) {
-    return toolError('INVALID_TALK', 'That is not a talk on this site.');
-  }
-
-  return { speakerSlug, talkSlug };
-}
-
-async function loadTalkForFlag(query: TalkQuery, talk: string, origin: string) {
-  const target = resolveTalkTarget(talk, origin);
-
-  if ('error' in target) {
-    return target;
-  }
-
-  try {
-    const loaded = await loadPublishedTalk(
-      query,
-      target.speakerSlug,
-      target.talkSlug
-    );
-
-    if (!loaded) {
-      return toolError(
-        'NOT_FOUND',
-        'That talk is not available. Use search_talks to find a published talk.'
-      );
-    }
-
-    return loaded;
-  } catch {
-    return toolError(
-      'TALK_LOOKUP_FAILED',
-      'Could not load that talk. Try again in a moment.',
-      true
-    );
-  }
-}
-
-async function commitTalkFlag({
-  enabled,
-  flag,
-  mutate,
-  query,
-  refreshLists,
-  talkId,
-}: {
-  enabled: boolean;
-  flag: TalkFlag;
-  mutate: TalkMutation;
-  query: TalkQuery;
-  refreshLists: () => Promise<void>;
-  talkId: Id<'talks'>;
-}) {
-  const current = await readTalkFlag(query, flag, talkId);
-
-  if (current === enabled) {
-    return;
-  }
-
-  await writeTalkFlag(mutate, flag, talkId, enabled);
-  await refreshLists();
-}
-
-async function setTalkFlag({
-  enabled,
-  flag,
-  mutate,
-  origin,
-  query,
-  refreshLists,
-  talk,
-}: {
-  enabled: unknown;
-  flag: TalkFlag;
-  mutate: TalkMutation;
-  origin: string;
-  query: TalkQuery;
-  refreshLists: () => Promise<void>;
-  talk: unknown;
-}) {
-  if (typeof enabled !== 'boolean' || typeof talk !== 'string') {
-    return toolError(
-      'INVALID_INPUT',
-      'Provide a talk on this site and whether the state should be on.'
-    );
-  }
-
-  const loaded = await loadTalkForFlag(query, talk, origin);
-
-  if ('error' in loaded) {
-    return loaded;
-  }
-
-  try {
-    await commitTalkFlag({
-      enabled,
-      flag,
-      mutate,
-      query,
-      refreshLists,
-      talkId: loaded.talk.id,
-    });
-  } catch {
-    return toolError(
-      'UPDATE_FAILED',
-      'Could not update that talk. Try again in a moment.',
-      true
-    );
-  }
-
-  return {
-    enabled,
-    talk: formatTalk(loaded.talk, loaded.speaker),
-  };
 }
 
 export async function registerSignedInWebMcpTools({
@@ -414,16 +231,74 @@ export async function registerSignedInWebMcpTools({
           description: tool.description,
           execute: withToolTracking(
             tool.name,
-            (input: { enabled?: unknown; talk?: unknown }) =>
-              setTalkFlag({
-                enabled: input.enabled,
-                flag: tool.flag,
-                mutate,
-                origin,
-                query,
-                refreshLists,
-                talk: input.talk,
-              })
+            async (input: { enabled?: unknown; talk?: unknown }) => {
+              const { enabled, talk } = input;
+
+              if (typeof enabled !== 'boolean' || typeof talk !== 'string') {
+                return toolError(
+                  'INVALID_INPUT',
+                  'Provide a talk on this site and whether the state should be on.'
+                );
+              }
+
+              const resolved = resolveTalkHref(talk, origin);
+
+              if ('error' in resolved) {
+                return resolved;
+              }
+
+              let loaded:
+                | FunctionReturnType<typeof api.talks.getTalkBySlug>
+                | undefined;
+
+              try {
+                loaded = await query(api.talks.getTalkBySlug, {
+                  speakerSlug: resolved.speakerSlug,
+                  talkSlug: resolved.talkSlug,
+                });
+              } catch {
+                return toolError(
+                  'TALK_LOOKUP_FAILED',
+                  'Could not load that talk. Try again in a moment.',
+                  true
+                );
+              }
+
+              if (!loaded?.talk) {
+                return toolError(
+                  'NOT_FOUND',
+                  'That talk is not available. Use search_talks to find a published talk.'
+                );
+              }
+
+              const talkId = loaded.talk._id;
+
+              try {
+                const current = await query(tool.read, { talkId });
+
+                if (current !== enabled) {
+                  await mutate(enabled ? tool.set : tool.unset, { talkId });
+                  await refreshLists();
+                }
+              } catch {
+                return toolError(
+                  'UPDATE_FAILED',
+                  'Could not update that talk. Try again in a moment.',
+                  true
+                );
+              }
+
+              return {
+                enabled,
+                talk: formatTalk(
+                  {
+                    ...loaded.talk,
+                    topicSlugs: loaded.topics.map((topic) => topic.slug),
+                  },
+                  loaded.speaker
+                ),
+              };
+            }
           ),
           inputSchema: {
             properties: {

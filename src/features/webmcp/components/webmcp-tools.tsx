@@ -11,19 +11,6 @@ function loadWebMcpTools() {
   return import('@/features/webmcp/tools');
 }
 
-function isUserListPage(pathname: string) {
-  return (
-    pathname.startsWith('/account/favorites') ||
-    pathname.startsWith('/account/finished')
-  );
-}
-
-async function refreshUserLists() {
-  await revalidateUserLists({
-    refreshPage: isUserListPage(window.location.pathname),
-  });
-}
-
 export function WebMcpTools() {
   const convex = useConvex();
   const router = useRouter();
@@ -78,7 +65,12 @@ export function WebMcpTools() {
           mutate: convex.mutation.bind(convex),
           origin: window.location.origin,
           query: convex.query.bind(convex),
-          refreshLists: refreshUserLists,
+          refreshLists: () =>
+            revalidateUserLists({
+              refreshPage:
+                window.location.pathname.startsWith('/account/favorites') ||
+                window.location.pathname.startsWith('/account/finished'),
+            }),
           signal: controller.signal,
         });
       })
