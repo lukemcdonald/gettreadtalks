@@ -49,12 +49,13 @@ export const saveTalkFeatureDraft = internalMutation({
       updatedAt: now,
     };
 
-    const featureId = existing
-      ? existing._id
-      : await ctx.db.insert('talkFeatures', fields);
+    let featureId: Id<'talkFeatures'>;
 
     if (existing) {
       await ctx.db.replace(existing._id, fields);
+      featureId = existing._id;
+    } else {
+      featureId = await ctx.db.insert('talkFeatures', fields);
     }
 
     await clearTalkDraftStep(ctx, args.talkId, 'study');
@@ -77,23 +78,24 @@ export const updateTalkFeature = mutation({
 
     const existing = await getTalkFeature(ctx, args.kind, args.talkId);
     const now = Date.now();
-    const featureId = existing
-      ? existing._id
-      : await ctx.db.insert('talkFeatures', {
-          body: args.body,
-          generatedAt: now,
-          kind: args.kind,
-          manuallyEditedAt: now,
-          status: args.status,
-          talkId: args.talkId,
-          updatedAt: now,
-        });
+    let featureId: Id<'talkFeatures'>;
 
     if (existing) {
       await ctx.db.patch(existing._id, {
         body: args.body,
         manuallyEditedAt: now,
         status: args.status,
+        updatedAt: now,
+      });
+      featureId = existing._id;
+    } else {
+      featureId = await ctx.db.insert('talkFeatures', {
+        body: args.body,
+        generatedAt: now,
+        kind: args.kind,
+        manuallyEditedAt: now,
+        status: args.status,
+        talkId: args.talkId,
         updatedAt: now,
       });
     }
