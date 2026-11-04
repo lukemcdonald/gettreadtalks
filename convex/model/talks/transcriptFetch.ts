@@ -358,12 +358,6 @@ export const insertPendingTalkTranscriptFetch = internalMutation({
   returns: v.id('talkTranscriptFetches'),
 });
 
-async function scheduleTalkDraft(ctx: ActionCtx, talkId: Id<'talks'>) {
-  await ctx.scheduler.runAfter(0, internal.talks.draftTalkSummaryAndStudy, {
-    talkId,
-  });
-}
-
 export const fetchTalkTranscript = internalAction({
   args: {
     continueDraft: v.optional(v.boolean()),
@@ -384,7 +378,11 @@ export const fetchTalkTranscript = internalAction({
           status: 'success',
           talkId: args.talkId,
         });
-        await scheduleTalkDraft(ctx, args.talkId);
+        await ctx.scheduler.runAfter(
+          0,
+          internal.talks.draftTalkSummaryAndStudy,
+          { talkId: args.talkId }
+        );
 
         return null;
       }
@@ -398,7 +396,9 @@ export const fetchTalkTranscript = internalAction({
     });
 
     if (args.continueDraft && result.status === 'success') {
-      await scheduleTalkDraft(ctx, args.talkId);
+      await ctx.scheduler.runAfter(0, internal.talks.draftTalkSummaryAndStudy, {
+        talkId: args.talkId,
+      });
     }
 
     return null;

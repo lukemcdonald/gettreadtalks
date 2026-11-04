@@ -2,7 +2,7 @@ import { mutations, queries } from './model/talks';
 
 export {
   draftTalkSummaryAndStudy,
-  setTalkAutoDraftStep,
+  setTalkDraftStep,
 } from './model/talks/autoDraft';
 export {
   fetchTalkTranscript,

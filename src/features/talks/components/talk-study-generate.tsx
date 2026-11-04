@@ -7,8 +7,8 @@ import { useState } from 'react';
 
 import { Button } from '@/components/ui';
 import { api } from '@/convex/_generated/api';
+import { TALK_DRAFT_PENDING } from '@/convex/model/talks/validators';
 import {
-  getTalkAutoDraftStatusText,
   getTalkGenerateIdleStatus,
   getTalkGeneratePendingLabel,
 } from '@/features/talks/components/talk-generate-status';
@@ -28,22 +28,17 @@ export function TalkStudyGenerate({
   const talk = useQuery(api.talks.getTalk, { id: talkId });
   const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
-  const backgroundStatus = talk?.autoDraft?.studyStatus;
-  const backgroundPending = backgroundStatus === 'pending';
+  const draft = talk?.draftStudy;
+  const draftPending = draft === TALK_DRAFT_PENDING;
   const pendingLabel = getTalkGeneratePendingLabel(
     canGenerate,
     hasTranscript,
     'study'
   );
-  const statusText = isPending
-    ? pendingLabel
-    : (error ??
-      getTalkAutoDraftStatusText(
-        backgroundStatus,
-        talk?.autoDraft?.studyMessage,
-        pendingLabel
-      ) ??
-      getTalkGenerateIdleStatus(canGenerate, null));
+  const statusText =
+    isPending || draftPending
+      ? pendingLabel
+      : getTalkGenerateIdleStatus(canGenerate, error ?? draft ?? null);
 
   async function handleClick() {
     setError(null);
@@ -68,7 +63,7 @@ export function TalkStudyGenerate({
     <div className="flex flex-wrap items-center gap-2">
       <Button
         data-testid="generate-study"
-        disabled={!canGenerate || isPending || backgroundPending}
+        disabled={!canGenerate || isPending || draftPending}
         loading={isPending}
         onClick={handleClick}
         size="sm"

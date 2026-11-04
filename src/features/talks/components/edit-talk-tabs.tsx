@@ -4,57 +4,17 @@ import type { TalkFeature } from '@/features/talks/types';
 import type { EditTalkTab } from '@/features/talks/utils';
 
 import { ManageStatusDot } from '@/components/manage-table/manage-status-badge';
-import { Spinner, Tabs, TabsList, TabsTab } from '@/components/ui';
-
-type DraftStepStatus = 'failed' | 'pending';
+import { Tabs, TabsList, TabsTab } from '@/components/ui';
 
 interface EditTalkTabsProps {
   onValueChange: (tab: EditTalkTab) => void;
-  studyMessage?: string;
   studyStatus?: TalkFeature['status'] | null;
-  studyStepStatus?: DraftStepStatus;
-  summaryMessage?: string;
-  summaryStepStatus?: DraftStepStatus;
-  transcriptMessage?: string;
-  transcriptStepStatus?: DraftStepStatus;
   value: EditTalkTab;
-}
-
-function DraftStepMark({
-  label,
-  message,
-  status,
-}: {
-  label: string;
-  message?: string;
-  status?: DraftStepStatus;
-}) {
-  if (status === 'pending') {
-    return (
-      <Spinner aria-label={`${label} in progress`} className="ms-1.5 size-3" />
-    );
-  }
-
-  if (status === 'failed') {
-    return (
-      <span className="text-destructive ms-1.5 text-xs" title={message}>
-        Failed
-      </span>
-    );
-  }
-
-  return null;
 }
 
 export function EditTalkTabs({
   onValueChange,
-  studyMessage,
   studyStatus,
-  studyStepStatus,
-  summaryMessage,
-  summaryStepStatus,
-  transcriptMessage,
-  transcriptStepStatus,
   value,
 }: EditTalkTabsProps) {
   return (
@@ -77,11 +37,6 @@ export function EditTalkTabs({
           value="content"
         >
           Content
-          <DraftStepMark
-            label="Summary"
-            message={summaryMessage}
-            status={summaryStepStatus}
-          />
         </TabsTab>
         <TabsTab
           className="grow-0"
@@ -89,14 +44,7 @@ export function EditTalkTabs({
           value="study"
         >
           Study
-          {studyStatus && !studyStepStatus ? (
-            <ManageStatusDot className="ms-1.5" status={studyStatus} />
-          ) : null}
-          <DraftStepMark
-            label="Study"
-            message={studyMessage}
-            status={studyStepStatus}
-          />
+          {studyStatus ? <ManageStatusDot status={studyStatus} /> : null}
         </TabsTab>
         <TabsTab
           className="grow-0"
@@ -104,11 +52,6 @@ export function EditTalkTabs({
           value="transcript"
         >
           Transcript
-          <DraftStepMark
-            label="Transcript"
-            message={transcriptMessage}
-            status={transcriptStepStatus}
-          />
         </TabsTab>
       </TabsList>
     </Tabs>
