@@ -160,7 +160,7 @@ describe('registerWebMcpTools', () => {
 const talkId = 'talks:romans' as Id<'talks'>;
 
 describe('registerSignedInWebMcpTools', () => {
-  async function registerFlags(enabled: boolean) {
+  async function registerFlags(enabled: boolean, status = 'published') {
     const mutate = vi.fn(
       (
         _reference: Parameters<typeof getFunctionName>[0],
@@ -171,7 +171,7 @@ describe('registerSignedInWebMcpTools', () => {
       if (getFunctionName(reference) === 'talks:getTalkBySlug') {
         return {
           speaker: john,
-          talk: { ...romansTalk, _id: talkId },
+          talk: { ...romansTalk, _id: talkId, status },
           topics: [{ slug: 'grace' }],
         };
       }
@@ -212,6 +212,17 @@ describe('registerSignedInWebMcpTools', () => {
       expect(mutate.mock.calls[0][1]).toEqual({ talkId });
     }
   );
+
+  it('does not change an unpublished talk', async () => {
+    const { mutate, registerTool } = await registerFlags(true, 'approved');
+    const result = await getExecute(registerTool, 'set_favorite')(
+      { enabled: true, talk: '/talks/john-doe/sample-sermon-on-romans-8' },
+      { signal: new AbortController().signal }
+    );
+
+    expect(result).toHaveProperty('error');
+    expect(mutate).not.toHaveBeenCalled();
+  });
 
   it('returns an error for a talk that is not on this site', async () => {
     const { mutate, registerTool } = await registerFlags(true);

@@ -264,7 +264,7 @@ export async function registerSignedInWebMcpTools({
                 );
               }
 
-              if (!loaded?.talk) {
+              if (!(loaded?.talk && loaded.talk.status === 'published')) {
                 return toolError(
                   'NOT_FOUND',
                   'That talk is not available. Use search_talks to find a published talk.'
