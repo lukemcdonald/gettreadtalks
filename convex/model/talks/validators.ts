@@ -93,6 +93,19 @@ export const talkTranscriptFetchErrorCode = v.union(
 
 export const TALK_DRAFT_PENDING = 'pending';
 
+const talkAutoDraftStepStatus = v.union(
+  v.literal('failed'),
+  v.literal('pending')
+);
+
+/** Leftover from the first preview deploy of this branch. Safe to remove once those documents are cleared. */
+export const talkAutoDraft = v.object({
+  studyMessage: v.optional(v.string()),
+  studyStatus: v.optional(talkAutoDraftStepStatus),
+  summaryMessage: v.optional(v.string()),
+  summaryStatus: v.optional(talkAutoDraftStepStatus),
+});
+
 export const talkTranscriptFetchStatus = v.union(
   v.literal('failed'),
   v.literal('pending'),

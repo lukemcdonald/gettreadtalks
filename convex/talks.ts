@@ -45,6 +45,7 @@ export const {
   destroyTalk,
   migrateTalkSummaries,
   saveTalkSummaryDraft,
+  unsetTalkAutoDrafts,
   updateTalk,
   updateTalkSummary,
   updateTalkTranscript,

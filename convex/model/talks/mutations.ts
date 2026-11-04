@@ -513,6 +513,29 @@ export const createTalkTranscriptFetch = mutation({
 });
 
 /**
+ * Drop autoDraft left by the first preview of this branch.
+ * Safe to re-run.
+ */
+export const unsetTalkAutoDrafts = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const talks = await ctx.db.query('talks').collect();
+    const stale = talks.filter((talk) => talk.autoDraft !== undefined);
+
+    await Promise.all(
+      stale.map((talk) =>
+        ctx.db.patch(talk._id, {
+          autoDraft: undefined,
+        })
+      )
+    );
+
+    return stale.length;
+  },
+  returns: v.number(),
+});
+
+/**
  * Fill publishedAt for published talks that are missing it.
  * Safe to re-run: never overwrites an existing date.
  */
