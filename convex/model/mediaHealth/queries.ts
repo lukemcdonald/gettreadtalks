@@ -10,7 +10,7 @@ import { v } from 'convex/values';
 import { internalQuery } from '../../_generated/server';
 import { mediaCheckEntityTable, mediaCheckStatus } from './validators';
 
-const publishedMediaItem = v.object({
+const publishedMediaItemValidator = v.object({
   entityId: v.string(),
   entityTable: mediaCheckEntityTable,
   mediaUrl: v.string(),
@@ -109,7 +109,7 @@ export const listPublishedMediaPage = internalQuery({
       page,
     };
   },
-  returns: paginationResultValidator(publishedMediaItem),
+  returns: paginationResultValidator(publishedMediaItemValidator),
 });
 
 export function loadMediaCheckByEntityUrl(

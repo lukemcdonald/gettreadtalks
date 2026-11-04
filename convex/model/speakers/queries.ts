@@ -13,6 +13,7 @@ import { rotateContent } from '../../lib/rotateContent';
 import { byPublishedAt, getSpeakerComparator } from '../../lib/sort';
 import { paginateArray } from '../../lib/utils';
 import { doc, docs } from '../../lib/validators/schema';
+import { publishState } from '../../lib/validators/shared';
 import { requireAdmin } from '../auth/helpers';
 import {
   LIST_SEARCH_LIMIT,
@@ -29,6 +30,15 @@ import {
 import { speakerRoleType } from './validators';
 
 const speakerPageValidator = paginationResultValidator(doc('speakers'));
+
+const speakerAdminPageValidator = paginationResultValidator(
+  v.object({
+    clipCount: v.number(),
+    speaker: doc('speakers'),
+    status: publishState,
+    talkCount: v.number(),
+  })
+);
 
 /**
  * Get speaker by ID.
@@ -224,15 +234,6 @@ export const listSpeakers = query({
   },
   returns: speakerPageValidator,
 });
-
-const speakerAdminPageValidator = paginationResultValidator(
-  v.object({
-    clipCount: v.number(),
-    speaker: doc('speakers'),
-    status: v.union(v.literal('draft'), v.literal('published')),
-    talkCount: v.number(),
-  })
-);
 
 /**
  * List speakers for admin use, with talk and clip counts.

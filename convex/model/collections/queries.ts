@@ -10,6 +10,7 @@ import { query } from '../../_generated/server';
 import { enrichWithSpeaker } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
+import { publishState } from '../../lib/validators/shared';
 import { requireAdmin } from '../auth/helpers';
 import { adminListArgs } from '../search/helpers';
 import { listPublishedTalksForCollection } from '../talks/helpers';
@@ -19,6 +20,22 @@ import {
   listPublishedCollectionsPage,
   loadSpeakersForTalks,
 } from './helpers';
+
+const collectionListItemValidator = v.object({
+  collection: doc('collections'),
+  speakers: docs('speakers'),
+  talkCount: v.number(),
+});
+
+const collectionPageValidator = paginationResultValidator(
+  collectionListItemValidator
+);
+
+const collectionAdminPageValidator = paginationResultValidator(
+  collectionListItemValidator.extend({
+    status: publishState,
+  })
+);
 
 /**
  * List slugs for collections with published talks.
@@ -169,18 +186,8 @@ export const listCollections = query({
       page: enrichedPage,
     };
   },
-  // PaginationResult with enriched page: Array<{ collection, speakers, talkCount }>
-  returns: v.any(),
+  returns: collectionPageValidator,
 });
-
-const collectionAdminPageValidator = paginationResultValidator(
-  v.object({
-    collection: doc('collections'),
-    speakers: docs('speakers'),
-    status: v.union(v.literal('draft'), v.literal('published')),
-    talkCount: v.number(),
-  })
-);
 
 /**
  * List collections for admin use.

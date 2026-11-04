@@ -14,13 +14,13 @@ import {
 import { checkMediaUrl } from './model/mediaHealth/check/oembed';
 import {
   mediaCheckEntityTable,
-  mediaHealthDigestItem,
+  mediaHealthDigestItemValidator,
 } from './model/mediaHealth/validators';
 
 const PAGE_SIZE = 40;
 
 const continueCheckArgs = {
-  items: v.array(mediaHealthDigestItem),
+  items: v.array(mediaHealthDigestItemValidator),
   paginationCursor: v.union(v.null(), v.string()),
   source: mediaCheckEntityTable,
 };

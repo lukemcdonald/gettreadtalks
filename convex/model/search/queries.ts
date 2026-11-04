@@ -11,7 +11,7 @@ import { searchPublishedTalks } from '../talks/helpers';
 import { searchPublishedTopics } from '../topics/helpers';
 import { DEFAULT_SEARCH_LIMIT, normalizeSearchQuery } from './helpers';
 
-const searchSpeakerValidator = v.object({
+const searchResultSpeakerValidator = v.object({
   firstName: v.string(),
   lastName: v.string(),
   slug: v.string(),
@@ -21,11 +21,11 @@ const searchClipValidator = v.object({
   _id: v.id('clips'),
   description: v.optional(v.string()),
   slug: v.string(),
-  speaker: v.nullable(searchSpeakerValidator),
+  speaker: v.nullable(searchResultSpeakerValidator),
   title: v.string(),
 });
 
-const searchSpeakerResultValidator = v.object({
+const searchSpeakerValidator = v.object({
   _id: v.id('speakers'),
   firstName: v.string(),
   lastName: v.string(),
@@ -37,7 +37,7 @@ const searchTalkValidator = v.object({
   _id: v.id('talks'),
   scripture: v.optional(v.string()),
   slug: v.string(),
-  speaker: v.nullable(searchSpeakerValidator),
+  speaker: v.nullable(searchResultSpeakerValidator),
   title: v.string(),
 });
 
@@ -129,7 +129,7 @@ export const searchSite = query({
   },
   returns: v.object({
     clips: v.array(searchClipValidator),
-    speakers: v.array(searchSpeakerResultValidator),
+    speakers: v.array(searchSpeakerValidator),
     talks: v.array(searchTalkValidator),
     topics: v.array(searchTopicValidator),
   }),
