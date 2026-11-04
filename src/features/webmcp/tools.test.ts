@@ -1,7 +1,12 @@
+import type { Id } from '@/convex/_generated/dataModel';
+import type { ConvexReactClient } from 'convex/react';
+
+import { getFunctionName } from 'convex/server';
+
 import { buildSearchPageHref } from '@/features/search/utils';
 import { describe, expect, it, vi } from '@/test';
 
-import { registerWebMcpTools } from './tools';
+import { registerSignedInWebMcpTools, registerWebMcpTools } from './tools';
 
 const origin = 'https://www.gettreadtalks.com';
 
@@ -27,7 +32,7 @@ function getExecute(registerTool: ReturnType<typeof vi.fn>, name: string) {
       ([registered]) =>
         registered as {
           execute?: (
-            input: Record<string, string>,
+            input: Record<string, unknown>,
             options: { signal: AbortSignal }
           ) => Promise<unknown>;
           name: string;
@@ -150,4 +155,83 @@ describe('registerWebMcpTools', () => {
       expect(navigate).not.toHaveBeenCalled();
     }
   );
+});
+
+const talkId = 'talks:romans' as Id<'talks'>;
+
+describe('registerSignedInWebMcpTools', () => {
+  async function registerFlags(enabled: boolean, status = 'published') {
+    const mutate = vi.fn(
+      (
+        _reference: Parameters<typeof getFunctionName>[0],
+        _args: { talkId: Id<'talks'> }
+      ) => null
+    );
+    const query = vi.fn((reference: Parameters<typeof getFunctionName>[0]) => {
+      if (getFunctionName(reference) === 'talks:getTalkBySlug') {
+        return {
+          speaker: john,
+          talk: { ...romansTalk, _id: talkId, status },
+          topics: [{ slug: 'grace' }],
+        };
+      }
+
+      return !enabled;
+    });
+    const registerTool = vi.fn(() => Promise.resolve());
+
+    await registerSignedInWebMcpTools({
+      document: { modelContext: { registerTool } },
+      mutate: mutate as unknown as ConvexReactClient['mutation'],
+      origin,
+      query: query as unknown as ConvexReactClient['query'],
+      refreshLists: vi.fn(() => Promise.resolve()),
+      signal: new AbortController().signal,
+    });
+
+    return { mutate, registerTool };
+  }
+
+  it.each([
+    { enabled: true, mutation: 'users:favoriteTalk', tool: 'set_favorite' },
+    { enabled: false, mutation: 'users:unfavoriteTalk', tool: 'set_favorite' },
+    { enabled: true, mutation: 'users:finishTalk', tool: 'set_finished' },
+    { enabled: false, mutation: 'users:unfinishTalk', tool: 'set_finished' },
+  ])(
+    '$tool calls $mutation when enabled is $enabled',
+    async ({ enabled, mutation, tool }) => {
+      const { mutate, registerTool } = await registerFlags(enabled);
+
+      await getExecute(registerTool, tool)(
+        { enabled, talk: '/talks/john-doe/sample-sermon-on-romans-8' },
+        { signal: new AbortController().signal }
+      );
+
+      expect(mutate).toHaveBeenCalledTimes(1);
+      expect(getFunctionName(mutate.mock.calls[0][0])).toBe(mutation);
+      expect(mutate.mock.calls[0][1]).toEqual({ talkId });
+    }
+  );
+
+  it('does not change an unpublished talk', async () => {
+    const { mutate, registerTool } = await registerFlags(true, 'approved');
+    const result = await getExecute(registerTool, 'set_favorite')(
+      { enabled: true, talk: '/talks/john-doe/sample-sermon-on-romans-8' },
+      { signal: new AbortController().signal }
+    );
+
+    expect(result).toHaveProperty('error');
+    expect(mutate).not.toHaveBeenCalled();
+  });
+
+  it('returns an error for a talk that is not on this site', async () => {
+    const { mutate, registerTool } = await registerFlags(true);
+    const result = await getExecute(registerTool, 'set_favorite')(
+      { enabled: true, talk: 'https://evil.example/talks/john-doe/x' },
+      { signal: new AbortController().signal }
+    );
+
+    expect(result).toHaveProperty('error');
+    expect(mutate).not.toHaveBeenCalled();
+  });
 });
