@@ -7,6 +7,7 @@ import { internalMutation, mutation } from '../../_generated/server';
 import { throwConvexError } from '../../lib/errors';
 import { getOrThrow } from '../../lib/utils';
 import { requireAdmin } from '../auth/helpers';
+import { clearTalkDraftStep } from '../talks/autoDraft';
 import { hasReviewedTalkFeature } from './helpers';
 import { talkFeatureKind, talkFeatureStatus } from './validators';
 
@@ -48,13 +49,18 @@ export const saveTalkFeatureDraft = internalMutation({
       updatedAt: now,
     };
 
+    let featureId: Id<'talkFeatures'>;
+
     if (existing) {
       await ctx.db.replace(existing._id, fields);
-
-      return existing._id;
+      featureId = existing._id;
+    } else {
+      featureId = await ctx.db.insert('talkFeatures', fields);
     }
 
-    return await ctx.db.insert('talkFeatures', fields);
+    await clearTalkDraftStep(ctx, args.talkId, 'study');
+
+    return featureId;
   },
   returns: v.id('talkFeatures'),
 });
@@ -72,6 +78,7 @@ export const updateTalkFeature = mutation({
 
     const existing = await getTalkFeature(ctx, args.kind, args.talkId);
     const now = Date.now();
+    let featureId: Id<'talkFeatures'>;
 
     if (existing) {
       await ctx.db.patch(existing._id, {
@@ -80,19 +87,22 @@ export const updateTalkFeature = mutation({
         status: args.status,
         updatedAt: now,
       });
-
-      return existing._id;
+      featureId = existing._id;
+    } else {
+      featureId = await ctx.db.insert('talkFeatures', {
+        body: args.body,
+        generatedAt: now,
+        kind: args.kind,
+        manuallyEditedAt: now,
+        status: args.status,
+        talkId: args.talkId,
+        updatedAt: now,
+      });
     }
 
-    return await ctx.db.insert('talkFeatures', {
-      body: args.body,
-      generatedAt: now,
-      kind: args.kind,
-      manuallyEditedAt: now,
-      status: args.status,
-      talkId: args.talkId,
-      updatedAt: now,
-    });
+    await clearTalkDraftStep(ctx, args.talkId, 'study');
+
+    return featureId;
   },
   returns: v.id('talkFeatures'),
 });
