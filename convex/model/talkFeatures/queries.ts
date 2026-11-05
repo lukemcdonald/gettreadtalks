@@ -3,6 +3,7 @@ import { v } from 'convex/values';
 import { query } from '../../_generated/server';
 import { doc } from '../../lib/validators/schema';
 import { requireAdmin } from '../auth/helpers';
+import { loadTalkFeature } from './helpers';
 import { talkFeatureKind } from './validators';
 
 export const getTalkFeature = query({
@@ -13,12 +14,7 @@ export const getTalkFeature = query({
   handler: async (ctx, { kind, talkId }) => {
     await requireAdmin(ctx);
 
-    return await ctx.db
-      .query('talkFeatures')
-      .withIndex('by_talkId_and_kind', (q) =>
-        q.eq('talkId', talkId).eq('kind', kind)
-      )
-      .unique();
+    return await loadTalkFeature(ctx, kind, talkId);
   },
   returns: doc('talkFeatures').nullable(),
 });

@@ -1,5 +1,4 @@
 import type { Id } from '../../_generated/dataModel';
-import type { MutationCtx } from '../../_generated/server';
 
 import { v } from 'convex/values';
 
@@ -8,21 +7,8 @@ import { throwConvexError } from '../../lib/errors';
 import { getOrThrow } from '../../lib/utils';
 import { requireAdmin } from '../auth/helpers';
 import { clearTalkDraftStep } from '../talks/autoDraft';
-import { hasReviewedTalkFeature } from './helpers';
+import { hasReviewedTalkFeature, loadTalkFeature } from './helpers';
 import { talkFeatureKind, talkFeatureStatus } from './validators';
-
-async function getTalkFeature(
-  ctx: MutationCtx,
-  kind: 'study',
-  talkId: Id<'talks'>
-) {
-  return await ctx.db
-    .query('talkFeatures')
-    .withIndex('by_talkId_and_kind', (q) =>
-      q.eq('talkId', talkId).eq('kind', kind)
-    )
-    .unique();
-}
 
 export const saveTalkFeatureDraft = internalMutation({
   args: {
@@ -33,7 +19,7 @@ export const saveTalkFeatureDraft = internalMutation({
   handler: async (ctx, args) => {
     await getOrThrow(ctx, 'talks', args.talkId);
 
-    const existing = await getTalkFeature(ctx, args.kind, args.talkId);
+    const existing = await loadTalkFeature(ctx, args.kind, args.talkId);
 
     if (hasReviewedTalkFeature(existing)) {
       throwConvexError(409, 'Study already reviewed');
@@ -76,7 +62,7 @@ export const updateTalkFeature = mutation({
     await requireAdmin(ctx);
     await getOrThrow(ctx, 'talks', args.talkId);
 
-    const existing = await getTalkFeature(ctx, args.kind, args.talkId);
+    const existing = await loadTalkFeature(ctx, args.kind, args.talkId);
     const now = Date.now();
     let featureId: Id<'talkFeatures'>;
 

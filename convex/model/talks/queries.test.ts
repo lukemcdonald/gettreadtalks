@@ -465,6 +465,104 @@ describe('listAllTalks', () => {
       [firstPage.page[0]?.slug, secondPage.page[0]?.slug].toSorted()
     ).toEqual(['study-backlog-draft', 'study-draft']);
   });
+
+  it('keeps paging study features past talks that do not match status', async () => {
+    const t = createConvexTest();
+    const { asUser: asAdmin } = await signInAs(t, {
+      email: 'admin@example.test',
+      name: 'Admin',
+      role: 'admin',
+    });
+
+    await t.run(async (ctx) => {
+      const speakerId = await insertSpeaker(ctx, {
+        firstName: 'John',
+        lastName: 'Owen',
+        slug: 'john-owen-skip',
+      });
+      const publishedTalkId = await insertTalk(ctx, {
+        publishedAt: Date.parse('2024-06-01T12:00:00.000Z'),
+        slug: 'published-draft-study',
+        speakerId,
+        title: 'Published Draft Study',
+      });
+      await ctx.db.insert('talkFeatures', {
+        body: '## Main points\n\nPublished draft.',
+        generatedAt: Date.now(),
+        kind: 'study',
+        status: 'draft',
+        talkId: publishedTalkId,
+        updatedAt: Date.now(),
+      });
+
+      for (let index = 0; index < 3; index += 1) {
+        // oxlint-disable-next-line no-await-in-loop -- newer backlog features must page before the published match
+        const talkId = await insertTalk(ctx, {
+          slug: `backlog-draft-study-${index}`,
+          speakerId,
+          status: 'backlog',
+          title: `Backlog Draft Study ${index}`,
+        });
+        // oxlint-disable-next-line no-await-in-loop -- newer backlog features must page before the published match
+        await ctx.db.insert('talkFeatures', {
+          body: `## Main points\n\nBacklog ${index}.`,
+          generatedAt: Date.now(),
+          kind: 'study',
+          status: 'draft',
+          talkId,
+          updatedAt: Date.now(),
+        });
+      }
+    });
+
+    const page = await asAdmin.query(api.talks.listAllTalks, {
+      paginationOpts: { cursor: null, numItems: 1 },
+      status: 'published',
+      studyStatus: 'draft',
+    });
+
+    expect(page.page.map((talk) => talk.slug)).toEqual([
+      'published-draft-study',
+    ]);
+    expect(page.isDone).toBe(true);
+  });
+});
+
+describe('listFeaturedTalksWithSpeakers', () => {
+  it('returns the same featured talks for the same seed', async () => {
+    const t = createConvexTest();
+
+    await t.run(async (ctx) => {
+      const speakerId = await insertSpeaker(ctx, {
+        firstName: 'John',
+        lastName: 'Owen',
+        slug: 'john-owen-featured',
+      });
+
+      for (let index = 0; index < 8; index += 1) {
+        // oxlint-disable-next-line no-await-in-loop -- featured index order follows insert order
+        await insertTalk(ctx, {
+          featured: true,
+          slug: `featured-talk-${index}`,
+          speakerId,
+          title: `Featured Talk ${index}`,
+        });
+      }
+    });
+
+    const first = await t.query(api.talks.listFeaturedTalksWithSpeakers, {
+      limit: 3,
+      seed: 11,
+    });
+    const again = await t.query(api.talks.listFeaturedTalksWithSpeakers, {
+      limit: 3,
+      seed: 11,
+    });
+
+    expect(first.map((talk) => talk._id)).toEqual(
+      again.map((talk) => talk._id)
+    );
+  });
 });
 
 describe('publishedAt order', () => {

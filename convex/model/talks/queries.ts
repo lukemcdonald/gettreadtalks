@@ -1,6 +1,8 @@
 import type { Doc, Id } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
 import type { ContentSortOption } from '../../lib/sort';
+import type { StatusFilterType } from '../../lib/types';
+import type { PaginationOptions } from 'convex/server';
 
 import { getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
 import {
@@ -27,6 +29,7 @@ import {
   listAllAdmin,
   normalizeSearchQuery,
 } from '../search/helpers';
+import { loadTalkFeature } from '../talkFeatures/helpers';
 import {
   enrichTalksForAdmin,
   enrichWithTopics,
@@ -243,9 +246,10 @@ export const getTalkBySlug = query({
 export const listFeaturedTalksWithSpeakers = query({
   args: {
     limit: v.optional(v.number()),
+    seed: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const { limit = 5 } = args;
+    const { limit = 5, seed } = args;
 
     const talks = await ctx.db
       .query('talks')
@@ -254,7 +258,11 @@ export const listFeaturedTalksWithSpeakers = query({
       )
       .take(50);
 
-    const page = rotateContent(talks, { count: limit, period: 'daily' });
+    const page = rotateContent(talks, {
+      count: limit,
+      period: 'daily',
+      seed,
+    });
 
     return await enrichWithSpeaker(ctx, page);
   },
@@ -268,10 +276,11 @@ export const listRandomTalksBySpeaker = query({
   args: {
     excludeTalkId: v.optional(v.string()),
     limit: v.optional(v.number()),
+    seed: v.optional(v.number()),
     speakerId: v.id('speakers'),
   },
   handler: async (ctx, args) => {
-    const { excludeTalkId, limit = 5, speakerId } = args;
+    const { excludeTalkId, limit = 5, seed, speakerId } = args;
 
     const talks = await ctx.db
       .query('talks')
@@ -284,9 +293,11 @@ export const listRandomTalksBySpeaker = query({
       ? talks.filter((talk) => talk._id !== excludeTalkId)
       : talks;
 
-    return rotateContent(filteredTalks, { count: limit, period: 'daily' }).map(
-      (talk) => toPublicTalk(talk)
-    );
+    return rotateContent(filteredTalks, {
+      count: limit,
+      period: 'daily',
+      seed,
+    }).map((talk) => toPublicTalk(talk));
   },
   returns: docs('talks'),
 });
@@ -298,14 +309,19 @@ export const listTalksByTopics = query({
   args: {
     excludeTalkIds: v.optional(v.array(v.id('talks'))),
     limit: v.optional(v.number()),
+    seed: v.optional(v.number()),
     topicIds: v.array(v.id('topics')),
   },
   handler: async (ctx, args) => {
-    const { excludeTalkIds = [], limit = 4, topicIds } = args;
+    const { excludeTalkIds = [], limit = 4, seed, topicIds } = args;
     const talks = await listPublishedTalksForTopics(ctx, topicIds, {
       excludeTalkIds,
     });
-    const page = rotateContent(talks, { count: limit, period: 'daily' });
+    const page = rotateContent(talks, {
+      count: limit,
+      period: 'daily',
+      seed,
+    });
 
     return await enrichWithSpeaker(ctx, page);
   },
@@ -427,20 +443,17 @@ export const listTalks = query({
   returns: talkPageValidator,
 });
 
+function hasTalkStatus(talk: Doc<'talks'>, status: StatusFilterType) {
+  return status === 'all' || talk.status === status;
+}
+
 async function filterTalksByStudyStatus(
   ctx: QueryCtx,
   talks: Doc<'talks'>[],
   studyStatus: 'draft' | 'none' | 'published'
 ) {
   const features = await Promise.all(
-    talks.map((talk) =>
-      ctx.db
-        .query('talkFeatures')
-        .withIndex('by_talkId_and_kind', (q) =>
-          q.eq('talkId', talk._id).eq('kind', 'study')
-        )
-        .unique()
-    )
+    talks.map((talk) => loadTalkFeature(ctx, 'study', talk._id))
   );
   const statusByTalkId = new Map(
     features.flatMap((feature) =>
@@ -451,10 +464,154 @@ async function filterTalksByStudyStatus(
   return talks.filter((talk) => {
     const current = statusByTalkId.get(talk._id);
 
-    return studyStatus === 'none'
-      ? current === undefined
-      : current === studyStatus;
+    if (studyStatus === 'none') {
+      return current === undefined;
+    }
+
+    return current === studyStatus;
   });
+}
+
+async function pageTalksFromSource<T>(
+  source: AsyncIterable<T>,
+  toTalk: (item: T) => Promise<Doc<'talks'> | null>,
+  paginationOpts: PaginationOptions
+) {
+  const startIndex = paginationOpts.cursor
+    ? Math.trunc(Number(paginationOpts.cursor))
+    : 0;
+  const page: Doc<'talks'>[] = [];
+  let matched = 0;
+  let hasMore = false;
+
+  for await (const item of source) {
+    // oxlint-disable-next-line no-await-in-loop -- skip until the cursor, then stop once the page is full
+    const talk = await toTalk(item);
+
+    if (!talk) {
+      continue;
+    }
+
+    if (matched < startIndex) {
+      matched += 1;
+      continue;
+    }
+
+    if (page.length < paginationOpts.numItems) {
+      page.push(talk);
+      matched += 1;
+      continue;
+    }
+
+    hasMore = true;
+    break;
+  }
+
+  return {
+    continueCursor: hasMore ? String(startIndex + page.length) : '',
+    isDone: !hasMore,
+    page,
+  };
+}
+
+async function listTalksWithoutStudy(
+  ctx: QueryCtx,
+  paginationOpts: PaginationOptions,
+  status: StatusFilterType
+) {
+  return await pageTalksFromSource(
+    talksByStatusQuery(ctx, status),
+    async (talk) => {
+      const feature = await loadTalkFeature(ctx, 'study', talk._id);
+
+      if (feature) {
+        return null;
+      }
+
+      return talk;
+    },
+    paginationOpts
+  );
+}
+
+async function listTalksWithStudyStatus(
+  ctx: QueryCtx,
+  paginationOpts: PaginationOptions,
+  status: StatusFilterType,
+  studyStatus: 'draft' | 'published'
+) {
+  return await pageTalksFromSource(
+    ctx.db
+      .query('talkFeatures')
+      .withIndex('by_kind_and_status', (q) =>
+        q.eq('kind', 'study').eq('status', studyStatus)
+      )
+      .order('desc'),
+    async (feature) => {
+      const talk = await ctx.db.get('talks', feature.talkId);
+
+      if (!talk || !hasTalkStatus(talk, status)) {
+        return null;
+      }
+
+      return talk;
+    },
+    paginationOpts
+  );
+}
+
+async function listAllTalksByStudyStatus(
+  ctx: QueryCtx,
+  args: {
+    paginationOpts: PaginationOptions;
+    search?: string;
+    status: StatusFilterType;
+    studyStatus: 'draft' | 'none' | 'published';
+  }
+) {
+  await requireAdmin(ctx);
+
+  const { paginationOpts, search, status, studyStatus } = args;
+  const queryText = normalizeSearchQuery(search ?? '');
+
+  if (queryText) {
+    const matches = await filterTalksByStudyStatus(
+      ctx,
+      await searchTalksByTitleOrSpeaker(
+        ctx,
+        queryText,
+        LIST_SEARCH_LIMIT,
+        status
+      ),
+      studyStatus
+    );
+    const { continueCursor, isDone, page } = paginateArray(
+      matches,
+      paginationOpts.cursor,
+      paginationOpts.numItems
+    );
+
+    return {
+      continueCursor,
+      isDone,
+      page: await enrichTalksForAdmin(ctx, page),
+    };
+  }
+
+  const result =
+    studyStatus === 'none'
+      ? await listTalksWithoutStudy(ctx, paginationOpts, status)
+      : await listTalksWithStudyStatus(
+          ctx,
+          paginationOpts,
+          status,
+          studyStatus
+        );
+
+  return {
+    ...result,
+    page: await enrichTalksForAdmin(ctx, result.page),
+  };
 }
 
 /**
@@ -474,29 +631,12 @@ export const listAllTalks = query({
     const { paginationOpts, search, status = 'published', studyStatus } = args;
 
     if (studyStatus) {
-      await requireAdmin(ctx);
-
-      const queryText = normalizeSearchQuery(search ?? '');
-      let talks = queryText
-        ? await searchTalksByTitleOrSpeaker(
-            ctx,
-            queryText,
-            LIST_SEARCH_LIMIT,
-            status
-          )
-        : await talksByStatusQuery(ctx, status).collect();
-      talks = await filterTalksByStudyStatus(ctx, talks, studyStatus);
-      const { continueCursor, isDone, page } = paginateArray(
-        talks,
-        paginationOpts.cursor,
-        paginationOpts.numItems
-      );
-
-      return {
-        continueCursor,
-        isDone,
-        page: await enrichTalksForAdmin(ctx, page),
-      };
+      return await listAllTalksByStudyStatus(ctx, {
+        paginationOpts,
+        search,
+        status,
+        studyStatus,
+      });
     }
 
     return await listAllAdmin(ctx, {
