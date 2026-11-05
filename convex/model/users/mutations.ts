@@ -323,7 +323,9 @@ export const updateUserPassword = mutation({
  * Set a user's role (internal - no auth required).
  *
  * Use this to set the first admin or manage roles programmatically.
- * Run scripts/set-user-role.sh --deployment prod <userId> <role>.
+ * Can be called from Convex Dashboard or CLI:
+ * - Dashboard: Functions → internal.model.users.mutations.setUserRoleInternal
+ * - CLI: npx convex run internal.model.users.mutations.setUserRoleInternal '{"role":"admin","userId":"..."}'
  */
 export const setUserRoleInternal = internalMutation({
   args: {
