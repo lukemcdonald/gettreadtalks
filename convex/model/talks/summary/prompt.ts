@@ -5,6 +5,20 @@ export const NO_TRANSCRIPT_SOURCE_MESSAGE = 'Generating needs a YouTube video.';
 /** Switch models here. Gateway ids: https://vercel.com/ai-gateway/models */
 export const TALK_SUMMARY_MODEL = 'spacexai/grok-4.20-reasoning';
 
+/** AI Gateway USD per token for TALK_SUMMARY_MODEL, base tier under 200k tokens. */
+export const TALK_SUMMARY_MODEL_INPUT_USD_PER_TOKEN = 0.00000125;
+export const TALK_SUMMARY_MODEL_OUTPUT_USD_PER_TOKEN = 0.0000025;
+
+export function estimateTalkGatewayCostUsd(
+  inputTokens: number,
+  outputTokens: number
+) {
+  return (
+    inputTokens * TALK_SUMMARY_MODEL_INPUT_USD_PER_TOKEN +
+    outputTokens * TALK_SUMMARY_MODEL_OUTPUT_USD_PER_TOKEN
+  );
+}
+
 export const talkSummaryOutputSchema = z.object({
   flags: z
     .array(z.string())

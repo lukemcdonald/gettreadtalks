@@ -112,56 +112,59 @@ export async function saveGeneratedTalkStudy(
   };
 }
 
+export type TalkStudyGenerateResult =
+  | {
+      errorCode: TalkStudyGenerateErrorCode;
+      message: string;
+      status: 'failed';
+    }
+  | { body: string; status: 'success' };
+
+export async function generateTalkStudy(
+  ctx: ActionCtx,
+  talkId: Id<'talks'>
+): Promise<TalkStudyGenerateResult> {
+  const source: TalkSummarySource = await ctx.runQuery(
+    internal.talks.loadTalkSummarySource,
+    { talkId }
+  );
+
+  const feature = await ctx.runQuery(api.talkFeatures.getTalkFeature, {
+    kind: 'study',
+    talkId,
+  });
+
+  if (hasReviewedTalkFeature(feature)) {
+    return toFailedResult('ALREADY_REVIEWED');
+  }
+
+  if (!process.env.AI_GATEWAY_API_KEY) {
+    return toFailedResult('TOKEN_MISSING');
+  }
+
+  const loaded = await loadTranscriptForGenerate(
+    ctx,
+    talkId,
+    source.transcript,
+    source.mediaUrl
+  );
+
+  if ('errorCode' in loaded) {
+    return toFailedResult(loaded.errorCode, loaded.message);
+  }
+
+  return await saveGeneratedTalkStudy(
+    ctx,
+    { ...source, transcript: loaded.transcript },
+    talkId
+  );
+}
+
 export const generateStudy = action({
   args: {
     talkId: v.id('talks'),
   },
-  handler: async (
-    ctx,
-    { talkId }
-  ): Promise<
-    | {
-        errorCode: TalkStudyGenerateErrorCode;
-        message: string;
-        status: 'failed';
-      }
-    | { body: string; status: 'success' }
-  > => {
-    const source: TalkSummarySource = await ctx.runQuery(
-      internal.talks.loadTalkSummarySource,
-      { talkId }
-    );
-
-    const feature = await ctx.runQuery(api.talkFeatures.getTalkFeature, {
-      kind: 'study',
-      talkId,
-    });
-
-    if (hasReviewedTalkFeature(feature)) {
-      return toFailedResult('ALREADY_REVIEWED');
-    }
-
-    if (!process.env.AI_GATEWAY_API_KEY) {
-      return toFailedResult('TOKEN_MISSING');
-    }
-
-    const loaded = await loadTranscriptForGenerate(
-      ctx,
-      talkId,
-      source.transcript,
-      source.mediaUrl
-    );
-
-    if ('errorCode' in loaded) {
-      return toFailedResult(loaded.errorCode, loaded.message);
-    }
-
-    return await saveGeneratedTalkStudy(
-      ctx,
-      { ...source, transcript: loaded.transcript },
-      talkId
-    );
-  },
+  handler: async (ctx, { talkId }) => await generateTalkStudy(ctx, talkId),
   returns: v.union(
     talkStudyGenerateFailure,
     v.object({
