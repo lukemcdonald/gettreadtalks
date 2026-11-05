@@ -323,7 +323,7 @@ export const updateUserPassword = mutation({
  * Set a user's role (internal - no auth required).
  *
  * Use this to set the first admin or manage roles programmatically.
- * Run scripts/set-user-role.sh <userId> <role>.
+ * Run scripts/set-user-role.sh --deployment prod <userId> <role>.
  */
 export const setUserRoleInternal = internalMutation({
   args: {

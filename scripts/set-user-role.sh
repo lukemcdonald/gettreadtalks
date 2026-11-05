@@ -2,13 +2,20 @@
 # Set a Better Auth user's role via the internal Convex mutation.
 set -euo pipefail
 
-if [ "$#" -ne 2 ]; then
-  echo "Usage: scripts/set-user-role.sh <userId> <role>" >&2
+if [ "$#" -ne 4 ] || [ "$1" != "--deployment" ]; then
+  echo "Usage: scripts/set-user-role.sh --deployment <dev|prod|NAME> <userId> <role>" >&2
   exit 1
 fi
 
-user_id="$1"
-role="$2"
+deployment="$2"
+user_id="$3"
+role="$4"
 
-npx convex run internal.model.users.mutations.setUserRoleInternal \
-  "{\"userId\":\"${user_id}\",\"role\":\"${role}\"}"
+args="$(
+  ROLE="$role" USER_ID="$user_id" node --input-type=module -e \
+    'console.log(JSON.stringify({ role: process.env.ROLE, userId: process.env.USER_ID }))'
+)"
+
+npx convex run --deployment "${deployment}" \
+  internal.model.users.mutations.setUserRoleInternal \
+  "${args}"

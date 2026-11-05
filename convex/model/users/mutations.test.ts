@@ -96,7 +96,7 @@ describe('users.deleteUser', () => {
 });
 
 describe('published favorites', () => {
-  it('rejects an unpublished talk and a clip whose talk is unpublished', async () => {
+  it('rejects an unpublished talk', async () => {
     const t = createConvexTest();
     const { asUser } = await signInAsPasswordUser(t, {
       email: 'luke@example.test',

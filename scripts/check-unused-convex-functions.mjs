@@ -7,9 +7,10 @@ const ROOT = path.resolve(import.meta.dirname, '..');
 const AUTH_FUNCTIONS_ASSIGNMENT =
   /authFunctions(?:\s*:\s*\w+)?\s*=\s*internal\.auth\b/u;
 const AUTH_TRIGGER_NAMES = ['onCreate', 'onDelete', 'onUpdate'];
+const BARREL_EXPORT = /export\s+(?:const\s*)?\{(?<names>[^}]+)\}/gu;
 const REFERENCE = /(?:api|internal)(?:\.[A-Za-z_]\w*)+\.[A-Za-z_]\w*/gu;
 const REGISTRATION =
-  /export\s+const\s+(?<name>\w+)\s*=\s*(?:internal)?(?:query|mutation|action)\s*[({]/gu;
+  /export\s+const\s+(?<name>\w+)\s*=\s*(?:query|mutation|action|internalQuery|internalMutation|internalAction)\s*[({]/gu;
 const SKIP_DIR_NAMES = new Set([
   '.git',
   '.next',
@@ -29,6 +30,43 @@ const SOURCE_EXTENSIONS = new Set([
 ]);
 const TRIGGER_REGISTRATION =
   /export\s+const\s*\{(?<names>[^}]+)\}\s*=\s*authComponent\.triggersApi\s*\(\s*\)/gu;
+
+function toPosixPath(relativePath) {
+  return relativePath.split(path.sep).join('/');
+}
+
+function toModulePath(relativePath) {
+  return toPosixPath(relativePath)
+    .replace(/^convex\//u, '')
+    .replace(/\.[^.]+$/u, '')
+    .split('/')
+    .join('.');
+}
+
+function toDomain(relativePath) {
+  const parts = toPosixPath(relativePath)
+    .replace(/^convex\//u, '')
+    .split('/');
+
+  if (parts[0] === 'model' && parts[1]) {
+    return parts[1].replace(/\.[^.]+$/u, '');
+  }
+
+  return parts[0].replace(/\.[^.]+$/u, '');
+}
+
+function parseExportedNames(names) {
+  return (names ?? '')
+    .split(',')
+    .map((part) =>
+      part
+        .trim()
+        .split(/\s+as\s+/u)
+        .at(-1)
+        ?.trim()
+    )
+    .filter(Boolean);
+}
 
 function isGeneratedPath(relativePath) {
   return relativePath.split(path.sep).includes('_generated');
@@ -93,12 +131,7 @@ function listRegistrations(source, relativePath) {
   }
 
   for (const match of stripped.matchAll(TRIGGER_REGISTRATION)) {
-    const names = (match.groups?.names ?? '')
-      .split(',')
-      .map((part) => part.trim())
-      .filter(Boolean);
-
-    for (const name of names) {
+    for (const name of parseExportedNames(match.groups?.names)) {
       registrations.push({
         file: relativePath,
         name,
@@ -109,39 +142,79 @@ function listRegistrations(source, relativePath) {
   return registrations;
 }
 
-function listReferencedNames(source, filename) {
-  const names = new Set();
+function listBarrelKeys(source, relativePath) {
+  const keys = new Set();
+  const modulePath = toModulePath(relativePath);
+  const stripped = stripComments(source, relativePath);
+
+  for (const match of stripped.matchAll(BARREL_EXPORT)) {
+    for (const name of parseExportedNames(match.groups?.names)) {
+      keys.add(`${modulePath}.${name}`);
+    }
+  }
+
+  return keys;
+}
+
+function listReferencedKeys(source, filename) {
+  const keys = new Set();
   const stripped = stripComments(source, filename);
 
   for (const match of stripped.matchAll(REFERENCE)) {
     const parts = match[0].split('.');
-    names.add(parts.at(-1));
+    const name = parts.at(-1);
+    const modulePath = parts.slice(1, -1).join('.');
+
+    keys.add(`${modulePath}.${name}`);
   }
 
   if (AUTH_FUNCTIONS_ASSIGNMENT.test(stripped)) {
     for (const name of AUTH_TRIGGER_NAMES) {
-      names.add(name);
+      keys.add(`auth.${name}`);
     }
   }
 
-  return names;
+  return keys;
 }
 
-function collectFromSource(relativePath, source, referenced, registrations) {
+function isRegistrationUsed(registration, referenced, barrels) {
+  const fileKey = `${toModulePath(registration.file)}.${registration.name}`;
+
+  if (referenced.has(fileKey)) {
+    return true;
+  }
+
+  const barrelKey = `${toDomain(registration.file)}.${registration.name}`;
+
+  return barrels.has(barrelKey) && referenced.has(barrelKey);
+}
+
+function collectFromSource(
+  relativePath,
+  source,
+  barrels,
+  referenced,
+  registrations
+) {
   if (
     relativePath.startsWith(`convex${path.sep}`) &&
     relativePath.endsWith('.ts')
   ) {
     registrations.push(...listRegistrations(source, relativePath));
+
+    for (const key of listBarrelKeys(source, relativePath)) {
+      barrels.add(key);
+    }
   }
 
-  for (const name of listReferencedNames(source, relativePath)) {
-    referenced.add(name);
+  for (const key of listReferencedKeys(source, relativePath)) {
+    referenced.add(key);
   }
 }
 
 async function main() {
   const files = await listFiles(ROOT);
+  const barrels = new Set();
   const referenced = new Set();
   const registrations = [];
   const sources = await Promise.all(
@@ -167,13 +240,16 @@ async function main() {
     collectFromSource(
       entry.relativePath,
       entry.source,
+      barrels,
       referenced,
       registrations
     );
   }
 
   const unused = registrations
-    .filter((registration) => !referenced.has(registration.name))
+    .filter(
+      (registration) => !isRegistrationUsed(registration, referenced, barrels)
+    )
     .toSorted((left, right) => {
       if (left.name === right.name) {
         return left.file.localeCompare(right.file);
