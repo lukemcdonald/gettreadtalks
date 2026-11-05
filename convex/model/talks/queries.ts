@@ -14,7 +14,7 @@ import { v } from 'convex/values';
 import { query } from '../../_generated/server';
 import { getTalkIdsByTopicSlugs } from '../../lib/filters';
 import { rotateContent } from '../../lib/rotateContent';
-import { getContentComparator } from '../../lib/sort';
+import { byPublishedAt, getContentComparator } from '../../lib/sort';
 import {
   enrichWithSpeaker,
   paginateArray,
@@ -447,6 +447,18 @@ function hasTalkStatus(talk: Doc<'talks'>, status: StatusFilterType) {
   return status === 'all' || talk.status === status;
 }
 
+function compareTalksForStatusList(
+  left: Doc<'talks'>,
+  right: Doc<'talks'>,
+  status: StatusFilterType
+) {
+  if (status === 'all') {
+    return right._creationTime - left._creationTime;
+  }
+
+  return byPublishedAt(left, right);
+}
+
 async function filterTalksByStudyStatus(
   ctx: QueryCtx,
   talks: Doc<'talks'>[],
@@ -540,24 +552,22 @@ async function listTalksWithStudyStatus(
   status: StatusFilterType,
   studyStatus: 'draft' | 'published'
 ) {
-  return await pageTalksFromSource(
-    ctx.db
-      .query('talkFeatures')
-      .withIndex('by_kind_and_status', (q) =>
-        q.eq('kind', 'study').eq('status', studyStatus)
-      )
-      .order('desc'),
-    async (feature) => {
-      const talk = await ctx.db.get('talks', feature.talkId);
-
-      if (!talk || !hasTalkStatus(talk, status)) {
-        return null;
-      }
-
-      return talk;
-    },
-    paginationOpts
+  const features = await ctx.db
+    .query('talkFeatures')
+    .withIndex('by_kind_and_status', (q) =>
+      q.eq('kind', 'study').eq('status', studyStatus)
+    )
+    .collect();
+  const loaded = await Promise.all(
+    features.map((feature) => ctx.db.get('talks', feature.talkId))
   );
+  const talks = loaded.filter(
+    (talk): talk is Doc<'talks'> => talk !== null && hasTalkStatus(talk, status)
+  );
+
+  talks.sort((left, right) => compareTalksForStatusList(left, right, status));
+
+  return paginateArray(talks, paginationOpts.cursor, paginationOpts.numItems);
 }
 
 async function listAllTalksByStudyStatus(

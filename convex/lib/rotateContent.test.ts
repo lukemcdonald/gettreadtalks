@@ -27,6 +27,23 @@ describe('rotateContent', () => {
       rotateContent(items, { count: 1, seed: 10 })
     );
   });
+
+  it('different seeds change the selection', () => {
+    const items = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+
+    expect(rotateContent(items, { count: 3, seed: 11 })).not.toEqual(
+      rotateContent(items, { count: 3, seed: 12 })
+    );
+  });
+
+  it('does not drop items when the seed is negative', () => {
+    const items = Array.from({ length: 50 }, (_, index) => index);
+    const rotated = rotateContent(items, { count: 25, seed: -1000 });
+
+    expect(rotated).toHaveLength(25);
+    expect(rotated.every((item) => typeof item === 'number')).toBe(true);
+    expect(new Set(rotated).size).toBe(25);
+  });
 });
 
 describe('secondsUntilNextRotation', () => {
