@@ -184,6 +184,32 @@ describe('loadFullPage', () => {
     expect(result.page).toEqual(items);
   });
 
+  it('reads an unbounded list past the single-page cap', async () => {
+    const total = 51;
+    let reads = 0;
+    const result = await loadFullPage(
+      () => {
+        reads += 1;
+        const isDone = reads === total;
+
+        return Promise.resolve({
+          continueCursor: isDone ? '' : `page-${reads}`,
+          isDone,
+          page: [String(reads)],
+        });
+      },
+      (rows) => rows,
+      {
+        cursor: null,
+        numItems: Number.POSITIVE_INFINITY,
+      }
+    );
+
+    expect(reads).toBe(total);
+    expect(result.isDone).toBe(true);
+    expect(result.page).toHaveLength(total);
+  });
+
   it('reads the next page when a filtered page is empty', async () => {
     let reads = 0;
     const result = await loadFullPage(

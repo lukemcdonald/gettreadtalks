@@ -234,4 +234,68 @@ describe('listAllSpeakers', () => {
       visibilitySlugs.publishedSpeaker,
     ]);
   });
+
+  it('labels a speaker draft when their only clip is on an unpublished talk', async () => {
+    const t = createConvexTest();
+    const { asUser: asAdmin } = await signInAs(t, {
+      email: 'admin@example.test',
+      name: 'Admin',
+      role: 'admin',
+    });
+
+    await t.run(async (ctx) => {
+      const draftClipSpeakerId = await insertSpeaker(ctx, {
+        firstName: 'Clip',
+        lastName: 'Draft',
+        slug: 'clip-on-draft-speaker',
+      });
+      const standaloneSpeakerId = await insertSpeaker(ctx, {
+        firstName: 'Clip',
+        lastName: 'Standalone',
+        slug: 'standalone-clip-speaker',
+      });
+      const talkId = await insertTalk(ctx, {
+        slug: 'admin-draft-parent-talk',
+        speakerId: draftClipSpeakerId,
+        status: 'backlog',
+        title: 'Admin Draft Parent',
+      });
+
+      await insertClip(ctx, {
+        slug: 'admin-clip-on-draft-talk',
+        speakerId: draftClipSpeakerId,
+        talkId,
+        title: 'Admin Clip On Draft',
+      });
+      await insertClip(ctx, {
+        slug: 'admin-standalone-clip',
+        speakerId: standaloneSpeakerId,
+        title: 'Admin Standalone Clip',
+      });
+    });
+
+    const paginationOpts = {
+      cursor: null,
+      numItems: 20,
+    };
+    const published = await asAdmin.query(api.speakers.listAllSpeakers, {
+      paginationOpts,
+    });
+    const all = await asAdmin.query(api.speakers.listAllSpeakers, {
+      paginationOpts,
+      status: 'all',
+    });
+    const draftRow = all.page.find(
+      (item) => item.speaker.slug === 'clip-on-draft-speaker'
+    );
+    const standaloneRow = all.page.find(
+      (item) => item.speaker.slug === 'standalone-clip-speaker'
+    );
+
+    expect(published.page.map((item) => item.speaker.slug)).toEqual([
+      'standalone-clip-speaker',
+    ]);
+    expect(draftRow?.status).toBe('draft');
+    expect(standaloneRow?.status).toBe('published');
+  });
 });

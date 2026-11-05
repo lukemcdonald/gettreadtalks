@@ -36,17 +36,20 @@ export async function filterSpeakersWithPublishedTalks(
 ): Promise<Doc<'speakers'>[]> {
   const results = await Promise.all(
     speakers.map(async (speaker) => {
-      const [hasTalks, hasClips] = await Promise.all([
-        ctx.db
-          .query('talks')
-          .withIndex('by_speakerId_and_status', (q) =>
-            q.eq('speakerId', speaker._id).eq('status', 'published')
-          )
-          .first(),
-        speakerHasPublicClip(ctx, speaker._id),
-      ]);
+      const hasTalks = await ctx.db
+        .query('talks')
+        .withIndex('by_speakerId_and_status', (q) =>
+          q.eq('speakerId', speaker._id).eq('status', 'published')
+        )
+        .first();
 
-      if (hasTalks || hasClips) {
+      if (hasTalks) {
+        return speaker;
+      }
+
+      const hasClips = await speakerHasPublicClip(ctx, speaker._id);
+
+      if (hasClips) {
         return speaker;
       }
 

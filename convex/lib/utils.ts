@@ -186,13 +186,16 @@ export async function loadFullPage<TSource, TItem>(
 ): Promise<PaginationResult<TItem>> {
   const target = paginationOpts.numItems;
   const page: TItem[] = [];
+  const readCap = Number.isFinite(target)
+    ? MAX_PAGE_READS
+    : Number.POSITIVE_INFINITY;
   let { cursor } = paginationOpts;
   let isDone = false;
   let continueCursor = '';
 
   for (
     let read = 0;
-    page.length < target && !isDone && read < MAX_PAGE_READS;
+    page.length < target && !isDone && read < readCap;
     read += 1
   ) {
     const numItems = Math.min(MAX_READ_SIZE, target - page.length);

@@ -121,4 +121,25 @@ describe('listClipsBySpeaker', () => {
       visibilitySlugs.clipOnPublishedTalk,
     ]);
   });
+
+  it('returns no clips when the limit is zero', async () => {
+    const t = createConvexTest();
+    await seedVisibilityCatalog(t);
+    const speaker = await t.query(api.speakers.getSpeakerBySlug, {
+      slug: visibilitySlugs.publishedSpeaker,
+    });
+
+    expect(speaker).not.toBeNull();
+
+    if (!speaker) {
+      throw new Error('expected a published speaker');
+    }
+
+    const clips = await t.query(api.clips.listClipsBySpeaker, {
+      limit: 0,
+      speakerId: speaker.speaker._id,
+    });
+
+    expect(clips).toEqual([]);
+  });
 });

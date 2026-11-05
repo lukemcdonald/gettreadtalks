@@ -216,6 +216,11 @@ export const listClipsBySpeaker = query({
   },
   handler: async (ctx, args) => {
     const { limit = 20, speakerId } = args;
+
+    if (limit <= 0) {
+      return [];
+    }
+
     const visible: Doc<'clips'>[] = [];
     const clips = ctx.db
       .query('clips')

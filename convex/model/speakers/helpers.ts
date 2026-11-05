@@ -97,21 +97,17 @@ export async function enrichSpeakersForAdmin(
   speakers: Doc<'speakers'>[]
 ) {
   return await asyncMap(speakers, async (speaker) => {
-    const talks = await ctx.db
-      .query('talks')
-      .withIndex('by_speakerId_and_status', (q) =>
-        q.eq('speakerId', speaker._id)
-      )
-      .collect();
-    const clips = await getManyFrom(
-      ctx.db,
-      'clips',
-      'by_speakerId',
-      speaker._id
-    );
-    const hasPublishedContent =
-      talks.some((talk) => talk.status === 'published') ||
-      clips.some((clip) => clip.status === 'published');
+    const [clips, publishedSpeakers, talks] = await Promise.all([
+      getManyFrom(ctx.db, 'clips', 'by_speakerId', speaker._id),
+      filterSpeakersWithPublishedTalks(ctx, [speaker]),
+      ctx.db
+        .query('talks')
+        .withIndex('by_speakerId_and_status', (q) =>
+          q.eq('speakerId', speaker._id)
+        )
+        .collect(),
+    ]);
+    const hasPublishedContent = publishedSpeakers.length > 0;
 
     return {
       clipCount: clips.length,
