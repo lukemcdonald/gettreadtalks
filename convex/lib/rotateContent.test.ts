@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { rotateContent, secondsUntilNextRotation } from './rotateContent';
+import {
+  getRotationCacheLife,
+  rotateContent,
+  secondsUntilNextRotation,
+} from './rotateContent';
 
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
 
@@ -32,5 +36,15 @@ describe('secondsUntilNextRotation', () => {
     expect(secondsUntilNextRotation('daily', now)).toBe(
       (MS_PER_DAY - 1000) / 1000
     );
+  });
+});
+
+describe('getRotationCacheLife', () => {
+  it('expires after revalidate', () => {
+    const now = MS_PER_DAY * 20_000 + 1000;
+    const life = getRotationCacheLife('daily', now);
+
+    expect(life.expire).toBeGreaterThan(life.revalidate);
+    expect(life.stale).toBe(life.expire);
   });
 });

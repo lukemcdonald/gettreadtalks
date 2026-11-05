@@ -38,6 +38,19 @@ export function secondsUntilNextRotation(
   return Math.max(1, Math.ceil(remainingMs / 1000));
 }
 
+export function getRotationCacheLife(
+  period: RotationPeriod = 'daily',
+  now = Date.now()
+) {
+  const expire = Math.max(2, secondsUntilNextRotation(period, now));
+
+  return {
+    expire,
+    revalidate: expire - 1,
+    stale: expire,
+  };
+}
+
 function seededShuffle<T>(array: T[], seed: number): T[] {
   const shuffled = [...array];
   let currentSeed = seed;
