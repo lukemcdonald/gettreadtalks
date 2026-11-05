@@ -1,25 +1,18 @@
 import type { Doc, Id } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
-import type { ContentSortOption } from '../../lib/sort';
 import type { StatusFilterType } from '../../lib/types';
 import type { PaginationOptions } from 'convex/server';
 
 import { asyncMap } from 'convex-helpers';
 import { getManyVia } from 'convex-helpers/server/relationships';
 
-import { getTalkIdsByTopicSlugs } from '../../lib/filters';
-import { getContentComparator } from '../../lib/sort';
-import { enrichWithSpeaker, loadFullPage } from '../../lib/utils';
+import { enrichWithSpeaker } from '../../lib/utils';
 import {
   DEFAULT_SEARCH_LIMIT,
   searchTitleQuery,
   uniqueById,
 } from '../search/helpers';
-import {
-  loadSpeakerIdsBySlugs,
-  searchPublishedSpeakers,
-  searchSpeakers,
-} from '../speakers/helpers';
+import { searchPublishedSpeakers, searchSpeakers } from '../speakers/helpers';
 
 function publishedTalksQuery(ctx: QueryCtx) {
   return ctx.db
@@ -154,113 +147,6 @@ export async function searchTalks(
     .take(limit);
 }
 
-function filterTalkSearchHits(
-  talks: Doc<'talks'>[],
-  options: {
-    featured?: boolean;
-    speakerIds: Set<Id<'speakers'>> | null;
-    topicTalkIds: Set<Id<'talks'>> | null | undefined;
-  }
-) {
-  const { featured, speakerIds, topicTalkIds } = options;
-
-  if (speakerIds?.size === 0 || topicTalkIds === null) {
-    return [];
-  }
-
-  return talks.filter((talk) => {
-    if (speakerIds && !speakerIds.has(talk.speakerId)) {
-      return false;
-    }
-
-    if (topicTalkIds && !topicTalkIds.has(talk._id)) {
-      return false;
-    }
-
-    if (featured && !talk.featured) {
-      return false;
-    }
-
-    return true;
-  });
-}
-
-export async function loadPublishedTalkSearchPage(
-  ctx: QueryCtx,
-  options: {
-    featured?: boolean;
-    paginationOpts: PaginationOptions;
-    queryText: string;
-    sort: ContentSortOption;
-    speakerSlugs?: string[];
-    topicSlugs?: string[];
-  }
-) {
-  const {
-    featured,
-    paginationOpts,
-    queryText,
-    sort,
-    speakerSlugs,
-    topicSlugs,
-  } = options;
-  const speakerIds = speakerSlugs?.length
-    ? await loadSpeakerIdsBySlugs(ctx, speakerSlugs)
-    : null;
-  const topicTalkIds = topicSlugs?.length
-    ? await getTalkIdsByTopicSlugs(ctx, topicSlugs)
-    : undefined;
-  const result = await loadFullPage(
-    (opts) =>
-      ctx.db
-        .query('talks')
-        .withSearchIndex(
-          'search_title',
-          searchTitleQuery(queryText, 'published')
-        )
-        .paginate(opts),
-    (found) =>
-      filterTalkSearchHits(found, { featured, speakerIds, topicTalkIds }),
-    paginationOpts
-  );
-
-  if (sort !== 'recent') {
-    result.page.sort(getContentComparator(sort));
-  }
-
-  if (!paginationOpts.cursor && result.page.length < paginationOpts.numItems) {
-    const named = filterTalkSearchHits(
-      await loadTalksByNamedSpeakers(
-        ctx,
-        queryText,
-        paginationOpts.numItems,
-        'published'
-      ),
-      { featured, speakerIds, topicTalkIds }
-    );
-    const seen = new Set(result.page.map((talk) => talk._id));
-
-    for (const talk of named) {
-      if (result.page.length >= paginationOpts.numItems) {
-        break;
-      }
-
-      if (!seen.has(talk._id)) {
-        result.page.push(talk);
-        seen.add(talk._id);
-      }
-    }
-  }
-
-  const talksWithSpeakers = await enrichWithSpeaker(ctx, result.page);
-
-  return {
-    continueCursor: result.continueCursor,
-    isDone: result.isDone,
-    page: await enrichWithTopics(ctx, talksWithSpeakers),
-  };
-}
-
 export async function searchPublishedTalks(
   ctx: QueryCtx,
   queryText: string,
@@ -269,7 +155,8 @@ export async function searchPublishedTalks(
   return await searchTalks(ctx, queryText, limit, 'published');
 }
 
-async function loadTalksByNamedSpeakers(
+/** Title matches plus talks by speakers whose names match. */
+export async function searchTalksByTitleOrSpeaker(
   ctx: QueryCtx,
   queryText: string,
   limit: number,
@@ -277,14 +164,13 @@ async function loadTalksByNamedSpeakers(
 ) {
   const searchSpeakersByName =
     status === 'published' ? searchPublishedSpeakers : searchSpeakers;
-  const speakers = await searchSpeakersByName(
-    ctx,
-    queryText,
-    DEFAULT_SEARCH_LIMIT
-  );
+  const [titleHits, speakers] = await Promise.all([
+    searchTalks(ctx, queryText, limit, status),
+    searchSpeakersByName(ctx, queryText, DEFAULT_SEARCH_LIMIT),
+  ]);
 
   if (speakers.length === 0) {
-    return [];
+    return titleHits;
   }
 
   const speakerTalkPages = await Promise.all(
@@ -302,22 +188,10 @@ async function loadTalksByNamedSpeakers(
     )
   );
 
-  return uniqueById(speakerTalkPages.flat()).slice(0, limit);
-}
-
-/** Title matches plus talks by speakers whose names match. */
-export async function searchTalksByTitleOrSpeaker(
-  ctx: QueryCtx,
-  queryText: string,
-  limit: number,
-  status?: StatusFilterType
-) {
-  const [titleHits, speakerTalks] = await Promise.all([
-    searchTalks(ctx, queryText, limit, status),
-    loadTalksByNamedSpeakers(ctx, queryText, limit, status),
-  ]);
-
-  return uniqueById([...titleHits, ...speakerTalks]).slice(0, limit);
+  return uniqueById<Doc<'talks'>>([
+    ...titleHits,
+    ...speakerTalkPages.flat(),
+  ]).slice(0, limit);
 }
 
 export async function searchPublishedTalksByTitleOrSpeaker(

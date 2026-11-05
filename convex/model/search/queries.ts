@@ -9,19 +9,7 @@ import { enrichClipsWithSpeaker, searchPublishedClips } from '../clips/helpers';
 import { searchPublishedSpeakers } from '../speakers/helpers';
 import { searchPublishedTalks } from '../talks/helpers';
 import { searchPublishedTopics } from '../topics/helpers';
-import {
-  DEFAULT_SEARCH_LIMIT,
-  LIST_SEARCH_LIMIT,
-  normalizeSearchQuery,
-} from './helpers';
-
-function normalizeSearchLimit(limit: number | undefined) {
-  if (limit === undefined || !Number.isFinite(limit) || limit < 1) {
-    return DEFAULT_SEARCH_LIMIT;
-  }
-
-  return Math.min(Math.floor(limit), LIST_SEARCH_LIMIT);
-}
+import { DEFAULT_SEARCH_LIMIT, normalizeSearchQuery } from './helpers';
 
 const searchResultSpeakerValidator = v.object({
   firstName: v.string(),
@@ -114,7 +102,7 @@ export const searchSite = query({
       return emptySiteSearch;
     }
 
-    const limit = normalizeSearchLimit(args.limit);
+    const limit = args.limit ?? DEFAULT_SEARCH_LIMIT;
     const [clips, speakers, talks, topics] = await Promise.all([
       searchPublishedClips(ctx, queryText, limit),
       searchPublishedSpeakers(ctx, queryText, limit),

@@ -8,7 +8,6 @@ import { cacheLife, cacheTag } from 'next/cache';
 import { api } from '@/convex/_generated/api';
 import { getCollectionComparator } from '@/convex/lib/sort';
 import { sortSpeakersByName } from '@/features/speakers/utils';
-import { loadAllPages } from '@/lib/load-all-pages';
 
 interface GetCollectionsProps {
   limit?: number;
@@ -22,16 +21,14 @@ export async function loadCollections(args?: GetCollectionsProps) {
 
   const { limit, sort, speakerSlug } = args ?? {};
 
-  const numItems = limit ?? 1000;
-  const listPage = (cursor: string | null) =>
-    fetchQuery(api.collections.listCollections, {
-      paginationOpts: {
-        cursor,
-        numItems,
-      },
-    });
-  const result =
-    limit === undefined ? await loadAllPages(listPage) : await listPage(null);
+  const paginationOpts = {
+    cursor: null,
+    numItems: limit ?? 1000,
+  };
+
+  const result = await fetchQuery(api.collections.listCollections, {
+    paginationOpts,
+  });
 
   const allCollections = result.page;
 

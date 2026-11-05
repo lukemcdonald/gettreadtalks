@@ -173,61 +173,6 @@ export function getPublishedAtForStatus(
  * Manually paginate an array with cursor support.
  * Returns page, continuation cursor, and done status.
  */
-const MAX_PAGINATION_SCANS = 25;
-
-/**
- * Read pages until `numItems` survive `accept`, or the index is exhausted.
- * Rejected rows advance the cursor so a filtered-empty page does not stop the scan.
- */
-export async function loadFullPage<TSource, TItem>(
-  loadPage: (
-    paginationOpts: PaginationOptions
-  ) => Promise<PaginationResult<TSource>>,
-  accept: (items: TSource[]) => Promise<TItem[]> | TItem[],
-  paginationOpts: PaginationOptions
-): Promise<PaginationResult<TItem>> {
-  const target = paginationOpts.numItems;
-  const page: TItem[] = [];
-  let { cursor } = paginationOpts;
-  let isDone = false;
-  let continueCursor = '';
-
-  for (
-    let scan = 0;
-    page.length < target && !isDone && scan < MAX_PAGINATION_SCANS;
-    scan += 1
-  ) {
-    // oxlint-disable-next-line no-await-in-loop -- the next cursor depends on this page
-    const result = await loadPage({
-      ...paginationOpts,
-      cursor,
-      numItems: target - page.length,
-    });
-    const {
-      continueCursor: nextCursor,
-      isDone: pageDone,
-      page: sourcePage,
-    } = result;
-    // oxlint-disable-next-line no-await-in-loop -- filtering reads documents from this page
-    const accepted = await accept(sourcePage);
-
-    page.push(...accepted);
-    isDone = pageDone;
-    continueCursor = nextCursor;
-    cursor = nextCursor;
-
-    if (sourcePage.length === 0) {
-      break;
-    }
-  }
-
-  return {
-    continueCursor,
-    isDone,
-    page,
-  };
-}
-
 export function paginateArray<T>(
   items: T[],
   cursor: string | null,

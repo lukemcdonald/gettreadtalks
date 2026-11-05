@@ -10,7 +10,7 @@ import { v } from 'convex/values';
 import { query } from '../../_generated/server';
 import { filterClipsByPublishedTalks } from '../../lib/filters';
 import { getContentComparator } from '../../lib/sort';
-import { loadFullPage, paginateArray } from '../../lib/utils';
+import { paginateArray, toPublicTalk } from '../../lib/utils';
 import { doc, docs } from '../../lib/validators/schema';
 import { statusFilterType } from '../../lib/validators/shared';
 import { canViewContent, getCurrentUser, requireAdmin } from '../auth/helpers';
@@ -19,14 +19,13 @@ import {
   listAllAdmin,
   normalizeSearchQuery,
 } from '../search/helpers';
-import { loadSpeakerIdsBySlugs } from '../speakers/helpers';
 import {
   enrichClipsForAdmin,
   enrichClipsWithSpeaker,
   listPublishedClips,
   listPublishedClipsPage,
-  loadPublishedClipSearchPage,
   searchClips,
+  searchPublishedClips,
 } from './helpers';
 
 const clipWithSpeakerValidator = doc('clips').extend({
@@ -116,7 +115,7 @@ export const getClipBySlug = query({
     return {
       clip,
       speaker,
-      talk,
+      talk: talk ? toPublicTalk(talk) : null,
     };
   },
   returns: v.nullable(
@@ -163,41 +162,9 @@ export const listClips = query({
       };
     }
 
-    if (hasSearch) {
-      const speakerIds = hasSpeakerFilter
-        ? await loadSpeakerIdsBySlugs(ctx, speakerSlugs)
-        : null;
-      const result = await loadPublishedClipSearchPage(
-        ctx,
-        queryText,
-        paginationOpts,
-        async (clips) => {
-          const published = await filterClipsByPublishedTalks(ctx, clips);
-
-          if (!speakerIds) {
-            return published;
-          }
-
-          return speakerIds.size > 0
-            ? published.filter(
-                (clip) => clip.speakerId && speakerIds.has(clip.speakerId)
-              )
-            : [];
-        }
-      );
-
-      if (needsCustomSort) {
-        result.page.sort(getContentComparator(sort as ContentSortOption));
-      }
-
-      return {
-        continueCursor: result.continueCursor,
-        isDone: result.isDone,
-        page: await enrichClipsWithSpeaker(ctx, result.page),
-      };
-    }
-
-    let clips = await listPublishedClips(ctx);
+    let clips = hasSearch
+      ? await searchPublishedClips(ctx, queryText, LIST_SEARCH_LIMIT)
+      : await listPublishedClips(ctx);
 
     // Apply speaker filter (multi-select)
     if (hasSpeakerFilter) {
@@ -249,20 +216,13 @@ export const listClipsBySpeaker = query({
   handler: async (ctx, args) => {
     const { limit = 20, speakerId } = args;
 
-    const visible = await loadFullPage(
-      (opts) =>
-        ctx.db
-          .query('clips')
-          .withIndex('by_speakerId_and_status', (q) =>
-            q.eq('speakerId', speakerId).eq('status', 'published')
-          )
-          .order('desc')
-          .paginate(opts),
-      (clips) => filterClipsByPublishedTalks(ctx, clips),
-      { cursor: null, numItems: limit }
-    );
-
-    return visible.page;
+    return await ctx.db
+      .query('clips')
+      .withIndex('by_speakerId_and_status', (q) =>
+        q.eq('speakerId', speakerId).eq('status', 'published')
+      )
+      .order('desc')
+      .take(limit);
   },
   returns: docs('clips'),
 });

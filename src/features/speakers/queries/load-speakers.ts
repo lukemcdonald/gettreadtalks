@@ -5,7 +5,6 @@ import { cacheLife, cacheTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
 import { speakerRoles } from '@/convex/model/speakers/validators';
-import { loadAllPages } from '@/lib/load-all-pages';
 
 type SortOption = 'alphabetical' | 'featured';
 const VALID_SORT_OPTIONS = new Set(['alphabetical', 'featured']);
@@ -32,20 +31,19 @@ export async function loadSpeakers(args?: GetSpeakersProps) {
     ? (sort as SortOption)
     : 'alphabetical';
 
-  const numItems = limit ?? 1000;
+  const paginationOpts = {
+    cursor: null,
+    numItems: limit ?? 1000,
+  };
+
   const validRole = speakerRoles.find((r) => r === role);
-  const listPage = (cursor: string | null) =>
-    fetchQuery(api.speakers.listSpeakers, {
-      paginationOpts: {
-        cursor,
-        numItems,
-      },
-      role: validRole,
-      search: search || undefined,
-      sort: sortOption,
-    });
-  const result =
-    limit === undefined ? await loadAllPages(listPage) : await listPage(null);
+
+  const result = await fetchQuery(api.speakers.listSpeakers, {
+    paginationOpts,
+    role: validRole,
+    search: search || undefined,
+    sort: sortOption,
+  });
 
   return {
     continueCursor: result.continueCursor,

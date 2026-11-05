@@ -28,16 +28,6 @@ export function getTimeSeed(period: RotationPeriod, now = Date.now()): number {
   return Math.floor(now / getRotationPeriodMs(period));
 }
 
-export function getRotationCacheLife(period: RotationPeriod = 'daily') {
-  const expire = Math.max(2, secondsUntilNextRotation(period));
-
-  return {
-    expire,
-    revalidate: expire - 1,
-    stale: expire,
-  };
-}
-
 export function secondsUntilNextRotation(
   period: RotationPeriod,
   now = Date.now()

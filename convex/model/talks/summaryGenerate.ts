@@ -76,8 +76,7 @@ export type TalkGenerateGuardError =
 
 export async function loadTalkGenerateSource(
   ctx: ActionCtx,
-  talkId: Id<'talks'>,
-  kind: 'study' | 'summary' = 'summary'
+  talkId: Id<'talks'>
 ): Promise<
   | (TalkSummarySource & { transcript: string })
   | {
@@ -91,17 +90,8 @@ export async function loadTalkGenerateSource(
       talkId,
     }
   );
-  const reviewed =
-    kind === 'study'
-      ? hasReviewedTalkFeature(
-          await ctx.runQuery(internal.talkFeatures.getTalkFeatureInternal, {
-            kind: 'study',
-            talkId,
-          })
-        )
-      : source.summaryManuallyEdited;
 
-  if (reviewed) {
+  if (source.summaryManuallyEdited) {
     return { errorCode: 'ALREADY_REVIEWED' };
   }
 
@@ -131,7 +121,7 @@ const SUMMARY_DRAFT_STATUS_TEXT = new Set<string>([
   ...Object.values(SUMMARY_GENERATE_MESSAGES),
 ]);
 
-function generatedDraftSummary(talk: Doc<'talks'>) {
+function toDraftSummary(talk: Doc<'talks'>) {
   const draft = talk.draftSummary;
 
   if (!draft || SUMMARY_DRAFT_STATUS_TEXT.has(draft)) {
@@ -150,7 +140,7 @@ function toTalkSummarySource(
     mediaUrl: talk.mediaUrl,
     scripture: talk.scripture ?? '',
     speaker: `${speaker.firstName} ${speaker.lastName}`.trim(),
-    summary: talk.summary?.trim() ? talk.summary : generatedDraftSummary(talk),
+    summary: talk.summary?.trim() ? talk.summary : toDraftSummary(talk),
     summaryManuallyEdited: talk.summaryManuallyEditedAt !== undefined,
     title: talk.title,
     transcript: transcript?.text?.trim() || null,

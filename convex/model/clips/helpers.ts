@@ -6,7 +6,6 @@ import type { PaginationOptions } from 'convex/server';
 import { asyncMap } from 'convex-helpers';
 
 import { filterClipsByPublishedTalks } from '../../lib/filters';
-import { loadFullPage } from '../../lib/utils';
 import { searchTitleQuery } from '../search/helpers';
 
 function publishedClipsQuery(ctx: QueryCtx) {
@@ -27,11 +26,12 @@ export async function listPublishedClipsPage(
   ctx: QueryCtx,
   paginationOpts: PaginationOptions
 ) {
-  return await loadFullPage(
-    (opts) => publishedClipsQuery(ctx).paginate(opts),
-    (clips) => filterClipsByPublishedTalks(ctx, clips),
-    paginationOpts
-  );
+  const result = await publishedClipsQuery(ctx).paginate(paginationOpts);
+
+  return {
+    ...result,
+    page: await filterClipsByPublishedTalks(ctx, result.page),
+  };
 }
 
 export async function searchClips(
@@ -46,61 +46,17 @@ export async function searchClips(
     .take(limit);
 }
 
-export async function loadPublishedClipSearchPage(
-  ctx: QueryCtx,
-  queryText: string,
-  paginationOpts: PaginationOptions,
-  accept: (clips: Doc<'clips'>[]) => Promise<Doc<'clips'>[]>
-) {
-  return await loadFullPage(
-    (opts) =>
-      ctx.db
-        .query('clips')
-        .withSearchIndex(
-          'search_title',
-          searchTitleQuery(queryText, 'published')
-        )
-        .paginate(opts),
-    accept,
-    paginationOpts
-  );
-}
-
 export async function searchPublishedClips(
   ctx: QueryCtx,
   queryText: string,
   limit: number
 ) {
-  const page: Doc<'clips'>[] = [];
-  let cursor: string | null = null;
-  let isDone = false;
+  const clips = await filterClipsByPublishedTalks(
+    ctx,
+    await searchClips(ctx, queryText, limit, 'published')
+  );
 
-  while (page.length < limit && !isDone) {
-    // oxlint-disable-next-line no-await-in-loop -- the next search cursor depends on this page
-    const result = await loadPublishedClipSearchPage(
-      ctx,
-      queryText,
-      { cursor, numItems: limit - page.length },
-      (clips) => filterClipsByPublishedTalks(ctx, clips)
-    );
-
-    const {
-      continueCursor: nextCursor,
-      isDone: pageDone,
-      page: sourcePage,
-    } = result;
-
-    page.push(...sourcePage);
-    isDone = pageDone;
-
-    if (sourcePage.length === 0 && (pageDone || nextCursor === cursor)) {
-      break;
-    }
-
-    cursor = nextCursor;
-  }
-
-  return page;
+  return clips.slice(0, limit);
 }
 
 export async function enrichClipsWithSpeaker<

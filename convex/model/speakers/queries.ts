@@ -9,13 +9,9 @@ import {
 import { v } from 'convex/values';
 
 import { query } from '../../_generated/server';
-import {
-  filterClipsByPublishedTalks,
-  filterSpeakersWithPublishedTalks,
-} from '../../lib/filters';
 import { rotateContent } from '../../lib/rotateContent';
 import { byPublishedAt, getSpeakerComparator } from '../../lib/sort';
-import { loadFullPage, paginateArray, toPublicTalk } from '../../lib/utils';
+import { paginateArray, toPublicTalk } from '../../lib/utils';
 import { doc, docs } from '../../lib/validators/schema';
 import { publishState } from '../../lib/validators/shared';
 import { requireAdmin } from '../auth/helpers';
@@ -76,7 +72,7 @@ export const getSpeakerBySlug = query({
 
     const { _id: speakerId } = speaker;
 
-    const [talks, clipRows] = await Promise.all([
+    const [talks, clips] = await Promise.all([
       ctx.db
         .query('talks')
         .withIndex('by_speakerId_and_status', (q) =>
@@ -94,7 +90,6 @@ export const getSpeakerBySlug = query({
         .order('desc')
         .collect(),
     ]);
-    const clips = await filterClipsByPublishedTalks(ctx, clipRows);
 
     const collectionIds = [
       ...new Set(
@@ -173,23 +168,18 @@ export const getSpeakersCount = query({
 export const listFeaturedSpeakers = query({
   args: {
     limit: v.optional(v.number()),
-    seed: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const { limit = 6, seed } = args;
+    const { limit = 6 } = args;
 
-    const featured = await loadFullPage(
-      (opts) =>
-        ctx.db
-          .query('speakers')
-          .withIndex('by_featured', (q) => q.eq('featured', true))
-          .paginate(opts),
-      (rows) => filterSpeakersWithPublishedTalks(ctx, rows),
-      { cursor: null, numItems: 50 }
-    );
-    const speakers = featured.page;
+    // Intentionally unbounded: Need all featured speakers for rotation
+    // Limited to 50 to prevent memory issues if featured speakers grow
+    const speakers = await ctx.db
+      .query('speakers')
+      .withIndex('by_featured', (q) => q.eq('featured', true))
+      .take(50);
 
-    return rotateContent(speakers, { count: limit, period: 'daily', seed });
+    return rotateContent(speakers, { count: limit, period: 'daily' });
   },
   returns: docs('speakers'),
 });
