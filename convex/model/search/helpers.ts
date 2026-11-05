@@ -21,6 +21,15 @@ export const adminListArgs = {
 export const DEFAULT_SEARCH_LIMIT = 12;
 export const LIST_SEARCH_LIMIT = 100;
 
+/** Clamp a requested limit to 1..LIST_SEARCH_LIMIT. Invalid values use the default. */
+export function normalizeSearchLimit(limit: number | undefined) {
+  if (limit === undefined || !Number.isFinite(limit)) {
+    return DEFAULT_SEARCH_LIMIT;
+  }
+
+  return Math.min(LIST_SEARCH_LIMIT, Math.max(1, Math.floor(limit)));
+}
+
 export function searchPhrases(query: string) {
   const normalized = normalizeSearchQuery(query);
 

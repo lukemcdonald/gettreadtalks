@@ -231,6 +231,34 @@ export async function loadFullPage<TSource, TItem>(
   };
 }
 
+/** loadFullPage pages a paginated query; loadUntilFull reads an async stream (e.g. a search index). */
+export async function loadUntilFull<T>(
+  source: AsyncIterable<T>,
+  accept: (item: T) => Promise<boolean> | boolean,
+  limit: number
+): Promise<T[]> {
+  const page: T[] = [];
+
+  if (limit < 1) {
+    return page;
+  }
+
+  for await (const item of source) {
+    // oxlint-disable-next-line no-await-in-loop -- stop once the page is full
+    if (!(await accept(item))) {
+      continue;
+    }
+
+    page.push(item);
+
+    if (page.length >= limit) {
+      break;
+    }
+  }
+
+  return page;
+}
+
 /**
  * Manually paginate an array with cursor support.
  * Returns page, continuation cursor, and done status.

@@ -7,9 +7,9 @@ import { query } from '../../_generated/server';
 import { enrichWithSpeaker } from '../../lib/utils';
 import { enrichClipsWithSpeaker, searchPublishedClips } from '../clips/helpers';
 import { searchPublishedSpeakers } from '../speakers/helpers';
-import { searchPublishedTalks } from '../talks/helpers';
+import { searchPublishedTalksByTitleOrSpeaker } from '../talks/helpers';
 import { searchPublishedTopics } from '../topics/helpers';
-import { DEFAULT_SEARCH_LIMIT, normalizeSearchQuery } from './helpers';
+import { normalizeSearchLimit, normalizeSearchQuery } from './helpers';
 
 const searchResultSpeakerValidator = v.object({
   firstName: v.string(),
@@ -69,13 +69,23 @@ function toSearchSpeaker(speaker: Doc<'speakers'> | null) {
 async function toSearchTalks(ctx: QueryCtx, talks: Doc<'talks'>[]) {
   const talksWithSpeakers = await enrichWithSpeaker(ctx, talks);
 
-  return talksWithSpeakers.map((talk) => ({
-    _id: talk._id,
-    scripture: talk.scripture,
-    slug: talk.slug,
-    speaker: toSearchSpeaker(talk.speaker),
-    title: talk.title,
-  }));
+  return talksWithSpeakers.flatMap((talk) => {
+    const speaker = toSearchSpeaker(talk.speaker);
+
+    if (!speaker) {
+      return [];
+    }
+
+    return [
+      {
+        _id: talk._id,
+        scripture: talk.scripture,
+        slug: talk.slug,
+        speaker,
+        title: talk.title,
+      },
+    ];
+  });
 }
 
 async function toSearchClips(ctx: QueryCtx, clips: Doc<'clips'>[]) {
@@ -102,11 +112,11 @@ export const searchSite = query({
       return emptySiteSearch;
     }
 
-    const limit = args.limit ?? DEFAULT_SEARCH_LIMIT;
+    const limit = normalizeSearchLimit(args.limit);
     const [clips, speakers, talks, topics] = await Promise.all([
       searchPublishedClips(ctx, queryText, limit),
       searchPublishedSpeakers(ctx, queryText, limit),
-      searchPublishedTalks(ctx, queryText, limit),
+      searchPublishedTalksByTitleOrSpeaker(ctx, queryText, limit),
       searchPublishedTopics(ctx, queryText, limit),
     ]);
 
