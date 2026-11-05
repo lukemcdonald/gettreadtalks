@@ -11,11 +11,9 @@ import { Controller, useForm } from 'react-hook-form';
 
 import { Field, FieldError, FieldLabel, Textarea } from '@/components/ui';
 import { api } from '@/convex/_generated/api';
-import { updateTalkSummaryAction } from '@/features/talks/actions/update-talk-study';
 import { isTalkDraftStatus } from '@/features/talks/components/talk-generate-status';
 import { TalkSummaryGenerate } from '@/features/talks/components/talk-summary-generate';
 import { talkSummaryFormSchema } from '@/features/talks/schemas/talk-study-form';
-import { setServerErrors } from '@/lib/forms/react-hook-form';
 
 // fallow-ignore-next-line complexity
 export function useTalkSummaryForm(
@@ -37,26 +35,20 @@ export function useTalkSummaryForm(
     },
   });
 
-  async function save() {
+  function getDirtySummary() {
     if (!form.formState.isDirty) {
-      return { success: true as const };
+      return;
     }
 
-    const result = await updateTalkSummaryAction(form.getValues(), talkId);
-
-    if (!result.success) {
-      setServerErrors(form.setError, result.errors);
-    }
-
-    return result;
+    return form.getValues().summary;
   }
 
   return {
     form,
+    getDirtySummary,
     handleFlagsChange: setSummaryFlags,
     hasTranscript:
       transcript === undefined ? hasTranscriptPrefill : Boolean(transcript),
-    save,
     summaryFlags,
   };
 }

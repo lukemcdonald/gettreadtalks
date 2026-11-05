@@ -239,6 +239,7 @@ export const updateTalk = mutation({
     slug: v.optional(v.string()),
     speakerId: v.optional(v.id('speakers')),
     status: v.optional(statusType),
+    summary: v.optional(v.string()),
     talkId: v.id('talks'),
     title: v.optional(v.string()),
     topicIds: v.optional(v.array(v.id('topics'))),
@@ -247,6 +248,7 @@ export const updateTalk = mutation({
     const {
       publishedAt: requestedPublishedAt,
       slug: rawSlug,
+      summary,
       talkId,
       topicIds,
       ...rest
@@ -280,7 +282,15 @@ export const updateTalk = mutation({
     });
     updates.updatedAt = Date.now();
 
+    if (summary !== undefined) {
+      Object.assign(updates, getTalkSummaryPatch(talk, summary));
+    }
+
     await ctx.db.patch(talkId, updates);
+
+    if (summary !== undefined) {
+      await clearTalkDraftStep(ctx, talkId, 'summary');
+    }
 
     if (topicIds !== undefined) {
       await setTalkTopics(ctx, talkId, topicIds);
@@ -400,6 +410,18 @@ function hasManuallyEditedTalkSummary(talk: Doc<'talks'>) {
   return talk.summaryManuallyEditedAt !== undefined;
 }
 
+function getTalkSummaryPatch(talk: Doc<'talks'>, summary: string) {
+  const editedAt = Date.now();
+
+  return {
+    draftSummary: undefined,
+    summary,
+    summaryGeneratedAt: talk.summaryGeneratedAt ?? editedAt,
+    summaryGenerator: talk.summaryGenerator ?? 'manual',
+    summaryManuallyEditedAt: editedAt,
+  };
+}
+
 /**
  * Save a generated talk summary. Never overwrites a manually edited summary.
  */
@@ -436,15 +458,8 @@ export const updateTalkSummary = mutation({
     await requireAdmin(ctx);
 
     const talk = await getOrThrow(ctx, 'talks', args.talkId);
-    const editedAt = Date.now();
 
-    await ctx.db.patch(args.talkId, {
-      draftSummary: undefined,
-      summary: args.summary,
-      summaryGeneratedAt: talk.summaryGeneratedAt ?? editedAt,
-      summaryGenerator: talk.summaryGenerator ?? 'manual',
-      summaryManuallyEditedAt: editedAt,
-    });
+    await ctx.db.patch(args.talkId, getTalkSummaryPatch(talk, args.summary));
     await clearTalkDraftStep(ctx, args.talkId, 'summary');
 
     return args.talkId;
