@@ -7,14 +7,17 @@ import { SearchPageResults } from '@/app/search/_components/search-page-results'
 import { CenteredLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { SearchInput } from '@/components/ui';
+import { buildSearchPath } from '@/features/search/utils';
+import { buildPageMetadata } from '@/lib/metadata';
 
 // fallow-ignore-next-line unused-export
 export const ensureStatic = 'shell';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
+  canonical: buildSearchPath(),
   description: 'Search published talks, speakers, topics, and clips.',
   title: 'Search',
-};
+});
 
 interface SearchPageProps {
   searchParams: Promise<SearchPageParams>;

@@ -22,9 +22,6 @@ import { cn } from '@/utils';
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
 export const metadata: Metadata = {
-  alternates: {
-    canonical: site.url,
-  },
   description: site.metaDescription,
   metadataBase: new URL(site.url),
   openGraph: {

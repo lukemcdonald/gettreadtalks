@@ -4,11 +4,13 @@ import { CenteredLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { Link } from '@/components/ui/link';
 import { site } from '@/configs/site';
+import { buildPageMetadata } from '@/lib/metadata';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
+  canonical: '/about',
   description: `${site.name} began as a way to bookmark sermons listened to while walking. Now a resource for finding and sharing Christ centered talks.`,
   title: 'About',
-};
+});
 
 function AboutContent() {
   return (

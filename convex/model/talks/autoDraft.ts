@@ -105,11 +105,22 @@ async function draftStep(
   const failed =
     result.status === 'failed' && result.errorCode !== 'ALREADY_REVIEWED';
 
-  await ctx.runMutation(internal.talks.setTalkDraftStep, {
-    step,
-    talkId,
-    ...(failed ? { value: result.message } : {}),
-  });
+  if (failed) {
+    await ctx.runMutation(internal.talks.setTalkDraftStep, {
+      step,
+      talkId,
+      value: result.message,
+    });
+
+    return;
+  }
+
+  if (step === 'study') {
+    await ctx.runMutation(internal.talks.setTalkDraftStep, {
+      step,
+      talkId,
+    });
+  }
 }
 
 export const draftTalkSummaryAndStudy = internalAction({

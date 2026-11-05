@@ -37,7 +37,7 @@ export async function updateTalkAction(
 
     await fetchAuthMutation(api.talks.updateTalk, {
       ...talk,
-      publishedAt: publishedAt ? parseUtcDate(publishedAt) : undefined,
+      ...(publishedAt ? { publishedAt: parseUtcDate(publishedAt) } : {}),
       talkId,
     });
 

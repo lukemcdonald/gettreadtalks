@@ -49,6 +49,7 @@ Applies to `src/` and Convex internal helpers. Convex registered query/mutation 
 - Constants `SCREAMING_CASE`; types and components PascalCase; spell out abbreviations except `id`/`url`
 - Framework names stay (`generateMetadata`, `GET`, Convex registered `get*`/`list*`/`search*`)
 - No aliases for old names
+- Reuse or extend an existing function before adding a similar one; when two must coexist, name them by what they return plus a qualifier (e.g. Published, ForAdmin, By<Key>) so the difference is obvious.
 
 Quick test: a person reads it = `format*`; assembled from parts = `build*`; one thing reshaped = `to*`.
 

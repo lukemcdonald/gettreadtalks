@@ -14,11 +14,13 @@ export function EditTalkTranscriptPanel({
   active,
   mediaUrl,
   onClose,
+  savedMediaUrl,
   talkId,
 }: {
   active: boolean;
   mediaUrl: string;
   onClose: () => void;
+  savedMediaUrl: string;
   talkId: TalkId;
 }) {
   const transcript = useQuery(
@@ -26,6 +28,7 @@ export function EditTalkTranscriptPanel({
     active ? { talkId } : 'skip'
   );
   const hasTranscript = Boolean(transcript);
+  const urlChanged = mediaUrl.trim() !== savedMediaUrl.trim();
 
   return (
     <FormSheetBody
@@ -44,13 +47,19 @@ export function EditTalkTranscriptPanel({
           The transcript is private and only used to generate the summary and
           study.
         </p>
-        <TalkTranscriptFetch
-          hasTranscript={hasTranscript}
-          mediaUrl={mediaUrl}
-          showLabel={false}
-          talkId={talkId}
-        />
-        {active && hasTalkTranscriptSource(mediaUrl) ? (
+        {urlChanged ? (
+          <p className="text-muted-foreground text-sm">
+            Save the talk before fetching a transcript for the new URL.
+          </p>
+        ) : (
+          <TalkTranscriptFetch
+            hasTranscript={hasTranscript}
+            mediaUrl={savedMediaUrl}
+            showLabel={false}
+            talkId={talkId}
+          />
+        )}
+        {active && (hasTranscript || hasTalkTranscriptSource(savedMediaUrl)) ? (
           <TalkTranscriptEditor talkId={talkId} />
         ) : null}
       </div>

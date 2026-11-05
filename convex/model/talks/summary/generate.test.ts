@@ -159,13 +159,16 @@ describe('generateTalkSummary', () => {
       });
 
       const generated = await asAdmin.query(api.talks.getTalk, { id: talkId });
+      const published = await t.query(api.talks.getTalkBySlug, {
+        speakerSlug: visibilitySlugs.publishedSpeaker,
+        talkSlug: visibilitySlugs.publishedTalk,
+      });
 
-      expect(generated).toEqual(
-        expect.objectContaining({
-          summary: GENERATED_SUMMARY,
-        })
-      );
+      expect(generated?.summary).toBeUndefined();
+      expect(generated?.draftSummary).toBe(GENERATED_SUMMARY);
       expect(generated?.summaryManuallyEditedAt).toBeUndefined();
+      expect(published?.summary).toBeNull();
+      expect(published?.talk).not.toHaveProperty('draftSummary');
 
       await asAdmin.mutation(api.talks.updateTalkSummary, {
         summary: 'Hand-edited summary.',

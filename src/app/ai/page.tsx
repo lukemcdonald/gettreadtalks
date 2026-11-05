@@ -4,7 +4,7 @@ import { CenteredLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { CodeBlock } from '@/components/ui';
 import { buildAbsoluteUrl } from '@/lib/entities/paths';
-import { DEFAULT_SHARE_IMAGE } from '@/lib/metadata';
+import { buildPageMetadata } from '@/lib/metadata';
 
 const MCP_URL = buildAbsoluteUrl('/mcp');
 const PAGE_DESCRIPTION =
@@ -75,21 +75,11 @@ const TOOL_GROUPS = [
   },
 ] as const;
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
+  canonical: '/ai',
   description: PAGE_DESCRIPTION,
-  openGraph: {
-    description: PAGE_DESCRIPTION,
-    images: [DEFAULT_SHARE_IMAGE],
-    title: PAGE_TITLE,
-    url: '/ai',
-  },
   title: PAGE_TITLE,
-  twitter: {
-    card: 'summary_large_image',
-    description: PAGE_DESCRIPTION,
-    title: PAGE_TITLE,
-  },
-};
+});
 
 function AiPageContent() {
   return (

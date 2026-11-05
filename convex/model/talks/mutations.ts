@@ -28,7 +28,7 @@ import {
 } from '../mediaHealth/check/clear';
 import { clearTalkDraftStep } from './autoDraft';
 import { talkTranscriptFields } from './schema';
-import { findOrInsertPendingTalkTranscriptFetch } from './transcriptFetch';
+import { createPendingTalkTranscriptFetch } from './transcriptFetch';
 import { statusType, talkTranscriptFetchErrorCode } from './validators';
 
 async function setTalkTopics(
@@ -104,15 +104,18 @@ function publishedAtForTalk({
   currentPublishedAt,
   requestedPublishedAt,
   status,
+  wasPublished,
 }: {
   currentPublishedAt?: number;
-  requestedPublishedAt?: number;
+  requestedPublishedAt?: null | number;
   status: StatusType;
+  wasPublished?: boolean;
 }): number | undefined {
   const publishedAt = getPublishedAt({
     currentPublishedAt,
     requestedPublishedAt,
     status,
+    wasPublished,
   });
 
   if (publishedAt !== undefined && isFuturePublishedAt(publishedAt)) {
@@ -140,7 +143,6 @@ export const archiveTalk = mutation({
     const newStatus = isArchived ? 'backlog' : 'archived';
 
     await ctx.db.patch(talkId, {
-      publishedAt: isArchived ? undefined : talk.publishedAt,
       status: newStatus,
       updatedAt: Date.now(),
     });
@@ -208,7 +210,7 @@ export const createTalk = mutation({
 
     // YouTube talks draft the transcript, summary, and study in the background.
     if (hasTalkTranscriptSource(talkArgs.mediaUrl)) {
-      const runId = await findOrInsertPendingTalkTranscriptFetch(ctx, talkId);
+      const runId = await createPendingTalkTranscriptFetch(ctx, talkId);
 
       await ctx.scheduler.runAfter(0, internal.talks.fetchTalkTranscript, {
         continueDraft: true,
@@ -232,7 +234,7 @@ export const updateTalk = mutation({
     collectionOrder: v.optional(v.number()),
     featured: v.optional(v.boolean()),
     mediaUrl: v.optional(v.string()),
-    publishedAt: v.optional(v.number()),
+    publishedAt: v.optional(v.union(v.null(), v.number())),
     scripture: v.optional(v.string()),
     slug: v.optional(v.string()),
     speakerId: v.optional(v.id('speakers')),
@@ -274,6 +276,7 @@ export const updateTalk = mutation({
       currentPublishedAt: talk.publishedAt,
       requestedPublishedAt,
       status: updates.status ?? talk.status,
+      wasPublished: talk.status === 'published',
     });
     updates.updatedAt = Date.now();
 
@@ -414,11 +417,10 @@ export const saveTalkSummaryDraft = internalMutation({
     }
 
     await ctx.db.patch(args.talkId, {
-      summary: args.summary,
+      draftSummary: args.summary,
       summaryGeneratedAt: Date.now(),
       summaryGenerator: args.generator,
     });
-    await clearTalkDraftStep(ctx, args.talkId, 'summary');
 
     return args.talkId;
   },
@@ -437,6 +439,7 @@ export const updateTalkSummary = mutation({
     const editedAt = Date.now();
 
     await ctx.db.patch(args.talkId, {
+      draftSummary: undefined,
       summary: args.summary,
       summaryGeneratedAt: talk.summaryGeneratedAt ?? editedAt,
       summaryGenerator: talk.summaryGenerator ?? 'manual',
@@ -501,7 +504,7 @@ export const createTalkTranscriptFetch = mutation({
       );
     }
 
-    const runId = await findOrInsertPendingTalkTranscriptFetch(ctx, talkId);
+    const runId = await createPendingTalkTranscriptFetch(ctx, talkId);
 
     await ctx.scheduler.runAfter(0, internal.talks.fetchTalkTranscript, {
       mediaUrl: talk.mediaUrl,
@@ -607,7 +610,7 @@ export const completeTalkTranscriptFetch = internalMutation({
   handler: async (ctx, args) => {
     const run = await ctx.db.get(args.runId);
 
-    if (run?.status !== 'pending') {
+    if (!run || run.status !== 'pending') {
       return null;
     }
 
@@ -620,6 +623,21 @@ export const completeTalkTranscriptFetch = internalMutation({
     });
 
     if (args.status === 'success' && args.text) {
+      const fetches = await ctx.db
+        .query('talkTranscriptFetches')
+        .withIndex('by_talkId', (q) => q.eq('talkId', args.talkId))
+        .collect();
+      const hasNewerSuccess = fetches.some(
+        (row) =>
+          row._id !== args.runId &&
+          row.status === 'success' &&
+          row._creationTime > run._creationTime
+      );
+
+      if (hasNewerSuccess) {
+        return null;
+      }
+
       const existing = await ctx.db
         .query('talkTranscripts')
         .withIndex('by_talkId', (q) => q.eq('talkId', args.talkId))

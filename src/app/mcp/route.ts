@@ -5,9 +5,10 @@ import { loadClips } from '@/features/clips/queries/load-clips';
 import { loadCollectionBySlug } from '@/features/collections/queries/load-collection-by-slug';
 import { loadCollections } from '@/features/collections/queries/load-collections';
 import {
-  createMcpRateLimitedHandler,
-  mcpLimiterToken,
   buildMcpRateLimitKey,
+  createMcpRateLimitedHandler,
+  getMcpLimiterUnavailableResult,
+  mcpLimiterToken,
   withMcpCors,
 } from '@/features/mcp/rate-limit';
 import { createTreadMcpHandler } from '@/features/mcp/tools';
@@ -34,7 +35,7 @@ async function consumeMcpRateLimit(request: Request) {
   const token = mcpLimiterToken(secret);
 
   if (!token) {
-    return { ok: true, retryAfter: null };
+    return getMcpLimiterUnavailableResult();
   }
 
   try {
@@ -43,7 +44,7 @@ async function consumeMcpRateLimit(request: Request) {
       token,
     });
   } catch {
-    return { ok: true, retryAfter: null };
+    return getMcpLimiterUnavailableResult();
   }
 }
 

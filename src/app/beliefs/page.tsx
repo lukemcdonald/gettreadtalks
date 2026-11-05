@@ -3,11 +3,13 @@ import type { Metadata } from 'next';
 import { CenteredLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { site } from '@/configs/site';
+import { buildPageMetadata } from '@/lib/metadata';
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildPageMetadata({
+  canonical: '/beliefs',
   description: `A brief statement of the core Christian beliefs that shape the content and mission of ${site.name}.`,
   title: 'Beliefs',
-};
+});
 
 function BeliefsContent() {
   return (

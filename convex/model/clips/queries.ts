@@ -10,7 +10,7 @@ import { v } from 'convex/values';
 import { query } from '../../_generated/server';
 import { filterClipsByPublishedTalks } from '../../lib/filters';
 import { getContentComparator } from '../../lib/sort';
-import { paginateArray } from '../../lib/utils';
+import { paginateArray, toPublicTalk } from '../../lib/utils';
 import { doc, docs } from '../../lib/validators/schema';
 import { statusFilterType } from '../../lib/validators/shared';
 import { canViewContent, getCurrentUser, requireAdmin } from '../auth/helpers';
@@ -115,7 +115,7 @@ export const getClipBySlug = query({
     return {
       clip,
       speaker,
-      talk,
+      talk: talk ? toPublicTalk(talk) : null,
     };
   },
   returns: v.nullable(

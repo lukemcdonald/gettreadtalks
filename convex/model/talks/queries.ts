@@ -17,7 +17,11 @@ import { query } from '../../_generated/server';
 import { getTalkIdsByTopicSlugs } from '../../lib/filters';
 import { rotateContent } from '../../lib/rotateContent';
 import { byPublishedAt, getContentComparator } from '../../lib/sort';
-import { enrichWithSpeaker, paginateArray } from '../../lib/utils';
+import {
+  enrichWithSpeaker,
+  paginateArray,
+  toPublicTalk,
+} from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
 import { statusFilterType } from '../../lib/validators/shared';
@@ -220,7 +224,7 @@ export const getTalkBySlug = query({
       speaker,
       studyBody: publishedStudyBody,
       summary,
-      talk,
+      talk: toPublicTalk(talk),
       topics: validTopics,
     };
   },
@@ -303,7 +307,9 @@ export const listRandomTalksBySpeaker = query({
       ? talks.filter((talk) => talk._id !== excludeTalkId)
       : talks;
 
-    return rotateContent(filteredTalks, { count: limit, period: 'daily' });
+    return rotateContent(filteredTalks, { count: limit, period: 'daily' }).map(
+      (talk) => toPublicTalk(talk)
+    );
   },
   returns: docs('talks'),
 });
@@ -330,7 +336,7 @@ export const listTalksByCollection = query({
       (a, b) => (a.collectionOrder || 0) - (b.collectionOrder || 0)
     );
 
-    return sortedTalks;
+    return sortedTalks.map((talk) => toPublicTalk(talk));
   },
   returns: docs('talks'),
 });
@@ -353,7 +359,8 @@ export const listTalksBySpeaker = query({
 
     return talks
       .toSorted((a, b) => byPublishedAt(a, b, 'desc'))
-      .slice(0, limit);
+      .slice(0, limit)
+      .map((talk) => toPublicTalk(talk));
   },
   returns: docs('talks'),
 });

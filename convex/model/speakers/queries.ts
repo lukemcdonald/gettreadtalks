@@ -11,7 +11,7 @@ import { v } from 'convex/values';
 import { query } from '../../_generated/server';
 import { rotateContent } from '../../lib/rotateContent';
 import { byPublishedAt, getSpeakerComparator } from '../../lib/sort';
-import { paginateArray } from '../../lib/utils';
+import { paginateArray, toPublicTalk } from '../../lib/utils';
 import { doc, docs } from '../../lib/validators/schema';
 import { publishState } from '../../lib/validators/shared';
 import { requireAdmin } from '../auth/helpers';
@@ -111,7 +111,7 @@ export const getSpeakerBySlug = query({
       clips,
       collections,
       speaker,
-      talks,
+      talks: talks.map((talk) => toPublicTalk(talk)),
       topics,
     };
   },

@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { api, components } from '../../_generated/api';
 import { ErrorCodes } from '../../lib/errors';
 import { createConvexTest, signInAsPasswordUser } from '../../test.setup';
+import { insertClip } from '../clips/test.factory';
 import { insertSpeaker } from '../speakers/test.factory';
 import { insertTalk } from '../talks/test.factory';
 import { insertUserFavoriteTalk } from './test.factory';
@@ -92,5 +93,63 @@ describe('users.deleteUser', () => {
     );
 
     expect(user).not.toBe(null);
+  });
+});
+
+describe('published favorites', () => {
+  it('rejects an unpublished talk and a clip whose talk is unpublished', async () => {
+    const t = createConvexTest();
+    const { asUser } = await signInAsPasswordUser(t, {
+      email: 'luke@example.test',
+      name: 'Luke',
+      password: PASSWORD,
+      role: 'user',
+    });
+    const ids = await t.run(async (ctx) => {
+      const speakerId = await insertSpeaker(ctx);
+      const draftTalkId = await insertTalk(ctx, {
+        speakerId,
+        status: 'backlog',
+      });
+      const publishedTalkId = await insertTalk(ctx, {
+        slug: 'published-talk',
+        speakerId,
+        title: 'Published Talk',
+      });
+      const clipId = await insertClip(ctx, {
+        speakerId,
+        talkId: draftTalkId,
+      });
+
+      return { clipId, draftTalkId, publishedTalkId };
+    });
+
+    await expect(
+      asUser.mutation(api.users.favoriteTalk, { talkId: ids.draftTalkId })
+    ).rejects.toMatchObject({
+      data: {
+        errorCode: ErrorCodes.NOT_FOUND,
+      },
+    });
+    await expect(
+      asUser.mutation(api.users.finishTalk, { talkId: ids.draftTalkId })
+    ).rejects.toMatchObject({
+      data: {
+        errorCode: ErrorCodes.NOT_FOUND,
+      },
+    });
+    await expect(
+      asUser.mutation(api.users.favoriteClip, { clipId: ids.clipId })
+    ).rejects.toMatchObject({
+      data: {
+        errorCode: ErrorCodes.NOT_FOUND,
+      },
+    });
+
+    const favoriteId = await asUser.mutation(api.users.favoriteTalk, {
+      talkId: ids.publishedTalkId,
+    });
+
+    expect(favoriteId).toEqual(expect.any(String));
   });
 });

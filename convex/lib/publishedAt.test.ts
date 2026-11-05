@@ -56,12 +56,43 @@ describe('isFuturePublishedAt', () => {
 });
 
 describe('getPublishedAt', () => {
-  it('clears the timestamp when the talk is not published', () => {
+  it('keeps a requested date when the talk is not published', () => {
+    const requestedPublishedAt = Date.parse('2020-01-01T00:00:00.000Z');
+
     expect(
       getPublishedAt({
         currentPublishedAt: NOW,
-        requestedPublishedAt: Date.parse('2020-01-01T00:00:00.000Z'),
+        requestedPublishedAt,
         status: 'backlog',
+      })
+    ).toBe(requestedPublishedAt);
+  });
+
+  it('leaves the stored date alone when a non-published save omits it', () => {
+    expect(
+      getPublishedAt({
+        currentPublishedAt: NOW,
+        status: 'archived',
+      })
+    ).toBe(NOW);
+  });
+
+  it('keeps the stored date when the editor leaves the field blank', () => {
+    expect(
+      getPublishedAt({
+        currentPublishedAt: NOW,
+        requestedPublishedAt: null,
+        status: 'backlog',
+      })
+    ).toBe(NOW);
+  });
+
+  it('keeps a published talk without a date empty on a later blank save', () => {
+    expect(
+      getPublishedAt({
+        requestedPublishedAt: null,
+        status: 'published',
+        wasPublished: true,
       })
     ).toBeUndefined();
   });

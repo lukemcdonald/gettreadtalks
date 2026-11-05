@@ -41,26 +41,32 @@ export function parseUtcDate(isoDate: string): number | undefined {
 }
 
 /**
- * Resolve the stored publishedAt for a status change.
- * Empty requested dates keep the existing timestamp, or now when first publishing.
+ * Resolve the stored publishedAt.
+ * A blank date keeps the stored timestamp. The first publish without a date uses now.
  */
 export function getPublishedAt({
   currentPublishedAt,
   now = Date.now(),
   requestedPublishedAt,
   status,
+  wasPublished = false,
 }: {
   currentPublishedAt?: number;
   now?: number;
-  requestedPublishedAt?: number;
+  requestedPublishedAt?: null | number;
   status: StatusType;
+  wasPublished?: boolean;
 }): number | undefined {
-  if (status !== 'published') {
-    return;
-  }
+  if (requestedPublishedAt === undefined || requestedPublishedAt === null) {
+    if (status !== 'published') {
+      return currentPublishedAt;
+    }
 
-  if (requestedPublishedAt === undefined) {
-    return currentPublishedAt ?? now;
+    if (currentPublishedAt !== undefined || wasPublished) {
+      return currentPublishedAt;
+    }
+
+    return now;
   }
 
   if (

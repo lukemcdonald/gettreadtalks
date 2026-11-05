@@ -269,6 +269,7 @@ export function EditTalkSheet({
             onClose={() => {
               handleOpenChange(false);
             }}
+            savedMediaUrl={talk.mediaUrl}
             talkId={talk._id}
           />
         ) : null}

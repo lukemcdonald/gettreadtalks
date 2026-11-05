@@ -222,6 +222,21 @@ export async function deleteAll<T extends { _id: Id<TableNames> }>(
 }
 
 /**
+ * Drop admin-only draft text before a talk leaves a public query.
+ */
+export function toPublicTalk<T extends object>(talk: T): T {
+  if (!('draftStudy' in talk) && !('draftSummary' in talk)) {
+    return talk;
+  }
+
+  const publicTalk = { ...talk };
+  delete (publicTalk as { draftStudy?: string }).draftStudy;
+  delete (publicTalk as { draftSummary?: string }).draftSummary;
+
+  return publicTalk;
+}
+
+/**
  * Attach the speaker for items that always have a speakerId (talks).
  */
 export async function enrichWithSpeaker<
@@ -233,6 +248,6 @@ export async function enrichWithSpeaker<
   return await asyncMap(items, async (item: T) => {
     const speaker = await ctx.db.get('speakers', item.speakerId);
 
-    return { ...item, speaker };
+    return { ...toPublicTalk(item), speaker };
   });
 }

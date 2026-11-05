@@ -17,6 +17,7 @@ import {
   talkSummaryOutputSchema,
 } from './summary/prompt';
 import { loadTranscriptForGenerate } from './transcriptFetch';
+import { TALK_DRAFT_PENDING } from './validators';
 
 export const SUMMARY_GENERATE_MESSAGES = {
   ALREADY_REVIEWED: 'This summary has already been edited.',
@@ -115,6 +116,21 @@ export async function loadTalkGenerateSource(
   };
 }
 
+const SUMMARY_DRAFT_STATUS_TEXT = new Set<string>([
+  TALK_DRAFT_PENDING,
+  ...Object.values(SUMMARY_GENERATE_MESSAGES),
+]);
+
+function toDraftSummary(talk: Doc<'talks'>) {
+  const draft = talk.draftSummary;
+
+  if (!draft || SUMMARY_DRAFT_STATUS_TEXT.has(draft)) {
+    return '';
+  }
+
+  return draft;
+}
+
 function toTalkSummarySource(
   speaker: Doc<'speakers'>,
   talk: Doc<'talks'>,
@@ -124,7 +140,7 @@ function toTalkSummarySource(
     mediaUrl: talk.mediaUrl,
     scripture: talk.scripture ?? '',
     speaker: `${speaker.firstName} ${speaker.lastName}`.trim(),
-    summary: talk.summary ?? '',
+    summary: talk.summary?.trim() ? talk.summary : toDraftSummary(talk),
     summaryManuallyEdited: talk.summaryManuallyEditedAt !== undefined,
     title: talk.title,
     transcript: transcript?.text?.trim() || null,

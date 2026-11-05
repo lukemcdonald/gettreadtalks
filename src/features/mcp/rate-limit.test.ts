@@ -1,8 +1,9 @@
-import { describe, expect, it } from '@/test';
+import { describe, expect, it, vi } from '@/test';
 
 import {
-  createMcpRateLimitedHandler,
   buildMcpRateLimitKey,
+  createMcpRateLimitedHandler,
+  getMcpLimiterUnavailableResult,
 } from './rate-limit';
 
 function mcpRequest(headers: Record<string, string>) {
@@ -94,12 +95,32 @@ describe('createMcpRateLimitedHandler', () => {
     expect(body).toEqual({ error: 'Rate limit exceeded' });
   });
 
-  it('fails open when the limiter throws', async () => {
+  it('fails open when the limiter throws outside production', async () => {
     const response = await passthrough(mcpRequest({ 'x-test-limit': 'throw' }));
     const body = await response.json();
 
     expect(response.status).toBe(200);
     expect(body).toEqual({ ok: true });
+  });
+
+  it('fails closed when the limiter throws in production', async () => {
+    vi.stubEnv('NODE_ENV', 'production');
+
+    try {
+      const response = await passthrough(
+        mcpRequest({ 'x-test-limit': 'throw' })
+      );
+      const body = await response.json();
+
+      expect(getMcpLimiterUnavailableResult()).toEqual({
+        ok: false,
+        retryAfter: 60_000,
+      });
+      expect(response.status).toBe(429);
+      expect(body).toEqual({ error: 'Rate limit exceeded' });
+    } finally {
+      vi.unstubAllEnvs();
+    }
   });
 
   it('returns a cors-wrapped 500 when the handler throws', async () => {
