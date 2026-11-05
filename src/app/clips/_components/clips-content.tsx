@@ -11,34 +11,50 @@ interface ClipsContentProps {
   hasPrevPage: boolean;
 }
 
+function ClipsEmpty() {
+  return (
+    <Empty>
+      <EmptyTitle>No clips found</EmptyTitle>
+      <EmptyDescription>
+        There are no clips available at this time.
+      </EmptyDescription>
+    </Empty>
+  );
+}
+
 export function ClipsContent({
   clips,
   continueCursor,
   hasNextPage,
   hasPrevPage,
 }: ClipsContentProps) {
-  const hasClips = clips.length > 0;
+  if (clips.length === 0 && !(hasNextPage || hasPrevPage)) {
+    return <ClipsEmpty />;
+  }
 
-  return (
-    <>
-      {hasClips ? (
-        <ClipsList clips={clips} />
-      ) : (
-        <Empty>
-          <EmptyTitle>No clips found</EmptyTitle>
-          <EmptyDescription>
-            There are no clips available at this time.
-          </EmptyDescription>
-        </Empty>
-      )}
-      {hasClips || hasNextPage || hasPrevPage ? (
+  if (clips.length === 0) {
+    return (
+      <>
+        <ClipsEmpty />
         <Pagination
           continueCursor={continueCursor}
           hasNextPage={hasNextPage}
           hasPrevPage={hasPrevPage}
           itemCount={clips.length}
         />
-      ) : null}
+      </>
+    );
+  }
+
+  return (
+    <>
+      <ClipsList clips={clips} />
+      <Pagination
+        continueCursor={continueCursor}
+        hasNextPage={hasNextPage}
+        hasPrevPage={hasPrevPage}
+        itemCount={clips.length}
+      />
     </>
   );
 }
