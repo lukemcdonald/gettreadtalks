@@ -102,31 +102,45 @@ describe('estimateStudyGenerateCost', () => {
 });
 
 describe('paginateStudyBackfillTalks', () => {
+  const orderedIds = ['talk-a', 'talk-b', 'talk-c'];
   const talks = [
     { talkId: 'talk-a' },
     { talkId: 'talk-b' },
     { talkId: 'talk-c' },
   ];
 
-  it('pages after a talk id and restarts when that talk leaves the list', () => {
-    const first = paginateStudyBackfillTalks(talks, null, 2);
+  it('pages after a talk id even when that talk is no longer eligible', () => {
+    const first = paginateStudyBackfillTalks({
+      cursor: null,
+      eligible: talks,
+      limit: 2,
+      orderedIds,
+    });
 
     expect(first).toEqual({
       continueCursor: 'talk-b',
       isDone: false,
       page: [{ talkId: 'talk-a' }, { talkId: 'talk-b' }],
     });
-    expect(paginateStudyBackfillTalks(talks, first.continueCursor, 2)).toEqual({
+    expect(
+      paginateStudyBackfillTalks({
+        cursor: first.continueCursor,
+        eligible: talks,
+        limit: 2,
+        orderedIds,
+      })
+    ).toEqual({
       continueCursor: '',
       isDone: true,
       page: [{ talkId: 'talk-c' }],
     });
     expect(
-      paginateStudyBackfillTalks(
-        [{ talkId: 'talk-c' }],
-        first.continueCursor,
-        2
-      )
+      paginateStudyBackfillTalks({
+        cursor: first.continueCursor,
+        eligible: [{ talkId: 'talk-a' }, { talkId: 'talk-c' }],
+        limit: 2,
+        orderedIds,
+      })
     ).toEqual({
       continueCursor: '',
       isDone: true,

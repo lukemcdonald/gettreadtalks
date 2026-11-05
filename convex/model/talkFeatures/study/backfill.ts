@@ -2,6 +2,7 @@ import type { Doc, Id } from '../../../_generated/dataModel';
 import type { QueryCtx } from '../../../_generated/server';
 import type { TalkStudyGenerateResult } from './generate';
 
+import { getOneFrom } from 'convex-helpers/server/relationships';
 import { v } from 'convex/values';
 
 import { api } from '../../../_generated/api';
@@ -9,6 +10,7 @@ import { action, query } from '../../../_generated/server';
 import { requireAdmin } from '../../auth/helpers';
 import { talksByStatusQuery } from '../../talks/helpers';
 import { TALK_SUMMARY_MODEL } from '../../talks/summary/prompt';
+import { TALK_DRAFT_PENDING } from '../../talks/validators';
 import { generateTalkStudy } from './generate';
 import {
   estimateStudyGenerateCost,
@@ -42,36 +44,28 @@ interface StudyBackfillTalk {
   transcriptChars: number;
 }
 
+function toTalkSpeakerName(
+  speaker: Pick<Doc<'speakers'>, 'firstName' | 'lastName'> | null
+) {
+  if (!speaker) {
+    return '';
+  }
+
+  return `${speaker.firstName} ${speaker.lastName}`.trim();
+}
+
 function toStudyBackfillTalk(
+  speakerName: string,
   talk: Doc<'talks'>,
   transcript: string
 ): StudyBackfillTalk {
   return {
     scripture: talk.scripture ?? '',
-    speaker: '',
+    speaker: speakerName,
     talkId: talk._id,
     title: talk.title,
     transcriptChars: transcript.length,
   };
-}
-
-function toEligibleStudyBackfillTalk(
-  talk: Doc<'talks'>,
-  feature: Doc<'talkFeatures'> | null,
-  transcript: string | undefined
-) {
-  if (
-    !isStudyBackfillEligible({
-      draftStudy: talk.draftStudy,
-      feature,
-      status: talk.status,
-      transcript,
-    })
-  ) {
-    return [];
-  }
-
-  return [toStudyBackfillTalk(talk, transcript?.trim() ?? '')];
 }
 
 function toStudyBackfillResult(
@@ -100,42 +94,75 @@ function toStudyBackfillResult(
   };
 }
 
-async function listStudyBackfillTalks(ctx: QueryCtx) {
-  const talks = await talksByStatusQuery(ctx, 'published').collect();
-  const [features, transcripts] = await Promise.all([
-    ctx.db.query('talkFeatures').collect(),
-    ctx.db.query('talkTranscripts').collect(),
-  ]);
-  const featureByTalkId = new Map(
-    features.flatMap((feature) =>
-      feature.kind === 'study' ? [[feature.talkId, feature] as const] : []
+async function loadStudyBackfillTalk(ctx: QueryCtx, talk: Doc<'talks'>) {
+  if (talk.draftStudy === TALK_DRAFT_PENDING) {
+    return null;
+  }
+
+  const feature = await ctx.db
+    .query('talkFeatures')
+    .withIndex('by_talkId_and_kind', (q) =>
+      q.eq('talkId', talk._id).eq('kind', 'study')
     )
-  );
-  const transcriptByTalkId = new Map(
-    transcripts.map((transcript) => [transcript.talkId, transcript] as const)
+    .unique();
+
+  if (feature !== null) {
+    return null;
+  }
+
+  const transcript = await getOneFrom(
+    ctx.db,
+    'talkTranscripts',
+    'by_talkId',
+    talk._id
   );
 
-  return talks.flatMap((talk) =>
-    toEligibleStudyBackfillTalk(
-      talk,
-      featureByTalkId.get(talk._id) ?? null,
-      transcriptByTalkId.get(talk._id)?.text
-    )
+  if (
+    !isStudyBackfillEligible({
+      draftStudy: talk.draftStudy,
+      feature,
+      status: talk.status,
+      transcript: transcript?.text,
+    })
+  ) {
+    return null;
+  }
+
+  const speaker = await ctx.db.get('speakers', talk.speakerId);
+
+  return toStudyBackfillTalk(
+    toTalkSpeakerName(speaker),
+    talk,
+    transcript?.text?.trim() ?? ''
   );
 }
 
+async function listStudyBackfillTalks(ctx: QueryCtx) {
+  const talks = await talksByStatusQuery(ctx, 'published').collect();
+  const eligible = await Promise.all(
+    talks.map(async (talk) => await loadStudyBackfillTalk(ctx, talk))
+  );
+
+  return {
+    eligible: eligible.filter((talk) => talk !== null),
+    orderedIds: talks.map((talk) => talk._id),
+  };
+}
+
 function toStudyBackfillEstimate(
-  talks: StudyBackfillTalk[],
+  eligible: StudyBackfillTalk[],
+  orderedIds: string[],
   cursor: string | null | undefined,
   limit: number
 ) {
-  const { continueCursor, isDone, page } = paginateStudyBackfillTalks(
-    talks,
+  const { continueCursor, isDone, page } = paginateStudyBackfillTalks({
     cursor,
-    limit
-  );
+    eligible,
+    limit,
+    orderedIds,
+  });
   const batch = estimateStudyGenerateCost(page);
-  const total = estimateStudyGenerateCost(talks);
+  const total = estimateStudyGenerateCost(eligible);
 
   return {
     batch: {
@@ -152,7 +179,7 @@ function toStudyBackfillEstimate(
     },
     model: TALK_SUMMARY_MODEL,
     total: {
-      eligibleCount: talks.length,
+      eligibleCount: eligible.length,
       estimatedCostUsd: total.estimatedCostUsd,
       estimatedInputTokens: total.estimatedInputTokens,
       estimatedOutputTokens: total.estimatedOutputTokens,
@@ -165,8 +192,11 @@ export const estimateStudyBackfill = query({
   handler: async (ctx, args) => {
     await requireAdmin(ctx);
 
+    const { eligible, orderedIds } = await listStudyBackfillTalks(ctx);
+
     return toStudyBackfillEstimate(
-      await listStudyBackfillTalks(ctx),
+      eligible,
+      orderedIds,
       args.cursor,
       getStudyBackfillLimit(args.limit)
     );
@@ -197,6 +227,8 @@ export const backfillStudies = action({
       status: 'failed' | 'skipped' | 'success';
       talkId: Id<'talks'>;
     }[] = [];
+    let { continueCursor } = estimate.batch;
+    let { isDone } = estimate.batch;
 
     for (const talk of estimate.batch.talks) {
       // oxlint-disable-next-line no-await-in-loop -- generate one talk at a time to cap gateway spend
@@ -206,13 +238,17 @@ export const backfillStudies = action({
       results.push(result);
 
       if (result.status === 'failed' && result.errorCode === 'TOKEN_MISSING') {
+        const completed = results.at(-2);
+
+        continueCursor = completed?.talkId ?? args.cursor ?? '';
+        isDone = false;
         break;
       }
     }
 
     return {
-      continueCursor: estimate.batch.continueCursor,
-      isDone: estimate.batch.isDone,
+      continueCursor,
+      isDone,
       results,
     };
   },

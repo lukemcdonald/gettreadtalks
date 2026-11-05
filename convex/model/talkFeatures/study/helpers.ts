@@ -95,17 +95,40 @@ export function estimateStudyGenerateCost(
   };
 }
 
-export function paginateStudyBackfillTalks<T extends { talkId: string }>(
-  talks: T[],
-  cursor: string | null | undefined,
-  limit: number
-) {
-  const startIndex = cursor
-    ? talks.findIndex((talk) => talk.talkId === cursor) + 1
-    : 0;
-  const page = talks.slice(startIndex, startIndex + limit);
+export function paginateStudyBackfillTalks<T extends { talkId: string }>({
+  cursor,
+  eligible,
+  limit,
+  orderedIds,
+}: {
+  cursor: string | null | undefined;
+  eligible: T[];
+  limit: number;
+  orderedIds: string[];
+}) {
+  const eligibleById = new Map(eligible.map((talk) => [talk.talkId, talk]));
+  const startIndex = cursor ? orderedIds.indexOf(cursor) + 1 : 0;
+  const page: T[] = [];
+
+  for (const talkId of orderedIds.slice(Math.max(startIndex, 0))) {
+    const talk = eligibleById.get(talkId);
+
+    if (!talk) {
+      continue;
+    }
+
+    page.push(talk);
+
+    if (page.length === limit) {
+      break;
+    }
+  }
+
   const last = page.at(-1);
-  const isDone = startIndex + page.length >= talks.length;
+  const lastIndex = last ? orderedIds.indexOf(last.talkId) : startIndex - 1;
+  const isDone = !orderedIds
+    .slice(lastIndex + 1)
+    .some((talkId) => eligibleById.has(talkId));
 
   return {
     continueCursor: last && !isDone ? last.talkId : '',

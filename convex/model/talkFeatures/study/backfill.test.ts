@@ -13,7 +13,11 @@ const GENERATED_STUDY_BODY = '## Main points\n\nGenerated backfill study.';
 async function seedBackfillCatalog() {
   const t = createConvexTest();
   const ids = await t.run(async (ctx) => {
-    const speakerId = await insertSpeaker(ctx);
+    const speakerId = await insertSpeaker(ctx, {
+      firstName: 'John',
+      lastName: 'Owen',
+      slug: 'john-owen',
+    });
     const eligibleA = await insertTalk(ctx, {
       publishedAt: 3,
       slug: 'eligible-a',
@@ -154,6 +158,14 @@ describe('estimateStudyBackfill', () => {
     const expectedBatch = estimateStudyGenerateCost(
       estimate.batch.talks.map((talk) => ({
         scripture: '',
+        speaker: 'John Owen',
+        title: talk.title,
+        transcriptChars: talk.transcriptChars,
+      }))
+    );
+    const withoutSpeaker = estimateStudyGenerateCost(
+      estimate.batch.talks.map((talk) => ({
+        scripture: '',
         speaker: '',
         title: talk.title,
         transcriptChars: talk.transcriptChars,
@@ -167,6 +179,12 @@ describe('estimateStudyBackfill', () => {
     ]);
     expect(estimate.batch.continueCursor).toBe(eligibleB);
     expect(estimate.batch.isDone).toBe(false);
+    expect(expectedBatch.estimatedInputTokens).toBeGreaterThan(
+      withoutSpeaker.estimatedInputTokens
+    );
+    expect(estimate.batch.estimatedInputTokens).toBe(
+      expectedBatch.estimatedInputTokens
+    );
     expect(estimate.batch.estimatedCostUsd).toBe(
       expectedBatch.estimatedCostUsd
     );
@@ -267,6 +285,89 @@ describe('backfillStudies', () => {
 
       expect(existingStudy?.body).toBe('Existing draft study.');
       expect(reviewedStudy?.body).toBe('Hand-edited study.');
+    });
+  });
+
+  it('keeps the cursor on unprocessed talks when the gateway key is missing', async () => {
+    const { asAdmin, eligibleA, eligibleB } = await seedBackfillCatalog();
+    const previousKey = process.env.AI_GATEWAY_API_KEY;
+
+    delete process.env.AI_GATEWAY_API_KEY;
+
+    try {
+      const first = await asAdmin.action(api.talkFeatures.backfillStudies, {
+        limit: 2,
+      });
+      const remaining = await asAdmin.query(
+        api.talkFeatures.estimateStudyBackfill,
+        {
+          cursor: first.continueCursor,
+          limit: 2,
+        }
+      );
+
+      expect(first).toEqual({
+        continueCursor: '',
+        isDone: false,
+        results: [
+          {
+            errorCode: 'TOKEN_MISSING',
+            status: 'failed',
+            talkId: eligibleA,
+          },
+        ],
+      });
+      expect(remaining.batch.talks.map((talk) => talk.talkId)).toEqual([
+        eligibleA,
+        eligibleB,
+      ]);
+    } finally {
+      if (previousKey === undefined) {
+        delete process.env.AI_GATEWAY_API_KEY;
+      } else {
+        process.env.AI_GATEWAY_API_KEY = previousKey;
+      }
+    }
+  });
+
+  it('does not retry a failed talk after the cursor advances past it', async () => {
+    const { asAdmin, eligibleA, eligibleB, eligibleC } =
+      await seedBackfillCatalog();
+
+    await withStudyGenerateStub(async () => {
+      talkStudyGenerator.generate = ({ title }) => {
+        if (title === 'Eligible A') {
+          return Promise.reject(new Error('upstream'));
+        }
+
+        return Promise.resolve(GENERATED_STUDY_BODY);
+      };
+
+      const first = await asAdmin.action(api.talkFeatures.backfillStudies, {
+        limit: 2,
+      });
+      const second = await asAdmin.action(api.talkFeatures.backfillStudies, {
+        cursor: first.continueCursor,
+        limit: 2,
+      });
+      const studyA = await asAdmin.query(api.talkFeatures.getTalkFeature, {
+        kind: 'study',
+        talkId: eligibleA,
+      });
+
+      expect(first.results).toEqual([
+        {
+          errorCode: 'UPSTREAM_ERROR',
+          status: 'failed',
+          talkId: eligibleA,
+        },
+        { status: 'success', talkId: eligibleB },
+      ]);
+      expect(first.continueCursor).toBe(eligibleB);
+      expect(second.results).toEqual([
+        { status: 'success', talkId: eligibleC },
+      ]);
+      expect(studyA).toBeNull();
     });
   });
 });
