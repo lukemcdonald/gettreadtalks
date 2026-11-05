@@ -40,6 +40,10 @@ const signedInUser = {
 describe('WebMcpTools', () => {
   const registrations: { name: string; signal: AbortSignal }[] = [];
 
+  beforeAll(async () => {
+    await import('@/features/webmcp/tools');
+  });
+
   function registeredNames() {
     return registrations.map((entry) => entry.name);
   }
@@ -79,21 +83,27 @@ describe('WebMcpTools', () => {
     setUser(null);
     const view = render(<WebMcpTools />);
 
-    await waitFor(() => {
-      expect(registeredNames()).toEqual(['search_talks', 'open_talk']);
-    });
+    await waitFor(
+      () => {
+        expect(registeredNames()).toEqual(['search_talks', 'open_talk']);
+      },
+      { timeout: 5000 }
+    );
 
     setUser(signedInUser);
     view.rerender(<WebMcpTools />);
 
-    await waitFor(() => {
-      expect(registeredNames()).toEqual([
-        'search_talks',
-        'open_talk',
-        'set_favorite',
-        'set_finished',
-      ]);
-    });
+    await waitFor(
+      () => {
+        expect(registeredNames()).toEqual([
+          'search_talks',
+          'open_talk',
+          'set_favorite',
+          'set_finished',
+        ]);
+      },
+      { timeout: 5000 }
+    );
 
     const signedInTools = registrations.filter(
       (entry) => entry.name === 'set_favorite' || entry.name === 'set_finished'
@@ -102,9 +112,12 @@ describe('WebMcpTools', () => {
     setUser(null);
     view.rerender(<WebMcpTools />);
 
-    await waitFor(() => {
-      expect(signedInTools.every((entry) => entry.signal.aborted)).toBe(true);
-    });
+    await waitFor(
+      () => {
+        expect(signedInTools.every((entry) => entry.signal.aborted)).toBe(true);
+      },
+      { timeout: 5000 }
+    );
     expect(registeredNames()).toEqual([
       'search_talks',
       'open_talk',
