@@ -143,7 +143,6 @@ Public reads live in `src/features/*/queries` with `'use cache'`, `cacheLife()`,
 - Put feature-specific code in a subfolder; use the same standard file names inside it where they fit.
 - `convex/model/auth/` - Authentication helpers
 - `convex/lib/` - Shared utilities
-- Client code imports only from `convex/_generated` or shared non-server modules.
 
 ### File Naming
 
