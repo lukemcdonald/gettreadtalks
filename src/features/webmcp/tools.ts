@@ -5,7 +5,7 @@ import type { WebMCP } from 'webmcp-types';
 
 import { site } from '@/configs/site';
 import { api } from '@/convex/_generated/api';
-import { normalizeSearchQuery } from '@/convex/model/search/helpers';
+import { normalizeSearchQuery } from '@/convex/model/search/normalize';
 import { formatTalk } from '@/features/mcp/format';
 import { buildSearchPageHref } from '@/features/search/utils';
 

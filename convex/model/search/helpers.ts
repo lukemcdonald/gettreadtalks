@@ -8,6 +8,9 @@ import { v } from 'convex/values';
 import { paginateSearchOrList } from '../../lib/utils';
 import { publishStateFilter } from '../../lib/validators/shared';
 import { requireAdmin } from '../auth/helpers';
+import { normalizeSearchQuery } from './normalize';
+
+export { normalizeSearchQuery } from './normalize';
 
 export const adminListArgs = {
   paginationOpts: paginationOptsValidator,
@@ -17,10 +20,6 @@ export const adminListArgs = {
 
 export const DEFAULT_SEARCH_LIMIT = 12;
 export const LIST_SEARCH_LIMIT = 100;
-
-export function normalizeSearchQuery(query: string) {
-  return query.trim().replaceAll(/\s+/gu, ' ');
-}
 
 export function searchPhrases(query: string) {
   const normalized = normalizeSearchQuery(query);
