@@ -11,7 +11,6 @@ import { components, internal } from './_generated/api';
 import { internalAction, internalMutation } from './_generated/server';
 import { MediaHealthEmail } from './emails/mediaHealth';
 import { ResetPasswordTemplate } from './emails/resetPassword';
-import { VerifyEmailTemplate } from './emails/verifyEmail';
 import { WelcomeEmail } from './emails/welcome';
 import { throwConvexError } from './lib/errors';
 import { reportSentryException } from './lib/sentry';
@@ -29,13 +28,7 @@ const CHECK_SEND_RESULT_DELAY_MS = 45_000;
 // Resend's own retry ladder can take up to ~15 minutes to exhaust.
 const CHECK_SEND_RESULT_MAX_BUDGET_MS = 20 * 60 * 1000;
 
-const EMAIL_KINDS = [
-  'mediaHealth',
-  'passwordReset',
-  'test',
-  'verification',
-  'welcome',
-] as const;
+const EMAIL_KINDS = ['mediaHealth', 'passwordReset', 'welcome'] as const;
 type EmailKind = (typeof EMAIL_KINDS)[number];
 const vEmailKind = v.union(...EMAIL_KINDS.map((kind) => v.literal(kind)));
 
@@ -229,67 +222,6 @@ export const sendPasswordResetEmail = internalAction({
         cause: formatErrorMessage(error),
         resource: 'email',
         resourceId: 'passwordReset',
-      });
-    }
-  },
-  returns: v.null(),
-});
-
-export const sendTestEmail = internalMutation({
-  handler: async (ctx) => {
-    await sendTrackedEmail(
-      ctx,
-      {
-        from: getFromAddress(),
-        html: '<p>This is a test email</p>',
-        replyTo: [getReplyToAddress()],
-        subject: `Test email from ${site.name}`,
-        text: 'This is a test email',
-        to: process.env.RESEND_TO_EMAIL || TEST_DOMAIN_EMAIL,
-      },
-      'test'
-    );
-  },
-});
-
-export const sendVerificationEmail = internalAction({
-  args: {
-    email: v.string(),
-    token: v.string(),
-    verificationUrl: v.string(),
-  },
-  handler: async (ctx, args) => {
-    if (shouldSkipTestModeSend(args.email)) {
-      console.log('Skipping verification email in Resend test mode');
-      return null;
-    }
-
-    try {
-      const template = VerifyEmailTemplate({
-        email: args.email,
-        token: args.token,
-        verificationUrl: args.verificationUrl,
-      });
-      const { html, text } = await renderEmail(template);
-
-      await sendTrackedEmail(
-        ctx,
-        {
-          from: getFromAddress(),
-          html,
-          replyTo: [getReplyToAddress()],
-          subject: 'Verify your email address',
-          text,
-          to: args.email,
-        },
-        'verification'
-      );
-    } catch (error) {
-      await reportEmailSendFailure('verification', error);
-      throwConvexError(500, 'Failed to send verification email', {
-        cause: formatErrorMessage(error),
-        resource: 'email',
-        resourceId: 'verification',
       });
     }
   },

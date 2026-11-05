@@ -12,7 +12,7 @@ import { query } from '../../_generated/server';
 import { getTopicComparator } from '../../lib/sort';
 import { enrichWithSpeaker, paginateArray } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
-import { doc, docs } from '../../lib/validators/schema';
+import { doc } from '../../lib/validators/schema';
 import { requireAdmin } from '../auth/helpers';
 import {
   LIST_SEARCH_LIMIT,
@@ -156,16 +156,6 @@ export const listTopicSlugs = query({
       updatedAt: v.number(),
     })
   ),
-});
-
-/**
- * List topics that have at least one published talk.
- * Returns topics sorted alphabetically by title.
- */
-export const listTopics = query({
-  args: {},
-  handler: async (ctx) => await listPublishedTopics(ctx),
-  returns: docs('topics'),
 });
 
 /**

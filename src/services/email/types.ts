@@ -22,11 +22,6 @@ export type PasswordResetEmailProps = EmailTemplateProps & {
   token: string;
 };
 
-export type VerificationEmailProps = EmailTemplateProps & {
-  token: string;
-  verificationUrl: string;
-};
-
 export type WelcomeEmailProps = EmailTemplateProps & {
   name: string;
   siteUrl: string;

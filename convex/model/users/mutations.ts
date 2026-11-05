@@ -11,7 +11,7 @@ import {
   throwNotFound,
   throwValidationError,
 } from '../../lib/errors';
-import { getUserId, requireAdmin } from '../auth/helpers';
+import { loadUserId } from '../auth/helpers';
 import { userRole } from './validators';
 
 async function requirePublishedTalk(ctx: MutationCtx, talkId: Id<'talks'>) {
@@ -27,63 +27,6 @@ async function requirePublishedTalk(ctx: MutationCtx, talkId: Id<'talks'>) {
   return talk;
 }
 
-async function requirePublishedClip(ctx: MutationCtx, clipId: Id<'clips'>) {
-  const clip = await ctx.db.get('clips', clipId);
-
-  if (!clip || clip.status !== 'published') {
-    throwNotFound('Clip not found', {
-      resource: 'clips',
-      resourceId: clipId,
-    });
-  }
-
-  if (!clip.talkId) {
-    return clip;
-  }
-
-  const talk = await ctx.db.get('talks', clip.talkId);
-
-  if (talk?.status !== 'published') {
-    throwNotFound('Clip not found', {
-      resource: 'clips',
-      resourceId: clipId,
-    });
-  }
-
-  return clip;
-}
-
-/**
- * Add a clip to user favorites.
- */
-export const favoriteClip = mutation({
-  args: {
-    clipId: v.id('clips'),
-  },
-  handler: async (ctx, args) => {
-    const userId = await getUserId(ctx);
-
-    await requirePublishedClip(ctx, args.clipId);
-
-    const existing = await ctx.db
-      .query('userFavoriteClips')
-      .withIndex('by_userId_and_clipId', (q) =>
-        q.eq('userId', userId).eq('clipId', args.clipId)
-      )
-      .first();
-
-    if (existing) {
-      throwValidationError('Clip already favorited');
-    }
-
-    return await ctx.db.insert('userFavoriteClips', {
-      clipId: args.clipId,
-      userId,
-    });
-  },
-  returns: v.id('userFavoriteClips'),
-});
-
 /**
  * Add a speaker to user favorites.
  */
@@ -92,7 +35,7 @@ export const favoriteSpeaker = mutation({
     speakerId: v.id('speakers'),
   },
   handler: async (ctx, args) => {
-    const userId = await getUserId(ctx);
+    const userId = await loadUserId(ctx);
 
     const existing = await ctx.db
       .query('userFavoriteSpeakers')
@@ -121,7 +64,7 @@ export const favoriteTalk = mutation({
     talkId: v.id('talks'),
   },
   handler: async (ctx, args) => {
-    const userId = await getUserId(ctx);
+    const userId = await loadUserId(ctx);
 
     await requirePublishedTalk(ctx, args.talkId);
 
@@ -152,7 +95,7 @@ export const finishTalk = mutation({
     talkId: v.id('talks'),
   },
   handler: async (ctx, args) => {
-    const userId = await getUserId(ctx);
+    const userId = await loadUserId(ctx);
 
     await requirePublishedTalk(ctx, args.talkId);
 
@@ -183,7 +126,7 @@ export const unfavoriteClip = mutation({
     clipId: v.id('clips'),
   },
   handler: async (ctx, args) => {
-    const userId = await getUserId(ctx);
+    const userId = await loadUserId(ctx);
 
     const favorite = await ctx.db
       .query('userFavoriteClips')
@@ -211,7 +154,7 @@ export const unfavoriteSpeaker = mutation({
     speakerId: v.id('speakers'),
   },
   handler: async (ctx, args) => {
-    const userId = await getUserId(ctx);
+    const userId = await loadUserId(ctx);
 
     const favorite = await ctx.db
       .query('userFavoriteSpeakers')
@@ -239,7 +182,7 @@ export const unfavoriteTalk = mutation({
     talkId: v.id('talks'),
   },
   handler: async (ctx, args) => {
-    const userId = await getUserId(ctx);
+    const userId = await loadUserId(ctx);
 
     const favorite = await ctx.db
       .query('userFavoriteTalks')
@@ -267,7 +210,7 @@ export const unfinishTalk = mutation({
     talkId: v.id('talks'),
   },
   handler: async (ctx, args) => {
-    const userId = await getUserId(ctx);
+    const userId = await loadUserId(ctx);
 
     const finished = await ctx.db
       .query('userFinishedTalks')
@@ -382,7 +325,7 @@ export const updateUserPassword = mutation({
  * Use this to set the first admin or manage roles programmatically.
  * Can be called from Convex Dashboard or CLI:
  * - Dashboard: Functions → internal.model.users.mutations.setUserRoleInternal
- * - CLI: npx convex run internal.model.users.mutations.setUserRoleInternal '{"userId":"...","role":"admin"}'
+ * - CLI: npx convex run internal.model.users.mutations.setUserRoleInternal '{"role":"admin","userId":"..."}'
  */
 export const setUserRoleInternal = internalMutation({
   args: {
@@ -396,30 +339,6 @@ export const setUserRoleInternal = internalMutation({
         userId: args.userId,
       },
       headers: {},
-    });
-
-    return args.userId;
-  },
-  returns: v.string(),
-});
-
-/**
- * Set a user's role (admin only).
- */
-export const setUserRole = mutation({
-  args: {
-    role: userRole,
-    userId: v.string(),
-  },
-  handler: async (ctx, args) => {
-    await requireAdmin(ctx);
-
-    await createAuth(ctx).api.setRole({
-      body: {
-        role: args.role,
-        userId: args.userId,
-      },
-      headers: await authComponent.getHeaders(ctx),
     });
 
     return args.userId;

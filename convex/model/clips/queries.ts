@@ -1,4 +1,3 @@
-import type { Doc } from '../../_generated/dataModel';
 import type { ContentSortOption } from '../../lib/sort';
 
 import { getOneFrom } from 'convex-helpers/server/relationships';
@@ -12,9 +11,9 @@ import { query } from '../../_generated/server';
 import { filterClipsWithPublishedTalk } from '../../lib/filters';
 import { getContentComparator } from '../../lib/sort';
 import { paginateArray, toPublicTalk } from '../../lib/utils';
-import { doc, docs } from '../../lib/validators/schema';
+import { doc } from '../../lib/validators/schema';
 import { statusFilterType } from '../../lib/validators/shared';
-import { canViewContent, getCurrentUser, requireAdmin } from '../auth/helpers';
+import { canViewContent, loadCurrentUser, requireAdmin } from '../auth/helpers';
 import {
   LIST_SEARCH_LIMIT,
   listAllAdmin,
@@ -95,7 +94,7 @@ export const getClipBySlug = query({
       return null;
     }
 
-    const user = await getCurrentUser(ctx);
+    const user = await loadCurrentUser(ctx);
 
     // Non-admin users can only view published clips
     if (!canViewContent(user, clip.status)) {
@@ -204,47 +203,6 @@ export const listClips = query({
     };
   },
   returns: clipPageWithSpeakersValidator,
-});
-
-/**
- * List clips by speaker.
- */
-export const listClipsBySpeaker = query({
-  args: {
-    limit: v.optional(v.number()),
-    speakerId: v.id('speakers'),
-  },
-  handler: async (ctx, args) => {
-    const { limit = 20, speakerId } = args;
-
-    if (limit <= 0) {
-      return [];
-    }
-
-    const visible: Doc<'clips'>[] = [];
-    const clips = ctx.db
-      .query('clips')
-      .withIndex('by_speakerId_and_status', (q) =>
-        q.eq('speakerId', speakerId).eq('status', 'published')
-      )
-      .order('desc');
-
-    for await (const clip of clips) {
-      // oxlint-disable-next-line no-await-in-loop -- stop at the requested number of public clips
-      const [published] = await filterClipsWithPublishedTalk(ctx, [clip]);
-
-      if (published) {
-        visible.push(published);
-      }
-
-      if (visible.length >= limit) {
-        break;
-      }
-    }
-
-    return visible;
-  },
-  returns: docs('clips'),
 });
 
 /**

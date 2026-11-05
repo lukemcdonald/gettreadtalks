@@ -8,7 +8,7 @@ import {
 import { v } from 'convex/values';
 
 import { internalQuery } from '../../_generated/server';
-import { mediaCheckEntityTable, mediaCheckStatus } from './validators';
+import { mediaCheckEntityTable } from './validators';
 
 const publishedMediaItemValidator = v.object({
   entityId: v.string(),
@@ -17,30 +17,6 @@ const publishedMediaItemValidator = v.object({
   slug: v.string(),
   speakerSlug: v.optional(v.string()),
   title: v.string(),
-});
-
-export const getMediaCheck = internalQuery({
-  args: {
-    entityId: v.string(),
-    entityTable: mediaCheckEntityTable,
-    mediaUrl: v.string(),
-  },
-  handler: async (ctx, args) => await loadMediaCheckByEntityUrl(ctx, args),
-  returns: v.union(
-    v.null(),
-    v.object({
-      _creationTime: v.number(),
-      _id: v.id('mediaChecks'),
-      checkedAt: v.number(),
-      entityId: v.string(),
-      entityTable: mediaCheckEntityTable,
-      firstBrokenAt: v.optional(v.number()),
-      lastNotifiedAt: v.optional(v.number()),
-      lastNotifiedStatus: v.optional(mediaCheckStatus),
-      mediaUrl: v.string(),
-      status: mediaCheckStatus,
-    })
-  ),
 });
 
 export const listPublishedMediaPage = internalQuery({

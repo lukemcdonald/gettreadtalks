@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest';
 import { api } from '../../_generated/api';
 import { ErrorCodes } from '../../lib/errors';
 import { createConvexTest, signInAs } from '../../test.setup';
-import { insertAffiliateLink } from '../affiliateLinks/test.factory';
 import { insertClip } from '../clips/test.factory';
 import { insertCollection } from '../collections/test.factory';
 import { insertSpeaker } from '../speakers/test.factory';
@@ -54,10 +53,8 @@ async function seedCatalog(t: ReturnType<typeof createConvexTest>) {
       title: 'Unused Collection',
     });
     const clipId = await insertClip(ctx);
-    const affiliateLinkId = await insertAffiliateLink(ctx);
 
     return {
-      affiliateLinkId,
       clipId,
       collectionId,
       speakerId,
@@ -73,30 +70,6 @@ const gatedFunctions: {
   call: (client: TestClient, seed: Seed) => Promise<unknown>;
   name: string;
 }[] = [
-  {
-    call: (client) =>
-      client.mutation(api.affiliateLinks.createAffiliateLink, {
-        title: 'A new book',
-        type: 'book',
-        url: 'https://example.test/new-book',
-      }),
-    name: 'affiliateLinks.createAffiliateLink',
-  },
-  {
-    call: (client, seed) =>
-      client.mutation(api.affiliateLinks.destroyAffiliateLink, {
-        affiliateLinkId: seed.affiliateLinkId,
-      }),
-    name: 'affiliateLinks.destroyAffiliateLink',
-  },
-  {
-    call: (client, seed) =>
-      client.mutation(api.affiliateLinks.updateAffiliateLink, {
-        affiliateLinkId: seed.affiliateLinkId,
-        title: 'Updated book',
-      }),
-    name: 'affiliateLinks.updateAffiliateLink',
-  },
   {
     call: (client, seed) =>
       client.mutation(api.clips.archiveClip, { clipId: seed.clipId }),
@@ -189,10 +162,6 @@ const gatedFunctions: {
     call: (client, seed) =>
       client.query(api.speakers.getSpeaker, { speakerId: seed.speakerId }),
     name: 'speakers.getSpeaker',
-  },
-  {
-    call: (client) => client.query(api.speakers.getSpeakersCount, {}),
-    name: 'speakers.getSpeakersCount',
   },
   {
     call: (client) =>
@@ -296,10 +265,6 @@ const gatedFunctions: {
     name: 'talks.listTalkTopics',
   },
   {
-    call: (client) => client.query(api.talks.listTalkTranscripts, {}),
-    name: 'talks.listTalkTranscripts',
-  },
-  {
     call: (client) => client.query(api.talks.listTalksWithoutTranscript, {}),
     name: 'talks.listTalksWithoutTranscript',
   },
@@ -328,14 +293,6 @@ const gatedFunctions: {
     name: 'talks.updateTalkTranscript',
   },
   {
-    call: (client, seed) =>
-      client.mutation(api.topics.addTalkToTopic, {
-        talkId: seed.talkId,
-        topicId: seed.unusedTopicId,
-      }),
-    name: 'topics.addTalkToTopic',
-  },
-  {
     call: (client) =>
       client.mutation(api.topics.createTopic, { title: 'A new topic' }),
     name: 'topics.createTopic',
@@ -354,14 +311,6 @@ const gatedFunctions: {
     call: (client) =>
       client.query(api.topics.listAllTopics, { paginationOpts }),
     name: 'topics.listAllTopics',
-  },
-  {
-    call: (client, seed) =>
-      client.mutation(api.topics.removeTalkFromTopic, {
-        talkId: seed.talkId,
-        topicId: seed.topicId,
-      }),
-    name: 'topics.removeTalkFromTopic',
   },
   {
     call: (client, seed) =>

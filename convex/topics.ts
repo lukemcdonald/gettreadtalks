@@ -6,16 +6,9 @@ export const {
   getTopicBySlug,
   listAllTopics,
   listTopicSlugs,
-  listTopics,
   listTopicsWithCount,
   listTopicsWithTalks,
 } = queries;
 
 // Mutations
-export const {
-  addTalkToTopic,
-  createTopic,
-  destroyTopic,
-  removeTalkFromTopic,
-  updateTopic,
-} = mutations;
+export const { createTopic, destroyTopic, updateTopic } = mutations;

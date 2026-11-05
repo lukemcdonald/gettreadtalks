@@ -10,52 +10,6 @@ import { requireAdmin } from '../auth/helpers';
 import { toTopicUpdates } from './helpers';
 
 /**
- * Add a talk to a topic.
- */
-export const addTalkToTopic = mutation({
-  args: {
-    talkId: v.id('talks'),
-    topicId: v.id('topics'),
-  },
-  handler: async (ctx, args) => {
-    await requireAdmin(ctx);
-
-    const talk = await ctx.db.get('talks', args.talkId);
-    if (!talk) {
-      throwNotFound('Talk not found', {
-        resource: 'talk',
-        resourceId: args.talkId,
-      });
-    }
-
-    const topic = await ctx.db.get('topics', args.topicId);
-    if (!topic) {
-      throwNotFound('Topic not found', {
-        resource: 'topic',
-        resourceId: args.topicId,
-      });
-    }
-
-    const existing = await ctx.db
-      .query('talksOnTopics')
-      .withIndex('by_talkId_and_topicId', (q) =>
-        q.eq('talkId', args.talkId).eq('topicId', args.topicId)
-      )
-      .unique();
-
-    if (existing) {
-      throwValidationError('Talk is already associated with this topic');
-    }
-
-    return await ctx.db.insert('talksOnTopics', {
-      talkId: args.talkId,
-      topicId: args.topicId,
-    });
-  },
-  returns: v.id('talksOnTopics'),
-});
-
-/**
  * Create a new topic.
  */
 export const createTopic = mutation({
@@ -114,35 +68,6 @@ export const destroyTopic = mutation({
 
     // Hard delete the topic
     await ctx.db.delete(args.id);
-
-    return null;
-  },
-  returns: v.null(),
-});
-
-/**
- * Remove a talk from a topic.
- */
-export const removeTalkFromTopic = mutation({
-  args: {
-    talkId: v.id('talks'),
-    topicId: v.id('topics'),
-  },
-  handler: async (ctx, args) => {
-    await requireAdmin(ctx);
-
-    const association = await ctx.db
-      .query('talksOnTopics')
-      .withIndex('by_talkId_and_topicId', (q) =>
-        q.eq('talkId', args.talkId).eq('topicId', args.topicId)
-      )
-      .first();
-
-    if (!association) {
-      throwNotFound('Association not found', { resource: 'talksOnTopics' });
-    }
-
-    await ctx.db.delete(association._id);
 
     return null;
   },

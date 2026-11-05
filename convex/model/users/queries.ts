@@ -1,12 +1,12 @@
 import { v } from 'convex/values';
 
 import { query } from '../../_generated/server';
-import { getCurrentUser as getAuthUser } from '../auth/helpers';
+import { loadCurrentUser } from '../auth/helpers';
 import {
-  getUserFavoriteClips,
-  getUserFavoriteSpeakers,
-  getUserFavoriteTalks,
-  getUserFinishedTalks,
+  listUserFavoriteClips,
+  listUserFavoriteSpeakers,
+  listUserFavoriteTalks,
+  listUserFinishedTalks as listFinishedTalksForUser,
 } from './helpers';
 
 /**
@@ -14,34 +14,8 @@ import {
  */
 export const getCurrentUser = query({
   args: {},
-  handler: async (ctx) => await getAuthUser(ctx),
+  handler: async (ctx) => await loadCurrentUser(ctx),
   returns: v.nullable(v.any()),
-});
-
-/**
- * Check if user has favorited a clip.
- */
-export const isClipFavorited = query({
-  args: {
-    clipId: v.id('clips'),
-  },
-  handler: async (ctx, args) => {
-    const user = await getAuthUser(ctx);
-
-    if (!user) {
-      return false;
-    }
-
-    const favorite = await ctx.db
-      .query('userFavoriteClips')
-      .withIndex('by_userId_and_clipId', (q) =>
-        q.eq('userId', user._id).eq('clipId', args.clipId)
-      )
-      .first();
-
-    return favorite !== null;
-  },
-  returns: v.boolean(),
 });
 
 /**
@@ -52,7 +26,7 @@ export const isSpeakerFavorited = query({
     speakerId: v.id('speakers'),
   },
   handler: async (ctx, args) => {
-    const user = await getAuthUser(ctx);
+    const user = await loadCurrentUser(ctx);
 
     if (!user) {
       return false;
@@ -78,7 +52,7 @@ export const isTalkFavorited = query({
     talkId: v.id('talks'),
   },
   handler: async (ctx, args) => {
-    const user = await getAuthUser(ctx);
+    const user = await loadCurrentUser(ctx);
 
     if (!user) {
       return false;
@@ -104,7 +78,7 @@ export const isTalkFinished = query({
     talkId: v.id('talks'),
   },
   handler: async (ctx, args) => {
-    const user = await getAuthUser(ctx);
+    const user = await loadCurrentUser(ctx);
 
     if (!user) {
       return false;
@@ -130,7 +104,7 @@ export const listUserFavorites = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const user = await getAuthUser(ctx);
+    const user = await loadCurrentUser(ctx);
 
     if (!user) {
       return {
@@ -144,9 +118,9 @@ export const listUserFavorites = query({
     const limit = args.limit ?? 100;
 
     const [clips, speakers, talks] = await Promise.all([
-      getUserFavoriteClips(ctx, userId, limit),
-      getUserFavoriteSpeakers(ctx, userId, limit),
-      getUserFavoriteTalks(ctx, userId, limit),
+      listUserFavoriteClips(ctx, userId, limit),
+      listUserFavoriteSpeakers(ctx, userId, limit),
+      listUserFavoriteTalks(ctx, userId, limit),
     ]);
 
     return {
@@ -170,7 +144,7 @@ export const listUserFinishedTalks = query({
     limit: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const user = await getAuthUser(ctx);
+    const user = await loadCurrentUser(ctx);
 
     if (!user) {
       return [];
@@ -178,7 +152,7 @@ export const listUserFinishedTalks = query({
 
     const limit = args.limit ?? 100;
 
-    return await getUserFinishedTalks(ctx, user._id, limit);
+    return await listFinishedTalksForUser(ctx, user._id, limit);
   },
   returns: v.array(v.any()),
 });
