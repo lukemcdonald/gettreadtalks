@@ -9,6 +9,7 @@ import { getManyVia } from 'convex-helpers/server/relationships';
 import { enrichWithSpeaker } from '../../lib/utils';
 import {
   DEFAULT_SEARCH_LIMIT,
+  loadAccepted,
   searchTitleQuery,
   uniqueById,
 } from '../search/helpers';
@@ -147,16 +148,36 @@ export async function searchTalks(
     .take(limit);
 }
 
+async function filterTalksWithSpeaker(ctx: QueryCtx, talks: Doc<'talks'>[]) {
+  const speakers = await Promise.all(
+    talks.map((talk) => ctx.db.get('speakers', talk.speakerId))
+  );
+
+  return talks.filter((_, index) => speakers[index] !== null);
+}
+
 export async function searchPublishedTalks(
   ctx: QueryCtx,
   queryText: string,
   limit: number
 ) {
-  return await searchTalks(ctx, queryText, limit, 'published');
+  return await loadAccepted(
+    ctx.db
+      .query('talks')
+      .withSearchIndex(
+        'search_title',
+        searchTitleQuery(queryText, 'published')
+      ),
+    async (talk) => {
+      const speaker = await ctx.db.get('speakers', talk.speakerId);
+
+      return speaker !== null;
+    },
+    limit
+  );
 }
 
-/** Title matches plus talks by speakers whose names match. */
-export async function searchTalksByTitleOrSpeaker(
+async function loadTalksByNamedSpeakers(
   ctx: QueryCtx,
   queryText: string,
   limit: number,
@@ -164,13 +185,14 @@ export async function searchTalksByTitleOrSpeaker(
 ) {
   const searchSpeakersByName =
     status === 'published' ? searchPublishedSpeakers : searchSpeakers;
-  const [titleHits, speakers] = await Promise.all([
-    searchTalks(ctx, queryText, limit, status),
-    searchSpeakersByName(ctx, queryText, DEFAULT_SEARCH_LIMIT),
-  ]);
+  const speakers = await searchSpeakersByName(
+    ctx,
+    queryText,
+    DEFAULT_SEARCH_LIMIT
+  );
 
   if (speakers.length === 0) {
-    return titleHits;
+    return [];
   }
 
   const speakerTalkPages = await Promise.all(
@@ -187,11 +209,35 @@ export async function searchTalksByTitleOrSpeaker(
         .take(limit)
     )
   );
+  const talks = uniqueById(speakerTalkPages.flat());
 
-  return uniqueById<Doc<'talks'>>([
-    ...titleHits,
-    ...speakerTalkPages.flat(),
-  ]).slice(0, limit);
+  if (status !== 'published') {
+    return talks.slice(0, limit);
+  }
+
+  const publishedTalks = await filterTalksWithSpeaker(ctx, talks);
+
+  return publishedTalks.slice(0, limit);
+}
+
+/** Title matches plus talks by speakers whose names match. */
+export async function searchTalksByTitleOrSpeaker(
+  ctx: QueryCtx,
+  queryText: string,
+  limit: number,
+  status?: StatusFilterType
+) {
+  const [titleHits, speakerTalks] = await Promise.all([
+    status === 'published'
+      ? searchPublishedTalks(ctx, queryText, limit)
+      : searchTalks(ctx, queryText, limit, status),
+    loadTalksByNamedSpeakers(ctx, queryText, limit, status),
+  ]);
+
+  return uniqueById<Doc<'talks'>>([...titleHits, ...speakerTalks]).slice(
+    0,
+    limit
+  );
 }
 
 export async function searchPublishedTalksByTitleOrSpeaker(
