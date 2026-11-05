@@ -6,10 +6,9 @@ import type { PaginationOptions } from 'convex/server';
 import { asyncMap } from 'convex-helpers';
 import { getManyVia } from 'convex-helpers/server/relationships';
 
-import { enrichWithSpeaker } from '../../lib/utils';
+import { enrichWithSpeaker, loadUntilFull } from '../../lib/utils';
 import {
   DEFAULT_SEARCH_LIMIT,
-  loadAccepted,
   searchTitleQuery,
   uniqueById,
 } from '../search/helpers';
@@ -161,7 +160,7 @@ export async function searchPublishedTalks(
   queryText: string,
   limit: number
 ) {
-  return await loadAccepted(
+  return await loadUntilFull(
     ctx.db
       .query('talks')
       .withSearchIndex(

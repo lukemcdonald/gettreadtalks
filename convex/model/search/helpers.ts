@@ -109,34 +109,3 @@ export async function listAllAdmin<T, TPage>(
     page: await enrich(result.page),
   };
 }
-
-/**
- * Read a search stream until `limit` rows survive `accept`, or the source ends.
- * Convex allows only one `.paginate()` per query, so site search cannot use `loadFullPage`.
- */
-export async function loadAccepted<T>(
-  source: AsyncIterable<T>,
-  accept: (item: T) => Promise<boolean> | boolean,
-  limit: number
-): Promise<T[]> {
-  const page: T[] = [];
-
-  if (limit < 1) {
-    return page;
-  }
-
-  for await (const item of source) {
-    // oxlint-disable-next-line no-await-in-loop -- stop once the page is full
-    if (!(await accept(item))) {
-      continue;
-    }
-
-    page.push(item);
-
-    if (page.length >= limit) {
-      break;
-    }
-  }
-
-  return page;
-}

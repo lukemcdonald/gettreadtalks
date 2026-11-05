@@ -6,7 +6,8 @@ import type { PaginationOptions } from 'convex/server';
 import { asyncMap } from 'convex-helpers';
 
 import { filterClipsWithPublishedTalk } from '../../lib/filters';
-import { loadAccepted, searchTitleQuery } from '../search/helpers';
+import { loadUntilFull } from '../../lib/utils';
+import { searchTitleQuery } from '../search/helpers';
 
 function publishedClipsQuery(ctx: QueryCtx) {
   return ctx.db
@@ -51,7 +52,7 @@ export async function searchPublishedClips(
   queryText: string,
   limit: number
 ) {
-  return await loadAccepted(
+  return await loadUntilFull(
     ctx.db
       .query('clips')
       .withSearchIndex(
@@ -59,9 +60,13 @@ export async function searchPublishedClips(
         searchTitleQuery(queryText, 'published')
       ),
     async (clip) => {
-      const accepted = await filterClipsWithPublishedTalk(ctx, [clip]);
+      if (!clip.talkId) {
+        return true;
+      }
 
-      return accepted.length > 0;
+      const talk = await ctx.db.get('talks', clip.talkId);
+
+      return talk?.status === 'published';
     },
     limit
   );

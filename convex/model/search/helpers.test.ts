@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest';
 import {
   DEFAULT_SEARCH_LIMIT,
   LIST_SEARCH_LIMIT,
-  loadAccepted,
   normalizeSearchLimit,
   searchPhrases,
   uniqueById,
@@ -54,30 +53,6 @@ describe('searchPhrases', () => {
       'John',
       'Piper',
     ]);
-  });
-});
-
-describe('loadAccepted', () => {
-  async function* numbers() {
-    yield* [1, 2, 3, 4, 5];
-  }
-
-  it('reads past rejected rows until the page is full', async () => {
-    const page = await loadAccepted(numbers(), (value) => value % 2 === 0, 2);
-
-    expect(page).toEqual([2, 4]);
-  });
-
-  it('stops when the source ends even if every row was rejected', async () => {
-    const page = await loadAccepted(numbers(), (value) => value > 10, 2);
-
-    expect(page).toEqual([]);
-  });
-
-  it('returns nothing when the limit is below one', async () => {
-    const page = await loadAccepted(numbers(), () => true, 0);
-
-    expect(page).toEqual([]);
   });
 });
 

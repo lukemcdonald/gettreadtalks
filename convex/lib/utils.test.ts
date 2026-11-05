@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   getPublishedAtForStatus,
   loadFullPage,
+  loadUntilFull,
   paginateArray,
   paginateSearchOrList,
   slugify,
@@ -300,5 +301,29 @@ describe('loadFullPage', () => {
       isDone: true,
       page: [],
     });
+  });
+});
+
+describe('loadUntilFull', () => {
+  async function* numbers() {
+    yield* [1, 2, 3, 4, 5];
+  }
+
+  it('reads past rejected rows until the page is full', async () => {
+    const page = await loadUntilFull(numbers(), (value) => value % 2 === 0, 2);
+
+    expect(page).toEqual([2, 4]);
+  });
+
+  it('stops when the source ends even if every row was rejected', async () => {
+    const page = await loadUntilFull(numbers(), (value) => value > 10, 2);
+
+    expect(page).toEqual([]);
+  });
+
+  it('returns nothing when the limit is below one', async () => {
+    const page = await loadUntilFull(numbers(), () => true, 0);
+
+    expect(page).toEqual([]);
   });
 });
