@@ -7,7 +7,6 @@ export const {
   listAllClips,
   listClipSlugs,
   listClips,
-  listClipsBySpeaker,
 } = queries;
 
 // Mutations

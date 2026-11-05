@@ -152,21 +152,6 @@ export const listSpeakerSlugs = query({
   ),
 });
 
-/**
- * Get total count of speakers.
- */
-export const getSpeakersCount = query({
-  args: {},
-  handler: async (ctx) => {
-    await requireAdmin(ctx);
-
-    const speakers = await ctx.db.query('speakers').collect();
-
-    return speakers.length;
-  },
-  returns: v.number(),
-});
-
 const FEATURED_SPEAKER_POOL = 50;
 
 /**

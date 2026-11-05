@@ -29,10 +29,7 @@ export {
   stampMediaChecksNotified,
   upsertMediaCheck,
 } from './model/mediaHealth/mutations';
-export {
-  getMediaCheck,
-  listPublishedMediaPage,
-} from './model/mediaHealth/queries';
+export { listPublishedMediaPage } from './model/mediaHealth/queries';
 
 export const checkPublishedMedia = internalAction({
   args: {},

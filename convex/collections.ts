@@ -7,7 +7,6 @@ export const {
   listAllCollections,
   listCollectionSlugs,
   listCollections,
-  listCollectionsBySpeaker,
 } = queries;
 
 // Mutations

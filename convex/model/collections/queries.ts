@@ -1,5 +1,5 @@
 import { asyncMap } from 'convex-helpers';
-import { getAll, getOneFrom } from 'convex-helpers/server/relationships';
+import { getOneFrom } from 'convex-helpers/server/relationships';
 import {
   paginationOptsValidator,
   paginationResultValidator,
@@ -116,38 +116,6 @@ export const getCollectionBySlug = query({
       talks: v.array(talkWithSpeakerValidator),
     })
   ),
-});
-
-/**
- * List collections by speaker. Returns collections that contain talks by the speaker.
- */
-export const listCollectionsBySpeaker = query({
-  args: {
-    speakerId: v.id('speakers'),
-  },
-  handler: async (ctx, args) => {
-    // Get all published talks by speaker
-    const talks = await ctx.db
-      .query('talks')
-      .withIndex('by_speakerId_and_status', (q) =>
-        q.eq('speakerId', args.speakerId).eq('status', 'published')
-      )
-      .collect();
-
-    // Get unique collection IDs (filter out talks without collections)
-    const collectionIds = [
-      ...new Set(
-        talks.flatMap((talk) => (talk.collectionId ? [talk.collectionId] : []))
-      ),
-    ];
-    const collections = await getAll(ctx.db, collectionIds);
-    const validCollections = collections.filter(
-      (collection) => collection !== null
-    );
-
-    return validCollections;
-  },
-  returns: docs('collections'),
 });
 
 /**

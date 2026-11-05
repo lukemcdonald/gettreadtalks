@@ -2,10 +2,7 @@ import type { MutationCtx, QueryCtx } from '../../_generated/server';
 
 import { deleteAll } from '../../lib/utils';
 
-/**
- * Get user's favorite clips with clip data.
- */
-export async function getUserFavoriteClips(
+export async function listUserFavoriteClips(
   ctx: QueryCtx,
   userId: string,
   limit: number
@@ -33,10 +30,7 @@ export async function getUserFavoriteClips(
   return enriched.filter((x): x is NonNullable<typeof x> => x !== null);
 }
 
-/**
- * Get user's favorite speakers with speaker data.
- */
-export async function getUserFavoriteSpeakers(
+export async function listUserFavoriteSpeakers(
   ctx: QueryCtx,
   userId: string,
   limit: number
@@ -65,10 +59,7 @@ export async function getUserFavoriteSpeakers(
   return enriched.filter((x): x is NonNullable<typeof x> => x !== null);
 }
 
-/**
- * Get user's favorite talks with talk and speaker data.
- */
-export async function getUserFavoriteTalks(
+export async function listUserFavoriteTalks(
   ctx: QueryCtx,
   userId: string,
   limit: number
@@ -105,10 +96,7 @@ export async function getUserFavoriteTalks(
   return enriched.filter((x): x is NonNullable<typeof x> => x !== null);
 }
 
-/**
- * Get user's finished talks with talk and speaker data.
- */
-export async function getUserFinishedTalks(
+export async function listUserFinishedTalks(
   ctx: QueryCtx,
   userId: string,
   limit: number

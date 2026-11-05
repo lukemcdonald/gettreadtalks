@@ -8,7 +8,6 @@
  * @module
  */
 
-import type * as affiliateLinks from "../affiliateLinks.js";
 import type * as auth from "../auth.js";
 import type * as clips from "../clips.js";
 import type * as collections from "../collections.js";
@@ -18,7 +17,6 @@ import type * as emails_components_layout from "../emails/components/layout.js";
 import type * as emails_components_styles from "../emails/components/styles.js";
 import type * as emails_mediaHealth from "../emails/mediaHealth.js";
 import type * as emails_resetPassword from "../emails/resetPassword.js";
-import type * as emails_verifyEmail from "../emails/verifyEmail.js";
 import type * as emails_welcome from "../emails/welcome.js";
 import type * as http from "../http.js";
 import type * as lib_clientIp from "../lib/clientIp.js";
@@ -42,9 +40,6 @@ import type * as lib_validators_query from "../lib/validators/query.js";
 import type * as lib_validators_shared from "../lib/validators/shared.js";
 import type * as lib_videoUrl from "../lib/videoUrl.js";
 import type * as mediaHealth from "../mediaHealth.js";
-import type * as model_affiliateLinks_index from "../model/affiliateLinks/index.js";
-import type * as model_affiliateLinks_mutations from "../model/affiliateLinks/mutations.js";
-import type * as model_affiliateLinks_queries from "../model/affiliateLinks/queries.js";
 import type * as model_affiliateLinks_validators from "../model/affiliateLinks/validators.js";
 import type * as model_auth_index from "../model/auth/index.js";
 import type * as model_auth_rateLimiter from "../model/auth/rateLimiter.js";
@@ -123,7 +118,6 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
-  affiliateLinks: typeof affiliateLinks;
   auth: typeof auth;
   clips: typeof clips;
   collections: typeof collections;
@@ -133,7 +127,6 @@ declare const fullApi: ApiFromModules<{
   "emails/components/styles": typeof emails_components_styles;
   "emails/mediaHealth": typeof emails_mediaHealth;
   "emails/resetPassword": typeof emails_resetPassword;
-  "emails/verifyEmail": typeof emails_verifyEmail;
   "emails/welcome": typeof emails_welcome;
   http: typeof http;
   "lib/clientIp": typeof lib_clientIp;
@@ -157,9 +150,6 @@ declare const fullApi: ApiFromModules<{
   "lib/validators/shared": typeof lib_validators_shared;
   "lib/videoUrl": typeof lib_videoUrl;
   mediaHealth: typeof mediaHealth;
-  "model/affiliateLinks/index": typeof model_affiliateLinks_index;
-  "model/affiliateLinks/mutations": typeof model_affiliateLinks_mutations;
-  "model/affiliateLinks/queries": typeof model_affiliateLinks_queries;
   "model/affiliateLinks/validators": typeof model_affiliateLinks_validators;
   "model/auth/index": typeof model_auth_index;
   "model/auth/rateLimiter": typeof model_auth_rateLimiter;

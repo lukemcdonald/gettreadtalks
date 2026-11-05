@@ -8,16 +8,16 @@ import { throwAuthRequired, throwForbidden } from '../../lib/errors';
 export type UserRole = 'admin' | 'user';
 
 /**
- * Get the current authenticated user. Returns null if not authenticated.
+ * Load the current authenticated user. Returns null if not authenticated.
  */
-export async function getCurrentUser(ctx: QueryCtx | MutationCtx) {
+export async function loadCurrentUser(ctx: QueryCtx | MutationCtx) {
   return await authComponent.safeGetAuthUser(ctx);
 }
 
 /**
- * Get user ID from authenticated user. Throws error if not authenticated.
+ * Load the authenticated user id. Throws if not authenticated.
  */
-export async function getUserId(ctx: QueryCtx | MutationCtx) {
+export async function loadUserId(ctx: QueryCtx | MutationCtx) {
   const user = await requireAuth(ctx);
   return user._id;
 }
@@ -26,7 +26,7 @@ export async function getUserId(ctx: QueryCtx | MutationCtx) {
  * Require authentication and return the current user. Throws error if not authenticated.
  */
 export async function requireAuth(ctx: QueryCtx | MutationCtx) {
-  const user = await getCurrentUser(ctx);
+  const user = await loadCurrentUser(ctx);
 
   if (!user) {
     throwAuthRequired();

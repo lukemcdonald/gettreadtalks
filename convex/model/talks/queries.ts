@@ -2,11 +2,7 @@ import type { Doc, Id } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
 import type { ContentSortOption } from '../../lib/sort';
 
-import {
-  getManyFrom,
-  getManyVia,
-  getOneFrom,
-} from 'convex-helpers/server/relationships';
+import { getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
 import {
   paginationOptsValidator,
   paginationResultValidator,
@@ -16,7 +12,7 @@ import { v } from 'convex/values';
 import { query } from '../../_generated/server';
 import { getTalkIdsByTopicSlugs } from '../../lib/filters';
 import { rotateContent } from '../../lib/rotateContent';
-import { byPublishedAt, getContentComparator } from '../../lib/sort';
+import { getContentComparator } from '../../lib/sort';
 import {
   enrichWithSpeaker,
   paginateArray,
@@ -25,7 +21,7 @@ import {
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
 import { statusFilterType } from '../../lib/validators/shared';
-import { canViewContent, getCurrentUser, requireAdmin } from '../auth/helpers';
+import { canViewContent, loadCurrentUser, requireAdmin } from '../auth/helpers';
 import {
   LIST_SEARCH_LIMIT,
   listAllAdmin,
@@ -148,7 +144,7 @@ export const getTalkBySlug = query({
   },
   // fallow-ignore-next-line complexity
   handler: async (ctx, args) => {
-    const user = await getCurrentUser(ctx);
+    const user = await loadCurrentUser(ctx);
 
     // First, get the speaker by slug
     const speaker = await getOneFrom(
@@ -242,25 +238,6 @@ export const getTalkBySlug = query({
 });
 
 /**
- * Get total count of published talks.
- */
-export const getTalksCount = query({
-  args: {},
-  handler: async (ctx) => {
-    const talks = await getManyFrom(
-      ctx.db,
-      'talks',
-      'by_status_and_publishedAt',
-      'published',
-      'status'
-    );
-
-    return talks.length;
-  },
-  returns: v.number(),
-});
-
-/**
  * Get featured talks with daily rotation.
  */
 export const listFeaturedTalksWithSpeakers = query({
@@ -310,57 +287,6 @@ export const listRandomTalksBySpeaker = query({
     return rotateContent(filteredTalks, { count: limit, period: 'daily' }).map(
       (talk) => toPublicTalk(talk)
     );
-  },
-  returns: docs('talks'),
-});
-
-/**
- * Get talks by collection with status filter. Returns talks sorted by collection order.
- */
-export const listTalksByCollection = query({
-  args: {
-    collectionId: v.id('collections'),
-    limit: v.optional(v.number()),
-  },
-  handler: async (ctx, args) => {
-    const { collectionId, limit = 100 } = args;
-
-    const talks = await ctx.db
-      .query('talks')
-      .withIndex('by_collectionId_and_status', (q) =>
-        q.eq('collectionId', collectionId).eq('status', 'published')
-      )
-      .take(limit);
-
-    const sortedTalks = talks.toSorted(
-      (a, b) => (a.collectionOrder || 0) - (b.collectionOrder || 0)
-    );
-
-    return sortedTalks.map((talk) => toPublicTalk(talk));
-  },
-  returns: docs('talks'),
-});
-
-/**
- * Get talks by speaker with status filter.
- */
-export const listTalksBySpeaker = query({
-  args: {
-    limit: v.optional(v.number()),
-    speakerId: v.id('speakers'),
-  },
-  handler: async (ctx, { limit = 20, speakerId }) => {
-    const talks = await ctx.db
-      .query('talks')
-      .withIndex('by_speakerId_and_status', (q) =>
-        q.eq('speakerId', speakerId).eq('status', 'published')
-      )
-      .collect();
-
-    return talks
-      .toSorted((a, b) => byPublishedAt(a, b, 'desc'))
-      .slice(0, limit)
-      .map((talk) => toPublicTalk(talk));
   },
   returns: docs('talks'),
 });
@@ -651,21 +577,6 @@ export const listTalksWithoutTranscript = query({
       lastError: v.union(talkTranscriptFetchLastError, v.null()),
     })
   ),
-});
-
-/**
- * List transcript metadata. Omits transcript text.
- */
-export const listTalkTranscripts = query({
-  args: {},
-  handler: async (ctx) => {
-    await requireAdmin(ctx);
-
-    const transcripts = await ctx.db.query('talkTranscripts').collect();
-
-    return transcripts.map(({ text: _text, ...item }) => item);
-  },
-  returns: v.array(talkTranscriptListItemValidator),
 });
 
 async function loadTalkTranscript(ctx: QueryCtx, talkId: Id<'talks'>) {

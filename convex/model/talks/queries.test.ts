@@ -82,9 +82,6 @@ describe('getTalkBySlug', () => {
       });
     });
 
-    const bySpeaker = await t.query(api.talks.listTalksBySpeaker, {
-      speakerId: published.talk.speakerId,
-    });
     const featured = await t.query(api.talks.listFeaturedTalksWithSpeakers, {});
     const listed = await t.query(api.talks.listTalks, {
       paginationOpts: { cursor: null, numItems: 50 },
@@ -99,7 +96,6 @@ describe('getTalkBySlug', () => {
       talkSlug: visibilitySlugs.publishedTalk,
     });
     const payload = JSON.stringify({
-      bySpeaker,
       featured,
       listed,
       related,
@@ -474,8 +470,8 @@ describe('listAllTalks', () => {
 describe('publishedAt order', () => {
   it('lists talks newest-first by publishedAt, not creation time', async () => {
     const t = createConvexTest();
-    const speakerId = await t.run(async (ctx) => {
-      const id = await insertSpeaker(ctx, {
+    await t.run(async (ctx) => {
+      const speakerId = await insertSpeaker(ctx, {
         firstName: 'John',
         lastName: 'Owen',
         slug: 'john-owen-order',
@@ -483,31 +479,24 @@ describe('publishedAt order', () => {
       await insertTalk(ctx, {
         publishedAt: Date.parse('2024-06-03T12:00:00.000Z'),
         slug: 'newer-by-date',
-        speakerId: id,
+        speakerId,
         title: 'Newer By Date',
       });
       await insertTalk(ctx, {
         publishedAt: Date.parse('2020-01-01T12:00:00.000Z'),
         slug: 'older-by-date',
-        speakerId: id,
+        speakerId,
         title: 'Older By Date',
       });
-
-      return id;
     });
 
     const listed = await t.query(api.talks.listTalks, {
       paginationOpts: { cursor: null, numItems: 50 },
     });
-    const bySpeaker = await t.query(api.talks.listTalksBySpeaker, {
-      speakerId,
-    });
     const listedSlugs = listed.page.map((talk) => talk.slug);
-    const speakerSlugs = bySpeaker.map((talk) => talk.slug);
 
     expect(listedSlugs.indexOf('newer-by-date')).toBeLessThan(
       listedSlugs.indexOf('older-by-date')
     );
-    expect(speakerSlugs).toEqual(['newer-by-date', 'older-by-date']);
   });
 });

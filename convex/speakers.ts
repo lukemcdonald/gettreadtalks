@@ -4,7 +4,6 @@ import { mutations, queries } from './model/speakers';
 export const {
   getSpeaker,
   getSpeakerBySlug,
-  getSpeakersCount,
   listAllSpeakers,
   listFeaturedSpeakers,
   listSpeakerSlugs,

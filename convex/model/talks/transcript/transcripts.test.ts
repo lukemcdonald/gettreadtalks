@@ -68,17 +68,6 @@ describe('talk transcript and study draft storage', () => {
     const missing = await asAdmin.query(api.talks.listTalksWithoutTranscript, {
       status: 'all',
     });
-    const transcripts = await asAdmin.query(api.talks.listTalkTranscripts, {});
-
-    expect(transcripts).toEqual([
-      expect.objectContaining({
-        source: 'speaker_audio_stt',
-        status: 'done',
-        talkId: talk._id,
-      }),
-    ]);
-    expect(transcripts[0]).not.toHaveProperty('text');
-    expect(JSON.stringify(transcripts)).not.toContain(transcriptSecret);
 
     const metadata = await asAdmin.query(api.talks.getTalkTranscript, {
       talkId: talk._id,
@@ -87,6 +76,13 @@ describe('talk transcript and study draft storage', () => {
       talkId: talk._id,
     });
 
+    expect(metadata).toEqual(
+      expect.objectContaining({
+        source: 'speaker_audio_stt',
+        status: 'done',
+        talkId: talk._id,
+      })
+    );
     expect(metadata).not.toHaveProperty('text');
     expect(JSON.stringify(metadata)).not.toContain(transcriptSecret);
     expect(loaded).toEqual({ text: transcriptSecret });
@@ -134,7 +130,9 @@ describe('talk transcript and study draft storage', () => {
     const studies = await t.run(
       async (ctx) => await ctx.db.query('talkStudies').collect()
     );
-    const transcripts = await asAdmin.query(api.talks.listTalkTranscripts, {});
+    const transcripts = await t.run(
+      async (ctx) => await ctx.db.query('talkTranscripts').collect()
+    );
 
     expect(features).toEqual([]);
     expect(studies).toEqual([]);

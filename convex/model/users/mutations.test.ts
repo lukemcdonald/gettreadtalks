@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest';
 import { api, components } from '../../_generated/api';
 import { ErrorCodes } from '../../lib/errors';
 import { createConvexTest, signInAsPasswordUser } from '../../test.setup';
-import { insertClip } from '../clips/test.factory';
 import { insertSpeaker } from '../speakers/test.factory';
 import { insertTalk } from '../talks/test.factory';
 import { insertUserFavoriteTalk } from './test.factory';
@@ -116,12 +115,8 @@ describe('published favorites', () => {
         speakerId,
         title: 'Published Talk',
       });
-      const clipId = await insertClip(ctx, {
-        speakerId,
-        talkId: draftTalkId,
-      });
 
-      return { clipId, draftTalkId, publishedTalkId };
+      return { draftTalkId, publishedTalkId };
     });
 
     await expect(
@@ -133,13 +128,6 @@ describe('published favorites', () => {
     });
     await expect(
       asUser.mutation(api.users.finishTalk, { talkId: ids.draftTalkId })
-    ).rejects.toMatchObject({
-      data: {
-        errorCode: ErrorCodes.NOT_FOUND,
-      },
-    });
-    await expect(
-      asUser.mutation(api.users.favoriteClip, { clipId: ids.clipId })
     ).rejects.toMatchObject({
       data: {
         errorCode: ErrorCodes.NOT_FOUND,
