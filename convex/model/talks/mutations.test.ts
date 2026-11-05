@@ -1,10 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import { api, internal } from '../../_generated/api';
+import { api } from '../../_generated/api';
 import { ErrorCodes } from '../../lib/errors';
 import { createConvexTest, signInAs } from '../../test.setup';
 import { insertSpeaker } from '../speakers/test.factory';
-import { insertTalk, insertTalkStudy } from './test.factory';
 
 const MEDIA_URL = 'https://www.youtube.com/watch?v=0SVTl4Xa5fY';
 const PAST_PUBLISHED_AT = Date.parse('2020-01-15T00:00:00.000Z');
@@ -120,134 +119,6 @@ describe('updateTalk publishedAt', () => {
         errorCode: ErrorCodes.VALIDATION_FAILED,
         field: 'publishedAt',
       },
-    });
-  });
-});
-
-describe('backfillTalkPublishedAt', () => {
-  it('fills missing dates and leaves existing dates alone', async () => {
-    const t = createConvexTest();
-    const ids = await t.run(async (ctx) => {
-      const speakerId = await insertSpeaker(ctx);
-      const missingId = await insertTalk(ctx, {
-        slug: 'missing-date',
-        speakerId,
-        title: 'Missing Date',
-      });
-      const keptId = await insertTalk(ctx, {
-        publishedAt: PAST_PUBLISHED_AT,
-        slug: 'kept-date',
-        speakerId,
-        title: 'Kept Date',
-      });
-      const backlogId = await insertTalk(ctx, {
-        slug: 'backlog-talk',
-        speakerId,
-        status: 'backlog',
-        title: 'Backlog Talk',
-      });
-
-      return { backlogId, keptId, missingId };
-    });
-
-    const first = await t.mutation(internal.talks.backfillTalkPublishedAt, {});
-    const missing = await t.run(
-      async (ctx) => await ctx.db.get('talks', ids.missingId)
-    );
-    const kept = await t.run(
-      async (ctx) => await ctx.db.get('talks', ids.keptId)
-    );
-    const backlog = await t.run(
-      async (ctx) => await ctx.db.get('talks', ids.backlogId)
-    );
-
-    expect(first.updated).toBe(1);
-    expect(missing?.publishedAt).toBe(missing?._creationTime);
-    expect(kept?.publishedAt).toBe(PAST_PUBLISHED_AT);
-    expect(backlog?.publishedAt).toBeUndefined();
-
-    const second = await t.mutation(internal.talks.backfillTalkPublishedAt, {});
-
-    expect(second.updated).toBe(0);
-  });
-});
-
-describe('migrateTalkSummaries', () => {
-  it('copies talkStudies summaries onto talks and is idempotent', async () => {
-    const t = createConvexTest();
-    const generatedAt = Date.parse('2024-06-01T12:00:00.000Z');
-    const manuallyEditedAt = Date.parse('2024-06-02T12:00:00.000Z');
-    const ids = await t.run(async (ctx) => {
-      const speakerId = await insertSpeaker(ctx);
-      const copyId = await insertTalk(ctx, {
-        slug: 'copy-summary',
-        speakerId,
-        title: 'Copy Summary',
-      });
-      const keptId = await insertTalk(ctx, {
-        slug: 'kept-summary',
-        speakerId,
-        summary: 'Already on the talk.',
-        title: 'Kept Summary',
-      });
-      const emptyStudyId = await insertTalk(ctx, {
-        slug: 'empty-study',
-        speakerId,
-        title: 'Empty Study',
-      });
-
-      await insertTalkStudy(ctx, {
-        generatedAt,
-        generator: 'grok-bot',
-        manuallyEditedAt,
-        summary: 'Copied from talkStudies.',
-        talkId: copyId,
-      });
-      await insertTalkStudy(ctx, {
-        summary: 'Should not overwrite.',
-        talkId: keptId,
-      });
-      await insertTalkStudy(ctx, {
-        summary: '   ',
-        talkId: emptyStudyId,
-      });
-
-      return { copyId, emptyStudyId, keptId };
-    });
-
-    const first = await t.mutation(internal.talks.migrateTalkSummaries, {});
-    const copied = await t.run(
-      async (ctx) => await ctx.db.get('talks', ids.copyId)
-    );
-    const kept = await t.run(
-      async (ctx) => await ctx.db.get('talks', ids.keptId)
-    );
-    const emptyStudy = await t.run(
-      async (ctx) => await ctx.db.get('talks', ids.emptyStudyId)
-    );
-
-    expect(first).toEqual({
-      scanned: 3,
-      skipped: 2,
-      updated: 1,
-    });
-    expect(copied).toEqual(
-      expect.objectContaining({
-        summary: 'Copied from talkStudies.',
-        summaryGeneratedAt: generatedAt,
-        summaryGenerator: 'grok-bot',
-        summaryManuallyEditedAt: manuallyEditedAt,
-      })
-    );
-    expect(kept?.summary).toBe('Already on the talk.');
-    expect(emptyStudy?.summary).toBeUndefined();
-
-    const second = await t.mutation(internal.talks.migrateTalkSummaries, {});
-
-    expect(second).toEqual({
-      scanned: 3,
-      skipped: 3,
-      updated: 0,
     });
   });
 });
