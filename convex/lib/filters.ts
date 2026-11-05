@@ -16,7 +16,7 @@ async function speakerHasPublicClip(ctx: QueryCtx, speakerId: Id<'speakers'>) {
 
   for await (const clip of clips) {
     // oxlint-disable-next-line no-await-in-loop -- stop at the first public clip
-    const [visible] = await filterClipsByPublishedTalks(ctx, [clip]);
+    const [visible] = await filterClipsWithPublishedTalk(ctx, [clip]);
 
     if (visible) {
       return true;
@@ -27,10 +27,10 @@ async function speakerHasPublicClip(ctx: QueryCtx, speakerId: Id<'speakers'>) {
 }
 
 /**
- * Filter speakers to only those with at least one published talk or public clip.
+ * Keep speakers with a published talk or a public clip.
  * Building block for listPublishedSpeakers / searchPublishedSpeakers.
  */
-export async function filterSpeakersWithPublishedTalks(
+export async function filterSpeakersWithPublicContent(
   ctx: QueryCtx,
   speakers: Doc<'speakers'>[]
 ): Promise<Doc<'speakers'>[]> {
@@ -63,11 +63,10 @@ export async function filterSpeakersWithPublishedTalks(
 }
 
 /**
- * Filter clips to only those with published parent talks.
- * Clips without a parent talk (standalone clips) are included.
+ * Keep a clip with no parent talk, or a published parent talk.
  * Building block for listPublishedClips / searchPublishedClips.
  */
-export async function filterClipsByPublishedTalks(
+export async function filterClipsWithPublishedTalk(
   ctx: QueryCtx,
   clips: Doc<'clips'>[]
 ): Promise<Doc<'clips'>[]> {

@@ -10,8 +10,8 @@ import { v } from 'convex/values';
 
 import { query } from '../../_generated/server';
 import {
-  filterClipsByPublishedTalks,
-  filterSpeakersWithPublishedTalks,
+  filterClipsWithPublishedTalk,
+  filterSpeakersWithPublicContent,
 } from '../../lib/filters';
 import { rotateContent } from '../../lib/rotateContent';
 import { byPublishedAt, getSpeakerComparator } from '../../lib/sort';
@@ -94,7 +94,7 @@ export const getSpeakerBySlug = query({
         .order('desc')
         .collect(),
     ]);
-    const clips = await filterClipsByPublishedTalks(ctx, clipRows);
+    const clips = await filterClipsWithPublishedTalk(ctx, clipRows);
 
     const collectionIds = [
       ...new Set(
@@ -185,7 +185,7 @@ export const listFeaturedSpeakers = query({
 
     for await (const speaker of featured) {
       // oxlint-disable-next-line no-await-in-loop -- stop once the rotation pool is full
-      const [visible] = await filterSpeakersWithPublishedTalks(ctx, [speaker]);
+      const [visible] = await filterSpeakersWithPublicContent(ctx, [speaker]);
 
       if (visible) {
         pool.push(visible);

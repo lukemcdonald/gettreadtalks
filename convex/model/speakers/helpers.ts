@@ -5,7 +5,7 @@ import type { PaginationOptions } from 'convex/server';
 import { asyncMap } from 'convex-helpers';
 import { getManyFrom } from 'convex-helpers/server/relationships';
 
-import { filterSpeakersWithPublishedTalks } from '../../lib/filters';
+import { filterSpeakersWithPublicContent } from '../../lib/filters';
 import { paginateArray } from '../../lib/utils';
 import {
   LIST_SEARCH_LIMIT,
@@ -21,7 +21,7 @@ function publishedSpeakersQuery(ctx: QueryCtx) {
 }
 
 export async function listPublishedSpeakers(ctx: QueryCtx) {
-  return await filterSpeakersWithPublishedTalks(
+  return await filterSpeakersWithPublicContent(
     ctx,
     await publishedSpeakersQuery(ctx).collect()
   );
@@ -35,7 +35,7 @@ export async function listPublishedSpeakersPage(
 
   return {
     ...result,
-    page: await filterSpeakersWithPublishedTalks(ctx, result.page),
+    page: await filterSpeakersWithPublicContent(ctx, result.page),
   };
 }
 
@@ -80,7 +80,7 @@ export async function searchPublishedSpeakers(
   queryText: string,
   limit: number
 ) {
-  const speakers = await filterSpeakersWithPublishedTalks(
+  const speakers = await filterSpeakersWithPublicContent(
     ctx,
     await searchSpeakerDocuments(
       ctx,
@@ -99,7 +99,7 @@ export async function enrichSpeakersForAdmin(
   return await asyncMap(speakers, async (speaker) => {
     const [clips, publishedSpeakers, talks] = await Promise.all([
       getManyFrom(ctx.db, 'clips', 'by_speakerId', speaker._id),
-      filterSpeakersWithPublishedTalks(ctx, [speaker]),
+      filterSpeakersWithPublicContent(ctx, [speaker]),
       ctx.db
         .query('talks')
         .withIndex('by_speakerId_and_status', (q) =>
@@ -127,7 +127,7 @@ async function filterSpeakersByStatus(
     return speakers;
   }
 
-  const published = await filterSpeakersWithPublishedTalks(ctx, speakers);
+  const published = await filterSpeakersWithPublicContent(ctx, speakers);
 
   if (status === 'published') {
     return published;

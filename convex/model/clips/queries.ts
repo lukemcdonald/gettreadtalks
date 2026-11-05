@@ -9,7 +9,7 @@ import {
 import { v } from 'convex/values';
 
 import { query } from '../../_generated/server';
-import { filterClipsByPublishedTalks } from '../../lib/filters';
+import { filterClipsWithPublishedTalk } from '../../lib/filters';
 import { getContentComparator } from '../../lib/sort';
 import { paginateArray, toPublicTalk } from '../../lib/utils';
 import { doc, docs } from '../../lib/validators/schema';
@@ -102,7 +102,7 @@ export const getClipBySlug = query({
       return null;
     }
 
-    const publishedClips = await filterClipsByPublishedTalks(ctx, [clip]);
+    const publishedClips = await filterClipsWithPublishedTalk(ctx, [clip]);
 
     if (publishedClips.length === 0) {
       return null;
@@ -135,7 +135,7 @@ const sortType = v.optional(
 /**
  * List published clips with speaker data (public-facing).
  * Supports filtering by search, speaker, and sorting.
- * Filters clips to only those with published parent talks.
+ * Keeps clips with no parent talk, or a published parent talk.
  */
 export const listClips = query({
   args: {
@@ -231,7 +231,7 @@ export const listClipsBySpeaker = query({
 
     for await (const clip of clips) {
       // oxlint-disable-next-line no-await-in-loop -- stop at the requested number of public clips
-      const [published] = await filterClipsByPublishedTalks(ctx, [clip]);
+      const [published] = await filterClipsWithPublishedTalk(ctx, [clip]);
 
       if (published) {
         visible.push(published);

@@ -15,7 +15,7 @@ interface GetClipsProps {
 
 /**
  * Get published clips with speakers.
- * Returns only published clips with published parent talks.
+ * Returns published clips with no parent talk, or a published parent talk.
  * Defaults to 50 items per page, sorted by most recent.
  */
 export async function loadClips(args?: GetClipsProps) {
