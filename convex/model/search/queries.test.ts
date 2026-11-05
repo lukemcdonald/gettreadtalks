@@ -107,7 +107,7 @@ describe('searchSite', () => {
           insertTalk(ctx, {
             slug: `orphan-fill-hidden-${index}`,
             speakerId: ghostSpeakerId,
-            title: `OrphanFill Hidden ${index}`,
+            title: 'OrphanFillHidden',
           })
         )
       );
@@ -115,14 +115,14 @@ describe('searchSite', () => {
       await insertTalk(ctx, {
         slug: 'orphan-fill-visible',
         speakerId: publishedSpeaker._id,
-        title: 'OrphanFill Hidden Visible',
+        title: 'Also OrphanFillHidden visible',
       });
       await ctx.db.delete(ghostSpeakerId);
     });
 
     const result = await t.query(api.search.searchSite, {
       limit: 1,
-      query: 'OrphanFill Hidden',
+      query: 'OrphanFillHidden',
     });
 
     expect(result.talks.map((talk) => talk.slug)).toEqual([
@@ -172,7 +172,7 @@ describe('searchSite', () => {
             slug: `clip-fill-hidden-${index}`,
             speakerId: publishedSpeaker._id,
             talkId: draftTalk._id,
-            title: `ClipFill Hidden ${index}`,
+            title: 'ClipFillHidden',
           })
         )
       );
@@ -180,13 +180,13 @@ describe('searchSite', () => {
       await insertClip(ctx, {
         slug: 'clip-fill-visible',
         speakerId: publishedSpeaker._id,
-        title: 'ClipFill Hidden Visible',
+        title: 'Also ClipFillHidden visible',
       });
     });
 
     const result = await t.query(api.search.searchSite, {
       limit: 1,
-      query: 'ClipFill Hidden',
+      query: 'ClipFillHidden',
     });
 
     expect(result.clips.map((clip) => clip.slug)).toEqual([
