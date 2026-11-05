@@ -147,14 +147,6 @@ export async function searchTalks(
     .take(limit);
 }
 
-async function filterTalksWithSpeaker(ctx: QueryCtx, talks: Doc<'talks'>[]) {
-  const speakers = await Promise.all(
-    talks.map((talk) => ctx.db.get('speakers', talk.speakerId))
-  );
-
-  return talks.filter((_, index) => speakers[index] !== null);
-}
-
 export async function searchPublishedTalks(
   ctx: QueryCtx,
   queryText: string,
@@ -208,15 +200,7 @@ async function loadTalksByNamedSpeakers(
         .take(limit)
     )
   );
-  const talks = uniqueById(speakerTalkPages.flat());
-
-  if (status !== 'published') {
-    return talks.slice(0, limit);
-  }
-
-  const publishedTalks = await filterTalksWithSpeaker(ctx, talks);
-
-  return publishedTalks.slice(0, limit);
+  return uniqueById(speakerTalkPages.flat()).slice(0, limit);
 }
 
 /** Title matches plus talks by speakers whose names match. */
