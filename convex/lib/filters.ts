@@ -4,15 +4,26 @@ import type { QueryCtx } from '../_generated/server';
 import { getOneFrom } from 'convex-helpers/server/relationships';
 
 async function speakerHasPublicClip(ctx: QueryCtx, speakerId: Id<'speakers'>) {
-  const clips = await ctx.db
+  const clips = ctx.db
     .query('clips')
     .withIndex('by_speakerId_and_status', (q) =>
       q.eq('speakerId', speakerId).eq('status', 'published')
-    )
-    .collect();
-  const visible = await filterClipsByPublishedTalks(ctx, clips);
+    );
 
-  return visible.length > 0;
+  for await (const clip of clips) {
+    if (!clip.talkId) {
+      return true;
+    }
+
+    // oxlint-disable-next-line no-await-in-loop -- stop at the first public parent
+    const talk = await ctx.db.get('talks', clip.talkId);
+
+    if (talk?.status === 'published') {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 /**

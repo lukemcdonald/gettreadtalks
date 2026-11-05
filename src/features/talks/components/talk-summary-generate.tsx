@@ -11,6 +11,7 @@ import { TALK_DRAFT_PENDING } from '@/convex/model/talks/validators';
 import {
   getTalkGenerateIdleStatus,
   getTalkGeneratePendingLabel,
+  isTalkDraftStatus,
 } from '@/features/talks/components/talk-generate-status';
 
 export function TalkSummaryGenerate({
@@ -28,7 +29,9 @@ export function TalkSummaryGenerate({
   const talk = useQuery(api.talks.getTalk, { id: talkId });
   const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
-  const draft = talk?.draftSummary;
+  const draft = isTalkDraftStatus(talk?.draftSummary)
+    ? talk?.draftSummary
+    : null;
   const draftPending = draft === TALK_DRAFT_PENDING;
   const pendingLabel = getTalkGeneratePendingLabel(
     canGenerate,

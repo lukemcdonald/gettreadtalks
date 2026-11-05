@@ -10,7 +10,7 @@ import { v } from 'convex/values';
 import { query } from '../../_generated/server';
 import { filterClipsByPublishedTalks } from '../../lib/filters';
 import { getContentComparator } from '../../lib/sort';
-import { paginateArray } from '../../lib/utils';
+import { loadFullPage, paginateArray } from '../../lib/utils';
 import { doc, docs } from '../../lib/validators/schema';
 import { statusFilterType } from '../../lib/validators/shared';
 import { canViewContent, getCurrentUser, requireAdmin } from '../auth/helpers';
@@ -249,16 +249,20 @@ export const listClipsBySpeaker = query({
   handler: async (ctx, args) => {
     const { limit = 20, speakerId } = args;
 
-    const clips = await ctx.db
-      .query('clips')
-      .withIndex('by_speakerId_and_status', (q) =>
-        q.eq('speakerId', speakerId).eq('status', 'published')
-      )
-      .order('desc')
-      .collect();
-    const visible = await filterClipsByPublishedTalks(ctx, clips);
+    const visible = await loadFullPage(
+      (opts) =>
+        ctx.db
+          .query('clips')
+          .withIndex('by_speakerId_and_status', (q) =>
+            q.eq('speakerId', speakerId).eq('status', 'published')
+          )
+          .order('desc')
+          .paginate(opts),
+      (clips) => filterClipsByPublishedTalks(ctx, clips),
+      { cursor: null, numItems: limit }
+    );
 
-    return visible.slice(0, limit);
+    return visible.page;
   },
   returns: docs('clips'),
 });

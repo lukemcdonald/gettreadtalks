@@ -77,12 +77,22 @@ describe('getPublishedAt', () => {
     ).toBe(NOW);
   });
 
-  it('clears the date only when the editor removes it', () => {
+  it('keeps the stored date when the editor leaves the field blank', () => {
     expect(
       getPublishedAt({
         currentPublishedAt: NOW,
         requestedPublishedAt: null,
         status: 'backlog',
+      })
+    ).toBe(NOW);
+  });
+
+  it('keeps a published talk without a date empty on a later blank save', () => {
+    expect(
+      getPublishedAt({
+        requestedPublishedAt: null,
+        status: 'published',
+        wasPublished: true,
       })
     ).toBeUndefined();
   });

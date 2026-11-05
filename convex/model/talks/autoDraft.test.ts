@@ -116,7 +116,7 @@ describe('auto draft', () => {
 
       expect(youtube.transcript?.text).toBe(FETCHED_TRANSCRIPT);
       expect(youtube.talk?.summary).toBeUndefined();
-      expect(youtube.talk?.summaryDraft).toBe(GENERATED_SUMMARY);
+      expect(youtube.talk?.draftSummary).toBe(GENERATED_SUMMARY);
       expect(youtube.talk?.status).toBe('backlog');
       expect(youtube.study).toMatchObject({
         body: GENERATED_STUDY,

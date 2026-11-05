@@ -27,7 +27,7 @@ export async function loadAllPages<T>(
     continueCursor = nextCursor;
     isDone = pageDone;
 
-    if (sourcePage.length === 0) {
+    if (sourcePage.length === 0 && (pageDone || nextCursor === cursor)) {
       break;
     }
 

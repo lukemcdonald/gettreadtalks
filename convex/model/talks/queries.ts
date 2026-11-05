@@ -19,8 +19,9 @@ import { rotateContent } from '../../lib/rotateContent';
 import { byPublishedAt, getContentComparator } from '../../lib/sort';
 import {
   enrichWithSpeaker,
-  paginateArray,
   loadFullPage,
+  paginateArray,
+  toPublicTalk,
 } from '../../lib/utils';
 import { talkWithSpeakerValidator } from '../../lib/validators/query';
 import { doc, docs } from '../../lib/validators/schema';
@@ -218,7 +219,6 @@ export const getTalkBySlug = query({
     const publishedStudyBody =
       studyFeature?.status === 'published' ? studyFeature.body : null;
     const summary = talk.summary?.trim() ? talk.summary : null;
-    const { summaryDraft: _summaryDraft, ...publicTalk } = talk;
 
     return {
       clips,
@@ -226,7 +226,7 @@ export const getTalkBySlug = query({
       speaker,
       studyBody: publishedStudyBody,
       summary,
-      talk: publicTalk,
+      talk: toPublicTalk(talk),
       topics: validTopics,
     };
   },
@@ -315,7 +315,7 @@ export const listRandomTalksBySpeaker = query({
       count: limit,
       period: 'daily',
       seed,
-    });
+    }).map((talk) => toPublicTalk(talk));
   },
   returns: docs('talks'),
 });
@@ -342,7 +342,7 @@ export const listTalksByCollection = query({
       (a, b) => (a.collectionOrder || 0) - (b.collectionOrder || 0)
     );
 
-    return sortedTalks;
+    return sortedTalks.map((talk) => toPublicTalk(talk));
   },
   returns: docs('talks'),
 });
@@ -365,7 +365,8 @@ export const listTalksBySpeaker = query({
 
     return talks
       .toSorted((a, b) => byPublishedAt(a, b, 'desc'))
-      .slice(0, limit);
+      .slice(0, limit)
+      .map((talk) => toPublicTalk(talk));
   },
   returns: docs('talks'),
 });

@@ -104,15 +104,18 @@ function publishedAtForTalk({
   currentPublishedAt,
   requestedPublishedAt,
   status,
+  wasPublished,
 }: {
   currentPublishedAt?: number;
   requestedPublishedAt?: null | number;
   status: StatusType;
+  wasPublished?: boolean;
 }): number | undefined {
   const publishedAt = getPublishedAt({
     currentPublishedAt,
     requestedPublishedAt,
     status,
+    wasPublished,
   });
 
   if (publishedAt !== undefined && isFuturePublishedAt(publishedAt)) {
@@ -273,6 +276,7 @@ export const updateTalk = mutation({
       currentPublishedAt: talk.publishedAt,
       requestedPublishedAt,
       status: updates.status ?? talk.status,
+      wasPublished: talk.status === 'published',
     });
     updates.updatedAt = Date.now();
 
@@ -413,11 +417,10 @@ export const saveTalkSummaryDraft = internalMutation({
     }
 
     await ctx.db.patch(args.talkId, {
-      summaryDraft: args.summary,
+      draftSummary: args.summary,
       summaryGeneratedAt: Date.now(),
       summaryGenerator: args.generator,
     });
-    await clearTalkDraftStep(ctx, args.talkId, 'summary');
 
     return args.talkId;
   },
@@ -436,8 +439,8 @@ export const updateTalkSummary = mutation({
     const editedAt = Date.now();
 
     await ctx.db.patch(args.talkId, {
+      draftSummary: undefined,
       summary: args.summary,
-      summaryDraft: undefined,
       summaryGeneratedAt: talk.summaryGeneratedAt ?? editedAt,
       summaryGenerator: talk.summaryGenerator ?? 'manual',
       summaryManuallyEditedAt: editedAt,

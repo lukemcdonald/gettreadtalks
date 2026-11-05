@@ -165,10 +165,10 @@ describe('generateTalkSummary', () => {
       });
 
       expect(generated?.summary).toBeUndefined();
-      expect(generated?.summaryDraft).toBe(GENERATED_SUMMARY);
+      expect(generated?.draftSummary).toBe(GENERATED_SUMMARY);
       expect(generated?.summaryManuallyEditedAt).toBeUndefined();
       expect(published?.summary).toBeNull();
-      expect(published?.talk).not.toHaveProperty('summaryDraft');
+      expect(published?.talk).not.toHaveProperty('draftSummary');
 
       await asAdmin.mutation(api.talks.updateTalkSummary, {
         summary: 'Hand-edited summary.',

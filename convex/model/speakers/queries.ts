@@ -15,7 +15,7 @@ import {
 } from '../../lib/filters';
 import { rotateContent } from '../../lib/rotateContent';
 import { byPublishedAt, getSpeakerComparator } from '../../lib/sort';
-import { paginateArray } from '../../lib/utils';
+import { loadFullPage, paginateArray, toPublicTalk } from '../../lib/utils';
 import { doc, docs } from '../../lib/validators/schema';
 import { publishState } from '../../lib/validators/shared';
 import { requireAdmin } from '../auth/helpers';
@@ -116,7 +116,7 @@ export const getSpeakerBySlug = query({
       clips,
       collections,
       speaker,
-      talks,
+      talks: talks.map((talk) => toPublicTalk(talk)),
       topics,
     };
   },
@@ -178,13 +178,16 @@ export const listFeaturedSpeakers = query({
   handler: async (ctx, args) => {
     const { limit = 6, seed } = args;
 
-    // Intentionally unbounded: Need all featured speakers for rotation
-    // Limited to 50 to prevent memory issues if featured speakers grow
-    const featured = await ctx.db
-      .query('speakers')
-      .withIndex('by_featured', (q) => q.eq('featured', true))
-      .take(50);
-    const speakers = await filterSpeakersWithPublishedTalks(ctx, featured);
+    const featured = await loadFullPage(
+      (opts) =>
+        ctx.db
+          .query('speakers')
+          .withIndex('by_featured', (q) => q.eq('featured', true))
+          .paginate(opts),
+      (rows) => filterSpeakersWithPublishedTalks(ctx, rows),
+      { cursor: null, numItems: 50 }
+    );
+    const speakers = featured.page;
 
     return rotateContent(speakers, { count: limit, period: 'daily', seed });
   },

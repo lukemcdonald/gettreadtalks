@@ -228,6 +228,30 @@ export async function loadPublishedTalkSearchPage(
     result.page.sort(getContentComparator(sort));
   }
 
+  if (!paginationOpts.cursor && result.page.length < paginationOpts.numItems) {
+    const named = filterTalkSearchHits(
+      await loadTalksByNamedSpeakers(
+        ctx,
+        queryText,
+        paginationOpts.numItems,
+        'published'
+      ),
+      { featured, speakerIds, topicTalkIds }
+    );
+    const seen = new Set(result.page.map((talk) => talk._id));
+
+    for (const talk of named) {
+      if (result.page.length >= paginationOpts.numItems) {
+        break;
+      }
+
+      if (!seen.has(talk._id)) {
+        result.page.push(talk);
+        seen.add(talk._id);
+      }
+    }
+  }
+
   const talksWithSpeakers = await enrichWithSpeaker(ctx, result.page);
 
   return {
@@ -245,8 +269,7 @@ export async function searchPublishedTalks(
   return await searchTalks(ctx, queryText, limit, 'published');
 }
 
-/** Title matches plus talks by speakers whose names match. */
-export async function searchTalksByTitleOrSpeaker(
+async function loadTalksByNamedSpeakers(
   ctx: QueryCtx,
   queryText: string,
   limit: number,
@@ -254,13 +277,14 @@ export async function searchTalksByTitleOrSpeaker(
 ) {
   const searchSpeakersByName =
     status === 'published' ? searchPublishedSpeakers : searchSpeakers;
-  const [titleHits, speakers] = await Promise.all([
-    searchTalks(ctx, queryText, limit, status),
-    searchSpeakersByName(ctx, queryText, DEFAULT_SEARCH_LIMIT),
-  ]);
+  const speakers = await searchSpeakersByName(
+    ctx,
+    queryText,
+    DEFAULT_SEARCH_LIMIT
+  );
 
   if (speakers.length === 0) {
-    return titleHits;
+    return [];
   }
 
   const speakerTalkPages = await Promise.all(
@@ -278,10 +302,22 @@ export async function searchTalksByTitleOrSpeaker(
     )
   );
 
-  return uniqueById<Doc<'talks'>>([
-    ...titleHits,
-    ...speakerTalkPages.flat(),
-  ]).slice(0, limit);
+  return uniqueById(speakerTalkPages.flat()).slice(0, limit);
+}
+
+/** Title matches plus talks by speakers whose names match. */
+export async function searchTalksByTitleOrSpeaker(
+  ctx: QueryCtx,
+  queryText: string,
+  limit: number,
+  status?: StatusFilterType
+) {
+  const [titleHits, speakerTalks] = await Promise.all([
+    searchTalks(ctx, queryText, limit, status),
+    loadTalksByNamedSpeakers(ctx, queryText, limit, status),
+  ]);
+
+  return uniqueById([...titleHits, ...speakerTalks]).slice(0, limit);
 }
 
 export async function searchPublishedTalksByTitleOrSpeaker(

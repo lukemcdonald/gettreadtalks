@@ -7,10 +7,7 @@ import { fetchQuery } from 'convex/nextjs';
 import { cacheLife, cacheTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
-import {
-  getTimeSeed,
-  secondsUntilNextRotation,
-} from '@/convex/lib/rotateContent';
+import { getRotationCacheLife, getTimeSeed } from '@/convex/lib/rotateContent';
 
 /**
  * Get published talks that share any of the given topics.
@@ -20,13 +17,7 @@ export async function loadTalksByTopics(
   excludeTalkIds: TalkId[] = [],
   limit = 4
 ) {
-  const expire = secondsUntilNextRotation('daily');
-
-  cacheLife({
-    expire,
-    revalidate: expire,
-    stale: expire,
-  });
+  cacheLife(getRotationCacheLife());
   cacheTag('talks');
 
   if (topicIds.length === 0) {

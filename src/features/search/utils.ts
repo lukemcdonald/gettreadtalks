@@ -91,14 +91,22 @@ export function buildSearchPageHref(query: string) {
 }
 
 export function toSearchHits(result: SiteSearchResult): SearchHit[] {
-  const talks = result.talks.map((talk) => ({
-    href: buildTalkPath(talk),
-    id: talk._id,
-    scripture: talk.scripture,
-    ...(talk.speaker ? { subtitle: getSpeakerName(talk.speaker) } : {}),
-    title: talk.title,
-    type: 'talk' as const,
-  }));
+  const talks = result.talks.flatMap((talk) => {
+    if (!talk.speaker) {
+      return [];
+    }
+
+    return [
+      {
+        href: buildTalkPath(talk),
+        id: talk._id,
+        scripture: talk.scripture,
+        subtitle: getSpeakerName(talk.speaker),
+        title: talk.title,
+        type: 'talk' as const,
+      },
+    ];
+  });
 
   const speakers = result.speakers.map((speaker) => ({
     href: buildSpeakerPath(speaker),

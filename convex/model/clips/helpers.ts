@@ -71,14 +71,36 @@ export async function searchPublishedClips(
   queryText: string,
   limit: number
 ) {
-  const result = await loadPublishedClipSearchPage(
-    ctx,
-    queryText,
-    { cursor: null, numItems: limit },
-    (clips) => filterClipsByPublishedTalks(ctx, clips)
-  );
+  const page: Doc<'clips'>[] = [];
+  let cursor: string | null = null;
+  let isDone = false;
 
-  return result.page;
+  while (page.length < limit && !isDone) {
+    // oxlint-disable-next-line no-await-in-loop -- the next search cursor depends on this page
+    const result = await loadPublishedClipSearchPage(
+      ctx,
+      queryText,
+      { cursor, numItems: limit - page.length },
+      (clips) => filterClipsByPublishedTalks(ctx, clips)
+    );
+
+    const {
+      continueCursor: nextCursor,
+      isDone: pageDone,
+      page: sourcePage,
+    } = result;
+
+    page.push(...sourcePage);
+    isDone = pageDone;
+
+    if (sourcePage.length === 0 && (pageDone || nextCursor === cursor)) {
+      break;
+    }
+
+    cursor = nextCursor;
+  }
+
+  return page;
 }
 
 export async function enrichClipsWithSpeaker<
