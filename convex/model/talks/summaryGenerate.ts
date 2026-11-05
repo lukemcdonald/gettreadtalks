@@ -8,7 +8,10 @@ import { internal } from '../../_generated/api';
 import { action, internalQuery } from '../../_generated/server';
 import { getOrThrow } from '../../lib/utils';
 import { requireAdmin } from '../auth/helpers';
-import { hasReviewedTalkFeature } from '../talkFeatures/helpers';
+import {
+  hasReviewedTalkFeature,
+  loadTalkFeature,
+} from '../talkFeatures/helpers';
 import {
   buildTalkSummaryPrompt,
   NO_TRANSCRIPT_SOURCE_MESSAGE,
@@ -184,16 +187,16 @@ export const loadTalkSummarySource = internalQuery({
 
 export const loadTalkDraftSource = internalQuery({
   args: {
+    asAdmin: v.optional(v.boolean()),
     talkId: v.id('talks'),
   },
-  handler: async (ctx, { talkId }) => {
+  handler: async (ctx, { asAdmin, talkId }) => {
+    if (asAdmin) {
+      await requireAdmin(ctx);
+    }
+
     const source = await readTalkSummarySource(ctx, talkId);
-    const feature = await ctx.db
-      .query('talkFeatures')
-      .withIndex('by_talkId_and_kind', (q) =>
-        q.eq('talkId', talkId).eq('kind', 'study')
-      )
-      .unique();
+    const feature = await loadTalkFeature(ctx, 'study', talkId);
 
     return {
       ...source,

@@ -4,14 +4,13 @@ import type { TalkSummarySource } from '../../talks/summaryGenerate';
 
 import { ConvexError, v } from 'convex/values';
 
-import { api, internal } from '../../../_generated/api';
+import { internal } from '../../../_generated/api';
 import { action } from '../../../_generated/server';
 import {
   NO_TRANSCRIPT_SOURCE_MESSAGE,
   TALK_SUMMARY_MODEL,
 } from '../../talks/summary/prompt';
 import { loadTranscriptForGenerate } from '../../talks/transcriptFetch';
-import { hasReviewedTalkFeature } from '../helpers';
 import { buildTalkStudyPrompt, TALK_STUDY_SYSTEM_PROMPT } from './prompt';
 
 export const STUDY_GENERATE_MESSAGES = {
@@ -124,17 +123,12 @@ export async function generateTalkStudy(
   ctx: ActionCtx,
   talkId: Id<'talks'>
 ): Promise<TalkStudyGenerateResult> {
-  const source: TalkSummarySource = await ctx.runQuery(
-    internal.talks.loadTalkSummarySource,
-    { talkId }
-  );
-
-  const feature = await ctx.runQuery(api.talkFeatures.getTalkFeature, {
-    kind: 'study',
+  const source = await ctx.runQuery(internal.talks.loadTalkDraftSource, {
+    asAdmin: true,
     talkId,
   });
 
-  if (hasReviewedTalkFeature(feature)) {
+  if (source.studyReviewed) {
     return toFailedResult('ALREADY_REVIEWED');
   }
 
