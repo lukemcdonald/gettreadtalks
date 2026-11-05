@@ -19,6 +19,9 @@ import {
 import { buildBreadcrumbJsonLd } from '@/lib/json-ld';
 import { buildPageMetadata } from '@/lib/metadata';
 
+// fallow-ignore-next-line unused-export
+export const ensureStatic = 'shell';
+
 interface CollectionPageProps {
   params: Promise<{ collectionSlug: string }>;
 }

@@ -9,6 +9,10 @@ import {
 import { v } from 'convex/values';
 
 import { query } from '../../_generated/server';
+import {
+  filterClipsWithPublishedTalk,
+  filterSpeakersWithPublicContent,
+} from '../../lib/filters';
 import { rotateContent } from '../../lib/rotateContent';
 import { byPublishedAt, getSpeakerComparator } from '../../lib/sort';
 import { paginateArray, toPublicTalk } from '../../lib/utils';
@@ -72,7 +76,7 @@ export const getSpeakerBySlug = query({
 
     const { _id: speakerId } = speaker;
 
-    const [talks, clips] = await Promise.all([
+    const [talks, clipRows] = await Promise.all([
       ctx.db
         .query('talks')
         .withIndex('by_speakerId_and_status', (q) =>
@@ -90,6 +94,7 @@ export const getSpeakerBySlug = query({
         .order('desc')
         .collect(),
     ]);
+    const clips = await filterClipsWithPublishedTalk(ctx, clipRows);
 
     const collectionIds = [
       ...new Set(
@@ -127,7 +132,7 @@ export const getSpeakerBySlug = query({
 });
 
 /**
- * List slugs for speakers with published talks or clips.
+ * List slugs for speakers with a published talk or a public clip.
  */
 export const listSpeakerSlugs = query({
   args: {},
@@ -162,6 +167,8 @@ export const getSpeakersCount = query({
   returns: v.number(),
 });
 
+const FEATURED_SPEAKER_POOL = 50;
+
 /**
  * Get featured speakers with daily rotation.
  */
@@ -171,22 +178,32 @@ export const listFeaturedSpeakers = query({
   },
   handler: async (ctx, args) => {
     const { limit = 6 } = args;
-
-    // Intentionally unbounded: Need all featured speakers for rotation
-    // Limited to 50 to prevent memory issues if featured speakers grow
-    const speakers = await ctx.db
+    const pool: Doc<'speakers'>[] = [];
+    const featured = ctx.db
       .query('speakers')
-      .withIndex('by_featured', (q) => q.eq('featured', true))
-      .take(50);
+      .withIndex('by_featured', (q) => q.eq('featured', true));
 
-    return rotateContent(speakers, { count: limit, period: 'daily' });
+    for await (const speaker of featured) {
+      // oxlint-disable-next-line no-await-in-loop -- stop once the rotation pool is full
+      const [visible] = await filterSpeakersWithPublicContent(ctx, [speaker]);
+
+      if (visible) {
+        pool.push(visible);
+      }
+
+      if (pool.length >= FEATURED_SPEAKER_POOL) {
+        break;
+      }
+    }
+
+    return rotateContent(pool, { count: limit, period: 'daily' });
   },
   returns: docs('speakers'),
 });
 
 /**
  * List speakers with pagination and optional filtering.
- * Filters to speakers who have at least one published talk or clip.
+ * Filters to speakers who have at least one published talk or public clip.
  */
 export const listSpeakers = query({
   args: {

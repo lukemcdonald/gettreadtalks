@@ -1,3 +1,4 @@
+import type { Doc } from '../../_generated/dataModel';
 import type { ContentSortOption } from '../../lib/sort';
 
 import { getOneFrom } from 'convex-helpers/server/relationships';
@@ -8,7 +9,7 @@ import {
 import { v } from 'convex/values';
 
 import { query } from '../../_generated/server';
-import { filterClipsByPublishedTalks } from '../../lib/filters';
+import { filterClipsWithPublishedTalk } from '../../lib/filters';
 import { getContentComparator } from '../../lib/sort';
 import { paginateArray, toPublicTalk } from '../../lib/utils';
 import { doc, docs } from '../../lib/validators/schema';
@@ -101,7 +102,7 @@ export const getClipBySlug = query({
       return null;
     }
 
-    const publishedClips = await filterClipsByPublishedTalks(ctx, [clip]);
+    const publishedClips = await filterClipsWithPublishedTalk(ctx, [clip]);
 
     if (publishedClips.length === 0) {
       return null;
@@ -134,7 +135,7 @@ const sortType = v.optional(
 /**
  * List published clips with speaker data (public-facing).
  * Supports filtering by search, speaker, and sorting.
- * Filters clips to only those with published parent talks.
+ * Keeps clips with no parent talk, or a published parent talk.
  */
 export const listClips = query({
   args: {
@@ -216,13 +217,32 @@ export const listClipsBySpeaker = query({
   handler: async (ctx, args) => {
     const { limit = 20, speakerId } = args;
 
-    return await ctx.db
+    if (limit <= 0) {
+      return [];
+    }
+
+    const visible: Doc<'clips'>[] = [];
+    const clips = ctx.db
       .query('clips')
       .withIndex('by_speakerId_and_status', (q) =>
         q.eq('speakerId', speakerId).eq('status', 'published')
       )
-      .order('desc')
-      .take(limit);
+      .order('desc');
+
+    for await (const clip of clips) {
+      // oxlint-disable-next-line no-await-in-loop -- stop at the requested number of public clips
+      const [published] = await filterClipsWithPublishedTalk(ctx, [clip]);
+
+      if (published) {
+        visible.push(published);
+      }
+
+      if (visible.length >= limit) {
+        break;
+      }
+    }
+
+    return visible;
   },
   returns: docs('clips'),
 });

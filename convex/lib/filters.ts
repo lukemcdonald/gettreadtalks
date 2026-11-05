@@ -4,43 +4,69 @@ import type { QueryCtx } from '../_generated/server';
 import { getOneFrom } from 'convex-helpers/server/relationships';
 
 /**
- * Filter speakers to only those with at least one published talk or clip.
+ * A published clip counts when it has no parent talk, or that talk is published.
+ * Stops at the first match.
+ */
+async function speakerHasPublicClip(ctx: QueryCtx, speakerId: Id<'speakers'>) {
+  const clips = ctx.db
+    .query('clips')
+    .withIndex('by_speakerId_and_status', (q) =>
+      q.eq('speakerId', speakerId).eq('status', 'published')
+    );
+
+  for await (const clip of clips) {
+    // oxlint-disable-next-line no-await-in-loop -- stop at the first public clip
+    const [visible] = await filterClipsWithPublishedTalk(ctx, [clip]);
+
+    if (visible) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/**
+ * Keep speakers with a published talk or a public clip.
  * Building block for listPublishedSpeakers / searchPublishedSpeakers.
  */
-export async function filterSpeakersWithPublishedTalks(
+export async function filterSpeakersWithPublicContent(
   ctx: QueryCtx,
   speakers: Doc<'speakers'>[]
 ): Promise<Doc<'speakers'>[]> {
   const results = await Promise.all(
     speakers.map(async (speaker) => {
-      const [hasTalks, hasClips] = await Promise.all([
-        ctx.db
-          .query('talks')
-          .withIndex('by_speakerId_and_status', (q) =>
-            q.eq('speakerId', speaker._id).eq('status', 'published')
-          )
-          .first(),
-        ctx.db
-          .query('clips')
-          .withIndex('by_speakerId_and_status', (q) =>
-            q.eq('speakerId', speaker._id).eq('status', 'published')
-          )
-          .first(),
-      ]);
+      const hasTalks = await ctx.db
+        .query('talks')
+        .withIndex('by_speakerId_and_status', (q) =>
+          q.eq('speakerId', speaker._id).eq('status', 'published')
+        )
+        .first();
 
-      return hasTalks || hasClips ? speaker : null;
+      if (hasTalks) {
+        return speaker;
+      }
+
+      const hasClips = await speakerHasPublicClip(ctx, speaker._id);
+
+      if (hasClips) {
+        return speaker;
+      }
+
+      return null;
     })
   );
 
-  return results.filter((s): s is Doc<'speakers'> => s !== null);
+  return results.filter(
+    (speaker): speaker is Doc<'speakers'> => speaker !== null
+  );
 }
 
 /**
- * Filter clips to only those with published parent talks.
- * Clips without a parent talk (standalone clips) are included.
+ * Keep a clip with no parent talk, or a published parent talk.
  * Building block for listPublishedClips / searchPublishedClips.
  */
-export async function filterClipsByPublishedTalks(
+export async function filterClipsWithPublishedTalk(
   ctx: QueryCtx,
   clips: Doc<'clips'>[]
 ): Promise<Doc<'clips'>[]> {
