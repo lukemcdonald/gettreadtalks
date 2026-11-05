@@ -169,6 +169,65 @@ export function getPublishedAtForStatus(
   return undefined;
 }
 
+// Keep each read inside a normal Convex page, and stop a scan that never fills.
+const MAX_PAGE_READS = 50;
+const MAX_READ_SIZE = 1000;
+
+/**
+ * Read until `numItems` rows survive `accept`, or the source is done.
+ * Rejected rows advance the cursor, so an empty filtered page does not end pagination.
+ */
+export async function loadFullPage<TSource, TItem>(
+  loadPage: (
+    paginationOpts: PaginationOptions
+  ) => Promise<PaginationResult<TSource>>,
+  accept: (items: TSource[]) => Promise<TItem[]> | TItem[],
+  paginationOpts: PaginationOptions
+): Promise<PaginationResult<TItem>> {
+  const target = paginationOpts.numItems;
+  const page: TItem[] = [];
+  let { cursor } = paginationOpts;
+  let isDone = false;
+  let continueCursor = '';
+
+  for (
+    let read = 0;
+    page.length < target && !isDone && read < MAX_PAGE_READS;
+    read += 1
+  ) {
+    const numItems = Math.min(MAX_READ_SIZE, target - page.length);
+    // oxlint-disable-next-line no-await-in-loop -- the next cursor depends on this page
+    const result = await loadPage({
+      ...paginationOpts,
+      cursor,
+      numItems,
+    });
+    const {
+      continueCursor: nextCursor,
+      isDone: pageDone,
+      page: sourcePage,
+    } = result;
+    // oxlint-disable-next-line no-await-in-loop -- acceptance can read documents on this page
+    const accepted = await accept(sourcePage);
+
+    page.push(...accepted);
+    continueCursor = nextCursor;
+    isDone = pageDone;
+
+    if (nextCursor === cursor) {
+      break;
+    }
+
+    cursor = nextCursor;
+  }
+
+  return {
+    continueCursor,
+    isDone,
+    page,
+  };
+}
+
 /**
  * Manually paginate an array with cursor support.
  * Returns page, continuation cursor, and done status.

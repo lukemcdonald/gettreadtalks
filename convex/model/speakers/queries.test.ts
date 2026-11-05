@@ -7,8 +7,10 @@ import {
   signInAs,
   visibilitySlugs,
 } from '../../test.setup';
+import { insertClip } from '../clips/test.factory';
 import { insertTalk } from '../talks/test.factory';
 import { insertTalkOnTopic, insertTopic } from '../topics/test.factory';
+import { insertSpeaker } from './test.factory';
 
 describe('listSpeakerSlugs', () => {
   it('lists only speakers with published talks or clips', async () => {
@@ -121,6 +123,87 @@ describe('getSpeakerBySlug', () => {
       visibilitySlugs.publishedTalk,
       'older-speaker-talk',
     ]);
+  });
+
+  it('omits clips whose parent talk is unpublished', async () => {
+    const t = createConvexTest();
+    await seedVisibilityCatalog(t);
+
+    const speaker = await t.query(api.speakers.getSpeakerBySlug, {
+      slug: visibilitySlugs.publishedSpeaker,
+    });
+
+    expect(speaker?.clips.map((clip) => clip.slug).toSorted()).toEqual([
+      visibilitySlugs.clipOnPublishedTalk,
+      visibilitySlugs.standaloneClip,
+    ]);
+  });
+});
+
+describe('listFeaturedSpeakers', () => {
+  it('keeps scanning past featured speakers with no public content', async () => {
+    const t = createConvexTest();
+
+    await t.run(async (ctx) => {
+      for (let index = 0; index < 51; index += 1) {
+        // oxlint-disable-next-line no-await-in-loop -- featured index order follows insert order
+        const speakerId = await insertSpeaker(ctx, {
+          featured: true,
+          firstName: 'Hidden',
+          lastName: `Speaker ${index}`,
+          slug: `hidden-featured-${index}`,
+        });
+        // oxlint-disable-next-line no-await-in-loop -- featured index order follows insert order
+        const talkId = await insertTalk(ctx, {
+          slug: `hidden-featured-talk-${index}`,
+          speakerId,
+          status: 'backlog',
+          title: `Hidden Featured Talk ${index}`,
+        });
+
+        // oxlint-disable-next-line no-await-in-loop -- featured index order follows insert order
+        await insertClip(ctx, {
+          slug: `hidden-featured-clip-${index}`,
+          speakerId,
+          talkId,
+          title: `Hidden Featured Clip ${index}`,
+        });
+      }
+
+      const standaloneId = await insertSpeaker(ctx, {
+        featured: true,
+        firstName: 'Standalone',
+        lastName: 'Featured',
+        slug: 'standalone-featured',
+      });
+      const visibleId = await insertSpeaker(ctx, {
+        featured: true,
+        firstName: 'Visible',
+        lastName: 'Featured',
+        slug: 'visible-featured',
+      });
+
+      await insertClip(ctx, {
+        slug: 'standalone-featured-clip',
+        speakerId: standaloneId,
+        title: 'Standalone Featured Clip',
+      });
+      await insertTalk(ctx, {
+        slug: 'visible-featured-talk',
+        speakerId: visibleId,
+        title: 'Visible Featured Talk',
+      });
+    });
+
+    const speakers = await t.query(api.speakers.listFeaturedSpeakers, {
+      limit: 6,
+    });
+    const slugs = speakers.map((speaker) => speaker.slug);
+
+    expect(slugs).toContain('standalone-featured');
+    expect(slugs).toContain('visible-featured');
+    expect(slugs).not.toContain('hidden-featured-0');
+    expect(slugs).not.toContain('hidden-featured-50');
   });
 });
 

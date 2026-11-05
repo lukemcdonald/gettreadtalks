@@ -65,3 +65,60 @@ describe('getClipBySlug', () => {
     expect(unpublishedParent).toBeNull();
   });
 });
+
+describe('listClips', () => {
+  it('keeps a later page when a clip on an unpublished talk drops out', async () => {
+    const t = createConvexTest();
+    await seedVisibilityCatalog(t);
+
+    const first = await t.query(api.clips.listClips, {
+      paginationOpts: {
+        cursor: null,
+        numItems: 2,
+      },
+    });
+
+    expect(first.page.map((clip) => clip.slug)).toEqual([
+      visibilitySlugs.standaloneClip,
+    ]);
+    expect(first.isDone).toBe(false);
+
+    const second = await t.query(api.clips.listClips, {
+      paginationOpts: {
+        cursor: first.continueCursor,
+        numItems: 2,
+      },
+    });
+
+    expect(second.page.map((clip) => clip.slug)).toEqual([
+      visibilitySlugs.clipOnPublishedTalk,
+    ]);
+    expect(second.isDone).toBe(true);
+  });
+});
+
+describe('listClipsBySpeaker', () => {
+  it('omits clips whose parent talk is unpublished', async () => {
+    const t = createConvexTest();
+    await seedVisibilityCatalog(t);
+    const speaker = await t.query(api.speakers.getSpeakerBySlug, {
+      slug: visibilitySlugs.publishedSpeaker,
+    });
+
+    expect(speaker).not.toBeNull();
+
+    if (!speaker) {
+      throw new Error('expected a published speaker');
+    }
+
+    const clips = await t.query(api.clips.listClipsBySpeaker, {
+      limit: 2,
+      speakerId: speaker.speaker._id,
+    });
+
+    expect(clips.map((clip) => clip.slug)).toEqual([
+      visibilitySlugs.standaloneClip,
+      visibilitySlugs.clipOnPublishedTalk,
+    ]);
+  });
+});

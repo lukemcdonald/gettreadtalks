@@ -4,6 +4,7 @@ import { fetchQuery } from 'convex/nextjs';
 import { cacheLife, cacheTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
+import { loadFullPage } from '@/convex/lib/utils';
 
 interface GetClipsProps {
   cursor?: string;
@@ -22,18 +23,20 @@ export async function loadClips(args?: GetClipsProps) {
   cacheTag('clips');
 
   const { cursor, limit = 50, search, speakerSlugs } = args ?? {};
-
-  const paginationOpts = {
-    cursor: cursor ?? null,
-    numItems: limit,
-  };
-
-  const result = await fetchQuery(api.clips.listClips, {
-    paginationOpts,
-    search,
-    sort: 'recent',
-    speakerSlugs,
-  });
+  const result = await loadFullPage(
+    (paginationOpts) =>
+      fetchQuery(api.clips.listClips, {
+        paginationOpts,
+        search,
+        sort: 'recent',
+        speakerSlugs,
+      }),
+    (clips) => clips,
+    {
+      cursor: cursor ?? null,
+      numItems: limit,
+    }
+  );
 
   return {
     clips: result.page,

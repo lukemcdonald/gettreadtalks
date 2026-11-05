@@ -1,3 +1,4 @@
+import type { Doc } from '../../_generated/dataModel';
 import type { ContentSortOption } from '../../lib/sort';
 
 import { getOneFrom } from 'convex-helpers/server/relationships';
@@ -215,14 +216,28 @@ export const listClipsBySpeaker = query({
   },
   handler: async (ctx, args) => {
     const { limit = 20, speakerId } = args;
-
-    return await ctx.db
+    const visible: Doc<'clips'>[] = [];
+    const clips = ctx.db
       .query('clips')
       .withIndex('by_speakerId_and_status', (q) =>
         q.eq('speakerId', speakerId).eq('status', 'published')
       )
-      .order('desc')
-      .take(limit);
+      .order('desc');
+
+    for await (const clip of clips) {
+      // oxlint-disable-next-line no-await-in-loop -- stop at the requested number of public clips
+      const [published] = await filterClipsByPublishedTalks(ctx, [clip]);
+
+      if (published) {
+        visible.push(published);
+      }
+
+      if (visible.length >= limit) {
+        break;
+      }
+    }
+
+    return visible;
   },
   returns: docs('clips'),
 });

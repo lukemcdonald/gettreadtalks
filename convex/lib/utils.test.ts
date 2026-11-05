@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   getPublishedAtForStatus,
+  loadFullPage,
   paginateArray,
   paginateSearchOrList,
   slugify,
@@ -124,5 +125,154 @@ describe('paginateSearchOrList', () => {
     });
 
     expect(unfiltered).toBe(listed);
+  });
+});
+
+describe('loadFullPage', () => {
+  function pageOf(items: string[]) {
+    return (opts: { cursor: string | null; numItems: number }) =>
+      Promise.resolve(paginateArray(items, opts.cursor, opts.numItems));
+  }
+
+  it('reads past rejected rows until the page is full', async () => {
+    const items = ['drop', 'keep-a', 'drop', 'keep-b', 'keep-c'];
+    const accept = (rows: string[]) =>
+      rows.filter((row) => row.startsWith('keep'));
+    const first = await loadFullPage(pageOf(items), accept, {
+      cursor: null,
+      numItems: 2,
+    });
+
+    expect(first.page).toEqual(['keep-a', 'keep-b']);
+    expect(first.isDone).toBe(false);
+
+    const second = await loadFullPage(pageOf(items), accept, {
+      cursor: first.continueCursor,
+      numItems: 2,
+    });
+
+    expect(second).toEqual({
+      continueCursor: '',
+      isDone: true,
+      page: ['keep-c'],
+    });
+  });
+
+  it('follows the cursor when one read cannot hold the requested rows', async () => {
+    const items = Array.from({ length: 1001 }, (_, index) => String(index));
+    let reads = 0;
+    const result = await loadFullPage(
+      (opts) => {
+        reads += 1;
+
+        expect(opts.numItems).toBeLessThanOrEqual(1000);
+        expect(Number.isFinite(opts.numItems)).toBe(true);
+
+        return Promise.resolve(
+          paginateArray(items, opts.cursor, opts.numItems)
+        );
+      },
+      (rows) => rows,
+      {
+        cursor: null,
+        numItems: Number.POSITIVE_INFINITY,
+      }
+    );
+
+    expect(reads).toBeGreaterThan(1);
+    expect(result.isDone).toBe(true);
+    expect(result.page).toEqual(items);
+  });
+
+  it('reads the next page when a filtered page is empty', async () => {
+    let reads = 0;
+    const result = await loadFullPage(
+      (opts) => {
+        reads += 1;
+
+        if (reads === 1) {
+          expect(opts).toMatchObject({
+            cursor: null,
+            maximumBytesRead: 2048,
+            numItems: 1,
+          });
+
+          return Promise.resolve({
+            continueCursor: 'next',
+            isDone: false,
+            page: [],
+          });
+        }
+
+        return Promise.resolve({
+          continueCursor: '',
+          isDone: true,
+          page: ['keep'],
+        });
+      },
+      (rows) => rows,
+      {
+        cursor: null,
+        maximumBytesRead: 2048,
+        numItems: 1,
+      }
+    );
+
+    expect(result).toEqual({
+      continueCursor: '',
+      isDone: true,
+      page: ['keep'],
+    });
+  });
+
+  it('keeps a later page when filtering empties the scanned rows', async () => {
+    const seen: { cursor: string | null; maximumBytesRead?: number }[] = [];
+    const result = await loadFullPage(
+      (opts) => {
+        seen.push(opts);
+
+        return Promise.resolve({
+          continueCursor: `page-${seen.length}`,
+          isDone: false,
+          page: ['hidden'],
+        });
+      },
+      () => [],
+      {
+        cursor: null,
+        maximumBytesRead: 2048,
+        numItems: 3,
+      }
+    );
+
+    expect(seen[0]).toMatchObject({
+      cursor: null,
+      maximumBytesRead: 2048,
+      numItems: 3,
+    });
+    expect(seen[1]).toMatchObject({
+      cursor: 'page-1',
+      maximumBytesRead: 2048,
+    });
+    expect(result.page).toEqual([]);
+    expect(result.isDone).toBe(false);
+    expect(result.continueCursor).toBe(`page-${seen.length}`);
+  });
+
+  it('ends when the source is done even if every row was rejected', async () => {
+    const result = await loadFullPage(
+      pageOf(['drop', 'drop']),
+      (rows) => rows.filter((row) => row === 'keep'),
+      {
+        cursor: null,
+        numItems: 2,
+      }
+    );
+
+    expect(result).toEqual({
+      continueCursor: '',
+      isDone: true,
+      page: [],
+    });
   });
 });
