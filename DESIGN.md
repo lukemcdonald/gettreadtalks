@@ -52,7 +52,7 @@ The document has one site `header`, one `main` (`#main`, skip target), and one `
 
 Every public page has one `h1` (`PageHeader` or `HeroTitle`). Real section titles are `h2` (`SectionHeading`, `FeaturedGrid`, search groups). Card titles (`MediaCardTitle`) and featured captions are one level below their container: `h3` under a section `h2`, `h2` on flat listings. Nested groups under an `h2` may use `h3`. Do not skip levels. Metadata labels (`MetadataGroup`) and footer column titles are not headings.
 
-Overlays: `Dialog` for centered blocking UI (confirm, alert, desktop search). Bottom drawers use `BottomDrawer` / `BottomDrawerPopup` (`src/components/ui/bottom-drawer.tsx`): half-viewport minimum, drag bar, optional locked `height` (`half` for filters, `tall` for search). `FormSheet` (`src/components/ui/form-sheet.tsx`) stays a `Drawer` — right on large screens, bottom on small — and uses `BottomDrawerPopup` so only the bottom state gets the floor. Do not import `Sheet` in feature or page code.
+Overlays: `Dialog` for centered blocking UI (confirm, alert, desktop search). Bottom drawers use `BottomDrawer` / `BottomDrawerPopup` (`src/components/ui/bottom-drawer.tsx`): default locked half-viewport height, drag bar, optional `height="tall"` for search. Child panels own scrolling and fill. `FormSheet` (`src/components/ui/form-sheet.tsx`) stays a `Drawer` — right on large screens, bottom on small — and uses `BottomDrawerPopup` so only the bottom state gets the height. Do not import `Sheet` in feature or page code.
 
 The header is `src/components/site-header/site-header.tsx`. Desktop shows branding, nav, search, theme, and account. Mobile is search plus menu only; account and theme live in `src/components/site-header/navigation/mobile-nav.tsx`.
 

@@ -107,55 +107,60 @@ export function MobileNav({ className }: MobileNavProps) {
           </div>
         </DrawerHeader>
 
-        <DrawerPanel scrollable={false}>
-          <DrawerMenu aria-label="Mobile navigation">
-            <DrawerMenuGroup>
-              {NAVIGATION_LINKS.map((link) => (
-                <MobileNavMenuLink
-                  href={link.href}
-                  isActive={pathname === link.href}
-                  key={link.href}
-                  label={link.label}
-                />
-              ))}
-            </DrawerMenuGroup>
-          </DrawerMenu>
-        </DrawerPanel>
-
-        {!isLoading && (
-          <CommandPanel className="rounded-b-none p-6 [clip-path:inset(0_1px)] not-has-[+[data-slot=command-footer]]:rounded-b-none not-has-[+[data-slot=command-footer]]:[clip-path:inset(0_1px)]">
-            <DrawerMenu>
-              {user ? (
-                <>
-                  <AccountIdentity user={user} />
-                  <DrawerMenuGroup>
-                    {getAccountMenuLinks(showContentLink).map((link) => (
-                      <MobileNavMenuLink
-                        href={link.href}
-                        isActive={isAccountMenuLinkActive(link.href, pathname)}
-                        key={link.href}
-                        label={link.label}
-                      />
-                    ))}
-                  </DrawerMenuGroup>
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain">
+          <DrawerPanel scrollable={false}>
+            <DrawerMenu aria-label="Mobile navigation">
+              <DrawerMenuGroup>
+                {NAVIGATION_LINKS.map((link) => (
                   <MobileNavMenuLink
-                    className="text-muted-foreground"
-                    href={ACCOUNT_MENU_SIGN_OUT_HREF}
-                    label="Sign out"
+                    href={link.href}
+                    isActive={pathname === link.href}
+                    key={link.href}
+                    label={link.label}
                   />
-                </>
-              ) : (
-                <DrawerMenuGroup>
-                  <MobileNavMenuLink
-                    href="/login"
-                    isActive={pathname === '/login'}
-                    label="Sign In"
-                  />
-                </DrawerMenuGroup>
-              )}
+                ))}
+              </DrawerMenuGroup>
             </DrawerMenu>
-          </CommandPanel>
-        )}
+          </DrawerPanel>
+
+          {!isLoading && (
+            <CommandPanel className="rounded-b-none p-6 [clip-path:inset(0_1px)] not-has-[+[data-slot=command-footer]]:rounded-b-none not-has-[+[data-slot=command-footer]]:[clip-path:inset(0_1px)]">
+              <DrawerMenu>
+                {user ? (
+                  <>
+                    <AccountIdentity user={user} />
+                    <DrawerMenuGroup>
+                      {getAccountMenuLinks(showContentLink).map((link) => (
+                        <MobileNavMenuLink
+                          href={link.href}
+                          isActive={isAccountMenuLinkActive(
+                            link.href,
+                            pathname
+                          )}
+                          key={link.href}
+                          label={link.label}
+                        />
+                      ))}
+                    </DrawerMenuGroup>
+                    <MobileNavMenuLink
+                      className="text-muted-foreground"
+                      href={ACCOUNT_MENU_SIGN_OUT_HREF}
+                      label="Sign out"
+                    />
+                  </>
+                ) : (
+                  <DrawerMenuGroup>
+                    <MobileNavMenuLink
+                      href="/login"
+                      isActive={pathname === '/login'}
+                      label="Sign In"
+                    />
+                  </DrawerMenuGroup>
+                )}
+              </DrawerMenu>
+            </CommandPanel>
+          )}
+        </div>
       </BottomDrawerPopup>
     </BottomDrawer>
   );

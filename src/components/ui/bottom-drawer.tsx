@@ -7,8 +7,8 @@ import { cn } from '@/utils';
 import { Drawer, DrawerPopup } from './primitives/drawer';
 
 const BOTTOM_DRAWER_HEIGHT_CLASS = {
-  half: '[--drawer-height:50dvh]',
-  tall: '[--drawer-height:90dvh]',
+  half: 'data-[swipe-direction=down]:[--drawer-height:50dvh]',
+  tall: 'data-[swipe-direction=down]:[--drawer-height:90dvh]',
 } as const;
 
 type BottomDrawerHeight = keyof typeof BOTTOM_DRAWER_HEIGHT_CLASS;
@@ -23,20 +23,16 @@ export function BottomDrawer(
   return <Drawer {...delegated} position="bottom" />;
 }
 
-/** Half-viewport floor on bottom sheets. `height` locks the sheet so nested popups cannot resize it. */
+/** Locked half-viewport height on bottom sheets. Pass `tall` for search. */
 export function BottomDrawerPopup({
   className,
-  height,
+  height = 'half',
   showBar = true,
   ...delegated
 }: BottomDrawerPopupProps) {
   return (
     <DrawerPopup
-      className={cn(
-        'data-[swipe-direction=down]:min-h-[50dvh]',
-        height && BOTTOM_DRAWER_HEIGHT_CLASS[height],
-        className
-      )}
+      className={cn(BOTTOM_DRAWER_HEIGHT_CLASS[height], className)}
       showBar={showBar}
       {...delegated}
     />
