@@ -121,4 +121,47 @@ describe('updateTalk publishedAt', () => {
       },
     });
   });
+
+  it('saves a summary with talk fields in one mutation', async () => {
+    const { asAdmin, speakerId, t } = await seedAdminTalk();
+    const talkId = await asAdmin.mutation(api.talks.createTalk, {
+      mediaUrl: MEDIA_URL,
+      speakerId,
+      status: 'published',
+      title: 'Original Title',
+    });
+
+    await asAdmin.mutation(api.talks.updateTalk, {
+      summary: 'Saved with the title.',
+      talkId,
+      title: 'Updated Title',
+    });
+
+    const talk = await t.run(async (ctx) => await ctx.db.get('talks', talkId));
+
+    expect(talk?.summary).toBe('Saved with the title.');
+    expect(talk?.title).toBe('Updated Title');
+    expect(talk?.summaryManuallyEditedAt).toEqual(expect.any(Number));
+  });
+
+  it('leaves the summary unpublished when it is omitted', async () => {
+    const { asAdmin, speakerId, t } = await seedAdminTalk();
+    const talkId = await asAdmin.mutation(api.talks.createTalk, {
+      mediaUrl: MEDIA_URL,
+      speakerId,
+      status: 'published',
+      title: 'Original Title',
+    });
+
+    await asAdmin.mutation(api.talks.updateTalk, {
+      talkId,
+      title: 'Updated Title',
+    });
+
+    const talk = await t.run(async (ctx) => await ctx.db.get('talks', talkId));
+
+    expect(talk?.summary).toBeUndefined();
+    expect(talk?.summaryManuallyEditedAt).toBeUndefined();
+    expect(talk?.title).toBe('Updated Title');
+  });
 });

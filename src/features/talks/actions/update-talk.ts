@@ -12,13 +12,15 @@ import { toConvexFormErrors, toZodFormErrors } from '@/lib/forms/validation';
 import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
 
 import { talkFormSchema } from '../schemas/talk-form';
+import { talkSummaryFormSchema } from '../schemas/talk-study-form';
 
 /**
  * Updates an existing talk. Validates data on server and requires admin authorization.
  */
 export async function updateTalkAction(
   data: unknown,
-  talkId: TalkId
+  talkId: TalkId,
+  summary?: string
 ): Promise<ActionResult<{ talkId: string }>> {
   // Re-verify authorization on every request
   await requireAdminUser();
@@ -32,12 +34,24 @@ export async function updateTalkAction(
     };
   }
 
+  if (summary !== undefined) {
+    const parsedSummary = talkSummaryFormSchema.safeParse({ summary });
+
+    if (!parsedSummary.success) {
+      return {
+        errors: toZodFormErrors(parsedSummary.error),
+        success: false,
+      };
+    }
+  }
+
   try {
     const { publishedAt, ...talk } = parsed.data;
 
     await fetchAuthMutation(api.talks.updateTalk, {
       ...talk,
       ...(publishedAt ? { publishedAt: parseUtcDate(publishedAt) } : {}),
+      ...(summary === undefined ? {} : { summary }),
       talkId,
     });
 

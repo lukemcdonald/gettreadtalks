@@ -5,9 +5,9 @@ import type { RotationPeriod } from '@/convex/lib/rotateContent';
 import { cacheLife } from 'next/cache';
 
 import {
+  getRotationCacheLife,
   getTimeSeed,
   rotateContent,
-  secondsUntilNextRotation,
 } from '@/convex/lib/rotateContent';
 
 interface RotateCachedContentOptions {
@@ -21,16 +21,12 @@ export async function rotateCachedContent<T>(
   options: RotateCachedContentOptions = {}
 ) {
   const count = options.count ?? 1;
+  const now = Date.now();
   const period = options.period ?? 'daily';
-  const expire = secondsUntilNextRotation(period);
 
-  cacheLife({
-    expire,
-    revalidate: expire,
-    stale: expire,
-  });
+  cacheLife(getRotationCacheLife(period, now));
 
-  return await rotateForBucket(items, count, getTimeSeed(period));
+  return await rotateForBucket(items, count, getTimeSeed(period, now));
 }
 
 async function rotateForBucket<T>(items: T[], count: number, bucket: number) {

@@ -62,11 +62,11 @@ interface PendingTalkUpdate {
 
 function useEditTalkSheet({
   closeHref,
-  saveSummary,
+  getDirtySummary,
   statusPrefill,
   talk,
 }: Pick<EditTalkSheetProps, 'closeHref' | 'statusPrefill' | 'talk'> & {
-  saveSummary: () => Promise<{ success: boolean }>;
+  getDirtySummary: () => string | undefined;
 }) {
   const { handleOpenChange, handleSuccess } = useSheetRoute(closeHref);
   const [isPending, startTransition] = useTransition();
@@ -82,16 +82,10 @@ function useEditTalkSheet({
 
   function submitData(data: TalkFormData) {
     startTransition(async () => {
-      const result = await updateTalkAction(data, talk._id);
+      const result = await updateTalkAction(data, talk._id, getDirtySummary());
 
       if (!result.success) {
         setServerErrors(form.setError, result.errors);
-        return;
-      }
-
-      const summaryResult = await saveSummary();
-
-      if (!summaryResult.success) {
         return;
       }
 
@@ -180,7 +174,7 @@ export function EditTalkSheet({
     setPendingUpdate,
   } = useEditTalkSheet({
     closeHref,
-    saveSummary: summary.save,
+    getDirtySummary: summary.getDirtySummary,
     statusPrefill,
     talk,
   });
