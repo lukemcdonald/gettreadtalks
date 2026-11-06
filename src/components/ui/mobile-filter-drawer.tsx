@@ -4,13 +4,12 @@ import type { ReactNode } from 'react';
 
 import { SlidersHorizontalIcon } from 'lucide-react';
 
+import { BottomDrawer, BottomDrawerPopup } from '@/components/ui/bottom-drawer';
 import { Badge } from '@/components/ui/primitives/badge';
 import { Button } from '@/components/ui/primitives/button';
 import {
-  Drawer,
   DrawerHeader,
   DrawerPanel,
-  DrawerPopup,
   DrawerTitle,
   DrawerTrigger,
 } from '@/components/ui/primitives/drawer';
@@ -93,20 +92,16 @@ export function MobileFilterDrawer({
     variant === 'icon' ? IconFilterTrigger : DefaultFilterTrigger;
 
   return (
-    <Drawer onOpenChange={onOpenChange} open={open} position="bottom">
+    <BottomDrawer onOpenChange={onOpenChange} open={open}>
       <FilterTrigger count={count} label={label} showCount={showCount} />
-      <DrawerPopup
-        className="[--drawer-height:50dvh]"
-        showBar
-        variant="default"
-      >
+      <BottomDrawerPopup height="half">
         <DrawerHeader>
           <DrawerTitle>{title ?? label}</DrawerTitle>
         </DrawerHeader>
         <DrawerPanel className="min-h-0 flex-1">
           <div className="flex flex-col gap-5 pb-2">{children}</div>
         </DrawerPanel>
-      </DrawerPopup>
-    </Drawer>
+      </BottomDrawerPopup>
+    </BottomDrawer>
   );
 }

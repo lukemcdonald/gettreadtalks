@@ -5,10 +5,10 @@ import type { SearchOverlayProps } from '@/features/search/types';
 import { useRef } from 'react';
 
 import {
+  BottomDrawer,
+  BottomDrawerPopup,
   CommandPanel,
-  Drawer,
   DrawerPanel,
-  DrawerPopup,
   DrawerTitle,
 } from '@/components/ui';
 
@@ -36,17 +36,12 @@ export function MobileSearchDrawer({
   }
 
   return (
-    <Drawer
+    <BottomDrawer
       onOpenChange={onOpenChange}
       onOpenChangeComplete={handleOpenChangeComplete}
       open={open}
-      position="bottom"
     >
-      <DrawerPopup
-        className="[--drawer-height:90dvh]"
-        showBar
-        variant="default"
-      >
+      <BottomDrawerPopup height="tall">
         <SearchCommand
           groups={groups}
           onInputValueChange={onValueChange}
@@ -64,7 +59,7 @@ export function MobileSearchDrawer({
             </CommandPanel>
           </DrawerPanel>
         </SearchCommand>
-      </DrawerPopup>
-    </Drawer>
+      </BottomDrawerPopup>
+    </BottomDrawer>
   );
 }

@@ -15,16 +15,16 @@ import { NAVIGATION_LINKS } from '@/components/site-header/constants';
 import { ModeSwitcher } from '@/components/site-header/mode-switcher';
 import { SiteBranding } from '@/components/site-header/site-branding';
 import {
+  BottomDrawer,
+  BottomDrawerPopup,
   Button,
   CommandPanel,
-  Drawer,
   DrawerClose,
   DrawerHeader,
   DrawerMenu,
   DrawerMenuGroup,
   DrawerMenuItem,
   DrawerPanel,
-  DrawerPopup,
   DrawerTitle,
   DrawerTrigger,
 } from '@/components/ui';
@@ -73,7 +73,7 @@ export function MobileNav({ className }: MobileNavProps) {
   const showContentLink = isAdmin(user);
 
   return (
-    <Drawer position="bottom">
+    <BottomDrawer>
       <DrawerTrigger
         render={
           <Button
@@ -87,12 +87,7 @@ export function MobileNav({ className }: MobileNavProps) {
         }
       />
 
-      <DrawerPopup
-        className="before:bg-muted/72 data-[swipe-direction=down]:min-h-[50dvh]"
-        showBar
-        showCloseButton={false}
-        variant="default"
-      >
+      <BottomDrawerPopup className="before:bg-muted/72">
         <DrawerHeader className="flex-row items-center justify-between">
           <DrawerTitle className="sr-only">Navigation menu</DrawerTitle>
           <SiteBranding />
@@ -161,7 +156,7 @@ export function MobileNav({ className }: MobileNavProps) {
             </DrawerMenu>
           </CommandPanel>
         )}
-      </DrawerPopup>
-    </Drawer>
+      </BottomDrawerPopup>
+    </BottomDrawer>
   );
 }
