@@ -88,7 +88,7 @@ export function MobileNav({ className }: MobileNavProps) {
       />
 
       <DrawerPopup
-        className="before:bg-muted/72"
+        className="before:bg-muted/72 data-[swipe-direction=down]:min-h-[50dvh]"
         showBar
         showCloseButton={false}
         variant="default"

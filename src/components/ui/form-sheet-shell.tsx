@@ -36,7 +36,7 @@ export function FormSheetShell({
       position={isDesktop ? 'right' : 'bottom'}
     >
       <DrawerPopup
-        className="has-data-[slot=drawer-bar]:ps-0 has-data-[slot=drawer-bar]:pt-0"
+        className="has-data-[slot=drawer-bar]:ps-0 has-data-[slot=drawer-bar]:pt-0 data-[swipe-direction=down]:min-h-[50dvh]"
         data-testid={testId}
         showBar={!isDesktop}
         showCloseButton

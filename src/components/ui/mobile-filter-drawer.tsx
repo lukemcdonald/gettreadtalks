@@ -95,11 +95,16 @@ export function MobileFilterDrawer({
   return (
     <Drawer onOpenChange={onOpenChange} open={open} position="bottom">
       <FilterTrigger count={count} label={label} showCount={showCount} />
-      <DrawerPopup showBar variant="default">
+      <DrawerPopup
+        className="[--drawer-height:50dvh]"
+        data-testid="mobile-filter-drawer"
+        showBar
+        variant="default"
+      >
         <DrawerHeader>
           <DrawerTitle>{title ?? label}</DrawerTitle>
         </DrawerHeader>
-        <DrawerPanel>
+        <DrawerPanel className="min-h-0 flex-1">
           <div className="flex flex-col gap-5 pb-2">{children}</div>
         </DrawerPanel>
       </DrawerPopup>
