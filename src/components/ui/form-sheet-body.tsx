@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
-import { DrawerFooter, DrawerPanel } from '@/components/ui/primitives/drawer';
+import { BottomDrawerPanel } from '@/components/ui/bottom-drawer';
+import { DrawerFooter } from '@/components/ui/primitives/drawer';
 
 interface FormSheetBodyProps {
   children: ReactNode;
@@ -15,14 +16,7 @@ export function FormSheetBody({
 }: FormSheetBodyProps) {
   return (
     <>
-      <div className="flex min-h-0 flex-1 flex-col">
-        <DrawerPanel
-          className={scrollable ? undefined : 'flex min-h-0 flex-1 flex-col'}
-          scrollable={scrollable}
-        >
-          {children}
-        </DrawerPanel>
-      </div>
+      <BottomDrawerPanel scrollable={scrollable}>{children}</BottomDrawerPanel>
 
       <DrawerFooter className="overflow-hidden">{footer}</DrawerFooter>
     </>

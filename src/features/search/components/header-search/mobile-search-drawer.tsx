@@ -6,9 +6,9 @@ import { useRef } from 'react';
 
 import {
   BottomDrawer,
+  BottomDrawerPanel,
   BottomDrawerPopup,
   CommandPanel,
-  DrawerPanel,
   DrawerTitle,
 } from '@/components/ui';
 
@@ -49,7 +49,7 @@ export function MobileSearchDrawer({
         >
           <DrawerTitle className="sr-only">Search</DrawerTitle>
           <SearchCommandField isLoading={isLoading} ref={inputRef} />
-          <DrawerPanel className="min-h-0 flex-1 p-0" scrollable={false}>
+          <BottomDrawerPanel className="p-0" scrollable={false}>
             <CommandPanel className="h-full min-h-0">
               <SearchCommandResults
                 groups={groups}
@@ -57,7 +57,7 @@ export function MobileSearchDrawer({
                 status={status}
               />
             </CommandPanel>
-          </DrawerPanel>
+          </BottomDrawerPanel>
         </SearchCommand>
       </BottomDrawerPopup>
     </BottomDrawer>

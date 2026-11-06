@@ -16,6 +16,7 @@ import { ModeSwitcher } from '@/components/site-header/mode-switcher';
 import { SiteBranding } from '@/components/site-header/site-branding';
 import {
   BottomDrawer,
+  BottomDrawerPanel,
   BottomDrawerPopup,
   Button,
   CommandPanel,
@@ -24,7 +25,6 @@ import {
   DrawerMenu,
   DrawerMenuGroup,
   DrawerMenuItem,
-  DrawerPanel,
   DrawerTitle,
   DrawerTrigger,
 } from '@/components/ui';
@@ -87,7 +87,7 @@ export function MobileNav({ className }: MobileNavProps) {
         }
       />
 
-      <BottomDrawerPopup className="before:bg-muted/72">
+      <BottomDrawerPopup>
         <DrawerHeader className="flex-row items-center justify-between">
           <DrawerTitle className="sr-only">Navigation menu</DrawerTitle>
           <SiteBranding />
@@ -107,24 +107,22 @@ export function MobileNav({ className }: MobileNavProps) {
           </div>
         </DrawerHeader>
 
-        <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain">
-          <DrawerPanel scrollable={false}>
-            <DrawerMenu aria-label="Mobile navigation">
-              <DrawerMenuGroup>
-                {NAVIGATION_LINKS.map((link) => (
-                  <MobileNavMenuLink
-                    href={link.href}
-                    isActive={pathname === link.href}
-                    key={link.href}
-                    label={link.label}
-                  />
-                ))}
-              </DrawerMenuGroup>
-            </DrawerMenu>
-          </DrawerPanel>
+        <BottomDrawerPanel>
+          <DrawerMenu aria-label="Mobile navigation">
+            <DrawerMenuGroup>
+              {NAVIGATION_LINKS.map((link) => (
+                <MobileNavMenuLink
+                  href={link.href}
+                  isActive={pathname === link.href}
+                  key={link.href}
+                  label={link.label}
+                />
+              ))}
+            </DrawerMenuGroup>
+          </DrawerMenu>
 
           {!isLoading && (
-            <CommandPanel className="rounded-b-none p-6 [clip-path:inset(0_1px)] not-has-[+[data-slot=command-footer]]:rounded-b-none not-has-[+[data-slot=command-footer]]:[clip-path:inset(0_1px)]">
+            <CommandPanel className="-mx-6 rounded-b-none p-6 [clip-path:inset(0_1px)] not-has-[+[data-slot=command-footer]]:-mb-6 not-has-[+[data-slot=command-footer]]:rounded-b-none not-has-[+[data-slot=command-footer]]:[clip-path:inset(0_1px)]">
               <DrawerMenu>
                 {user ? (
                   <>
@@ -160,7 +158,7 @@ export function MobileNav({ className }: MobileNavProps) {
               </DrawerMenu>
             </CommandPanel>
           )}
-        </div>
+        </BottomDrawerPanel>
       </BottomDrawerPopup>
     </BottomDrawer>
   );

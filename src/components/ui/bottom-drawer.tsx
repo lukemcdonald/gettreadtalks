@@ -4,7 +4,7 @@ import type { ComponentProps } from 'react';
 
 import { cn } from '@/utils';
 
-import { Drawer, DrawerPopup } from './primitives/drawer';
+import { Drawer, DrawerPanel, DrawerPopup } from './primitives/drawer';
 
 const BOTTOM_DRAWER_HEIGHT_CLASS = {
   half: 'data-[swipe-direction=down]:[--drawer-height:50dvh]',
@@ -32,9 +32,30 @@ export function BottomDrawerPopup({
 }: BottomDrawerPopupProps) {
   return (
     <DrawerPopup
-      className={cn(BOTTOM_DRAWER_HEIGHT_CLASS[height], className)}
+      className={cn(
+        'data-[swipe-direction=down]:before:bg-muted/72',
+        BOTTOM_DRAWER_HEIGHT_CLASS[height],
+        className
+      )}
       showBar={showBar}
       {...delegated}
     />
+  );
+}
+
+/** Fills remaining sheet height. Scrolls by default; pass `scrollable={false}` when children own overflow. */
+export function BottomDrawerPanel({
+  className,
+  scrollable = true,
+  ...delegated
+}: ComponentProps<typeof DrawerPanel>) {
+  return (
+    <div className="flex min-h-0 flex-1 flex-col">
+      <DrawerPanel
+        className={cn(!scrollable && 'flex min-h-0 flex-1 flex-col', className)}
+        scrollable={scrollable}
+        {...delegated}
+      />
+    </div>
   );
 }
