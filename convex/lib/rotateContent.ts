@@ -54,7 +54,7 @@ export function getRotationCacheLife(
   };
 }
 
-function toRotationSeed(seed: number) {
+function normalizeRotationSeed(seed: number) {
   if (!Number.isFinite(seed)) {
     return 0;
   }
@@ -68,7 +68,7 @@ function toRotationSeed(seed: number) {
   return wrapped;
 }
 
-function resolveRotationSeed(period: RotationPeriod, seed: number | undefined) {
+function getRotationSeed(period: RotationPeriod, seed: number | undefined) {
   if (seed === undefined || !Number.isFinite(seed)) {
     return getTimeSeed(period);
   }
@@ -78,7 +78,7 @@ function resolveRotationSeed(period: RotationPeriod, seed: number | undefined) {
 
 function seededShuffle<T>(array: T[], seed: number): T[] {
   const shuffled = [...array];
-  let currentSeed = toRotationSeed(seed);
+  let currentSeed = normalizeRotationSeed(seed);
 
   for (let i = shuffled.length - 1; i > 0; i -= 1) {
     currentSeed = (LCG_MULTIPLIER * currentSeed + LCG_INCREMENT) % LCG_MODULUS;
@@ -103,7 +103,7 @@ export function rotateContent<T>(
     return items.slice(0, count);
   }
 
-  const shuffled = seededShuffle(items, resolveRotationSeed(period, seed));
+  const shuffled = seededShuffle(items, getRotationSeed(period, seed));
 
   return shuffled.slice(0, count);
 }
