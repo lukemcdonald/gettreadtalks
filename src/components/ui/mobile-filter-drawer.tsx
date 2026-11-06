@@ -97,7 +97,6 @@ export function MobileFilterDrawer({
       <FilterTrigger count={count} label={label} showCount={showCount} />
       <DrawerPopup
         className="[--drawer-height:50dvh]"
-        data-testid="mobile-filter-drawer"
         showBar
         variant="default"
       >
