@@ -44,7 +44,7 @@ interface StudyBackfillTalk {
   transcriptChars: number;
 }
 
-function toTalkSpeakerName(
+function formatSpeakerName(
   speaker: Pick<Doc<'speakers'>, 'firstName' | 'lastName'> | null
 ) {
   if (!speaker) {
@@ -131,7 +131,7 @@ async function loadStudyBackfillTalk(ctx: QueryCtx, talk: Doc<'talks'>) {
   const speaker = await ctx.db.get('speakers', talk.speakerId);
 
   return toStudyBackfillTalk(
-    toTalkSpeakerName(speaker),
+    formatSpeakerName(speaker),
     talk,
     transcript?.text?.trim() ?? ''
   );
