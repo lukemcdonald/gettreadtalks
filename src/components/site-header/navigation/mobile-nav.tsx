@@ -122,7 +122,7 @@ export function MobileNav({ className }: MobileNavProps) {
           </DrawerMenu>
 
           {!isLoading && (
-            <CommandPanel className="-mx-6 rounded-b-none p-6 [clip-path:inset(0_1px)] not-has-[+[data-slot=command-footer]]:-mb-6 not-has-[+[data-slot=command-footer]]:rounded-b-none not-has-[+[data-slot=command-footer]]:[clip-path:inset(0_1px)]">
+            <CommandPanel className="-mx-6 mt-6 rounded-b-none p-6 [clip-path:inset(0_1px)] not-has-[+[data-slot=command-footer]]:-mb-6 not-has-[+[data-slot=command-footer]]:rounded-b-none not-has-[+[data-slot=command-footer]]:[clip-path:inset(0_1px)]">
               <DrawerMenu>
                 {user ? (
                   <>
