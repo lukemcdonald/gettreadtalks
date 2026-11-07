@@ -293,7 +293,10 @@ export const backfillStudies = action({
         (result.errorCode === 'TOKEN_MISSING' ||
           result.errorCode === ErrorCodes.SERVER_ERROR)
       ) {
-        continueCursor = results.at(-2)?.talkId ?? args.cursor ?? '';
+        continueCursor =
+          result.errorCode === ErrorCodes.SERVER_ERROR
+            ? result.talkId
+            : (results.at(-2)?.talkId ?? args.cursor ?? '');
         isDone = false;
         break;
       }

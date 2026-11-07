@@ -416,11 +416,28 @@ describe('backfillStudies', () => {
             title: 'Eligible B',
           },
         ]);
-        expect(first.continueCursor).toBe(eligibleA);
+        expect(first.continueCursor).toBe(eligibleB);
         expect(first.isDone).toBe(false);
         expect(studyA?.body).toBe(GENERATED_STUDY_BODY);
         expect(studyB).toBeNull();
         expect(studyC).toBeNull();
+
+        const second = await asAdmin.action(api.talkFeatures.backfillStudies, {
+          cursor: first.continueCursor,
+          limit: 3,
+        });
+        const studyCAfter = await asAdmin.query(
+          api.talkFeatures.getTalkFeature,
+          {
+            kind: 'study',
+            talkId: eligibleC,
+          }
+        );
+
+        expect(second.results).toEqual([
+          { status: 'success', talkId: eligibleC, title: 'Eligible C' },
+        ]);
+        expect(studyCAfter?.body).toBe(GENERATED_STUDY_BODY);
       } finally {
         studyBackfillGenerator.generate = previousGenerate;
       }

@@ -10,6 +10,7 @@ import { ErrorBoundary } from '@/components/error-boundary';
 import { Button } from '@/components/ui';
 import { api } from '@/convex/_generated/api';
 import {
+  STUDY_BACKFILL_REQUEST_ENDED_MESSAGE,
   formatStudyBackfillResults,
   getStudyBackfillErrorMessage,
   reportStudyBackfillClientFailure,
@@ -130,9 +131,6 @@ function StudyBackfillPanel() {
   const batchCount = estimate?.batch.talks.length ?? 0;
   const batchCostUsd = estimate?.batch.estimatedCostUsd ?? 0;
   const canGenerate = !isPending && batchCount > 0;
-  const hasUnknownResults = lastResults?.some(
-    (result) => result.status === 'unknown'
-  );
   const results = formatStudyBackfillResults(lastResults);
   const status = getStatus({
     batchCount,
@@ -184,7 +182,11 @@ function StudyBackfillPanel() {
       </p>
       {error ? (
         <p
-          className={hasUnknownResults ? undefined : 'text-destructive'}
+          className={
+            error === STUDY_BACKFILL_REQUEST_ENDED_MESSAGE
+              ? undefined
+              : 'text-destructive'
+          }
           data-testid="study-backfill-error"
         >
           {error}
