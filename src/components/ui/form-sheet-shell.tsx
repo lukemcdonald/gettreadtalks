@@ -2,10 +2,10 @@
 
 import type { ReactNode } from 'react';
 
+import { BottomDrawerPopup } from '@/components/ui/bottom-drawer';
 import {
   Drawer,
   DrawerHeader,
-  DrawerPopup,
   DrawerTitle,
 } from '@/components/ui/primitives/drawer';
 import { useMediaQuery } from '@/hooks/use-media-query';
@@ -35,19 +35,18 @@ export function FormSheetShell({
       open={open}
       position={isDesktop ? 'right' : 'bottom'}
     >
-      <DrawerPopup
+      <BottomDrawerPopup
         className="has-data-[slot=drawer-bar]:ps-0 has-data-[slot=drawer-bar]:pt-0"
         data-testid={testId}
         showBar={!isDesktop}
         showCloseButton
-        variant="default"
       >
         <DrawerHeader>
           <DrawerTitle>{title}</DrawerTitle>
           {header}
         </DrawerHeader>
         {children}
-      </DrawerPopup>
+      </BottomDrawerPopup>
     </Drawer>
   );
 }

@@ -15,16 +15,16 @@ import { NAVIGATION_LINKS } from '@/components/site-header/constants';
 import { ModeSwitcher } from '@/components/site-header/mode-switcher';
 import { SiteBranding } from '@/components/site-header/site-branding';
 import {
+  BottomDrawer,
+  BottomDrawerPanel,
+  BottomDrawerPopup,
   Button,
   CommandPanel,
-  Drawer,
   DrawerClose,
   DrawerHeader,
   DrawerMenu,
   DrawerMenuGroup,
   DrawerMenuItem,
-  DrawerPanel,
-  DrawerPopup,
   DrawerTitle,
   DrawerTrigger,
 } from '@/components/ui';
@@ -73,7 +73,7 @@ export function MobileNav({ className }: MobileNavProps) {
   const showContentLink = isAdmin(user);
 
   return (
-    <Drawer position="bottom">
+    <BottomDrawer>
       <DrawerTrigger
         render={
           <Button
@@ -87,12 +87,7 @@ export function MobileNav({ className }: MobileNavProps) {
         }
       />
 
-      <DrawerPopup
-        className="before:bg-muted/72"
-        showBar
-        showCloseButton={false}
-        variant="default"
-      >
+      <BottomDrawerPopup>
         <DrawerHeader className="flex-row items-center justify-between">
           <DrawerTitle className="sr-only">Navigation menu</DrawerTitle>
           <SiteBranding />
@@ -112,7 +107,7 @@ export function MobileNav({ className }: MobileNavProps) {
           </div>
         </DrawerHeader>
 
-        <DrawerPanel scrollable={false}>
+        <BottomDrawerPanel>
           <DrawerMenu aria-label="Mobile navigation">
             <DrawerMenuGroup>
               {NAVIGATION_LINKS.map((link) => (
@@ -125,43 +120,46 @@ export function MobileNav({ className }: MobileNavProps) {
               ))}
             </DrawerMenuGroup>
           </DrawerMenu>
-        </DrawerPanel>
 
-        {!isLoading && (
-          <CommandPanel className="rounded-b-none p-6 [clip-path:inset(0_1px)] not-has-[+[data-slot=command-footer]]:rounded-b-none not-has-[+[data-slot=command-footer]]:[clip-path:inset(0_1px)]">
-            <DrawerMenu>
-              {user ? (
-                <>
-                  <AccountIdentity user={user} />
+          {!isLoading && (
+            <CommandPanel className="-mx-6 rounded-b-none p-6 [clip-path:inset(0_1px)] not-has-[+[data-slot=command-footer]]:-mb-6 not-has-[+[data-slot=command-footer]]:rounded-b-none not-has-[+[data-slot=command-footer]]:[clip-path:inset(0_1px)]">
+              <DrawerMenu>
+                {user ? (
+                  <>
+                    <AccountIdentity user={user} />
+                    <DrawerMenuGroup>
+                      {getAccountMenuLinks(showContentLink).map((link) => (
+                        <MobileNavMenuLink
+                          href={link.href}
+                          isActive={isAccountMenuLinkActive(
+                            link.href,
+                            pathname
+                          )}
+                          key={link.href}
+                          label={link.label}
+                        />
+                      ))}
+                    </DrawerMenuGroup>
+                    <MobileNavMenuLink
+                      className="text-muted-foreground"
+                      href={ACCOUNT_MENU_SIGN_OUT_HREF}
+                      label="Sign out"
+                    />
+                  </>
+                ) : (
                   <DrawerMenuGroup>
-                    {getAccountMenuLinks(showContentLink).map((link) => (
-                      <MobileNavMenuLink
-                        href={link.href}
-                        isActive={isAccountMenuLinkActive(link.href, pathname)}
-                        key={link.href}
-                        label={link.label}
-                      />
-                    ))}
+                    <MobileNavMenuLink
+                      href="/login"
+                      isActive={pathname === '/login'}
+                      label="Sign In"
+                    />
                   </DrawerMenuGroup>
-                  <MobileNavMenuLink
-                    className="text-muted-foreground"
-                    href={ACCOUNT_MENU_SIGN_OUT_HREF}
-                    label="Sign out"
-                  />
-                </>
-              ) : (
-                <DrawerMenuGroup>
-                  <MobileNavMenuLink
-                    href="/login"
-                    isActive={pathname === '/login'}
-                    label="Sign In"
-                  />
-                </DrawerMenuGroup>
-              )}
-            </DrawerMenu>
-          </CommandPanel>
-        )}
-      </DrawerPopup>
-    </Drawer>
+                )}
+              </DrawerMenu>
+            </CommandPanel>
+          )}
+        </BottomDrawerPanel>
+      </BottomDrawerPopup>
+    </BottomDrawer>
   );
 }
