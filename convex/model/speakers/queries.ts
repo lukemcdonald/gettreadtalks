@@ -160,10 +160,9 @@ const FEATURED_SPEAKER_POOL = 50;
 export const listFeaturedSpeakers = query({
   args: {
     limit: v.optional(v.number()),
-    seed: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const { limit = 6, seed } = args;
+    const { limit = 6 } = args;
     const pool: Doc<'speakers'>[] = [];
     const featured = ctx.db
       .query('speakers')
@@ -182,11 +181,7 @@ export const listFeaturedSpeakers = query({
       }
     }
 
-    return rotateContent(pool, {
-      count: limit,
-      period: 'daily',
-      seed,
-    });
+    return rotateContent(pool, { count: limit, period: 'daily' });
   },
   returns: docs('speakers'),
 });

@@ -10,7 +10,6 @@ import { action, query } from '../../../_generated/server';
 import { requireAdmin } from '../../auth/helpers';
 import { talksByStatusQuery } from '../../talks/helpers';
 import { TALK_SUMMARY_MODEL } from '../../talks/summary/prompt';
-import { TALK_DRAFT_PENDING } from '../../talks/validators';
 import { generateTalkStudy } from './generate';
 import {
   estimateStudyGenerateCost,
@@ -95,21 +94,12 @@ function toStudyBackfillResult(
 }
 
 async function loadStudyBackfillTalk(ctx: QueryCtx, talk: Doc<'talks'>) {
-  if (talk.draftStudy === TALK_DRAFT_PENDING) {
-    return null;
-  }
-
   const feature = await ctx.db
     .query('talkFeatures')
     .withIndex('by_talkId_and_kind', (q) =>
       q.eq('talkId', talk._id).eq('kind', 'study')
     )
     .unique();
-
-  if (feature !== null) {
-    return null;
-  }
-
   const transcript = await getOneFrom(
     ctx.db,
     'talkTranscripts',
