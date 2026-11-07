@@ -246,10 +246,9 @@ export const getTalkBySlug = query({
 export const listFeaturedTalksWithSpeakers = query({
   args: {
     limit: v.optional(v.number()),
-    seed: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const { limit = 5, seed } = args;
+    const { limit = 5 } = args;
 
     const talks = await ctx.db
       .query('talks')
@@ -258,11 +257,7 @@ export const listFeaturedTalksWithSpeakers = query({
       )
       .take(50);
 
-    const page = rotateContent(talks, {
-      count: limit,
-      period: 'daily',
-      seed,
-    });
+    const page = rotateContent(talks, { count: limit, period: 'daily' });
 
     return await enrichWithSpeaker(ctx, page);
   },
@@ -276,11 +271,10 @@ export const listRandomTalksBySpeaker = query({
   args: {
     excludeTalkId: v.optional(v.string()),
     limit: v.optional(v.number()),
-    seed: v.optional(v.number()),
     speakerId: v.id('speakers'),
   },
   handler: async (ctx, args) => {
-    const { excludeTalkId, limit = 5, seed, speakerId } = args;
+    const { excludeTalkId, limit = 5, speakerId } = args;
 
     const talks = await ctx.db
       .query('talks')
@@ -293,11 +287,9 @@ export const listRandomTalksBySpeaker = query({
       ? talks.filter((talk) => talk._id !== excludeTalkId)
       : talks;
 
-    return rotateContent(filteredTalks, {
-      count: limit,
-      period: 'daily',
-      seed,
-    }).map((talk) => toPublicTalk(talk));
+    return rotateContent(filteredTalks, { count: limit, period: 'daily' }).map(
+      (talk) => toPublicTalk(talk)
+    );
   },
   returns: docs('talks'),
 });
@@ -309,19 +301,14 @@ export const listTalksByTopics = query({
   args: {
     excludeTalkIds: v.optional(v.array(v.id('talks'))),
     limit: v.optional(v.number()),
-    seed: v.optional(v.number()),
     topicIds: v.array(v.id('topics')),
   },
   handler: async (ctx, args) => {
-    const { excludeTalkIds = [], limit = 4, seed, topicIds } = args;
+    const { excludeTalkIds = [], limit = 4, topicIds } = args;
     const talks = await listPublishedTalksForTopics(ctx, topicIds, {
       excludeTalkIds,
     });
-    const page = rotateContent(talks, {
-      count: limit,
-      period: 'daily',
-      seed,
-    });
+    const page = rotateContent(talks, { count: limit, period: 'daily' });
 
     return await enrichWithSpeaker(ctx, page);
   },

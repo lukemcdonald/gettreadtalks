@@ -586,7 +586,7 @@ describe('listAllTalks', () => {
 });
 
 describe('listFeaturedTalksWithSpeakers', () => {
-  it('honors the rotation seed', async () => {
+  it('returns published featured talks up to the limit', async () => {
     const t = createConvexTest();
 
     await t.run(async (ctx) => {
@@ -596,7 +596,7 @@ describe('listFeaturedTalksWithSpeakers', () => {
         slug: 'john-owen-featured',
       });
 
-      for (let index = 0; index < 8; index += 1) {
+      for (let index = 0; index < 4; index += 1) {
         // oxlint-disable-next-line no-await-in-loop -- featured index order follows insert order
         await insertTalk(ctx, {
           featured: true,
@@ -605,27 +605,24 @@ describe('listFeaturedTalksWithSpeakers', () => {
           title: `Featured Talk ${index}`,
         });
       }
+
+      await insertTalk(ctx, {
+        featured: true,
+        slug: 'backlog-featured-talk',
+        speakerId,
+        status: 'backlog',
+        title: 'Backlog Featured Talk',
+      });
     });
 
-    const first = await t.query(api.talks.listFeaturedTalksWithSpeakers, {
+    const talks = await t.query(api.talks.listFeaturedTalksWithSpeakers, {
       limit: 3,
-      seed: 11,
-    });
-    const again = await t.query(api.talks.listFeaturedTalksWithSpeakers, {
-      limit: 3,
-      seed: 11,
-    });
-    const other = await t.query(api.talks.listFeaturedTalksWithSpeakers, {
-      limit: 3,
-      seed: 12,
     });
 
-    expect(first.map((talk) => talk._id)).toEqual(
-      again.map((talk) => talk._id)
-    );
-    expect(first.map((talk) => talk._id)).not.toEqual(
-      other.map((talk) => talk._id)
-    );
+    expect(talks).toHaveLength(3);
+    expect(
+      talks.every((talk) => talk.featured && talk.status === 'published')
+    ).toBe(true);
   });
 });
 
