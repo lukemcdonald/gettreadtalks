@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
 import { api } from '../../../_generated/api';
+import { ErrorCodes } from '../../../lib/errors';
 import { createConvexTest, signInAs } from '../../../test.setup';
 import { insertSpeaker } from '../../speakers/test.factory';
 import { insertTalk, insertTalkTranscript } from '../../talks/test.factory';
 import { TALK_DRAFT_PENDING } from '../../talks/validators';
+import { studyBackfillGenerator } from './backfill';
 import { talkStudyGenerator } from './generate';
 import { estimateStudyGenerateCost } from './helpers';
 
@@ -230,8 +232,8 @@ describe('backfillStudies', () => {
       });
 
       expect(first.results).toEqual([
-        { status: 'success', talkId: eligibleA },
-        { status: 'success', talkId: eligibleB },
+        { status: 'success', talkId: eligibleA, title: 'Eligible A' },
+        { status: 'success', talkId: eligibleB, title: 'Eligible B' },
       ]);
       expect(firstA).toEqual(
         expect.objectContaining({
@@ -264,7 +266,7 @@ describe('backfillStudies', () => {
         eligibleC,
       ]);
       expect(second.results).toEqual([
-        { status: 'success', talkId: eligibleC },
+        { status: 'success', talkId: eligibleC, title: 'Eligible C' },
       ]);
       expect(secondC?.body).toBe(GENERATED_STUDY_BODY);
 
@@ -314,6 +316,7 @@ describe('backfillStudies', () => {
             errorCode: 'TOKEN_MISSING',
             status: 'failed',
             talkId: eligibleA,
+            title: 'Eligible A',
           },
         ],
       });
@@ -360,14 +363,67 @@ describe('backfillStudies', () => {
           errorCode: 'UPSTREAM_ERROR',
           status: 'failed',
           talkId: eligibleA,
+          title: 'Eligible A',
         },
-        { status: 'success', talkId: eligibleB },
+        { status: 'success', talkId: eligibleB, title: 'Eligible B' },
       ]);
       expect(first.continueCursor).toBe(eligibleB);
       expect(second.results).toEqual([
-        { status: 'success', talkId: eligibleC },
+        { status: 'success', talkId: eligibleC, title: 'Eligible C' },
       ]);
       expect(studyA).toBeNull();
+    });
+  });
+
+  it('keeps earlier successes when generating a later talk throws', async () => {
+    const { asAdmin, eligibleA, eligibleB, eligibleC } =
+      await seedBackfillCatalog();
+
+    await withStudyGenerateStub(async () => {
+      const previousGenerate = studyBackfillGenerator.generate;
+
+      studyBackfillGenerator.generate = async (ctx, talkId) => {
+        if (talkId === eligibleB) {
+          throw new Error('boom');
+        }
+
+        return await previousGenerate(ctx, talkId);
+      };
+
+      try {
+        const first = await asAdmin.action(api.talkFeatures.backfillStudies, {
+          limit: 3,
+        });
+        const studyA = await asAdmin.query(api.talkFeatures.getTalkFeature, {
+          kind: 'study',
+          talkId: eligibleA,
+        });
+        const studyB = await asAdmin.query(api.talkFeatures.getTalkFeature, {
+          kind: 'study',
+          talkId: eligibleB,
+        });
+        const studyC = await asAdmin.query(api.talkFeatures.getTalkFeature, {
+          kind: 'study',
+          talkId: eligibleC,
+        });
+
+        expect(first.results).toEqual([
+          { status: 'success', talkId: eligibleA, title: 'Eligible A' },
+          {
+            errorCode: ErrorCodes.SERVER_ERROR,
+            status: 'failed',
+            talkId: eligibleB,
+            title: 'Eligible B',
+          },
+        ]);
+        expect(first.continueCursor).toBe(eligibleA);
+        expect(first.isDone).toBe(false);
+        expect(studyA?.body).toBe(GENERATED_STUDY_BODY);
+        expect(studyB).toBeNull();
+        expect(studyC).toBeNull();
+      } finally {
+        studyBackfillGenerator.generate = previousGenerate;
+      }
     });
   });
 });

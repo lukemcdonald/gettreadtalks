@@ -1,5 +1,6 @@
 'use client';
 
+import type { StudyBackfillOutcome } from '@/features/talks/components/study-backfill-outcome';
 import type { FallbackProps } from 'react-error-boundary';
 
 import { useAction, useConvexAuth, useQuery } from 'convex/react';
@@ -8,6 +9,10 @@ import { useRef, useState } from 'react';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { Button } from '@/components/ui';
 import { api } from '@/convex/_generated/api';
+import {
+  formatStudyBackfillResults,
+  runStudyBackfillRequest,
+} from '@/features/talks/components/study-backfill-outcome';
 import { USER_ERROR_MESSAGE } from '@/services/errors/user-facing';
 
 const STUDY_BACKFILL_BATCH_LIMIT = 5;
@@ -19,48 +24,6 @@ function formatUsd(amount: number) {
     minimumFractionDigits: 2,
     style: 'currency',
   }).format(amount);
-}
-
-function formatResults(results: { status: string }[] | null) {
-  if (!results?.length) {
-    return null;
-  }
-
-  let failed = 0;
-  let skipped = 0;
-  let success = 0;
-
-  for (const result of results) {
-    if (result.status === 'failed') {
-      failed += 1;
-    } else if (result.status === 'skipped') {
-      skipped += 1;
-    } else {
-      success += 1;
-    }
-  }
-
-  return (
-    [
-      success > 0 ? `${success} generated` : null,
-      skipped > 0 ? `${skipped} skipped` : null,
-      failed > 0 ? `${failed} failed` : null,
-    ]
-      .filter(Boolean)
-      .join(', ') || null
-  );
-}
-
-function getErrorMessage(code?: string) {
-  if (code === 'TOKEN_MISSING') {
-    return 'Study service is not configured.';
-  }
-
-  if (code === 'UPSTREAM_ERROR') {
-    return 'Study service returned an error.';
-  }
-
-  return USER_ERROR_MESSAGE;
 }
 
 function getStatus({
@@ -153,9 +116,10 @@ function StudyBackfillPanel() {
   const [cursor, setCursor] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
-  const [lastResults, setLastResults] = useState<{ status: string }[] | null>(
+  const [lastResults, setLastResults] = useState<StudyBackfillOutcome[] | null>(
     null
   );
+  // ponytail: same-tab duplicate-submit only; reloads/tabs can still overlap
   const inFlight = useRef(false);
   const backfill = useAction(api.talkFeatures.backfillStudies);
   const estimate = useQuery(api.talkFeatures.estimateStudyBackfill, {
@@ -165,7 +129,10 @@ function StudyBackfillPanel() {
   const batchCount = estimate?.batch.talks.length ?? 0;
   const batchCostUsd = estimate?.batch.estimatedCostUsd ?? 0;
   const canGenerate = !isPending && batchCount > 0;
-  const results = formatResults(lastResults);
+  const hasUnknownResults = lastResults?.some(
+    (result) => result.status === 'unknown'
+  );
+  const results = formatStudyBackfillResults(lastResults);
   const status = getStatus({
     batchCount,
     batchCostUsd,
@@ -184,23 +151,22 @@ function StudyBackfillPanel() {
     setError(null);
     setIsPending(true);
 
-    try {
-      const result = await backfill({
-        cursor: cursor || undefined,
-        limit: STUDY_BACKFILL_BATCH_LIMIT,
-      });
-      const failed = result.results.find((item) => item.status === 'failed');
+    const outcome = await runStudyBackfillRequest({
+      attempted: estimate?.batch.talks ?? [],
+      backfill,
+      cursor,
+      limit: STUDY_BACKFILL_BATCH_LIMIT,
+    });
 
-      setLastResults(result.results);
-      setCursor(result.continueCursor);
-
-      if (failed) {
-        setError(getErrorMessage(failed.errorCode));
-      }
-    } catch {
-      setError(getErrorMessage());
+    if (outcome.results) {
+      setLastResults(outcome.results);
     }
 
+    if (outcome.continueCursor !== undefined) {
+      setCursor(outcome.continueCursor);
+    }
+
+    setError(outcome.error);
     inFlight.current = false;
     setIsPending(false);
   }
@@ -212,7 +178,10 @@ function StudyBackfillPanel() {
         {status}
       </p>
       {error ? (
-        <p className="text-destructive" data-testid="study-backfill-error">
+        <p
+          className={hasUnknownResults ? undefined : 'text-destructive'}
+          data-testid="study-backfill-error"
+        >
           {error}
         </p>
       ) : null}
