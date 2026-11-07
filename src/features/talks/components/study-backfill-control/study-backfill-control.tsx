@@ -1,10 +1,12 @@
 'use client';
 
 import type { StudyBackfillResult } from './utils';
+import type { FallbackProps } from 'react-error-boundary';
 
 import { useAction, useConvexAuth, useQuery } from 'convex/react';
 import { useRef, useState } from 'react';
 
+import { ErrorBoundary } from '@/components/error-boundary';
 import { Button, Card, FieldDescription } from '@/components/ui';
 import { api } from '@/convex/_generated/api';
 
@@ -14,7 +16,32 @@ import {
   getStudyBackfillView,
 } from './utils';
 
+function StudyBackfillFallback({ resetErrorBoundary }: FallbackProps) {
+  return (
+    <Card className="gap-3 p-4">
+      <p className="font-medium">Study drafts</p>
+      <FieldDescription>{getStudyBackfillErrorMessage()}</FieldDescription>
+      <Button
+        onClick={resetErrorBoundary}
+        size="sm"
+        type="button"
+        variant="outline"
+      >
+        Try again
+      </Button>
+    </Card>
+  );
+}
+
 export function StudyBackfillControl() {
+  return (
+    <ErrorBoundary fallback={StudyBackfillFallback}>
+      <StudyBackfillPanel />
+    </ErrorBoundary>
+  );
+}
+
+function StudyBackfillPanel() {
   const { isAuthenticated, isLoading: isAuthLoading } = useConvexAuth();
   const [cursor, setCursor] = useState('');
   const [error, setError] = useState<string | null>(null);

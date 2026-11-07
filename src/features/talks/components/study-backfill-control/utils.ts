@@ -72,7 +72,9 @@ export function formatStudyBackfillResultSummary(
     return null;
   }
 
-  return `${parts.join(', ')}.`;
+  const summary = parts.join(', ');
+
+  return `${summary.charAt(0).toUpperCase()}${summary.slice(1)}.`;
 }
 
 function getStudyBackfillStatus({
@@ -93,7 +95,7 @@ function getStudyBackfillStatus({
   totalCostUsd: number;
 }) {
   if (isPending) {
-    return `Generating ${batchCount} study drafts...`;
+    return `Generating ${batchCount} study ${batchCount === 1 ? 'draft' : 'drafts'}...`;
   }
 
   if (isSessionLoading) {
@@ -109,10 +111,10 @@ function getStudyBackfillStatus({
   }
 
   if (batchCount === 0) {
-    return `${eligibleCount} talks still need a study draft. This pass is done.`;
+    return `${eligibleCount === 1 ? '1 talk still needs' : `${eligibleCount} talks still need`} a study draft. This pass is done.`;
   }
 
-  const batch = `${eligibleCount} talks need a study draft. This batch of ${batchCount} is about ${formatStudyBackfillCostUsd(batchCostUsd)}.`;
+  const batch = `${eligibleCount === 1 ? '1 talk needs' : `${eligibleCount} talks need`} a study draft. This batch of ${batchCount} is about ${formatStudyBackfillCostUsd(batchCostUsd)}.`;
 
   if (eligibleCount > batchCount) {
     return `${batch} About ${formatStudyBackfillCostUsd(totalCostUsd)} for all remaining talks.`;
@@ -142,7 +144,7 @@ export function getStudyBackfillView({
 
   return {
     batchCount,
-    buttonLabel: `Generate ${batchCount} study drafts`,
+    buttonLabel: `Generate ${batchCount} study ${batchCount === 1 ? 'draft' : 'drafts'}`,
     canGenerate,
     errorMessage: error,
     resultSummary: lastResults

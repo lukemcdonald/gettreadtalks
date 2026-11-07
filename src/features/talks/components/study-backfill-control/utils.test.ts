@@ -56,6 +56,14 @@ describe('formatStudyBackfillResultSummary', () => {
   it('returns null when a batch produced no results', () => {
     expect(formatStudyBackfillResultSummary([])).toBeNull();
   });
+
+  it('capitalizes a summary that starts with failed or skipped', () => {
+    expect(
+      formatStudyBackfillResultSummary([
+        { errorCode: 'UPSTREAM_ERROR', status: 'failed' },
+      ])
+    ).toBe('Failed 1.');
+  });
 });
 
 describe('getStudyBackfillView', () => {
@@ -157,6 +165,21 @@ describe('getStudyBackfillView', () => {
       canGenerate: false,
       resultSummary: 'Generated 1, failed 1.',
       status: '2 talks still need a study draft. This pass is done.',
+    });
+  });
+
+  it('uses singular copy for a one-talk batch', () => {
+    expect(
+      getStudyBackfillView({
+        ...ready,
+        estimate: {
+          batch: { estimatedCostUsd: 0.01, talks: [{}] },
+          total: { eligibleCount: 1, estimatedCostUsd: 0.01 },
+        },
+      })
+    ).toMatchObject({
+      buttonLabel: 'Generate 1 study draft',
+      status: '1 talk needs a study draft. This batch of 1 is about $0.01.',
     });
   });
 
