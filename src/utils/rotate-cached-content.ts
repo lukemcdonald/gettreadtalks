@@ -22,11 +22,11 @@ export async function rotateCachedContent<T>(
 ) {
   const count = options.count ?? 1;
   const period = options.period ?? 'daily';
-  const expire = secondsUntilNextRotation(period);
+  const expire = Math.max(2, secondsUntilNextRotation(period));
 
   cacheLife({
     expire,
-    revalidate: expire,
+    revalidate: expire - 1,
     stale: expire,
   });
 
