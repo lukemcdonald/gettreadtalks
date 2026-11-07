@@ -137,6 +137,7 @@ async function generateStudyBackfillResult(
       tags: {
         errorCode: ErrorCodes.SERVER_ERROR,
         operation: 'backfillStudies',
+        talkId: talk.talkId,
       },
     });
 

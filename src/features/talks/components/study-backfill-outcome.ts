@@ -9,7 +9,7 @@ import { getSentryConfig, isConvexError } from '@/services/errors/convex';
 import { USER_ERROR_MESSAGE } from '@/services/errors/user-facing';
 
 export const STUDY_BACKFILL_REQUEST_ENDED_MESSAGE =
-  'The request ended before a result arrived. Generation may still be running. Wait until the remaining count stops changing before generating again.';
+  'The request ended before a result arrived. Generation may still be running. Review remaining talks before generating again.';
 
 const CONVEX_CONNECTION_LOST = 'Connection lost while action was in flight';
 
@@ -40,113 +40,76 @@ export function getStudyBackfillErrorMessage(code?: string) {
   return USER_ERROR_MESSAGE;
 }
 
-export function getStudyBackfillRequestFailure(error: unknown) {
-  const message = error instanceof Error ? error.message : String(error ?? '');
+function getErrorMessage(error: unknown) {
+  return error instanceof Error ? error.message : String(error ?? '');
+}
 
-  if (message.includes(CONVEX_CONNECTION_LOST)) {
-    return {
-      errorCode: ErrorCodes.NETWORK_ERROR,
-      message: STUDY_BACKFILL_REQUEST_ENDED_MESSAGE,
-    };
+function isExpectedStudyBackfillClientError(error: unknown) {
+  if (isConvexError(error)) {
+    return true;
   }
 
-  return {
-    errorCode: ErrorCodes.UNKNOWN_ERROR,
-    message: STUDY_BACKFILL_REQUEST_ENDED_MESSAGE,
-  };
+  return getErrorMessage(error).includes('ArgumentValidationError');
 }
 
 export function reportStudyBackfillClientFailure(
   error: unknown,
-  attempted: { talkId: string; title: string }[]
+  selected: { talkId: string; title: string }[]
 ) {
-  if (isConvexError(error)) {
-    const sentryConfig = getSentryConfig(error);
+  try {
+    if (isExpectedStudyBackfillClientError(error)) {
+      const sentryConfig = getSentryConfig(error);
 
-    if (sentryConfig.shouldLog) {
-      captureException(error, {
-        context: sentryConfig.context,
-        fingerprint: sentryConfig.fingerprint,
-        level: sentryConfig.level,
-        tags: {
-          ...sentryConfig.tags,
-          operation: 'backfillStudies',
-        },
-      });
+      if (sentryConfig.shouldLog) {
+        captureException(error, {
+          context: sentryConfig.context,
+          fingerprint: sentryConfig.fingerprint,
+          level: sentryConfig.level,
+          tags: {
+            ...sentryConfig.tags,
+            operation: 'backfillStudies',
+          },
+        });
+      }
+
+      return {
+        message: formatErrorMessage(error),
+        results: null,
+      };
     }
 
+    const errorCode = getErrorMessage(error).includes(CONVEX_CONNECTION_LOST)
+      ? ErrorCodes.NETWORK_ERROR
+      : ErrorCodes.UNKNOWN_ERROR;
+
+    reportUnexpectedError(error, {
+      fingerprint: [
+        errorCode === ErrorCodes.NETWORK_ERROR ? 'network' : 'error',
+        'backfillStudies',
+        errorCode,
+      ],
+      level: errorCode === ErrorCodes.NETWORK_ERROR ? 'warning' : 'error',
+      tags: {
+        errorCode,
+        operation: 'backfillStudies',
+        selectedCount: String(selected.length),
+      },
+    });
+
     return {
-      message: formatErrorMessage(error),
+      message: STUDY_BACKFILL_REQUEST_ENDED_MESSAGE,
+      results: selected.map((talk) => ({
+        status: 'unknown' as const,
+        talkId: talk.talkId,
+        title: talk.title,
+      })),
+    };
+  } catch {
+    return {
+      message: USER_ERROR_MESSAGE,
       results: null,
     };
   }
-
-  const failure = getStudyBackfillRequestFailure(error);
-
-  reportUnexpectedError(error, {
-    fingerprint: [
-      failure.errorCode === ErrorCodes.NETWORK_ERROR ? 'network' : 'error',
-      'backfillStudies',
-      failure.errorCode,
-    ],
-    level: failure.errorCode === ErrorCodes.NETWORK_ERROR ? 'warning' : 'error',
-    tags: {
-      attemptedCount: String(attempted.length),
-      errorCode: failure.errorCode,
-      operation: 'backfillStudies',
-    },
-  });
-
-  return {
-    message: failure.message,
-    results: toStudyBackfillUnknownResults(attempted),
-  };
-}
-
-export async function runStudyBackfillRequest({
-  attempted,
-  backfill,
-  cursor,
-  limit,
-}: {
-  attempted: { talkId: string; title: string }[];
-  backfill: (args: { cursor?: string; limit: number }) => Promise<{
-    continueCursor: string;
-    results: StudyBackfillOutcome[];
-  }>;
-  cursor: string;
-  limit: number;
-}) {
-  try {
-    const result = await backfill({
-      cursor: cursor || undefined,
-      limit,
-    });
-    const failed = result.results.find((item) => item.status === 'failed');
-
-    return {
-      continueCursor: result.continueCursor,
-      error: failed ? getStudyBackfillErrorMessage(failed.errorCode) : null,
-      results: result.results,
-    };
-  } catch (error) {
-    const failure = reportStudyBackfillClientFailure(error, attempted);
-
-    return {
-      error: failure.message,
-      results: failure.results,
-    };
-  }
-}
-
-export function toStudyBackfillUnknownResults(
-  talks: { talkId: string; title: string }[]
-): StudyBackfillOutcome[] {
-  return talks.map((talk) => ({
-    status: 'unknown' as const,
-    talkId: talk.talkId,
-    title: talk.title,
-  }));
 }
 
 export function formatStudyBackfillResults(
@@ -158,8 +121,8 @@ export function formatStudyBackfillResults(
 
   const failed: string[] = [];
   const generated: string[] = [];
+  const selected: string[] = [];
   const skipped: string[] = [];
-  const unknown: string[] = [];
 
   for (const result of results) {
     const title = result.title?.trim() || 'Talk';
@@ -169,7 +132,7 @@ export function formatStudyBackfillResults(
     } else if (result.status === 'skipped') {
       skipped.push(title);
     } else if (result.status === 'unknown') {
-      unknown.push(title);
+      selected.push(title);
     } else if (result.status === 'success') {
       generated.push(title);
     }
@@ -180,7 +143,7 @@ export function formatStudyBackfillResults(
       formatStudyBackfillGroup('generated', generated),
       formatStudyBackfillGroup('skipped', skipped),
       formatStudyBackfillGroup('failed', failed),
-      formatStudyBackfillGroup('unknown', unknown),
+      formatStudyBackfillGroup('selected', selected),
     ]
       .filter(Boolean)
       .join('. ') || null

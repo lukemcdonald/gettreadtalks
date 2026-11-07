@@ -11,7 +11,8 @@ import { Button } from '@/components/ui';
 import { api } from '@/convex/_generated/api';
 import {
   formatStudyBackfillResults,
-  runStudyBackfillRequest,
+  getStudyBackfillErrorMessage,
+  reportStudyBackfillClientFailure,
 } from '@/features/talks/components/study-backfill-outcome';
 import { USER_ERROR_MESSAGE } from '@/services/errors/user-facing';
 
@@ -147,26 +148,30 @@ function StudyBackfillPanel() {
       return;
     }
 
+    const selected = estimate?.batch.talks ?? [];
+
     inFlight.current = true;
+    setLastResults(null);
     setError(null);
     setIsPending(true);
 
-    const outcome = await runStudyBackfillRequest({
-      attempted: estimate?.batch.talks ?? [],
-      backfill,
-      cursor,
-      limit: STUDY_BACKFILL_BATCH_LIMIT,
-    });
+    try {
+      const result = await backfill({
+        cursor: cursor || undefined,
+        limit: STUDY_BACKFILL_BATCH_LIMIT,
+      });
+      const failed = result.results.find((item) => item.status === 'failed');
 
-    if (outcome.results) {
-      setLastResults(outcome.results);
+      setLastResults(result.results);
+      setCursor(result.continueCursor);
+      setError(failed ? getStudyBackfillErrorMessage(failed.errorCode) : null);
+    } catch (error_) {
+      const failure = reportStudyBackfillClientFailure(error_, selected);
+
+      setLastResults(failure.results);
+      setError(failure.message);
     }
 
-    if (outcome.continueCursor !== undefined) {
-      setCursor(outcome.continueCursor);
-    }
-
-    setError(outcome.error);
     inFlight.current = false;
     setIsPending(false);
   }
