@@ -1,5 +1,5 @@
 import type { Doc, Id } from '../../../_generated/dataModel';
-import type { QueryCtx } from '../../../_generated/server';
+import type { ActionCtx, QueryCtx } from '../../../_generated/server';
 import type { TalkStudyGenerateResult } from './generate';
 
 import { getOneFrom } from 'convex-helpers/server/relationships';
@@ -7,6 +7,9 @@ import { v } from 'convex/values';
 
 import { api } from '../../../_generated/api';
 import { action, query } from '../../../_generated/server';
+import { ErrorCodes } from '../../../lib/errors';
+import { reportSentryException } from '../../../lib/sentry';
+import { formatErrorMessage } from '../../../lib/utils';
 import { requireAdmin } from '../../auth/helpers';
 import { talksByStatusQuery } from '../../talks/helpers';
 import { TALK_SUMMARY_MODEL } from '../../talks/summary/prompt';
@@ -68,30 +71,83 @@ function toStudyBackfillTalk(
   };
 }
 
+export const studyBackfillGenerator = {
+  generate: generateTalkStudy,
+};
+
+const studyBackfillResultValidator = v.object({
+  errorCode: v.optional(v.string()),
+  status: v.union(
+    v.literal('failed'),
+    v.literal('skipped'),
+    v.literal('success')
+  ),
+  talkId: v.id('talks'),
+  title: v.string(),
+});
+
+interface StudyBackfillResult {
+  errorCode?: string;
+  status: 'failed' | 'skipped' | 'success';
+  talkId: Id<'talks'>;
+  title: string;
+}
+
 function toStudyBackfillResult(
   result: TalkStudyGenerateResult,
-  talkId: Id<'talks'>
-) {
+  talk: { talkId: Id<'talks'>; title: string }
+): StudyBackfillResult {
   if (result.status === 'success') {
     return {
-      status: 'success' as const,
-      talkId,
+      status: 'success',
+      talkId: talk.talkId,
+      title: talk.title,
     };
   }
 
   if (result.errorCode === 'ALREADY_REVIEWED') {
     return {
       errorCode: result.errorCode,
-      status: 'skipped' as const,
-      talkId,
+      status: 'skipped',
+      talkId: talk.talkId,
+      title: talk.title,
     };
   }
 
   return {
     errorCode: result.errorCode,
-    status: 'failed' as const,
-    talkId,
+    status: 'failed',
+    talkId: talk.talkId,
+    title: talk.title,
   };
+}
+
+async function generateStudyBackfillResult(
+  ctx: ActionCtx,
+  talk: { talkId: Id<'talks'>; title: string }
+): Promise<StudyBackfillResult> {
+  try {
+    return toStudyBackfillResult(
+      await studyBackfillGenerator.generate(ctx, talk.talkId),
+      talk
+    );
+  } catch (error) {
+    await reportSentryException({
+      message: `Study backfill failed: ${formatErrorMessage(error)}`,
+      tags: {
+        errorCode: ErrorCodes.SERVER_ERROR,
+        operation: 'backfillStudies',
+        talkId: talk.talkId,
+      },
+    });
+
+    return {
+      errorCode: ErrorCodes.SERVER_ERROR,
+      status: 'failed',
+      talkId: talk.talkId,
+      title: talk.title,
+    };
+  }
 }
 
 async function loadStudyBackfillTalk(ctx: QueryCtx, talk: Doc<'talks'>) {
@@ -222,25 +278,25 @@ export const backfillStudies = action({
         cursor: args.cursor,
         limit: args.limit,
       });
-    const results: {
-      errorCode?: string;
-      status: 'failed' | 'skipped' | 'success';
-      talkId: Id<'talks'>;
-    }[] = [];
+    const results: StudyBackfillResult[] = [];
     let { continueCursor } = estimate.batch;
     let { isDone } = estimate.batch;
 
     for (const talk of estimate.batch.talks) {
       // oxlint-disable-next-line no-await-in-loop -- generate one talk at a time to cap gateway spend
-      const generated = await generateTalkStudy(ctx, talk.talkId);
-      const result = toStudyBackfillResult(generated, talk.talkId);
+      const result = await generateStudyBackfillResult(ctx, talk);
 
       results.push(result);
 
-      if (result.status === 'failed' && result.errorCode === 'TOKEN_MISSING') {
-        const completed = results.at(-2);
-
-        continueCursor = completed?.talkId ?? args.cursor ?? '';
+      if (
+        result.status === 'failed' &&
+        (result.errorCode === 'TOKEN_MISSING' ||
+          result.errorCode === ErrorCodes.SERVER_ERROR)
+      ) {
+        continueCursor =
+          result.errorCode === ErrorCodes.SERVER_ERROR
+            ? result.talkId
+            : (results.at(-2)?.talkId ?? args.cursor ?? '');
         isDone = false;
         break;
       }
@@ -255,16 +311,6 @@ export const backfillStudies = action({
   returns: v.object({
     continueCursor: v.string(),
     isDone: v.boolean(),
-    results: v.array(
-      v.object({
-        errorCode: v.optional(v.string()),
-        status: v.union(
-          v.literal('failed'),
-          v.literal('skipped'),
-          v.literal('success')
-        ),
-        talkId: v.id('talks'),
-      })
-    ),
+    results: v.array(studyBackfillResultValidator),
   }),
 });
