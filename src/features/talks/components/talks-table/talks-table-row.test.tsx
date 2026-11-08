@@ -4,6 +4,7 @@ import type { Speaker } from '@/features/speakers/types';
 import type { TalkWithSpeakerAndTopics } from '@/features/talks/types';
 
 import { Table, TableBody } from '@/components/ui';
+import { buildTalkStudyPath } from '@/features/talks/utils';
 import { buildEntityEditPath } from '@/lib/entities/paths';
 import { describe, expect, it, render, screen } from '@/test';
 
@@ -86,6 +87,27 @@ describe('TalksTableRow', () => {
     expect(screen.getByRole('link', { name: talk.title })).toHaveAttribute(
       'href',
       buildEntityEditPath('talks', talk._id)
+    );
+  });
+
+  it('opens the study editor from the studies list', () => {
+    const talk = createTalk();
+
+    render(
+      <Table>
+        <TableBody>
+          <TalksTableRow
+            editHref={buildTalkStudyPath(talk._id)}
+            status="draft"
+            talk={talk}
+          />
+        </TableBody>
+      </Table>
+    );
+
+    expect(screen.getByRole('link', { name: talk.title })).toHaveAttribute(
+      'href',
+      buildTalkStudyPath(talk._id)
     );
   });
 });

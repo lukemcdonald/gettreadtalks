@@ -70,37 +70,79 @@ describe('AreaNav', () => {
         screen.getByRole('link', { name: 'Settings' })
       ).not.toHaveAttribute('aria-current');
     });
+  });
 
-    it('marks a nested item as the current page', () => {
-      usePathname.mockReturnValue('/manage/talks/transcripts');
+  const TALKS_ITEMS: AreaNavItem[] = [
+    {
+      children: [
+        {
+          href: '/manage/talks/studies',
+          icon: 'studies',
+          label: 'Studies',
+        },
+        {
+          href: '/manage/talks/transcripts',
+          icon: 'transcripts',
+          label: 'Transcripts',
+        },
+      ],
+      href: '/manage/talks',
+      icon: 'talks',
+      label: 'Talks',
+    },
+    { href: '/manage/clips', icon: 'clips', label: 'Clips' },
+  ];
 
-      render(
-        <AreaNav
-          items={[
-            {
-              children: [
-                {
-                  href: '/manage/talks/transcripts',
-                  icon: 'transcripts',
-                  label: 'Transcripts',
-                },
-              ],
-              href: '/manage/talks',
-              icon: 'talks',
-              label: 'Talks',
-            },
-          ]}
-          label="Content"
-          variant={variant}
-        />
-      );
+  it('lists nested destinations as individual sidebar items', () => {
+    usePathname.mockReturnValue('/manage/talks/studies');
 
-      expect(
-        screen.getByTestId('nav-manage-talks-transcripts')
-      ).toHaveAttribute('aria-current', 'page');
-      expect(screen.getByTestId('nav-manage-talks')).not.toHaveAttribute(
-        'aria-current'
-      );
-    });
+    render(<AreaNav items={TALKS_ITEMS} label="Content" variant="sidebar" />);
+
+    expect(screen.getByTestId('nav-manage-talks-studies')).toHaveAttribute(
+      'aria-current',
+      'page'
+    );
+    expect(screen.getByTestId('nav-manage-talks')).not.toHaveAttribute(
+      'aria-current'
+    );
+    expect(screen.getByTestId('nav-manage-talks-transcripts')).toBeVisible();
+    expect(screen.getByTestId('nav-manage-clips')).toBeVisible();
+  });
+
+  it('labels the Talks menu with the current destination', () => {
+    usePathname.mockReturnValue('/manage/talks');
+
+    render(<AreaNav items={TALKS_ITEMS} label="Content" variant="tabs" />);
+
+    expect(screen.getByTestId('nav-manage-talks-menu')).toHaveTextContent(
+      'Talks'
+    );
+  });
+
+  it('groups nested destinations under a Talks menu on tabs', async () => {
+    usePathname.mockReturnValue('/manage/talks/studies');
+
+    const { click } = render(
+      <AreaNav items={TALKS_ITEMS} label="Content" variant="tabs" />
+    );
+
+    expect(screen.getByTestId('nav-manage-talks-menu')).toHaveTextContent(
+      'Studies'
+    );
+    expect(screen.getByTestId('nav-manage-clips')).toBeVisible();
+    expect(
+      screen.queryByTestId('nav-manage-talks-transcripts')
+    ).not.toBeInTheDocument();
+
+    await click(screen.getByTestId('nav-manage-talks-menu'));
+
+    expect(screen.getByTestId('nav-manage-talks-studies')).toHaveAttribute(
+      'aria-current',
+      'page'
+    );
+    expect(screen.getByTestId('nav-manage-talks')).not.toHaveAttribute(
+      'aria-current'
+    );
+    expect(screen.getByTestId('nav-manage-talks-transcripts')).toBeVisible();
   });
 });
