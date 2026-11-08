@@ -1,5 +1,6 @@
 import type { ManageStatus } from '@/components/manage-table';
 import type { TalkWithSpeakerAndTopics } from '@/features/talks/types';
+import type { ReactNode } from 'react';
 
 import { getHoverItems, ManageRow } from '@/components/manage-table';
 import { getSpeakerName } from '@/features/speakers/utils';
@@ -7,12 +8,18 @@ import { TalkActionsMenu } from '@/features/talks/components/talk-actions-menu';
 import { buildTalkEditPath, buildTalkPath } from '@/features/talks/utils';
 
 interface TalksTableRowProps {
+  actions?: ReactNode;
   editHref?: string;
   status?: ManageStatus;
   talk: TalkWithSpeakerAndTopics;
 }
 
-export function TalksTableRow({ editHref, status, talk }: TalksTableRowProps) {
+export function TalksTableRow({
+  actions,
+  editHref,
+  status,
+  talk,
+}: TalksTableRowProps) {
   const publicPath =
     talk.status === 'published' && talk.speaker
       ? buildTalkPath(talk)
@@ -20,7 +27,13 @@ export function TalksTableRow({ editHref, status, talk }: TalksTableRowProps) {
 
   return (
     <ManageRow
-      actions={<TalkActionsMenu talk={talk} talkUrl={publicPath} />}
+      actions={
+        actions === undefined ? (
+          <TalkActionsMenu talk={talk} talkUrl={publicPath} />
+        ) : (
+          actions
+        )
+      }
       editHref={editHref ?? buildTalkEditPath(talk._id)}
       hoverItems={getHoverItems([
         { label: 'Scripture', value: talk.scripture },
