@@ -39,6 +39,7 @@ export async function ManageStudiesContent({
     >
       {result.talks.map((talk) => (
         <TalksTableRow
+          actions={null}
           editHref={buildTalkStudyPath(talk._id)}
           key={talk._id}
           status={study}

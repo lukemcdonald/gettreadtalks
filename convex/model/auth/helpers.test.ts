@@ -177,14 +177,6 @@ const gatedFunctions: {
     name: 'speakers.updateSpeaker',
   },
   {
-    call: (client) => client.action(api.talkFeatures.backfillStudies, {}),
-    name: 'talkFeatures.backfillStudies',
-  },
-  {
-    call: (client) => client.query(api.talkFeatures.estimateStudyBackfill, {}),
-    name: 'talkFeatures.estimateStudyBackfill',
-  },
-  {
     call: (client, seed) =>
       client.action(api.talkFeatures.generateStudy, { talkId: seed.talkId }),
     name: 'talkFeatures.generateStudy',

@@ -26,7 +26,7 @@ export function ManageRow({
   subtitle,
   title,
 }: {
-  actions: ReactNode;
+  actions?: ReactNode;
   children?: ReactNode;
   editHref: string;
   hoverItems?: readonly { label: string; value: string }[];
@@ -69,7 +69,9 @@ export function ManageRow({
           <ManageStatusBadge status={status} />
         </TableCell>
       )}
-      <TableCell className="relative z-10 w-px">{actions}</TableCell>
+      {!!actions && (
+        <TableCell className="relative z-10 w-px">{actions}</TableCell>
+      )}
     </TableRow>
   );
 }

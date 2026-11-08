@@ -12,7 +12,6 @@ import {
 } from '@/components/manage-table';
 import { Skeleton } from '@/components/ui';
 import { SelectFilter } from '@/components/ui/select-filter';
-import { StudyBackfillControl } from '@/features/talks/components/study-backfill-control';
 import { CONTENT_STATUS_OPTIONS } from '@/lib/entities/manage-status';
 
 const STUDY_FILTER_OPTIONS = [
@@ -34,7 +33,6 @@ export default function ManageTalksPage({
         action={<ManageNewButton entity="talks" />}
         title="Talks"
       />
-      <StudyBackfillControl />
       <Suspense fallback={<Skeleton className="h-16 w-full" />}>
         <ManageFilters
           searchPlaceholder="Search talks and speakers..."
