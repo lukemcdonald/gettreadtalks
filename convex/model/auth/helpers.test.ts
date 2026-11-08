@@ -190,6 +190,14 @@ const gatedFunctions: {
     name: 'talkFeatures.getTalkFeature',
   },
   {
+    call: (client, seed) =>
+      client.query(api.talkFeatures.getTalkFeatureProgress, {
+        kind: 'study',
+        talkId: seed.talkId,
+      }),
+    name: 'talkFeatures.getTalkFeatureProgress',
+  },
+  {
     call: (client) =>
       client.query(api.talkFeatures.listEligibleStudyDrafts, {}),
     name: 'talkFeatures.listEligibleStudyDrafts',

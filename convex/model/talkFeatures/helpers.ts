@@ -52,3 +52,19 @@ export async function loadTalkFeature(
     )
     .unique();
 }
+
+export function toTalkFeatureProgress(
+  feature: {
+    body: string;
+    status: 'draft' | 'published';
+  } | null
+) {
+  if (!feature) {
+    return null;
+  }
+
+  return {
+    hasBody: feature.body.trim() !== '',
+    status: feature.status,
+  };
+}
