@@ -40,6 +40,11 @@ const COLUMNS: Record<string, readonly ManageColumn[]> = {
     { className: HIDDEN_MD, key: 'Status' },
     { className: 'w-px', key: 'Actions', srOnly: true },
   ],
+  studies: [
+    { key: 'Title' },
+    { className: HIDDEN_MD, key: 'Status' },
+    { className: 'w-px', key: 'Actions', srOnly: true },
+  ],
   talks: [
     { key: 'Title' },
     { className: HIDDEN_MD, key: 'Status' },
@@ -57,6 +62,7 @@ type ManageResource =
   | 'clips'
   | 'collections'
   | 'speakers'
+  | 'studies'
   | 'talks'
   | 'topics'
   | 'transcripts';

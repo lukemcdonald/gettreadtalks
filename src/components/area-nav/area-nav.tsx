@@ -5,7 +5,9 @@ import type { Route } from 'next';
 import type { RefObject } from 'react';
 
 import {
+  BookOpenIcon,
   CheckCircle2Icon,
+  ChevronDownIcon,
   FilmIcon,
   FolderIcon,
   HeartIcon,
@@ -18,6 +20,7 @@ import {
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
+import { Menu, MenuItem, MenuPopup, MenuTrigger } from '@/components/ui';
 import { Link } from '@/components/ui/link';
 import { cn } from '@/utils';
 
@@ -30,6 +33,7 @@ export const AREA_NAV_ICONS = {
   finished: CheckCircle2Icon,
   settings: SettingsIcon,
   speakers: UsersIcon,
+  studies: BookOpenIcon,
   talks: MicIcon,
   topics: TagIcon,
   transcripts: ScrollTextIcon,
@@ -61,19 +65,23 @@ interface AreaNavProps {
 interface AreaNavLinkProps {
   href: Route;
   icon: AreaNavIcon;
-  isActive: boolean;
   isCurrent: boolean;
   label: string;
-  linkRef: RefObject<HTMLAnchorElement | null>;
+  linkRef: RefObject<HTMLElement | null>;
   variant: AreaNavVariant;
 }
 
 interface AreaNavListProps {
   items: AreaNavItem[];
-  linkRef: RefObject<HTMLAnchorElement | null>;
-  nested?: boolean;
+  linkRef: RefObject<HTMLElement | null>;
   pathname: string;
   variant: AreaNavVariant;
+}
+
+interface AreaNavMenuProps {
+  item: AreaNavItem;
+  linkRef: RefObject<HTMLElement | null>;
+  pathname: string;
 }
 
 function buildAreaNavTestId(href: string) {
@@ -110,15 +118,7 @@ function getAreaNavLinkClassName(isActive: boolean, variant: AreaNavVariant) {
   );
 }
 
-function getAreaNavListClassName(nested: boolean, variant: AreaNavVariant) {
-  if (nested && variant === 'sidebar') {
-    return 'border-input mt-1 ms-5 flex flex-col gap-1 border-s ps-1';
-  }
-
-  if (nested) {
-    return 'border-input ms-1 flex border-s ps-1';
-  }
-
+function getAreaNavListClassName(variant: AreaNavVariant) {
   if (variant === 'sidebar') {
     return '-mx-3 flex flex-col gap-1';
   }
@@ -126,10 +126,40 @@ function getAreaNavListClassName(nested: boolean, variant: AreaNavVariant) {
   return 'border-input flex w-full min-w-max gap-1 border-b';
 }
 
+function getAreaNavGroupItems(item: AreaNavItem) {
+  return [item, ...(item.children ?? [])];
+}
+
+function flattenAreaNavItems(items: AreaNavItem[]) {
+  return items.flatMap((item) => {
+    if (!item.children?.length) {
+      return [item];
+    }
+
+    return [item, ...item.children];
+  });
+}
+
+function getAreaNavGroupCurrentItem(item: AreaNavItem, pathname: string) {
+  return (
+    getAreaNavGroupItems(item).find((entry) => entry.href === pathname) ?? item
+  );
+}
+
+function bindActiveRef(
+  isCurrent: boolean,
+  linkRef: RefObject<HTMLElement | null>
+) {
+  return (node: HTMLElement | null) => {
+    if (isCurrent) {
+      linkRef.current = node;
+    }
+  };
+}
+
 function AreaNavLink({
   href,
   icon,
-  isActive,
   isCurrent,
   label,
   linkRef,
@@ -138,10 +168,10 @@ function AreaNavLink({
   return (
     <Link
       aria-current={isCurrent ? 'page' : undefined}
-      className={getAreaNavLinkClassName(isActive, variant)}
+      className={getAreaNavLinkClassName(isCurrent, variant)}
       data-testid={buildAreaNavTestId(href)}
       href={href}
-      ref={isCurrent ? linkRef : undefined}
+      ref={bindActiveRef(isCurrent, linkRef)}
     >
       <AreaNavGlyph name={icon} />
       {label}
@@ -149,55 +179,85 @@ function AreaNavLink({
   );
 }
 
-function AreaNavList({
-  items,
-  linkRef,
-  nested = false,
-  pathname,
-  variant,
-}: AreaNavListProps) {
-  return (
-    <ul className={getAreaNavListClassName(nested, variant)}>
-      {items.map((item) => {
-        const isCurrent = item.href === pathname;
+function AreaNavMenu({ item, linkRef, pathname }: AreaNavMenuProps) {
+  const current = getAreaNavGroupCurrentItem(item, pathname);
+  const isActive = isAreaNavItemActive(item, pathname);
 
-        return (
-          <li
-            className={cn(
-              variant === 'sidebar'
-                ? 'flex flex-col'
-                : 'flex shrink-0 items-end'
-            )}
-            key={item.href}
-          >
+  return (
+    <Menu>
+      <MenuTrigger
+        className={cn(
+          'cursor-pointer border-0 bg-transparent',
+          getAreaNavLinkClassName(isActive, 'tabs')
+        )}
+        data-testid={`${buildAreaNavTestId(item.href)}-menu`}
+        ref={bindActiveRef(isActive, linkRef)}
+        type="button"
+      >
+        <AreaNavGlyph name={current.icon} />
+        {current.label}
+        <ChevronDownIcon aria-hidden="true" className="size-4 shrink-0" />
+      </MenuTrigger>
+      <MenuPopup align="start">
+        {getAreaNavGroupItems(item).map((entry) => {
+          const isCurrent = entry.href === pathname;
+
+          return (
+            <MenuItem
+              key={entry.href}
+              nativeButton={false}
+              render={
+                <Link
+                  aria-current={isCurrent ? 'page' : undefined}
+                  data-testid={buildAreaNavTestId(entry.href)}
+                  href={entry.href}
+                />
+              }
+            >
+              <AreaNavGlyph name={entry.icon} />
+              {entry.label}
+            </MenuItem>
+          );
+        })}
+      </MenuPopup>
+    </Menu>
+  );
+}
+
+function AreaNavList({ items, linkRef, pathname, variant }: AreaNavListProps) {
+  const visibleItems =
+    variant === 'sidebar' ? flattenAreaNavItems(items) : items;
+
+  return (
+    <ul className={getAreaNavListClassName(variant)}>
+      {visibleItems.map((item) => (
+        <li
+          className={
+            variant === 'sidebar' ? 'flex flex-col' : 'flex shrink-0 items-end'
+          }
+          key={item.href}
+        >
+          {variant === 'tabs' && item.children?.length ? (
+            <AreaNavMenu item={item} linkRef={linkRef} pathname={pathname} />
+          ) : (
             <AreaNavLink
               href={item.href}
               icon={item.icon}
-              isActive={isAreaNavItemActive(item, pathname)}
-              isCurrent={isCurrent}
+              isCurrent={item.href === pathname}
               label={item.label}
               linkRef={linkRef}
               variant={variant}
             />
-            {item.children?.length ? (
-              <AreaNavList
-                items={item.children}
-                linkRef={linkRef}
-                nested
-                pathname={pathname}
-                variant={variant}
-              />
-            ) : null}
-          </li>
-        );
-      })}
+          )}
+        </li>
+      ))}
     </ul>
   );
 }
 
 export function AreaNav({ items, label, variant }: AreaNavProps) {
   const pathname = usePathname();
-  const activeRef = useRef<HTMLAnchorElement>(null);
+  const activeRef = useRef<HTMLElement>(null);
   const scrollerRef = useRef<HTMLElement>(null);
   const [showEndFade, setShowEndFade] = useState(false);
   const [showStartFade, setShowStartFade] = useState(false);

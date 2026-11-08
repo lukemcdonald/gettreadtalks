@@ -10,6 +10,11 @@ export const PRESENCE_STATUS_OPTIONS = [
   { label: 'Draft', value: 'draft' },
 ] as const;
 
+export const STUDY_STATUS_OPTIONS = [
+  { label: 'Draft', value: 'draft' },
+  { label: 'Published', value: 'published' },
+] as const;
+
 const CONTENT_STATUS_VALUES = [
   'all',
   ...CONTENT_STATUS_OPTIONS.map((option) => option.value),
@@ -22,6 +27,7 @@ const PRESENCE_STATUS_VALUES = [
 
 type ContentStatusFilter = (typeof CONTENT_STATUS_VALUES)[number];
 type PresenceStatusFilter = (typeof PRESENCE_STATUS_VALUES)[number];
+type StudyStatusFilter = (typeof STUDY_STATUS_OPTIONS)[number]['value'];
 
 export function parseContentStatus(status?: string): ContentStatusFilter {
   if (isListed(status, CONTENT_STATUS_VALUES)) {
@@ -37,6 +43,14 @@ export function parsePresenceStatus(status?: string): PresenceStatusFilter {
   }
 
   return 'published';
+}
+
+export function parseStudyStatus(study?: string): StudyStatusFilter {
+  if (study === 'published') {
+    return 'published';
+  }
+
+  return 'draft';
 }
 
 export function hasManageListFilters({
