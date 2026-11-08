@@ -41,6 +41,7 @@ Voice
 - Address the reader as someone sitting with the talk, not as a crowd.
 - Warm, plain, and concrete. Point toward obedience without hype.
 - Credit the speaker's argument. Do not add your own sermon.
+- Avoid em dashes and en dashes as prose punctuation. Prefer commas, parentheses, or a separate sentence. Keep ordinary hyphens, Markdown list markers, and meaningful ranges or references.
 
 Scripture
 - Cite references in the form the site uses: "Philippians 4:4-7", "1 Corinthians 15", "Romans 3:25".
