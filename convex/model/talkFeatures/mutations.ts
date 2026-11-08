@@ -11,7 +11,6 @@ import {
   hasReviewedTalkFeature,
   isEligibleStudyDraft,
   loadTalkFeature,
-  PUBLISH_STUDY_DRAFTS_MAX,
 } from './helpers';
 import { talkFeatureKind, talkFeatureStatus } from './validators';
 
@@ -106,14 +105,13 @@ export const publishStudyDrafts = mutation({
     await requireAdmin(ctx);
 
     const uniqueIds = [...new Set(args.featureIds)];
-    const boundedIds = uniqueIds.slice(0, PUBLISH_STUDY_DRAFTS_MAX);
     const features = await Promise.all(
-      boundedIds.map((featureId) => ctx.db.get(featureId))
+      uniqueIds.map((featureId) => ctx.db.get(featureId))
     );
     const now = Date.now();
     const patches: Promise<void>[] = [];
     let published = 0;
-    let skipped = uniqueIds.length - boundedIds.length;
+    let skipped = 0;
 
     for (const feature of features) {
       if (!feature || !isEligibleStudyDraft(feature)) {

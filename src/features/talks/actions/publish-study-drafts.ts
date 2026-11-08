@@ -12,7 +12,7 @@ import { toConvexFormErrors, toZodFormErrors } from '@/lib/forms/validation';
 import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
 
 const publishStudyDraftsSchema = z.object({
-  featureIds: z.array(zid('talkFeatures')).max(1000),
+  featureIds: z.array(zid('talkFeatures')),
 });
 
 export async function publishStudyDraftsAction(

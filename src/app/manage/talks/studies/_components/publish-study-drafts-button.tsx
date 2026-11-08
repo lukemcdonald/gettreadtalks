@@ -7,7 +7,6 @@ import { useQuery } from 'convex/react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-import { Button } from '@/components/ui';
 import {
   AlertDialog,
   AlertDialogClose,
@@ -16,10 +15,12 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@/components/ui/primitives/alert-dialog';
-import { toastManager } from '@/components/ui/primitives/toast';
+  Button,
+  toastManager,
+} from '@/components/ui';
 import { api } from '@/convex/_generated/api';
 import { publishStudyDraftsAction } from '@/features/talks/actions/publish-study-drafts';
+import { reportUnexpectedError } from '@/services/errors';
 
 function formatStudyDraftCount(count: number) {
   return count === 1 ? '1 study draft' : `${count} study drafts`;
@@ -91,8 +92,12 @@ export function PublishStudyDraftsConfirm({
       setSnapshotIds(null);
       setIsPending(false);
       router.refresh();
-    } catch {
+    } catch (error) {
       toastManager.add({
+        description: reportUnexpectedError(error, {
+          fingerprint: ['error', 'publishStudyDrafts'],
+          tags: { operation: 'publishStudyDrafts' },
+        }),
         title: 'Could not publish study drafts',
         type: 'error',
       });
@@ -110,7 +115,7 @@ export function PublishStudyDraftsConfirm({
         type="button"
         variant="outline"
       >
-        Publish all study drafts
+        Publish all study drafts ({featureIds.length})
       </Button>
       <AlertDialog
         onOpenChange={(open) => {
@@ -137,7 +142,11 @@ export function PublishStudyDraftsConfirm({
             >
               Cancel
             </AlertDialogClose>
-            <Button loading={isPending} onClick={handleConfirm}>
+            <Button
+              data-testid="publish-study-drafts-confirm"
+              loading={isPending}
+              onClick={handleConfirm}
+            >
               Publish
             </Button>
           </AlertDialogFooter>

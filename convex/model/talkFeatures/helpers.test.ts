@@ -2,11 +2,7 @@ import type { Id } from '../../_generated/dataModel';
 
 import { describe, expect, it } from 'vitest';
 
-import {
-  isEligibleStudyDraft,
-  PUBLISH_STUDY_DRAFTS_MAX,
-  toEligibleStudyDraftIds,
-} from './helpers';
+import { isEligibleStudyDraft, toEligibleStudyDraftIds } from './helpers';
 
 describe('isEligibleStudyDraft', () => {
   const eligible = {
@@ -30,7 +26,7 @@ describe('isEligibleStudyDraft', () => {
 });
 
 describe('toEligibleStudyDraftIds', () => {
-  it('keeps nonempty drafts, skips the rest, and caps the list', () => {
+  it('keeps nonempty drafts and skips the rest', () => {
     const features = [
       {
         _id: 'talkFeatures:empty' as Id<'talkFeatures'>,
@@ -62,7 +58,5 @@ describe('toEligibleStudyDraftIds', () => {
       'talkFeatures:one',
       'talkFeatures:two',
     ]);
-    expect(toEligibleStudyDraftIds(features, 1)).toEqual(['talkFeatures:one']);
-    expect(PUBLISH_STUDY_DRAFTS_MAX).toBe(1000);
   });
 });

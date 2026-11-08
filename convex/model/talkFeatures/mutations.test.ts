@@ -101,6 +101,84 @@ describe('publishStudyDrafts', () => {
     expect(after.extra?.body).toBe(STUDY_BODY);
   });
 
+  it('skips missing, deleted, and stale ids without changing talk status', async () => {
+    const t = createConvexTest();
+    const { asUser: asAdmin } = await signInAs(t, {
+      email: 'admin@example.test',
+      name: 'Admin',
+      role: 'admin',
+    });
+
+    const seeded = await t.run(async (ctx) => {
+      const speakerId = await insertSpeaker(ctx);
+      const backlogTalkId = await insertTalk(ctx, {
+        slug: 'backlog-study',
+        speakerId,
+        status: 'backlog',
+        title: 'Backlog Study',
+      });
+      const staleTalkId = await insertTalk(ctx, {
+        slug: 'stale-study',
+        speakerId,
+        status: 'published',
+        title: 'Stale Study',
+      });
+      const deletedTalkId = await insertTalk(ctx, {
+        slug: 'deleted-study',
+        speakerId,
+        title: 'Deleted Study',
+      });
+      const keepTalkId = await insertTalk(ctx, {
+        slug: 'keep-study',
+        speakerId,
+        status: 'backlog',
+        title: 'Keep Study',
+      });
+      const backlogStudyId = await insertStudy(ctx, backlogTalkId);
+      const staleId = await insertStudy(ctx, staleTalkId);
+      const deletedId = await insertStudy(ctx, deletedTalkId);
+      const keepId = await insertStudy(ctx, keepTalkId);
+
+      await ctx.db.patch(staleId, { body: '   ' });
+      await ctx.db.delete(deletedId);
+
+      return {
+        backlogStudyId,
+        backlogTalkId,
+        deletedId,
+        keepId,
+        staleId,
+      };
+    });
+
+    const result = await asAdmin.mutation(api.talkFeatures.publishStudyDrafts, {
+      featureIds: [
+        seeded.backlogStudyId,
+        seeded.staleId,
+        seeded.deletedId,
+        seeded.keepId,
+      ],
+    });
+
+    expect(result).toEqual({ published: 2, skipped: 2 });
+
+    const after = await t.run(async (ctx) => ({
+      backlogStudy: await ctx.db.get(seeded.backlogStudyId),
+      backlogTalk: await ctx.db.get(seeded.backlogTalkId),
+      deleted: await ctx.db.get(seeded.deletedId),
+      keep: await ctx.db.get(seeded.keepId),
+      stale: await ctx.db.get(seeded.staleId),
+    }));
+
+    expect(after.backlogStudy?.status).toBe('published');
+    expect(after.backlogStudy?.body).toBe(STUDY_BODY);
+    expect(after.backlogTalk?.status).toBe('backlog');
+    expect(after.keep?.status).toBe('published');
+    expect(after.stale?.status).toBe('draft');
+    expect(after.stale?.body).toBe('   ');
+    expect(after.deleted).toBeNull();
+  });
+
   it('requires admin', async () => {
     const t = createConvexTest();
     const { asUser } = await signInAs(t, {

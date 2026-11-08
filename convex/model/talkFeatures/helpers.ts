@@ -3,9 +3,6 @@ import type { MutationCtx, QueryCtx } from '../../_generated/server';
 import type { talkFeatureKind } from './validators';
 import type { Infer } from 'convex/values';
 
-// ponytail: one mutation, not a job. Remainder stays draft for another click.
-export const PUBLISH_STUDY_DRAFTS_MAX = 1000;
-
 export function isEligibleStudyDraft(feature: {
   body: string;
   kind: string;
@@ -25,22 +22,10 @@ export function toEligibleStudyDraftIds<
     kind: string;
     status: string;
   },
->(features: T[], max = PUBLISH_STUDY_DRAFTS_MAX) {
-  const featureIds: Id<'talkFeatures'>[] = [];
-
-  for (const feature of features) {
-    if (!isEligibleStudyDraft(feature)) {
-      continue;
-    }
-
-    featureIds.push(feature._id);
-
-    if (featureIds.length === max) {
-      break;
-    }
-  }
-
-  return featureIds;
+>(features: T[]) {
+  return features
+    .filter((feature) => isEligibleStudyDraft(feature))
+    .map((feature) => feature._id);
 }
 
 export function hasReviewedTalkFeature(
