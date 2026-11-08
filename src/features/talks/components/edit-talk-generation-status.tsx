@@ -66,7 +66,7 @@ export function EditTalkGenerationStatus({
   const talk = useQuery(api.talks.getTalk, { id: talkId });
   const transcript = useQuery(api.talks.getTalkTranscript, { talkId });
   const fetch = useQuery(api.talks.getTalkTranscriptFetch, { talkId });
-  const study = useQuery(api.talkFeatures.getTalkFeature, {
+  const study = useQuery(api.talkFeatures.getTalkFeatureProgress, {
     kind: 'study',
     talkId,
   });

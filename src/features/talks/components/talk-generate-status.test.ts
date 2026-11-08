@@ -115,7 +115,7 @@ describe('getTalkGenerationStatus', () => {
         draftSummary: 'Draft summary.',
         fetch: { status: 'success' },
         hasTranscript: true,
-        study: { body: 'Draft study.', status: 'draft' },
+        study: { hasBody: true, status: 'draft' },
       })
     ).toEqual({
       study: { kind: 'draft' },
@@ -127,7 +127,7 @@ describe('getTalkGenerationStatus', () => {
       status({
         fetch: { status: 'success' },
         hasTranscript: true,
-        study: { body: 'Published study.', status: 'published' },
+        study: { hasBody: true, status: 'published' },
         summary: 'Saved summary.',
       })
     ).toEqual({
@@ -219,7 +219,7 @@ describe('getTalkGenerationStatus', () => {
         draftSummary: 'Summary service returned an error.',
         fetch: { status: 'success' },
         hasTranscript: true,
-        study: { body: 'Published study.', status: 'published' },
+        study: { hasBody: true, status: 'published' },
         summary: 'Saved summary.',
       })
     ).toEqual({
@@ -235,6 +235,23 @@ describe('getTalkGenerationStatus', () => {
       summary: { kind: 'missing' },
       transcript: { kind: 'missing' },
     });
+  });
+
+  it('maps study progress from hasBody, not study text', () => {
+    expect(
+      status({
+        fetch: { status: 'success' },
+        hasTranscript: true,
+        study: { hasBody: true, status: 'draft' },
+      }).study
+    ).toEqual({ kind: 'draft' });
+    expect(
+      status({
+        fetch: { status: 'success' },
+        hasTranscript: true,
+        study: { hasBody: false, status: 'draft' },
+      }).study
+    ).toEqual({ kind: 'missing' });
   });
 
   it('does not treat pending as saved summary text', () => {

@@ -264,7 +264,7 @@ export function getTalkGenerationStatus({
   } | null;
   hasTranscript: boolean;
   mediaUrl: string;
-  study: { body?: string; status?: 'draft' | 'published' } | null;
+  study: { hasBody: boolean; status: 'draft' | 'published' } | null;
   summary?: string;
 }): TalkGenerationStatus {
   const hasSource = hasTalkTranscriptSource(mediaUrl);
@@ -279,7 +279,7 @@ export function getTalkGenerationStatus({
   return {
     study: getStudyStage({
       draft: studyDraft,
-      hasBody: Boolean(study?.body?.trim()),
+      hasBody: Boolean(study?.hasBody),
       hasSource,
       isPublished: study?.status === 'published',
       isSummaryGenerating: summaryDraft.kind === 'generating',

@@ -2,7 +2,11 @@ import type { Id } from '../../_generated/dataModel';
 
 import { describe, expect, it } from 'vitest';
 
-import { isEligibleStudyDraft, toEligibleStudyDraftIds } from './helpers';
+import {
+  isEligibleStudyDraft,
+  toEligibleStudyDraftIds,
+  toTalkFeatureProgress,
+} from './helpers';
 
 describe('isEligibleStudyDraft', () => {
   const eligible = {
@@ -58,5 +62,29 @@ describe('toEligibleStudyDraftIds', () => {
       'talkFeatures:one',
       'talkFeatures:two',
     ]);
+  });
+});
+
+describe('toTalkFeatureProgress', () => {
+  it('returns hasBody and status without the study text', () => {
+    expect(
+      toTalkFeatureProgress({
+        body: '## Main points\n\nA study.',
+        status: 'draft',
+      })
+    ).toEqual({
+      hasBody: true,
+      status: 'draft',
+    });
+    expect(
+      toTalkFeatureProgress({
+        body: '   ',
+        status: 'published',
+      })
+    ).toEqual({
+      hasBody: false,
+      status: 'published',
+    });
+    expect(toTalkFeatureProgress(null)).toBeNull();
   });
 });
