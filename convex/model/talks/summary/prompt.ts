@@ -71,6 +71,7 @@ Voice and tone
 - Plain, warm and neutral. Report rather than praise or critique. No hype ("powerful", "must-listen"), no "In this sermon..." filler, and no addressing the reader as "you".
 - Original wording. Paraphrase. No quoted passage longer than one sentence, except Scripture. Use quotations sparingly, at most one or two short phrases, in straight double quotes.
 - Use theological terms the speaker uses (propitiation, sanctification) but keep sentences readable.
+- Avoid em dashes and en dashes as prose punctuation. Prefer commas, parentheses, or a separate sentence. Keep ordinary hyphens and meaningful ranges or references.
 
 Scripture and names
 - Cite references in the form the site uses: "Philippians 4:4–7", "1 Corinthians 15", "Romans 3:25", with an en dash for ranges. Put a reference in parentheses after the idea it supports, or name the passage directly in the sentence.
