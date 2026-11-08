@@ -152,16 +152,12 @@ function getTranscriptStage({
   hasSource: boolean;
   hasTranscript: boolean;
 }): TalkGenerationStage {
-  if (!hasSource) {
-    return { kind: 'unavailable' };
+  if (hasTranscript || fetch?.status === 'success') {
+    return { kind: 'ready' };
   }
 
   if (fetch?.status === 'pending') {
     return { kind: 'fetching' };
-  }
-
-  if (hasTranscript || fetch?.status === 'success') {
-    return { kind: 'ready' };
   }
 
   if (fetch?.status === 'failed') {
@@ -171,6 +167,10 @@ function getTranscriptStage({
     };
   }
 
+  if (!hasSource) {
+    return { kind: 'unavailable' };
+  }
+
   return { kind: 'missing' };
 }
 
@@ -178,19 +178,13 @@ function getSummaryStage({
   draft,
   hasSaved,
   hasSource,
-  isTranscriptFetching,
 }: {
   draft: ReturnType<typeof getTalkDraftStep>;
   hasSaved: boolean;
   hasSource: boolean;
-  isTranscriptFetching: boolean;
 }): TalkGenerationStage {
   if (draft.kind === 'generating') {
     return { kind: 'generating' };
-  }
-
-  if (draft.kind === 'failed') {
-    return { kind: 'failed', message: draft.message };
   }
 
   if (hasSaved) {
@@ -201,8 +195,8 @@ function getSummaryStage({
     return { kind: 'draft' };
   }
 
-  if (isTranscriptFetching) {
-    return { kind: 'waiting' };
+  if (draft.kind === 'failed') {
+    return { kind: 'failed', message: draft.message };
   }
 
   if (!hasSource) {
@@ -218,21 +212,15 @@ function getStudyStage({
   hasSource,
   isPublished,
   isSummaryGenerating,
-  isTranscriptFetching,
 }: {
   draft: ReturnType<typeof getTalkDraftStep>;
   hasBody: boolean;
   hasSource: boolean;
   isPublished: boolean;
   isSummaryGenerating: boolean;
-  isTranscriptFetching: boolean;
 }): TalkGenerationStage {
   if (draft.kind === 'generating') {
     return { kind: 'generating' };
-  }
-
-  if (draft.kind === 'failed') {
-    return { kind: 'failed', message: draft.message };
   }
 
   if (isPublished) {
@@ -243,7 +231,11 @@ function getStudyStage({
     return { kind: 'draft' };
   }
 
-  if (isTranscriptFetching || isSummaryGenerating) {
+  if (draft.kind === 'failed') {
+    return { kind: 'failed', message: draft.message };
+  }
+
+  if (isSummaryGenerating) {
     return { kind: 'waiting' };
   }
 
@@ -291,13 +283,11 @@ export function getTalkGenerationStatus({
       hasSource,
       isPublished: study?.status === 'published',
       isSummaryGenerating: summaryDraft.kind === 'generating',
-      isTranscriptFetching: transcript.kind === 'fetching',
     }),
     summary: getSummaryStage({
       draft: summaryDraft,
       hasSaved: Boolean(summary?.trim()),
       hasSource,
-      isTranscriptFetching: transcript.kind === 'fetching',
     }),
     transcript,
   };

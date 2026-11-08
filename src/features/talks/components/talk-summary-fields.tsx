@@ -15,6 +15,23 @@ import { getTalkSummaryEditorValue } from '@/features/talks/components/talk-gene
 import { TalkSummaryGenerate } from '@/features/talks/components/talk-summary-generate';
 import { talkSummaryFormSchema } from '@/features/talks/schemas/talk-study-form';
 
+export function useTalkSummaryEditorForm(
+  talk: {
+    draftSummary?: string;
+    summary?: string;
+  } | null
+) {
+  return useForm<TalkSummaryFormData>({
+    mode: 'onBlur',
+    resetOptions: { keepDirtyValues: true },
+    // oxlint-disable-next-line typescript/no-explicit-any -- Zod 4 compatibility with zodResolver
+    resolver: zodResolver(talkSummaryFormSchema as any),
+    values: {
+      summary: getTalkSummaryEditorValue(talk),
+    },
+  });
+}
+
 // fallow-ignore-next-line complexity
 export function useTalkSummaryForm(
   talkId: TalkId,
@@ -23,15 +40,7 @@ export function useTalkSummaryForm(
   const talkDoc = useQuery(api.talks.getTalk, { id: talkId });
   const transcript = useQuery(api.talks.getTalkTranscript, { talkId });
   const [summaryFlags, setSummaryFlags] = useState<string[]>([]);
-  const form = useForm<TalkSummaryFormData>({
-    mode: 'onBlur',
-    resetOptions: { keepDirtyValues: true },
-    // oxlint-disable-next-line typescript/no-explicit-any -- Zod 4 compatibility with zodResolver
-    resolver: zodResolver(talkSummaryFormSchema as any),
-    values: {
-      summary: getTalkSummaryEditorValue(talkDoc ?? null),
-    },
-  });
+  const form = useTalkSummaryEditorForm(talkDoc ?? null);
 
   function getDirtySummary() {
     if (!form.formState.isDirty) {
@@ -87,6 +96,7 @@ export function TalkSummaryFields({
               size="lg"
               {...field}
               aria-invalid={fieldState.invalid}
+              data-testid="talk-summary-field"
               id={field.name}
             />
             {fieldState.error ? (

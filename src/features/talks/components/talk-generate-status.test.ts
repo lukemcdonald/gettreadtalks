@@ -95,18 +95,6 @@ describe('shouldOpenTalkStudyPreview', () => {
 });
 
 describe('getTalkGenerationStatus', () => {
-  it('shows fetching and waiting after a YouTube create, not idle empty fields', () => {
-    expect(
-      status({
-        fetch: { status: 'pending' },
-      })
-    ).toEqual({
-      study: { kind: 'waiting' },
-      summary: { kind: 'waiting' },
-      transcript: { kind: 'fetching' },
-    });
-  });
-
   it('keeps study waiting while the summary is generating after a ready transcript', () => {
     expect(
       status({
@@ -195,6 +183,49 @@ describe('getTalkGenerationStatus', () => {
       study: { kind: 'unavailable' },
       summary: { kind: 'unavailable' },
       transcript: { kind: 'unavailable' },
+    });
+  });
+
+  it('treats a pending manual fetch as unknown downstream intent', () => {
+    expect(
+      status({
+        fetch: { status: 'pending' },
+        hasTranscript: false,
+      })
+    ).toEqual({
+      study: { kind: 'missing' },
+      summary: { kind: 'missing' },
+      transcript: { kind: 'fetching' },
+    });
+  });
+
+  it('shows Ready for a saved non-YouTube transcript', () => {
+    expect(
+      status({
+        hasTranscript: true,
+        mediaUrl: audio,
+      })
+    ).toEqual({
+      study: { kind: 'unavailable' },
+      summary: { kind: 'unavailable' },
+      transcript: { kind: 'ready' },
+    });
+  });
+
+  it('keeps saved and published content when a later attempt failed', () => {
+    expect(
+      status({
+        draftStudy: 'Study service returned an error.',
+        draftSummary: 'Summary service returned an error.',
+        fetch: { status: 'success' },
+        hasTranscript: true,
+        study: { body: 'Published study.', status: 'published' },
+        summary: 'Saved summary.',
+      })
+    ).toEqual({
+      study: { kind: 'published' },
+      summary: { kind: 'saved' },
+      transcript: { kind: 'ready' },
     });
   });
 

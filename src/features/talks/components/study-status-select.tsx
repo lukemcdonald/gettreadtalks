@@ -40,6 +40,8 @@ export function StudyStatusSelect<T extends FieldValues>({
           <SelectTrigger
             aria-label="Status"
             className="w-auto min-w-24"
+            data-status={field.value}
+            data-testid="talk-study-status"
             id={field.name}
             size="sm"
           >

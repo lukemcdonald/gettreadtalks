@@ -112,7 +112,7 @@ function TalkStudyToolbar({
   );
 }
 
-function TalkStudyBodyField({
+export function TalkStudyBodyField({
   control,
   warningText,
 }: {
@@ -137,6 +137,7 @@ function TalkStudyBodyField({
             {...field}
             aria-invalid={fieldState.invalid}
             aria-label="Study"
+            data-testid="talk-study-field"
             id={field.name}
           />
           {fieldState.error ? (
@@ -177,6 +178,20 @@ function TalkStudyPanelBody({
   return <TalkStudyContent body={body} />;
 }
 
+export function useTalkStudyEditorForm(
+  feature: {
+    body?: string;
+    status?: TalkFeatureFormData['status'];
+  } | null
+) {
+  return useForm<TalkFeatureFormData>({
+    mode: 'onBlur',
+    resetOptions: { keepDirtyValues: true },
+    resolver: talkFeatureResolver,
+    values: getTalkFeatureFormValues(feature ?? EMPTY_STUDY_FEATURE),
+  });
+}
+
 function useTalkStudyPanelForm({
   initialFeature,
   talkId,
@@ -191,12 +206,7 @@ function useTalkStudyPanelForm({
   const feature = liveFeature === undefined ? initialFeature : liveFeature;
   const hadBody = useRef(Boolean(initialFeature?.body?.trim()));
   const [isEditing, setIsEditing] = useState(!initialFeature?.body?.trim());
-  const form = useForm<TalkFeatureFormData>({
-    mode: 'onBlur',
-    resetOptions: { keepDirtyValues: true },
-    resolver: talkFeatureResolver,
-    values: getTalkFeatureFormValues(feature ?? EMPTY_STUDY_FEATURE),
-  });
+  const form = useTalkStudyEditorForm(feature ?? null);
   const body = useWatch({
     control: form.control,
     name: 'body',
