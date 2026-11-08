@@ -18,7 +18,7 @@ export function FormSheetBody({
     <>
       <BottomDrawerPanel scrollable={scrollable}>{children}</BottomDrawerPanel>
 
-      <DrawerFooter className="overflow-hidden">{footer}</DrawerFooter>
+      <DrawerFooter className="shrink-0">{footer}</DrawerFooter>
     </>
   );
 }
