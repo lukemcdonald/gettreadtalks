@@ -80,7 +80,7 @@ export function getTalkGeneratePendingLabel(
   return `Generating ${label}...`;
 }
 
-export function getTalkCreateGenerationHint(mediaUrl: string) {
+export function formatTalkCreateGenerationHint(mediaUrl: string) {
   const trimmed = mediaUrl.trim();
 
   if (!trimmed) {

@@ -16,7 +16,7 @@ import {
 
 const STAGE_ORDER = ['transcript', 'summary', 'study'] as const;
 
-function getStageText(stage: TalkGenerationStage) {
+function formatStageText(stage: TalkGenerationStage) {
   const label = TALK_GENERATION_STAGE_LABEL[stage.kind];
 
   if (stage.kind === 'failed' && stage.message) {
@@ -48,7 +48,7 @@ export function TalkGenerationStatusList({
             key={name}
           >
             <span className="text-foreground capitalize">{name}</span>{' '}
-            {getStageText(stage)}
+            {formatStageText(stage)}
           </li>
         );
       })}

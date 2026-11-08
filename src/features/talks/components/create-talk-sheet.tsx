@@ -12,7 +12,7 @@ import { useForm, useWatch } from 'react-hook-form';
 import { FormSheet } from '@/components/ui';
 import { createTalkAction } from '@/features/talks/actions/create-talk';
 import { TalkFormFields } from '@/features/talks/components/talk-form-fields';
-import { getTalkCreateGenerationHint } from '@/features/talks/components/talk-generate-status';
+import { formatTalkCreateGenerationHint } from '@/features/talks/components/talk-generate-status';
 import { talkFormSchema } from '@/features/talks/schemas/talk-form';
 import { useCreateFormSheet } from '@/lib/forms/use-create-form-sheet';
 
@@ -62,7 +62,7 @@ export function CreateTalkSheet({
     submit: createTalkAction,
   });
   const mediaUrl = useWatch({ control: form.control, name: 'mediaUrl' });
-  const generationHint = getTalkCreateGenerationHint(mediaUrl);
+  const generationHint = formatTalkCreateGenerationHint(mediaUrl);
 
   return (
     <FormSheet

@@ -3,11 +3,11 @@ import { TALK_DRAFT_PENDING } from '@/convex/model/talks/validators';
 import { describe, expect, it } from '@/test';
 
 import {
-  getTalkCreateGenerationHint,
+  TALK_CREATE_YOUTUBE_DRAFT_HINT,
+  formatTalkCreateGenerationHint,
   getTalkGenerationStatus,
   getTalkSummaryEditorValue,
   shouldOpenTalkStudyPreview,
-  TALK_CREATE_YOUTUBE_DRAFT_HINT,
 } from './talk-generate-status';
 
 const youtube = 'https://www.youtube.com/watch?v=jNQXAC9IVRw';
@@ -25,14 +25,14 @@ function status(
   });
 }
 
-describe('getTalkCreateGenerationHint', () => {
+describe('formatTalkCreateGenerationHint', () => {
   it('explains background drafts for YouTube and stays quiet until a URL exists', () => {
-    expect(getTalkCreateGenerationHint('')).toBeNull();
-    expect(getTalkCreateGenerationHint('  ')).toBeNull();
-    expect(getTalkCreateGenerationHint(youtube)).toBe(
+    expect(formatTalkCreateGenerationHint('')).toBeNull();
+    expect(formatTalkCreateGenerationHint('  ')).toBeNull();
+    expect(formatTalkCreateGenerationHint(youtube)).toBe(
       TALK_CREATE_YOUTUBE_DRAFT_HINT
     );
-    expect(getTalkCreateGenerationHint(audio)).toBe(
+    expect(formatTalkCreateGenerationHint(audio)).toBe(
       NO_TRANSCRIPT_SOURCE_MESSAGE
     );
   });
