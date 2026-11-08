@@ -7,11 +7,12 @@ import type { TalkId } from '@/features/talks/types';
 import type { TopicListItem } from '@/features/topics/types';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 
 import { FormSheet } from '@/components/ui';
 import { createTalkAction } from '@/features/talks/actions/create-talk';
 import { TalkFormFields } from '@/features/talks/components/talk-form-fields';
+import { getTalkCreateGenerationHint } from '@/features/talks/components/talk-generate-status';
 import { talkFormSchema } from '@/features/talks/schemas/talk-form';
 import { useCreateFormSheet } from '@/lib/forms/use-create-form-sheet';
 
@@ -60,6 +61,8 @@ export function CreateTalkSheet({
     open,
     submit: createTalkAction,
   });
+  const mediaUrl = useWatch({ control: form.control, name: 'mediaUrl' });
+  const generationHint = getTalkCreateGenerationHint(mediaUrl);
 
   return (
     <FormSheet
@@ -79,6 +82,14 @@ export function CreateTalkSheet({
         speakers={speakers}
         topics={topics}
       />
+      {generationHint ? (
+        <p
+          className="text-muted-foreground mt-4 text-sm"
+          data-testid="create-talk-draft-hint"
+        >
+          {generationHint}
+        </p>
+      ) : null}
     </FormSheet>
   );
 }

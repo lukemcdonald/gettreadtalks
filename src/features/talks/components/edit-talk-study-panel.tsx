@@ -6,7 +6,7 @@ import type { Control, Resolver, UseFormSetError } from 'react-hook-form';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery } from 'convex/react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 
 import {
@@ -21,6 +21,7 @@ import { api } from '@/convex/_generated/api';
 import { getMissingStudyTemplateHeadings } from '@/convex/model/talkFeatures/study/template';
 import { updateTalkFeatureAction } from '@/features/talks/actions/update-talk-study';
 import { StudyStatusSelect } from '@/features/talks/components/study-status-select';
+import { shouldOpenTalkStudyPreview } from '@/features/talks/components/talk-generate-status';
 import { TalkStudyContent } from '@/features/talks/components/talk-study-content';
 import { TalkStudyGenerate } from '@/features/talks/components/talk-study-generate';
 import { talkFeatureFormSchema } from '@/features/talks/schemas/talk-study-form';
@@ -188,9 +189,11 @@ function useTalkStudyPanelForm({
     talkId,
   });
   const feature = liveFeature === undefined ? initialFeature : liveFeature;
+  const hadBody = useRef(Boolean(initialFeature?.body?.trim()));
   const [isEditing, setIsEditing] = useState(!initialFeature?.body?.trim());
   const form = useForm<TalkFeatureFormData>({
     mode: 'onBlur',
+    resetOptions: { keepDirtyValues: true },
     resolver: talkFeatureResolver,
     values: getTalkFeatureFormValues(feature ?? EMPTY_STUDY_FEATURE),
   });
@@ -198,6 +201,21 @@ function useTalkStudyPanelForm({
     control: form.control,
     name: 'body',
   });
+  const hasBody = Boolean(feature?.body?.trim());
+
+  useEffect(() => {
+    if (
+      shouldOpenTalkStudyPreview({
+        hadBody: hadBody.current,
+        hasBody,
+        isDirty: form.formState.isDirty,
+      })
+    ) {
+      setIsEditing(false);
+    }
+
+    hadBody.current = hasBody;
+  }, [form.formState.isDirty, hasBody]);
 
   return {
     body,

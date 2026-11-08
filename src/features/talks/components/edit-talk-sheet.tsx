@@ -21,6 +21,7 @@ import {
   FormSheetShell,
 } from '@/components/ui';
 import { updateTalkAction } from '@/features/talks/actions/update-talk';
+import { EditTalkGenerationStatus } from '@/features/talks/components/edit-talk-generation-status';
 import {
   getTalkFormValues,
   getUrlChangeForTalk,
@@ -186,11 +187,17 @@ export function EditTalkSheet({
     <>
       <FormSheetShell
         header={
-          <EditTalkTabs
-            onValueChange={handleTabChange}
-            studyStatus={studyStatus}
-            value={tab}
-          />
+          <>
+            <EditTalkTabs
+              onValueChange={handleTabChange}
+              studyStatus={studyStatus}
+              value={tab}
+            />
+            <EditTalkGenerationStatus
+              mediaUrl={talk.mediaUrl}
+              talkId={talk._id}
+            />
+          </>
         }
         onOpenChange={handleOpenChange}
         open

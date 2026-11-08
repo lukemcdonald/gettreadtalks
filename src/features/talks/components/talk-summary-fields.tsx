@@ -11,7 +11,7 @@ import { Controller, useForm } from 'react-hook-form';
 
 import { Field, FieldError, FieldLabel, Textarea } from '@/components/ui';
 import { api } from '@/convex/_generated/api';
-import { isTalkDraftStatus } from '@/features/talks/components/talk-generate-status';
+import { getTalkSummaryEditorValue } from '@/features/talks/components/talk-generate-status';
 import { TalkSummaryGenerate } from '@/features/talks/components/talk-summary-generate';
 import { talkSummaryFormSchema } from '@/features/talks/schemas/talk-study-form';
 
@@ -25,13 +25,11 @@ export function useTalkSummaryForm(
   const [summaryFlags, setSummaryFlags] = useState<string[]>([]);
   const form = useForm<TalkSummaryFormData>({
     mode: 'onBlur',
+    resetOptions: { keepDirtyValues: true },
     // oxlint-disable-next-line typescript/no-explicit-any -- Zod 4 compatibility with zodResolver
     resolver: zodResolver(talkSummaryFormSchema as any),
     values: {
-      summary:
-        talkDoc?.draftSummary && !isTalkDraftStatus(talkDoc.draftSummary)
-          ? talkDoc.draftSummary
-          : (talkDoc?.summary ?? ''),
+      summary: getTalkSummaryEditorValue(talkDoc ?? null),
     },
   });
 
