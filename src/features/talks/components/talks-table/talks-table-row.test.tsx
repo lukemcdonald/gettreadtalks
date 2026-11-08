@@ -11,7 +11,7 @@ import { describe, expect, it, render, screen } from '@/test';
 import { TalksTableRow } from './talks-table-row';
 
 vi.mock('@/features/talks/components/talk-actions-menu', () => ({
-  TalkActionsMenu: () => null,
+  TalkActionsMenu: () => <div data-testid="talk-actions-menu" />,
 }));
 
 describe('TalksTableRow', () => {
@@ -90,13 +90,20 @@ describe('TalksTableRow', () => {
     );
   });
 
-  it('opens the study editor from the studies list', () => {
+  it('keeps talk actions on the talks list', () => {
+    setup(createTalk());
+
+    expect(screen.getByTestId('talk-actions-menu')).toBeInTheDocument();
+  });
+
+  it('opens the study editor without talk archive or delete', () => {
     const talk = createTalk();
 
     render(
       <Table>
         <TableBody>
           <TalksTableRow
+            actions={null}
             editHref={buildTalkStudyPath(talk._id)}
             status="draft"
             talk={talk}
@@ -109,5 +116,6 @@ describe('TalksTableRow', () => {
       'href',
       buildTalkStudyPath(talk._id)
     );
+    expect(screen.queryByTestId('talk-actions-menu')).not.toBeInTheDocument();
   });
 });
