@@ -74,9 +74,7 @@ import type * as model_talkFeatures_helpers from "../model/talkFeatures/helpers.
 import type * as model_talkFeatures_index from "../model/talkFeatures/index.js";
 import type * as model_talkFeatures_mutations from "../model/talkFeatures/mutations.js";
 import type * as model_talkFeatures_queries from "../model/talkFeatures/queries.js";
-import type * as model_talkFeatures_study_backfill from "../model/talkFeatures/study/backfill.js";
 import type * as model_talkFeatures_study_generate from "../model/talkFeatures/study/generate.js";
-import type * as model_talkFeatures_study_helpers from "../model/talkFeatures/study/helpers.js";
 import type * as model_talkFeatures_study_prompt from "../model/talkFeatures/study/prompt.js";
 import type * as model_talkFeatures_study_template from "../model/talkFeatures/study/template.js";
 import type * as model_talkFeatures_validators from "../model/talkFeatures/validators.js";
@@ -181,9 +179,7 @@ declare const fullApi: ApiFromModules<{
   "model/talkFeatures/index": typeof model_talkFeatures_index;
   "model/talkFeatures/mutations": typeof model_talkFeatures_mutations;
   "model/talkFeatures/queries": typeof model_talkFeatures_queries;
-  "model/talkFeatures/study/backfill": typeof model_talkFeatures_study_backfill;
   "model/talkFeatures/study/generate": typeof model_talkFeatures_study_generate;
-  "model/talkFeatures/study/helpers": typeof model_talkFeatures_study_helpers;
   "model/talkFeatures/study/prompt": typeof model_talkFeatures_study_prompt;
   "model/talkFeatures/study/template": typeof model_talkFeatures_study_template;
   "model/talkFeatures/validators": typeof model_talkFeatures_validators;
