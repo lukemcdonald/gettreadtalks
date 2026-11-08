@@ -7,7 +7,11 @@ import { throwConvexError } from '../../lib/errors';
 import { getOrThrow } from '../../lib/utils';
 import { requireAdmin } from '../auth/helpers';
 import { clearTalkDraftStep } from '../talks/autoDraft';
-import { hasReviewedTalkFeature, loadTalkFeature } from './helpers';
+import {
+  hasReviewedTalkFeature,
+  isEligibleStudyDraft,
+  loadTalkFeature,
+} from './helpers';
 import { talkFeatureKind, talkFeatureStatus } from './validators';
 
 export const saveTalkFeatureDraft = internalMutation({
@@ -91,4 +95,46 @@ export const updateTalkFeature = mutation({
     return featureId;
   },
   returns: v.id('talkFeatures'),
+});
+
+export const publishStudyDrafts = mutation({
+  args: {
+    featureIds: v.array(v.id('talkFeatures')),
+  },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+
+    const uniqueIds = [...new Set(args.featureIds)];
+    const features = await Promise.all(
+      uniqueIds.map((featureId) => ctx.db.get(featureId))
+    );
+    const now = Date.now();
+    const patches: Promise<void>[] = [];
+    let published = 0;
+    let skipped = 0;
+
+    for (const feature of features) {
+      if (!feature || !isEligibleStudyDraft(feature)) {
+        skipped += 1;
+        continue;
+      }
+
+      patches.push(
+        ctx.db.patch(feature._id, {
+          manuallyEditedAt: now,
+          status: 'published',
+          updatedAt: now,
+        })
+      );
+      published += 1;
+    }
+
+    await Promise.all(patches);
+
+    return { published, skipped };
+  },
+  returns: v.object({
+    published: v.number(),
+    skipped: v.number(),
+  }),
 });

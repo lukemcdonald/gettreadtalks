@@ -190,6 +190,16 @@ const gatedFunctions: {
     name: 'talkFeatures.getTalkFeature',
   },
   {
+    call: (client) =>
+      client.query(api.talkFeatures.listEligibleStudyDrafts, {}),
+    name: 'talkFeatures.listEligibleStudyDrafts',
+  },
+  {
+    call: (client) =>
+      client.mutation(api.talkFeatures.publishStudyDrafts, { featureIds: [] }),
+    name: 'talkFeatures.publishStudyDrafts',
+  },
+  {
     call: (client, seed) =>
       client.mutation(api.talkFeatures.updateTalkFeature, {
         body: '## Main points\n\nUpdated study.',

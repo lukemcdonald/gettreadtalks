@@ -3,6 +3,31 @@ import type { MutationCtx, QueryCtx } from '../../_generated/server';
 import type { talkFeatureKind } from './validators';
 import type { Infer } from 'convex/values';
 
+export function isEligibleStudyDraft(feature: {
+  body: string;
+  kind: string;
+  status: string;
+}) {
+  return (
+    feature.kind === 'study' &&
+    feature.status === 'draft' &&
+    feature.body.trim() !== ''
+  );
+}
+
+export function toEligibleStudyDraftIds<
+  T extends {
+    _id: Id<'talkFeatures'>;
+    body: string;
+    kind: string;
+    status: string;
+  },
+>(features: T[]) {
+  return features
+    .filter((feature) => isEligibleStudyDraft(feature))
+    .map((feature) => feature._id);
+}
+
 export function hasReviewedTalkFeature(
   feature: {
     manuallyEditedAt?: number;
