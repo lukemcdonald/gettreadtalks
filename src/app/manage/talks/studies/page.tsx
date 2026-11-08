@@ -2,6 +2,7 @@ import type { ManageStudiesSearchParams } from '@/app/manage/talks/studies/_comp
 
 import { Suspense } from 'react';
 
+import { PublishStudyDraftsButton } from '@/app/manage/talks/studies/_components/publish-study-drafts-button';
 import { ManageStudiesContent } from '@/app/manage/talks/studies/_components/studies-content';
 import { ManagePageHeader } from '@/components/manage-page-header';
 import {
@@ -22,7 +23,7 @@ export default function ManageStudiesPage({
 }: ManageStudiesPageProps) {
   return (
     <>
-      <ManagePageHeader title="Studies" />
+      <ManagePageHeader action={<PublishStudyDraftsButton />} title="Studies" />
       <Suspense fallback={<Skeleton className="h-16 w-full" />}>
         <ManageFilters searchPlaceholder="Search talks and speakers...">
           <SelectFilter
