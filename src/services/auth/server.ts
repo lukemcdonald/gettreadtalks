@@ -8,6 +8,7 @@ import { redirect } from 'next/navigation';
 import { cache } from 'react';
 
 import { api } from '@/convex/_generated/api';
+import { hasSessionCookieHeader } from '@/services/auth/session-cookie';
 import { isAdmin } from '@/services/auth/utils';
 
 // Framework-specific utilities from Convex + Better Auth
@@ -26,41 +27,32 @@ const { fetchAuthMutation, fetchAuthQuery, getToken, handler } =
     convexUrl,
   });
 
-/**
- * Get the authentication token for the current user.
- * Wrapped with React's cache() to ensure the token is only retrieved once per request,
- * even if called multiple times. This reduces redundant cookie reads and improves performance.
- *
- * @returns Authentication token or null if not authenticated
- */
+const hasSessionCookie = cache(async () => {
+  const cookieStore = await cookies();
+  const cookieHeader = cookieStore
+    .getAll()
+    .map(({ name, value }) => `${name}=${value}`)
+    .join('; ');
+
+  return hasSessionCookieHeader(cookieHeader);
+});
+
 const getAuthToken = cache(async () => {
-  // Always access cookies to satisfy Next.js 16 Turbopack requirements
-  // This ensures dynamic rendering before Math.random() usage in betterAuth
-  // Avoids the "used Math.random() before accessing Request data" error on page and builds.
-  await cookies();
+  if (!(await hasSessionCookie())) {
+    return;
+  }
+
   return await getToken();
 });
 
-/**
- * Get the current authenticated user server-side.
- *
- * Uses fetchAuthQuery which automatically handles:
- * - Cookie reading and token extraction
- * - Passing auth token to Convex query
- * - Error handling for unauthenticated requests
- *
- * @returns User object or null if not authenticated
- */
 const getCurrentUser = cache(async () => {
-  // Always access cookies to satisfy Next.js 16 Turbopack requirements
-  // This ensures dynamic rendering before Math.random() usage in betterAuth
-  await cookies();
+  if (!(await hasSessionCookie())) {
+    return null;
+  }
 
-  // fetchAuthQuery handles token extraction and passing automatically
   try {
     return await fetchAuthQuery(api.users.getCurrentUser, {});
   } catch {
-    // If query fails, user is not authenticated
     return null;
   }
 });
@@ -111,6 +103,7 @@ export {
   getAuthToken,
   getCurrentUser,
   handler,
+  hasSessionCookie,
   requireAdminUser,
   requireCurrentUser,
 };

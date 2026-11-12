@@ -3,11 +3,13 @@ import type { ReactNode } from 'react';
 
 import { Analytics } from '@vercel/analytics/next';
 import { Inter } from 'next/font/google';
+import { Suspense } from 'react';
 
 import { AnalyticsProvider } from '@/components/analytics-provider';
 import { AuthProvider } from '@/components/auth-provider';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { Main } from '@/components/main';
+import { SessionCookieSync } from '@/components/session-cookie-sync';
 import { SiteFooter } from '@/components/site-footer';
 import { SiteHeader } from '@/components/site-header';
 import { SkipNavLink } from '@/components/site-header/navigation/skip-nav-link';
@@ -75,6 +77,9 @@ export default function RootLayout({
         <ErrorBoundary>
           <ThemeProvider>
             <AuthProvider>
+              <Suspense fallback={null}>
+                <SessionCookieSync />
+              </Suspense>
               <AnalyticsProvider>
                 <ToastProvider>
                   <SkipNavLink href="#main" />

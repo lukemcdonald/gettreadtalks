@@ -5,6 +5,7 @@ import type { User } from '@/services/auth/types';
 import { useConvexAuth, useQuery } from 'convex/react';
 
 import { api } from '@/convex/_generated/api';
+import { useSessionCookiePresence } from '@/services/auth/session-presence-store';
 
 /**
  * Get the current authenticated user.
@@ -15,8 +16,19 @@ import { api } from '@/convex/_generated/api';
  * @returns Current user data (`data`) and whether client auth is still resolving (`isLoading`)
  */
 export function useCurrentUser(initialData?: User | null) {
+  const hasSessionCookie = useSessionCookiePresence();
   const { isLoading: isAuthLoading } = useConvexAuth();
-  const data = useQuery(api.users.getCurrentUser);
+  const data = useQuery(
+    api.users.getCurrentUser,
+    hasSessionCookie === true ? {} : 'skip'
+  );
+
+  if (hasSessionCookie !== true) {
+    return {
+      data: initialData ?? null,
+      isLoading: hasSessionCookie === null && initialData === undefined,
+    };
+  }
 
   // Trust SSR data until client-side auth is fully resolved:
   // 1. Auth is still syncing (isAuthLoading = true)
