@@ -11,7 +11,12 @@ type LinkProps = Omit<NextLinkProps, 'prefetch'> & {
   prefetch?: NextLinkProps['prefetch'] | 'intent';
 };
 
-export function Link({ prefetch, rel, target, ...delegated }: LinkProps) {
+export function Link({
+  prefetch = 'intent',
+  rel,
+  target,
+  ...delegated
+}: LinkProps) {
   const resolvedRel = getRel(target, rel);
 
   if (prefetch === 'intent') {

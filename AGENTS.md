@@ -132,7 +132,7 @@ Do not split a simple component just to match the directory shape.
 
 Pages and layouts stay synchronous. Put `params`, `searchParams`, cookies, headers, and auth in small async children, each behind its own `<Suspense>` (separate boundaries for filters vs results; `fallback={null}` only for small pieces). No per-route `loading.tsx` on listings. Auth via `AdminGate` / `UserGate` — do not await `requireCurrentUser` / `requireAdminUser` in the layout.
 
-Public reads live in `src/features/*/queries` with `'use cache'`, `cacheLife()`, and `cacheTag()`. Mutations call `updateTag()` (`refresh()` only when that is not enough). Public listing and detail pages export `ensureStatic = 'shell'`. React Compiler is on. Use `Link` from `@/components/ui/link`, not `next/link` directly; default prefetch.
+Public reads live in `src/features/*/queries` with `'use cache'`, `cacheLife()`, and `cacheTag()`. Mutations call `updateTag()` (`refresh()` only when that is not enough). Public listing and detail pages export `ensureStatic = 'shell'`. React Compiler is on. Use `Link` from `@/components/ui/link`, not `next/link` directly; default hover prefetch (`prefetch="intent"`).
 
 ## Convex
 
