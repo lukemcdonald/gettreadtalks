@@ -2,6 +2,8 @@
 
 import { useSyncExternalStore } from 'react';
 
+const BETTER_AUTH_BROADCAST_KEY = 'better-auth.message';
+
 let sessionCookiePresence: boolean | null = null;
 const listeners = new Set<() => void>();
 
@@ -35,4 +37,39 @@ export function useSessionCookiePresence() {
     getSessionCookiePresence,
     () => null
   );
+}
+
+export function isBetterAuthSessionBroadcast(
+  key: string | null,
+  value: string | null
+) {
+  if (key !== BETTER_AUTH_BROADCAST_KEY || !value) {
+    return false;
+  }
+
+  try {
+    const message = JSON.parse(value) as { event?: string };
+
+    return message.event === 'session';
+  } catch {
+    return false;
+  }
+}
+
+export function broadcastSessionCookiePresence() {
+  setSessionCookiePresence(true);
+
+  try {
+    localStorage.setItem(
+      BETTER_AUTH_BROADCAST_KEY,
+      JSON.stringify({
+        clientId: Math.random().toString(36).slice(2),
+        data: { trigger: 'signin' },
+        event: 'session',
+        timestamp: Math.floor(Date.now() / 1000),
+      })
+    );
+  } catch {
+    // localStorage can throw in private mode.
+  }
 }

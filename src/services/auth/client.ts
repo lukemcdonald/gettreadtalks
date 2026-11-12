@@ -7,7 +7,10 @@ import { adminClient } from 'better-auth/client/plugins';
 import { createAuthClient } from 'better-auth/react';
 
 import { isAnonymousAuthSessionProbe } from '@/services/auth/session-cookie';
-import { getSessionCookiePresence } from '@/services/auth/session-presence-store';
+import {
+  broadcastSessionCookiePresence,
+  getSessionCookiePresence,
+} from '@/services/auth/session-presence-store';
 
 function getRequestUrl(input: RequestInfo | URL) {
   if (typeof input === 'string') {
@@ -70,19 +73,31 @@ export async function signUp({
   name,
   password,
 }: SignUpParams) {
-  return await authClient.signUp.email({
+  const result = await authClient.signUp.email({
     email,
     name: name || email.split('@')[0],
     password,
     ...captchaFetchOptions(captchaToken),
   });
+
+  if (result.data) {
+    broadcastSessionCookiePresence();
+  }
+
+  return result;
 }
 
 export async function signIn({ email, password }: SignInParams) {
-  return await authClient.signIn.email({
+  const result = await authClient.signIn.email({
     email,
     password,
   });
+
+  if (result.data) {
+    broadcastSessionCookiePresence();
+  }
+
+  return result;
 }
 
 export async function signOut() {
