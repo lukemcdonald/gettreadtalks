@@ -9,7 +9,6 @@ import { getCurrentUser } from '@/services/auth/server';
  */
 export async function AccountMenuServer() {
   await navigation();
-  const user = await getCurrentUser();
 
-  return <AccountMenu initialUser={user} />;
+  return <AccountMenu initialUser={await getCurrentUser()} />;
 }

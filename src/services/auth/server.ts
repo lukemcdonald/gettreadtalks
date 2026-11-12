@@ -5,6 +5,7 @@ import type { Route } from 'next';
 import { convexBetterAuthNextJs } from '@convex-dev/better-auth/nextjs';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { connection } from 'next/server';
 import { cache } from 'react';
 
 import { api } from '@/convex/_generated/api';
@@ -28,6 +29,7 @@ const { fetchAuthMutation, fetchAuthQuery, getToken, handler } =
   });
 
 const hasSessionCookie = cache(async () => {
+  await connection();
   const headerList = await headers();
 
   return hasSessionCookieHeader(headerList.get('cookie'));

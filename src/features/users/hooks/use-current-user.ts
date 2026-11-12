@@ -7,22 +7,24 @@ import { useConvexAuth, useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { useSessionCookiePresence } from '@/services/auth/session-presence-store';
 
-/**
- * Get the current authenticated user.
- *
- * Uses SSR data while client auth is syncing to prevent flash of incorrect state.
- *
- * @param initialData - Optional SSR user data to prevent layout shift
- * @returns Current user data (`data`) and whether client auth is still resolving (`isLoading`)
- */
-export function useCurrentUser(initialData?: User | null) {
-  const hasSessionCookie = useSessionCookiePresence();
-  const { isLoading: isAuthLoading } = useConvexAuth();
-  const data = useQuery(
-    api.users.getCurrentUser,
-    hasSessionCookie === true ? {} : 'skip'
-  );
+interface CurrentUserState {
+  data: User | null;
+  isLoading: boolean;
+}
 
+export function getCurrentUserState({
+  hasSessionCookie,
+  initialData,
+  isAuthLoading,
+  isAuthenticated,
+  queryData,
+}: {
+  hasSessionCookie: boolean | null;
+  initialData?: User | null;
+  isAuthLoading: boolean;
+  isAuthenticated: boolean;
+  queryData: User | undefined;
+}): CurrentUserState {
   if (hasSessionCookie === false) {
     return {
       data: null,
@@ -37,16 +39,42 @@ export function useCurrentUser(initialData?: User | null) {
     };
   }
 
-  // Trust SSR data until client-side auth is fully resolved:
-  // 1. Auth is still syncing (isAuthLoading = true)
-  // 2. Query hasn't returned yet (data = undefined)
-  // Only show logged-out state when query explicitly returns null
-  const isClientReady = !isAuthLoading && data !== undefined;
-  const user = isClientReady ? (data ?? null) : (initialData ?? null);
-  const isLoading = !isClientReady && initialData === undefined;
+  if (!isAuthenticated) {
+    return {
+      data: initialData ?? null,
+      isLoading: isAuthLoading && initialData === undefined,
+    };
+  }
+
+  const isClientReady = !isAuthLoading && queryData !== undefined;
 
   return {
-    data: user,
-    isLoading,
+    data: isClientReady ? (queryData ?? null) : (initialData ?? null),
+    isLoading: !isClientReady && initialData === undefined,
   };
+}
+
+/**
+ * Get the current authenticated user.
+ *
+ * Uses SSR data while client auth is syncing to prevent flash of incorrect state.
+ *
+ * @param initialData - Optional SSR user data to prevent layout shift
+ * @returns Current user data (`data`) and whether client auth is still resolving (`isLoading`)
+ */
+export function useCurrentUser(initialData?: User | null) {
+  const hasSessionCookie = useSessionCookiePresence();
+  const { isAuthenticated, isLoading: isAuthLoading } = useConvexAuth();
+  const queryData = useQuery(
+    api.users.getCurrentUser,
+    hasSessionCookie === true ? {} : 'skip'
+  );
+
+  return getCurrentUserState({
+    hasSessionCookie,
+    initialData,
+    isAuthLoading,
+    isAuthenticated,
+    queryData,
+  });
 }

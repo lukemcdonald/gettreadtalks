@@ -1,6 +1,7 @@
 import { Suspense } from 'react';
 
 import { MobileNav } from '@/components/site-header/navigation/mobile-nav';
+import { MobileNavServer } from '@/components/site-header/navigation/mobile-nav-server';
 import { PrimaryNav } from '@/components/site-header/navigation/primary-nav';
 import { SecondaryNav } from '@/components/site-header/navigation/secondary-nav';
 import { SiteBranding } from '@/components/site-header/site-branding';
@@ -20,8 +21,8 @@ export function SiteHeader() {
           <PrimaryNav className="hidden justify-center md:flex lg:flex-1" />
         </Suspense>
         <SecondaryNav className="flex justify-end lg:flex-1" />
-        <Suspense>
-          <MobileNav className="md:hidden" />
+        <Suspense fallback={<MobileNav className="md:hidden" />}>
+          <MobileNavServer className="md:hidden" />
         </Suspense>
       </Container>
     </Section>
