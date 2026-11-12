@@ -9,6 +9,7 @@ import { SpeakerActionsMenu } from './speaker-actions-menu';
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
+    prefetch: vi.fn(),
     push: vi.fn(),
     refresh: vi.fn(),
   }),

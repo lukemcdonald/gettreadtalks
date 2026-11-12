@@ -12,15 +12,21 @@ interface IntentHandlers<Element extends HTMLElement> {
   onTouchStart?: (event: TouchEvent<Element>) => void;
 }
 
-function getHrefPath(href: Href) {
-  return typeof href === 'string' ? href : (href.pathname ?? '');
+function getPrefetchPath(href: Href) {
+  const path = typeof href === 'string' ? href : (href.pathname ?? '');
+
+  if (!path.startsWith('/') || path.startsWith('//')) {
+    return '';
+  }
+
+  return path;
 }
 
 export function useIntentPrefetch<
   Element extends HTMLElement = HTMLAnchorElement,
 >(href: Href, handlers: IntentHandlers<Element> = {}) {
   const router = useRouter();
-  const path = getHrefPath(href);
+  const path = getPrefetchPath(href);
 
   function prefetch() {
     if (path) {

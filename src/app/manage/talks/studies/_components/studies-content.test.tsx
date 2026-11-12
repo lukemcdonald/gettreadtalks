@@ -17,6 +17,7 @@ vi.mock('@/features/talks/queries/load-all-talks', () => ({
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
+    prefetch: vi.fn(),
     push: vi.fn(),
     refresh: vi.fn(),
     replace: vi.fn(),

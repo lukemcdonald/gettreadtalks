@@ -54,7 +54,7 @@ Every public page has one `h1` (`PageHeader` or `HeroTitle`). Real section title
 
 Overlays: `Dialog` for centered blocking UI (confirm, alert, desktop search). Bottom drawers use `BottomDrawer` / `BottomDrawerPopup` / `BottomDrawerPanel` (`src/components/ui/bottom-drawer.tsx`): default content-sized height from half-viewport minimum to tall maximum, then the panel scrolls. Pass `height="half"` or `height="tall"` for a fixed sheet, and `scrollable={false}` when children own overflow. Search uses `height="tall"`. `FormSheet` (`src/components/ui/form-sheet.tsx`) stays a `Drawer` — right on large screens, bottom on small — and uses `BottomDrawerPopup` so only the bottom state gets the height. Footer actions keep their intrinsic height; the panel scrolls. Do not import `Sheet` in feature or page code.
 
-The header is `src/components/site-header/site-header.tsx`. Desktop shows branding, nav, search, theme, and account. Mobile is search plus menu only; account and theme live in `src/components/site-header/navigation/mobile-nav.tsx`.
+The header is `src/components/site-header/site-header.tsx`. Desktop shows branding, nav, search, theme, and account. Mobile is search plus menu only; account and theme live in `src/components/site-header/navigation/mobile-nav.tsx`. Header, footer, and other always-visible nav links use the shared `Link` hover prefetch (`prefetch="intent"` by default): they prefetch on hover, focus, or touch, not on load. Listing cards, featured cards, and search results share that path.
 
 ## Elevation & Depth
 

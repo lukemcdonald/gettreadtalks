@@ -13,6 +13,7 @@ const { convex, router } = vi.hoisted(() => ({
     query: vi.fn(),
   },
   router: {
+    prefetch: vi.fn(),
     push: vi.fn(),
   },
 }));
