@@ -14,9 +14,6 @@ vi.mock('@/features/users/hooks/use-current-user', () => ({
 
 vi.mock('next/navigation', () => ({
   usePathname: vi.fn(() => '/'),
-  useRouter: () => ({
-    prefetch: vi.fn(),
-  }),
 }));
 
 describe('MobileNav', () => {

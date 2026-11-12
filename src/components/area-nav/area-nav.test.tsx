@@ -13,9 +13,6 @@ const { usePathname } = vi.hoisted(() => ({
 
 vi.mock('next/navigation', () => ({
   usePathname,
-  useRouter: () => ({
-    prefetch: vi.fn(),
-  }),
 }));
 
 describe('AreaNav', () => {

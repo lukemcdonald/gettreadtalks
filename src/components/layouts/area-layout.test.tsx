@@ -18,7 +18,6 @@ vi.mock('@/features/users/hooks/use-is-admin', () => ({
 vi.mock('next/navigation', () => ({
   usePathname,
   useRouter: () => ({
-    prefetch: vi.fn(),
     push: vi.fn(),
   }),
 }));

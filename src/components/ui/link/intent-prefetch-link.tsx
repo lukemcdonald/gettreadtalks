@@ -3,8 +3,9 @@
 import type { ComponentProps } from 'react';
 
 import NextLink from 'next/link';
+import { useState } from 'react';
 
-import { useIntentPrefetch } from './use-intent-prefetch';
+import { getPrefetchPath } from './get-prefetch-path';
 
 function IntentPrefetchLink({
   href,
@@ -13,13 +14,33 @@ function IntentPrefetchLink({
   onTouchStart,
   ...delegated
 }: ComponentProps<typeof NextLink>) {
-  const intent = useIntentPrefetch(href, {
-    onFocus,
-    onMouseEnter,
-    onTouchStart,
-  });
+  const [prefetch, setPrefetch] = useState(false);
 
-  return <NextLink {...delegated} href={href} prefetch={false} {...intent} />;
+  function enablePrefetch() {
+    if (getPrefetchPath(href)) {
+      setPrefetch(true);
+    }
+  }
+
+  return (
+    <NextLink
+      {...delegated}
+      href={href}
+      onFocus={(event) => {
+        enablePrefetch();
+        onFocus?.(event);
+      }}
+      onMouseEnter={(event) => {
+        enablePrefetch();
+        onMouseEnter?.(event);
+      }}
+      onTouchStart={(event) => {
+        enablePrefetch();
+        onTouchStart?.(event);
+      }}
+      prefetch={prefetch}
+    />
+  );
 }
 
 export { IntentPrefetchLink };

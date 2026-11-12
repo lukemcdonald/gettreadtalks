@@ -19,7 +19,6 @@ vi.mock('@/features/talks/actions/publish-study-drafts', () => ({
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
-    prefetch: vi.fn(),
     refresh,
   }),
 }));

@@ -15,7 +15,6 @@ const { archiveTalk, push, refresh } = vi.hoisted(() => ({
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
-    prefetch: vi.fn(),
     push,
     refresh,
   }),
