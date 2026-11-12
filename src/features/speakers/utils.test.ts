@@ -5,7 +5,7 @@ import { describe, expect, it } from '@/test';
 import { groupSpeakersByLastName } from './utils';
 
 describe('groupSpeakersByLastName', () => {
-  it('groups only the speakers on the current page', () => {
+  it('groups speakers by last-name letter', () => {
     const speakers = [
       { lastName: 'Adams' },
       { lastName: 'White' },

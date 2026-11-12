@@ -41,9 +41,7 @@ export function sortSpeakersByName(speakers: Speaker[]) {
   );
 }
 
-/**
- * Group speakers by the first letter of last name. Applies to the given page only.
- */
+/** Group speakers by the first letter of last name. */
 export function groupSpeakersByLastName(speakers: Speaker[]) {
   const grouped = new Map<string, Speaker[]>();
 

@@ -152,30 +152,6 @@ export const listSpeakerSlugs = query({
   ),
 });
 
-/**
- * Published speaker count and roles in use for the listing header and sidebar.
- */
-export const listSpeakerRoles = query({
-  args: {},
-  handler: async (ctx) => {
-    const speakers = await listPublishedSpeakers(ctx);
-    const roles = [
-      ...new Set(
-        speakers.flatMap((speaker) => (speaker.role ? [speaker.role] : []))
-      ),
-    ].toSorted();
-
-    return {
-      count: speakers.length,
-      roles,
-    };
-  },
-  returns: v.object({
-    count: v.number(),
-    roles: v.array(speakerRoleType),
-  }),
-});
-
 const FEATURED_SPEAKER_POOL = 50;
 
 /**

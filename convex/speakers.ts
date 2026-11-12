@@ -6,7 +6,6 @@ export const {
   getSpeakerBySlug,
   listAllSpeakers,
   listFeaturedSpeakers,
-  listSpeakerRoles,
   listSpeakerSlugs,
   listSpeakers,
 } = queries;

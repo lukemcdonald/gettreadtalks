@@ -11,7 +11,6 @@ type SortOption = 'alphabetical' | 'featured';
 const VALID_SORT_OPTIONS = new Set(['alphabetical', 'featured']);
 
 interface GetSpeakersProps {
-  cursor?: string;
   limit?: number;
   role?: string;
   search?: string;
@@ -26,7 +25,7 @@ export async function loadSpeakers(args?: GetSpeakersProps) {
   cacheLife('hours');
   cacheTag('speakers');
 
-  const { cursor, limit, role, search, sort } = args ?? {};
+  const { limit, role, search, sort } = args ?? {};
 
   // Validate sort option from URL params (untrusted input)
   const sortOption = VALID_SORT_OPTIONS.has(sort as SortOption)
@@ -43,7 +42,7 @@ export async function loadSpeakers(args?: GetSpeakersProps) {
       }),
     (speakers) => speakers,
     {
-      cursor: cursor ?? null,
+      cursor: null,
       numItems: limit ?? Number.POSITIVE_INFINITY,
     }
   );
