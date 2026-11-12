@@ -1,6 +1,5 @@
 'use client';
 
-import type { User } from '@/services/auth/types';
 import type { Route } from 'next';
 
 import { Menu as MenuIcon, X as XIcon } from 'lucide-react';
@@ -36,7 +35,6 @@ import { cn } from '@/utils';
 
 interface MobileNavProps {
   className?: string;
-  initialUser?: User | null;
 }
 
 interface MobileNavMenuLinkProps {
@@ -69,8 +67,8 @@ function MobileNavMenuLink({
   );
 }
 
-export function MobileNav({ className, initialUser }: MobileNavProps) {
-  const { data: user, isLoading } = useCurrentUser(initialUser);
+export function MobileNav({ className }: MobileNavProps) {
+  const { data: user, isLoading } = useCurrentUser();
   const pathname = usePathname();
   const showContentLink = isAdmin(user);
 

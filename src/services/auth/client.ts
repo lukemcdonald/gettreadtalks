@@ -6,65 +6,18 @@ import { convexClient } from '@convex-dev/better-auth/client/plugins';
 import { adminClient } from 'better-auth/client/plugins';
 import { createAuthClient } from 'better-auth/react';
 
-import { isAnonymousAuthSessionProbe } from '@/services/auth/session-cookie';
-import {
-  broadcastSessionCookiePresence,
-  getSessionCookiePresence,
-  setSessionCookiePresence,
-  waitForSessionCookiePresence,
-} from '@/services/auth/session-presence-store';
-
-function getRequestUrl(input: RequestInfo | URL) {
-  if (typeof input === 'string') {
-    return input;
-  }
-
-  if (input instanceof URL) {
-    return input.href;
-  }
-
-  return input.url;
-}
-
-function shouldSkipAnonymousAuthFetch(input: RequestInfo | URL) {
-  return isAnonymousAuthSessionProbe(
-    getRequestUrl(input),
-    getSessionCookiePresence()
-  );
-}
-
-function createEmptySessionResponse() {
-  return new Response('null', {
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    status: 200,
-  });
-}
-
+/**
+ * Create a Better Auth client instance for interacting with Better Auth server from the client.
+ *
+ * The convexClient() plugin automatically routes auth requests to the Convex deployment.
+ * baseURL is optional - if not provided, it uses relative URLs which work with the Next.js proxy.
+ *
+ * @returns The Better Auth client instance.
+ */
 export const authClient = createAuthClient({
-  fetchOptions: {
-    customFetchImpl: (input, init) => {
-      if (!shouldSkipAnonymousAuthFetch(input)) {
-        return fetch(input, init);
-      }
-
-      if (
-        typeof window === 'undefined' ||
-        getSessionCookiePresence() === false
-      ) {
-        return Promise.resolve(createEmptySessionResponse());
-      }
-
-      return waitForSessionCookiePresence().then((hasSession) => {
-        if (!hasSession) {
-          return createEmptySessionResponse();
-        }
-
-        return fetch(input, init);
-      });
-    },
-  },
+  // baseURL is optional - convexClient() plugin handles routing to Convex
+  // If you need to specify it, use the Next.js site URL (not Convex site URL)
+  // since requests go through /api/auth/[...all] which proxies to Convex
   plugins: [convexClient(), adminClient()],
 });
 
@@ -88,39 +41,23 @@ export async function signUp({
   name,
   password,
 }: SignUpParams) {
-  const result = await authClient.signUp.email({
+  return await authClient.signUp.email({
     email,
     name: name || email.split('@')[0],
     password,
     ...captchaFetchOptions(captchaToken),
   });
-
-  if (result.data) {
-    broadcastSessionCookiePresence();
-  }
-
-  return result;
 }
 
 export async function signIn({ email, password }: SignInParams) {
-  const result = await authClient.signIn.email({
+  return await authClient.signIn.email({
     email,
     password,
   });
-
-  if (result.data) {
-    broadcastSessionCookiePresence();
-  }
-
-  return result;
 }
 
 export async function signOut() {
-  const result = await authClient.signOut();
-
-  setSessionCookiePresence(false);
-
-  return result;
+  return await authClient.signOut();
 }
 
 export async function requestPasswordReset({

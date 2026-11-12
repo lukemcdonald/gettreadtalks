@@ -101,7 +101,6 @@ export {
   getAuthToken,
   getCurrentUser,
   handler,
-  hasSessionCookie,
   requireAdminUser,
   requireCurrentUser,
 };
