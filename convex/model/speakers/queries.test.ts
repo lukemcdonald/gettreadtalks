@@ -207,6 +207,77 @@ describe('listFeaturedSpeakers', () => {
   });
 });
 
+describe('listSpeakerRoles', () => {
+  it('counts published speakers and lists every in-use role', async () => {
+    const t = createConvexTest();
+    const pageSize = 24;
+
+    await t.run(async (ctx) => {
+      const roles = [
+        ...Array.from({ length: pageSize }, () => 'Pastor' as const),
+        'Author' as const,
+        'Theologian' as const,
+      ];
+
+      await Promise.all(
+        roles.map(async (role, index) => {
+          const suffix = String(index).padStart(2, '0');
+          const speakerId = await insertSpeaker(ctx, {
+            firstName: 'Published',
+            lastName: `Alpha ${suffix}`,
+            role,
+            slug: `published-speaker-${suffix}`,
+          });
+
+          await insertTalk(ctx, {
+            slug: `published-talk-${suffix}`,
+            speakerId,
+            title: `Published Talk ${suffix}`,
+          });
+        })
+      );
+
+      const draftSpeakerId = await insertSpeaker(ctx, {
+        firstName: 'Draft',
+        lastName: 'Zeta',
+        role: 'Evangelist',
+        slug: 'draft-evangelist',
+      });
+
+      await insertTalk(ctx, {
+        slug: 'draft-evangelist-talk',
+        speakerId: draftSpeakerId,
+        status: 'backlog',
+        title: 'Draft Evangelist Talk',
+      });
+    });
+
+    const directory = await t.query(api.speakers.listSpeakerRoles, {});
+    const firstPage = await t.query(api.speakers.listSpeakers, {
+      paginationOpts: { cursor: null, numItems: pageSize },
+    });
+    const secondPage = await t.query(api.speakers.listSpeakers, {
+      paginationOpts: {
+        cursor: firstPage.continueCursor,
+        numItems: pageSize,
+      },
+    });
+
+    expect(directory.count).toBe(pageSize + 2);
+    expect(directory.roles).toEqual(['Author', 'Pastor', 'Theologian']);
+    expect(firstPage.page).toHaveLength(pageSize);
+    expect(firstPage.page.map((speaker) => speaker.role)).toEqual(
+      Array.from({ length: pageSize }, () => 'Pastor')
+    );
+    expect(firstPage.isDone).toBe(false);
+    expect(secondPage.page.map((speaker) => speaker.role)).toEqual([
+      'Author',
+      'Theologian',
+    ]);
+    expect(secondPage.isDone).toBe(true);
+  });
+});
+
 describe('listAllSpeakers', () => {
   it('defaults to published and returns every speaker for all', async () => {
     const t = createConvexTest();

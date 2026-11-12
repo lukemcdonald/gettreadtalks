@@ -9,7 +9,7 @@ import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { SidebarFiltersSkeleton } from '@/components/skeletons';
 import { SpeakersListSkeleton } from '@/features/speakers/components/speakers-list-skeleton';
-import { loadSpeakers } from '@/features/speakers/queries/load-speakers';
+import { loadSpeakerRoles } from '@/features/speakers/queries/load-speaker-roles';
 import { buildSpeakersPath } from '@/features/speakers/utils';
 import { buildPageMetadata } from '@/lib/metadata';
 
@@ -30,7 +30,7 @@ interface SpeakersPageProps {
 export default async function SpeakersPage({
   searchParams,
 }: SpeakersPageProps) {
-  const { speakers } = await loadSpeakers();
+  const { count, roles } = await loadSpeakerRoles();
 
   return (
     <SidebarLayout
@@ -41,14 +41,14 @@ export default async function SpeakersPage({
       }
       header={
         <PageHeader
-          description={`Listen to ${speakers.length} faithful ambassadors of Christ and be blessed.`}
+          description={`Listen to ${count} faithful ambassadors of Christ and be blessed.`}
           size="lg"
           title="Speakers"
         />
       }
       sidebar={
         <Suspense fallback={<SidebarFiltersSkeleton />}>
-          <SpeakersSidebar speakers={speakers} />
+          <SpeakersSidebar roles={roles} />
         </Suspense>
       }
       sidebarSticky
