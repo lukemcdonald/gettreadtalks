@@ -7,22 +7,20 @@ import { useConvexAuth, useQuery } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 
 /**
- * Get the current authenticated user.
- *
- * Uses SSR data while client auth is syncing to prevent flash of incorrect state.
- *
- * @param initialData - Optional SSR user data to prevent layout shift
- * @returns Current user data (`data`) and whether client auth is still resolving (`isLoading`)
+ * Live user query. Skip until Convex auth is ready; trust SSR `initialData`
+ * while auth is loading so a signed-in refresh does not flash signed-out.
  */
 export function useCurrentUser(initialData?: User | null) {
-  const { isLoading: isAuthLoading } = useConvexAuth();
-  const data = useQuery(api.users.getCurrentUser);
+  const { isAuthenticated, isLoading: isAuthLoading } = useConvexAuth();
+  const data = useQuery(
+    api.users.getCurrentUser,
+    isAuthenticated ? {} : 'skip'
+  );
 
-  // Trust SSR data until client-side auth is fully resolved:
-  // 1. Auth is still syncing (isAuthLoading = true)
-  // 2. Query hasn't returned yet (data = undefined)
-  // Only show logged-out state when query explicitly returns null
-  const isClientReady = !isAuthLoading && data !== undefined;
+  // A skipped query stays `undefined`. Signed-out visitors are ready once
+  // auth has finished; only signed-in visitors wait for query data.
+  const isClientReady =
+    !isAuthLoading && (!isAuthenticated || data !== undefined);
   const user = isClientReady ? (data ?? null) : (initialData ?? null);
   const isLoading = !isClientReady && initialData === undefined;
 
