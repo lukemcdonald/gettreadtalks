@@ -3,7 +3,7 @@ import type { AdminUser } from '@/services/auth/types';
 import type { Route } from 'next';
 
 import { convexBetterAuthNextJs } from '@convex-dev/better-auth/nextjs';
-import { cookies } from 'next/headers';
+import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { cache } from 'react';
 
@@ -28,13 +28,9 @@ const { fetchAuthMutation, fetchAuthQuery, getToken, handler } =
   });
 
 const hasSessionCookie = cache(async () => {
-  const cookieStore = await cookies();
-  const cookieHeader = cookieStore
-    .getAll()
-    .map(({ name, value }) => `${name}=${value}`)
-    .join('; ');
+  const headerList = await headers();
 
-  return hasSessionCookieHeader(cookieHeader);
+  return hasSessionCookieHeader(headerList.get('cookie'));
 });
 
 const getAuthToken = cache(async () => {

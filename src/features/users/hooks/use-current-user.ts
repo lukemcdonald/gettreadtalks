@@ -23,10 +23,17 @@ export function useCurrentUser(initialData?: User | null) {
     hasSessionCookie === true ? {} : 'skip'
   );
 
+  if (hasSessionCookie === false) {
+    return {
+      data: null,
+      isLoading: false,
+    };
+  }
+
   if (hasSessionCookie !== true) {
     return {
       data: initialData ?? null,
-      isLoading: hasSessionCookie === null && initialData === undefined,
+      isLoading: initialData === undefined,
     };
   }
 

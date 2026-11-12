@@ -39,6 +39,34 @@ export function useSessionCookiePresence() {
   );
 }
 
+export async function waitForSessionCookiePresence() {
+  const current = getSessionCookiePresence();
+
+  if (current !== null) {
+    return current;
+  }
+
+  const { promise, resolve } = Promise.withResolvers<boolean>();
+  const unsubscribe = subscribeSessionCookiePresence(() => {
+    const next = getSessionCookiePresence();
+
+    if (next === null) {
+      return;
+    }
+
+    unsubscribe();
+    resolve(next);
+  });
+  const next = getSessionCookiePresence();
+
+  if (next !== null) {
+    unsubscribe();
+    resolve(next);
+  }
+
+  return await promise;
+}
+
 export function isBetterAuthSessionBroadcast(
   key: string | null,
   value: string | null

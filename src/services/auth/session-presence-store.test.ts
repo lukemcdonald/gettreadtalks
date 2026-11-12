@@ -1,6 +1,10 @@
 import { describe, expect, it } from '@/test';
 
-import { isBetterAuthSessionBroadcast } from './session-presence-store';
+import {
+  isBetterAuthSessionBroadcast,
+  setSessionCookiePresence,
+  waitForSessionCookiePresence,
+} from './session-presence-store';
 
 describe('isBetterAuthSessionBroadcast', () => {
   it('is true for a Better Auth session message', () => {
@@ -28,5 +32,17 @@ describe('isBetterAuthSessionBroadcast', () => {
     expect(isBetterAuthSessionBroadcast('better-auth.message', '{')).toBe(
       false
     );
+  });
+});
+
+describe('waitForSessionCookiePresence', () => {
+  it('resolves with the known presence', async () => {
+    setSessionCookiePresence(true);
+
+    await expect(waitForSessionCookiePresence()).resolves.toBe(true);
+
+    setSessionCookiePresence(false);
+
+    await expect(waitForSessionCookiePresence()).resolves.toBe(false);
   });
 });

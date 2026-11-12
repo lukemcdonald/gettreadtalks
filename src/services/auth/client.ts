@@ -10,6 +10,8 @@ import { isAnonymousAuthSessionProbe } from '@/services/auth/session-cookie';
 import {
   broadcastSessionCookiePresence,
   getSessionCookiePresence,
+  setSessionCookiePresence,
+  waitForSessionCookiePresence,
 } from '@/services/auth/session-presence-store';
 
 function getRequestUrl(input: RequestInfo | URL) {
@@ -43,11 +45,24 @@ function createEmptySessionResponse() {
 export const authClient = createAuthClient({
   fetchOptions: {
     customFetchImpl: (input, init) => {
-      if (shouldSkipAnonymousAuthFetch(input)) {
+      if (!shouldSkipAnonymousAuthFetch(input)) {
+        return fetch(input, init);
+      }
+
+      if (
+        typeof window === 'undefined' ||
+        getSessionCookiePresence() === false
+      ) {
         return Promise.resolve(createEmptySessionResponse());
       }
 
-      return fetch(input, init);
+      return waitForSessionCookiePresence().then((hasSession) => {
+        if (!hasSession) {
+          return createEmptySessionResponse();
+        }
+
+        return fetch(input, init);
+      });
     },
   },
   plugins: [convexClient(), adminClient()],
@@ -101,7 +116,11 @@ export async function signIn({ email, password }: SignInParams) {
 }
 
 export async function signOut() {
-  return await authClient.signOut();
+  const result = await authClient.signOut();
+
+  setSessionCookiePresence(false);
+
+  return result;
 }
 
 export async function requestPasswordReset({
