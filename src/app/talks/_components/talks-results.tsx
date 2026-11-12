@@ -1,4 +1,5 @@
 import { TalksContent } from '@/app/talks/_components/talks-content';
+import { PUBLIC_LISTING_PAGE_SIZE } from '@/constants/ui';
 import { loadTalks } from '@/features/talks/queries/load-talks';
 
 export interface TalksSearchParams {
@@ -26,6 +27,7 @@ export async function TalksResults({ searchParams }: TalksResultsProps) {
   const result = await loadTalks({
     cursor: params.cursor,
     featured: params.featured === 'true',
+    limit: PUBLIC_LISTING_PAGE_SIZE,
     search: params.search,
     sort: params.sort,
     speakerSlugs,
