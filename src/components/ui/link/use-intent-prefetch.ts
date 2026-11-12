@@ -5,21 +5,13 @@ import type { ComponentProps, FocusEvent, MouseEvent, TouchEvent } from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import { getPrefetchPath } from './get-prefetch-path';
+
 type Href = ComponentProps<typeof NextLink>['href'];
 interface IntentHandlers<Element extends HTMLElement> {
   onFocus?: (event: FocusEvent<Element>) => void;
   onMouseEnter?: (event: MouseEvent<Element>) => void;
   onTouchStart?: (event: TouchEvent<Element>) => void;
-}
-
-function getPrefetchPath(href: Href) {
-  const path = typeof href === 'string' ? href : (href.pathname ?? '');
-
-  if (!path.startsWith('/') || path.startsWith('//')) {
-    return '';
-  }
-
-  return path;
 }
 
 export function useIntentPrefetch<
