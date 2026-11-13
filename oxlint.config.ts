@@ -10,6 +10,7 @@ export default defineConfig({
     '.agents/**',
     '.claude/**',
     '.pnpm-store/**',
+    'apm_modules/**',
     'convex/**/_generated/**',
     'convex/betterAuth/schema.ts',
     'src/components/ui/primitives/**',

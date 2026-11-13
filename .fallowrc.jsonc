@@ -27,6 +27,10 @@
     "tailwindcss",
   ],
   "ignorePatterns": [
+    // Installed agent skills and the APM download cache. Not application code.
+    ".agents/**",
+    ".claude/**",
+    "apm_modules/**",
     // Tool configs are entrypoints for their own CLIs and are already covered by the toolchain.
     "oxfmt.config.ts",
     "oxlint.config.ts",

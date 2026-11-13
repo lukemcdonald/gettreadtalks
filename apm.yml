@@ -1,0 +1,52 @@
+name: gettreadtalks
+version: 0.1.0
+description: Pinned agent skills for Cursor and Claude Code.
+targets:
+  - claude
+  - cursor
+dependencies:
+  apm:
+    - git: https://github.com/GoogleChromeLabs/webmcp-tools.git
+      path: webmcp-skills/skills/build-webmcp-tools
+      ref: 9229b1b8e5b59b9028e7a88327c6ad160fbbc265
+      targets: [cursor]
+    - git: https://github.com/fallow-rs/fallow.git
+      path: .agents/skills/fallow
+      ref: a6956af63dd896d6106a7d28361585e0ff1c250b
+      targets: [cursor]
+    - git: https://github.com/fallow-rs/fallow.git
+      path: .agents/skills/fallow-setup
+      ref: a6956af63dd896d6106a7d28361585e0ff1c250b
+      targets: [cursor]
+    - git: https://github.com/get-convex/agent-skills.git
+      path: skills/convex-authz
+      ref: f60629d7c6c1f27eb58a56260546d2445049274d
+      targets: [cursor]
+    - git: https://github.com/get-convex/agent-skills.git
+      path: skills/convex-reviewer
+      ref: f60629d7c6c1f27eb58a56260546d2445049274d
+      targets: [cursor]
+    - git: https://github.com/haydenbleasel/ultracite.git
+      path: skills/ultracite
+      ref: 929481461f0dd435b7cb19fb2a3737987c15d8d6
+      targets: [cursor]
+    - git: https://github.com/vercel-labs/agent-skills.git
+      path: skills/composition-patterns
+      ref: 1a2c79d4e6c4a2283dc2c614b6538cbe1ed5ca62
+      targets: [cursor]
+    - git: https://github.com/vercel-labs/agent-skills.git
+      path: skills/react-best-practices
+      ref: 1a2c79d4e6c4a2283dc2c614b6538cbe1ed5ca62
+      targets: [cursor]
+  mcp:
+    - name: gettreadtalks
+      registry: false
+      transport: http
+      url: https://www.gettreadtalks.com/mcp
+    - args:
+        - -y
+        - next-devtools-mcp@0.4.0
+      command: npx
+      name: next-devtools
+      registry: false
+      transport: stdio

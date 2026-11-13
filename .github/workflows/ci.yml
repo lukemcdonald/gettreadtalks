@@ -45,6 +45,20 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
 
+  agent-skills:
+    name: Agent skills
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'labeled')
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install APM
+        uses: microsoft/apm-action@v1
+        with:
+          apm-version: '0.35.1'
+          setup-only: true
+      - name: Audit committed skills
+        run: apm audit --ci --policy apm-policy.yml
+
   code-health:
     name: Code health
     if: github.event_name == 'pull_request' && github.event.action != 'labeled'

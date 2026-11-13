@@ -37,6 +37,22 @@ Faith-based talks platform. Next.js app with a Convex backend.
 
 Runs Next.js (HTTPS on `https://localhost:3000`) and Convex in parallel. On macOS it also opens the browser.
 
+### Agent skills
+
+Cursor reads committed skills in `.agents/skills/`. Claude Code reads the same files through symlinks in `.claude/skills/`. A fresh clone already has both. Cursor cloud agents use those committed files; `.cursor/environment.json` only runs `pnpm install --frozen-lockfile`.
+
+The manifest is `apm.yml`. Each skill is pinned to a full git commit, and `apm.lock.yaml` records the content hashes. Do not edit installed skill files or replace the `.claude/skills` symlinks with copies. MCP servers in that manifest are written to `.mcp.json` and `.cursor/mcp.json`.
+
+To update a skill:
+
+1. Install [APM](https://microsoft.github.io/apm/) 0.35.1.
+2. Change that skill's commit in `apm.yml`. Keep `targets: [cursor]` so the install writes `.agents/skills/` and leaves the Claude symlinks in place.
+3. Run `apm install`.
+4. For a new skill, add `.claude/skills/<name>` as a symlink to `../../.agents/skills/<name>`.
+5. Commit `apm.yml`, `apm.lock.yaml`, the skill files, and any new symlink together.
+
+`apm audit --ci --policy apm-policy.yml` fails when the committed skills drift from the manifest and lockfile.
+
 ### Useful scripts
 
 | Script           | What it does                       |

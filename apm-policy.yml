@@ -1,0 +1,25 @@
+name: gettreadtalks
+version: '1'
+enforcement: block
+compilation:
+  target:
+    allow:
+      - claude
+      - cursor
+dependencies:
+  allow:
+    - fallow-rs/fallow/**
+    - get-convex/agent-skills/**
+    - googlechromelabs/webmcp-tools/**
+    - haydenbleasel/ultracite/**
+    - vercel-labs/agent-skills/**
+  require_pinned_constraint: true
+mcp:
+  allow:
+    - gettreadtalks
+    - next-devtools
+  self_defined: allow
+  trust_transitive: false
+security:
+  integrity:
+    require_hashes: true

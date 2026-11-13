@@ -18,7 +18,6 @@
     "format:fix:yolo": "ultracite fix --unsafe",
     "lint": "oxlint .",
     "lint:fix": "ultracite fix .",
-    "prepare": "skills-npm --agents cursor,claude-code --yes",
     "release": "convex deploy --yes",
     "release:full": "pnpm build && pnpm release",
     "start": "next start",
@@ -78,12 +77,11 @@
     "@types/react-dom": "^19.3.0",
     "babel-plugin-react-compiler": "^1.0.0",
     "convex-test": "^0.0.67",
-    "fallow": "3.39.0",
+    "fallow": "^3.39.0",
     "happy-dom": "^21.0.4",
     "npm-run-all": "^4.1.5",
     "oxfmt": "^0.76.0",
     "oxlint": "^1.91.0",
-    "skills-npm": "^4.1.0",
     "tailwindcss": "^4.3.4",
     "typescript": "^7.0.2",
     "ultracite": "^8.1.1",
@@ -95,14 +93,5 @@
   "engines": {
     "node": "24.x"
   },
-  "packageManager": "pnpm@12.16.1",
-  "skills": [
-    {
-      "ref": "9229b1b8e5b59b9028e7a88327c6ad160fbbc265",
-      "skills": [
-        "build-webmcp-tools"
-      ],
-      "source": "GoogleChromeLabs/webmcp-tools/webmcp-skills"
-    }
-  ]
+  "packageManager": "pnpm@12.16.1"
 }
