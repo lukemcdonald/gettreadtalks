@@ -7,6 +7,7 @@ import {
   signInAs,
   visibilitySlugs,
 } from '../../test.setup';
+import { LIST_SEARCH_LIMIT } from '../search/helpers';
 import { insertSpeaker } from '../speakers/test.factory';
 import { insertTalkOnTopic, insertTopic } from '../topics/test.factory';
 import { insertTalk } from './test.factory';
@@ -801,5 +802,41 @@ describe('listTalks format', () => {
       'ben-prayer-debate',
     ]);
     expect(byBoth.page.map((talk) => talk.slug)).toEqual(['ada-grace-debate']);
+  });
+
+  it('returns a debate that sits past the search cap', async () => {
+    const t = createConvexTest();
+    await t.run(async (ctx) => {
+      const speakerId = await insertSpeaker(ctx, {
+        firstName: 'Ada',
+        lastName: 'Clare',
+        slug: 'ada-clare',
+      });
+
+      for (let index = 0; index < LIST_SEARCH_LIMIT; index += 1) {
+        // oxlint-disable-next-line no-await-in-loop -- later rows must sort after these in the speaker index
+        await insertTalk(ctx, {
+          format: 'sermon',
+          slug: `sermon-${index}`,
+          speakerId,
+          title: `Sermon ${index}`,
+        });
+      }
+
+      await insertTalk(ctx, {
+        format: 'debate',
+        slug: 'later-debate',
+        speakerId,
+        title: 'Later Debate',
+      });
+    });
+
+    const result = await t.query(api.talks.listTalks, {
+      format: 'debate',
+      paginationOpts: page,
+      search: 'Ada',
+    });
+
+    expect(result.page.map((talk) => talk.slug)).toEqual(['later-debate']);
   });
 });

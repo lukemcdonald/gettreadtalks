@@ -331,32 +331,24 @@ const sortType = v.optional(
 
 async function listCandidateTalks(
   ctx: QueryCtx,
-  {
-    format,
-    queryText,
-  }: {
+  args: {
     format?: Doc<'talks'>['format'];
     queryText: string;
   }
 ) {
-  if (queryText) {
-    const talks = await searchPublishedTalksByTitleOrSpeaker(ctx, {
+  if (args.queryText) {
+    return await searchPublishedTalksByTitleOrSpeaker(ctx, {
+      format: args.format,
       limit: LIST_SEARCH_LIMIT,
-      queryText,
+      queryText: args.queryText,
     });
-
-    if (!format) {
-      return talks;
-    }
-
-    return talks.filter((talk) => talk.format === format);
   }
 
-  if (format) {
+  if (args.format) {
     return await ctx.db
       .query('talks')
       .withIndex('by_format_and_status', (q) =>
-        q.eq('format', format).eq('status', 'published')
+        q.eq('format', args.format).eq('status', 'published')
       )
       .collect();
   }
