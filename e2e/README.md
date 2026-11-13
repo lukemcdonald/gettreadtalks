@@ -1,6 +1,6 @@
 # End-to-end tests
 
-Playwright runs Chromium only, against the PR preview in CI or `PLAYWRIGHT_BASE_URL` locally.
+Playwright runs Chromium only, against the PR preview in CI or `PLAYWRIGHT_BASE_URL` locally. CI E2E is opt-in: add the `run-e2e` label to a non-draft PR, or run the CI workflow with `workflow_dispatch` and the PR number.
 
 ```sh
 PLAYWRIGHT_BASE_URL=https://www.gettreadtalks.com pnpm test:e2e

@@ -3,6 +3,7 @@ name: CI
 on:
   pull_request:
     types:
+      - labeled
       - opened
       - ready_for_review
       - reopened
@@ -10,10 +11,17 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      pr-number:
+        description: Pull request number whose Vercel preview to test
+        required: true
+        type: number
 
 concurrency:
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
-  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' && github.event.action != 'labeled' }}
+  # Unrelated labels get a unique group so they cannot cancel a pending run-e2e run.
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || inputs.pr-number || github.ref }}${{ github.event.action == 'labeled' && github.event.label.name != 'run-e2e' && format('-{0}', github.run_id) || '' }}
 
 permissions:
   contents: read
@@ -21,6 +29,7 @@ permissions:
 jobs:
   validate:
     name: Validate
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'labeled')
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
@@ -38,7 +47,7 @@ jobs:
 
   code-health:
     name: Code health
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' && github.event.action != 'labeled'
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
@@ -59,7 +68,19 @@ jobs:
 
   e2e:
     name: E2E
-    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false
+    # Opt-in: `run-e2e` label on a non-draft PR, or workflow_dispatch with the PR number.
+    if: >
+      github.event_name == 'workflow_dispatch' || (
+        github.event_name == 'pull_request' &&
+        github.event.pull_request.draft == false &&
+        (
+          github.event.label.name == 'run-e2e' ||
+          (
+            github.event.action != 'labeled' &&
+            contains(github.event.pull_request.labels.*.name, 'run-e2e')
+          )
+        )
+      )
     permissions:
       contents: read
       deployments: read
@@ -84,11 +105,46 @@ jobs:
           curl -fsSL https://github.com/cli/cli/releases/download/v2.103.0/gh_2.103.0_linux_amd64.tar.gz \
             | tar -xz --strip-components=2 -C "${dest}" gh_2.103.0_linux_amd64/bin/gh
           echo "${dest}" >> "${GITHUB_PATH}"
+      - name: Resolve pull request
+        id: pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr-number }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${PR_NUMBER}" ]]; then
+            echo "Provide a pull request number."
+            exit 1
+          fi
+
+          sha="${SHA}"
+          head_repo="${HEAD_REPO}"
+          if [[ -z "${sha}" || -z "${head_repo}" ]]; then
+            read -r sha head_repo <<<"$(
+              gh api "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}" \
+                --jq '[.head.sha, (.head.repo.full_name // "")] | @tsv'
+            )"
+          fi
+
+          if [[ -z "${sha}" ]]; then
+            echo "Could not resolve head SHA for PR ${PR_NUMBER}"
+            exit 1
+          fi
+
+          if [[ "${head_repo}" != "${GITHUB_REPOSITORY}" ]]; then
+            echo "Refusing to run E2E for PR ${PR_NUMBER} from ${head_repo:-unknown}; only same-repo heads are allowed."
+            exit 1
+          fi
+
+          echo "number=${PR_NUMBER}" >> "${GITHUB_OUTPUT}"
+          echo "sha=${sha}" >> "${GITHUB_OUTPUT}"
       - name: Detect non-docs changes
         id: changes
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
         run: |
           set -euo pipefail
           files="$(
@@ -132,7 +188,7 @@ jobs:
       - if: steps.changes.outputs.run == 'true' && steps.e2e-secrets.outputs.available == 'true'
         uses: actions/checkout@v7
         with:
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          ref: ${{ steps.pr.outputs.sha }}
       - if: steps.changes.outputs.run == 'true' && steps.e2e-secrets.outputs.available == 'true'
         name: Trust workspace
         run: git config --global --add safe.directory "${GITHUB_WORKSPACE}"
@@ -162,7 +218,7 @@ jobs:
         id: preview
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SHA: ${{ github.event.pull_request.head.sha }}
+          SHA: ${{ steps.pr.outputs.sha }}
         run: |
           set -euo pipefail
           deadline=$((SECONDS + 900))

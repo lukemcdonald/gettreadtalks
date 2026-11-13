@@ -59,7 +59,7 @@ export default defineConfig({
         ['json', { outputFile: 'test-results/results.json' }],
       ]
     : 'list',
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 1 : 0,
   testDir: './e2e',
   use: {
     baseURL,
