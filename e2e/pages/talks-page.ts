@@ -43,6 +43,11 @@ export class TalksPage {
     await this.editDrawer.getByRole('button', { name: 'Close' }).click();
   }
 
+  async filterByFormat(label: string) {
+    await this.page.getByLabel('Format').filter({ visible: true }).click();
+    await this.page.getByRole('option', { exact: true, name: label }).click();
+  }
+
   async fillCreateTalk({
     mediaUrl,
     speakerQuery,

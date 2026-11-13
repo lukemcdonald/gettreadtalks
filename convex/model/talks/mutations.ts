@@ -27,9 +27,24 @@ import {
   clearStaleMediaChecks,
 } from '../mediaHealth/check/clear';
 import { clearTalkDraftStep } from './autoDraft';
-import { talkTranscriptFields } from './schema';
+import { talkFields, talkTranscriptFields } from './schema';
 import { createPendingTalkTranscriptFetch } from './transcriptFetch';
-import { statusType, talkTranscriptFetchErrorCode } from './validators';
+import {
+  statusType,
+  talkFormat,
+  talkTranscriptFetchErrorCode,
+} from './validators';
+
+function assignTalkFormat(
+  updates: Partial<Doc<'talks'>>,
+  format: Doc<'talks'>['format'] | null | undefined
+) {
+  if (format === undefined) {
+    return;
+  }
+
+  updates.format = format ?? undefined;
+}
 
 async function setTalkTopics(
   ctx: MutationCtx,
@@ -176,15 +191,20 @@ export const archiveTalk = mutation({
  */
 export const createTalk = mutation({
   args: {
-    collectionId: v.optional(v.id('collections')),
-    collectionOrder: v.optional(v.number()),
-    featured: v.optional(v.boolean()),
-    mediaUrl: v.string(),
-    publishedAt: v.optional(v.number()),
-    scripture: v.optional(v.string()),
-    speakerId: v.id('speakers'),
+    ...v
+      .object(talkFields)
+      .pick(
+        'collectionId',
+        'collectionOrder',
+        'featured',
+        'format',
+        'mediaUrl',
+        'publishedAt',
+        'scripture',
+        'speakerId',
+        'title'
+      ).fields,
     status: v.optional(statusType),
-    title: v.string(),
     topicIds: v.optional(v.array(v.id('topics'))),
   },
   handler: async (ctx, args) => {
@@ -255,6 +275,7 @@ export const updateTalk = mutation({
     collectionId: v.optional(v.id('collections')),
     collectionOrder: v.optional(v.number()),
     featured: v.optional(v.boolean()),
+    format: v.optional(v.union(v.null(), talkFormat)),
     mediaUrl: v.optional(v.string()),
     publishedAt: v.optional(v.union(v.null(), v.number())),
     scripture: v.optional(v.string()),
@@ -268,6 +289,7 @@ export const updateTalk = mutation({
   },
   handler: async (ctx, args) => {
     const {
+      format,
       publishedAt: requestedPublishedAt,
       slug: rawSlug,
       summary,
@@ -279,6 +301,8 @@ export const updateTalk = mutation({
     await requireAdmin(ctx);
 
     const updates: Partial<Doc<'talks'>> = rest;
+
+    assignTalkFormat(updates, format);
     const talk = await getOrThrow(ctx, {
       id: talkId,
       table: 'talks',

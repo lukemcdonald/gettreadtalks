@@ -1,9 +1,18 @@
 import { Link } from '@/components/ui/link';
 
 interface TalkCardSubtitleProps {
+  format?: string | null;
   scripture?: string | null;
   speakerHref?: string;
   speakerName?: string;
+}
+
+function SubtitleSeparator() {
+  return (
+    <span aria-hidden="true" className="shrink-0 px-1">
+      ·
+    </span>
+  );
 }
 
 function SpeakerNameLink({ href, name }: { href: string; name: string }) {
@@ -27,14 +36,16 @@ function SpeakerName({ href, name }: { href?: string; name: string }) {
 }
 
 export function TalkCardSubtitle({
+  format,
   scripture,
   speakerHref,
   speakerName,
 }: TalkCardSubtitleProps) {
+  const showFormat = Boolean(format);
   const showScripture = Boolean(scripture);
   const showSpeaker = Boolean(speakerName);
 
-  if (!(showScripture || showSpeaker)) {
+  if (!(showFormat || showScripture || showSpeaker)) {
     return;
   }
 
@@ -43,14 +54,14 @@ export function TalkCardSubtitle({
       {showSpeaker && speakerName ? (
         <SpeakerName href={speakerHref} name={speakerName} />
       ) : null}
-      {showScripture && showSpeaker ? (
-        <span aria-hidden="true" className="shrink-0 px-1">
-          ·
-        </span>
+      {showSpeaker && (showScripture || showFormat) ? (
+        <SubtitleSeparator />
       ) : null}
       {showScripture ? (
         <span className="min-w-0 truncate">{scripture}</span>
       ) : null}
+      {showScripture && showFormat ? <SubtitleSeparator /> : null}
+      {showFormat ? <span className="shrink-0">{format}</span> : null}
     </span>
   );
 }

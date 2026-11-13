@@ -8,7 +8,7 @@ import {
   visibilitySlugs,
 } from '../../test.setup';
 import { insertSpeaker } from '../speakers/test.factory';
-import { insertTalkOnTopic } from '../topics/test.factory';
+import { insertTalkOnTopic, insertTopic } from '../topics/test.factory';
 import { insertTalk } from './test.factory';
 
 describe('listTalkSlugs', () => {
@@ -657,5 +657,149 @@ describe('publishedAt order', () => {
     expect(listedSlugs.indexOf('newer-by-date')).toBeLessThan(
       listedSlugs.indexOf('older-by-date')
     );
+  });
+});
+
+const page = { cursor: null, numItems: 50 };
+
+describe('listTalks format', () => {
+  it('returns a published debate and keeps talks with no format when the filter is cleared', async () => {
+    const t = createConvexTest();
+    await t.run(async (ctx) => {
+      const speakerId = await insertSpeaker(ctx, {
+        firstName: 'Ada',
+        lastName: 'Clare',
+        slug: 'ada-clare',
+      });
+
+      await insertTalk(ctx, {
+        format: 'debate',
+        publishedAt: Date.parse('2024-06-02T12:00:00.000Z'),
+        slug: 'published-debate',
+        speakerId,
+        title: 'Shared Debate',
+      });
+      await insertTalk(ctx, {
+        publishedAt: Date.parse('2024-06-03T12:00:00.000Z'),
+        slug: 'unset-format',
+        speakerId,
+        title: 'Shared Unset',
+      });
+      await insertTalk(ctx, {
+        format: 'debate',
+        slug: 'draft-debate',
+        speakerId,
+        status: 'backlog',
+        title: 'Draft Debate',
+      });
+    });
+
+    const filtered = await t.query(api.talks.listTalks, {
+      format: 'debate',
+      paginationOpts: page,
+    });
+    const searched = await t.query(api.talks.listTalks, {
+      format: 'debate',
+      paginationOpts: page,
+      search: 'Shared',
+    });
+    const cleared = await t.query(api.talks.listTalks, {
+      paginationOpts: page,
+    });
+    const clearedSlugs = cleared.page.map((talk) => talk.slug);
+
+    expect(filtered.page.map((talk) => talk.slug)).toEqual([
+      'published-debate',
+    ]);
+    expect(searched.page.map((talk) => talk.slug)).toEqual([
+      'published-debate',
+    ]);
+    expect(clearedSlugs).toHaveLength(2);
+    expect(clearedSlugs).toEqual(
+      expect.arrayContaining(['published-debate', 'unset-format'])
+    );
+  });
+
+  it('combines a format filter with speaker and topic filters', async () => {
+    const t = createConvexTest();
+    await t.run(async (ctx) => {
+      const adaId = await insertSpeaker(ctx, {
+        firstName: 'Ada',
+        lastName: 'Clare',
+        slug: 'ada-clare',
+      });
+      const benId = await insertSpeaker(ctx, {
+        firstName: 'Ben',
+        lastName: 'Cole',
+        slug: 'ben-cole',
+      });
+      const graceId = await insertTopic(ctx, {
+        slug: 'grace',
+        title: 'Grace',
+      });
+      const prayerId = await insertTopic(ctx, {
+        slug: 'prayer',
+        title: 'Prayer',
+      });
+      const debateAda = await insertTalk(ctx, {
+        format: 'debate',
+        publishedAt: Date.parse('2024-06-04T12:00:00.000Z'),
+        slug: 'ada-grace-debate',
+        speakerId: adaId,
+        title: 'Ada Grace Debate',
+      });
+      const debateBen = await insertTalk(ctx, {
+        format: 'debate',
+        publishedAt: Date.parse('2024-06-03T12:00:00.000Z'),
+        slug: 'ben-prayer-debate',
+        speakerId: benId,
+        title: 'Ben Prayer Debate',
+      });
+      const sermonAda = await insertTalk(ctx, {
+        format: 'sermon',
+        publishedAt: Date.parse('2024-06-02T12:00:00.000Z'),
+        slug: 'ada-grace-sermon',
+        speakerId: adaId,
+        title: 'Ada Grace Sermon',
+      });
+      const unsetAda = await insertTalk(ctx, {
+        publishedAt: Date.parse('2024-06-01T12:00:00.000Z'),
+        slug: 'ada-grace-unset',
+        speakerId: adaId,
+        title: 'Ada Grace Unset',
+      });
+
+      await Promise.all([
+        insertTalkOnTopic(ctx, { talkId: debateAda, topicId: graceId }),
+        insertTalkOnTopic(ctx, { talkId: debateBen, topicId: prayerId }),
+        insertTalkOnTopic(ctx, { talkId: sermonAda, topicId: graceId }),
+        insertTalkOnTopic(ctx, { talkId: unsetAda, topicId: graceId }),
+      ]);
+    });
+
+    const bySpeaker = await t.query(api.talks.listTalks, {
+      format: 'debate',
+      paginationOpts: page,
+      speakerSlugs: ['ada-clare'],
+    });
+    const byTopic = await t.query(api.talks.listTalks, {
+      format: 'debate',
+      paginationOpts: page,
+      topicSlugs: ['prayer'],
+    });
+    const byBoth = await t.query(api.talks.listTalks, {
+      format: 'debate',
+      paginationOpts: page,
+      speakerSlugs: ['ada-clare'],
+      topicSlugs: ['grace'],
+    });
+
+    expect(bySpeaker.page.map((talk) => talk.slug)).toEqual([
+      'ada-grace-debate',
+    ]);
+    expect(byTopic.page.map((talk) => talk.slug)).toEqual([
+      'ben-prayer-debate',
+    ]);
+    expect(byBoth.page.map((talk) => talk.slug)).toEqual(['ada-grace-debate']);
   });
 });

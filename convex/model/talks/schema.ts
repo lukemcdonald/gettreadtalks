@@ -3,6 +3,7 @@ import { v } from 'convex/values';
 
 import { statusType, timestampFields } from '../../lib/validators';
 import {
+  talkFormat,
   talkStudyContentFields,
   talkStudyStatus,
   talkTranscriptFetchErrorCode,
@@ -19,6 +20,7 @@ export const talkFields = {
   draftStudy: v.optional(v.string()),
   draftSummary: v.optional(v.string()),
   featured: v.optional(v.boolean()),
+  format: v.optional(talkFormat),
   mediaUrl: v.string(),
   publishedAt: v.optional(v.number()),
   scripture: v.optional(v.string()),
@@ -85,6 +87,7 @@ export const talkTables = {
     ])
     .index('by_collectionId_and_status', ['collectionId', 'status'])
     .index('by_featured_and_status', ['featured', 'status'])
+    .index('by_format_and_status', ['format', 'status'])
     .index('by_slug', ['slug'])
     .index('by_speakerId_and_status', ['speakerId', 'status'])
     .index('by_status_and_publishedAt', ['status', 'publishedAt'])

@@ -40,6 +40,7 @@ function talkWithTopics(
 function formData(overrides: Partial<TalkFormData> = {}): TalkFormData {
   return {
     featured: false,
+    format: '',
     mediaUrl: 'https://example.com/talk',
     slug: 'the-cross',
     speakerId,
@@ -64,6 +65,7 @@ describe('getTalkFormValues', () => {
       collectionId: undefined,
       collectionOrder: undefined,
       featured: false,
+      format: '',
       mediaUrl: '',
       publishedAt: '',
       scripture: '',

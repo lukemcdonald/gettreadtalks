@@ -7,6 +7,7 @@ import {
   buildTalkListItemsJsonLd,
   buildTalkPath,
   buildTalksPath,
+  formatTalkFormat,
   formatTalkMetaDescription,
   getEditTalkTab,
   isTranscriptFetchCoolingDown,
@@ -181,6 +182,18 @@ describe('isTranscriptFetchCoolingDown', () => {
         now
       )
     ).toBe(true);
+  });
+});
+
+describe('formatTalkFormat', () => {
+  it('returns the display label for each format', () => {
+    expect(formatTalkFormat('debate')).toBe('Debate');
+    expect(formatTalkFormat('lecture')).toBe('Lecture');
+    expect(formatTalkFormat('panel-discussion')).toBe('Panel discussion');
+    expect(formatTalkFormat('qa')).toBe('Q&A');
+    expect(formatTalkFormat('sermon')).toBe('Sermon');
+    expect(formatTalkFormat('street-evangelism')).toBe('Street evangelism');
+    expect(formatTalkFormat('testimony')).toBe('Testimony');
   });
 });
 

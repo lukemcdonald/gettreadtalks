@@ -43,7 +43,7 @@ import {
   talksByStatusQuery,
 } from './helpers';
 import { talkFields, talkTranscriptFields } from './schema';
-import { talkTranscriptFetchLastError } from './validators';
+import { talkFormat, talkTranscriptFetchLastError } from './validators';
 
 const talkPageValidator = paginationResultValidator(
   talkWithSpeakerValidator.extend({
@@ -329,6 +329,41 @@ const sortType = v.optional(
   )
 );
 
+async function listCandidateTalks(
+  ctx: QueryCtx,
+  {
+    format,
+    queryText,
+  }: {
+    format?: Doc<'talks'>['format'];
+    queryText: string;
+  }
+) {
+  if (queryText) {
+    const talks = await searchPublishedTalksByTitleOrSpeaker(ctx, {
+      limit: LIST_SEARCH_LIMIT,
+      queryText,
+    });
+
+    if (!format) {
+      return talks;
+    }
+
+    return talks.filter((talk) => talk.format === format);
+  }
+
+  if (format) {
+    return await ctx.db
+      .query('talks')
+      .withIndex('by_format_and_status', (q) =>
+        q.eq('format', format).eq('status', 'published')
+      )
+      .collect();
+  }
+
+  return await listPublishedTalks(ctx);
+}
+
 /**
  * List published talks with speaker data, optional filtering, and sorting.
  * Defaults to 50 items per page, sorted by most recent.
@@ -336,6 +371,7 @@ const sortType = v.optional(
 export const listTalks = query({
   args: {
     featured: v.optional(v.boolean()),
+    format: v.optional(talkFormat),
     paginationOpts: paginationOptsValidator,
     search: v.optional(v.string()),
     sort: sortType,
@@ -345,6 +381,7 @@ export const listTalks = query({
   handler: async (ctx, args) => {
     const {
       featured,
+      format,
       paginationOpts,
       search,
       sort = 'recent',
@@ -357,7 +394,11 @@ export const listTalks = query({
     const hasSpeakerFilter = speakerSlugs && speakerSlugs.length > 0;
     const hasTopicFilter = topicSlugs && topicSlugs.length > 0;
     const hasFilters =
-      hasSearch || hasSpeakerFilter || hasTopicFilter || featured;
+      hasSearch ||
+      hasSpeakerFilter ||
+      hasTopicFilter ||
+      featured ||
+      format !== undefined;
     const needsCustomSort = sort !== 'recent';
 
     // When no filters and default sort, use native Convex pagination for efficiency
@@ -376,12 +417,7 @@ export const listTalks = query({
       };
     }
 
-    let talks = hasSearch
-      ? await searchPublishedTalksByTitleOrSpeaker(ctx, {
-          limit: LIST_SEARCH_LIMIT,
-          queryText,
-        })
-      : await listPublishedTalks(ctx);
+    let talks = await listCandidateTalks(ctx, { format, queryText });
 
     // Apply speaker filter (multi-select)
     if (hasSpeakerFilter) {

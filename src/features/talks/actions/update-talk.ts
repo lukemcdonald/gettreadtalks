@@ -1,6 +1,7 @@
 'use server';
 
 import 'server-only';
+import type { TalkFormData } from '../schemas/talk-form';
 import type { TalkId } from '../types';
 import type { ActionResult } from '@/lib/forms/types';
 
@@ -13,6 +14,22 @@ import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
 
 import { talkFormSchema } from '../schemas/talk-form';
 import { talkSummaryFormSchema } from '../schemas/talk-study-form';
+
+function toUpdateTalkInput(
+  data: TalkFormData,
+  talkId: TalkId,
+  summary?: string
+) {
+  const { format, publishedAt, ...talk } = data;
+
+  return {
+    ...talk,
+    ...(publishedAt ? { publishedAt: parseUtcDate(publishedAt) } : {}),
+    ...(summary === undefined ? {} : { summary }),
+    format: format === '' ? null : format,
+    talkId,
+  };
+}
 
 /**
  * Updates an existing talk. Validates data on server and requires admin authorization.
@@ -46,14 +63,10 @@ export async function updateTalkAction(
   }
 
   try {
-    const { publishedAt, ...talk } = parsed.data;
-
-    await fetchAuthMutation(api.talks.updateTalk, {
-      ...talk,
-      ...(publishedAt ? { publishedAt: parseUtcDate(publishedAt) } : {}),
-      ...(summary === undefined ? {} : { summary }),
-      talkId,
-    });
+    await fetchAuthMutation(
+      api.talks.updateTalk,
+      toUpdateTalkInput(parsed.data, talkId, summary)
+    );
 
     updateTag('talks');
     updateTag('form-options');

@@ -1,10 +1,12 @@
 import { TalksContent } from '@/app/talks/_components/talks-content';
 import { PUBLIC_LISTING_PAGE_SIZE } from '@/constants/ui';
+import { parseTalkFormat } from '@/convex/model/talks/validators';
 import { loadTalks } from '@/features/talks/queries/load-talks';
 
 export interface TalksSearchParams {
   cursor?: string;
   featured?: string;
+  format?: string;
   search?: string;
   sort?: string;
   speakers?: string;
@@ -22,11 +24,13 @@ function splitSlugs(value?: string) {
 // fallow-ignore-next-line complexity
 export async function TalksResults({ searchParams }: TalksResultsProps) {
   const params = await searchParams;
+  const format = parseTalkFormat(params.format);
   const speakerSlugs = splitSlugs(params.speakers);
   const topicSlugs = splitSlugs(params.topics);
   const result = await loadTalks({
     cursor: params.cursor,
     featured: params.featured === 'true',
+    format,
     limit: PUBLIC_LISTING_PAGE_SIZE,
     search: params.search,
     sort: params.sort,
@@ -39,6 +43,7 @@ export async function TalksResults({ searchParams }: TalksResultsProps) {
       continueCursor={result.continueCursor}
       hasActiveFilters={Boolean(
         params.search ||
+        format ||
         speakerSlugs?.length ||
         topicSlugs?.length ||
         params.featured === 'true'
