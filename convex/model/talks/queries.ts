@@ -329,6 +329,107 @@ const sortType = v.optional(
   )
 );
 
+function publishedTalksForFormatQuery(
+  ctx: QueryCtx,
+  args: {
+    format: NonNullable<Doc<'talks'>['format']>;
+    sort: 'oldest' | 'recent';
+  }
+) {
+  return ctx.db
+    .query('talks')
+    .withIndex('by_format_status_and_publishedAt', (q) =>
+      q.eq('format', args.format).eq('status', 'published')
+    )
+    .order(args.sort === 'oldest' ? 'asc' : 'desc');
+}
+
+function sortsByPublishedAt(sort: string): sort is 'oldest' | 'recent' {
+  return sort === 'oldest' || sort === 'recent';
+}
+
+async function speakerIdsForSlugs(
+  ctx: QueryCtx,
+  args: { speakerSlugs: string[] }
+) {
+  const speakers = await Promise.all(
+    args.speakerSlugs.map((slug) =>
+      getOneFrom(ctx.db, 'speakers', 'by_slug', slug)
+    )
+  );
+
+  return new Set(speakers.flatMap((speaker) => (speaker ? [speaker._id] : [])));
+}
+
+async function listPublishedTalksForFormat(
+  ctx: QueryCtx,
+  args: {
+    featured?: boolean;
+    format: NonNullable<Doc<'talks'>['format']>;
+    paginationOpts: PaginationOptions;
+    sort: 'oldest' | 'recent';
+    speakerSlugs?: string[];
+    topicSlugs?: string[];
+  }
+) {
+  const speakerSlugs = args.speakerSlugs ?? [];
+  const topicSlugs = args.topicSlugs ?? [];
+  const source = publishedTalksForFormatQuery(ctx, {
+    format: args.format,
+    sort: args.sort,
+  });
+  const hasSpeakerFilter = speakerSlugs.length > 0;
+  const hasTopicFilter = topicSlugs.length > 0;
+
+  if (!(args.featured || hasSpeakerFilter || hasTopicFilter)) {
+    const result = await source.paginate(args.paginationOpts);
+    const talksWithSpeakers = await enrichWithSpeaker(ctx, {
+      items: result.page,
+    });
+    const page = await enrichWithTopics(ctx, { talks: talksWithSpeakers });
+
+    return {
+      ...result,
+      page,
+    };
+  }
+
+  const speakerIds = hasSpeakerFilter
+    ? await speakerIdsForSlugs(ctx, { speakerSlugs })
+    : undefined;
+  const topicTalkIds = hasTopicFilter
+    ? await getTalkIdsByTopicSlugs(ctx, { topicSlugs })
+    : undefined;
+  const result = await pageTalksFromSource(
+    source,
+    (talk) => {
+      if (speakerIds && !speakerIds.has(talk.speakerId)) {
+        return null;
+      }
+
+      if (hasTopicFilter && !(topicTalkIds && topicTalkIds.has(talk._id))) {
+        return null;
+      }
+
+      if (args.featured && !talk.featured) {
+        return null;
+      }
+
+      return talk;
+    },
+    args.paginationOpts
+  );
+  const talksWithSpeakers = await enrichWithSpeaker(ctx, {
+    items: result.page,
+  });
+  const page = await enrichWithTopics(ctx, { talks: talksWithSpeakers });
+
+  return {
+    ...result,
+    page,
+  };
+}
+
 async function listCandidateTalks(
   ctx: QueryCtx,
   args: {
@@ -345,12 +446,10 @@ async function listCandidateTalks(
   }
 
   if (args.format) {
-    return await ctx.db
-      .query('talks')
-      .withIndex('by_format_and_status', (q) =>
-        q.eq('format', args.format).eq('status', 'published')
-      )
-      .collect();
+    return await publishedTalksForFormatQuery(ctx, {
+      format: args.format,
+      sort: 'recent',
+    }).collect();
   }
 
   return await listPublishedTalks(ctx);
@@ -407,6 +506,17 @@ export const listTalks = query({
         ...result,
         page: enrichedTalks,
       };
+    }
+
+    if (format && !hasSearch && sortsByPublishedAt(sort)) {
+      return await listPublishedTalksForFormat(ctx, {
+        featured,
+        format,
+        paginationOpts,
+        sort,
+        speakerSlugs,
+        topicSlugs,
+      });
     }
 
     let talks = await listCandidateTalks(ctx, { format, queryText });
@@ -520,7 +630,7 @@ async function filterTalksByStudyStatus(
 
 async function pageTalksFromSource<T>(
   source: AsyncIterable<T>,
-  toTalk: (item: T) => Promise<Doc<'talks'> | null>,
+  toTalk: (item: T) => Doc<'talks'> | null | Promise<Doc<'talks'> | null>,
   paginationOpts: PaginationOptions
 ) {
   const startIndex = paginationOpts.cursor

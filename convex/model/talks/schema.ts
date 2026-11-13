@@ -87,7 +87,11 @@ export const talkTables = {
     ])
     .index('by_collectionId_and_status', ['collectionId', 'status'])
     .index('by_featured_and_status', ['featured', 'status'])
-    .index('by_format_and_status', ['format', 'status'])
+    .index('by_format_status_and_publishedAt', [
+      'format',
+      'status',
+      'publishedAt',
+    ])
     .index('by_slug', ['slug'])
     .index('by_speakerId_and_status', ['speakerId', 'status'])
     .index('by_status_and_publishedAt', ['status', 'publishedAt'])

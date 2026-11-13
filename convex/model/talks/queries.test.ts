@@ -712,6 +712,7 @@ describe('listTalks format', () => {
     expect(filtered.page.map((talk) => talk.slug)).toEqual([
       'published-debate',
     ]);
+    expect(filtered.isDone).toBe(true);
     expect(searched.page.map((talk) => talk.slug)).toEqual([
       'published-debate',
     ]);
@@ -719,6 +720,58 @@ describe('listTalks format', () => {
     expect(clearedSlugs).toEqual(
       expect.arrayContaining(['published-debate', 'unset-format'])
     );
+  });
+
+  it('pages a format filter by publish date', async () => {
+    const t = createConvexTest();
+    await t.run(async (ctx) => {
+      const speakerId = await insertSpeaker(ctx, {
+        firstName: 'Ada',
+        lastName: 'Clare',
+        slug: 'ada-clare',
+      });
+
+      await insertTalk(ctx, {
+        format: 'debate',
+        publishedAt: Date.parse('2024-06-03T12:00:00.000Z'),
+        slug: 'newer-debate',
+        speakerId,
+        title: 'Newer Debate',
+      });
+      await insertTalk(ctx, {
+        format: 'debate',
+        publishedAt: Date.parse('2024-06-01T12:00:00.000Z'),
+        slug: 'older-debate',
+        speakerId,
+        title: 'Older Debate',
+      });
+      await insertTalk(ctx, {
+        publishedAt: Date.parse('2024-06-04T12:00:00.000Z'),
+        slug: 'unset-format',
+        speakerId,
+        title: 'Unset Format',
+      });
+    });
+
+    const first = await t.query(api.talks.listTalks, {
+      format: 'debate',
+      paginationOpts: { cursor: null, numItems: 1 },
+    });
+    const second = await t.query(api.talks.listTalks, {
+      format: 'debate',
+      paginationOpts: { cursor: first.continueCursor, numItems: 1 },
+    });
+    const oldest = await t.query(api.talks.listTalks, {
+      format: 'debate',
+      paginationOpts: { cursor: null, numItems: 1 },
+      sort: 'oldest',
+    });
+
+    expect(first.page.map((talk) => talk.slug)).toEqual(['newer-debate']);
+    expect(first.isDone).toBe(false);
+    expect(second.page.map((talk) => talk.slug)).toEqual(['older-debate']);
+    expect(second.isDone).toBe(true);
+    expect(oldest.page.map((talk) => talk.slug)).toEqual(['older-debate']);
   });
 
   it('combines a format filter with speaker and topic filters', async () => {
