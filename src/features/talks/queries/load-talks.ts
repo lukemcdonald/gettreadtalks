@@ -3,6 +3,7 @@
 import { fetchQuery } from 'convex/nextjs';
 import { cacheLife, cacheTag } from 'next/cache';
 
+import { PUBLIC_LISTING_PAGE_SIZE } from '@/constants/ui';
 import { api } from '@/convex/_generated/api';
 
 type SortOption = 'alphabetical' | 'featured' | 'oldest' | 'recent';
@@ -19,7 +20,7 @@ interface GetTalksProps {
 
 /**
  * Get published talks with speakers and optional filtering.
- * Defaults to 50 items per page, sorted by most recent.
+ * Defaults to one public listing page, sorted by most recent.
  */
 // fallow-ignore-next-line complexity
 export async function loadTalks(args?: GetTalksProps) {
@@ -29,7 +30,7 @@ export async function loadTalks(args?: GetTalksProps) {
   const {
     cursor,
     featured,
-    limit = 50,
+    limit = PUBLIC_LISTING_PAGE_SIZE,
     search,
     sort,
     speakerSlugs,

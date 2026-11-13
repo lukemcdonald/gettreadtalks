@@ -1,6 +1,7 @@
 'use server';
 
 import { loadSpeakers } from '@/features/speakers/queries/load-speakers';
+import { groupSpeakersByLastName } from '@/features/speakers/utils';
 
 interface GetSpeakersGroupedProps {
   limit?: number;
@@ -12,10 +13,8 @@ interface GetSpeakersGroupedProps {
 /**
  * Get speakers grouped alphabetically by last name.
  */
-// fallow-ignore-next-line complexity
 export async function loadSpeakersGrouped(args?: GetSpeakersGroupedProps) {
   const { limit, role, search, sort } = args ?? {};
-
   const { speakers } = await loadSpeakers({
     limit,
     role,
@@ -23,37 +22,5 @@ export async function loadSpeakersGrouped(args?: GetSpeakersGroupedProps) {
     sort,
   });
 
-  // Group speakers by first letter of last name
-  const grouped = new Map<string, typeof speakers>();
-
-  for (const speaker of speakers) {
-    const firstLetter = speaker.lastName[0]?.toUpperCase() || 'Other';
-
-    if (!grouped.has(firstLetter)) {
-      grouped.set(firstLetter, []);
-    }
-
-    grouped.get(firstLetter)?.push(speaker);
-  }
-
-  // Convert to array and sort by letter
-  const groups = [...grouped.entries()]
-    .map(([letter, items]) => {
-      const sorted = items.toSorted((a, b) =>
-        a.lastName.localeCompare(b.lastName)
-      );
-      const [first] = sorted;
-      const last = sorted.at(-1);
-      const range =
-        first && last ? `${first.lastName}—${last.lastName}` : letter;
-
-      return {
-        items: sorted,
-        letter,
-        range,
-      };
-    })
-    .toSorted((a, b) => a.letter.localeCompare(b.letter));
-
-  return groups;
+  return groupSpeakersByLastName(speakers);
 }
