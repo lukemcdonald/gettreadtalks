@@ -90,7 +90,9 @@ export default function RootLayout({
             </AuthProvider>
           </ThemeProvider>
         </ErrorBoundary>
-        <Analytics debug={false} />
+        {process.env.NEXT_PUBLIC_VERCEL_ENV === 'production' && (
+          <Analytics debug={false} />
+        )}
       </body>
     </html>
   );
