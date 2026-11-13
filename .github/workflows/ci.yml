@@ -20,7 +20,8 @@ on:
 
 concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' && github.event.action != 'labeled' }}
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || inputs.pr-number || github.ref }}
+  # Unrelated labels get a unique group so they cannot cancel a pending run-e2e run.
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || inputs.pr-number || github.ref }}${{ github.event.action == 'labeled' && github.event.label.name != 'run-e2e' && format('-{0}', github.run_id) || '' }}
 
 permissions:
   contents: read
@@ -108,6 +109,7 @@ jobs:
         id: pr
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
           PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr-number }}
           SHA: ${{ github.event.pull_request.head.sha }}
         run: |
@@ -118,15 +120,21 @@ jobs:
           fi
 
           sha="${SHA}"
-          if [[ -z "${sha}" ]]; then
-            sha="$(
+          head_repo="${HEAD_REPO}"
+          if [[ -z "${sha}" || -z "${head_repo}" ]]; then
+            read -r sha head_repo <<<"$(
               gh api "repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}" \
-                --jq '.head.sha'
+                --jq '[.head.sha, (.head.repo.full_name // "")] | @tsv'
             )"
           fi
 
           if [[ -z "${sha}" ]]; then
             echo "Could not resolve head SHA for PR ${PR_NUMBER}"
+            exit 1
+          fi
+
+          if [[ "${head_repo}" != "${GITHUB_REPOSITORY}" ]]; then
+            echo "Refusing to run E2E for PR ${PR_NUMBER} from ${head_repo:-unknown}; only same-repo heads are allowed."
             exit 1
           fi
 
