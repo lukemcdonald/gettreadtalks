@@ -27,6 +27,7 @@ const graceTopic = {
 };
 
 const romansTalk = {
+  format: 'debate' as const,
   publishedAt: Date.parse('2024-06-03T12:00:00.000Z'),
   scripture: 'Romans 8:28',
   slug: 'sample-sermon-on-romans-8',
@@ -159,12 +160,18 @@ function createCatalog(overrides: Partial<McpCatalog> = {}): McpCatalog {
         topics: talk.topicSlugs.includes('grace') ? [graceTopic] : [],
       });
     },
-    loadTalks: ({ search, speakerSlugs, topicSlugs } = {}) => {
+    loadTalks: ({ format, search, speakerSlugs, topicSlugs } = {}) => {
       let talks = publishedTalks;
 
       if (search) {
         talks = talks.filter((talk) =>
           talk.title.toLowerCase().includes(search.toLowerCase())
+        );
+      }
+
+      if (format) {
+        talks = talks.filter(
+          (talk) => 'format' in talk && talk.format === format
         );
       }
 
@@ -216,6 +223,43 @@ describe('searchTalks', () => {
       'https://www.gettreadtalks.com/talks/john-doe/sample-sermon-on-romans-8'
     );
   });
+
+  it('includes format when set and returns only that format', async () => {
+    const result = await searchTalks({ format: 'debate' }, createCatalog());
+    const body = parseToolJson(result);
+    const talks = body.talks as { format?: string; slug: string }[];
+
+    expect(talks).toEqual([
+      expect.objectContaining({
+        format: 'debate',
+        slug: 'sample-sermon-on-romans-8',
+      }),
+    ]);
+  });
+
+  it('still filters by speaker and topic', async () => {
+    const bySpeakerAndTopic = await searchTalks(
+      { speaker: 'john-doe', topic: 'prayer' },
+      createCatalog()
+    );
+    const speakerBody = parseToolJson(bySpeakerAndTopic);
+    const speakerTalks = speakerBody.talks as { slug: string }[];
+
+    expect(speakerTalks.map((talk) => talk.slug)).toEqual([
+      'sample-talk-the-lord-is-my-shepherd',
+    ]);
+
+    const combined = await searchTalks(
+      { format: 'debate', speaker: 'john-doe', topic: 'grace' },
+      createCatalog()
+    );
+    const combinedBody = parseToolJson(combined);
+    const combinedTalks = combinedBody.talks as { slug: string }[];
+
+    expect(combinedTalks.map((talk) => talk.slug)).toEqual([
+      'sample-sermon-on-romans-8',
+    ]);
+  });
 });
 
 describe('loadTalk', () => {
@@ -240,6 +284,31 @@ describe('loadTalk', () => {
     expect(clips[0]?.url).toBe(
       'https://www.gettreadtalks.com/clips/sample-clip-no-condemnation'
     );
+  });
+
+  it('includes format when set and omits it when unset', async () => {
+    const debate = await loadTalk(
+      {
+        speakerSlug: 'john-doe',
+        talkSlug: 'sample-sermon-on-romans-8',
+      },
+      createCatalog()
+    );
+    const debateBody = parseToolJson(debate);
+    const debateTalk = debateBody.talk as { format?: string };
+
+    expect(debateTalk.format).toBe('debate');
+
+    const unset = await loadTalk(
+      {
+        speakerSlug: 'john-doe',
+        talkSlug: 'sample-talk-the-lord-is-my-shepherd',
+      },
+      createCatalog()
+    );
+    const unsetBody = parseToolJson(unset);
+
+    expect(unsetBody.talk).not.toHaveProperty('format');
   });
 
   it('returns not found for missing or unpublished talks', async () => {

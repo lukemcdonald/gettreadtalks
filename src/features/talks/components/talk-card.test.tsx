@@ -42,6 +42,23 @@ describe('TalkCard', () => {
     expect(screen.queryByText('Acts 19:23-31')).not.toBeInTheDocument();
   });
 
+  it('shows a format label when the talk has one', () => {
+    setup({
+      talk: {
+        ...talk,
+        format: 'debate',
+      },
+    });
+
+    expect(screen.getByText('Debate')).toBeVisible();
+  });
+
+  it('omits the format when the talk has none', () => {
+    setup();
+
+    expect(screen.queryByText('Debate')).not.toBeInTheDocument();
+  });
+
   it('defaults the title to an h2', () => {
     setup();
 

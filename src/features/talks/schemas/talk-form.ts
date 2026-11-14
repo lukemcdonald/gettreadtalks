@@ -2,6 +2,7 @@ import { zid } from 'convex-helpers/server/zod4';
 import { z } from 'zod';
 
 import { isFutureUtcDate, parseUtcDate } from '@/convex/lib/publishedAt';
+import { talkFormats } from '@/convex/model/talks/validators';
 
 const publishDateSchema = z
   .string()
@@ -22,6 +23,7 @@ export const talkFormSchema = z.object({
   collectionId: zid('collections').optional(),
   collectionOrder: z.number().optional(),
   featured: z.boolean().default(false),
+  format: z.enum(talkFormats).or(z.literal('')),
   mediaUrl: z.url('Please enter a valid URL'),
   publishedAt: publishDateSchema,
   scripture: z.string().optional(),

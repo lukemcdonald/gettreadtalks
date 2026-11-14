@@ -1,3 +1,5 @@
+import type { TalkFormat } from '@/convex/model/talks/validators';
+
 import { buildSpeakerPath, getSpeakerName } from '@/features/speakers/utils';
 import { buildTalkPath } from '@/features/talks/utils';
 import { buildAbsoluteUrl } from '@/lib/entities/paths';
@@ -10,6 +12,7 @@ export interface SpeakerRecord {
 }
 
 export interface TalkRecord {
+  format?: TalkFormat;
   publishedAt?: number;
   scripture?: string;
   slug: string;
@@ -36,6 +39,7 @@ export function formatSpeaker(speaker: SpeakerRecord) {
 
 export function formatTalk(talk: TalkRecord, speaker: SpeakerRecord | null) {
   return {
+    ...(talk.format ? { format: talk.format } : {}),
     publishedAt: toIsoDate(talk.publishedAt),
     scripture: talk.scripture,
     slug: talk.slug,

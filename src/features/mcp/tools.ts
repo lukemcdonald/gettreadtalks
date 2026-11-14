@@ -3,6 +3,7 @@ import type { SpeakerRecord, TalkRecord } from './format';
 import { createMcpHandler, McpServer } from '@modelcontextprotocol/server';
 import { z } from 'zod';
 
+import { talkFormats } from '@/convex/model/talks/validators';
 import { buildClipPath } from '@/features/clips/utils';
 import { buildCollectionPath } from '@/features/collections/utils';
 import { buildTalkPath } from '@/features/talks/utils';
@@ -57,6 +58,10 @@ const searchLimitSchema = z
 
 const searchTalksInputSchema = z.object({
   cursor: cursorSchema,
+  format: z
+    .enum(talkFormats)
+    .optional()
+    .describe('Talk format slug, such as debate or sermon.'),
   limit: searchLimitSchema,
   query: searchTextSchema
     .optional()
@@ -166,6 +171,7 @@ export interface McpCatalog {
   } | null>;
   loadTalks: (args?: {
     cursor?: string;
+    format?: TalkRecord['format'];
     limit?: number;
     search?: string;
     speakerSlugs?: string[];
@@ -226,6 +232,7 @@ export async function searchTalks(
 ) {
   const result = await catalog.loadTalks({
     cursor: input.cursor,
+    format: input.format,
     limit: input.limit ?? DEFAULT_SEARCH_LIMIT,
     search: input.query,
     speakerSlugs: input.speaker ? [input.speaker] : undefined,
@@ -384,7 +391,7 @@ function registerMcpTools(server: McpServer, catalog: McpCatalog) {
     {
       annotations: readOnlyAnnotations,
       description:
-        'Search published TREAD talks by text, speaker slug, and/or topic slug. Use list_speakers and list_topics to resolve slugs. Returns canonical gettreadtalks.com URLs.',
+        'Search published TREAD talks by text, speaker slug, topic slug, and/or format. Use list_speakers and list_topics to resolve slugs. Returns canonical gettreadtalks.com URLs.',
       inputSchema: searchTalksInputSchema,
     },
     withToolTracking('search_talks', (input) => searchTalks(input, catalog))

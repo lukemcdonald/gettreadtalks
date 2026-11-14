@@ -19,6 +19,7 @@ export function getTalkFormValues(
     collectionId: talk.collectionId,
     collectionOrder: talk.collectionId ? talk.collectionOrder : undefined,
     featured: talk.featured ?? false,
+    format: talk.format ?? '',
     mediaUrl: talk.mediaUrl ?? '',
     publishedAt: talk.publishedAt ? formatUtcDate(talk.publishedAt) : '',
     scripture: talk.scripture ?? '',

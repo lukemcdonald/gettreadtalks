@@ -1,6 +1,7 @@
 'use server';
 
 import 'server-only';
+import type { TalkFormData } from '../schemas/talk-form';
 import type { ActionResult } from '@/lib/forms/types';
 
 import { updateTag } from 'next/cache';
@@ -11,6 +12,16 @@ import { toConvexFormErrors, toZodFormErrors } from '@/lib/forms/validation';
 import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
 
 import { talkFormSchema } from '../schemas/talk-form';
+
+function toCreateTalkInput(data: TalkFormData) {
+  const { format, publishedAt, ...talk } = data;
+
+  return {
+    ...talk,
+    ...(format ? { format } : {}),
+    publishedAt: publishedAt ? parseUtcDate(publishedAt) : undefined,
+  };
+}
 
 /**
  * Creates a new talk. Validates data on server and requires admin authorization.
@@ -31,11 +42,10 @@ export async function createTalkAction(
   }
 
   try {
-    const { publishedAt, ...talk } = parsed.data;
-    const talkId = await fetchAuthMutation(api.talks.createTalk, {
-      ...talk,
-      publishedAt: publishedAt ? parseUtcDate(publishedAt) : undefined,
-    });
+    const talkId = await fetchAuthMutation(
+      api.talks.createTalk,
+      toCreateTalkInput(parsed.data)
+    );
 
     updateTag('talks');
     updateTag('form-options');

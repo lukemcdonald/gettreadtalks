@@ -32,6 +32,7 @@ export function CollectionTalkList({ talks }: CollectionTalkListProps) {
                   : undefined
               }
               talk={{
+                format: talk.format,
                 scripture: talk.scripture,
                 slug: talk.slug,
                 title: talk.title,

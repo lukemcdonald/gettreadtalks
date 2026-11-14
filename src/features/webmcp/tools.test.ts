@@ -107,6 +107,36 @@ describe('registerWebMcpTools', () => {
     });
   });
 
+  it('search_talks includes format when the talk has one', async () => {
+    const navigate = vi.fn();
+    const registerTool = vi.fn(async () => {});
+    const searchTalks = vi.fn().mockResolvedValue({
+      talks: [{ ...romansTalk, format: 'debate' }],
+    });
+
+    await registerWebMcpTools({
+      document: { modelContext: { registerTool } },
+      navigate,
+      origin,
+      searchTalks,
+      signal: new AbortController().signal,
+    });
+
+    const result = await getExecute(registerTool, 'search_talks')(
+      { query: 'Romans' },
+      { signal: new AbortController().signal }
+    );
+
+    expect(result).toEqual({
+      talks: [
+        expect.objectContaining({
+          format: 'debate',
+          slug: 'sample-sermon-on-romans-8',
+        }),
+      ],
+    });
+  });
+
   it.each([
     {
       expected: { href: '/talks/john-doe/sample-sermon-on-romans-8' },
