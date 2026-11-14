@@ -155,9 +155,17 @@ export async function searchTalks(ctx: QueryCtx, args: StatusSearchArgs) {
     .take(args.limit);
 }
 
+type PublishedTalkSearchArgs = SearchArgs & {
+  format?: Doc<'talks'>['format'];
+};
+
+type TalkSearchArgs = StatusSearchArgs & {
+  format?: Doc<'talks'>['format'];
+};
+
 export async function searchPublishedTalks(
   ctx: QueryCtx,
-  args: SearchArgs & { format?: Doc<'talks'>['format'] }
+  args: PublishedTalkSearchArgs
 ) {
   return await loadUntilFull(
     ctx.db
@@ -195,10 +203,7 @@ function talksForSpeakerQuery(
   });
 }
 
-async function loadTalksByNamedSpeakers(
-  ctx: QueryCtx,
-  args: StatusSearchArgs & { format?: Doc<'talks'>['format'] }
-) {
+async function loadTalksByNamedSpeakers(ctx: QueryCtx, args: TalkSearchArgs) {
   const searchSpeakersByName =
     args.status === 'published' ? searchPublishedSpeakers : searchSpeakers;
   const speakers = await searchSpeakersByName(ctx, {
@@ -234,7 +239,7 @@ async function loadTalksByNamedSpeakers(
 /** Title matches plus talks by speakers whose names match. */
 export async function searchTalksByTitleOrSpeaker(
   ctx: QueryCtx,
-  args: StatusSearchArgs & { format?: Doc<'talks'>['format'] }
+  args: TalkSearchArgs
 ) {
   const [titleHits, speakerTalks] = await Promise.all([
     args.status === 'published'
@@ -264,7 +269,7 @@ export async function searchTalksByTitleOrSpeaker(
 
 export async function searchPublishedTalksByTitleOrSpeaker(
   ctx: QueryCtx,
-  args: SearchArgs & { format?: Doc<'talks'>['format'] }
+  args: PublishedTalkSearchArgs
 ) {
   return await searchTalksByTitleOrSpeaker(ctx, {
     format: args.format,
