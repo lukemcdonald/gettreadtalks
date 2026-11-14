@@ -94,7 +94,7 @@ export const getSpeakerBySlug = query({
         .order('desc')
         .collect(),
     ]);
-    const clips = await filterClipsWithPublishedTalk(ctx, clipRows);
+    const clips = await filterClipsWithPublishedTalk(ctx, { clips: clipRows });
 
     const collectionIds = [
       ...new Set(
@@ -103,10 +103,9 @@ export const getSpeakerBySlug = query({
     ];
     const [collectionsData, topics] = await Promise.all([
       Promise.all(collectionIds.map((id) => ctx.db.get('collections', id))),
-      listPublishedTopicsForTalks(
-        ctx,
-        talks.map((talk) => talk._id)
-      ),
+      listPublishedTopicsForTalks(ctx, {
+        talkIds: talks.map((talk) => talk._id),
+      }),
     ]);
     const collections = collectionsData.filter(
       (col): col is Doc<'collections'> => col !== null
@@ -170,7 +169,9 @@ export const listFeaturedSpeakers = query({
 
     for await (const speaker of featured) {
       // oxlint-disable-next-line no-await-in-loop -- stop once the rotation pool is full
-      const [visible] = await filterSpeakersWithPublicContent(ctx, [speaker]);
+      const [visible] = await filterSpeakersWithPublicContent(ctx, {
+        speakers: [speaker],
+      });
 
       if (visible) {
         pool.push(visible);
@@ -207,11 +208,14 @@ export const listSpeakers = query({
 
     // When no filters and default sort, use native Convex pagination
     if (!(hasFilters || needsCustomSort)) {
-      return await listPublishedSpeakersPage(ctx, paginationOpts);
+      return await listPublishedSpeakersPage(ctx, { paginationOpts });
     }
 
     let speakers = hasSearch
-      ? await searchPublishedSpeakers(ctx, queryText, LIST_SEARCH_LIMIT)
+      ? await searchPublishedSpeakers(ctx, {
+          limit: LIST_SEARCH_LIMIT,
+          queryText,
+        })
       : await listPublishedSpeakers(ctx);
 
     // Filter by role

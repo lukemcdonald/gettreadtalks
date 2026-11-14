@@ -4,8 +4,13 @@ import { deleteAll } from '../../lib/utils';
 
 export async function listUserFavoriteClips(
   ctx: QueryCtx,
-  userId: string,
-  limit: number
+  {
+    limit,
+    userId,
+  }: {
+    limit: number;
+    userId: string;
+  }
 ) {
   const rows = await ctx.db
     .query('userFavoriteClips')
@@ -32,8 +37,13 @@ export async function listUserFavoriteClips(
 
 export async function listUserFavoriteSpeakers(
   ctx: QueryCtx,
-  userId: string,
-  limit: number
+  {
+    limit,
+    userId,
+  }: {
+    limit: number;
+    userId: string;
+  }
 ) {
   const rows = await ctx.db
     .query('userFavoriteSpeakers')
@@ -61,8 +71,13 @@ export async function listUserFavoriteSpeakers(
 
 export async function listUserFavoriteTalks(
   ctx: QueryCtx,
-  userId: string,
-  limit: number
+  {
+    limit,
+    userId,
+  }: {
+    limit: number;
+    userId: string;
+  }
 ) {
   const rows = await ctx.db
     .query('userFavoriteTalks')
@@ -98,8 +113,13 @@ export async function listUserFavoriteTalks(
 
 export async function listUserFinishedTalks(
   ctx: QueryCtx,
-  userId: string,
-  limit: number
+  {
+    limit,
+    userId,
+  }: {
+    limit: number;
+    userId: string;
+  }
 ) {
   const rows = await ctx.db
     .query('userFinishedTalks')
@@ -137,7 +157,10 @@ export async function listUserFinishedTalks(
  * Remove app-owned rows keyed by Better Auth user id. Auth tables are
  * deleted by Better Auth itself.
  */
-export async function destroyUserOwnedRows(ctx: MutationCtx, userId: string) {
+export async function destroyUserOwnedRows(
+  ctx: MutationCtx,
+  { userId }: { userId: string }
+) {
   const [clips, speakers, talks, finished] = await Promise.all([
     ctx.db
       .query('userFavoriteClips')
@@ -157,5 +180,7 @@ export async function destroyUserOwnedRows(ctx: MutationCtx, userId: string) {
       .collect(),
   ]);
 
-  await deleteAll(ctx, [...clips, ...speakers, ...talks, ...finished]);
+  await deleteAll(ctx, {
+    items: [...clips, ...speakers, ...talks, ...finished],
+  });
 }

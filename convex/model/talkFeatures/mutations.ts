@@ -21,9 +21,15 @@ export const saveTalkFeatureDraft = internalMutation({
     talkId: v.id('talks'),
   },
   handler: async (ctx, args) => {
-    await getOrThrow(ctx, 'talks', args.talkId);
+    await getOrThrow(ctx, {
+      id: args.talkId,
+      table: 'talks',
+    });
 
-    const existing = await loadTalkFeature(ctx, args.kind, args.talkId);
+    const existing = await loadTalkFeature(ctx, {
+      kind: args.kind,
+      talkId: args.talkId,
+    });
 
     if (hasReviewedTalkFeature(existing)) {
       throwConvexError(409, 'Study already reviewed');
@@ -48,7 +54,10 @@ export const saveTalkFeatureDraft = internalMutation({
       featureId = await ctx.db.insert('talkFeatures', fields);
     }
 
-    await clearTalkDraftStep(ctx, args.talkId, 'study');
+    await clearTalkDraftStep(ctx, {
+      step: 'study',
+      talkId: args.talkId,
+    });
 
     return featureId;
   },
@@ -64,9 +73,15 @@ export const updateTalkFeature = mutation({
   },
   handler: async (ctx, args) => {
     await requireAdmin(ctx);
-    await getOrThrow(ctx, 'talks', args.talkId);
+    await getOrThrow(ctx, {
+      id: args.talkId,
+      table: 'talks',
+    });
 
-    const existing = await loadTalkFeature(ctx, args.kind, args.talkId);
+    const existing = await loadTalkFeature(ctx, {
+      kind: args.kind,
+      talkId: args.talkId,
+    });
     const now = Date.now();
     let featureId: Id<'talkFeatures'>;
 
@@ -90,7 +105,10 @@ export const updateTalkFeature = mutation({
       });
     }
 
-    await clearTalkDraftStep(ctx, args.talkId, 'study');
+    await clearTalkDraftStep(ctx, {
+      step: 'study',
+      talkId: args.talkId,
+    });
 
     return featureId;
   },

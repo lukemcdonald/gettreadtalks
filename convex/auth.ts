@@ -42,7 +42,7 @@ export const authComponent = createClient<DataModel, typeof authSchema>(
           await scheduleWelcomeEmail(ctx, doc);
         },
         onDelete: async (ctx, doc) => {
-          await destroyUserOwnedRows(ctx, doc._id);
+          await destroyUserOwnedRows(ctx, { userId: doc._id });
         },
       },
     },
@@ -108,7 +108,10 @@ function warnIfAuthEnvInvalid(siteUrl: string) {
   }
 }
 
-function createAuthPlugins(ctx: GenericCtx<DataModel>, siteUrl: string) {
+function createAuthPlugins(
+  ctx: GenericCtx<DataModel>,
+  { siteUrl }: { siteUrl: string }
+) {
   const plugins = [
     adminPlugin({
       adminRoles: ['admin'],
@@ -165,7 +168,7 @@ export const createAuthOptions = (ctx: GenericCtx<DataModel>) => {
         });
       },
     },
-    plugins: createAuthPlugins(ctx, siteUrl),
+    plugins: createAuthPlugins(ctx, { siteUrl }),
     secret,
     trustedOrigins: TRUSTED_ORIGINS,
     user: {
@@ -193,13 +196,21 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
  */
 async function scheduleWelcomeEmail(
   ctx: MutationCtx,
-  user: { _id: string; email: string; name: string }
+  {
+    _id,
+    email,
+    name,
+  }: {
+    _id: string;
+    email: string;
+    name: string;
+  }
 ) {
   try {
     await ctx.scheduler.runAfter(0, internal.emails.sendWelcomeEmail, {
-      email: user.email,
-      name: user.name,
-      userId: user._id,
+      email,
+      name,
+      userId: _id,
     });
   } catch (error) {
     console.error(

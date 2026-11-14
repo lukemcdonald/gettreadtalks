@@ -12,7 +12,7 @@ import { TRANSCRIPT_FETCH_ERROR_CODES } from './validators';
 
 export async function createPendingTalkTranscriptFetch(
   ctx: MutationCtx,
-  talkId: Id<'talks'>
+  { talkId }: { talkId: Id<'talks'> }
 ) {
   return await ctx.db.insert('talkTranscriptFetches', {
     checkedAt: Date.now(),
@@ -298,7 +298,12 @@ function toCompleteTalkTranscriptFetchArgs(
 
 export async function fetchAndCompleteTalkTranscript(
   ctx: ActionCtx,
-  args: {
+  {
+    keepExistingTranscript,
+    mediaUrl,
+    runId,
+    talkId,
+  }: {
     keepExistingTranscript?: boolean;
     mediaUrl: string;
     runId: Id<'talkTranscriptFetches'>;
@@ -306,13 +311,13 @@ export async function fetchAndCompleteTalkTranscript(
   }
 ): Promise<TranscriptFetchResult> {
   const result = await talkTranscriptFetcher.fetch(
-    args.mediaUrl,
+    mediaUrl,
     process.env.YOUTUBE_TRANSCRIPT_IO_TOKEN ?? ''
   );
 
   await ctx.runMutation(internal.talks.completeTalkTranscriptFetch, {
-    ...toCompleteTalkTranscriptFetchArgs(result, args.runId, args.talkId),
-    ...(args.keepExistingTranscript ? { keepExistingTranscript: true } : {}),
+    ...toCompleteTalkTranscriptFetchArgs(result, runId, talkId),
+    ...(keepExistingTranscript ? { keepExistingTranscript: true } : {}),
   });
 
   return result;
@@ -344,7 +349,7 @@ export const insertPendingTalkTranscriptFetch = internalMutation({
     talkId: v.id('talks'),
   },
   handler: async (ctx, { talkId }) =>
-    await createPendingTalkTranscriptFetch(ctx, talkId),
+    await createPendingTalkTranscriptFetch(ctx, { talkId }),
   returns: v.id('talkTranscriptFetches'),
 });
 
@@ -428,16 +433,21 @@ export function toGenerateTranscriptEnsureFailure(
 
 export async function loadTranscriptForGenerate(
   ctx: ActionCtx,
-  talkId: Id<'talks'>,
-  existingTranscript: string | null,
-  mediaUrl: string
-): Promise<{ transcript: string } | GenerateTranscriptEnsureFailure> {
-  const ensured = await ensureTalkTranscriptText(
-    ctx,
-    talkId,
+  {
     existingTranscript,
-    mediaUrl
-  );
+    mediaUrl,
+    talkId,
+  }: {
+    existingTranscript: string | null;
+    mediaUrl: string;
+    talkId: Id<'talks'>;
+  }
+): Promise<{ transcript: string } | GenerateTranscriptEnsureFailure> {
+  const ensured = await ensureTalkTranscriptText(ctx, {
+    existingTranscript,
+    mediaUrl,
+    talkId,
+  });
 
   if (ensured.status === 'success') {
     return {
@@ -450,9 +460,15 @@ export async function loadTranscriptForGenerate(
 
 export async function ensureTalkTranscriptText(
   ctx: ActionCtx,
-  talkId: Id<'talks'>,
-  existingTranscript: string | null,
-  mediaUrl: string
+  {
+    existingTranscript,
+    mediaUrl,
+    talkId,
+  }: {
+    existingTranscript: string | null;
+    mediaUrl: string;
+    talkId: Id<'talks'>;
+  }
 ): Promise<EnsureTalkTranscriptResult> {
   const trimmed = existingTranscript?.trim();
 

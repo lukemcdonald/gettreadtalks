@@ -27,7 +27,10 @@ export function makeTalk(overrides: TalkOverrides): TalkFields {
   };
 }
 
-export async function insertTalk(ctx: MutationCtx, overrides: TalkOverrides) {
+export async function insertTalk(
+  ctx: MutationCtx,
+  { ...overrides }: TalkOverrides
+) {
   return await ctx.db.insert('talks', makeTalk(overrides));
 }
 
@@ -44,7 +47,7 @@ export function makeTalkTranscript(
 
 export async function insertTalkTranscript(
   ctx: MutationCtx,
-  overrides: TalkTranscriptOverrides
+  { ...overrides }: TalkTranscriptOverrides
 ) {
   return await ctx.db.insert('talkTranscripts', makeTalkTranscript(overrides));
 }

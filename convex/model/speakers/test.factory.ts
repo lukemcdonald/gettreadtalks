@@ -22,7 +22,7 @@ export function makeSpeaker(
 
 export async function insertSpeaker(
   ctx: MutationCtx,
-  overrides: Partial<SpeakerFields> = {}
+  { ...overrides }: Partial<SpeakerFields> = {}
 ) {
   return await ctx.db.insert('speakers', makeSpeaker(overrides));
 }

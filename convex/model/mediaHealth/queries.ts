@@ -90,7 +90,11 @@ export const listPublishedMediaPage = internalQuery({
 
 export function loadMediaCheckByEntityUrl(
   ctx: MutationCtx | QueryCtx,
-  args: {
+  {
+    entityId,
+    entityTable,
+    mediaUrl,
+  }: {
     entityId: string;
     entityTable: 'clips' | 'talks';
     mediaUrl: string;
@@ -100,9 +104,9 @@ export function loadMediaCheckByEntityUrl(
     .query('mediaChecks')
     .withIndex('by_entityTable_and_entityId_and_mediaUrl', (q) =>
       q
-        .eq('entityTable', args.entityTable)
-        .eq('entityId', args.entityId)
-        .eq('mediaUrl', args.mediaUrl)
+        .eq('entityTable', entityTable)
+        .eq('entityId', entityId)
+        .eq('mediaUrl', mediaUrl)
     )
     .unique();
 }

@@ -22,7 +22,7 @@ export async function handleEnrichmentRequest(ctx: ActionCtx, req: Request) {
     return new Response('Unauthorized', { status: 401 });
   }
 
-  return await saveEnrichment(ctx, req);
+  return await saveEnrichment(ctx, { req });
 }
 
 function isAuthorizedEnrichmentRequest(req: Request) {
@@ -37,7 +37,7 @@ function isAuthorizedEnrichmentRequest(req: Request) {
   );
 }
 
-async function saveEnrichment(ctx: ActionCtx, req: Request) {
+async function saveEnrichment(ctx: ActionCtx, { req }: { req: Request }) {
   try {
     const body = parseEnrichmentBody(await req.json());
     let summaryTalkId = null;

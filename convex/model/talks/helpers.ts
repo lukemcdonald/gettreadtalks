@@ -21,7 +21,10 @@ function publishedTalksQuery(ctx: QueryCtx) {
     .order('desc');
 }
 
-export function talksByStatusQuery(ctx: QueryCtx, status: StatusFilterType) {
+export function talksByStatusQuery(
+  ctx: QueryCtx,
+  { status }: { status: StatusFilterType }
+) {
   if (status === 'all') {
     return ctx.db.query('talks').order('desc');
   }
@@ -38,14 +41,14 @@ export async function listPublishedTalks(ctx: QueryCtx) {
 
 export async function listPublishedTalksPage(
   ctx: QueryCtx,
-  paginationOpts: PaginationOptions
+  { paginationOpts }: { paginationOpts: PaginationOptions }
 ) {
   return await publishedTalksQuery(ctx).paginate(paginationOpts);
 }
 
 function publishedTalksForCollectionQuery(
   ctx: QueryCtx,
-  collectionId: Id<'collections'>
+  { collectionId }: { collectionId: Id<'collections'> }
 ) {
   return ctx.db
     .query('talks')
@@ -56,17 +59,22 @@ function publishedTalksForCollectionQuery(
 
 export async function listPublishedTalksForCollection(
   ctx: QueryCtx,
-  collectionId: Id<'collections'>,
-  limit?: number
+  {
+    collectionId,
+    limit,
+  }: {
+    collectionId: Id<'collections'>;
+    limit?: number;
+  }
 ) {
-  const talks = publishedTalksForCollectionQuery(ctx, collectionId);
+  const talks = publishedTalksForCollectionQuery(ctx, { collectionId });
 
   return await (limit ? talks.take(limit) : talks.collect());
 }
 
 export async function listTalksForCollection(
   ctx: QueryCtx,
-  collectionId: Id<'collections'>
+  { collectionId }: { collectionId: Id<'collections'> }
 ) {
   return await ctx.db
     .query('talks')
@@ -78,7 +86,7 @@ export async function listTalksForCollection(
 
 export async function listPublishedTalksForTopic(
   ctx: QueryCtx,
-  topicId: Id<'topics'>
+  { topicId }: { topicId: Id<'topics'> }
 ) {
   const talks = await getManyVia(
     ctx.db,
@@ -99,17 +107,20 @@ const TALKS_PER_TOPIC = 24;
 /** Published talks that share any of the given topics, excluding listed ids. */
 export async function listPublishedTalksForTopics(
   ctx: QueryCtx,
-  topicIds: Id<'topics'>[],
-  options: {
+  {
+    excludeTalkIds,
+    topicIds,
+  }: {
     excludeTalkIds?: Iterable<string>;
-  } = {}
+    topicIds: Id<'topics'>[];
+  }
 ) {
   if (topicIds.length === 0) {
     return [];
   }
 
-  const excludeTalkIds = new Set(options.excludeTalkIds);
-  const takePerTopic = TALKS_PER_TOPIC + excludeTalkIds.size;
+  const excludedTalkIds = new Set(excludeTalkIds);
+  const takePerTopic = TALKS_PER_TOPIC + excludedTalkIds.size;
 
   const talkPages = await Promise.all(
     topicIds.map(async (topicId) => {
@@ -127,7 +138,7 @@ export async function listPublishedTalksForTopics(
         (talk): talk is Doc<'talks'> =>
           talk !== null &&
           talk.status === 'published' &&
-          !excludeTalkIds.has(talk._id)
+          !excludedTalkIds.has(talk._id)
       );
     })
   );
@@ -137,9 +148,15 @@ export async function listPublishedTalksForTopics(
 
 export async function searchTalks(
   ctx: QueryCtx,
-  queryText: string,
-  limit: number,
-  status?: StatusFilterType
+  {
+    limit,
+    queryText,
+    status,
+  }: {
+    limit: number;
+    queryText: string;
+    status?: StatusFilterType;
+  }
 ) {
   return await ctx.db
     .query('talks')
@@ -149,8 +166,13 @@ export async function searchTalks(
 
 export async function searchPublishedTalks(
   ctx: QueryCtx,
-  queryText: string,
-  limit: number
+  {
+    limit,
+    queryText,
+  }: {
+    limit: number;
+    queryText: string;
+  }
 ) {
   return await loadUntilFull(
     ctx.db
@@ -170,17 +192,22 @@ export async function searchPublishedTalks(
 
 async function loadTalksByNamedSpeakers(
   ctx: QueryCtx,
-  queryText: string,
-  limit: number,
-  status?: StatusFilterType
+  {
+    limit,
+    queryText,
+    status,
+  }: {
+    limit: number;
+    queryText: string;
+    status?: StatusFilterType;
+  }
 ) {
   const searchSpeakersByName =
     status === 'published' ? searchPublishedSpeakers : searchSpeakers;
-  const speakers = await searchSpeakersByName(
-    ctx,
+  const speakers = await searchSpeakersByName(ctx, {
+    limit: DEFAULT_SEARCH_LIMIT,
     queryText,
-    DEFAULT_SEARCH_LIMIT
-  );
+  });
 
   if (speakers.length === 0) {
     return [];
@@ -206,15 +233,32 @@ async function loadTalksByNamedSpeakers(
 /** Title matches plus talks by speakers whose names match. */
 export async function searchTalksByTitleOrSpeaker(
   ctx: QueryCtx,
-  queryText: string,
-  limit: number,
-  status?: StatusFilterType
+  {
+    limit,
+    queryText,
+    status,
+  }: {
+    limit: number;
+    queryText: string;
+    status?: StatusFilterType;
+  }
 ) {
   const [titleHits, speakerTalks] = await Promise.all([
     status === 'published'
-      ? searchPublishedTalks(ctx, queryText, limit)
-      : searchTalks(ctx, queryText, limit, status),
-    loadTalksByNamedSpeakers(ctx, queryText, limit, status),
+      ? searchPublishedTalks(ctx, {
+          limit,
+          queryText,
+        })
+      : searchTalks(ctx, {
+          limit,
+          queryText,
+          status,
+        }),
+    loadTalksByNamedSpeakers(ctx, {
+      limit,
+      queryText,
+      status,
+    }),
   ]);
 
   return uniqueById<Doc<'talks'>>([...titleHits, ...speakerTalks]).slice(
@@ -225,10 +269,19 @@ export async function searchTalksByTitleOrSpeaker(
 
 export async function searchPublishedTalksByTitleOrSpeaker(
   ctx: QueryCtx,
-  queryText: string,
-  limit: number
+  {
+    limit,
+    queryText,
+  }: {
+    limit: number;
+    queryText: string;
+  }
 ) {
-  return await searchTalksByTitleOrSpeaker(ctx, queryText, limit, 'published');
+  return await searchTalksByTitleOrSpeaker(ctx, {
+    limit,
+    queryText,
+    status: 'published',
+  });
 }
 
 /**
@@ -237,7 +290,7 @@ export async function searchPublishedTalksByTitleOrSpeaker(
  */
 export async function enrichWithTopics<T extends { _id: Id<'talks'> }>(
   ctx: QueryCtx,
-  talks: T[]
+  { talks }: { talks: T[] }
 ): Promise<(T & { topicSlugs: string[] })[]> {
   return await asyncMap(talks, async (talk: T) => {
     const talksOnTopics = await ctx.db
@@ -268,7 +321,10 @@ function collectionTitleForTalk(
   return titlesByCollectionId.get(collectionId) ?? null;
 }
 
-async function featuredClipTitleForTalk(ctx: QueryCtx, talkId: Id<'talks'>) {
+async function featuredClipTitleForTalk(
+  ctx: QueryCtx,
+  { talkId }: { talkId: Id<'talks'> }
+) {
   const clip = await ctx.db
     .query('clips')
     .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
@@ -279,7 +335,7 @@ async function featuredClipTitleForTalk(ctx: QueryCtx, talkId: Id<'talks'>) {
 
 async function loadCollectionTitles(
   ctx: QueryCtx,
-  talks: { collectionId?: Id<'collections'> }[]
+  { talks }: { talks: { collectionId?: Id<'collections'> }[] }
 ) {
   const collectionIds = [
     ...new Set(
@@ -299,13 +355,14 @@ async function loadCollectionTitles(
 
 export async function enrichTalksForAdmin(
   ctx: QueryCtx,
-  talks: Doc<'talks'>[]
+  { talks }: { talks: Doc<'talks'>[] }
 ) {
-  const talksWithTopics = await enrichWithTopics(
-    ctx,
-    await enrichWithSpeaker(ctx, talks)
-  );
-  const titlesByCollectionId = await loadCollectionTitles(ctx, talksWithTopics);
+  const talksWithTopics = await enrichWithTopics(ctx, {
+    talks: await enrichWithSpeaker(ctx, { items: talks }),
+  });
+  const titlesByCollectionId = await loadCollectionTitles(ctx, {
+    talks: talksWithTopics,
+  });
 
   return await asyncMap(talksWithTopics, async (talk) => ({
     ...talk,
@@ -313,6 +370,8 @@ export async function enrichTalksForAdmin(
       talk.collectionId,
       titlesByCollectionId
     ),
-    featuredClipTitle: await featuredClipTitleForTalk(ctx, talk._id),
+    featuredClipTitle: await featuredClipTitleForTalk(ctx, {
+      talkId: talk._id,
+    }),
   }));
 }

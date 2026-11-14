@@ -17,29 +17,34 @@ function publishedClipsQuery(ctx: QueryCtx) {
 }
 
 export async function listPublishedClips(ctx: QueryCtx) {
-  return await filterClipsWithPublishedTalk(
-    ctx,
-    await publishedClipsQuery(ctx).collect()
-  );
+  return await filterClipsWithPublishedTalk(ctx, {
+    clips: await publishedClipsQuery(ctx).collect(),
+  });
 }
 
 export async function listPublishedClipsPage(
   ctx: QueryCtx,
-  paginationOpts: PaginationOptions
+  { paginationOpts }: { paginationOpts: PaginationOptions }
 ) {
   const result = await publishedClipsQuery(ctx).paginate(paginationOpts);
 
   return {
     ...result,
-    page: await filterClipsWithPublishedTalk(ctx, result.page),
+    page: await filterClipsWithPublishedTalk(ctx, { clips: result.page }),
   };
 }
 
 export async function searchClips(
   ctx: QueryCtx,
-  queryText: string,
-  limit: number,
-  status?: StatusFilterType
+  {
+    limit,
+    queryText,
+    status,
+  }: {
+    limit: number;
+    queryText: string;
+    status?: StatusFilterType;
+  }
 ) {
   return await ctx.db
     .query('clips')
@@ -49,8 +54,13 @@ export async function searchClips(
 
 export async function searchPublishedClips(
   ctx: QueryCtx,
-  queryText: string,
-  limit: number
+  {
+    limit,
+    queryText,
+  }: {
+    limit: number;
+    queryText: string;
+  }
 ) {
   return await loadUntilFull(
     ctx.db
@@ -76,7 +86,7 @@ export async function enrichClipsWithSpeaker<
   T extends { speakerId?: Id<'speakers'> },
 >(
   ctx: QueryCtx,
-  items: T[]
+  { items }: { items: T[] }
 ): Promise<(T & { speaker: Doc<'speakers'> | null })[]> {
   return await asyncMap(items, async (item: T) => {
     const speaker = item.speakerId
@@ -89,9 +99,9 @@ export async function enrichClipsWithSpeaker<
 
 export async function enrichClipsForAdmin(
   ctx: QueryCtx,
-  clips: Doc<'clips'>[]
+  { clips }: { clips: Doc<'clips'>[] }
 ) {
-  const clipsWithSpeakers = await enrichClipsWithSpeaker(ctx, clips);
+  const clipsWithSpeakers = await enrichClipsWithSpeaker(ctx, { items: clips });
 
   return await asyncMap(clipsWithSpeakers, async (clip) => {
     const talk = clip.talkId ? await ctx.db.get('talks', clip.talkId) : null;

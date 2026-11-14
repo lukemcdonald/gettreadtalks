@@ -25,7 +25,10 @@ export const createTopic = mutation({
       throwValidationError('Title cannot be empty', 'title');
     }
 
-    const slug = await generateSlug(ctx, 'topics', args.title);
+    const slug = await generateSlug(ctx, {
+      baseText: args.title,
+      table: 'topics',
+    });
 
     return await ctx.db.insert('topics', {
       ...args,
@@ -101,7 +104,11 @@ export const updateTopic = mutation({
         throwValidationError('Title cannot be empty', 'title');
       }
 
-      const newSlug = await generateSlug(ctx, 'topics', updates.title, id);
+      const newSlug = await generateSlug(ctx, {
+        baseText: updates.title,
+        excludeId: id,
+        table: 'topics',
+      });
 
       if (newSlug !== topic.slug) {
         updates.slug = newSlug;

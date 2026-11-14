@@ -91,11 +91,10 @@ export const getCollectionBySlug = query({
       return null;
     }
 
-    const talks = await listPublishedTalksForCollection(
-      ctx,
-      collection._id,
-      limit
-    );
+    const talks = await listPublishedTalksForCollection(ctx, {
+      collectionId: collection._id,
+      limit,
+    });
 
     if (talks.length === 0) {
       return null;
@@ -103,7 +102,7 @@ export const getCollectionBySlug = query({
 
     talks.sort((a, b) => (a.collectionOrder || 0) - (b.collectionOrder || 0));
 
-    const talksWithSpeakers = await enrichWithSpeaker(ctx, talks);
+    const talksWithSpeakers = await enrichWithSpeaker(ctx, { items: talks });
 
     return {
       collection,
@@ -127,23 +126,21 @@ export const listCollections = query({
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
-    const collectionPages = await listPublishedCollectionsPage(
-      ctx,
-      args.paginationOpts
-    );
+    const collectionPages = await listPublishedCollectionsPage(ctx, {
+      paginationOpts: args.paginationOpts,
+    });
 
     // Enrich each collection with stats
     const enrichedPage = await asyncMap(
       collectionPages.page,
       async (collection) => {
-        const talks = await listPublishedTalksForCollection(
-          ctx,
-          collection._id
-        );
+        const talks = await listPublishedTalksForCollection(ctx, {
+          collectionId: collection._id,
+        });
 
         return {
           collection,
-          speakers: await loadSpeakersForTalks(ctx, talks),
+          speakers: await loadSpeakersForTalks(ctx, { talks }),
           talkCount: talks.length,
         };
       }

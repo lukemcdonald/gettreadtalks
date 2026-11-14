@@ -25,7 +25,11 @@ export const upsertMediaCheck = internalMutation({
       existing: sameUrl ? existing : null,
       observedStatus: args.observedStatus,
     });
-    const checkId = await writeMediaCheck(ctx, existing, args, decision);
+    const checkId = await writeMediaCheck(ctx, {
+      ...args,
+      ...decision,
+      existing,
+    });
 
     return {
       checkId,
@@ -61,13 +65,21 @@ export const stampMediaChecksNotified = internalMutation({
 
 async function loadExistingCheck(
   ctx: MutationCtx,
-  args: {
+  {
+    entityId,
+    entityTable,
+    mediaUrl,
+  }: {
     entityId: string;
     entityTable: 'clips' | 'talks';
     mediaUrl: string;
   }
 ) {
-  const exact = await loadMediaCheckByEntityUrl(ctx, args);
+  const exact = await loadMediaCheckByEntityUrl(ctx, {
+    entityId,
+    entityTable,
+    mediaUrl,
+  });
 
   if (exact) {
     return exact;
@@ -76,38 +88,41 @@ async function loadExistingCheck(
   return await ctx.db
     .query('mediaChecks')
     .withIndex('by_entityTable_and_entityId_and_mediaUrl', (q) =>
-      q.eq('entityTable', args.entityTable).eq('entityId', args.entityId)
+      q.eq('entityTable', entityTable).eq('entityId', entityId)
     )
     .first();
 }
 
 async function writeMediaCheck(
   ctx: MutationCtx,
-  existing: Doc<'mediaChecks'> | null,
-  args: {
+  {
+    checkedAt,
+    entityId,
+    entityTable,
+    existing,
+    firstBrokenAt,
+    lastNotifiedAt,
+    mediaUrl,
+    persistStatus,
+  }: {
     checkedAt: number;
     entityId: string;
     entityTable: 'clips' | 'talks';
-    mediaUrl: string;
-  },
-  decision: {
+    existing: Doc<'mediaChecks'> | null;
     firstBrokenAt?: number;
     lastNotifiedAt?: number;
+    mediaUrl: string;
     persistStatus: MediaCheckStatus;
   }
 ) {
   const fields = {
-    checkedAt: args.checkedAt,
-    entityId: args.entityId,
-    entityTable: args.entityTable,
-    mediaUrl: args.mediaUrl,
-    status: decision.persistStatus,
-    ...(decision.firstBrokenAt === undefined
-      ? {}
-      : { firstBrokenAt: decision.firstBrokenAt }),
-    ...(decision.lastNotifiedAt === undefined
-      ? {}
-      : { lastNotifiedAt: decision.lastNotifiedAt }),
+    checkedAt,
+    entityId,
+    entityTable,
+    mediaUrl,
+    status: persistStatus,
+    ...(firstBrokenAt === undefined ? {} : { firstBrokenAt }),
+    ...(lastNotifiedAt === undefined ? {} : { lastNotifiedAt }),
   };
 
   if (existing) {

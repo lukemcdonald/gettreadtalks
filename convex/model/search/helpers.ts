@@ -84,7 +84,13 @@ export function uniqueById<T extends { _id: string }>(items: T[]) {
 
 export async function listAllAdmin<T, TPage>(
   ctx: QueryCtx,
-  options: {
+  {
+    enrich,
+    listPage,
+    paginationOpts,
+    search,
+    searchItems,
+  }: {
     enrich: (page: T[]) => Promise<TPage[]>;
     listPage: () => Promise<PaginationResult<T>>;
     paginationOpts: PaginationOptions;
@@ -92,8 +98,6 @@ export async function listAllAdmin<T, TPage>(
     searchItems: (queryText: string) => Promise<T[]>;
   }
 ): Promise<PaginationResult<TPage>> {
-  const { enrich, listPage, paginationOpts, search, searchItems } = options;
-
   await requireAdmin(ctx);
 
   const queryText = normalizeSearchQuery(search ?? '');

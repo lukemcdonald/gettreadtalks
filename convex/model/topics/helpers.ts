@@ -25,20 +25,28 @@ function publishedTopicsQuery(ctx: QueryCtx) {
   return ctx.db.query('topics').withIndex('by_title');
 }
 
-export async function listPublishedTopics(ctx: QueryCtx, limit?: number) {
+export async function listPublishedTopics(
+  ctx: QueryCtx,
+  { limit }: { limit?: number }
+) {
   const topicsQuery = publishedTopicsQuery(ctx);
   const topics =
     limit === undefined
       ? await topicsQuery.collect()
       : await topicsQuery.take(limit);
 
-  return await filterTopicsWithPublishedTalks(ctx, topics);
+  return await filterTopicsWithPublishedTalks(ctx, { topics });
 }
 
 export async function searchTopics(
   ctx: QueryCtx,
-  queryText: string,
-  limit: number
+  {
+    limit,
+    queryText,
+  }: {
+    limit: number;
+    queryText: string;
+  }
 ) {
   return await ctx.db
     .query('topics')
@@ -48,20 +56,27 @@ export async function searchTopics(
 
 export async function searchPublishedTopics(
   ctx: QueryCtx,
-  queryText: string,
-  limit: number
+  {
+    limit,
+    queryText,
+  }: {
+    limit: number;
+    queryText: string;
+  }
 ) {
-  const published = await filterTopicsWithPublishedTalks(
-    ctx,
-    await searchTopics(ctx, queryText, limit * UNFILTERED_SEARCH_MULTIPLIER)
-  );
+  const published = await filterTopicsWithPublishedTalks(ctx, {
+    topics: await searchTopics(ctx, {
+      limit: limit * UNFILTERED_SEARCH_MULTIPLIER,
+      queryText,
+    }),
+  });
 
   return published.slice(0, limit);
 }
 
 export async function enrichTopicsForAdmin(
   ctx: QueryCtx,
-  topics: Doc<'topics'>[]
+  { topics }: { topics: Doc<'topics'>[] }
 ) {
   return await asyncMap(topics, async (topic) => {
     const talksOnTopic = await getManyFrom(
@@ -81,7 +96,7 @@ export async function enrichTopicsForAdmin(
 /** Distinct topics linked to the given talks, sorted by title. */
 export async function listPublishedTopicsForTalks(
   ctx: QueryCtx,
-  talkIds: Id<'talks'>[]
+  { talkIds }: { talkIds: Id<'talks'>[] }
 ) {
   if (talkIds.length === 0) {
     return [];

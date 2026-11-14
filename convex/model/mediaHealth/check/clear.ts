@@ -11,7 +11,10 @@ export function shouldClearMediaChecks(args: {
 
 export async function clearMediaChecksForEntity(
   ctx: MutationCtx,
-  args: {
+  {
+    entityId,
+    entityTable,
+  }: {
     entityId: string;
     entityTable: 'clips' | 'talks';
   }
@@ -19,16 +22,23 @@ export async function clearMediaChecksForEntity(
   const rows = await ctx.db
     .query('mediaChecks')
     .withIndex('by_entityTable_and_entityId_and_mediaUrl', (q) =>
-      q.eq('entityTable', args.entityTable).eq('entityId', args.entityId)
+      q.eq('entityTable', entityTable).eq('entityId', entityId)
     )
     .collect();
 
-  await deleteAll(ctx, rows);
+  await deleteAll(ctx, { items: rows });
 }
 
 export async function clearStaleMediaChecks(
   ctx: MutationCtx,
-  args: {
+  {
+    entityId,
+    entityTable,
+    nextMediaUrl,
+    nextStatus,
+    previousMediaUrl,
+    previousStatus,
+  }: {
     entityId: string;
     entityTable: 'clips' | 'talks';
     nextMediaUrl?: string;
@@ -40,16 +50,15 @@ export async function clearStaleMediaChecks(
   if (
     !shouldClearMediaChecks({
       mediaUrlChanged:
-        args.nextMediaUrl !== undefined &&
-        args.nextMediaUrl !== args.previousMediaUrl,
-      published: (args.nextStatus ?? args.previousStatus) === 'published',
+        nextMediaUrl !== undefined && nextMediaUrl !== previousMediaUrl,
+      published: (nextStatus ?? previousStatus) === 'published',
     })
   ) {
     return;
   }
 
   await clearMediaChecksForEntity(ctx, {
-    entityId: args.entityId,
-    entityTable: args.entityTable,
+    entityId,
+    entityTable,
   });
 }

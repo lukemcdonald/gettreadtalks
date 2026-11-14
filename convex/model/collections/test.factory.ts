@@ -21,7 +21,7 @@ export function makeCollection(
 
 export async function insertCollection(
   ctx: MutationCtx,
-  overrides: Partial<CollectionFields> = {}
+  { ...overrides }: Partial<CollectionFields> = {}
 ) {
   return await ctx.db.insert('collections', makeCollection(overrides));
 }

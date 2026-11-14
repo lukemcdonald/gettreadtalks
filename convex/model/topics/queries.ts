@@ -66,19 +66,22 @@ export const getTopicBySlug = query({
       return null;
     }
 
-    let publishedTalks = await listPublishedTalksForTopic(ctx, topic._id);
+    let publishedTalks = await listPublishedTalksForTopic(ctx, {
+      topicId: topic._id,
+    });
 
     if (queryText) {
-      const matches = await searchPublishedTalksByTitleOrSpeaker(
-        ctx,
+      const matches = await searchPublishedTalksByTitleOrSpeaker(ctx, {
+        limit: LIST_SEARCH_LIMIT,
         queryText,
-        LIST_SEARCH_LIMIT
-      );
+      });
       const matchIds = new Set(matches.map((talk) => talk._id));
       publishedTalks = publishedTalks.filter((talk) => matchIds.has(talk._id));
     }
 
-    const filteredTalks = await enrichWithSpeaker(ctx, publishedTalks);
+    const filteredTalks = await enrichWithSpeaker(ctx, {
+      items: publishedTalks,
+    });
 
     const { continueCursor, isDone, page } = paginateArray(
       filteredTalks,
@@ -122,7 +125,7 @@ export const listAllTopics = query({
   },
   handler: async (ctx, args) =>
     await listAllAdmin(ctx, {
-      enrich: (page) => enrichTopicsForAdmin(ctx, page),
+      enrich: (page) => enrichTopicsForAdmin(ctx, { topics: page }),
       listPage: () =>
         ctx.db
           .query('topics')
@@ -132,7 +135,10 @@ export const listAllTopics = query({
       paginationOpts: args.paginationOpts,
       search: args.search,
       searchItems: (queryText) =>
-        searchTopics(ctx, queryText, LIST_SEARCH_LIMIT),
+        searchTopics(ctx, {
+          limit: LIST_SEARCH_LIMIT,
+          queryText,
+        }),
     }),
   returns: topicAdminPageValidator,
 });
@@ -143,7 +149,7 @@ export const listAllTopics = query({
 export const listTopicSlugs = query({
   args: {},
   handler: async (ctx) => {
-    const topics = await listPublishedTopics(ctx);
+    const topics = await listPublishedTopics(ctx, {});
 
     return topics.map((topic) => ({
       slug: topic.slug,
@@ -180,11 +186,16 @@ export const listTopicsWithCount = query({
     const queryText = normalizeSearchQuery(search ?? '');
 
     const topics = queryText
-      ? await searchPublishedTopics(ctx, queryText, limit)
-      : await listPublishedTopics(ctx, limit);
+      ? await searchPublishedTopics(ctx, {
+          limit,
+          queryText,
+        })
+      : await listPublishedTopics(ctx, { limit });
 
     const topicsWithCounts = await asyncMap(topics, async (topic) => {
-      const publishedTalks = await listPublishedTalksForTopic(ctx, topic._id);
+      const publishedTalks = await listPublishedTalksForTopic(ctx, {
+        topicId: topic._id,
+      });
 
       return {
         count: publishedTalks.length,
@@ -220,10 +231,12 @@ export const listTopicsWithTalks = query({
   handler: async (ctx, args) => {
     const { limit = 100, talksPerTopic = 5 } = args;
 
-    const topics = await listPublishedTopics(ctx, limit);
+    const topics = await listPublishedTopics(ctx, { limit });
 
     const topicsWithTalks = await asyncMap(topics, async (topic) => {
-      const publishedTalks = await listPublishedTalksForTopic(ctx, topic._id);
+      const publishedTalks = await listPublishedTalksForTopic(ctx, {
+        topicId: topic._id,
+      });
 
       // Sort: featured talks first, then by creation date (newest first)
       publishedTalks.sort((a, b) => {
@@ -237,7 +250,9 @@ export const listTopicsWithTalks = query({
       });
 
       const limitedTalks = publishedTalks.slice(0, talksPerTopic);
-      const talksWithSpeakers = await enrichWithSpeaker(ctx, limitedTalks);
+      const talksWithSpeakers = await enrichWithSpeaker(ctx, {
+        items: limitedTalks,
+      });
 
       return {
         talkCount: publishedTalks.length,

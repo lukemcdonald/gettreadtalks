@@ -57,7 +57,11 @@ export const continueCheck = internalAction({
 
 async function runMediaHealthPage(
   ctx: ActionCtx,
-  args: {
+  {
+    items,
+    paginationCursor,
+    source,
+  }: {
     items: MediaHealthDigestItem[];
     paginationCursor: string | null;
     source: 'clips' | 'talks';
@@ -68,15 +72,18 @@ async function runMediaHealthPage(
       internal.mediaHealth.listPublishedMediaPage,
       {
         paginationOpts: {
-          cursor: args.paginationCursor,
+          cursor: paginationCursor,
           numItems: PAGE_SIZE,
         },
-        source: args.source,
+        source,
       }
     );
 
-    const items = await checkMediaPageItems(ctx, result.page, args.items);
-    const nextPage = nextMediaHealthPage(result, args, items);
+    const digestItems = await checkMediaPageItems(ctx, {
+      items,
+      pageItems: result.page,
+    });
+    const nextPage = nextMediaHealthPage(result, { source }, digestItems);
 
     if (nextPage) {
       await ctx.scheduler.runAfter(
@@ -88,7 +95,7 @@ async function runMediaHealthPage(
       return;
     }
 
-    await sendMediaHealthDigest(ctx, items);
+    await sendMediaHealthDigest(ctx, { items: digestItems });
   } catch (error) {
     await reportSentryException({
       message: `Media health check failed: ${formatErrorMessage(error)}`,
@@ -109,7 +116,7 @@ interface PublishedMediaItem {
 
 async function sendMediaHealthDigest(
   ctx: ActionCtx,
-  items: MediaHealthDigestItem[]
+  { items }: { items: MediaHealthDigestItem[] }
 ) {
   const digest = buildMediaHealthDigest(items);
 
@@ -133,8 +140,13 @@ async function sendMediaHealthDigest(
 
 async function checkMediaPageItems(
   ctx: ActionCtx,
-  pageItems: PublishedMediaItem[],
-  items: MediaHealthDigestItem[]
+  {
+    items,
+    pageItems,
+  }: {
+    items: MediaHealthDigestItem[];
+    pageItems: PublishedMediaItem[];
+  }
 ): Promise<MediaHealthDigestItem[]> {
   if (pageItems.length === 0) {
     return items;
@@ -146,15 +158,26 @@ async function checkMediaPageItems(
     return items;
   }
 
-  const nextItems = await checkPublishedMediaItem(ctx, item, items);
+  const nextItems = await checkPublishedMediaItem(ctx, {
+    item,
+    items,
+  });
 
-  return await checkMediaPageItems(ctx, pageItems.slice(1), nextItems);
+  return await checkMediaPageItems(ctx, {
+    items: nextItems,
+    pageItems: pageItems.slice(1),
+  });
 }
 
 async function checkPublishedMediaItem(
   ctx: ActionCtx,
-  item: PublishedMediaItem,
-  items: MediaHealthDigestItem[]
+  {
+    item,
+    items,
+  }: {
+    item: PublishedMediaItem;
+    items: MediaHealthDigestItem[];
+  }
 ): Promise<MediaHealthDigestItem[]> {
   const check = await checkMediaUrl(item.mediaUrl);
 

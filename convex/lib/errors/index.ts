@@ -101,7 +101,7 @@ export function throwNotFound(
  * Throws a duplicate slug error (409).
  *
  * @example
- * if (await slugExists(ctx, 'topics', slug)) {
+ * if (await slugExists(ctx, { slug, table: 'topics' })) {
  *   throwDuplicateSlug('Topic with this title already exists', 'title');
  * }
  */

@@ -23,7 +23,7 @@ export function makeClip(overrides: Partial<ClipFields> = {}): ClipFields {
 
 export async function insertClip(
   ctx: MutationCtx,
-  overrides: Partial<ClipFields> = {}
+  { ...overrides }: Partial<ClipFields> = {}
 ) {
   return await ctx.db.insert('clips', makeClip(overrides));
 }

@@ -101,7 +101,9 @@ export const getClipBySlug = query({
       return null;
     }
 
-    const publishedClips = await filterClipsWithPublishedTalk(ctx, [clip]);
+    const publishedClips = await filterClipsWithPublishedTalk(ctx, {
+      clips: [clip],
+    });
 
     if (publishedClips.length === 0) {
       return null;
@@ -154,16 +156,19 @@ export const listClips = query({
 
     // When no filters and default sort, use native Convex pagination
     if (!(hasFilters || needsCustomSort)) {
-      const clipPages = await listPublishedClipsPage(ctx, paginationOpts);
+      const clipPages = await listPublishedClipsPage(ctx, { paginationOpts });
 
       return {
         ...clipPages,
-        page: await enrichClipsWithSpeaker(ctx, clipPages.page),
+        page: await enrichClipsWithSpeaker(ctx, { items: clipPages.page }),
       };
     }
 
     let clips = hasSearch
-      ? await searchPublishedClips(ctx, queryText, LIST_SEARCH_LIMIT)
+      ? await searchPublishedClips(ctx, {
+          limit: LIST_SEARCH_LIMIT,
+          queryText,
+        })
       : await listPublishedClips(ctx);
 
     // Apply speaker filter (multi-select)
@@ -199,7 +204,7 @@ export const listClips = query({
     return {
       continueCursor,
       isDone,
-      page: await enrichClipsWithSpeaker(ctx, page),
+      page: await enrichClipsWithSpeaker(ctx, { items: page }),
     };
   },
   returns: clipPageWithSpeakersValidator,
@@ -220,7 +225,7 @@ export const listAllClips = query({
     const { paginationOpts, search, status = 'published' } = args;
 
     return await listAllAdmin(ctx, {
-      enrich: (page) => enrichClipsForAdmin(ctx, page),
+      enrich: (page) => enrichClipsForAdmin(ctx, { clips: page }),
       listPage: () =>
         status === 'all'
           ? ctx.db.query('clips').order('desc').paginate(paginationOpts)
@@ -234,7 +239,11 @@ export const listAllClips = query({
       paginationOpts,
       search,
       searchItems: (queryText) =>
-        searchClips(ctx, queryText, LIST_SEARCH_LIMIT, status),
+        searchClips(ctx, {
+          limit: LIST_SEARCH_LIMIT,
+          queryText,
+          status,
+        }),
     });
   },
   returns: clipAdminPageValidator,

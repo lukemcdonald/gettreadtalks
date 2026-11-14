@@ -75,8 +75,13 @@ export const talkStudyGenerator = {
 
 export async function saveGeneratedTalkStudy(
   ctx: ActionCtx,
-  source: TalkSummarySource & { transcript: string },
-  talkId: Id<'talks'>
+  {
+    source,
+    talkId,
+  }: {
+    source: TalkSummarySource & { transcript: string };
+    talkId: Id<'talks'>;
+  }
 ) {
   let body: string;
 
@@ -121,7 +126,7 @@ export type TalkStudyGenerateResult =
 
 export async function generateTalkStudy(
   ctx: ActionCtx,
-  talkId: Id<'talks'>
+  { talkId }: { talkId: Id<'talks'> }
 ): Promise<TalkStudyGenerateResult> {
   const source = await ctx.runQuery(internal.talks.loadTalkDraftSource, {
     asAdmin: true,
@@ -136,29 +141,27 @@ export async function generateTalkStudy(
     return toFailedResult('TOKEN_MISSING');
   }
 
-  const loaded = await loadTranscriptForGenerate(
-    ctx,
+  const loaded = await loadTranscriptForGenerate(ctx, {
+    existingTranscript: source.transcript,
+    mediaUrl: source.mediaUrl,
     talkId,
-    source.transcript,
-    source.mediaUrl
-  );
+  });
 
   if ('errorCode' in loaded) {
     return toFailedResult(loaded.errorCode, loaded.message);
   }
 
-  return await saveGeneratedTalkStudy(
-    ctx,
-    { ...source, transcript: loaded.transcript },
-    talkId
-  );
+  return await saveGeneratedTalkStudy(ctx, {
+    source: { ...source, transcript: loaded.transcript },
+    talkId,
+  });
 }
 
 export const generateStudy = action({
   args: {
     talkId: v.id('talks'),
   },
-  handler: async (ctx, { talkId }) => await generateTalkStudy(ctx, talkId),
+  handler: async (ctx, { talkId }) => await generateTalkStudy(ctx, { talkId }),
   returns: v.union(
     talkStudyGenerateFailure,
     v.object({

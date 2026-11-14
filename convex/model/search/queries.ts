@@ -66,8 +66,11 @@ function toSearchSpeaker(speaker: Doc<'speakers'> | null) {
   };
 }
 
-async function toSearchTalks(ctx: QueryCtx, talks: Doc<'talks'>[]) {
-  const talksWithSpeakers = await enrichWithSpeaker(ctx, talks);
+async function toSearchTalks(
+  ctx: QueryCtx,
+  { talks }: { talks: Doc<'talks'>[] }
+) {
+  const talksWithSpeakers = await enrichWithSpeaker(ctx, { items: talks });
 
   return talksWithSpeakers.flatMap((talk) => {
     const speaker = toSearchSpeaker(talk.speaker);
@@ -88,8 +91,11 @@ async function toSearchTalks(ctx: QueryCtx, talks: Doc<'talks'>[]) {
   });
 }
 
-async function toSearchClips(ctx: QueryCtx, clips: Doc<'clips'>[]) {
-  const clipsWithSpeakers = await enrichClipsWithSpeaker(ctx, clips);
+async function toSearchClips(
+  ctx: QueryCtx,
+  { clips }: { clips: Doc<'clips'>[] }
+) {
+  const clipsWithSpeakers = await enrichClipsWithSpeaker(ctx, { items: clips });
 
   return clipsWithSpeakers.map((clip) => ({
     _id: clip._id,
@@ -114,14 +120,26 @@ export const searchSite = query({
 
     const limit = normalizeSearchLimit(args.limit);
     const [clips, speakers, talks, topics] = await Promise.all([
-      searchPublishedClips(ctx, queryText, limit),
-      searchPublishedSpeakers(ctx, queryText, limit),
-      searchPublishedTalksByTitleOrSpeaker(ctx, queryText, limit),
-      searchPublishedTopics(ctx, queryText, limit),
+      searchPublishedClips(ctx, {
+        limit,
+        queryText,
+      }),
+      searchPublishedSpeakers(ctx, {
+        limit,
+        queryText,
+      }),
+      searchPublishedTalksByTitleOrSpeaker(ctx, {
+        limit,
+        queryText,
+      }),
+      searchPublishedTopics(ctx, {
+        limit,
+        queryText,
+      }),
     ]);
 
     return {
-      clips: await toSearchClips(ctx, clips),
+      clips: await toSearchClips(ctx, { clips }),
       speakers: speakers.map((speaker) => ({
         _id: speaker._id,
         firstName: speaker.firstName,
@@ -129,7 +147,7 @@ export const searchSite = query({
         ministry: speaker.ministry,
         slug: speaker.slug,
       })),
-      talks: await toSearchTalks(ctx, talks),
+      talks: await toSearchTalks(ctx, { talks }),
       topics: topics.map((topic) => ({
         _id: topic._id,
         slug: topic.slug,

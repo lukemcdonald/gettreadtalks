@@ -53,9 +53,15 @@ type SlugTable =
  */
 export async function slugExists(
   ctx: QueryCtx | MutationCtx,
-  table: SlugTable,
-  slug: string,
-  excludeId?: string
+  {
+    excludeId,
+    slug,
+    table,
+  }: {
+    excludeId?: string;
+    slug: string;
+    table: SlugTable;
+  }
 ): Promise<boolean> {
   const existing = await getOneFrom(ctx.db, table, 'by_slug', slug);
 
@@ -78,9 +84,15 @@ export async function slugExists(
  */
 export async function talkSlugExistsForSpeaker(
   ctx: QueryCtx | MutationCtx,
-  speakerId: Id<'speakers'>,
-  slug: string,
-  excludeId?: Id<'talks'>
+  {
+    excludeId,
+    slug,
+    speakerId,
+  }: {
+    excludeId?: Id<'talks'>;
+    slug: string;
+    speakerId: Id<'speakers'>;
+  }
 ) {
   const speakerTalks = await ctx.db
     .query('talks')
@@ -109,12 +121,22 @@ export async function talkSlugExistsForSpeaker(
  */
 export async function generateSlug(
   ctx: QueryCtx | MutationCtx,
-  table: SlugTable,
-  baseText: string,
-  excludeId?: string
+  {
+    baseText,
+    excludeId,
+    table,
+  }: {
+    baseText: string;
+    excludeId?: string;
+    table: SlugTable;
+  }
 ) {
   const baseSlug = slugify(baseText);
-  const baseSlugExists = await slugExists(ctx, table, baseSlug, excludeId);
+  const baseSlugExists = await slugExists(ctx, {
+    excludeId,
+    slug: baseSlug,
+    table,
+  });
 
   if (!baseSlugExists) {
     return baseSlug;
@@ -124,8 +146,14 @@ export async function generateSlug(
   let candidateSlug = `${baseSlug}-${counter}`;
 
   // Try with numeric suffix
-  // oxlint-disable-next-line no-await-in-loop -- each candidate depends on the previous uniqueness check
-  while (await slugExists(ctx, table, candidateSlug, excludeId)) {
+  while (
+    // oxlint-disable-next-line no-await-in-loop -- each candidate depends on the previous uniqueness check
+    await slugExists(ctx, {
+      excludeId,
+      slug: candidateSlug,
+      table,
+    })
+  ) {
     counter += 1;
     candidateSlug = `${baseSlug}-${counter}`;
   }
@@ -139,8 +167,13 @@ export async function generateSlug(
  */
 export async function getOrThrow<T extends TableNames>(
   ctx: QueryCtx | MutationCtx,
-  table: T,
-  id: Id<T>
+  {
+    id,
+    table,
+  }: {
+    id: Id<T>;
+    table: T;
+  }
 ): Promise<Doc<T>> {
   const entity = await ctx.db.get(table, id);
 
@@ -306,7 +339,7 @@ export async function paginateSearchOrList<T>(options: {
  */
 export async function deleteAll<T extends { _id: Id<TableNames> }>(
   ctx: MutationCtx,
-  items: T[]
+  { items }: { items: T[] }
 ): Promise<void> {
   await Promise.all(items.map((item) => ctx.db.delete(item._id)));
 }
@@ -333,7 +366,7 @@ export async function enrichWithSpeaker<
   T extends { speakerId: Id<'speakers'> },
 >(
   ctx: QueryCtx,
-  items: T[]
+  { items }: { items: T[] }
 ): Promise<(T & { speaker: Doc<'speakers'> | null })[]> {
   return await asyncMap(items, async (item: T) => {
     const speaker = await ctx.db.get('speakers', item.speakerId);
