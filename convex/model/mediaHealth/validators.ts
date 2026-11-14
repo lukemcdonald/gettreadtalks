@@ -1,4 +1,11 @@
+import type { Doc } from '../../_generated/dataModel';
+
 import { v } from 'convex/values';
+
+export type MediaCheckKey = Pick<
+  Doc<'mediaChecks'>,
+  'entityId' | 'entityTable' | 'mediaUrl'
+>;
 
 const MEDIA_CHECK_STATUSES = ['missing', 'ok', 'private', 'unknown'] as const;
 

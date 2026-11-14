@@ -72,6 +72,10 @@ export interface TalkSummarySource {
   transcript: string | null;
 }
 
+export type TalkSummaryWithTranscript = TalkSummarySource & {
+  transcript: string;
+};
+
 export type TalkGenerateGuardError =
   | 'ALREADY_REVIEWED'
   | 'NO_TRANSCRIPT_SOURCE'
@@ -79,9 +83,9 @@ export type TalkGenerateGuardError =
 
 export async function loadTalkGenerateSource(
   ctx: ActionCtx,
-  { talkId }: { talkId: Id<'talks'> }
+  args: { talkId: Id<'talks'> }
 ): Promise<
-  | (TalkSummarySource & { transcript: string })
+  | TalkSummaryWithTranscript
   | {
       errorCode: TalkGenerateGuardError | 'UPSTREAM_ERROR';
       message?: string;
@@ -90,7 +94,7 @@ export async function loadTalkGenerateSource(
   const source: TalkSummarySource = await ctx.runQuery(
     internal.talks.loadTalkSummarySource,
     {
-      talkId,
+      talkId: args.talkId,
     }
   );
 
@@ -105,7 +109,7 @@ export async function loadTalkGenerateSource(
   const loaded = await loadTranscriptForGenerate(ctx, {
     existingTranscript: source.transcript,
     mediaUrl: source.mediaUrl,
-    talkId,
+    talkId: args.talkId,
   });
 
   if ('errorCode' in loaded) {
@@ -151,10 +155,10 @@ function toTalkSummarySource(
 
 async function readTalkSummarySource(
   ctx: QueryCtx,
-  { talkId }: { talkId: Id<'talks'> }
+  args: { talkId: Id<'talks'> }
 ) {
   const talk = await getOrThrow(ctx, {
-    id: talkId,
+    id: args.talkId,
     table: 'talks',
   });
   const speaker = await getOrThrow(ctx, {
@@ -165,7 +169,7 @@ async function readTalkSummarySource(
     ctx.db,
     'talkTranscripts',
     'by_talkId',
-    talkId
+    args.talkId
   );
 
   return toTalkSummarySource(speaker, talk, transcript);
@@ -244,11 +248,8 @@ export const talkSummaryGenerator = {
 
 export async function saveGeneratedTalkSummary(
   ctx: ActionCtx,
-  {
-    source,
-    talkId,
-  }: {
-    source: TalkSummarySource & { transcript: string };
+  args: {
+    source: TalkSummaryWithTranscript;
     talkId: Id<'talks'>;
   }
 ) {
@@ -256,10 +257,10 @@ export async function saveGeneratedTalkSummary(
 
   try {
     generated = await talkSummaryGenerator.generate({
-      scripture: source.scripture,
-      speaker: source.speaker,
-      title: source.title,
-      transcript: source.transcript,
+      scripture: args.source.scripture,
+      speaker: args.source.speaker,
+      title: args.source.title,
+      transcript: args.source.transcript,
     });
   } catch {
     return toFailedResult('UPSTREAM_ERROR');
@@ -269,7 +270,7 @@ export async function saveGeneratedTalkSummary(
     await ctx.runMutation(internal.talks.saveTalkSummaryDraft, {
       generator: TALK_SUMMARY_MODEL,
       summary: generated.summary,
-      talkId,
+      talkId: args.talkId,
     });
   } catch (error) {
     if (isConflictError(error)) {

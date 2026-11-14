@@ -110,7 +110,7 @@ function warnIfAuthEnvInvalid(siteUrl: string) {
 
 function createAuthPlugins(
   ctx: GenericCtx<DataModel>,
-  { siteUrl }: { siteUrl: string }
+  args: { siteUrl: string }
 ) {
   const plugins = [
     adminPlugin({
@@ -124,7 +124,7 @@ function createAuthPlugins(
     authRateLimitPlugin(ctx),
   ];
 
-  if (isPreviewSiteUrl(siteUrl)) {
+  if (isPreviewSiteUrl(args.siteUrl)) {
     return plugins;
   }
 
@@ -196,11 +196,7 @@ export const createAuth = (ctx: GenericCtx<DataModel>) => {
  */
 async function scheduleWelcomeEmail(
   ctx: MutationCtx,
-  {
-    _id,
-    email,
-    name,
-  }: {
+  args: {
     _id: string;
     email: string;
     name: string;
@@ -208,9 +204,9 @@ async function scheduleWelcomeEmail(
 ) {
   try {
     await ctx.scheduler.runAfter(0, internal.emails.sendWelcomeEmail, {
-      email,
-      name,
-      userId: _id,
+      email: args.email,
+      name: args.name,
+      userId: args._id,
     });
   } catch (error) {
     console.error(

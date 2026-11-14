@@ -16,14 +16,14 @@ import { userRole } from './validators';
 
 async function requirePublishedTalk(
   ctx: MutationCtx,
-  { talkId }: { talkId: Id<'talks'> }
+  args: { talkId: Id<'talks'> }
 ) {
-  const talk = await ctx.db.get('talks', talkId);
+  const talk = await ctx.db.get('talks', args.talkId);
 
   if (!talk || talk.status !== 'published') {
     throwNotFound('Talk not found', {
       resource: 'talks',
-      resourceId: talkId,
+      resourceId: args.talkId,
     });
   }
 

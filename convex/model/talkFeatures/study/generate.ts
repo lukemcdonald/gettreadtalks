@@ -1,6 +1,6 @@
 import type { Id } from '../../../_generated/dataModel';
 import type { ActionCtx } from '../../../_generated/server';
-import type { TalkSummarySource } from '../../talks/summaryGenerate';
+import type { TalkSummaryWithTranscript } from '../../talks/summaryGenerate';
 
 import { ConvexError, v } from 'convex/values';
 
@@ -75,11 +75,8 @@ export const talkStudyGenerator = {
 
 export async function saveGeneratedTalkStudy(
   ctx: ActionCtx,
-  {
-    source,
-    talkId,
-  }: {
-    source: TalkSummarySource & { transcript: string };
+  args: {
+    source: TalkSummaryWithTranscript;
     talkId: Id<'talks'>;
   }
 ) {
@@ -87,10 +84,10 @@ export async function saveGeneratedTalkStudy(
 
   try {
     body = await talkStudyGenerator.generate({
-      scripture: source.scripture,
-      speaker: source.speaker,
-      title: source.title,
-      transcript: source.transcript,
+      scripture: args.source.scripture,
+      speaker: args.source.speaker,
+      title: args.source.title,
+      transcript: args.source.transcript,
     });
   } catch {
     return toFailedResult('UPSTREAM_ERROR');
@@ -100,7 +97,7 @@ export async function saveGeneratedTalkStudy(
     await ctx.runMutation(internal.talkFeatures.saveTalkFeatureDraft, {
       body,
       kind: 'study',
-      talkId,
+      talkId: args.talkId,
     });
   } catch (error) {
     if (isConflictError(error)) {
@@ -126,11 +123,11 @@ export type TalkStudyGenerateResult =
 
 export async function generateTalkStudy(
   ctx: ActionCtx,
-  { talkId }: { talkId: Id<'talks'> }
+  args: { talkId: Id<'talks'> }
 ): Promise<TalkStudyGenerateResult> {
   const source = await ctx.runQuery(internal.talks.loadTalkDraftSource, {
     asAdmin: true,
-    talkId,
+    talkId: args.talkId,
   });
 
   if (source.studyReviewed) {
@@ -144,7 +141,7 @@ export async function generateTalkStudy(
   const loaded = await loadTranscriptForGenerate(ctx, {
     existingTranscript: source.transcript,
     mediaUrl: source.mediaUrl,
-    talkId,
+    talkId: args.talkId,
   });
 
   if ('errorCode' in loaded) {
@@ -153,7 +150,7 @@ export async function generateTalkStudy(
 
   return await saveGeneratedTalkStudy(ctx, {
     source: { ...source, transcript: loaded.transcript },
-    talkId,
+    talkId: args.talkId,
   });
 }
 

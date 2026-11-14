@@ -57,11 +57,7 @@ export const continueCheck = internalAction({
 
 async function runMediaHealthPage(
   ctx: ActionCtx,
-  {
-    items,
-    paginationCursor,
-    source,
-  }: {
+  args: {
     items: MediaHealthDigestItem[];
     paginationCursor: string | null;
     source: 'clips' | 'talks';
@@ -72,18 +68,22 @@ async function runMediaHealthPage(
       internal.mediaHealth.listPublishedMediaPage,
       {
         paginationOpts: {
-          cursor: paginationCursor,
+          cursor: args.paginationCursor,
           numItems: PAGE_SIZE,
         },
-        source,
+        source: args.source,
       }
     );
 
     const digestItems = await checkMediaPageItems(ctx, {
-      items,
+      items: args.items,
       pageItems: result.page,
     });
-    const nextPage = nextMediaHealthPage(result, { source }, digestItems);
+    const nextPage = nextMediaHealthPage(
+      result,
+      { source: args.source },
+      digestItems
+    );
 
     if (nextPage) {
       await ctx.scheduler.runAfter(
@@ -116,9 +116,9 @@ interface PublishedMediaItem {
 
 async function sendMediaHealthDigest(
   ctx: ActionCtx,
-  { items }: { items: MediaHealthDigestItem[] }
+  args: { items: MediaHealthDigestItem[] }
 ) {
-  const digest = buildMediaHealthDigest(items);
+  const digest = buildMediaHealthDigest(args.items);
 
   if (!digest) {
     return;
@@ -140,60 +140,54 @@ async function sendMediaHealthDigest(
 
 async function checkMediaPageItems(
   ctx: ActionCtx,
-  {
-    items,
-    pageItems,
-  }: {
+  args: {
     items: MediaHealthDigestItem[];
     pageItems: PublishedMediaItem[];
   }
 ): Promise<MediaHealthDigestItem[]> {
-  if (pageItems.length === 0) {
-    return items;
+  if (args.pageItems.length === 0) {
+    return args.items;
   }
 
-  const [item] = pageItems;
+  const [item] = args.pageItems;
 
   if (!item) {
-    return items;
+    return args.items;
   }
 
   const nextItems = await checkPublishedMediaItem(ctx, {
     item,
-    items,
+    items: args.items,
   });
 
   return await checkMediaPageItems(ctx, {
     items: nextItems,
-    pageItems: pageItems.slice(1),
+    pageItems: args.pageItems.slice(1),
   });
 }
 
 async function checkPublishedMediaItem(
   ctx: ActionCtx,
-  {
-    item,
-    items,
-  }: {
+  args: {
     item: PublishedMediaItem;
     items: MediaHealthDigestItem[];
   }
 ): Promise<MediaHealthDigestItem[]> {
-  const check = await checkMediaUrl(item.mediaUrl);
+  const check = await checkMediaUrl(args.item.mediaUrl);
 
   if (check.skipped) {
-    return items;
+    return args.items;
   }
 
   const outcome = await ctx.runMutation(internal.mediaHealth.upsertMediaCheck, {
     checkedAt: Date.now(),
-    entityId: item.entityId,
-    entityTable: item.entityTable,
-    mediaUrl: item.mediaUrl,
+    entityId: args.item.entityId,
+    entityTable: args.item.entityTable,
+    mediaUrl: args.item.mediaUrl,
     observedStatus: check.status,
   });
 
-  return appendMediaHealthItem(item, outcome, items);
+  return appendMediaHealthItem(args.item, outcome, args.items);
 }
 
 function nextMediaHealthPage(

@@ -3,13 +3,13 @@ import type { MutationCtx } from '../../_generated/server';
 
 export async function insertUserFavoriteTalk(
   ctx: MutationCtx,
-  {
-    talkId,
-    userId,
-  }: {
+  args: {
     talkId: Id<'talks'>;
     userId: string;
   }
 ) {
-  return await ctx.db.insert('userFavoriteTalks', { talkId, userId });
+  return await ctx.db.insert('userFavoriteTalks', {
+    talkId: args.talkId,
+    userId: args.userId,
+  });
 }

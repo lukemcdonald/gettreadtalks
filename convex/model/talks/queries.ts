@@ -2,7 +2,9 @@ import type { Doc, Id } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
 import type { ContentSortOption } from '../../lib/sort';
 import type { StatusFilterType } from '../../lib/types';
+import type { talkStudyStatus } from './validators';
 import type { PaginationOptions } from 'convex/server';
+import type { Infer } from 'convex/values';
 
 import { getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
 import {
@@ -454,18 +456,17 @@ function compareTalksForStatusList(
   return byPublishedAt(left, right);
 }
 
+type StudyListStatus = 'none' | Infer<typeof talkStudyStatus>;
+
 async function filterTalksByStudyStatus(
   ctx: QueryCtx,
-  {
-    studyStatus,
-    talks,
-  }: {
-    studyStatus: 'draft' | 'none' | 'published';
+  args: {
+    studyStatus: StudyListStatus;
     talks: Doc<'talks'>[];
   }
 ) {
   const features = await Promise.all(
-    talks.map((talk) =>
+    args.talks.map((talk) =>
       loadTalkFeature(ctx, {
         kind: 'study',
         talkId: talk._id,
@@ -478,14 +479,14 @@ async function filterTalksByStudyStatus(
     )
   );
 
-  return talks.filter((talk) => {
+  return args.talks.filter((talk) => {
     const current = statusByTalkId.get(talk._id);
 
-    if (studyStatus === 'none') {
+    if (args.studyStatus === 'none') {
       return current === undefined;
     }
 
-    return current === studyStatus;
+    return current === args.studyStatus;
   });
 }
 
@@ -533,16 +534,13 @@ async function pageTalksFromSource<T>(
 
 async function listTalksWithoutStudy(
   ctx: QueryCtx,
-  {
-    paginationOpts,
-    status,
-  }: {
+  args: {
     paginationOpts: PaginationOptions;
     status: StatusFilterType;
   }
 ) {
   return await pageTalksFromSource(
-    talksByStatusQuery(ctx, { status }),
+    talksByStatusQuery(ctx, { status: args.status }),
     async (talk) => {
       const feature = await loadTalkFeature(ctx, {
         kind: 'study',
@@ -555,71 +553,69 @@ async function listTalksWithoutStudy(
 
       return talk;
     },
-    paginationOpts
+    args.paginationOpts
   );
 }
 
 async function listTalksWithStudyStatus(
   ctx: QueryCtx,
-  {
-    paginationOpts,
-    status,
-    studyStatus,
-  }: {
+  args: {
     paginationOpts: PaginationOptions;
     status: StatusFilterType;
-    studyStatus: 'draft' | 'published';
+    studyStatus: Infer<typeof talkStudyStatus>;
   }
 ) {
   const features = await ctx.db
     .query('talkFeatures')
     .withIndex('by_kind_and_status', (q) =>
-      q.eq('kind', 'study').eq('status', studyStatus)
+      q.eq('kind', 'study').eq('status', args.studyStatus)
     )
     .collect();
   const loaded = await Promise.all(
     features.map((feature) => ctx.db.get('talks', feature.talkId))
   );
   const talks = loaded.filter(
-    (talk): talk is Doc<'talks'> => talk !== null && hasTalkStatus(talk, status)
+    (talk): talk is Doc<'talks'> =>
+      talk !== null && hasTalkStatus(talk, args.status)
   );
 
-  talks.sort((left, right) => compareTalksForStatusList(left, right, status));
+  talks.sort((left, right) =>
+    compareTalksForStatusList(left, right, args.status)
+  );
 
-  return paginateArray(talks, paginationOpts.cursor, paginationOpts.numItems);
+  return paginateArray(
+    talks,
+    args.paginationOpts.cursor,
+    args.paginationOpts.numItems
+  );
 }
 
 async function listAllTalksByStudyStatus(
   ctx: QueryCtx,
-  {
-    paginationOpts,
-    search,
-    status,
-    studyStatus,
-  }: {
+  args: {
     paginationOpts: PaginationOptions;
     search?: string;
     status: StatusFilterType;
-    studyStatus: 'draft' | 'none' | 'published';
+    studyStatus: StudyListStatus;
   }
 ) {
   await requireAdmin(ctx);
 
-  const queryText = normalizeSearchQuery(search ?? '');
+  const queryText = normalizeSearchQuery(args.search ?? '');
 
   if (queryText) {
     const matches = await filterTalksByStudyStatus(ctx, {
-      studyStatus,
+      studyStatus: args.studyStatus,
       talks: await searchTalksByTitleOrSpeaker(ctx, {
         limit: LIST_SEARCH_LIMIT,
         queryText,
-        status,
+        status: args.status,
       }),
     });
     const { continueCursor, isDone, page } = paginateArray(
       matches,
-      paginationOpts.cursor,
-      paginationOpts.numItems
+      args.paginationOpts.cursor,
+      args.paginationOpts.numItems
     );
 
     return {
@@ -630,15 +626,15 @@ async function listAllTalksByStudyStatus(
   }
 
   const result =
-    studyStatus === 'none'
+    args.studyStatus === 'none'
       ? await listTalksWithoutStudy(ctx, {
-          paginationOpts,
-          status,
+          paginationOpts: args.paginationOpts,
+          status: args.status,
         })
       : await listTalksWithStudyStatus(ctx, {
-          paginationOpts,
-          status,
-          studyStatus,
+          paginationOpts: args.paginationOpts,
+          status: args.status,
+          studyStatus: args.studyStatus,
         });
 
   return {
@@ -759,11 +755,11 @@ export const listTalksWithoutTranscript = query({
 
 async function loadTalkTranscript(
   ctx: QueryCtx,
-  { talkId }: { talkId: Id<'talks'> }
+  args: { talkId: Id<'talks'> }
 ) {
   await requireAdmin(ctx);
 
-  return await getOneFrom(ctx.db, 'talkTranscripts', 'by_talkId', talkId);
+  return await getOneFrom(ctx.db, 'talkTranscripts', 'by_talkId', args.talkId);
 }
 
 /**

@@ -33,15 +33,12 @@ import { statusType, talkTranscriptFetchErrorCode } from './validators';
 
 async function setTalkTopics(
   ctx: MutationCtx,
-  {
-    talkId,
-    topicIds,
-  }: {
+  args: {
     talkId: Id<'talks'>;
     topicIds: Id<'topics'>[];
   }
 ) {
-  const uniqueTopicIds = [...new Set(topicIds)];
+  const uniqueTopicIds = [...new Set(args.topicIds)];
 
   await Promise.all(
     uniqueTopicIds.map((topicId) =>
@@ -54,7 +51,7 @@ async function setTalkTopics(
 
   const existing = await ctx.db
     .query('talksOnTopics')
-    .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
+    .withIndex('by_talkId', (q) => q.eq('talkId', args.talkId))
     .collect();
 
   const existingIds = new Set(existing.map((row) => row.topicId));
@@ -71,7 +68,7 @@ async function setTalkTopics(
       .filter((topicId) => !existingIds.has(topicId))
       .map((topicId) =>
         ctx.db.insert('talksOnTopics', {
-          talkId,
+          talkId: args.talkId,
           topicId,
         })
       )
@@ -80,13 +77,7 @@ async function setTalkTopics(
 
 async function applyTalkSlugUpdate(
   ctx: MutationCtx,
-  {
-    rawSlug,
-    speakerId,
-    talk,
-    talkId,
-    updates,
-  }: {
+  args: {
     rawSlug: string;
     speakerId: Id<'speakers'>;
     talk: Doc<'talks'>;
@@ -94,21 +85,21 @@ async function applyTalkSlugUpdate(
     updates: Partial<Doc<'talks'>>;
   }
 ) {
-  const newSlug = slugify(rawSlug);
+  const newSlug = slugify(args.rawSlug);
 
   if (!newSlug) {
     throwValidationError('Slug cannot be empty', 'slug');
   }
 
-  if (newSlug === talk.slug) {
+  if (newSlug === args.talk.slug) {
     return;
   }
 
   if (
     await talkSlugExistsForSpeaker(ctx, {
-      excludeId: talkId,
+      excludeId: args.talkId,
       slug: newSlug,
-      speakerId,
+      speakerId: args.speakerId,
     })
   ) {
     throwDuplicateSlug(
@@ -117,7 +108,7 @@ async function applyTalkSlugUpdate(
     );
   }
 
-  updates.slug = newSlug;
+  args.updates.slug = newSlug;
 }
 
 function publishedAtForTalk({

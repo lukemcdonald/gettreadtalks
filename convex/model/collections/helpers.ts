@@ -1,5 +1,7 @@
 import type { Doc } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
+import type { PublishStateFilter } from '../../lib/types';
+import type { AdminListPageArgs, SearchArgs } from '../search/helpers';
 import type { PaginationOptions } from 'convex/server';
 
 import { asyncMap } from 'convex-helpers';
@@ -22,10 +24,11 @@ export async function listPublishedCollections(ctx: QueryCtx) {
 
 export async function listPublishedCollectionsPage(
   ctx: QueryCtx,
-  { paginationOpts }: { paginationOpts: PaginationOptions }
+  args: { paginationOpts: PaginationOptions }
 ) {
-  const collectionPages =
-    await publishedCollectionsQuery(ctx).paginate(paginationOpts);
+  const collectionPages = await publishedCollectionsQuery(ctx).paginate(
+    args.paginationOpts
+  );
 
   return {
     ...collectionPages,
@@ -35,27 +38,18 @@ export async function listPublishedCollectionsPage(
   };
 }
 
-export async function searchCollections(
-  ctx: QueryCtx,
-  {
-    limit,
-    queryText,
-  }: {
-    limit: number;
-    queryText: string;
-  }
-) {
+export async function searchCollections(ctx: QueryCtx, args: SearchArgs) {
   return await ctx.db
     .query('collections')
-    .withSearchIndex('search_title', (q) => q.search('title', queryText))
-    .take(limit);
+    .withSearchIndex('search_title', (q) => q.search('title', args.queryText))
+    .take(args.limit);
 }
 
 export async function loadSpeakersForTalks(
   ctx: QueryCtx,
-  { talks }: { talks: Doc<'talks'>[] }
+  args: { talks: Doc<'talks'>[] }
 ) {
-  const speakerIds = [...new Set(talks.map((talk) => talk.speakerId))];
+  const speakerIds = [...new Set(args.talks.map((talk) => talk.speakerId))];
   const speakers = await getAll(ctx.db, speakerIds);
 
   return speakers.filter((speaker) => speaker !== null);
@@ -63,9 +57,9 @@ export async function loadSpeakersForTalks(
 
 export async function enrichCollectionsForAdmin(
   ctx: QueryCtx,
-  { collections }: { collections: Doc<'collections'>[] }
+  args: { collections: Doc<'collections'>[] }
 ) {
-  return await asyncMap(collections, async (collection) => {
+  return await asyncMap(args.collections, async (collection) => {
     const talks = await listTalksForCollection(ctx, {
       collectionId: collection._id,
     });
@@ -83,44 +77,35 @@ export async function enrichCollectionsForAdmin(
 
 async function filterCollectionsByStatus(
   ctx: QueryCtx,
-  {
-    collections,
-    status,
-  }: {
+  args: {
     collections: Doc<'collections'>[];
-    status: 'all' | 'draft' | 'published';
+    status: PublishStateFilter;
   }
 ) {
-  if (status === 'all') {
-    return collections;
+  if (args.status === 'all') {
+    return args.collections;
   }
 
   const published = await filterCollectionsWithPublishedTalks(ctx, {
-    collections,
+    collections: args.collections,
   });
 
-  if (status === 'published') {
+  if (args.status === 'published') {
     return published;
   }
 
   const publishedIds = new Set(published.map((collection) => collection._id));
 
-  return collections.filter((collection) => !publishedIds.has(collection._id));
+  return args.collections.filter(
+    (collection) => !publishedIds.has(collection._id)
+  );
 }
 
 export async function listCollectionsForAdmin(
   ctx: QueryCtx,
-  {
-    paginationOpts,
-    search,
-    status,
-  }: {
-    paginationOpts: PaginationOptions;
-    search?: string;
-    status: 'all' | 'draft' | 'published';
-  }
+  args: AdminListPageArgs
 ) {
-  const queryText = normalizeSearchQuery(search ?? '');
+  const queryText = normalizeSearchQuery(args.search ?? '');
   const collections =
     queryText.length > 0
       ? await searchCollections(ctx, {
@@ -130,12 +115,12 @@ export async function listCollectionsForAdmin(
       : await publishedCollectionsQuery(ctx).collect();
   const filtered = await filterCollectionsByStatus(ctx, {
     collections,
-    status,
+    status: args.status,
   });
   const result = paginateArray(
     filtered,
-    paginationOpts.cursor,
-    paginationOpts.numItems
+    args.paginationOpts.cursor,
+    args.paginationOpts.numItems
   );
 
   return {

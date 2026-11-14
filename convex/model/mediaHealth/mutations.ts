@@ -1,6 +1,6 @@
 import type { Doc } from '../../_generated/dataModel';
 import type { MutationCtx } from '../../_generated/server';
-import type { MediaCheckStatus } from './validators';
+import type { MediaCheckKey, MediaCheckStatus } from './validators';
 
 import { v } from 'convex/values';
 
@@ -63,23 +63,8 @@ export const stampMediaChecksNotified = internalMutation({
   returns: v.null(),
 });
 
-async function loadExistingCheck(
-  ctx: MutationCtx,
-  {
-    entityId,
-    entityTable,
-    mediaUrl,
-  }: {
-    entityId: string;
-    entityTable: 'clips' | 'talks';
-    mediaUrl: string;
-  }
-) {
-  const exact = await loadMediaCheckByEntityUrl(ctx, {
-    entityId,
-    entityTable,
-    mediaUrl,
-  });
+async function loadExistingCheck(ctx: MutationCtx, args: MediaCheckKey) {
+  const exact = await loadMediaCheckByEntityUrl(ctx, args);
 
   if (exact) {
     return exact;
@@ -88,14 +73,23 @@ async function loadExistingCheck(
   return await ctx.db
     .query('mediaChecks')
     .withIndex('by_entityTable_and_entityId_and_mediaUrl', (q) =>
-      q.eq('entityTable', entityTable).eq('entityId', entityId)
+      q.eq('entityTable', args.entityTable).eq('entityId', args.entityId)
     )
     .first();
 }
 
 async function writeMediaCheck(
   ctx: MutationCtx,
-  {
+  args: MediaCheckKey &
+    Pick<
+      Doc<'mediaChecks'>,
+      'checkedAt' | 'firstBrokenAt' | 'lastNotifiedAt'
+    > & {
+      existing: Doc<'mediaChecks'> | null;
+      persistStatus: MediaCheckStatus;
+    }
+) {
+  const {
     checkedAt,
     entityId,
     entityTable,
@@ -104,17 +98,7 @@ async function writeMediaCheck(
     lastNotifiedAt,
     mediaUrl,
     persistStatus,
-  }: {
-    checkedAt: number;
-    entityId: string;
-    entityTable: 'clips' | 'talks';
-    existing: Doc<'mediaChecks'> | null;
-    firstBrokenAt?: number;
-    lastNotifiedAt?: number;
-    mediaUrl: string;
-    persistStatus: MediaCheckStatus;
-  }
-) {
+  } = args;
   const fields = {
     checkedAt,
     entityId,

@@ -1,6 +1,6 @@
 import type { Doc, Id } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
-import type { StatusFilterType } from '../../lib/types';
+import type { SearchArgs, StatusSearchArgs } from '../search/helpers';
 import type { PaginationOptions } from 'convex/server';
 
 import { asyncMap } from 'convex-helpers';
@@ -24,9 +24,9 @@ export async function listPublishedClips(ctx: QueryCtx) {
 
 export async function listPublishedClipsPage(
   ctx: QueryCtx,
-  { paginationOpts }: { paginationOpts: PaginationOptions }
+  args: { paginationOpts: PaginationOptions }
 ) {
-  const result = await publishedClipsQuery(ctx).paginate(paginationOpts);
+  const result = await publishedClipsQuery(ctx).paginate(args.paginationOpts);
 
   return {
     ...result,
@@ -34,40 +34,23 @@ export async function listPublishedClipsPage(
   };
 }
 
-export async function searchClips(
-  ctx: QueryCtx,
-  {
-    limit,
-    queryText,
-    status,
-  }: {
-    limit: number;
-    queryText: string;
-    status?: StatusFilterType;
-  }
-) {
+export async function searchClips(ctx: QueryCtx, args: StatusSearchArgs) {
   return await ctx.db
     .query('clips')
-    .withSearchIndex('search_title', searchTitleQuery(queryText, status))
-    .take(limit);
+    .withSearchIndex(
+      'search_title',
+      searchTitleQuery(args.queryText, args.status)
+    )
+    .take(args.limit);
 }
 
-export async function searchPublishedClips(
-  ctx: QueryCtx,
-  {
-    limit,
-    queryText,
-  }: {
-    limit: number;
-    queryText: string;
-  }
-) {
+export async function searchPublishedClips(ctx: QueryCtx, args: SearchArgs) {
   return await loadUntilFull(
     ctx.db
       .query('clips')
       .withSearchIndex(
         'search_title',
-        searchTitleQuery(queryText, 'published')
+        searchTitleQuery(args.queryText, 'published')
       ),
     async (clip) => {
       if (!clip.talkId) {
@@ -78,7 +61,7 @@ export async function searchPublishedClips(
 
       return talk?.status === 'published';
     },
-    limit
+    args.limit
   );
 }
 
@@ -86,9 +69,9 @@ export async function enrichClipsWithSpeaker<
   T extends { speakerId?: Id<'speakers'> },
 >(
   ctx: QueryCtx,
-  { items }: { items: T[] }
+  args: { items: T[] }
 ): Promise<(T & { speaker: Doc<'speakers'> | null })[]> {
-  return await asyncMap(items, async (item: T) => {
+  return await asyncMap(args.items, async (item: T) => {
     const speaker = item.speakerId
       ? await ctx.db.get('speakers', item.speakerId)
       : null;
@@ -99,9 +82,11 @@ export async function enrichClipsWithSpeaker<
 
 export async function enrichClipsForAdmin(
   ctx: QueryCtx,
-  { clips }: { clips: Doc<'clips'>[] }
+  args: { clips: Doc<'clips'>[] }
 ) {
-  const clipsWithSpeakers = await enrichClipsWithSpeaker(ctx, { items: clips });
+  const clipsWithSpeakers = await enrichClipsWithSpeaker(ctx, {
+    items: args.clips,
+  });
 
   return await asyncMap(clipsWithSpeakers, async (clip) => {
     const talk = clip.talkId ? await ctx.db.get('talks', clip.talkId) : null;

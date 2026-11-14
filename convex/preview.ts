@@ -76,10 +76,7 @@ function requireSeedId<Table extends TableNames>(
 
 async function upsertCredentialAccount(
   ctx: MutationCtx,
-  {
-    passwordHash,
-    userId,
-  }: {
+  args: {
     passwordHash: string;
     userId: string;
   }
@@ -97,7 +94,7 @@ async function upsertCredentialAccount(
         {
           connector: 'AND',
           field: 'userId',
-          value: userId,
+          value: args.userId,
         },
       ],
     }
@@ -110,7 +107,7 @@ async function upsertCredentialAccount(
       input: {
         model: 'account',
         update: {
-          password: passwordHash,
+          password: args.passwordHash,
           updatedAt: now,
         },
         where: [
@@ -128,12 +125,12 @@ async function upsertCredentialAccount(
   await ctx.runMutation(components.betterAuth.adapter.create, {
     input: {
       data: {
-        accountId: userId,
+        accountId: args.userId,
         createdAt: now,
-        password: passwordHash,
+        password: args.passwordHash,
         providerId: 'credential',
         updatedAt: now,
-        userId,
+        userId: args.userId,
       },
       model: 'account',
     },
@@ -142,8 +139,9 @@ async function upsertCredentialAccount(
 
 async function upsertSpeaker(
   ctx: MutationCtx,
-  { speaker }: { speaker: PreviewRecord<typeof PREVIEW_SPEAKERS> }
+  args: { speaker: PreviewRecord<typeof PREVIEW_SPEAKERS> }
 ): Promise<Id<'speakers'>> {
+  const { speaker } = args;
   const existing = await getOneFrom(
     ctx.db,
     'speakers',
@@ -171,8 +169,9 @@ async function upsertSpeaker(
 
 async function upsertTopic(
   ctx: MutationCtx,
-  { topic }: { topic: PreviewRecord<typeof PREVIEW_TOPICS> }
+  args: { topic: PreviewRecord<typeof PREVIEW_TOPICS> }
 ): Promise<Id<'topics'>> {
+  const { topic } = args;
   const existing = await getOneFrom(ctx.db, 'topics', 'by_slug', topic.slug);
 
   if (existing) {
@@ -190,8 +189,9 @@ async function upsertTopic(
 
 async function upsertCollection(
   ctx: MutationCtx,
-  { collection }: { collection: PreviewRecord<typeof PREVIEW_COLLECTIONS> }
+  args: { collection: PreviewRecord<typeof PREVIEW_COLLECTIONS> }
 ): Promise<Id<'collections'>> {
+  const { collection } = args;
   const existing = await getOneFrom(
     ctx.db,
     'collections',
@@ -214,16 +214,13 @@ async function upsertCollection(
 
 async function upsertTalk(
   ctx: MutationCtx,
-  {
-    collectionId,
-    speakerId,
-    talk,
-  }: {
+  args: {
     collectionId: Id<'collections'>;
     speakerId: Id<'speakers'>;
     talk: PreviewRecord<typeof PREVIEW_TALKS>;
   }
 ): Promise<Id<'talks'>> {
+  const { collectionId, speakerId, talk } = args;
   const existing = await getOneFrom(ctx.db, 'talks', 'by_slug', talk.slug);
   const publishedAt =
     talk.status === 'published' ? talk.publishedAt : undefined;
@@ -266,16 +263,13 @@ async function upsertTalk(
 
 async function upsertClip(
   ctx: MutationCtx,
-  {
-    clip,
-    speakerId,
-    talkId,
-  }: {
+  args: {
     clip: PreviewRecord<typeof PREVIEW_CLIPS>;
     speakerId: Id<'speakers'>;
     talkId: Id<'talks'>;
   }
 ): Promise<Id<'clips'>> {
+  const { clip, speakerId, talkId } = args;
   const existing = await getOneFrom(ctx.db, 'clips', 'by_slug', clip.slug);
   const publishedAt =
     clip.status === 'published' ? clip.publishedAt : undefined;
@@ -306,18 +300,15 @@ async function upsertClip(
 
 async function upsertTalkTopics(
   ctx: MutationCtx,
-  {
-    talkId,
-    topicIds,
-  }: {
+  args: {
     talkId: Id<'talks'>;
     topicIds: Id<'topics'>[];
   }
 ) {
-  const uniqueTopicIds = [...new Set(topicIds)];
+  const uniqueTopicIds = [...new Set(args.topicIds)];
   const existing = await ctx.db
     .query('talksOnTopics')
-    .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
+    .withIndex('by_talkId', (q) => q.eq('talkId', args.talkId))
     .collect();
   const existingIds = new Set(existing.map((row) => row.topicId));
   const nextIds = new Set(uniqueTopicIds);
@@ -333,7 +324,7 @@ async function upsertTalkTopics(
       .filter((topicId) => !existingIds.has(topicId))
       .map((topicId) =>
         ctx.db.insert('talksOnTopics', {
-          talkId,
+          talkId: args.talkId,
           topicId,
         })
       )

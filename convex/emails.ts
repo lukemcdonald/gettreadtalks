@@ -303,15 +303,12 @@ function redactEmailAddresses(message: string): string {
  */
 async function sendTrackedEmail(
   ctx: ActionCtx | MutationCtx,
-  {
-    emailParams,
-    kind,
-  }: {
+  args: {
     emailParams: SendEmailOptions;
     kind: EmailKind;
   }
 ): Promise<EmailId> {
-  const emailId = await resend.sendEmail(ctx, emailParams);
+  const emailId = await resend.sendEmail(ctx, args.emailParams);
 
   try {
     await ctx.scheduler.runAfter(
@@ -319,7 +316,7 @@ async function sendTrackedEmail(
       internal.emails.checkSendResult,
       {
         emailId,
-        kind,
+        kind: args.kind,
         startedAt: Date.now(),
       }
     );
@@ -371,13 +368,7 @@ function normalizeRecipients(to: string | string[]): string[] {
 
 async function suppressRecipients(
   ctx: MutationCtx,
-  {
-    bounceSubType,
-    bounceType,
-    emails,
-    reason,
-    resendEmailId,
-  }: {
+  args: {
     bounceSubType?: string;
     bounceType?: string;
     emails: string[];
@@ -385,7 +376,7 @@ async function suppressRecipients(
     resendEmailId: string;
   }
 ) {
-  const uniqueEmails = [...new Set(emails)];
+  const uniqueEmails = [...new Set(args.emails)];
 
   await Promise.all(
     uniqueEmails.map(async (email) => {
@@ -399,15 +390,15 @@ async function suppressRecipients(
       }
 
       await ctx.db.insert('emailSuppressions', {
-        bounceSubType,
-        bounceType,
+        bounceSubType: args.bounceSubType,
+        bounceType: args.bounceType,
         email,
-        reason,
-        resendEmailId,
+        reason: args.reason,
+        resendEmailId: args.resendEmailId,
         suppressedAt: Date.now(),
       });
 
-      console.log('Email suppressed:', email, 'reason:', reason);
+      console.log('Email suppressed:', email, 'reason:', args.reason);
     })
   );
 }

@@ -27,13 +27,13 @@ export async function insertTopic(
 
 export async function insertTalkOnTopic(
   ctx: MutationCtx,
-  {
-    talkId,
-    topicId,
-  }: {
+  args: {
     talkId: Id<'talks'>;
     topicId: Id<'topics'>;
   }
 ) {
-  return await ctx.db.insert('talksOnTopics', { talkId, topicId });
+  return await ctx.db.insert('talksOnTopics', {
+    talkId: args.talkId,
+    topicId: args.topicId,
+  });
 }

@@ -14,22 +14,18 @@ const STUDY_BODY = '## Main points\n\nA confirmed study draft.';
 
 async function insertStudy(
   ctx: MutationCtx,
-  {
-    body,
-    status,
-    talkId,
-  }: {
+  args: {
     body?: string;
     status?: 'draft' | 'published';
     talkId: Id<'talks'>;
   }
 ) {
   return await ctx.db.insert('talkFeatures', {
-    body: body ?? STUDY_BODY,
+    body: args.body ?? STUDY_BODY,
     generatedAt: Date.now(),
     kind: 'study',
-    status: status ?? 'draft',
-    talkId,
+    status: args.status ?? 'draft',
+    talkId: args.talkId,
     updatedAt: Date.now(),
   });
 }

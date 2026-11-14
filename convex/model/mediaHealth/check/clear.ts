@@ -1,4 +1,5 @@
 import type { MutationCtx } from '../../../_generated/server';
+import type { MediaCheckKey } from '../validators';
 
 import { deleteAll } from '../../../lib/utils';
 
@@ -11,18 +12,12 @@ export function shouldClearMediaChecks(args: {
 
 export async function clearMediaChecksForEntity(
   ctx: MutationCtx,
-  {
-    entityId,
-    entityTable,
-  }: {
-    entityId: string;
-    entityTable: 'clips' | 'talks';
-  }
+  args: Pick<MediaCheckKey, 'entityId' | 'entityTable'>
 ) {
   const rows = await ctx.db
     .query('mediaChecks')
     .withIndex('by_entityTable_and_entityId_and_mediaUrl', (q) =>
-      q.eq('entityTable', entityTable).eq('entityId', entityId)
+      q.eq('entityTable', args.entityTable).eq('entityId', args.entityId)
     )
     .collect();
 
@@ -31,16 +26,7 @@ export async function clearMediaChecksForEntity(
 
 export async function clearStaleMediaChecks(
   ctx: MutationCtx,
-  {
-    entityId,
-    entityTable,
-    nextMediaUrl,
-    nextStatus,
-    previousMediaUrl,
-    previousStatus,
-  }: {
-    entityId: string;
-    entityTable: 'clips' | 'talks';
+  args: Pick<MediaCheckKey, 'entityId' | 'entityTable'> & {
     nextMediaUrl?: string;
     nextStatus?: string;
     previousMediaUrl: string;
@@ -50,15 +36,16 @@ export async function clearStaleMediaChecks(
   if (
     !shouldClearMediaChecks({
       mediaUrlChanged:
-        nextMediaUrl !== undefined && nextMediaUrl !== previousMediaUrl,
-      published: (nextStatus ?? previousStatus) === 'published',
+        args.nextMediaUrl !== undefined &&
+        args.nextMediaUrl !== args.previousMediaUrl,
+      published: (args.nextStatus ?? args.previousStatus) === 'published',
     })
   ) {
     return;
   }
 
   await clearMediaChecksForEntity(ctx, {
-    entityId,
-    entityTable,
+    entityId: args.entityId,
+    entityTable: args.entityTable,
   });
 }

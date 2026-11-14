@@ -1,4 +1,5 @@
 import type { MutationCtx, QueryCtx } from '../../_generated/server';
+import type { MediaCheckKey } from './validators';
 import type { PaginationOptions } from 'convex/server';
 
 import {
@@ -90,23 +91,15 @@ export const listPublishedMediaPage = internalQuery({
 
 export function loadMediaCheckByEntityUrl(
   ctx: MutationCtx | QueryCtx,
-  {
-    entityId,
-    entityTable,
-    mediaUrl,
-  }: {
-    entityId: string;
-    entityTable: 'clips' | 'talks';
-    mediaUrl: string;
-  }
+  args: MediaCheckKey
 ) {
   return ctx.db
     .query('mediaChecks')
     .withIndex('by_entityTable_and_entityId_and_mediaUrl', (q) =>
       q
-        .eq('entityTable', entityTable)
-        .eq('entityId', entityId)
-        .eq('mediaUrl', mediaUrl)
+        .eq('entityTable', args.entityTable)
+        .eq('entityId', args.entityId)
+        .eq('mediaUrl', args.mediaUrl)
     )
     .unique();
 }

@@ -37,9 +37,9 @@ function isAuthorizedEnrichmentRequest(req: Request) {
   );
 }
 
-async function saveEnrichment(ctx: ActionCtx, { req }: { req: Request }) {
+async function saveEnrichment(ctx: ActionCtx, args: { req: Request }) {
   try {
-    const body = parseEnrichmentBody(await req.json());
+    const body = parseEnrichmentBody(await args.req.json());
     let summaryTalkId = null;
     let transcriptId = null;
 

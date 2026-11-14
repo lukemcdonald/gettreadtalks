@@ -1,5 +1,7 @@
 import type { Doc } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
+import type { PublishStateFilter } from '../../lib/types';
+import type { AdminListPageArgs, SearchArgs } from '../search/helpers';
 import type { PaginationOptions } from 'convex/server';
 
 import { asyncMap } from 'convex-helpers';
@@ -28,9 +30,11 @@ export async function listPublishedSpeakers(ctx: QueryCtx) {
 
 export async function listPublishedSpeakersPage(
   ctx: QueryCtx,
-  { paginationOpts }: { paginationOpts: PaginationOptions }
+  args: { paginationOpts: PaginationOptions }
 ) {
-  const result = await publishedSpeakersQuery(ctx).paginate(paginationOpts);
+  const result = await publishedSpeakersQuery(ctx).paginate(
+    args.paginationOpts
+  );
 
   return {
     ...result,
@@ -40,15 +44,12 @@ export async function listPublishedSpeakersPage(
 
 async function searchSpeakerDocuments(
   ctx: QueryCtx,
-  {
-    queryText,
-    take,
-  }: {
+  args: {
     queryText: string;
     take: number;
   }
 ) {
-  const phrases = searchPhrases(queryText);
+  const phrases = searchPhrases(args.queryText);
   const matches = await Promise.all([
     ...phrases.map((phrase) =>
       ctx.db
@@ -56,62 +57,44 @@ async function searchSpeakerDocuments(
         .withSearchIndex('search_firstName', (q) =>
           q.search('firstName', phrase)
         )
-        .take(take)
+        .take(args.take)
     ),
     ...phrases.map((phrase) =>
       ctx.db
         .query('speakers')
         .withSearchIndex('search_lastName', (q) => q.search('lastName', phrase))
-        .take(take)
+        .take(args.take)
     ),
   ]);
 
   return uniqueById(matches.flat());
 }
 
-export async function searchSpeakers(
-  ctx: QueryCtx,
-  {
-    limit,
-    queryText,
-  }: {
-    limit: number;
-    queryText: string;
-  }
-) {
+export async function searchSpeakers(ctx: QueryCtx, args: SearchArgs) {
   const speakers = await searchSpeakerDocuments(ctx, {
-    queryText,
-    take: limit,
+    queryText: args.queryText,
+    take: args.limit,
   });
 
-  return speakers.slice(0, limit);
+  return speakers.slice(0, args.limit);
 }
 
-export async function searchPublishedSpeakers(
-  ctx: QueryCtx,
-  {
-    limit,
-    queryText,
-  }: {
-    limit: number;
-    queryText: string;
-  }
-) {
+export async function searchPublishedSpeakers(ctx: QueryCtx, args: SearchArgs) {
   const speakers = await filterSpeakersWithPublicContent(ctx, {
     speakers: await searchSpeakerDocuments(ctx, {
-      queryText,
-      take: limit * UNFILTERED_SEARCH_MULTIPLIER,
+      queryText: args.queryText,
+      take: args.limit * UNFILTERED_SEARCH_MULTIPLIER,
     }),
   });
 
-  return speakers.slice(0, limit);
+  return speakers.slice(0, args.limit);
 }
 
 export async function enrichSpeakersForAdmin(
   ctx: QueryCtx,
-  { speakers }: { speakers: Doc<'speakers'>[] }
+  args: { speakers: Doc<'speakers'>[] }
 ) {
-  return await asyncMap(speakers, async (speaker) => {
+  return await asyncMap(args.speakers, async (speaker) => {
     const [clips, publishedSpeakers, talks] = await Promise.all([
       getManyFrom(ctx.db, 'clips', 'by_speakerId', speaker._id),
       filterSpeakersWithPublicContent(ctx, { speakers: [speaker] }),
@@ -135,42 +118,33 @@ export async function enrichSpeakersForAdmin(
 
 async function filterSpeakersByStatus(
   ctx: QueryCtx,
-  {
-    speakers,
-    status,
-  }: {
+  args: {
     speakers: Doc<'speakers'>[];
-    status: 'all' | 'draft' | 'published';
+    status: PublishStateFilter;
   }
 ) {
-  if (status === 'all') {
-    return speakers;
+  if (args.status === 'all') {
+    return args.speakers;
   }
 
-  const published = await filterSpeakersWithPublicContent(ctx, { speakers });
+  const published = await filterSpeakersWithPublicContent(ctx, {
+    speakers: args.speakers,
+  });
 
-  if (status === 'published') {
+  if (args.status === 'published') {
     return published;
   }
 
   const publishedIds = new Set(published.map((speaker) => speaker._id));
 
-  return speakers.filter((speaker) => !publishedIds.has(speaker._id));
+  return args.speakers.filter((speaker) => !publishedIds.has(speaker._id));
 }
 
 export async function listSpeakersForAdmin(
   ctx: QueryCtx,
-  {
-    paginationOpts,
-    search,
-    status,
-  }: {
-    paginationOpts: PaginationOptions;
-    search?: string;
-    status: 'all' | 'draft' | 'published';
-  }
+  args: AdminListPageArgs
 ) {
-  const queryText = normalizeSearchQuery(search ?? '');
+  const queryText = normalizeSearchQuery(args.search ?? '');
   const speakers =
     queryText.length > 0
       ? await searchSpeakers(ctx, {
@@ -180,12 +154,12 @@ export async function listSpeakersForAdmin(
       : await publishedSpeakersQuery(ctx).collect();
   const filtered = await filterSpeakersByStatus(ctx, {
     speakers,
-    status,
+    status: args.status,
   });
   const result = paginateArray(
     filtered,
-    paginationOpts.cursor,
-    paginationOpts.numItems
+    args.paginationOpts.cursor,
+    args.paginationOpts.numItems
   );
 
   return {

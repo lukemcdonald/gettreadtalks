@@ -9,12 +9,12 @@ import { getOneFrom } from 'convex-helpers/server/relationships';
  */
 async function speakerHasPublicClip(
   ctx: QueryCtx,
-  { speakerId }: { speakerId: Id<'speakers'> }
+  args: { speakerId: Id<'speakers'> }
 ) {
   const clips = ctx.db
     .query('clips')
     .withIndex('by_speakerId_and_status', (q) =>
-      q.eq('speakerId', speakerId).eq('status', 'published')
+      q.eq('speakerId', args.speakerId).eq('status', 'published')
     );
 
   for await (const clip of clips) {
@@ -37,10 +37,10 @@ async function speakerHasPublicClip(
  */
 export async function filterSpeakersWithPublicContent(
   ctx: QueryCtx,
-  { speakers }: { speakers: Doc<'speakers'>[] }
+  args: { speakers: Doc<'speakers'>[] }
 ): Promise<Doc<'speakers'>[]> {
   const results = await Promise.all(
-    speakers.map(async (speaker) => {
+    args.speakers.map(async (speaker) => {
       const hasTalks = await ctx.db
         .query('talks')
         .withIndex('by_speakerId_and_status', (q) =>
@@ -75,10 +75,10 @@ export async function filterSpeakersWithPublicContent(
  */
 export async function filterClipsWithPublishedTalk(
   ctx: QueryCtx,
-  { clips }: { clips: Doc<'clips'>[] }
+  args: { clips: Doc<'clips'>[] }
 ): Promise<Doc<'clips'>[]> {
   const results = await Promise.all(
-    clips.map(async (clip) => {
+    args.clips.map(async (clip) => {
       if (!clip.talkId) {
         return clip;
       }
@@ -97,10 +97,10 @@ export async function filterClipsWithPublishedTalk(
  */
 export async function filterCollectionsWithPublishedTalks(
   ctx: QueryCtx,
-  { collections }: { collections: Doc<'collections'>[] }
+  args: { collections: Doc<'collections'>[] }
 ): Promise<Doc<'collections'>[]> {
   const results = await Promise.all(
-    collections.map(async (collection) => {
+    args.collections.map(async (collection) => {
       const hasTalks = await ctx.db
         .query('talks')
         .withIndex('by_collectionId_and_status', (q) =>
@@ -121,10 +121,10 @@ export async function filterCollectionsWithPublishedTalks(
  */
 export async function filterTopicsWithPublishedTalks(
   ctx: QueryCtx,
-  { topics }: { topics: Doc<'topics'>[] }
+  args: { topics: Doc<'topics'>[] }
 ): Promise<Doc<'topics'>[]> {
   const results = await Promise.all(
-    topics.map(async (topic) => {
+    args.topics.map(async (topic) => {
       for await (const entry of ctx.db
         .query('talksOnTopics')
         .withIndex('by_topicId', (q) => q.eq('topicId', topic._id))) {
@@ -148,10 +148,10 @@ export async function filterTopicsWithPublishedTalks(
  */
 export async function getTalkIdsByTopicSlugs(
   ctx: QueryCtx,
-  { topicSlugs }: { topicSlugs: string[] }
+  args: { topicSlugs: string[] }
 ): Promise<Set<Id<'talks'>> | null> {
   const topics = await Promise.all(
-    topicSlugs.map((slug) => getOneFrom(ctx.db, 'topics', 'by_slug', slug))
+    args.topicSlugs.map((slug) => getOneFrom(ctx.db, 'topics', 'by_slug', slug))
   );
   const validTopics = topics.filter((t): t is Doc<'topics'> => t !== null);
 

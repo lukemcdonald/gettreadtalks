@@ -38,17 +38,16 @@ function hasExistingDraft(text: string | null | undefined, locked: boolean) {
 
 export async function clearTalkDraftStep(
   ctx: MutationCtx,
-  {
-    step,
-    talkId,
-  }: {
+  args: {
     step: DraftStep;
     talkId: Id<'talks'>;
   }
 ) {
   await ctx.db.patch(
-    talkId,
-    step === 'study' ? { draftStudy: undefined } : { draftSummary: undefined }
+    args.talkId,
+    args.step === 'study'
+      ? { draftStudy: undefined }
+      : { draftSummary: undefined }
   );
 }
 
@@ -85,18 +84,15 @@ export const setTalkDraftStep = internalMutation({
 
 async function draftStep(
   ctx: ActionCtx,
-  {
-    save,
-    source,
-    step,
-    talkId,
-  }: {
+  args: {
     save: (transcript: string) => Promise<DraftResult>;
     source: DraftSource;
     step: DraftStep;
     talkId: Id<'talks'>;
   }
 ) {
+  const { save, source, step, talkId } = args;
+
   await ctx.runMutation(internal.talks.setTalkDraftStep, {
     step,
     talkId,

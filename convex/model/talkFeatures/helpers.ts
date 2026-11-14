@@ -42,10 +42,7 @@ export function hasReviewedTalkFeature(
 
 export async function loadTalkFeature(
   ctx: MutationCtx | QueryCtx,
-  {
-    kind,
-    talkId,
-  }: {
+  args: {
     kind: Infer<typeof talkFeatureKind>;
     talkId: Id<'talks'>;
   }
@@ -53,7 +50,7 @@ export async function loadTalkFeature(
   return await ctx.db
     .query('talkFeatures')
     .withIndex('by_talkId_and_kind', (q) =>
-      q.eq('talkId', talkId).eq('kind', kind)
+      q.eq('talkId', args.talkId).eq('kind', args.kind)
     )
     .unique();
 }

@@ -66,11 +66,8 @@ function toSearchSpeaker(speaker: Doc<'speakers'> | null) {
   };
 }
 
-async function toSearchTalks(
-  ctx: QueryCtx,
-  { talks }: { talks: Doc<'talks'>[] }
-) {
-  const talksWithSpeakers = await enrichWithSpeaker(ctx, { items: talks });
+async function toSearchTalks(ctx: QueryCtx, args: { talks: Doc<'talks'>[] }) {
+  const talksWithSpeakers = await enrichWithSpeaker(ctx, { items: args.talks });
 
   return talksWithSpeakers.flatMap((talk) => {
     const speaker = toSearchSpeaker(talk.speaker);
@@ -91,11 +88,10 @@ async function toSearchTalks(
   });
 }
 
-async function toSearchClips(
-  ctx: QueryCtx,
-  { clips }: { clips: Doc<'clips'>[] }
-) {
-  const clipsWithSpeakers = await enrichClipsWithSpeaker(ctx, { items: clips });
+async function toSearchClips(ctx: QueryCtx, args: { clips: Doc<'clips'>[] }) {
+  const clipsWithSpeakers = await enrichClipsWithSpeaker(ctx, {
+    items: args.clips,
+  });
 
   return clipsWithSpeakers.map((clip) => ({
     _id: clip._id,
