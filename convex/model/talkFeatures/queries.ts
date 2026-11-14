@@ -18,7 +18,10 @@ export const getTalkFeature = query({
   handler: async (ctx, { kind, talkId }) => {
     await requireAdmin(ctx);
 
-    return await loadTalkFeature(ctx, kind, talkId);
+    return await loadTalkFeature(ctx, {
+      kind,
+      talkId,
+    });
   },
   returns: doc('talkFeatures').nullable(),
 });
@@ -34,7 +37,12 @@ export const getTalkFeatureProgress = query({
   handler: async (ctx, { kind, talkId }) => {
     await requireAdmin(ctx);
 
-    return toTalkFeatureProgress(await loadTalkFeature(ctx, kind, talkId));
+    return toTalkFeatureProgress(
+      await loadTalkFeature(ctx, {
+        kind,
+        talkId,
+      })
+    );
   },
   returns: v.union(
     v.null(),

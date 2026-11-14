@@ -2,7 +2,9 @@ import type { Doc, Id } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
 import type { ContentSortOption } from '../../lib/sort';
 import type { StatusFilterType } from '../../lib/types';
+import type { talkStudyStatus } from './validators';
 import type { PaginationOptions } from 'convex/server';
+import type { Infer } from 'convex/values';
 
 import { getManyVia, getOneFrom } from 'convex-helpers/server/relationships';
 import {
@@ -72,7 +74,9 @@ const talkTranscriptListItemValidator = v.object({
 export const listTalkSlugs = query({
   args: {},
   handler: async (ctx) => {
-    const talks = await enrichWithSpeaker(ctx, await listPublishedTalks(ctx));
+    const talks = await enrichWithSpeaker(ctx, {
+      items: await listPublishedTalks(ctx),
+    });
 
     return talks.flatMap((talk) => {
       if (!talk.speaker) {
@@ -259,7 +263,7 @@ export const listFeaturedTalksWithSpeakers = query({
 
     const page = rotateContent(talks, { count: limit, period: 'daily' });
 
-    return await enrichWithSpeaker(ctx, page);
+    return await enrichWithSpeaker(ctx, { items: page });
   },
   returns: v.array(talkWithSpeakerValidator),
 });
@@ -305,12 +309,13 @@ export const listTalksByTopics = query({
   },
   handler: async (ctx, args) => {
     const { excludeTalkIds = [], limit = 4, topicIds } = args;
-    const talks = await listPublishedTalksForTopics(ctx, topicIds, {
+    const talks = await listPublishedTalksForTopics(ctx, {
       excludeTalkIds,
+      topicIds,
     });
     const page = rotateContent(talks, { count: limit, period: 'daily' });
 
-    return await enrichWithSpeaker(ctx, page);
+    return await enrichWithSpeaker(ctx, { items: page });
   },
   returns: v.array(talkWithSpeakerValidator),
 });
@@ -357,9 +362,13 @@ export const listTalks = query({
 
     // When no filters and default sort, use native Convex pagination for efficiency
     if (!(hasFilters || needsCustomSort)) {
-      const result = await listPublishedTalksPage(ctx, paginationOpts);
-      const talksWithSpeakers = await enrichWithSpeaker(ctx, result.page);
-      const enrichedTalks = await enrichWithTopics(ctx, talksWithSpeakers);
+      const result = await listPublishedTalksPage(ctx, { paginationOpts });
+      const talksWithSpeakers = await enrichWithSpeaker(ctx, {
+        items: result.page,
+      });
+      const enrichedTalks = await enrichWithTopics(ctx, {
+        talks: talksWithSpeakers,
+      });
 
       return {
         ...result,
@@ -368,11 +377,10 @@ export const listTalks = query({
     }
 
     let talks = hasSearch
-      ? await searchPublishedTalksByTitleOrSpeaker(
-          ctx,
+      ? await searchPublishedTalksByTitleOrSpeaker(ctx, {
+          limit: LIST_SEARCH_LIMIT,
           queryText,
-          LIST_SEARCH_LIMIT
-        )
+        })
       : await listPublishedTalks(ctx);
 
     // Apply speaker filter (multi-select)
@@ -396,7 +404,7 @@ export const listTalks = query({
 
     // Apply topic filter (multi-select)
     if (hasTopicFilter) {
-      const topicTalkIds = await getTalkIdsByTopicSlugs(ctx, topicSlugs);
+      const topicTalkIds = await getTalkIdsByTopicSlugs(ctx, { topicSlugs });
 
       // No matching topics found
       talks = topicTalkIds
@@ -418,8 +426,10 @@ export const listTalks = query({
       paginationOpts.numItems
     );
 
-    const talksWithSpeakers = await enrichWithSpeaker(ctx, page);
-    const enrichedTalks = await enrichWithTopics(ctx, talksWithSpeakers);
+    const talksWithSpeakers = await enrichWithSpeaker(ctx, { items: page });
+    const enrichedTalks = await enrichWithTopics(ctx, {
+      talks: talksWithSpeakers,
+    });
 
     return {
       continueCursor,
@@ -446,13 +456,22 @@ function compareTalksForStatusList(
   return byPublishedAt(left, right);
 }
 
+type StudyListStatus = 'none' | Infer<typeof talkStudyStatus>;
+
 async function filterTalksByStudyStatus(
   ctx: QueryCtx,
-  talks: Doc<'talks'>[],
-  studyStatus: 'draft' | 'none' | 'published'
+  args: {
+    studyStatus: StudyListStatus;
+    talks: Doc<'talks'>[];
+  }
 ) {
   const features = await Promise.all(
-    talks.map((talk) => loadTalkFeature(ctx, 'study', talk._id))
+    args.talks.map((talk) =>
+      loadTalkFeature(ctx, {
+        kind: 'study',
+        talkId: talk._id,
+      })
+    )
   );
   const statusByTalkId = new Map(
     features.flatMap((feature) =>
@@ -460,14 +479,14 @@ async function filterTalksByStudyStatus(
     )
   );
 
-  return talks.filter((talk) => {
+  return args.talks.filter((talk) => {
     const current = statusByTalkId.get(talk._id);
 
-    if (studyStatus === 'none') {
+    if (args.studyStatus === 'none') {
       return current === undefined;
     }
 
-    return current === studyStatus;
+    return current === args.studyStatus;
   });
 }
 
@@ -515,13 +534,18 @@ async function pageTalksFromSource<T>(
 
 async function listTalksWithoutStudy(
   ctx: QueryCtx,
-  paginationOpts: PaginationOptions,
-  status: StatusFilterType
+  args: {
+    paginationOpts: PaginationOptions;
+    status: StatusFilterType;
+  }
 ) {
   return await pageTalksFromSource(
-    talksByStatusQuery(ctx, status),
+    talksByStatusQuery(ctx, { status: args.status }),
     async (talk) => {
-      const feature = await loadTalkFeature(ctx, 'study', talk._id);
+      const feature = await loadTalkFeature(ctx, {
+        kind: 'study',
+        talkId: talk._id,
+      });
 
       if (feature) {
         return null;
@@ -529,32 +553,41 @@ async function listTalksWithoutStudy(
 
       return talk;
     },
-    paginationOpts
+    args.paginationOpts
   );
 }
 
 async function listTalksWithStudyStatus(
   ctx: QueryCtx,
-  paginationOpts: PaginationOptions,
-  status: StatusFilterType,
-  studyStatus: 'draft' | 'published'
+  args: {
+    paginationOpts: PaginationOptions;
+    status: StatusFilterType;
+    studyStatus: Infer<typeof talkStudyStatus>;
+  }
 ) {
   const features = await ctx.db
     .query('talkFeatures')
     .withIndex('by_kind_and_status', (q) =>
-      q.eq('kind', 'study').eq('status', studyStatus)
+      q.eq('kind', 'study').eq('status', args.studyStatus)
     )
     .collect();
   const loaded = await Promise.all(
     features.map((feature) => ctx.db.get('talks', feature.talkId))
   );
   const talks = loaded.filter(
-    (talk): talk is Doc<'talks'> => talk !== null && hasTalkStatus(talk, status)
+    (talk): talk is Doc<'talks'> =>
+      talk !== null && hasTalkStatus(talk, args.status)
   );
 
-  talks.sort((left, right) => compareTalksForStatusList(left, right, status));
+  talks.sort((left, right) =>
+    compareTalksForStatusList(left, right, args.status)
+  );
 
-  return paginateArray(talks, paginationOpts.cursor, paginationOpts.numItems);
+  return paginateArray(
+    talks,
+    args.paginationOpts.cursor,
+    args.paginationOpts.numItems
+  );
 }
 
 async function listAllTalksByStudyStatus(
@@ -563,51 +596,50 @@ async function listAllTalksByStudyStatus(
     paginationOpts: PaginationOptions;
     search?: string;
     status: StatusFilterType;
-    studyStatus: 'draft' | 'none' | 'published';
+    studyStatus: StudyListStatus;
   }
 ) {
   await requireAdmin(ctx);
 
-  const { paginationOpts, search, status, studyStatus } = args;
-  const queryText = normalizeSearchQuery(search ?? '');
+  const queryText = normalizeSearchQuery(args.search ?? '');
 
   if (queryText) {
-    const matches = await filterTalksByStudyStatus(
-      ctx,
-      await searchTalksByTitleOrSpeaker(
-        ctx,
+    const matches = await filterTalksByStudyStatus(ctx, {
+      studyStatus: args.studyStatus,
+      talks: await searchTalksByTitleOrSpeaker(ctx, {
+        limit: LIST_SEARCH_LIMIT,
         queryText,
-        LIST_SEARCH_LIMIT,
-        status
-      ),
-      studyStatus
-    );
+        status: args.status,
+      }),
+    });
     const { continueCursor, isDone, page } = paginateArray(
       matches,
-      paginationOpts.cursor,
-      paginationOpts.numItems
+      args.paginationOpts.cursor,
+      args.paginationOpts.numItems
     );
 
     return {
       continueCursor,
       isDone,
-      page: await enrichTalksForAdmin(ctx, page),
+      page: await enrichTalksForAdmin(ctx, { talks: page }),
     };
   }
 
   const result =
-    studyStatus === 'none'
-      ? await listTalksWithoutStudy(ctx, paginationOpts, status)
-      : await listTalksWithStudyStatus(
-          ctx,
-          paginationOpts,
-          status,
-          studyStatus
-        );
+    args.studyStatus === 'none'
+      ? await listTalksWithoutStudy(ctx, {
+          paginationOpts: args.paginationOpts,
+          status: args.status,
+        })
+      : await listTalksWithStudyStatus(ctx, {
+          paginationOpts: args.paginationOpts,
+          status: args.status,
+          studyStatus: args.studyStatus,
+        });
 
   return {
     ...result,
-    page: await enrichTalksForAdmin(ctx, result.page),
+    page: await enrichTalksForAdmin(ctx, { talks: result.page }),
   };
 }
 
@@ -637,12 +669,17 @@ export const listAllTalks = query({
     }
 
     return await listAllAdmin(ctx, {
-      enrich: (page) => enrichTalksForAdmin(ctx, page),
-      listPage: () => talksByStatusQuery(ctx, status).paginate(paginationOpts),
+      enrich: (page) => enrichTalksForAdmin(ctx, { talks: page }),
+      listPage: () =>
+        talksByStatusQuery(ctx, { status }).paginate(paginationOpts),
       paginationOpts,
       search,
       searchItems: (queryText) =>
-        searchTalksByTitleOrSpeaker(ctx, queryText, LIST_SEARCH_LIMIT, status),
+        searchTalksByTitleOrSpeaker(ctx, {
+          limit: LIST_SEARCH_LIMIT,
+          queryText,
+          status,
+        }),
     });
   },
   returns: talkAdminPageValidator,
@@ -678,7 +715,7 @@ export const listTalksWithoutTranscript = query({
     await requireAdmin(ctx);
 
     const status = args.status ?? 'published';
-    const talks = await talksByStatusQuery(ctx, status).collect();
+    const talks = await talksByStatusQuery(ctx, { status }).collect();
     const [fetches, transcripts] = await Promise.all([
       ctx.db.query('talkTranscriptFetches').collect(),
       ctx.db.query('talkTranscripts').collect(),
@@ -716,10 +753,13 @@ export const listTalksWithoutTranscript = query({
   ),
 });
 
-async function loadTalkTranscript(ctx: QueryCtx, talkId: Id<'talks'>) {
+async function loadTalkTranscript(
+  ctx: QueryCtx,
+  args: { talkId: Id<'talks'> }
+) {
   await requireAdmin(ctx);
 
-  return await getOneFrom(ctx.db, 'talkTranscripts', 'by_talkId', talkId);
+  return await getOneFrom(ctx.db, 'talkTranscripts', 'by_talkId', args.talkId);
 }
 
 /**
@@ -728,7 +768,7 @@ async function loadTalkTranscript(ctx: QueryCtx, talkId: Id<'talks'>) {
 export const getTalkTranscript = query({
   args: { talkId: v.id('talks') },
   handler: async (ctx, { talkId }) => {
-    const transcript = await loadTalkTranscript(ctx, talkId);
+    const transcript = await loadTalkTranscript(ctx, { talkId });
 
     if (!transcript) {
       return null;
@@ -747,7 +787,7 @@ export const getTalkTranscript = query({
 export const getTalkTranscriptText = query({
   args: { talkId: v.id('talks') },
   handler: async (ctx, { talkId }) => {
-    const transcript = await loadTalkTranscript(ctx, talkId);
+    const transcript = await loadTalkTranscript(ctx, { talkId });
 
     if (!transcript) {
       return null;

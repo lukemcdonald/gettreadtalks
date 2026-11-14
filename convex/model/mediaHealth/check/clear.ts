@@ -1,4 +1,5 @@
 import type { MutationCtx } from '../../../_generated/server';
+import type { MediaCheckKey } from '../validators';
 
 import { deleteAll } from '../../../lib/utils';
 
@@ -11,10 +12,7 @@ export function shouldClearMediaChecks(args: {
 
 export async function clearMediaChecksForEntity(
   ctx: MutationCtx,
-  args: {
-    entityId: string;
-    entityTable: 'clips' | 'talks';
-  }
+  args: Pick<MediaCheckKey, 'entityId' | 'entityTable'>
 ) {
   const rows = await ctx.db
     .query('mediaChecks')
@@ -23,14 +21,12 @@ export async function clearMediaChecksForEntity(
     )
     .collect();
 
-  await deleteAll(ctx, rows);
+  await deleteAll(ctx, { items: rows });
 }
 
 export async function clearStaleMediaChecks(
   ctx: MutationCtx,
-  args: {
-    entityId: string;
-    entityTable: 'clips' | 'talks';
+  args: Pick<MediaCheckKey, 'entityId' | 'entityTable'> & {
     nextMediaUrl?: string;
     nextStatus?: string;
     previousMediaUrl: string;

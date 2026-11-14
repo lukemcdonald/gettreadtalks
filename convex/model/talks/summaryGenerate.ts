@@ -72,6 +72,10 @@ export interface TalkSummarySource {
   transcript: string | null;
 }
 
+export type TalkSummaryWithTranscript = TalkSummarySource & {
+  transcript: string;
+};
+
 export type TalkGenerateGuardError =
   | 'ALREADY_REVIEWED'
   | 'NO_TRANSCRIPT_SOURCE'
@@ -79,9 +83,9 @@ export type TalkGenerateGuardError =
 
 export async function loadTalkGenerateSource(
   ctx: ActionCtx,
-  talkId: Id<'talks'>
+  args: { talkId: Id<'talks'> }
 ): Promise<
-  | (TalkSummarySource & { transcript: string })
+  | TalkSummaryWithTranscript
   | {
       errorCode: TalkGenerateGuardError | 'UPSTREAM_ERROR';
       message?: string;
@@ -90,7 +94,7 @@ export async function loadTalkGenerateSource(
   const source: TalkSummarySource = await ctx.runQuery(
     internal.talks.loadTalkSummarySource,
     {
-      talkId,
+      talkId: args.talkId,
     }
   );
 
@@ -102,12 +106,11 @@ export async function loadTalkGenerateSource(
     return { errorCode: 'TOKEN_MISSING' };
   }
 
-  const loaded = await loadTranscriptForGenerate(
-    ctx,
-    talkId,
-    source.transcript,
-    source.mediaUrl
-  );
+  const loaded = await loadTranscriptForGenerate(ctx, {
+    existingTranscript: source.transcript,
+    mediaUrl: source.mediaUrl,
+    talkId: args.talkId,
+  });
 
   if ('errorCode' in loaded) {
     return loaded;
@@ -150,14 +153,23 @@ function toTalkSummarySource(
   };
 }
 
-async function readTalkSummarySource(ctx: QueryCtx, talkId: Id<'talks'>) {
-  const talk = await getOrThrow(ctx, 'talks', talkId);
-  const speaker = await getOrThrow(ctx, 'speakers', talk.speakerId);
+async function readTalkSummarySource(
+  ctx: QueryCtx,
+  args: { talkId: Id<'talks'> }
+) {
+  const talk = await getOrThrow(ctx, {
+    id: args.talkId,
+    table: 'talks',
+  });
+  const speaker = await getOrThrow(ctx, {
+    id: talk.speakerId,
+    table: 'speakers',
+  });
   const transcript = await getOneFrom(
     ctx.db,
     'talkTranscripts',
     'by_talkId',
-    talkId
+    args.talkId
   );
 
   return toTalkSummarySource(speaker, talk, transcript);
@@ -180,7 +192,7 @@ export const loadTalkSummarySource = internalQuery({
   handler: async (ctx, { talkId }) => {
     await requireAdmin(ctx);
 
-    return await readTalkSummarySource(ctx, talkId);
+    return await readTalkSummarySource(ctx, { talkId });
   },
   returns: talkSummarySourceValidator,
 });
@@ -195,8 +207,11 @@ export const loadTalkDraftSource = internalQuery({
       await requireAdmin(ctx);
     }
 
-    const source = await readTalkSummarySource(ctx, talkId);
-    const feature = await loadTalkFeature(ctx, 'study', talkId);
+    const source = await readTalkSummarySource(ctx, { talkId });
+    const feature = await loadTalkFeature(ctx, {
+      kind: 'study',
+      talkId,
+    });
 
     return {
       ...source,
@@ -233,17 +248,19 @@ export const talkSummaryGenerator = {
 
 export async function saveGeneratedTalkSummary(
   ctx: ActionCtx,
-  source: TalkSummarySource & { transcript: string },
-  talkId: Id<'talks'>
+  args: {
+    source: TalkSummaryWithTranscript;
+    talkId: Id<'talks'>;
+  }
 ) {
   let generated: { flags: string[]; summary: string };
 
   try {
     generated = await talkSummaryGenerator.generate({
-      scripture: source.scripture,
-      speaker: source.speaker,
-      title: source.title,
-      transcript: source.transcript,
+      scripture: args.source.scripture,
+      speaker: args.source.speaker,
+      title: args.source.title,
+      transcript: args.source.transcript,
     });
   } catch {
     return toFailedResult('UPSTREAM_ERROR');
@@ -253,7 +270,7 @@ export async function saveGeneratedTalkSummary(
     await ctx.runMutation(internal.talks.saveTalkSummaryDraft, {
       generator: TALK_SUMMARY_MODEL,
       summary: generated.summary,
-      talkId,
+      talkId: args.talkId,
     });
   } catch (error) {
     if (isConflictError(error)) {
@@ -285,13 +302,16 @@ export const generateTalkSummary = action({
       }
     | { flags: string[]; status: 'success'; summary: string }
   > => {
-    const source = await loadTalkGenerateSource(ctx, talkId);
+    const source = await loadTalkGenerateSource(ctx, { talkId });
 
     if (!('transcript' in source)) {
       return toFailedResult(source.errorCode, source.message);
     }
 
-    return await saveGeneratedTalkSummary(ctx, source, talkId);
+    return await saveGeneratedTalkSummary(ctx, {
+      source,
+      talkId,
+    });
   },
   returns: v.union(
     talkSummaryGenerateFailure,

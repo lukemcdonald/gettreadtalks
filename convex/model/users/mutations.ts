@@ -14,13 +14,16 @@ import {
 import { loadUserId } from '../auth/helpers';
 import { userRole } from './validators';
 
-async function requirePublishedTalk(ctx: MutationCtx, talkId: Id<'talks'>) {
-  const talk = await ctx.db.get('talks', talkId);
+async function requirePublishedTalk(
+  ctx: MutationCtx,
+  args: { talkId: Id<'talks'> }
+) {
+  const talk = await ctx.db.get('talks', args.talkId);
 
   if (!talk || talk.status !== 'published') {
     throwNotFound('Talk not found', {
       resource: 'talks',
-      resourceId: talkId,
+      resourceId: args.talkId,
     });
   }
 
@@ -66,7 +69,7 @@ export const favoriteTalk = mutation({
   handler: async (ctx, args) => {
     const userId = await loadUserId(ctx);
 
-    await requirePublishedTalk(ctx, args.talkId);
+    await requirePublishedTalk(ctx, { talkId: args.talkId });
 
     const existing = await ctx.db
       .query('userFavoriteTalks')
@@ -97,7 +100,7 @@ export const finishTalk = mutation({
   handler: async (ctx, args) => {
     const userId = await loadUserId(ctx);
 
-    await requirePublishedTalk(ctx, args.talkId);
+    await requirePublishedTalk(ctx, { talkId: args.talkId });
 
     const existing = await ctx.db
       .query('userFinishedTalks')

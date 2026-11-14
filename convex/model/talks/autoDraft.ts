@@ -38,12 +38,16 @@ function hasExistingDraft(text: string | null | undefined, locked: boolean) {
 
 export async function clearTalkDraftStep(
   ctx: MutationCtx,
-  talkId: Id<'talks'>,
-  step: DraftStep
+  args: {
+    step: DraftStep;
+    talkId: Id<'talks'>;
+  }
 ) {
   await ctx.db.patch(
-    talkId,
-    step === 'study' ? { draftStudy: undefined } : { draftSummary: undefined }
+    args.talkId,
+    args.step === 'study'
+      ? { draftStudy: undefined }
+      : { draftSummary: undefined }
   );
 }
 
@@ -54,10 +58,16 @@ export const setTalkDraftStep = internalMutation({
     value: v.optional(v.string()),
   },
   handler: async (ctx, { step, talkId, value }) => {
-    await getOrThrow(ctx, 'talks', talkId);
+    await getOrThrow(ctx, {
+      id: talkId,
+      table: 'talks',
+    });
 
     if (value === undefined) {
-      await clearTalkDraftStep(ctx, talkId, step);
+      await clearTalkDraftStep(ctx, {
+        step,
+        talkId,
+      });
 
       return null;
     }
@@ -74,11 +84,15 @@ export const setTalkDraftStep = internalMutation({
 
 async function draftStep(
   ctx: ActionCtx,
-  talkId: Id<'talks'>,
-  step: DraftStep,
-  source: DraftSource,
-  save: (transcript: string) => Promise<DraftResult>
+  args: {
+    save: (transcript: string) => Promise<DraftResult>;
+    source: DraftSource;
+    step: DraftStep;
+    talkId: Id<'talks'>;
+  }
 ) {
+  const { save, source, step, talkId } = args;
+
   await ctx.runMutation(internal.talks.setTalkDraftStep, {
     step,
     talkId,
@@ -137,18 +151,16 @@ export const draftTalkSummaryAndStudy = internalAction({
           step: 'summary',
           talkId,
         })
-      : draftStep(
-          ctx,
-          talkId,
-          'summary',
+      : draftStep(ctx, {
+          save: async (transcript) =>
+            await saveGeneratedTalkSummary(ctx, {
+              source: { ...source, transcript },
+              talkId,
+            }),
           source,
-          async (transcript) =>
-            await saveGeneratedTalkSummary(
-              ctx,
-              { ...source, transcript },
-              talkId
-            )
-        ));
+          step: 'summary',
+          talkId,
+        }));
 
     const fresh = await ctx.runQuery(internal.talks.loadTalkDraftSource, {
       talkId,
@@ -159,14 +171,16 @@ export const draftTalkSummaryAndStudy = internalAction({
           step: 'study',
           talkId,
         })
-      : draftStep(
-          ctx,
+      : draftStep(ctx, {
+          save: async (transcript) =>
+            await saveGeneratedTalkStudy(ctx, {
+              source: { ...fresh, transcript },
+              talkId,
+            }),
+          source: fresh,
+          step: 'study',
           talkId,
-          'study',
-          fresh,
-          async (transcript) =>
-            await saveGeneratedTalkStudy(ctx, { ...fresh, transcript }, talkId)
-        ));
+        }));
 
     return null;
   },

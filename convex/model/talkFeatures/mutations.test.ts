@@ -14,15 +14,18 @@ const STUDY_BODY = '## Main points\n\nA confirmed study draft.';
 
 async function insertStudy(
   ctx: MutationCtx,
-  talkId: Id<'talks'>,
-  overrides?: { body?: string; status?: 'draft' | 'published' }
+  args: {
+    body?: string;
+    status?: 'draft' | 'published';
+    talkId: Id<'talks'>;
+  }
 ) {
   return await ctx.db.insert('talkFeatures', {
-    body: overrides?.body ?? STUDY_BODY,
+    body: args.body ?? STUDY_BODY,
     generatedAt: Date.now(),
     kind: 'study',
-    status: overrides?.status ?? 'draft',
-    talkId,
+    status: args.status ?? 'draft',
+    talkId: args.talkId,
     updatedAt: Date.now(),
   });
 }
@@ -58,12 +61,16 @@ describe('publishStudyDrafts', () => {
         speakerId,
         title: 'Extra Study',
       });
-      const draftId = await insertStudy(ctx, draftTalkId);
-      const emptyId = await insertStudy(ctx, emptyTalkId, { body: '   ' });
-      const publishedId = await insertStudy(ctx, publishedTalkId, {
-        status: 'published',
+      const draftId = await insertStudy(ctx, { talkId: draftTalkId });
+      const emptyId = await insertStudy(ctx, {
+        body: '   ',
+        talkId: emptyTalkId,
       });
-      const extraId = await insertStudy(ctx, extraTalkId);
+      const publishedId = await insertStudy(ctx, {
+        status: 'published',
+        talkId: publishedTalkId,
+      });
+      const extraId = await insertStudy(ctx, { talkId: extraTalkId });
 
       return { draftId, emptyId, extraId, publishedId };
     });
@@ -134,10 +141,10 @@ describe('publishStudyDrafts', () => {
         status: 'backlog',
         title: 'Keep Study',
       });
-      const backlogStudyId = await insertStudy(ctx, backlogTalkId);
-      const staleId = await insertStudy(ctx, staleTalkId);
-      const deletedId = await insertStudy(ctx, deletedTalkId);
-      const keepId = await insertStudy(ctx, keepTalkId);
+      const backlogStudyId = await insertStudy(ctx, { talkId: backlogTalkId });
+      const staleId = await insertStudy(ctx, { talkId: staleTalkId });
+      const deletedId = await insertStudy(ctx, { talkId: deletedTalkId });
+      const keepId = await insertStudy(ctx, { talkId: keepTalkId });
 
       await ctx.db.patch(staleId, { body: '   ' });
       await ctx.db.delete(deletedId);

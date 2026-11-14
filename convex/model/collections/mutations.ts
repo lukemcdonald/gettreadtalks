@@ -28,7 +28,10 @@ export const createCollection = mutation({
       throwValidationError('Title cannot be empty', 'title');
     }
 
-    const slug = await generateSlug(ctx, 'collections', args.title);
+    const slug = await generateSlug(ctx, {
+      baseText: args.title,
+      table: 'collections',
+    });
 
     return await ctx.db.insert('collections', {
       ...args,
@@ -120,7 +123,13 @@ export const updateCollection = mutation({
       }
 
       if (newSlug !== collection.slug) {
-        if (await slugExists(ctx, 'collections', newSlug, collectionId)) {
+        if (
+          await slugExists(ctx, {
+            excludeId: collectionId,
+            slug: newSlug,
+            table: 'collections',
+          })
+        ) {
           throwDuplicateSlug(
             'A collection with this slug already exists',
             'slug'
@@ -135,12 +144,11 @@ export const updateCollection = mutation({
         throwValidationError('Title cannot be empty', 'title');
       }
 
-      const newSlug = await generateSlug(
-        ctx,
-        'collections',
-        updates.title,
-        collectionId
-      );
+      const newSlug = await generateSlug(ctx, {
+        baseText: updates.title,
+        excludeId: collectionId,
+        table: 'collections',
+      });
 
       if (newSlug !== collection.slug) {
         updates.slug = newSlug;

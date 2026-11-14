@@ -1,5 +1,5 @@
 import type { QueryCtx } from '../../_generated/server';
-import type { StatusFilterType } from '../../lib/types';
+import type { PublishStateFilter, StatusFilterType } from '../../lib/types';
 import type { PaginationOptions, PaginationResult } from 'convex/server';
 
 import { paginationOptsValidator } from 'convex/server';
@@ -11,6 +11,21 @@ import { requireAdmin } from '../auth/helpers';
 import { normalizeSearchQuery } from './normalize';
 
 export { normalizeSearchQuery } from './normalize';
+
+export interface AdminListPageArgs {
+  paginationOpts: PaginationOptions;
+  search?: string;
+  status: PublishStateFilter;
+}
+
+export interface SearchArgs {
+  limit: number;
+  queryText: string;
+}
+
+export type StatusSearchArgs = SearchArgs & {
+  status?: StatusFilterType;
+};
 
 export const adminListArgs = {
   paginationOpts: paginationOptsValidator,
@@ -84,7 +99,7 @@ export function uniqueById<T extends { _id: string }>(items: T[]) {
 
 export async function listAllAdmin<T, TPage>(
   ctx: QueryCtx,
-  options: {
+  args: {
     enrich: (page: T[]) => Promise<TPage[]>;
     listPage: () => Promise<PaginationResult<T>>;
     paginationOpts: PaginationOptions;
@@ -92,20 +107,18 @@ export async function listAllAdmin<T, TPage>(
     searchItems: (queryText: string) => Promise<T[]>;
   }
 ): Promise<PaginationResult<TPage>> {
-  const { enrich, listPage, paginationOpts, search, searchItems } = options;
-
   await requireAdmin(ctx);
 
-  const queryText = normalizeSearchQuery(search ?? '');
+  const queryText = normalizeSearchQuery(args.search ?? '');
   const result = await paginateSearchOrList({
-    listPage,
-    paginationOpts,
+    listPage: args.listPage,
+    paginationOpts: args.paginationOpts,
     queryText,
-    search: () => searchItems(queryText),
+    search: () => args.searchItems(queryText),
   });
 
   return {
     ...result,
-    page: await enrich(result.page),
+    page: await args.enrich(result.page),
   };
 }

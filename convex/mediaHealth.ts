@@ -75,8 +75,15 @@ async function runMediaHealthPage(
       }
     );
 
-    const items = await checkMediaPageItems(ctx, result.page, args.items);
-    const nextPage = nextMediaHealthPage(result, args, items);
+    const digestItems = await checkMediaPageItems(ctx, {
+      items: args.items,
+      pageItems: result.page,
+    });
+    const nextPage = nextMediaHealthPage(
+      result,
+      { source: args.source },
+      digestItems
+    );
 
     if (nextPage) {
       await ctx.scheduler.runAfter(
@@ -88,7 +95,7 @@ async function runMediaHealthPage(
       return;
     }
 
-    await sendMediaHealthDigest(ctx, items);
+    await sendMediaHealthDigest(ctx, { items: digestItems });
   } catch (error) {
     await reportSentryException({
       message: `Media health check failed: ${formatErrorMessage(error)}`,
@@ -109,9 +116,9 @@ interface PublishedMediaItem {
 
 async function sendMediaHealthDigest(
   ctx: ActionCtx,
-  items: MediaHealthDigestItem[]
+  args: { items: MediaHealthDigestItem[] }
 ) {
-  const digest = buildMediaHealthDigest(items);
+  const digest = buildMediaHealthDigest(args.items);
 
   if (!digest) {
     return;
@@ -133,44 +140,54 @@ async function sendMediaHealthDigest(
 
 async function checkMediaPageItems(
   ctx: ActionCtx,
-  pageItems: PublishedMediaItem[],
-  items: MediaHealthDigestItem[]
+  args: {
+    items: MediaHealthDigestItem[];
+    pageItems: PublishedMediaItem[];
+  }
 ): Promise<MediaHealthDigestItem[]> {
-  if (pageItems.length === 0) {
-    return items;
+  if (args.pageItems.length === 0) {
+    return args.items;
   }
 
-  const [item] = pageItems;
+  const [item] = args.pageItems;
 
   if (!item) {
-    return items;
+    return args.items;
   }
 
-  const nextItems = await checkPublishedMediaItem(ctx, item, items);
+  const nextItems = await checkPublishedMediaItem(ctx, {
+    item,
+    items: args.items,
+  });
 
-  return await checkMediaPageItems(ctx, pageItems.slice(1), nextItems);
+  return await checkMediaPageItems(ctx, {
+    items: nextItems,
+    pageItems: args.pageItems.slice(1),
+  });
 }
 
 async function checkPublishedMediaItem(
   ctx: ActionCtx,
-  item: PublishedMediaItem,
-  items: MediaHealthDigestItem[]
+  args: {
+    item: PublishedMediaItem;
+    items: MediaHealthDigestItem[];
+  }
 ): Promise<MediaHealthDigestItem[]> {
-  const check = await checkMediaUrl(item.mediaUrl);
+  const check = await checkMediaUrl(args.item.mediaUrl);
 
   if (check.skipped) {
-    return items;
+    return args.items;
   }
 
   const outcome = await ctx.runMutation(internal.mediaHealth.upsertMediaCheck, {
     checkedAt: Date.now(),
-    entityId: item.entityId,
-    entityTable: item.entityTable,
-    mediaUrl: item.mediaUrl,
+    entityId: args.item.entityId,
+    entityTable: args.item.entityTable,
+    mediaUrl: args.item.mediaUrl,
     observedStatus: check.status,
   });
 
-  return appendMediaHealthItem(item, outcome, items);
+  return appendMediaHealthItem(args.item, outcome, args.items);
 }
 
 function nextMediaHealthPage(

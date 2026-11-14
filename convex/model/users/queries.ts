@@ -118,9 +118,18 @@ export const listUserFavorites = query({
     const limit = args.limit ?? 100;
 
     const [clips, speakers, talks] = await Promise.all([
-      listUserFavoriteClips(ctx, userId, limit),
-      listUserFavoriteSpeakers(ctx, userId, limit),
-      listUserFavoriteTalks(ctx, userId, limit),
+      listUserFavoriteClips(ctx, {
+        limit,
+        userId,
+      }),
+      listUserFavoriteSpeakers(ctx, {
+        limit,
+        userId,
+      }),
+      listUserFavoriteTalks(ctx, {
+        limit,
+        userId,
+      }),
     ]);
 
     return {
@@ -152,7 +161,10 @@ export const listUserFinishedTalks = query({
 
     const limit = args.limit ?? 100;
 
-    return await listFinishedTalksForUser(ctx, user._id, limit);
+    return await listFinishedTalksForUser(ctx, {
+      limit,
+      userId: user._id,
+    });
   },
   returns: v.array(v.any()),
 });

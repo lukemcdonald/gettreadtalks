@@ -158,9 +158,8 @@ export const sendMediaHealthEmail = internalAction({
       });
       const { html, text } = await renderEmail(template);
 
-      await sendTrackedEmail(
-        ctx,
-        {
+      await sendTrackedEmail(ctx, {
+        emailParams: {
           from: getFromAddress(),
           html,
           replyTo: [getReplyToAddress()],
@@ -168,8 +167,8 @@ export const sendMediaHealthEmail = internalAction({
           text,
           to: site.email.contact,
         },
-        'mediaHealth'
-      );
+        kind: 'mediaHealth',
+      });
     } catch (error) {
       await reportEmailSendFailure('mediaHealth', error);
       throwConvexError(500, 'Failed to send media health email', {
@@ -204,9 +203,8 @@ export const sendPasswordResetEmail = internalAction({
       });
       const { html, text } = await renderEmail(template);
 
-      await sendTrackedEmail(
-        ctx,
-        {
+      await sendTrackedEmail(ctx, {
+        emailParams: {
           from: getFromAddress(),
           html,
           replyTo: [getReplyToAddress()],
@@ -214,8 +212,8 @@ export const sendPasswordResetEmail = internalAction({
           text,
           to: args.email,
         },
-        'passwordReset'
-      );
+        kind: 'passwordReset',
+      });
     } catch (error) {
       await reportEmailSendFailure('passwordReset', error);
       throwConvexError(500, 'Failed to send password reset email', {
@@ -248,9 +246,8 @@ export const sendWelcomeEmail = internalAction({
       });
       const { html, text } = await renderEmail(template);
 
-      await sendTrackedEmail(
-        ctx,
-        {
+      await sendTrackedEmail(ctx, {
+        emailParams: {
           from: getFromAddress(),
           html,
           replyTo: [getReplyToAddress()],
@@ -258,8 +255,8 @@ export const sendWelcomeEmail = internalAction({
           text,
           to: args.email,
         },
-        'welcome'
-      );
+        kind: 'welcome',
+      });
       console.log('Welcome email sent');
     } catch (error) {
       await reportEmailSendFailure('welcome', error);
@@ -306,10 +303,12 @@ function redactEmailAddresses(message: string): string {
  */
 async function sendTrackedEmail(
   ctx: ActionCtx | MutationCtx,
-  emailParams: SendEmailOptions,
-  kind: EmailKind
+  args: {
+    emailParams: SendEmailOptions;
+    kind: EmailKind;
+  }
 ): Promise<EmailId> {
-  const emailId = await resend.sendEmail(ctx, emailParams);
+  const emailId = await resend.sendEmail(ctx, args.emailParams);
 
   try {
     await ctx.scheduler.runAfter(
@@ -317,7 +316,7 @@ async function sendTrackedEmail(
       internal.emails.checkSendResult,
       {
         emailId,
-        kind,
+        kind: args.kind,
         startedAt: Date.now(),
       }
     );
@@ -369,7 +368,7 @@ function normalizeRecipients(to: string | string[]): string[] {
 
 async function suppressRecipients(
   ctx: MutationCtx,
-  params: {
+  args: {
     bounceSubType?: string;
     bounceType?: string;
     emails: string[];
@@ -377,7 +376,7 @@ async function suppressRecipients(
     resendEmailId: string;
   }
 ) {
-  const uniqueEmails = [...new Set(params.emails)];
+  const uniqueEmails = [...new Set(args.emails)];
 
   await Promise.all(
     uniqueEmails.map(async (email) => {
@@ -391,15 +390,15 @@ async function suppressRecipients(
       }
 
       await ctx.db.insert('emailSuppressions', {
-        bounceSubType: params.bounceSubType,
-        bounceType: params.bounceType,
+        bounceSubType: args.bounceSubType,
+        bounceType: args.bounceType,
         email,
-        reason: params.reason,
-        resendEmailId: params.resendEmailId,
+        reason: args.reason,
+        resendEmailId: args.resendEmailId,
         suppressedAt: Date.now(),
       });
 
-      console.log('Email suppressed:', email, 'reason:', params.reason);
+      console.log('Email suppressed:', email, 'reason:', args.reason);
     })
   );
 }

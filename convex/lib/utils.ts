@@ -53,18 +53,20 @@ type SlugTable =
  */
 export async function slugExists(
   ctx: QueryCtx | MutationCtx,
-  table: SlugTable,
-  slug: string,
-  excludeId?: string
+  args: {
+    excludeId?: string;
+    slug: string;
+    table: SlugTable;
+  }
 ): Promise<boolean> {
-  const existing = await getOneFrom(ctx.db, table, 'by_slug', slug);
+  const existing = await getOneFrom(ctx.db, args.table, 'by_slug', args.slug);
 
   if (!existing) {
     return false;
   }
 
   // If excludeId is provided, check if it's the same record
-  if (excludeId && existing._id === excludeId) {
+  if (args.excludeId && existing._id === args.excludeId) {
     return false;
   }
 
@@ -78,22 +80,26 @@ export async function slugExists(
  */
 export async function talkSlugExistsForSpeaker(
   ctx: QueryCtx | MutationCtx,
-  speakerId: Id<'speakers'>,
-  slug: string,
-  excludeId?: Id<'talks'>
+  args: {
+    excludeId?: Id<'talks'>;
+    slug: string;
+    speakerId: Id<'speakers'>;
+  }
 ) {
   const speakerTalks = await ctx.db
     .query('talks')
-    .withIndex('by_speakerId_and_status', (q) => q.eq('speakerId', speakerId))
+    .withIndex('by_speakerId_and_status', (q) =>
+      q.eq('speakerId', args.speakerId)
+    )
     .collect();
 
   const existing = speakerTalks.find((talk) => {
-    if (talk.slug !== slug) {
+    if (talk.slug !== args.slug) {
       return false;
     }
 
     // If we're updating a talk, exclude the current talk from the check
-    if (excludeId && talk._id === excludeId) {
+    if (args.excludeId && talk._id === args.excludeId) {
       return false;
     }
 
@@ -109,12 +115,18 @@ export async function talkSlugExistsForSpeaker(
  */
 export async function generateSlug(
   ctx: QueryCtx | MutationCtx,
-  table: SlugTable,
-  baseText: string,
-  excludeId?: string
+  args: {
+    baseText: string;
+    excludeId?: string;
+    table: SlugTable;
+  }
 ) {
-  const baseSlug = slugify(baseText);
-  const baseSlugExists = await slugExists(ctx, table, baseSlug, excludeId);
+  const baseSlug = slugify(args.baseText);
+  const baseSlugExists = await slugExists(ctx, {
+    excludeId: args.excludeId,
+    slug: baseSlug,
+    table: args.table,
+  });
 
   if (!baseSlugExists) {
     return baseSlug;
@@ -124,8 +136,14 @@ export async function generateSlug(
   let candidateSlug = `${baseSlug}-${counter}`;
 
   // Try with numeric suffix
-  // oxlint-disable-next-line no-await-in-loop -- each candidate depends on the previous uniqueness check
-  while (await slugExists(ctx, table, candidateSlug, excludeId)) {
+  while (
+    // oxlint-disable-next-line no-await-in-loop -- each candidate depends on the previous uniqueness check
+    await slugExists(ctx, {
+      excludeId: args.excludeId,
+      slug: candidateSlug,
+      table: args.table,
+    })
+  ) {
     counter += 1;
     candidateSlug = `${baseSlug}-${counter}`;
   }
@@ -139,15 +157,17 @@ export async function generateSlug(
  */
 export async function getOrThrow<T extends TableNames>(
   ctx: QueryCtx | MutationCtx,
-  table: T,
-  id: Id<T>
+  args: {
+    id: Id<T>;
+    table: T;
+  }
 ): Promise<Doc<T>> {
-  const entity = await ctx.db.get(table, id);
+  const entity = await ctx.db.get(args.table, args.id);
 
   if (!entity) {
-    throwNotFound(`${table} not found`, {
-      resource: table,
-      resourceId: id,
+    throwNotFound(`${args.table} not found`, {
+      resource: args.table,
+      resourceId: args.id,
     });
   }
 
@@ -306,9 +326,9 @@ export async function paginateSearchOrList<T>(options: {
  */
 export async function deleteAll<T extends { _id: Id<TableNames> }>(
   ctx: MutationCtx,
-  items: T[]
+  args: { items: T[] }
 ): Promise<void> {
-  await Promise.all(items.map((item) => ctx.db.delete(item._id)));
+  await Promise.all(args.items.map((item) => ctx.db.delete(item._id)));
 }
 
 /**
@@ -333,9 +353,9 @@ export async function enrichWithSpeaker<
   T extends { speakerId: Id<'speakers'> },
 >(
   ctx: QueryCtx,
-  items: T[]
+  args: { items: T[] }
 ): Promise<(T & { speaker: Doc<'speakers'> | null })[]> {
-  return await asyncMap(items, async (item: T) => {
+  return await asyncMap(args.items, async (item: T) => {
     const speaker = await ctx.db.get('speakers', item.speakerId);
 
     return { ...toPublicTalk(item), speaker };

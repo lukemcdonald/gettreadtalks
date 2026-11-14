@@ -4,13 +4,15 @@ import { deleteAll } from '../../lib/utils';
 
 export async function listUserFavoriteClips(
   ctx: QueryCtx,
-  userId: string,
-  limit: number
+  args: {
+    limit: number;
+    userId: string;
+  }
 ) {
   const rows = await ctx.db
     .query('userFavoriteClips')
-    .withIndex('by_userId_and_clipId', (q) => q.eq('userId', userId))
-    .take(limit);
+    .withIndex('by_userId_and_clipId', (q) => q.eq('userId', args.userId))
+    .take(args.limit);
 
   const enriched = await Promise.all(
     rows.map(async (row) => {
@@ -32,13 +34,15 @@ export async function listUserFavoriteClips(
 
 export async function listUserFavoriteSpeakers(
   ctx: QueryCtx,
-  userId: string,
-  limit: number
+  args: {
+    limit: number;
+    userId: string;
+  }
 ) {
   const rows = await ctx.db
     .query('userFavoriteSpeakers')
-    .withIndex('by_userId_and_speakerId', (q) => q.eq('userId', userId))
-    .take(limit);
+    .withIndex('by_userId_and_speakerId', (q) => q.eq('userId', args.userId))
+    .take(args.limit);
 
   const enriched = await Promise.all(
     rows.map(async (row) => {
@@ -61,13 +65,15 @@ export async function listUserFavoriteSpeakers(
 
 export async function listUserFavoriteTalks(
   ctx: QueryCtx,
-  userId: string,
-  limit: number
+  args: {
+    limit: number;
+    userId: string;
+  }
 ) {
   const rows = await ctx.db
     .query('userFavoriteTalks')
-    .withIndex('by_userId_and_talkId', (q) => q.eq('userId', userId))
-    .take(limit);
+    .withIndex('by_userId_and_talkId', (q) => q.eq('userId', args.userId))
+    .take(args.limit);
 
   const enriched = await Promise.all(
     rows.map(async (row) => {
@@ -98,14 +104,16 @@ export async function listUserFavoriteTalks(
 
 export async function listUserFinishedTalks(
   ctx: QueryCtx,
-  userId: string,
-  limit: number
+  args: {
+    limit: number;
+    userId: string;
+  }
 ) {
   const rows = await ctx.db
     .query('userFinishedTalks')
-    .withIndex('by_userId', (q) => q.eq('userId', userId))
+    .withIndex('by_userId', (q) => q.eq('userId', args.userId))
     .order('desc')
-    .take(limit);
+    .take(args.limit);
 
   const enriched = await Promise.all(
     rows.map(async (row) => {
@@ -137,25 +145,30 @@ export async function listUserFinishedTalks(
  * Remove app-owned rows keyed by Better Auth user id. Auth tables are
  * deleted by Better Auth itself.
  */
-export async function destroyUserOwnedRows(ctx: MutationCtx, userId: string) {
+export async function destroyUserOwnedRows(
+  ctx: MutationCtx,
+  args: { userId: string }
+) {
   const [clips, speakers, talks, finished] = await Promise.all([
     ctx.db
       .query('userFavoriteClips')
-      .withIndex('by_userId_and_clipId', (q) => q.eq('userId', userId))
+      .withIndex('by_userId_and_clipId', (q) => q.eq('userId', args.userId))
       .collect(),
     ctx.db
       .query('userFavoriteSpeakers')
-      .withIndex('by_userId_and_speakerId', (q) => q.eq('userId', userId))
+      .withIndex('by_userId_and_speakerId', (q) => q.eq('userId', args.userId))
       .collect(),
     ctx.db
       .query('userFavoriteTalks')
-      .withIndex('by_userId_and_talkId', (q) => q.eq('userId', userId))
+      .withIndex('by_userId_and_talkId', (q) => q.eq('userId', args.userId))
       .collect(),
     ctx.db
       .query('userFinishedTalks')
-      .withIndex('by_userId', (q) => q.eq('userId', userId))
+      .withIndex('by_userId', (q) => q.eq('userId', args.userId))
       .collect(),
   ]);
 
-  await deleteAll(ctx, [...clips, ...speakers, ...talks, ...finished]);
+  await deleteAll(ctx, {
+    items: [...clips, ...speakers, ...talks, ...finished],
+  });
 }

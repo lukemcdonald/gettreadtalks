@@ -33,18 +33,25 @@ import { statusType, talkTranscriptFetchErrorCode } from './validators';
 
 async function setTalkTopics(
   ctx: MutationCtx,
-  talkId: Id<'talks'>,
-  topicIds: Id<'topics'>[]
+  args: {
+    talkId: Id<'talks'>;
+    topicIds: Id<'topics'>[];
+  }
 ) {
-  const uniqueTopicIds = [...new Set(topicIds)];
+  const uniqueTopicIds = [...new Set(args.topicIds)];
 
   await Promise.all(
-    uniqueTopicIds.map((topicId) => getOrThrow(ctx, 'topics', topicId))
+    uniqueTopicIds.map((topicId) =>
+      getOrThrow(ctx, {
+        id: topicId,
+        table: 'topics',
+      })
+    )
   );
 
   const existing = await ctx.db
     .query('talksOnTopics')
-    .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
+    .withIndex('by_talkId', (q) => q.eq('talkId', args.talkId))
     .collect();
 
   const existingIds = new Set(existing.map((row) => row.topicId));
@@ -61,7 +68,7 @@ async function setTalkTopics(
       .filter((topicId) => !existingIds.has(topicId))
       .map((topicId) =>
         ctx.db.insert('talksOnTopics', {
-          talkId,
+          talkId: args.talkId,
           topicId,
         })
       )
@@ -89,7 +96,11 @@ async function applyTalkSlugUpdate(
   }
 
   if (
-    await talkSlugExistsForSpeaker(ctx, args.speakerId, newSlug, args.talkId)
+    await talkSlugExistsForSpeaker(ctx, {
+      excludeId: args.talkId,
+      slug: newSlug,
+      speakerId: args.speakerId,
+    })
   ) {
     throwDuplicateSlug(
       'A talk with this slug already exists for this speaker',
@@ -137,7 +148,10 @@ export const archiveTalk = mutation({
 
     await requireAdmin(ctx);
 
-    const talk = await getOrThrow(ctx, 'talks', talkId);
+    const talk = await getOrThrow(ctx, {
+      id: talkId,
+      table: 'talks',
+    });
 
     const isArchived = talk.status === 'archived';
     const newStatus = isArchived ? 'backlog' : 'archived';
@@ -184,7 +198,12 @@ export const createTalk = mutation({
 
     const slug = slugify(talkArgs.title);
 
-    if (await talkSlugExistsForSpeaker(ctx, talkArgs.speakerId, slug)) {
+    if (
+      await talkSlugExistsForSpeaker(ctx, {
+        slug,
+        speakerId: talkArgs.speakerId,
+      })
+    ) {
       throwDuplicateSlug(
         'Talk with this title already exists for this speaker',
         'title'
@@ -205,12 +224,15 @@ export const createTalk = mutation({
     });
 
     if (topicIds !== undefined) {
-      await setTalkTopics(ctx, talkId, topicIds);
+      await setTalkTopics(ctx, {
+        talkId,
+        topicIds,
+      });
     }
 
     // YouTube talks draft the transcript, summary, and study in the background.
     if (hasTalkTranscriptSource(talkArgs.mediaUrl)) {
-      const runId = await createPendingTalkTranscriptFetch(ctx, talkId);
+      const runId = await createPendingTalkTranscriptFetch(ctx, { talkId });
 
       await ctx.scheduler.runAfter(0, internal.talks.fetchTalkTranscript, {
         continueDraft: true,
@@ -257,7 +279,10 @@ export const updateTalk = mutation({
     await requireAdmin(ctx);
 
     const updates: Partial<Doc<'talks'>> = rest;
-    const talk = await getOrThrow(ctx, 'talks', talkId);
+    const talk = await getOrThrow(ctx, {
+      id: talkId,
+      table: 'talks',
+    });
     const speakerIdToCheck = updates.speakerId || talk.speakerId;
 
     if (updates.title !== undefined && !updates.title.trim()) {
@@ -289,11 +314,17 @@ export const updateTalk = mutation({
     await ctx.db.patch(talkId, updates);
 
     if (summary !== undefined) {
-      await clearTalkDraftStep(ctx, talkId, 'summary');
+      await clearTalkDraftStep(ctx, {
+        step: 'summary',
+        talkId,
+      });
     }
 
     if (topicIds !== undefined) {
-      await setTalkTopics(ctx, talkId, topicIds);
+      await setTalkTopics(ctx, {
+        talkId,
+        topicIds,
+      });
     }
 
     await clearStaleMediaChecks(ctx, {
@@ -322,7 +353,10 @@ export const destroyTalk = mutation({
 
     await requireAdmin(ctx);
 
-    await getOrThrow(ctx, 'talks', talkId);
+    await getOrThrow(ctx, {
+      id: talkId,
+      table: 'talks',
+    });
 
     await clearMediaChecksForEntity(ctx, {
       entityId: talkId,
@@ -353,25 +387,25 @@ export const destroyTalk = mutation({
           .collect(),
       ]);
 
-    await deleteAll(ctx, features);
-    await deleteAll(ctx, fetches);
-    await deleteAll(ctx, studies);
-    await deleteAll(ctx, talksOnTopics);
-    await deleteAll(ctx, transcripts);
+    await deleteAll(ctx, { items: features });
+    await deleteAll(ctx, { items: fetches });
+    await deleteAll(ctx, { items: studies });
+    await deleteAll(ctx, { items: talksOnTopics });
+    await deleteAll(ctx, { items: transcripts });
 
     const favorites = await ctx.db
       .query('userFavoriteTalks')
       .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
       .collect();
 
-    await deleteAll(ctx, favorites);
+    await deleteAll(ctx, { items: favorites });
 
     const finished = await ctx.db
       .query('userFinishedTalks')
       .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
       .collect();
 
-    await deleteAll(ctx, finished);
+    await deleteAll(ctx, { items: finished });
 
     // Clips remain intact - talkId is optional and nullability is intentional
 
@@ -388,7 +422,10 @@ export const destroyTalk = mutation({
 export const upsertTalkTranscript = internalMutation({
   args: talkTranscriptFields,
   handler: async (ctx, args) => {
-    await getOrThrow(ctx, 'talks', args.talkId);
+    await getOrThrow(ctx, {
+      id: args.talkId,
+      table: 'talks',
+    });
 
     const existing = await ctx.db
       .query('talkTranscripts')
@@ -432,7 +469,10 @@ export const saveTalkSummaryDraft = internalMutation({
     talkId: v.id('talks'),
   },
   handler: async (ctx, args) => {
-    const talk = await getOrThrow(ctx, 'talks', args.talkId);
+    const talk = await getOrThrow(ctx, {
+      id: args.talkId,
+      table: 'talks',
+    });
 
     if (hasManuallyEditedTalkSummary(talk)) {
       throwConvexError(409, 'Summary already edited');
@@ -457,10 +497,16 @@ export const updateTalkSummary = mutation({
   handler: async (ctx, args) => {
     await requireAdmin(ctx);
 
-    const talk = await getOrThrow(ctx, 'talks', args.talkId);
+    const talk = await getOrThrow(ctx, {
+      id: args.talkId,
+      table: 'talks',
+    });
 
     await ctx.db.patch(args.talkId, getTalkSummaryPatch(talk, args.summary));
-    await clearTalkDraftStep(ctx, args.talkId, 'summary');
+    await clearTalkDraftStep(ctx, {
+      step: 'summary',
+      talkId: args.talkId,
+    });
 
     return args.talkId;
   },
@@ -505,7 +551,10 @@ export const createTalkTranscriptFetch = mutation({
   handler: async (ctx, { confirmRefetch = false, talkId }) => {
     await requireAdmin(ctx);
 
-    const talk = await getOrThrow(ctx, 'talks', talkId);
+    const talk = await getOrThrow(ctx, {
+      id: talkId,
+      table: 'talks',
+    });
     const existingTranscript = await getOneFrom(
       ctx.db,
       'talkTranscripts',
@@ -519,7 +568,7 @@ export const createTalkTranscriptFetch = mutation({
       );
     }
 
-    const runId = await createPendingTalkTranscriptFetch(ctx, talkId);
+    const runId = await createPendingTalkTranscriptFetch(ctx, { talkId });
 
     await ctx.scheduler.runAfter(0, internal.talks.fetchTalkTranscript, {
       mediaUrl: talk.mediaUrl,

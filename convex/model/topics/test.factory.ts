@@ -20,17 +20,20 @@ export function makeTopic(overrides: Partial<TopicFields> = {}): TopicFields {
 
 export async function insertTopic(
   ctx: MutationCtx,
-  overrides: Partial<TopicFields> = {}
+  { ...overrides }: Partial<TopicFields> = {}
 ) {
   return await ctx.db.insert('topics', makeTopic(overrides));
 }
 
 export async function insertTalkOnTopic(
   ctx: MutationCtx,
-  fields: {
+  args: {
     talkId: Id<'talks'>;
     topicId: Id<'topics'>;
   }
 ) {
-  return await ctx.db.insert('talksOnTopics', fields);
+  return await ctx.db.insert('talksOnTopics', {
+    talkId: args.talkId,
+    topicId: args.topicId,
+  });
 }

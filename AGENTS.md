@@ -172,6 +172,10 @@ _Mutations:_
 - `add*To*`, `remove*From*` — Associations
 - `favorite*`, `unfavorite*`, `finish*`, `unfinish*` — User actions
 
+### Helper arguments
+
+An internal helper that takes a Convex context and any other value takes that context and one args object, typed inline on the parameter and read from that object. Name the type only when it is exported or shared by more than one helper, and reuse an existing type instead of retyping its fields.
+
 ### Query & Action Directives
 
 File-level directives for single-function files:

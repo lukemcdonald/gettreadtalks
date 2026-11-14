@@ -34,7 +34,12 @@ export const createSpeaker = mutation({
 
     const slug = slugify(`${args.firstName} ${args.lastName}`);
 
-    if (await slugExists(ctx, 'speakers', slug)) {
+    if (
+      await slugExists(ctx, {
+        slug,
+        table: 'speakers',
+      })
+    ) {
       throwDuplicateSlug('Speaker with this name already exists', 'firstName');
     }
 
@@ -58,7 +63,10 @@ export const destroySpeaker = mutation({
 
     await requireAdmin(ctx);
 
-    await getOrThrow(ctx, 'speakers', speakerId);
+    await getOrThrow(ctx, {
+      id: speakerId,
+      table: 'speakers',
+    });
 
     // Prevent deletion if speaker has associated content
     const talksWithSpeaker = await getOneFrom(
@@ -96,7 +104,7 @@ export const destroySpeaker = mutation({
       speakerId
     );
 
-    await deleteAll(ctx, favorites);
+    await deleteAll(ctx, { items: favorites });
 
     await ctx.db.delete(speakerId);
 
@@ -126,7 +134,10 @@ export const updateSpeaker = mutation({
     const { slug: rawSlug, speakerId, ...rest } = args;
     const updates: Partial<Doc<'speakers'>> = rest;
 
-    const speaker = await getOrThrow(ctx, 'speakers', speakerId);
+    const speaker = await getOrThrow(ctx, {
+      id: speakerId,
+      table: 'speakers',
+    });
 
     if (updates.firstName !== undefined && !updates.firstName.trim()) {
       throwValidationError('First name cannot be empty', 'firstName');
@@ -145,7 +156,13 @@ export const updateSpeaker = mutation({
       }
 
       if (newSlug !== speaker.slug) {
-        if (await slugExists(ctx, 'speakers', newSlug, speakerId)) {
+        if (
+          await slugExists(ctx, {
+            excludeId: speakerId,
+            slug: newSlug,
+            table: 'speakers',
+          })
+        ) {
           throwDuplicateSlug('A speaker with this slug already exists', 'slug');
         }
 

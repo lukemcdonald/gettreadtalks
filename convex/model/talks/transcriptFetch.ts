@@ -12,12 +12,12 @@ import { TRANSCRIPT_FETCH_ERROR_CODES } from './validators';
 
 export async function createPendingTalkTranscriptFetch(
   ctx: MutationCtx,
-  talkId: Id<'talks'>
+  args: { talkId: Id<'talks'> }
 ) {
   return await ctx.db.insert('talkTranscriptFetches', {
     checkedAt: Date.now(),
     status: 'pending',
-    talkId,
+    talkId: args.talkId,
   });
 }
 
@@ -344,7 +344,7 @@ export const insertPendingTalkTranscriptFetch = internalMutation({
     talkId: v.id('talks'),
   },
   handler: async (ctx, { talkId }) =>
-    await createPendingTalkTranscriptFetch(ctx, talkId),
+    await createPendingTalkTranscriptFetch(ctx, { talkId }),
   returns: v.id('talkTranscriptFetches'),
 });
 
@@ -426,18 +426,17 @@ export function toGenerateTranscriptEnsureFailure(
   };
 }
 
+interface TranscriptEnsureArgs {
+  existingTranscript: string | null;
+  mediaUrl: string;
+  talkId: Id<'talks'>;
+}
+
 export async function loadTranscriptForGenerate(
   ctx: ActionCtx,
-  talkId: Id<'talks'>,
-  existingTranscript: string | null,
-  mediaUrl: string
+  args: TranscriptEnsureArgs
 ): Promise<{ transcript: string } | GenerateTranscriptEnsureFailure> {
-  const ensured = await ensureTalkTranscriptText(
-    ctx,
-    talkId,
-    existingTranscript,
-    mediaUrl
-  );
+  const ensured = await ensureTalkTranscriptText(ctx, args);
 
   if (ensured.status === 'success') {
     return {
@@ -450,11 +449,9 @@ export async function loadTranscriptForGenerate(
 
 export async function ensureTalkTranscriptText(
   ctx: ActionCtx,
-  talkId: Id<'talks'>,
-  existingTranscript: string | null,
-  mediaUrl: string
+  args: TranscriptEnsureArgs
 ): Promise<EnsureTalkTranscriptResult> {
-  const trimmed = existingTranscript?.trim();
+  const trimmed = args.existingTranscript?.trim();
 
   if (trimmed) {
     return {
@@ -463,7 +460,7 @@ export async function ensureTalkTranscriptText(
     };
   }
 
-  if (!hasTalkTranscriptSource(mediaUrl)) {
+  if (!hasTalkTranscriptSource(args.mediaUrl)) {
     return {
       errorCode: 'NO_TRANSCRIPT_SOURCE',
       message: NO_TRANSCRIPT_SOURCE_MESSAGE,
@@ -473,12 +470,12 @@ export async function ensureTalkTranscriptText(
 
   const runId = await ctx.runMutation(
     internal.talks.insertPendingTalkTranscriptFetch,
-    { talkId }
+    { talkId: args.talkId }
   );
 
   return await fetchAndCompleteTalkTranscript(ctx, {
-    mediaUrl,
+    mediaUrl: args.mediaUrl,
     runId,
-    talkId,
+    talkId: args.talkId,
   });
 }

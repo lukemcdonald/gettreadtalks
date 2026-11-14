@@ -76,8 +76,10 @@ function requireSeedId<Table extends TableNames>(
 
 async function upsertCredentialAccount(
   ctx: MutationCtx,
-  passwordHash: string,
-  userId: string
+  args: {
+    passwordHash: string;
+    userId: string;
+  }
 ) {
   const now = Date.now();
   const existingAccount: unknown = await ctx.runQuery(
@@ -92,7 +94,7 @@ async function upsertCredentialAccount(
         {
           connector: 'AND',
           field: 'userId',
-          value: userId,
+          value: args.userId,
         },
       ],
     }
@@ -105,7 +107,7 @@ async function upsertCredentialAccount(
       input: {
         model: 'account',
         update: {
-          password: passwordHash,
+          password: args.passwordHash,
           updatedAt: now,
         },
         where: [
@@ -123,12 +125,12 @@ async function upsertCredentialAccount(
   await ctx.runMutation(components.betterAuth.adapter.create, {
     input: {
       data: {
-        accountId: userId,
+        accountId: args.userId,
         createdAt: now,
-        password: passwordHash,
+        password: args.passwordHash,
         providerId: 'credential',
         updatedAt: now,
-        userId,
+        userId: args.userId,
       },
       model: 'account',
     },
@@ -137,8 +139,9 @@ async function upsertCredentialAccount(
 
 async function upsertSpeaker(
   ctx: MutationCtx,
-  speaker: PreviewRecord<typeof PREVIEW_SPEAKERS>
+  args: { speaker: PreviewRecord<typeof PREVIEW_SPEAKERS> }
 ): Promise<Id<'speakers'>> {
+  const { speaker } = args;
   const existing = await getOneFrom(
     ctx.db,
     'speakers',
@@ -166,8 +169,9 @@ async function upsertSpeaker(
 
 async function upsertTopic(
   ctx: MutationCtx,
-  topic: PreviewRecord<typeof PREVIEW_TOPICS>
+  args: { topic: PreviewRecord<typeof PREVIEW_TOPICS> }
 ): Promise<Id<'topics'>> {
+  const { topic } = args;
   const existing = await getOneFrom(ctx.db, 'topics', 'by_slug', topic.slug);
 
   if (existing) {
@@ -185,8 +189,9 @@ async function upsertTopic(
 
 async function upsertCollection(
   ctx: MutationCtx,
-  collection: PreviewRecord<typeof PREVIEW_COLLECTIONS>
+  args: { collection: PreviewRecord<typeof PREVIEW_COLLECTIONS> }
 ): Promise<Id<'collections'>> {
+  const { collection } = args;
   const existing = await getOneFrom(
     ctx.db,
     'collections',
@@ -209,10 +214,13 @@ async function upsertCollection(
 
 async function upsertTalk(
   ctx: MutationCtx,
-  collectionId: Id<'collections'>,
-  speakerId: Id<'speakers'>,
-  talk: PreviewRecord<typeof PREVIEW_TALKS>
+  args: {
+    collectionId: Id<'collections'>;
+    speakerId: Id<'speakers'>;
+    talk: PreviewRecord<typeof PREVIEW_TALKS>;
+  }
 ): Promise<Id<'talks'>> {
+  const { collectionId, speakerId, talk } = args;
   const existing = await getOneFrom(ctx.db, 'talks', 'by_slug', talk.slug);
   const publishedAt =
     talk.status === 'published' ? talk.publishedAt : undefined;
@@ -255,10 +263,13 @@ async function upsertTalk(
 
 async function upsertClip(
   ctx: MutationCtx,
-  speakerId: Id<'speakers'>,
-  talkId: Id<'talks'>,
-  clip: PreviewRecord<typeof PREVIEW_CLIPS>
+  args: {
+    clip: PreviewRecord<typeof PREVIEW_CLIPS>;
+    speakerId: Id<'speakers'>;
+    talkId: Id<'talks'>;
+  }
 ): Promise<Id<'clips'>> {
+  const { clip, speakerId, talkId } = args;
   const existing = await getOneFrom(ctx.db, 'clips', 'by_slug', clip.slug);
   const publishedAt =
     clip.status === 'published' ? clip.publishedAt : undefined;
@@ -289,13 +300,15 @@ async function upsertClip(
 
 async function upsertTalkTopics(
   ctx: MutationCtx,
-  talkId: Id<'talks'>,
-  topicIds: Id<'topics'>[]
+  args: {
+    talkId: Id<'talks'>;
+    topicIds: Id<'topics'>[];
+  }
 ) {
-  const uniqueTopicIds = [...new Set(topicIds)];
+  const uniqueTopicIds = [...new Set(args.topicIds)];
   const existing = await ctx.db
     .query('talksOnTopics')
-    .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
+    .withIndex('by_talkId', (q) => q.eq('talkId', args.talkId))
     .collect();
   const existingIds = new Set(existing.map((row) => row.topicId));
   const nextIds = new Set(uniqueTopicIds);
@@ -311,7 +324,7 @@ async function upsertTalkTopics(
       .filter((topicId) => !existingIds.has(topicId))
       .map((topicId) =>
         ctx.db.insert('talksOnTopics', {
-          talkId,
+          talkId: args.talkId,
           topicId,
         })
       )
@@ -331,19 +344,19 @@ export const seedContent = internalMutation({
     await Promise.all([
       Promise.all(
         Object.values(PREVIEW_SPEAKERS).map(async (speaker) => {
-          const speakerId = await upsertSpeaker(ctx, speaker);
+          const speakerId = await upsertSpeaker(ctx, { speaker });
           speakerIdsBySlug.set(speaker.slug, speakerId);
         })
       ),
       Promise.all(
         Object.values(PREVIEW_TOPICS).map(async (topic) => {
-          const topicId = await upsertTopic(ctx, topic);
+          const topicId = await upsertTopic(ctx, { topic });
           topicIdsBySlug.set(topic.slug, topicId);
         })
       ),
       Promise.all(
         Object.values(PREVIEW_COLLECTIONS).map(async (collection) => {
-          const collectionId = await upsertCollection(ctx, collection);
+          const collectionId = await upsertCollection(ctx, { collection });
           collectionIdsBySlug.set(collection.slug, collectionId);
         })
       ),
@@ -361,7 +374,11 @@ export const seedContent = internalMutation({
           'speaker',
           talk.speakerSlug
         );
-        const talkId = await upsertTalk(ctx, collectionId, speakerId, talk);
+        const talkId = await upsertTalk(ctx, {
+          collectionId,
+          speakerId,
+          talk,
+        });
         talkIdsBySlug.set(talk.slug, talkId);
       })
     );
@@ -373,7 +390,10 @@ export const seedContent = internalMutation({
           requireSeedId(topicIdsBySlug, 'topic', topicSlug)
         );
 
-        await upsertTalkTopics(ctx, talkId, topicIds);
+        await upsertTalkTopics(ctx, {
+          talkId,
+          topicIds,
+        });
       })
     );
 
@@ -443,7 +463,11 @@ export const seedContent = internalMutation({
         );
         const talkId = requireSeedId(talkIdsBySlug, 'talk', clip.talkSlug);
 
-        await upsertClip(ctx, speakerId, talkId, clip);
+        await upsertClip(ctx, {
+          clip,
+          speakerId,
+          talkId,
+        });
       })
     );
 
@@ -508,7 +532,10 @@ export const seedPreviewUser = internalMutation({
       throwValidationError('Preview user seed did not return a user id');
     }
 
-    await upsertCredentialAccount(ctx, args.passwordHash, userId);
+    await upsertCredentialAccount(ctx, {
+      passwordHash: args.passwordHash,
+      userId,
+    });
 
     return 'created';
   },

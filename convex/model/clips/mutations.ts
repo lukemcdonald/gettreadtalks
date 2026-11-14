@@ -28,7 +28,10 @@ export const archiveClip = mutation({
   handler: async (ctx, args) => {
     await requireAdmin(ctx);
 
-    await getOrThrow(ctx, 'clips', args.clipId);
+    await getOrThrow(ctx, {
+      id: args.clipId,
+      table: 'clips',
+    });
 
     await ctx.db.patch(args.clipId, {
       publishedAt: undefined,
@@ -58,7 +61,10 @@ export const destroyClip = mutation({
 
     await requireAdmin(ctx);
 
-    await getOrThrow(ctx, 'clips', clipId);
+    await getOrThrow(ctx, {
+      id: clipId,
+      table: 'clips',
+    });
 
     await clearMediaChecksForEntity(ctx, {
       entityId: clipId,
@@ -72,7 +78,7 @@ export const destroyClip = mutation({
       clipId
     );
 
-    await deleteAll(ctx, favorites);
+    await deleteAll(ctx, { items: favorites });
 
     await ctx.db.delete(clipId);
 
@@ -100,7 +106,10 @@ export const createClip = mutation({
       throwValidationError('Title cannot be empty', 'title');
     }
 
-    const slug = await generateSlug(ctx, 'clips', args.title);
+    const slug = await generateSlug(ctx, {
+      baseText: args.title,
+      table: 'clips',
+    });
 
     const status = args.status ?? 'backlog';
     const publishedAt = getPublishedAtForStatus(status);
@@ -134,7 +143,10 @@ export const updateClip = mutation({
     const { clipId, ...rest } = args;
     const updates: Partial<Doc<'clips'>> = rest;
 
-    const clip = await getOrThrow(ctx, 'clips', clipId);
+    const clip = await getOrThrow(ctx, {
+      id: clipId,
+      table: 'clips',
+    });
 
     // If title changed, update slug
     if (updates.title !== undefined) {
@@ -142,7 +154,11 @@ export const updateClip = mutation({
         throwValidationError('Title cannot be empty', 'title');
       }
 
-      const newSlug = await generateSlug(ctx, 'clips', updates.title, clipId);
+      const newSlug = await generateSlug(ctx, {
+        baseText: updates.title,
+        excludeId: clipId,
+        table: 'clips',
+      });
 
       if (newSlug !== clip.slug) {
         updates.slug = newSlug;
