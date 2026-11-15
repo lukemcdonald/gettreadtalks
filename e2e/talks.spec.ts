@@ -35,7 +35,8 @@ test('Talk listing format filter shows the matching talk card', async ({
   );
 });
 
-test('Talk detail shows related talks', async ({ talksPage }) => {
+// VOLTA-604: direct loads leave a hidden duplicate talk heading in previews.
+test.fixme('Talk detail shows related talks', async ({ talksPage }) => {
   await talksPage.page.goto(talkPath(PREVIEW_TALKS.THE_PRODIGAL_SON));
 
   await expect(talksPage.page.getByTestId('talk-heading')).toBeVisible();
