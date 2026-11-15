@@ -57,6 +57,7 @@ export const PREVIEW_TALKS = {
     collectionOrder: 1,
     collectionSlug: PREVIEW_COLLECTIONS.SAMPLE_CONFERENCE.slug,
     featured: true,
+    format: 'sermon' as const,
     mediaUrl: 'https://www.youtube.com/live/0SVTl4Xa5fY',
     publishedAt: Date.parse('2024-06-03T12:00:00.000Z'),
     scripture: 'Romans 8:28',

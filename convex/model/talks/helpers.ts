@@ -2,6 +2,7 @@ import type { Doc, Id } from '../../_generated/dataModel';
 import type { QueryCtx } from '../../_generated/server';
 import type { StatusFilterType } from '../../lib/types';
 import type { SearchArgs, StatusSearchArgs } from '../search/helpers';
+import type { TalkFormat } from './validators';
 import type { PaginationOptions } from 'convex/server';
 
 import { asyncMap } from 'convex-helpers';
@@ -14,6 +15,7 @@ import {
   uniqueById,
 } from '../search/helpers';
 import { searchPublishedSpeakers, searchSpeakers } from '../speakers/helpers';
+import { talkFormats } from './validators';
 
 function publishedTalksQuery(ctx: QueryCtx) {
   return ctx.db
@@ -371,4 +373,28 @@ export async function enrichTalksForAdmin(
       talkId: talk._id,
     }),
   }));
+}
+
+const MINIMUM_PUBLISHED_TALK_FORMATS = 2;
+
+async function findPublishedTalkForFormat(
+  ctx: QueryCtx,
+  args: { format: TalkFormat }
+) {
+  return await ctx.db
+    .query('talks')
+    .withIndex('by_format_status_and_publishedAt', (q) =>
+      q.eq('format', args.format).eq('status', 'published')
+    )
+    .first();
+}
+
+/** True when published talks use enough formats for the public filter to help. */
+export async function hasMultiplePublishedTalkFormats(ctx: QueryCtx) {
+  const matches = await Promise.all(
+    talkFormats.map((format) => findPublishedTalkForFormat(ctx, { format }))
+  );
+  const publishedFormats = matches.filter((talk) => talk !== null);
+
+  return publishedFormats.length >= MINIMUM_PUBLISHED_TALK_FORMATS;
 }

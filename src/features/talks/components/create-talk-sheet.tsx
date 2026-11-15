@@ -13,7 +13,10 @@ import { FormSheet } from '@/components/ui';
 import { createTalkAction } from '@/features/talks/actions/create-talk';
 import { TalkFormFields } from '@/features/talks/components/talk-form-fields';
 import { formatTalkCreateGenerationHint } from '@/features/talks/components/talk-generate-status';
-import { talkFormSchema } from '@/features/talks/schemas/talk-form';
+import {
+  getTalkCreateFormValues,
+  talkFormSchema,
+} from '@/features/talks/schemas/talk-form';
 import { useCreateFormSheet } from '@/lib/forms/use-create-form-sheet';
 
 interface CreateTalkSheetProps {
@@ -34,19 +37,7 @@ export function CreateTalkSheet({
   topics,
 }: CreateTalkSheetProps) {
   const form = useForm<TalkFormData>({
-    defaultValues: {
-      collectionId: undefined,
-      collectionOrder: undefined,
-      featured: false,
-      format: '',
-      mediaUrl: '',
-      publishedAt: '',
-      scripture: '',
-      speakerId: undefined,
-      status: 'backlog',
-      title: '',
-      topicIds: [],
-    },
+    defaultValues: getTalkCreateFormValues(),
     mode: 'onBlur',
     // oxlint-disable-next-line typescript/no-explicit-any -- Zod 4 compatibility with zodResolver
     resolver: zodResolver(talkFormSchema as any),

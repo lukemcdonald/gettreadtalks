@@ -893,3 +893,73 @@ describe('listTalks format', () => {
     expect(result.page.map((talk) => talk.slug)).toEqual(['later-debate']);
   });
 });
+
+describe('getTalkFormatFilter', () => {
+  it('hides the filter when published talks use fewer than two formats', async () => {
+    const t = createConvexTest();
+    await t.run(async (ctx) => {
+      const speakerId = await insertSpeaker(ctx, {
+        firstName: 'Ada',
+        lastName: 'Clare',
+        slug: 'ada-clare',
+      });
+
+      await insertTalk(ctx, {
+        format: 'debate',
+        slug: 'published-debate',
+        speakerId,
+        title: 'Published Debate',
+      });
+      await insertTalk(ctx, {
+        slug: 'unset-format',
+        speakerId,
+        title: 'Unset Format',
+      });
+      await insertTalk(ctx, {
+        format: 'lecture',
+        slug: 'draft-lecture',
+        speakerId,
+        status: 'backlog',
+        title: 'Draft Lecture',
+      });
+    });
+
+    const filter = await t.query(api.talks.getTalkFormatFilter, {});
+
+    expect(filter.visible).toBe(false);
+  });
+
+  it('shows the filter when published talks use two formats', async () => {
+    const t = createConvexTest();
+    await t.run(async (ctx) => {
+      const speakerId = await insertSpeaker(ctx, {
+        firstName: 'Ada',
+        lastName: 'Clare',
+        slug: 'ada-clare',
+      });
+
+      await insertTalk(ctx, {
+        format: 'debate',
+        slug: 'published-debate',
+        speakerId,
+        title: 'Published Debate',
+      });
+      await insertTalk(ctx, {
+        format: 'sermon',
+        slug: 'published-sermon',
+        speakerId,
+        title: 'Published Sermon',
+      });
+      await insertTalk(ctx, {
+        format: 'sermon',
+        slug: 'another-sermon',
+        speakerId,
+        title: 'Another Sermon',
+      });
+    });
+
+    const filter = await t.query(api.talks.getTalkFormatFilter, {});
+
+    expect(filter.visible).toBe(true);
+  });
+});

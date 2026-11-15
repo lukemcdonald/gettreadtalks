@@ -140,7 +140,7 @@ Public reads live in `src/features/*/queries` with `'use cache'`, `cacheLife()`,
 
 - `convex/{domain}.ts` - Public API exports
 - `convex/model/{domain}/` - Use only the standard top-level files the domain needs (`schema`, `validators`, `types`, `queries`, `mutations`, `helpers`, `index`, `test.factory`, and matching tests).
-- Put feature-specific code in a subfolder; use the same standard file names inside it where they fit.
+- Feature-specific code goes in a subfolder named for the feature, never for the action. Inside it, use a standard file name only when the file really is that kind of file; otherwise name the file for what it does. Never create a folder that holds a single standard-named file.
 - `convex/model/auth/` - Authentication helpers
 - `convex/lib/` - Shared utilities
 

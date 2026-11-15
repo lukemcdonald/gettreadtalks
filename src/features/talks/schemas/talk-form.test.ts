@@ -1,6 +1,12 @@
+import type { TalkFormData } from './talk-form';
+
 import { describe, expect, it } from '@/test';
 
-import { talkFormSchema } from './talk-form';
+import {
+  getTalkCreateFormValues,
+  talkFormSchema,
+  toCreateTalkInput,
+} from './talk-form';
 
 const talkFields = {
   mediaUrl: 'https://example.com/talk',
@@ -74,5 +80,31 @@ describe('talkFormSchema format', () => {
     });
 
     expect(result.success).toBe(false);
+  });
+});
+
+function createTalkInput(format: TalkFormData['format']) {
+  return toCreateTalkInput({
+    featured: false,
+    format,
+    mediaUrl: talkFields.mediaUrl,
+    publishedAt: '',
+    speakerId: talkFields.speakerId as TalkFormData['speakerId'],
+    status: 'backlog',
+    title: talkFields.title,
+    topicIds: [],
+  });
+}
+
+describe('talk create format', () => {
+  it('starts on sermon and sends that format', () => {
+    expect(getTalkCreateFormValues().format).toBe('sermon');
+    expect(createTalkInput(getTalkCreateFormValues().format).format).toBe(
+      'sermon'
+    );
+  });
+
+  it('omits an empty format', () => {
+    expect(createTalkInput('')).not.toHaveProperty('format');
   });
 });
