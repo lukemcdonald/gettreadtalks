@@ -4,11 +4,13 @@ import { createAuthOptions } from '../auth';
 import schema from './schema';
 
 export const {
+  consumeOne,
   create,
-  findOne,
-  findMany,
-  updateOne,
-  updateMany,
-  deleteOne,
   deleteMany,
+  deleteOne,
+  findMany,
+  findOne,
+  incrementOne,
+  updateMany,
+  updateOne,
 } = createApi(schema, createAuthOptions);
