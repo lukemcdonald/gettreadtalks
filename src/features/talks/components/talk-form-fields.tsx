@@ -14,13 +14,24 @@ import {
   DateField,
   FeaturedField,
   NumberField,
+  SelectField,
   StatusField,
   TextField,
   UrlField,
 } from '@/components/ui';
+import { talkFormats } from '@/convex/model/talks/validators';
 import { CollectionSelectField } from '@/features/collections/components/collection-select-field';
 import { SpeakerField } from '@/features/speakers/components/speaker-field';
+import { formatTalkFormat } from '@/features/talks/utils';
 import { TopicField } from '@/features/topics/components/topic-field';
+
+const formatOptions = [
+  { label: 'None', value: '' },
+  ...talkFormats.map((format) => ({
+    label: formatTalkFormat(format),
+    value: format,
+  })),
+];
 
 interface TalkCollectionFieldsProps {
   collections: CollectionListItem[];
@@ -142,6 +153,13 @@ export function TalkFormFields({
         label="Scripture"
         name="scripture"
         placeholder="Romans 8:28"
+      />
+
+      <SelectField
+        control={control}
+        label="Format"
+        name="format"
+        options={formatOptions}
       />
 
       <TopicField control={control} name="topicIds" topics={topics} />

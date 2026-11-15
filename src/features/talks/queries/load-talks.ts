@@ -1,5 +1,7 @@
 'use cache';
 
+import type { TalkFormat } from '@/convex/model/talks/validators';
+
 import { fetchQuery } from 'convex/nextjs';
 import { cacheLife, cacheTag } from 'next/cache';
 
@@ -11,6 +13,7 @@ type SortOption = 'alphabetical' | 'featured' | 'oldest' | 'recent';
 interface GetTalksProps {
   cursor?: string;
   featured?: boolean;
+  format?: TalkFormat;
   limit?: number;
   search?: string;
   sort?: string;
@@ -30,6 +33,7 @@ export async function loadTalks(args?: GetTalksProps) {
   const {
     cursor,
     featured,
+    format,
     limit = PUBLIC_LISTING_PAGE_SIZE,
     search,
     sort,
@@ -55,6 +59,7 @@ export async function loadTalks(args?: GetTalksProps) {
 
   const result = await fetchQuery(api.talks.listTalks, {
     featured: featured || undefined,
+    format,
     paginationOpts,
     search: search || undefined,
     sort: sortOption,

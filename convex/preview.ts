@@ -233,10 +233,12 @@ async function upsertTalk(
           summaryGeneratedAt: existing?.summaryGeneratedAt ?? Date.now(),
           summaryGenerator: existing?.summaryGenerator ?? 'grok-bot',
         };
+  const format = 'format' in talk ? talk.format : undefined;
   const fields = {
     collectionId,
     collectionOrder: talk.collectionOrder,
     featured: talk.featured,
+    ...(format ? { format } : {}),
     mediaUrl: talk.mediaUrl,
     publishedAt,
     scripture: talk.scripture,
@@ -249,6 +251,7 @@ async function upsertTalk(
   if (existing) {
     await ctx.db.patch(existing._id, {
       ...fields,
+      format,
       updatedAt: Date.now(),
     });
 

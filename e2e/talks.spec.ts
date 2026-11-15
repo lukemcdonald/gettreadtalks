@@ -18,6 +18,23 @@ test('Talk listing search filters results', async ({ talksPage }) => {
   ).toHaveCount(0);
 });
 
+test('Talk listing format filter shows the matching talk card', async ({
+  talksPage,
+}) => {
+  await talksPage.goto();
+  await talksPage.filterByFormat('Debate');
+
+  await expect(talksPage.page).toHaveURL(/format=debate/u);
+
+  const cards = talksPage.page.getByTestId('talk-card');
+
+  await expect(cards).toHaveCount(1);
+  await expect(cards).toHaveAttribute(
+    'href',
+    talkPath(PREVIEW_TALKS.THE_PRODIGAL_SON)
+  );
+});
+
 test('Talk detail shows related talks', async ({ talksPage }) => {
   await talksPage.page.goto(talkPath(PREVIEW_TALKS.THE_PRODIGAL_SON));
 

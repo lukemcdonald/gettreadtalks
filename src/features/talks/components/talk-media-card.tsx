@@ -7,12 +7,12 @@ import { MediaCard, MediaIconFrame } from '@/components/media-card';
 import { detectMediaType } from '@/components/media-embed/utils';
 import { getSpeakerName } from '@/features/speakers/utils';
 import { TalkCardSubtitle } from '@/features/talks/components/talk-card-subtitle';
-import { buildTalkPath } from '@/features/talks/utils';
+import { buildTalkPath, formatTalkFormat } from '@/features/talks/utils';
 
 interface TalkMediaCardProps {
   headingLevel?: 2 | 3;
   speaker: Pick<Speaker, 'firstName' | 'lastName' | 'slug'>;
-  talk: Pick<Talk, 'mediaUrl' | 'scripture' | 'slug' | 'title'>;
+  talk: Pick<Talk, 'format' | 'mediaUrl' | 'scripture' | 'slug' | 'title'>;
 }
 
 function TalkMediaIcon({ mediaUrl }: { mediaUrl: string }) {
@@ -58,6 +58,7 @@ export function TalkMediaCard({
       media={<TalkMediaIcon mediaUrl={talk.mediaUrl} />}
       subtitle={
         <TalkCardSubtitle
+          format={talk.format ? formatTalkFormat(talk.format) : undefined}
           scripture={talk.scripture}
           speakerName={getSpeakerName(speaker)}
         />

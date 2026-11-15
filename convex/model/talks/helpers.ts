@@ -155,7 +155,18 @@ export async function searchTalks(ctx: QueryCtx, args: StatusSearchArgs) {
     .take(args.limit);
 }
 
-export async function searchPublishedTalks(ctx: QueryCtx, args: SearchArgs) {
+type PublishedTalkSearchArgs = SearchArgs & {
+  format?: Doc<'talks'>['format'];
+};
+
+type TalkSearchArgs = StatusSearchArgs & {
+  format?: Doc<'talks'>['format'];
+};
+
+export async function searchPublishedTalks(
+  ctx: QueryCtx,
+  args: PublishedTalkSearchArgs
+) {
   return await loadUntilFull(
     ctx.db
       .query('talks')
@@ -164,6 +175,10 @@ export async function searchPublishedTalks(ctx: QueryCtx, args: SearchArgs) {
         searchTitleQuery(args.queryText, 'published')
       ),
     async (talk) => {
+      if (args.format && talk.format !== args.format) {
+        return false;
+      }
+
       const speaker = await ctx.db.get('speakers', talk.speakerId);
 
       return speaker !== null;
@@ -172,7 +187,23 @@ export async function searchPublishedTalks(ctx: QueryCtx, args: SearchArgs) {
   );
 }
 
-async function loadTalksByNamedSpeakers(ctx: QueryCtx, args: StatusSearchArgs) {
+function talksForSpeakerQuery(
+  ctx: QueryCtx,
+  args: {
+    speakerId: Id<'speakers'>;
+    status?: StatusFilterType;
+  }
+) {
+  return ctx.db.query('talks').withIndex('by_speakerId_and_status', (q) => {
+    const bySpeaker = q.eq('speakerId', args.speakerId);
+
+    return args.status && args.status !== 'all'
+      ? bySpeaker.eq('status', args.status)
+      : bySpeaker;
+  });
+}
+
+async function loadTalksByNamedSpeakers(ctx: QueryCtx, args: TalkSearchArgs) {
   const searchSpeakersByName =
     args.status === 'published' ? searchPublishedSpeakers : searchSpeakers;
   const speakers = await searchSpeakersByName(ctx, {
@@ -185,18 +216,22 @@ async function loadTalksByNamedSpeakers(ctx: QueryCtx, args: StatusSearchArgs) {
   }
 
   const speakerTalkPages = await Promise.all(
-    speakers.map((speaker) =>
-      ctx.db
-        .query('talks')
-        .withIndex('by_speakerId_and_status', (q) => {
-          const bySpeaker = q.eq('speakerId', speaker._id);
+    speakers.map((speaker) => {
+      const talks = talksForSpeakerQuery(ctx, {
+        speakerId: speaker._id,
+        status: args.status,
+      });
 
-          return args.status && args.status !== 'all'
-            ? bySpeaker.eq('status', args.status)
-            : bySpeaker;
-        })
-        .take(args.limit)
-    )
+      if (!args.format) {
+        return talks.take(args.limit);
+      }
+
+      return loadUntilFull(
+        talks,
+        (talk) => talk.format === args.format,
+        args.limit
+      );
+    })
   );
   return uniqueById(speakerTalkPages.flat()).slice(0, args.limit);
 }
@@ -204,11 +239,12 @@ async function loadTalksByNamedSpeakers(ctx: QueryCtx, args: StatusSearchArgs) {
 /** Title matches plus talks by speakers whose names match. */
 export async function searchTalksByTitleOrSpeaker(
   ctx: QueryCtx,
-  args: StatusSearchArgs
+  args: TalkSearchArgs
 ) {
   const [titleHits, speakerTalks] = await Promise.all([
     args.status === 'published'
       ? searchPublishedTalks(ctx, {
+          format: args.format,
           limit: args.limit,
           queryText: args.queryText,
         })
@@ -218,6 +254,7 @@ export async function searchTalksByTitleOrSpeaker(
           status: args.status,
         }),
     loadTalksByNamedSpeakers(ctx, {
+      format: args.format,
       limit: args.limit,
       queryText: args.queryText,
       status: args.status,
@@ -232,9 +269,10 @@ export async function searchTalksByTitleOrSpeaker(
 
 export async function searchPublishedTalksByTitleOrSpeaker(
   ctx: QueryCtx,
-  args: SearchArgs
+  args: PublishedTalkSearchArgs
 ) {
   return await searchTalksByTitleOrSpeaker(ctx, {
+    format: args.format,
     limit: args.limit,
     queryText: args.queryText,
     status: 'published',

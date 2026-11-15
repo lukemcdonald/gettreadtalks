@@ -4,6 +4,7 @@ import { api } from '../../_generated/api';
 import { ErrorCodes } from '../../lib/errors';
 import { createConvexTest, signInAs } from '../../test.setup';
 import { insertSpeaker } from '../speakers/test.factory';
+import { talkFormats } from './validators';
 
 const MEDIA_URL = 'https://www.youtube.com/watch?v=0SVTl4Xa5fY';
 const PAST_PUBLISHED_AT = Date.parse('2020-01-15T00:00:00.000Z');
@@ -163,5 +164,86 @@ describe('updateTalk publishedAt', () => {
     expect(talk?.summary).toBeUndefined();
     expect(talk?.summaryManuallyEditedAt).toBeUndefined();
     expect(talk?.title).toBe('Updated Title');
+  });
+});
+
+describe('talk format', () => {
+  it('creates a talk with no format', async () => {
+    const { asAdmin, speakerId, t } = await seedAdminTalk();
+    const talkId = await asAdmin.mutation(api.talks.createTalk, {
+      mediaUrl: MEDIA_URL,
+      speakerId,
+      title: 'Unset Format Talk',
+    });
+    const talk = await t.run(async (ctx) => await ctx.db.get('talks', talkId));
+
+    expect(talk?.format).toBeUndefined();
+  });
+
+  it('persists each format', async () => {
+    const { asAdmin, speakerId, t } = await seedAdminTalk();
+    const talkIds = await Promise.all(
+      talkFormats.map((format) =>
+        asAdmin.mutation(api.talks.createTalk, {
+          format,
+          mediaUrl: MEDIA_URL,
+          speakerId,
+          title: `Format ${format}`,
+        })
+      )
+    );
+    const stored = await t.run(
+      async (ctx) =>
+        await Promise.all(
+          talkIds.map(async (talkId) => await ctx.db.get('talks', talkId))
+        )
+    );
+
+    expect(stored.map((talk) => talk?.format)).toEqual([...talkFormats]);
+  });
+
+  it('rejects an unknown format', async () => {
+    const { asAdmin, speakerId } = await seedAdminTalk();
+
+    await expect(
+      asAdmin.mutation(api.talks.createTalk, {
+        format: 'homily' as 'debate',
+        mediaUrl: MEDIA_URL,
+        speakerId,
+        title: 'Unknown Format Talk',
+      })
+    ).rejects.toThrow();
+  });
+
+  it('changes and clears a format', async () => {
+    const { asAdmin, speakerId, t } = await seedAdminTalk();
+    const talkId = await asAdmin.mutation(api.talks.createTalk, {
+      format: 'sermon',
+      mediaUrl: MEDIA_URL,
+      speakerId,
+      title: 'Changeable Format Talk',
+    });
+
+    await asAdmin.mutation(api.talks.updateTalk, {
+      format: 'debate',
+      talkId,
+    });
+
+    const changed = await t.run(
+      async (ctx) => await ctx.db.get('talks', talkId)
+    );
+
+    expect(changed?.format).toBe('debate');
+
+    await asAdmin.mutation(api.talks.updateTalk, {
+      format: null,
+      talkId,
+    });
+
+    const cleared = await t.run(
+      async (ctx) => await ctx.db.get('talks', talkId)
+    );
+
+    expect(cleared?.format).toBeUndefined();
   });
 });

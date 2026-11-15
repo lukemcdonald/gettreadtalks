@@ -100,6 +100,7 @@ export const PREVIEW_TALKS = {
     collectionOrder: 2,
     collectionSlug: PREVIEW_COLLECTIONS.SAMPLE_CONFERENCE.slug,
     featured: false,
+    format: 'debate' as const,
     mediaUrl: 'https://www.youtube.com/watch?v=26z_KhwNdD8',
     publishedAt: Date.parse('2024-06-04T12:00:00.000Z'),
     scripture: 'Luke 15:11-32',

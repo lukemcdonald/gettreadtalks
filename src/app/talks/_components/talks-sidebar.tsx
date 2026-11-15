@@ -2,8 +2,10 @@ import type { Speaker } from '@/features/speakers/types';
 import type { Topic } from '@/features/topics/types';
 
 import { BrowseFilters } from '@/components/browse-filters';
-import { ComboboxMultiFilter, SortSelect } from '@/components/ui';
+import { ComboboxMultiFilter, SelectFilter, SortSelect } from '@/components/ui';
+import { talkFormats } from '@/convex/model/talks/validators';
 import { getSpeakerName } from '@/features/speakers/utils';
+import { formatTalkFormat } from '@/features/talks/utils';
 
 interface TopicWithCount {
   count: number;
@@ -24,6 +26,11 @@ export function TalksSidebar({ speakers, topics }: TalksSidebarProps) {
   const topicOptions = topics.map(({ topic }) => ({
     label: topic.title,
     value: topic.slug,
+  }));
+
+  const formatOptions = talkFormats.map((format) => ({
+    label: formatTalkFormat(format),
+    value: format,
   }));
 
   const sortOptions = [
@@ -48,6 +55,12 @@ export function TalksSidebar({ speakers, topics }: TalksSidebarProps) {
         name="topics"
         options={topicOptions}
         placeholder="All Topics"
+      />
+      <SelectFilter
+        label="Format"
+        name="format"
+        options={formatOptions}
+        placeholder="All Formats"
       />
       <SortSelect label="Sort by" options={sortOptions} />
     </BrowseFilters>

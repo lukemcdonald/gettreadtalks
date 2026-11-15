@@ -2,6 +2,12 @@ import { describe, expect, it } from '@/test';
 
 import { talkFormSchema } from './talk-form';
 
+const talkFields = {
+  mediaUrl: 'https://example.com/talk',
+  speakerId: 'speakers:example',
+  title: 'A Talk',
+};
+
 function parsePublishDate(publishedAt?: string) {
   return talkFormSchema.pick({ publishedAt: true }).safeParse({
     publishedAt,
@@ -31,5 +37,42 @@ describe('talkFormSchema publishedAt', () => {
     expect(result.error.issues[0]?.message).toBe(
       'Publish date cannot be in the future'
     );
+  });
+});
+
+describe('talkFormSchema format', () => {
+  it('accepts a format and keeps it on the parsed form', () => {
+    const result = talkFormSchema.safeParse({
+      ...talkFields,
+      format: 'debate',
+    });
+
+    expect(result.success).toBe(true);
+
+    if (result.success) {
+      expect(result.data.format).toBe('debate');
+    }
+  });
+
+  it('accepts an empty format', () => {
+    const result = talkFormSchema.safeParse({
+      ...talkFields,
+      format: '',
+    });
+
+    expect(result.success).toBe(true);
+
+    if (result.success) {
+      expect(result.data.format).toBe('');
+    }
+  });
+
+  it('rejects an invalid format', () => {
+    const result = talkFormSchema.safeParse({
+      ...talkFields,
+      format: 'homily',
+    });
+
+    expect(result.success).toBe(false);
   });
 });

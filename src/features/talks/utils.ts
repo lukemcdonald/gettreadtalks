@@ -1,3 +1,4 @@
+import type { TalkFormat } from '@/convex/model/talks/validators';
 import type { Speaker } from '@/features/speakers/types';
 import type { Talk, TalkId } from '@/features/talks/types';
 
@@ -170,6 +171,20 @@ function trimAtWordBoundary(text: string, maxLength: number) {
   }
 
   return text.slice(0, lastSpace);
+}
+
+const TALK_FORMAT_LABELS = {
+  debate: 'Debate',
+  lecture: 'Lecture',
+  'panel-discussion': 'Panel discussion',
+  qa: 'Q&A',
+  sermon: 'Sermon',
+  'street-evangelism': 'Street evangelism',
+  testimony: 'Testimony',
+} as const satisfies Record<TalkFormat, string>;
+
+export function formatTalkFormat(format: TalkFormat) {
+  return TALK_FORMAT_LABELS[format];
 }
 
 export function formatTalkMetaTitle(title: string, speakerName?: string) {

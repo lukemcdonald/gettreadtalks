@@ -1,4 +1,27 @@
+import { literals } from 'convex-helpers/validators';
 import { v } from 'convex/values';
+
+export const talkFormats = [
+  'debate',
+  'lecture',
+  'panel-discussion',
+  'qa',
+  'sermon',
+  'street-evangelism',
+  'testimony',
+] as const;
+
+export type TalkFormat = (typeof talkFormats)[number];
+
+export const talkFormat = literals(...talkFormats);
+
+export function parseTalkFormat(value?: string | null) {
+  if (!value) {
+    return;
+  }
+
+  return talkFormats.find((format) => format === value);
+}
 
 export const statusType = v.union(
   v.literal('approved'),

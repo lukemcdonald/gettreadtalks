@@ -7,7 +7,20 @@ import { ExternalLinkIcon } from 'lucide-react';
 import { MetadataGroup } from '@/components/metadata-group';
 import { Link } from '@/components/ui/link';
 import { TalkActions } from '@/features/talks/components/talk-actions';
+import { formatTalkFormat } from '@/features/talks/utils';
 import { TopicLinks } from '@/features/topics/components/topic-links';
+
+function TalkFormatGroup({ format }: { format: Talk['format'] }) {
+  if (!format) {
+    return null;
+  }
+
+  return (
+    <MetadataGroup label="Format">
+      <p className="text-sm">{formatTalkFormat(format)}</p>
+    </MetadataGroup>
+  );
+}
 
 interface TalkMetadataSidebarProps {
   speaker: Speaker | null;
@@ -38,6 +51,8 @@ export function TalkMetadataSidebar({
           </div>
         </MetadataGroup>
       ) : null}
+
+      <TalkFormatGroup format={talk.format} />
 
       {topics.length > 0 && (
         <MetadataGroup label="Topics">

@@ -38,6 +38,7 @@ export function CreateTalkSheet({
       collectionId: undefined,
       collectionOrder: undefined,
       featured: false,
+      format: '',
       mediaUrl: '',
       publishedAt: '',
       scripture: '',

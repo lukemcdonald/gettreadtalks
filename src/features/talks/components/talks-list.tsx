@@ -28,6 +28,7 @@ export function TalksList({ talks }: TalksListProps) {
               : undefined
           }
           talk={{
+            format: talk.format,
             scripture: talk.scripture,
             slug: talk.slug,
             title: talk.title,
