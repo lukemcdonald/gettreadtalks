@@ -3,17 +3,17 @@
   "skills": {
     "fallow": {
       "package": "fallow",
-      "version": "3.37.0",
+      "version": "3.39.0",
       "skillPath": "skills/fallow/SKILL.md"
     },
     "fallow-setup": {
       "package": "fallow",
-      "version": "3.37.0",
+      "version": "3.39.0",
       "skillPath": "skills/fallow-setup/SKILL.md"
     },
     "ultracite": {
       "package": "ultracite",
-      "version": "8.1.0",
+      "version": "8.1.1",
       "skillPath": "skills/ultracite/SKILL.md"
     }
   },
