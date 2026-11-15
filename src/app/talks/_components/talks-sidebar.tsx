@@ -1,11 +1,17 @@
+import type { TalksSearchParams } from '@/app/talks/_components/talks-results';
 import type { Speaker } from '@/features/speakers/types';
 import type { Topic } from '@/features/topics/types';
 
 import { BrowseFilters } from '@/components/browse-filters';
 import { ComboboxMultiFilter, SelectFilter, SortSelect } from '@/components/ui';
 import { talkFormats } from '@/convex/model/talks/validators';
-import { getSpeakerName } from '@/features/speakers/utils';
+import { loadSpeakers } from '@/features/speakers/queries/load-speakers';
+import { getSpeakerName, sortSpeakersByName } from '@/features/speakers/utils';
+import { loadTalkFormatFilter } from '@/features/talks/queries/load-talk-format-filter';
 import { formatTalkFormat } from '@/features/talks/utils';
+import { loadTopicsWithCounts } from '@/features/topics/queries/load-topics-with-counts';
+
+import { showsTalkFormatFilter } from './shows-talk-format-filter';
 
 interface TopicWithCount {
   count: number;
@@ -18,7 +24,31 @@ interface TalksSidebarProps {
   topics: TopicWithCount[];
 }
 
-export function TalksSidebar({
+export async function TalksSidebarContent({
+  searchParams,
+}: {
+  searchParams: Promise<TalksSearchParams>;
+}) {
+  const [formatFilter, params, speakersResult, topics] = await Promise.all([
+    loadTalkFormatFilter(),
+    searchParams,
+    loadSpeakers(),
+    loadTopicsWithCounts(),
+  ]);
+
+  return (
+    <TalksSidebar
+      showFormatFilter={showsTalkFormatFilter({
+        format: params.format,
+        visible: formatFilter.visible,
+      })}
+      speakers={sortSpeakersByName(speakersResult.speakers)}
+      topics={topics}
+    />
+  );
+}
+
+function TalksSidebar({
   showFormatFilter,
   speakers,
   topics,

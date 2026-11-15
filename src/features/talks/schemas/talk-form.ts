@@ -43,3 +43,29 @@ export const talkFormSchema = z.object({
  * Type inferred from the talk form schema.
  */
 export type TalkFormData = z.infer<typeof talkFormSchema>;
+
+export function getTalkCreateFormValues() {
+  return {
+    collectionId: undefined,
+    collectionOrder: undefined,
+    featured: false,
+    format: 'sermon' as const,
+    mediaUrl: '',
+    publishedAt: '',
+    scripture: '',
+    speakerId: undefined,
+    status: 'backlog' as const,
+    title: '',
+    topicIds: [],
+  };
+}
+
+export function toCreateTalkInput(data: TalkFormData) {
+  const { format, publishedAt, ...talk } = data;
+
+  return {
+    ...talk,
+    ...(format ? { format } : {}),
+    publishedAt: publishedAt ? parseUtcDate(publishedAt) : undefined,
+  };
+}

@@ -1,13 +1,12 @@
-import type { Doc } from '../../_generated/dataModel';
-import type { MutationCtx } from '../../_generated/server';
+import type { Doc } from '../../../_generated/dataModel';
+import type { MutationCtx } from '../../../_generated/server';
 
 import { v } from 'convex/values';
 
-import { internal } from '../../_generated/api';
-import { internalMutation } from '../../_generated/server';
+import { internal } from '../../../_generated/api';
+import { internalMutation } from '../../../_generated/server';
 
-export const TALK_FORMAT_BACKFILL_PAGE_SIZE = 50;
-
+const TALK_FORMAT_BACKFILL_PAGE_SIZE = 50;
 const DEFAULT_TALK_FORMAT = 'sermon' as const;
 
 async function fillMissingTalkFormat(

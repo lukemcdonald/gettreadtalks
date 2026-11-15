@@ -1,27 +1,15 @@
 'use server';
 
 import 'server-only';
-import type { TalkFormData } from '../schemas/talk-form';
 import type { ActionResult } from '@/lib/forms/types';
 
 import { updateTag } from 'next/cache';
 
 import { api } from '@/convex/_generated/api';
-import { parseUtcDate } from '@/convex/lib/publishedAt';
 import { toConvexFormErrors, toZodFormErrors } from '@/lib/forms/validation';
 import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
 
-import { talkFormSchema } from '../schemas/talk-form';
-
-function toCreateTalkInput(data: TalkFormData) {
-  const { format, publishedAt, ...talk } = data;
-
-  return {
-    ...talk,
-    ...(format ? { format } : {}),
-    publishedAt: publishedAt ? parseUtcDate(publishedAt) : undefined,
-  };
-}
+import { talkFormSchema, toCreateTalkInput } from '../schemas/talk-form';
 
 /**
  * Creates a new talk. Validates data on server and requires admin authorization.

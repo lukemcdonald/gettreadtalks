@@ -4,16 +4,12 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 
 import { TalksResults } from '@/app/talks/_components/talks-results';
-import { TalksSidebar } from '@/app/talks/_components/talks-sidebar';
+import { TalksSidebarContent } from '@/app/talks/_components/talks-sidebar';
 import { SidebarLayout } from '@/components/layouts';
 import { PageHeader } from '@/components/page-header';
 import { SidebarFiltersSkeleton } from '@/components/skeletons';
-import { loadSpeakers } from '@/features/speakers/queries/load-speakers';
-import { sortSpeakersByName } from '@/features/speakers/utils';
 import { TalksListSkeleton } from '@/features/talks/components/talks-list-skeleton';
-import { loadTalkFormatFilter } from '@/features/talks/queries/load-talk-format-filter';
 import { buildTalksPath } from '@/features/talks/utils';
-import { loadTopicsWithCounts } from '@/features/topics/queries/load-topics-with-counts';
 import { buildPageMetadata } from '@/lib/metadata';
 
 // fallow-ignore-next-line unused-export
@@ -30,13 +26,7 @@ interface TalksPageProps {
   searchParams: Promise<TalksSearchParams>;
 }
 
-export default async function TalksPage({ searchParams }: TalksPageProps) {
-  const [formatFilter, speakersResult, topicsResult] = await Promise.all([
-    loadTalkFormatFilter(),
-    loadSpeakers(),
-    loadTopicsWithCounts(),
-  ]);
-
+export default function TalksPage({ searchParams }: TalksPageProps) {
   return (
     <SidebarLayout
       content={
@@ -53,11 +43,7 @@ export default async function TalksPage({ searchParams }: TalksPageProps) {
       }
       sidebar={
         <Suspense fallback={<SidebarFiltersSkeleton />}>
-          <TalksSidebar
-            showFormatFilter={formatFilter.visible}
-            speakers={sortSpeakersByName(speakersResult.speakers)}
-            topics={topicsResult}
-          />
+          <TalksSidebarContent searchParams={searchParams} />
         </Suspense>
       }
       sidebarSticky

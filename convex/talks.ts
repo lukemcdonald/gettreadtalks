@@ -1,6 +1,6 @@
 import { mutations, queries } from './model/talks';
 
-export { backfillMissingTalkFormats } from './model/talks/backfill';
+export { backfillMissingTalkFormats } from './model/talks/formatBackfill/mutations';
 export {
   draftTalkSummaryAndStudy,
   setTalkDraftStep,
