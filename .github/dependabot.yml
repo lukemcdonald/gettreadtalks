@@ -28,10 +28,10 @@ updates:
         update-types:
           - minor
           - patch
-    # @convex-dev/better-auth@0.12.5 requires better-auth <1.7.0
+    # @convex-dev/better-auth@0.13 requires better-auth <1.8.0; raise with the adapter
     ignore:
       - dependency-name: better-auth
         versions:
-          - '>=1.7.0'
+          - '>=1.8.0'
     schedule:
       interval: weekly
