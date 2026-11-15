@@ -1,5 +1,6 @@
 import { mutations, queries } from './model/talks';
 
+export { backfillMissingTalkFormats } from './model/talks/backfill';
 export {
   draftTalkSummaryAndStudy,
   setTalkDraftStep,
@@ -18,6 +19,7 @@ export {
 export const {
   getTalk,
   getTalkBySlug,
+  getTalkFormatFilter,
   getTalkTranscript,
   getTalkTranscriptFetch,
   getTalkTranscriptText,

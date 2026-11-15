@@ -35,6 +35,7 @@ import { loadTalkFeature } from '../talkFeatures/helpers';
 import {
   enrichTalksForAdmin,
   enrichWithTopics,
+  hasMultiplePublishedTalkFormats,
   listPublishedTalks,
   listPublishedTalksForTopics,
   listPublishedTalksPage,
@@ -242,6 +243,19 @@ export const getTalkBySlug = query({
       topics: docs('topics'),
     })
   ),
+});
+
+/** Whether the public talks list should show the format filter. */
+export const getTalkFormatFilter = query({
+  args: {},
+  handler: async (ctx) => {
+    const visible = await hasMultiplePublishedTalkFormats(ctx);
+
+    return { visible };
+  },
+  returns: v.object({
+    visible: v.boolean(),
+  }),
 });
 
 /**

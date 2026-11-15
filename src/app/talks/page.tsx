@@ -11,6 +11,7 @@ import { SidebarFiltersSkeleton } from '@/components/skeletons';
 import { loadSpeakers } from '@/features/speakers/queries/load-speakers';
 import { sortSpeakersByName } from '@/features/speakers/utils';
 import { TalksListSkeleton } from '@/features/talks/components/talks-list-skeleton';
+import { loadTalkFormatFilter } from '@/features/talks/queries/load-talk-format-filter';
 import { buildTalksPath } from '@/features/talks/utils';
 import { loadTopicsWithCounts } from '@/features/topics/queries/load-topics-with-counts';
 import { buildPageMetadata } from '@/lib/metadata';
@@ -30,7 +31,8 @@ interface TalksPageProps {
 }
 
 export default async function TalksPage({ searchParams }: TalksPageProps) {
-  const [speakersResult, topicsResult] = await Promise.all([
+  const [formatFilter, speakersResult, topicsResult] = await Promise.all([
+    loadTalkFormatFilter(),
     loadSpeakers(),
     loadTopicsWithCounts(),
   ]);
@@ -52,6 +54,7 @@ export default async function TalksPage({ searchParams }: TalksPageProps) {
       sidebar={
         <Suspense fallback={<SidebarFiltersSkeleton />}>
           <TalksSidebar
+            showFormatFilter={formatFilter.visible}
             speakers={sortSpeakersByName(speakersResult.speakers)}
             topics={topicsResult}
           />

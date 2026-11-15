@@ -13,11 +13,16 @@ interface TopicWithCount {
 }
 
 interface TalksSidebarProps {
+  showFormatFilter: boolean;
   speakers: Speaker[];
   topics: TopicWithCount[];
 }
 
-export function TalksSidebar({ speakers, topics }: TalksSidebarProps) {
+export function TalksSidebar({
+  showFormatFilter,
+  speakers,
+  topics,
+}: TalksSidebarProps) {
   const speakerOptions = speakers.map((speaker) => ({
     label: getSpeakerName(speaker),
     value: speaker.slug,
@@ -56,12 +61,14 @@ export function TalksSidebar({ speakers, topics }: TalksSidebarProps) {
         options={topicOptions}
         placeholder="All Topics"
       />
-      <SelectFilter
-        label="Format"
-        name="format"
-        options={formatOptions}
-        placeholder="All Formats"
-      />
+      {showFormatFilter ? (
+        <SelectFilter
+          label="Format"
+          name="format"
+          options={formatOptions}
+          placeholder="All Formats"
+        />
+      ) : null}
       <SortSelect label="Sort by" options={sortOptions} />
     </BrowseFilters>
   );
