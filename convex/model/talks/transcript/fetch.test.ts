@@ -75,6 +75,22 @@ describe('fetchTranscript', () => {
 });
 
 describe('toGenerateTranscriptEnsureFailure', () => {
+  it('keeps out of credits as a retryable upstream error', async () => {
+    mockResponse(402, { code: 'QUOTA_EXCEEDED' });
+
+    const result = await fetchTranscript(MEDIA_URL, 'secret');
+
+    if (result.status !== 'failed') {
+      throw new Error('expected a failed fetch');
+    }
+
+    expect(result.errorCode).toBe('QUOTA_EXCEEDED');
+    expect(toGenerateTranscriptEnsureFailure(result)).toEqual({
+      errorCode: 'UPSTREAM_ERROR',
+      message: 'The transcript service is out of transcription credits.',
+    });
+  });
+
   it('treats an unsupported media URL as having no transcript source', async () => {
     mockResponse(422, { code: 'UNSUPPORTED_URL' });
 

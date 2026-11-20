@@ -28,6 +28,7 @@ const TRANSCRIPT_FETCH_MESSAGES: Record<TranscriptFetchErrorCode, string> = {
   NOT_FOUND: 'The video was not found. It may be deleted or private.',
   PROVIDER_AUTH_FAILED: 'Transcript service is not configured correctly.',
   PROVIDER_ERROR: 'Transcript service returned an error.',
+  QUOTA_EXCEEDED: 'The transcript service is out of transcription credits.',
   QUOTA_EXHAUSTED: 'The monthly transcript quota has been used up.',
   RATE_LIMITED: 'Too many transcript requests.',
   RESTRICTED: 'The video needs sign-in or is age or region restricted.',
