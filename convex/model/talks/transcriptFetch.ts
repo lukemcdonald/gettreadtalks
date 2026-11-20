@@ -6,9 +6,8 @@ import { v } from 'convex/values';
 
 import { internal } from '../../_generated/api';
 import { internalAction, internalMutation } from '../../_generated/server';
-import { getVideoId, hasTalkTranscriptSource } from '../../lib/videoUrl';
+import { hasTalkTranscriptSource } from '../../lib/videoUrl';
 import { NO_TRANSCRIPT_SOURCE_MESSAGE } from './summary/prompt';
-import { TRANSCRIPT_FETCH_ERROR_CODES } from './validators';
 
 export async function createPendingTalkTranscriptFetch(
   ctx: MutationCtx,
@@ -21,246 +20,96 @@ export async function createPendingTalkTranscriptFetch(
   });
 }
 
-const YOUTUBE_TRANSCRIPT_API_URL =
-  'https://www.youtube-transcript.io/api/transcripts';
+const TRANSCRIPTS_API_URL =
+  'https://transcripts.lukemcdonald.com/api/transcripts';
 
-const TRANSCRIPT_FETCH_MESSAGES = {
-  LOGIN_REQUIRED: 'YouTube requires a login to view this talk.',
-  NO_CAPTIONS: 'No captions are available for this talk.',
-  NOT_YOUTUBE: 'Transcripts can only be fetched from YouTube talks.',
+const TRANSCRIPT_FETCH_MESSAGES: Record<TranscriptFetchErrorCode, string> = {
+  NO_TRANSCRIPT: 'No transcript is available for this talk.',
+  NOT_FOUND: 'The video was not found. It may be deleted or private.',
+  PROVIDER_AUTH_FAILED: 'Transcript service is not configured correctly.',
+  PROVIDER_ERROR: 'Transcript service returned an error.',
   QUOTA_EXHAUSTED: 'The monthly transcript quota has been used up.',
   RATE_LIMITED: 'Too many transcript requests.',
-  TOKEN_INVALID: 'Transcript service rejected the request.',
-  TOKEN_MISSING: 'Transcript service is not configured.',
-} as const;
+  RESTRICTED: 'The video needs sign-in or is age or region restricted.',
+  TIMED_OUT: 'The transcript took too long to fetch.',
+  UNSUPPORTED_URL: 'Transcripts can only be fetched from YouTube talks.',
+};
 
 type TranscriptFetchResult =
   | TranscriptFetchFailure
   | { status: 'success'; text: string };
 
-function getQuotaResetAt(nowMs: number) {
-  const now = new Date(nowMs);
-  const year = now.getUTCFullYear();
-  const month = now.getUTCMonth();
-  let reset = Date.UTC(year, month, 21);
-
-  if (nowMs >= reset) {
-    reset = Date.UTC(year, month + 1, 21);
-  }
-
-  return reset;
-}
-
-function parseRetryAfter(header: string | null, nowMs: number) {
-  if (!header) {
-    return;
-  }
-
-  const seconds = Number(header);
-
-  if (Number.isFinite(seconds)) {
-    return nowMs + seconds * 1000;
-  }
-
-  const date = Date.parse(header);
-
-  if (Number.isFinite(date)) {
-    return date;
-  }
-}
-
-export function toTranscriptHttpError(
-  status: number,
-  body: string,
-  retryAfterHeader: string | null,
-  nowMs: number
-): TranscriptFetchFailure {
-  if (status === 429) {
-    return {
-      errorCode: TRANSCRIPT_FETCH_ERROR_CODES.RATE_LIMITED,
-      message: TRANSCRIPT_FETCH_MESSAGES.RATE_LIMITED,
-      retryAfter: parseRetryAfter(retryAfterHeader, nowMs),
-      status: 'failed',
-    };
-  }
-
-  if (
-    status === 402 ||
-    /credit|limit exceeded|limit reached|quota/iu.test(body)
-  ) {
-    return {
-      errorCode: TRANSCRIPT_FETCH_ERROR_CODES.QUOTA_EXHAUSTED,
-      message: TRANSCRIPT_FETCH_MESSAGES.QUOTA_EXHAUSTED,
-      retryAfter: getQuotaResetAt(nowMs),
-      status: 'failed',
-    };
-  }
-
-  if (status === 401 || status === 403) {
-    return {
-      errorCode: TRANSCRIPT_FETCH_ERROR_CODES.TOKEN_INVALID,
-      message: TRANSCRIPT_FETCH_MESSAGES.TOKEN_INVALID,
-      status: 'failed',
-    };
-  }
-
-  return {
-    errorCode: TRANSCRIPT_FETCH_ERROR_CODES.UPSTREAM_ERROR,
-    message: `Transcript service returned an error (HTTP ${status}).`,
-    status: 'failed',
-  };
-}
-
-function getVideoText(video: Record<string, unknown>) {
-  if (typeof video.text === 'string' && video.text.trim()) {
-    return video.text;
-  }
-
-  const { tracks } = video;
-
-  if (!Array.isArray(tracks) || tracks.length === 0) {
-    return '';
-  }
-
-  const [first] = tracks;
-
-  if (!first || typeof first !== 'object') {
-    return '';
-  }
-
-  const { transcript } = first as { transcript?: unknown };
-
-  if (!Array.isArray(transcript)) {
-    return '';
-  }
-
-  return transcript
-    .map((segment) => {
-      if (!segment || typeof segment !== 'object') {
-        return '';
-      }
-
-      const { text } = segment as { text?: unknown };
-
-      return typeof text === 'string' ? text : '';
-    })
-    .filter(Boolean)
-    .join(' ');
-}
-
-export function parseTranscriptApiVideo(value: unknown): TranscriptFetchResult {
-  if (!value || typeof value !== 'object') {
-    return {
-      errorCode: TRANSCRIPT_FETCH_ERROR_CODES.UPSTREAM_ERROR,
-      message: 'Transcript service returned an error (HTTP 200).',
-      status: 'failed',
-    };
-  }
-
-  const video = value as Record<string, unknown>;
-  const { playabilityStatus } = video;
-  const reason =
-    playabilityStatus &&
-    typeof playabilityStatus === 'object' &&
-    'reason' in playabilityStatus &&
-    typeof playabilityStatus.reason === 'string'
-      ? playabilityStatus.reason
-      : '';
-
-  if (video.isLoginRequired === true || /login required/iu.test(reason)) {
-    return {
-      errorCode: TRANSCRIPT_FETCH_ERROR_CODES.LOGIN_REQUIRED,
-      message: TRANSCRIPT_FETCH_MESSAGES.LOGIN_REQUIRED,
-      status: 'failed',
-    };
-  }
-
-  const text = getVideoText(video)
-    .replaceAll(/\[(?:[^\]]+)\]/gu, ' ')
-    .replaceAll(/\s+/gu, ' ')
-    .trim();
-
-  if (!text) {
-    return {
-      errorCode: TRANSCRIPT_FETCH_ERROR_CODES.NO_CAPTIONS,
-      message: TRANSCRIPT_FETCH_MESSAGES.NO_CAPTIONS,
-      status: 'failed',
-    };
-  }
-
-  return {
-    status: 'success',
-    text,
-  };
-}
-
-async function loadYoutubeTranscript(
-  videoId: string,
-  token: string,
-  nowMs = Date.now()
-): Promise<TranscriptFetchResult> {
-  let response: Response;
-
-  try {
-    response = await fetch(YOUTUBE_TRANSCRIPT_API_URL, {
-      body: JSON.stringify({ ids: [videoId] }),
-      headers: {
-        Authorization: token.startsWith('Basic ') ? token : `Basic ${token}`,
-        'Content-Type': 'application/json',
-      },
-      method: 'POST',
-    });
-  } catch {
-    return {
-      errorCode: TRANSCRIPT_FETCH_ERROR_CODES.UPSTREAM_ERROR,
-      message: 'Transcript service is unavailable.',
-      status: 'failed',
-    };
-  }
-
-  const body = await response.text();
-
-  if (!response.ok) {
-    return toTranscriptHttpError(
-      response.status,
-      body,
-      response.headers.get('Retry-After'),
-      nowMs
-    );
-  }
-
-  try {
-    const parsed: unknown = JSON.parse(body);
-
-    if (!Array.isArray(parsed) || parsed.length === 0) {
-      return {
-        errorCode: TRANSCRIPT_FETCH_ERROR_CODES.NO_CAPTIONS,
-        message: TRANSCRIPT_FETCH_MESSAGES.NO_CAPTIONS,
-        status: 'failed',
-      };
-    }
-
-    return parseTranscriptApiVideo(parsed[0]);
-  } catch {
-    return {
-      errorCode: TRANSCRIPT_FETCH_ERROR_CODES.UPSTREAM_ERROR,
-      message: 'Transcript service returned an error (HTTP 200).',
-      status: 'failed',
-    };
-  }
-}
-
 function toFailedResult(
-  errorCode: Exclude<
-    TranscriptFetchErrorCode,
-    typeof TRANSCRIPT_FETCH_ERROR_CODES.UPSTREAM_ERROR
-  >
+  errorCode: TranscriptFetchErrorCode,
+  retryAfter?: number
 ): TranscriptFetchFailure {
   return {
     errorCode,
     message: TRANSCRIPT_FETCH_MESSAGES[errorCode],
+    ...(retryAfter ? { retryAfter } : {}),
     status: 'failed',
   };
+}
+
+function isTranscriptFetchErrorCode(
+  value: unknown
+): value is TranscriptFetchErrorCode {
+  return (
+    typeof value === 'string' && Object.hasOwn(TRANSCRIPT_FETCH_MESSAGES, value)
+  );
+}
+
+function parseRetryAfter(value: unknown) {
+  const retryAfter = typeof value === 'string' ? Date.parse(value) : Number.NaN;
+
+  return Number.isFinite(retryAfter) ? retryAfter : undefined;
+}
+
+/** Unknown failures, including INVALID_REQUEST, become PROVIDER_ERROR. */
+function toTranscriptFetchResult(
+  response: Response,
+  body: unknown
+): TranscriptFetchResult {
+  const data = (body ?? {}) as Record<string, unknown>;
+  const text = typeof data.text === 'string' ? data.text.trim() : '';
+
+  if (response.ok && text) {
+    return { status: 'success', text };
+  }
+
+  if (response.status === 401) {
+    return toFailedResult('PROVIDER_AUTH_FAILED');
+  }
+
+  return toFailedResult(
+    isTranscriptFetchErrorCode(data.code) ? data.code : 'PROVIDER_ERROR',
+    parseRetryAfter(data.retryAfter)
+  );
+}
+
+export async function fetchTranscript(
+  mediaUrl: string,
+  token: string
+): Promise<TranscriptFetchResult> {
+  if (!token) {
+    return toFailedResult('PROVIDER_AUTH_FAILED');
+  }
+
+  try {
+    const response = await fetch(TRANSCRIPTS_API_URL, {
+      body: JSON.stringify({ url: mediaUrl }),
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      method: 'POST',
+    });
+    const body: unknown = await response.json().catch(() => null);
+
+    return toTranscriptFetchResult(response, body);
+  } catch {
+    return toFailedResult('PROVIDER_ERROR');
+  }
 }
 
 export interface TranscriptFetchFailure {
@@ -307,7 +156,7 @@ export async function fetchAndCompleteTalkTranscript(
 ): Promise<TranscriptFetchResult> {
   const result = await talkTranscriptFetcher.fetch(
     args.mediaUrl,
-    process.env.YOUTUBE_TRANSCRIPT_IO_TOKEN ?? ''
+    process.env.TRANSCRIPTS_API_TOKEN ?? ''
   );
 
   await ctx.runMutation(internal.talks.completeTalkTranscriptFetch, {
@@ -316,27 +165,6 @@ export async function fetchAndCompleteTalkTranscript(
   });
 
   return result;
-}
-
-export function fetchTranscript(
-  mediaUrl: string,
-  token: string
-): Promise<TranscriptFetchResult> {
-  if (!token) {
-    return Promise.resolve(
-      toFailedResult(TRANSCRIPT_FETCH_ERROR_CODES.TOKEN_MISSING)
-    );
-  }
-
-  const video = getVideoId(mediaUrl);
-
-  if (video?.service !== 'youtube') {
-    return Promise.resolve(
-      toFailedResult(TRANSCRIPT_FETCH_ERROR_CODES.NOT_YOUTUBE)
-    );
-  }
-
-  return loadYoutubeTranscript(video.id, token);
 }
 
 export const insertPendingTalkTranscriptFetch = internalMutation({
