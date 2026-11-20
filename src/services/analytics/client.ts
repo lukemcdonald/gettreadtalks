@@ -62,7 +62,7 @@ function getClient() {
 }
 
 function enqueue(task: () => Promise<void>) {
-  const run = dispatchQueue.then(task, task);
+  const run = dispatchQueue.catch(() => {}).then(task);
 
   dispatchQueue = run.catch(() => {});
 
