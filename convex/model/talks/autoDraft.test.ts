@@ -99,9 +99,8 @@ async function createTalk(
 }
 
 describe('auto draft', () => {
-  it('drafts a YouTube talk and ignores other media', async () => {
+  it('drafts any media URL the transcript service accepts', async () => {
     await withDraftMocks(async ({ asAdmin, speakerId, t }) => {
-      const youtubeId = await createTalk(asAdmin, speakerId, 'YouTube Talk');
       const audioId = await createTalk(
         asAdmin,
         speakerId,
@@ -111,20 +110,16 @@ describe('auto draft', () => {
 
       await t.finishAllScheduledFunctions(vi.runAllTimers);
 
-      const youtube = await loadDraft(t, youtubeId);
       const audio = await loadDraft(t, audioId);
 
-      expect(youtube.transcript?.text).toBe(FETCHED_TRANSCRIPT);
-      expect(youtube.talk?.summary).toBeUndefined();
-      expect(youtube.talk?.draftSummary).toBe(GENERATED_SUMMARY);
-      expect(youtube.talk?.status).toBe('backlog');
-      expect(youtube.study).toMatchObject({
+      expect(audio.transcript?.text).toBe(FETCHED_TRANSCRIPT);
+      expect(audio.talk?.summary).toBeUndefined();
+      expect(audio.talk?.draftSummary).toBe(GENERATED_SUMMARY);
+      expect(audio.talk?.status).toBe('backlog');
+      expect(audio.study).toMatchObject({
         body: GENERATED_STUDY,
         status: 'draft',
       });
-      expect(audio.transcript).toBeNull();
-      expect(audio.talk?.summary).toBeUndefined();
-      expect(audio.study).toBeNull();
     });
   });
 

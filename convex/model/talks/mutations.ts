@@ -250,7 +250,7 @@ export const createTalk = mutation({
       });
     }
 
-    // YouTube talks draft the transcript, summary, and study in the background.
+    // Talks with a media URL draft the transcript, summary, and study in the background.
     if (hasTalkTranscriptSource(talkArgs.mediaUrl)) {
       const runId = await createPendingTalkTranscriptFetch(ctx, { talkId });
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { getVideoId } from './videoUrl';
+import { getVideoId, hasTalkTranscriptSource } from './videoUrl';
 
 describe('getVideoId', () => {
   it.each([
@@ -22,5 +22,18 @@ describe('getVideoId', () => {
     },
   ] as const)('reads $url', ({ expected, url }) => {
     expect(getVideoId(url)).toEqual(expected);
+  });
+});
+
+describe('hasTalkTranscriptSource', () => {
+  it.each([
+    { expected: true, url: 'https://www.youtube.com/watch?v=jNQXAC9IVRw' },
+    { expected: true, url: 'https://vimeo.com/123456789' },
+    { expected: true, url: ' http://example.com/talk.mp3 ' },
+    { expected: false, url: 'ftp://example.com/talk.mp3' },
+    { expected: false, url: 'not a url' },
+    { expected: false, url: '' },
+  ])('reads $url as $expected', ({ expected, url }) => {
+    expect(hasTalkTranscriptSource(url)).toBe(expected);
   });
 });

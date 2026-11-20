@@ -48,7 +48,6 @@ describe('buildTalkEditPath', () => {
 
 describe('shouldAutoFetchTalkTranscript', () => {
   const youtube = 'https://www.youtube.com/watch?v=jNQXAC9IVRw';
-  const audio = 'https://example.com/talk.mp3';
 
   it('fetches after create when media has a source and no fetch exists', () => {
     expect(
@@ -102,7 +101,7 @@ describe('shouldAutoFetchTalkTranscript', () => {
         autoFetch: true,
         fetch: null,
         hasTranscript: false,
-        mediaUrl: audio,
+        mediaUrl: 'not a url',
       })
     ).toBe(false);
   });

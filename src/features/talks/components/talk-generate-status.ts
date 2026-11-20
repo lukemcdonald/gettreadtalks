@@ -3,6 +3,7 @@ import { TALK_DRAFT_PENDING } from '@/convex/model/talks/validators';
 import {
   formatTranscriptFetchFailure,
   hasTalkTranscriptSource,
+  isTranscriptSourceUnsupported,
 } from '@/features/talks/utils';
 
 const TALK_DRAFT_STATUS_TEXT = new Set([
@@ -16,7 +17,7 @@ const TALK_DRAFT_STATUS_TEXT = new Set([
   TALK_DRAFT_PENDING,
 ]);
 
-export const TALK_CREATE_YOUTUBE_DRAFT_HINT =
+export const TALK_CREATE_DRAFT_HINT =
   'After you create this talk, we will fetch the transcript and draft a summary and study.';
 
 export const TALK_GENERATION_STAGE_LABEL = {
@@ -88,7 +89,7 @@ export function formatTalkCreateGenerationHint(mediaUrl: string) {
   }
 
   if (hasTalkTranscriptSource(trimmed)) {
-    return TALK_CREATE_YOUTUBE_DRAFT_HINT;
+    return TALK_CREATE_DRAFT_HINT;
   }
 
   return NO_TRANSCRIPT_SOURCE_MESSAGE;
@@ -145,6 +146,7 @@ function getTranscriptStage({
   hasTranscript,
 }: {
   fetch: {
+    errorCode?: string;
     message?: string;
     retryAfter?: number;
     status?: string;
@@ -158,6 +160,10 @@ function getTranscriptStage({
 
   if (fetch?.status === 'pending') {
     return { kind: 'fetching' };
+  }
+
+  if (fetch?.status === 'failed' && isTranscriptSourceUnsupported(fetch)) {
+    return { kind: 'unavailable', message: fetch.message };
   }
 
   if (fetch?.status === 'failed') {
@@ -258,6 +264,7 @@ export function getTalkGenerationStatus({
   draftStudy?: string;
   draftSummary?: string;
   fetch: {
+    errorCode?: string;
     message?: string;
     retryAfter?: number;
     status?: string;
@@ -267,7 +274,8 @@ export function getTalkGenerationStatus({
   study: { hasBody: boolean; status: 'draft' | 'published' } | null;
   summary?: string;
 }): TalkGenerationStatus {
-  const hasSource = hasTalkTranscriptSource(mediaUrl);
+  const hasSource =
+    hasTalkTranscriptSource(mediaUrl) && !isTranscriptSourceUnsupported(fetch);
   const summaryDraft = getTalkDraftStep(draftSummary);
   const studyDraft = getTalkDraftStep(draftStudy);
   const transcript = getTranscriptStage({
