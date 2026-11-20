@@ -36,22 +36,25 @@ describe('talk admin actions', () => {
       args: { talkId },
       mutation: api.talks.archiveTalk,
       name: 'archiveTalkAction',
+      tags: ['talks'],
     },
     {
       act: () => destroyTalkAction(talkId),
       args: { talkId },
       mutation: api.talks.destroyTalk,
       name: 'destroyTalkAction',
+      tags: ['form-options', 'talks'],
     },
     {
       act: () => updateTalkFeaturedAction(talkId, true),
       args: { featured: true, talkId },
       mutation: api.talks.updateTalk,
       name: 'updateTalkFeaturedAction',
+      tags: ['talks'],
     },
   ])(
     '$name requires an admin and invalidates the talks cache',
-    async ({ act, args, mutation }) => {
+    async ({ act, args, mutation, tags }) => {
       vi.mocked(requireAdminUser).mockResolvedValue({
         role: 'admin',
       } as AdminUser);
@@ -61,8 +64,11 @@ describe('talk admin actions', () => {
 
       expect(requireAdminUser).toHaveBeenCalledTimes(1);
       expect(fetchAuthMutation).toHaveBeenCalledWith(mutation, args);
-      expect(updateTag).toHaveBeenCalledTimes(1);
-      expect(updateTag).toHaveBeenCalledWith('talks');
+      expect(updateTag).toHaveBeenCalledTimes(tags.length);
+
+      for (const tag of tags) {
+        expect(updateTag).toHaveBeenCalledWith(tag);
+      }
     }
   );
 

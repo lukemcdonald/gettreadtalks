@@ -6,7 +6,8 @@ import { describe, expect, it, render, screen } from '@/test';
 
 import { EditTalkSheet } from './edit-talk-sheet';
 
-const { updateTalkAction } = vi.hoisted(() => ({
+const { back, updateTalkAction } = vi.hoisted(() => ({
+  back: vi.fn(),
   updateTalkAction: vi.fn(),
 }));
 
@@ -18,7 +19,7 @@ vi.mock('convex/react', () => ({
 vi.mock('next/navigation', () => ({
   usePathname: () => '/talks/edit/talks:the-cross',
   useRouter: () => ({
-    back: vi.fn(),
+    back,
     push: vi.fn(),
     refresh: vi.fn(),
     replace: vi.fn(),
@@ -86,6 +87,15 @@ describe('EditTalkSheet status pre-fill', () => {
       talk._id,
       undefined
     );
+  });
+
+  it('does not save when the sheet closes', async () => {
+    const { click } = renderSheet('published', 'archived');
+
+    await click(screen.getByRole('button', { name: 'Cancel' }));
+
+    expect(updateTalkAction).not.toHaveBeenCalled();
+    expect(back).toHaveBeenCalledTimes(1);
   });
 
   it('hides the notice when the talk is already archived', () => {

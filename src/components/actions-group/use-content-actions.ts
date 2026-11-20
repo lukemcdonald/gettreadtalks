@@ -67,13 +67,15 @@ function useArchiveContent({
 
     setIsArchiving(true);
 
+    const failureTitle = `Failed to ${isArchived ? 'unarchive' : 'archive'} ${contentType}`;
+
     try {
       const result = await onArchiveAction(contentId);
 
       if (isFailedActionResult(result)) {
         toastContentAction({
           description: getActionErrorMessage(result),
-          title: `Failed to archive ${contentType}`,
+          title: failureTitle,
           type: 'error',
         });
       } else {
@@ -86,7 +88,7 @@ function useArchiveContent({
     } catch (error: unknown) {
       toastContentAction({
         error,
-        title: `Failed to archive ${contentType}`,
+        title: failureTitle,
         type: 'error',
       });
     }

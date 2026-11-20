@@ -19,6 +19,7 @@ export async function destroyTalkAction(
     await fetchAuthMutation(api.talks.destroyTalk, { talkId });
 
     updateTag('talks');
+    updateTag('form-options');
 
     return {
       data: null,

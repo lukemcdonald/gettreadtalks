@@ -2,6 +2,7 @@
 
 import type { TalkWithSpeakerAndTopics } from '@/features/talks/types';
 
+import { toastManager } from '@/components/ui/primitives/toast';
 import { buildTalkPath } from '@/features/talks/utils';
 import { describe, expect, it, render, screen } from '@/test';
 
@@ -104,5 +105,32 @@ describe('TalkActionsMenu', () => {
 
     expect(refresh).not.toHaveBeenCalled();
     expect(push).not.toHaveBeenCalled();
+    expect(toastManager.add).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: 'Failed to archive talk',
+        type: 'error',
+      })
+    );
+  });
+
+  it('says unarchive failed when the talk is already archived', async () => {
+    archiveTalk.mockResolvedValue({
+      errors: { _form: 'Could not archive this talk' },
+      success: false,
+    });
+
+    const { click } = render(
+      <TalkActionsMenu talk={{ ...talk, status: 'archived' }} />
+    );
+
+    await click(screen.getByRole('button', { name: 'More actions' }));
+    await click(screen.getByRole('menuitem', { name: 'Unarchive' }));
+
+    expect(toastManager.add).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: 'Failed to unarchive talk',
+        type: 'error',
+      })
+    );
   });
 });

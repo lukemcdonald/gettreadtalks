@@ -77,7 +77,7 @@ describe('getTalkFormValues', () => {
     });
   });
 
-  it('keeps collection order and prefers a status prefill', () => {
+  it('keeps collection order and the saved status', () => {
     const talk = talkWithTopics({
       collectionId: 'collections:romans' as Talk['collectionId'],
       collectionOrder: 3,
@@ -86,10 +86,10 @@ describe('getTalkFormValues', () => {
       scripture: 'Romans 8',
     });
 
-    expect(getTalkFormValues(talk, 'archived')).toMatchObject({
+    expect(getTalkFormValues(talk)).toMatchObject({
       collectionOrder: 3,
       publishedAt: '',
-      status: 'archived',
+      status: 'published',
     });
   });
 
