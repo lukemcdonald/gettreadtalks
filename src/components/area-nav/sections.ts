@@ -21,16 +21,8 @@ const AREA_NAV: AreaNavSection[] = [
     items: [
       {
         children: [
-          {
-            href: '/manage/talks/studies',
-            icon: 'studies',
-            label: 'Studies',
-          },
-          {
-            href: '/manage/talks/transcripts',
-            icon: 'transcripts',
-            label: 'Transcripts',
-          },
+          { href: '/manage/talks/studies', label: 'Studies' },
+          { href: '/manage/talks/transcripts', label: 'Transcripts' },
         ],
         href: ADMIN_LIST_PATHS.talks,
         icon: 'talks',

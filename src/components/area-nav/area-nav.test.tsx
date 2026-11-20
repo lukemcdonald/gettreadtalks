@@ -75,16 +75,8 @@ describe('AreaNav', () => {
   const TALKS_ITEMS: AreaNavItem[] = [
     {
       children: [
-        {
-          href: '/manage/talks/studies',
-          icon: 'studies',
-          label: 'Studies',
-        },
-        {
-          href: '/manage/talks/transcripts',
-          icon: 'transcripts',
-          label: 'Transcripts',
-        },
+        { href: '/manage/talks/studies', label: 'Studies' },
+        { href: '/manage/talks/transcripts', label: 'Transcripts' },
       ],
       href: '/manage/talks',
       icon: 'talks',
@@ -93,56 +85,53 @@ describe('AreaNav', () => {
     { href: '/manage/clips', icon: 'clips', label: 'Clips' },
   ];
 
-  it('lists nested destinations as individual sidebar items', () => {
-    usePathname.mockReturnValue('/manage/talks/studies');
+  describe.each(['sidebar', 'tabs'] as const)(
+    'nested items on %s',
+    (variant) => {
+      it('lists children in a nested list under their parent link', () => {
+        usePathname.mockReturnValue('/manage/talks');
 
-    render(<AreaNav items={TALKS_ITEMS} label="Content" variant="sidebar" />);
+        render(
+          <AreaNav items={TALKS_ITEMS} label="Content" variant={variant} />
+        );
 
-    expect(screen.getByTestId('nav-manage-talks-studies')).toHaveAttribute(
-      'aria-current',
-      'page'
-    );
-    expect(screen.getByTestId('nav-manage-talks')).not.toHaveAttribute(
-      'aria-current'
-    );
-    expect(screen.getByTestId('nav-manage-talks-transcripts')).toBeVisible();
-    expect(screen.getByTestId('nav-manage-clips')).toBeVisible();
-  });
+        const talks = screen.getByTestId('nav-manage-talks');
+        const parentItem = talks.closest('li');
 
-  it('labels the Talks menu with the current destination', () => {
-    usePathname.mockReturnValue('/manage/talks');
+        expect(talks).toHaveAttribute('href', '/manage/talks');
+        expect(talks).toHaveAttribute('aria-current', 'page');
+        expect(
+          parentItem?.querySelector('ul')?.querySelectorAll('a')
+        ).toHaveLength(2);
+        expect(parentItem).toContainElement(
+          screen.getByTestId('nav-manage-talks-studies')
+        );
+        expect(parentItem).toContainElement(
+          screen.getByTestId('nav-manage-talks-transcripts')
+        );
+        expect(parentItem).not.toContainElement(
+          screen.getByTestId('nav-manage-clips')
+        );
+      });
 
-    render(<AreaNav items={TALKS_ITEMS} label="Content" variant="tabs" />);
+      it('marks only the current child as the current page', () => {
+        usePathname.mockReturnValue('/manage/talks/studies');
 
-    expect(screen.getByTestId('nav-manage-talks-menu')).toHaveTextContent(
-      'Talks'
-    );
-  });
+        render(
+          <AreaNav items={TALKS_ITEMS} label="Content" variant={variant} />
+        );
 
-  it('groups nested destinations under a Talks menu on tabs', async () => {
-    usePathname.mockReturnValue('/manage/talks/studies');
-
-    const { click } = render(
-      <AreaNav items={TALKS_ITEMS} label="Content" variant="tabs" />
-    );
-
-    expect(screen.getByTestId('nav-manage-talks-menu')).toHaveTextContent(
-      'Studies'
-    );
-    expect(screen.getByTestId('nav-manage-clips')).toBeVisible();
-    expect(
-      screen.queryByTestId('nav-manage-talks-transcripts')
-    ).not.toBeInTheDocument();
-
-    await click(screen.getByTestId('nav-manage-talks-menu'));
-
-    expect(screen.getByTestId('nav-manage-talks-studies')).toHaveAttribute(
-      'aria-current',
-      'page'
-    );
-    expect(screen.getByTestId('nav-manage-talks')).not.toHaveAttribute(
-      'aria-current'
-    );
-    expect(screen.getByTestId('nav-manage-talks-transcripts')).toBeVisible();
-  });
+        expect(screen.getByTestId('nav-manage-talks-studies')).toHaveAttribute(
+          'aria-current',
+          'page'
+        );
+        expect(screen.getByTestId('nav-manage-talks')).not.toHaveAttribute(
+          'aria-current'
+        );
+        expect(
+          screen.getByTestId('nav-manage-talks-transcripts')
+        ).not.toHaveAttribute('aria-current');
+      });
+    }
+  );
 });
