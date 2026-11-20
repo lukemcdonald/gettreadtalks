@@ -1,10 +1,9 @@
 'use client';
 
-import type { UseMutationOptions } from '@/hooks/use-mutation';
+import { archiveTalkAction } from '@/features/talks/actions/archive-talk';
 
-import { api } from '@/convex/_generated/api';
-import { useMutation } from '@/hooks';
-
-export function useArchiveTalk(options?: UseMutationOptions) {
-  return useMutation(api.talks.archiveTalk, options);
+export function useArchiveTalk() {
+  return {
+    archiveTalk: archiveTalkAction,
+  };
 }

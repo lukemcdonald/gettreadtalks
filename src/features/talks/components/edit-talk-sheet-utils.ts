@@ -1,6 +1,5 @@
 import type { TalkFormData } from '@/features/talks/schemas/talk-form';
 import type { Talk, TalkWithTopicIds } from '@/features/talks/types';
-import type { StatusPrefill } from '@/lib/entities/status-prefill';
 
 import { formatUtcDate } from '@/convex/lib/publishedAt';
 import { slugify } from '@/convex/lib/utils';
@@ -11,10 +10,7 @@ export interface TalkUrlChange {
   oldUrl: string;
 }
 
-export function getTalkFormValues(
-  talk: TalkWithTopicIds,
-  statusPrefill?: StatusPrefill
-): TalkFormData {
+export function getTalkFormValues(talk: TalkWithTopicIds): TalkFormData {
   return {
     collectionId: talk.collectionId,
     collectionOrder: talk.collectionId ? talk.collectionOrder : undefined,
@@ -25,7 +21,7 @@ export function getTalkFormValues(
     scripture: talk.scripture ?? '',
     slug: talk.slug ?? '',
     speakerId: talk.speakerId,
-    status: statusPrefill ?? talk.status ?? 'backlog',
+    status: talk.status ?? 'backlog',
     title: talk.title ?? '',
     topicIds: talk.topicIds,
   };
