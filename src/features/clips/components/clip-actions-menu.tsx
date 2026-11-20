@@ -18,18 +18,20 @@ export function ClipActionsMenu({ clip, clipUrl }: ClipActionsMenuProps) {
   const clipId = clip._id;
   const router = useRouter();
 
-  const { mutateAsync: archiveClip } = useArchiveClip();
-  const { mutateAsync: destroyClip } = useDestroyClip({
-    onSuccess: () => router.push(buildAdminListPath('clips')),
+  const { archiveClip } = useArchiveClip();
+  const { destroyClip } = useDestroyClip({
+    onSuccess: () => {
+      router.push(buildAdminListPath('clips'));
+    },
   });
 
-  const handleArchive = async () => {
-    await archiveClip({ clipId });
-  };
+  async function handleArchive() {
+    return await archiveClip(clipId);
+  }
 
-  const handleDelete = async () => {
-    await destroyClip({ clipId });
-  };
+  async function handleDelete() {
+    return await destroyClip(clipId);
+  }
 
   return (
     <ContentActionsGroup

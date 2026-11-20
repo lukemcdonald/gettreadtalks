@@ -10,6 +10,7 @@ import { formatArchiveLabel } from '@/lib/entities/utils';
 import { formatErrorMessage } from '@/services/errors';
 import { capitalize } from '@/utils';
 
+import { getActionErrorMessage, isFailedActionResult } from './action-result';
 import { getContentMenuItems } from './get-content-menu-items';
 import { useEntityDeleteConfirm } from './use-entity-delete-confirm';
 
@@ -26,16 +27,20 @@ type ContentActionsStateProps = Pick<
 >;
 
 function toastContentAction({
+  description,
   error,
   title,
   type,
 }: {
+  description?: string;
   error?: unknown;
   title: string;
   type: 'error' | 'success';
 }) {
   toastManager.add({
-    description: error === undefined ? undefined : formatErrorMessage(error),
+    description:
+      description ??
+      (error === undefined ? undefined : formatErrorMessage(error)),
     title,
     type,
   });
@@ -63,12 +68,21 @@ function useArchiveContent({
     setIsArchiving(true);
 
     try {
-      await onArchiveAction(contentId);
-      toastContentAction({
-        title: `${capitalize(contentType)} ${isArchived ? 'unarchived' : 'archived'}`,
-        type: 'success',
-      });
-      router.refresh();
+      const result = await onArchiveAction(contentId);
+
+      if (isFailedActionResult(result)) {
+        toastContentAction({
+          description: getActionErrorMessage(result),
+          title: `Failed to archive ${contentType}`,
+          type: 'error',
+        });
+      } else {
+        toastContentAction({
+          title: `${capitalize(contentType)} ${isArchived ? 'unarchived' : 'archived'}`,
+          type: 'success',
+        });
+        router.refresh();
+      }
     } catch (error: unknown) {
       toastContentAction({
         error,

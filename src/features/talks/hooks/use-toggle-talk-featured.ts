@@ -3,8 +3,8 @@
 import type { Speaker } from '@/features/speakers/types';
 import type { Talk } from '@/features/talks/types';
 
-import { api } from '@/convex/_generated/api';
-import { useMutation, useOptimisticToggle } from '@/hooks';
+import { updateTalkFeaturedAction } from '@/features/talks/actions/update-talk-featured';
+import { useOptimisticToggle } from '@/hooks';
 import { buildTalkTrackProps, track } from '@/services/analytics';
 
 export function useToggleTalkFeatured({
@@ -16,23 +16,29 @@ export function useToggleTalkFeatured({
 }) {
   const talkId = talk._id;
 
-  const { clearOptimistic, isActive, isLoading, toggle } = useOptimisticToggle({
-    data: talk.featured ?? false,
-    onToggle: async (next) => {
-      try {
-        await update.mutateAsync({ featured: next, talkId });
-      } catch {
+  async function setFeatured(next: boolean) {
+    try {
+      const result = await updateTalkFeaturedAction(talkId, next);
+
+      if (!result.success) {
+        clearOptimistic();
         return;
       }
+
       track(
         next ? 'talk_featured' : 'talk_unfeatured',
         buildTalkTrackProps(talk, speaker)
       );
-    },
-  });
+    } catch {
+      clearOptimistic();
+    }
+  }
 
-  const update = useMutation(api.talks.updateTalk, {
-    onError: clearOptimistic,
+  const { clearOptimistic, isActive, isLoading, toggle } = useOptimisticToggle({
+    data: talk.featured ?? false,
+    onToggle: (next) => {
+      void setFeatured(next);
+    },
   });
 
   return { isFeatured: isActive, isLoading, toggle };

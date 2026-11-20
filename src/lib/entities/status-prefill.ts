@@ -1,3 +1,5 @@
+import { capitalize } from '@/utils';
+
 export type StatusPrefill = 'archived';
 
 export function parseStatusPrefill(
@@ -10,4 +12,19 @@ export function parseStatusPrefill(
   }
 
   return undefined;
+}
+
+export function getUnsavedStatusPrefill(
+  savedStatus: string | undefined,
+  statusPrefill?: StatusPrefill
+) {
+  if (statusPrefill === undefined || statusPrefill === savedStatus) {
+    return;
+  }
+
+  return statusPrefill;
+}
+
+export function formatUnsavedStatusNotice(status: StatusPrefill) {
+  return `Status was pre-filled as ${capitalize(status)} and is not saved until you press Save.`;
 }
