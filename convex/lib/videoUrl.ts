@@ -19,6 +19,13 @@ export function getVideoId(url: string): VideoId | null {
   return { id, service };
 }
 
+/** Any http(s) URL is a candidate; the transcripts service decides support. */
 export function hasTalkTranscriptSource(mediaUrl: string) {
-  return getVideoId(mediaUrl)?.service === 'youtube';
+  try {
+    const { protocol } = new URL(mediaUrl.trim());
+
+    return protocol === 'http:' || protocol === 'https:';
+  } catch {
+    return false;
+  }
 }
