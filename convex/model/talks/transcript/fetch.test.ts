@@ -1,33 +1,71 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import {
-  parseTranscriptApiVideo,
-  toTranscriptHttpError,
-} from '../transcriptFetch';
-import { TRANSCRIPT_FETCH_ERROR_CODES } from '../validators';
+import { fetchTranscript } from '../transcriptFetch';
 
-const NOW = Date.UTC(2026, 9, 21, 12, 0, 0);
+const MEDIA_URL = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
 
-describe('transcript fetch error mapping', () => {
-  it('maps HTTP and per-video API responses to error codes', () => {
-    expect(toTranscriptHttpError(401, '', null, NOW).errorCode).toBe(
-      TRANSCRIPT_FETCH_ERROR_CODES.TOKEN_INVALID
-    );
-    expect(toTranscriptHttpError(429, '', '10', NOW)).toMatchObject({
-      errorCode: TRANSCRIPT_FETCH_ERROR_CODES.RATE_LIMITED,
-      retryAfter: NOW + 10_000,
+function mockResponse(status: number, body: unknown) {
+  const fetchMock = vi.fn(() =>
+    Promise.resolve(Response.json(body, { status }))
+  );
+
+  vi.stubGlobal('fetch', fetchMock);
+
+  return fetchMock;
+}
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
+
+describe('fetchTranscript', () => {
+  it('posts the media url with a bearer token and returns the text', async () => {
+    const fetchMock = mockResponse(200, { text: ' Hello world ' });
+
+    await expect(fetchTranscript(MEDIA_URL, 'secret')).resolves.toEqual({
+      status: 'success',
+      text: 'Hello world',
     });
-    expect(toTranscriptHttpError(402, '', null, NOW).errorCode).toBe(
-      TRANSCRIPT_FETCH_ERROR_CODES.QUOTA_EXHAUSTED
+    expect(fetchMock).toHaveBeenCalledWith(
+      'https://transcripts.lukemcdonald.com/api/transcripts',
+      expect.objectContaining({
+        body: JSON.stringify({ url: MEDIA_URL }),
+        headers: expect.objectContaining({ Authorization: 'Bearer secret' }),
+        method: 'POST',
+      })
     );
-    expect(
-      toTranscriptHttpError(403, 'quota exceeded', null, NOW).errorCode
-    ).toBe(TRANSCRIPT_FETCH_ERROR_CODES.QUOTA_EXHAUSTED);
-    expect(parseTranscriptApiVideo({ isLoginRequired: true })).toMatchObject({
-      errorCode: TRANSCRIPT_FETCH_ERROR_CODES.LOGIN_REQUIRED,
+  });
+
+  it('keeps the service error code and parses retryAfter', async () => {
+    const retryAfter = '2026-12-01T00:00:00.000Z';
+
+    mockResponse(429, { code: 'QUOTA_EXHAUSTED', message: 'x', retryAfter });
+
+    await expect(fetchTranscript(MEDIA_URL, 'secret')).resolves.toMatchObject({
+      errorCode: 'QUOTA_EXHAUSTED',
+      retryAfter: Date.parse(retryAfter),
+      status: 'failed',
     });
-    expect(parseTranscriptApiVideo({ tracks: [] })).toMatchObject({
-      errorCode: TRANSCRIPT_FETCH_ERROR_CODES.NO_CAPTIONS,
+  });
+
+  it('maps auth, unknown, and network failures', async () => {
+    await expect(fetchTranscript(MEDIA_URL, '')).resolves.toMatchObject({
+      errorCode: 'PROVIDER_AUTH_FAILED',
+    });
+
+    mockResponse(401, null);
+    await expect(fetchTranscript(MEDIA_URL, 'bad')).resolves.toMatchObject({
+      errorCode: 'PROVIDER_AUTH_FAILED',
+    });
+
+    mockResponse(400, { code: 'INVALID_REQUEST', message: 'x' });
+    await expect(fetchTranscript(MEDIA_URL, 'secret')).resolves.toMatchObject({
+      errorCode: 'PROVIDER_ERROR',
+    });
+
+    vi.stubGlobal('fetch', () => Promise.reject(new Error('offline')));
+    await expect(fetchTranscript(MEDIA_URL, 'secret')).resolves.toMatchObject({
+      errorCode: 'PROVIDER_ERROR',
     });
   });
 });

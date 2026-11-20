@@ -169,8 +169,8 @@ describe('auto draft', () => {
     await withDraftMocks(async ({ asAdmin, speakerId, t }) => {
       talkTranscriptFetcher.fetch = () =>
         Promise.resolve({
-          errorCode: 'NO_CAPTIONS',
-          message: 'No captions are available for this talk.',
+          errorCode: 'NO_TRANSCRIPT',
+          message: 'No transcript is available for this talk.',
           status: 'failed',
         });
       const talkId = await createTalk(asAdmin, speakerId, 'No Captions');

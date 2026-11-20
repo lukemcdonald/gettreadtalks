@@ -4,7 +4,6 @@ import type { Talk, TalkId } from '@/features/talks/types';
 
 import { site } from '@/configs/site';
 import { hasTalkTranscriptSource } from '@/convex/lib/videoUrl';
-import { TRANSCRIPT_FETCH_ERROR_CODES } from '@/convex/model/talks/validators';
 import { buildAbsoluteUrl, buildPathQuery } from '@/lib/entities/paths';
 import {
   META_DESCRIPTION_MAX_LENGTH,
@@ -122,19 +121,10 @@ function formatTranscriptRetryAfter(retryAfter: number) {
 }
 
 export function isTranscriptFetchCoolingDown(
-  fetch: {
-    errorCode?: string | null;
-    retryAfter?: number;
-    status?: string;
-  } | null,
+  fetch: { retryAfter?: number; status?: string } | null,
   now = Date.now()
 ) {
-  return (
-    fetch?.status === 'failed' &&
-    (fetch.errorCode === TRANSCRIPT_FETCH_ERROR_CODES.QUOTA_EXHAUSTED ||
-      fetch.errorCode === TRANSCRIPT_FETCH_ERROR_CODES.RATE_LIMITED) &&
-    (fetch.retryAfter ?? 0) > now
-  );
+  return fetch?.status === 'failed' && (fetch.retryAfter ?? 0) > now;
 }
 
 export function formatTranscriptFetchFailure(fetch: {

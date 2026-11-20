@@ -161,27 +161,12 @@ describe('isTranscriptFetchCoolingDown', () => {
   const retryAfter = Date.UTC(2026, 9, 24, 20, 0, 0);
   const now = retryAfter - 1000;
 
-  it('cools down quota and rate-limit failures until retryAfter', () => {
-    expect(
-      isTranscriptFetchCoolingDown(
-        {
-          errorCode: 'QUOTA_EXHAUSTED',
-          retryAfter,
-          status: 'failed',
-        },
-        now
-      )
-    ).toBe(true);
-    expect(
-      isTranscriptFetchCoolingDown(
-        {
-          errorCode: 'RATE_LIMITED',
-          retryAfter,
-          status: 'failed',
-        },
-        now
-      )
-    ).toBe(true);
+  it('cools down failed fetches until retryAfter passes', () => {
+    const fetch = { retryAfter, status: 'failed' };
+
+    expect(isTranscriptFetchCoolingDown(fetch, now)).toBe(true);
+    expect(isTranscriptFetchCoolingDown(fetch, retryAfter)).toBe(false);
+    expect(isTranscriptFetchCoolingDown({ status: 'failed' }, now)).toBe(false);
   });
 });
 

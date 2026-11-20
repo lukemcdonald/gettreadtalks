@@ -1,3 +1,5 @@
+import type { Infer } from 'convex/values';
+
 import { literals } from 'convex-helpers/validators';
 import { v } from 'convex/values';
 
@@ -89,30 +91,21 @@ export const talkTranscriptStatus = v.union(
   v.literal('failed')
 );
 
-export const TRANSCRIPT_FETCH_ERROR_CODES = {
-  LOGIN_REQUIRED: 'LOGIN_REQUIRED',
-  NO_CAPTIONS: 'NO_CAPTIONS',
-  NOT_YOUTUBE: 'NOT_YOUTUBE',
-  QUOTA_EXHAUSTED: 'QUOTA_EXHAUSTED',
-  RATE_LIMITED: 'RATE_LIMITED',
-  TOKEN_INVALID: 'TOKEN_INVALID',
-  TOKEN_MISSING: 'TOKEN_MISSING',
-  UPSTREAM_ERROR: 'UPSTREAM_ERROR',
-} as const;
-
-export type TranscriptFetchErrorCode =
-  (typeof TRANSCRIPT_FETCH_ERROR_CODES)[keyof typeof TRANSCRIPT_FETCH_ERROR_CODES];
-
 export const talkTranscriptFetchErrorCode = v.union(
-  v.literal('LOGIN_REQUIRED'),
-  v.literal('NO_CAPTIONS'),
-  v.literal('NOT_YOUTUBE'),
+  v.literal('NO_TRANSCRIPT'),
+  v.literal('NOT_FOUND'),
+  v.literal('PROVIDER_AUTH_FAILED'),
+  v.literal('PROVIDER_ERROR'),
   v.literal('QUOTA_EXHAUSTED'),
   v.literal('RATE_LIMITED'),
-  v.literal('TOKEN_INVALID'),
-  v.literal('TOKEN_MISSING'),
-  v.literal('UPSTREAM_ERROR')
+  v.literal('RESTRICTED'),
+  v.literal('TIMED_OUT'),
+  v.literal('UNSUPPORTED_URL')
 );
+
+export type TranscriptFetchErrorCode = Infer<
+  typeof talkTranscriptFetchErrorCode
+>;
 
 export const TALK_DRAFT_PENDING = 'pending';
 
