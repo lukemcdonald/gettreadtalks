@@ -18,7 +18,11 @@ export async function archiveTalkAction(
   try {
     await fetchAuthMutation(api.talks.archiveTalk, { talkId });
 
+    updateTag('clips');
+    updateTag('collections');
+    updateTag('speakers');
     updateTag('talks');
+    updateTag('topics');
 
     return {
       data: null,

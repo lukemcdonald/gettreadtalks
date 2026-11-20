@@ -19,6 +19,8 @@ export async function archiveClipAction(
     await fetchAuthMutation(api.clips.archiveClip, { clipId });
 
     updateTag('clips');
+    updateTag('speakers');
+    updateTag('talks');
 
     return {
       data: null,

@@ -18,8 +18,12 @@ export async function destroyTalkAction(
   try {
     await fetchAuthMutation(api.talks.destroyTalk, { talkId });
 
-    updateTag('talks');
+    updateTag('clips');
+    updateTag('collections');
     updateTag('form-options');
+    updateTag('speakers');
+    updateTag('talks');
+    updateTag('topics');
 
     return {
       data: null,

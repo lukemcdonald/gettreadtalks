@@ -54,8 +54,10 @@ describe('clip admin actions', () => {
 
       expect(requireAdminUser).toHaveBeenCalledTimes(1);
       expect(fetchAuthMutation).toHaveBeenCalledWith(mutation, args);
-      expect(updateTag).toHaveBeenCalledTimes(1);
+      expect(updateTag).toHaveBeenCalledTimes(3);
       expect(updateTag).toHaveBeenCalledWith('clips');
+      expect(updateTag).toHaveBeenCalledWith('speakers');
+      expect(updateTag).toHaveBeenCalledWith('talks');
     }
   );
 

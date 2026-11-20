@@ -19,6 +19,8 @@ export async function destroyClipAction(
     await fetchAuthMutation(api.clips.destroyClip, { clipId });
 
     updateTag('clips');
+    updateTag('speakers');
+    updateTag('talks');
 
     return {
       data: null,

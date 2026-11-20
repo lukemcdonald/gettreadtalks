@@ -22,7 +22,10 @@ export async function updateTalkFeaturedAction(
       talkId,
     });
 
+    updateTag('collections');
+    updateTag('speakers');
     updateTag('talks');
+    updateTag('topics');
 
     return {
       data: null,
