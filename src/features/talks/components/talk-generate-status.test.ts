@@ -3,7 +3,7 @@ import { TALK_DRAFT_PENDING } from '@/convex/model/talks/validators';
 import { describe, expect, it } from '@/test';
 
 import {
-  TALK_CREATE_YOUTUBE_DRAFT_HINT,
+  TALK_CREATE_DRAFT_HINT,
   formatTalkCreateGenerationHint,
   getTalkGenerationStatus,
   getTalkSummaryEditorValue,
@@ -26,13 +26,14 @@ function status(
 }
 
 describe('formatTalkCreateGenerationHint', () => {
-  it('explains background drafts for YouTube and stays quiet until a URL exists', () => {
+  it('explains background drafts for any media URL and stays quiet until one exists', () => {
     expect(formatTalkCreateGenerationHint('')).toBeNull();
     expect(formatTalkCreateGenerationHint('  ')).toBeNull();
     expect(formatTalkCreateGenerationHint(youtube)).toBe(
-      TALK_CREATE_YOUTUBE_DRAFT_HINT
+      TALK_CREATE_DRAFT_HINT
     );
-    expect(formatTalkCreateGenerationHint(audio)).toBe(
+    expect(formatTalkCreateGenerationHint(audio)).toBe(TALK_CREATE_DRAFT_HINT);
+    expect(formatTalkCreateGenerationHint('not a url')).toBe(
       NO_TRANSCRIPT_SOURCE_MESSAGE
     );
   });
@@ -174,10 +175,10 @@ describe('getTalkGenerationStatus', () => {
     });
   });
 
-  it('marks unsupported media unavailable and never waiting', () => {
+  it('marks a missing media URL unavailable and never waiting', () => {
     expect(
       status({
-        mediaUrl: audio,
+        mediaUrl: 'not a url',
       })
     ).toEqual({
       study: { kind: 'unavailable' },
@@ -206,8 +207,43 @@ describe('getTalkGenerationStatus', () => {
         mediaUrl: audio,
       })
     ).toEqual({
+      study: { kind: 'missing' },
+      summary: { kind: 'missing' },
+      transcript: { kind: 'ready' },
+    });
+  });
+
+  it('marks media the transcript service rejects as unavailable, not failed', () => {
+    expect(
+      status({
+        fetch: {
+          errorCode: 'UNSUPPORTED_URL',
+          message: 'Unsupported.',
+          status: 'failed',
+        },
+        mediaUrl: audio,
+      })
+    ).toEqual({
       study: { kind: 'unavailable' },
       summary: { kind: 'unavailable' },
+      transcript: { kind: 'unavailable', message: 'Unsupported.' },
+    });
+  });
+
+  it('keeps summary and study available from a saved transcript after a rejected URL', () => {
+    expect(
+      status({
+        fetch: {
+          errorCode: 'UNSUPPORTED_URL',
+          message: 'Unsupported.',
+          status: 'failed',
+        },
+        hasTranscript: true,
+        mediaUrl: audio,
+      })
+    ).toEqual({
+      study: { kind: 'missing' },
+      summary: { kind: 'missing' },
       transcript: { kind: 'ready' },
     });
   });

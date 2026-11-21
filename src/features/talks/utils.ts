@@ -120,6 +120,13 @@ function formatTranscriptRetryAfter(retryAfter: number) {
   }).format(new Date(retryAfter));
 }
 
+/** The transcripts service rejected the URL; retrying the same URL will not help. */
+export function isTranscriptSourceUnsupported(
+  fetch: { errorCode?: string; status?: string } | null
+) {
+  return fetch?.status === 'failed' && fetch.errorCode === 'UNSUPPORTED_URL';
+}
+
 export function isTranscriptFetchCoolingDown(
   fetch: { retryAfter?: number; status?: string } | null,
   now = Date.now()

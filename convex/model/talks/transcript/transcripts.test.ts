@@ -209,6 +209,42 @@ describe('talk transcript and study draft storage', () => {
     }
   });
 
+  it('clears failed transcript fetches when the media URL changes', async () => {
+    const { asAdmin, t, talk } = await seedPublishedTalk();
+
+    await t.run(async (ctx) => {
+      await ctx.db.insert('talkTranscriptFetches', {
+        checkedAt: Date.now(),
+        errorCode: 'UNSUPPORTED_URL',
+        message: 'Unsupported.',
+        status: 'failed',
+        talkId: talk._id,
+      });
+    });
+
+    await asAdmin.mutation(api.talks.updateTalk, {
+      talkId: talk._id,
+      title: 'Renamed talk',
+    });
+
+    expect(
+      await asAdmin.query(api.talks.getTalkTranscriptFetch, {
+        talkId: talk._id,
+      })
+    ).toMatchObject({ errorCode: 'UNSUPPORTED_URL' });
+
+    await asAdmin.mutation(api.talks.updateTalk, {
+      mediaUrl: 'https://example.com/talk.mp3',
+      talkId: talk._id,
+    });
+
+    expect(
+      await asAdmin.query(api.talks.getTalkTranscriptFetch, {
+        talkId: talk._id,
+      })
+    ).toBeNull();
+  });
+
   it('updates a transcript after trim and rejects an empty one', async () => {
     const { asAdmin, t, talk } = await seedPublishedTalk();
 
