@@ -80,7 +80,6 @@ import type * as model_talkFeatures_study_prompt from "../model/talkFeatures/stu
 import type * as model_talkFeatures_study_template from "../model/talkFeatures/study/template.js";
 import type * as model_talkFeatures_validators from "../model/talkFeatures/validators.js";
 import type * as model_talks_autoDraft from "../model/talks/autoDraft.js";
-import type * as model_talks_enrichment_handler from "../model/talks/enrichment/handler.js";
 import type * as model_talks_helpers from "../model/talks/helpers.js";
 import type * as model_talks_index from "../model/talks/index.js";
 import type * as model_talks_mutations from "../model/talks/mutations.js";
@@ -186,7 +185,6 @@ declare const fullApi: ApiFromModules<{
   "model/talkFeatures/study/template": typeof model_talkFeatures_study_template;
   "model/talkFeatures/validators": typeof model_talkFeatures_validators;
   "model/talks/autoDraft": typeof model_talks_autoDraft;
-  "model/talks/enrichment/handler": typeof model_talks_enrichment_handler;
   "model/talks/helpers": typeof model_talks_helpers;
   "model/talks/index": typeof model_talks_index;
   "model/talks/mutations": typeof model_talks_mutations;
