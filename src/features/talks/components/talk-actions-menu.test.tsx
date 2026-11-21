@@ -2,6 +2,7 @@
 
 import type { TalkWithSpeakerAndTopics } from '@/features/talks/types';
 
+import { toastManager } from '@/components/ui/primitives/toast';
 import { buildTalkPath } from '@/features/talks/utils';
 import { describe, expect, it, render, screen } from '@/test';
 
@@ -22,13 +23,13 @@ vi.mock('next/navigation', () => ({
 
 vi.mock('@/features/talks/hooks/use-archive-talk', () => ({
   useArchiveTalk: () => ({
-    mutateAsync: archiveTalk,
+    archiveTalk,
   }),
 }));
 
 vi.mock('@/features/talks/hooks/use-destroy-talk', () => ({
   useDestroyTalk: () => ({
-    mutateAsync: vi.fn(),
+    destroyTalk: vi.fn(),
   }),
 }));
 
@@ -83,13 +84,53 @@ describe('TalkActionsMenu', () => {
   });
 
   it('archives without leaving the manage list', async () => {
-    archiveTalk.mockImplementation(async () => {});
+    archiveTalk.mockResolvedValue({ data: null, success: true });
 
     const click = await openMenu(talkUrl);
     await click(screen.getByRole('menuitem', { name: 'Archive' }));
 
-    expect(archiveTalk).toHaveBeenCalledWith({ talkId: talk._id });
+    expect(archiveTalk).toHaveBeenCalledWith(talk._id);
     expect(refresh).toHaveBeenCalledTimes(1);
     expect(push).not.toHaveBeenCalled();
+  });
+
+  it('stays on the list when archive fails', async () => {
+    archiveTalk.mockResolvedValue({
+      errors: { _form: 'Could not archive this talk' },
+      success: false,
+    });
+
+    const click = await openMenu(talkUrl);
+    await click(screen.getByRole('menuitem', { name: 'Archive' }));
+
+    expect(refresh).not.toHaveBeenCalled();
+    expect(push).not.toHaveBeenCalled();
+    expect(toastManager.add).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: 'Failed to archive talk',
+        type: 'error',
+      })
+    );
+  });
+
+  it('says unarchive failed when the talk is already archived', async () => {
+    archiveTalk.mockResolvedValue({
+      errors: { _form: 'Could not archive this talk' },
+      success: false,
+    });
+
+    const { click } = render(
+      <TalkActionsMenu talk={{ ...talk, status: 'archived' }} />
+    );
+
+    await click(screen.getByRole('button', { name: 'More actions' }));
+    await click(screen.getByRole('menuitem', { name: 'Unarchive' }));
+
+    expect(toastManager.add).toHaveBeenCalledWith(
+      expect.objectContaining({
+        title: 'Failed to unarchive talk',
+        type: 'error',
+      })
+    );
   });
 });

@@ -1,0 +1,35 @@
+'use server';
+
+import 'server-only';
+import type { ClipId } from '../types';
+import type { ActionResult } from '@/lib/forms/types';
+
+import { updateTag } from 'next/cache';
+
+import { api } from '@/convex/_generated/api';
+import { toConvexFormErrors } from '@/lib/forms/validation';
+import { fetchAuthMutation, requireAdminUser } from '@/services/auth/server';
+
+export async function destroyClipAction(
+  clipId: ClipId
+): Promise<ActionResult<null>> {
+  await requireAdminUser();
+
+  try {
+    await fetchAuthMutation(api.clips.destroyClip, { clipId });
+
+    updateTag('clips');
+    updateTag('speakers');
+    updateTag('talks');
+
+    return {
+      data: null,
+      success: true,
+    };
+  } catch (error) {
+    return {
+      errors: toConvexFormErrors(error),
+      success: false,
+    };
+  }
+}

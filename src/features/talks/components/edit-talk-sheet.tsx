@@ -11,7 +11,7 @@ import type { StatusPrefill } from '@/lib/entities/status-prefill';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useState, useTransition } from 'react';
-import { useForm, useWatch } from 'react-hook-form';
+import { useWatch } from 'react-hook-form';
 
 import { useSheetRoute } from '@/app/@sheet/_hooks/use-sheet-route';
 import {
@@ -20,6 +20,7 @@ import {
   FormSheetBody,
   FormSheetShell,
 } from '@/components/ui';
+import { UnsavedStatusNotice } from '@/components/unsaved-status-notice';
 import { updateTalkAction } from '@/features/talks/actions/update-talk';
 import { EditTalkGenerationStatus } from '@/features/talks/components/edit-talk-generation-status';
 import {
@@ -42,7 +43,9 @@ import {
   hasTalkTranscriptSource,
 } from '@/features/talks/utils';
 import { buildEntityEditPath } from '@/lib/entities/paths';
+import { getUnsavedStatusPrefill } from '@/lib/entities/status-prefill';
 import { setServerErrors } from '@/lib/forms/react-hook-form';
+import { useStatusPrefillForm } from '@/lib/forms/use-status-prefill-form';
 
 interface EditTalkSheetProps {
   closeHref?: string;
@@ -74,12 +77,24 @@ function useEditTalkSheet({
   const [pendingUpdate, setPendingUpdate] = useState<PendingTalkUpdate | null>(
     null
   );
-  const form = useForm<TalkFormData>({
-    mode: 'onBlur',
-    // oxlint-disable-next-line typescript/no-explicit-any -- Zod 4 compatibility with zodResolver
-    resolver: zodResolver(talkFormSchema as any),
-    values: getTalkFormValues(talk, statusPrefill),
-  });
+  const savedValues = getTalkFormValues(talk);
+  const unsavedStatus = getUnsavedStatusPrefill(
+    savedValues.status,
+    statusPrefill
+  );
+  const displayedValues = unsavedStatus
+    ? { ...savedValues, status: unsavedStatus }
+    : savedValues;
+  const form = useStatusPrefillForm(
+    savedValues,
+    displayedValues,
+    unsavedStatus,
+    {
+      mode: 'onBlur',
+      // oxlint-disable-next-line typescript/no-explicit-any -- Zod 4 compatibility with zodResolver
+      resolver: zodResolver(talkFormSchema as any),
+    }
+  );
 
   function submitData(data: TalkFormData) {
     startTransition(async () => {
@@ -123,6 +138,7 @@ function useEditTalkSheet({
     isPending,
     pendingUpdate,
     setPendingUpdate,
+    unsavedStatus,
   };
 }
 
@@ -173,6 +189,7 @@ export function EditTalkSheet({
     isPending,
     pendingUpdate,
     setPendingUpdate,
+    unsavedStatus,
   } = useEditTalkSheet({
     closeHref,
     getDirtySummary: summary.getDirtySummary,
@@ -226,6 +243,9 @@ export function EditTalkSheet({
               }
             >
               <div className="space-y-4">
+                {unsavedStatus ? (
+                  <UnsavedStatusNotice status={unsavedStatus} />
+                ) : null}
                 <FormError error={form.formState.errors.root} />
                 <FormError error={summary.form.formState.errors.root} />
                 <TalkFormFields

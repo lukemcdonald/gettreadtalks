@@ -1,10 +1,19 @@
 'use client';
 
-import type { UseMutationOptions } from '@/hooks/use-mutation';
+import type { TalkId } from '@/features/talks/types';
 
-import { api } from '@/convex/_generated/api';
-import { useMutation } from '@/hooks';
+import { destroyTalkAction } from '@/features/talks/actions/destroy-talk';
 
-export function useDestroyTalk(options?: UseMutationOptions) {
-  return useMutation(api.talks.destroyTalk, options);
+export function useDestroyTalk(options?: { onSuccess?: () => void }) {
+  async function destroyTalk(talkId: TalkId) {
+    const result = await destroyTalkAction(talkId);
+
+    if (result.success) {
+      options?.onSuccess?.();
+    }
+
+    return result;
+  }
+
+  return { destroyTalk };
 }

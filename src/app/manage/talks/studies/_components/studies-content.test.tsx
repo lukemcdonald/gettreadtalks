@@ -15,6 +15,10 @@ vi.mock('@/features/talks/queries/load-all-talks', () => ({
   loadAllTalks: loadAllTalksMock,
 }));
 
+vi.mock('@/features/talks/components/talk-actions-menu', () => ({
+  TalkActionsMenu: () => null,
+}));
+
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: vi.fn(),

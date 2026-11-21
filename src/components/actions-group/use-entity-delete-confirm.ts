@@ -1,13 +1,12 @@
 'use client';
 
-import type { ActionResult } from '@/lib/forms/types';
-
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import { toastManager } from '@/components/ui/primitives/toast';
 import { formatErrorMessage } from '@/services/errors';
 
+import { getActionErrorMessage, isFailedActionResult } from './action-result';
 import { getContentMenuItems } from './get-content-menu-items';
 
 interface UseEntityDeleteConfirmOptions<TId> {
@@ -17,17 +16,6 @@ interface UseEntityDeleteConfirmOptions<TId> {
   listUrl?: string;
   successTitle: string;
   viewUrl?: string;
-}
-
-function isFailedActionResult(
-  result: unknown
-): result is Extract<ActionResult<unknown>, { success: false }> {
-  return (
-    typeof result === 'object' &&
-    result !== null &&
-    'success' in result &&
-    result.success === false
-  );
 }
 
 export function useEntityDeleteConfirm<TId>({
@@ -54,7 +42,7 @@ export function useEntityDeleteConfirm<TId>({
 
       if (isFailedActionResult(result)) {
         toastManager.add({
-          description: result.errors.root ?? 'An error occurred',
+          description: getActionErrorMessage(result),
           title: failureTitle,
           type: 'error',
         });

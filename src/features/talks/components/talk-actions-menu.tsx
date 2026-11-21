@@ -19,18 +19,20 @@ export function TalkActionsMenu({ talk, talkUrl }: TalkActionsMenuProps) {
   const talkId = talk._id;
   const router = useRouter();
 
-  const { mutateAsync: archiveTalk } = useArchiveTalk();
-  const { mutateAsync: destroyTalk } = useDestroyTalk({
-    onSuccess: () => router.push(buildTalksPath()),
+  const { archiveTalk } = useArchiveTalk();
+  const { destroyTalk } = useDestroyTalk({
+    onSuccess: () => {
+      router.push(buildTalksPath());
+    },
   });
 
-  const handleArchive = async () => {
-    await archiveTalk({ talkId });
-  };
+  async function handleArchive() {
+    return await archiveTalk(talkId);
+  }
 
-  const handleDelete = async () => {
-    await destroyTalk({ talkId });
-  };
+  async function handleDelete() {
+    return await destroyTalk(talkId);
+  }
 
   return (
     <ContentActionsGroup
