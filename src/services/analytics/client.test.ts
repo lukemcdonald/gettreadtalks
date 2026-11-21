@@ -88,4 +88,21 @@ describe('analytics client', () => {
 
     expect(segmentLoad).not.toHaveBeenCalled();
   });
+
+  it('loads and settles in browsers without Promise.withResolvers', async () => {
+    const { withResolvers } = Promise;
+    Reflect.deleteProperty(Promise, 'withResolvers');
+
+    try {
+      analytics.loadAnalytics();
+      const settled = analytics.waitForAnalytics(Promise.race([]));
+
+      await vi.advanceTimersByTimeAsync(MOCK_IDLE_TIMEOUT_MS);
+      await settled;
+
+      expect(segmentLoad).toHaveBeenCalledTimes(1);
+    } finally {
+      Promise.withResolvers = withResolvers;
+    }
+  });
 });

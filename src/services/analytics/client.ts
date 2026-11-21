@@ -23,16 +23,16 @@ function scheduleIdleLoad() {
     return idleLoad;
   }
 
-  const idle = Promise.withResolvers<null>();
-  idleLoad = idle.promise;
-
-  if (typeof requestIdleCallback === 'function') {
-    requestIdleCallback(() => idle.resolve(null), {
-      timeout: IDLE_LOAD_TIMEOUT_MS,
-    });
-  } else {
-    setTimeout(() => idle.resolve(null), IDLE_LOAD_TIMEOUT_MS);
-  }
+  // oxlint-disable-next-line promise/avoid-new -- Promise.withResolvers is missing in older browsers and crawlers.
+  idleLoad = new Promise<null>((resolve) => {
+    if (typeof requestIdleCallback === 'function') {
+      requestIdleCallback(() => resolve(null), {
+        timeout: IDLE_LOAD_TIMEOUT_MS,
+      });
+    } else {
+      setTimeout(() => resolve(null), IDLE_LOAD_TIMEOUT_MS);
+    }
+  });
 
   return idleLoad;
 }
@@ -152,11 +152,14 @@ export function trackEvent(
 }
 
 export async function waitForAnalytics(event: Promise<void>) {
-  const timeout = Promise.withResolvers<null>();
-  const timer = setTimeout(() => timeout.resolve(null), 500);
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  // oxlint-disable-next-line promise/avoid-new -- Promise.withResolvers is missing in older browsers.
+  const timeout = new Promise<null>((resolve) => {
+    timer = setTimeout(() => resolve(null), 500);
+  });
 
   try {
-    await Promise.race([event, timeout.promise]);
+    await Promise.race([event, timeout]);
   } finally {
     clearTimeout(timer);
   }
