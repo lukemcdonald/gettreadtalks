@@ -274,8 +274,11 @@ export function getTalkGenerationStatus({
   study: { hasBody: boolean; status: 'draft' | 'published' } | null;
   summary?: string;
 }): TalkGenerationStatus {
+  // A saved transcript is enough to generate, whatever the media URL.
   const hasSource =
-    hasTalkTranscriptSource(mediaUrl) && !isTranscriptSourceUnsupported(fetch);
+    hasTranscript ||
+    (hasTalkTranscriptSource(mediaUrl) &&
+      !isTranscriptSourceUnsupported(fetch));
   const summaryDraft = getTalkDraftStep(draftSummary);
   const studyDraft = getTalkDraftStep(draftStudy);
   const transcript = getTranscriptStage({

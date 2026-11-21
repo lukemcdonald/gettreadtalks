@@ -230,6 +230,24 @@ describe('getTalkGenerationStatus', () => {
     });
   });
 
+  it('keeps summary and study available from a saved transcript after a rejected URL', () => {
+    expect(
+      status({
+        fetch: {
+          errorCode: 'UNSUPPORTED_URL',
+          message: 'Unsupported.',
+          status: 'failed',
+        },
+        hasTranscript: true,
+        mediaUrl: audio,
+      })
+    ).toEqual({
+      study: { kind: 'missing' },
+      summary: { kind: 'missing' },
+      transcript: { kind: 'ready' },
+    });
+  });
+
   it('keeps saved and published content when a later attempt failed', () => {
     expect(
       status({
