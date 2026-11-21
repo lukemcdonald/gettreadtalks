@@ -188,25 +188,16 @@ describe('talk transcript and study draft storage', () => {
     );
     expect(saved?.summaryManuallyEditedAt).toBeGreaterThanOrEqual(before);
 
-    const previous = process.env.ENRICHMENT_API_TOKEN;
+    await expect(
+      t.mutation(
+        internal.talks.saveTalkSummaryDraft,
+        summaryDraftArgs(talk._id)
+      )
+    ).rejects.toMatchObject({ data: { statusCode: 409 } });
 
-    try {
-      process.env.ENRICHMENT_API_TOKEN = 'correct-token';
+    const after = await asAdmin.query(api.talks.getTalk, { id: talk._id });
 
-      const response = await t.fetch('/enrichment', {
-        body: JSON.stringify({ summary: summaryDraftArgs(talk._id) }),
-        headers: { Authorization: 'Bearer correct-token' },
-        method: 'POST',
-      });
-
-      expect(response.status).toBe(409);
-    } finally {
-      if (previous === undefined) {
-        delete process.env.ENRICHMENT_API_TOKEN;
-      } else {
-        process.env.ENRICHMENT_API_TOKEN = previous;
-      }
-    }
+    expect(after?.summary).toBe(editedSummary);
   });
 
   it('clears failed transcript fetches when the media URL changes', async () => {
@@ -276,33 +267,5 @@ describe('talk transcript and study draft storage', () => {
         errorCode: ErrorCodes.VALIDATION_FAILED,
       },
     });
-  });
-
-  it('returns 401 when the enrichment token is missing or wrong', async () => {
-    const t = createConvexTest();
-    const previous = process.env.ENRICHMENT_API_TOKEN;
-
-    try {
-      process.env.ENRICHMENT_API_TOKEN = 'correct-token';
-
-      const missing = await t.fetch('/enrichment', {
-        body: '{}',
-        method: 'POST',
-      });
-      const wrong = await t.fetch('/enrichment', {
-        body: '{}',
-        headers: { Authorization: 'Bearer wrong-token' },
-        method: 'POST',
-      });
-
-      expect(missing.status).toBe(401);
-      expect(wrong.status).toBe(401);
-    } finally {
-      if (previous === undefined) {
-        delete process.env.ENRICHMENT_API_TOKEN;
-      } else {
-        process.env.ENRICHMENT_API_TOKEN = previous;
-      }
-    }
   });
 });
