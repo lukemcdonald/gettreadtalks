@@ -28,11 +28,12 @@ const TRANSCRIPT_FETCH_MESSAGES: Record<TranscriptFetchErrorCode, string> = {
   NOT_FOUND: 'The video was not found. It may be deleted or private.',
   PROVIDER_AUTH_FAILED: 'Transcript service is not configured correctly.',
   PROVIDER_ERROR: 'Transcript service returned an error.',
+  QUOTA_EXCEEDED: 'The transcript service is out of transcription credits.',
   QUOTA_EXHAUSTED: 'The monthly transcript quota has been used up.',
   RATE_LIMITED: 'Too many transcript requests.',
   RESTRICTED: 'The video needs sign-in or is age or region restricted.',
   TIMED_OUT: 'The transcript took too long to fetch.',
-  UNSUPPORTED_URL: 'Transcripts can only be fetched from YouTube talks.',
+  UNSUPPORTED_URL: 'The transcript service does not support this media URL.',
 };
 
 type TranscriptFetchResult =
@@ -241,7 +242,10 @@ export interface GenerateTranscriptEnsureFailure {
 export function toGenerateTranscriptEnsureFailure(
   ensured: Exclude<EnsureTalkTranscriptResult, { status: 'success' }>
 ): GenerateTranscriptEnsureFailure {
-  if (ensured.errorCode === 'NO_TRANSCRIPT_SOURCE') {
+  if (
+    ensured.errorCode === 'NO_TRANSCRIPT_SOURCE' ||
+    ensured.errorCode === 'UNSUPPORTED_URL'
+  ) {
     return {
       errorCode: 'NO_TRANSCRIPT_SOURCE',
       message: NO_TRANSCRIPT_SOURCE_MESSAGE,

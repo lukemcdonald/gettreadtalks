@@ -28,6 +28,7 @@ import {
   hasCreatedTalkTranscriptFetch,
   hasTalkTranscriptSource,
   isTranscriptFetchCoolingDown,
+  isTranscriptSourceUnsupported,
   shouldAutoFetchTalkTranscript,
 } from '@/features/talks/utils';
 import { useMutation } from '@/hooks';
@@ -102,7 +103,11 @@ function TalkTranscriptFetchControls({
   const fetch = liveFetch ?? null;
   const saved = hasTranscript || fetch?.status === 'success';
   const coolingDown = isTranscriptFetchCoolingDown(fetch, now);
-  const disabled = isLoading || fetch?.status === 'pending' || coolingDown;
+  const disabled =
+    isLoading ||
+    fetch?.status === 'pending' ||
+    coolingDown ||
+    isTranscriptSourceUnsupported(fetch);
   const statusText = getTranscriptFetchStatusText(fetch, saved);
 
   useEffect(() => {

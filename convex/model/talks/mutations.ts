@@ -250,7 +250,7 @@ export const createTalk = mutation({
       });
     }
 
-    // YouTube talks draft the transcript, summary, and study in the background.
+    // Talks with a media URL draft the transcript, summary, and study in the background.
     if (hasTalkTranscriptSource(talkArgs.mediaUrl)) {
       const runId = await createPendingTalkTranscriptFetch(ctx, { talkId });
 
@@ -266,6 +266,23 @@ export const createTalk = mutation({
   },
   returns: v.id('talks'),
 });
+
+/** Failed fetches describe the old media URL, so a new URL starts clean. */
+async function clearFailedTranscriptFetches(
+  ctx: MutationCtx,
+  { talkId }: { talkId: Id<'talks'> }
+) {
+  const fetches = await ctx.db
+    .query('talkTranscriptFetches')
+    .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
+    .collect();
+
+  await Promise.all(
+    fetches
+      .filter((row) => row.status === 'failed')
+      .map((row) => ctx.db.delete(row._id))
+  );
+}
 
 /**
  * Update an existing talk.
@@ -349,6 +366,13 @@ export const updateTalk = mutation({
         talkId,
         topicIds,
       });
+    }
+
+    if (
+      updates.mediaUrl !== undefined &&
+      updates.mediaUrl.trim() !== talk.mediaUrl.trim()
+    ) {
+      await clearFailedTranscriptFetches(ctx, { talkId });
     }
 
     await clearStaleMediaChecks(ctx, {

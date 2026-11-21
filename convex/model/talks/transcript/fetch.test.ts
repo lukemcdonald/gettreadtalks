@@ -1,6 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { fetchTranscript } from '../transcriptFetch';
+import { NO_TRANSCRIPT_SOURCE_MESSAGE } from '../summary/prompt';
+import {
+  fetchTranscript,
+  toGenerateTranscriptEnsureFailure,
+} from '../transcriptFetch';
 
 const MEDIA_URL = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
 
@@ -66,6 +70,40 @@ describe('fetchTranscript', () => {
     vi.stubGlobal('fetch', () => Promise.reject(new Error('offline')));
     await expect(fetchTranscript(MEDIA_URL, 'secret')).resolves.toMatchObject({
       errorCode: 'PROVIDER_ERROR',
+    });
+  });
+});
+
+describe('toGenerateTranscriptEnsureFailure', () => {
+  it('keeps out of credits as a retryable upstream error', async () => {
+    mockResponse(402, { code: 'QUOTA_EXCEEDED' });
+
+    const result = await fetchTranscript(MEDIA_URL, 'secret');
+
+    if (result.status !== 'failed') {
+      throw new Error('expected a failed fetch');
+    }
+
+    expect(result.errorCode).toBe('QUOTA_EXCEEDED');
+    expect(toGenerateTranscriptEnsureFailure(result)).toEqual({
+      errorCode: 'UPSTREAM_ERROR',
+      message: 'The transcript service is out of transcription credits.',
+    });
+  });
+
+  it('treats an unsupported media URL as having no transcript source', async () => {
+    mockResponse(422, { code: 'UNSUPPORTED_URL' });
+
+    const result = await fetchTranscript('https://example.com/talk', 'secret');
+
+    if (result.status !== 'failed') {
+      throw new Error('expected a failed fetch');
+    }
+
+    expect(result.errorCode).toBe('UNSUPPORTED_URL');
+    expect(toGenerateTranscriptEnsureFailure(result)).toEqual({
+      errorCode: 'NO_TRANSCRIPT_SOURCE',
+      message: NO_TRANSCRIPT_SOURCE_MESSAGE,
     });
   });
 });

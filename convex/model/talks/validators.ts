@@ -96,6 +96,7 @@ export const talkTranscriptFetchErrorCode = v.union(
   v.literal('NOT_FOUND'),
   v.literal('PROVIDER_AUTH_FAILED'),
   v.literal('PROVIDER_ERROR'),
+  v.literal('QUOTA_EXCEEDED'),
   v.literal('QUOTA_EXHAUSTED'),
   v.literal('RATE_LIMITED'),
   v.literal('RESTRICTED'),

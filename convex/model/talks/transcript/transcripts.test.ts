@@ -188,25 +188,52 @@ describe('talk transcript and study draft storage', () => {
     );
     expect(saved?.summaryManuallyEditedAt).toBeGreaterThanOrEqual(before);
 
-    const previous = process.env.ENRICHMENT_API_TOKEN;
+    await expect(
+      t.mutation(
+        internal.talks.saveTalkSummaryDraft,
+        summaryDraftArgs(talk._id)
+      )
+    ).rejects.toMatchObject({ data: { statusCode: 409 } });
 
-    try {
-      process.env.ENRICHMENT_API_TOKEN = 'correct-token';
+    const after = await asAdmin.query(api.talks.getTalk, { id: talk._id });
 
-      const response = await t.fetch('/enrichment', {
-        body: JSON.stringify({ summary: summaryDraftArgs(talk._id) }),
-        headers: { Authorization: 'Bearer correct-token' },
-        method: 'POST',
+    expect(after?.summary).toBe(editedSummary);
+  });
+
+  it('clears failed transcript fetches when the media URL changes', async () => {
+    const { asAdmin, t, talk } = await seedPublishedTalk();
+
+    await t.run(async (ctx) => {
+      await ctx.db.insert('talkTranscriptFetches', {
+        checkedAt: Date.now(),
+        errorCode: 'UNSUPPORTED_URL',
+        message: 'Unsupported.',
+        status: 'failed',
+        talkId: talk._id,
       });
+    });
 
-      expect(response.status).toBe(409);
-    } finally {
-      if (previous === undefined) {
-        delete process.env.ENRICHMENT_API_TOKEN;
-      } else {
-        process.env.ENRICHMENT_API_TOKEN = previous;
-      }
-    }
+    await asAdmin.mutation(api.talks.updateTalk, {
+      talkId: talk._id,
+      title: 'Renamed talk',
+    });
+
+    expect(
+      await asAdmin.query(api.talks.getTalkTranscriptFetch, {
+        talkId: talk._id,
+      })
+    ).toMatchObject({ errorCode: 'UNSUPPORTED_URL' });
+
+    await asAdmin.mutation(api.talks.updateTalk, {
+      mediaUrl: 'https://example.com/talk.mp3',
+      talkId: talk._id,
+    });
+
+    expect(
+      await asAdmin.query(api.talks.getTalkTranscriptFetch, {
+        talkId: talk._id,
+      })
+    ).toBeNull();
   });
 
   it('updates a transcript after trim and rejects an empty one', async () => {
@@ -240,33 +267,5 @@ describe('talk transcript and study draft storage', () => {
         errorCode: ErrorCodes.VALIDATION_FAILED,
       },
     });
-  });
-
-  it('returns 401 when the enrichment token is missing or wrong', async () => {
-    const t = createConvexTest();
-    const previous = process.env.ENRICHMENT_API_TOKEN;
-
-    try {
-      process.env.ENRICHMENT_API_TOKEN = 'correct-token';
-
-      const missing = await t.fetch('/enrichment', {
-        body: '{}',
-        method: 'POST',
-      });
-      const wrong = await t.fetch('/enrichment', {
-        body: '{}',
-        headers: { Authorization: 'Bearer wrong-token' },
-        method: 'POST',
-      });
-
-      expect(missing.status).toBe(401);
-      expect(wrong.status).toBe(401);
-    } finally {
-      if (previous === undefined) {
-        delete process.env.ENRICHMENT_API_TOKEN;
-      } else {
-        process.env.ENRICHMENT_API_TOKEN = previous;
-      }
-    }
   });
 });

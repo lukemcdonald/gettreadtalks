@@ -24,7 +24,6 @@ export default defineConfig({
     globals: true,
     projects: [
       {
-        extends: true,
         test: {
           environment: 'edge-runtime',
           include: ['convex/**/*.test.ts'],
@@ -32,7 +31,6 @@ export default defineConfig({
         },
       },
       {
-        extends: true,
         test: {
           environment: 'node',
           include: ['src/**/*.test.ts'],
@@ -40,7 +38,6 @@ export default defineConfig({
         },
       },
       {
-        extends: true,
         test: {
           environment: 'happy-dom',
           include: ['src/**/*.test.tsx'],

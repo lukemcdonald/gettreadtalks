@@ -44,7 +44,6 @@ describe('PublishStudyDraftsConfirm', () => {
   beforeEach(() => {
     onPublish.mockReset();
     refresh.mockReset();
-    vi.mocked(reportUnexpectedError).mockClear();
     vi.spyOn(toastManager, 'add').mockReturnValue('toast');
   });
 
