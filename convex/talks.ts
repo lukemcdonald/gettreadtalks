@@ -7,6 +7,7 @@ export {
 export {
   fetchTalkTranscript,
   insertPendingTalkTranscriptFetch,
+  saveTalkTranscriptFetchJob,
 } from './model/talks/transcriptFetch';
 export {
   generateTalkSummary,

@@ -1,5 +1,5 @@
 import type { Id } from '../../_generated/dataModel';
-import type { ActionCtx, MutationCtx } from '../../_generated/server';
+import type { ActionCtx, MutationCtx, QueryCtx } from '../../_generated/server';
 import type { TranscriptFetchErrorCode } from './validators';
 
 import { v } from 'convex/values';
@@ -38,8 +38,24 @@ const TRANSCRIPT_FETCH_MESSAGES: Record<TranscriptFetchErrorCode, string> = {
   UNSUPPORTED_URL: 'The transcript service does not support this media URL.',
 };
 
-const TRANSCRIPT_PROCESSING_MESSAGE =
+export const TRANSCRIPT_PROCESSING_MESSAGE =
   'The transcript is still being generated. Try again in a few minutes.';
+
+/** The service's suggested wait when a still-processing answer names none. */
+const PROCESSING_RETRY_MS = 15_000;
+
+/** A pending run that is resuming a job, so a new fetch would pay for the same transcript twice. */
+export async function loadProcessingTalkTranscriptFetch(
+  ctx: MutationCtx | QueryCtx,
+  talkId: Id<'talks'>
+) {
+  const runs = await ctx.db
+    .query('talkTranscriptFetches')
+    .withIndex('by_talkId', (q) => q.eq('talkId', talkId))
+    .collect();
+
+  return runs.find((run) => run.status === 'pending' && run.jobId) ?? null;
+}
 
 interface TranscriptFetchProcessing {
   jobId: string;
@@ -186,8 +202,15 @@ export async function fetchAndCompleteTalkTranscript(
   );
 
   if (result.status === 'processing') {
+    await ctx.runMutation(internal.talks.saveTalkTranscriptFetchJob, {
+      jobId: result.jobId,
+      runId: args.runId,
+    });
     await ctx.scheduler.runAfter(
-      Math.max((result.retryAfter ?? 0) - Date.now(), 0),
+      Math.max(
+        (result.retryAfter ?? Date.now() + PROCESSING_RETRY_MS) - Date.now(),
+        0
+      ),
       internal.talks.fetchTalkTranscript,
       {
         ...(args.continueDraft ? { continueDraft: true } : {}),
@@ -209,13 +232,37 @@ export async function fetchAndCompleteTalkTranscript(
   return result;
 }
 
+export const saveTalkTranscriptFetchJob = internalMutation({
+  args: {
+    jobId: v.string(),
+    runId: v.id('talkTranscriptFetches'),
+  },
+  handler: async (ctx, { jobId, runId }) => {
+    await ctx.db.patch(runId, { checkedAt: Date.now(), jobId });
+
+    return null;
+  },
+  returns: v.null(),
+});
+
+/** Starts a run, or returns the job a pending run is already resuming. */
 export const insertPendingTalkTranscriptFetch = internalMutation({
   args: {
     talkId: v.id('talks'),
   },
-  handler: async (ctx, { talkId }) =>
-    await createPendingTalkTranscriptFetch(ctx, { talkId }),
-  returns: v.id('talkTranscriptFetches'),
+  handler: async (ctx, { talkId }) => {
+    const processing = await loadProcessingTalkTranscriptFetch(ctx, talkId);
+
+    if (processing?.jobId) {
+      return { jobId: processing.jobId };
+    }
+
+    return await createPendingTalkTranscriptFetch(ctx, { talkId });
+  },
+  returns: v.union(
+    v.id('talkTranscriptFetches'),
+    v.object({ jobId: v.string() })
+  ),
 });
 
 export const fetchTalkTranscript = internalAction({
@@ -345,14 +392,18 @@ export async function ensureTalkTranscriptText(
     };
   }
 
-  const runId = await ctx.runMutation(
+  const run = await ctx.runMutation(
     internal.talks.insertPendingTalkTranscriptFetch,
     { talkId: args.talkId }
   );
 
+  if (typeof run !== 'string') {
+    return { jobId: run.jobId, status: 'processing' };
+  }
+
   return await fetchAndCompleteTalkTranscript(ctx, {
     mediaUrl: args.mediaUrl,
-    runId,
+    runId: run,
     talkId: args.talkId,
   });
 }

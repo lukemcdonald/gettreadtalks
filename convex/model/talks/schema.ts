@@ -65,6 +65,8 @@ export const talkTranscriptFields = {
 export const talkTranscriptFetchFields = {
   checkedAt: v.number(),
   errorCode: v.optional(talkTranscriptFetchErrorCode),
+  /** Set while the transcripts service is still generating; the run resumes this job. */
+  jobId: v.optional(v.string()),
   message: v.optional(v.string()),
   retryAfter: v.optional(v.number()),
   status: talkTranscriptFetchStatus,
