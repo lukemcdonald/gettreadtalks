@@ -120,6 +120,72 @@ describe('generateTalkSummary', () => {
     }
   });
 
+  it('reuses an in-flight transcript job instead of starting another', async () => {
+    const t = createConvexTest();
+    await seedVisibilityCatalog(t);
+    const published = await t.query(api.talks.getTalkBySlug, {
+      speakerSlug: visibilitySlugs.publishedSpeaker,
+      talkSlug: visibilitySlugs.publishedTalk,
+    });
+
+    if (!published) {
+      throw new Error('expected a published talk');
+    }
+
+    const { asUser: asAdmin } = await signInAs(t, {
+      email: 'admin@example.test',
+      name: 'Admin',
+      role: 'admin',
+    });
+    const talkId = published.talk._id;
+    const previousFetch = talkTranscriptFetcher.fetch;
+    const previousKey = process.env.AI_GATEWAY_API_KEY;
+    let fetchCount = 0;
+
+    process.env.AI_GATEWAY_API_KEY = 'test-gateway-key';
+
+    talkTranscriptFetcher.fetch = () => {
+      fetchCount += 1;
+
+      return Promise.resolve({
+        jobId: 'job-1',
+        retryAfter: Date.now() + 60 * 60_000,
+        status: 'processing',
+      });
+    };
+
+    try {
+      const first = await asAdmin.action(api.talks.generateTalkSummary, {
+        talkId,
+      });
+      const second = await asAdmin.action(api.talks.generateTalkSummary, {
+        talkId,
+      });
+
+      expect(fetchCount).toBe(1);
+      expect([first, second]).toEqual([
+        expect.objectContaining({
+          message: expect.stringContaining('still being generated'),
+        }),
+        expect.objectContaining({
+          message: expect.stringContaining('still being generated'),
+        }),
+      ]);
+      await expect(
+        asAdmin.mutation(api.talks.createTalkTranscriptFetch, { talkId })
+      ).rejects.toThrow(/still being generated/u);
+      expect(fetchCount).toBe(1);
+    } finally {
+      talkTranscriptFetcher.fetch = previousFetch;
+
+      if (previousKey === undefined) {
+        delete process.env.AI_GATEWAY_API_KEY;
+      } else {
+        process.env.AI_GATEWAY_API_KEY = previousKey;
+      }
+    }
+  });
+
   it('writes the talk summary and refuses to overwrite a manually edited one', async () => {
     const { asAdmin, asMember, t, talkId } = await seedTalkWithTranscript();
     const previousKey = process.env.AI_GATEWAY_API_KEY;

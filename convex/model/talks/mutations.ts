@@ -28,7 +28,11 @@ import {
 } from '../mediaHealth/check/clear';
 import { clearTalkDraftStep } from './autoDraft';
 import { talkFields, talkTranscriptFields } from './schema';
-import { createPendingTalkTranscriptFetch } from './transcriptFetch';
+import {
+  createPendingTalkTranscriptFetch,
+  loadProcessingTalkTranscriptFetch,
+  TRANSCRIPT_PROCESSING_MESSAGE,
+} from './transcriptFetch';
 import {
   statusType,
   talkFormat,
@@ -614,6 +618,10 @@ export const createTalkTranscriptFetch = mutation({
       throwValidationError(
         'This talk already has a transcript. Confirm to fetch it again.'
       );
+    }
+
+    if (await loadProcessingTalkTranscriptFetch(ctx, talkId)) {
+      throwValidationError(TRANSCRIPT_PROCESSING_MESSAGE);
     }
 
     const runId = await createPendingTalkTranscriptFetch(ctx, { talkId });
