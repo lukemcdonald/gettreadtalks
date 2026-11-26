@@ -41,7 +41,6 @@ const TRANSCRIPT_FETCH_MESSAGES: Record<TranscriptFetchErrorCode, string> = {
 const TRANSCRIPT_PROCESSING_MESSAGE =
   'The transcript is still being generated. Try again in a few minutes.';
 
-/** The service is still generating; pass `jobId` back after `retryAfter` to resume without paying again. */
 interface TranscriptFetchProcessing {
   jobId: string;
   retryAfter?: number;
@@ -186,7 +185,6 @@ export async function fetchAndCompleteTalkTranscript(
     args.jobId
   );
 
-  // A still-processing run stays pending and resumes the same job, so a long generation is paid for once.
   if (result.status === 'processing') {
     await ctx.scheduler.runAfter(
       Math.max((result.retryAfter ?? 0) - Date.now(), 0),
