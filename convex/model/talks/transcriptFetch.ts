@@ -24,6 +24,8 @@ const TRANSCRIPTS_API_URL =
   'https://transcripts.lukemcdonald.com/api/transcripts';
 
 const TRANSCRIPT_FETCH_MESSAGES: Record<TranscriptFetchErrorCode, string> = {
+  JOB_NOT_FOUND:
+    'The transcript job expired before it finished. Fetch the transcript again.',
   NO_TRANSCRIPT: 'No transcript is available for this talk.',
   NOT_FOUND: 'The video was not found. It may be deleted or private.',
   PROVIDER_AUTH_FAILED: 'Transcript service is not configured correctly.',
@@ -36,8 +38,19 @@ const TRANSCRIPT_FETCH_MESSAGES: Record<TranscriptFetchErrorCode, string> = {
   UNSUPPORTED_URL: 'The transcript service does not support this media URL.',
 };
 
+const TRANSCRIPT_PROCESSING_MESSAGE =
+  'The transcript is still being generated. Try again in a few minutes.';
+
+/** The service is still generating; pass `jobId` back after `retryAfter` to resume without paying again. */
+interface TranscriptFetchProcessing {
+  jobId: string;
+  retryAfter?: number;
+  status: 'processing';
+}
+
 type TranscriptFetchResult =
   | TranscriptFetchFailure
+  | TranscriptFetchProcessing
   | { status: 'success'; text: string };
 
 function toFailedResult(
@@ -82,6 +95,14 @@ function toTranscriptFetchResult(
     return toFailedResult('PROVIDER_AUTH_FAILED');
   }
 
+  if (data.code === 'PROCESSING' && typeof data.jobId === 'string') {
+    return {
+      jobId: data.jobId,
+      retryAfter: parseRetryAfter(data.retryAfter),
+      status: 'processing',
+    };
+  }
+
   return toFailedResult(
     isTranscriptFetchErrorCode(data.code) ? data.code : 'PROVIDER_ERROR',
     parseRetryAfter(data.retryAfter)
@@ -90,7 +111,8 @@ function toTranscriptFetchResult(
 
 export async function fetchTranscript(
   mediaUrl: string,
-  token: string
+  token: string,
+  jobId?: string
 ): Promise<TranscriptFetchResult> {
   if (!token) {
     return toFailedResult('PROVIDER_AUTH_FAILED');
@@ -98,7 +120,9 @@ export async function fetchTranscript(
 
   try {
     const response = await fetch(TRANSCRIPTS_API_URL, {
-      body: JSON.stringify({ url: mediaUrl }),
+      body: JSON.stringify(
+        jobId ? { jobId, url: mediaUrl } : { url: mediaUrl }
+      ),
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
@@ -125,7 +149,7 @@ export const talkTranscriptFetcher = {
 };
 
 function toCompleteTalkTranscriptFetchArgs(
-  result: TranscriptFetchResult,
+  result: Exclude<TranscriptFetchResult, TranscriptFetchProcessing>,
   runId: Id<'talkTranscriptFetches'>,
   talkId: Id<'talks'>
 ) {
@@ -149,7 +173,8 @@ function toCompleteTalkTranscriptFetchArgs(
 export async function fetchAndCompleteTalkTranscript(
   ctx: ActionCtx,
   args: {
-    keepExistingTranscript?: boolean;
+    continueDraft?: boolean;
+    jobId?: string;
     mediaUrl: string;
     runId: Id<'talkTranscriptFetches'>;
     talkId: Id<'talks'>;
@@ -157,12 +182,30 @@ export async function fetchAndCompleteTalkTranscript(
 ): Promise<TranscriptFetchResult> {
   const result = await talkTranscriptFetcher.fetch(
     args.mediaUrl,
-    process.env.TRANSCRIPTS_API_TOKEN ?? ''
+    process.env.TRANSCRIPTS_API_TOKEN ?? '',
+    args.jobId
   );
+
+  // A still-processing run stays pending and resumes the same job, so a long generation is paid for once.
+  if (result.status === 'processing') {
+    await ctx.scheduler.runAfter(
+      Math.max((result.retryAfter ?? 0) - Date.now(), 0),
+      internal.talks.fetchTalkTranscript,
+      {
+        ...(args.continueDraft ? { continueDraft: true } : {}),
+        jobId: result.jobId,
+        mediaUrl: args.mediaUrl,
+        runId: args.runId,
+        talkId: args.talkId,
+      }
+    );
+
+    return result;
+  }
 
   await ctx.runMutation(internal.talks.completeTalkTranscriptFetch, {
     ...toCompleteTalkTranscriptFetchArgs(result, args.runId, args.talkId),
-    ...(args.keepExistingTranscript ? { keepExistingTranscript: true } : {}),
+    ...(args.continueDraft ? { keepExistingTranscript: true } : {}),
   });
 
   return result;
@@ -180,6 +223,7 @@ export const insertPendingTalkTranscriptFetch = internalMutation({
 export const fetchTalkTranscript = internalAction({
   args: {
     continueDraft: v.optional(v.boolean()),
+    jobId: v.optional(v.string()),
     mediaUrl: v.string(),
     runId: v.id('talkTranscriptFetches'),
     talkId: v.id('talks'),
@@ -207,12 +251,7 @@ export const fetchTalkTranscript = internalAction({
       }
     }
 
-    const result = await fetchAndCompleteTalkTranscript(ctx, {
-      keepExistingTranscript: args.continueDraft,
-      mediaUrl: args.mediaUrl,
-      runId: args.runId,
-      talkId: args.talkId,
-    });
+    const result = await fetchAndCompleteTalkTranscript(ctx, args);
 
     if (args.continueDraft && result.status === 'success') {
       await ctx.scheduler.runAfter(0, internal.talks.draftTalkSummaryAndStudy, {
@@ -227,6 +266,7 @@ export const fetchTalkTranscript = internalAction({
 
 export type EnsureTalkTranscriptResult =
   | TranscriptFetchFailure
+  | TranscriptFetchProcessing
   | {
       errorCode: 'NO_TRANSCRIPT_SOURCE';
       message: string;
@@ -242,6 +282,13 @@ export interface GenerateTranscriptEnsureFailure {
 export function toGenerateTranscriptEnsureFailure(
   ensured: Exclude<EnsureTalkTranscriptResult, { status: 'success' }>
 ): GenerateTranscriptEnsureFailure {
+  if (ensured.status === 'processing') {
+    return {
+      errorCode: 'UPSTREAM_ERROR',
+      message: TRANSCRIPT_PROCESSING_MESSAGE,
+    };
+  }
+
   if (
     ensured.errorCode === 'NO_TRANSCRIPT_SOURCE' ||
     ensured.errorCode === 'UNSUPPORTED_URL'

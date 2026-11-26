@@ -160,6 +160,35 @@ describe('auto draft', () => {
     });
   });
 
+  it('resumes a still-processing transcript with its job reference', async () => {
+    await withDraftMocks(async ({ asAdmin, speakerId, t }) => {
+      const fetchMock = vi.fn((_url: string, _token: string, jobId?: string) =>
+        Promise.resolve(
+          jobId
+            ? { status: 'success' as const, text: FETCHED_TRANSCRIPT }
+            : {
+                jobId: 'job-1',
+                retryAfter: Date.now() + 15_000,
+                status: 'processing' as const,
+              }
+        )
+      );
+      talkTranscriptFetcher.fetch = fetchMock;
+      const talkId = await createTalk(asAdmin, speakerId, 'Long Talk');
+
+      await t.finishAllScheduledFunctions(vi.runAllTimers);
+
+      const saved = await loadDraft(t, talkId);
+
+      expect(fetchMock.mock.calls.map((call) => call[2])).toEqual([
+        undefined,
+        'job-1',
+      ]);
+      expect(saved.transcript?.text).toBe(FETCHED_TRANSCRIPT);
+      expect(saved.talk?.draftSummary).toBe(GENERATED_SUMMARY);
+    });
+  });
+
   it('stops when the transcript fetch fails', async () => {
     await withDraftMocks(async ({ asAdmin, speakerId, t }) => {
       talkTranscriptFetcher.fetch = () =>

@@ -52,6 +52,46 @@ describe('fetchTranscript', () => {
     });
   });
 
+  it('sends the job reference when resuming a job', async () => {
+    const fetchMock = mockResponse(200, { text: 'Hello world' });
+
+    await fetchTranscript(MEDIA_URL, 'secret', 'job-1');
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.any(String),
+      expect.objectContaining({
+        body: JSON.stringify({ jobId: 'job-1', url: MEDIA_URL }),
+      })
+    );
+  });
+
+  it('returns a still-processing job as its own result, not a failure', async () => {
+    const retryAfter = '2026-11-26T10:00:15.000Z';
+
+    mockResponse(202, {
+      code: 'PROCESSING',
+      jobId: 'job-1',
+      message: 'x',
+      retryAfter,
+    });
+
+    await expect(fetchTranscript(MEDIA_URL, 'secret')).resolves.toEqual({
+      jobId: 'job-1',
+      retryAfter: Date.parse(retryAfter),
+      status: 'processing',
+    });
+  });
+
+  it('keeps an expired job reference as JOB_NOT_FOUND', async () => {
+    mockResponse(404, { code: 'JOB_NOT_FOUND', message: 'x' });
+
+    await expect(fetchTranscript(MEDIA_URL, 'secret', 'old')).resolves.toEqual({
+      errorCode: 'JOB_NOT_FOUND',
+      message: expect.any(String),
+      status: 'failed',
+    });
+  });
+
   it('maps auth, unknown, and network failures', async () => {
     await expect(fetchTranscript(MEDIA_URL, '')).resolves.toMatchObject({
       errorCode: 'PROVIDER_AUTH_FAILED',
