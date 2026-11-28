@@ -109,7 +109,7 @@ export const PREVIEW_TALKS = {
     speakerSlug: PREVIEW_SPEAKERS.MARY_SMITH.slug,
     status: 'published' as const,
     summary:
-      'This talk follows the younger son home in Luke 15 and shows that the father runs to meet him before the apology is finished.\n\nGrace here is not a thin pardon. It is a restored place at the table, given at cost to the father.',
+      "This talk follows the younger son home in Luke 15 and shows that the father runs to meet him before the apology is finished. The son has rehearsed a speech about earning a servant's place, but the father never lets him reach the bargaining part.\n\nGrace here is not a thin pardon. It is a restored place at the table, given at cost to the father: the robe, the ring, the sandals, and the fattened calf all say that the son is home as a son, not hired back as a worker.\n\nThe story ends with the older brother still outside the feast. He has stayed and served, yet he measures love by labor and cannot rejoice. The father goes out to him too, and the parable leaves the question open for every listener who thinks faithfulness has earned more than grace.",
     title: 'Example Talk: The Prodigal Son',
     topicSlugs: [PREVIEW_TOPICS.GRACE.slug, PREVIEW_TOPICS.PRAYER.slug],
   },
@@ -180,7 +180,7 @@ export const PREVIEW_STUDIES = {
     studyStatus: 'published' as const,
     suggestedTopics: [PREVIEW_TOPICS.GRACE.slug],
     summary:
-      'This talk follows the younger son home in Luke 15 and shows that the father runs to meet him before the apology is finished.\n\nGrace here is not a thin pardon. It is a restored place at the table, given at cost to the father.',
+      "This talk follows the younger son home in Luke 15 and shows that the father runs to meet him before the apology is finished. The son has rehearsed a speech about earning a servant's place, but the father never lets him reach the bargaining part.\n\nGrace here is not a thin pardon. It is a restored place at the table, given at cost to the father: the robe, the ring, the sandals, and the fattened calf all say that the son is home as a son, not hired back as a worker.\n\nThe story ends with the older brother still outside the feast. He has stayed and served, yet he measures love by labor and cannot rejoice. The father goes out to him too, and the parable leaves the question open for every listener who thinks faithfulness has earned more than grace.",
     talkSlug: PREVIEW_TALKS.THE_PRODIGAL_SON.slug,
   },
 };
@@ -218,14 +218,20 @@ Name one hard circumstance and ask to be shaped like the Son in it this week.`,
   THE_PRODIGAL_SON: {
     body: `## Main points
 
+### A son who wants the gifts without the father
+The younger son asks for his share early, treating his father as already dead to him. Luke 15:11-13
+
+### A hunger that turns him home
+In the far country he loses everything and comes to himself among the pigs. Luke 15:14-19
+
 ### A father who runs
 The father does not wait for the son to finish a speech. He runs to meet him. Luke 15:20
 
-### An older brother who stays out
-The older brother stands outside the feast, measuring love by labor. Luke 15:28-32
-
 ### A place at the table
 Grace here is not a thin pardon. It is a restored place at the table. Luke 15:22-24, Romans 5:8
+
+### An older brother who stays out
+The older brother stands outside the feast, measuring love by labor. Luke 15:28-32
 
 ## Key passages
 
@@ -235,10 +241,19 @@ The father runs to the returning son before the apology is finished.
 ### Luke 15:22-24
 Grace is a restored place at the table, given at cost.
 
+### Luke 15:1-2
+The parable answers those who grumble that Jesus receives sinners and eats with them.
+
+### Romans 5:8
+God shows his love in that while we were still sinners, Christ died for us.
+
 ## Questions
 
 - Where are you still rehearsing an apology God has already run to meet?
+- What gifts of God have you wanted more than God himself?
 - Which part of the feast are you standing outside of?
+- Where do you measure love by how much you have served?
+- Who in your life needs to be received before they finish their speech?
 
 ## Next step
 
@@ -270,5 +285,15 @@ export const PREVIEW_CLIPS = {
     status: 'published' as const,
     talkSlug: PREVIEW_TALKS.ROMANS_8.slug,
     title: 'Sample Clip: No Condemnation',
+  },
+  THE_FATHER_RUNS: {
+    description: PLACEHOLDER_DESCRIPTION,
+    mediaUrl: 'https://www.youtube.com/watch?v=26z_KhwNdD8',
+    publishedAt: Date.parse('2024-06-04T12:30:00.000Z'),
+    slug: 'example-clip-the-father-runs',
+    speakerSlug: PREVIEW_SPEAKERS.MARY_SMITH.slug,
+    status: 'published' as const,
+    talkSlug: PREVIEW_TALKS.THE_PRODIGAL_SON.slug,
+    title: 'Example Clip: The Father Runs',
   },
 };
