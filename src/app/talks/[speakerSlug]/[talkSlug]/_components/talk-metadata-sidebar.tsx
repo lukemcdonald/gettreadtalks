@@ -6,7 +6,10 @@ import type { Topic } from '@/features/topics/types';
 import { AdminActionsGroup } from '@/components/admin-actions-group';
 import { AdminEditButton } from '@/components/admin-edit-button';
 import { MetadataGroup } from '@/components/metadata-group';
-import { MetadataSidebar } from '@/components/metadata-sidebar';
+import {
+  MetadataSidebar,
+  MetadataSidebarActions,
+} from '@/components/metadata-sidebar';
 import { ScriptureGroup } from '@/components/scripture-group';
 import { FeatureTalkButton } from '@/features/talks/components/feature-talk-button';
 import { TalkActions } from '@/features/talks/components/talk-actions';
@@ -41,7 +44,9 @@ export function TalkMetadataSidebar({
   return (
     <MetadataSidebar layout={layout}>
       <MetadataGroup label="Actions">
-        <TalkActions speaker={speaker} talk={talk} />
+        <MetadataSidebarActions layout={layout}>
+          <TalkActions speaker={speaker} talk={talk} />
+        </MetadataSidebarActions>
       </MetadataGroup>
 
       <ScriptureGroup scripture={talk.scripture} />

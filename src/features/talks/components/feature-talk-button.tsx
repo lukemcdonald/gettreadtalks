@@ -5,7 +5,7 @@ import type { Talk } from '@/features/talks/types';
 
 import { StarIcon } from 'lucide-react';
 
-import { ToggleIconButton } from '@/components/ui';
+import { ActionButton } from '@/components/ui';
 import { useToggleTalkFeatured } from '@/features/talks/hooks/use-toggle-talk-featured';
 import { useIsAdmin } from '@/features/users/hooks/use-is-admin';
 
@@ -26,13 +26,12 @@ export function FeatureTalkButton({ speaker, talk }: FeatureTalkButtonProps) {
   }
 
   return (
-    <ToggleIconButton
-      activeLabel="Unfeature"
+    <ActionButton
       icon={StarIcon}
-      inactiveLabel="Feature"
-      isActive={isFeatured}
+      label="Feature"
       loading={isLoading}
-      onToggle={toggle}
+      onClick={toggle}
+      pressed={isFeatured}
     />
   );
 }

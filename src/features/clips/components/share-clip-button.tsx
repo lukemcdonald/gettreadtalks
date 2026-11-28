@@ -12,6 +12,7 @@ interface ShareClipButtonProps {
 export function ShareClipButton({ clip }: ShareClipButtonProps) {
   return (
     <ShareButton
+      appearance="label"
       onShare={(method) =>
         track('clip_shared', {
           clip_id: clip._id,

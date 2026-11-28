@@ -1,6 +1,7 @@
 // Customized components - re-export primitives and override/add customizations
 // Primitives - Vendor components from Coss UI (never edit directly)
 
+export * from './action-button';
 export * from './action-icon-button';
 export * from './bottom-drawer';
 export * from './code-block';

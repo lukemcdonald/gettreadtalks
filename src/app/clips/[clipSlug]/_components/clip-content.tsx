@@ -7,7 +7,10 @@ import { AdminActionsGroup } from '@/components/admin-actions-group';
 import { AdminEditButton } from '@/components/admin-edit-button';
 import { FeaturedGrid } from '@/components/featured-grid';
 import { MetadataGroup } from '@/components/metadata-group';
-import { MetadataSidebar } from '@/components/metadata-sidebar';
+import {
+  MetadataSidebar,
+  MetadataSidebarActions,
+} from '@/components/metadata-sidebar';
 import { ProseParagraphs } from '@/components/prose-paragraphs';
 import { ScriptureGroup } from '@/components/scripture-group';
 import { ShareClipButton } from '@/features/clips/components/share-clip-button';
@@ -29,9 +32,9 @@ function ClipMetadataSidebar({
   return (
     <MetadataSidebar layout={layout}>
       <MetadataGroup label="Actions">
-        <div className="flex flex-wrap gap-2">
+        <MetadataSidebarActions layout={layout}>
           <ShareClipButton clip={clip} />
-        </div>
+        </MetadataSidebarActions>
       </MetadataGroup>
 
       <ScriptureGroup scripture={talk?.scripture} />

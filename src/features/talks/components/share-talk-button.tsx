@@ -14,6 +14,7 @@ interface ShareTalkButtonProps {
 export function ShareTalkButton({ speaker, talk }: ShareTalkButtonProps) {
   return (
     <ShareButton
+      appearance="label"
       onShare={(method) =>
         track('talk_shared', {
           method,

@@ -12,10 +12,10 @@ interface TalkActionsProps {
 
 export function TalkActions({ speaker, talk }: TalkActionsProps) {
   return (
-    <div className="flex flex-wrap gap-2">
-      <ShareTalkButton speaker={speaker} talk={talk} />
+    <>
       <FavoriteTalkButton speaker={speaker} talk={talk} />
       <FinishTalkButton speaker={speaker} talk={talk} />
-    </div>
+      <ShareTalkButton speaker={speaker} talk={talk} />
+    </>
   );
 }
