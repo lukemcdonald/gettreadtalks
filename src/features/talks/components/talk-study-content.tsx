@@ -1,7 +1,11 @@
 import type { ReactNode } from 'react';
 import type { Components } from 'react-markdown';
 
+import { isValidElement } from 'react';
 import Markdown from 'react-markdown';
+
+import { slugify } from '@/convex/lib/utils';
+import { cn } from '@/utils';
 
 const STUDY_MARKDOWN_ELEMENTS = [
   'br',
@@ -20,42 +24,55 @@ const STUDY_MARKDOWN_ELEMENTS = [
   'ul',
 ];
 
-const STUDY_HEADING_CLASS_NAME = {
-  h2: 'text-muted-foreground mt-6 first:mt-0 text-xs font-semibold tracking-wide uppercase',
-  h3: 'mt-3 text-base font-semibold',
-  h4: 'mt-3 text-sm font-semibold',
-} as const;
+function getText(node: ReactNode): string {
+  if (typeof node === 'string' || typeof node === 'number') {
+    return String(node);
+  }
 
-function StudyHeading({
-  as: Tag,
-  children,
-}: {
-  as: keyof typeof STUDY_HEADING_CLASS_NAME;
-  children?: ReactNode;
-}) {
-  return <Tag className={STUDY_HEADING_CLASS_NAME[Tag]}>{children}</Tag>;
+  if (Array.isArray(node)) {
+    return node.map(getText).join('');
+  }
+
+  if (isValidElement<{ children?: ReactNode }>(node)) {
+    return getText(node.props.children);
+  }
+
+  return '';
 }
 
+function StudyPartHeading({ children }: { children?: ReactNode }) {
+  return (
+    <h3
+      className="mt-12 scroll-mt-24 text-lg font-semibold tracking-tight first:mt-0"
+      id={slugify(getText(children))}
+    >
+      {children}
+    </h3>
+  );
+}
+
+function StudyItemHeading({ children }: { children?: ReactNode }) {
+  return <h4 className="mt-5 font-semibold [h3+&]:mt-4">{children}</h4>;
+}
+
+const STUDY_BLOCK_CLASS_NAME = 'mt-1 [h3+&]:mt-4';
+
 const studyMarkdownComponents: Components = {
-  h1: ({ children }) => <StudyHeading as="h2">{children}</StudyHeading>,
-  h2: ({ children }) => <StudyHeading as="h2">{children}</StudyHeading>,
-  h3: ({ children }) => <StudyHeading as="h3">{children}</StudyHeading>,
-  h4: ({ children }) => <StudyHeading as="h4">{children}</StudyHeading>,
-  h5: ({ children }) => <StudyHeading as="h4">{children}</StudyHeading>,
-  h6: ({ children }) => <StudyHeading as="h4">{children}</StudyHeading>,
+  h1: StudyPartHeading,
+  h2: StudyPartHeading,
+  h3: StudyItemHeading,
+  h4: StudyItemHeading,
+  h5: StudyItemHeading,
+  h6: StudyItemHeading,
   li: ({ children }) => <li>{children}</li>,
   ol: ({ children }) => (
-    <ol className="text-muted-foreground mt-1 list-decimal space-y-1 pl-5 text-sm leading-relaxed">
+    <ol className={cn(STUDY_BLOCK_CLASS_NAME, 'list-decimal space-y-2 pl-5')}>
       {children}
     </ol>
   ),
-  p: ({ children }) => (
-    <p className="text-muted-foreground mt-1 text-sm leading-relaxed">
-      {children}
-    </p>
-  ),
+  p: ({ children }) => <p className={STUDY_BLOCK_CLASS_NAME}>{children}</p>,
   ul: ({ children }) => (
-    <ul className="text-muted-foreground mt-1 list-disc space-y-1 pl-5 text-sm leading-relaxed">
+    <ul className={cn(STUDY_BLOCK_CLASS_NAME, 'list-disc space-y-2 pl-5')}>
       {children}
     </ul>
   ),
@@ -69,7 +86,10 @@ export function TalkStudyContent({ body }: { body?: string | null }) {
   }
 
   return (
-    <div data-testid="talk-study-content">
+    <div
+      className="text-foreground max-w-prose text-base leading-7"
+      data-testid="talk-study-content"
+    >
       <Markdown
         allowedElements={STUDY_MARKDOWN_ELEMENTS}
         components={studyMarkdownComponents}
