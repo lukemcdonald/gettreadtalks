@@ -1,4 +1,4 @@
-/** Long-form text split on blank lines, with the first paragraph as a lead. */
+/** Long-form text with one paragraph per line, the first as a lead. */
 export function ProseParagraphs({ text }: { text: string }) {
   return (
     <div className="text-foreground max-w-prose space-y-5 text-base leading-7">
@@ -8,7 +8,7 @@ export function ProseParagraphs({ text }: { text: string }) {
         .map((paragraph, index) => (
           <p
             className={index === 0 ? 'text-lg leading-8' : undefined}
-            key={paragraph}
+            key={`${index}:${paragraph}`}
           >
             {paragraph}
           </p>
