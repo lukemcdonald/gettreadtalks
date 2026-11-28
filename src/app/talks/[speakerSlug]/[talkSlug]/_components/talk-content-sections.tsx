@@ -7,6 +7,7 @@ import type { ReactNode } from 'react';
 
 import { TalkMetadataSidebar } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-metadata-sidebar';
 import { FeaturedGrid } from '@/components/featured-grid';
+import { ProseParagraphs } from '@/components/prose-paragraphs';
 import { ClipCard } from '@/features/clips/components/clip-card';
 import { CollectionMediaCard } from '@/features/collections/components/collection-media-card';
 import { TalkStudyContent } from '@/features/talks/components/talk-study-content';
@@ -21,24 +22,6 @@ interface TalkContentSectionsProps {
   summary: string | null;
   talk: Talk;
   topics: Topic[];
-}
-
-function TalkSummary({ summary }: { summary: string }) {
-  return (
-    <div className="text-foreground max-w-prose space-y-5 text-base leading-7">
-      {summary
-        .split(/\n+/u)
-        .filter(Boolean)
-        .map((paragraph, index) => (
-          <p
-            className={index === 0 ? 'text-lg leading-8' : undefined}
-            key={paragraph}
-          >
-            {paragraph}
-          </p>
-        ))}
-    </div>
-  );
 }
 
 function TalkReadingSections({
@@ -57,7 +40,7 @@ function TalkReadingSections({
           sticky
           title="About"
         >
-          <TalkSummary summary={about} />
+          <ProseParagraphs text={about} />
         </FeaturedGrid>
       )}
 
