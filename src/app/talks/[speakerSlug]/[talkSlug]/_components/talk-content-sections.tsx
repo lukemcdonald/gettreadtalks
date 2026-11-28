@@ -25,7 +25,7 @@ interface TalkContentSectionsProps {
 
 function TalkSummary({ summary }: { summary: string }) {
   return (
-    <div className="text-foreground max-w-[70ch] space-y-5 text-base leading-7">
+    <div className="text-foreground max-w-prose space-y-5 text-base leading-7">
       {summary
         .split(/\n+/u)
         .filter(Boolean)
@@ -41,61 +41,48 @@ function TalkSummary({ summary }: { summary: string }) {
   );
 }
 
-export function TalkContentSections({
-  clips,
-  collection,
-  relatedTalks,
-  speaker,
-  studyBody,
-  summary,
-  talk,
-  topics,
-}: TalkContentSectionsProps) {
-  const about = summary?.trim();
-  const study = studyBody?.trim();
-
+function TalkReadingSections({
+  about,
+  study,
+}: {
+  about?: string;
+  study?: string;
+}) {
   return (
-    <div className="space-y-12 lg:space-y-16">
-      {about || study ? (
-        <div className="grid grid-cols-1 gap-x-8 gap-y-12 lg:grid-cols-[1fr_280px]">
-          <div className="order-2 space-y-12 lg:order-1 lg:space-y-16">
-            {about && (
-              <FeaturedGrid
-                columns={{ default: 1 }}
-                description="What this talk covers."
-                sticky
-                title="About"
-              >
-                <TalkSummary summary={about} />
-              </FeaturedGrid>
-            )}
-
-            {study && (
-              <FeaturedGrid
-                columns={{ default: 1 }}
-                description="Go deeper on your own or with a group."
-                quickLinks={getStudyJumpLinks(study)}
-                sticky
-                title="Study"
-              >
-                <TalkStudyContent body={study} />
-              </FeaturedGrid>
-            )}
-          </div>
-
-          <aside className="order-1 lg:sticky lg:top-20 lg:order-2 lg:h-fit">
-            <TalkMetadataSidebar
-              className="lg:flex-col lg:gap-8"
-              speaker={speaker}
-              talk={talk}
-              topics={topics}
-            />
-          </aside>
-        </div>
-      ) : (
-        <TalkMetadataSidebar speaker={speaker} talk={talk} topics={topics} />
+    <div className="order-2 space-y-12 lg:order-1 lg:space-y-16">
+      {about && (
+        <FeaturedGrid
+          columns={{ default: 1 }}
+          description="What this talk covers."
+          sticky
+          title="About"
+        >
+          <TalkSummary summary={about} />
+        </FeaturedGrid>
       )}
 
+      {study && (
+        <FeaturedGrid
+          columns={{ default: 1 }}
+          description="Go deeper on your own or with a group."
+          quickLinks={getStudyJumpLinks(study)}
+          sticky
+          title="Study"
+        >
+          <TalkStudyContent body={study} />
+        </FeaturedGrid>
+      )}
+    </div>
+  );
+}
+
+function TalkRelatedSections({
+  clips,
+  collection,
+  speaker,
+}: Pick<TalkContentSectionsProps, 'clips' | 'collection' | 'speaker'>) {
+  return (
+    <>
       {collection && (
         <FeaturedGrid
           columns={{ default: 1, lg: 2, md: 2, sm: 1, xl: 2 }}
@@ -124,6 +111,47 @@ export function TalkContentSections({
           ))}
         </FeaturedGrid>
       )}
+    </>
+  );
+}
+
+export function TalkContentSections({
+  clips,
+  collection,
+  relatedTalks,
+  speaker,
+  studyBody,
+  summary,
+  talk,
+  topics,
+}: TalkContentSectionsProps) {
+  const about = summary?.trim();
+  const study = studyBody?.trim();
+
+  return (
+    <div className="space-y-12 lg:space-y-16">
+      {about || study ? (
+        <div className="grid grid-cols-1 gap-x-8 gap-y-12 lg:grid-cols-[1fr_280px]">
+          <TalkReadingSections about={about} study={study} />
+
+          <aside className="order-1 lg:sticky lg:top-20 lg:order-2 lg:h-fit">
+            <TalkMetadataSidebar
+              className="lg:flex-col lg:gap-8"
+              speaker={speaker}
+              talk={talk}
+              topics={topics}
+            />
+          </aside>
+        </div>
+      ) : (
+        <TalkMetadataSidebar speaker={speaker} talk={talk} topics={topics} />
+      )}
+
+      <TalkRelatedSections
+        clips={clips}
+        collection={collection}
+        speaker={speaker}
+      />
 
       {relatedTalks}
     </div>

@@ -89,7 +89,7 @@ export function TalkStudyContent({ body }: { body?: string | null }) {
 
   return (
     <div
-      className="text-foreground max-w-[70ch] text-base leading-7"
+      className="text-foreground max-w-prose text-base leading-7"
       data-testid="talk-study-content"
     >
       <Markdown
