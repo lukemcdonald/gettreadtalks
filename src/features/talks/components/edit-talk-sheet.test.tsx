@@ -35,6 +35,10 @@ vi.mock('@/features/talks/actions/update-talk-study', () => ({
   updateTalkFeatureAction: vi.fn(),
 }));
 
+vi.mock('@/features/talks/actions/update-talks-cache', () => ({
+  updateTalksCacheAction: vi.fn(),
+}));
+
 vi.mock('@/features/speakers/actions/create-speaker', () => ({
   createSpeakerAction: vi.fn(),
 }));
