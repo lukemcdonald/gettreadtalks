@@ -19,6 +19,11 @@ export interface EventMap {
   clip_completed: { clip_id: string; clip_slug: string };
   clip_paused: { clip_id: string; clip_slug: string; progress_pct: number };
   clip_played: { clip_id: string; clip_slug: string };
+  clip_shared: {
+    clip_id: string;
+    clip_slug: string;
+    method: 'clipboard' | 'share_api';
+  };
   filter_applied: { filter: string; path: string; value: string };
   mcp_tool_called: ToolCallProperties & {
     duration_ms: number;

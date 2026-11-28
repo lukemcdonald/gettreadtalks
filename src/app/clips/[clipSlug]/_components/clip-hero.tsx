@@ -1,7 +1,6 @@
 import type { Clip } from '@/features/clips/types';
 import type { Speaker } from '@/features/speakers/types';
 
-import { AdminEditButton } from '@/components/admin-edit-button';
 import { ArchiveBackLink } from '@/components/archive-back-link';
 import { HeroTitle } from '@/components/hero';
 import { MediaEmbed } from '@/components/media-embed';
@@ -24,12 +23,9 @@ export function ClipHero({ clip, speaker }: ClipHeroProps) {
         <header className="space-y-2 text-center">
           <div>
             <ArchiveBackLink href={buildClipsPath()} label="Clips" />
-            <div className="flex flex-wrap items-center justify-center gap-3">
-              <HeroTitle className="text-foreground min-w-0" size="sm">
-                {clip.title}
-              </HeroTitle>
-              <AdminEditButton entity="clips" id={clip._id} />
-            </div>
+            <HeroTitle className="text-foreground min-w-0" size="sm">
+              {clip.title}
+            </HeroTitle>
           </div>
           {speaker && (
             <p className="text-muted-foreground text-lg">
