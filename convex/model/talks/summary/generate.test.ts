@@ -230,10 +230,10 @@ describe('generateTalkSummary', () => {
         talkSlug: visibilitySlugs.publishedTalk,
       });
 
-      expect(generated?.summary).toBeUndefined();
-      expect(generated?.draftSummary).toBe(GENERATED_SUMMARY);
+      expect(generated?.summary).toBe(GENERATED_SUMMARY);
+      expect(generated?.draftSummary).toBeUndefined();
       expect(generated?.summaryManuallyEditedAt).toBeUndefined();
-      expect(published?.summary).toBeNull();
+      expect(published?.summary).toBe(GENERATED_SUMMARY);
       expect(published?.talk).not.toHaveProperty('draftSummary');
 
       await asAdmin.mutation(api.talks.updateTalkSummary, {

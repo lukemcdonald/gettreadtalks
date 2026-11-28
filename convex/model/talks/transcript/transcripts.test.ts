@@ -101,7 +101,7 @@ describe('talk transcript and study draft storage', () => {
       text: transcriptSecret,
     });
     await t.mutation(
-      internal.talks.saveTalkSummaryDraft,
+      internal.talks.updateGeneratedTalkSummary,
       summaryDraftArgs(talk._id)
     );
 
@@ -165,7 +165,7 @@ describe('talk transcript and study draft storage', () => {
     const { asAdmin, t, talk } = await seedPublishedTalk();
 
     await t.mutation(
-      internal.talks.saveTalkSummaryDraft,
+      internal.talks.updateGeneratedTalkSummary,
       summaryDraftArgs(talk._id)
     );
 
@@ -190,7 +190,7 @@ describe('talk transcript and study draft storage', () => {
 
     await expect(
       t.mutation(
-        internal.talks.saveTalkSummaryDraft,
+        internal.talks.updateGeneratedTalkSummary,
         summaryDraftArgs(talk._id)
       )
     ).rejects.toMatchObject({ data: { statusCode: 409 } });

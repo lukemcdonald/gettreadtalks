@@ -267,7 +267,7 @@ export async function saveGeneratedTalkSummary(
   }
 
   try {
-    await ctx.runMutation(internal.talks.saveTalkSummaryDraft, {
+    await ctx.runMutation(internal.talks.updateGeneratedTalkSummary, {
       generator: TALK_SUMMARY_MODEL,
       summary: generated.summary,
       talkId: args.talkId,
