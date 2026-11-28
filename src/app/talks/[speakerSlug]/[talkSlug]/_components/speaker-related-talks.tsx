@@ -20,7 +20,7 @@ export function SpeakerRelatedTalks({
 
   return (
     <FeaturedGrid
-      columns={{ default: 1 }}
+      columns={{ default: 1, lg: 2, md: 2, sm: 1, xl: 2 }}
       description={`Enjoy more talks by ${getSpeakerName(speaker)}.`}
       quickLinks={[
         {

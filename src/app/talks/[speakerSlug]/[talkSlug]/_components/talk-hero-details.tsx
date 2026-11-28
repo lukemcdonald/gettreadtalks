@@ -1,7 +1,6 @@
 import type { Speaker } from '@/features/speakers/types';
 import type { Talk } from '@/features/talks/types';
 
-import { AdminEditButton } from '@/components/admin-edit-button';
 import { ArchiveBackLink } from '@/components/archive-back-link';
 import { HeroTitle } from '@/components/hero';
 import { Link } from '@/components/ui/link';
@@ -10,7 +9,7 @@ import { buildTalksPath } from '@/features/talks/utils';
 
 interface TalkHeroDetailsProps {
   speaker: Pick<Speaker, 'firstName' | 'lastName' | 'slug'> | null;
-  talk: Pick<Talk, '_id' | 'title'>;
+  talk: Pick<Talk, 'title'>;
 }
 
 export function TalkHeroDetails({ speaker, talk }: TalkHeroDetailsProps) {
@@ -20,16 +19,13 @@ export function TalkHeroDetails({ speaker, talk }: TalkHeroDetailsProps) {
     <header className="space-y-2 text-center">
       <div>
         <ArchiveBackLink href={buildTalksPath()} label="Talks" />
-        <div className="flex flex-wrap items-center justify-center gap-3">
-          <HeroTitle
-            className="text-foreground min-w-0"
-            data-testid="talk-heading"
-            size="sm"
-          >
-            {talk.title}
-          </HeroTitle>
-          <AdminEditButton entity="talks" id={talk._id} />
-        </div>
+        <HeroTitle
+          className="text-foreground min-w-0"
+          data-testid="talk-heading"
+          size="sm"
+        >
+          {talk.title}
+        </HeroTitle>
       </div>
       {speaker && (
         <p className="text-muted-foreground text-lg">

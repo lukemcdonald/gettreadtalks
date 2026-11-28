@@ -4,11 +4,13 @@ import type { Topic } from '@/features/topics/types';
 
 import { ExternalLinkIcon } from 'lucide-react';
 
+import { TalkAdminActions } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-admin-actions';
 import { MetadataGroup } from '@/components/metadata-group';
 import { Link } from '@/components/ui/link';
 import { TalkActions } from '@/features/talks/components/talk-actions';
 import { formatTalkFormat } from '@/features/talks/utils';
 import { TopicLinks } from '@/features/topics/components/topic-links';
+import { cn } from '@/utils';
 
 function TalkFormatGroup({ format }: { format: Talk['format'] }) {
   if (!format) {
@@ -23,42 +25,28 @@ function TalkFormatGroup({ format }: { format: Talk['format'] }) {
 }
 
 interface TalkMetadataSidebarProps {
+  className?: string;
   speaker: Speaker | null;
-  summary: string | null;
   talk: Talk;
   topics: Topic[];
 }
 
 export function TalkMetadataSidebar({
+  className,
   speaker,
-  summary,
   talk,
   topics,
 }: TalkMetadataSidebarProps) {
-  const about = summary?.trim();
-
   return (
-    <div className="flex flex-col gap-8 sm:flex-row sm:flex-wrap sm:gap-12 lg:flex-col lg:gap-8">
-      {about ? (
-        <MetadataGroup className="sm:basis-full lg:basis-auto" label="About">
-          <div className="text-muted-foreground space-y-4 text-sm leading-relaxed">
-            {about
-              .split(/\n+/u)
-              .filter(Boolean)
-              .map((paragraph) => (
-                <p key={paragraph}>{paragraph}</p>
-              ))}
-          </div>
-        </MetadataGroup>
-      ) : null}
-
-      <TalkFormatGroup format={talk.format} />
-
-      {topics.length > 0 && (
-        <MetadataGroup label="Topics">
-          <TopicLinks topics={topics} />
-        </MetadataGroup>
+    <div
+      className={cn(
+        'flex flex-col gap-8 sm:flex-row sm:flex-wrap sm:gap-12',
+        className
       )}
+    >
+      <MetadataGroup label="Actions">
+        <TalkActions speaker={speaker} talk={talk} />
+      </MetadataGroup>
 
       {talk.scripture && (
         <MetadataGroup label="Scripture">
@@ -73,9 +61,15 @@ export function TalkMetadataSidebar({
         </MetadataGroup>
       )}
 
-      <MetadataGroup label="Actions">
-        <TalkActions speaker={speaker} talk={talk} />
-      </MetadataGroup>
+      {topics.length > 0 && (
+        <MetadataGroup label="Topics">
+          <TopicLinks topics={topics} />
+        </MetadataGroup>
+      )}
+
+      <TalkFormatGroup format={talk.format} />
+
+      <TalkAdminActions speaker={speaker} talk={talk} />
     </div>
   );
 }

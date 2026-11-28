@@ -41,7 +41,7 @@ export function TopicRelatedTalks({ talks, topics }: TopicRelatedTalksProps) {
 
   return (
     <FeaturedGrid
-      columns={{ default: 1 }}
+      columns={{ default: 1, lg: 2, md: 2, sm: 1, xl: 2 }}
       description={section.description}
       quickLinks={section.quickLinks}
       sticky
