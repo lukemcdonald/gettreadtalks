@@ -40,7 +40,7 @@ export const {
   createTalk,
   createTalkTranscriptFetch,
   destroyTalk,
-  saveTalkSummaryDraft,
+  updateGeneratedTalkSummary,
   updateTalk,
   updateTalkSummary,
   updateTalkTranscript,

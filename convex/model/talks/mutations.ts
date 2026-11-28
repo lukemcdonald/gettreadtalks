@@ -512,9 +512,9 @@ function getTalkSummaryPatch(talk: Doc<'talks'>, summary: string) {
 }
 
 /**
- * Save a generated talk summary. Never overwrites a manually edited summary.
+ * Publish a generated talk summary. Never overwrites a manually edited summary.
  */
-export const saveTalkSummaryDraft = internalMutation({
+export const updateGeneratedTalkSummary = internalMutation({
   args: {
     generator: v.string(),
     summary: v.string(),
@@ -531,7 +531,8 @@ export const saveTalkSummaryDraft = internalMutation({
     }
 
     await ctx.db.patch(args.talkId, {
-      draftSummary: args.summary,
+      draftSummary: undefined,
+      summary: args.summary,
       summaryGeneratedAt: Date.now(),
       summaryGenerator: args.generator,
     });

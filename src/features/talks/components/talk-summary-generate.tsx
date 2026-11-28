@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { Button, FieldDescription } from '@/components/ui';
 import { api } from '@/convex/_generated/api';
 import { TALK_DRAFT_PENDING } from '@/convex/model/talks/validators';
+import { updateTalksCacheAction } from '@/features/talks/actions/update-talks-cache';
 import {
   getTalkGenerateIdleStatus,
   getTalkGeneratePendingLabel,
@@ -55,6 +56,7 @@ export function TalkSummaryGenerate({
         setError(result.message);
       } else {
         onFlagsChange?.(result.flags);
+        await updateTalksCacheAction();
       }
     } catch {
       setError('Something went wrong. Please try again.');

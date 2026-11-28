@@ -113,8 +113,8 @@ describe('auto draft', () => {
       const audio = await loadDraft(t, audioId);
 
       expect(audio.transcript?.text).toBe(FETCHED_TRANSCRIPT);
-      expect(audio.talk?.summary).toBeUndefined();
-      expect(audio.talk?.draftSummary).toBe(GENERATED_SUMMARY);
+      expect(audio.talk?.summary).toBe(GENERATED_SUMMARY);
+      expect(audio.talk?.draftSummary).toBeUndefined();
       expect(audio.talk?.status).toBe('backlog');
       expect(audio.study).toMatchObject({
         body: GENERATED_STUDY,
@@ -185,7 +185,7 @@ describe('auto draft', () => {
         'job-1',
       ]);
       expect(saved.transcript?.text).toBe(FETCHED_TRANSCRIPT);
-      expect(saved.talk?.draftSummary).toBe(GENERATED_SUMMARY);
+      expect(saved.talk?.summary).toBe(GENERATED_SUMMARY);
     });
   });
 
