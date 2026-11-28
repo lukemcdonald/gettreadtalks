@@ -253,13 +253,21 @@ export function buildTalkListItemsJsonLd(
   });
 }
 
-const STUDY_TOP_HEADING_PATTERN = /^##[ \t]+(?<label>.+?)[ \t#]*$/gmu;
+const STUDY_TOP_HEADING_PATTERN = /^ {0,3}##[ \t]+(?<label>.+?)[ \t#]*$/gmu;
+const MARKDOWN_LINK_PATTERN = /\[(?<text>[^\]]*)\]\([^)]*\)/gu;
+const MARKDOWN_EMPHASIS_PATTERN = /[*_`~]/gu;
+
+function toPlainHeadingText(markdown: string) {
+  return markdown
+    .replaceAll(MARKDOWN_LINK_PATTERN, '$<text>')
+    .replaceAll(MARKDOWN_EMPHASIS_PATTERN, '');
+}
 
 /** Jump links for the study's `##` headings; ids match the anchors `TalkStudyContent` renders. */
 export function getStudyJumpLinks(markdown: string | null | undefined) {
   return [...(markdown ?? '').matchAll(STUDY_TOP_HEADING_PATTERN)].map(
     (match) => {
-      const label = match.groups?.label ?? '';
+      const label = toPlainHeadingText(match.groups?.label ?? '');
 
       return { href: `#${slugify(label)}`, label };
     }

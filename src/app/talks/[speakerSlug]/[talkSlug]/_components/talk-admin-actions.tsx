@@ -22,7 +22,7 @@ async function TalkAdminActionsGroup({ speaker, talk }: TalkAdminActionsProps) {
   }
 
   return (
-    <MetadataGroup label="Admin">
+    <MetadataGroup className="border-border w-full border-t pt-6" label="Admin">
       <div className="flex flex-wrap items-center gap-2">
         <AdminEditButton entity="talks" id={talk._id} />
         <FeatureTalkButton speaker={speaker} talk={talk} />
