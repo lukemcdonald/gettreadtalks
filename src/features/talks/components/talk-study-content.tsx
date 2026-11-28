@@ -24,11 +24,6 @@ const STUDY_MARKDOWN_ELEMENTS = [
   'ul',
 ];
 
-const STUDY_HEADING_CLASS_NAME = {
-  h3: 'mt-12 scroll-mt-24 text-lg font-semibold tracking-tight first:mt-0',
-  h4: 'mt-5 font-semibold [h3+&]:mt-4',
-} as const;
-
 function getText(node: ReactNode): string {
   if (typeof node === 'string' || typeof node === 'number') {
     return String(node);
@@ -47,14 +42,17 @@ function getText(node: ReactNode): string {
 
 function StudyPartHeading({ children }: { children?: ReactNode }) {
   return (
-    <h3 className={STUDY_HEADING_CLASS_NAME.h3} id={slugify(getText(children))}>
+    <h3
+      className="mt-12 scroll-mt-24 text-lg font-semibold tracking-tight first:mt-0"
+      id={slugify(getText(children))}
+    >
       {children}
     </h3>
   );
 }
 
 function StudyItemHeading({ children }: { children?: ReactNode }) {
-  return <h4 className={STUDY_HEADING_CLASS_NAME.h4}>{children}</h4>;
+  return <h4 className="mt-5 font-semibold [h3+&]:mt-4">{children}</h4>;
 }
 
 const STUDY_BLOCK_CLASS_NAME = 'mt-1 [h3+&]:mt-4';
