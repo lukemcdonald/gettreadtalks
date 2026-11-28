@@ -1,3 +1,4 @@
+import type { MetadataSidebarLayout } from '@/components/metadata-sidebar';
 import type { Clip } from '@/features/clips/types';
 import type { Speaker } from '@/features/speakers/types';
 import type { Talk } from '@/features/talks/types';
@@ -6,13 +7,13 @@ import { AdminActionsGroup } from '@/components/admin-actions-group';
 import { AdminEditButton } from '@/components/admin-edit-button';
 import { FeaturedGrid } from '@/components/featured-grid';
 import { MetadataGroup } from '@/components/metadata-group';
+import { MetadataSidebar } from '@/components/metadata-sidebar';
 import { ProseParagraphs } from '@/components/prose-paragraphs';
 import { ScriptureGroup } from '@/components/scripture-group';
 import { ShareClipButton } from '@/features/clips/components/share-clip-button';
 import { SpeakerCard } from '@/features/speakers/components/speaker-card';
 import { buildSpeakerPath, getSpeakerName } from '@/features/speakers/utils';
 import { TalkCard } from '@/features/talks/components/talk-card';
-import { cn } from '@/utils';
 
 interface ClipContentProps {
   clip: Clip;
@@ -21,17 +22,12 @@ interface ClipContentProps {
 }
 
 function ClipMetadataSidebar({
-  className,
+  layout,
   clip,
   talk,
-}: Omit<ClipContentProps, 'speaker'> & { className?: string }) {
+}: Omit<ClipContentProps, 'speaker'> & { layout: MetadataSidebarLayout }) {
   return (
-    <div
-      className={cn(
-        'flex flex-col gap-8 sm:flex-row sm:flex-wrap sm:gap-12',
-        className
-      )}
-    >
+    <MetadataSidebar layout={layout}>
       <MetadataGroup label="Actions">
         <div className="flex flex-wrap gap-2">
           <ShareClipButton clip={clip} />
@@ -40,10 +36,10 @@ function ClipMetadataSidebar({
 
       <ScriptureGroup scripture={talk?.scripture} />
 
-      <AdminActionsGroup>
+      <AdminActionsGroup layout={layout}>
         <AdminEditButton entity="clips" id={clip._id} />
       </AdminActionsGroup>
-    </div>
+    </MetadataSidebar>
   );
 }
 
@@ -100,15 +96,11 @@ export function ClipContent({ clip, speaker, talk }: ClipContentProps) {
           </div>
 
           <aside className="order-1 lg:sticky lg:top-20 lg:order-2 lg:h-fit">
-            <ClipMetadataSidebar
-              className="lg:flex-col lg:gap-8"
-              clip={clip}
-              talk={talk}
-            />
+            <ClipMetadataSidebar clip={clip} layout="column" talk={talk} />
           </aside>
         </div>
       ) : (
-        <ClipMetadataSidebar clip={clip} talk={talk} />
+        <ClipMetadataSidebar clip={clip} layout="row" talk={talk} />
       )}
 
       <ClipRelatedSections speaker={speaker} talk={talk} />

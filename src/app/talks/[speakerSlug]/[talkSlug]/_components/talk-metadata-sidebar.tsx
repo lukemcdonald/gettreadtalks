@@ -1,3 +1,4 @@
+import type { MetadataSidebarLayout } from '@/components/metadata-sidebar';
 import type { Speaker } from '@/features/speakers/types';
 import type { Talk } from '@/features/talks/types';
 import type { Topic } from '@/features/topics/types';
@@ -5,12 +6,12 @@ import type { Topic } from '@/features/topics/types';
 import { AdminActionsGroup } from '@/components/admin-actions-group';
 import { AdminEditButton } from '@/components/admin-edit-button';
 import { MetadataGroup } from '@/components/metadata-group';
+import { MetadataSidebar } from '@/components/metadata-sidebar';
 import { ScriptureGroup } from '@/components/scripture-group';
 import { FeatureTalkButton } from '@/features/talks/components/feature-talk-button';
 import { TalkActions } from '@/features/talks/components/talk-actions';
 import { formatTalkFormat } from '@/features/talks/utils';
 import { TopicLinks } from '@/features/topics/components/topic-links';
-import { cn } from '@/utils';
 
 function TalkFormatGroup({ format }: { format: Talk['format'] }) {
   if (!format) {
@@ -25,25 +26,20 @@ function TalkFormatGroup({ format }: { format: Talk['format'] }) {
 }
 
 interface TalkMetadataSidebarProps {
-  className?: string;
+  layout: MetadataSidebarLayout;
   speaker: Speaker | null;
   talk: Talk;
   topics: Topic[];
 }
 
 export function TalkMetadataSidebar({
-  className,
+  layout,
   speaker,
   talk,
   topics,
 }: TalkMetadataSidebarProps) {
   return (
-    <div
-      className={cn(
-        'flex flex-col gap-8 sm:flex-row sm:flex-wrap sm:gap-12',
-        className
-      )}
-    >
+    <MetadataSidebar layout={layout}>
       <MetadataGroup label="Actions">
         <TalkActions speaker={speaker} talk={talk} />
       </MetadataGroup>
@@ -58,10 +54,10 @@ export function TalkMetadataSidebar({
 
       <TalkFormatGroup format={talk.format} />
 
-      <AdminActionsGroup>
+      <AdminActionsGroup layout={layout}>
         <AdminEditButton entity="talks" id={talk._id} />
         <FeatureTalkButton speaker={speaker} talk={talk} />
       </AdminActionsGroup>
-    </div>
+    </MetadataSidebar>
   );
 }
