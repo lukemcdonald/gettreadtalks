@@ -3,16 +3,21 @@
 import { CheckIcon, ShareIcon } from 'lucide-react';
 import { useState } from 'react';
 
-import { ActionIconButton } from '@/components/ui';
+import { ActionButton, ActionIconButton } from '@/components/ui';
 
 type ShareMethod = 'clipboard' | 'share_api';
 
 interface ShareButtonProps {
+  appearance?: 'icon' | 'label';
   onShare?: (method: ShareMethod) => void;
   title: string;
 }
 
-export function ShareButton({ onShare, title }: ShareButtonProps) {
+export function ShareButton({
+  appearance = 'icon',
+  onShare,
+  title,
+}: ShareButtonProps) {
   const [copied, setCopied] = useState(false);
 
   const handleShare = async () => {
@@ -39,6 +44,16 @@ export function ShareButton({ onShare, title }: ShareButtonProps) {
       console.error('Failed to copy link:', error);
     }
   };
+
+  if (appearance === 'label') {
+    return (
+      <ActionButton
+        icon={copied ? CheckIcon : ShareIcon}
+        label={copied ? 'Link copied' : 'Share'}
+        onClick={handleShare}
+      />
+    );
+  }
 
   return (
     <ActionIconButton

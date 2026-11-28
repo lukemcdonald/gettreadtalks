@@ -15,10 +15,6 @@ interface ClipPageContentProps {
   params: Promise<{ clipSlug: string }>;
 }
 
-function hasClipBody({ clip, speaker, talk }: ClipBySlug) {
-  return Boolean(clip.description?.trim() || speaker || talk);
-}
-
 function ClipDetail({ data }: { data: ClipBySlug }) {
   const { clip, speaker, talk } = data;
   const segments = [
@@ -31,11 +27,7 @@ function ClipDetail({ data }: { data: ClipBySlug }) {
       <JsonLd data={buildBreadcrumbJsonLd(segments)} />
       <JsonLd data={buildClipJsonLd({ clip, speaker, talk })} />
       <EditorialProfileLayout
-        content={
-          hasClipBody(data) ? (
-            <ClipContent clip={clip} speaker={speaker} talk={talk} />
-          ) : undefined
-        }
+        content={<ClipContent clip={clip} speaker={speaker} talk={talk} />}
         hero={<ClipHero clip={clip} speaker={speaker} />}
       />
     </>

@@ -1,9 +1,19 @@
+import type { MetadataSidebarLayout } from '@/components/metadata-sidebar';
 import type { Clip } from '@/features/clips/types';
 import type { Speaker } from '@/features/speakers/types';
 import type { Talk } from '@/features/talks/types';
 
+import { AdminActionsGroup } from '@/components/admin-actions-group';
+import { AdminEditButton } from '@/components/admin-edit-button';
 import { FeaturedGrid } from '@/components/featured-grid';
 import { MetadataGroup } from '@/components/metadata-group';
+import {
+  MetadataSidebar,
+  MetadataSidebarActions,
+} from '@/components/metadata-sidebar';
+import { ProseParagraphs } from '@/components/prose-paragraphs';
+import { ScriptureGroup } from '@/components/scripture-group';
+import { ShareClipButton } from '@/features/clips/components/share-clip-button';
 import { SpeakerCard } from '@/features/speakers/components/speaker-card';
 import { buildSpeakerPath, getSpeakerName } from '@/features/speakers/utils';
 import { TalkCard } from '@/features/talks/components/talk-card';
@@ -14,35 +24,37 @@ interface ClipContentProps {
   talk: Talk | null;
 }
 
-function ClipAbout({ description }: { description: string }) {
+function ClipMetadataSidebar({
+  layout,
+  clip,
+  talk,
+}: Omit<ClipContentProps, 'speaker'> & { layout: MetadataSidebarLayout }) {
   return (
-    <MetadataGroup label="About">
-      <div className="text-muted-foreground space-y-4 text-sm leading-relaxed">
-        {description
-          .split(/\n+/u)
-          .filter(Boolean)
-          .map((paragraph) => (
-            <p key={paragraph}>{paragraph}</p>
-          ))}
-      </div>
-    </MetadataGroup>
+    <MetadataSidebar layout={layout}>
+      <MetadataGroup label="Actions">
+        <MetadataSidebarActions layout={layout}>
+          <ShareClipButton clip={clip} />
+        </MetadataSidebarActions>
+      </MetadataGroup>
+
+      <ScriptureGroup scripture={talk?.scripture} />
+
+      <AdminActionsGroup layout={layout}>
+        <AdminEditButton entity="clips" id={clip._id} />
+      </AdminActionsGroup>
+    </MetadataSidebar>
   );
 }
 
-function ClipRelatedCards({
+function ClipRelatedSections({
   speaker,
   talk,
-}: {
-  speaker: Speaker | null;
-  talk: Talk | null;
-}) {
-  const speakerName = getSpeakerName(speaker);
-
+}: Pick<ClipContentProps, 'speaker' | 'talk'>) {
   return (
-    <div className="space-y-8 lg:space-y-16">
+    <>
       {talk && (
         <FeaturedGrid
-          columns={{ default: 1 }}
+          columns={{ default: 1, lg: 2, md: 2, sm: 1, xl: 2 }}
           description="This clip is taken from a full talk."
           sticky
           title="From the Talk"
@@ -53,8 +65,8 @@ function ClipRelatedCards({
 
       {speaker && (
         <FeaturedGrid
-          columns={{ default: 1 }}
-          description={`Browse all talks by ${speakerName}.`}
+          columns={{ default: 1, lg: 2, md: 2, sm: 1, xl: 2 }}
+          description={`Browse all talks by ${getSpeakerName(speaker)}.`}
           quickLinks={[
             { href: buildSpeakerPath(speaker), label: 'View all talks' },
           ]}
@@ -64,24 +76,37 @@ function ClipRelatedCards({
           <SpeakerCard headingLevel={3} speaker={speaker} />
         </FeaturedGrid>
       )}
-    </div>
+    </>
   );
 }
 
 export function ClipContent({ clip, speaker, talk }: ClipContentProps) {
   const about = clip.description?.trim();
-  const related = <ClipRelatedCards speaker={speaker} talk={talk} />;
-
-  if (!about) {
-    return related;
-  }
 
   return (
-    <div className="grid grid-cols-1 gap-x-8 gap-y-12 lg:grid-cols-[1fr_280px]">
-      <div className="order-2 lg:order-1">{related}</div>
-      <aside className="order-1 lg:sticky lg:top-20 lg:order-2 lg:h-fit">
-        <ClipAbout description={about} />
-      </aside>
+    <div className="space-y-12 lg:space-y-16">
+      {about ? (
+        <div className="grid grid-cols-1 gap-x-8 gap-y-12 lg:grid-cols-[1fr_280px]">
+          <div className="order-2 lg:order-1">
+            <FeaturedGrid
+              columns={{ default: 1 }}
+              description="What this clip covers."
+              sticky
+              title="About"
+            >
+              <ProseParagraphs text={about} />
+            </FeaturedGrid>
+          </div>
+
+          <aside className="order-1 lg:sticky lg:top-20 lg:order-2 lg:h-fit">
+            <ClipMetadataSidebar clip={clip} layout="column" talk={talk} />
+          </aside>
+        </div>
+      ) : (
+        <ClipMetadataSidebar clip={clip} layout="row" talk={talk} />
+      )}
+
+      <ClipRelatedSections speaker={speaker} talk={talk} />
     </div>
   );
 }

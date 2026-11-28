@@ -1,16 +1,20 @@
+import type { MetadataSidebarLayout } from '@/components/metadata-sidebar';
 import type { Speaker } from '@/features/speakers/types';
 import type { Talk } from '@/features/talks/types';
 import type { Topic } from '@/features/topics/types';
 
-import { ExternalLinkIcon } from 'lucide-react';
-
-import { TalkAdminActions } from '@/app/talks/[speakerSlug]/[talkSlug]/_components/talk-admin-actions';
+import { AdminActionsGroup } from '@/components/admin-actions-group';
+import { AdminEditButton } from '@/components/admin-edit-button';
 import { MetadataGroup } from '@/components/metadata-group';
-import { Link } from '@/components/ui/link';
+import {
+  MetadataSidebar,
+  MetadataSidebarActions,
+} from '@/components/metadata-sidebar';
+import { ScriptureGroup } from '@/components/scripture-group';
+import { FeatureTalkButton } from '@/features/talks/components/feature-talk-button';
 import { TalkActions } from '@/features/talks/components/talk-actions';
 import { formatTalkFormat } from '@/features/talks/utils';
 import { TopicLinks } from '@/features/topics/components/topic-links';
-import { cn } from '@/utils';
 
 function TalkFormatGroup({ format }: { format: Talk['format'] }) {
   if (!format) {
@@ -25,41 +29,27 @@ function TalkFormatGroup({ format }: { format: Talk['format'] }) {
 }
 
 interface TalkMetadataSidebarProps {
-  className?: string;
+  layout: MetadataSidebarLayout;
   speaker: Speaker | null;
   talk: Talk;
   topics: Topic[];
 }
 
 export function TalkMetadataSidebar({
-  className,
+  layout,
   speaker,
   talk,
   topics,
 }: TalkMetadataSidebarProps) {
   return (
-    <div
-      className={cn(
-        'flex flex-col gap-8 sm:flex-row sm:flex-wrap sm:gap-12',
-        className
-      )}
-    >
+    <MetadataSidebar layout={layout}>
       <MetadataGroup label="Actions">
-        <TalkActions speaker={speaker} talk={talk} />
+        <MetadataSidebarActions layout={layout}>
+          <TalkActions speaker={speaker} talk={talk} />
+        </MetadataSidebarActions>
       </MetadataGroup>
 
-      {talk.scripture && (
-        <MetadataGroup label="Scripture">
-          <Link
-            className="bg-muted text-foreground hover:bg-muted/80 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm transition-colors"
-            href={`https://www.biblegateway.com/passage/?search=${encodeURIComponent(talk.scripture)}&version=ESV`}
-            target="_blank"
-          >
-            {talk.scripture}
-            <ExternalLinkIcon className="size-3.5" />
-          </Link>
-        </MetadataGroup>
-      )}
+      <ScriptureGroup scripture={talk.scripture} />
 
       {topics.length > 0 && (
         <MetadataGroup label="Topics">
@@ -69,7 +59,10 @@ export function TalkMetadataSidebar({
 
       <TalkFormatGroup format={talk.format} />
 
-      <TalkAdminActions speaker={speaker} talk={talk} />
-    </div>
+      <AdminActionsGroup layout={layout}>
+        <AdminEditButton entity="talks" id={talk._id} />
+        <FeatureTalkButton speaker={speaker} talk={talk} />
+      </AdminActionsGroup>
+    </MetadataSidebar>
   );
 }
