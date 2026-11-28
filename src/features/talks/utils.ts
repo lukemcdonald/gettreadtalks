@@ -3,6 +3,7 @@ import type { Speaker } from '@/features/speakers/types';
 import type { Talk, TalkId } from '@/features/talks/types';
 
 import { site } from '@/configs/site';
+import { slugify } from '@/convex/lib/utils';
 import { hasTalkTranscriptSource } from '@/convex/lib/videoUrl';
 import { buildAbsoluteUrl, buildPathQuery } from '@/lib/entities/paths';
 import {
@@ -250,4 +251,17 @@ export function buildTalkListItemsJsonLd(
       url,
     };
   });
+}
+
+const STUDY_TOP_HEADING_PATTERN = /^##[ \t]+(?<label>.+?)[ \t#]*$/gmu;
+
+/** Jump links for the study's `##` headings; ids match the anchors `TalkStudyContent` renders. */
+export function getStudyJumpLinks(markdown: string | null | undefined) {
+  return [...(markdown ?? '').matchAll(STUDY_TOP_HEADING_PATTERN)].map(
+    (match) => {
+      const label = match.groups?.label ?? '';
+
+      return { href: `#${slugify(label)}`, label };
+    }
+  );
 }

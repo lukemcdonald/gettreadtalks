@@ -10,6 +10,7 @@ import {
   formatTalkFormat,
   formatTalkMetaDescription,
   getEditTalkTab,
+  getStudyJumpLinks,
   isTranscriptFetchCoolingDown,
   shouldAutoFetchTalkTranscript,
 } from './utils';
@@ -191,5 +192,38 @@ describe('formatTalkMetaDescription', () => {
     expect(
       formatTalkMetaDescription('Justification is a gift,\n\nnot a wage.')
     ).toBe('Justification is a gift, not a wage.');
+  });
+});
+
+describe('getStudyJumpLinks', () => {
+  it('links each top-level heading in order and ignores deeper ones', () => {
+    const body = [
+      '## Main points',
+      '### A father who runs',
+      'Body.',
+      '## Key passages',
+      '#### Luke 15:20',
+      '## Questions',
+      '- One?',
+      '## Next step',
+    ].join('\n');
+
+    expect(getStudyJumpLinks(body)).toEqual([
+      { href: '#main-points', label: 'Main points' },
+      { href: '#key-passages', label: 'Key passages' },
+      { href: '#questions', label: 'Questions' },
+      { href: '#next-step', label: 'Next step' },
+    ]);
+  });
+
+  it('builds clean slugs from punctuation and extra spaces', () => {
+    expect(getStudyJumpLinks("##   What now?  It's yours!  ")).toEqual([
+      { href: '#what-now-its-yours', label: "What now?  It's yours!" },
+    ]);
+  });
+
+  it('returns no links for empty or missing Markdown', () => {
+    expect(getStudyJumpLinks('')).toEqual([]);
+    expect(getStudyJumpLinks(null)).toEqual([]);
   });
 });
